@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "claim_id": "native-memory-lifecycle-20260919",
+  "component_ids": [
+    "ai-memory"
+  ],
+  "kind": "native_cli_e2e",
+  "observed_at": "2026-09-19T21:43:10Z",
+  "status": "passed_scoped_acceptance",
+  "scope": "Disposable fixture only: explicit project routing, TTL/search visibility, ingestion-time version lookup, scoped sweep and deletion.",
+  "native": {
+    "repository": "https://github.com/akitaonrails/ai-memory",
+    "version": "2.3.1",
+    "release": "v2.3.1",
+    "release_source_commit": "5b2426f73db69ee45a6805dabf74b061ed2c63dd",
+    "binary_sha256": "6596b4d0cb0fc9b259be2487c9207001894ce07e137832665237a003a99ca20e",
+    "binary_unchanged": true,
+    "exit_code": 0,
+    "advertised_mcp_tools": 23,
+    "protocol_requests": 33,
+    "tool_calls": 31
+  },
+  "native_commands": [
+    [
+      "ai-memory",
+      "--version"
+    ],
+    [
+      "ai-memory",
+      "--data-dir",
+      "/run/data",
+      "--config",
+      "/run/config.toml",
+      "serve",
+      "--transport",
+      "stdio",
+      "--no-watcher",
+      "--workspace",
+      "lifecycle",
+      "--project",
+      "alpha"
+    ]
+  ],
+  "protocol": {
+    "transport": "stdio",
+    "version": "2025-03-26",
+    "sequence": "initialize; notifications/initialized; tools/list; 31 tools/call requests",
+    "retained_requests_sha256": "a006d8d48bdafb773f89d784dba945c006ab384170be32a1fe0a4322ed2e5b65",
+    "retained_schema_sha256": "477728305baed636bc96ec634b408e0d24fa35af933282f46ca492be30e70c61"
+  },
+  "results": {
+    "passed": true,
+    "tool_calls": 31,
+    "checks": {
+      "alpha_search_beta": true,
+      "beta_search_alpha": true,
+      "expired_default": true,
+      "old_now": true,
+      "new_as_of": true,
+      "expired_after_sweep": true,
+      "deleted_now": true,
+      "deleted_as_of": true,
+      "expired_explicit": true,
+      "future_default": true,
+      "new_now": true,
+      "old_as_of": true,
+      "expired_after_preview": true,
+      "future_after_sweep": true,
+      "explicit_project_bodies": true,
+      "expired_direct_read_still_available": true,
+      "expired_is_pinned": true,
+      "as_of_selects_original_version": true,
+      "as_of_fts_active": true,
+      "sweep_preview_preserves_expired": true,
+      "sweep_deletes_expired_pinned": true,
+      "explicit_delete": true,
+      "no_imported_observations": true
+    },
+    "expected_protocol_rejections": {
+      "missing_scope": {
+        "code": -32603,
+        "message": "project 'absent' not found in workspace 'lifecycle'"
+      },
+      "invalid_combined_scope": {
+        "code": -32603,
+        "message": "global cannot be combined with workspace/project/scopes"
+      },
+      "invalid_expiry": {
+        "code": -32603,
+        "message": "invalid expires_at in frontmatter for notes/invalid-expiry.md (want RFC3339 or YYYY-MM-DD): not-a-date"
+      }
+    },
+    "retrieval_hit_counts": {
+      "alpha_search_beta": 0,
+      "beta_search_alpha": 0,
+      "expired_default": 0,
+      "old_now": 0,
+      "new_as_of": 0,
+      "expired_after_sweep": 0,
+      "deleted_now": 0,
+      "deleted_as_of": 0,
+      "expired_explicit": 1,
+      "future_default": 1,
+      "new_now": 1,
+      "old_as_of": 1,
+      "expired_after_preview": 1,
+      "future_after_sweep": 1
+    },
+    "sweep": {
+      "preview_expired_deleted": false,
+      "apply_expired_deleted": true,
+      "native_hard_deleted_counter": 0
+    },
+    "expired_direct_read_available_before_sweep": true,
+    "status_counts_native_scope": {
+      "pages_latest": 2,
+      "pages_all": 2,
+      "sessions": 0,
+      "observations": 0
+    }
+  },
+  "isolation": {
+    "mechanism": "bubblewrap --unshare-all --clearenv --die-with-parent; only fresh output writable and native binary/system runtime/driver readonly",
+    "home": "fresh fixture directory",
+    "network_interfaces": [
+      "lo"
+    ],
+    "environment_keys": [
+      "HOME",
+      "LANG",
+      "PATH",
+      "PWD"
+    ],
+    "llm": "not configured",
+    "embedding_provider": "none",
+    "watcher": false,
+    "backfill_on_start": false,
+    "run_autowire": false,
+    "maintenance": false,
+    "auto_improve_scheduler": false,
+    "real_memory_or_authentication_stores_mounted": false,
+    "namespace_record_sha256": "25d24d874aa3a879a2155bbd967c6f22e6bac3b35078954db8993aa651761fa4",
+    "mountinfo_sha256": "a39063dfe00d3cc2ab32249a8a3bf5d35adb80cc6a8647e76924fe734ca1d495",
+    "config_sha256": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11"
+  },
+  "source_manifest": [
+    {
+      "path": "crates/ai-memory-cli/src/config.rs",
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/5b2426f73db69ee45a6805dabf74b061ed2c63dd/crates/ai-memory-cli/src/config.rs",
+      "sha256": "a802ba824b2058fa1de5f9b1cbc3ae0d65a5e023bedd095231b30bb78e74c7e3",
+      "bytes": 150147
+    },
+    {
+      "path": "crates/ai-memory-mcp/src/server.rs",
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/5b2426f73db69ee45a6805dabf74b061ed2c63dd/crates/ai-memory-mcp/src/server.rs",
+      "sha256": "c8fe56966aaca77efb62fc342c0eadf70dc7fcbea05fc068dcd846f5deac35e9",
+      "bytes": 511384
+    },
+    {
+      "path": "docs/temporal.md",
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/5b2426f73db69ee45a6805dabf74b061ed2c63dd/docs/temporal.md",
+      "sha256": "e580ebd57313ac5aa1609529acabbb8249876bbc9e4816a9ee62191bc47cf326",
+      "bytes": 7537
+    }
+  ],
+  "raw_evidence_hashes": {
+    "acceptance.json": "5fb7b2e95e1fa377cf2103137a42436ecf1e3863a052c34bbafd50e3271a5a82",
+    "as-of.json": "52d25d614f5270fca6f904b11341da44902ac15a7a6516d50784a2d6f918778f",
+    "command.private.json": "e660cec809a7d4e537698cee184302b3e62a8bfebdb911eed4c0756089ea378d",
+    "config.toml": "cf748d3f115d7d604cf00bede77dc02a7950e92d6b6cfa7c59f37b572b7c8b11",
+    "driver.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "driver.stdout": "6a47559900c47b848f27e5e09d49e50f87e2cb94a20ddf5b15c19eb5274ea6d7",
+    "mountinfo.txt": "a39063dfe00d3cc2ab32249a8a3bf5d35adb80cc6a8647e76924fe734ca1d495",
+    "namespace.json": "25d24d874aa3a879a2155bbd967c6f22e6bac3b35078954db8993aa651761fa4",
+    "outcomes.json": "ac3138f7fad7bf7ee1ee98b7df161ad474dde618d08f04cbf2727495893a3750",
+    "protocol.jsonl": "3187f58b9c7170d8a59ee130204cb2d70262b37a9243dff5daf68c9638b6fbce",
+    "records.json": "a006d8d48bdafb773f89d784dba945c006ab384170be32a1fe0a4322ed2e5b65",
+    "server-argv.json": "e163e9c1feae3391f98062fb0e3bbc1a7e4d3e6f9f9736d63d49ed134380a7f6",
+    "server.stderr": "eadfe95b99c833fcd7ebbccb6ec5dbed8fcd8081f5d9059f76cf3221327455f7",
+    "shutdown.json": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce",
+    "tools.json": "477728305baed636bc96ec634b408e0d24fa35af933282f46ca492be30e70c61",
+    "version.json": "514f2672323eca1227e94c406829d031cc5abfa8f5ea2bb9c2e6ff6cb72ec1b8"
+  },
+  "public_outcomes": {
+    "path": "blueprints/us-equities/memory-lifecycle/outcomes.json",
+    "sha256": "fff42297d32a773fa4026b53d293afb8cbc09fd6cbbc233f9fc345679d3a01de",
+    "normalization": "Native page identifiers consistently replaced by fixture aliases; Git checkpoint identifiers omitted; native bodies/counts/errors preserved."
+  },
+  "attempts": [
+    {
+      "name": "schema discovery",
+      "native_exit_code": 0,
+      "tool_calls": 0
+    },
+    {
+      "name": "first lifecycle fixture",
+      "native_exit_code": 0,
+      "tool_calls": 31,
+      "note": "Preserved privately; replayed once after adding namespace evidence and assertion reporting."
+    },
+    {
+      "name": "final lifecycle fixture",
+      "native_exit_code": 0,
+      "tool_calls": 31
+    }
+  ],
+  "limitations": [
+    "No live store or client hooks were exercised; this does not certify all current Codex/Claude sessions.",
+    "Project routing is not authentication or tenant authorization. This fixture deliberately permits creating its two projects.",
+    "An already expired pinned page is hidden from default query, but exact-path read and include_expired can read it until explicit sweep; TTL alone is not immediate access revocation.",
+    "as_of selects ingestion-time versions; it is not real-world/market valid time and does not reproduce historical BM25 ranking.",
+    "Deletion removes current and as_of query results. Git checkpoints and backups can retain historical content; secure erasure was not tested.",
+    "31 calls are a small deterministic fixture, not a memory retrieval-quality benchmark or an application-level answer evaluation.",
+    "No provider inference, write-path LLM, semantic embedding, scheduler, secure multi-tenant access, restart durability, or net provider token saving was measured.",
+    "Tests cover an already-expired timestamp and a future timestamp, not passage of a short TTL across the wall-clock boundary.",
+    "Linux/WSL Bubblewrap recipe; macOS and Windows native execution require separately accepted isolation."
+  ],
+  "provider_usage": {
+    "model_calls": 0,
+    "token_savings": null,
+    "reason": "No provider calls; tool/context compression counters were not measured."
+  }
+}

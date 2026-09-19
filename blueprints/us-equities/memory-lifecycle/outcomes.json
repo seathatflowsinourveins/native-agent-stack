@@ -1,0 +1,390 @@
+{
+  "write_alpha": {
+    "jsonrpc": "2.0",
+    "id": 3,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"page_id\": \"fixture-id-1\",\n  \"path\": \"notes/routing.md\"\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_beta": {
+    "jsonrpc": "2.0",
+    "id": 4,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"page_id\": \"fixture-id-2\",\n  \"path\": \"notes/routing.md\"\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "alpha_read": {
+    "jsonrpc": "2.0",
+    "id": 5,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"path\": \"notes/routing.md\",\n  \"title\": \"Alpha routing\",\n  \"body\": \"# Alpha routing\\nCobaltquartz is an alpha fixture only.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.1\",\n      \"at\": \"2026-09-19T21:43:10Z\"\n    }\n  }\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "beta_read": {
+    "jsonrpc": "2.0",
+    "id": 6,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"path\": \"notes/routing.md\",\n  \"title\": \"Beta routing\",\n  \"body\": \"# Beta routing\\nAmbermeadow is a beta fixture only.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.1\",\n      \"at\": \"2026-09-19T21:43:10Z\"\n    }\n  }\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "alpha_search_beta": {
+    "jsonrpc": "2.0",
+    "id": 7,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"hits\": []\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "beta_search_alpha": {
+    "jsonrpc": "2.0",
+    "id": 8,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"hits\": []\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "missing_scope": {
+    "jsonrpc": "2.0",
+    "id": 9,
+    "error": {
+      "code": -32603,
+      "message": "project 'absent' not found in workspace 'lifecycle'"
+    }
+  },
+  "invalid_combined_scope": {
+    "jsonrpc": "2.0",
+    "id": 10,
+    "error": {
+      "code": -32603,
+      "message": "global cannot be combined with workspace/project/scopes"
+    }
+  },
+  "write_expired": {
+    "jsonrpc": "2.0",
+    "id": 11,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"page_id\": \"fixture-id-3\",\n  \"path\": \"notes/expired.md\"\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "expired_default": {
+    "jsonrpc": "2.0",
+    "id": 12,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"hits\": []\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "expired_explicit": {
+    "jsonrpc": "2.0",
+    "id": 13,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-3\",\n      \"path\": \"notes/expired.md\",\n      \"title\": \"Expired fixture\",\n      \"snippet\": \"# Expired fixture\\n<mark>Violetcedar</mark> is temporary.\\n\",\n      \"rank\": -0.01934426229508197\n    }\n  ]\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "expired_direct_read": {
+    "jsonrpc": "2.0",
+    "id": 14,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"path\": \"notes/expired.md\",\n  \"title\": \"Expired fixture\",\n  \"body\": \"# Expired fixture\\nVioletcedar is temporary.\\n\",\n  \"frontmatter\": {\n    \"pinned\": true,\n    \"expires_at\": \"2000-01-01T00:00:00Z\",\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"stale_after\": \"2000-01-01T00:00:00Z\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.1\",\n      \"at\": \"2026-09-19T21:43:10Z\"\n    }\n  }\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_future": {
+    "jsonrpc": "2.0",
+    "id": 15,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"page_id\": \"fixture-id-4\",\n  \"path\": \"notes/future.md\"\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "future_default": {
+    "jsonrpc": "2.0",
+    "id": 16,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-4\",\n      \"path\": \"notes/future.md\",\n      \"title\": \"Future fixture\",\n      \"snippet\": \"# Future fixture\\n<mark>Saffronwillow</mark> is retained.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "invalid_expiry": {
+    "jsonrpc": "2.0",
+    "id": 17,
+    "error": {
+      "code": -32603,
+      "message": "invalid expires_at in frontmatter for notes/invalid-expiry.md (want RFC3339 or YYYY-MM-DD): not-a-date"
+    }
+  },
+  "write_old": {
+    "jsonrpc": "2.0",
+    "id": 18,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"page_id\": \"fixture-id-5\",\n  \"path\": \"notes/revision.md\"\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "write_new": {
+    "jsonrpc": "2.0",
+    "id": 19,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"page_id\": \"fixture-id-6\",\n  \"path\": \"notes/revision.md\"\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "old_now": {
+    "jsonrpc": "2.0",
+    "id": 20,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"hits\": []\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "new_now": {
+    "jsonrpc": "2.0",
+    "id": 21,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-6\",\n      \"path\": \"notes/revision.md\",\n      \"title\": \"Revision fixture\",\n      \"snippet\": \"# Revision fixture\\n<mark>Goldenharbor</mark> is the replacement selection.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "old_as_of": {
+    "jsonrpc": "2.0",
+    "id": 22,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-5\",\n      \"path\": \"notes/revision.md\",\n      \"title\": \"Revision fixture\",\n      \"snippet\": \"# Revision fixture\\n<mark>Silverorchard</mark> was the original selection.\\n\",\n      \"rank\": -0.018032786885245903,\n      \"score_details\": {\n        \"fts_rank\": 1,\n        \"fts_score\": -1.287314154184332,\n        \"rrf\": {\n          \"fts\": 0.01639344262295082,\n          \"vector\": 0.0,\n          \"graph\": 0.0,\n          \"entity\": 0.0\n        },\n        \"fused\": 0.01639344262295082,\n        \"authority\": 1.1\n      }\n    }\n  ],\n  \"streams_active\": [\n    \"entity\",\n    \"fts\"\n  ]\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "new_as_of": {
+    "jsonrpc": "2.0",
+    "id": 23,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"hits\": [],\n  \"streams_active\": [\n    \"entity\",\n    \"fts\"\n  ]\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "sweep_preview": {
+    "jsonrpc": "2.0",
+    "id": 24,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"dry_run\": true,\n  \"candidates_evaluated\": 4,\n  \"evicted\": [],\n  \"expired\": [\n    {\n      \"id\": \"fixture-id-3\",\n      \"path\": \"notes/expired.md\",\n      \"expired_at\": \"2000-01-01T00:00:00Z\",\n      \"deleted\": false\n    }\n  ],\n  \"hard_deleted\": 0,\n  \"observations_prunable\": 0,\n  \"observations_pruned\": 0,\n  \"observation_prune_sessions\": 0,\n  \"observation_prune_batches\": 0\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "expired_after_preview": {
+    "jsonrpc": "2.0",
+    "id": 25,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-3\",\n      \"path\": \"notes/expired.md\",\n      \"title\": \"Expired fixture\",\n      \"snippet\": \"# Expired fixture\\n<mark>Violetcedar</mark> is temporary.\\n\",\n      \"rank\": -0.01934426229508197\n    }\n  ]\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "sweep_apply": {
+    "jsonrpc": "2.0",
+    "id": 26,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"dry_run\": false,\n  \"candidates_evaluated\": 4,\n  \"evicted\": [],\n  \"expired\": [\n    {\n      \"id\": \"fixture-id-3\",\n      \"path\": \"notes/expired.md\",\n      \"expired_at\": \"2000-01-01T00:00:00Z\",\n      \"deleted\": true\n    }\n  ],\n  \"hard_deleted\": 0,\n  \"observations_prunable\": 0,\n  \"observations_pruned\": 0,\n  \"observation_prune_sessions\": 0,\n  \"observation_prune_batches\": 0\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "expired_after_sweep": {
+    "jsonrpc": "2.0",
+    "id": 27,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"hits\": []\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "future_after_sweep": {
+    "jsonrpc": "2.0",
+    "id": 28,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"hits\": [\n    {\n      \"id\": \"fixture-id-4\",\n      \"path\": \"notes/future.md\",\n      \"title\": \"Future fixture\",\n      \"snippet\": \"# Future fixture\\n<mark>Saffronwillow</mark> is retained.\\n\",\n      \"rank\": -0.018032786885245903\n    }\n  ]\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "delete_revision": {
+    "jsonrpc": "2.0",
+    "id": 29,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"path\": \"notes/revision.md\",\n  \"deleted\": true\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "deleted_now": {
+    "jsonrpc": "2.0",
+    "id": 30,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"hits\": []\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "deleted_as_of": {
+    "jsonrpc": "2.0",
+    "id": 31,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"hits\": []\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "beta_after_alpha_mutations": {
+    "jsonrpc": "2.0",
+    "id": 32,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"path\": \"notes/routing.md\",\n  \"title\": \"Beta routing\",\n  \"body\": \"# Beta routing\\nAmbermeadow is a beta fixture only.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.1\",\n      \"at\": \"2026-09-19T21:43:10Z\"\n    }\n  }\n}"
+        }
+      ],
+      "isError": false
+    }
+  },
+  "status": {
+    "jsonrpc": "2.0",
+    "id": 33,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\n  \"counts\": {\n    \"pages_latest\": 2,\n    \"pages_all\": 2,\n    \"sessions\": 0,\n    \"observations\": 0\n  }\n}"
+        }
+      ],
+      "isError": false
+    }
+  }
+}

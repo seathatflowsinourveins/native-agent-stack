@@ -1,0 +1,1091 @@
+{
+  "schema_version": 1,
+  "kind": "research_supplement",
+  "checked_at": "2026-09-19",
+  "base_commit": "4898871620fb2b3e4e8c80756b0c9b3039a292bf",
+  "scope": "Bounded foundation convergence: native tool context, memory lifecycle, retrieval, SDK protocol and Mac/WSL portability. This is not an exhaustive landscape or a global install list.",
+  "method": {
+    "rounds": [
+      {
+        "round": 1,
+        "selection": "Five incumbent identities; refresh exact pins/releases and inspect missing lifecycle/hook-budget boundaries. Reuse unchanged Context Mode/QMD prior review explicitly.",
+        "actionable_result": "Disposable ai-memory routing/TTL/as_of acceptance selected and executed; RTK Codex rewrite classification requires a separate adoption gate."
+      },
+      {
+        "round": 2,
+        "selection": "Five SDK/memory/Mac embedding comparators plus three pinned discovery lists. Inspect implementation and targeted regression tests, not README scores.",
+        "actionable_result": "Embedding identity/mixed-index migration, scope-before-ranking and protocol-cancellation contracts remain useful gaps. No replacement justified for the accepted record of memory."
+      }
+    ],
+    "quality_criteria": [
+      "specific uncovered capability",
+      "native API and integration boundary",
+      "pinned implementation plus meaningful tests",
+      "license and dependency/platform fit",
+      "maintenance/release dates separated from measured quality",
+      "duplicate service and write-path cost",
+      "actual failure and fallback visibility"
+    ],
+    "newly_captured_source_files": 59,
+    "reused_source_files": 10,
+    "new_provider_calls": 0,
+    "new_installs": 0,
+    "stopping_evidence": "Two bounded rounds completed. The screened challengers add conditional capabilities but none justifies a second durable store or unmeasured encoder upgrade. Three benchmark/workflow leads remain discovery-only, so universal saturation is explicitly not claimed.",
+    "public_star_audit": "Parent-owned full-star enumeration is an identity audit only; this lane uses the prior decision index for membership and does not count it as deep source review."
+  },
+  "repositories": [
+    {
+      "repository": "akitaonrails/ai-memory",
+      "url": "https://github.com/akitaonrails/ai-memory",
+      "round": 1,
+      "decision": "retain",
+      "evidence_level": "native_lifecycle_acceptance",
+      "gap_addressed": "Durable memory lifecycle and explicit project scope",
+      "rationale": "The disposable native 2.3.1 fixture closes a routing/TTL/ingestion-time lifecycle evidence gap without changing the accepted store. Retain one cross-harness memory of record.",
+      "limitations": "TTL hides default search but an exact-path read still returns expired content until sweep. Deletion removes current/as_of retrieval, not necessarily Git or backup history. Autonomous improvement remains off; require_approval defaults false in inspected source when a configured reviewer is used.",
+      "platform_evidence": "Actual Linux/WSL Bubblewrap+native stdio acceptance. Mac/Windows require their own isolation and native run.",
+      "source_commit": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+      "source_commit_date": "2026-09-19T18:42:42Z",
+      "source_license": "MIT",
+      "latest_release": {
+        "tag": "v2.3.1",
+        "published_at": "2026-09-17T18:26:44Z",
+        "url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.1"
+      },
+      "archived": false,
+      "prior_index_public_star": true,
+      "selected_sources": [
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "crates/ai-memory-mcp/src/server.rs",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/crates/ai-memory-mcp/src/server.rs",
+          "sha256": "b9cbe00cebae965a1769d0de3aab44cd9e7519527dbc2a90628bbf3fb76cfc1d",
+          "bytes": 525440,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "docs/temporal.md",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/docs/temporal.md",
+          "sha256": "e580ebd57313ac5aa1609529acabbb8249876bbc9e4816a9ee62191bc47cf326",
+          "bytes": 7537,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "crates/ai-memory-mcp/tests/suite/admin_write_page.rs",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/crates/ai-memory-mcp/tests/suite/admin_write_page.rs",
+          "sha256": "90402b6cfefc35c1c2e9c56371ed94558be4d50b94f1fd9f174c4c6404ca22ba",
+          "bytes": 10079,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "crates/ai-memory-mcp/tests/suite/admin_read_page.rs",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/crates/ai-memory-mcp/tests/suite/admin_read_page.rs",
+          "sha256": "1c846246c09abf05d229d74f81ed308729e669e856ac978dae47a03c862d000d",
+          "bytes": 8605,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/README.md",
+          "sha256": "c9e3866c3863ead80e6f61509c3f6b9fcccdae3fd356b126902322bed9a106e1",
+          "bytes": 23603,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/LICENSE",
+          "sha256": "18332c61780ce8e694d4fa330770cd4d8c85e33f47ac13a80d72d70bb032ae72",
+          "bytes": 1068,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "crates/ai-memory-cli/src/main.rs",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/crates/ai-memory-cli/src/main.rs",
+          "sha256": "fc71cf9771543b1ad896f48dae94a84d81cc9a8cba874e4246c6784850d2e753",
+          "bytes": 1720,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "crates/ai-memory-cli/src/cli.rs",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/crates/ai-memory-cli/src/cli.rs",
+          "sha256": "9adac107ff35b9a7591164d3e43a16d0d5a4764875577d4027a23aa51bb31b99",
+          "bytes": 143557,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "crates/ai-memory-cli/src/config.rs",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/crates/ai-memory-cli/src/config.rs",
+          "sha256": "a802ba824b2058fa1de5f9b1cbc3ae0d65a5e023bedd095231b30bb78e74c7e3",
+          "bytes": 150147,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "crates/ai-memory-cli/src/commands/write_page.rs",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/crates/ai-memory-cli/src/commands/write_page.rs",
+          "sha256": "330aa934c0e8c3c27c864a7afd8ea96c77d9e9ae54c6215beb9c3e9db7791820",
+          "bytes": 2516,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "crates/ai-memory-cli/src/commands/read_page.rs",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/crates/ai-memory-cli/src/commands/read_page.rs",
+          "sha256": "55eadd037d0e735824341c7aab5d072624d5fb48fbb45f00e066320a5eef36a9",
+          "bytes": 2532,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "crates/ai-memory-cli/src/commands/search.rs",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/crates/ai-memory-cli/src/commands/search.rs",
+          "sha256": "673922da2868ae6cca55261dc3c160fe93a0db3dac5ec20c859fdc5fb04eb1d0",
+          "bytes": 1744,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "crates/ai-memory-cli/src/commands/forget_sweep.rs",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/crates/ai-memory-cli/src/commands/forget_sweep.rs",
+          "sha256": "d0c416905e3c838cf120751985271b2cdbf5ba97ce4d87d7d7ee428dfb74eec7",
+          "bytes": 1221,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "crates/ai-memory-cli/src/commands/delete_page.rs",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/crates/ai-memory-cli/src/commands/delete_page.rs",
+          "sha256": "d8f1f9b606cfeb57be5c0af86d8a1d9fd1ebb02ff8121257836c0e5c7429b7ed",
+          "bytes": 2041,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "crates/ai-memory-cli/src/commands/pending_writes.rs",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/crates/ai-memory-cli/src/commands/pending_writes.rs",
+          "sha256": "d5448cf492f6270799b87443e4e447ebc5e1484e909835ea84b897afd839e0ed",
+          "bytes": 5148,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "docs/auto-scope.md",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/docs/auto-scope.md",
+          "sha256": "07d4c1d35422857abc2cb7685f1c76cc455f0c30bb192f0e256f741dd69cea8e",
+          "bytes": 14566,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "akitaonrails/ai-memory",
+          "pin": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+          "path": "docs/auto-improvement-loop.md",
+          "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/docs/auto-improvement-loop.md",
+          "sha256": "16f074cd9f57f323a7983846a08fa618a1e43fcfd4f4217f90cc6a72ed3e66cd",
+          "bytes": 30303,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        }
+      ],
+      "native_acceptance": [
+        {
+          "command": "python3 blueprints/us-equities/memory-lifecycle/run.py --binary \"$AI_MEMORY_BINARY\" --out \"$NEW_PRIVATE_RUN_DIRECTORY\"",
+          "status": "executed_by_this_wave",
+          "scope": "disposable upstream MCP lifecycle",
+          "requires": "new empty private run; native Linux executable; Python3.11+; Bubblewrap"
+        }
+      ],
+      "receipt": "blueprints/us-equities/memory-lifecycle/receipt.json"
+    },
+    {
+      "repository": "mksglu/context-mode",
+      "url": "https://github.com/mksglu/context-mode",
+      "round": 1,
+      "decision": "retain",
+      "evidence_level": "pinned_primary_source_reuse",
+      "gap_addressed": "Bounded tool-output retrieval and client hooks",
+      "rationale": "Refresh confirms the previously inspected pin is unchanged. Keep native output indexing and retrieval; do not stack a second lossy compressor on the same artifact.",
+      "limitations": "Main is newer than the installed 1.0.169 artifact even though its package version matches. Main project-containment tests do not certify installed behavior. Elastic-2.0 source license is distinct from hosted-service rights; counters estimate context reduction, not provider billing.",
+      "platform_evidence": "Prior Linux/WSL native tools/hooks accepted; upstream Linux/macOS/Windows matrix is source evidence only. PreCompact remains a separate lifecycle gate.",
+      "source_commit": "5283a70780305994433cb65d6a0275386e797172",
+      "source_commit_date": "2026-09-19T12:05:40Z",
+      "source_license": "Elastic-2.0",
+      "latest_release": {
+        "tag": "v1.0.169",
+        "published_at": "2026-06-29T18:18:53Z",
+        "url": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169"
+      },
+      "archived": false,
+      "prior_index_public_star": true,
+      "selected_sources": [
+        {
+          "repository": "mksglu/context-mode",
+          "pin": "5283a70780305994433cb65d6a0275386e797172",
+          "path": "README.md",
+          "url": "https://github.com/mksglu/context-mode/blob/5283a70780305994433cb65d6a0275386e797172/README.md",
+          "sha256": "9308e09043c4746340662e7a72e68de155fc28d70a1dd316f5ff292596076d04",
+          "bytes": 94871,
+          "review": "reused prior selected-source review at freshly confirmed unchanged pin"
+        },
+        {
+          "repository": "mksglu/context-mode",
+          "pin": "5283a70780305994433cb65d6a0275386e797172",
+          "path": "LICENSE",
+          "url": "https://github.com/mksglu/context-mode/blob/5283a70780305994433cb65d6a0275386e797172/LICENSE",
+          "sha256": "92f11a867c41c9e575ccb978ff205ae2011c244a14aa3c576e914e537105caa0",
+          "bytes": 3840,
+          "review": "reused prior selected-source review at freshly confirmed unchanged pin"
+        },
+        {
+          "repository": "mksglu/context-mode",
+          "pin": "5283a70780305994433cb65d6a0275386e797172",
+          "path": "docs/platform-support.md",
+          "url": "https://github.com/mksglu/context-mode/blob/5283a70780305994433cb65d6a0275386e797172/docs/platform-support.md",
+          "sha256": "6933f5b02f6a61bdb8bae85e9311d4599a989c888c38f7f65f0cd778ab3b4dac",
+          "bytes": 56264,
+          "review": "reused prior selected-source review at freshly confirmed unchanged pin"
+        },
+        {
+          "repository": "mksglu/context-mode",
+          "pin": "5283a70780305994433cb65d6a0275386e797172",
+          "path": "tests/security/project-boundary-852.test.ts",
+          "url": "https://github.com/mksglu/context-mode/blob/5283a70780305994433cb65d6a0275386e797172/tests/security/project-boundary-852.test.ts",
+          "sha256": "10f042cce9c1fa77af9d06a384eb141c703596bbc945c6e0fe472ab843f9fd0d",
+          "bytes": 8523,
+          "review": "reused prior selected-source review at freshly confirmed unchanged pin"
+        },
+        {
+          "repository": "mksglu/context-mode",
+          "pin": "5283a70780305994433cb65d6a0275386e797172",
+          "path": ".github/workflows/ci.yml",
+          "url": "https://github.com/mksglu/context-mode/blob/5283a70780305994433cb65d6a0275386e797172/.github/workflows/ci.yml",
+          "sha256": "e036684e82d00e6f612fdf1dded8ed687fb16e2c3af2ce289562db3de4b8f55e",
+          "bytes": 3105,
+          "review": "reused prior selected-source review at freshly confirmed unchanged pin"
+        },
+        {
+          "repository": "mksglu/context-mode",
+          "pin": "5283a70780305994433cb65d6a0275386e797172",
+          "path": "src/security.ts",
+          "url": "https://github.com/mksglu/context-mode/blob/5283a70780305994433cb65d6a0275386e797172/src/security.ts",
+          "sha256": "769a68f66f879c6d442a441ca69f4d58f84a6442742bfc5d02ab5f3fc7103468",
+          "bytes": 30724,
+          "review": "reused prior selected-source review at freshly confirmed unchanged pin"
+        }
+      ],
+      "native_acceptance": [
+        {
+          "command": "mcporter --config \"$MCPORTER_CONFIG\" call context-mode.ctx_doctor --args '{}' --output text --no-oauth",
+          "status": "prospective_unexecuted",
+          "scope": "selected upstream contract/diagnostic; not full application acceptance",
+          "requires": "prepared pinned upstream checkout and its declared development dependencies, or already installed named tool; native platform where applicable"
+        }
+      ]
+    },
+    {
+      "repository": "rtk-ai/rtk",
+      "url": "https://github.com/rtk-ai/rtk",
+      "round": 1,
+      "decision": "retain_conditional_hook_review",
+      "evidence_level": "pinned_primary_source_review",
+      "gap_addressed": "Command rewrite permissions and failure visibility",
+      "rationale": "Keep accepted RTK 0.49.0 and explicit output lanes. Develop now documents native Codex hook support with the shared permission-decision pipeline; stage a separate compatibility review before changing active hooks.",
+      "limitations": "Codex updatedInput requires protocol-level allow while native approval still runs. Upstream warns the classifier does not unwrap RTK, which can obscure wrapped mutating-command signals. Unsupported shell constructs defer to the original command. Main/develop source is not proof these semantics are in the installed release.",
+      "platform_evidence": "Native Rust implementation and byte-difference regression fixtures are inspected. Current Linux/WSL installation is historical evidence; no new Mac or Codex-hook activation here.",
+      "source_commit": "0924356b4caba4989607227b7c8824d3d8098719",
+      "source_commit_date": "2026-09-18T23:11:20Z",
+      "source_license": "Apache-2.0",
+      "latest_release": {
+        "tag": "v0.49.0",
+        "published_at": "2026-09-11T08:52:38Z",
+        "url": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0"
+      },
+      "archived": false,
+      "prior_index_public_star": true,
+      "selected_sources": [
+        {
+          "repository": "rtk-ai/rtk",
+          "pin": "0924356b4caba4989607227b7c8824d3d8098719",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/rtk-ai/rtk/0924356b4caba4989607227b7c8824d3d8098719/LICENSE",
+          "sha256": "4044ade9c21d8b084d3d16a03375cf3b7e166b946a327bb37a3fbbdb53287cfd",
+          "bytes": 10767,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "rtk-ai/rtk",
+          "pin": "0924356b4caba4989607227b7c8824d3d8098719",
+          "path": "hooks/codex/README.md",
+          "url": "https://raw.githubusercontent.com/rtk-ai/rtk/0924356b4caba4989607227b7c8824d3d8098719/hooks/codex/README.md",
+          "sha256": "3318d8912ab7ede93e57434f62ea8302ac75ffb35de4cb2a59d5c30214472dbd",
+          "bytes": 2800,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "rtk-ai/rtk",
+          "pin": "0924356b4caba4989607227b7c8824d3d8098719",
+          "path": "hooks/claude/README.md",
+          "url": "https://raw.githubusercontent.com/rtk-ai/rtk/0924356b4caba4989607227b7c8824d3d8098719/hooks/claude/README.md",
+          "sha256": "b8856e1a28f80cdc66367a722c9713e6f91c2a96a612a17979f93bdcaf8a13f2",
+          "bytes": 925,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "rtk-ai/rtk",
+          "pin": "0924356b4caba4989607227b7c8824d3d8098719",
+          "path": "src/hooks/decision.rs",
+          "url": "https://raw.githubusercontent.com/rtk-ai/rtk/0924356b4caba4989607227b7c8824d3d8098719/src/hooks/decision.rs",
+          "sha256": "9106ef9384fd4250dec83ae2e849c91387d9291743a7176b6a60534b89c78978",
+          "bytes": 17627,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "rtk-ai/rtk",
+          "pin": "0924356b4caba4989607227b7c8824d3d8098719",
+          "path": "src/hooks/hook_audit_cmd.rs",
+          "url": "https://raw.githubusercontent.com/rtk-ai/rtk/0924356b4caba4989607227b7c8824d3d8098719/src/hooks/hook_audit_cmd.rs",
+          "sha256": "a8ff70635ab39e5677b6b01ae6fede94c67fc2f2fd9f02686022190e1fbfe453",
+          "bytes": 10107,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "rtk-ai/rtk",
+          "pin": "0924356b4caba4989607227b7c8824d3d8098719",
+          "path": "tests/diff_byte_accuracy_test.rs",
+          "url": "https://raw.githubusercontent.com/rtk-ai/rtk/0924356b4caba4989607227b7c8824d3d8098719/tests/diff_byte_accuracy_test.rs",
+          "sha256": "60e2699aeea98e34fd3f2967c713c320ebe983e1b2871cb7aa730de22b04d01c",
+          "bytes": 2288,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        }
+      ],
+      "native_acceptance": [
+        {
+          "command": "cargo test --test diff_byte_accuracy_test",
+          "status": "prospective_unexecuted",
+          "scope": "selected upstream contract/diagnostic; not full application acceptance",
+          "requires": "prepared pinned upstream checkout and its declared development dependencies, or already installed named tool; native platform where applicable"
+        },
+        {
+          "command": "rtk hook audit --since 1",
+          "status": "prospective_unexecuted",
+          "scope": "selected upstream contract/diagnostic; not full application acceptance",
+          "requires": "prepared pinned upstream checkout and its declared development dependencies, or already installed named tool; native platform where applicable"
+        }
+      ]
+    },
+    {
+      "repository": "tobi/qmd",
+      "url": "https://github.com/tobi/qmd",
+      "round": 1,
+      "decision": "retain",
+      "evidence_level": "pinned_primary_source_reuse",
+      "gap_addressed": "Scoped lexical retrieval before costly query expansion",
+      "rationale": "Unchanged source pin and prior frozen benchmark justify retaining search/get with explicit scope and one stronger-keyword reformulation. Do not treat the baseline as robust full RAG acceptance.",
+      "limitations": "Historical 12-query raw-BM25 benchmark achieved 8/12 top-three hits and two empty results; 33 shared-index documents determine statistics although only 18 were eligible. New models or hybrid expansion need a separate held-out evaluation and full-corpus provenance.",
+      "platform_evidence": "Prior Linux/WSL scoped BM25 acceptance; Mac CI/source support requires host-specific SQLite/model verification. No current index was changed.",
+      "source_commit": "04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+      "source_commit_date": "2026-09-09T20:51:54Z",
+      "source_license": "MIT",
+      "latest_release": {
+        "tag": "v2.8.3",
+        "published_at": "2026-08-16T22:30:34Z",
+        "url": "https://github.com/tobi/qmd/releases/tag/v2.8.3"
+      },
+      "archived": false,
+      "prior_index_public_star": false,
+      "selected_sources": [
+        {
+          "repository": "tobi/qmd",
+          "pin": "04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+          "path": "README.md",
+          "url": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/README.md",
+          "sha256": "0b08e5c533fea7406def0613027249f49e9b5c3168689467d6b3f86cd9c0701f",
+          "bytes": 54049,
+          "review": "reused prior selected-source review at freshly confirmed unchanged pin"
+        },
+        {
+          "repository": "tobi/qmd",
+          "pin": "04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+          "path": "LICENSE",
+          "url": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/LICENSE",
+          "sha256": "24c446836e7e2cdea13a914de10c88c553e6297366061ba24013b8ce73c8f7fa",
+          "bytes": 1072,
+          "review": "reused prior selected-source review at freshly confirmed unchanged pin"
+        },
+        {
+          "repository": "tobi/qmd",
+          "pin": "04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+          "path": "src/store.ts",
+          "url": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/src/store.ts",
+          "sha256": "eca580b693b39ec285a14eca060fba9573c7d426a4a15d14a044a7043db7f7b7",
+          "bytes": 232221,
+          "review": "reused prior selected-source review at freshly confirmed unchanged pin"
+        },
+        {
+          "repository": "tobi/qmd",
+          "pin": "04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+          "path": ".github/workflows/ci.yml",
+          "url": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/.github/workflows/ci.yml",
+          "sha256": "0de772f7ed2b0edcce1213812fddade6576613365393ed0444e954b30ecd3461",
+          "bytes": 1788,
+          "review": "reused prior selected-source review at freshly confirmed unchanged pin"
+        }
+      ],
+      "native_acceptance": [
+        {
+          "command": "qmd --index \"$QMD_INDEX\" search \"$QUERY\" -c \"$QMD_COLLECTION\" -n 5 --json",
+          "status": "prospective_unexecuted",
+          "scope": "selected upstream contract/diagnostic; not full application acceptance",
+          "requires": "prepared pinned upstream checkout and its declared development dependencies, or already installed named tool; native platform where applicable"
+        },
+        {
+          "command": "qmd --index \"$QMD_INDEX\" get \"$DOCUMENT_ID\"",
+          "status": "prospective_unexecuted",
+          "scope": "selected upstream contract/diagnostic; not full application acceptance",
+          "requires": "prepared pinned upstream checkout and its declared development dependencies, or already installed named tool; native platform where applicable"
+        }
+      ]
+    },
+    {
+      "repository": "openai/codex",
+      "url": "https://github.com/openai/codex",
+      "round": 1,
+      "decision": "retain",
+      "evidence_level": "pinned_primary_source_review",
+      "gap_addressed": "Native hook context budget and raw recovery",
+      "rationale": "Keep native client/cache/tool-discovery behavior. Reviewed hook spiller caps model-visible additional context at a default approximate 2500 tokens and retains a full-file recovery path when writing succeeds.",
+      "limitations": "A zero limit disables the cap. A spill-write failure falls back to truncation without a saved full artifact. Reviewed main moved seven commits beyond the prior snapshot while stable remains 0.155.1; no new-main feature is claimed installed. UI preview changes are not provider token savings.",
+      "platform_evidence": "Existing native Linux CLI/paired worker acceptance remains historical. No fresh Desktop/macOS hook run in this lane.",
+      "source_commit": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+      "source_commit_date": "2026-09-19T20:41:55Z",
+      "source_license": "Apache-2.0",
+      "latest_release": {
+        "tag": "rust-v0.155.1",
+        "published_at": "2026-09-18T20:03:04Z",
+        "url": "https://github.com/openai/codex/releases/tag/rust-v0.155.1"
+      },
+      "archived": false,
+      "prior_index_public_star": false,
+      "selected_sources": [
+        {
+          "repository": "openai/codex",
+          "pin": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/openai/codex/daed4b9755a4215a149ae7e5538d8cd34709cb40/LICENSE",
+          "sha256": "d17f227e4df5da1600391338865ce0f3055211760a36688f816941d58232d8dc",
+          "bytes": 10926,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "openai/codex",
+          "pin": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+          "path": "codex-rs/hooks/src/output_spill.rs",
+          "url": "https://raw.githubusercontent.com/openai/codex/daed4b9755a4215a149ae7e5538d8cd34709cb40/codex-rs/hooks/src/output_spill.rs",
+          "sha256": "ec83fb20d3a0d56db3f64ef1a69669aed72a8fc14990051b7fb03ed5f519e852",
+          "bytes": 4485,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "openai/codex",
+          "pin": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+          "path": "codex-rs/hooks/src/output_spill_tests.rs",
+          "url": "https://raw.githubusercontent.com/openai/codex/daed4b9755a4215a149ae7e5538d8cd34709cb40/codex-rs/hooks/src/output_spill_tests.rs",
+          "sha256": "b0882b0336f85cdec3e6aecf405f6f374f178045d6518a2655ad49c79a295a50",
+          "bytes": 2881,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "openai/codex",
+          "pin": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+          "path": "codex-rs/hooks/src/engine/command_runner.rs",
+          "url": "https://raw.githubusercontent.com/openai/codex/daed4b9755a4215a149ae7e5538d8cd34709cb40/codex-rs/hooks/src/engine/command_runner.rs",
+          "sha256": "957758d4bf558b165fa52e81dfad2f3093681ba1c4344c5d60b1fb12de1d8c41",
+          "bytes": 14999,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        }
+      ],
+      "native_acceptance": [
+        {
+          "command": "cargo test --manifest-path codex-rs/hooks/Cargo.toml output_spill",
+          "status": "prospective_unexecuted",
+          "scope": "selected upstream contract/diagnostic; not full application acceptance",
+          "requires": "prepared pinned upstream checkout and its declared development dependencies, or already installed named tool; native platform where applicable"
+        }
+      ]
+    },
+    {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "url": "https://github.com/anthropics/claude-agent-sdk-python",
+      "round": 2,
+      "decision": "retain_native_cli_conditional_sdk",
+      "evidence_level": "pinned_primary_source_review",
+      "gap_addressed": "Preserve native settings, hooks and bounded tool access in workers",
+      "rationale": "Transport source omits setting-sources when unset, passes an empty list as --setting-sources=, and maps tools=[] to an empty base tool set. Skills options can default settings to user/project. Make worker policy explicit rather than assuming SDK defaults match native CLI.",
+      "limitations": "allowed_tools expresses approval patterns, not the available base tool set. Settings selection is not filesystem isolation. Windows transport refuses .cmd/.bat and prefers native executables. GitHub release 0.2.156 differs from publisher PyPI 0.2.157; neither is installed by this review.",
+      "platform_evidence": "Native Claude headless workflow already accepted separately. Selected Windows transport code and provider-backed upstream E2E tests are source evidence; no provider call was made here.",
+      "source_commit": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+      "source_commit_date": "2026-09-19T03:11:07Z",
+      "source_license": "MIT",
+      "latest_release": {
+        "tag": "v0.2.156",
+        "published_at": "2026-09-18T02:28:01Z",
+        "url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.156"
+      },
+      "archived": false,
+      "prior_index_public_star": true,
+      "selected_sources": [
+        {
+          "repository": "anthropics/claude-agent-sdk-python",
+          "pin": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/LICENSE",
+          "sha256": "cebdde8a8fb9ee59e5eaaed19578bf8085aa7047562259c31f38f225c26f6812",
+          "bytes": 1070,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "anthropics/claude-agent-sdk-python",
+          "pin": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+          "path": "src/claude_agent_sdk/_internal/transport/subprocess_cli.py",
+          "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/src/claude_agent_sdk/_internal/transport/subprocess_cli.py",
+          "sha256": "92eb1ba5291090388c9e845ad82b1a5ad0b1ca11f0abe76175fc55d9ace85f9e",
+          "bytes": 53514,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "anthropics/claude-agent-sdk-python",
+          "pin": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+          "path": "e2e-tests/test_agents_and_settings.py",
+          "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/e2e-tests/test_agents_and_settings.py",
+          "sha256": "f7e899b71a1216c0d2ec368532384e58b1140613c661434a84d0d73870cc580c",
+          "bytes": 14332,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "anthropics/claude-agent-sdk-python",
+          "pin": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+          "path": "e2e-tests/test_session_store_resume_settings.py",
+          "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/e2e-tests/test_session_store_resume_settings.py",
+          "sha256": "51cecde5d322c995f7b789dcdf48f6d44d4e0222160fb2ed082fa7885c2b49e5",
+          "bytes": 3619,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "anthropics/claude-agent-sdk-python",
+          "pin": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+          "path": "tests/test_transport.py",
+          "url": "https://raw.githubusercontent.com/anthropics/claude-agent-sdk-python/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/tests/test_transport.py",
+          "sha256": "1ad02c4e4c92ebd45d8258e8489582302dd60c24916337172ed8917689ae96f8",
+          "bytes": 117024,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        }
+      ],
+      "native_acceptance": [
+        {
+          "command": "uv run pytest tests/test_transport.py -k \"setting_sources or skills\"",
+          "status": "prospective_unexecuted",
+          "scope": "selected upstream contract/diagnostic; not full application acceptance",
+          "requires": "prepared pinned upstream checkout and its declared development dependencies, or already installed named tool; native platform where applicable"
+        }
+      ],
+      "publisher_package": {
+        "version": "0.2.157",
+        "uploaded": "2026-09-18T18:21:10.306259Z",
+        "url": "https://pypi.org/project/claude-agent-sdk/0.2.157/"
+      }
+    },
+    {
+      "repository": "modelcontextprotocol/python-sdk",
+      "url": "https://github.com/modelcontextprotocol/python-sdk",
+      "round": 2,
+      "decision": "conditional",
+      "evidence_level": "pinned_primary_source_review",
+      "gap_addressed": "MCP cancellation, concurrency and protocol-version compatibility",
+      "rationale": "A strong transport-conformance reference for future reusable tool adapters. Source tests correlate concurrent out-of-order responses and exercise cancellation/session survival across transports.",
+      "limitations": "The inspected v2-era Client/MCPServer surface differs from older SDK integrations. Legacy streamable HTTP cancellation has a terminal error response; newer/stream transports can abandon without one. Do not upgrade an installed integration transitively without its own contract replay.",
+      "platform_evidence": "Python >=3.10; selected tests are platform-neutral protocol contracts. No SDK install, transport service, or runtime upgrade executed.",
+      "source_commit": "6affe5c0d3588fd1705713b3703dc68015cfe3eb",
+      "source_commit_date": "2026-09-16T10:12:27Z",
+      "source_license": "MIT",
+      "latest_release": {
+        "tag": "v2.2.0",
+        "published_at": "2026-09-07T15:53:57Z",
+        "url": "https://github.com/modelcontextprotocol/python-sdk/releases/tag/v2.2.0"
+      },
+      "archived": false,
+      "prior_index_public_star": false,
+      "selected_sources": [
+        {
+          "repository": "modelcontextprotocol/python-sdk",
+          "pin": "6affe5c0d3588fd1705713b3703dc68015cfe3eb",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/modelcontextprotocol/python-sdk/6affe5c0d3588fd1705713b3703dc68015cfe3eb/LICENSE",
+          "sha256": "5e13dbbc1d120fc2a03cecde7c91424ae2d7de11b63d58ded2f4431e261ee50d",
+          "bytes": 1071,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "modelcontextprotocol/python-sdk",
+          "pin": "6affe5c0d3588fd1705713b3703dc68015cfe3eb",
+          "path": "pyproject.toml",
+          "url": "https://raw.githubusercontent.com/modelcontextprotocol/python-sdk/6affe5c0d3588fd1705713b3703dc68015cfe3eb/pyproject.toml",
+          "sha256": "847129cf40e418290eb0ff9b9a735d6d4ce5e158c9aa82e46f02c966f697aba6",
+          "bytes": 12713,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "modelcontextprotocol/python-sdk",
+          "pin": "6affe5c0d3588fd1705713b3703dc68015cfe3eb",
+          "path": "src/mcp/client/session.py",
+          "url": "https://raw.githubusercontent.com/modelcontextprotocol/python-sdk/6affe5c0d3588fd1705713b3703dc68015cfe3eb/src/mcp/client/session.py",
+          "sha256": "fb1365c908c0dfc65ad9b59f63d1f5d433153c5da050725f5f98450871fc9a39",
+          "bytes": 69388,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "modelcontextprotocol/python-sdk",
+          "pin": "6affe5c0d3588fd1705713b3703dc68015cfe3eb",
+          "path": "tests/client/test_session_concurrency.py",
+          "url": "https://raw.githubusercontent.com/modelcontextprotocol/python-sdk/6affe5c0d3588fd1705713b3703dc68015cfe3eb/tests/client/test_session_concurrency.py",
+          "sha256": "6aa40b0765e45df6304f10ce1ceeba30c1eea5d3d058a1f4b4d33efb11cd53ed",
+          "bytes": 6372,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "modelcontextprotocol/python-sdk",
+          "pin": "6affe5c0d3588fd1705713b3703dc68015cfe3eb",
+          "path": "tests/interaction/lowlevel/test_cancellation.py",
+          "url": "https://raw.githubusercontent.com/modelcontextprotocol/python-sdk/6affe5c0d3588fd1705713b3703dc68015cfe3eb/tests/interaction/lowlevel/test_cancellation.py",
+          "sha256": "eb682b22e7cf51003e9398d50357867913c17f8f464848babb6c93bed8c7901e",
+          "bytes": 22236,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        }
+      ],
+      "native_acceptance": [
+        {
+          "command": "uv run pytest tests/client/test_session_concurrency.py tests/interaction/lowlevel/test_cancellation.py",
+          "status": "prospective_unexecuted",
+          "scope": "selected upstream contract/diagnostic; not full application acceptance",
+          "requires": "prepared pinned upstream checkout and its declared development dependencies, or already installed named tool; native platform where applicable"
+        }
+      ],
+      "publisher_package": {
+        "version": "2.2.0",
+        "uploaded": "2026-09-07T16:06:23.439276Z",
+        "url": "https://pypi.org/project/mcp/2.2.0/"
+      }
+    },
+    {
+      "repository": "Blaizzy/mlx-embeddings",
+      "url": "https://github.com/Blaizzy/mlx-embeddings",
+      "round": 2,
+      "decision": "conditional_macos",
+      "evidence_level": "pinned_primary_source_review",
+      "gap_addressed": "Apple Silicon local embedding portability",
+      "rationale": "A targeted Mac embedding candidate, distinct from a generation-only MLX runtime. Source exposes masked mean/CLS/max/last-token pooling and model-specific embedding APIs.",
+      "limitations": "Prompt-excluded, concatenated and weighted-mean pooling modes raise unsupported errors; architecture support does not prove fidelity for our selected encoder. CI uses macos-14 but excludes model smoke tests. GPL-3.0-or-later source and separate model licenses require deliberate integration; source date May13 and release March24 do not establish a newest-model choice.",
+      "platform_evidence": "Apple Silicon/MLX candidate only, no Mac hardware acceptance. The reviewed API is Python; no compatible SocratiCode OpenAI-style serving endpoint was established.",
+      "source_commit": "9b28270be81211f2b8daed0041aec65ea5dc4b28",
+      "source_commit_date": "2026-05-13T19:55:12Z",
+      "source_license": "GPL-3.0-or-later",
+      "latest_release": {
+        "tag": "v0.1.0",
+        "published_at": "2026-03-24T14:00:31Z",
+        "url": "https://github.com/Blaizzy/mlx-embeddings/releases/tag/v0.1.0"
+      },
+      "archived": false,
+      "prior_index_public_star": false,
+      "selected_sources": [
+        {
+          "repository": "Blaizzy/mlx-embeddings",
+          "pin": "9b28270be81211f2b8daed0041aec65ea5dc4b28",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/Blaizzy/mlx-embeddings/9b28270be81211f2b8daed0041aec65ea5dc4b28/README.md",
+          "sha256": "b22a74b0ebbee4d86ad6883b54c7cbd9d86d151e81cd8e193af19d570477ddb9",
+          "bytes": 20515,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "Blaizzy/mlx-embeddings",
+          "pin": "9b28270be81211f2b8daed0041aec65ea5dc4b28",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/Blaizzy/mlx-embeddings/9b28270be81211f2b8daed0041aec65ea5dc4b28/LICENSE",
+          "sha256": "1fdd38fb2622edbbac9938f3989cea3ecf18e800d323349b430706a512fd8eb6",
+          "bytes": 1562,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "Blaizzy/mlx-embeddings",
+          "pin": "9b28270be81211f2b8daed0041aec65ea5dc4b28",
+          "path": "mlx_embeddings/models/pooling.py",
+          "url": "https://raw.githubusercontent.com/Blaizzy/mlx-embeddings/9b28270be81211f2b8daed0041aec65ea5dc4b28/mlx_embeddings/models/pooling.py",
+          "sha256": "1cdc4cca4e746e629fcb6479180a7dca9882b29f41d698815364c4f9efba0caa",
+          "bytes": 4336,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "Blaizzy/mlx-embeddings",
+          "pin": "9b28270be81211f2b8daed0041aec65ea5dc4b28",
+          "path": "mlx_embeddings/tests/test_pooling.py",
+          "url": "https://raw.githubusercontent.com/Blaizzy/mlx-embeddings/9b28270be81211f2b8daed0041aec65ea5dc4b28/mlx_embeddings/tests/test_pooling.py",
+          "sha256": "50c7d9f192de1f1f9af1b5c1a223067cb0fd9b39cdabacd78362c8f73397c5df",
+          "bytes": 7888,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "Blaizzy/mlx-embeddings",
+          "pin": "9b28270be81211f2b8daed0041aec65ea5dc4b28",
+          "path": ".github/workflows/test.yaml",
+          "url": "https://raw.githubusercontent.com/Blaizzy/mlx-embeddings/9b28270be81211f2b8daed0041aec65ea5dc4b28/.github/workflows/test.yaml",
+          "sha256": "ad85ebb9850221d8212c37d83bd611d60c7886a150b8b6ea1817612b77da4a2e",
+          "bytes": 1013,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        }
+      ],
+      "native_acceptance": [
+        {
+          "command": "python -m pytest mlx_embeddings/tests/test_pooling.py",
+          "status": "prospective_unexecuted",
+          "scope": "selected upstream contract/diagnostic; not full application acceptance",
+          "requires": "prepared pinned upstream checkout and its declared development dependencies, or already installed named tool; native platform where applicable"
+        }
+      ],
+      "publisher_package": {
+        "version": "0.1.0",
+        "uploaded": "2026-03-24T14:01:03.413862Z",
+        "url": "https://pypi.org/project/mlx-embeddings/0.1.0/"
+      }
+    },
+    {
+      "repository": "basicmachines-co/basic-memory",
+      "url": "https://github.com/basicmachines-co/basic-memory",
+      "round": 2,
+      "decision": "alternative_not_parallel_default",
+      "evidence_level": "pinned_primary_source_review",
+      "gap_addressed": "Scope-first ranking and scoped result hydration",
+      "rationale": "Useful comparator for scope-before-ranking: ProjectScope validates positive integer IDs, empty scopes match nothing, and result hydration applies project predicates. Keep the existing ai-memory record rather than duplicate facts into another store.",
+      "limitations": "Cloud scoped-credential read fallback and mutating-route rejection are explicitly regression-tested in source. These semantics are not transferable proof for ai-memory. AGPL-3.0-or-later and Python>=3.12; hosted sync and self-hosted Git/manual sync are separate products.",
+      "platform_evidence": "Upstream cross-client platform instructions; no local install or Mac/Windows execution. PostgreSQL/SQLite deployment choice remains conditional.",
+      "source_commit": "3bf2d523c0a941f71cb144a5502e7557dd025d69",
+      "source_commit_date": "2026-09-16T03:43:59Z",
+      "source_license": "AGPL-3.0-or-later",
+      "latest_release": {
+        "tag": "v0.23.2",
+        "published_at": "2026-08-25T20:44:29Z",
+        "url": "https://github.com/basicmachines-co/basic-memory/releases/tag/v0.23.2"
+      },
+      "archived": false,
+      "prior_index_public_star": false,
+      "selected_sources": [
+        {
+          "repository": "basicmachines-co/basic-memory",
+          "pin": "3bf2d523c0a941f71cb144a5502e7557dd025d69",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/LICENSE",
+          "sha256": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+          "bytes": 34523,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "basicmachines-co/basic-memory",
+          "pin": "3bf2d523c0a941f71cb144a5502e7557dd025d69",
+          "path": "pyproject.toml",
+          "url": "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/pyproject.toml",
+          "sha256": "4e694e6591de3d3e3ca8c6e0437a3cbe4b0cbd030bca9982e0939fa88c32ffdc",
+          "bytes": 8979,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "basicmachines-co/basic-memory",
+          "pin": "3bf2d523c0a941f71cb144a5502e7557dd025d69",
+          "path": "src/basic_memory/repository/search_scope.py",
+          "url": "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/src/basic_memory/repository/search_scope.py",
+          "sha256": "cd85b7e30e82b8ab2161af618f9b156fa07b405d4f6a8938fdcd617eaa924a41",
+          "bytes": 2404,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "basicmachines-co/basic-memory",
+          "pin": "3bf2d523c0a941f71cb144a5502e7557dd025d69",
+          "path": "src/basic_memory/services/scoped_search_service.py",
+          "url": "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/src/basic_memory/services/scoped_search_service.py",
+          "sha256": "069af8c275da68f29ae527f0f107e4e09745cf928af3f3685b94f54a9a8075fb",
+          "bytes": 6070,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "basicmachines-co/basic-memory",
+          "pin": "3bf2d523c0a941f71cb144a5502e7557dd025d69",
+          "path": "tests/repository/test_search_scope.py",
+          "url": "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/tests/repository/test_search_scope.py",
+          "sha256": "26b386a74a27a59d51b90be4401c8bc808dd99aaab7805ad6d0c5caa9d0721a9",
+          "bytes": 1597,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "basicmachines-co/basic-memory",
+          "pin": "3bf2d523c0a941f71cb144a5502e7557dd025d69",
+          "path": "tests/mcp/test_project_context_scoped_key.py",
+          "url": "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/tests/mcp/test_project_context_scoped_key.py",
+          "sha256": "da59f8345cccf0277ab1e84453f272b8bba51e6e27df7dda5c5ffad0e679ba93",
+          "bytes": 6940,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "basicmachines-co/basic-memory",
+          "pin": "3bf2d523c0a941f71cb144a5502e7557dd025d69",
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/README.md",
+          "sha256": "f17c69dbb796108638d4da27fc7929aef8f6cd99d2c66ec4b22b01a8ca40dc52",
+          "bytes": 24495,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        }
+      ],
+      "native_acceptance": [
+        {
+          "command": "uv run pytest tests/repository/test_search_scope.py tests/mcp/test_project_context_scoped_key.py",
+          "status": "prospective_unexecuted",
+          "scope": "selected upstream contract/diagnostic; not full application acceptance",
+          "requires": "prepared pinned upstream checkout and its declared development dependencies, or already installed named tool; native platform where applicable"
+        }
+      ]
+    },
+    {
+      "repository": "ipiton/agent-memory-mcp",
+      "url": "https://github.com/ipiton/agent-memory-mcp",
+      "round": 2,
+      "decision": "alternative_not_parallel_default",
+      "evidence_level": "pinned_primary_source_review",
+      "gap_addressed": "Embedding identity migration and superseded-memory filtering",
+      "rationale": "Useful migration comparator: memory-bank records identify their embedding model, mismatch degrades to text matching, and source tests separate supersession filtering from similarity using a stub encoder.",
+      "limitations": "Upstream explicitly states the RAG index does not detect mixed models and must be rebuilt too. Re-embedding, index rebuild and service/cache restart are a coupled operation; partial failures can leave stale vectors. Published machine-labelled scores are not our quality proof. Do not run eval-recall against live configuration during a supposedly offline review.",
+      "platform_evidence": "Go and Homebrew/macOS operational examples, plus local-only configuration tests. No daemon install, encoder call or live-bank access here.",
+      "source_commit": "ceef5851c2012ec4e9500eb5e955ae3388b3add8",
+      "source_commit_date": "2026-09-04T19:00:18Z",
+      "source_license": "MIT",
+      "latest_release": {
+        "tag": "v0.13.3",
+        "published_at": "2026-09-04T19:10:13Z",
+        "url": "https://github.com/ipiton/agent-memory-mcp/releases/tag/v0.13.3"
+      },
+      "archived": false,
+      "prior_index_public_star": false,
+      "selected_sources": [
+        {
+          "repository": "ipiton/agent-memory-mcp",
+          "pin": "ceef5851c2012ec4e9500eb5e955ae3388b3add8",
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/ipiton/agent-memory-mcp/ceef5851c2012ec4e9500eb5e955ae3388b3add8/LICENSE",
+          "sha256": "495f413154da10ad6ff2f0833e3bf5389f62a64a5b61af69e27c6c9bbd2fdd4a",
+          "bytes": 1063,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "ipiton/agent-memory-mcp",
+          "pin": "ceef5851c2012ec4e9500eb5e955ae3388b3add8",
+          "path": "docs/EMBEDDING_MIGRATION.md",
+          "url": "https://raw.githubusercontent.com/ipiton/agent-memory-mcp/ceef5851c2012ec4e9500eb5e955ae3388b3add8/docs/EMBEDDING_MIGRATION.md",
+          "sha256": "48299188f7aacb4f0b993f039f853104510ec676b2e3de65e4a9dc9afeb3495e",
+          "bytes": 5573,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "ipiton/agent-memory-mcp",
+          "pin": "ceef5851c2012ec4e9500eb5e955ae3388b3add8",
+          "path": "internal/config/config_local_only_test.go",
+          "url": "https://raw.githubusercontent.com/ipiton/agent-memory-mcp/ceef5851c2012ec4e9500eb5e955ae3388b3add8/internal/config/config_local_only_test.go",
+          "sha256": "ccd12f2b8bebdd29d9dfacd83b212b16722031c8d0d35e24b2c892a48ffb923a",
+          "bytes": 8683,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "ipiton/agent-memory-mcp",
+          "pin": "ceef5851c2012ec4e9500eb5e955ae3388b3add8",
+          "path": "internal/embedder/provider_hosted.go",
+          "url": "https://raw.githubusercontent.com/ipiton/agent-memory-mcp/ceef5851c2012ec4e9500eb5e955ae3388b3add8/internal/embedder/provider_hosted.go",
+          "sha256": "5240a3cb4675d8e699425d91b2bf39a304c483af74ca4f7b215fd8f33ba07970",
+          "bytes": 3248,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "ipiton/agent-memory-mcp",
+          "pin": "ceef5851c2012ec4e9500eb5e955ae3388b3add8",
+          "path": "internal/memory/temporal_test.go",
+          "url": "https://raw.githubusercontent.com/ipiton/agent-memory-mcp/ceef5851c2012ec4e9500eb5e955ae3388b3add8/internal/memory/temporal_test.go",
+          "sha256": "66cbc3b78eb7d3f32f59ef7c74585d28b6b0fd1efacbef3fe03525bcbbe49a6d",
+          "bytes": 6640,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "ipiton/agent-memory-mcp",
+          "pin": "ceef5851c2012ec4e9500eb5e955ae3388b3add8",
+          "path": "internal/memory/superseded_recall_test.go",
+          "url": "https://raw.githubusercontent.com/ipiton/agent-memory-mcp/ceef5851c2012ec4e9500eb5e955ae3388b3add8/internal/memory/superseded_recall_test.go",
+          "sha256": "97c9e77111b3bc8c44c82ef357c001c4ea3d70344663235df1b56341f5a7830a",
+          "bytes": 4662,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        },
+        {
+          "repository": "ipiton/agent-memory-mcp",
+          "pin": "ceef5851c2012ec4e9500eb5e955ae3388b3add8",
+          "path": "internal/embedder/providers.go",
+          "url": "https://raw.githubusercontent.com/ipiton/agent-memory-mcp/ceef5851c2012ec4e9500eb5e955ae3388b3add8/internal/embedder/providers.go",
+          "sha256": "7b35e6922c9dc0ad4f1f6374a2774edca387927536e38b4fa93e6885c53fa3b7",
+          "bytes": 2914,
+          "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+        }
+      ],
+      "native_acceptance": [
+        {
+          "command": "go test ./internal/config -run \"TestLoadFromEnvEmbeddingModeLocalOnly|TestLoadFromEnvRejectsUnparseableDuration\"",
+          "status": "prospective_unexecuted",
+          "scope": "selected upstream contract/diagnostic; not full application acceptance",
+          "requires": "prepared pinned upstream checkout and its declared development dependencies, or already installed named tool; native platform where applicable"
+        },
+        {
+          "command": "go test ./internal/memory -run \"TestRecallAsOf|TestSupersededMemoryExcludedFromRecall\"",
+          "status": "prospective_unexecuted",
+          "scope": "selected upstream contract/diagnostic; not full application acceptance",
+          "requires": "prepared pinned upstream checkout and its declared development dependencies, or already installed named tool; native platform where applicable"
+        }
+      ]
+    }
+  ],
+  "discovery_lists": [
+    {
+      "repository": "mnemoverse/awesome-agent-memory",
+      "pin": "472535dfe2e4277c5f943f6cec9d57a7f67896ac",
+      "commit_date": "2026-09-19T11:56:17Z",
+      "source": {
+        "repository": "mnemoverse/awesome-agent-memory",
+        "pin": "472535dfe2e4277c5f943f6cec9d57a7f67896ac",
+        "path": "README.md",
+        "url": "https://raw.githubusercontent.com/mnemoverse/awesome-agent-memory/472535dfe2e4277c5f943f6cec9d57a7f67896ac/README.md",
+        "sha256": "351bd40258155c50cea580cc0e6b35d051f88caac2a71e3095b6247f74783cc8",
+        "bytes": 9494,
+        "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+      },
+      "use": "discovery only; list inclusion/star count/quoted benchmark is not selection evidence"
+    },
+    {
+      "repository": "punkpeye/awesome-mcp-servers",
+      "pin": "393b4e9fafb0348e5a1c2a4ef5a8719b0d85e061",
+      "commit_date": "2026-09-15T23:17:38Z",
+      "source": {
+        "repository": "punkpeye/awesome-mcp-servers",
+        "pin": "393b4e9fafb0348e5a1c2a4ef5a8719b0d85e061",
+        "path": "README.md",
+        "url": "https://raw.githubusercontent.com/punkpeye/awesome-mcp-servers/393b4e9fafb0348e5a1c2a4ef5a8719b0d85e061/README.md",
+        "sha256": "9b6a1ee410fde8132c92444f15cc153c2d6c4866dd74c4ac8b428981d49f777c",
+        "bytes": 1756337,
+        "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+      },
+      "use": "discovery only; list inclusion/star count/quoted benchmark is not selection evidence"
+    },
+    {
+      "repository": "tfatykhov/awesome-agent-memory",
+      "pin": "1212946cb2c64cf8b941494c441aee26e90b1d34",
+      "commit_date": "2026-09-03T02:14:48Z",
+      "source": {
+        "repository": "tfatykhov/awesome-agent-memory",
+        "pin": "1212946cb2c64cf8b941494c441aee26e90b1d34",
+        "path": "README.md",
+        "url": "https://raw.githubusercontent.com/tfatykhov/awesome-agent-memory/1212946cb2c64cf8b941494c441aee26e90b1d34/README.md",
+        "sha256": "c033fe1783e188069b7d7d6b32c10b1a08c6835f2ce94d0f15b507eab9227d43",
+        "bytes": 119274,
+        "review": "captured at pin; relevant implementation/documentation/test excerpts inspected at repository level, not a complete file audit"
+      },
+      "use": "discovery only; list inclusion/star count/quoted benchmark is not selection evidence"
+    }
+  ],
+  "discovery_only_leads": [
+    {
+      "repository": "GiulioDER/agent-memory-bench",
+      "decision": "discovery_only",
+      "evidence_level": "list_reference_only",
+      "rationale": "Potential execution-graded coding-memory evaluation; inspect official retrieval/lifecycle separation and cost before any run. No primary implementation reviewed.",
+      "source": "https://raw.githubusercontent.com/mnemoverse/awesome-agent-memory/472535dfe2e4277c5f943f6cec9d57a7f67896ac/README.md"
+    },
+    {
+      "repository": "rocke2020/open-agent-memory-benchmark",
+      "decision": "discovery_only",
+      "evidence_level": "list_reference_only",
+      "rationale": "Potential native-API comparison with frozen evaluation plans; underlying claims and provider costs need primary-source review.",
+      "source": "https://raw.githubusercontent.com/mnemoverse/awesome-agent-memory/472535dfe2e4277c5f943f6cec9d57a7f67896ac/README.md"
+    },
+    {
+      "repository": "ArcticFox2029/chamnan",
+      "decision": "discovery_only",
+      "evidence_level": "list_reference_only",
+      "rationale": "Repo-local no-network context candidate; may duplicate canonical instructions and the accepted memory record. No installation recommendation.",
+      "source": "https://raw.githubusercontent.com/mnemoverse/awesome-agent-memory/472535dfe2e4277c5f943f6cec9d57a7f67896ac/README.md"
+    }
+  ],
+  "recommended_next_acceptance": [
+    {
+      "priority": 1,
+      "action": "Adopt the scoped lifecycle receipt and enforce explicit memory status/expiry checks where retrieval requires freshness. Keep the real service unchanged until separately authorized policy migration.",
+      "status": "native_fixture_complete",
+      "receipt": "blueprints/us-equities/memory-lifecycle/receipt.json"
+    },
+    {
+      "priority": 2,
+      "action": "Run isolated upstream RTK hook protocol/permission fixtures for the exact release before enabling or changing Codex automatic rewrites. Preserve raw recovery and audit attribution.",
+      "status": "prospective_unexecuted"
+    },
+    {
+      "priority": 3,
+      "action": "Prepare held-out retrieval queries and an embedding identity/corpus fingerprint gate before any local model substitution; include write/reindex cost and misses.",
+      "status": "prospective_unexecuted"
+    }
+  ],
+  "official_documentation": [
+    {
+      "url": "https://developers.openai.com/es-419/docs/hooks",
+      "topic": "Native hook output and trust behavior; official route opened successfully."
+    },
+    {
+      "url": "https://code.claude.com/docs/en/agent-sdk/migration-guide",
+      "topic": "Current SDK setting-source defaults and migration boundaries."
+    }
+  ],
+  "retained_research_failures": [
+    {
+      "url": "https://developers.openai.com/docs/hooks",
+      "result": "404; used an official localized route returned by discovery instead."
+    },
+    {
+      "operation": "latest-release endpoint for three discovery lists",
+      "result": "404, retained as absence of package release, not a repository failure."
+    }
+  ],
+  "boundaries": [
+    "Historical receipts remain dated evidence and do not certify this Desktop session or another host.",
+    "No active MCP configuration, home, credentials, current memory, indexes, model servers or SDK installations were changed.",
+    "Provider caching, tool discovery and native compaction remain the default; local estimates cannot establish exact net provider token savings.",
+    "Learning promotion requires explicit write authority, conflict/expiry policy and evaluation evidence; autonomous consolidation is not accepted by this fixture.",
+    "Source pins, releases, publisher packages and installed binaries are separate version identities."
+  ]
+}
