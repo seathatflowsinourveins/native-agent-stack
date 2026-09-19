@@ -114,7 +114,7 @@ def parse_header(raw, member, observed):
                 raise ValueError("missing_or_duplicate_header_field")
             return matches[0].strip()
         accession = field(r"^(?:ACCESSION NUMBER:\s*|<ACCESSION-NUMBER>)([^\r\n<]+)")
-        form = field(r"^(?:CONFORMED SUBMISSION TYPE:\s*|<CONFORMED-SUBMISSION-TYPE>)([^\r\n<]+)")
+        form = field(r"^(?:CONFORMED SUBMISSION TYPE:\s*|<CONFORMED-SUBMISSION-TYPE>|<TYPE>)([^\r\n<]+)")
         filed = field(r"^(?:FILED AS OF DATE:\s*|<FILING-DATE>)([0-9]{8})")
         value = field(r"^<ACCEPTANCE-DATETIME>([^\r\n<]+)")
         result["acceptance_raw"] = value

@@ -22,6 +22,7 @@ INDEX = b"Description: Master Index of EDGAR Dissemination Feed\nCIK|Company Nam
 # Header and compact date syntax observed in the retained SEC 2020-03-02 index.
 NATIVE_INDEX = b"Description: Master Index of EDGAR Dissemination Feed\nCIK|Company Name|Form Type|Date Filed|File Name\n----\n2|Example B|8-K/A|20200302|edgar/data/2/0000000002-20-000002.txt\n1|Example A|8-K|20200302|edgar/data/1/0000000001-20-000001.txt\n3|Example C|CORRESP|20190801|edgar/data/3/0000000003-19-000003.txt\n"
 HEADER = b"<SEC-HEADER>\n<ACCEPTANCE-DATETIME>20200302100000\nACCESSION NUMBER: 0000000001-20-000001\nCONFORMED SUBMISSION TYPE: 8-K\nFILED AS OF DATE: 20200302\n</SEC-HEADER>\n"
+NATIVE_HEADER = b"<ACCEPTANCE-DATETIME>20200302100000\n<ACCESSION-NUMBER>0000000001-20-000001\n<TYPE>8-K\n<FILING-DATE>20200302\n"
 
 
 class CatalystProvenanceTests(unittest.TestCase):
@@ -69,6 +70,21 @@ class CatalystProvenanceTests(unittest.TestCase):
         self.assertEqual(event["accepted_at"], "2020-03-02T15:00:00Z")
         self.assertEqual(event["available_at"], "2026-09-19T12:00:00Z")
         self.assertEqual(event["status"], "qualified")
+
+    def test_native_header_type_tag_qualifies_without_backdating_observation(self):
+        member = self.m.parse_index(NATIVE_INDEX, "2020-03-02")[0]
+        event = self.m.parse_header(NATIVE_HEADER, member, "2026-09-19T12:00:00Z")
+        self.assertEqual(event["status"], "qualified")
+        self.assertEqual(event["accepted_at"], "2020-03-02T15:00:00Z")
+        self.assertEqual(event["available_at"], "2026-09-19T12:00:00Z")
+
+    def test_native_header_duplicate_or_conflicting_form_fields_quarantine(self):
+        member = self.m.parse_index(NATIVE_INDEX, "2020-03-02")[0]
+        for raw in [NATIVE_HEADER + b"<TYPE>8-K\n", NATIVE_HEADER + b"CONFORMED SUBMISSION TYPE: 8-K/A\n", NATIVE_HEADER.replace(b"<TYPE>8-K", b"<TYPE>8-K/A")]:
+            with self.subTest(raw=raw):
+                event = self.m.parse_header(raw, member, "2026-09-19T12:00:00Z")
+                self.assertEqual(event["status"], "quarantined")
+                self.assertIsNone(event["available_at"])
 
     def test_missing_or_mismatched_header_is_quarantined(self):
         member = self.m.parse_index(INDEX, "2020-03-02")[0]
