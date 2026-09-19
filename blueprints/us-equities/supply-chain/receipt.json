@@ -1,0 +1,433 @@
+{
+  "schema_version": 1,
+  "id": "syft-sdk-inventory-20260919",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "syft"
+  ],
+  "observed_at_utc": "2026-09-19T18:52:28.903219+00:00",
+  "status": "passed_scoped_inventory_acceptance",
+  "claim": "Pinned upstream Syft 1.52.0 enumerated the existing equity-worker-sdk directory with networking isolated and source read-only; all 36 package name/version/PURL tuples agree between native Syft and CycloneDX outputs and all 36 installed Python metadata distributions match.",
+  "upstream": {
+    "repository": "https://github.com/anchore/syft",
+    "release_tag": "v1.52.0",
+    "release_published_at": "2026-09-17T14:38:17Z",
+    "version": {
+      "application": "syft",
+      "buildDate": "2026-09-17T14:32:25Z",
+      "compiler": "gc",
+      "gitCommit": "02ba369d13b4248395b20a504eca94b0cab564d8",
+      "gitDescription": "v1.52.0",
+      "goVersion": "go1.26.3",
+      "platform": "linux/amd64",
+      "schemaVersion": "16.1.10",
+      "version": "1.52.0"
+    },
+    "license": "Apache-2.0",
+    "archive_name": "syft_1.52.0_linux_amd64.tar.gz",
+    "archive_sha256": "caeedb81fb0491615f1ebd1761e4145d41ee86dd2cc7bf80669f9f5ad9d6133d",
+    "publisher_checksum_list_sha256": "21d9ee36c7c6fb43d6493718a387ecca021321791d1815c716e56c99b9c8d6b9",
+    "installed_binary_sha256": "15a52d0122953081d16e6695f48055216a4de293bb005948663bb739a63880f9",
+    "publisher_checksum_matched": true,
+    "github_asset_digest_matched": true,
+    "signature_verified": false
+  },
+  "scope": {
+    "source_name": "equity-worker-sdk",
+    "source_type": "directory",
+    "regular_files": 7700,
+    "regular_file_bytes": 537874984,
+    "symlinks": 4,
+    "outbound_symlinks_not_followed": 3,
+    "catalogers_selection": "upstream directory defaults",
+    "source_read_only": true,
+    "network_namespace_isolated": true,
+    "inherited_environment_cleared": true,
+    "source_fingerprint_before_sha256": "9d6ae09990f9f9c30596e2f5bb9178ebc1bc6906cfbd161db6c4149314342e00",
+    "source_fingerprint_after_sha256": "9d6ae09990f9f9c30596e2f5bb9178ebc1bc6906cfbd161db6c4149314342e00",
+    "source_unchanged": true
+  },
+  "native_scan": {
+    "exit_code": 0,
+    "elapsed_seconds": 1.2522220160008146,
+    "stdout_bytes": 0,
+    "stderr_bytes": 0,
+    "command": "syft scan dir:/sdk --base-path /sdk --source-name equity-worker-sdk --parallelism 2 -o syft-json=/output/runtime.syft.json -o cyclonedx-json=/output/runtime.cdx.json",
+    "execution_boundary": "bubblewrap 0.9.0 with fresh namespaces, all capabilities dropped, only source and executable mounted read-only, new private output writable"
+  },
+  "inventory": {
+    "syft_packages": 36,
+    "package_types": {
+      "python": 36
+    },
+    "catalogers": {
+      "python-installed-package-cataloger": 36
+    },
+    "packages_with_license_metadata": 34,
+    "packages_with_spdx_expression": 31,
+    "license_expression_counts": {
+      "Apache-2.0": 8,
+      "MIT": 13,
+      "MPL-2.0": 1,
+      "BSD-3-Clause": 5,
+      "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0": 1,
+      "Apache-2.0 OR BSD-2-Clause": 1,
+      "MIT OR Apache-2.0": 1,
+      "PSF-2.0": 1
+    },
+    "cyclonedx_spec_version": "1.7",
+    "cyclonedx_component_types": {
+      "library": 36,
+      "file": 87
+    },
+    "cyclonedx_purl_components_match_syft": true,
+    "installed_dist_info_count": 36,
+    "installed_dist_info_matches_syft": true,
+    "files_catalogued": 166,
+    "artifact_relationship_count": 177
+  },
+  "packages": [
+    {
+      "name": "alpaca-py",
+      "version": "0.44.0",
+      "purl": "pkg:pypi/alpaca-py@0.44.0",
+      "license_expressions": [
+        "Apache-2.0"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "annotated-types",
+      "version": "0.8.0",
+      "purl": "pkg:pypi/annotated-types@0.8.0",
+      "license_expressions": [
+        "MIT"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "anyio",
+      "version": "4.15.1",
+      "purl": "pkg:pypi/anyio@4.15.1",
+      "license_expressions": [
+        "MIT"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "certifi",
+      "version": "2026.7.22",
+      "purl": "pkg:pypi/certifi@2026.7.22",
+      "license_expressions": [
+        "MPL-2.0"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "charset-normalizer",
+      "version": "3.5.1",
+      "purl": "pkg:pypi/charset-normalizer@3.5.1",
+      "license_expressions": [
+        "MIT"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "duckdb",
+      "version": "1.5.5",
+      "purl": "pkg:pypi/duckdb@1.5.5",
+      "license_expressions": [],
+      "license_metadata_present": false
+    },
+    {
+      "name": "exchange-calendars",
+      "version": "4.13.2",
+      "purl": "pkg:pypi/exchange-calendars@4.13.2",
+      "license_expressions": [
+        "Apache-2.0"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "h11",
+      "version": "0.16.0",
+      "purl": "pkg:pypi/h11@0.16.0",
+      "license_expressions": [
+        "MIT"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "httpcore2",
+      "version": "2.13.0",
+      "purl": "pkg:pypi/httpcore2@2.13.0",
+      "license_expressions": [
+        "BSD-3-Clause"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "httpx2",
+      "version": "2.13.0",
+      "purl": "pkg:pypi/httpx2@2.13.0",
+      "license_expressions": [
+        "BSD-3-Clause"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "idna",
+      "version": "3.20",
+      "purl": "pkg:pypi/idna@3.20",
+      "license_expressions": [
+        "BSD-3-Clause"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "jiter",
+      "version": "0.17.0",
+      "purl": "pkg:pypi/jiter@0.17.0",
+      "license_expressions": [
+        "MIT"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "korean-lunar-calendar",
+      "version": "0.4.0",
+      "purl": "pkg:pypi/korean-lunar-calendar@0.4.0",
+      "license_expressions": [
+        "MIT"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "msgpack",
+      "version": "1.2.2",
+      "purl": "pkg:pypi/msgpack@1.2.2",
+      "license_expressions": [
+        "Apache-2.0"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "numpy",
+      "version": "2.5.3",
+      "purl": "pkg:pypi/numpy@2.5.3",
+      "license_expressions": [
+        "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "openai",
+      "version": "3.16.2",
+      "purl": "pkg:pypi/openai@3.16.2",
+      "license_expressions": [
+        "Apache-2.0"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "openai-codex",
+      "version": "0.154.0",
+      "purl": "pkg:pypi/openai-codex@0.154.0",
+      "license_expressions": [
+        "Apache-2.0"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "openai-codex-cli-bin",
+      "version": "0.154.0",
+      "purl": "pkg:pypi/openai-codex-cli-bin@0.154.0",
+      "license_expressions": [
+        "Apache-2.0"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "packaging",
+      "version": "26.3",
+      "purl": "pkg:pypi/packaging@26.3",
+      "license_expressions": [
+        "Apache-2.0 OR BSD-2-Clause"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "pandas",
+      "version": "3.0.6",
+      "purl": "pkg:pypi/pandas@3.0.6",
+      "license_expressions": [],
+      "license_metadata_present": true
+    },
+    {
+      "name": "pydantic",
+      "version": "2.13.5",
+      "purl": "pkg:pypi/pydantic@2.13.5",
+      "license_expressions": [
+        "MIT"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "pydantic-core",
+      "version": "2.46.5",
+      "purl": "pkg:pypi/pydantic-core@2.46.5",
+      "license_expressions": [
+        "MIT"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "pyluach",
+      "version": "2.3.0",
+      "purl": "pkg:pypi/pyluach@2.3.0",
+      "license_expressions": [],
+      "license_metadata_present": false
+    },
+    {
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "purl": "pkg:pypi/python-dateutil@2.9.0.post0",
+      "license_expressions": [],
+      "license_metadata_present": true
+    },
+    {
+      "name": "pytz",
+      "version": "2026.3.post1",
+      "purl": "pkg:pypi/pytz@2026.3.post1",
+      "license_expressions": [
+        "MIT"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "requests",
+      "version": "2.34.2",
+      "purl": "pkg:pypi/requests@2.34.2",
+      "license_expressions": [
+        "Apache-2.0"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "six",
+      "version": "1.17.0",
+      "purl": "pkg:pypi/six@1.17.0",
+      "license_expressions": [
+        "MIT"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "sniffio",
+      "version": "1.3.1",
+      "purl": "pkg:pypi/sniffio@1.3.1",
+      "license_expressions": [
+        "MIT OR Apache-2.0"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "sseclient-py",
+      "version": "1.9.0",
+      "purl": "pkg:pypi/sseclient-py@1.9.0",
+      "license_expressions": [],
+      "license_metadata_present": true
+    },
+    {
+      "name": "toolz",
+      "version": "1.1.0",
+      "purl": "pkg:pypi/toolz@1.1.0",
+      "license_expressions": [
+        "BSD-3-Clause"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "truststore",
+      "version": "0.10.4",
+      "purl": "pkg:pypi/truststore@0.10.4",
+      "license_expressions": [
+        "MIT"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "typing-extensions",
+      "version": "4.16.0",
+      "purl": "pkg:pypi/typing-extensions@4.16.0",
+      "license_expressions": [
+        "PSF-2.0"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "typing-inspection",
+      "version": "0.4.4",
+      "purl": "pkg:pypi/typing-inspection@0.4.4",
+      "license_expressions": [
+        "MIT"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "tzdata",
+      "version": "2026.4",
+      "purl": "pkg:pypi/tzdata@2026.4",
+      "license_expressions": [
+        "Apache-2.0"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "urllib3",
+      "version": "2.8.0",
+      "purl": "pkg:pypi/urllib3@2.8.0",
+      "license_expressions": [
+        "MIT"
+      ],
+      "license_metadata_present": true
+    },
+    {
+      "name": "websockets",
+      "version": "17.1",
+      "purl": "pkg:pypi/websockets@17.1",
+      "license_expressions": [
+        "BSD-3-Clause"
+      ],
+      "license_metadata_present": true
+    }
+  ],
+  "raw_artifacts": [
+    {
+      "name": "runtime.syft.json",
+      "bytes": 1230213,
+      "sha256": "6912fc526853724556519872207534d54bda90f9c22b48c9625b689c12b210fc",
+      "publication": "private only"
+    },
+    {
+      "name": "runtime.cdx.json",
+      "bytes": 160043,
+      "sha256": "8ec9bd528ac2e46c3109a843213d19e87af08dd7c4848d2929339b5a39a77c31",
+      "publication": "private only"
+    }
+  ],
+  "model_calls": 0,
+  "net_provider_tokens_saved": null,
+  "limitations": [
+    "Inventory is scoped to one existing SDK prefix; it does not cover every Codex/Claude runtime, host OS, external interpreter or services.",
+    "Three symlinks resolving outside the selected prefix were not followed; externally installed interpreter and system libraries are outside this inventory.",
+    "Checksums matched publisher release files and GitHub asset digests. Release signature and build provenance were not verified; this is not a broader authenticity verdict.",
+    "No vulnerability scanner or vulnerability database was run or downloaded; no vulnerability-free claim follows from inventory success.",
+    "License metadata was present for 34 of 36 packages and an SPDX expression for 31. Missing or unparsed metadata is not evidence of absent licenses or an approved compliance policy.",
+    "All 36 installed Python distributions matched native METADATA names/versions after standard case/separator normalization. This does not establish completeness for vendored native libraries or other package types.",
+    "CycloneDX 1.7 contains 36 library components plus 87 file components; file components are not additional installed packages.",
+    "Raw reports and source-file manifest stay private; their hashes and selected public package metadata are published. The source fingerprint includes host-specific symlink targets and is not a portable lockfile.",
+    "This is a point-in-time inventory, not dependency upgrade, recurring scan, model inference, agent quality evaluation or measured provider token savings.",
+    "One initial summary reader assumed every CycloneDX component had a version and raised KeyError. The native scan was unaffected; corrected enumeration separates package and file components."
+  ]
+}
