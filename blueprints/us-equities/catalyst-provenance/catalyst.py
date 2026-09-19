@@ -52,29 +52,43 @@ def json_bytes(value):
 
 
 def parse_index(raw, day):
-    date.fromisoformat(day)
+    day = date.fromisoformat(day).isoformat()
     lines = raw.decode("utf-8").splitlines()
-    if "CIK|Company Name|Form Type|Date Filed|Filename" not in lines:
+    headers = {"CIK|Company Name|Form Type|Date Filed|Filename",
+               "CIK|Company Name|Form Type|Date Filed|File Name"}
+    header_index = next((i for i, line in enumerate(lines) if line in headers), None)
+    if header_index is None:
         raise ValueError("missing_master_index_header")
     rows, seen = [], set()
-    for line in lines[lines.index("CIK|Company Name|Form Type|Date Filed|Filename") + 1:]:
+    for line in lines[header_index + 1:]:
         if not line.strip() or set(line.strip()) == {"-"}:
             continue
         parts = line.split("|")
         if len(parts) != 5:
             raise ValueError("malformed_master_index_row")
         cik, company, form, filed, path = parts
+        if re.fullmatch(r"[0-9]{8}", filed):
+            filed = f"{filed[:4]}-{filed[4:6]}-{filed[6:]}"
+        elif not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", filed):
+            raise ValueError("invalid_index_date")
+        date.fromisoformat(filed)
         match = re.fullmatch(r"edgar/data/([0-9]+)/([0-9]{10}-[0-9]{2}-[0-9]{6})\.txt", path)
-        if not cik.isdigit() or not match or int(cik) != int(match[1]) or filed != day:
+        if not cik.isdigit() or not match or int(cik) != int(match[1]):
+            raise ValueError("index_identity_or_day_mismatch")
+        # Other forms can be older correspondence or repeated ownership entries.
+        # Day and duplicate membership checks apply to the declared catalyst cohort.
+        if form not in FORMS:
+            continue
+        if filed != day:
             raise ValueError("index_identity_or_day_mismatch")
         accession = match[2]
-        if accession in seen:
+        identity = (int(cik), accession)
+        if identity in seen:
             raise ValueError("duplicate_accession")
-        seen.add(accession)
-        if form in FORMS:
-            rows.append({"cik": int(cik), "company": company, "form": form,
-                         "filed_date": filed, "accession": accession,
-                         "header_url": f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace('-', '')}/{accession}.hdr.sgml"})
+        seen.add(identity)
+        rows.append({"cik": int(cik), "company": company, "form": form,
+                     "filed_date": filed, "accession": accession,
+                     "header_url": f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession.replace('-', '')}/{accession}.hdr.sgml"})
     return sorted(rows, key=lambda row: (row["cik"], row["accession"]))
 
 
@@ -179,7 +193,7 @@ def acquire(root, run_id, identity, member_limit=5):
             receipt["request_count"] += 1
             raw = fetch(current["header_url"], identity, MAX_HEADER)
             observed = now()
-            name = current["accession"] + ".hdr.sgml"
+            name = f"{current['cik']}-{current['accession']}.hdr.sgml"
             write_new(run / name, raw)
             receipt["files"].append({"path": name, "sha256": sha(raw), "bytes": len(raw), "first_observed_at": observed})
             current.update(acquisition_status="complete", event=parse_header(raw, current, observed))
@@ -212,11 +226,17 @@ def packet(run, as_of):
         blobs[name] = (raw, entry["first_observed_at"])
     cohort = parse_index(blobs["index.idx"][0], receipt["day"])
     selected = cohort[:receipt["member_limit"]]
-    if len(cohort) != receipt["cohort_count"] or [x["accession"] for x in selected] != [x["accession"] for x in receipt["selected"]]:
+    if len(cohort) != receipt["cohort_count"] or [(x["cik"], x["accession"]) for x in selected] != [(x["cik"], x["accession"]) for x in receipt["selected"]]:
         raise ValueError("cohort_receipt_mismatch")
     events, exclusions = [], {}
     for member in selected:
-        raw, observed = blobs[member["accession"] + ".hdr.sgml"]
+        name = f"{member['cik']}-{member['accession']}.hdr.sgml"
+        if name not in blobs:
+            # Existing successful runs used accession-only filenames and unique accessions.
+            if sum(row["accession"] == member["accession"] for row in selected) != 1:
+                raise ValueError("ambiguous_legacy_header")
+            name = member["accession"] + ".hdr.sgml"
+        raw, observed = blobs[name]
         # Index and document are both required to reconstruct this cohort member.
         observed = iso(max(timestamp(observed), timestamp(blobs["index.idx"][1])))
         event = parse_header(raw, member, observed)
