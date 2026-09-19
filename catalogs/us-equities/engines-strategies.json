@@ -1,0 +1,1658 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "layer": "engines-strategies",
+  "entries": [
+    {
+      "id": "lean",
+      "repository": "https://github.com/QuantConnect/Lean",
+      "layers": [
+        "backtesting",
+        "execution-engine"
+      ],
+      "role": "Event-driven research engine and eventual shared strategy host",
+      "decision": "default",
+      "rationale": "Retain the already proven native C# source build and bundled backtest; a separate official Alpaca adapter avoids inventing a broker bridge.",
+      "version_or_commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "release_date": null,
+      "license": "Apache-2.0",
+      "us_equities_fit": "US equities, exchange calendars, corporate-action models and configurable fills/costs; real coverage still depends on data.",
+      "alpaca_fit": "Official adapter is a separate catalog entry; the accepted sample used the default brokerage model, not Alpaca.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "blueprints/us-equities/engine/receipt.json",
+        "blueprints/us-equities/engine/README.md"
+      ],
+      "native_workflow": [
+        "# Historical commands already executed in the linked receipt; replay only in a dedicated source checkout.",
+        "cd \"${LEAN_SOURCE}\"",
+        "\"${DOTNET_ROOT}/dotnet\" build QuantConnect.Lean.sln --disable-build-servers -m:2 --verbosity minimal",
+        "cd Launcher/bin/Debug",
+        "\"${DOTNET_ROOT}/dotnet\" QuantConnect.Lean.Launcher.dll < /dev/null"
+      ],
+      "requirements": [
+        "Pinned source 985ef30ad3ac774218c5ac516b4cb0aa2655730f and .NET SDK 10.0.401; NuGet access for restore.",
+        "C# sample uses bundled data; paid/current data is a separate decision.",
+        "Keep live-mode=false and original backtesting environment for this replay."
+      ],
+      "limitations": [
+        "Proof: Completed, 3,943 bundled data points, 3 simulated orders; no broker connection or strategy validation.",
+        "Native restore reported 7 advisory pairs across 5 runtime packages, including high/critical classifications; exploitability was not assessed and remediation remains open.",
+        "GitHub latest release v2.4.0.1 is from 2017; this is a 2026 source pin, not that old release.",
+        "LEAN CLI is a separate paid-organization/Docker workflow; the accepted source build required neither."
+      ],
+      "sources": [
+        "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/readme.md",
+        "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/LICENSE",
+        "https://github.com/QuantConnect/Lean/commit/985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+        "https://github.com/QuantConnect/Lean/releases/tag/v2.4.0.1",
+        "https://www.quantconnect.com/docs/v2/lean-cli/key-concepts/getting-started",
+        "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Brokerages/AlpacaBrokerageModel.cs"
+      ]
+    },
+    {
+      "id": "lean-alpaca",
+      "repository": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca",
+      "layers": [
+        "broker-adapter",
+        "execution"
+      ],
+      "role": "Official LEAN Alpaca brokerage implementation",
+      "decision": "default",
+      "rationale": "Chosen paper route after the research/data/risk gates; this is the official adapter rather than a claim that paper trading already works locally.",
+      "version_or_commit": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+      "release_date": null,
+      "license": "Apache-2.0 (README and source-header declaration)",
+      "us_equities_fit": "Equity order conversion and broker state integration exist in source.",
+      "alpaca_fit": "Factory reads alpaca-paper-trading and selects Alpaca paper/live environments.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. source/build inspection only; do not start a brokerage session.",
+        "git clone https://github.com/QuantConnect/Lean.Brokerages.Alpaca.git Lean.Brokerages.Alpaca",
+        "git -C Lean.Brokerages.Alpaca checkout --detach 1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+        "cd Lean.Brokerages.Alpaca",
+        "dotnet build QuantConnect.AlpacaBrokerage.sln",
+        "rg -n 'alpaca-paper-trading|CreateBrokerage' QuantConnect.AlpacaBrokerage/AlpacaBrokerageFactory.cs"
+      ],
+      "requirements": [
+        "Compatible pinned LEAN packages/.NET runtime and adapter dependency restore.",
+        "Later paper use requires a separately provisioned Alpaca paper account, private credentials, market-data entitlement, and explicit paper configuration."
+      ],
+      "limitations": [
+        "Adapter build/connection not executed here; no Alpaca paper orders accepted yet.",
+        "Brokerage model defaults include NullSlippageModel; explicitly calibrate spread, slippage, fees and liquidity before evaluating a strategy.",
+        "README deployment/account prose contains dated details; use current broker docs and pinned implementation for operational decisions.",
+        "License is declared Apache-2.0 in README/source headers; GitHub license API is empty.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md",
+        "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/commit/1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+        "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/QuantConnect.AlpacaBrokerage/AlpacaBrokerageFactory.cs",
+        "https://www.quantconnect.com/docs/v2/writing-algorithms/reality-modeling/brokerages/supported-models/alpaca"
+      ]
+    },
+    {
+      "id": "alpaca-py",
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "layers": [
+        "broker-sdk",
+        "reconciliation"
+      ],
+      "role": "Official Python Trading API and market-data SDK",
+      "decision": "default",
+      "rationale": "Use a read-only account/order observer independent of the strategy loop; keep a single order writer.",
+      "version_or_commit": "0.44.0",
+      "release_date": "2026-08-11T10:15:07.141408Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Stocks/ETFs, positions, orders and data clients are native SDK concepts.",
+      "alpaca_fit": "TradingClient(..., paper=True), account/positions/orders queries and trade-update subscription are implemented.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. read-only paper account query; private paper credentials must already be provided by the operator.",
+        "python -m pip install alpaca-py==0.44.0",
+        "python - <<'PY'\nimport os\nfrom alpaca.trading.client import TradingClient\nfrom alpaca.trading.requests import GetOrdersRequest\nfrom alpaca.trading.enums import QueryOrderStatus\nc=TradingClient(os.environ['ALPACA_PAPER_KEY'],os.environ['ALPACA_PAPER_SECRET'],paper=True)\nprint(c.get_account().status)\nprint(len(c.get_all_positions()))\nprint(len(c.get_orders(filter=GetOrdersRequest(status=QueryOrderStatus.OPEN))))\nPY"
+      ],
+      "requirements": [
+        "Python <4.0.0,>=3.10.0; use a separate environment for this package.",
+        "Private paper-account credentials; no credentials in source or catalog.",
+        "Durable local order journal and application-level reconciliation are separate implementation work."
+      ],
+      "limitations": [
+        "SDK availability does not prove paper connectivity, exactly-once submission, restart recovery or entitlement.",
+        "Basic/paper-only equities data is IEX; do not equate it with consolidated SIP coverage.",
+        "On ambiguous order timeout, do not blindly resubmit; follow broker confirmation/reconciliation guidance.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/README.md",
+        "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/LICENSE",
+        "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/pyproject.toml",
+        "https://pypi.org/project/alpaca-py/0.44.0/",
+        "https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0",
+        "https://alpaca.markets/sdks/python/api_reference/trading/stream.html",
+        "https://docs.alpaca.markets/us/docs/working-with-orders",
+        "https://docs.alpaca.markets/us/docs/paper-trading",
+        "https://docs.alpaca.markets/us/docs/about-market-data-api",
+        "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/alpaca/trading/client.py"
+      ]
+    },
+    {
+      "id": "nautilustrader",
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "layers": [
+        "backtesting",
+        "execution-engine"
+      ],
+      "role": "Typed event-driven multi-venue engine",
+      "decision": "alternative",
+      "rationale": "Strong alternative if the broker/data requirements change, especially IBKR; avoid writing a new Alpaca adapter merely to switch engines.",
+      "version_or_commit": "1.231.0",
+      "release_date": "2026-08-02T18:47:40.645057Z",
+      "license": "LGPL-3.0-or-later",
+      "us_equities_fit": "Stable source includes equities examples and Interactive Brokers/Databento adapters.",
+      "alpaca_fit": "No Alpaca directory in the inspected v1.231.0 adapter tree.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/nautechsystems/nautilus_trader/blob/v1.231.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. upstream AAPL backtest requires the documented local Databento sample files.",
+        "python -m pip install nautilus_trader==1.231.0",
+        "git clone https://github.com/nautechsystems/nautilus_trader.git nautilus_trader",
+        "git -C nautilus_trader checkout --detach v1.231.0",
+        "cd nautilus_trader",
+        "python examples/backtest/databento_ema_cross_long_only_aapl_bars.py"
+      ],
+      "requirements": [
+        "Python <3.15,>=3.12; use a separate environment for this package.",
+        "Release-compatible wheels or a Rust/Cython build environment.",
+        "Example expects aapl-xnas-ohlcv-1s-2023.dbn.zst and aapl-xnas-ohlcv-1m-2023.dbn.zst under tests/test_data/databento/temp.",
+        "IBKR route additionally requires TWS/Gateway, account permissions and data subscriptions."
+      ],
+      "limitations": [
+        "v2 Rust/PyO3 development and release-candidate documentation is not interchangeable with stable 1.231.0 APIs.",
+        "No local simulation, broker session or latency benchmark performed.",
+        "Event semantics shared by backtest/live still require a calibrated data/fill model and recovery tests.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/nautechsystems/nautilus_trader/blob/v1.231.0/README.md",
+        "https://github.com/nautechsystems/nautilus_trader/blob/v1.231.0/LICENSE",
+        "https://github.com/nautechsystems/nautilus_trader/blob/v1.231.0/pyproject.toml",
+        "https://pypi.org/project/nautilus_trader/1.231.0/",
+        "https://github.com/nautechsystems/nautilus_trader/releases/tag/v1.231.0",
+        "https://github.com/nautechsystems/nautilus_trader/tree/v1.231.0/nautilus_trader/adapters",
+        "https://github.com/nautechsystems/nautilus_trader/blob/v1.231.0/examples/backtest/databento_ema_cross_long_only_aapl_bars.py",
+        "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/"
+      ]
+    },
+    {
+      "id": "lumibot",
+      "repository": "https://github.com/Lumiwealth/lumibot",
+      "layers": [
+        "backtesting",
+        "execution-engine",
+        "broker-adapter"
+      ],
+      "role": "Python strategy lifecycle with built-in Alpaca broker",
+      "decision": "alternative",
+      "rationale": "Most direct Python-first alternative for the same backtest/paper strategy class; retain as an alternative rather than a second active engine.",
+      "version_or_commit": "4.5.91",
+      "release_date": "2026-09-06T21:16:02.051952Z",
+      "license": "GPL-3.0 license file; conflicting MIT package metadata (unresolved)",
+      "us_equities_fit": "Deterministic equity strategies and historical-data backtesting are documented.",
+      "alpaca_fit": "Shipped Alpaca broker constructs paper-aware REST/stream clients; paper mode uses PAPER=True.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/Lumiwealth/lumibot/blob/v4.5.91/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. deterministic backtest only; downloads Yahoo data and never creates a broker.",
+        "python -m pip install lumibot==4.5.91",
+        "python - <<'PY'\nfrom datetime import datetime\nfrom lumibot.strategies import Strategy\nfrom lumibot.backtesting import YahooDataBacktesting\nclass Baseline(Strategy):\n    def on_trading_iteration(self):\n        if self.first_iteration:\n            self.submit_order(self.create_order('SPY',1,'buy'))\nBaseline.backtest(YahooDataBacktesting,datetime(2023,1,1),datetime(2024,1,1))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; use a separate environment for this package.",
+        "Isolated Python environment and audited data provider.",
+        "Resolve license conflict before adoption or redistribution."
+      ],
+      "limitations": [
+        "Release LICENSE is GPL-3.0 while setup.py declares MIT; the conflict is unresolved, not silently treated as permissive.",
+        "Current agent examples can invoke paid LLMs and submit orders; those paths are outside this deterministic workflow.",
+        "Yahoo example data and one backtest are not point-in-time universe or execution-quality validation.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/Lumiwealth/lumibot/blob/v4.5.91/README.md",
+        "https://github.com/Lumiwealth/lumibot/blob/v4.5.91/LICENSE",
+        "https://github.com/Lumiwealth/lumibot/blob/v4.5.91/pyproject.toml",
+        "https://github.com/Lumiwealth/lumibot/blob/v4.5.91/setup.py",
+        "https://pypi.org/project/lumibot/4.5.91/",
+        "https://github.com/Lumiwealth/lumibot/releases/tag/v4.5.91",
+        "https://github.com/Lumiwealth/lumibot/blob/v4.5.91/lumibot/brokers/alpaca.py"
+      ]
+    },
+    {
+      "id": "vectorbt",
+      "repository": "https://github.com/polakowo/vectorbt",
+      "layers": [
+        "vectorized-research",
+        "backtesting"
+      ],
+      "role": "Fast signal/parameter sweeps and portfolio simulation",
+      "decision": "alternative",
+      "rationale": "Use for broad research only if its array semantics and license fit; recheck selected strategies in the chosen event-driven engine.",
+      "version_or_commit": "1.1.0",
+      "release_date": "2026-07-05T17:21:08.372312Z",
+      "license": "Apache-2.0 with Commons Clause License Condition v1.0",
+      "us_equities_fit": "Works on supplied equity price arrays; no entitlement or corporate-action dataset included.",
+      "alpaca_fit": "Research outputs must be translated and verified in the execution engine; no selected official Alpaca execution route.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/polakowo/vectorbt/blob/v1.1.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local-file holding baseline; sample fee assumption is not broker calibration.",
+        "python -m pip install vectorbt==1.1.0",
+        "python - <<'PY'\nimport pandas as pd, vectorbt as vbt\np=pd.read_csv('prices.csv',index_col=0,parse_dates=True)\nprint(vbt.Portfolio.from_holding(p,fees=0.001,freq='1D').stats())\nPY"
+      ],
+      "requirements": [
+        "Python <3.15,>=3.11; use a separate environment for this package.",
+        "prices.csv with aligned daily prices; defined adjustment/session policy.",
+        "Numba and compatible NumPy/pandas; optional Rust extension is separate."
+      ],
+      "limitations": [
+        "Apache-2.0 plus Commons Clause v1.0; do not describe as unrestricted Apache-only software.",
+        "PRO is a separate membership/commercial-license product (site advertises 2026.9.5); private code and member install API were not audited.",
+        "Fast parameter search increases multiple-testing exposure; it does not establish edge.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/polakowo/vectorbt/blob/v1.1.0/README.md",
+        "https://github.com/polakowo/vectorbt/blob/v1.1.0/LICENSE.md",
+        "https://github.com/polakowo/vectorbt/blob/v1.1.0/pyproject.toml",
+        "https://github.com/polakowo/vectorbt/blob/v1.1.0/setup.py",
+        "https://pypi.org/project/vectorbt/1.1.0/",
+        "https://github.com/polakowo/vectorbt/releases/tag/v1.1.0",
+        "https://vectorbt.pro/",
+        "https://vectorbt.pro/terms/software-license/"
+      ]
+    },
+    {
+      "id": "backtrader",
+      "repository": "https://github.com/mementum/backtrader",
+      "layers": [
+        "backtesting",
+        "legacy-engine"
+      ],
+      "role": "Mature Python event-driven research framework",
+      "decision": "alternative",
+      "rationale": "Reasonable for existing strategies and offline comparisons; old integrations and package age make it a weaker new Alpaca default.",
+      "version_or_commit": "1.9.78.123",
+      "release_date": "2023-04-19T14:13:18.842786Z",
+      "license": "GPL-3.0-or-later",
+      "us_equities_fit": "CSV/Pandas multi-feed simulations, commissions, order types and slippage are documented.",
+      "alpaca_fit": "Alpaca integration is a separate older repository, not built into the reviewed core.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/mementum/backtrader/blob/b853d7c90b6721476eb5a5ea3135224e33db1f14/README.rst"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. read the pinned bundled example before running it with licensed local data.",
+        "python -m pip install backtrader==1.9.78.123",
+        "git clone https://github.com/mementum/backtrader.git backtrader",
+        "git -C backtrader checkout --detach b853d7c90b6721476eb5a5ea3135224e33db1f14",
+        "git -C backtrader show HEAD:samples/sigsmacross/sigsmacross.py"
+      ],
+      "requirements": [
+        "Separate compatibility environment; local data and explicit broker/fill settings."
+      ],
+      "limitations": [
+        "Latest PyPI upload and repository HEAD are from 2023; do not infer compatibility with every modern dependency or broker API.",
+        "Core examples reference dated Yahoo/IBPy integrations; source review is not current connectivity acceptance.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/mementum/backtrader/blob/b853d7c90b6721476eb5a5ea3135224e33db1f14/README.rst",
+        "https://github.com/mementum/backtrader/blob/b853d7c90b6721476eb5a5ea3135224e33db1f14/LICENSE",
+        "https://github.com/mementum/backtrader/blob/b853d7c90b6721476eb5a5ea3135224e33db1f14/setup.py",
+        "https://pypi.org/project/backtrader/1.9.78.123/"
+      ]
+    },
+    {
+      "id": "backtesting-py",
+      "repository": "https://github.com/kernc/backtesting.py",
+      "layers": [
+        "backtesting",
+        "single-instrument-research"
+      ],
+      "role": "Small OHLC strategy prototyping engine",
+      "decision": "alternative",
+      "rationale": "Useful for isolated signal sanity checks; not the portfolio execution/reconciliation host.",
+      "version_or_commit": "0.6.6",
+      "release_date": "2026-07-22T14:39:23.626152Z",
+      "license": "AGPL-3.0-or-later",
+      "us_equities_fit": "Single-instrument OHLC(V) examples include bundled GOOG data.",
+      "alpaca_fit": "No reviewed Alpaca broker execution adapter.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. inspect built-in local sample and callable API; research code supplies the Strategy subclass.",
+        "python -m pip install backtesting==0.6.6",
+        "python - <<'PY'\nfrom backtesting.test import GOOG\nfrom backtesting import Backtest\nprint(GOOG[['Open','High','Low','Close','Volume']].shape)\nprint(Backtest.__doc__.splitlines()[1])\nPY"
+      ],
+      "requirements": [
+        "Python >=3.9; use a separate environment for this package.",
+        "Explicit strategy subclass, slippage/cost assumptions and subsequent portfolio-engine comparison."
+      ],
+      "limitations": [
+        "AGPL obligations differ from permissive libraries; review intended distribution/network deployment.",
+        "A parameter optimizer and attractive bundled example statistics are not out-of-sample evidence.",
+        "Workflow is an offline data/API inspection, not a completed strategy backtest.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/README.md",
+        "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/LICENSE.md",
+        "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/pyproject.toml",
+        "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/setup.py",
+        "https://pypi.org/project/backtesting/0.6.6/"
+      ]
+    },
+    {
+      "id": "zipline-reloaded",
+      "repository": "https://github.com/stefan-jansen/zipline-reloaded",
+      "layers": [
+        "backtesting",
+        "factor-research"
+      ],
+      "role": "Maintained Zipline research continuation",
+      "decision": "alternative",
+      "rationale": "Useful for existing Zipline/Pipeline research; avoid adopting a second event engine without a specific need.",
+      "version_or_commit": "3.1.1",
+      "release_date": "2025-07-19T13:52:06.873238Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Equity calendars, bundles and pandas research workflow; data ingestion is explicit.",
+      "alpaca_fit": "No selected built-in Alpaca paper route verified.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/stefan-jansen/zipline-reloaded/blob/3.1.1/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. requires an already ingested licensed bundle and a reviewed local algorithm.",
+        "python -m pip install zipline-reloaded==3.1.1",
+        "zipline run -f \"${ALGORITHM_FILE}\" -b \"${ZIPLINE_BUNDLE}\" --start 2020-01-01 --end 2021-01-01 -o research.pickle --no-benchmark"
+      ],
+      "requirements": [
+        "Python >=3.10; use a separate environment for this package.",
+        "Compiled dependencies, compatible pandas/NumPy and exchange_calendars; documented bundle ingestion.",
+        "Treat serialized results as trusted local artifacts only."
+      ],
+      "limitations": [
+        "README Nasdaq/Quandl tutorial data is historical; it is not a current universe or guaranteed free/live feed.",
+        "Current PyPI requires Python >=3.10 although parts of README say >=3.9.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/stefan-jansen/zipline-reloaded/blob/3.1.1/README.md",
+        "https://github.com/stefan-jansen/zipline-reloaded/blob/3.1.1/LICENSE",
+        "https://github.com/stefan-jansen/zipline-reloaded/blob/3.1.1/pyproject.toml",
+        "https://github.com/stefan-jansen/zipline-reloaded/blob/3.1.1/setup.py",
+        "https://pypi.org/project/zipline-reloaded/3.1.1/",
+        "https://github.com/stefan-jansen/zipline-reloaded/releases/tag/3.1.1"
+      ]
+    },
+    {
+      "id": "bt",
+      "repository": "https://github.com/pmorissette/bt",
+      "layers": [
+        "portfolio-backtesting"
+      ],
+      "role": "Composable portfolio allocation backtests",
+      "decision": "alternative",
+      "rationale": "Good lightweight allocation comparator; complements rather than replaces the order-state engine.",
+      "version_or_commit": "1.2.3",
+      "release_date": "2026-09-12T00:45:25.544397Z",
+      "license": "MIT",
+      "us_equities_fit": "Monthly rebalance and multi-asset historical-price research fit equity/ETF portfolios.",
+      "alpaca_fit": "No broker execution adapter in the selected workflow.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/pmorissette/bt/blob/v1.2.3/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local price matrix only.",
+        "python -m pip install bt==1.2.3",
+        "python - <<'PY'\nimport pandas as pd, bt\np=pd.read_csv('prices.csv',index_col=0,parse_dates=True)\ns=bt.Strategy('equal_weight',[bt.algos.RunMonthly(),bt.algos.SelectAll(),bt.algos.WeighEqually(),bt.algos.Rebalance()])\nbt.run(bt.Backtest(s,p)).display()\nPY"
+      ],
+      "requirements": [
+        "Python >=3.9; use a separate environment for this package.",
+        "Aligned prices.csv, cost model and point-in-time membership supplied by researcher."
+      ],
+      "limitations": [
+        "Default demonstration does not calibrate costs or order fills.",
+        "Portfolio accounting research is not broker risk, reconciliation or live operations.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/pmorissette/bt/blob/v1.2.3/README.md",
+        "https://github.com/pmorissette/bt/blob/v1.2.3/LICENSE",
+        "https://github.com/pmorissette/bt/blob/v1.2.3/pyproject.toml",
+        "https://pypi.org/project/bt/1.2.3/",
+        "https://github.com/pmorissette/bt/releases/tag/v1.2.3"
+      ]
+    },
+    {
+      "id": "qlib",
+      "repository": "https://github.com/microsoft/qlib",
+      "layers": [
+        "ml-research",
+        "factor-research",
+        "research-workflows"
+      ],
+      "role": "Structured factor/model training and backtest workflows",
+      "decision": "conditional",
+      "rationale": "Adopt only after a point-in-time US dataset and baseline are established; useful experiment organization and signal analysis.",
+      "version_or_commit": "0.9.7",
+      "release_date": "2025-08-15T09:51:40.103455Z",
+      "license": "MIT",
+      "us_equities_fit": "US region is supported, but the reviewed Alpha158/LightGBM YAML defaults to China/CSI300.",
+      "alpaca_fit": "No verified direct Alpaca execution adapter; export dated signals to the chosen engine.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/microsoft/qlib/blob/v0.9.7/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. QLIB_US_CONFIG must be a reviewed US adaptation, not the unchanged China example.",
+        "python -m pip install pyqlib==0.9.7",
+        "qrun \"${QLIB_US_CONFIG}\""
+      ],
+      "requirements": [
+        "Python >=3.8.0; use a separate environment for this package.",
+        "QLib-format licensed US prices/features, explicit REG_US/market/benchmark/calendar and train/validation/test dates.",
+        "Correct US exchange/lot/price-limit/fee configuration; LightGBM and experiment storage."
+      ],
+      "limitations": [
+        "The bundled China workflow uses CSI300, SH000300 and China-style exchange costs/limits; copying it does not prove US-equity compatibility.",
+        "Upstream data download availability is not verified; data health/PIT audit precedes model training.",
+        "Automated factor mining/RD-Agent is separate and can incur model costs and multiple-testing bias.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/microsoft/qlib/blob/v0.9.7/README.md",
+        "https://github.com/microsoft/qlib/blob/v0.9.7/LICENSE",
+        "https://github.com/microsoft/qlib/blob/v0.9.7/pyproject.toml",
+        "https://github.com/microsoft/qlib/blob/v0.9.7/setup.py",
+        "https://pypi.org/project/pyqlib/0.9.7/",
+        "https://github.com/microsoft/qlib/releases/tag/v0.9.7",
+        "https://github.com/microsoft/qlib/blob/v0.9.7/examples/benchmarks/LightGBM/workflow_config_lightgbm_Alpha158.yaml",
+        "https://github.com/microsoft/qlib/blob/v0.9.7/qlib/tests/data.py",
+        "https://qlib.readthedocs.io/en/latest/component/workflow.html"
+      ]
+    },
+    {
+      "id": "finrl",
+      "repository": "https://github.com/AI4Finance-Foundation/FinRL",
+      "layers": [
+        "reinforcement-learning",
+        "research-demos"
+      ],
+      "role": "Educational train/test/trade reinforcement-learning framework",
+      "decision": "watch",
+      "rationale": "Keep as an experimental RL benchmark, after deterministic and supervised baselines; not a production execution default.",
+      "version_or_commit": "2334a5fe6d30629157f13c3b0319e1637e15e123",
+      "release_date": null,
+      "license": "MIT",
+      "us_equities_fit": "Stock-trading Gym environments and US-stock examples are present.",
+      "alpaca_fit": "Original repository contains basic Alpaca-oriented examples; connection robustness not established.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. source inspection only; no training/data/broker process starts.",
+        "git clone https://github.com/AI4Finance-Foundation/FinRL.git FinRL",
+        "git -C FinRL checkout --detach 2334a5fe6d30629157f13c3b0319e1637e15e123",
+        "git -C FinRL show HEAD:finrl/meta/env_stock_trading/env_stocktrading.py"
+      ],
+      "requirements": [
+        "Reviewed source setup.py declares Python >=3.7; resolve a compatible modern dependency lock rather than assuming the old PyPI environment matches this source.",
+        "Separate pinned RL/Gym/Stable-Baselines environment and audited chronological dataset.",
+        "Reward, cost, state and action definitions must match tradable constraints."
+      ],
+      "limitations": [
+        "Latest GitHub release is v0.3.8 (2026-03-20); PyPI finrl remains 0.3.7 (2024). This entry pins reviewed source, not the older wheel.",
+        "Current README positions this repository as educational/research and redirects deployment work to FinRL-Trading.",
+        "Environment reward/backtest gains do not establish executable alpha, fill realism, or safe position sizing.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/README.md",
+        "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/LICENSE",
+        "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/pyproject.toml",
+        "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/setup.py",
+        "https://github.com/AI4Finance-Foundation/FinRL/commit/2334a5fe6d30629157f13c3b0319e1637e15e123",
+        "https://github.com/AI4Finance-Foundation/FinRL/releases/tag/v0.3.8"
+      ]
+    },
+    {
+      "id": "fingpt",
+      "repository": "https://github.com/AI4Finance-Foundation/FinGPT",
+      "layers": [
+        "financial-nlp",
+        "research-demos"
+      ],
+      "role": "Financial sentiment/LLM fine-tuning and forecasting research",
+      "decision": "watch",
+      "rationale": "Potential text-feature producer under dated evidence controls; never the sole portfolio or order authority.",
+      "version_or_commit": "cefb3a26b84a3a4c57868f1ca48fb0d9723fd28e",
+      "release_date": null,
+      "license": "MIT",
+      "us_equities_fit": "US-company/news datasets and Dow30 forecasting examples are documented.",
+      "alpaca_fit": "No selected deterministic Alpaca execution adapter.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/AI4Finance-Foundation/FinGPT/blob/cefb3a26b84a3a4c57868f1ca48fb0d9723fd28e/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. pinned source review only; model downloads/inference are not started.",
+        "git clone https://github.com/AI4Finance-Foundation/FinGPT.git FinGPT",
+        "git -C FinGPT checkout --detach cefb3a26b84a3a4c57868f1ca48fb0d9723fd28e",
+        "git -C FinGPT show HEAD:README.md"
+      ],
+      "requirements": [
+        "Reviewed source setup.py declares Python >=3.8,<3.13; individual model projects can have stricter dependencies.",
+        "Separate base-model and dataset licenses, GPU or explicitly configured provider, timestamped text corpus.",
+        "Evaluate NLP labels separately from downstream net trading outcomes."
+      ],
+      "limitations": [
+        "GitHub release v1.0.0 (2026-04-08) and PyPI fingpt 0.0.1 (2023) are different surfaces; reviewed source is pinned explicitly.",
+        "Code MIT does not automatically cover Llama-family base weights, datasets or third-party news.",
+        "README historical benchmark/low-cost claims are not current comparative evidence and were not reproduced.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/AI4Finance-Foundation/FinGPT/blob/cefb3a26b84a3a4c57868f1ca48fb0d9723fd28e/README.md",
+        "https://github.com/AI4Finance-Foundation/FinGPT/blob/cefb3a26b84a3a4c57868f1ca48fb0d9723fd28e/LICENSE",
+        "https://github.com/AI4Finance-Foundation/FinGPT/blob/cefb3a26b84a3a4c57868f1ca48fb0d9723fd28e/setup.py",
+        "https://github.com/AI4Finance-Foundation/FinGPT/commit/cefb3a26b84a3a4c57868f1ca48fb0d9723fd28e",
+        "https://github.com/AI4Finance-Foundation/FinGPT/releases/tag/v1.0.0"
+      ]
+    },
+    {
+      "id": "quantstats",
+      "repository": "https://github.com/ranaroussi/quantstats",
+      "layers": [
+        "performance-evaluation"
+      ],
+      "role": "Human-readable return/risk reports",
+      "decision": "default",
+      "rationale": "One report layer for reconciled equity curves; independently cross-check critical metrics rather than installing several report stacks by default.",
+      "version_or_commit": "0.0.81",
+      "release_date": "2026-01-13T18:18:18.451739Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Works on supplied strategy/benchmark return series.",
+      "alpaca_fit": "Consumes journal-derived returns; does not connect to Alpaca or reconcile orders.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/ranaroussi/quantstats/blob/v0.0.81/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local return series and local HTML output; benchmark is a Series, avoiding implicit ticker download.",
+        "python -m pip install quantstats==0.0.81",
+        "python - <<'PY'\nimport pandas as pd, quantstats as qs\nr=pd.read_csv('returns.csv',index_col=0,parse_dates=True)\nqs.reports.html(r['strategy'],benchmark=r['benchmark'],output='tearsheet.html',periods_per_year=252)\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; use a separate environment for this package.",
+        "returns.csv with dated decimal strategy and benchmark returns; aligned frequency and cash-flow handling.",
+        "Declare annualization and risk-free-rate convention; retain underlying journal."
+      ],
+      "limitations": [
+        "Statistics operate on return periods, not individual trade win rates.",
+        "A tear sheet is descriptive; it does not fix leakage, trial selection, poor fills or accounting errors.",
+        "Example 252-period convention must be changed for other sampling frequencies.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/ranaroussi/quantstats/blob/v0.0.81/README.md",
+        "https://github.com/ranaroussi/quantstats/blob/v0.0.81/LICENSE.txt",
+        "https://github.com/ranaroussi/quantstats/blob/v0.0.81/pyproject.toml",
+        "https://pypi.org/project/quantstats/0.0.81/",
+        "https://github.com/ranaroussi/quantstats/releases/tag/v0.0.81",
+        "https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/reports.py",
+        "https://github.com/ranaroussi/quantstats/blob/v0.0.81/quantstats/stats.py"
+      ]
+    },
+    {
+      "id": "pyportfolioopt",
+      "repository": "https://github.com/PyPortfolio/PyPortfolioOpt",
+      "layers": [
+        "portfolio-optimization"
+      ],
+      "role": "Transparent classical allocation and covariance models",
+      "decision": "alternative",
+      "rationale": "Straightforward optimizer if a small allocation module suffices; skfolio is preferred when model-selection orchestration is central.",
+      "version_or_commit": "1.6.0",
+      "release_date": "2026-02-26T23:29:39.493214Z",
+      "license": "MIT",
+      "us_equities_fit": "Mean-variance, shrinkage, HRP and Black-Litterman can consume US-equity returns.",
+      "alpaca_fit": "Weights are proposals only; execution must check available assets, cash, rounding and open orders.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/PyPortfolio/PyPortfolioOpt/blob/v1.6.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local data; example computes a research minimum-volatility allocation.",
+        "python -m pip install PyPortfolioOpt==1.6.0",
+        "python - <<'PY'\nimport pandas as pd\nfrom pypfopt import EfficientFrontier,expected_returns,risk_models\np=pd.read_csv('prices.csv',index_col=0,parse_dates=True)\nm=EfficientFrontier(expected_returns.mean_historical_return(p),risk_models.CovarianceShrinkage(p).ledoit_wolf())\nm.min_volatility()\nprint(m.clean_weights())\nPY"
+      ],
+      "requirements": [
+        "Compatible Python/CVXPY solver, finite aligned prices and explicit constraints."
+      ],
+      "limitations": [
+        "No optimizer can supply reliable expected returns by itself; concentration/turnover and covariance error need out-of-sample stress.",
+        "Latest repository moved to PyPortfolio/PyPortfolioOpt; old robertmartin8 URL redirects.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/PyPortfolio/PyPortfolioOpt/blob/v1.6.0/README.md",
+        "https://github.com/PyPortfolio/PyPortfolioOpt/blob/v1.6.0/LICENSE",
+        "https://github.com/PyPortfolio/PyPortfolioOpt/blob/v1.6.0/pyproject.toml",
+        "https://pypi.org/project/PyPortfolioOpt/1.6.0/",
+        "https://github.com/PyPortfolio/PyPortfolioOpt/releases/tag/v1.6.0",
+        "https://github.com/PyPortfolio/PyPortfolioOpt/blob/v1.6.0/pypfopt/efficient_frontier/efficient_frontier.py",
+        "https://github.com/PyPortfolio/PyPortfolioOpt/blob/v1.6.0/pypfopt/risk_models.py"
+      ]
+    },
+    {
+      "id": "riskfolio-lib",
+      "repository": "https://github.com/dcajasn/Riskfolio-Lib",
+      "layers": [
+        "portfolio-optimization",
+        "tail-risk"
+      ],
+      "role": "Broad convex risk, risk-budgeting and hierarchical allocation toolkit",
+      "decision": "alternative",
+      "rationale": "Choose when a specified CVaR/drawdown/risk-budget constraint warrants its larger solver surface.",
+      "version_or_commit": "7.3.0",
+      "release_date": "2026-05-31T07:11:19.001687Z",
+      "license": "BSD-3-Clause",
+      "us_equities_fit": "Portfolio methods apply to a cleaned equity return matrix.",
+      "alpaca_fit": "No broker adapter; resulting weights require deterministic execution checks.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/dcajasn/Riskfolio-Lib/blob/632a9e48fbaf2b9f8e83864a492332364b6ed32c/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local return matrix and solver; no account.",
+        "python -m pip install Riskfolio-Lib==7.3.0",
+        "python - <<'PY'\nimport pandas as pd, riskfolio as rp\nr=pd.read_csv('returns.csv',index_col=0,parse_dates=True)\np=rp.Portfolio(returns=r)\np.assets_stats(method_mu='hist',method_cov='hist')\nprint(p.optimization(model='Classic',rm='CVaR',obj='MinRisk',hist=True))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; use a separate environment for this package.",
+        "Numerical dependencies and a solver supporting the selected problem cones; some choices require optional/commercial solvers."
+      ],
+      "limitations": [
+        "More risk measures increase research degrees of freedom; select the objective before examining the holdout.",
+        "A feasible allocation under estimated tails does not bound future losses or implement a broker kill switch.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/dcajasn/Riskfolio-Lib/blob/632a9e48fbaf2b9f8e83864a492332364b6ed32c/README.md",
+        "https://github.com/dcajasn/Riskfolio-Lib/blob/632a9e48fbaf2b9f8e83864a492332364b6ed32c/LICENSE.txt",
+        "https://github.com/dcajasn/Riskfolio-Lib/blob/632a9e48fbaf2b9f8e83864a492332364b6ed32c/pyproject.toml",
+        "https://github.com/dcajasn/Riskfolio-Lib/blob/632a9e48fbaf2b9f8e83864a492332364b6ed32c/setup.py",
+        "https://pypi.org/project/Riskfolio-Lib/7.3.0/",
+        "https://github.com/dcajasn/Riskfolio-Lib/blob/632a9e48fbaf2b9f8e83864a492332364b6ed32c/riskfolio/src/Portfolio.py"
+      ]
+    },
+    {
+      "id": "skfolio",
+      "repository": "https://github.com/skfolio/skfolio",
+      "layers": [
+        "portfolio-optimization",
+        "model-selection"
+      ],
+      "role": "Portfolio estimators with chronological validation",
+      "decision": "conditional",
+      "rationale": "Preferred research module when comparing allocations; explicit WalkForward/CPCV helps make split policy reviewable.",
+      "version_or_commit": "1.2.8",
+      "release_date": "2026-09-16T12:13:24.532236Z",
+      "license": "BSD-3-Clause",
+      "us_equities_fit": "US equities fit through researcher-supplied returns, constraints and dated factor inputs.",
+      "alpaca_fit": "No broker execution; weights remain inputs to the order-risk service.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/skfolio/skfolio/blob/v1.2.8/README.rst"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. inspect chronological split indices; choose purge length from actual decision/label horizon.",
+        "python -m pip install skfolio==1.2.8",
+        "python - <<'PY'\nimport pandas as pd\nfrom skfolio.model_selection import WalkForward\nr=pd.read_csv('returns.csv',index_col=0,parse_dates=True)\ncv=WalkForward(train_size=252,test_size=21,purged_size=1)\nfor train,test in cv.split(r):\n    print(r.index[train[-1]],r.index[test[0]],len(test))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; use a separate environment for this package.",
+        "At least 274 valid time-ordered observations for the example; explicit split/embargo and execution-delay policy.",
+        "CVXPY and an appropriate solver for later allocation fitting."
+      ],
+      "limitations": [
+        "WalkForward/CPCV purge and embargo default to zero; installing the library does not prevent leakage.",
+        "Fixed observation-count purging must be mapped to overlapping labels and timestamps; retain a final chronological holdout.",
+        "Optimization/risk estimates are not pre-trade enforcement or broker reconciliation.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/skfolio/skfolio/blob/v1.2.8/README.rst",
+        "https://github.com/skfolio/skfolio/blob/v1.2.8/LICENSE",
+        "https://github.com/skfolio/skfolio/blob/v1.2.8/pyproject.toml",
+        "https://pypi.org/project/skfolio/1.2.8/",
+        "https://github.com/skfolio/skfolio/releases/tag/v1.2.8",
+        "https://github.com/skfolio/skfolio/blob/v1.2.8/src/skfolio/model_selection/_walk_forward.py",
+        "https://github.com/skfolio/skfolio/blob/v1.2.8/src/skfolio/model_selection/_combinatorial.py",
+        "https://skfolio.org/generated/skfolio.optimization.MeanRisk.html"
+      ]
+    },
+    {
+      "id": "empyrical-reloaded",
+      "repository": "https://github.com/stefan-jansen/empyrical-reloaded",
+      "layers": [
+        "performance-evaluation"
+      ],
+      "role": "Small independent return/risk metric functions",
+      "decision": "conditional",
+      "rationale": "Use as a second calculation path for selected report metrics or when Zipline requires it.",
+      "version_or_commit": "0.5.12",
+      "release_date": "2025-06-01T23:17:09.958416Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Aligned decimal equity returns and benchmark inputs.",
+      "alpaca_fit": "No brokerage integration.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local metric calculation.",
+        "python -m pip install empyrical-reloaded==0.5.12",
+        "python - <<'PY'\nimport pandas as pd, empyrical as ep\nr=pd.read_csv('returns.csv',index_col=0,parse_dates=True)\nprint(ep.max_drawdown(r['strategy']))\nprint(ep.alpha_beta(r['strategy'],r['benchmark']))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.9; use a separate environment for this package.",
+        "Explicit frequency/annualization and matching benchmark; select Python >=3.10 to satisfy README as well as package metadata."
+      ],
+      "limitations": [
+        "Shares import name empyrical with the older package; do not install both into one environment.",
+        "README warns optional pandas-datareader integration is incompatible with Python >=3.12; local-array workflow avoids it.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/README.md",
+        "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/LICENSE",
+        "https://github.com/stefan-jansen/empyrical-reloaded/blob/0.5.12/pyproject.toml",
+        "https://pypi.org/project/empyrical-reloaded/0.5.12/",
+        "https://github.com/stefan-jansen/empyrical-reloaded/releases/tag/0.5.12"
+      ]
+    },
+    {
+      "id": "ffn",
+      "repository": "https://github.com/pmorissette/ffn",
+      "layers": [
+        "performance-evaluation",
+        "portfolio-research"
+      ],
+      "role": "Pandas-oriented financial transformations and statistics",
+      "decision": "alternative",
+      "rationale": "Useful mainly when bt is selected; avoid adding another report dependency without need.",
+      "version_or_commit": "1.2.2",
+      "release_date": "2026-09-17T15:40:18.439608Z",
+      "license": "MIT",
+      "us_equities_fit": "Prices/returns/statistics can be supplied locally.",
+      "alpaca_fit": "No brokerage integration.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/pmorissette/ffn/blob/42c4473de46fecc270eb95bd5803cf67d8463f57/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local price transformation and summary.",
+        "python -m pip install ffn==1.2.2",
+        "python - <<'PY'\nimport pandas as pd, ffn\np=pd.read_csv('prices.csv',index_col=0,parse_dates=True)\nprint(p.to_returns().dropna().tail())\np.calc_stats().display()\nPY"
+      ],
+      "requirements": [
+        "Python >=3.9; use a separate environment for this package.",
+        "Aligned local price matrix and common accounting/annualization conventions."
+      ],
+      "limitations": [
+        "PyPI 1.2.2 (2026-09-17) is newer than GitHub latest-release marker v1.2.1; reviewed source corresponds to current package date.",
+        "Convenient data download helpers do not establish provider licensing or point-in-time data quality.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/pmorissette/ffn/blob/42c4473de46fecc270eb95bd5803cf67d8463f57/README.md",
+        "https://github.com/pmorissette/ffn/blob/42c4473de46fecc270eb95bd5803cf67d8463f57/LICENSE",
+        "https://github.com/pmorissette/ffn/blob/42c4473de46fecc270eb95bd5803cf67d8463f57/pyproject.toml",
+        "https://pypi.org/project/ffn/1.2.2/",
+        "https://github.com/pmorissette/ffn/releases/tag/v1.2.1"
+      ]
+    },
+    {
+      "id": "cvxportfolio",
+      "repository": "https://github.com/cvxgrp/cvxportfolio",
+      "layers": [
+        "portfolio-optimization",
+        "cost-aware-simulation"
+      ],
+      "role": "Multi-period portfolio policies with transaction/holding cost models",
+      "decision": "conditional",
+      "rationale": "Useful once turnover/cost-aware allocation is the research question, beyond static weight optimization.",
+      "version_or_commit": "1.5.1",
+      "release_date": "2025-07-06T16:06:02.415917Z",
+      "license": "GPL-3.0-or-later",
+      "us_equities_fit": "US-stock-oriented simulator and custom returns/volumes/prices are supported.",
+      "alpaca_fit": "No selected Alpaca order adapter; revalidate target trades in LEAN and the risk/reconciliation layer.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local open-to-open return matrix whose LAST column is explicit USDOLLAR cash returns.",
+        "python -m pip install cvxportfolio==1.5.1",
+        "python - <<'PY'\nimport pandas as pd, cvxportfolio as cvx\nr=pd.read_csv('returns.csv',index_col=0,parse_dates=True)\nassert r.columns[-1]=='USDOLLAR'\nsim=cvx.MarketSimulator(returns=r,cash_key='USDOLLAR',costs=())\nprint(sim.backtest(cvx.Uniform()))\nPY"
+      ],
+      "requirements": [
+        "CVXPY/solver and enough history; return at t represents open(t+1)/open(t)-1.",
+        "Example intentionally uses no costs; a research-ready run must supply calibrated costs, prices and dollar volumes."
+      ],
+      "limitations": [
+        "Forward-aligned return convention differs from many reports; misalignment can leak future information.",
+        "When cash returns are absent, simulator may download risk-free data; explicit final cash column avoids that path.",
+        "Research simulator is not an order gateway, and optimizer feasibility is not execution feasibility.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/README.rst",
+        "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/LICENSE",
+        "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/pyproject.toml",
+        "https://pypi.org/project/cvxportfolio/1.5.1/",
+        "https://github.com/cvxgrp/cvxportfolio/releases/tag/1.5.1",
+        "https://github.com/cvxgrp/cvxportfolio/blob/1.5.1/cvxportfolio/simulator.py"
+      ]
+    },
+    {
+      "id": "statsmodels",
+      "repository": "https://github.com/statsmodels/statsmodels",
+      "layers": [
+        "econometrics",
+        "statistical-baselines"
+      ],
+      "role": "Interpretable regressions and time-series diagnostics",
+      "decision": "conditional",
+      "rationale": "Use classical baselines, residual diagnostics and statistical tests before complex learners.",
+      "version_or_commit": "0.15.0",
+      "release_date": "2026-08-27T10:34:19.376888Z",
+      "license": "BSD-3-Clause",
+      "us_equities_fit": "Factor exposure, cointegration, stationarity and state-space questions fit US-equity research.",
+      "alpaca_fit": "No execution or broker adapter.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/statsmodels/statsmodels/blob/v0.15.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local benchmark regression with HAC covariance; lags are an example assumption.",
+        "python -m pip install statsmodels==0.15.0",
+        "python - <<'PY'\nimport pandas as pd, statsmodels.api as sm\nr=pd.read_csv('returns.csv',index_col=0,parse_dates=True)\nf=sm.OLS(r['strategy'],sm.add_constant(r[['benchmark']]),missing='raise').fit(cov_type='HAC',cov_kwds={'maxlags':5})\nprint(f.params)\nprint(f.bse)\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; use a separate environment for this package.",
+        "Aligned returns, justified model assumptions and diagnostics; excess-return/factor specification supplied by researcher."
+      ],
+      "limitations": [
+        "Significance is not economic profitability; serial dependence, regime change and repeated testing remain.",
+        "Do not interpret a price-level regression or one cointegration p-value as a stable pairs strategy.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/statsmodels/statsmodels/blob/v0.15.0/README.md",
+        "https://github.com/statsmodels/statsmodels/blob/v0.15.0/LICENSE.txt",
+        "https://github.com/statsmodels/statsmodels/blob/v0.15.0/pyproject.toml",
+        "https://pypi.org/project/statsmodels/0.15.0/",
+        "https://github.com/statsmodels/statsmodels/releases/tag/v0.15.0",
+        "https://www.statsmodels.org/stable/tsa.html",
+        "https://www.statsmodels.org/stable/generated/statsmodels.regression.linear_model.OLS.html"
+      ]
+    },
+    {
+      "id": "arch",
+      "repository": "https://github.com/bashtage/arch",
+      "layers": [
+        "econometrics",
+        "volatility",
+        "research-validation"
+      ],
+      "role": "Volatility forecasts, block bootstrap and multiple-comparison tools",
+      "decision": "conditional",
+      "rationale": "Prefer for a defined volatility/risk or uncertainty-estimation hypothesis, not as an automatic trading signal.",
+      "version_or_commit": "8.0.0",
+      "release_date": "2025-10-21T08:42:37.818056Z",
+      "license": "NCSA",
+      "us_equities_fit": "Return volatility, drawdown uncertainty and candidate-loss comparisons apply to equities.",
+      "alpaca_fit": "No broker integration.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/bashtage/arch/blob/v8.0.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local volatility fit; percent scaling is explicit.",
+        "python -m pip install arch==8.0.0",
+        "python - <<'PY'\nimport pandas as pd\nfrom arch import arch_model\nr=pd.read_csv('returns.csv',index_col=0,parse_dates=True)\nf=arch_model(100*r['strategy'].dropna(),mean='Zero',vol='GARCH',p=1,q=1,dist='t').fit(disp='off')\nprint(f.forecast(horizon=1).variance.tail(1))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; use a separate environment for this package.",
+        "Well-defined return frequency/scaling and model diagnostics; retain fit/convergence warnings."
+      ],
+      "limitations": [
+        "Model-implied volatility is conditional on assumptions and can miss jumps/regime changes.",
+        "Block bootstrap/SPA/MCS help quantify uncertainty but do not remove dataset selection or strategy-search bias.",
+        "PyPI license expression is NCSA; GitHub classifier says Other.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/bashtage/arch/blob/v8.0.0/README.md",
+        "https://github.com/bashtage/arch/blob/v8.0.0/LICENSE.md",
+        "https://github.com/bashtage/arch/blob/v8.0.0/pyproject.toml",
+        "https://pypi.org/project/arch/8.0.0/",
+        "https://github.com/bashtage/arch/releases/tag/v8.0.0",
+        "https://arch.readthedocs.io/en/latest/multiple-comparison/multiple-comparison_examples.html"
+      ]
+    },
+    {
+      "id": "statsforecast",
+      "repository": "https://github.com/Nixtla/statsforecast",
+      "layers": [
+        "forecasting",
+        "statistical-baselines"
+      ],
+      "role": "Batched classical forecasting baselines",
+      "decision": "alternative",
+      "rationale": "Useful for forecasting volume/volatility or many related series; prefer a simple baseline before neural/foundation models.",
+      "version_or_commit": "2.1.1",
+      "release_date": "2026-07-16T18:20:05.106853Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Generic series forecasting; market target and data transformations must be defined separately.",
+      "alpaca_fit": "No trading/execution adapter.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/Nixtla/statsforecast/blob/v2.1.1/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. generic packaged example, not an equity strategy.",
+        "python -m pip install statsforecast==2.1.1",
+        "python - <<'PY'\nfrom statsforecast import StatsForecast\nfrom statsforecast.models import AutoARIMA\nfrom statsforecast.utils import AirPassengersDF\nm=StatsForecast(models=[AutoARIMA(season_length=12)],freq='ME')\nm.fit(AirPassengersDF)\nprint(m.predict(h=3,level=[95]))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; use a separate environment for this package.",
+        "Numba-compatible environment and target-specific frequency/seasonality."
+      ],
+      "limitations": [
+        "Forecast error improvements on generic series do not imply tradable returns after costs.",
+        "Exogenous values must be actually known at the decision timestamp.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/Nixtla/statsforecast/blob/v2.1.1/README.md",
+        "https://github.com/Nixtla/statsforecast/blob/v2.1.1/LICENSE",
+        "https://github.com/Nixtla/statsforecast/blob/v2.1.1/pyproject.toml",
+        "https://github.com/Nixtla/statsforecast/blob/v2.1.1/setup.py",
+        "https://pypi.org/project/statsforecast/2.1.1/",
+        "https://github.com/Nixtla/statsforecast/releases/tag/v2.1.1"
+      ]
+    },
+    {
+      "id": "neuralforecast",
+      "repository": "https://github.com/Nixtla/neuralforecast",
+      "layers": [
+        "forecasting",
+        "neural-research"
+      ],
+      "role": "Local neural forecasting model library",
+      "decision": "watch",
+      "rationale": "Defer until classical baselines fail a defined forecast objective and there is enough independent data to justify tuning.",
+      "version_or_commit": "3.2.2",
+      "release_date": "2026-09-08T14:05:49.328233Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "May forecast volume, volatility or other measured targets; not an equity execution engine.",
+      "alpaca_fit": "No broker route.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/Nixtla/neuralforecast/blob/v3.2.2/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local training example; no provider API, but this does perform compute if later run.",
+        "python -m pip install neuralforecast==3.2.2",
+        "python - <<'PY'\nfrom neuralforecast import NeuralForecast\nfrom neuralforecast.models import NBEATS\nfrom neuralforecast.utils import AirPassengersDF\nm=NeuralForecast(models=[NBEATS(input_size=24,h=12,max_steps=100)],freq='ME')\nm.fit(df=AirPassengersDF)\nprint(m.predict().head())\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; use a separate environment for this package.",
+        "PyTorch/Lightning and adequate CPU/GPU; explicit seeds, validation windows and compute budget."
+      ],
+      "limitations": [
+        "No training or inference executed for this catalog.",
+        "Model/hyperparameter count increases selection risk; generic forecast benchmarks are not equity alpha.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/Nixtla/neuralforecast/blob/v3.2.2/README.md",
+        "https://github.com/Nixtla/neuralforecast/blob/v3.2.2/LICENSE",
+        "https://github.com/Nixtla/neuralforecast/blob/v3.2.2/pyproject.toml",
+        "https://pypi.org/project/neuralforecast/3.2.2/",
+        "https://github.com/Nixtla/neuralforecast/releases/tag/v3.2.2"
+      ]
+    },
+    {
+      "id": "darts",
+      "repository": "https://github.com/unit8co/darts",
+      "layers": [
+        "forecasting",
+        "time-series-research"
+      ],
+      "role": "Unified forecasting and anomaly-detection APIs",
+      "decision": "alternative",
+      "rationale": "Choose for API breadth only if it replaces other forecasting wrappers; not needed alongside every Nixtla/sktime option.",
+      "version_or_commit": "0.47.0",
+      "release_date": "2026-09-04T15:05:04.422583Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Forecasting and data anomaly research with supplied equity-related series.",
+      "alpaca_fit": "No broker execution adapter.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/unit8co/darts/blob/0.47.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local CSV with Month/value columns and at least several complete seasonal cycles.",
+        "python -m pip install darts==0.47.0",
+        "python - <<'PY'\nimport pandas as pd\nfrom darts import TimeSeries\nfrom darts.models import ExponentialSmoothing\ns=TimeSeries.from_dataframe(pd.read_csv('series.csv'),'Month','value')\nm=ExponentialSmoothing()\nm.fit(s[:-12])\nprint(m.predict(12))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; use a separate environment for this package.",
+        "Install current darts package, not legacy u8darts; optional deep-learning backends are separate.",
+        "Validated regular time index and only known-at-time covariates."
+      ],
+      "limitations": [
+        "Current GitHub/PyPI darts is 0.47.0; legacy u8darts latest is 0.41.0.",
+        "Anomaly flags and forecast intervals do not directly produce executable trading decisions.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/unit8co/darts/blob/0.47.0/README.md",
+        "https://github.com/unit8co/darts/blob/0.47.0/LICENSE",
+        "https://github.com/unit8co/darts/blob/0.47.0/pyproject.toml",
+        "https://pypi.org/project/darts/0.47.0/",
+        "https://github.com/unit8co/darts/releases/tag/0.47.0",
+        "https://github.com/unit8co/darts/blob/0.47.0/INSTALL.md"
+      ]
+    },
+    {
+      "id": "sktime",
+      "repository": "https://github.com/sktime/sktime",
+      "layers": [
+        "forecasting",
+        "model-selection"
+      ],
+      "role": "Time-series estimator/pipeline interoperability",
+      "decision": "alternative",
+      "rationale": "Useful when multiple time-series tasks share a rigorous evaluation pipeline; otherwise overlaps the smaller selected stack.",
+      "version_or_commit": "1.1.0",
+      "release_date": "2026-07-28T17:10:45.174908Z",
+      "license": "BSD-3-Clause",
+      "us_equities_fit": "Generic temporal learning with user-defined financial targets.",
+      "alpaca_fit": "No execution adapter.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/sktime/sktime/blob/v1.1.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. naive seasonal baseline on a packaged non-financial dataset.",
+        "python -m pip install sktime==1.1.0",
+        "python - <<'PY'\nfrom sktime.datasets import load_airline\nfrom sktime.forecasting.naive import NaiveForecaster\nm=NaiveForecaster(strategy='last',sp=12)\nm.fit(load_airline())\nprint(m.predict(fh=[1,2,3]))\nPY"
+      ],
+      "requirements": [
+        "Python <3.15,>=3.10; use a separate environment for this package.",
+        "Optional estimators require their own dependencies; explicit forecast horizon and temporal split."
+      ],
+      "limitations": [
+        "Generic estimator benchmarks do not validate trading outcomes.",
+        "Keep pipeline preprocessing inside each training fold; API compatibility alone does not enforce chronology.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/sktime/sktime/blob/v1.1.0/README.md",
+        "https://github.com/sktime/sktime/blob/v1.1.0/LICENSE",
+        "https://github.com/sktime/sktime/blob/v1.1.0/pyproject.toml",
+        "https://pypi.org/project/sktime/1.1.0/",
+        "https://github.com/sktime/sktime/releases/tag/v1.1.0",
+        "https://github.com/sktime/sktime/blob/v1.1.0/sktime/forecasting/naive/_naive.py"
+      ]
+    },
+    {
+      "id": "scikit-learn",
+      "repository": "https://github.com/scikit-learn/scikit-learn",
+      "layers": [
+        "supervised-learning",
+        "model-selection"
+      ],
+      "role": "Classical predictive baselines and fold-local preprocessing",
+      "decision": "conditional",
+      "rationale": "Preferred supervised-learning starting point before Qlib-scale orchestration, RL or foundation models.",
+      "version_or_commit": "1.9.1",
+      "release_date": "2026-09-10T18:32:29.891551Z",
+      "license": "BSD-3-Clause",
+      "us_equities_fit": "Regularized regressions/trees, calibration and time-series splitting on point-in-time features.",
+      "alpaca_fit": "Predictions only; no account/order access.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/scikit-learn/scikit-learn/blob/1.9.1/README.rst"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. inspect chronological indices before fitting any estimator.",
+        "python -m pip install scikit-learn==1.9.1",
+        "python - <<'PY'\nimport pandas as pd\nfrom sklearn.model_selection import TimeSeriesSplit\nx=pd.read_csv('features.csv',index_col=0,parse_dates=True)\nfor tr,te in TimeSeriesSplit(n_splits=5,gap=1).split(x):\n    print(x.index[tr[-1]],x.index[te[0]])\nPY"
+      ],
+      "requirements": [
+        "Python >=3.11; use a separate environment for this package.",
+        "At least enough chronological observations for splits; preserve event-time and availability-time metadata.",
+        "Pipeline every learned imputation/scaler/feature selector inside the fold."
+      ],
+      "limitations": [
+        "TimeSeriesSplit gap=1 is illustrative; derive a purge/embargo policy from label overlap and execution latency.",
+        "Default random/K-fold validation is inappropriate for dependent time-ordered financial labels.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/scikit-learn/scikit-learn/blob/1.9.1/README.rst",
+        "https://github.com/scikit-learn/scikit-learn/blob/1.9.1/COPYING",
+        "https://github.com/scikit-learn/scikit-learn/blob/1.9.1/pyproject.toml",
+        "https://pypi.org/project/scikit-learn/1.9.1/",
+        "https://github.com/scikit-learn/scikit-learn/releases/tag/1.9.1",
+        "https://scikit-learn.org/stable/modules/cross_validation.html#time-series-split",
+        "https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html"
+      ]
+    },
+    {
+      "id": "mlfinpy",
+      "repository": "https://github.com/baobach/mlfinpy",
+      "layers": [
+        "financial-ml",
+        "labeling"
+      ],
+      "role": "Event sampling and financial-labeling research helpers",
+      "decision": "watch",
+      "rationale": "Inspect useful methods individually; do not add another broad framework or assume reproduction equals validation.",
+      "version_or_commit": "0.1.2",
+      "release_date": "2024-10-09T12:28:14.322192Z",
+      "license": "MIT",
+      "us_equities_fit": "CUSUM events, labels and sampling can be applied to equity series with correct horizons.",
+      "alpaca_fit": "No broker adapter.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/baobach/mlfinpy/blob/0.1.2/README.rst"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local event sampling only.",
+        "python -m pip install mlfinpy==0.1.2",
+        "python - <<'PY'\nimport pandas as pd\nfrom mlfinpy.filters import cusum_filter\np=pd.read_csv('prices.csv',index_col=0,parse_dates=True)\nprint(cusum_filter(p.iloc[:,0],threshold=0.05))\nPY"
+      ],
+      "requirements": [
+        "Python <4.0,>=3.11; use a separate environment for this package.",
+        "Python >=3.11 and compatible scientific dependencies; event/label horizon specified before evaluation."
+      ],
+      "limitations": [
+        "This is baobach/mlfinpy, a separate project inspired by financial-ML literature, not Hudson-and-Thames mlfinlab.",
+        "Thresholds and overlapping labels introduce additional tuning/leakage risks; no equity benchmark acceptance here.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/baobach/mlfinpy/blob/0.1.2/README.rst",
+        "https://github.com/baobach/mlfinpy/blob/0.1.2/LICENSE",
+        "https://github.com/baobach/mlfinpy/blob/0.1.2/pyproject.toml",
+        "https://pypi.org/project/mlfinpy/0.1.2/",
+        "https://github.com/baobach/mlfinpy/releases/tag/0.1.2",
+        "https://mlfinpy.readthedocs.io/en/latest/Filtering.html"
+      ]
+    },
+    {
+      "id": "alphalens-reloaded",
+      "repository": "https://github.com/stefan-jansen/alphalens-reloaded",
+      "layers": [
+        "factor-evaluation"
+      ],
+      "role": "Cross-sectional factor return, IC and turnover diagnostics",
+      "decision": "conditional",
+      "rationale": "Use to reject weak/unstable equity factors before converting them into a strategy.",
+      "version_or_commit": "0.4.6",
+      "release_date": "2025-06-02T02:15:14.827514Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Explicit stock-factor and forward-return analysis with optional group/sector views.",
+      "alpaca_fit": "Factor diagnostics only; no trading adapter.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local inputs; factors.csv columns date,asset,factor and prices.csv date-indexed columns by asset.",
+        "python -m pip install alphalens-reloaded==0.4.6",
+        "python - <<'PY'\nimport pandas as pd, alphalens as al\nf=pd.read_csv('factors.csv',parse_dates=['date']).set_index(['date','asset'])['factor']\np=pd.read_csv('prices.csv',index_col=0,parse_dates=True)\nd=al.utils.get_clean_factor_and_forward_returns(f,p,periods=(1,5,10),quantiles=5)\nprint(al.performance.factor_information_coefficient(d))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; use a separate environment for this package.",
+        "Point-in-time universe/features, sufficient future prices for diagnostic labels, and correctly lagged factor timestamps."
+      ],
+      "limitations": [
+        "Forward returns belong only to offline evaluation labels, never inference features.",
+        "PyPI 0.4.6 is newer numerically than GitHub latest-release tag 0.4.5; source/PyPI references are explicit.",
+        "IC does not include all turnover/borrow/execution costs or prove net portfolio edge.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/README.md",
+        "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/LICENSE",
+        "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/pyproject.toml",
+        "https://pypi.org/project/alphalens-reloaded/0.4.6/",
+        "https://github.com/stefan-jansen/alphalens-reloaded/releases/tag/0.4.5",
+        "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/src/alphalens/performance.py"
+      ]
+    },
+    {
+      "id": "empyrical-legacy",
+      "repository": "https://github.com/quantopian/empyrical",
+      "layers": [
+        "legacy-metrics"
+      ],
+      "role": "Original Quantopian metrics package",
+      "decision": "excluded",
+      "rationale": "Use the maintained reloaded fork for a new environment; retain this record to prevent import/package-name confusion.",
+      "version_or_commit": "0.5.5",
+      "release_date": "2020-10-13T21:29:19.836297Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Historical return-metric API remains relevant for old notebooks.",
+      "alpaca_fit": "None.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/quantopian/empyrical/blob/0.5.5/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. source comparison only; do not co-install with empyrical-reloaded.",
+        "git clone https://github.com/quantopian/empyrical.git empyrical",
+        "git -C empyrical checkout --detach 0.5.5",
+        "git -C empyrical show 0.5.5:empyrical/stats.py"
+      ],
+      "requirements": [
+        "Legacy environment only if reproducing historical work."
+      ],
+      "limitations": [
+        "Latest release/PyPI is 0.5.5 from 2020; repository HEAD also dates to 2020.",
+        "Not marked archived by GitHub; exclusion is our new-stack maintenance choice, not an upstream archive claim.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/quantopian/empyrical/blob/0.5.5/README.md",
+        "https://github.com/quantopian/empyrical/blob/0.5.5/LICENSE",
+        "https://github.com/quantopian/empyrical/blob/0.5.5/setup.py",
+        "https://pypi.org/project/empyrical/0.5.5/",
+        "https://github.com/quantopian/empyrical/releases/tag/0.5.5"
+      ]
+    },
+    {
+      "id": "alpaca-backtrader-legacy",
+      "repository": "https://github.com/alpacahq/alpaca-backtrader-api",
+      "layers": [
+        "legacy-broker-adapter"
+      ],
+      "role": "Older Alpaca/Backtrader connector",
+      "decision": "excluded",
+      "rationale": "Do not make the 2022 connector the new execution foundation; keep for legacy migration/reference.",
+      "version_or_commit": "0.15.0",
+      "release_date": "2022-01-02T21:34:24.007397Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Equity data/broker examples are present but reference historical Polygon access assumptions.",
+      "alpaca_fit": "Explicit paper flag exists; README states its default is False/live.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/alpacahq/alpaca-backtrader-api/blob/v0.15.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. source inspection only; no adapter construction or broker access.",
+        "git clone https://github.com/alpacahq/alpaca-backtrader-api.git alpaca-backtrader-api",
+        "git -C alpaca-backtrader-api checkout --detach v0.15.0",
+        "git -C alpaca-backtrader-api show v0.15.0:README.md"
+      ],
+      "requirements": [
+        "A separately isolated legacy dependency stack for any future reproduction."
+      ],
+      "limitations": [
+        "Latest release and HEAD are 2022; it depends on the older alpaca-trade-api family.",
+        "Never assume paper-by-default; historical samples and feed entitlements require re-audit.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/alpacahq/alpaca-backtrader-api/blob/v0.15.0/README.md",
+        "https://github.com/alpacahq/alpaca-backtrader-api/blob/v0.15.0/LICENSE",
+        "https://github.com/alpacahq/alpaca-backtrader-api/blob/v0.15.0/setup.py",
+        "https://pypi.org/project/alpaca-backtrader-api/0.15.0/",
+        "https://github.com/alpacahq/alpaca-backtrader-api/releases/tag/v0.15.0"
+      ]
+    },
+    {
+      "id": "ib-async",
+      "repository": "https://github.com/ib-api-reloaded/ib_async",
+      "layers": [
+        "broker-sdk",
+        "conditional-broker"
+      ],
+      "role": "Community-maintained IBKR TWS/Gateway Python client",
+      "decision": "alternative",
+      "rationale": "Only relevant if the user later selects IBKR; avoid adding another brokerage now.",
+      "version_or_commit": "2.1.0",
+      "release_date": "2025-12-08T01:42:30.883458Z",
+      "license": "BSD-2-Clause",
+      "us_equities_fit": "US equity contracts, account state and historical-data requests through IBKR.",
+      "alpaca_fit": "No Alpaca route.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/ib-api-reloaded/ib_async/blob/ab629f34c1823ea4c1542f32f07377208a86bdfd/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. no connection; inspect an equity contract object locally.",
+        "python -m pip install ib_async==2.1.0",
+        "python - <<'PY'\nfrom ib_async import Stock\nprint(Stock('SPY','SMART','USD'))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; use a separate environment for this package.",
+        "Later connectivity requires configured TWS/IB Gateway and eligible account/data permissions.",
+        "Use actual configured paper socket port; do not copy README live/ambiguous port examples."
+      ],
+      "limitations": [
+        "Community SDK, not official IBKR source; reviewed PyPI 2.1.0 is newer than GitHub release marker v2.0.1.",
+        "Local contract construction is not IBKR paper connectivity or execution acceptance.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/ib-api-reloaded/ib_async/blob/ab629f34c1823ea4c1542f32f07377208a86bdfd/README.md",
+        "https://github.com/ib-api-reloaded/ib_async/blob/ab629f34c1823ea4c1542f32f07377208a86bdfd/LICENSE",
+        "https://github.com/ib-api-reloaded/ib_async/blob/ab629f34c1823ea4c1542f32f07377208a86bdfd/pyproject.toml",
+        "https://pypi.org/project/ib_async/2.1.0/",
+        "https://github.com/ib-api-reloaded/ib_async/releases/tag/v2.0.1"
+      ]
+    },
+    {
+      "id": "finrl-x",
+      "repository": "https://github.com/AI4Finance-Foundation/FinRL-Trading",
+      "layers": [
+        "research-platform",
+        "execution-experiment"
+      ],
+      "role": "FinRL successor with weight-centric strategy and Alpaca execution code",
+      "decision": "watch",
+      "rationale": "Inspect modular target-weight contracts and research examples; production-readiness claims require independent order/restart/risk proof.",
+      "version_or_commit": "4409abe925c904e570be78ebfb5e77ac3491dff8",
+      "release_date": null,
+      "license": "Apache-2.0",
+      "us_equities_fit": "US-stock allocation/rotation examples; bt-based backtesting and data-source selection.",
+      "alpaca_fit": "Alpaca manager/executor and paper/dry-run modes exist in source.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. historical backtest only after installing the pinned source and dependencies.",
+        "git clone https://github.com/AI4Finance-Foundation/FinRL-Trading.git FinRL-Trading",
+        "git -C FinRL-Trading checkout --detach 4409abe925c904e570be78ebfb5e77ac3491dff8",
+        "cd FinRL-Trading",
+        "python -m pip install -e .",
+        "./deploy.sh --strategy adaptive_rotation --mode backtest --start 2023-01-01 --end 2024-12-31"
+      ],
+      "requirements": [
+        "Provider-appropriate historical data, compatible dependencies and explicit backtest configuration.",
+        "Separate review of live executor, persistence, idempotency and operational recovery before any paper deployment."
+      ],
+      "limitations": [
+        "Source pin is 4409abe925c904e570be78ebfb5e77ac3491dff8; no claim that README result tables were reproduced.",
+        "README no-lookahead/production wording is an upstream claim, not this catalog acceptance.",
+        "--mode paper is a brokerage execution path; --dry-run behavior must be independently checked before relying on it.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/README.md",
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/LICENSE",
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/commit/4409abe925c904e570be78ebfb5e77ac3491dff8",
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/releases/tag/v1.0.0",
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/deploy.sh",
+        "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/trading/trade_executor.py"
+      ]
+    },
+    {
+      "id": "timesfm",
+      "repository": "https://github.com/google-research/timesfm",
+      "layers": [
+        "foundation-forecasting"
+      ],
+      "role": "Pretrained forecasting baseline with model-specific licensing",
+      "decision": "conditional",
+      "rationale": "Evaluate 2.5 weights on a defined forecast target; do not adopt the newer 3.0 weights for production trading under their current license.",
+      "version_or_commit": "v3.0.0",
+      "release_date": "2026-08-28T23:42:49Z",
+      "license": "Apache-2.0 source and 2.5 weights; separate non-commercial license for 3.0 weights",
+      "us_equities_fit": "Generic forecasting may inform volume/volatility research; pretraining provenance and finance holdouts must be audited.",
+      "alpaca_fit": "No broker/strategy engine.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/google-research/timesfm/blob/v3.0.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. source v3.0.0 retains the 2.5 API; model loading/inference downloads weights and uses local compute.",
+        "git clone https://github.com/google-research/timesfm.git timesfm",
+        "git -C timesfm checkout --detach v3.0.0",
+        "cd timesfm",
+        "python -m pip install '.[torch]'",
+        "python - <<'PY'\nimport numpy as np, timesfm\nm=timesfm.TimesFM_2p5_200M_torch.from_pretrained('google/timesfm-2.5-200m-pytorch')\nm.compile(timesfm.ForecastConfig(max_context=512,max_horizon=32,normalize_inputs=True))\np,q=m.forecast(horizon=12,inputs=[np.sin(np.linspace(0,20,200))])\nprint(p.shape,q.shape)\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; use a separate environment for this package.",
+        "PyTorch and model storage/CPU or GPU; independently pin the selected model revision before a reproducible experiment.",
+        "Source v3.0.0 workflow is deliberate; newest PyPI 3.0.2 was observed but not source/API-audited here."
+      ],
+      "limitations": [
+        "Code and model weights through 2.5 are Apache-2.0; google/timesfm-3.0-pytorch weights use timesfm-non-commercial-license-v1.0 and prohibit commercial/production use.",
+        "This is an API/shape example on a synthetic series, not a finance benchmark or alpha proof.",
+        "Model release 2.5 (2025-09-15) differs from repository v3.0.0 (2026-08-28) and package 3.0.2 (2026-09-09).",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/google-research/timesfm/blob/v3.0.0/README.md",
+        "https://github.com/google-research/timesfm/blob/v3.0.0/LICENSE",
+        "https://github.com/google-research/timesfm/blob/v3.0.0/pyproject.toml",
+        "https://pypi.org/project/timesfm/3.0.2/",
+        "https://github.com/google-research/timesfm/releases/tag/v3.0.0",
+        "https://huggingface.co/google/timesfm-2.5-200m-pytorch",
+        "https://github.com/google-research/timesfm/blob/v3.0.0/src/timesfm/__init__.py",
+        "https://github.com/google-research/timesfm/blob/v3.0.0/timesfm-forecasting/SKILL.md"
+      ]
+    },
+    {
+      "id": "chronos",
+      "repository": "https://github.com/amazon-science/chronos-forecasting",
+      "layers": [
+        "foundation-forecasting"
+      ],
+      "role": "Chronos-2 probabilistic forecasting baseline",
+      "decision": "conditional",
+      "rationale": "Compare against naive/classical models only for a specified target and untouched time periods; no need for hosted AWS deployment.",
+      "version_or_commit": "2.3.2",
+      "release_date": "2026-09-08T14:07:20.138443Z",
+      "license": "Apache-2.0 source and amazon/chronos-2 model-card declaration",
+      "us_equities_fit": "Univariate/multivariate/covariate forecasts can be evaluated on equity-related series.",
+      "alpaca_fit": "No strategy execution or broker route.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/amazon-science/chronos-forecasting/blob/v2.3.2/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. local inference; model weights download on first load. series.csv contains id,timestamp,target.",
+        "python -m pip install chronos-forecasting==2.3.2",
+        "python - <<'PY'\nimport pandas as pd\nfrom chronos import Chronos2Pipeline\nm=Chronos2Pipeline.from_pretrained('amazon/chronos-2',device_map='cpu')\nd=pd.read_csv('series.csv',parse_dates=['timestamp'])\nprint(m.predict_df(d,id_column='id',prediction_length=5,quantile_levels=[0.1,0.5,0.9]).head())\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; use a separate environment for this package.",
+        "PyTorch and model storage; pin model revision separately before reproducibility claims.",
+        "Only actually known future covariates may be supplied; this example supplies none."
+      ],
+      "limitations": [
+        "Library v2.3.2 (2026-09-08) is not model release date: Chronos-2 was announced 2025-10-20.",
+        "Generic forecasting benchmark claims and parameter counts do not establish US-equity alpha.",
+        "No inference, hosted service or GPU compatibility check was performed.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/amazon-science/chronos-forecasting/blob/v2.3.2/README.md",
+        "https://github.com/amazon-science/chronos-forecasting/blob/v2.3.2/LICENSE",
+        "https://github.com/amazon-science/chronos-forecasting/blob/v2.3.2/pyproject.toml",
+        "https://pypi.org/project/chronos-forecasting/2.3.2/",
+        "https://github.com/amazon-science/chronos-forecasting/releases/tag/v2.3.2",
+        "https://huggingface.co/amazon/chronos-2",
+        "https://github.com/amazon-science/chronos-forecasting/blob/v2.3.2/src/chronos/chronos2/pipeline.py"
+      ]
+    },
+    {
+      "id": "ai-berkshire",
+      "repository": "https://github.com/xbtlin/ai-berkshire",
+      "layers": [
+        "financial-research-skills"
+      ],
+      "role": "Value-investing research/checklist prompt collection",
+      "decision": "watch",
+      "rationale": "Useful as a source for structured evidence questions; retain human/source verification rather than treating generated valuation as an order.",
+      "version_or_commit": "v1.0.0",
+      "release_date": "2026-04-07T11:31:35Z",
+      "license": "MIT",
+      "us_equities_fit": "Company/industry research applies to US listings, though many examples are Chinese-market companies.",
+      "alpaca_fit": "No broker integration or deterministic backtester.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/xbtlin/ai-berkshire/blob/v1.0.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. read source before any opt-in skill installation; no model call.",
+        "git clone https://github.com/xbtlin/ai-berkshire.git ai-berkshire",
+        "git -C ai-berkshire checkout --detach v1.0.0",
+        "git -C ai-berkshire show v1.0.0:skills/investment-research.md"
+      ],
+      "requirements": [
+        "Compatible agent client and licensed/current source data only if separately adopted.",
+        "Explicit project-scoped selection; do not blindly copy all prompts into global command directories."
+      ],
+      "limitations": [
+        "No valuation accuracy, claimed research-speed improvement or investment performance was measured.",
+        "Released v1.0.0 is the inspected snapshot; newer default-branch edits were not deep-audited.",
+        "Prompts are research material, not a deterministic risk or execution authority.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/xbtlin/ai-berkshire/blob/v1.0.0/README.md",
+        "https://github.com/xbtlin/ai-berkshire/blob/v1.0.0/LICENSE",
+        "https://github.com/xbtlin/ai-berkshire/releases/tag/v1.0.0"
+      ]
+    },
+    {
+      "id": "tradingagents",
+      "repository": "https://github.com/TauricResearch/TradingAgents",
+      "layers": [
+        "financial-agents",
+        "research-demos"
+      ],
+      "role": "Multi-agent financial analysis and simulated decision workflow",
+      "decision": "watch",
+      "rationale": "Recent starred research framework merits a dated-data audit; preserve it as an experiment rather than replace deterministic engine/risk code.",
+      "version_or_commit": "v0.5.0",
+      "release_date": "2026-09-18T05:43:43Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Fundamental/news/technical agent roles and dated backtest paths are documented.",
+      "alpaca_fit": "README simulated execution is not proof of a supported Alpaca production connector.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/TauricResearch/TradingAgents/blob/v0.5.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. interactive research client may call configured model/data services.",
+        "git clone https://github.com/TauricResearch/TradingAgents.git TradingAgents",
+        "git -C TradingAgents checkout --detach v0.5.0",
+        "cd TradingAgents",
+        "python -m pip install .",
+        "tradingagents"
+      ],
+      "requirements": [
+        "Explicit provider or local-model configuration, data permissions, retry budget and privacy review.",
+        "Reproducible model/prompts/source timestamps; no brokerage credentials supplied to research agents."
+      ],
+      "limitations": [
+        "v0.5.0 claims point-in-time fixes; this catalog read the source documentation, not an independent historical-data correctness audit.",
+        "Debate, an LLM risk-manager role and a simulated exchange do not prove safe execution or profitable decisions.",
+        "No model calls or installed-provider compatibility acceptance performed.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/TauricResearch/TradingAgents/blob/v0.5.0/README.md",
+        "https://github.com/TauricResearch/TradingAgents/blob/v0.5.0/LICENSE",
+        "https://github.com/TauricResearch/TradingAgents/blob/v0.5.0/pyproject.toml",
+        "https://github.com/TauricResearch/TradingAgents/releases/tag/v0.5.0"
+      ]
+    },
+    {
+      "id": "dexter",
+      "repository": "https://github.com/virattt/dexter",
+      "layers": [
+        "financial-research-agent"
+      ],
+      "role": "Bun-based agent for source gathering and financial questions",
+      "decision": "watch",
+      "rationale": "Possible research assistant only; its own README excludes real trading/investment use.",
+      "version_or_commit": "v1.0.5",
+      "release_date": "2026-08-04T15:20:43Z",
+      "license": "MIT stated in README; standalone license file absent at reviewed pin",
+      "us_equities_fit": "Company fundamentals and financial question-answering, subject to provider data/license quality.",
+      "alpaca_fit": "No approved Alpaca execution route.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/virattt/dexter/blob/v1.0.5/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and unexecuted. interactive research launch may call configured model/data services.",
+        "git clone https://github.com/virattt/dexter.git dexter",
+        "git -C dexter checkout --detach v1.0.5",
+        "cd dexter",
+        "bun install",
+        "bun start"
+      ],
+      "requirements": [
+        "Bun and selected model/data service configuration; Financial Datasets and optional web-search credentials may be required.",
+        "Review raw tool scratchpad retention and optional LangSmith evaluation transmission before use."
+      ],
+      "limitations": [
+        "README/package declaration says MIT but no standalone LICENSE file was found at v1.0.5; clarify redistribution terms before adopting.",
+        "Self-reflection and an LLM judge are not factual or financial validation.",
+        "No global client configuration, messaging gateway, credentials or model runs were added.",
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+      ],
+      "sources": [
+        "https://github.com/virattt/dexter/blob/v1.0.5/README.md",
+        "https://github.com/virattt/dexter/blob/v1.0.5/package.json",
+        "https://github.com/virattt/dexter/releases/tag/v1.0.5"
+      ]
+    }
+  ]
+}
