@@ -1,0 +1,268 @@
+{
+  "schema_version": 1,
+  "id": "lean-native-bundled-backtest",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-19T05:55:38.559324+00:00",
+  "claim": "Pinned upstream LEAN compiled and completed its unmodified bundled C# sample backtest on Linux x64 without broker account credentials.",
+  "passed": true,
+  "engine": {
+    "repository": "https://github.com/QuantConnect/Lean",
+    "commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+    "commit_date_utc": "2026-09-18T14:03:24Z",
+    "license": "Apache-2.0",
+    "license_sha256": "522cf0a716ce03f67d46f8fceb5bf78c5b84400ec5cd8d14bf9f02cddc1cb6ba",
+    "source_changed_after_execution": false,
+    "language": "CSharp",
+    "algorithm": "BasicTemplateFrameworkAlgorithm",
+    "configuration": "Unmodified upstream Launcher/config.json; environment=backtesting; live-mode=false; local data/map/factor providers",
+    "brokerage_model": "Upstream sample default, not the Alpaca brokerage model"
+  },
+  "runtime": {
+    "dotnet_sdk": "10.0.401",
+    "release_date": "2026-09-08",
+    "architecture": "linux-x64",
+    "archive_url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.401/dotnet-sdk-10.0.401-linux-x64.tar.gz",
+    "archive_bytes": 240059572,
+    "archive_sha512": "51c8b999af9e8dd9998c9edc5944e19a90788862068acd38694e098889054ce8c23d4f0c5cccfa16bf187d044562359e5ee69a9f8ad0bbe913ba90311fbce25b",
+    "publisher_sha512_match": true,
+    "installation": "New isolated prefix; original Microsoft license and notices retained; no global PATH modification"
+  },
+  "commands": {
+    "build": {
+      "cwd": "${LEAN_SOURCE}",
+      "argv": [
+        "${DOTNET_ROOT}/dotnet",
+        "build",
+        "QuantConnect.Lean.sln",
+        "--disable-build-servers",
+        "-m:2",
+        "--verbosity",
+        "minimal"
+      ]
+    },
+    "backtest": {
+      "cwd": "${LEAN_SOURCE}/Launcher/bin/Debug",
+      "argv": [
+        "${DOTNET_ROOT}/dotnet",
+        "QuantConnect.Lean.Launcher.dll"
+      ],
+      "stdin": "Closed/DEVNULL for unattended completion"
+    },
+    "environment": "Explicit isolated DOTNET_ROOT, CLI home and NuGet cache; telemetry opt-out; backtest receives only runtime/path/locale variables, no broker credentials"
+  },
+  "build": {
+    "attempts": 1,
+    "exit_code": 0,
+    "monotonic_process_seconds": 63.089,
+    "native_msbuild_elapsed": "00:01:07.14",
+    "warnings_reported_by_msbuild": 7855,
+    "errors_reported_by_msbuild": 0,
+    "raw_diagnostics_retained": true,
+    "warning_scope": "Upstream compiler/analyzer/dependency warnings retained. Successful build is not a security audit.",
+    "reported_dependency_advisories": [
+      {
+        "warning_code": "NU1902",
+        "package": "System.Private.ServiceModel",
+        "version": "4.4.0",
+        "reported_severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-p9wx-v264-q34p"
+      },
+      {
+        "warning_code": "NU1902",
+        "package": "System.ServiceModel.Primitives",
+        "version": "4.4.0",
+        "reported_severity": "moderate",
+        "url": "https://github.com/advisories/GHSA-p9wx-v264-q34p"
+      },
+      {
+        "warning_code": "NU1903",
+        "package": "DotNetZip",
+        "version": "1.16.0",
+        "reported_severity": "high",
+        "url": "https://github.com/advisories/GHSA-xhg6-9j5j-w4vf"
+      },
+      {
+        "warning_code": "NU1903",
+        "package": "System.Net.Http.WinHttpHandler",
+        "version": "4.4.0",
+        "reported_severity": "high",
+        "url": "https://github.com/advisories/GHSA-6xh7-4v2w-36q6"
+      },
+      {
+        "warning_code": "NU1903",
+        "package": "System.Private.ServiceModel",
+        "version": "4.4.0",
+        "reported_severity": "high",
+        "url": "https://github.com/advisories/GHSA-jc8g-xhw5-6x46"
+      },
+      {
+        "warning_code": "NU1903",
+        "package": "System.ServiceModel.Primitives",
+        "version": "4.4.0",
+        "reported_severity": "high",
+        "url": "https://github.com/advisories/GHSA-jc8g-xhw5-6x46"
+      },
+      {
+        "warning_code": "NU1904",
+        "package": "System.Drawing.Common",
+        "version": "4.7.0",
+        "reported_severity": "critical",
+        "url": "https://github.com/advisories/GHSA-rxg9-xrhp-64gj"
+      }
+    ],
+    "advisory_scope": "Reported by native NuGet restore; all five package/version pairs also occur in Launcher project.assets.json and Launcher.deps.json. No independent exploitability assessment or dependency fix performed."
+  },
+  "backtest": {
+    "attempts": 1,
+    "exit_code": 0,
+    "monotonic_process_seconds": 1.718,
+    "algorithm_reported_seconds": 0.27,
+    "status": "Completed",
+    "runtime_error_empty": true,
+    "stack_trace_empty": true,
+    "stderr_bytes": 0,
+    "data_points": 3943,
+    "expected_upstream_data_points": 3943,
+    "simulated_orders": 3,
+    "order_events": 6,
+    "order_event_status_counts": {
+      "submitted": 3,
+      "filled": 3
+    },
+    "order_list_hash": "f209ed42701b0419858e0100595b40c0",
+    "matches_upstream_order_list_hash": true,
+    "data_requests": 13,
+    "succeeded_data_requests": 13,
+    "failed_data_requests": 0,
+    "data_request_scope": "Engine local-data-provider requests, not a count of network API requests",
+    "sample_symbol": "SPY",
+    "sample_start_date": "2013-10-07",
+    "sample_end_date": "2013-10-11"
+  },
+  "not_exercised": [
+    "Alpaca account or paper brokerage connection",
+    "Alpaca brokerage model simulation",
+    "Live market-data feed or data entitlements",
+    "Any external order submission",
+    "Python strategy runtime",
+    "Strategy profitability or out-of-sample robustness",
+    "Production execution risk and reconciliation",
+    "Unattended hosting or restart recovery"
+  ],
+  "limitations": [
+    "Old bundled sample verifies engine execution only; no strategy return or future performance conclusion.",
+    "No model/provider calls, broker login, paid QuantConnect service or Docker installation were part of this check.",
+    "Raw files remain private because native results contain local paths and host metadata. Published hashes establish identity, not independent provider attestation.",
+    "Source/SDK pins do not claim a fully locked transitive package build. Native restore assets and the isolated package cache remain with the local installation.",
+    "The documentation replay uses operator-selected paths and may pause at the native completion prompt when run interactively.",
+    "Native NuGet reported moderate/high/critical dependency advisories. Successful engine execution does not establish security readiness; triage is needed before broader deployment."
+  ],
+  "private_artifacts": [
+    {
+      "name": "dotnet-selected.json",
+      "sha256": "1a238b4178f2945f6db2901f3a535278b16b23e1e7595fdef4779e895de08916",
+      "bytes": 660
+    },
+    {
+      "name": "dotnet-install-receipt.json",
+      "sha256": "97403a5c014a7f620d93ee44fa964918faf461938aaea482475ac8c960b9d320",
+      "bytes": 587
+    },
+    {
+      "name": "dotnet-info.stdout.txt",
+      "sha256": "533f5ff2eaa07c5acf33c3eb8583ae8582d50c7d6e060e84c09ed9a2c6d66c54",
+      "bytes": 1644
+    },
+    {
+      "name": "source-clone.json",
+      "sha256": "028e5bf0731601191a1e66153a0dcd5e336fb1e78226bf7cd74f884604c184a5",
+      "bytes": 413
+    },
+    {
+      "name": "build.stdout.txt",
+      "sha256": "725e85d3e004b83e59be48348ecc848483ad418a0eb95c02f763e5cf9189e4c6",
+      "bytes": 6944244
+    },
+    {
+      "name": "build.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "build.json",
+      "sha256": "717bb8804f13ca138702b2c6adb3a464ae2e51cefe755c888180618bd55a8770",
+      "bytes": 973
+    },
+    {
+      "name": "run.stdout.txt",
+      "sha256": "84c0698309cd2b479d19c073def694ebce7be4924ba837ec9fa711ff269f7db4",
+      "bytes": 8388
+    },
+    {
+      "name": "run.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "run.json",
+      "sha256": "85c042cd706937a7472d303ecefe9d437850ba6b29076e0796b69b739fdb620e",
+      "bytes": 947
+    },
+    {
+      "name": "BasicTemplateFrameworkAlgorithm.json",
+      "sha256": "1a392e1d605ec5db9617cbdebf56110789f7522bfd597cfd05010ccd0f56e797",
+      "bytes": 46063
+    },
+    {
+      "name": "BasicTemplateFrameworkAlgorithm-summary.json",
+      "sha256": "d0a66780ffae4f88e553c39e0850ca4eaecc749c47bd1756770cf80bc81a6adf",
+      "bytes": 4847
+    },
+    {
+      "name": "BasicTemplateFrameworkAlgorithm-order-events.json",
+      "sha256": "8e22c0052e1e769708114064cba69c3ddaec2c5af8148a6cf171e0f296f192de",
+      "bytes": 2279
+    },
+    {
+      "name": "BasicTemplateFrameworkAlgorithm-log.txt",
+      "sha256": "630c4e345dc84fe7b7a019c9e36cc4c70faec29253a8c7660a22ac60e1763261",
+      "bytes": 594
+    },
+    {
+      "name": "source-LICENSE",
+      "sha256": "522cf0a716ce03f67d46f8fceb5bf78c5b84400ec5cd8d14bf9f02cddc1cb6ba",
+      "bytes": 10737
+    },
+    {
+      "name": "source-Launcher-config.json",
+      "sha256": "d8c25c38e873c2354df58271f11b177208d98bb39af9249885f6137f45312658",
+      "bytes": 40228
+    },
+    {
+      "name": "source-Algorithm.CSharp-BasicTemplateFrameworkAlgorithm.cs",
+      "sha256": "c6d6b05e55d87e7e220a7a7abf521755ba826f1b2ea078853c0ebaf218f584a2",
+      "bytes": 5993
+    },
+    {
+      "name": "source-after-status.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "launcher-project.assets.json",
+      "sha256": "5f37bbba7fd1c24d309cc1b2a8df1275eb90814531bb12215aa509a2d670dd3e",
+      "bytes": 228449
+    },
+    {
+      "name": "launcher.deps.json",
+      "sha256": "22ba83c1f986a0d010c6bacd6babf2a71b2549d11fe0a2a97a89e68c371b6eb6",
+      "bytes": 67855
+    }
+  ],
+  "sources": [
+    "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/readme.md",
+    "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Launcher/config.json",
+    "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Algorithm.CSharp/BasicTemplateFrameworkAlgorithm.cs",
+    "https://builds.dotnet.microsoft.com/dotnet/release-metadata/10.0/releases.json"
+  ]
+}
