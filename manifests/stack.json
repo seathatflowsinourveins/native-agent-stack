@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-19T04:42:15.552095+00:00",
+  "scope": "Linux/WSL x86_64 native Codex and Claude reference stack; evidence statuses distinguish live and historical runs.",
+  "components": [],
+  "models": [],
+  "profiles": []
+}
