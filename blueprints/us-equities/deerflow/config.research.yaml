@@ -1,0 +1,34 @@
+# Embedded ACP tool invocation only; no DeerFlow planner/provider is configured.
+models: []
+tools: []
+tool_groups: []
+sandbox:
+  use: deerflow.sandbox.local:LocalSandboxProvider
+  allow_host_bash: false
+memory:
+  enabled: false
+  injection_enabled: false
+  manager_class: noop
+scheduler:
+  enabled: false
+database:
+  backend: memory
+acp_agents:
+  codex:
+    # The helper replaces these two installation-specific fields explicitly.
+    command: node
+    args: [codex-acp/dist/index.js]
+    description: Native Codex Astra, evidence research with ACP approvals denied
+    auto_approve_permissions: false
+    timeout_seconds: 180
+    env:
+      HOME: $HOME
+      PATH: $PATH
+      LANG: $LANG
+      CODEX_PATH: $CODEX_PATH
+      CODEX_HOME: $CODEX_HOME
+      APP_SERVER_LOGS: $APP_SERVER_LOGS
+      # Upstream 1.12.0 names this mode read-only but grants workspaceWrite.
+      # It means ask for approval, NOT strict filesystem read-only enforcement.
+      INITIAL_AGENT_MODE: read-only
+      CODEX_CONFIG: '{"model":"gpt-6-astra","model_provider":"openai","model_reasoning_effort":"high"}'

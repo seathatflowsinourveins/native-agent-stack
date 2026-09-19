@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "id": "deerflow-native-acp-research",
+  "kind": "native_model_e2e",
+  "recorded_at_utc": "2026-09-19T12:47:50+00:00",
+  "component_ids": [
+    "deerflow",
+    "codex-acp"
+  ],
+  "claim": "The unmodified pinned DeerFlow invoke_acp_agent tool completed one native Astra evidence-review task through maintained Codex ACP; the task read two public receipts and returned correct counts.",
+  "limitations": [
+    "Embedded tool invocation, not a complete DeerFlow planner/UI/scheduler or hosted service.",
+    "ACP 1.12.0 mode ID read-only actually maps to workspaceWrite, networkAccess=false, approvalPolicy=on-request. This task performed only reads, but strict filesystem read-only enforcement is not established.",
+    "DeerFlow returns text and discards ACP completion/usage; completion and cumulative usage below were selected from private native adapter logs.",
+    "Reported native model/provider identity is not independent provider attestation. No reroute event was observed.",
+    "Input/cache/output counters are observed native usage, not net token savings, billed dollars or a comparison against an alternative workflow.",
+    "No broker connectivity, paper order, live data entitlement, profitability, durable recovery, memory/RAG integration or general inference-quality benchmark was exercised.",
+    "Configured native MCP servers can still be discovered. Local sandboxing does not remove remote-tool authority. No MCP tool call was observed in this task.",
+    "Raw adapter logs include local session/account metadata and remain private. The public selected fields are sanitized; a private log hash does not make that log independently public."
+  ],
+  "versions": {
+    "deerflow_commit": "42334f26d7025d905678f9075b079fc65f9beaf9",
+    "deerflow_backend": "2.1.0-rc0",
+    "codex_acp": "1.12.0",
+    "native_codex": "0.155.1"
+  },
+  "readiness": {
+    "model": "gpt-6-astra",
+    "model_available": true,
+    "ordinary_usage_allowed": true,
+    "windows": {
+      "primary": {
+        "usedPercent": 50,
+        "resetsAt": 1790398209,
+        "windowDurationMins": 10080
+      }
+    },
+    "ready": true
+  },
+  "native_workflow": [
+    {
+      "command": "\"$WORKER_PYTHON\" \"$STACK_REPO/blueprints/us-equities/workers/native_worker.py\" inspect --codex-bin \"$CODEX_PATH\" --codex-home \"$CODEX_HOME\" --workspace \"$STACK_REPO\" --receipt \"$PRIVATE_RUN/readiness.json\"",
+      "exit_code": 0,
+      "model_inference_submitted": false
+    },
+    {
+      "command": "\"$DEERFLOW_HOME/backend/.venv/bin/python\" \"$STACK_REPO/blueprints/us-equities/deerflow/native-research.py\" --node \"$ACP_NODE\" --adapter \"$ACP_ENTRYPOINT\" --codex-bin \"$CODEX_PATH\" --codex-home \"$CODEX_HOME\" --state-dir \"$PRIVATE_RUN/research-1\" --readiness \"$PRIVATE_RUN/readiness.json\"",
+      "exit_code": 0,
+      "tool": "deerflow.tools.builtins.invoke_acp_agent_tool.build_invoke_acp_agent_tool(...).ainvoke",
+      "prompt_calls": 1
+    },
+    {
+      "native_agent_command": "head -c 24000 -- engine-receipt.json deerflow-discovery.json",
+      "exit_code": 0
+    }
+  ],
+  "result": {
+    "status": "completed",
+    "native_turn_duration_ms": 31027,
+    "helper_elapsed_seconds": 33.469,
+    "model": "gpt-6-astra",
+    "provider": "openai",
+    "reasoning_effort": "high",
+    "mode_id": "read-only",
+    "approval_policy": "on-request",
+    "sandbox_policy": {
+      "type": "workspaceWrite",
+      "writableRoots": [],
+      "networkAccess": false,
+      "excludeTmpdirEnvVar": false,
+      "excludeSlashTmp": false
+    },
+    "permission_auto_approval": false,
+    "model_reroute_events": 0,
+    "usage_cumulative": {
+      "totalTokens": 42345,
+      "inputTokens": 41737,
+      "cachedInputTokens": 24320,
+      "cacheWriteInputTokens": 0,
+      "outputTokens": 608,
+      "reasoningOutputTokens": 53
+    },
+    "usage_last_request": {
+      "totalTokens": 24164,
+      "inputTokens": 23628,
+      "cachedInputTokens": 12160,
+      "cacheWriteInputTokens": 0,
+      "outputTokens": 536,
+      "reasoningOutputTokens": 53
+    },
+    "model_context_window": 258400,
+    "usage_semantics": "Use cumulative totals once. cachedInputTokens is included in inputTokens; reasoningOutputTokens is included in outputTokens. last is the final request, not this entire multi-request turn.",
+    "native_command_count": 1,
+    "native_mcp_tool_call_count": 0,
+    "hooks_completed": [
+      {
+        "event": "sessionStart",
+        "status": "completed",
+        "count": 2
+      },
+      {
+        "event": "userPromptSubmit",
+        "status": "completed",
+        "count": 2
+      },
+      {
+        "event": "preToolUse",
+        "status": "completed",
+        "count": 2
+      },
+      {
+        "event": "postToolUse",
+        "status": "completed",
+        "count": 2
+      },
+      {
+        "event": "stop",
+        "status": "completed",
+        "count": 2
+      }
+    ],
+    "returned_facts": {
+      "lean_data_points": 3943,
+      "lean_simulated_orders": 3,
+      "lean_failed_data_requests": 0,
+      "historical_deerflow_models": 0,
+      "historical_deerflow_skills": 23,
+      "historical_acp_prompts": 0
+    },
+    "processes_exited": true,
+    "listening_service_started": false,
+    "returned_text": "blueprints/us-equities/deerflow/research-result.md",
+    "returned_text_sha256": "4aa4f228b0a976353c61adeb2d9f51d030081f3b359b2bfc8c388fbdc0b9d613"
+  },
+  "input_files": [
+    {
+      "path": "blueprints/us-equities/engine/receipt.json",
+      "sha256": "f74599195cbb51ad6c1112dc5af61ccd27bd6aa37f622ed874148f7616f5ede2"
+    },
+    {
+      "path": "blueprints/us-equities/deerflow/native-receipt.json",
+      "sha256": "7cbe9e489ff57c47619302e0cae728bfc451539d5370dd7278eca4058d6f5fb3"
+    }
+  ],
+  "private_evidence_sha256": {
+    "app_server_log": "28982baedc4f1bc4fdf157f0f338681a04419ea00ac99e9cc645210976c12a2d",
+    "helper_receipt": "42d7b589ed24201e8920cd099bad1050a72a77815ed98d9f04003ffba0ee1dc1",
+    "readiness": "dffefbf4b85188746dae90552a719230e5dd65dabd000a3238f837d4f72875a3"
+  },
+  "sources": [
+    "https://github.com/bytedance/deer-flow/blob/42334f26d7025d905678f9075b079fc65f9beaf9/backend/packages/harness/deerflow/tools/builtins/invoke_acp_agent_tool.py",
+    "https://github.com/bytedance/deer-flow/blob/42334f26d7025d905678f9075b079fc65f9beaf9/backend/packages/harness/deerflow/config/acp_config.py",
+    "https://github.com/agentclientprotocol/codex-acp/tree/v1.12.0",
+    "https://github.com/agentclientprotocol/codex-acp/blob/v1.12.0/src/AgentMode.ts",
+    "https://github.com/agentclientprotocol/codex-acp/blob/v1.12.0/src/Logger.ts"
+  ]
+}
