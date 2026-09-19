@@ -1,5 +1,14 @@
 # Coverage audit: what the selection establishes
 
+**Expanded catalog now available:** the [September 19 US-equities grand catalog](../catalogs/us-equities/README.md)
+adds 145 decision cards across 140 unique repositories and 20 model entries.
+Its [337-star ledger](../catalogs/us-equities/coverage.json) distinguishes 41 stars
+with current catalog cards, 10 additional baseline records and 286 without a
+current catalog/baseline card. The current catalog also reviews 99 repositories
+beyond those stars. The [combined index](../catalogs/us-equities/repository-index.md)
+contains 164 repositories including earlier records. Counts below preserve the
+earlier, smaller audit and must not be read as the new catalog's totals.
+
 Checked September 19, 2026 against a fresh authenticated GitHub star listing, the published manifests, prior research records and a bounded new primary-source search.
 
 The repository is a reviewed, evidence-backed selection for the chosen native coding workflow. The word "finalized" must not imply exhaustive evaluation of everything starred or a proven universal SOTA result. Successful upstream execution establishes that a path works; it does not establish that it outperforms competing approaches.

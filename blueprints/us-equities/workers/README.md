@@ -106,6 +106,8 @@ reported **34,097 input / 28,288 cached / 215 output**. Across all three SDK tur
 Cached-input share across all three is **87.06%**; no paired net-savings claim is
 made. A completed assistant turn that reports a tool rejection is still a failed
 extraction task. [The receipt](receipt.json) distinguishes those outcomes.
+These totals cover those three SDK turns only, excluding the coordinator and
+separate catalog-research agents; they are not a whole-task cost measurement.
 
 Receipts contain private native item records. Review and select fields before
 publishing. Failed SDK turns can raise before returning previously observed

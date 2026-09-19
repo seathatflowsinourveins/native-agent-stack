@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "scope": "Offline publication/catalog integrity plus independent source and evidence review. These checks do not rerun model inference, broker access or strategy performance.",
+  "checks": [
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "result": "Baseline component/receipt joins, published evidence hashes and privacy checks passed. Catalog artifacts are hash-listed in the same manifest."
+    },
+    {
+      "command": "python3 scripts/validate_catalogs.py",
+      "exit_code": 0,
+      "result": "145 repository entries, 140 unique repositories, 20 models and 337-star coverage joins validated; 41 starred and 99 beyond-star catalog identities."
+    },
+    {
+      "command": "python3 -m unittest discover -s tests",
+      "exit_code": 0,
+      "result": "55 offline tests passed: 24 baseline and 31 catalog failure-mode tests."
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "result": "No whitespace errors."
+    },
+    {
+      "command": "gitleaks dir --redact=100 --no-banner --no-color --report-format json --report-path \"$PRIVATE_RUN_DIR/gitleaks-public.json\" .",
+      "exit_code": 0,
+      "result": "No detected secrets in the current publication directory. This is a current-tree scan, not proof that arbitrary upstream dependencies or every historical commit are safe."
+    }
+  ],
+  "independent_review": [
+    "Foundation source/commands: clarified moving unpinned examples, Claude-mem online enrollment/trial and Supermemory extraction-model requirements.",
+    "Engine/data integration: retained source-only acceptance limits; corrected Mem0 plugin-date versus core pin and linked existing TOON fixture proof.",
+    "Models/agents/harness: verified all 17 HF revisions and 28 retained stdout hashes; corrected read-only task template and Phoenix provider-visibility versus authorization claim.",
+    "Retrieval evidence: independently recounted 6398 versus 490 tokens and matched all selected source lines to full output.",
+    "Catalog validator: corrected malformed receipt claim/scope acceptance; added non-string, empty and whitespace-only regression cases."
+  ],
+  "remaining_acceptance": [
+    "No universal SOTA or exhaustive deep review of all stars claimed.",
+    "Most catalog workflows remain source-reviewed and unexecuted.",
+    "No full DeerFlow inference chain or Astra gateway route proved.",
+    "No financial data ingestion, accepted strategy, Alpaca paper connection, risk/reconciliation service or unattended hosting proved.",
+    "LEAN dependency advisories remain open before unattended deployment.",
+    "Artifact token reduction and native SDK cache reuse do not establish whole-task provider or billing savings."
+  ]
+}

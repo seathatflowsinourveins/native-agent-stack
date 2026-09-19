@@ -989,7 +989,7 @@
         "ELv2 permits self-host use with restrictions; not Apache2 or unrestricted managed-service redistribution.",
         "Server launch is prospective; no app instrumented and no judge-model calls run.",
         "Auto-instrumentation can capture prompt/tool contents; scrub at source.",
-        "The proposed local inspection launch disables its optional MCP endpoint and playground providers; enabling them is a separate scope decision."
+        "The proposed launch disables the optional MCP endpoint and hides built-in providers from the UI/catalog. PHOENIX_ALLOWED_PROVIDERS=NONE is not a backend inference authorization boundary; use a credential-free environment and appropriate access controls."
       ],
       "sources": [
         "https://github.com/Arize-ai/phoenix",

@@ -264,6 +264,21 @@ class CatalogValidationTests(unittest.TestCase):
         self.save()
         validate(self.root)
 
+    def test_native_receipt_scope_requires_meaningful_text(self):
+        self.model["evidence_level"] = "native_proven"
+        self.model["evidence_refs"] = ["evidence/malformed.json"]
+        self.save()
+        for field in ("claim", "scope", "task", "result.scope"):
+            for value in ({"x": 1}, ["scope"], True, 1, "", "   ", None):
+                with self.subTest(field=field, value=value):
+                    record = {"schema_version": 1, "kind": "native_model_e2e", "data": {"exit_code": 0}}
+                    if field == "result.scope":
+                        record["result"] = {"scope": value}
+                    else:
+                        record[field] = value
+                    self.write("evidence/malformed.json", record)
+                    self.assert_invalid("native_model_e2e")
+
     def test_legacy_health_receipt_is_native_cli_evidence_only(self):
         self.write("evidence/health.json", {
             "checked_at_utc": "2026-09-19T00:00:00+00:00", "scope": "Anonymous health only.",

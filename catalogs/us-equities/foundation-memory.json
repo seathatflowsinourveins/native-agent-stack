@@ -1,0 +1,1398 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "layer": "foundation-memory",
+  "scope": "Source and native-evidence decision catalog; defaults are coherent selections, not universal benchmark winners. Installation is not implied by inclusion.",
+  "entries": [
+    {
+      "id": "foundation-ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "layers": [
+        "durable-memory",
+        "continuity"
+      ],
+      "role": "Cross-harness project memory and handoffs",
+      "decision": "default",
+      "rationale": "Retain one scoped memory of record shared by Codex and Claude; lexical retrieval avoids an extraction-model dependency.",
+      "version_or_commit": "v2.3.1",
+      "source_commit": "bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-17T18:26:44Z",
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "native_proven",
+      "evidence_scope": "Only the referenced receipt scope ran; commands may be prospective replays with operator-selected paths.",
+      "evidence_refs": [
+        "evidence/receipts/native-memory.json",
+        "evidence/receipts/desktop-direct-rag.json",
+        "evidence/receipts/component-history.json"
+      ],
+      "native_workflow": [
+        "ai-memory --version",
+        "ai-memory install-mcp --client codex --apply",
+        "ai-memory install-mcp --client claude-code --apply"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Native client hooks/instructions and explicit project identity; existing local installation."
+      ],
+      "limitations": [
+        "Lifecycle capture is bounded sanitized observations, not complete transcripts. Durable writes require explicit intent; recalled prose cannot authorize actions."
+      ],
+      "sources": [
+        "https://github.com/akitaonrails/ai-memory/blob/bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025/README.md",
+        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.1"
+      ],
+      "installed_version": "2.3.1"
+    },
+    {
+      "id": "foundation-context-mode",
+      "repository": "https://github.com/mksglu/context-mode",
+      "layers": [
+        "token-efficiency",
+        "tool-output"
+      ],
+      "role": "Execute large outputs locally and retrieve bounded relevant results",
+      "decision": "default",
+      "rationale": "Reduce tool-output context while preserving raw artifacts; use the existing native plugin and project-scoped bridge.",
+      "version_or_commit": "v1.0.169",
+      "source_commit": "6f0cc6841c687e754059f36714a11233fda1a02b",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-06-29T18:18:53Z",
+      "license": "Elastic-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "native_proven",
+      "evidence_scope": "Only the referenced receipt scope ran; commands may be prospective replays with operator-selected paths.",
+      "evidence_refs": [
+        "evidence/receipts/native-context-memory.json",
+        "evidence/receipts/artifact-reductions.json",
+        "evidence/receipts/component-history.json",
+        "blueprints/us-equities/workers/receipt.json"
+      ],
+      "native_workflow": [
+        "mcporter --config \"${MCPORTER_CONFIG}\" call context-mode.ctx_doctor --args '{}' --output text --no-oauth"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Supported runtime, native hooks and trusted MCP registration."
+      ],
+      "limitations": [
+        "Counters estimate context reduction, not provider billing savings.",
+        "Current Desktop tool catalog lacks direct ctx tools; native mcporter works. Astra SDK ctx_execute ran, but ephemeral ctx_execute_file scope and new-registration approval remain unresolved."
+      ],
+      "sources": [
+        "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md",
+        "https://github.com/mksglu/context-mode/releases/tag/v1.0.169",
+        "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/LICENSE"
+      ],
+      "installed_version": "1.0.169"
+    },
+    {
+      "id": "foundation-rtk",
+      "repository": "https://github.com/rtk-ai/rtk",
+      "layers": [
+        "token-efficiency"
+      ],
+      "role": "Compact supported CLI output",
+      "decision": "default",
+      "rationale": "Use one output-filtering lane per artifact; preserve errors and raw-output recovery.",
+      "version_or_commit": "v0.49.0",
+      "source_commit": "0924356b4caba4989607227b7c8824d3d8098719",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-11T08:52:38Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "native_proven",
+      "evidence_scope": "Only the referenced receipt scope ran; commands may be prospective replays with operator-selected paths.",
+      "evidence_refs": [
+        "evidence/receipts/native-context-memory.json",
+        "evidence/receipts/artifact-reductions.json",
+        "evidence/receipts/component-history.json"
+      ],
+      "native_workflow": [
+        "rtk git status"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Existing native CLI and hook selection."
+      ],
+      "limitations": [
+        "RTK estimated token counters are not native provider usage or an independent quality benchmark."
+      ],
+      "sources": [
+        "https://github.com/rtk-ai/rtk/blob/0924356b4caba4989607227b7c8824d3d8098719/README.md",
+        "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0"
+      ],
+      "installed_version": "0.49.0"
+    },
+    {
+      "id": "foundation-qmd",
+      "repository": "https://github.com/tobi/qmd",
+      "layers": [
+        "document-retrieval"
+      ],
+      "role": "Scoped Markdown BM25 retrieval",
+      "decision": "default",
+      "rationale": "Keep the proven local lexical lane for docs; use search then get instead of loading whole archives.",
+      "version_or_commit": "v2.8.3",
+      "source_commit": "04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-08-16T22:30:34Z",
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "native_proven",
+      "evidence_scope": "Only the referenced receipt scope ran; commands may be prospective replays with operator-selected paths.",
+      "evidence_refs": [
+        "evidence/receipts/native-cli-gaps.json",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/desktop-cli-workflows.json"
+      ],
+      "native_workflow": [
+        "qmd --index \"${QMD_INDEX}\" search \"automatic local code RAG Nemotron\" -c \"${QMD_COLLECTION}\" -n 2 --json"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Explicit per-project index/collection."
+      ],
+      "limitations": [
+        "Current profile is BM25 only. Semantic query/reranking models are not downloaded. New HF models are not automatically compatible with QMD GGUF/pooling contracts."
+      ],
+      "sources": [
+        "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/README.md",
+        "https://github.com/tobi/qmd/releases/tag/v2.8.3"
+      ],
+      "installed_version": "2.8.3"
+    },
+    {
+      "id": "foundation-socraticode",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "layers": [
+        "code-rag",
+        "index-freshness"
+      ],
+      "role": "Automatic semantic code indexing and graph context",
+      "decision": "default",
+      "rationale": "Retain the proven watcher, local Nemotron embedding endpoint and Qdrant collection for conceptual code search.",
+      "version_or_commit": "v1.14.0",
+      "source_commit": "b67f1328ff52ca869f642bb6b068bb0d3f2c3646",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-16T14:26:47Z",
+      "license": "AGPL-3.0-only; commercial alternative",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "native_proven",
+      "evidence_scope": "Only the referenced receipt scope ran; commands may be prospective replays with operator-selected paths.",
+      "evidence_refs": [
+        "evidence/receipts/native-rag.json",
+        "evidence/receipts/desktop-direct-rag.json",
+        "evidence/receipts/artifact-reductions.json",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/vllm-compatibility.json"
+      ],
+      "native_workflow": [
+        "mcporter --config \"${MCPORTER_CONFIG}\" call socraticode.codebase_health --args '{}' --output text --no-oauth",
+        "mcporter --config \"${MCPORTER_CONFIG}\" call socraticode.codebase_search --args \"${SEARCH_ARGS}\" --output text --no-oauth"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Configured per-project scope, local embedding service and Qdrant."
+      ],
+      "limitations": [
+        "AGPL obligations or commercial license apply to relevant deployments. The lmstudio setting in this profile targets local vLLM; it does not require LM Studio.",
+        "Embedding dimension/model changes require deliberate reindexing; no automatic linked-project expansion."
+      ],
+      "sources": [
+        "https://github.com/giancarloerra/SocratiCode/blob/b67f1328ff52ca869f642bb6b068bb0d3f2c3646/README.md",
+        "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.14.0"
+      ],
+      "installed_version": "1.14.0"
+    },
+    {
+      "id": "foundation-serena",
+      "repository": "https://github.com/oraios/serena",
+      "layers": [
+        "code-retrieval"
+      ],
+      "role": "Language-server symbol and reference retrieval",
+      "decision": "default",
+      "rationale": "Prefer exact symbol bodies/references for edits; complements conceptual retrieval without dumping the codebase.",
+      "version_or_commit": "v1.7.0",
+      "source_commit": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-08-09T18:38:06Z",
+      "license": "GPL-3.0-or-later application; MIT SolidLSP",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "native_proven",
+      "evidence_scope": "Only the referenced receipt scope ran; commands may be prospective replays with operator-selected paths.",
+      "evidence_refs": [
+        "evidence/receipts/native-context-memory.json",
+        "evidence/receipts/component-history.json"
+      ],
+      "native_workflow": [
+        "{\"tool\": \"find_symbol\", \"arguments\": {\"name_path_pattern\": \"greeting\", \"relative_path\": \"fixtures/after.py\", \"include_body\": true}}"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Supported language server and selected workspace."
+      ],
+      "limitations": [
+        "Installed development snapshot differs from latest stable v1.7.0. Static correctness still requires original source inspection."
+      ],
+      "sources": [
+        "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md",
+        "https://github.com/oraios/serena/releases/tag/v1.7.0"
+      ],
+      "installed_version": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+    },
+    {
+      "id": "foundation-codebase-memory-mcp",
+      "repository": "https://github.com/DeusData/codebase-memory-mcp",
+      "layers": [
+        "code-retrieval"
+      ],
+      "role": "Static code graph fallback",
+      "decision": "conditional",
+      "rationale": "Use the installed graph service where language-server coverage is insufficient; avoid redundant full indexes.",
+      "version_or_commit": "v0.11.0",
+      "source_commit": "59a05eb1bf9e11deb060d782cd7d3a29f2ae2866",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-15T23:40:39Z",
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "native_proven",
+      "evidence_scope": "Only the referenced receipt scope ran; commands may be prospective replays with operator-selected paths.",
+      "evidence_refs": [
+        "evidence/receipts/native-cli-gaps.json",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/desktop-cli-workflows.json"
+      ],
+      "native_workflow": [
+        "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory.search_graph --args \"${GRAPH_QUERY_ARGS}\" --output json --no-oauth"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Native MCP bridge and explicit graph scope."
+      ],
+      "limitations": [
+        "A static call graph cannot resolve every dynamic runtime dependency."
+      ],
+      "sources": [
+        "https://github.com/DeusData/codebase-memory-mcp/blob/59a05eb1bf9e11deb060d782cd7d3a29f2ae2866/README.md",
+        "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0"
+      ],
+      "installed_version": "0.11.0"
+    },
+    {
+      "id": "foundation-repomix",
+      "repository": "https://github.com/yamadashy/repomix",
+      "layers": [
+        "token-efficiency",
+        "handoff"
+      ],
+      "role": "Selected-file handoff bundles",
+      "decision": "conditional",
+      "rationale": "Pack explicit files for a bounded worker handoff; compressed structure is an index to original implementation.",
+      "version_or_commit": "v1.18.0",
+      "source_commit": "6c5ead0d2b83911d4284be9f3424e7381ae44763",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-08-08T04:31:26Z",
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "native_proven",
+      "evidence_scope": "Only the referenced receipt scope ran; commands may be prospective replays with operator-selected paths.",
+      "evidence_refs": [
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/portable-cli-artifacts.json"
+      ],
+      "native_workflow": [
+        "repomix --include fixtures/records.json,fixtures/example.sh --output \"${OUTPUT_DIR}/repomix.xml\""
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Native CLI and explicit include paths."
+      ],
+      "limitations": [
+        "Compression omits implementation detail and is not adequate evidence for correctness."
+      ],
+      "sources": [
+        "https://github.com/yamadashy/repomix/blob/6c5ead0d2b83911d4284be9f3424e7381ae44763/README.md",
+        "https://github.com/yamadashy/repomix/releases/tag/v1.18.0"
+      ],
+      "installed_version": "1.18.0"
+    },
+    {
+      "id": "foundation-headroom",
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "layers": [
+        "token-efficiency"
+      ],
+      "role": "Context compression SDK/proxy",
+      "decision": "alternative",
+      "rationale": "Consider a measured API-worker experiment only after native retrieval/caching; do not insert a second compressor into every turn.",
+      "version_or_commit": "v0.37.0",
+      "source_commit": "bc21c9370793f7e4aa94ac4c5d9a67a8d2dd0df9",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-08-27T21:18:26Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/headroomlabs-ai/headroom/blob/bc21c9370793f7e4aa94ac4c5d9a67a8d2dd0df9/README.md",
+        "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0"
+      ],
+      "native_workflow": [
+        "uv tool install --python 3.13 \"headroom-ai[all]\""
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Supported Python/wheels; explicit provider/proxy configuration."
+      ],
+      "limitations": [
+        "Canonical repository moved to headroomlabs-ai/headroom. Compression can discard trading evidence or disturb tool-call structure/cache prefixes.",
+        "Existing offline Headroom artifact handling remains a separate baseline receipt; this proxy/SDK path is unexecuted. Upstream claimed savings do not measure this stack; native Codex subscription and Astra gateway behavior are unproved."
+      ],
+      "sources": [
+        "https://github.com/headroomlabs-ai/headroom/blob/bc21c9370793f7e4aa94ac4c5d9a67a8d2dd0df9/README.md",
+        "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0"
+      ],
+      "installed_version": "0.37.0"
+    },
+    {
+      "id": "foundation-toon",
+      "repository": "https://github.com/toon-format/toon",
+      "layers": [
+        "token-efficiency",
+        "structured-artifacts"
+      ],
+      "role": "Compact structured serialization",
+      "decision": "conditional",
+      "rationale": "Use for homogeneous tabular research handoffs only after a same-data tokenizer comparison; retain canonical JSON/Parquet.",
+      "version_or_commit": "v4.1.1",
+      "source_commit": "f151a5d830d001bc244395b891183cba37e0d935",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-08-05T11:49:55Z",
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "native_proven",
+      "evidence_scope": "Only the referenced receipt scope ran; commands may be prospective replays with operator-selected paths.",
+      "evidence_refs": [
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/portable-cli-artifacts.json"
+      ],
+      "native_workflow": [
+        "toon fixtures/records.json --stats -o \"${OUTPUT_DIR}/records.toon\"",
+        "toon \"${OUTPUT_DIR}/records.toon\" --decode --strict -o \"${OUTPUT_DIR}/recovered.json\""
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "SDK-compatible consumers and lossless round-trip validation."
+      ],
+      "limitations": [
+        "Native proof is one encode/decode fixture roundtrip, not generalized token savings. Not universally smaller than JSON, especially nested or irregular records. Not an order-message protocol replacement."
+      ],
+      "sources": [
+        "https://github.com/toon-format/toon/blob/f151a5d830d001bc244395b891183cba37e0d935/README.md",
+        "https://github.com/toon-format/toon/releases/tag/v4.1.1"
+      ],
+      "installed_version": "4.1.1"
+    },
+    {
+      "id": "foundation-mem0",
+      "repository": "https://github.com/mem0ai/mem0",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Model-extracted user/agent memory",
+      "decision": "alternative",
+      "rationale": "Useful when application-level personalized memory becomes a requirement; avoids duplicating the current coding memory store.",
+      "version_or_commit": "core source a39a802bbc93e85b820078cd3c4dbaf53af25dbe",
+      "source_commit": "a39a802bbc93e85b820078cd3c4dbaf53af25dbe",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": null,
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/mem0ai/mem0/blob/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/README.md",
+        "https://github.com/mem0ai/mem0/releases/tag/openclaw-v1.2.0"
+      ],
+      "native_workflow": [
+        "pip install mem0ai"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Configured extraction LLM and embeddings; self-hosted authentication configuration."
+      ],
+      "limitations": [
+        "Latest GitHub tag openclaw-v1.2.0 belongs to a plugin, not the Python core version.",
+        "Extraction adds model calls and retention decisions; no local financial-memory quality or savings evaluation."
+      ],
+      "sources": [
+        "https://github.com/mem0ai/mem0/blob/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/README.md",
+        "https://github.com/mem0ai/mem0/releases/tag/openclaw-v1.2.0"
+      ],
+      "plugin_release_observed": {
+        "tag": "openclaw-v1.2.0",
+        "date": "2026-09-18T11:25:47Z"
+      }
+    },
+    {
+      "id": "foundation-hindsight",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Retain/recall/reflect memory service",
+      "decision": "alternative",
+      "rationale": "Evaluate when time-aware belief/observation consolidation is needed beyond the existing scoped wiki.",
+      "version_or_commit": "v0.10.0",
+      "source_commit": "79a2fb152f17ad03e94882e9cb6b8b25049f38c0",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-14T11:09:45Z",
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/vectorize-io/hindsight/blob/79a2fb152f17ad03e94882e9cb6b8b25049f38c0/README.md",
+        "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.0"
+      ],
+      "native_workflow": [
+        "pip install hindsight-api hindsight-client",
+        "hindsight-api"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "PostgreSQL or packaged local database path; extraction/reflection model configuration."
+      ],
+      "limitations": [
+        "Normal retention/reflection needs a model; managed-service claims do not establish local availability or latency."
+      ],
+      "sources": [
+        "https://github.com/vectorize-io/hindsight/blob/79a2fb152f17ad03e94882e9cb6b8b25049f38c0/README.md",
+        "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.0"
+      ]
+    },
+    {
+      "id": "foundation-openviking",
+      "repository": "https://github.com/volcengine/OpenViking",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Hierarchical context filesystem",
+      "decision": "alternative",
+      "rationale": "Consider when resources, memories and skills need a unified hierarchical retrieval service.",
+      "version_or_commit": "v0.4.20",
+      "source_commit": "535f0e003444fb2869d2cbeca95c65b027420780",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-14T05:57:59Z",
+      "license": "AGPL-3.0 server; Apache-2.0 CLI/examples",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/volcengine/OpenViking/blob/535f0e003444fb2869d2cbeca95c65b027420780/README.md",
+        "https://github.com/volcengine/OpenViking/releases/tag/v0.4.20"
+      ],
+      "native_workflow": [
+        "pip install --upgrade openviking"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Python 3.10+; embedding and VLM configuration; storage planning."
+      ],
+      "limitations": [
+        "Server moved to AGPL from v0.3; CLI/examples have separate Apache licensing. Commercial BYOC is distinct.",
+        "No migration from ai-memory or measured token improvement performed."
+      ],
+      "sources": [
+        "https://github.com/volcengine/OpenViking/blob/535f0e003444fb2869d2cbeca95c65b027420780/README.md",
+        "https://github.com/volcengine/OpenViking/releases/tag/v0.4.20"
+      ]
+    },
+    {
+      "id": "foundation-cognee",
+      "repository": "https://github.com/topoteretes/cognee",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Graph memory extraction and retrieval",
+      "decision": "alternative",
+      "rationale": "Optional graph-first research when entity relations improve a measured retrieval task.",
+      "version_or_commit": "v1.6.0",
+      "source_commit": "4294605f20324b250fd0edf8893cb69dc4215369",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-18T21:53:00Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/topoteretes/cognee/blob/4294605f20324b250fd0edf8893cb69dc4215369/README.md",
+        "https://github.com/topoteretes/cognee/releases/tag/v1.6.0"
+      ],
+      "native_workflow": [
+        "uv pip install cognee"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Python 3.10\u20133.14 and configured extraction/embedding providers."
+      ],
+      "limitations": [
+        "Default provider examples invoke OpenAI; local extraction options require configuration.",
+        "Upstream describes the OSS PostgreSQL graph store as demo; production PostgreSQL graph support has separate licensing."
+      ],
+      "sources": [
+        "https://github.com/topoteretes/cognee/blob/4294605f20324b250fd0edf8893cb69dc4215369/README.md",
+        "https://github.com/topoteretes/cognee/releases/tag/v1.6.0"
+      ]
+    },
+    {
+      "id": "foundation-mempalace",
+      "repository": "https://github.com/MemPalace/mempalace",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Searchable local conversation archive",
+      "decision": "alternative",
+      "rationale": "Use only for an explicitly selected archive with retention boundaries; preserve ai-memory as shared durable knowledge.",
+      "version_or_commit": "v3.10.0",
+      "source_commit": "36ec72f95e2e9f2bd6112891752edff457229f93",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-16T00:24:11Z",
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/MemPalace/mempalace/blob/36ec72f95e2e9f2bd6112891752edff457229f93/README.md",
+        "https://github.com/MemPalace/mempalace/releases/tag/v3.10.0"
+      ],
+      "native_workflow": [
+        "uv tool install mempalace"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Local embedding download and archive permissions; separate skill/MCP registration."
+      ],
+      "limitations": [
+        "Verbatim archive import is broader than bounded lifecycle capture. Publisher recall figures are not independent local results."
+      ],
+      "sources": [
+        "https://github.com/MemPalace/mempalace/blob/36ec72f95e2e9f2bd6112891752edff457229f93/README.md",
+        "https://github.com/MemPalace/mempalace/releases/tag/v3.10.0"
+      ]
+    },
+    {
+      "id": "foundation-everos",
+      "repository": "https://github.com/EverMind-AI/EverOS",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Structured episodic memory platform",
+      "decision": "watch",
+      "rationale": "Track model-backed memory research; run the no-key demo before committing a service migration.",
+      "version_or_commit": "v1.3.1",
+      "source_commit": "5076683ab88d714390573d8f88ff3c470e51129a",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-08T08:19:26Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/EverMind-AI/EverOS/blob/5076683ab88d714390573d8f88ff3c470e51129a/README.md",
+        "https://github.com/EverMind-AI/EverOS/releases/tag/v1.3.1"
+      ],
+      "native_workflow": [
+        "uv pip install everos",
+        "uv run everos demo --plain"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Python environment; real extraction/embedding/reranking configuration beyond demo."
+      ],
+      "limitations": [
+        "Demo behavior is not a production hybrid-memory evaluation. Office ingestion may require LibreOffice."
+      ],
+      "sources": [
+        "https://github.com/EverMind-AI/EverOS/blob/5076683ab88d714390573d8f88ff3c470e51129a/README.md",
+        "https://github.com/EverMind-AI/EverOS/releases/tag/v1.3.1"
+      ]
+    },
+    {
+      "id": "foundation-claude-mem",
+      "repository": "https://github.com/thedotmack/claude-mem",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Claude lifecycle capture and compressed retrieval",
+      "decision": "alternative",
+      "rationale": "Useful in Claude-centric environments, but overlaps existing cross-harness ai-memory capture.",
+      "version_or_commit": "v13.24.23",
+      "source_commit": "adce0fdfaf1cd46646bbd0b22ae74cbd460ed787",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-11T17:33:49Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/thedotmack/claude-mem/blob/adce0fdfaf1cd46646bbd0b22ae74cbd460ed787/README.md",
+        "https://github.com/thedotmack/claude-mem/releases/tag/v13.24.23"
+      ],
+      "native_workflow": [
+        "CLAUDE_MEM_ONLINE_OPTIN=false npx claude-mem install"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Native installer, background worker, storage and compression provider. Normal installer can request browser sign-in/observer provisioning; opt-out shown avoids new online enrollment."
+      ],
+      "limitations": [
+        "Global npm SDK installation alone does not register hooks and worker. Additional capture/consolidation has retention and model-cost consequences.",
+        "Online observer flow documents a 30-day trial and potential Anthropic-plan fallback; it is not free permanent hosted memory."
+      ],
+      "sources": [
+        "https://github.com/thedotmack/claude-mem/blob/adce0fdfaf1cd46646bbd0b22ae74cbd460ed787/README.md",
+        "https://github.com/thedotmack/claude-mem/releases/tag/v13.24.23"
+      ]
+    },
+    {
+      "id": "foundation-graphiti",
+      "repository": "https://github.com/getzep/graphiti",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Temporal knowledge graph for sourced relationships",
+      "decision": "conditional",
+      "rationale": "Candidate for issuer/entity relationships with valid-time provenance; separate it from trading/order state.",
+      "version_or_commit": "v0.30.2",
+      "source_commit": "de8eb5b896c05ed1b5b329d4cb52015446d65e21",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-08T20:38:41Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/getzep/graphiti/blob/de8eb5b896c05ed1b5b329d4cb52015446d65e21/README.md",
+        "https://github.com/getzep/graphiti/releases/tag/v0.30.2"
+      ],
+      "native_workflow": [
+        "pip install graphiti-core"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Supported Neo4j/FalkorDB or Neptune/OpenSearch backend; configured LLM and embeddings."
+      ],
+      "limitations": [
+        "Canonical repository is getzep/graphiti. Temporal graph assertions still require source timestamps and correction history.",
+        "Default examples use model API credentials; no graph deployment or extraction accuracy proof here."
+      ],
+      "sources": [
+        "https://github.com/getzep/graphiti/blob/de8eb5b896c05ed1b5b329d4cb52015446d65e21/README.md",
+        "https://github.com/getzep/graphiti/releases/tag/v0.30.2"
+      ]
+    },
+    {
+      "id": "foundation-lightrag",
+      "repository": "https://github.com/HKUDS/LightRAG",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Graph-assisted document retrieval",
+      "decision": "alternative",
+      "rationale": "Compare only when cross-document relationships outperform simpler hybrid retrieval on selected filings.",
+      "version_or_commit": "v1.5.7",
+      "source_commit": "e4e261c2b1566dba67e9a62cb84b9cb122581ae7",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-02T07:23:55Z",
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/HKUDS/LightRAG/blob/e4e261c2b1566dba67e9a62cb84b9cb122581ae7/README.md",
+        "https://github.com/HKUDS/LightRAG/releases/tag/v1.5.7"
+      ],
+      "native_workflow": [
+        "uv tool install \"lightrag-hku[api]\""
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Configured generation/embedding model; selected storage backend."
+      ],
+      "limitations": [
+        "Entity extraction consumes tokens; graph retrieval is not automatically more accurate or cheaper than lexical+dense search."
+      ],
+      "sources": [
+        "https://github.com/HKUDS/LightRAG/blob/e4e261c2b1566dba67e9a62cb84b9cb122581ae7/README.md",
+        "https://github.com/HKUDS/LightRAG/releases/tag/v1.5.7"
+      ]
+    },
+    {
+      "id": "foundation-ragflow",
+      "repository": "https://github.com/infiniflow/ragflow",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Document RAG platform",
+      "decision": "alternative",
+      "rationale": "A full ingestion/UI platform option if enterprise document operations justify the additional services.",
+      "version_or_commit": "v0.27.2",
+      "source_commit": "302ada2cdbdd72a5db4bd8e046478e52011fe4f0",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-10T11:11:35Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/infiniflow/ragflow/blob/302ada2cdbdd72a5db4bd8e046478e52011fe4f0/README.md",
+        "https://github.com/infiniflow/ragflow/releases/tag/v0.27.2"
+      ],
+      "native_workflow": [
+        "git clone https://github.com/infiniflow/ragflow.git",
+        "git -C ragflow checkout v0.27.2"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Container infrastructure, document storage, model configuration and resource capacity."
+      ],
+      "limitations": [
+        "Repository checkout is only preparation; follow pinned compose/model instructions for deployment. No service was installed in this review.",
+        "Do not apply upstream destructive volume-removal examples to retained data."
+      ],
+      "sources": [
+        "https://github.com/infiniflow/ragflow/blob/302ada2cdbdd72a5db4bd8e046478e52011fe4f0/README.md",
+        "https://github.com/infiniflow/ragflow/releases/tag/v0.27.2"
+      ]
+    },
+    {
+      "id": "foundation-weknora",
+      "repository": "https://github.com/Tencent/WeKnora",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Enterprise knowledge ingestion, search and access control",
+      "decision": "alternative",
+      "rationale": "Consider for governed multi-user collections and connectors, not as a duplicate personal coding index.",
+      "version_or_commit": "v0.8.0",
+      "source_commit": "2a6a9c251734d12bf65bf17d8f3412689ebed4e1",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-03T07:03:36Z",
+      "license": "MIT core; third-party notices apply",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/Tencent/WeKnora/blob/2a6a9c251734d12bf65bf17d8f3412689ebed4e1/README.md",
+        "https://github.com/Tencent/WeKnora/releases/tag/v0.8.0"
+      ],
+      "native_workflow": [
+        "git clone https://github.com/Tencent/WeKnora.git",
+        "git -C WeKnora checkout v0.8.0"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Deployment dependencies, chosen model/vector providers and connector permissions."
+      ],
+      "limitations": [
+        "Core MIT is subject to third-party notices. Connected sources require explicit scope and authorization."
+      ],
+      "sources": [
+        "https://github.com/Tencent/WeKnora/blob/2a6a9c251734d12bf65bf17d8f3412689ebed4e1/README.md",
+        "https://github.com/Tencent/WeKnora/releases/tag/v0.8.0"
+      ]
+    },
+    {
+      "id": "foundation-pageindex",
+      "repository": "https://github.com/VectifyAI/PageIndex",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Document-tree reasoning retrieval",
+      "decision": "conditional",
+      "rationale": "Compare on long financial reports where section/table structure is valuable and citations can be checked.",
+      "version_or_commit": "v0.2.18",
+      "source_commit": "9a8dd6658278fec90347e8ac3388a205305667a3",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-16T13:31:21Z",
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/VectifyAI/PageIndex/blob/9a8dd6658278fec90347e8ac3388a205305667a3/README.md",
+        "https://github.com/VectifyAI/PageIndex/releases/tag/v0.2.18"
+      ],
+      "native_workflow": [
+        "pip install -U pageindex"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Configured supported LLM; local SDK mode and document-tree generation."
+      ],
+      "limitations": [
+        "Vectorless does not mean zero model tokens; tree construction and reasoning have cost. Publisher benchmark is not this system\u2019s finance evaluation."
+      ],
+      "sources": [
+        "https://github.com/VectifyAI/PageIndex/blob/9a8dd6658278fec90347e8ac3388a205305667a3/README.md",
+        "https://github.com/VectifyAI/PageIndex/releases/tag/v0.2.18"
+      ]
+    },
+    {
+      "id": "foundation-letta",
+      "repository": "https://github.com/letta-ai/letta",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Historical Letta V1 server repository",
+      "decision": "excluded",
+      "rationale": "Current upstream explicitly retires V1 and points to letta-ai/letta-code; retain this card to prevent stale installation guidance.",
+      "version_or_commit": "0.16.8",
+      "source_commit": "5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-05-14T17:14:24Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/letta-ai/letta/blob/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/README.md",
+        "https://github.com/letta-ai/letta/releases/tag/0.16.8"
+      ],
+      "native_workflow": [
+        "git ls-remote https://github.com/letta-ai/letta.git HEAD"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Historical reproduction only."
+      ],
+      "limitations": [
+        "Old v0.16.8 release is not the current active harness. Do not deploy the retired server as the latest stack."
+      ],
+      "sources": [
+        "https://github.com/letta-ai/letta/blob/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/README.md",
+        "https://github.com/letta-ai/letta/releases/tag/0.16.8"
+      ]
+    },
+    {
+      "id": "foundation-letta-code",
+      "repository": "https://github.com/letta-ai/letta-code",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Stateful agent harness and App Server",
+      "decision": "alternative",
+      "rationale": "Active successor with memory blocks, MemFS, hooks and native provider connections; evaluate as a separate harness.",
+      "version_or_commit": "v0.32.13",
+      "source_commit": "8994497c7f5bc29da97fdad8703e4531152ca631",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-17T23:09:38Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/letta-ai/letta-code/blob/8994497c7f5bc29da97fdad8703e4531152ca631/README.md",
+        "https://github.com/letta-ai/letta-code/releases/tag/v0.32.13"
+      ],
+      "native_workflow": [
+        "npm install -g @letta-ai/letta-code",
+        "letta",
+        "letta server"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Node runtime and native /connect login/provider setup; managed remote features may require Letta account."
+      ],
+      "limitations": [
+        "Not a transparent memory plugin for Codex/Claude. Autonomous context/skill rewriting must not redefine deterministic trading controls.",
+        "AgentFile import/export was removed; do not reuse old V1 recipes."
+      ],
+      "sources": [
+        "https://github.com/letta-ai/letta-code/blob/8994497c7f5bc29da97fdad8703e4531152ca631/README.md",
+        "https://github.com/letta-ai/letta-code/releases/tag/v0.32.13"
+      ]
+    },
+    {
+      "id": "foundation-haystack",
+      "repository": "https://github.com/deepset-ai/haystack",
+      "layers": [
+        "rag-pipeline"
+      ],
+      "role": "Composable document/retrieval pipelines",
+      "decision": "conditional",
+      "rationale": "Preferred explicit RAG pipeline candidate when financial document evaluation requires a maintained application framework.",
+      "version_or_commit": "v3.1.1",
+      "source_commit": "b717d00654af0dc405e5cec35546d734c832042f",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-03T09:27:52Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/deepset-ai/haystack/blob/b717d00654af0dc405e5cec35546d734c832042f/README.md",
+        "https://github.com/deepset-ai/haystack/releases/tag/v3.1.1"
+      ],
+      "native_workflow": [
+        "pip install haystack-ai"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Selected retriever, document store and model integrations."
+      ],
+      "limitations": [
+        "No financial corpus pipeline or performance proof yet; enterprise platform is separate."
+      ],
+      "sources": [
+        "https://github.com/deepset-ai/haystack/blob/b717d00654af0dc405e5cec35546d734c832042f/README.md",
+        "https://github.com/deepset-ai/haystack/releases/tag/v3.1.1"
+      ]
+    },
+    {
+      "id": "foundation-llama_index",
+      "repository": "https://github.com/run-llama/llama_index",
+      "layers": [
+        "rag-pipeline"
+      ],
+      "role": "Document loaders and RAG integrations",
+      "decision": "alternative",
+      "rationale": "Useful targeted connectors; select core plus needed integrations instead of broad dependency bundles.",
+      "version_or_commit": "v0.14.24",
+      "source_commit": "f475afd8a9bbda84f252567e045d89d07b5701b3",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-08-19T18:48:01Z",
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/run-llama/llama_index/blob/f475afd8a9bbda84f252567e045d89d07b5701b3/README.md",
+        "https://github.com/run-llama/llama_index/releases/tag/v0.14.24"
+      ],
+      "native_workflow": [
+        "pip install llama-index-core"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Explicit provider integration packages and document permissions."
+      ],
+      "limitations": [
+        "Current README prioritizes LlamaParse/liteparse/benchmarks; reassess active integration maintenance. Managed parsing can have separate cost/data transfer."
+      ],
+      "sources": [
+        "https://github.com/run-llama/llama_index/blob/f475afd8a9bbda84f252567e045d89d07b5701b3/README.md",
+        "https://github.com/run-llama/llama_index/releases/tag/v0.14.24"
+      ]
+    },
+    {
+      "id": "foundation-qdrant",
+      "repository": "https://github.com/qdrant/qdrant",
+      "layers": [
+        "vector-storage"
+      ],
+      "role": "Local dense/sparse vector index",
+      "decision": "default",
+      "rationale": "Keep the existing native service already accepted with SocratiCode and Nemotron.",
+      "version_or_commit": "v1.19.1",
+      "source_commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-04T07:59:14Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "native_proven",
+      "evidence_scope": "Only the referenced receipt scope ran; commands may be prospective replays with operator-selected paths.",
+      "evidence_refs": [
+        "evidence/receipts/native-rag.json"
+      ],
+      "native_workflow": [
+        "qdrant --config-path \"${QDRANT_CONFIG}\" --disable-telemetry"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Existing configured native binary/service and per-project collection."
+      ],
+      "limitations": [
+        "Installed code search does not imply a financial-doc corpus exists. Enforce as-of/source/tenant metadata in future corpora."
+      ],
+      "sources": [
+        "https://github.com/qdrant/qdrant/blob/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/README.md",
+        "https://github.com/qdrant/qdrant/releases/tag/v1.19.1"
+      ],
+      "installed_version": "1.19.1"
+    },
+    {
+      "id": "foundation-pgvector",
+      "repository": "https://github.com/pgvector/pgvector",
+      "layers": [
+        "vector-storage"
+      ],
+      "role": "Vector search inside PostgreSQL",
+      "decision": "conditional",
+      "rationale": "Prefer when a future service already uses PostgreSQL and benefits from transactionally joined metadata.",
+      "version_or_commit": "v0.8.6 documented tag; reviewed HEAD efa08fda9ec485d80292d0487a77939c087dedcc",
+      "source_commit": "efa08fda9ec485d80292d0487a77939c087dedcc",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": null,
+      "license": "PostgreSQL",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/pgvector/pgvector/blob/efa08fda9ec485d80292d0487a77939c087dedcc/README.md"
+      ],
+      "native_workflow": [
+        "git clone --branch v0.8.6 https://github.com/pgvector/pgvector.git",
+        "make -C pgvector"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "PostgreSQL 13+, build dependencies and explicit database installation."
+      ],
+      "limitations": [
+        "No GitHub release object; v0.8.6 is the documented tag. Build is not database extension activation.",
+        "Adds no benefit to current Qdrant code index unless a specific SQL integration need is established."
+      ],
+      "sources": [
+        "https://github.com/pgvector/pgvector/blob/efa08fda9ec485d80292d0487a77939c087dedcc/README.md"
+      ]
+    },
+    {
+      "id": "foundation-lancedb",
+      "repository": "https://github.com/lancedb/lancedb",
+      "layers": [
+        "vector-storage"
+      ],
+      "role": "Embedded multimodal vector tables",
+      "decision": "alternative",
+      "rationale": "Consider local research corpora co-located with columnar artifacts without another service.",
+      "version_or_commit": "v0.39.0",
+      "source_commit": "df5709efd8411b66095e29f708290a3e2c80f0fe",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-17T20:59:02Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/lancedb/lancedb/blob/df5709efd8411b66095e29f708290a3e2c80f0fe/README.md",
+        "https://github.com/lancedb/lancedb/releases/tag/v0.39.0",
+        "https://docs.lancedb.com/quickstart"
+      ],
+      "native_workflow": [
+        "pip install lancedb",
+        "python -c \"import lancedb; db = lancedb.connect('./research-vectors'); print(db.table_names())\""
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Compatible CPU wheel; standard x86 wheel requires AVX2/FMA/F16C, older CPUs need lancedb-compat instead."
+      ],
+      "limitations": [
+        "Cloud/enterprise API differs from local embedded mode. Generated vectors and filters must still be validated."
+      ],
+      "sources": [
+        "https://github.com/lancedb/lancedb/blob/df5709efd8411b66095e29f708290a3e2c80f0fe/README.md",
+        "https://github.com/lancedb/lancedb/releases/tag/v0.39.0",
+        "https://docs.lancedb.com/quickstart"
+      ]
+    },
+    {
+      "id": "foundation-docling",
+      "repository": "https://github.com/docling-project/docling",
+      "layers": [
+        "document-ingestion"
+      ],
+      "role": "Financial PDF/table/OCR ingestion",
+      "decision": "conditional",
+      "rationale": "Preferred document-layout candidate before evaluating complex filing RAG.",
+      "version_or_commit": "v2.129.0",
+      "source_commit": "890dd42d017497c955a56a1d2cfc3f0af5bc2aa9",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-18T09:18:32Z",
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/docling-project/docling/blob/890dd42d017497c955a56a1d2cfc3f0af5bc2aa9/README.md",
+        "https://github.com/docling-project/docling/releases/tag/v2.129.0"
+      ],
+      "native_workflow": [
+        "pip install docling",
+        "docling --help"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Document-specific pipeline/model downloads and sufficient CPU/GPU resources."
+      ],
+      "limitations": [
+        "MIT applies to code; downloaded OCR/layout/model weights retain separate licenses. Table/unit extraction quality is unmeasured."
+      ],
+      "sources": [
+        "https://github.com/docling-project/docling/blob/890dd42d017497c955a56a1d2cfc3f0af5bc2aa9/README.md",
+        "https://github.com/docling-project/docling/releases/tag/v2.129.0"
+      ]
+    },
+    {
+      "id": "foundation-markitdown",
+      "repository": "https://github.com/microsoft/markitdown",
+      "layers": [
+        "document-ingestion"
+      ],
+      "role": "Selected document-to-Markdown conversion",
+      "decision": "default",
+      "rationale": "Use the installed lightweight converter for supported inputs before adding an OCR platform.",
+      "version_or_commit": "v0.1.7",
+      "source_commit": "945314a45ddbe02935f2fd287b797dc0ba4a01e4",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-07-29T18:19:15Z",
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "native_proven",
+      "evidence_scope": "Only the referenced receipt scope ran; commands may be prospective replays with operator-selected paths.",
+      "evidence_refs": [
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/portable-cli-artifacts.json"
+      ],
+      "native_workflow": [
+        "markitdown fixtures/greeting.html"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Existing base package."
+      ],
+      "limitations": [
+        "Current proof is local HTML conversion only; PDF/Office extras are not installed or proven."
+      ],
+      "sources": [
+        "https://github.com/microsoft/markitdown/blob/945314a45ddbe02935f2fd287b797dc0ba4a01e4/README.md",
+        "https://github.com/microsoft/markitdown/releases/tag/v0.1.7"
+      ],
+      "installed_version": "0.1.7"
+    },
+    {
+      "id": "foundation-mteb",
+      "repository": "https://github.com/embeddings-benchmark/mteb",
+      "layers": [
+        "evaluation"
+      ],
+      "role": "Embedding/retrieval evaluation tooling",
+      "decision": "conditional",
+      "rationale": "Use reproducible benchmark tasks plus a domain-specific financial retrieval set to compare upgrades.",
+      "version_or_commit": "2.21.0",
+      "source_commit": "8ecdd976aad52ee9d5718772065438ec60ed388a",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-14T17:42:24Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/README.md",
+        "https://github.com/embeddings-benchmark/mteb/releases/tag/2.21.0"
+      ],
+      "native_workflow": [
+        "pip install mteb"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Task datasets, model runtime and reproducible evaluation configuration."
+      ],
+      "limitations": [
+        "Public leaderboard is not independent proof for code retrieval, point-in-time filings or net trading performance."
+      ],
+      "sources": [
+        "https://github.com/embeddings-benchmark/mteb/blob/8ecdd976aad52ee9d5718772065438ec60ed388a/README.md",
+        "https://github.com/embeddings-benchmark/mteb/releases/tag/2.21.0"
+      ]
+    },
+    {
+      "id": "foundation-sentence-transformers",
+      "repository": "https://github.com/huggingface/sentence-transformers",
+      "layers": [
+        "model-sdk"
+      ],
+      "role": "Embedding and reranking model SDK",
+      "decision": "conditional",
+      "rationale": "Use supported publisher recipes for model-specific pooling/prefixes; canonical project moved to Hugging Face.",
+      "version_or_commit": "v6.1.0",
+      "source_commit": "f3864a53cfafb40a6f03f029ce96da70591e9931",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-09-18T10:44:39Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/huggingface/sentence-transformers/blob/f3864a53cfafb40a6f03f029ce96da70591e9931/README.md",
+        "https://github.com/huggingface/sentence-transformers/releases/tag/v6.1.0"
+      ],
+      "native_workflow": [
+        "pip install -U sentence-transformers"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Compatible PyTorch/Transformers and model-specific license/runtime."
+      ],
+      "limitations": [
+        "A generic feature-extraction pipeline is not a substitute for documented model wrappers. Newest package does not establish compatibility with the current vLLM service."
+      ],
+      "sources": [
+        "https://github.com/huggingface/sentence-transformers/blob/f3864a53cfafb40a6f03f029ce96da70591e9931/README.md",
+        "https://github.com/huggingface/sentence-transformers/releases/tag/v6.1.0"
+      ]
+    },
+    {
+      "id": "foundation-agent-retrieval-bench",
+      "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+      "layers": [
+        "evaluation",
+        "token-efficiency"
+      ],
+      "role": "File-level agent retrieval evaluation",
+      "decision": "conditional",
+      "rationale": "Useful acceptance framework for code-context quality per fixed context budget and abstention.",
+      "version_or_commit": "v0.2.1",
+      "source_commit": "07014c986f3deadb1548c62b32c0ffbe6a81465d",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-07-26T01:08:48Z",
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md",
+        "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1"
+      ],
+      "native_workflow": [
+        "git clone https://github.com/eyuansu62/agent-retrieval-bench.git",
+        "pip install -e ./agent-retrieval-bench",
+        "arb releases"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Python 3.10+, chosen corpus snapshots and evaluator."
+      ],
+      "limitations": [
+        "427 examples across 25 repositories are not a financial-document benchmark. Large-project concentration and no-gold cases affect interpretation.",
+        "No benchmark download/evaluation performed; freezing source and budgets is required."
+      ],
+      "sources": [
+        "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md",
+        "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1"
+      ]
+    },
+    {
+      "id": "foundation-engram-benchmark",
+      "repository": "https://github.com/Ubundi/engram-benchmark",
+      "layers": [
+        "evaluation"
+      ],
+      "role": "Cross-session memory evaluation harness",
+      "decision": "watch",
+      "rationale": "Track memory retention/usefulness separately from compression size.",
+      "version_or_commit": "ef432e3323eea4a298c6d53ff645d3fd322361a2",
+      "source_commit": "ef432e3323eea4a298c6d53ff645d3fd322361a2",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": null,
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/Ubundi/engram-benchmark/blob/ef432e3323eea4a298c6d53ff645d3fd322361a2/README.md"
+      ],
+      "native_workflow": [
+        "git clone https://github.com/Ubundi/engram-benchmark.git",
+        "uv sync --project engram-benchmark --dev"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Configured agent adapter, seeded tasks and optional judge model."
+      ],
+      "limitations": [
+        "Current practical adapters center on OpenClaw; Codex/Claude support is unproved. No benchmark execution or universal memory ranking claimed."
+      ],
+      "sources": [
+        "https://github.com/Ubundi/engram-benchmark/blob/ef432e3323eea4a298c6d53ff645d3fd322361a2/README.md"
+      ]
+    },
+    {
+      "id": "foundation-supermemory",
+      "repository": "https://github.com/supermemoryai/supermemory",
+      "layers": [
+        "memory-retrieval"
+      ],
+      "role": "Local/cloud memory SDK",
+      "decision": "alternative",
+      "rationale": "Consider for a separate application memory service if its ownership/API model is preferable to existing stores.",
+      "version_or_commit": "server-v0.0.8",
+      "source_commit": "57b430b5b6a19106a989651f4cde853c05147682",
+      "source_pin_scope": "Reviewed default-branch snapshot; release tag and installed version can differ.",
+      "release_date": "2026-08-17T18:39:22Z",
+      "license": "MIT",
+      "us_equities_fit": "Research and engineering evidence; retrieved text is not market truth or execution authority.",
+      "alpaca_fit": "No broker access required; keep credentials in a separate execution service.",
+      "evidence_level": "source_review",
+      "evidence_scope": "Pinned upstream source review; commands are prospective and were not executed for this candidate.",
+      "evidence_refs": [
+        "https://github.com/supermemoryai/supermemory/blob/57b430b5b6a19106a989651f4cde853c05147682/README.md",
+        "https://github.com/supermemoryai/supermemory/releases/tag/server-v0.0.8"
+      ],
+      "native_workflow": [
+        "npx supermemory local"
+      ],
+      "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
+      "requirements": [
+        "Local embedding download/storage; service authentication; selected generation/extraction provider or local Ollama model. API costs or model downloads are separate; cloud option separately configured."
+      ],
+      "limitations": [
+        "Native local startup can print a generated API key: keep its output private. Publisher benchmark leadership is not a local result.",
+        "Not installed or integrated; avoid duplicate automatic capture."
+      ],
+      "sources": [
+        "https://github.com/supermemoryai/supermemory/blob/57b430b5b6a19106a989651f4cde853c05147682/README.md",
+        "https://github.com/supermemoryai/supermemory/releases/tag/server-v0.0.8"
+      ]
+    }
+  ]
+}

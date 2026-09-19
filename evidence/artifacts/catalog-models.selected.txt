@@ -1,0 +1,30 @@
+qmd://us-equities-catalog/models.md  #5a1572
+---
+
+268: ### google/timesfm-3.0-pytorch
+269: 
+270: Recent forecasting research only; excluded from the commercial/production path under current weights license.
+271: 
+272: Revision: `43046b85ec22d584a13f8098c2ed39c889e129c2`. Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.
+273: 
+274: - TimesFM Non-Commercial License v1.0 is separate from Apache source code. Forecast accuracy is not equity alpha or execution evidence.
+275: 
+276: ```bash
+277: hf models info google/timesfm-3.0-pytorch --expand sha,createdAt,lastModified,cardData,safetensors --format json
+278: hf models card google/timesfm-3.0-pytorch --text --format human
+279: ```
+280: 
+281: ### google/timesfm-2.5-200m-pytorch
+282: 
+283: Apache-licensed 200M forecasting baseline for a properly lagged comparison, despite not being a recent model.
+284: 
+285: Revision: `1d952420fba87f3c6dee4f240de0f1a0fbc790e3`. Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.
+286: 
+287: - Package 3.0.2 is not model 3.0 permission. No financial out-of-sample evaluation performed. Forecasted prices alone are not a strategy.
+288: 
+289: ```bash
+290: hf models info google/timesfm-2.5-200m-pytorch --expand sha,createdAt,lastModified,cardData,safetensors --format json
+291: hf models card google/timesfm-2.5-200m-pytorch --text --format human
+292: ```
+293: 
+294: Prospective inference entry point: timesfm.TimesFM_2p5_200M_torch.from_pretrained('google/timesfm-2.5-200m-pytorch'); configure ForecastConfig before forecast.

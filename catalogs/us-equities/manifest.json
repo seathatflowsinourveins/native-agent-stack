@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "catalog_files": [
+    "catalogs/us-equities/foundation-memory.json",
+    "catalogs/us-equities/agents-operations.json",
+    "catalogs/us-equities/data-research.json",
+    "catalogs/us-equities/engines-strategies.json"
+  ],
+  "model_file": "catalogs/us-equities/models.json",
+  "coverage_file": "catalogs/us-equities/coverage.json",
+  "counts": {
+    "repository_entries": 145,
+    "unique_catalog_repositories": 140,
+    "models": 20,
+    "public_stars": 337,
+    "starred_catalog_repositories": 41,
+    "beyond_star_catalog_repositories": 99
+  },
+  "scope": "Decisions and source review are not installation or E2E. native_proven is bounded by referenced receipts; defaults can still require implementation.",
+  "evidence_files": [
+    "catalogs/us-equities/research-receipt.json",
+    "catalogs/us-equities/retrieval-receipt.json",
+    "catalogs/us-equities/verification.json"
+  ],
+  "north_star": "blueprints/us-equities/north-star.md",
+  "harness_contract": "blueprints/us-equities/harness-contract.json",
+  "broader_reference_union": 164
+}

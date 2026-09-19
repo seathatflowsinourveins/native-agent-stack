@@ -25,6 +25,10 @@ The broker side must own numeric validation, order state and reconciliation.
 Models produce research and proposed code; they do not own broker credentials
 or an unrestricted order-submission tool.
 
+Read the [north-star architecture and acceptance boundaries](north-star.md),
+[grand repository catalog](../../catalogs/us-equities/README.md), and
+[machine-readable harness contract](harness-contract.json) for the integrated path.
+
 ## Selected stack and actual acceptance
 
 | Layer | Upstream selection | Status and evidence |

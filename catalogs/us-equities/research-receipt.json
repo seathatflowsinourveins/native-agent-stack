@@ -1,0 +1,286 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "kind": "native_metadata_commands",
+  "cli": "huggingface_hub 1.32.0",
+  "scope": "Successful native public metadata retrieval in this session; no new weights or inference. Raw metadata retained privately; published structured fields are allowlisted.",
+  "commands": [
+    {
+      "command": "hf models info Alibaba-NLP/UEmbed-2B --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "Alibaba-NLP/UEmbed-2B",
+        "revision": "d02beb2d8b975f8140ebb035bd0e1dbf8afe98c4",
+        "created_at": "2026-07-29T08:28:08+00:00",
+        "last_modified": "2026-08-18T06:24:03+00:00"
+      },
+      "raw_stdout_sha256": "424dda4d88fd57aba7818a268d7bb3aa2e478163f6f4348b09a3a3f0f2632b85"
+    },
+    {
+      "command": "hf models card Alibaba-NLP/UEmbed-2B --text --format human",
+      "exit_code": 0,
+      "result": {
+        "model_card_bytes": 6144
+      },
+      "raw_stdout_sha256": "35bf9f0cda5e59376fc62d9d2eb5f6ac4e38353e0cf0fef41346d864a07e8a30"
+    },
+    {
+      "command": "hf models info Alibaba-NLP/core-emb-2b --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "Alibaba-NLP/core-emb-2b",
+        "revision": "cc9870ea92d64ebd5f8f9fc368d1120453564158",
+        "created_at": "2026-08-30T17:23:17+00:00",
+        "last_modified": "2026-09-04T02:06:59+00:00"
+      },
+      "raw_stdout_sha256": "8a39d435328064f3aca9d1f68b92d77450437c448180fec12789b2fe8f3008c3"
+    },
+    {
+      "command": "hf models card Alibaba-NLP/core-emb-2b --text --format human",
+      "exit_code": 0,
+      "result": {
+        "model_card_bytes": 5392
+      },
+      "raw_stdout_sha256": "91e62d243cdbb158aade88da0f9c88eb0f36da319b959e9c1e6a84ff421bd69b"
+    },
+    {
+      "command": "hf models info Alibaba-NLP/core-reranker-2b --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "Alibaba-NLP/core-reranker-2b",
+        "revision": "64e1a36cd6ecace459a4c7cd8f7d0ef5d6fee30b",
+        "created_at": "2026-08-30T17:13:54+00:00",
+        "last_modified": "2026-09-04T02:09:04+00:00"
+      },
+      "raw_stdout_sha256": "81a4fd3d4f33ac0d1a7f2da7d889344846ed1bdc8a6a7fa43f40cc4fee85f181"
+    },
+    {
+      "command": "hf models card Alibaba-NLP/core-reranker-2b --text --format human",
+      "exit_code": 0,
+      "result": {
+        "model_card_bytes": 5392
+      },
+      "raw_stdout_sha256": "91e62d243cdbb158aade88da0f9c88eb0f36da319b959e9c1e6a84ff421bd69b"
+    },
+    {
+      "command": "hf models info Qwen/Qwen3.8-2.4T-A95B --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "Qwen/Qwen3.8-2.4T-A95B",
+        "revision": "207bd685a7e3696cfaff12ded7c6a7ea0f88c996",
+        "created_at": "2026-08-08T01:50:52+00:00",
+        "last_modified": "2026-08-12T10:24:04+00:00"
+      },
+      "raw_stdout_sha256": "8c15f2ec9b4b4a73a78fda78bed8f002160c0e41402d1c55a0e048225abee36e"
+    },
+    {
+      "command": "hf models card Qwen/Qwen3.8-2.4T-A95B --text --format human",
+      "exit_code": 0,
+      "result": {
+        "model_card_bytes": 35628
+      },
+      "raw_stdout_sha256": "dc0f870244bc14724b987e92407f69ee8dc41ac4967b405a012808605da2af99"
+    },
+    {
+      "command": "hf models info Qwen/Qwen3.8-27B --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "Qwen/Qwen3.8-27B",
+        "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+        "created_at": "2026-08-05T08:22:59+00:00",
+        "last_modified": "2026-08-14T15:00:01+00:00"
+      },
+      "raw_stdout_sha256": "18b18a6a10ab64a937f9c14821f665de5730d53d9cc1dd84794a3905aeec6e57"
+    },
+    {
+      "command": "hf models card Qwen/Qwen3.8-27B --text --format human",
+      "exit_code": 0,
+      "result": {
+        "model_card_bytes": 64343
+      },
+      "raw_stdout_sha256": "44da8f6328ced7b532b0ab4c266d79431ead8adc0c3c5a9f9e75e8e99df74252"
+    },
+    {
+      "command": "hf models info Qwen/Qwen3.8-Flash-Next --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "Qwen/Qwen3.8-Flash-Next",
+        "revision": "de4b8e4d43b917e7706784d8bb445c9af86a3540",
+        "created_at": "2026-08-24T08:24:59+00:00",
+        "last_modified": "2026-08-27T05:03:36+00:00"
+      },
+      "raw_stdout_sha256": "308221964910f82469c930cedee8e98e3108271ecb3b36815f2a310c29119f85"
+    },
+    {
+      "command": "hf models card Qwen/Qwen3.8-Flash-Next --text --format human",
+      "exit_code": 0,
+      "result": {
+        "model_card_bytes": 65018
+      },
+      "raw_stdout_sha256": "06d06e90a4b4cb9f002fd72b258770fe42a07b70646d1121ff7d06440be2f66e"
+    },
+    {
+      "command": "hf models info amazon/chronos-2 --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "amazon/chronos-2",
+        "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+        "created_at": "2025-10-30T14:54:39+00:00",
+        "last_modified": "2026-06-05T11:55:42+00:00"
+      },
+      "raw_stdout_sha256": "2617f2f1142e1812e0de7e389189c68f5f1cba2793d2c4be7555e4c15f32b92d"
+    },
+    {
+      "command": "hf models card amazon/chronos-2 --text --format human",
+      "exit_code": 0,
+      "result": {
+        "model_card_bytes": 7369
+      },
+      "raw_stdout_sha256": "5a3279369b2a42dde286ce859062aa2f508cd0e2978b862536df5ace2261d2b6"
+    },
+    {
+      "command": "hf models info deepseek-ai/DeepSeek-V4.1-Flash --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "deepseek-ai/DeepSeek-V4.1-Flash",
+        "revision": "dba1be0a40aa45a94ad051997016db3960a90277",
+        "created_at": "2026-09-10T02:17:58+00:00",
+        "last_modified": "2026-09-10T08:18:10+00:00"
+      },
+      "raw_stdout_sha256": "94e290cbcb739bb54a524ae77c0ab0746bade1fbaf85e31c1e22094dba6daebd"
+    },
+    {
+      "command": "hf models info google/timesfm-2.5-200m-pytorch --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "google/timesfm-2.5-200m-pytorch",
+        "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+        "created_at": "2025-09-02T18:55:45+00:00",
+        "last_modified": "2025-10-02T17:21:38+00:00"
+      },
+      "raw_stdout_sha256": "68d10d9aaad7180ef7ecd691a78dcd9c66f88a52ac4ac13cafb6e7b1bfa82cf5"
+    },
+    {
+      "command": "hf models card google/timesfm-2.5-200m-pytorch --text --format human",
+      "exit_code": 0,
+      "result": {
+        "model_card_bytes": 2409
+      },
+      "raw_stdout_sha256": "af75fdc036bf4d708094c75910ce2050e41847abed88ac1c9659a4371cfff70d"
+    },
+    {
+      "command": "hf models info google/timesfm-3.0-pytorch --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "google/timesfm-3.0-pytorch",
+        "revision": "43046b85ec22d584a13f8098c2ed39c889e129c2",
+        "created_at": "2026-08-24T22:05:51+00:00",
+        "last_modified": "2026-09-02T15:44:59+00:00"
+      },
+      "raw_stdout_sha256": "280192d23a293ea4dca0e8e007ad915976d87f6be6c18dab8347dba32097f834"
+    },
+    {
+      "command": "hf models card google/timesfm-3.0-pytorch --text --format human",
+      "exit_code": 0,
+      "result": {
+        "model_card_bytes": 1238
+      },
+      "raw_stdout_sha256": "e4432960794f01e64704798a1c4697ff8606c436cb54d598833ea612cbb263ac"
+    },
+    {
+      "command": "hf models info jinaai/jina-reranker-v3.5 --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "jinaai/jina-reranker-v3.5",
+        "revision": "e8a93f33f0b22108f8c2364f8484ce3422552fbc",
+        "created_at": "2026-07-14T10:01:14+00:00",
+        "last_modified": "2026-07-30T11:35:06+00:00"
+      },
+      "raw_stdout_sha256": "a62ee1ecd7598b08e300ba65bdbd475e927569ab2fefa38bf9753f8853e01fe8"
+    },
+    {
+      "command": "hf models card jinaai/jina-reranker-v3.5 --text --format human",
+      "exit_code": 0,
+      "result": {
+        "model_card_bytes": 6483
+      },
+      "raw_stdout_sha256": "b673817cd9e6a79900d8dfefac1d4f44df513d915bfd2fef06eae662c74cfb49"
+    },
+    {
+      "command": "hf models info moonshotai/Kimi-K3 --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "moonshotai/Kimi-K3",
+        "revision": "f831ab66814297da540d832a5235f8e904f29d06",
+        "created_at": "2026-06-13T06:42:57+00:00",
+        "last_modified": "2026-09-02T02:22:41+00:00"
+      },
+      "raw_stdout_sha256": "d7d63d14830ef10c17b28b95dc8c9420e6d9c0549eaf8132553b233be507e353"
+    },
+    {
+      "command": "hf models info nvidia/Nemotron-3-Embed-1B-BF16 --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "nvidia/Nemotron-3-Embed-1B-BF16",
+        "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+        "created_at": "2026-07-14T07:32:18+00:00",
+        "last_modified": "2026-08-27T23:53:03+00:00"
+      },
+      "raw_stdout_sha256": "9ea63921c0bd5df24e9aac5672bdd8e948e15549abf6c99f669c709592541502"
+    },
+    {
+      "command": "hf models card nvidia/Nemotron-3-Embed-1B-BF16 --text --format human",
+      "exit_code": 0,
+      "result": {
+        "model_card_bytes": 35710
+      },
+      "raw_stdout_sha256": "b80c729354dbd883cc67069525991479fdc7d305d149a9ed5c2eb1d9e945ad0f"
+    },
+    {
+      "command": "hf models info nvidia/Nemotron-3-Embed-1B-NVFP4 --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "nvidia/Nemotron-3-Embed-1B-NVFP4",
+        "revision": "f630128278eb245579d3ea022b4f659fbd614318",
+        "created_at": "2026-07-14T07:46:58+00:00",
+        "last_modified": "2026-08-28T16:42:39+00:00"
+      },
+      "raw_stdout_sha256": "3a7ae461d79fc4606cdec8fac80c14063e901262a93036245077eb1a503d5945"
+    },
+    {
+      "command": "hf models info nvidia/Nemotron-3-Embed-8B-BF16 --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "nvidia/Nemotron-3-Embed-8B-BF16",
+        "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
+        "created_at": "2026-07-14T07:38:49+00:00",
+        "last_modified": "2026-08-28T15:59:43+00:00"
+      },
+      "raw_stdout_sha256": "2166b240d0cd3cd492069bc5ebfbd0f81c827fa73dbd180c0ec871ba985bebe5"
+    },
+    {
+      "command": "hf models info zai-org/GLM-5.3 --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "zai-org/GLM-5.3",
+        "revision": "aca966e4e02791568aa6a4ced368624b3d897f42",
+        "created_at": "2026-08-25T06:42:50+00:00",
+        "last_modified": "2026-09-04T06:41:23+00:00"
+      },
+      "raw_stdout_sha256": "80e5d0219641df4ba602e1f285c4ad478edfe16b8378d8b23f6836b4ce6f64d6"
+    },
+    {
+      "command": "hf models info zai-org/GLM-5.3-Flash --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+      "exit_code": 0,
+      "result": {
+        "id": "zai-org/GLM-5.3-Flash",
+        "revision": "eb9eb208eb0d988989d07a6a12d0fdeb5f52574a",
+        "created_at": "2026-08-25T06:43:14+00:00",
+        "last_modified": "2026-09-07T12:13:47+00:00"
+      },
+      "raw_stdout_sha256": "86c83f2ee0c10611843656990d714b91fcdfdd0d30621fb26ecc42fad56e133a"
+    }
+  ],
+  "model_info_successes": 17,
+  "model_card_successes": 11
+}

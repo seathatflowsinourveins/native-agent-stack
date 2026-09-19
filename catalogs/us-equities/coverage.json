@@ -1,0 +1,2723 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "scope": "Complete public-star identity ledger; metadata_only_unassessed means no current grand-catalog card or adopted baseline record. An older candidate decision, where present, is flagged separately. Absence of a card is not a technical rejection.",
+  "source_command": "gh api --paginate user/starred --jq '.[] | {full_name,private,html_url}'",
+  "stars": [
+    {
+      "repository": "https://github.com/0xNyk/awesome-hermes-agent",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/0xNyk/council-of-high-intelligence",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/1jehuang/jcode",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/666ghj/MiroFish",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/aaif-goose/goose",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/abhigyanpatwari/GitNexus",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/abhisheknaiidu/awesome-github-profile-readme",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/abi/screenshot-to-code",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/actions/checkout",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/addyosmani/agent-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/affaan-m/ECC",
+      "disposition": "baseline_record",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/agentskills/agentskills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": true
+    },
+    {
+      "repository": "https://github.com/AgriciDaniel/claude-obsidian",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/akfamily/akshare",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-ai-memory"
+      ],
+      "prior_candidate_decision": true
+    },
+    {
+      "repository": "https://github.com/alebcay/awesome-shell",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/AlexsJones/llmfit",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/alibaba/open-code-review",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/alirezarezvani/claude-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/alphaXiv/OpenResearch",
+      "disposition": "baseline_record",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/andrewyng/context-hub",
+      "disposition": "baseline_record",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Andyyyy64/whichllm",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/ankitects/anki",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "claude-agent-sdk"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-code",
+      "disposition": "baseline_record",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-cookbooks",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-plugins-official",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-quickstarts",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/anthropics/knowledge-work-plugins",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/apache/maka",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/aquasecurity/trivy",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "trivy"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/asavinov/intelligent-trading-bot",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/assafelovic/gpt-researcher",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/AsyncFuncAI/deepwiki-open",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/atilaahmettaner/tradingview-mcp",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/avelino/awesome-go",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/awarexone/Agentic-Bug-Hunter",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/awesome-foss/awesome-sysadmin",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/awesome-selfhosted/awesome-selfhosted",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/ayghri/i-have-adhd",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/bbfamily/abu",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/BigPizzaV3/CodexPlusPlus",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/bigskysoftware/htmx",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/bilawalsidhu/gods-eye-view",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/blader/humanizer",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/bradautomates/claude-video",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/breferrari/obsidian-mind",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/brianpetro/obsidian-smart-connections",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/browser-use/browser-use",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/BuilderIO/agent-native",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/bytebase/dbhub",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/bytedance/deer-flow",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "deerflow"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/can1357/oh-my-pi",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/catchorg/Catch2",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/cathrynlavery/diagram-design",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Chachamaru127/claude-code-harness",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/chaitanyagiri/munder-difflin",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/citrolabs/ego-lite",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/cli/cli",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/ClickHouse/ClickHouse",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "data-clickhouse"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/cline/cline",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/CloakHQ/CloakBrowser",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/cobusgreyling/loop-engineering",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/code-yeongyu/oh-my-openagent",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/codejunkie99/agentic-stack",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/colbymchenry/codegraph",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/coleam00/Archon",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/ColeMurray/background-agents",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/comet-ml/opik",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/composio-community/awesome-claude-plugins",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/composio-community/awesome-codex-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/ComposioHQ/awesome-claude-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/ComposioHQ/composio",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/cordiverse/cordis",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Crosstalk-Solutions/project-nomad",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/cursor/plugins",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/D4Vinci/Scrapling",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/davila7/claude-code-templates",
+      "disposition": "baseline_record",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/dbt-labs/dbt",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/DenisSergeevitch/agents-best-practices",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/dependabot/dependabot-core",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/deta/surf",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/DeusData/codebase-memory-mcp",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-codebase-memory-mcp"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "data-edgartools"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/di-sukharev/opencommit",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "omniroute"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/DietrichGebert/ponytail",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/docker/awesome-compose",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/donnemartin/system-design-primer",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/DovAmir/awesome-design-patterns",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/drona23/claude-token-efficient",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/e2b-dev/awesome-ai-agents",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/earendil-works/pi",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Egonex-AI/Understand-Anything",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/enaqx/awesome-react",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/eugeniughelbur/obsidian-second-brain",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/eugr/spark-vllm-docker",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/EverMind-AI/EverOS",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-everos"
+      ],
+      "prior_candidate_decision": true
+    },
+    {
+      "repository": "https://github.com/EveryInc/compound-engineering-plugin",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/f/prompts.chat",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/farion1231/cc-switch",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/fffaraz/awesome-cpp",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Fincept-Corporation/FinceptTerminal",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "data-fincept-terminal"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/firecrawl/firecrawl-mcp-server",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/FlorianBruniaux/claude-code-ultimate-guide",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/flyteorg/flyte",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/fmtlib/fmt",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/fmzquant/strategies",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/frankbria/ralph-claude-code",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/garrytan/gbrain",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/gastownhall/beads",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": true
+    },
+    {
+      "repository": "https://github.com/getagentseal/codeburn",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-socraticode"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/github/awesome-copilot",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "gitleaks"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/goabstract/Awesome-Design-Tools",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/google-ai-edge/gallery",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/google-ai-edge/LiteRT-LM",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/google-labs-code/stitch-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/google-research/timesfm",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "timesfm"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/google/googletest",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Graphify-Labs/graphify",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/graykode/abtop",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/h4ckf0r0day/obscura",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-headroom"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/hesreallyhim/awesome-claude-code",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/HKUDS/AI-Trader",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/HKUDS/CLI-Anything",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/HKUDS/DeepTutor",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/HKUDS/OpenHarness",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/HKUDS/RAG-Anything",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/HKUDS/Vibe-Trading",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/huangruiteng/loopx",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/humanlayer/humanlayer",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Imbad0202/academic-research-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/immich-app/immich",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/infiniflow/ragflow",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-ragflow"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/jarrodwatts/claude-hud",
+      "disposition": "baseline_record",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/jdx/mise",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/JetBrains/go-modern-guidelines",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/JuliusBrussee/caveman",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/K-Dense-AI/scientific-agent-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/karpathy/autoresearch",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/kenn-io/agentsview",
+      "disposition": "baseline_record",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/kepano/obsidian-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/kernc/backtesting.py",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "backtesting-py"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/khoj-ai/khoj",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/KnockOutEZ/wigolo",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/koala73/worldmonitor",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Kong/insomnia",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/kvcache-ai/ktransformers",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/langchain-ai/deepagents",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/langchain-ai/open-swe",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/langchain-ai/openwiki",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/langgenius/dify",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/LearningCircuit/local-deep-research",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Leonxlnx/taste-skill",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/lfnovo/open-notebook",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/lightpanda-io/browser",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/likec4/likec4",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/livekit/agents",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/llm-d/llm-d",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/LMCache/LMCache",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/looplj/axonhub",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/lsdefine/GenericAgent",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Lumiwealth/lumibot",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "lumibot"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/luongnv89/claude-howto",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Maciek-roboblog/Claude-Code-Usage-Monitor",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/magnitudedev/magnitude",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/mattpocock/skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "disposition": "baseline_record",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/mcp-use/mcp-use",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/mem0ai/mem0",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-mem0"
+      ],
+      "prior_candidate_decision": true
+    },
+    {
+      "repository": "https://github.com/MemPalace/mempalace",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-mempalace"
+      ],
+      "prior_candidate_decision": true
+    },
+    {
+      "repository": "https://github.com/microsoft/markitdown",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-markitdown"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/microsoft/PowerToys",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/microsoft/SkillOpt",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/mindfold-ai/Trellis",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/MiroMindAI/MiroThinker",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/mksglu/context-mode",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-context-mode"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/mlflow/mlflow",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "data-mlflow",
+        "mlflow"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/modelcontextprotocol/modelcontextprotocol",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/modelcontextprotocol/servers",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/modelscope/FunASR",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/msitarzewski/agency-agents",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/multica-ai/andrej-karpathy-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/multica-ai/multica",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/musistudio/claude-code-router",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/mvanhorn/last30days-skill",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/n8n-io/n8n",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/nashsu/llm_wiki",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "nautilustrader"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/nexu-io/html-anything",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/NirDiamant/Prompt_Engineering",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/NousResearch/hermes-agent",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/NousResearch/hermes-agent-self-evolution",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/NVIDIA-NeMo/Speech",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/NVIDIA-NeMo/Switchyard",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/nyldn/claude-octopus",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/obra/superpowers",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/odysseus-dev/odysseus",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/ollama/ollama",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/omacom/omarchy",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/omnigent-ai/omnigent",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/onyx-dot-app/onyx",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/open-compass/opencompass",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/open-compass/VLMEvalKit",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Open-Dev-Society/OpenStock",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Open-LLM-VTuber/Open-LLM-VTuber",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/open-multi-agent/open-multi-agent",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/openai/codex-plugin-cc",
+      "disposition": "baseline_record",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/openai/openai-agents-python",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "openai-agents-sdk"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/openai/plugins",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/openai/skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/opengeos/GeoLibre",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/OpenHands/OpenHands",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/oraios/serena",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-serena"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Orchestra-Research/AI-Research-SKILLs",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Osmantic/ODS",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/OthmanAdi/planning-with-files",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/OtterMind/Chat2DB",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/oven-sh/bun",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Panniantong/Agent-Reach",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/paperclipai/paperclip",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/paperless-ngx/paperless-ngx",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/paperswithbacktest/awesome-systematic-trading",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/pbakaus/impeccable",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/phuryn/pm-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Piebald-AI/claude-code-system-prompts",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/pola-rs/polars",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "data-polars"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/PostHog/posthog",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/PrefectHQ/prefect",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "prefect"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/PrimeIntellect-ai/prime-agent",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "promptfoo"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/public-apis/public-apis",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/punkpeye/awesome-mcp-servers",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/pydantic/pydantic",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/pytest-dev/pytest",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/quemsah/awesome-claude-plugins",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/refactoringhq/tolaria",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/restic/restic",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/revfactory/harness",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/ripienaar/free-for-dev",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/rohitg00/ai-engineering-from-scratch",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/router-for-me/CLIProxyAPI",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/rowboatlabs/rowboat",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/rtk-ai/rtk",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-rtk"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/ruvnet/ruflo",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/screenpipe/screenpipe",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/sdras/awesome-actions",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/searxng/searxng",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/SeemSeam/claude_codex_bridge",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/shanraisshan/claude-code-best-practice",
+      "disposition": "baseline_record",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/shanraisshan/codex-cli-best-practice",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/shareAI-lab/learn-claude-code",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/shiyu-coder/Kronos",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Shubhamsaboo/awesome-llm-apps",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/sickn33/agentic-awesome-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/SigNoz/signoz",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/sindresorhus/awesome",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/sindresorhus/awesome-nodejs",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/sirmalloc/ccstatusline",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/smtg-ai/claude-squad",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/stablyai/orca",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/supermemoryai/supermemory",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-supermemory"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/superplanehq/superplane",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/TauricResearch/TradingAgents",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "tradingagents"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/tech-leads-club/agent-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": true
+    },
+    {
+      "repository": "https://github.com/Tencent/WeKnora",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-weknora"
+      ],
+      "prior_candidate_decision": true
+    },
+    {
+      "repository": "https://github.com/TencentCloud/TencentDB-Agent-Memory",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/teng-lin/notebooklm-py",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/thedotmack/claude-mem",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-claude-mem"
+      ],
+      "prior_candidate_decision": true
+    },
+    {
+      "repository": "https://github.com/THU-MAIC/OpenMAIC",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/tiimgreen/github-cheat-sheet",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/tinyhumansai/openhuman",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/tirth8205/code-review-graph",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/toon-format/toon",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-toon"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/topoteretes/cognee",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-cognee"
+      ],
+      "prior_candidate_decision": true
+    },
+    {
+      "repository": "https://github.com/Tracer-Cloud/opensre",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/tradermonty/claude-trading-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/tradesdontlie/tradingview-mcp",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/trailofbits/skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/tt-a1i/archify",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/tursodatabase/turso",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/tw93/Waza",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/uditgoenka/autoresearch",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/UfoMiao/zcf",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/unclebob/swarm-forge",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/unclecode/crawl4ai",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/unslothai/unsloth",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Untrivial-ai/agent-orchestrator",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/usekaneo/kaneo",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/VectifyAI/PageIndex",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-pageindex"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-hindsight"
+      ],
+      "prior_candidate_decision": true
+    },
+    {
+      "repository": "https://github.com/VeejaLiu/ScienceFictionCollection",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/veggiemonk/awesome-docker",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/vercel-labs/agent-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/vinta/awesome-python",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/virattt/ai-hedge-fund",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/virattt/dexter",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "dexter"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/virgiliojr94/book-to-skill",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/vitali87/code-graph-rag",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/volcengine/OpenViking",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-openviking"
+      ],
+      "prior_candidate_decision": true
+    },
+    {
+      "repository": "https://github.com/VoltAgent/awesome-agent-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/VoltAgent/awesome-claude-code-subagents",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/VoltAgent/awesome-claude-design",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/VoltAgent/awesome-codex-subagents",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/VoltAgent/awesome-openclaw-skills",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/walkinglabs/learn-harness-engineering",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/wangzhe3224/awesome-systematic-trading",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/warp-tech/warpgate",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/warpdotdev/warp",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/weave-os/router",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/whchien/ai-trader",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/wilsonfreitas/awesome-quant",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/wonderwhy-er/DesktopCommanderMCP",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/wshobson/agents",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/xbtlin/ai-berkshire",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "ai-berkshire"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/xingkongliang/skills-manager",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/yamadashy/repomix",
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "foundation-repomix"
+      ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Yeachan-Heo/oh-my-claudecode",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Yeachan-Heo/oh-my-codex",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/YishenTu/claudian",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/ykdojo/claude-code-tips",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/yorukot/superfile",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/yusufkaraaslan/Skill_Seekers",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/Zackriya-Solutions/meetily",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/zebbern/claude-code-guide",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/ZhuLinsen/daily_stock_analysis",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/zilliztech/claude-context",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/ZSeven-W/openpencil",
+      "disposition": "metadata_only_unassessed",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    }
+  ],
+  "beyond_stars": [
+    {
+      "repository": "https://github.com/agentclientprotocol/codex-acp",
+      "catalog_entry_ids": [
+        "codex-acp"
+      ]
+    },
+    {
+      "repository": "https://github.com/ai4finance-foundation/fingpt",
+      "catalog_entry_ids": [
+        "fingpt"
+      ]
+    },
+    {
+      "repository": "https://github.com/ai4finance-foundation/finrl",
+      "catalog_entry_ids": [
+        "finrl"
+      ]
+    },
+    {
+      "repository": "https://github.com/ai4finance-foundation/finrl-trading",
+      "catalog_entry_ids": [
+        "finrl-x"
+      ]
+    },
+    {
+      "repository": "https://github.com/alex9smith/gdelt-doc-api",
+      "catalog_entry_ids": [
+        "data-gdeltdoc"
+      ]
+    },
+    {
+      "repository": "https://github.com/alpacahq/alpaca-backtrader-api",
+      "catalog_entry_ids": [
+        "alpaca-backtrader-legacy"
+      ]
+    },
+    {
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "catalog_entry_ids": [
+        "alpaca-py",
+        "data-alpaca-py"
+      ]
+    },
+    {
+      "repository": "https://github.com/amazon-science/chronos-forecasting",
+      "catalog_entry_ids": [
+        "chronos"
+      ]
+    },
+    {
+      "repository": "https://github.com/anchore/grype",
+      "catalog_entry_ids": [
+        "grype"
+      ]
+    },
+    {
+      "repository": "https://github.com/anchore/syft",
+      "catalog_entry_ids": [
+        "syft"
+      ]
+    },
+    {
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "catalog_entry_ids": [
+        "sandbox-runtime"
+      ]
+    },
+    {
+      "repository": "https://github.com/apache/arrow",
+      "catalog_entry_ids": [
+        "data-arrow"
+      ]
+    },
+    {
+      "repository": "https://github.com/apache/iceberg",
+      "catalog_entry_ids": [
+        "data-iceberg"
+      ]
+    },
+    {
+      "repository": "https://github.com/apache/kafka",
+      "catalog_entry_ids": [
+        "data-kafka"
+      ]
+    },
+    {
+      "repository": "https://github.com/arize-ai/phoenix",
+      "catalog_entry_ids": [
+        "phoenix"
+      ]
+    },
+    {
+      "repository": "https://github.com/baobach/mlfinpy",
+      "catalog_entry_ids": [
+        "mlfinpy"
+      ]
+    },
+    {
+      "repository": "https://github.com/bashtage/arch",
+      "catalog_entry_ids": [
+        "arch"
+      ]
+    },
+    {
+      "repository": "https://github.com/bentoml/bentoml",
+      "catalog_entry_ids": [
+        "bentoml"
+      ]
+    },
+    {
+      "repository": "https://github.com/blue-yonder/tsfresh",
+      "catalog_entry_ids": [
+        "data-tsfresh"
+      ]
+    },
+    {
+      "repository": "https://github.com/cvxgrp/cvxportfolio",
+      "catalog_entry_ids": [
+        "cvxportfolio"
+      ]
+    },
+    {
+      "repository": "https://github.com/dagster-io/dagster",
+      "catalog_entry_ids": [
+        "dagster"
+      ]
+    },
+    {
+      "repository": "https://github.com/dagucloud/dagu",
+      "catalog_entry_ids": [
+        "dagu"
+      ]
+    },
+    {
+      "repository": "https://github.com/databento/databento-python",
+      "catalog_entry_ids": [
+        "data-databento"
+      ]
+    },
+    {
+      "repository": "https://github.com/daytonaio/daytona",
+      "catalog_entry_ids": [
+        "daytona"
+      ]
+    },
+    {
+      "repository": "https://github.com/dcajasn/riskfolio-lib",
+      "catalog_entry_ids": [
+        "riskfolio-lib"
+      ]
+    },
+    {
+      "repository": "https://github.com/deepset-ai/haystack",
+      "catalog_entry_ids": [
+        "foundation-haystack"
+      ]
+    },
+    {
+      "repository": "https://github.com/delta-io/delta-rs",
+      "catalog_entry_ids": [
+        "data-delta-rs"
+      ]
+    },
+    {
+      "repository": "https://github.com/dlt-hub/dlt",
+      "catalog_entry_ids": [
+        "data-dlt"
+      ]
+    },
+    {
+      "repository": "https://github.com/docling-project/docling",
+      "catalog_entry_ids": [
+        "foundation-docling"
+      ]
+    },
+    {
+      "repository": "https://github.com/duckdb/duckdb",
+      "catalog_entry_ids": [
+        "data-duckdb"
+      ]
+    },
+    {
+      "repository": "https://github.com/e2b-dev/e2b",
+      "catalog_entry_ids": [
+        "e2b"
+      ]
+    },
+    {
+      "repository": "https://github.com/embeddings-benchmark/mteb",
+      "catalog_entry_ids": [
+        "foundation-mteb"
+      ]
+    },
+    {
+      "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+      "catalog_entry_ids": [
+        "foundation-agent-retrieval-bench"
+      ]
+    },
+    {
+      "repository": "https://github.com/feast-dev/feast",
+      "catalog_entry_ids": [
+        "data-feast"
+      ]
+    },
+    {
+      "repository": "https://github.com/fivetran/great_expectations",
+      "catalog_entry_ids": [
+        "data-great-expectations"
+      ]
+    },
+    {
+      "repository": "https://github.com/gerrymanoim/exchange_calendars",
+      "catalog_entry_ids": [
+        "data-exchange-calendars"
+      ]
+    },
+    {
+      "repository": "https://github.com/getzep/graphiti",
+      "catalog_entry_ids": [
+        "foundation-graphiti"
+      ]
+    },
+    {
+      "repository": "https://github.com/grafana/grafana",
+      "catalog_entry_ids": [
+        "grafana"
+      ]
+    },
+    {
+      "repository": "https://github.com/hkuds/lightrag",
+      "catalog_entry_ids": [
+        "foundation-lightrag"
+      ]
+    },
+    {
+      "repository": "https://github.com/huggingface/sentence-transformers",
+      "catalog_entry_ids": [
+        "foundation-sentence-transformers"
+      ]
+    },
+    {
+      "repository": "https://github.com/ib-api-reloaded/ib_async",
+      "catalog_entry_ids": [
+        "ib-async"
+      ]
+    },
+    {
+      "repository": "https://github.com/jadchaar/sec-edgar-downloader",
+      "catalog_entry_ids": [
+        "data-sec-edgar-downloader"
+      ]
+    },
+    {
+      "repository": "https://github.com/lancedb/lancedb",
+      "catalog_entry_ids": [
+        "foundation-lancedb"
+      ]
+    },
+    {
+      "repository": "https://github.com/langchain-ai/langgraph",
+      "catalog_entry_ids": [
+        "langgraph"
+      ]
+    },
+    {
+      "repository": "https://github.com/langfuse/langfuse",
+      "catalog_entry_ids": [
+        "langfuse"
+      ]
+    },
+    {
+      "repository": "https://github.com/letta-ai/letta",
+      "catalog_entry_ids": [
+        "foundation-letta"
+      ]
+    },
+    {
+      "repository": "https://github.com/letta-ai/letta-code",
+      "catalog_entry_ids": [
+        "foundation-letta-code"
+      ]
+    },
+    {
+      "repository": "https://github.com/man-group/arcticdb",
+      "catalog_entry_ids": [
+        "data-arcticdb"
+      ]
+    },
+    {
+      "repository": "https://github.com/massive-com/client-python",
+      "catalog_entry_ids": [
+        "data-massive"
+      ]
+    },
+    {
+      "repository": "https://github.com/mementum/backtrader",
+      "catalog_entry_ids": [
+        "backtrader"
+      ]
+    },
+    {
+      "repository": "https://github.com/microsoft/qlib",
+      "catalog_entry_ids": [
+        "data-qlib",
+        "qlib"
+      ]
+    },
+    {
+      "repository": "https://github.com/modal-labs/modal-client",
+      "catalog_entry_ids": [
+        "modal"
+      ]
+    },
+    {
+      "repository": "https://github.com/mortada/fredapi",
+      "catalog_entry_ids": [
+        "data-fredapi"
+      ]
+    },
+    {
+      "repository": "https://github.com/nixtla/mlforecast",
+      "catalog_entry_ids": [
+        "data-mlforecast"
+      ]
+    },
+    {
+      "repository": "https://github.com/nixtla/neuralforecast",
+      "catalog_entry_ids": [
+        "neuralforecast"
+      ]
+    },
+    {
+      "repository": "https://github.com/nixtla/statsforecast",
+      "catalog_entry_ids": [
+        "data-statsforecast",
+        "statsforecast"
+      ]
+    },
+    {
+      "repository": "https://github.com/online-ml/river",
+      "catalog_entry_ids": [
+        "data-river"
+      ]
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector",
+      "catalog_entry_ids": [
+        "opentelemetry-collector"
+      ]
+    },
+    {
+      "repository": "https://github.com/openai/codex",
+      "catalog_entry_ids": [
+        "codex-native-sdk"
+      ]
+    },
+    {
+      "repository": "https://github.com/openbao/openbao",
+      "catalog_entry_ids": [
+        "openbao"
+      ]
+    },
+    {
+      "repository": "https://github.com/openbb-finance/openbb",
+      "catalog_entry_ids": [
+        "data-openbb"
+      ]
+    },
+    {
+      "repository": "https://github.com/openlineage/openlineage",
+      "catalog_entry_ids": [
+        "data-openlineage"
+      ]
+    },
+    {
+      "repository": "https://github.com/opensandbox-group/opensandbox",
+      "catalog_entry_ids": [
+        "opensandbox"
+      ]
+    },
+    {
+      "repository": "https://github.com/pgvector/pgvector",
+      "catalog_entry_ids": [
+        "foundation-pgvector"
+      ]
+    },
+    {
+      "repository": "https://github.com/pmorissette/bt",
+      "catalog_entry_ids": [
+        "bt"
+      ]
+    },
+    {
+      "repository": "https://github.com/pmorissette/ffn",
+      "catalog_entry_ids": [
+        "ffn"
+      ]
+    },
+    {
+      "repository": "https://github.com/polakowo/vectorbt",
+      "catalog_entry_ids": [
+        "vectorbt"
+      ]
+    },
+    {
+      "repository": "https://github.com/prometheus/prometheus",
+      "catalog_entry_ids": [
+        "prometheus"
+      ]
+    },
+    {
+      "repository": "https://github.com/pyportfolio/pyportfolioopt",
+      "catalog_entry_ids": [
+        "pyportfolioopt"
+      ]
+    },
+    {
+      "repository": "https://github.com/qdrant/qdrant",
+      "catalog_entry_ids": [
+        "foundation-qdrant"
+      ]
+    },
+    {
+      "repository": "https://github.com/quantconnect/lean",
+      "catalog_entry_ids": [
+        "lean"
+      ]
+    },
+    {
+      "repository": "https://github.com/quantconnect/lean.brokerages.alpaca",
+      "catalog_entry_ids": [
+        "lean-alpaca"
+      ]
+    },
+    {
+      "repository": "https://github.com/quantopian/empyrical",
+      "catalog_entry_ids": [
+        "empyrical-legacy"
+      ]
+    },
+    {
+      "repository": "https://github.com/questdb/questdb",
+      "catalog_entry_ids": [
+        "data-questdb"
+      ]
+    },
+    {
+      "repository": "https://github.com/ranaroussi/quantstats",
+      "catalog_entry_ids": [
+        "quantstats"
+      ]
+    },
+    {
+      "repository": "https://github.com/ranaroussi/yfinance",
+      "catalog_entry_ids": [
+        "data-yfinance"
+      ]
+    },
+    {
+      "repository": "https://github.com/ray-project/ray",
+      "catalog_entry_ids": [
+        "ray-serve"
+      ]
+    },
+    {
+      "repository": "https://github.com/redpanda-data/redpanda",
+      "catalog_entry_ids": [
+        "data-redpanda"
+      ]
+    },
+    {
+      "repository": "https://github.com/rsheftel/pandas_market_calendars",
+      "catalog_entry_ids": [
+        "data-pandas-market-calendars"
+      ]
+    },
+    {
+      "repository": "https://github.com/run-llama/llama_index",
+      "catalog_entry_ids": [
+        "foundation-llama_index"
+      ]
+    },
+    {
+      "repository": "https://github.com/scikit-learn/scikit-learn",
+      "catalog_entry_ids": [
+        "scikit-learn"
+      ]
+    },
+    {
+      "repository": "https://github.com/sgl-project/sglang",
+      "catalog_entry_ids": [
+        "sglang"
+      ]
+    },
+    {
+      "repository": "https://github.com/sigstore/cosign",
+      "catalog_entry_ids": [
+        "cosign"
+      ]
+    },
+    {
+      "repository": "https://github.com/skfolio/skfolio",
+      "catalog_entry_ids": [
+        "skfolio"
+      ]
+    },
+    {
+      "repository": "https://github.com/sktime/sktime",
+      "catalog_entry_ids": [
+        "data-sktime",
+        "sktime"
+      ]
+    },
+    {
+      "repository": "https://github.com/statsmodels/statsmodels",
+      "catalog_entry_ids": [
+        "statsmodels"
+      ]
+    },
+    {
+      "repository": "https://github.com/stefan-jansen/alphalens-reloaded",
+      "catalog_entry_ids": [
+        "alphalens-reloaded"
+      ]
+    },
+    {
+      "repository": "https://github.com/stefan-jansen/empyrical-reloaded",
+      "catalog_entry_ids": [
+        "empyrical-reloaded"
+      ]
+    },
+    {
+      "repository": "https://github.com/stefan-jansen/zipline-reloaded",
+      "catalog_entry_ids": [
+        "zipline-reloaded"
+      ]
+    },
+    {
+      "repository": "https://github.com/tashfeenahmed/freellmapi",
+      "catalog_entry_ids": [
+        "freellmapi"
+      ]
+    },
+    {
+      "repository": "https://github.com/temporalio/temporal",
+      "catalog_entry_ids": [
+        "temporal"
+      ]
+    },
+    {
+      "repository": "https://github.com/tobi/qmd",
+      "catalog_entry_ids": [
+        "foundation-qmd"
+      ]
+    },
+    {
+      "repository": "https://github.com/treeverse/dvc",
+      "catalog_entry_ids": [
+        "data-dvc"
+      ]
+    },
+    {
+      "repository": "https://github.com/treeverse/lakefs",
+      "catalog_entry_ids": [
+        "data-lakefs"
+      ]
+    },
+    {
+      "repository": "https://github.com/ubundi/engram-benchmark",
+      "catalog_entry_ids": [
+        "foundation-engram-benchmark"
+      ]
+    },
+    {
+      "repository": "https://github.com/ukgovernmentbeis/inspect_ai",
+      "catalog_entry_ids": [
+        "inspect-ai"
+      ]
+    },
+    {
+      "repository": "https://github.com/unionai-oss/pandera",
+      "catalog_entry_ids": [
+        "data-pandera"
+      ]
+    },
+    {
+      "repository": "https://github.com/unit8co/darts",
+      "catalog_entry_ids": [
+        "darts"
+      ]
+    },
+    {
+      "repository": "https://github.com/vllm-project/vllm",
+      "catalog_entry_ids": [
+        "vllm"
+      ]
+    }
+  ],
+  "aliases": {
+    "chopratejas/headroom": "headroomlabs-ai/headroom",
+    "ukplab/sentence-transformers": "huggingface/sentence-transformers",
+    "zep-ai/graphiti": "getzep/graphiti",
+    "iterative/dvc": "treeverse/dvc",
+    "great-expectations/great_expectations": "fivetran/great_expectations",
+    "dagu-org/dagu": "dagucloud/dagu",
+    "zed-industries/codex-acp": "agentclientprotocol/codex-acp",
+    "polygon-io/client-python": "massive-com/client-python"
+  }
+}

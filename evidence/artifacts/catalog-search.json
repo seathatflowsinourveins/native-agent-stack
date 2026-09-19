@@ -1,0 +1,10 @@
+[
+  {
+    "docid": "#5a1572",
+    "score": 0.81,
+    "file": "qmd://us-equities-catalog/models.md?index=native-agent-stack-catalog",
+    "line": 26,
+    "title": "Model choices and recent-release evidence",
+    "snippet": "@@ -25,4 @@ (24 before, 282 after)\n| [Alibaba-NLP/core-reranker-2b](https://huggingface.co/Alibaba-NLP/core-reranker-2b/blob/64e1a36cd6ecace459a4c7cd8f7d0ef5d6fee30b/README.md) | watch | 2026-09-03; Research paper date, not a verified weight-release announcement | Multimodal compositional reranking | cc-by-4.0 |\n| [google/timesfm-..."
+  }
+]

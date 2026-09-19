@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "kind": "native_cli_artifact_measurement",
+  "tool": "QMD 2.8.3",
+  "mode": "BM25 only; no embedding/reranker/generation model",
+  "question": "Which TimesFM version is suitable for the commercial-trading research path under its available weights license?",
+  "result": "Retrieved source distinguishes TimesFM3.0 non-commercial weights from Apache-licensed2.5; neither has finance evaluation proof.",
+  "commands": [
+    {
+      "command": "qmd --index native-agent-stack-catalog search timesfm -c us-equities-catalog -n 2 --json",
+      "exit_code": 0,
+      "stdout_artifact": "evidence/artifacts/catalog-search.json",
+      "hits": 1
+    },
+    {
+      "command": "qmd --index native-agent-stack-catalog get qmd://us-equities-catalog/models.md",
+      "exit_code": 0,
+      "stdout_artifact": "evidence/artifacts/catalog-models.full.txt",
+      "stdout_bytes": 22440
+    },
+    {
+      "command": "qmd --index native-agent-stack-catalog get qmd://us-equities-catalog/models.md:268:27",
+      "exit_code": 0,
+      "stdout_artifact": "evidence/artifacts/catalog-models.selected.txt",
+      "stdout_bytes": 1770
+    }
+  ],
+  "token_measurement": {
+    "tokenizer": "gpt-tokenizer",
+    "version": "3.4.0",
+    "encoding": "o200k_base",
+    "command": "TOKENIZER_PREFIX=\"$TOKENIZER_PREFIX\" node scripts/recount-tokens.cjs --catalog",
+    "full_tokens": 6398,
+    "selected_tokens": 490,
+    "tokens_removed": 5908,
+    "reduction_percent": 92.34135667396062
+  },
+  "limitations": [
+    "Selected-document context reduction only; not measured provider tokens, quality equivalence across arbitrary tasks, billing savings or full catalog coverage.",
+    "Full/selected outputs are frozen evidence snapshots. The live guide may evolve; refresh the explicit index before future queries.",
+    "Index is local to the operator host; other checkouts must deliberately add their own scoped collections. No global home-directory indexing."
+  ]
+}

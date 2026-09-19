@@ -223,6 +223,156 @@
   ],
   "files": [
     {
+      "path": "blueprints/us-equities/data/receipt.json",
+      "sha256": "9a2338f3d064571c6f60a5b9a15c618252b281fd9df84349340d07abe8b7d75c",
+      "bytes": 842
+    },
+    {
+      "path": "blueprints/us-equities/deerflow/native-receipt.json",
+      "sha256": "7cbe9e489ff57c47619302e0cae728bfc451539d5370dd7278eca4058d6f5fb3",
+      "bytes": 4598
+    },
+    {
+      "path": "blueprints/us-equities/engine/receipt.json",
+      "sha256": "f74599195cbb51ad6c1112dc5af61ccd27bd6aa37f622ed874148f7616f5ede2",
+      "bytes": 10333
+    },
+    {
+      "path": "blueprints/us-equities/harness-contract.json",
+      "sha256": "de24d0b33ce48e1a1e940ec7751a68613ac7e0fd140652f46991cf017e5e7496",
+      "bytes": 2199
+    },
+    {
+      "path": "blueprints/us-equities/manifest.json",
+      "sha256": "6067df3527c601a15adef59bf824fc25269772f827b6c2e0fc1f292b251af007",
+      "bytes": 4398
+    },
+    {
+      "path": "blueprints/us-equities/north-star.md",
+      "sha256": "d11d447db662a97b01eaae4e656cab21f7aaf4ccaf514a1f54a6e679d46c7119",
+      "bytes": 9507
+    },
+    {
+      "path": "blueprints/us-equities/routing/health-receipt.json",
+      "sha256": "d3ebd61dec8496e4b8de3cf9a9e371f816790c45fb563eba5b46718e021352e8",
+      "bytes": 1043
+    },
+    {
+      "path": "blueprints/us-equities/workers/receipt.json",
+      "sha256": "4308f002936d354757ab819b1b537e26db41c76bf8201f58e0ce559750986afc",
+      "bytes": 7508
+    },
+    {
+      "path": "blueprints/us-equities/workers/research-task.md",
+      "sha256": "743c1f63d87ea9c4186b1d569ff02fc3a9dd32b3a7283048201ffee32b481cf5",
+      "bytes": 1309
+    },
+    {
+      "path": "catalogs/us-equities/README.md",
+      "sha256": "d976a681307f5356eac3abc1a603819f9c739d8e9c8f9ad00214d7ed32e90d3f",
+      "bytes": 6642
+    },
+    {
+      "path": "catalogs/us-equities/agents-operations.json",
+      "sha256": "97faa0810a23b5cc5f3796f676cc7959c31c6a1a3b4415c791e1cb3fc6e73984",
+      "bytes": 74069
+    },
+    {
+      "path": "catalogs/us-equities/agents-operations.md",
+      "sha256": "6081bada49014eb7195987dc193cbf975ec1f300b4b067e46ab2642515699549",
+      "bytes": 21117
+    },
+    {
+      "path": "catalogs/us-equities/coverage.json",
+      "sha256": "b46cb418638ec038cea69cc9616fcdc574fc318ec4110561995c50a227c5fb71",
+      "bytes": 82409
+    },
+    {
+      "path": "catalogs/us-equities/data-research.json",
+      "sha256": "4a94cf850de73d8dd4a0dce6720ab6e17c512d54e0a56823c6e890f7e0a93a70",
+      "bytes": 95006
+    },
+    {
+      "path": "catalogs/us-equities/data-research.md",
+      "sha256": "baaa862e3f51f75b3ecd061e79075d2b027aa3e3aecea6e256649cd1f53599cb",
+      "bytes": 22107
+    },
+    {
+      "path": "catalogs/us-equities/engines-strategies.json",
+      "sha256": "b647525f6f9e322911af464bd7184a5493162143e3fdaba56170e44a4e157d7a",
+      "bytes": 97298
+    },
+    {
+      "path": "catalogs/us-equities/engines-strategies.md",
+      "sha256": "d27095795b644780aab0f865a1b505bedfaf94f8236f44fa4000b73ef28e19e8",
+      "bytes": 20703
+    },
+    {
+      "path": "catalogs/us-equities/foundation-memory.json",
+      "sha256": "8b603a00886b9222a624a31ba3e476d79c1e0aef1f543fe4df9b118014ed369b",
+      "bytes": 79530
+    },
+    {
+      "path": "catalogs/us-equities/foundation-memory.md",
+      "sha256": "309749db52a34008e4c4c0515b96f2f6cb25a3321d488ecc04145b894f1fea02",
+      "bytes": 47755
+    },
+    {
+      "path": "catalogs/us-equities/manifest.json",
+      "sha256": "ff45327a7647f2aa9bf7049abd17dd6b9cfcfafaf48b9dd8754c04e430ab8445",
+      "bytes": 1103
+    },
+    {
+      "path": "catalogs/us-equities/models.json",
+      "sha256": "4cdb9604ce2c644616fb7b87fd83a72dc3f95ff1cf81964a620e8e0576f6741d",
+      "bytes": 32822
+    },
+    {
+      "path": "catalogs/us-equities/models.md",
+      "sha256": "5a157242c590846f0aa4f34f6d0d4c5e705b7b1062ec04e05012901c54df9d69",
+      "bytes": 20947
+    },
+    {
+      "path": "catalogs/us-equities/native-workflows.md",
+      "sha256": "779cba8c4cf2d9fa470e82ed69c2a44a4e2bc93db6fb150c7720c568fd1d09f4",
+      "bytes": 5601
+    },
+    {
+      "path": "catalogs/us-equities/repository-index.md",
+      "sha256": "1e0425ff557a01d0ed057b156d98434d411bed0807c0b0212d789a72656362f2",
+      "bytes": 24947
+    },
+    {
+      "path": "catalogs/us-equities/research-receipt.json",
+      "sha256": "c3db6928bdcea3d57eefd859d01cabfd6e30a4f7f5096c076b929418b9624c00",
+      "bytes": 11827
+    },
+    {
+      "path": "catalogs/us-equities/retrieval-receipt.json",
+      "sha256": "d42e225d314b077f91768d821f4990932ad76376d421d48295c8cfad5a02de64",
+      "bytes": 1995
+    },
+    {
+      "path": "catalogs/us-equities/verification.json",
+      "sha256": "078d743a4766ae0a69ee6e97e2eb1da96fe7d14bdced1397093162ca86750e79",
+      "bytes": 2787
+    },
+    {
+      "path": "evidence/artifacts/catalog-models.full.txt",
+      "sha256": "37310d0ba7b66eb2caf6825e155bca4a3abf2186dda4ab69751b22750b068227",
+      "bytes": 22440
+    },
+    {
+      "path": "evidence/artifacts/catalog-models.selected.txt",
+      "sha256": "39f7fe765e0727895e4ade7371f4e177a29665ffaec9ac8769c39f2a1fe44eab",
+      "bytes": 1770
+    },
+    {
+      "path": "evidence/artifacts/catalog-search.json",
+      "sha256": "3f65add4e0745ca9c5f5801a6e654f747611142f8190c106c9fbbdfd590d699e",
+      "bytes": 568
+    },
+    {
       "path": "evidence/artifacts/desktop-browser.png",
       "sha256": "87b71779f55e4ab120b33a30ee41641f3dd61b5a44876c3f0e3c1ae7ea8240b9",
       "bytes": 18114
@@ -336,36 +486,6 @@
       "path": "fixtures/records.json",
       "sha256": "3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc617ade4df8b0cb6e85c",
       "bytes": 96
-    },
-    {
-      "path": "blueprints/us-equities/workers/receipt.json",
-      "sha256": "4308f002936d354757ab819b1b537e26db41c76bf8201f58e0ce559750986afc",
-      "bytes": 7508
-    },
-    {
-      "path": "blueprints/us-equities/data/receipt.json",
-      "sha256": "9a2338f3d064571c6f60a5b9a15c618252b281fd9df84349340d07abe8b7d75c",
-      "bytes": 842
-    },
-    {
-      "path": "blueprints/us-equities/engine/receipt.json",
-      "sha256": "f74599195cbb51ad6c1112dc5af61ccd27bd6aa37f622ed874148f7616f5ede2",
-      "bytes": 10333
-    },
-    {
-      "path": "blueprints/us-equities/deerflow/native-receipt.json",
-      "sha256": "7cbe9e489ff57c47619302e0cae728bfc451539d5370dd7278eca4058d6f5fb3",
-      "bytes": 4598
-    },
-    {
-      "path": "blueprints/us-equities/routing/health-receipt.json",
-      "sha256": "d3ebd61dec8496e4b8de3cf9a9e371f816790c45fb563eba5b46718e021352e8",
-      "bytes": 1043
-    },
-    {
-      "path": "blueprints/us-equities/manifest.json",
-      "sha256": "6067df3527c601a15adef59bf824fc25269772f827b6c2e0fc1f292b251af007",
-      "bytes": 4398
     }
   ]
 }

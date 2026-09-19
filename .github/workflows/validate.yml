@@ -19,5 +19,7 @@ jobs:
           persist-credentials: false
       - name: Validate manifests and evidence integrity
         run: python3 scripts/validate.py
+      - name: Validate catalog evidence and coverage joins
+        run: python3 scripts/validate_catalogs.py
       - name: Test validation failure modes
         run: python3 -m unittest

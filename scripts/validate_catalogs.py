@@ -198,8 +198,9 @@ class Validator:
         allowed = {"native_model_e2e"} if model else NATIVE_RECEIPT_KINDS
         if isinstance(data.get("kind"), str) and data["kind"] in allowed:
             result_scope = data.get("result", {}).get("scope") if isinstance(data.get("result"), dict) else None
+            scopes = [data.get(key) for key in ("claim", "scope", "task")] + [result_scope]
             return (type(data.get("schema_version")) is int and data["schema_version"] == 1
-                    and (any(data.get(key) for key in ("claim", "scope", "task")) or bool(result_scope))
+                    and any(isinstance(value, str) and value.strip() for value in scopes)
                     and any(isinstance(data.get(key), (dict, list)) and data[key]
                             for key in ("data", "results", "result", "run", "commands")))
         # Older router receipts predate the kind field. These prove only anonymous

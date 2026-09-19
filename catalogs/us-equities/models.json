@@ -1,0 +1,604 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "layer": "models",
+  "recent_window": [
+    "2026-06-21",
+    "2026-09-19"
+  ],
+  "scope": "Task-fit review, not an exhaustive model census or independent SOTA ranking. Older forecasting baselines are intentionally labeled; new quant/card updates are not new base-model releases.",
+  "entries": [
+    {
+      "id": "gpt-6-astra",
+      "provider": "OpenAI native Codex",
+      "role": "Primary native research workers",
+      "decision": "default",
+      "revision": null,
+      "release_evidence_date": "2026-09-03",
+      "release_evidence_kind": "Official API changelog",
+      "license": "Proprietary hosted model",
+      "task_fit": "Keep native subscription sign-in and the actual SDK worker path.",
+      "limitations": [
+        "No official HF weights. Native model/route configuration is not independent provider attestation.",
+        "API context/output limits are distinct from native Codex runtime limits. API billing is separate from subscription allowance.",
+        "OmniRoute Astra route and output-cap enforcement remain unproved; do not relabel a gateway alias as Astra proof."
+      ],
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "blueprints/us-equities/workers/receipt.json"
+      ],
+      "native_workflow": [
+        "python blueprints/us-equities/workers/native_worker.py --help"
+      ],
+      "workflow_scope": "Actual configured native SDK task receipt; help is not another inference.",
+      "sources": [
+        "https://developers.openai.com/api/docs/models/gpt-6-astra",
+        "https://developers.openai.com/api/docs/changelog"
+      ]
+    },
+    {
+      "id": "claude-opus-5[1m]",
+      "provider": "Anthropic native Claude Code",
+      "role": "Native research/review companion",
+      "decision": "default",
+      "revision": null,
+      "release_evidence_date": "2026-07-24",
+      "release_evidence_kind": "Official model overview",
+      "license": "Proprietary hosted model",
+      "task_fit": "Retain existing native model and account flow with shared scoped memory/retrieval.",
+      "limitations": [
+        "Historical native evidence is separate from this extension, which did not rerun Claude. Fresh account allowance is required.",
+        "A router configured at 200K does not reproduce the native/API 1M context behavior. No official HF weights."
+      ],
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "evidence/receipts/native-context-memory.json",
+        "evidence/receipts/native-memory.json"
+      ],
+      "native_workflow": [
+        "claude --version",
+        "claude auth status"
+      ],
+      "workflow_scope": "Readiness commands; inference evidence is historical and separately scoped.",
+      "sources": [
+        "https://platform.claude.com/docs/en/models/opus-5/overview",
+        "https://platform.claude.com/docs/en/models/overview"
+      ]
+    },
+    {
+      "id": "claude-fable-5-1",
+      "provider": "Anthropic",
+      "role": "Newer hosted candidate",
+      "decision": "excluded",
+      "revision": null,
+      "release_evidence_date": "2026-09-01",
+      "release_evidence_kind": "Official model documentation",
+      "license": "Proprietary hosted model",
+      "task_fit": "Record the newer release for landscape completeness; preserve the user-selected exclusion.",
+      "limitations": [
+        "No account/model switch or inference performed; latest release is not permission to change native defaults."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://platform.claude.com/docs/en/models/overview"
+      ],
+      "native_workflow": [],
+      "workflow_scope": "No execution proposed while excluded.",
+      "sources": [
+        "https://platform.claude.com/docs/en/models/overview"
+      ]
+    },
+    {
+      "id": "Qwen/Qwen3.8-27B",
+      "provider": "Hugging Face publisher repository",
+      "role": "Local generation",
+      "decision": "conditional",
+      "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+      "repository_created_at": "2026-08-05T08:22:59+00:00",
+      "last_modified": "2026-08-14T15:00:01+00:00",
+      "release_evidence_date": "2026-08-14",
+      "release_evidence_kind": "Publisher release announcement",
+      "license": "apache-2.0",
+      "task_fit": "Practical local generation baseline: historical Ollama quant at 8192 context; research summaries and bounded extraction candidates.",
+      "limitations": [
+        "27B dense BF16 is larger than the demonstrated quant. Financial extraction accuracy is unmeasured. Card maximum context is not the installed GPU capacity."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/Qwen/Qwen3.8-27B/blob/1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0/README.md"
+      ],
+      "native_workflow": [
+        "hf models info Qwen/Qwen3.8-27B --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card Qwen/Qwen3.8-27B --text --format human"
+      ],
+      "inference_recipe": null,
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3.8-27B/blob/1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0/README.md",
+        "https://github.com/QwenLM/Qwen3.8"
+      ]
+    },
+    {
+      "id": "Qwen/Qwen3.8-Flash-Next",
+      "provider": "Hugging Face publisher repository",
+      "role": "Cluster generation",
+      "decision": "watch",
+      "revision": "de4b8e4d43b917e7706784d8bb445c9af86a3540",
+      "repository_created_at": "2026-08-24T08:24:59+00:00",
+      "last_modified": "2026-08-27T05:03:36+00:00",
+      "release_evidence_date": "2026-08-26",
+      "release_evidence_kind": "Publisher release announcement",
+      "license": "qwen-community-1.0",
+      "task_fit": "Cluster research candidate; not a PC upgrade solely because active parameters are small.",
+      "limitations": [
+        "About 180B stored parameters including n-gram/MTP despite 6B active language parameters. Custom license and architecture support require review."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/Qwen/Qwen3.8-Flash-Next/blob/de4b8e4d43b917e7706784d8bb445c9af86a3540/README.md"
+      ],
+      "native_workflow": [
+        "hf models info Qwen/Qwen3.8-Flash-Next --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card Qwen/Qwen3.8-Flash-Next --text --format human"
+      ],
+      "inference_recipe": null,
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3.8-Flash-Next/blob/de4b8e4d43b917e7706784d8bb445c9af86a3540/README.md",
+        "https://github.com/QwenLM/Qwen3.8-Flash-Next"
+      ]
+    },
+    {
+      "id": "Qwen/Qwen3.8-2.4T-A95B",
+      "provider": "Hugging Face publisher repository",
+      "role": "Cluster generation",
+      "decision": "watch",
+      "revision": "207bd685a7e3696cfaff12ded7c6a7ea0f88c996",
+      "repository_created_at": "2026-08-08T01:50:52+00:00",
+      "last_modified": "2026-08-12T10:24:04+00:00",
+      "release_evidence_date": null,
+      "release_evidence_kind": "Model card available; exact public launch date not verified",
+      "license": "qwen3.8-max",
+      "task_fit": "Large open-weight multimodal generation alternative when cluster capacity and licensing justify it.",
+      "limitations": [
+        "2.4T total/95B active is not a local-memory footprint. Repository creation August 8 is not a verified public release date. Custom Qwen3.8-Max license."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B/blob/207bd685a7e3696cfaff12ded7c6a7ea0f88c996/README.md"
+      ],
+      "native_workflow": [
+        "hf models info Qwen/Qwen3.8-2.4T-A95B --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card Qwen/Qwen3.8-2.4T-A95B --text --format human"
+      ],
+      "inference_recipe": null,
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3.8-2.4T-A95B/blob/207bd685a7e3696cfaff12ded7c6a7ea0f88c996/README.md"
+      ]
+    },
+    {
+      "id": "deepseek-ai/DeepSeek-V4.1-Flash",
+      "provider": "Hugging Face publisher repository",
+      "role": "Cluster generation",
+      "decision": "watch",
+      "revision": "dba1be0a40aa45a94ad051997016db3960a90277",
+      "repository_created_at": "2026-09-10T02:17:58+00:00",
+      "last_modified": "2026-09-10T08:18:10+00:00",
+      "release_evidence_date": "2026-09-10",
+      "release_evidence_kind": "Publisher announcement",
+      "license": "mit",
+      "task_fit": "Recent high-capacity generation candidate with specialized serving requirements.",
+      "limitations": [
+        "552B backbone plus 196B Engram; multimodal protocol and runtime compatibility require acceptance. No local inference."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/dba1be0a40aa45a94ad051997016db3960a90277/README.md"
+      ],
+      "native_workflow": [
+        "hf models info deepseek-ai/DeepSeek-V4.1-Flash --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card deepseek-ai/DeepSeek-V4.1-Flash --text --format human"
+      ],
+      "inference_recipe": null,
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/blob/dba1be0a40aa45a94ad051997016db3960a90277/README.md",
+        "https://www.deepseek.com/en/news/deepseek-v4-1-flash/"
+      ]
+    },
+    {
+      "id": "zai-org/GLM-5.3-Flash",
+      "provider": "Hugging Face publisher repository",
+      "role": "Cluster generation",
+      "decision": "watch",
+      "revision": "eb9eb208eb0d988989d07a6a12d0fdeb5f52574a",
+      "repository_created_at": "2026-08-25T06:43:14+00:00",
+      "last_modified": "2026-09-07T12:13:47+00:00",
+      "release_evidence_date": "2026-08-26",
+      "release_evidence_kind": "First weight uploads; not a verified hosted launch date",
+      "license": "mit",
+      "task_fit": "320B total/18B active visual coding and agent research option.",
+      "limitations": [
+        "No local serving proof; sparse active parameters do not eliminate checkpoint memory requirements."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/zai-org/GLM-5.3-Flash/blob/eb9eb208eb0d988989d07a6a12d0fdeb5f52574a/README.md"
+      ],
+      "native_workflow": [
+        "hf models info zai-org/GLM-5.3-Flash --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card zai-org/GLM-5.3-Flash --text --format human"
+      ],
+      "inference_recipe": null,
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/zai-org/GLM-5.3-Flash/blob/eb9eb208eb0d988989d07a6a12d0fdeb5f52574a/README.md",
+        "https://huggingface.co/api/models/zai-org/GLM-5.3-Flash/commits/main"
+      ]
+    },
+    {
+      "id": "zai-org/GLM-5.3",
+      "provider": "Hugging Face publisher repository",
+      "role": "Cluster generation",
+      "decision": "watch",
+      "revision": "aca966e4e02791568aa6a4ced368624b3d897f42",
+      "repository_created_at": "2026-08-25T06:42:50+00:00",
+      "last_modified": "2026-09-04T06:41:23+00:00",
+      "release_evidence_date": "2026-08-27",
+      "release_evidence_kind": "Initial model tree UTC; August 28 UTC+8",
+      "license": "glm-5.3",
+      "task_fit": "Large text/coding model candidate subject to custom license.",
+      "limitations": [
+        "HF tensor elements (~753B) are not a independently verified logical architecture count. No local deployment."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/zai-org/GLM-5.3/blob/aca966e4e02791568aa6a4ced368624b3d897f42/README.md"
+      ],
+      "native_workflow": [
+        "hf models info zai-org/GLM-5.3 --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card zai-org/GLM-5.3 --text --format human"
+      ],
+      "inference_recipe": null,
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/zai-org/GLM-5.3/blob/aca966e4e02791568aa6a4ced368624b3d897f42/README.md",
+        "https://huggingface.co/api/models/zai-org/GLM-5.3/commits/main"
+      ]
+    },
+    {
+      "id": "moonshotai/Kimi-K3",
+      "provider": "Hugging Face publisher repository",
+      "role": "Cluster generation",
+      "decision": "watch",
+      "revision": "f831ab66814297da540d832a5235f8e904f29d06",
+      "repository_created_at": "2026-06-13T06:42:57+00:00",
+      "last_modified": "2026-09-02T02:22:41+00:00",
+      "release_evidence_date": "2026-07-16",
+      "release_evidence_kind": "Announcement; first HF weight tree July 27",
+      "license": "kimi-k3",
+      "task_fit": "Cluster-class multimodal research model, not a required foundation dependency.",
+      "limitations": [
+        "2.8T total/104B active and custom license. September card changes do not establish a new model release."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/moonshotai/Kimi-K3/blob/f831ab66814297da540d832a5235f8e904f29d06/README.md"
+      ],
+      "native_workflow": [
+        "hf models info moonshotai/Kimi-K3 --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card moonshotai/Kimi-K3 --text --format human"
+      ],
+      "inference_recipe": null,
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/moonshotai/Kimi-K3/blob/f831ab66814297da540d832a5235f8e904f29d06/README.md",
+        "https://www.kimi.com/code/docs/en/kimi-code/whats-new.html"
+      ]
+    },
+    {
+      "id": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "provider": "Hugging Face publisher repository",
+      "role": "Local text/code embeddings",
+      "decision": "default",
+      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+      "repository_created_at": "2026-07-14T07:32:18+00:00",
+      "last_modified": "2026-08-27T23:53:03+00:00",
+      "release_evidence_date": "2026-07-16",
+      "release_evidence_kind": "Publisher model-card date and announcement",
+      "license": "openmdw-1.1",
+      "task_fit": "Keep the demonstrated 2048-dimensional embedding service powering automatic local code RAG.",
+      "limitations": [
+        "Use query: and passage: prefixes with trailing spaces and correct pooling. Changing models requires dimension/collection migration.",
+        "Retain working vLLM 0.25.0 on this WSL host; newer 0.29.0 failed GPU UVA initialization. It is not a drop-in QMD GGUF model."
+      ],
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "evidence/receipts/native-rag.json",
+        "evidence/receipts/vllm-compatibility.json"
+      ],
+      "native_workflow": [
+        "hf models info nvidia/Nemotron-3-Embed-1B-BF16 --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card nvidia/Nemotron-3-Embed-1B-BF16 --text --format human"
+      ],
+      "inference_recipe": "Use the existing native RAG recipe and pinned model revision; publisher alternatives require Transformers >=5.2 and SentenceTransformers >=5.4.1.",
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16/blob/c0c9fea93ea424587517f2c59e20db9f1d6bf615/README.md",
+        "https://huggingface.co/blog/nvidia/nemotron-3-embed-wins-rteb"
+      ]
+    },
+    {
+      "id": "nvidia/Nemotron-3-Embed-8B-BF16",
+      "provider": "Hugging Face publisher repository",
+      "role": "Larger local/hosted embeddings",
+      "decision": "conditional",
+      "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
+      "repository_created_at": "2026-07-14T07:38:49+00:00",
+      "last_modified": "2026-08-28T15:59:43+00:00",
+      "release_evidence_date": "2026-07-16",
+      "release_evidence_kind": "Publisher announcement",
+      "license": "openmdw-1.1",
+      "task_fit": "Compare only if a held-out retrieval task justifies the greater resource cost.",
+      "limitations": [
+        "7.95B, 4096 dimensions, about 15.91GB BF16 weights alone. No inference or reindex performed."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md"
+      ],
+      "native_workflow": [
+        "hf models info nvidia/Nemotron-3-Embed-8B-BF16 --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card nvidia/Nemotron-3-Embed-8B-BF16 --text --format human"
+      ],
+      "inference_recipe": null,
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md",
+        "https://huggingface.co/blog/nvidia/nemotron-3-embed-wins-rteb"
+      ]
+    },
+    {
+      "id": "nvidia/Nemotron-3-Embed-1B-NVFP4",
+      "provider": "Hugging Face publisher repository",
+      "role": "Quantized embedding variant",
+      "decision": "watch",
+      "revision": "f630128278eb245579d3ea022b4f659fbd614318",
+      "repository_created_at": "2026-07-14T07:46:58+00:00",
+      "last_modified": "2026-08-28T16:42:39+00:00",
+      "release_evidence_date": "2026-07-16",
+      "release_evidence_kind": "Parent-family release; no separate quant launch established",
+      "license": "openmdw-1.1",
+      "task_fit": "Potential hardware-specific serving option for the same embedding family.",
+      "limitations": [
+        "Not a separate newly trained family. NVFP4 hardware/kernel compatibility and quality are unverified on this host."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-NVFP4/blob/f630128278eb245579d3ea022b4f659fbd614318/README.md"
+      ],
+      "native_workflow": [
+        "hf models info nvidia/Nemotron-3-Embed-1B-NVFP4 --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card nvidia/Nemotron-3-Embed-1B-NVFP4 --text --format human"
+      ],
+      "inference_recipe": null,
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-NVFP4/blob/f630128278eb245579d3ea022b4f659fbd614318/README.md"
+      ]
+    },
+    {
+      "id": "jinaai/jina-reranker-v3.5",
+      "provider": "Hugging Face publisher repository",
+      "role": "Listwise reranking",
+      "decision": "excluded",
+      "revision": "e8a93f33f0b22108f8c2364f8484ce3422552fbc",
+      "repository_created_at": "2026-07-14T10:01:14+00:00",
+      "last_modified": "2026-07-30T11:35:06+00:00",
+      "release_evidence_date": "2026-08-03",
+      "release_evidence_kind": "Publisher announcement; July 20 paper",
+      "license": "cc-by-nc-4.0",
+      "task_fit": "Research comparison only under the available license; not the commercial-trading default.",
+      "limitations": [
+        "CC-BY-NC-4.0; commercial permission would need separate review. GGUF requires a special projector/scorer and llama.cpp support, not a QMD model-variable swap."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/jinaai/jina-reranker-v3.5/blob/e8a93f33f0b22108f8c2364f8484ce3422552fbc/README.md"
+      ],
+      "native_workflow": [
+        "hf models info jinaai/jina-reranker-v3.5 --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card jinaai/jina-reranker-v3.5 --text --format human"
+      ],
+      "inference_recipe": null,
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/jinaai/jina-reranker-v3.5/blob/e8a93f33f0b22108f8c2364f8484ce3422552fbc/README.md",
+        "https://jina.ai/news/jina-reranker-v3-5-faster-listwise-reranking-hybrid-attention-self-distillation/"
+      ]
+    },
+    {
+      "id": "Alibaba-NLP/UEmbed-2B",
+      "provider": "Hugging Face publisher repository",
+      "role": "Dense+sparse multimodal retrieval",
+      "decision": "conditional",
+      "revision": "d02beb2d8b975f8140ebb035bd0e1dbf8afe98c4",
+      "repository_created_at": "2026-07-29T08:28:08+00:00",
+      "last_modified": "2026-08-18T06:24:03+00:00",
+      "release_evidence_date": "2026-08-03",
+      "release_evidence_kind": "Author paper states released family; exact weight-publication day unknown",
+      "license": "cc-by-4.0",
+      "task_fit": "Financial document/image retrieval candidate when sparse+dense/multimodal signals are useful.",
+      "limitations": [
+        "CC-BY-4.0 attribution required. Model-specific preprocessing and sparse outputs need a supported pipeline; no local financial evaluation or QMD compatibility proof."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/Alibaba-NLP/UEmbed-2B/blob/d02beb2d8b975f8140ebb035bd0e1dbf8afe98c4/README.md"
+      ],
+      "native_workflow": [
+        "hf models info Alibaba-NLP/UEmbed-2B --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card Alibaba-NLP/UEmbed-2B --text --format human"
+      ],
+      "inference_recipe": null,
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/Alibaba-NLP/UEmbed-2B/blob/d02beb2d8b975f8140ebb035bd0e1dbf8afe98c4/README.md",
+        "https://arxiv.org/abs/2608.02583"
+      ]
+    },
+    {
+      "id": "Alibaba-NLP/core-emb-2b",
+      "provider": "Hugging Face publisher repository",
+      "role": "Multimodal compositional embeddings",
+      "decision": "watch",
+      "revision": "cc9870ea92d64ebd5f8f9fc368d1120453564158",
+      "repository_created_at": "2026-08-30T17:23:17+00:00",
+      "last_modified": "2026-09-04T02:06:59+00:00",
+      "release_evidence_date": "2026-09-03",
+      "release_evidence_kind": "Research paper date, not a verified weight-release announcement",
+      "license": "cc-by-4.0",
+      "task_fit": "Recent research candidate for complex image/text matching; compare on sourced financial tables and filings before adoption.",
+      "limitations": [
+        "CC-BY-4.0 attribution required. Author benchmark does not establish code/financial retrieval superiority.",
+        "Publisher recipe uses custom Qwen3-VL wrappers, Transformers >=4.57, PyTorch/qwen-vl-utils/Pillow. Generic autogenerated HF pipeline is insufficient; no inference run."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/Alibaba-NLP/core-emb-2b/blob/cc9870ea92d64ebd5f8f9fc368d1120453564158/README.md"
+      ],
+      "native_workflow": [
+        "hf models info Alibaba-NLP/core-emb-2b --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card Alibaba-NLP/core-emb-2b --text --format human"
+      ],
+      "inference_recipe": null,
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/Alibaba-NLP/core-emb-2b/blob/cc9870ea92d64ebd5f8f9fc368d1120453564158/README.md",
+        "https://arxiv.org/abs/2609.04083"
+      ]
+    },
+    {
+      "id": "Alibaba-NLP/core-reranker-2b",
+      "provider": "Hugging Face publisher repository",
+      "role": "Multimodal compositional reranking",
+      "decision": "watch",
+      "revision": "64e1a36cd6ecace459a4c7cd8f7d0ef5d6fee30b",
+      "repository_created_at": "2026-08-30T17:13:54+00:00",
+      "last_modified": "2026-09-04T02:09:04+00:00",
+      "release_evidence_date": "2026-09-03",
+      "release_evidence_kind": "Research paper date, not a verified weight-release announcement",
+      "license": "cc-by-4.0",
+      "task_fit": "Recent research candidate for complex image/text matching; compare on sourced financial tables and filings before adoption.",
+      "limitations": [
+        "CC-BY-4.0 attribution required. Author benchmark does not establish code/financial retrieval superiority.",
+        "Publisher recipe uses custom Qwen3-VL wrappers, Transformers >=4.57, PyTorch/qwen-vl-utils/Pillow. Generic autogenerated HF pipeline is insufficient; no inference run."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/Alibaba-NLP/core-reranker-2b/blob/64e1a36cd6ecace459a4c7cd8f7d0ef5d6fee30b/README.md"
+      ],
+      "native_workflow": [
+        "hf models info Alibaba-NLP/core-reranker-2b --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card Alibaba-NLP/core-reranker-2b --text --format human"
+      ],
+      "inference_recipe": null,
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/Alibaba-NLP/core-reranker-2b/blob/64e1a36cd6ecace459a4c7cd8f7d0ef5d6fee30b/README.md",
+        "https://arxiv.org/abs/2609.04083"
+      ]
+    },
+    {
+      "id": "google/timesfm-3.0-pytorch",
+      "provider": "Hugging Face publisher repository",
+      "role": "Time-series forecasting",
+      "decision": "excluded",
+      "revision": "43046b85ec22d584a13f8098c2ed39c889e129c2",
+      "repository_created_at": "2026-08-24T22:05:51+00:00",
+      "last_modified": "2026-09-02T15:44:59+00:00",
+      "release_evidence_date": "2026-08-28",
+      "release_evidence_kind": "TimesFM v3.0.0 source release; model announcement August 2026",
+      "license": "TimesFM Non-Commercial License v1.0",
+      "task_fit": "Recent forecasting research only; excluded from the commercial/production path under current weights license.",
+      "limitations": [
+        "TimesFM Non-Commercial License v1.0 is separate from Apache source code. Forecast accuracy is not equity alpha or execution evidence."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/google/timesfm-3.0-pytorch/blob/43046b85ec22d584a13f8098c2ed39c889e129c2/README.md"
+      ],
+      "native_workflow": [
+        "hf models info google/timesfm-3.0-pytorch --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card google/timesfm-3.0-pytorch --text --format human"
+      ],
+      "inference_recipe": null,
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/google/timesfm-3.0-pytorch/blob/43046b85ec22d584a13f8098c2ed39c889e129c2/README.md",
+        "https://github.com/google-research/timesfm/releases/tag/v3.0.0"
+      ]
+    },
+    {
+      "id": "google/timesfm-2.5-200m-pytorch",
+      "provider": "Hugging Face publisher repository",
+      "role": "Time-series forecasting baseline",
+      "decision": "conditional",
+      "revision": "1d952420fba87f3c6dee4f240de0f1a0fbc790e3",
+      "repository_created_at": "2025-09-02T18:55:45+00:00",
+      "last_modified": "2025-10-02T17:21:38+00:00",
+      "release_evidence_date": "2025-09-15",
+      "release_evidence_kind": "Publisher model announcement; older compatible baseline",
+      "license": "apache-2.0",
+      "task_fit": "Apache-licensed 200M forecasting baseline for a properly lagged comparison, despite not being a recent model.",
+      "limitations": [
+        "Package 3.0.2 is not model 3.0 permission. No financial out-of-sample evaluation performed. Forecasted prices alone are not a strategy."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/google/timesfm-2.5-200m-pytorch/blob/1d952420fba87f3c6dee4f240de0f1a0fbc790e3/README.md"
+      ],
+      "native_workflow": [
+        "hf models info google/timesfm-2.5-200m-pytorch --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card google/timesfm-2.5-200m-pytorch --text --format human"
+      ],
+      "inference_recipe": "timesfm.TimesFM_2p5_200M_torch.from_pretrained('google/timesfm-2.5-200m-pytorch'); configure ForecastConfig before forecast.",
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/google/timesfm-2.5-200m-pytorch/blob/1d952420fba87f3c6dee4f240de0f1a0fbc790e3/README.md",
+        "https://github.com/google-research/timesfm"
+      ]
+    },
+    {
+      "id": "amazon/chronos-2",
+      "provider": "Hugging Face publisher repository",
+      "role": "Probabilistic time-series baseline",
+      "decision": "conditional",
+      "revision": "29ec3766d36d6f73f0696f85560a422f50e8498c",
+      "repository_created_at": "2025-10-30T14:54:39+00:00",
+      "last_modified": "2026-06-05T11:55:42+00:00",
+      "release_evidence_date": "2025-10-20",
+      "release_evidence_kind": "Upstream model announcement; this HF repository created October 30",
+      "license": "apache-2.0",
+      "task_fit": "120M probabilistic baseline with covariates for research comparisons; current library release does not make the weights recent.",
+      "limitations": [
+        "Keep covariates available at prediction time, embargo overlaps and evaluate net trading utility separately. No inference or finance benchmark run."
+      ],
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://huggingface.co/amazon/chronos-2/blob/29ec3766d36d6f73f0696f85560a422f50e8498c/README.md"
+      ],
+      "native_workflow": [
+        "hf models info amazon/chronos-2 --expand sha,createdAt,lastModified,cardData,safetensors --format json",
+        "hf models card amazon/chronos-2 --text --format human"
+      ],
+      "inference_recipe": "Chronos2Pipeline.from_pretrained('amazon/chronos-2'); predict_df on versioned, time-ordered data.",
+      "workflow_scope": "Metadata command passed this session. Model-card command passed only where listed in research-receipt.json. Inference recipe is prospective unless a receipt explicitly proves it.",
+      "sources": [
+        "https://huggingface.co/amazon/chronos-2/blob/29ec3766d36d6f73f0696f85560a422f50e8498c/README.md",
+        "https://github.com/amazon-science/chronos-forecasting"
+      ]
+    }
+  ]
+}

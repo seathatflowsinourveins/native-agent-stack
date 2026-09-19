@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "target": "US-equities research/backtesting, then Alpaca paper",
+  "current_mode": "on_demand_research_and_local_backtest",
+  "worker_entrypoint": "blueprints/us-equities/workers/native_worker.py",
+  "worker_policy": "blueprints/us-equities/workers/policy.md",
+  "task_template": "blueprints/us-equities/workers/research-task.md",
+  "implemented": [
+    "Native SDK readiness and configured Astra/provider check",
+    "Native account-owned interactive login",
+    "Ephemeral read-only thread with deny-all escalation policy",
+    "Bounded prompt size, stream deadline and documented outer process timeout",
+    "Private exclusive receipts with returned usage or explicit unknown status",
+    "Shared research/token policy passed as developer instructions",
+    "Deterministic sample backtest and JSON-to-Parquet aggregation"
+  ],
+  "not_implemented": [
+    "Host-enforced removal of all inherited secrets and remote MCP capabilities",
+    "Provider spending cap or independently attested per-request model route",
+    "Durable worker queue, retries and full-process cancellation guarantees",
+    "DeerFlow-to-ACP completed model inference",
+    "Astra inference through OmniRoute",
+    "Alpaca account/data/broker adapter acceptance",
+    "Financial point-in-time ingestion or validated trading strategy",
+    "Persistent order journal, deterministic risk checks, broker reconciliation and kill switch",
+    "Unattended hosting, operational alerts and recovery acceptance"
+  ],
+  "broker_authority": "No broker keys or order tools supplied to the recorded research worker; no orders submitted.",
+  "future_sessions": "Installed native tools and project instructions persist. New tool registrations require normal client discovery/reload; other projects need deliberate scoped adoption. No blanket all-project hook or service deployment is implied.",
+  "evidence_refs": [
+    "blueprints/us-equities/workers/receipt.json",
+    "blueprints/us-equities/deerflow/native-receipt.json",
+    "blueprints/us-equities/routing/health-receipt.json",
+    "blueprints/us-equities/engine/receipt.json",
+    "blueprints/us-equities/data/receipt.json"
+  ]
+}
