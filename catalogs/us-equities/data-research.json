@@ -1,0 +1,1499 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "layer": "data-research",
+  "entries": [
+    {
+      "id": "data-alpaca-py",
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "layers": [
+        "market-data",
+        "reference",
+        "broker-adapter"
+      ],
+      "role": "Official Alpaca historical/streaming data and paper-trading SDK",
+      "decision": "default",
+      "rationale": "Use the broker-native interface first; explicitly select feed, adjustment and symbol as-of date.",
+      "version_or_commit": "v0.44.0; source cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+      "release_date": "2026-08-11",
+      "license": "Apache-2.0",
+      "us_equities_fit": "US stocks/ETFs; Basic live coverage is IEX, not consolidated SIP. Older historical SIP requests can be available without a paid live subscription; confirm the exact endpoint and account entitlement.",
+      "alpaca_fit": "Direct native match. Paper account keys, market-data rights and historical coverage are separate concerns.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'alpaca-py==0.44.0'",
+        "python - <<'PY'\nfrom datetime import datetime, timezone\nfrom alpaca.data.requests import StockBarsRequest\nfrom alpaca.data.timeframe import TimeFrame\nfrom alpaca.data.enums import DataFeed, Adjustment\nrequest = StockBarsRequest(symbol_or_symbols=['AAPL'], timeframe=TimeFrame.Day,\n    start=datetime(2024,1,2,tzinfo=timezone.utc), end=datetime(2024,1,6,tzinfo=timezone.utc),\n    feed=DataFeed.IEX, adjustment=Adjustment.RAW, asof='2024-01-05')\nprint(request.to_request_fields())  # offline request construction only\nPY",
+        "# Optional network retrieval only after account/feed authorization; may fail on unavailable entitlements.",
+        "python - <<'PY'\nimport os\nfrom datetime import datetime, timezone\nfrom alpaca.data.historical import StockHistoricalDataClient\nfrom alpaca.data.requests import StockBarsRequest\nfrom alpaca.data.timeframe import TimeFrame\nfrom alpaca.data.enums import DataFeed, Adjustment\nclient = StockHistoricalDataClient(os.environ['APCA_API_KEY_ID'], os.environ['APCA_API_SECRET_KEY'])\nrequest = StockBarsRequest(symbol_or_symbols=['AAPL'], timeframe=TimeFrame.Day,\n    start=datetime(2024,1,2,tzinfo=timezone.utc), end=datetime(2024,1,6,tzinfo=timezone.utc),\n    feed=DataFeed.IEX, adjustment=Adjustment.RAW, asof='2024-01-05')\nprint(client.get_stock_bars(request).df)\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; explicit account feed/history rights; private environment-managed credentials for network calls.",
+        "Store raw feed, request parameters, response metadata and receive time; version corporate-action and security-master inputs."
+      ],
+      "limitations": [
+        "No account, entitlement, data request or order was exercised by this catalog. An installed SDK is not acquisition evidence.",
+        "Symbol asof selects symbol interpretation; it does not reconstruct every historical revision known at that date. A present-day asset list is not a survivorship-free universe.",
+        "Corporate-action completeness and corrections require explicit policy; IEX-derived strategies may differ on consolidated data."
+      ],
+      "sources": [
+        "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/README.md",
+        "https://docs.alpaca.markets/us/docs/about-market-data-api",
+        "https://docs.alpaca.markets/us/docs/market-data-faq",
+        "https://docs.alpaca.markets/us/reference/corporateactions-1",
+        "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/alpaca/data/requests.py",
+        "https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0",
+        "https://pypi.org/pypi/alpaca-py/0.44.0/json",
+        "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/alpaca/common/requests.py"
+      ]
+    },
+    {
+      "id": "data-databento",
+      "repository": "https://github.com/databento/databento-python",
+      "layers": [
+        "market-data",
+        "reference",
+        "corporate-actions"
+      ],
+      "role": "Normalized historical/live market data and instrument definitions",
+      "decision": "conditional",
+      "rationale": "Prefer when licensed exchange-level history, replay or point-in-time reference data is required.",
+      "version_or_commit": "v0.86.0; source e675ef30369f5ee9f68b04606080c519adf3be69",
+      "release_date": "2026-09-01",
+      "license": "Apache-2.0",
+      "us_equities_fit": "US-equity venues, instrument symbology and separate reference/corporate-action products; retain dataset/venue identity and ts_event versus ts_recv.",
+      "alpaca_fit": "Independent research feed feeding normalized private datasets; does not change Alpaca order execution or confer broker entitlements.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'databento==0.86.0'",
+        "# Network and potentially billable: run only after approving this dataset, interval and usage cost.",
+        "python - <<'PY'\nimport databento as db\nclient = db.Historical()  # DATABENTO_API_KEY from the environment\nrecords = client.timeseries.get_range(dataset='XNAS.ITCH', schema='ohlcv-1m',\n    symbols=['AAPL'], start='2024-01-02T14:30:00Z', end='2024-01-02T14:31:00Z')\nprint(records.to_df())\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; licensed dataset and private API credential; cost/coverage review before any download.",
+        "Separate reference-data subscription if required; preserve stable instrument/event identifiers."
+      ],
+      "limitations": [
+        "Exchange-specific feed is not automatically consolidated US coverage. SDK Apache license does not license the data.",
+        "Corporate-action ts_record is UTC while action dates use exchange-local dates; late adjustment factors must not leak into earlier decisions.",
+        "Corporate-action product documentation restricts external redistribution; contracts govern storage, derived data and sharing."
+      ],
+      "sources": [
+        "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/README.md",
+        "https://databento.com/docs/standards-and-conventions/symbology",
+        "https://databento.com/docs/schemas-and-data-formats/corporate-actions",
+        "https://databento.com/docs/venues-and-datasets/adjustment-factors",
+        "https://databento.com/corporate-actions",
+        "https://databento.com/security-master",
+        "https://github.com/databento/databento-python/releases/tag/v0.86.0",
+        "https://pypi.org/pypi/databento/0.86.0/json"
+      ]
+    },
+    {
+      "id": "data-massive",
+      "repository": "https://github.com/massive-com/client-python",
+      "layers": [
+        "market-data",
+        "reference",
+        "corporate-actions",
+        "news"
+      ],
+      "role": "Official Massive SDK, formerly Polygon.io",
+      "decision": "conditional",
+      "rationale": "Alternative consolidated-data/reference/news provider; select against required history and permitted use.",
+      "version_or_commit": "v2.8.0; source 3c247d78c603fc13d274fda1aa26749e7c8c3710",
+      "release_date": "2026-05-26",
+      "license": "MIT",
+      "us_equities_fit": "Dated ticker queries and inactive listings support historical-universe research. Aggregate adjustment covers splits, not dividends; total-return series need explicit construction.",
+      "alpaca_fit": "Supplemental independent data source; map instruments and sessions before comparing with Alpaca fills.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'massive==2.8.0'",
+        "# Network: requires a Massive key and the requested historical-data entitlement.",
+        "python - <<'PY'\nimport os\nfrom massive import RESTClient\nclient = RESTClient(api_key=os.environ['MASSIVE_API_KEY'])\nfor bar in client.list_aggs(ticker='AAPL', multiplier=1, timespan='day',\n    from_='2024-01-02', to='2024-01-05', adjusted=False, limit=10):\n    print(bar)\nPY"
+      ],
+      "requirements": [
+        "Python >=3.9,<4; explicit plan, professional/nonprofessional classification and exchange rights.",
+        "Resolve persistent instruments across ticker changes; store corporate-action versions and article publication/first-seen times."
+      ],
+      "limitations": [
+        "Free SDK and limited free service do not grant commercial use, redistribution or every endpoint.",
+        "Ticker inactive/date filters help but do not alone prove a complete historical investable universe.",
+        "October 2025 rename makes massive the current Python package; old Polygon names remain in older integrations."
+      ],
+      "sources": [
+        "https://github.com/massive-com/client-python/blob/3c247d78c603fc13d274fda1aa26749e7c8c3710/README.md",
+        "https://www.massive.com/blog/polygon-is-now-massive",
+        "https://massive.com/docs/rest/stocks/overview",
+        "https://www.massive.com/blog/new-splits-and-dividends-endpoints",
+        "https://massive.com/knowledge-base/article/is-massives-stock-data-adjusted-for-splits-or-dividends",
+        "https://massive.com/terms/market_data_terms.pdf",
+        "https://github.com/massive-com/client-python/releases/tag/v2.8.0",
+        "https://pypi.org/pypi/massive/2.8.0/json"
+      ]
+    },
+    {
+      "id": "data-edgartools",
+      "repository": "https://github.com/dgunning/edgartools",
+      "layers": [
+        "sec",
+        "fundamentals",
+        "document-research"
+      ],
+      "role": "SEC filing objects, XBRL, ownership and filing-text extraction",
+      "decision": "default",
+      "rationale": "Use structured filing access for research while retaining accession-keyed original filings and acquisition metadata.",
+      "version_or_commit": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+      "release_date": "2026-09-11",
+      "license": "MIT",
+      "us_equities_fit": "10-K/10-Q/8-K, insider filings and 13F can enrich US-company research; CIK is an issuer identifier, not a security/share-class identifier.",
+      "alpaca_fit": "Adds research context to a symbol-linked data plane; filing analysis must not directly submit Alpaca orders.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'edgartools==5.58.0'",
+        "# Network to SEC; set a real organization/contact identity privately and obey aggregate rate limits.",
+        "python - <<'PY'\nimport os\nfrom edgar import get_filings, set_identity\nset_identity(os.environ['SEC_IDENTITY'])\nfilings = get_filings(2024, 1, form='10-K')\nprint(filings.head(2))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; SEC identifying User-Agent/contact and fair-access controls across all workers.",
+        "Retain accession, filing/acceptance time, first observed availability, reporting period, amendment links, original document and hash."
+      ],
+      "limitations": [
+        "Company facts can contain later revisions; fiscal period end is not the date a fact became tradable information.",
+        "SEC public availability can lag acceptance. Historical downloads today do not prove what an agent actually observed in the past.",
+        "Automated filings parsing requires validation of units, dimensions, duplicate facts and issuer/security mappings."
+      ],
+      "sources": [
+        "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",
+        "https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data",
+        "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+        "https://www.sec.gov/about/webmaster-frequently-asked-questions",
+        "https://github.com/dgunning/edgartools/releases/tag/v5.58.0",
+        "https://pypi.org/pypi/edgartools/5.58.0/json"
+      ]
+    },
+    {
+      "id": "data-sec-edgar-downloader",
+      "repository": "https://github.com/jadchaar/sec-edgar-downloader",
+      "layers": [
+        "sec",
+        "raw-ingestion"
+      ],
+      "role": "Download SEC submission documents to local storage",
+      "decision": "alternative",
+      "rationale": "Choose for a small raw-filings collector when richer EdgarTools parsing is unnecessary.",
+      "version_or_commit": "5.1.0; source 185a5548e49fd37afb9871df8aa9485075f21e21",
+      "release_date": "2026-02-02",
+      "license": "MIT",
+      "us_equities_fit": "Accession-oriented originals support auditable US fundamentals/text research after separate parsing and historical availability controls.",
+      "alpaca_fit": "Offline filing inputs only; no broker integration or execution authority.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/jadchaar/sec-edgar-downloader/blob/185a5548e49fd37afb9871df8aa9485075f21e21/README.rst"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'sec-edgar-downloader==5.1.0'",
+        "# Network SEC download to a new private directory; real contact identity required.",
+        "python - <<'PY'\nimport os\nfrom sec_edgar_downloader import Downloader\ndl = Downloader(os.environ['SEC_ORGANIZATION'], os.environ['SEC_CONTACT_EMAIL'], 'sec-raw')\nprint(dl.get('10-K', 'AAPL', limit=1))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; identified SEC requests, shared throttling and private immutable raw-file retention."
+      ],
+      "limitations": [
+        "Download success is not XBRL correctness, timeliness or point-in-time fundamentals.",
+        "The latest-one example is acquisition demonstration only; it is not a historical-universe or backtest recipe."
+      ],
+      "sources": [
+        "https://github.com/jadchaar/sec-edgar-downloader/blob/185a5548e49fd37afb9871df8aa9485075f21e21/README.rst",
+        "https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data",
+        "https://sec-edgar-downloader.readthedocs.io/",
+        "https://github.com/jadchaar/sec-edgar-downloader/releases/tag/5.1.0",
+        "https://pypi.org/pypi/sec-edgar-downloader/5.1.0/json"
+      ]
+    },
+    {
+      "id": "data-openbb",
+      "repository": "https://github.com/OpenBB-finance/OpenBB",
+      "layers": [
+        "research-interface",
+        "data-adapters"
+      ],
+      "role": "OpenBB Python financial-data integration layer",
+      "decision": "alternative",
+      "rationale": "Useful provider-normalized research interface when its extensions reduce bespoke adapters; avoid redundant provider calls.",
+      "version_or_commit": "openbb 4.7.2; source 3e071fcc2cd9f891cac6040ae60296dba76dab46",
+      "release_date": "2026-05-26",
+      "license": "AGPL-3.0 (repository); commercial licensing available",
+      "us_equities_fit": "Equity, fundamental and macro access depends on each installed provider extension and its data contract.",
+      "alpaca_fit": "Research aggregation can consume permitted datasets; it is not the broker risk/reconciliation service.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/OpenBB-finance/OpenBB/blob/3e071fcc2cd9f891cac6040ae60296dba76dab46/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'openbb==4.7.2'",
+        "python - <<'PY'\nfrom openbb import obb\nprint(type(obb).__name__)  # imports the router; no data or model request\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10,<4; selected provider extras and credentials where required.",
+        "AGPL obligations or appropriate commercial license; separate terms for every data source."
+      ],
+      "limitations": [
+        "Provider-normalized output does not equal normalized adjustment, time-of-availability or survivorship semantics.",
+        "Package 4.7.2 was checked in PyPI; GitHub latest release is an ODP umbrella tag, not a matching Python version. Reviewed source is a separately pinned commit."
+      ],
+      "sources": [
+        "https://github.com/OpenBB-finance/OpenBB/blob/3e071fcc2cd9f891cac6040ae60296dba76dab46/README.md",
+        "https://docs.openbb.co/odp/python",
+        "https://docs.openbb.co/odp/python/faqs/license",
+        "https://github.com/OpenBB-finance/OpenBB/releases/tag/ODP",
+        "https://pypi.org/pypi/openbb/4.7.2/json"
+      ]
+    },
+    {
+      "id": "data-yfinance",
+      "repository": "https://github.com/ranaroussi/yfinance",
+      "layers": [
+        "market-data",
+        "exploration"
+      ],
+      "role": "Community Yahoo Finance data wrapper",
+      "decision": "excluded",
+      "rationale": "Exclude from the authoritative automated-trading data plane; convenience does not resolve service rights or historical-data quality.",
+      "version_or_commit": "1.7.0; source 3d9d2f0cacb662bff689874cd6113bae3a30a885",
+      "release_date": "2026-08-26",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Handy equity exploration, but present-day downloaded/adjusted history and current tickers are insufficient for point-in-time investment research.",
+      "alpaca_fit": "No official Alpaca relationship; never silently substitute its prices for the specified research feed.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/ranaroussi/yfinance/blob/3d9d2f0cacb662bff689874cd6113bae3a30a885/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'yfinance==1.7.0'",
+        "python - <<'PY'\nimport yfinance as yf\nprint(yf.__version__)  # no Yahoo request\nPY"
+      ],
+      "requirements": [
+        "Python and Yahoo service terms appropriate to the intended use; no assumed commercial-data grant."
+      ],
+      "limitations": [
+        "Upstream states Yahoo Finance API data is intended for personal use. Code Apache license is separate.",
+        "Unofficial access can change; historical corrections, adjustment defaults, missing delisted names and coverage require independent checks."
+      ],
+      "sources": [
+        "https://github.com/ranaroussi/yfinance/blob/3d9d2f0cacb662bff689874cd6113bae3a30a885/README.md",
+        "https://github.com/ranaroussi/yfinance/releases/tag/1.7.0",
+        "https://pypi.org/pypi/yfinance/1.7.0/json"
+      ]
+    },
+    {
+      "id": "data-arcticdb",
+      "repository": "https://github.com/man-group/ArcticDB",
+      "layers": [
+        "versioned-store",
+        "time-series"
+      ],
+      "role": "Versioned dataframe storage using LMDB or object storage",
+      "decision": "conditional",
+      "rationale": "Consider for large versioned dataframe workloads after license terms and operational needs are resolved.",
+      "version_or_commit": "v6.26.0; source e620d8572a1e62c9ec07df8cbc8f5c432cd84325",
+      "release_date": "2026-09-14",
+      "license": "BSL-1.1; deployment-specific Additional Use Grant/commercial terms",
+      "us_equities_fit": "Can retain explicit dataset versions and named snapshots; financial event time and knowledge time remain application fields.",
+      "alpaca_fit": "Stores normalized research snapshots independently of Alpaca; no native trading guarantee.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/man-group/ArcticDB/blob/e620d8572a1e62c9ec07df8cbc8f5c432cd84325/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'arcticdb==6.26.0'",
+        "# Only after license review; fresh local directory and synthetic data.",
+        "python - <<'PY'\nimport tempfile\nimport pandas as pd\nimport arcticdb as adb\nwith tempfile.TemporaryDirectory() as directory:\n    store = adb.Arctic('lmdb://' + directory)\n    store.create_library('research')\n    library = store['research']\n    library.write('synthetic', pd.DataFrame({'value': [1, 2]}))\n    print(library.read('synthetic').data)\nPY"
+      ],
+      "requirements": [
+        "Supported Python wheel/platform and explicit license review before business deployment.",
+        "Retention policy for versions/snapshots; private storage and independent source entitlements."
+      ],
+      "limitations": [
+        "Current release is BSL-1.1 source-available, not blanket Apache-licensed software.",
+        "Pinned license includes an Additional Use Grant while current vendor prose describes paid production/business use; resolve the intended deployment with the licensor instead of assuming unrestricted commercial rights.",
+        "Storage version time is not proof of market information availability; do not discard revisions needed for replay."
+      ],
+      "sources": [
+        "https://github.com/man-group/ArcticDB/blob/e620d8572a1e62c9ec07df8cbc8f5c432cd84325/README.md",
+        "https://github.com/man-group/ArcticDB/blob/v6.26.0/LICENSE.txt",
+        "https://arcticdb.io/faqs/",
+        "https://docs.arcticdb.io/latest/api/library/",
+        "https://github.com/man-group/ArcticDB/releases/tag/v6.26.0",
+        "https://pypi.org/pypi/arcticdb/6.26.0/json"
+      ]
+    },
+    {
+      "id": "data-duckdb",
+      "repository": "https://github.com/duckdb/duckdb",
+      "layers": [
+        "columnar-compute",
+        "local-store"
+      ],
+      "role": "Embedded SQL over immutable Parquet research snapshots",
+      "decision": "default",
+      "rationale": "Small local analytical core; existing native receipt already demonstrates bounded LEAN-event conversion and reread.",
+      "version_or_commit": "v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
+      "release_date": "2026-07-22",
+      "license": "MIT",
+      "us_equities_fit": "Good for timestamped event tables, exact-decimal prices and joins; entity-aware backward ASOF must follow knowledge-time filtering.",
+      "alpaca_fit": "Can normalize historical simulation or permitted Alpaca datasets without coupling research to the order path.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/README.md",
+        "blueprints/us-equities/data/receipt.json",
+        "blueprints/us-equities/data/summarize_backtest.py",
+        "blueprints/us-equities/workers/requirements.txt"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'duckdb==1.5.5'",
+        "python - <<'PY'\nimport duckdb\nprint(duckdb.sql('SELECT version()').fetchone())\nprint(duckdb.sql('SELECT sum(i) FROM range(4) AS t(i)').fetchone())\nPY",
+        "# Existing native evidence is in blueprints/us-equities/data/receipt.json. The following replay is prospective and requires its declared local inputs.",
+        "python blueprints/us-equities/data/summarize_backtest.py \"$LEAN_SOURCE/Launcher/bin/Debug/BasicTemplateFrameworkAlgorithm-order-events.json\" \"$PRIVATE_RUN_DIR/order-events.parquet\""
+      ],
+      "requirements": [
+        "Python >=3.10 for the package; local disk and an explicit schema/session/version contract.",
+        "Use a coordinated writer for a local database; external feed acquisition and rights are separate."
+      ],
+      "limitations": [
+        "Native evidence covers six bundled historical simulation events, three order IDs, Parquet reread and one XNYS session; it proves neither market-data ingestion nor live trading.",
+        "ASOF join alone cannot remove revised fundamentals or reconstruct unavailable historical universes.",
+        "Decimal/timestamp schemas and immutable snapshot selection are application responsibilities."
+      ],
+      "sources": [
+        "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/README.md",
+        "https://duckdb.org/docs/stable/sql/query_syntax/from",
+        "https://duckdb.org/docs/current/guides/sql_features/asof_join",
+        "https://github.com/duckdb/duckdb/releases/tag/v1.5.5",
+        "https://pypi.org/pypi/duckdb/1.5.5/json"
+      ]
+    },
+    {
+      "id": "data-polars",
+      "repository": "https://github.com/pola-rs/polars",
+      "layers": [
+        "columnar-compute",
+        "feature-transforms"
+      ],
+      "role": "Lazy dataframe transformations and streaming execution",
+      "decision": "alternative",
+      "rationale": "Use instead of, or selectively alongside, SQL when expression-based transformations are clearer.",
+      "version_or_commit": "py-1.44.2; source 1bd8ec12f42d40fcec62badf32ef2177d2377d8d",
+      "release_date": "2026-09-09",
+      "license": "MIT",
+      "us_equities_fit": "Efficient Parquet scans and entity-aware joins; preserve sortedness and choose backward/tolerance semantics explicitly.",
+      "alpaca_fit": "Transforms private data snapshots; does not provide Alpaca data, corporate actions or execution controls.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/pola-rs/polars/blob/1bd8ec12f42d40fcec62badf32ef2177d2377d8d/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'polars==1.44.2'",
+        "python - <<'PY'\nimport polars as pl\nprint(pl.DataFrame({'symbol': ['AAPL', 'AAPL'], 'volume': [10, 20]}).lazy()\n      .group_by('symbol').agg(pl.col('volume').sum()).collect())\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10 and compatible CPU wheel; explicit input/output schemas."
+      ],
+      "limitations": [
+        "A fast lazy plan is not a point-in-time contract; sort and group by stable instrument identity before ASOF.",
+        "Avoid duplicating a full SQL pipeline solely to add another framework; optional GPU execution is not required here."
+      ],
+      "sources": [
+        "https://github.com/pola-rs/polars/blob/1bd8ec12f42d40fcec62badf32ef2177d2377d8d/README.md",
+        "https://docs.pola.rs/api/python/stable/reference/lazyframe/api/polars.LazyFrame.join_asof.html",
+        "https://docs.pola.rs/user-guide/transformations/joins/",
+        "https://github.com/pola-rs/polars/releases/tag/py-1.44.2",
+        "https://pypi.org/pypi/polars/1.44.2/json"
+      ]
+    },
+    {
+      "id": "data-arrow",
+      "repository": "https://github.com/apache/arrow",
+      "layers": [
+        "columnar-interchange",
+        "parquet"
+      ],
+      "role": "Typed columnar interchange and Parquet IO",
+      "decision": "conditional",
+      "rationale": "Add the Python library where explicit Arrow schemas or cross-engine interoperability are needed; DuckDB does not require it for its basic Parquet path.",
+      "version_or_commit": "apache-arrow-25.0.1; source beccec0d0c451b7aa3e4530416ac431b3c035c69",
+      "release_date": "2026-08-10",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Preserves timestamp units/timezones and decimal types when explicitly declared; useful between feed adapters, transforms and lake tables.",
+      "alpaca_fit": "Interchange layer only; vendor feed entitlements remain attached to the data.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/apache/arrow/blob/beccec0d0c451b7aa3e4530416ac431b3c035c69/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'pyarrow==25.0.1'",
+        "python - <<'PY'\nimport tempfile\nfrom pathlib import Path\nimport pyarrow as pa\nimport pyarrow.parquet as pq\nwith tempfile.TemporaryDirectory() as directory:\n    path = Path(directory) / 'synthetic.parquet'\n    pq.write_table(pa.table({'instrument_id': [1], 'quantity': [2]}), path)\n    print(pq.read_table(path).schema)\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10 for PyArrow25; schema and extension-type compatibility across consumers."
+      ],
+      "limitations": [
+        "Arrow is an interchange format/library, not a historical security master or data service.",
+        "Parquet encodings and time units can be lost or coerced across conversions; verify round-trip precision."
+      ],
+      "sources": [
+        "https://github.com/apache/arrow/blob/beccec0d0c451b7aa3e4530416ac431b3c035c69/README.md",
+        "https://arrow.apache.org/docs/python/parquet.html",
+        "https://github.com/apache/arrow/releases/tag/apache-arrow-25.0.1",
+        "https://pypi.org/pypi/pyarrow/25.0.1/json"
+      ]
+    },
+    {
+      "id": "data-questdb",
+      "repository": "https://github.com/questdb/questdb",
+      "layers": [
+        "time-series-database",
+        "stream-ingestion"
+      ],
+      "role": "SQL time-series server with ingestion and temporal joins",
+      "decision": "conditional",
+      "rationale": "Adopt for sustained tick ingestion and concurrent time-series queries when embedded files no longer meet measured needs.",
+      "version_or_commit": "10.0.1; source 7a391566ac827e0d8c269b91f2415c16b0a32a84",
+      "release_date": "2026-08-24",
+      "license": "Apache-2.0 core; enterprise components separately licensed",
+      "us_equities_fit": "WAL, time partitioning, deduplication and temporal joins fit trades/quotes; keep original sequence/revision identity alongside normalized rows.",
+      "alpaca_fit": "Independent analytical ingest target; adapter/replay/checkpoint logic is still required for Alpaca streams.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "# After installing the reviewed server release into a dedicated local directory:",
+        "./questdb.sh status",
+        "# With a reviewed server already bound to loopback:",
+        "curl --fail --get 'http://127.0.0.1:9000/exec' --data-urlencode 'query=select 1'"
+      ],
+      "requirements": [
+        "Native QuestDB10.0.1 distribution (bundled runtime or Java25 for no-JRE build), private data directory and reviewed loopback/auth configuration.",
+        "Client package questdb5.0.0 is separately versioned from the server."
+      ],
+      "limitations": [
+        "Catalog did not install/start a server. Enterprise features and managed hosting have separate terms.",
+        "Dedup/upsert can overwrite corrections; retain a raw immutable ledger before serving latest state."
+      ],
+      "sources": [
+        "https://github.com/questdb/questdb/blob/7a391566ac827e0d8c269b91f2415c16b0a32a84/README.md",
+        "https://questdb.com/docs/getting-started/quick-start/",
+        "https://questdb.com/docs/reference/sql/asof-join/",
+        "https://questdb.com/docs/reference/sql/create-table/",
+        "https://github.com/questdb/questdb/releases/tag/10.0.1",
+        "https://github.com/questdb/questdb/blob/10.0.1/core/src/main/bin/questdb.sh"
+      ]
+    },
+    {
+      "id": "data-clickhouse",
+      "repository": "https://github.com/ClickHouse/ClickHouse",
+      "layers": [
+        "columnar-database",
+        "analytics-serving"
+      ],
+      "role": "Columnar analytical database and local query utility",
+      "decision": "conditional",
+      "rationale": "Choose for large shared scans/aggregations after measuring a need for a server or cluster.",
+      "version_or_commit": "v26.8.7.19-lts; source f29d27def7ee0adb10e7e2fff080ba204054dd4b",
+      "release_date": "2026-09-18",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Useful for broad tick/news feature analytics; sorting keys, partitions and revision-aware SQL determine financial correctness.",
+      "alpaca_fit": "Analytics consumer only; broker sequencing and reconciliation remain outside the database.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/ClickHouse/ClickHouse/blob/f29d27def7ee0adb10e7e2fff080ba204054dd4b/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "# From a reviewed 26.8.7.19-lts native binary:",
+        "clickhouse local --query \"SELECT version(), sum(number) FROM numbers(4)\""
+      ],
+      "requirements": [
+        "Verified native binary; dedicated storage and operational ownership if deploying a server.",
+        "Separate Python client clickhouse-connect is not the engine version."
+      ],
+      "limitations": [
+        "Local SQL command is prospective; no server, cluster, throughput or reliability evidence was created.",
+        "Eventual background merges/deduplication must not be mistaken for an immutable revision ledger or globally exactly-once external effects."
+      ],
+      "sources": [
+        "https://github.com/ClickHouse/ClickHouse/blob/f29d27def7ee0adb10e7e2fff080ba204054dd4b/README.md",
+        "https://clickhouse.com/docs/concepts/features/tools-and-utilities/clickhouse-local",
+        "https://clickhouse.com/docs/engines/table-engines/mergetree-family/replacingmergetree",
+        "https://github.com/ClickHouse/ClickHouse/releases/tag/v26.8.7.19-lts"
+      ]
+    },
+    {
+      "id": "data-kafka",
+      "repository": "https://github.com/apache/kafka",
+      "layers": [
+        "event-stream",
+        "replay-log"
+      ],
+      "role": "Durable partitioned event log for multiple independent consumers",
+      "decision": "conditional",
+      "rationale": "Use only when reconnect/replay, independent consumer offsets and multiple writers justify a broker.",
+      "version_or_commit": "4.3.1; source 26b251a451ce941d3d7a55e6487bcb7f16b5ad48",
+      "release_date": "2026-06-25",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Can retain raw trades, quotes, corrections and reference updates; partition keys and source sequence numbers determine ordering.",
+      "alpaca_fit": "Place between explicit feed capture and research consumers, not as an implicit broker-order executor.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "# After verifying and extracting the official 4.3.1 distribution; read-only version check:",
+        "bin/kafka-topics.sh --version",
+        "# With a separately reviewed loopback-only local broker running:",
+        "bin/kafka-topics.sh --create --topic research-synthetic --partitions 1 --replication-factor 1 --bootstrap-server 127.0.0.1:9092",
+        "printf '%s\n' '{\"instrument_id\":1,\"sequence\":1}' | bin/kafka-console-producer.sh --topic research-synthetic --bootstrap-server 127.0.0.1:9092",
+        "bin/kafka-console-consumer.sh --topic research-synthetic --from-beginning --max-messages 1 --bootstrap-server 127.0.0.1:9092"
+      ],
+      "requirements": [
+        "Java17+ for native server scripts; verified archive, dedicated storage, loopback listeners and explicit retention/offset policy.",
+        "Separate native broker bootstrap from these client commands; never format an existing broker storage directory."
+      ],
+      "limitations": [
+        "Single-node synthetic replay is a prospective smoke check, not high availability or exchange recovery evidence.",
+        "Ordering is partition-local; Kafka transactions do not make broker orders, files or all external sinks exactly-once.",
+        "GitHub has no current release entries; version/date come from Apache downloads."
+      ],
+      "sources": [
+        "https://github.com/apache/kafka/blob/26b251a451ce941d3d7a55e6487bcb7f16b5ad48/README.md",
+        "https://kafka.apache.org/community/downloads/",
+        "https://kafka.apache.org/43/getting-started/quickstart/",
+        "https://kafka.apache.org/43/design/design/"
+      ]
+    },
+    {
+      "id": "data-redpanda",
+      "repository": "https://github.com/redpanda-data/redpanda",
+      "layers": [
+        "event-stream",
+        "replay-log"
+      ],
+      "role": "Kafka-compatible streaming server and rpk tooling",
+      "decision": "alternative",
+      "rationale": "Alternative to Kafka for a team that prefers its native operational model and accepts its license terms.",
+      "version_or_commit": "v26.2.2; source fd30e45b31e0c5e9595e530121a0896e3ddd12a3",
+      "release_date": "2026-08-22",
+      "license": "BSL-1.1 core; Redpanda Community License for enterprise features",
+      "us_equities_fit": "Same source sequence, retention, corrections and partitioning contracts as any market-event log.",
+      "alpaca_fit": "Feed/research transport only; no additional Alpaca execution permissions.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/redpanda-data/redpanda/blob/fd30e45b31e0c5e9595e530121a0896e3ddd12a3/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "# After reviewed native installation and isolated loopback server configuration:",
+        "rpk version",
+        "rpk cluster info",
+        "rpk topic create research-synthetic",
+        "printf '%s\n' '{\"instrument_id\":1,\"sequence\":1}' | rpk topic produce research-synthetic",
+        "rpk topic consume research-synthetic --num 1"
+      ],
+      "requirements": [
+        "Native Linux package/binary; a selected local rpk profile and adequate storage/memory.",
+        "Review BSL Additional Use Grant and paid RCL enterprise feature requirements."
+      ],
+      "limitations": [
+        "Source available under BSL1.1; not blanket Apache2 for this release. Its BSL restricts offering specified streaming/queuing services to third parties.",
+        "Kafka protocol compatibility is not proof every Kafka client, transaction pattern or connector is interchangeable."
+      ],
+      "sources": [
+        "https://github.com/redpanda-data/redpanda/blob/fd30e45b31e0c5e9595e530121a0896e3ddd12a3/README.md",
+        "https://github.com/redpanda-data/redpanda/blob/v26.2.2/licenses/README.md",
+        "https://github.com/redpanda-data/redpanda/blob/v26.2.2/licenses/bsl.md",
+        "https://docs.redpanda.com/current/reference/rpk/",
+        "https://github.com/redpanda-data/redpanda/releases/tag/v26.2.2"
+      ]
+    },
+    {
+      "id": "data-dlt",
+      "repository": "https://github.com/dlt-hub/dlt",
+      "layers": [
+        "ingestion",
+        "schema-normalization"
+      ],
+      "role": "Python extraction/loading pipelines with local DuckDB destination",
+      "decision": "conditional",
+      "rationale": "Add for repeatable incremental ingestion when handwritten extraction/checkpoint code becomes substantial.",
+      "version_or_commit": "1.30.0; source a2f4a21e22e5c266278271b6591c70dbc485aea8",
+      "release_date": "2026-08-11",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Can normalize SEC/reference/news records, but a source cursor must reflect late corrections and observed availability, not only event date.",
+      "alpaca_fit": "Wrap permitted data adapters into private append-only landing tables before curated research joins.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'dlt[duckdb]==1.30.0'",
+        "python - <<'PY'\nimport tempfile\nimport dlt\nfrom dlt.destinations import duckdb\nwith tempfile.TemporaryDirectory() as directory:\n    pipeline = dlt.pipeline(pipeline_name='synthetic', pipelines_dir=directory,\n        destination=duckdb(credentials=directory + '/research.duckdb'), dataset_name='research')\n    print(pipeline.run([{'instrument_id': 1, 'sequence': 1}], table_name='events', write_disposition='append'))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10,<3.15; selected destination extra, private state and explicit append/merge keys."
+      ],
+      "limitations": [
+        "Schema inference is not a financial data-quality contract. Validate precision, timezones and schema drift.",
+        "Watermark-only extraction can miss late revisions; use bounded overlap, deduplication and immutable capture. The hub extra is separate from the basic local pipeline."
+      ],
+      "sources": [
+        "https://github.com/dlt-hub/dlt/blob/a2f4a21e22e5c266278271b6591c70dbc485aea8/README.md",
+        "https://dlthub.com/docs/general-usage/incremental-loading",
+        "https://dlthub.com/docs/dlt-ecosystem/destinations/duckdb",
+        "https://github.com/dlt-hub/dlt/releases/tag/1.30.0",
+        "https://pypi.org/pypi/dlt/1.30.0/json"
+      ]
+    },
+    {
+      "id": "data-dvc",
+      "repository": "https://github.com/treeverse/dvc",
+      "layers": [
+        "data-versioning",
+        "reproducibility"
+      ],
+      "role": "Git-linked hashes, data dependencies and experiment pipelines",
+      "decision": "default",
+      "rationale": "Use lightweight dataset manifests and private content-addressed artifacts before adding a lake service.",
+      "version_or_commit": "3.67.1; source 356dfa03278058b02df42124f243c2c345329dae",
+      "release_date": "2026-03-31",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Pins exact raw/curated snapshots and preprocessing dependencies; enables replay of a specified historical experiment.",
+      "alpaca_fit": "Versions research inputs independently of broker state; do not expose licensed market data through a public remote.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'dvc==3.67.1'",
+        "# Run only inside a NEW private research Git repository, with an existing local data snapshot:",
+        "dvc init",
+        "dvc add data/snapshot.parquet",
+        "dvc status",
+        "# Commit reviewed .dvc metadata and code only. Remote upload is deliberately a separate entitlement-controlled operation."
+      ],
+      "requirements": [
+        "Python >=3.9; Git repository, private cache/optional private remote and retention policy.",
+        "Snapshot must already include source contract, universe, adjustment and knowledge-cutoff metadata."
+      ],
+      "limitations": [
+        "Content hashes prove identity, not data validity or point-in-time correctness.",
+        "GitHub canonical repository now resolves to treeverse/dvc; older iterative URLs redirect.",
+        "Even metadata can reveal identifiers; review public manifests separately from private data/cache."
+      ],
+      "sources": [
+        "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst",
+        "https://doc.dvc.org/start",
+        "https://dvc.org/doc/command-reference/add",
+        "https://dvc.org/doc/command-reference/stage/add",
+        "https://github.com/treeverse/dvc/releases/tag/3.67.1",
+        "https://pypi.org/pypi/dvc/3.67.1/json"
+      ]
+    },
+    {
+      "id": "data-lakefs",
+      "repository": "https://github.com/treeverse/lakeFS",
+      "layers": [
+        "object-store-versioning",
+        "data-branches"
+      ],
+      "role": "Versioned object-storage branches and commits",
+      "decision": "alternative",
+      "rationale": "Choose over simple file manifests when concurrent teams need atomic lake branches and promotion gates.",
+      "version_or_commit": "server v1.86.0; Python wrapper 0.16.0; source 36fad6476e23c118b91247523a0c7fb045cead4e",
+      "release_date": "2026-08-05",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Can pin multi-table object snapshots; historical issuer universes and knowledge-time semantics still live in those tables.",
+      "alpaca_fit": "Shared research dataset plane; no direct broker control.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/treeverse/lakeFS/blob/36fad6476e23c118b91247523a0c7fb045cead4e/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'lakefs==0.16.0'",
+        "# Native upstream Python quickstart; creates/starts a local demo service and may fetch its binary. Review before running:",
+        "python -m lakefs.quickstart"
+      ],
+      "requirements": [
+        "Python >=3.10 for wrapper0.16.0; verify downloaded demo-server version separately from cataloged server1.86.0.",
+        "Production object storage, metadata backend, access policy and backup plan are separate deployment work."
+      ],
+      "limitations": [
+        "Quickstart is a local demonstration, not a pinned production server deployment or high-availability proof.",
+        "lakeFS commits do not make independently updated external databases part of one atomic financial snapshot.",
+        "Branch retention and object garbage collection can remove historical artifacts needed for reproducibility."
+      ],
+      "sources": [
+        "https://github.com/treeverse/lakeFS/blob/36fad6476e23c118b91247523a0c7fb045cead4e/README.md",
+        "https://docs.lakefs.io/latest/quickstart/",
+        "https://docs.lakefs.io/latest/understand/model/",
+        "https://github.com/treeverse/lakeFS/releases/tag/v1.86.0",
+        "https://pypi.org/pypi/lakefs/0.16.0/json"
+      ]
+    },
+    {
+      "id": "data-mlflow",
+      "repository": "https://github.com/mlflow/mlflow",
+      "layers": [
+        "experiment-tracking",
+        "model-lineage"
+      ],
+      "role": "Local experiment runs, parameters, metrics and artifacts",
+      "decision": "conditional",
+      "rationale": "Add when comparing research runs; link each run to exact private data snapshots and temporal split manifests.",
+      "version_or_commit": "v3.16.1; source 32792afe5b0183fce10532d3a023f5cfa8612d09",
+      "release_date": "2026-09-17",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Record universe, as-of cutoff, feature/code versions, transaction-cost assumptions and out-of-sample results as explicit run metadata.",
+      "alpaca_fit": "Research audit trail only; a registered model is not permission to trade or evidence of broker readiness.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'mlflow==3.16.1'",
+        "python - <<'PY'\nimport tempfile\nimport mlflow\nwith tempfile.TemporaryDirectory() as directory:\n    mlflow.set_tracking_uri('sqlite:///' + directory + '/mlflow.db')\n    mlflow.set_experiment('synthetic-catalog-demo')\n    with mlflow.start_run():\n        mlflow.log_param('input_kind', 'synthetic')\n        mlflow.log_metric('row_count', 3)\n        print(mlflow.get_tracking_uri())\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; private artifact/backend stores; explicit access controls before exposing any tracking server."
+      ],
+      "limitations": [
+        "No experiments or models were run by this review. The example would only record a synthetic local metric.",
+        "Autologging does not capture every data revision, leakage decision or external service cost; avoid unreviewed hosted telemetry and dataset uploads."
+      ],
+      "sources": [
+        "https://github.com/mlflow/mlflow/blob/32792afe5b0183fce10532d3a023f5cfa8612d09/README.md",
+        "https://mlflow.org/docs/latest/ml/tracking/",
+        "https://mlflow.org/docs/latest/ml/tracking/data-api/",
+        "https://github.com/mlflow/mlflow/releases/tag/v3.16.1",
+        "https://pypi.org/pypi/mlflow/3.16.1/json"
+      ]
+    },
+    {
+      "id": "data-openlineage",
+      "repository": "https://github.com/OpenLineage/OpenLineage",
+      "layers": [
+        "data-lineage",
+        "metadata-events"
+      ],
+      "role": "Open job/run/dataset lineage event standard and clients",
+      "decision": "conditional",
+      "rationale": "Useful when several engines need interoperable lineage metadata; keep the initial local pipeline simpler.",
+      "version_or_commit": "1.53.0; source 8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe",
+      "release_date": "2026-09-01",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Can describe source-to-feature-to-experiment dependencies with dataset identities and custom facets.",
+      "alpaca_fit": "Observability metadata around data jobs; no Alpaca market-data or order interface.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/OpenLineage/OpenLineage/blob/8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'openlineage-python==1.53.0'",
+        "python - <<'PY'\nfrom openlineage.client.event_v2 import Dataset\nprint(Dataset(namespace='local-research', name='synthetic-events'))  # no transport or network emission\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; intentionally configured transport and an access-controlled receiver if events are emitted.",
+        "Define dataset-version and knowledge-cutoff facets consistently across jobs."
+      ],
+      "limitations": [
+        "The client/specification is not a persistent lineage server, scheduler or dataset version store.",
+        "Lineage metadata may disclose private dataset names/URIs; never embed credentials or licensed row contents."
+      ],
+      "sources": [
+        "https://github.com/OpenLineage/OpenLineage/blob/8ad5c14c63fbab63fedd8ff42f9a208d86ad07fe/README.md",
+        "https://openlineage.io/docs/client/python/",
+        "https://openlineage.io/docs/spec/facets/",
+        "https://github.com/OpenLineage/OpenLineage/releases/tag/1.53.0",
+        "https://pypi.org/pypi/openlineage-python/1.53.0/json",
+        "https://github.com/OpenLineage/OpenLineage/blob/1.53.0/client/python/src/openlineage/client/event_v2.py",
+        "https://github.com/OpenLineage/OpenLineage/blob/1.53.0/client/python/src/openlineage/client/generated/base.py"
+      ]
+    },
+    {
+      "id": "data-iceberg",
+      "repository": "https://github.com/apache/iceberg",
+      "layers": [
+        "lakehouse-table",
+        "snapshot-store"
+      ],
+      "role": "Open table snapshots and schema/partition evolution",
+      "decision": "conditional",
+      "rationale": "Select when multiple query engines need a shared object-storage table contract; unnecessary for the first local Parquet snapshots.",
+      "version_or_commit": "Apache Iceberg 1.11.0; PyIceberg 0.12.0; source 6976e020b894f6a6777704df2b8c4458cb291ae9",
+      "release_date": "2026-05-20",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Snapshots pin table contents, while correction/knowledge-time semantics still require explicit columns and retention.",
+      "alpaca_fit": "Research lake table layer independently consumed by backtests and reports.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/apache/iceberg/blob/6976e020b894f6a6777704df2b8c4458cb291ae9/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'pyiceberg[pyarrow,sql-sqlite]==0.12.0'",
+        "python - <<'PY'\nimport tempfile\nfrom pyiceberg.catalog.sql import SqlCatalog\nwith tempfile.TemporaryDirectory() as directory:\n    catalog = SqlCatalog('research', uri='sqlite:///' + directory + '/catalog.db',\n                         warehouse='file://' + directory + '/warehouse')\n    catalog.create_namespace('synthetic')\n    print(catalog.list_namespaces())\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10 for separately released PyIceberg0.12.0; reviewed catalog and storage backend.",
+        "Apache Iceberg1.11.0 is the table/JVM release, not the Python package version."
+      ],
+      "limitations": [
+        "Catalog creation alone would not prove append, multi-writer conflict handling, cross-engine compatibility or time travel.",
+        "Snapshot expiry and orphan-file removal must preserve required research/audit versions; storage snapshots do not imply past information availability."
+      ],
+      "sources": [
+        "https://github.com/apache/iceberg/blob/6976e020b894f6a6777704df2b8c4458cb291ae9/README.md",
+        "https://iceberg.apache.org/docs/latest/evolution/",
+        "https://iceberg.apache.org/docs/latest/reliability/",
+        "https://py.iceberg.apache.org/",
+        "https://github.com/apache/iceberg/releases/tag/apache-iceberg-1.11.0",
+        "https://pypi.org/pypi/pyiceberg/0.12.0/json"
+      ]
+    },
+    {
+      "id": "data-delta-rs",
+      "repository": "https://github.com/delta-io/delta-rs",
+      "layers": [
+        "lakehouse-table",
+        "snapshot-store"
+      ],
+      "role": "Rust/Python Delta Lake tables without a Spark runtime",
+      "decision": "alternative",
+      "rationale": "Choose a Delta table contract when local transactions/version reads are useful or downstream systems already use Delta.",
+      "version_or_commit": "deltalake 1.6.4 (python-v1.6.4); source 6a954aff7503103f9cc7a9c7878fe330ec57e080",
+      "release_date": "2026-09-18",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Append and versioned reads can preserve curated research snapshots; immutable raw revisions still need a deliberate design.",
+      "alpaca_fit": "Private research storage only; independent of broker credentials and routing.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/delta-io/delta-rs/blob/6a954aff7503103f9cc7a9c7878fe330ec57e080/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'deltalake==1.6.4'",
+        "python -m pip install 'pyarrow==25.0.1'",
+        "python - <<'PY'\nimport tempfile\nimport pyarrow as pa\nfrom deltalake import DeltaTable, write_deltalake\nwith tempfile.TemporaryDirectory() as directory:\n    write_deltalake(directory + '/events', pa.table({'instrument_id': [1], 'sequence': [1]}))\n    table = DeltaTable(directory + '/events')\n    print(table.version(), table.to_pyarrow_table().num_rows)\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; compatible Arrow runtime and backend-specific storage/concurrency configuration."
+      ],
+      "limitations": [
+        "Do not conflate Delta table protocol compatibility across engines with every feature being supported by delta-rs.",
+        "Vacuum/retention can destroy reproducibility; knowledge-time corrections remain an application contract.",
+        "PyPI1.6.4 and its source tag are newer than GitHub latest-release pointer1.6.3 checked on this date."
+      ],
+      "sources": [
+        "https://github.com/delta-io/delta-rs/blob/6a954aff7503103f9cc7a9c7878fe330ec57e080/README.md",
+        "https://delta-io.github.io/delta-rs/usage/writing/",
+        "https://delta-io.github.io/delta-rs/usage/loading-table/",
+        "https://github.com/delta-io/delta-rs/tree/python-v1.6.4",
+        "https://github.com/delta-io/delta-rs/releases/tag/python-v1.6.3",
+        "https://pypi.org/pypi/deltalake/1.6.4/json"
+      ]
+    },
+    {
+      "id": "data-feast",
+      "repository": "https://github.com/feast-dev/feast",
+      "layers": [
+        "feature-store",
+        "point-in-time-joins"
+      ],
+      "role": "Historical feature retrieval and online/offline feature definitions",
+      "decision": "conditional",
+      "rationale": "Add when shared model serving needs consistent feature definitions; keep initial features in explicit snapshot tables.",
+      "version_or_commit": "v0.66.0; source 1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335",
+      "release_date": "2026-08-21",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Entity/timestamp joins and TTL help avoid event-time leakage, provided revisions and known-at cutoffs are also modeled.",
+      "alpaca_fit": "Provides research/serving features; never independently decides or executes broker orders.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'feast==0.66.0'",
+        "# Creates a NEW local demonstration feature repository, not a production market-data store:",
+        "feast init research_demo",
+        "cd research_demo/feature_repo",
+        "feast apply",
+        "feast feature-views list"
+      ],
+      "requirements": [
+        "Python >=3.10; isolated feature repository and reviewed offline/online stores.",
+        "Stable instrument entity keys, timezone-aware feature times, declared TTL and revision/availability policy."
+      ],
+      "limitations": [
+        "Event-time point-in-time retrieval does not automatically exclude a late correction learned after the historical decision.",
+        "Materialization freshness, feature skew, access control and outage fallback require separate operational evidence."
+      ],
+      "sources": [
+        "https://github.com/feast-dev/feast/blob/1d5be950cf718a674cb01eaf0fd0ad6f0a4c6335/README.md",
+        "https://docs.feast.dev/getting-started/concepts/point-in-time-joins",
+        "https://docs.feast.dev/getting-started/quickstart",
+        "https://github.com/feast-dev/feast/releases/tag/v0.66.0",
+        "https://pypi.org/pypi/feast/0.66.0/json"
+      ]
+    },
+    {
+      "id": "data-pandera",
+      "repository": "https://github.com/unionai-oss/pandera",
+      "layers": [
+        "data-quality",
+        "schema-contracts"
+      ],
+      "role": "Dataframe schemas and validation before snapshot promotion",
+      "decision": "default",
+      "rationale": "Use compact explicit contracts for required fields, types, keys and domain checks close to transformations.",
+      "version_or_commit": "v0.33.1; source 62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6",
+      "release_date": "2026-09-01",
+      "license": "MIT",
+      "us_equities_fit": "Can validate stable IDs, UTC timestamps, quantities, OHLC relationships and correction keys; rules must match the specific feed.",
+      "alpaca_fit": "Quarantine malformed inputs before they reach research or paper decision logic.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'pandera[pandas]==0.33.1'",
+        "python - <<'PY'\nimport pandas as pd\nimport pandera.pandas as pa\nschema = pa.DataFrameSchema({'instrument_id': pa.Column(int),\n    'sequence': pa.Column(int, pa.Check.ge(0)),\n    'quantity': pa.Column(int, pa.Check.ge(0))},\n    strict=True, unique=['instrument_id', 'sequence'])\nprint(schema.validate(pd.DataFrame({'instrument_id': [1], 'sequence': [1], 'quantity': [2]}), lazy=True))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10 and selected dataframe extra; schemas committed alongside each dataset version.",
+        "Separate received corrections/cancellations from ordinary trade/bar validation; do not coerce away precision or missing values silently."
+      ],
+      "limitations": [
+        "Schema validation is not provider completeness, correct corporate actions, accurate prices or absence of leakage.",
+        "The demonstration checks synthetic keys/quantities only; real market schemas and fail-closed promotion are still implementation work.",
+        "pandera-dev/pandera currently redirects to canonical unionai-oss/pandera."
+      ],
+      "sources": [
+        "https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md",
+        "https://pandera.readthedocs.io/en/stable/dataframe_schemas.html",
+        "https://pandera.readthedocs.io/en/stable/lazy_validation.html",
+        "https://github.com/unionai-oss/pandera/releases/tag/v0.33.1",
+        "https://pypi.org/pypi/pandera/0.33.1/json"
+      ]
+    },
+    {
+      "id": "data-great-expectations",
+      "repository": "https://github.com/fivetran/great_expectations",
+      "layers": [
+        "data-quality",
+        "validation-reporting"
+      ],
+      "role": "Expectation suites, validation results and data documentation",
+      "decision": "alternative",
+      "rationale": "Choose when an organization needs managed validation suites/results rather than only in-process schemas.",
+      "version_or_commit": "1.23.1; source b6bf1ed79571d652eee159420b6095ce1fb53db5",
+      "release_date": "2026-09-18",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Can express financial-table checks; statistical expectation success is not market-data correctness.",
+      "alpaca_fit": "Dataset quality gates only; no broker integration or automatic trade approval.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/fivetran/great_expectations/blob/b6bf1ed79571d652eee159420b6095ce1fb53db5/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'great_expectations==1.23.1'",
+        "python - <<'PY'\nimport great_expectations as gx\ncontext = gx.get_context(mode='ephemeral')\nprint(type(context).__name__)  # no hosted context or datasource\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10,<3.14; a chosen local context/backend and private result storage."
+      ],
+      "limitations": [
+        "Creating a context does not validate any data. Author and version domain-specific suites before claiming quality gates.",
+        "Avoid two competing schema systems by default. Canonical repository now resolves to fivetran/great_expectations."
+      ],
+      "sources": [
+        "https://github.com/fivetran/great_expectations/blob/b6bf1ed79571d652eee159420b6095ce1fb53db5/README.md",
+        "https://docs.greatexpectations.io/docs/core/introduction/try_gx/",
+        "https://github.com/fivetran/great_expectations/releases/tag/1.23.1",
+        "https://pypi.org/pypi/great_expectations/1.23.1/json"
+      ]
+    },
+    {
+      "id": "data-exchange-calendars",
+      "repository": "https://github.com/gerrymanoim/exchange_calendars",
+      "layers": [
+        "market-calendars",
+        "timezones"
+      ],
+      "role": "Trading sessions, holidays, breaks and UTC boundaries",
+      "decision": "default",
+      "rationale": "Use the native XNYS calendar already exercised by the local six-event data receipt.",
+      "version_or_commit": "4.13.2; source dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+      "release_date": "2026-03-10",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Handles exchange session boundaries and holiday/early-close rules; retain calendar package version with each backtest.",
+      "alpaca_fit": "Provides research/session checks; broker clock/status and actual halts remain separate live inputs.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md",
+        "blueprints/us-equities/data/receipt.json",
+        "blueprints/us-equities/data/summarize_backtest.py",
+        "blueprints/us-equities/workers/requirements.txt"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'exchange-calendars==4.13.2'",
+        "python - <<'PY'\nimport exchange_calendars as xcals\ncalendar = xcals.get_calendar('XNYS')\nprint(calendar.session_open('2013-10-07'))\nprint(calendar.session_close('2013-10-07'))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; explicit venue/calendar, session side and timestamp conventions."
+      ],
+      "limitations": [
+        "Existing native receipt confirms one XNYS session only, not every holiday, future schedule or venue.",
+        "Regular-session calendars do not describe every extended-hours feed, security-specific halt or emergency closure. Calendar updates must be revalidated."
+      ],
+      "sources": [
+        "https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md",
+        "https://github.com/gerrymanoim/exchange_calendars/blob/4.13.2/README.md",
+        "https://github.com/gerrymanoim/exchange_calendars/releases/tag/4.13.2",
+        "https://pypi.org/pypi/exchange_calendars/4.13.2/json"
+      ]
+    },
+    {
+      "id": "data-pandas-market-calendars",
+      "repository": "https://github.com/rsheftel/pandas_market_calendars",
+      "layers": [
+        "market-calendars",
+        "timezones"
+      ],
+      "role": "Pandas-oriented schedules and market interruptions",
+      "decision": "alternative",
+      "rationale": "Use when its schedule API fits existing Pandas workflows; avoid silently mixing calendar implementations.",
+      "version_or_commit": "5.4.0 (v5.4.0); source 275890784073a3a3a347e4f05f4dc986456e6a75",
+      "release_date": "2026-05-27",
+      "license": "MIT",
+      "us_equities_fit": "NYSE session schedules and interruption support; declared venue rules and installed package determine results.",
+      "alpaca_fit": "Research session normalization only; not a realtime broker market-status feed.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/rsheftel/pandas_market_calendars/blob/275890784073a3a3a347e4f05f4dc986456e6a75/README.rst"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'pandas_market_calendars==5.4.0'",
+        "python - <<'PY'\nimport pandas_market_calendars as mcal\nprint(mcal.get_calendar('NYSE').schedule(start_date='2024-07-01', end_date='2024-07-05'))\nPY"
+      ],
+      "requirements": [
+        "Supported Python/Pandas versions and pinned zoneinfo/calendar dependencies."
+      ],
+      "limitations": [
+        "Rules ship with package code, not live exchange queries. Upgrade/review to obtain rule corrections.",
+        "PyPI5.4.0 and source tag v5.4.0 supersede the stale GitHub latest-release pointer v4.6.1."
+      ],
+      "sources": [
+        "https://github.com/rsheftel/pandas_market_calendars/blob/275890784073a3a3a347e4f05f4dc986456e6a75/README.rst",
+        "https://pandas-market-calendars.readthedocs.io/en/latest/usage.html",
+        "https://github.com/rsheftel/pandas_market_calendars/tree/v5.4.0",
+        "https://github.com/rsheftel/pandas_market_calendars/releases/tag/v4.6.1",
+        "https://pypi.org/pypi/pandas_market_calendars/5.4.0/json"
+      ]
+    },
+    {
+      "id": "data-sktime",
+      "repository": "https://github.com/sktime/sktime",
+      "layers": [
+        "time-series-evaluation",
+        "forecasting"
+      ],
+      "role": "Temporal splits, model interfaces and baseline evaluation",
+      "decision": "conditional",
+      "rationale": "Use a common evaluation interface after defining a defensible temporal dataset contract.",
+      "version_or_commit": "v1.1.0; source 918fa838d99eb3703fe9bc963891619608aa35b4",
+      "release_date": "2026-07-28",
+      "license": "BSD-3-Clause",
+      "us_equities_fit": "Useful for rolling time-series baselines; session spacing, overlapping labels and cross-sectional groups need explicit treatment.",
+      "alpaca_fit": "Produces research forecasts/metrics only, separated from broker execution.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/sktime/sktime/blob/918fa838d99eb3703fe9bc963891619608aa35b4/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'sktime==1.1.0'",
+        "python - <<'PY'\nimport pandas as pd\nfrom sktime.forecasting.naive import NaiveForecaster\nfrom sktime.split import temporal_train_test_split\ny = pd.Series(range(24), index=pd.period_range('2024-01', periods=24, freq='M'))\ntrain, test = temporal_train_test_split(y, test_size=3)\nmodel = NaiveForecaster(strategy='last').fit(train)\nprint(model.predict(fh=[1, 2, 3]))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10,<3.15; selected optional estimators only; frozen chronological train/validation/test definitions."
+      ],
+      "limitations": [
+        "Synthetic monthly example would demonstrate an API, not equity predictability or trading returns.",
+        "Purge overlapping future labels where required; fit scaling/selection within each training fold, retain a final untouched period and account for repeated strategy search."
+      ],
+      "sources": [
+        "https://github.com/sktime/sktime/blob/918fa838d99eb3703fe9bc963891619608aa35b4/README.md",
+        "https://www.sktime.net/en/stable/api_reference/auto_generated/sktime.split.ExpandingWindowSplitter.html",
+        "https://www.sktime.net/en/stable/api_reference/auto_generated/sktime.forecasting.model_evaluation.evaluate.html",
+        "https://github.com/sktime/sktime/releases/tag/v1.1.0",
+        "https://pypi.org/pypi/sktime/1.1.0/json"
+      ]
+    },
+    {
+      "id": "data-statsforecast",
+      "repository": "https://github.com/Nixtla/statsforecast",
+      "layers": [
+        "forecasting",
+        "statistical-baselines"
+      ],
+      "role": "CPU statistical forecasting and rolling evaluation",
+      "decision": "conditional",
+      "rationale": "Establish inexpensive naive/seasonal/statistical baselines before complex learned forecasting systems.",
+      "version_or_commit": "v2.1.1; source 264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc",
+      "release_date": "2026-07-16",
+      "license": "Apache-2.0",
+      "us_equities_fit": "May model permitted volume/volatility or other research series; exchange-session sampling is not the same as calendar-day sampling.",
+      "alpaca_fit": "Offline research outputs only; no model or service relationship with Alpaca.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/Nixtla/statsforecast/blob/264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'statsforecast==2.1.1'",
+        "python - <<'PY'\nfrom statsforecast import StatsForecast\nfrom statsforecast.models import Naive\nfrom statsforecast.utils import AirPassengersDF\nmodel = StatsForecast(models=[Naive()], freq='ME')\nprint(model.cross_validation(df=AirPassengersDF, h=3, n_windows=2))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; CPU dependencies and explicit forecast horizon/fold/session semantics."
+      ],
+      "limitations": [
+        "Bundled airline data is a method demonstration, not financial evidence.",
+        "This open-source library is separate from Nixtla hosted TimeGPT; no hosted inference, key or forecast-performance claim is implied."
+      ],
+      "sources": [
+        "https://github.com/Nixtla/statsforecast/blob/264166ec0ddbfd481ee8e0b71e5ca42d2c0676fc/README.md",
+        "https://nixtlaverse.nixtla.io/statsforecast/docs/tutorials/crossvalidation.html",
+        "https://github.com/Nixtla/statsforecast/releases/tag/v2.1.1",
+        "https://pypi.org/pypi/statsforecast/2.1.1/json"
+      ]
+    },
+    {
+      "id": "data-mlforecast",
+      "repository": "https://github.com/Nixtla/mlforecast",
+      "layers": [
+        "forecasting",
+        "feature-transforms"
+      ],
+      "role": "Lag features and sklearn-style global forecasting",
+      "decision": "alternative",
+      "rationale": "Use for transparent lag-based ML comparisons once statistical baselines and temporal folds exist.",
+      "version_or_commit": "v1.1.0; source a1609efddf8cf1a83510a50cd5487b66f32271c6",
+      "release_date": "2026-07-10",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Can build many-series equity research features; respect session indexes, listing changes and availability of exogenous variables.",
+      "alpaca_fit": "Offline predictions remain advisory inputs to separately tested deterministic decision/risk code.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/Nixtla/mlforecast/blob/a1609efddf8cf1a83510a50cd5487b66f32271c6/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'mlforecast==1.1.0'",
+        "python - <<'PY'\nfrom sklearn.linear_model import LinearRegression\nfrom mlforecast import MLForecast\nfrom mlforecast.utils import generate_daily_series\ndata = generate_daily_series(n_series=2, min_length=40, max_length=40)\nmodel = MLForecast(models=[LinearRegression()], freq='D', lags=[1, 2])\nprint(model.cross_validation(df=data, h=3, n_windows=2))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.10; chosen estimator dependencies; stable instrument IDs and fold-local transformations."
+      ],
+      "limitations": [
+        "Generated daily data does not validate market-session handling or financial performance.",
+        "Exogenous future values and target transforms can leak information; do not use current revised fundamentals or globally fitted features in past folds."
+      ],
+      "sources": [
+        "https://github.com/Nixtla/mlforecast/blob/a1609efddf8cf1a83510a50cd5487b66f32271c6/README.md",
+        "https://nixtlaverse.nixtla.io/mlforecast/docs/how-to-guides/cross_validation.html",
+        "https://nixtlaverse.nixtla.io/mlforecast/docs/getting-started/quick_start_local.html",
+        "https://github.com/Nixtla/mlforecast/releases/tag/v1.1.0",
+        "https://pypi.org/pypi/mlforecast/1.1.0/json"
+      ]
+    },
+    {
+      "id": "data-tsfresh",
+      "repository": "https://github.com/blue-yonder/tsfresh",
+      "layers": [
+        "feature-extraction",
+        "time-series-research"
+      ],
+      "role": "Statistical time-series features and feature selection",
+      "decision": "conditional",
+      "rationale": "Evaluate when a defined task benefits from systematic window features beyond simple lags; restrict the feature set first.",
+      "version_or_commit": "v0.21.2; source 6aa24fdef7e3c3f48b19482535693f5796f2b598",
+      "release_date": "2026-05-31",
+      "license": "MIT",
+      "us_equities_fit": "Extract from past-only instrument windows; map each feature to its latest underlying availability time.",
+      "alpaca_fit": "Feature research only; no provider, broker or model-serving runtime.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/blue-yonder/tsfresh/blob/6aa24fdef7e3c3f48b19482535693f5796f2b598/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'tsfresh==0.21.2'",
+        "python - <<'PY'\nimport pandas as pd\nfrom tsfresh import extract_features\nfrom tsfresh.feature_extraction import MinimalFCParameters\nframe = pd.DataFrame({'window': [1,1,1], 'step': [0,1,2], 'value': [2.,3.,4.]})\nprint(extract_features(frame, column_id='window', column_sort='step',\n    default_fc_parameters=MinimalFCParameters(), n_jobs=0, disable_progressbar=True))\nPY"
+      ],
+      "requirements": [
+        "Python >=3.9; bounded window size/feature settings and train-only feature selection."
+      ],
+      "limitations": [
+        "Feature extraction over a whole future window leaks; selection/imputation must occur inside training folds.",
+        "Large feature searches create multiple-testing/overfitting risk; feature significance is not economic usefulness after trading costs."
+      ],
+      "sources": [
+        "https://github.com/blue-yonder/tsfresh/blob/6aa24fdef7e3c3f48b19482535693f5796f2b598/README.md",
+        "https://tsfresh.readthedocs.io/en/latest/text/quick_start.html",
+        "https://tsfresh.readthedocs.io/en/latest/text/forecasting.html",
+        "https://github.com/blue-yonder/tsfresh/releases/tag/v0.21.2",
+        "https://pypi.org/pypi/tsfresh/0.21.2/json"
+      ]
+    },
+    {
+      "id": "data-river",
+      "repository": "https://github.com/online-ml/river",
+      "layers": [
+        "online-learning",
+        "progressive-evaluation"
+      ],
+      "role": "Incremental models, pipelines and progressive validation",
+      "decision": "conditional",
+      "rationale": "Choose when there is a justified need to update a model on streaming observations rather than periodic batch retraining.",
+      "version_or_commit": "0.26.1; source 64285b9dd6c606804753235fe992bcf25b9856ee",
+      "release_date": "2026-08-21",
+      "license": "BSD-3-Clause",
+      "us_equities_fit": "Predict before learning and delay each update until its outcome label is actually known; retain order/version checkpoints.",
+      "alpaca_fit": "Advisory streaming features/scores only; does not alter broker risk controls.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'river==0.26.1'",
+        "python - <<'PY'\nfrom river import linear_model, preprocessing, metrics\nmodel = preprocessing.StandardScaler() | linear_model.LinearRegression()\nmetric = metrics.MAE()\nfor x, y in [({'x': 1.}, 2.), ({'x': 2.}, 4.), ({'x': 3.}, 6.)]:\n    prediction = model.predict_one(x)\n    metric.update(y, prediction)\n    model.learn_one(x, y)\nprint(metric)\nPY"
+      ],
+      "requirements": [
+        "Python >=3.11; explicit event order, label delay, checkpoint/replay and drift response policy."
+      ],
+      "limitations": [
+        "Immediate synthetic labels are not a valid financial online-evaluation assumption.",
+        "Progressive validation must model delayed fills/returns, late corrections and restart behavior; online updates do not guarantee adaptation or profitability."
+      ],
+      "sources": [
+        "https://github.com/online-ml/river/blob/64285b9dd6c606804753235fe992bcf25b9856ee/README.md",
+        "https://riverml.xyz/latest/api/evaluate/progressive-val-score/",
+        "https://github.com/online-ml/river/releases/tag/0.26.1",
+        "https://pypi.org/pypi/river/0.26.1/json"
+      ]
+    },
+    {
+      "id": "data-qlib",
+      "repository": "https://github.com/microsoft/qlib",
+      "layers": [
+        "financial-ml",
+        "research-framework"
+      ],
+      "role": "Financial ML datasets, factors, model workflows and backtests",
+      "decision": "watch",
+      "rationale": "Useful research comparison suite; defer adoption until US data provenance and a focused experimental need are established.",
+      "version_or_commit": "v0.9.7; source da920b7f954f48ab1bb64117c976710de198373e",
+      "release_date": "2025-08-15",
+      "license": "MIT",
+      "us_equities_fit": "US-region research is possible with correctly converted licensed data; common examples/default datasets are not automatically suitable US survivorship-free inputs.",
+      "alpaca_fit": "Keep Qlib experiments separate from the selected paper execution engine and broker adapter.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/microsoft/qlib/blob/da920b7f954f48ab1bb64117c976710de198373e/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'pyqlib==0.9.7'",
+        "qrun --help",
+        "# Actual experiment requires a reviewed US-region configuration and licensed, versioned local dataset; no bundled/Yahoo download is authorized by this catalog."
+      ],
+      "requirements": [
+        "Supported Python build/dependencies; a reviewed region/calendar/universe configuration and custom data conversion."
+      ],
+      "limitations": [
+        "Pinned release README says its official dataset is temporarily disabled and points to a community substitute; do not assume example data is available or entitled.",
+        "Latest checked release is from 2025; current source activity does not make that a newly released 2026 package.",
+        "An integrated backtest or LLM factor search is not proof of realistic US fills, absence of leakage or robust out-of-sample returns."
+      ],
+      "sources": [
+        "https://github.com/microsoft/qlib/blob/da920b7f954f48ab1bb64117c976710de198373e/README.md",
+        "https://qlib.readthedocs.io/en/latest/component/data.html",
+        "https://qlib.readthedocs.io/en/latest/component/workflow.html",
+        "https://github.com/microsoft/qlib/releases/tag/v0.9.7",
+        "https://pypi.org/pypi/pyqlib/0.9.7/json"
+      ]
+    },
+    {
+      "id": "data-gdeltdoc",
+      "repository": "https://github.com/alex9smith/gdelt-doc-api",
+      "layers": [
+        "news",
+        "alternative-data"
+      ],
+      "role": "Community client for GDELT article and coverage queries",
+      "decision": "conditional",
+      "rationale": "Use for exploratory news coverage signals and URL discovery, not as a complete licensed financial-news archive.",
+      "version_or_commit": "1.12.0; source f2e500144b0a6090d63723f94453b32717e5fd23",
+      "release_date": "2025-04-03",
+      "license": "MIT",
+      "us_equities_fit": "Requires issuer disambiguation, deduplication and publication/first-seen timestamps; entity keywords alone are not reliable ticker mapping.",
+      "alpaca_fit": "Optional research input only; never a direct order trigger without separately evaluated decision rules.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'gdeltdoc==1.12.0'",
+        "python - <<'PY'\nfrom gdeltdoc import Filters\nquery = Filters(keyword='earnings', start_date='2026-09-01', end_date='2026-09-02', num_records=10)\nprint(type(query).__name__)  # constructs filters only; no API request\nPY",
+        "# After reviewing endpoint availability and publisher rights, native network shape: GdeltDoc().article_search(query)."
+      ],
+      "requirements": [
+        "Python >=3.10; current API query limits/retention, issuer mapping and source-rights review."
+      ],
+      "limitations": [
+        "Community wrapper is not an official GDELT SDK. Its 2025 release is recorded honestly, not presented as newly released.",
+        "GDELT DOC search has bounded results/time windows; it is not exhaustive historical financial news.",
+        "Article URLs/text remain subject to publisher rights; GDELT first-seen time is not necessarily publication or tradable availability time."
+      ],
+      "sources": [
+        "https://github.com/alex9smith/gdelt-doc-api/blob/f2e500144b0a6090d63723f94453b32717e5fd23/README.md",
+        "https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/",
+        "https://www.gdeltproject.org/about.html",
+        "https://github.com/alex9smith/gdelt-doc-api/releases/tag/1.12.0",
+        "https://pypi.org/pypi/gdeltdoc/1.12.0/json"
+      ]
+    },
+    {
+      "id": "data-fredapi",
+      "repository": "https://github.com/mortada/fredapi",
+      "layers": [
+        "macro-data",
+        "vintage-data"
+      ],
+      "role": "Community FRED/ALFRED macro series and vintage access",
+      "decision": "conditional",
+      "rationale": "Use macro vintages where a hypothesis needs information available at the historical decision date.",
+      "version_or_commit": "v0.5.2; source bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d",
+      "release_date": "2024-05-05",
+      "license": "Apache-2.0",
+      "us_equities_fit": "ALFRED release revisions support macro point-in-time research; observation period is distinct from release/vintage availability.",
+      "alpaca_fit": "Optional macro context for offline research, independently of Alpaca execution.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "python -m pip install 'fredapi==0.5.2'",
+        "# Network: requires an authorized FRED API key; respects each underlying series rights.",
+        "python - <<'PY'\nimport os\nfrom fredapi import Fred\nclient = Fred(api_key=os.environ['FRED_API_KEY'])\nprint(client.get_series_as_of_date('GDP', '2024-01-31').tail())\nPY"
+      ],
+      "requirements": [
+        "Python/Pandas; FRED key, per-series source terms and explicit intraday release-time mapping."
+      ],
+      "limitations": [
+        "FRED default queries often return revised latest data; select vintage/as-of data explicitly.",
+        "A vintage date alone does not encode exact intraday announcement/receipt time. Some underlying series carry third-party restrictions.",
+        "Community wrapper latest checked release is 2024, not a recent foundation-model release; no data request was run.",
+        "As-of retrieval can return multiple eligible releases for a period; select the last eligible vintage explicitly while retaining the revision history."
+      ],
+      "sources": [
+        "https://github.com/mortada/fredapi/blob/bf7cc8fdb03b12f8224bbb1bf66381b9d21c6d6d/README.md",
+        "https://fred.stlouisfed.org/docs/api/fred/realtime_period.html",
+        "https://fred.stlouisfed.org/docs/api/terms_of_use.html",
+        "https://github.com/mortada/fredapi/releases/tag/v0.5.2",
+        "https://pypi.org/pypi/fredapi/0.5.2/json"
+      ]
+    },
+    {
+      "id": "data-fincept-terminal",
+      "repository": "https://github.com/Fincept-Corporation/FinceptTerminal",
+      "layers": [
+        "research-interface",
+        "desktop-analytics"
+      ],
+      "role": "Native financial research desktop interface from the recent stars",
+      "decision": "watch",
+      "rationale": "Evaluate as an optional human research UI after resolving its nonstandard license terms; keep broker execution authority in the deterministic system.",
+      "version_or_commit": "v4.5.0; source ec88590aa6e9c3ee76504a7571bcb1fcb2e1398e",
+      "release_date": "2026-09-01",
+      "license": "Nonstandard AGPL-3.0-or-later wording plus commercial/internal-use restrictions; commercial option",
+      "us_equities_fit": "Connector/analytics breadth is useful for exploration, but individual providers, corporate-action handling and historical universes require separate validation.",
+      "alpaca_fit": "Do not infer Alpaca-ready execution from a broker integration list. Public UI or AI outputs are research evidence inputs only.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/Fincept-Corporation/FinceptTerminal/blob/ec88590aa6e9c3ee76504a7571bcb1fcb2e1398e/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
+        "# Source inspection only until licensing/build prerequisites are reviewed:",
+        "git clone --branch v4.5.0 --depth 1 https://github.com/Fincept-Corporation/FinceptTerminal.git fincept-review",
+        "git -C fincept-review show HEAD:LICENSE",
+        "git -C fincept-review show HEAD:setup.sh",
+        "# Upstream Linux/macOS build entrypoint is ./setup.sh after review; it is NOT run or automatically authorized here."
+      ],
+      "requirements": [
+        "Native C++20/Qt6 desktop environment and embedded Python3.11 toolchain; inspect the pinned setup script before installation.",
+        "Repository license combines AGPL wording with additional commercial/internal-use restrictions; obtain applicable rights before business adoption.",
+        "Each data/LLM connector has separate keys, costs and use terms; none was activated."
+      ],
+      "limitations": [
+        "Pinned release README describes a Qt6/C++ desktop, not older Electron/Tauri recipes; its download table still points to 4.4.1 artifacts.",
+        "GitHub license is NOASSERTION. Do not summarize this license as unrestricted standard AGPL or resolve its conflicting labels on behalf of the licensor.",
+        "Public source and paid Enterprise feature claims must be kept separate; no GUI, feed, model or trading capability was executed."
+      ],
+      "sources": [
+        "https://github.com/Fincept-Corporation/FinceptTerminal/blob/ec88590aa6e9c3ee76504a7571bcb1fcb2e1398e/README.md",
+        "https://github.com/Fincept-Corporation/FinceptTerminal/blob/v4.5.0/LICENSE",
+        "https://github.com/Fincept-Corporation/FinceptTerminal/blob/v4.5.0/setup.sh",
+        "https://github.com/Fincept-Corporation/FinceptTerminal/releases/tag/v4.5.0"
+      ]
+    }
+  ]
+}
