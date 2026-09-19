@@ -104,6 +104,8 @@ def pointer(document, value):
 
 def identity(value):
     require(isinstance(value, str), "repository must be text")
+    require(not any(char.isspace() or ord(char) < 32 or 127 <= ord(char) <= 159
+                    for char in value), "repository must not contain whitespace or control characters")
     if "://" in value:
         try:
             parsed = urlsplit(value)
@@ -190,7 +192,7 @@ def build_index(root: Path, sources=None):
                 record["record_types"].append(kind)
             record["public_star"] |= kind == "public_star"
             reference = {"kind": kind, "path": path, "pointer": f"{spec['collection']}/{number}"}
-            for field in ("id", "decision", "disposition", "review_level", "review_depth", "evidence_level"):
+            for field in ("id", "decision", "disposition", "review_level", "review_depth", "evidence_depth", "evidence_level"):
                 if isinstance(entry.get(field), str):
                     reference[field] = entry[field]
             record["references"].append(reference)

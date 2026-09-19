@@ -7,9 +7,12 @@ A current, evidence-backed reference for native **Codex + Claude Code**, with sc
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
 and an auditable **337-star coverage ledger**. Its combined index includes
-**453 repository identities** across all 337 public stars and 116 beyond them,
-with explicit review depth and adoption decisions.
-Start with the [north-star architecture](blueprints/us-equities/north-star.md)
+**479 repository identities** across all 337 public stars and 142 beyond them,
+with typed, validated pointers to decisions and evidence. The latest
+[architecture research wave](catalogs/us-equities/architecture/README.md) adds
+source reviews, awesome-list coverage and official Alpaca constraints.
+Start with the [current roles and architecture](blueprints/us-equities/architecture/README.md),
+[north-star architecture](blueprints/us-equities/north-star.md)
 and [native commands with direct results](catalogs/us-equities/native-workflows.md).
 
 The [complete star audit](catalogs/us-equities/star-audit.md) records every starred repository; the [latest gap-resolution ledger](blueprints/us-equities/gap-resolution.md) links the new runtime proofs. The earlier [coverage audit](docs/convergence-audit.md) distinguishes the full starred-list metadata refresh from individual repository decisions and local execution, and records newly found research leads outside the original comparison.

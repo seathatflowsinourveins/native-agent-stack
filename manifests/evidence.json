@@ -495,6 +495,28 @@
         "Structural numeric/citation/scope checks passed, but Claude identified wording/citation weaknesses in Astra's narrative. Model output is not treated as authoritative strategy or financial advice.",
         "New hosts must recreate selected runtime prerequisites and native sign-in; historical receipts do not transfer live acceptance."
       ]
+    },
+    {
+      "path": "blueprints/us-equities/architecture/receipt.json",
+      "id": "native-architecture-review-20260919",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "opentelemetry-collector-contrib",
+        "prometheus",
+        "loki"
+      ],
+      "claim": "Native GPT-6 Astra and Claude Opus 5 independently reviewed the same bounded twelve-fact architecture packet, returned structurally checked source-ID-linked critiques without model tool calls, and their usage reconciled to local monitoring.",
+      "limitations": [
+        "The models reviewed supplied evidence and did not independently inspect primary sources. Their critiques are advisory and were adjudicated; agreement does not establish correctness or trading performance.",
+        "This is a native architecture-review task, not another LEAN/Dagu backtest run, full MCP/RAG acceptance, broker integration, hosted deployment or universal SOTA census.",
+        "The44,214 combined native reported tokens exclude coordinator and source-research workers. They are usage, not causal tokens saved or a billing measurement across identical tokenizers.",
+        "Astra cached input is included in input and reasoning output in output. Claude thinking is included in output; duplicate per-model/iteration/stream views are not added again.",
+        "Native model selection and terminal usage are not independent provider attestation. Full account/session/process identifiers and raw event streams remain private.",
+        "The offline Alpaca observation detects synthetic field loss only; no client/network/order, valid advanced-order fixture, entitlement or execution adapter was tested.",
+        "New machines must reproduce their own selected native profile and sign-in; these local WSL receipts do not establish macOS or unattended-host acceptance."
+      ]
     }
   ],
   "files": [
@@ -515,8 +537,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "eeaaa3129aba892438af99114f1dc9e81e76f9a789da00801afa69689580333a",
-      "bytes": 2464
+      "sha256": "bcd158ff5bcb706d93278d338bbd02cad398432334cbfeee5a408f6a921b6ddd",
+      "bytes": 2878
     },
     {
       "path": "CLAUDE.md",
@@ -530,8 +552,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "517560da4638ff78784a1b88f7f279b083305968ca1e58c8edae2f4f876245a0",
-      "bytes": 9881
+      "sha256": "9b747a98ba096523a4de31fc6584a0f84df599e094cfc323e2e723777e539c16",
+      "bytes": 10130
     },
     {
       "path": "adoption/README.md",
@@ -615,13 +637,63 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "6e7ff644dac9c081eb532ff02b73a9323fa118df2b33e2757e56e73d61fb1881",
-      "bytes": 6560
+      "sha256": "0a08204bc18e5a91e6b02d6d6fc48938c2dbb3132f3e39e931610a5fa99064f9",
+      "bytes": 7358
     },
     {
       "path": "blueprints/us-equities/README.md",
-      "sha256": "d9cac228aaabae1d5566cfaf18c0d9c7dfeb532f8d252c5ca501ea75af3400b2",
-      "bytes": 8026
+      "sha256": "268f4d9e91d250177ed27324ea09e84149ece10a575c4102522b70f7bb26045d",
+      "bytes": 8344
+    },
+    {
+      "path": "blueprints/us-equities/architecture/README.md",
+      "sha256": "d78e85f8117bc870f89f605e0efdfe7fbe376c0499a49d3cc038f1d3f1e62239",
+      "bytes": 13428
+    },
+    {
+      "path": "blueprints/us-equities/architecture/alpaca-probe.json",
+      "sha256": "0644288ca074d609984192c14a031cf93cd2a16a7411e3502dd7f98d412a8e7a",
+      "bytes": 1986
+    },
+    {
+      "path": "blueprints/us-equities/architecture/alpaca_capabilities.py",
+      "sha256": "2fd96921a29ac216464b1a7a03f9de4eba9f1d7600a2764eb2aac4368a1434db",
+      "bytes": 2472
+    },
+    {
+      "path": "blueprints/us-equities/architecture/astra.report.json",
+      "sha256": "6bb9729e1aa5cab5cb19775c8f9c44820925fe685613baf2afd00815d3d9aff8",
+      "bytes": 5185
+    },
+    {
+      "path": "blueprints/us-equities/architecture/claude.report.json",
+      "sha256": "b087f5687fdec25fe05b553d60756cdf5917da9ea467f75473aac4b1f3de5d44",
+      "bytes": 8996
+    },
+    {
+      "path": "blueprints/us-equities/architecture/observation.json",
+      "sha256": "af7df8064e83ec445b258e909c134f774e31f5fce8d47ae63478f631c2c1328b",
+      "bytes": 9631
+    },
+    {
+      "path": "blueprints/us-equities/architecture/receipt.json",
+      "sha256": "6faf3d35c0d57fd957608d0e60c4bb238060580f95a379dfe4e263e137ddef01",
+      "bytes": 4615
+    },
+    {
+      "path": "blueprints/us-equities/architecture/review-adjudication.md",
+      "sha256": "75d93aa0121f173181436d02fa875ad3718904f6371f0ed2fd814cb4b5118d10",
+      "bytes": 3002
+    },
+    {
+      "path": "blueprints/us-equities/architecture/review-packet.json",
+      "sha256": "45035fbe85d5ec6315f639231f8924fd091d82cc5db4413c623b445e52f104b3",
+      "bytes": 6728
+    },
+    {
+      "path": "blueprints/us-equities/architecture/review-prompt.txt",
+      "sha256": "ce5ccf53ffb05a79f6cb86d293f9161e4dd97e1b6cfd7312d948cc5dd34cf9a9",
+      "bytes": 6997
     },
     {
       "path": "blueprints/us-equities/convergence-review/README.md",
@@ -940,8 +1012,8 @@
     },
     {
       "path": "blueprints/us-equities/north-star.md",
-      "sha256": "19ccc73438955a78fb0c6a9ddb17c0b6e7c7aed5987890abbfb5fdfcb4cb9092",
-      "bytes": 9701
+      "sha256": "265b1f61a7697260ce2c117977339e9ed2a343c0d7c052543e5aad48af58f95b",
+      "bytes": 10040
     },
     {
       "path": "blueprints/us-equities/research-runtime/README.md",
@@ -1155,8 +1227,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "93205f1dd052444ac885cd7242cd54b894360efd95b145a20d804b96cb842480",
-      "bytes": 9190
+      "sha256": "947f3d30214fb24f6208a69aa7b667765711651aa4735a2554003347de72b575",
+      "bytes": 9799
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -1165,23 +1237,68 @@
     },
     {
       "path": "catalogs/us-equities/agents-operations.md",
-      "sha256": "c59dee9872e258985d893842d2bb1c0524f192274d37b506680128dbf404f80c",
-      "bytes": 26314
+      "sha256": "da3319fdd04dc6c6ee41a092f18f179ce3ff2b3c281999b4908de8f05de1c097",
+      "bytes": 26472
+    },
+    {
+      "path": "catalogs/us-equities/architecture/README.md",
+      "sha256": "195f642f0c217827c5b7d296416f0778212486cd192a27e519bf89fa6e81d633",
+      "bytes": 6518
+    },
+    {
+      "path": "catalogs/us-equities/architecture/alpaca-organization.json",
+      "sha256": "ee70c0e03b34060b1b8f0180d1af109e62631996507022dae3d59bbc84921f60",
+      "bytes": 39802
+    },
+    {
+      "path": "catalogs/us-equities/architecture/alpaca.json",
+      "sha256": "5b8630bdcf2fb0586320bcbe04226ac9f96bc1d776101d96c0cd88a3cce9b3d0",
+      "bytes": 5891
+    },
+    {
+      "path": "catalogs/us-equities/architecture/coverage-accounting.json",
+      "sha256": "a709d80b24552d54d7fa32e7b92d9281a4111b7745d6ff29677658a0555c4eda",
+      "bytes": 29503
+    },
+    {
+      "path": "catalogs/us-equities/architecture/coverage.json",
+      "sha256": "bc02fbe14cdd0a36075443eed99397801fa8388f7af0ca6dd8c54f93417172e1",
+      "bytes": 34648
+    },
+    {
+      "path": "catalogs/us-equities/architecture/foundation-sources.json",
+      "sha256": "7c7fb03c461b2fc0b34e9fff68a0c839302455f5968b3de28db4293529367d52",
+      "bytes": 25914
+    },
+    {
+      "path": "catalogs/us-equities/architecture/foundation.json",
+      "sha256": "9a3e091d43bbfee1267483131dd967502b87161da64a3a35c259d85e14bbd59b",
+      "bytes": 66622
+    },
+    {
+      "path": "catalogs/us-equities/architecture/trading-sources.json",
+      "sha256": "21ec8c13905947c186c5aab55d71fab582fb6fb4ee58402d9c1cd606efd2ea7a",
+      "bytes": 38284
+    },
+    {
+      "path": "catalogs/us-equities/architecture/trading.json",
+      "sha256": "26dd4e0882823e3537922fa495e46dd518ad2b627a6db41962e7fa09d63ecedf",
+      "bytes": 69055
     },
     {
       "path": "catalogs/us-equities/convergence-review.json",
-      "sha256": "6d56781aaac17911e968aca2d360a20a89a22ed77ed45913bb6fc872ef7f656a",
-      "bytes": 5097
+      "sha256": "a22dcc322d34510ea4cf3b4724e5bed7f563f15c1ea225b3de1eeb0ca2be602c",
+      "bytes": 7019
     },
     {
       "path": "catalogs/us-equities/convergence-review.md",
-      "sha256": "a94beb8cd1416b7cfd2bea0259b43803138464acb0377c7c7b674a12e6b99b3f",
-      "bytes": 8522
+      "sha256": "6cb0234181d22b22adfa768adb98a6f7e0d346f7606318cd9287f330c4e0f334",
+      "bytes": 8740
     },
     {
       "path": "catalogs/us-equities/coverage.json",
-      "sha256": "e0afeb6e680f5f82b77510576b1f2c94488e9ccd90f090bf68579855b0690b95",
-      "bytes": 81724
+      "sha256": "ce18ee24fa9074c8995dd41bd1f786f6687759c5ebc1d6fbf41d6a1f52710db0",
+      "bytes": 81820
     },
     {
       "path": "catalogs/us-equities/data-evaluation-followup.json",
@@ -1200,8 +1317,13 @@
     },
     {
       "path": "catalogs/us-equities/data-research.md",
-      "sha256": "95cd49b54d658ead130400f9e16cd220022950182e3f1b072f680052711040d3",
-      "bytes": 22772
+      "sha256": "a3c5be071059f5452694549acb21fdd911b6728e4e78bb5d92a3c1754847c831",
+      "bytes": 22880
+    },
+    {
+      "path": "catalogs/us-equities/decision-index.json",
+      "sha256": "da024dd7d137599f921f9aa6fff6af3f775eb8d40b53ca52b189abf8a803e9f1",
+      "bytes": 345659
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -1235,8 +1357,8 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "327c87eff736512c9591259e0b7caabd1ef73640770bb83f9eac5fbdcef8ec40",
-      "bytes": 1864
+      "sha256": "17a504b563d6f85e3a42870f0558bf5efdd2f702e2ae0282a518b9df2653a4a1",
+      "bytes": 1933
     },
     {
       "path": "catalogs/us-equities/model-followup.json",
@@ -1265,8 +1387,8 @@
     },
     {
       "path": "catalogs/us-equities/repository-index.md",
-      "sha256": "33407b72602d33e350515880f23843abf56c96b393ba6075098b8d1a1c053b5e",
-      "bytes": 84180
+      "sha256": "54b6308af96861caaf297c851e4ace705ae3f878194c2f493435895ef5ce791a",
+      "bytes": 86010
     },
     {
       "path": "catalogs/us-equities/research-receipt.json",
@@ -1560,8 +1682,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "892c51e31fe79ab9891d71ab3340b8a64915e792358d4cfdb4f91a00e2ed2bfc",
-      "bytes": 42229
+      "sha256": "d3f4071c0d577568ed2fd63416cb64a5d4f4754ddd46746b14ef6f89b89f61ca",
+      "bytes": 42464
     },
     {
       "path": "observability/README.md",
@@ -1704,6 +1826,11 @@
       "bytes": 11297
     },
     {
+      "path": "scripts/catalog_decisions.py",
+      "sha256": "af621796e0c11888b7fa90ff13c9266e350416c924a4b6848ed995ca38faa552",
+      "bytes": 13435
+    },
+    {
       "path": "scripts/recount-tokens.cjs",
       "sha256": "8f5749fb447e508e0a9a6b52ce61fad195a4f9cdcc6407726a677622cb9f5837",
       "bytes": 1634
@@ -1715,8 +1842,8 @@
     },
     {
       "path": "scripts/validate_catalogs.py",
-      "sha256": "c2f40c774e567f464ea7e5fb779452f8f3ad0e840ba53266dcf605f4c8349750",
-      "bytes": 24201
+      "sha256": "9c02daa402a3a89fe6278992eca752ac2b56d888fe91909b96556ca60f966f6b",
+      "bytes": 24776
     },
     {
       "path": "tests/__init__.py",
@@ -1732,6 +1859,16 @@
       "path": "tests/test_adoption_status.py",
       "sha256": "6decac3f2b0a9e752ecfe662c1e32e8790efb8cd60965eeeb103c2388886084a",
       "bytes": 9430
+    },
+    {
+      "path": "tests/test_alpaca_capabilities.py",
+      "sha256": "caf5811788334b0aab5adb5041598cba7ddf4cd10de9d8aeebd706d2b4dd5721",
+      "bytes": 1036
+    },
+    {
+      "path": "tests/test_catalog_decisions.py",
+      "sha256": "e24efa328daf0a3536ee8416bcf5c1ac406e207202f559c3ad5ca11155e4110e",
+      "bytes": 9953
     },
     {
       "path": "tests/test_catalogs.py",

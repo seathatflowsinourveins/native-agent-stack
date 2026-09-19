@@ -1,0 +1,1195 @@
+{
+  "schema_version": 1,
+  "kind": "architecture_foundation_research",
+  "checked_at": "2026-09-19",
+  "base_commit": "a9f40f21a26819cc8fdf109b1b36e2867d792c08",
+  "scope": {
+    "shortlisted_repositories": 15,
+    "discovery_lists": 4,
+    "selected_source_files": 76,
+    "waves": [
+      {
+        "number": 1,
+        "focus": "Refresh selected accepted foundation, native Codex and orchestration alternatives",
+        "repositories": [
+          "mksglu/context-mode",
+          "akitaonrails/ai-memory",
+          "tobi/qmd",
+          "giancarloerra/SocratiCode",
+          "dagucloud/dagu",
+          "temporalio/temporal",
+          "bytedance/deer-flow",
+          "openai/codex"
+        ]
+      },
+      {
+        "number": 2,
+        "focus": "Compare programmable Claude, graph/harness/memory overlap, and macOS versus Linux runtime boundaries",
+        "repositories": [
+          "anthropics/claude-agent-sdk-python",
+          "langchain-ai/langgraph",
+          "OpenHands/OpenHands",
+          "mem0ai/mem0",
+          "ml-explore/mlx-lm",
+          "vllm-project/vllm",
+          "lima-vm/lima"
+        ]
+      }
+    ],
+    "not_claimed": [
+      "Exhaustive landscape or universal SOTA ranking",
+      "A fresh full-star refresh in this lane",
+      "Installation or inference acceptance of inspected main branches",
+      "macOS or remote-host E2E",
+      "Measured whole-task token savings",
+      "Production trading or automatic strategy promotion"
+    ]
+  },
+  "method": {
+    "discovery": "Community lists only nominate leads. Decisions use selected primary repository implementation, config, test and license sources at immutable commits plus publisher package metadata.",
+    "evidence_depth": "Read-only source/release/package research. Source presence and CI workflow definitions are not an executed or passing CI run.",
+    "execution": {
+      "model_calls": 0,
+      "installs": 0,
+      "active_config_changes": 0,
+      "orders": 0,
+      "paid_resources": 0,
+      "runtime_service_calls": 0
+    },
+    "source_manifest": "source-manifest.json",
+    "native_read_templates": [
+      "gh api \"repos/$REPO\"",
+      "gh api \"repos/$REPO/commits/$BRANCH\"",
+      "gh api \"repos/$REPO/releases/latest\"",
+      "gh api \"repos/$REPO/releases?per_page=50\"",
+      "gh api \"repos/$REPO/git/trees/$COMMIT?recursive=1\"",
+      "gh api \"repos/$REPO/contents/$SELECTED_FILE?ref=$COMMIT\"",
+      "gh api -H \"Accept: application/vnd.github.raw+json\" \"repos/$REPO/contents/$SELECTED_FILE?ref=$COMMIT\""
+    ],
+    "package_metadata": "Read selected https://pypi.org/pypi/<package>/json publisher endpoints without installing or downloading distributions.",
+    "unverified": "Release asset checksums/signatures, dependency vulnerability databases and current CI execution outcomes were not checked by this lane.",
+    "source_lookup": "Each repository's selected_source_paths resolves in source-manifest.json by repository and path; that manifest retains exact source URL, byte length and SHA-256. The record's reviewed_source commit pins every selected path."
+  },
+  "discovery_lists": [
+    {
+      "repository": "punkpeye/awesome-mcp-servers",
+      "commit": "393b4e9fafb0348e5a1c2a4ef5a8719b0d85e061",
+      "committed_at": "2026-09-15T23:17:38Z",
+      "source": {
+        "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/393b4e9fafb0348e5a1c2a4ef5a8719b0d85e061/README.md",
+        "sha256": "9b6a1ee410fde8132c92444f15cc153c2d6c4866dd74c4ac8b428981d49f777c"
+      },
+      "leads": [
+        "mem0ai/mem0-mcp",
+        "topoteretes/cognee"
+      ],
+      "outcome": "Read selected memory/context entries at the pinned revision. Mem0 led to direct core-repository comparison; Cognee remains a discovery-only alternative, with no new quality or installation claim.",
+      "quality_status": "discovery_only"
+    },
+    {
+      "repository": "e2b-dev/awesome-ai-agents",
+      "commit": "9596ab1e69fbbb6c95291141c8dab5c181083216",
+      "committed_at": "2026-08-21T18:52:43Z",
+      "source": {
+        "url": "https://github.com/e2b-dev/awesome-ai-agents/blob/9596ab1e69fbbb6c95291141c8dab5c181083216/README.md",
+        "sha256": "db062c798654c5f6dec1ddedf7ab823c70d11d2f66ccf2a7036171f1e5b6eaa8"
+      },
+      "leads": [
+        "reworkd/AgentGPT",
+        "AutoGPT-related entries"
+      ],
+      "outcome": "The selected entries are broad agent wrappers rather than a demonstrated missing responsibility in this stack. No runtime was promoted from this list.",
+      "quality_status": "discovery_only"
+    },
+    {
+      "repository": "Shubhamsaboo/awesome-llm-apps",
+      "commit": "22a91e2a64bee40277477988d5ac5e786555cf01",
+      "committed_at": "2026-09-19T07:54:25Z",
+      "source": {
+        "url": "https://github.com/Shubhamsaboo/awesome-llm-apps/blob/22a91e2a64bee40277477988d5ac5e786555cf01/README.md",
+        "sha256": "c285c86867fb3ea9d66bdf0ee9d89d5ade747ce64d1181df86bf038898393ef3"
+      },
+      "leads": [
+        "LangGraph examples",
+        "Headroom context optimization example",
+        "self-improving agent skill examples"
+      ],
+      "outcome": "Used for architectural discovery only. Example cost-reduction claims were not adopted as this stack's token-savings evidence; skill-generated changes need review and held-out evaluation.",
+      "quality_status": "discovery_only"
+    },
+    {
+      "repository": "kyrolabs/awesome-langchain",
+      "commit": "9796b1d50c20c65cccbf4ccd2dc1497a8b15cd79",
+      "committed_at": "2026-08-11T04:36:21Z",
+      "source": {
+        "url": "https://github.com/kyrolabs/awesome-langchain/blob/9796b1d50c20c65cccbf4ccd2dc1497a8b15cd79/README.md",
+        "sha256": "9e7ffc1279740d0121ae8bfeadf8a4e4750f4eca2a7fa5d6346c8aa1144eb0db"
+      },
+      "leads": [
+        "mem0ai/mem0",
+        "cloudwego/eino"
+      ],
+      "outcome": "Mem0 received direct source review. Eino is a discovery-only Go-framework alternative and is not added beside the current Python/native stack.",
+      "quality_status": "discovery_only"
+    }
+  ],
+  "recommendation": {
+    "summary": "Converge on clear responsibility boundaries and host-specific acceptance rather than a larger stack. Preserve native Codex/Claude workers, scoped Context Mode/QMD/SocratiCode retrieval, ai-memory durable knowledge and the existing Dagu pipeline. Keep DeerFlow optional; do not add standalone LangGraph, OpenHands and Mem0 as parallel defaults.",
+    "next_architectural_moves": [
+      {
+        "priority": 1,
+        "move": "Define and verify three small worker capability profiles",
+        "detail": "Prepared-packet reviewer: bounded immutable evidence and no ambient tools. Retrieval worker: only selected project QMD/SocratiCode/ai-memory read capabilities. Coding worker: isolated workspace plus selected execution tools and hooks. Share a small stable policy prefix; send task-specific evidence by selected IDs/files. Do not inject the entire catalog, session archive or skill inventory into every worker.",
+        "acceptance": "For each profile record actual launched binary, settings/account scope, exposed tools, discovered skills/MCPs, relevant hook events, exact input packet hash, outputs, latency and complete provider usage. A zero-tool packet worker can be fully accepted for its role without pretending every installed MCP is loaded.",
+        "implementation_status": "recommendation; no changes in this lane"
+      },
+      {
+        "priority": 2,
+        "move": "Make learning and strategy promotion separate state transitions",
+        "detail": "Keep automatic capture distinct from durable write approval. Upstream ai-memory now documents automatic proposal approval when its LLM reviewer is configured; use the canonical project's explicit-write rule, require_approval=true where reviewed learning is authorized, and disable its scheduler where automatic review is not selected. Scope lessons by project, evidence date and expiry; never grant a retrieved note authority over instructions or execution.",
+        "acceptance": "Disposable cross-client tests must reject wrong-project, expired, contradicted and instruction-like entries and keep rejected proposals auditable. Any strategy change needs versioned data, chronological held-out evaluation, risk-policy review and a separate paper/live promotion process outside the memory system.",
+        "implementation_status": "recommendation; active memory configuration was not inspected or changed"
+      },
+      {
+        "priority": 3,
+        "move": "Separate developer hosts from the eventual continuous execution host",
+        "detail": "macOS and WSL are client/development profiles. A dedicated always-on Linux profile is the preferred candidate for continuous data, deterministic engines and hosted workers. Select one orchestration owner; prove Dagu recovery first, consider Temporal only for a concrete unmet durability requirement. Native logins, GPU backends and OS sandboxing remain host-specific.",
+        "acceptance": "Before claiming unattended hosting, verify reboot/interruption recovery, duplicate suppression, bounded concurrency/resources, cancellation, clock/feed freshness, off-host restore and the authorized alert destination. The current local snapshot restores and seven healthy scrape targets do not establish those properties.",
+        "implementation_status": "source-reviewed architecture only; no host provisioned"
+      },
+      {
+        "priority": 4,
+        "move": "Measure architecture efficiency with equivalent tasks",
+        "detail": "Preserve native prefix caching, deferred tool discovery and selective retrieval. Count all worker turns, failures/retries and memory/extraction/embedding overhead. Use the same task, model, data and acceptance criteria for baseline and candidate; record cold/warm cache conditions and quality together with latency.",
+        "acceptance": "Report artifact bytes/tokens, estimated Context Mode counters, cache categories and total provider tokens as distinct measurements. Cached input is a subset for Codex; thinking is already included in Claude output. Historical paired totals establish usage visibility, not a counterfactual saving.",
+        "implementation_status": "evaluation design; no new token-savings experiment"
+      },
+      {
+        "priority": 5,
+        "move": "Adopt macOS acceleration only when a workload requires it",
+        "detail": "Native MLX is a candidate for local Apple Silicon generation. vLLM's Apple path is a separate community Metal/MLX plugin. Use Lima only for specific Linux-tooling needs; do not assume GPU passthrough or move the existing vector index across incompatible embeddings.",
+        "acceptance": "On the actual Mac record OS/chip/RAM, exact model revision and quantization, API/pooling/dimensions, quality, latency, memory and restart behavior. No macOS pass is inferred from upstream CI or package availability.",
+        "implementation_status": "source review only"
+      }
+    ]
+  },
+  "platform_profiles": {
+    "macos": {
+      "role": "Native development/client host; optional Apple Silicon local inference.",
+      "selected_path": "Native Codex/Claude plus pinned Python tooling, Context Mode, ai-memory and scoped QMD; select a Mac-compatible local code embedding backend only after acceptance.",
+      "optional": "MLX for generation; Lima for a concrete Linux-only development requirement.",
+      "status": "Source support reviewed; no hardware/OS/client/account/MCP/model/daemon acceptance on macOS."
+    },
+    "wsl": {
+      "role": "Existing development/research host with historical native paired-model, retrieval, observation and local-recovery receipts.",
+      "selected_path": "Retain known-good vLLM 0.25.0 embedding compatibility and explicit native SDK CLI binding; keep Windows Desktop configuration separate from native Linux account/config state.",
+      "status": "Historical accepted scope only; this research did not run live checks and does not prove continuity through sleep, reboot or an internet outage."
+    },
+    "always_on_linux": {
+      "role": "Prospective continuous data and deterministic engine host, with bounded model research workers.",
+      "selected_path": "Dedicated identities and state, one workflow owner, native application snapshots plus independent recovery, restricted ingress/egress, explicit resource policy and per-run observation.",
+      "status": "Architecture recommendation; no host, paid resources, commercial account entitlement or broker permissions created."
+    }
+  },
+  "key_freshness_findings": [
+    "Accepted native Codex CLI 0.155.1 is already the latest observed GitHub stable; openai-codex 0.154.0 is the separately locked Python package with an intentional explicit native binary override.",
+    "Claude Agent SDK publisher package is 0.2.157 while GitHub releases/latest returns v0.2.156; latest is component/channel-specific.",
+    "LangGraph releases/latest selects SDK 0.4.4, while core Python package/latest reviewed core tag is 1.2.11.",
+    "Mem0 releases/latest selects an OpenClaw plugin tag; the compared Python package is mem0ai 2.1.0.",
+    "DeerFlow stable release v2.0.0 differs from inspected backend main 2.1.0-rc0; current-main features are not automatically accepted stable features.",
+    "OpenHands README's Node 22.12+ prerequisite conflicts with package.json >=24; resolve exact package metadata before installation.",
+    "Latest vLLM 0.29.0 does not supersede the known-good 0.25.0 WSL embedding pin after the recorded startup failure.",
+    "Recent repository commits are not the same as a recent stable package release; MLX-LM stable remains 0.31.3."
+  ],
+  "official_documentation": [
+    {
+      "url": "https://learn.chatgpt.com/docs/codex-sdk",
+      "topic": "Official Codex Python SDK drives the local app-server; installed package and selected native binary are separate concerns.",
+      "reviewed": true
+    },
+    {
+      "url": "https://code.claude.com/docs/en/agent-sdk/overview",
+      "topic": "SDK/CLI versus Managed Agents and service entitlement distinction.",
+      "reviewed": true
+    },
+    {
+      "url": "https://code.claude.com/docs/en/agent-sdk/tool-search",
+      "topic": "Deferred discovery loads selected tool schemas on demand; preserve this capability instead of front-loading all schemas.",
+      "reviewed": true
+    },
+    {
+      "url": "https://docs.langchain.com/oss/python/langgraph/persistence",
+      "topic": "Thread checkpointers differ from cross-thread stores; in-memory persistence is lost on process restart.",
+      "reviewed": true
+    },
+    {
+      "url": "https://docs.temporal.io/cli/command-reference/server",
+      "topic": "start-dev with a database file is still a development server and skips production security checks.",
+      "reviewed": true
+    }
+  ],
+  "repositories": [
+    {
+      "repository": "mksglu/context-mode",
+      "url": "https://github.com/mksglu/context-mode",
+      "wave": 1,
+      "layer": "context-output boundary and indexed tool results",
+      "decision": "retain",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "5283a70780305994433cb65d6a0275386e797172",
+        "committed_at": "2026-09-19T12:05:40Z"
+      },
+      "latest_github_release": {
+        "tag": "v1.0.169",
+        "published_at": "2026-06-29T18:18:53Z",
+        "prerelease": false,
+        "url": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169"
+      },
+      "publisher_package": null,
+      "source_license": "Elastic-2.0",
+      "adopted_pin": {
+        "component_id": "context-mode",
+        "version": "1.0.169",
+        "evidence_ids": [
+          "native-context-memory",
+          "artifact-reductions",
+          "component-history",
+          "native-observability-followup",
+          "desktop-restart-acceptance"
+        ]
+      },
+      "quality_dimensions": {
+        "architecture_fit": "Keep raw large outputs outside model context and retrieve bounded answers; choose this or another artifact filter for a given output, not serial compression.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-19T12:05:41Z"
+        },
+        "test_and_source_evidence": "Current main includes project-containment regression tests and a Linux/macOS/Windows CI matrix. The CI script interprets test output to tolerate native worker teardown failures; no current CI run was checked.",
+        "security_and_dependency_boundary": "Elastic-2.0 source license is distinct from hosted-service permission. The inspected main revision is newer than release v1.0.169; current source guards cannot be assumed present in the installed artifact merely because the version matches."
+      },
+      "platform_matrix": {
+        "macos": "Upstream CI/source support; this host was not tested.",
+        "wsl": "Historical native plugin/hook/direct-tool acceptance in this stack; no new lifecycle run here.",
+        "linux_host": "Native runtime is plausible; host sandbox, client hook protocol and project containment require host-specific acceptance."
+      },
+      "acceptance_gate": "At the selected installed revision, verify project-path containment, each enabled client hook, raw-output recovery, and one bounded retrieval task. Trigger PreCompact before claiming that hook works. Measure retained context separately from provider usage.",
+      "upstream_workflows": [
+        {
+          "command": "mcporter --config \"$MCPORTER_CONFIG\" call context-mode.ctx_doctor --args '{}' --output text --no-oauth",
+          "purpose": "Existing stack bridge to upstream diagnostics; diagnostics are not complete inference acceptance.",
+          "source": "manifests/stack.json",
+          "execution": "not_executed_in_this_research"
+        },
+        {
+          "command": "ctx stats",
+          "purpose": "Native Codex in-chat estimated Context Mode counters; not a shell command or billing measurement.",
+          "source": "https://github.com/mksglu/context-mode",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "src/security.ts",
+        "tests/security/project-boundary-852.test.ts",
+        ".github/workflows/ci.yml"
+      ]
+    },
+    {
+      "repository": "akitaonrails/ai-memory",
+      "url": "https://github.com/akitaonrails/ai-memory",
+      "wave": 1,
+      "layer": "cross-client durable knowledge and handoffs",
+      "decision": "retain",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52",
+        "committed_at": "2026-09-19T18:42:42Z"
+      },
+      "latest_github_release": {
+        "tag": "v2.3.1",
+        "published_at": "2026-09-17T18:26:44Z",
+        "prerelease": false,
+        "url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.1"
+      },
+      "publisher_package": null,
+      "source_license": "MIT",
+      "adopted_pin": {
+        "component_id": "ai-memory",
+        "version": "2.3.1",
+        "evidence_ids": [
+          "native-memory",
+          "desktop-direct-rag",
+          "component-history",
+          "native-observability-followup",
+          "ai-memory-native-state-recovery-20260919"
+        ]
+      },
+      "quality_dimensions": {
+        "architecture_fit": "Keep a single scoped durable memory of record, backed by provenance, temporal validity and reversible wiki history. Retrieve only relevant entries into a worker.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-19T19:32:44Z"
+        },
+        "test_and_source_evidence": "Current source separates read-only proposal review from staging/apply; security documentation and CI definitions were inspected, including conditional macOS coverage.",
+        "security_and_dependency_boundary": "Current main auto-improvement documentation defaults validated proposals to auto-approval when an LLM/scheduler is configured; zero-LLM installations do not run that reviewer. This review did not inspect or change active configuration and does not establish that automatic review is enabled locally."
+      },
+      "platform_matrix": {
+        "macos": "Explicit native upstream support; fresh host acceptance absent.",
+        "wsl": "Historical scoped memory and isolated recovery acceptance; current source review only.",
+        "linux_host": "Supported native server; app-consistent backups, scoped auth and an explicit knowledge-promotion policy remain required."
+      },
+      "acceptance_gate": "Use an isolated fixture to verify project isolation, provenance, expiry, contradiction handling, failed/rejected proposals and recovery. For reviewed learning use [auto_improve] require_approval=true; disabling automatic review is [auto_improve.scheduler] enabled=false. Canonical project rules still govern writes. No automatic strategy, risk-limit or order-policy promotion.",
+      "upstream_workflows": [
+        {
+          "command": "ai-memory pending-writes list",
+          "purpose": "Inspect native proposal states without treating staged sidecars as applied facts.",
+          "source": "https://github.com/akitaonrails/ai-memory/blob/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/docs/auto-improvement-loop.md",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "SECURITY.md",
+        "docs/auto-improvement-loop.md",
+        "crates/ai-memory-consolidate/src/auto_improve.rs",
+        ".github/workflows/ci.yml"
+      ]
+    },
+    {
+      "repository": "tobi/qmd",
+      "url": "https://github.com/tobi/qmd",
+      "wave": 1,
+      "layer": "scoped document retrieval",
+      "decision": "retain",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+        "committed_at": "2026-09-09T20:51:54Z"
+      },
+      "latest_github_release": {
+        "tag": "v2.8.3",
+        "published_at": "2026-08-16T22:30:34Z",
+        "prerelease": false,
+        "url": "https://github.com/tobi/qmd/releases/tag/v2.8.3"
+      },
+      "publisher_package": null,
+      "source_license": "MIT",
+      "adopted_pin": {
+        "component_id": "qmd",
+        "version": "2.8.3",
+        "evidence_ids": [
+          "native-cli-gaps",
+          "component-history",
+          "desktop-cli-workflows",
+          "qmd-bm25-retrieval-20260919"
+        ]
+      },
+      "quality_dimensions": {
+        "architecture_fit": "Use lexical search/get as the low-overhead first retrieval path; hybrid expansion and reranking are conditional on a held-out quality and latency gain.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-09T20:51:56Z"
+        },
+        "test_and_source_evidence": "Source includes BM25/vector/RRF/reranking paths; CI defines Linux/macOS SQLite setup and Bun tests. The existing frozen retrieval receipt remains historical evidence, not a new test here.",
+        "security_and_dependency_boundary": "An index's full FTS corpus influences BM25 statistics even when results are collection-filtered. Project trust controls and index/model scope must be preserved; retrieval quality does not follow from installation."
+      },
+      "platform_matrix": {
+        "macos": "Native source and CI support, with SQLite extension setup; not tested on a Mac here.",
+        "wsl": "Historical BM25 evaluation and scoped search/get; no new index writes.",
+        "linux_host": "Suitable for selected documentation corpora; model-based query modes add their own runtime and resource requirements."
+      },
+      "acceptance_gate": "Keep full corpus and eligible-result manifests, exact revisions and queries. Evaluate a new held-out set with zero-result failures retained before adopting query expansion or reranking.",
+      "upstream_workflows": [
+        {
+          "command": "qmd --index \"$QMD_INDEX\" search \"$QUERY\" -c \"$QMD_COLLECTION\" -n 5 --json",
+          "purpose": "Bounded lexical retrieval from the explicitly selected collection.",
+          "source": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/README.md",
+          "execution": "not_executed_in_this_research"
+        },
+        {
+          "command": "qmd --index \"$QMD_INDEX\" get \"$DOCUMENT_ID\"",
+          "purpose": "Fetch only a selected result.",
+          "source": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/README.md",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "src/store.ts",
+        ".github/workflows/ci.yml"
+      ]
+    },
+    {
+      "repository": "giancarloerra/SocratiCode",
+      "url": "https://github.com/giancarloerra/SocratiCode",
+      "wave": 1,
+      "layer": "incremental semantic code retrieval and code graph",
+      "decision": "retain",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "b67f1328ff52ca869f642bb6b068bb0d3f2c3646",
+        "committed_at": "2026-09-17T19:14:39Z"
+      },
+      "latest_github_release": {
+        "tag": "v1.14.0",
+        "published_at": "2026-09-16T14:26:47Z",
+        "prerelease": false,
+        "url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.14.0"
+      },
+      "publisher_package": null,
+      "source_license": "AGPL-3.0",
+      "adopted_pin": {
+        "component_id": "socraticode",
+        "version": "1.14.0",
+        "evidence_ids": [
+          "native-rag",
+          "desktop-direct-rag",
+          "artifact-reductions",
+          "component-history",
+          "vllm-compatibility",
+          "native-observability-followup"
+        ]
+      },
+      "quality_dimensions": {
+        "architecture_fit": "Use for conceptual code questions and automatic incremental updates in explicitly adopted projects; exact identifiers still fit rg and symbol tools.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-17T19:14:39Z"
+        },
+        "test_and_source_evidence": "Inspected recovery tests cover removed chunks, shared project identity across worktrees and leaving a healthy completed index unchanged. Current README documents batched checkpointing and watcher catch-up.",
+        "security_and_dependency_boundary": "AGPL-3.0 source with a commercial alternative; avoid assuming an arbitrary hosted distribution has the same obligations as local use. Embedding model/revision, normalization and dimensions are part of index compatibility."
+      },
+      "platform_matrix": {
+        "macos": "Upstream recommends a native embedding runtime for GPU acceleration rather than assuming Docker Metal passthrough; no Mac acceptance.",
+        "wsl": "Historical native Qdrant/vLLM-backed retrieval accepted on the selected embedding profile.",
+        "linux_host": "Native embedding and Qdrant services fit an always-on host, with deliberate project/collection and network scope."
+      },
+      "acceptance_gate": "On a disposable collection demonstrate edit/add/delete freshness, interrupted reindex recovery and held-out code retrieval. A new embedding backend requires dimension/pooling/quality comparison and explicit rebuild boundaries.",
+      "upstream_workflows": [
+        {
+          "command": "mcporter --config \"$MCPORTER_CONFIG\" call socraticode.codebase_health --args '{}' --output text --no-oauth",
+          "purpose": "Existing native bridge health check; not retrieval acceptance.",
+          "source": "manifests/stack.json",
+          "execution": "not_executed_in_this_research"
+        },
+        {
+          "command": "mcporter --config \"$MCPORTER_CONFIG\" call socraticode.codebase_search --args \"$SEARCH_ARGS\" --output text --no-oauth",
+          "purpose": "Scoped semantic query after explicit project adoption.",
+          "source": "manifests/stack.json",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "tests/integration/interrupted-resume-recovery.test.ts",
+        ".github/workflows/ci.yml"
+      ]
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "url": "https://github.com/dagucloud/dagu",
+      "wave": 1,
+      "layer": "manual research orchestration and prospective single-host scheduling",
+      "decision": "retain",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "0a8edff8e55c281c2f217ef4383fbf5262138def",
+        "committed_at": "2026-09-19T16:09:41Z"
+      },
+      "latest_github_release": {
+        "tag": "v2.16.6",
+        "published_at": "2026-09-14T14:45:57Z",
+        "prerelease": false,
+        "url": "https://github.com/dagucloud/dagu/releases/tag/v2.16.6"
+      },
+      "publisher_package": null,
+      "source_license": "GPL-3.0",
+      "adopted_pin": {
+        "component_id": "dagu",
+        "version": "2.16.6",
+        "evidence_ids": [
+          "native-research-runtime-20260919",
+          "native-paired-adoption-20260919"
+        ]
+      },
+      "quality_dimensions": {
+        "architecture_fit": "Continue using the existing native YAML pipeline for deterministic preparation and bounded independent model workers; preserve one owner for retries and run state.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-19T16:09:43Z"
+        },
+        "test_and_source_evidence": "Current upstream source includes an explicit worker-crash/failover test and command/runtime CI definitions. Historical local LEAN-to-Astra-to-Claude acceptance is separate.",
+        "security_and_dependency_boundary": "Community self-hosting requires no license key; current README places SSO/RBAC/audit features in its licensed offering. server-only operation is different from start-all, which enables scheduling/coordinator behavior. Upstream failover tests do not establish safe replay of external side effects."
+      },
+      "platform_matrix": {
+        "macos": "Upstream supports native binary; no local macOS scheduling/recovery acceptance.",
+        "wsl": "Historical manual execution accepted; laptop/WSL suspension and reboot continuity remain unproved.",
+        "linux_host": "Preferred next operational profile for continuous workloads, subject to dedicated identity, persistent state, resource limits and interruption/recovery tests."
+      },
+      "acceptance_gate": "Kill/restart a disposable preparation job; verify history and incomplete-artifact handling, bounded concurrency, cancellation, timeouts and duplicate suppression. Keep broker submission outside this research DAG until a separate deterministic idempotency/reconciliation gate passes.",
+      "upstream_workflows": [
+        {
+          "command": "dagu validate --dagu-home \"$RESEARCH_HOME\" \"$DAG\"",
+          "purpose": "Validate selected native DAG.",
+          "source": "manifests/stack.json",
+          "execution": "not_executed_in_this_research"
+        },
+        {
+          "command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id \"$NEW_RUN_ID\" \"$DAG\"",
+          "purpose": "Manual explicitly scoped execution; can consume models only when its authorized DAG does.",
+          "source": "manifests/stack.json",
+          "execution": "not_executed_in_this_research"
+        },
+        {
+          "command": "dagu history --context local --dagu-home \"$RESEARCH_HOME\" --format json",
+          "purpose": "Inspect actual native run history.",
+          "source": "manifests/stack.json",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "ui/e2e/worker-failover.spec.ts",
+        ".github/workflows/ci.yaml"
+      ]
+    },
+    {
+      "repository": "temporalio/temporal",
+      "url": "https://github.com/temporalio/temporal",
+      "wave": 1,
+      "layer": "durable application workflow alternative",
+      "decision": "investigate",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a",
+        "committed_at": "2026-09-19T05:32:51Z"
+      },
+      "latest_github_release": {
+        "tag": "v1.32.0",
+        "published_at": "2026-09-11T16:10:29Z",
+        "prerelease": false,
+        "url": "https://github.com/temporalio/temporal/releases/tag/v1.32.0"
+      },
+      "publisher_package": null,
+      "source_license": "MIT",
+      "adopted_pin": null,
+      "quality_dimensions": {
+        "architecture_fit": "Adopt only when durable multi-process coordination, long waits and recoverable activity state exceed the accepted Dagu pipeline. Do not run both engines as competing owners of the same retry/order state.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-19T12:01:03Z"
+        },
+        "test_and_source_evidence": "The architecture specification requires deterministic, side-effect-free workflow code and idempotent or non-retryable activities; a server test workflow definition was reviewed.",
+        "security_and_dependency_boundary": "Durable workflow execution is not an exactly-once broker action guarantee. The native development server skips security checks and is explicitly not a production deployment."
+      },
+      "platform_matrix": {
+        "macos": "Development client/service path is source-supported; untested here.",
+        "wsl": "Development candidate only; not installed or accepted by this pass.",
+        "linux_host": "Production candidate requires a separately operated service, persistence, upgrades and workers; no cloud subscription or deployment is implied."
+      },
+      "acceptance_gate": "Define one real durability requirement, then prove activity idempotency, replay compatibility, worker termination/restart, cancellation, timeouts, storage restore and version migration using a side-effect-free simulator before migration.",
+      "upstream_workflows": [
+        {
+          "command": "temporal server start-dev --db-filename \"$PRIVATE_DB\" --ip 127.0.0.1",
+          "purpose": "Disposable persistent development server only; not production.",
+          "source": "https://docs.temporal.io/cli/command-reference/server",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "docs/architecture/README.md",
+        ".github/workflows/run-tests.yml"
+      ]
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "url": "https://github.com/bytedance/deer-flow",
+      "wave": 1,
+      "layer": "optional integrated deep-research harness",
+      "decision": "retain",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "aa4e43a2bcc8ffc3838b012c4583f561a0e199be",
+        "committed_at": "2026-09-19T07:09:36Z"
+      },
+      "latest_github_release": {
+        "tag": "v2.0.0",
+        "published_at": "2026-06-25T16:23:22Z",
+        "prerelease": false,
+        "url": "https://github.com/bytedance/deer-flow/releases/tag/v2.0.0"
+      },
+      "publisher_package": null,
+      "source_license": "MIT",
+      "adopted_pin": null,
+      "quality_dimensions": {
+        "architecture_fit": "Retain the existing scoped research/ACP option; use its internal graph and sandbox features only when the integrated research UI/workflow adds value over the prepared native pair.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-19T07:09:37Z"
+        },
+        "test_and_source_evidence": "The current harness explicitly depends on LangGraph and LangChain. Record/replay E2E CI tests the frontend/backend contract without API keys; those replay tests are not native model inference.",
+        "security_and_dependency_boundary": "Latest stable release remains v2.0.0, whereas inspected backend main declares 2.1.0-rc0. Current main documentation/commands must not be silently applied to the older accepted checkout. Do not copy native authentication stores into a hosted sandbox."
+      },
+      "platform_matrix": {
+        "macos": "Current README treats macOS as development/evaluation; native Mac execution untested.",
+        "wsl": "Existing scoped research path is historical; full current-main planner/UI hosting is not accepted.",
+        "linux_host": "Current README recommends Linux plus Docker for persistent hosting. This is a source recommendation, not a provisioned service."
+      },
+      "acceptance_gate": "Pin one release and lock; verify exact planner/tool/sandbox boundaries, persistence after process restart, cancellation, browser/frontend contract, native account route and usage. Keep ai-memory as durable knowledge authority instead of silently duplicating policy in harness memory.",
+      "upstream_workflows": [
+        {
+          "command": "make doctor",
+          "purpose": "Current-main setup diagnosis; verify target exists at the selected release before use.",
+          "source": "https://github.com/bytedance/deer-flow/blob/aa4e43a2bcc8ffc3838b012c4583f561a0e199be/README.md",
+          "execution": "not_executed_in_this_research"
+        },
+        {
+          "command": "make up",
+          "purpose": "Current-main persistent server recipe, conditional on a separately approved configured host; unexecuted.",
+          "source": "https://github.com/bytedance/deer-flow/blob/aa4e43a2bcc8ffc3838b012c4583f561a0e199be/README.md",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "backend/pyproject.toml",
+        "backend/packages/harness/pyproject.toml",
+        ".github/workflows/replay-e2e.yml"
+      ]
+    },
+    {
+      "repository": "openai/codex",
+      "url": "https://github.com/openai/codex",
+      "wave": 1,
+      "layer": "native Codex CLI/app-server Python worker SDK",
+      "decision": "retain",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "5ee2bdf1e0e04064bc427ae31a49a01e8f7064df",
+        "committed_at": "2026-09-19T19:21:35Z"
+      },
+      "latest_github_release": {
+        "tag": "rust-v0.155.1",
+        "published_at": "2026-09-18T20:03:04Z",
+        "prerelease": false,
+        "url": "https://github.com/openai/codex/releases/tag/rust-v0.155.1"
+      },
+      "publisher_package": {
+        "name": "openai-codex",
+        "version": "0.154.0",
+        "requires_python": ">=3.10",
+        "published_at": "2026-09-10T19:51:06.371304Z",
+        "url": "https://pypi.org/pypi/openai-codex/json"
+      },
+      "source_license": "Apache-2.0",
+      "adopted_pin": {
+        "component_id": "codex",
+        "version": "0.155.1",
+        "evidence_ids": [
+          "native-context-memory",
+          "native-memory",
+          "native-rag",
+          "component-history",
+          "desktop-cli-workflows",
+          "native-observability",
+          "native-observability-followup",
+          "desktop-restart-acceptance",
+          "portable-sdk-adoption-20260919",
+          "native-paired-adoption-20260919"
+        ]
+      },
+      "quality_dimensions": {
+        "architecture_fit": "Keep the accepted Python SDK and explicit native binary binding so account scope, model selection, context management and usage remain attributable to the native runtime.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-19T19:21:49Z"
+        },
+        "test_and_source_evidence": "SDK README documents native authentication reuse, thread/turn usage and sandbox controls; Python package build workflow and getting-started docs were reviewed.",
+        "security_and_dependency_boundary": "Accepted CLI 0.155.1 and Python openai-codex 0.154.0 are separate pins; the existing adoption recipe intentionally points the SDK at the accepted native CLI. Source main is newer and not accepted merely by this review."
+      },
+      "platform_matrix": {
+        "macos": "Official native Mac packages/source documentation; new native login, MCP trust and sandbox acceptance required.",
+        "wsl": "Historical fresh locked-prefix plus native paired Astra/Claude acceptance; no new model run here.",
+        "linux_host": "Native SDK worker possible; service account/config/entitlement and project permissions must be selected for that host rather than copying Desktop state."
+      },
+      "acceptance_gate": "For each worker profile verify selected CLI path, native readiness, model availability, exact tool/MCP inventory and allowed workspace. Run one bounded turn and correlate complete native usage with a single observation; check startup/tool/stop hooks separately when tools are enabled.",
+      "upstream_workflows": [
+        {
+          "command": "python -m pydoc openai_codex",
+          "purpose": "Inspect the installed upstream SDK API without inference.",
+          "source": "https://github.com/openai/codex/blob/5ee2bdf1e0e04064bc427ae31a49a01e8f7064df/sdk/python/README.md",
+          "execution": "not_executed_in_this_research"
+        },
+        {
+          "command": "codex exec -C \"$PROJECT_ROOT\" --json - < \"$TASK_FILE\"",
+          "purpose": "Native bounded worker recipe; model use requires the actual selected task and account readiness.",
+          "source": "manifests/stack.json",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "sdk/python/README.md",
+        "sdk/python/docs/getting-started.md",
+        ".github/workflows/python-sdk-build.yml"
+      ]
+    },
+    {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "url": "https://github.com/anthropics/claude-agent-sdk-python",
+      "wave": 2,
+      "layer": "optional native Claude programmable worker adapter",
+      "decision": "investigate",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+        "committed_at": "2026-09-19T03:11:07Z"
+      },
+      "latest_github_release": {
+        "tag": "v0.2.156",
+        "published_at": "2026-09-18T02:28:01Z",
+        "prerelease": false,
+        "url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.156"
+      },
+      "publisher_package": {
+        "name": "claude-agent-sdk",
+        "version": "0.2.157",
+        "requires_python": ">=3.10",
+        "published_at": "2026-09-18T18:21:10.306259Z",
+        "url": "https://pypi.org/pypi/claude-agent-sdk/json"
+      },
+      "source_license": "MIT",
+      "adopted_pin": null,
+      "quality_dimensions": {
+        "architecture_fit": "Use only if Python hooks, structured session control or in-process custom tools materially improve the accepted native CLI worker; a second wrapper is not required for the existing pair.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-19T05:41:13Z"
+        },
+        "test_and_source_evidence": "Inspected source exposes tools, permissions, hooks, session resume/fork, setting sources, skill filters and usage/budget controls. Test CI defines Linux/macOS/Windows unit coverage; no CI result or inference was run here.",
+        "security_and_dependency_boundary": "PyPI stable 0.2.157 is newer than GitHub latest release v0.2.156. MIT package code does not replace Anthropic service terms; personal native login acceptance is not authorization to offer subscription limits in a third-party hosted product."
+      },
+      "platform_matrix": {
+        "macos": "Platform wheels and CI source support; fresh host untested.",
+        "wsl": "Native Claude CLI path has historical acceptance; this candidate SDK version was not installed.",
+        "linux_host": "Supported programmable process model, but require deliberate configuration and the applicable account/API entitlement."
+      },
+      "acceptance_gate": "Pin package and native CLI, then verify actual launched argv/config. In inspected source tools=[] disables built-ins; allowed_tools governs automatic approval instead. setting_sources=None loads native sources, [] isolates; skills=[] is a listing filter, not filesystem isolation. Confirm these semantics at the adopted pin and verify hooks plus tool discovery on the exact worker.",
+      "upstream_workflows": [
+        {
+          "command": "python -m pip install claude-agent-sdk==0.2.157",
+          "purpose": "Prospective isolated-prefix pinned installation, not executed; published version verified via PyPI.",
+          "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/README.md",
+          "execution": "not_executed_in_this_research"
+        },
+        {
+          "command": "python -m pytest tests/ -v --cov=claude_agent_sdk --cov-report=xml",
+          "purpose": "Upstream test workflow command; selected source test environment only.",
+          "source": "https://github.com/anthropics/claude-agent-sdk-python/blob/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/.github/workflows/test.yml",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "pyproject.toml",
+        "src/claude_agent_sdk/types.py",
+        ".github/workflows/test.yml"
+      ]
+    },
+    {
+      "repository": "langchain-ai/langgraph",
+      "url": "https://github.com/langchain-ai/langgraph",
+      "wave": 2,
+      "layer": "stateful graph library already embedded by DeerFlow",
+      "decision": "omit",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "aa742fb31e2827d569b843e3600aeda2e0528e4b",
+        "committed_at": "2026-09-18T23:31:43Z"
+      },
+      "latest_github_release": {
+        "tag": "sdk==0.4.4",
+        "published_at": "2026-08-27T21:25:36Z",
+        "prerelease": false,
+        "url": "https://github.com/langchain-ai/langgraph/releases/tag/sdk%3D%3D0.4.4"
+      },
+      "publisher_package": {
+        "name": "langgraph",
+        "version": "1.2.11",
+        "requires_python": ">=3.10",
+        "published_at": "2026-08-11T14:00:35.494718Z",
+        "url": "https://pypi.org/pypi/langgraph/json"
+      },
+      "source_license": "MIT",
+      "adopted_pin": null,
+      "quality_dimensions": {
+        "architecture_fit": "Omit an additional standalone control plane by default; retain it as a versioned DeerFlow dependency or choose it explicitly for an application-specific graph.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-18T23:31:45Z"
+        },
+        "test_and_source_evidence": "Checkpoint interfaces distinguish thread state from cross-thread stores, preserve successful pending writes and document deserialization restrictions. Native CI uses a frozen uv environment and graph tests.",
+        "security_and_dependency_boundary": "GitHub latest release sdk==0.4.4 is not the Python langgraph core version; core is 1.2.11 per publisher package metadata. In-memory checkpoint examples do not persist across restart, and a checkpoint does not make an external side effect idempotent."
+      },
+      "platform_matrix": {
+        "macos": "Python development support inferred from package requirements, not validated here.",
+        "wsl": "Transitive harness dependency; no new standalone deployment acceptance.",
+        "linux_host": "Application candidate only with persistent checkpointer/store, state retention and serialization policy."
+      },
+      "acceptance_gate": "If needed, use a persistent checkpointer with isolated thread namespaces; select safe deserialization (current source recommends LANGGRAPH_STRICT_MSGPACK=true or explicit allowed_msgpack_modules), prove crash/replay and bounded state retention, and designate exactly one durable retry owner.",
+      "upstream_workflows": [
+        {
+          "command": "python -m pip install langgraph==1.2.11",
+          "purpose": "Prospective isolated graph evaluation; not an instruction to add a second framework now.",
+          "source": "https://github.com/langchain-ai/langgraph/blob/aa742fb31e2827d569b843e3600aeda2e0528e4b/README.md",
+          "execution": "not_executed_in_this_research"
+        },
+        {
+          "command": "uv sync --frozen --group test --no-dev",
+          "purpose": "Upstream graph test environment command.",
+          "source": "https://github.com/langchain-ai/langgraph/blob/aa742fb31e2827d569b843e3600aeda2e0528e4b/.github/workflows/_test_langgraph.yml",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "libs/langgraph/pyproject.toml",
+        "libs/checkpoint/README.md",
+        ".github/workflows/_test_langgraph.yml"
+      ]
+    },
+    {
+      "repository": "OpenHands/OpenHands",
+      "url": "https://github.com/OpenHands/OpenHands",
+      "wave": 2,
+      "layer": "alternative agent UI and hosting backend",
+      "decision": "omit",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "a07364828c8f202e7745c6bce3dcef3915ae7ac1",
+        "committed_at": "2026-09-18T21:29:17Z"
+      },
+      "latest_github_release": {
+        "tag": "v1.20.0",
+        "published_at": "2026-09-17T07:15:18Z",
+        "prerelease": false,
+        "url": "https://github.com/OpenHands/OpenHands/releases/tag/v1.20.0"
+      },
+      "publisher_package": null,
+      "source_license": "MIT",
+      "adopted_pin": null,
+      "quality_dimensions": {
+        "architecture_fit": "Omit from the default runtime because native Codex/Claude plus Dagu and optional DeerFlow already cover the selected work. Investigate only for a concrete multi-user backend/UI requirement.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-19T18:02:49Z"
+        },
+        "test_and_source_evidence": "Current repository is Agent Canvas 1.20.0 with mock-LLM Docker E2E workflow and explicit self-hosting security guidance.",
+        "security_and_dependency_boundary": "README says Node 22.12+ while inspected package.json requires >=24; resolve from the exact package before installation. The local no-sandbox mode exposes the host filesystem. Mock model E2E is not actual provider acceptance."
+      },
+      "platform_matrix": {
+        "macos": "Documented local/Mac Mini and Docker development paths; no Mac test here.",
+        "wsl": "Possible development host; no installation or acceptance in this pass.",
+        "linux_host": "Documented always-on host path; container, mount, network and authentication boundaries require distinct acceptance."
+      },
+      "acceptance_gate": "Demonstrate a requirement the retained stack does not meet, pin Node/package/image digest, prove only intended project mounts are reachable and authenticate the exposed service. Verify real model usage separately from mock E2E.",
+      "upstream_workflows": [
+        {
+          "command": "agent-canvas --backend-only",
+          "purpose": "Current upstream split-backend command, after secure host configuration; not executed.",
+          "source": "https://github.com/OpenHands/OpenHands/blob/a07364828c8f202e7745c6bce3dcef3915ae7ac1/README.md",
+          "execution": "not_executed_in_this_research"
+        },
+        {
+          "command": "npm run test:e2e:mock-llm:docker",
+          "purpose": "Native mocked Docker E2E script; no inference claim.",
+          "source": "https://github.com/OpenHands/OpenHands/blob/a07364828c8f202e7745c6bce3dcef3915ae7ac1/package.json",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "package.json",
+        "docs/SELF_HOSTING.md",
+        ".github/workflows/mock-llm-docker-e2e.yml"
+      ]
+    },
+    {
+      "repository": "mem0ai/mem0",
+      "url": "https://github.com/mem0ai/mem0",
+      "wave": 2,
+      "layer": "alternative model-assisted application memory",
+      "decision": "omit",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "a39a802bbc93e85b820078cd3c4dbaf53af25dbe",
+        "committed_at": "2026-09-18T17:49:15Z"
+      },
+      "latest_github_release": {
+        "tag": "openclaw-v1.2.0",
+        "published_at": "2026-09-18T11:25:47Z",
+        "prerelease": false,
+        "url": "https://github.com/mem0ai/mem0/releases/tag/openclaw-v1.2.0"
+      },
+      "publisher_package": {
+        "name": "mem0ai",
+        "version": "2.1.0",
+        "requires_python": "<4.0,>=3.10",
+        "published_at": "2026-09-18T11:12:07.711418Z",
+        "url": "https://pypi.org/pypi/mem0ai/json"
+      },
+      "source_license": "Apache-2.0",
+      "adopted_pin": null,
+      "quality_dimensions": {
+        "architecture_fit": "Do not add a second default durable memory authority. Consider only for application-user memory that demonstrably needs its extraction/retrieval APIs and is separate from agent project policy.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-19T01:14:39Z"
+        },
+        "test_and_source_evidence": "Current Python package is mem0ai 2.1.0. Source separates entity filters and has a Python CI workflow; README explicitly distinguishes its managed benchmark stack from open-source behavior.",
+        "security_and_dependency_boundary": "Default extraction and embedding use external model dependencies unless explicitly configured. Published managed-service benchmark scores include proprietary optimizations and cannot be assigned to a local OSS installation."
+      },
+      "platform_matrix": {
+        "macos": "Python >=3.10,<4 package portability is source evidence; no host test.",
+        "wsl": "Candidate only; existing ai-memory is retained.",
+        "linux_host": "Self-hosted candidate adds extraction/embedding/storage operations and entitlement needs."
+      },
+      "acceptance_gate": "Run a local, scoped held-out comparison against the current memory path including failed/contradictory/stale entries, deletion, isolation and all extraction/embedding tokens. Adoption requires quality gain after operational cost, not a vendor benchmark.",
+      "upstream_workflows": [
+        {
+          "command": "python -m pip install mem0ai==2.1.0",
+          "purpose": "Prospective isolated comparison only; not executed.",
+          "source": "https://github.com/mem0ai/mem0/blob/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/README.md",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "pyproject.toml",
+        "mem0/memory/main.py",
+        ".github/workflows/ci.yml"
+      ]
+    },
+    {
+      "repository": "ml-explore/mlx-lm",
+      "url": "https://github.com/ml-explore/mlx-lm",
+      "wave": 2,
+      "layer": "optional native Apple Silicon inference",
+      "decision": "investigate",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "9d1e356e7cc6549e7d1697adabe2ea01ff8e062c",
+        "committed_at": "2026-09-18T15:27:36Z"
+      },
+      "latest_github_release": {
+        "tag": "v0.31.3",
+        "published_at": "2026-04-22T07:43:57Z",
+        "prerelease": false,
+        "url": "https://github.com/ml-explore/mlx-lm/releases/tag/v0.31.3"
+      },
+      "publisher_package": {
+        "name": "mlx-lm",
+        "version": "0.31.3",
+        "requires_python": ">=3.8",
+        "published_at": "2026-04-22T07:37:25.965952Z",
+        "url": "https://pypi.org/pypi/mlx-lm/json"
+      },
+      "source_license": "MIT",
+      "adopted_pin": null,
+      "quality_dimensions": {
+        "architecture_fit": "Use as the first simple native Mac generation-runtime candidate when local inference is actually needed; it does not provide native OpenAI/Anthropic account inference or automatically match the adopted embedding API.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-18T15:27:36Z"
+        },
+        "test_and_source_evidence": "README describes Apple Silicon inference, prompt/KV cache controls; server source exposes model/host/port flags and loopback default. CI declares native macOS unit/distributed tests.",
+        "security_and_dependency_boundary": "Latest checked release/package is 0.31.3 from April; recent main commits do not make a newer stable release. Model conversion, quantization, memory fit and API compatibility remain model-specific."
+      },
+      "platform_matrix": {
+        "macos": "Native Apple Silicon target; large wired-memory optimization has a macOS 15 requirement. No Mac hardware was tested.",
+        "wsl": "Not selected for the existing NVIDIA/WSL lane.",
+        "linux_host": "Not a replacement for the selected Linux CUDA runtime."
+      },
+      "acceptance_gate": "On the intended Mac pin model revision/quantization; measure held-out quality, prompt/decode latency, peak memory and cache behavior. For embedding replacement prove pooling/dimensions/API before any index rebuild.",
+      "upstream_workflows": [
+        {
+          "command": "mlx_lm.server --model \"$MODEL_ID\" --host 127.0.0.1 --port 8080",
+          "purpose": "Prospective native loopback model server on selected Apple Silicon host; can load model data, not executed.",
+          "source": "https://github.com/ml-explore/mlx-lm/blob/9d1e356e7cc6549e7d1697adabe2ea01ff8e062c/mlx_lm/server.py",
+          "execution": "not_executed_in_this_research"
+        },
+        {
+          "command": "mlx_lm.generate -h",
+          "purpose": "Native command discovery without running inference.",
+          "source": "https://github.com/ml-explore/mlx-lm/blob/9d1e356e7cc6549e7d1697adabe2ea01ff8e062c/README.md",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "mlx_lm/server.py",
+        ".github/workflows/pull_request.yml"
+      ]
+    },
+    {
+      "repository": "vllm-project/vllm",
+      "url": "https://github.com/vllm-project/vllm",
+      "wave": 2,
+      "layer": "existing Linux GPU serving and optional Apple plugin comparison",
+      "decision": "retain",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "5302d1fe40e6969b854e0ab288d34825653767c6",
+        "committed_at": "2026-09-19T17:46:49Z"
+      },
+      "latest_github_release": {
+        "tag": "v0.29.0",
+        "published_at": "2026-09-09T08:54:49Z",
+        "prerelease": false,
+        "url": "https://github.com/vllm-project/vllm/releases/tag/v0.29.0"
+      },
+      "publisher_package": null,
+      "source_license": "Apache-2.0",
+      "adopted_pin": {
+        "component_id": "vllm",
+        "version": "0.25.0",
+        "evidence_ids": [
+          "native-rag",
+          "vllm-compatibility",
+          "desktop-direct-rag",
+          "component-history"
+        ]
+      },
+      "quality_dimensions": {
+        "architecture_fit": "Keep accepted vLLM 0.25.0 for the current embedding lane; latest observed 0.29.0 already has a recorded WSL startup failure in this stack. Native provider workers remain independent.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-19T17:46:49Z"
+        },
+        "test_and_source_evidence": "Current source documents automatic prefix caching, continuous batching and network security boundaries; Apple support is documented through a separate community vllm-metal package using MLX.",
+        "security_and_dependency_boundary": "Prefix reuse avoids repeated prefill work; it does not establish reduced output tokens or lower task spend. vllm-metal source documentation is not CUDA feature parity or accepted host support. Multi-node internal communications need network isolation."
+      },
+      "platform_matrix": {
+        "macos": "Source docs refer to vllm-metal with Apple Silicon/macOS Sonoma+; separate unreviewed plugin dependency and no Mac acceptance.",
+        "wsl": "Adopted 0.25.0 retains historical native embedding acceptance; 0.29.0 incompatibility remains documented.",
+        "linux_host": "Appropriate GPU serving candidate after exact CUDA/driver/model/resource compatibility and network controls are demonstrated."
+      },
+      "acceptance_gate": "Upgrade only in isolated profile after startup and identical embedding dimensions/pooling, held-out quality, memory and latency pass. Validate cache observability with cold/warm prefixes for generative workloads; do not infer those savings for the present embedding role.",
+      "upstream_workflows": [
+        {
+          "command": "vllm serve \"$MODEL_DIRECTORY\" --served-model-name nvidia/Nemotron-3-Embed-1B-BF16 --host 127.0.0.1 --port 8231 --max-model-len 4096 --max-num-seqs 4 --gpu-memory-utilization 0.16 --enforce-eager --no-enable-log-requests",
+          "purpose": "Existing accepted 0.25.0 embedding recipe; not executed in this source review.",
+          "source": "manifests/stack.json",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "docs/features/automatic_prefix_caching.md",
+        "docs/getting_started/installation/gpu.apple.inc.md",
+        "docs/usage/security.md"
+      ]
+    },
+    {
+      "repository": "lima-vm/lima",
+      "url": "https://github.com/lima-vm/lima",
+      "wave": 2,
+      "layer": "optional Linux development VM on macOS",
+      "decision": "investigate",
+      "evidence_depth": "pinned_primary_source_review",
+      "reviewed_source": {
+        "commit": "376d310483786938d59284ede8f60bff940325a5",
+        "committed_at": "2026-09-19T04:04:10Z"
+      },
+      "latest_github_release": {
+        "tag": "v2.2.0",
+        "published_at": "2026-07-21T15:05:43Z",
+        "prerelease": false,
+        "url": "https://github.com/lima-vm/lima/releases/tag/v2.2.0"
+      },
+      "publisher_package": null,
+      "source_license": "Apache-2.0",
+      "adopted_pin": null,
+      "quality_dimensions": {
+        "architecture_fit": "Use only when Linux-only development/isolation tools need a Mac-side VM. Prefer native Mac clients and native MLX for local Mac acceleration rather than introducing a VM for every component.",
+        "maintenance": {
+          "archived": false,
+          "pushed_at": "2026-09-19T04:04:10Z"
+        },
+        "test_and_source_evidence": "Upstream documents Linux VMs with file sharing/forwarding, image-update security and test workflows. The default template exposes resource, image-digest, mount and forwarding settings.",
+        "security_and_dependency_boundary": "VM isolation depends on selected mounts and forwarding; a Linux guest does not establish NVIDIA CUDA or Metal passthrough. Template freshness is not guaranteed current OS patching."
+      },
+      "platform_matrix": {
+        "macos": "Primary documented host use case; this review did not create or test a VM.",
+        "wsl": "No additional nested VM selected.",
+        "linux_host": "Do not add Lima to an already suitable dedicated Linux host without a concrete VM requirement."
+      },
+      "acceptance_gate": "Choose a pinned image and explicit project mounts/resource limits; verify guest-to-host access, port forwarding, updates, suspend/resume and data restore. Keep native sign-ins separate and never mount account stores by default.",
+      "upstream_workflows": [
+        {
+          "command": "limactl start",
+          "purpose": "Upstream interactive development-VM entry point; creates/downloads state and was not executed.",
+          "source": "https://github.com/lima-vm/lima/blob/376d310483786938d59284ede8f60bff940325a5/README.md",
+          "execution": "not_executed_in_this_research"
+        }
+      ],
+      "selected_source_paths": [
+        "README.md",
+        "LICENSE",
+        "templates/default.yaml",
+        "website/content/en/docs/security/_index.md",
+        ".github/workflows/test.yml"
+      ]
+    }
+  ],
+  "retained_research_failures": [
+    {
+      "operation": "Native GitHub CLI discovery inside the Context Mode subprocess",
+      "result": "Initial gh lookup failed because that subprocess PATH omitted the existing binary.",
+      "resolution": "Resolved the native installed path once; subsequent metadata/source reads succeeded. No installation or account probe."
+    },
+    {
+      "operation": "GitHub Contents inline README read for awesome-mcp-servers",
+      "result": "Over-1-MB content was not inlined; empty decoded result was rejected.",
+      "resolution": "Used native gh raw-media Accept header; obtained and hashed the actual 1,756,337-byte README."
+    },
+    {
+      "operation": "Guessed current source paths",
+      "result": "Claude SDK .github/workflows/ci.yml and OpenHands pyproject.toml returned 404.",
+      "resolution": "Used repository tree evidence; selected test.yml and package.json respectively."
+    },
+    {
+      "operation": "Release endpoints for discovery lists",
+      "result": "Three lists have no releases/latest record.",
+      "resolution": "Pinned their actual source commits and did not invent release versions."
+    },
+    {
+      "operation": "Guessed documentation routes",
+      "result": "One obsolete OpenAI docs route returned 404; two guessed Claude configure routes did not resolve.",
+      "resolution": "Used the working official Codex SDK and Claude Agent SDK pages plus pinned SDK source; no unsupported route was cited as evidence."
+    }
+  ],
+  "limits": [
+    "No automatic upgrades or framework installations were performed.",
+    "Four community lists and 15 direct candidate reviews form a bounded selection, not proof that every repository has been found.",
+    "Main-branch source statements apply to the inspected commits, not every older accepted release.",
+    "Durable project learning improves future retrieval only when correct, scoped and evaluated; it is not evidence of a profitable or safe self-improving trading strategy.",
+    "A source-reviewed command is a prospective workflow, not an executed acceptance result."
+  ]
+}

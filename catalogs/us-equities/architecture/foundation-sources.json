@@ -1,0 +1,608 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "method": "Native gh api at immutable inspected head commits; selected source files hashed and relevant implementation/documentation/test excerpts inspected. File presence or workflow definitions do not establish that upstream CI passed.",
+  "sources": [
+    {
+      "repo": "e2b-dev/awesome-ai-agents",
+      "path": "README.md",
+      "sha256": "db062c798654c5f6dec1ddedf7ab823c70d11d2f66ccf2a7036171f1e5b6eaa8",
+      "bytes": 212139,
+      "url": "https://github.com/e2b-dev/awesome-ai-agents/blob/9596ab1e69fbbb6c95291141c8dab5c181083216/README.md"
+    },
+    {
+      "repo": "Shubhamsaboo/awesome-llm-apps",
+      "path": "README.md",
+      "sha256": "c285c86867fb3ea9d66bdf0ee9d89d5ade747ce64d1181df86bf038898393ef3",
+      "bytes": 24369,
+      "url": "https://github.com/Shubhamsaboo/awesome-llm-apps/blob/22a91e2a64bee40277477988d5ac5e786555cf01/README.md"
+    },
+    {
+      "repo": "kyrolabs/awesome-langchain",
+      "path": "README.md",
+      "sha256": "9e7ffc1279740d0121ae8bfeadf8a4e4750f4eca2a7fa5d6346c8aa1144eb0db",
+      "bytes": 48534,
+      "url": "https://github.com/kyrolabs/awesome-langchain/blob/9796b1d50c20c65cccbf4ccd2dc1497a8b15cd79/README.md"
+    },
+    {
+      "repo": "mksglu/context-mode",
+      "path": "README.md",
+      "sha256": "9308e09043c4746340662e7a72e68de155fc28d70a1dd316f5ff292596076d04",
+      "bytes": 94871,
+      "url": "https://github.com/mksglu/context-mode/blob/5283a70780305994433cb65d6a0275386e797172/README.md"
+    },
+    {
+      "repo": "mksglu/context-mode",
+      "path": "LICENSE",
+      "sha256": "92f11a867c41c9e575ccb978ff205ae2011c244a14aa3c576e914e537105caa0",
+      "bytes": 3840,
+      "url": "https://github.com/mksglu/context-mode/blob/5283a70780305994433cb65d6a0275386e797172/LICENSE"
+    },
+    {
+      "repo": "akitaonrails/ai-memory",
+      "path": "README.md",
+      "sha256": "c9e3866c3863ead80e6f61509c3f6b9fcccdae3fd356b126902322bed9a106e1",
+      "bytes": 23603,
+      "url": "https://github.com/akitaonrails/ai-memory/blob/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/README.md"
+    },
+    {
+      "repo": "akitaonrails/ai-memory",
+      "path": "LICENSE",
+      "sha256": "18332c61780ce8e694d4fa330770cd4d8c85e33f47ac13a80d72d70bb032ae72",
+      "bytes": 1068,
+      "url": "https://github.com/akitaonrails/ai-memory/blob/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/LICENSE"
+    },
+    {
+      "repo": "tobi/qmd",
+      "path": "README.md",
+      "sha256": "0b08e5c533fea7406def0613027249f49e9b5c3168689467d6b3f86cd9c0701f",
+      "bytes": 54049,
+      "url": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/README.md"
+    },
+    {
+      "repo": "tobi/qmd",
+      "path": "LICENSE",
+      "sha256": "24c446836e7e2cdea13a914de10c88c553e6297366061ba24013b8ce73c8f7fa",
+      "bytes": 1072,
+      "url": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/LICENSE"
+    },
+    {
+      "repo": "giancarloerra/SocratiCode",
+      "path": "README.md",
+      "sha256": "280f3c7b8415953c00885f489cb59bab10d6e3bc8637a32f7196165cc4cb700d",
+      "bytes": 144321,
+      "url": "https://github.com/giancarloerra/SocratiCode/blob/b67f1328ff52ca869f642bb6b068bb0d3f2c3646/README.md"
+    },
+    {
+      "repo": "giancarloerra/SocratiCode",
+      "path": "LICENSE",
+      "sha256": "644937712a0d0e36507a8739c289074625c9953668ba9ccbcfe7e74efb09a86e",
+      "bytes": 35430,
+      "url": "https://github.com/giancarloerra/SocratiCode/blob/b67f1328ff52ca869f642bb6b068bb0d3f2c3646/LICENSE"
+    },
+    {
+      "repo": "dagucloud/dagu",
+      "path": "README.md",
+      "sha256": "b652813bb7a60ffe9bc8ff4638dd92b7d632361536a2c4c83f7301b23a390132",
+      "bytes": 52639,
+      "url": "https://github.com/dagucloud/dagu/blob/0a8edff8e55c281c2f217ef4383fbf5262138def/README.md"
+    },
+    {
+      "repo": "dagucloud/dagu",
+      "path": "LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149,
+      "url": "https://github.com/dagucloud/dagu/blob/0a8edff8e55c281c2f217ef4383fbf5262138def/LICENSE"
+    },
+    {
+      "repo": "temporalio/temporal",
+      "path": "README.md",
+      "sha256": "269838d3de5da90d4c2c0b45bf7fc745b384a5a05c0932582e923638e8994189",
+      "bytes": 3888,
+      "url": "https://github.com/temporalio/temporal/blob/ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a/README.md"
+    },
+    {
+      "repo": "temporalio/temporal",
+      "path": "LICENSE",
+      "sha256": "6aab9afd99ceb1dcaf6a0d91386b46baef9bce17ae4006044e0f231e31430b69",
+      "bytes": 1152,
+      "url": "https://github.com/temporalio/temporal/blob/ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a/LICENSE"
+    },
+    {
+      "repo": "bytedance/deer-flow",
+      "path": "README.md",
+      "sha256": "907df0f3d875a6498c1a2d638146dfbf111805faa886fb04c35f7d49c3a5ce69",
+      "bytes": 175869,
+      "url": "https://github.com/bytedance/deer-flow/blob/aa4e43a2bcc8ffc3838b012c4583f561a0e199be/README.md"
+    },
+    {
+      "repo": "bytedance/deer-flow",
+      "path": "LICENSE",
+      "sha256": "b23dff4d4bac8d17b6efaaa7e88c2b730149c4dda45699ce676b719cfdffe7e1",
+      "bytes": 1134,
+      "url": "https://github.com/bytedance/deer-flow/blob/aa4e43a2bcc8ffc3838b012c4583f561a0e199be/LICENSE"
+    },
+    {
+      "repo": "openai/codex",
+      "path": "README.md",
+      "sha256": "ba4e1f69ff48386e72a9c5e1edaf76aad64a475c2d51af79ccba6d1128261ba7",
+      "bytes": 3334,
+      "url": "https://github.com/openai/codex/blob/5ee2bdf1e0e04064bc427ae31a49a01e8f7064df/README.md"
+    },
+    {
+      "repo": "openai/codex",
+      "path": "LICENSE",
+      "sha256": "d17f227e4df5da1600391338865ce0f3055211760a36688f816941d58232d8dc",
+      "bytes": 10926,
+      "url": "https://github.com/openai/codex/blob/5ee2bdf1e0e04064bc427ae31a49a01e8f7064df/LICENSE"
+    },
+    {
+      "repo": "mksglu/context-mode",
+      "path": "docs/platform-support.md",
+      "sha256": "6933f5b02f6a61bdb8bae85e9311d4599a989c888c38f7f65f0cd778ab3b4dac",
+      "bytes": 56264,
+      "url": "https://github.com/mksglu/context-mode/blob/5283a70780305994433cb65d6a0275386e797172/docs/platform-support.md"
+    },
+    {
+      "repo": "mksglu/context-mode",
+      "path": "tests/security/project-boundary-852.test.ts",
+      "sha256": "10f042cce9c1fa77af9d06a384eb141c703596bbc945c6e0fe472ab843f9fd0d",
+      "bytes": 8523,
+      "url": "https://github.com/mksglu/context-mode/blob/5283a70780305994433cb65d6a0275386e797172/tests/security/project-boundary-852.test.ts"
+    },
+    {
+      "repo": "mksglu/context-mode",
+      "path": ".github/workflows/ci.yml",
+      "sha256": "e036684e82d00e6f612fdf1dded8ed687fb16e2c3af2ce289562db3de4b8f55e",
+      "bytes": 3105,
+      "url": "https://github.com/mksglu/context-mode/blob/5283a70780305994433cb65d6a0275386e797172/.github/workflows/ci.yml"
+    },
+    {
+      "repo": "akitaonrails/ai-memory",
+      "path": "crates/ai-memory-consolidate/src/auto_improve.rs",
+      "sha256": "78a33a2aeccb22bbc47bb7f604cc29d6fccfae31f49100ce3e10b97197ad76e5",
+      "bytes": 127918,
+      "url": "https://github.com/akitaonrails/ai-memory/blob/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/crates/ai-memory-consolidate/src/auto_improve.rs"
+    },
+    {
+      "repo": "akitaonrails/ai-memory",
+      "path": "SECURITY.md",
+      "sha256": "051bb0fbcac6ada44e77d2cfd72c41d38012d0f869a7f80aa2c17c077d6dec2c",
+      "bytes": 8996,
+      "url": "https://github.com/akitaonrails/ai-memory/blob/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/SECURITY.md"
+    },
+    {
+      "repo": "akitaonrails/ai-memory",
+      "path": ".github/workflows/ci.yml",
+      "sha256": "d5f6bbd68ab8655f0f23d0b2dca03910fbaf5ce620ba8957abf68fc7091962de",
+      "bytes": 13903,
+      "url": "https://github.com/akitaonrails/ai-memory/blob/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/.github/workflows/ci.yml"
+    },
+    {
+      "repo": "tobi/qmd",
+      "path": "src/store.ts",
+      "sha256": "eca580b693b39ec285a14eca060fba9573c7d426a4a15d14a044a7043db7f7b7",
+      "bytes": 232221,
+      "url": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/src/store.ts"
+    },
+    {
+      "repo": "tobi/qmd",
+      "path": ".github/workflows/ci.yml",
+      "sha256": "0de772f7ed2b0edcce1213812fddade6576613365393ed0444e954b30ecd3461",
+      "bytes": 1788,
+      "url": "https://github.com/tobi/qmd/blob/04e4dbd8245c527a88f1a8f0bda547aef9ca81fb/.github/workflows/ci.yml"
+    },
+    {
+      "repo": "giancarloerra/SocratiCode",
+      "path": "tests/integration/interrupted-resume-recovery.test.ts",
+      "sha256": "60bf0dd17e06d0e6a2d1b135dd5d769c2e336e219ef4d1e4e6cf7954cbea7633",
+      "bytes": 11168,
+      "url": "https://github.com/giancarloerra/SocratiCode/blob/b67f1328ff52ca869f642bb6b068bb0d3f2c3646/tests/integration/interrupted-resume-recovery.test.ts"
+    },
+    {
+      "repo": "giancarloerra/SocratiCode",
+      "path": ".github/workflows/ci.yml",
+      "sha256": "8961d3c0d046724a5c2bac5a5caa50b8caa901738e3e7d20487b1e0fd2cab649",
+      "bytes": 6678,
+      "url": "https://github.com/giancarloerra/SocratiCode/blob/b67f1328ff52ca869f642bb6b068bb0d3f2c3646/.github/workflows/ci.yml"
+    },
+    {
+      "repo": "dagucloud/dagu",
+      "path": "ui/e2e/worker-failover.spec.ts",
+      "sha256": "14fcdb19ef5864879f28188e2613e35b88cc5f2402a78c404bba17ded7c38b33",
+      "bytes": 3613,
+      "url": "https://github.com/dagucloud/dagu/blob/0a8edff8e55c281c2f217ef4383fbf5262138def/ui/e2e/worker-failover.spec.ts"
+    },
+    {
+      "repo": "dagucloud/dagu",
+      "path": ".github/workflows/ci.yaml",
+      "sha256": "a362f77d7c2731f42f505141f2222e11c88ad8706b6c0ebdac72759749383730",
+      "bytes": 25449,
+      "url": "https://github.com/dagucloud/dagu/blob/0a8edff8e55c281c2f217ef4383fbf5262138def/.github/workflows/ci.yaml"
+    },
+    {
+      "repo": "temporalio/temporal",
+      "path": "docs/architecture/README.md",
+      "sha256": "ad9495fc887f302b50f289966f55266e6cab6883afd7d0e10081b2d6d0405f55",
+      "bytes": 5098,
+      "url": "https://github.com/temporalio/temporal/blob/ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a/docs/architecture/README.md"
+    },
+    {
+      "repo": "temporalio/temporal",
+      "path": ".github/workflows/run-tests.yml",
+      "sha256": "4faba05bb22b2dc34cc1093cac626e656be0bfcf5d31106af7e24861c07eb37d",
+      "bytes": 20927,
+      "url": "https://github.com/temporalio/temporal/blob/ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a/.github/workflows/run-tests.yml"
+    },
+    {
+      "repo": "bytedance/deer-flow",
+      "path": "backend/pyproject.toml",
+      "sha256": "c104c504d25b075117ffce1e447dcb8c54c694a648b413db017b148d2989d869",
+      "bytes": 5122,
+      "url": "https://github.com/bytedance/deer-flow/blob/aa4e43a2bcc8ffc3838b012c4583f561a0e199be/backend/pyproject.toml"
+    },
+    {
+      "repo": "openai/codex",
+      "path": "sdk/python/README.md",
+      "sha256": "e81cdb5f96e4e00862bb567f6a84864169033423c80fbbe4f19a56aff3597ed5",
+      "bytes": 1910,
+      "url": "https://github.com/openai/codex/blob/5ee2bdf1e0e04064bc427ae31a49a01e8f7064df/sdk/python/README.md"
+    },
+    {
+      "repo": "anthropics/claude-agent-sdk-python",
+      "path": "README.md",
+      "sha256": "c38a933bf8fef26316ea38635989b254e69a26d21d80b96bf5731cba4e88bcc6",
+      "bytes": 13250,
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/README.md"
+    },
+    {
+      "repo": "anthropics/claude-agent-sdk-python",
+      "path": "LICENSE",
+      "sha256": "cebdde8a8fb9ee59e5eaaed19578bf8085aa7047562259c31f38f225c26f6812",
+      "bytes": 1070,
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/LICENSE"
+    },
+    {
+      "repo": "langchain-ai/langgraph",
+      "path": "README.md",
+      "sha256": "3a13e257af1216962d53d72414a7f44ac1fc5cea34d994bdff60ea2a3b045933",
+      "bytes": 6395,
+      "url": "https://github.com/langchain-ai/langgraph/blob/aa742fb31e2827d569b843e3600aeda2e0528e4b/README.md"
+    },
+    {
+      "repo": "langchain-ai/langgraph",
+      "path": "LICENSE",
+      "sha256": "d9bb52f2e3540d60ff50d8f0f5b6ba649b7fd346948c4c3d086c8afb120763c7",
+      "bytes": 1072,
+      "url": "https://github.com/langchain-ai/langgraph/blob/aa742fb31e2827d569b843e3600aeda2e0528e4b/LICENSE"
+    },
+    {
+      "repo": "OpenHands/OpenHands",
+      "path": "README.md",
+      "sha256": "1b783460b1ec68ee4eb0a9de28b97b97cb2a128bcc524d2ab0340ba32143659c",
+      "bytes": 10126,
+      "url": "https://github.com/OpenHands/OpenHands/blob/a07364828c8f202e7745c6bce3dcef3915ae7ac1/README.md"
+    },
+    {
+      "repo": "OpenHands/OpenHands",
+      "path": "LICENSE",
+      "sha256": "e1d1fa9f3a8d7bef24449d488fcd8f00f8f272cac297bb9bed161eb6175b876a",
+      "bytes": 1096,
+      "url": "https://github.com/OpenHands/OpenHands/blob/a07364828c8f202e7745c6bce3dcef3915ae7ac1/LICENSE"
+    },
+    {
+      "repo": "mem0ai/mem0",
+      "path": "README.md",
+      "sha256": "7509347d34a767a2ef37ceb6cf6c714de9e8d84fe66ad5eea92bbae824a8fbeb",
+      "bytes": 11914,
+      "url": "https://github.com/mem0ai/mem0/blob/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/README.md"
+    },
+    {
+      "repo": "mem0ai/mem0",
+      "path": "LICENSE",
+      "sha256": "0bbcbe931c353293a2fafce08326181dfeea0e568c566afd4ce8337a70f5e219",
+      "bytes": 11349,
+      "url": "https://github.com/mem0ai/mem0/blob/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/LICENSE"
+    },
+    {
+      "repo": "ml-explore/mlx-lm",
+      "path": "README.md",
+      "sha256": "625b4478800ad2fd5d393792f7ca8d4006be9c95b725cc239a9e67b7aa891875",
+      "bytes": 8590,
+      "url": "https://github.com/ml-explore/mlx-lm/blob/9d1e356e7cc6549e7d1697adabe2ea01ff8e062c/README.md"
+    },
+    {
+      "repo": "ml-explore/mlx-lm",
+      "path": "LICENSE",
+      "sha256": "ccfab7ccb2ea306f71531c8ca77bb55507606cd90768b1e32b8b52ab5b48cf01",
+      "bytes": 1066,
+      "url": "https://github.com/ml-explore/mlx-lm/blob/9d1e356e7cc6549e7d1697adabe2ea01ff8e062c/LICENSE"
+    },
+    {
+      "repo": "vllm-project/vllm",
+      "path": "README.md",
+      "sha256": "8d2e7cd8d120bcd91ddfa85ef957f7246021b4a3f46f2e1f4ccf084ec6c20026",
+      "bytes": 5708,
+      "url": "https://github.com/vllm-project/vllm/blob/5302d1fe40e6969b854e0ab288d34825653767c6/README.md"
+    },
+    {
+      "repo": "vllm-project/vllm",
+      "path": "LICENSE",
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "bytes": 11357,
+      "url": "https://github.com/vllm-project/vllm/blob/5302d1fe40e6969b854e0ab288d34825653767c6/LICENSE"
+    },
+    {
+      "repo": "lima-vm/lima",
+      "path": "README.md",
+      "sha256": "b1f921a59f492918a7e502319cf159127f966c998ffb9a6e027868945705b36d",
+      "bytes": 5042,
+      "url": "https://github.com/lima-vm/lima/blob/376d310483786938d59284ede8f60bff940325a5/README.md"
+    },
+    {
+      "repo": "lima-vm/lima",
+      "path": "LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358,
+      "url": "https://github.com/lima-vm/lima/blob/376d310483786938d59284ede8f60bff940325a5/LICENSE"
+    },
+    {
+      "repo": "anthropics/claude-agent-sdk-python",
+      "path": "pyproject.toml",
+      "sha256": "653cd0b38cfaaca875fcd1daa132bd5793207c4377009c2c5890235e576f7c10",
+      "bytes": 3786,
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/pyproject.toml"
+    },
+    {
+      "repo": "anthropics/claude-agent-sdk-python",
+      "path": "src/claude_agent_sdk/types.py",
+      "sha256": "fa526a35292a7463c35793cc4246364caa2e286c5c229cf0cfe2fa3cbd7efafe",
+      "bytes": 89729,
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/src/claude_agent_sdk/types.py"
+    },
+    {
+      "repo": "langchain-ai/langgraph",
+      "path": "libs/langgraph/pyproject.toml",
+      "sha256": "d5e0706f1c3cba845757379ffcbf4bd54b34b9d69ccf6158555a40697903b019",
+      "bytes": 4466,
+      "url": "https://github.com/langchain-ai/langgraph/blob/aa742fb31e2827d569b843e3600aeda2e0528e4b/libs/langgraph/pyproject.toml"
+    },
+    {
+      "repo": "langchain-ai/langgraph",
+      "path": "libs/checkpoint/README.md",
+      "sha256": "efedc0a489d4ab9147d69c8575a9cfd2344d01040322ec6330302887c65aa80e",
+      "bytes": 6100,
+      "url": "https://github.com/langchain-ai/langgraph/blob/aa742fb31e2827d569b843e3600aeda2e0528e4b/libs/checkpoint/README.md"
+    },
+    {
+      "repo": "mem0ai/mem0",
+      "path": "pyproject.toml",
+      "sha256": "1662b662cf75295be5d78fa9c8be48166b7f09ab3985ff20891201cb9ceb708d",
+      "bytes": 3312,
+      "url": "https://github.com/mem0ai/mem0/blob/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/pyproject.toml"
+    },
+    {
+      "repo": "mem0ai/mem0",
+      "path": "mem0/memory/main.py",
+      "sha256": "5b1b75e2f00aca7bd368a6e9cd5905145d60fd05a0e36d6b1ef3e2f1b4f28ca1",
+      "bytes": 168002,
+      "url": "https://github.com/mem0ai/mem0/blob/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/mem0/memory/main.py"
+    },
+    {
+      "repo": "ml-explore/mlx-lm",
+      "path": ".github/workflows/pull_request.yml",
+      "sha256": "f7f15c9b72d32e028bf89c5d46334c5fedc593c354a04910e4a1ae57ab7629f1",
+      "bytes": 1331,
+      "url": "https://github.com/ml-explore/mlx-lm/blob/9d1e356e7cc6549e7d1697adabe2ea01ff8e062c/.github/workflows/pull_request.yml"
+    },
+    {
+      "repo": "ml-explore/mlx-lm",
+      "path": "mlx_lm/server.py",
+      "sha256": "57392576de114af80ede723976b9dd156dc234f856b9943b8b44b8b78bc27f79",
+      "bytes": 70765,
+      "url": "https://github.com/ml-explore/mlx-lm/blob/9d1e356e7cc6549e7d1697adabe2ea01ff8e062c/mlx_lm/server.py"
+    },
+    {
+      "repo": "vllm-project/vllm",
+      "path": "docs/features/automatic_prefix_caching.md",
+      "sha256": "39038f83d3ef4e39eb57bb4dcb7edb17922a65d8cfdb8e63277e1f872ff49873",
+      "bytes": 3711,
+      "url": "https://github.com/vllm-project/vllm/blob/5302d1fe40e6969b854e0ab288d34825653767c6/docs/features/automatic_prefix_caching.md"
+    },
+    {
+      "repo": "vllm-project/vllm",
+      "path": "docs/getting_started/installation/gpu.apple.inc.md",
+      "sha256": "d8e3bbaadeddbeaa0109eac02449f7eb751d35f7d5ce0f5cc59a40f075663987",
+      "bytes": 4218,
+      "url": "https://github.com/vllm-project/vllm/blob/5302d1fe40e6969b854e0ab288d34825653767c6/docs/getting_started/installation/gpu.apple.inc.md"
+    },
+    {
+      "repo": "vllm-project/vllm",
+      "path": "docs/usage/security.md",
+      "sha256": "c6fb4f02ddcc234669b34ed2c3cdc8b993c2191675f0064c25422afea7b885a2",
+      "bytes": 42730,
+      "url": "https://github.com/vllm-project/vllm/blob/5302d1fe40e6969b854e0ab288d34825653767c6/docs/usage/security.md"
+    },
+    {
+      "repo": "lima-vm/lima",
+      "path": "website/content/en/docs/security/_index.md",
+      "sha256": "eceac08ed20075a05e4bf459d4d327ef39fc637d7afd2d7d9b126c5dd28cf5c5",
+      "bytes": 1379,
+      "url": "https://github.com/lima-vm/lima/blob/376d310483786938d59284ede8f60bff940325a5/website/content/en/docs/security/_index.md"
+    },
+    {
+      "repo": "lima-vm/lima",
+      "path": ".github/workflows/test.yml",
+      "sha256": "f8346223ec65d902054d84136862481c3fe66da55c1107dadb7f72e92037cc0a",
+      "bytes": 26379,
+      "url": "https://github.com/lima-vm/lima/blob/376d310483786938d59284ede8f60bff940325a5/.github/workflows/test.yml"
+    },
+    {
+      "repo": "mksglu/context-mode",
+      "path": "src/security.ts",
+      "sha256": "769a68f66f879c6d442a441ca69f4d58f84a6442742bfc5d02ab5f3fc7103468",
+      "bytes": 30724,
+      "url": "https://github.com/mksglu/context-mode/blob/5283a70780305994433cb65d6a0275386e797172/src/security.ts"
+    },
+    {
+      "repo": "akitaonrails/ai-memory",
+      "path": "docs/auto-improvement-loop.md",
+      "sha256": "16f074cd9f57f323a7983846a08fa618a1e43fcfd4f4217f90cc6a72ed3e66cd",
+      "bytes": 30303,
+      "url": "https://github.com/akitaonrails/ai-memory/blob/13eb7a20bb5f7da1ed3ee701b7bff8be75de7c52/docs/auto-improvement-loop.md"
+    },
+    {
+      "repo": "anthropics/claude-agent-sdk-python",
+      "path": ".github/workflows/test.yml",
+      "sha256": "ced5ca8b8974096dddfe2a8fafef00693158813bc2aacf543cc095a2c07f914a",
+      "bytes": 10214,
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/.github/workflows/test.yml"
+    },
+    {
+      "repo": "langchain-ai/langgraph",
+      "path": ".github/workflows/_test_langgraph.yml",
+      "sha256": "ed26ce8d3e17ec86211443cbcc58b9974b1c48fce2906bd088ee831720c544e2",
+      "bytes": 1831,
+      "url": "https://github.com/langchain-ai/langgraph/blob/aa742fb31e2827d569b843e3600aeda2e0528e4b/.github/workflows/_test_langgraph.yml"
+    },
+    {
+      "repo": "OpenHands/OpenHands",
+      "path": ".github/workflows/mock-llm-docker-e2e.yml",
+      "sha256": "5e21077405742888af45b2f5d7ac55defd4ffc32c1ff3f54e4e1721573834515",
+      "bytes": 11993,
+      "url": "https://github.com/OpenHands/OpenHands/blob/a07364828c8f202e7745c6bce3dcef3915ae7ac1/.github/workflows/mock-llm-docker-e2e.yml"
+    },
+    {
+      "repo": "OpenHands/OpenHands",
+      "path": "docs/SELF_HOSTING.md",
+      "sha256": "1f756101d3c353947d2e6a964b05679c29978b688f88fbd1fed04b63aa52611c",
+      "bytes": 10347,
+      "url": "https://github.com/OpenHands/OpenHands/blob/a07364828c8f202e7745c6bce3dcef3915ae7ac1/docs/SELF_HOSTING.md"
+    },
+    {
+      "repo": "mem0ai/mem0",
+      "path": ".github/workflows/ci.yml",
+      "sha256": "f994019cee96647f650405a95259b72fa70bad66241fa5781f504b774fa3145d",
+      "bytes": 4370,
+      "url": "https://github.com/mem0ai/mem0/blob/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/.github/workflows/ci.yml"
+    },
+    {
+      "repo": "bytedance/deer-flow",
+      "path": ".github/workflows/replay-e2e.yml",
+      "sha256": "05fc38f771aa65353fdd74b96a662e6ac1505f8eb1fa07f5916e454d39133849",
+      "bytes": 4225,
+      "url": "https://github.com/bytedance/deer-flow/blob/aa4e43a2bcc8ffc3838b012c4583f561a0e199be/.github/workflows/replay-e2e.yml"
+    },
+    {
+      "repo": "openai/codex",
+      "path": ".github/workflows/python-sdk-build.yml",
+      "sha256": "a4a4f31b1fc77cf5c333d74ad778e187fb730effeb3950aef161a46a954ea94b",
+      "bytes": 2151,
+      "url": "https://github.com/openai/codex/blob/5ee2bdf1e0e04064bc427ae31a49a01e8f7064df/.github/workflows/python-sdk-build.yml"
+    },
+    {
+      "repo": "openai/codex",
+      "path": "sdk/python/docs/getting-started.md",
+      "sha256": "a636514fb73fb1e526624d5fcc28d68e119533af97cf31a4fb0d62d995d8368c",
+      "bytes": 4255,
+      "url": "https://github.com/openai/codex/blob/5ee2bdf1e0e04064bc427ae31a49a01e8f7064df/sdk/python/docs/getting-started.md"
+    },
+    {
+      "repo": "bytedance/deer-flow",
+      "path": "backend/packages/harness/pyproject.toml",
+      "sha256": "235e642dd628d70cccde5d619dfacd4855b2697f74abffd91b8f6cac10fe2ba8",
+      "bytes": 4303,
+      "url": "https://github.com/bytedance/deer-flow/blob/aa4e43a2bcc8ffc3838b012c4583f561a0e199be/backend/packages/harness/pyproject.toml"
+    },
+    {
+      "repo": "lima-vm/lima",
+      "path": "templates/default.yaml",
+      "sha256": "233409ce23fbea8c919afa2b91c37e16a905f8825fad507eff91a05e8a48944b",
+      "bytes": 35470,
+      "url": "https://github.com/lima-vm/lima/blob/376d310483786938d59284ede8f60bff940325a5/templates/default.yaml"
+    },
+    {
+      "repo": "OpenHands/OpenHands",
+      "path": "package.json",
+      "sha256": "3541ae99bc2d2b4c8a4835c349cb95ef6c855100a81786980524b433ffd700a3",
+      "bytes": 9494,
+      "url": "https://github.com/OpenHands/OpenHands/blob/a07364828c8f202e7745c6bce3dcef3915ae7ac1/package.json"
+    },
+    {
+      "repo": "punkpeye/awesome-mcp-servers",
+      "path": "README.md",
+      "sha256": "9b6a1ee410fde8132c92444f15cc153c2d6c4866dd74c4ac8b428981d49f777c",
+      "bytes": 1756337,
+      "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/393b4e9fafb0348e5a1c2a4ef5a8719b0d85e061/README.md"
+    }
+  ],
+  "publisher_package_metadata": [
+    {
+      "package": "langgraph",
+      "version": "1.2.11",
+      "python": ">=3.10",
+      "release_dates": [
+        "2026-08-11T14:00:35.494718Z",
+        "2026-08-11T14:00:36.945931Z"
+      ],
+      "url": "https://pypi.org/pypi/langgraph/json"
+    },
+    {
+      "package": "mem0ai",
+      "version": "2.1.0",
+      "python": "<4.0,>=3.10",
+      "release_dates": [
+        "2026-09-18T11:12:07.711418Z",
+        "2026-09-18T11:12:09.901786Z"
+      ],
+      "url": "https://pypi.org/pypi/mem0ai/json"
+    },
+    {
+      "package": "mlx-lm",
+      "version": "0.31.3",
+      "python": ">=3.8",
+      "release_dates": [
+        "2026-04-22T07:37:25.965952Z",
+        "2026-04-22T07:37:27.922017Z"
+      ],
+      "url": "https://pypi.org/pypi/mlx-lm/json"
+    },
+    {
+      "package": "claude-agent-sdk",
+      "version": "0.2.157",
+      "python": ">=3.10",
+      "release_dates": [
+        "2026-09-18T18:21:10.306259Z",
+        "2026-09-18T18:21:15.969863Z"
+      ],
+      "url": "https://pypi.org/pypi/claude-agent-sdk/json"
+    },
+    {
+      "package": "openai-codex",
+      "version": "0.154.0",
+      "python": ">=3.10",
+      "release_dates": [
+        "2026-09-10T19:51:06.371304Z",
+        "2026-09-10T19:51:08.001344Z"
+      ],
+      "url": "https://pypi.org/pypi/openai-codex/json"
+    }
+  ],
+  "retained_read_failures": [
+    {
+      "repo": "punkpeye/awesome-mcp-servers",
+      "path": "README.md",
+      "error": "GitHub Contents returned no inline content for a README larger than 1 MB; raw-media retry succeeded. Zero-byte digest rejected."
+    },
+    {
+      "repo": "anthropics/claude-agent-sdk-python",
+      "path": ".github/workflows/ci.yml",
+      "error": "gh: Not Found (HTTP 404)\n"
+    },
+    {
+      "repo": "OpenHands/OpenHands",
+      "path": "pyproject.toml",
+      "error": "gh: Not Found (HTTP 404)\n"
+    }
+  ]
+}

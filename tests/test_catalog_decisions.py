@@ -10,7 +10,7 @@ import unittest
 
 from scripts.catalog_decisions import (
     BASE, BASE_SOURCES, INDEX, MANIFEST, InvalidDecisionIndex,
-    build_index, main, pointer, supplement, validate_index,
+    build_index, identity, main, pointer, supplement, validate_index,
 )
 
 
@@ -73,7 +73,8 @@ class DecisionIndexTests(unittest.TestCase):
         self.assertEqual(core["record_types"], ["catalog_card", "component_record"])
 
     def test_multiple_explicit_supplement_collections_are_supported(self):
-        self.write("research/a.json", {"repositories": [{"repository": "example/portable", "decision": "watch"}]})
+        self.write("research/a.json", {"repositories": [{"repository": "example/portable", "decision": "watch",
+                                                       "evidence_depth": "pinned_primary_source_review"}]})
         self.write("research/b.json", {"entries": [{"repository": "https://github.com/example/new", "decision": "conditional"}]})
         with redirect_stdout(io.StringIO()):
             code = main(["--root", str(self.root), "--write",
@@ -82,6 +83,17 @@ class DecisionIndexTests(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(validate_index(self.root)["repositories"], 5)
         self.assertEqual(validate_index(self.root)["repositories_by_record_type"]["research_supplement"], 2)
+        generated = json.loads((self.root / INDEX).read_text())
+        references = [ref for row in generated["records"] for ref in row["references"]
+                      if ref["path"] == "research/a.json"]
+        self.assertEqual(references[0]["evidence_depth"], "pinned_primary_source_review")
+
+    def test_repository_whitespace_and_controls_are_rejected_before_url_parsing(self):
+        for malformed in ("https://github.com/example/re\tpo", "https://github.com/example/repo\n",
+                          " https://github.com/example/repo", "\x01https://github.com/example/repo",
+                          "https://github.com/example/repo/releases/\x7f"):
+            with self.subTest(value=repr(malformed)), self.assertRaises(InvalidDecisionIndex):
+                identity(malformed)
 
     def test_unknown_collection_or_missing_repository_fails(self):
         self.write("research/new.json", {"entries": [{"name": "example/not-a-repository-field"}]})

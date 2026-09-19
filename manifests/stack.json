@@ -156,7 +156,8 @@
         "native-observability",
         "native-research-runtime-20260919",
         "native-claude-convergence-review-20260919",
-        "native-paired-adoption-20260919"
+        "native-paired-adoption-20260919",
+        "native-architecture-review-20260919"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -230,7 +231,8 @@
         "native-observability-followup",
         "desktop-restart-acceptance",
         "portable-sdk-adoption-20260919",
-        "native-paired-adoption-20260919"
+        "native-paired-adoption-20260919",
+        "native-architecture-review-20260919"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -813,7 +815,8 @@
         "desktop-restart-acceptance",
         "native-research-runtime-20260919",
         "native-claude-convergence-review-20260919",
-        "native-paired-adoption-20260919"
+        "native-paired-adoption-20260919",
+        "native-architecture-review-20260919"
       ],
       "source_pin": null,
       "upstream_sources": [
@@ -838,7 +841,8 @@
         "desktop-restart-acceptance",
         "native-research-runtime-20260919",
         "native-claude-convergence-review-20260919",
-        "native-paired-adoption-20260919"
+        "native-paired-adoption-20260919",
+        "native-architecture-review-20260919"
       ],
       "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
       "upstream_sources": [
@@ -862,7 +866,8 @@
         "desktop-restart-acceptance",
         "native-research-runtime-20260919",
         "native-claude-convergence-review-20260919",
-        "native-paired-adoption-20260919"
+        "native-paired-adoption-20260919",
+        "native-architecture-review-20260919"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [

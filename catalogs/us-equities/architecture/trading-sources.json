@@ -1,0 +1,855 @@
+{
+  "checked_at_utc": "2026-09-19T20:10:36.190412+00:00",
+  "sources": [
+    {
+      "wave": 1,
+      "repository": "QuantConnect/Lean",
+      "source_commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "path": "LICENSE",
+      "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/LICENSE",
+      "status": "captured",
+      "bytes": 10737,
+      "sha256": "522cf0a716ce03f67d46f8fceb5bf78c5b84400ec5cd8d14bf9f02cddc1cb6ba"
+    },
+    {
+      "wave": 1,
+      "repository": "QuantConnect/Lean",
+      "source_commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "path": "Common/Orders/Fills/EquityFillModel.cs",
+      "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Orders/Fills/EquityFillModel.cs",
+      "status": "captured",
+      "bytes": 52099,
+      "sha256": "7f8c0e35eb538f5a63184c9b5ef4b32886e2c7779ccce1e773229a1a1ec18232"
+    },
+    {
+      "wave": 1,
+      "repository": "QuantConnect/Lean",
+      "source_commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "path": "Common/Orders/Slippage/VolumeShareSlippageModel.cs",
+      "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Orders/Slippage/VolumeShareSlippageModel.cs",
+      "status": "captured",
+      "bytes": 4089,
+      "sha256": "1bf775a04e149f70efcb8196ae6530aad455b48e1cc037ec10a30a9d4543f1be"
+    },
+    {
+      "wave": 1,
+      "repository": "QuantConnect/Lean",
+      "source_commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "path": "Common/Data/Auxiliary/FactorFile.cs",
+      "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Data/Auxiliary/FactorFile.cs",
+      "status": "captured",
+      "bytes": 5488,
+      "sha256": "fa0c953fe65c42382b969c61aea95c14f46826661d193392251efa3f24f8907c"
+    },
+    {
+      "wave": 1,
+      "repository": "QuantConnect/Lean",
+      "source_commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "path": "Common/Data/Auxiliary/MapFile.cs",
+      "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Data/Auxiliary/MapFile.cs",
+      "status": "captured",
+      "bytes": 9650,
+      "sha256": "47a177002507105948617fa7313a21d7dd3d764b07233631a1f2c3bb2bf080a7"
+    },
+    {
+      "wave": 1,
+      "repository": "QuantConnect/Lean",
+      "source_commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "path": "Tests/Common/Orders/Fills/EquityFillModelTests.cs",
+      "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Tests/Common/Orders/Fills/EquityFillModelTests.cs",
+      "status": "captured",
+      "bytes": 78288,
+      "sha256": "89bb0db4f60816965c63e91bdde92d2c85e9e570015439b83ca27c97a1e505db"
+    },
+    {
+      "wave": 1,
+      "repository": "nautechsystems/nautilus_trader",
+      "source_commit": "27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+      "path": "LICENSE",
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/LICENSE",
+      "status": "captured",
+      "bytes": 7651,
+      "sha256": "ee907919ec88c9c017b1f8b608db20960b6598aefcc4fe58820bde955d65ed3c"
+    },
+    {
+      "wave": 1,
+      "repository": "nautechsystems/nautilus_trader",
+      "source_commit": "27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+      "path": "pyproject.toml",
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/pyproject.toml",
+      "status": "captured",
+      "bytes": 15841,
+      "sha256": "5dbc4591408bd65f7b35c2274348a7a02ff7b034a15f46d5f8628d3c8fbafa36"
+    },
+    {
+      "wave": 1,
+      "repository": "nautechsystems/nautilus_trader",
+      "source_commit": "27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+      "path": "docs/concepts/backtesting/fill-models.md",
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/docs/concepts/backtesting/fill-models.md",
+      "status": "captured",
+      "bytes": 6566,
+      "sha256": "1ffd8196b3891142ae870f1abb255408ca2abe8eee2f486738afd4bc706905a4"
+    },
+    {
+      "wave": 1,
+      "repository": "nautechsystems/nautilus_trader",
+      "source_commit": "27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+      "path": "docs/concepts/reconciliation.md",
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/docs/concepts/reconciliation.md",
+      "status": "captured",
+      "bytes": 20913,
+      "sha256": "8b6df487ac8d00e74bd8098175482dad043dbda51124afa391238ddc760366b6"
+    },
+    {
+      "wave": 1,
+      "repository": "nautechsystems/nautilus_trader",
+      "source_commit": "27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+      "path": "nautilus_trader/risk/engine.pyx",
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/nautilus_trader/risk/engine.pyx",
+      "status": "captured",
+      "bytes": 50544,
+      "sha256": "bf51d0d886d98c4e95c1ef1aa74e4dd24a236a9fc149fb646a1f038d7dfb8d84"
+    },
+    {
+      "wave": 1,
+      "repository": "nautechsystems/nautilus_trader",
+      "source_commit": "27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+      "path": "tests/unit_tests/backtest/test_models.py",
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/tests/unit_tests/backtest/test_models.py",
+      "status": "captured",
+      "bytes": 4545,
+      "sha256": "cc73cf00c98f1534b6fb77fb9bf45f8a0eb95d15e8c0918523cd0cf73572fa2f"
+    },
+    {
+      "wave": 1,
+      "repository": "nautechsystems/nautilus_trader",
+      "source_commit": "27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+      "path": "tests/unit_tests/risk/test_engine.py",
+      "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/tests/unit_tests/risk/test_engine.py",
+      "status": "captured",
+      "bytes": 124834,
+      "sha256": "27244d8a8e85c379c8b0b7e33762cbab1f0caf0a3b6db03246ad04a091e2ff23"
+    },
+    {
+      "wave": 1,
+      "repository": "Lumiwealth/lumibot",
+      "source_commit": "f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b",
+      "path": "LICENSE",
+      "url": "https://github.com/Lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/LICENSE",
+      "status": "captured",
+      "bytes": 35130,
+      "sha256": "7d8846232c63c8d5c00a0a4d412df1c69c4339a54e59157164c0916ec0eff24d"
+    },
+    {
+      "wave": 1,
+      "repository": "Lumiwealth/lumibot",
+      "source_commit": "f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b",
+      "path": "setup.py",
+      "url": "https://github.com/Lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/setup.py",
+      "status": "captured",
+      "bytes": 6179,
+      "sha256": "8964f77b43429d46f68602fca8a56f6025da691d0fb0efeb4da366daba95fcea"
+    },
+    {
+      "wave": 1,
+      "repository": "Lumiwealth/lumibot",
+      "source_commit": "f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b",
+      "path": "lumibot/backtesting/backtesting_broker.py",
+      "url": "https://github.com/Lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/lumibot/backtesting/backtesting_broker.py",
+      "status": "captured",
+      "bytes": 230589,
+      "sha256": "0cb2c26df03a25878dd9bfa2f212ac533f991d1f89c0dec38b1a9b32fcac660f"
+    },
+    {
+      "wave": 1,
+      "repository": "Lumiwealth/lumibot",
+      "source_commit": "f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b",
+      "path": "lumibot/entities/trading_slippage.py",
+      "url": "https://github.com/Lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/lumibot/entities/trading_slippage.py",
+      "status": "captured",
+      "bytes": 783,
+      "sha256": "ffa4c30f6f7b1ef5361d6559dfe22e6573a61603ec1bfb7275908143dae27e15"
+    },
+    {
+      "wave": 1,
+      "repository": "Lumiwealth/lumibot",
+      "source_commit": "f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b",
+      "path": "tests/backtest/test_dividends.py",
+      "url": "https://github.com/Lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/tests/backtest/test_dividends.py",
+      "status": "captured",
+      "bytes": 10490,
+      "sha256": "c0786998573e8ec11d3a03bf06c63ecfdf0bd0c24921bbf220dc9f21da65ba4f"
+    },
+    {
+      "wave": 1,
+      "repository": "Lumiwealth/lumibot",
+      "source_commit": "f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b",
+      "path": "tests/test_broker_sync_positions.py",
+      "url": "https://github.com/Lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/tests/test_broker_sync_positions.py",
+      "status": "captured",
+      "bytes": 3379,
+      "sha256": "80f29bd7ed16cf16ad8e2cdceb79e7cba427e6693f6232649fede3732ea1aabf"
+    },
+    {
+      "wave": 1,
+      "repository": "polakowo/vectorbt",
+      "source_commit": "259d2d89fe2e7638baf3ca76c394937cd32b656d",
+      "path": "LICENSE.md",
+      "url": "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/LICENSE.md",
+      "status": "captured",
+      "bytes": 12321,
+      "sha256": "a914859a115b70e80956a3cbd613139ad74c04e5d1bd38da8bcc16725822ec84"
+    },
+    {
+      "wave": 1,
+      "repository": "polakowo/vectorbt",
+      "source_commit": "259d2d89fe2e7638baf3ca76c394937cd32b656d",
+      "path": "pyproject.toml",
+      "url": "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/pyproject.toml",
+      "status": "captured",
+      "bytes": 2220,
+      "sha256": "a26c19497b7d0a72aa95fa372fedc94b1a7040ddf591d2501ae49230994d398e"
+    },
+    {
+      "wave": 1,
+      "repository": "polakowo/vectorbt",
+      "source_commit": "259d2d89fe2e7638baf3ca76c394937cd32b656d",
+      "path": "vectorbt/generic/splitters.py",
+      "url": "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/vectorbt/generic/splitters.py",
+      "status": "captured",
+      "bytes": 10528,
+      "sha256": "ca35bbe250352795b519045d7157e20b1aba130529e8c7caf0c71bb88dc8c563"
+    },
+    {
+      "wave": 1,
+      "repository": "polakowo/vectorbt",
+      "source_commit": "259d2d89fe2e7638baf3ca76c394937cd32b656d",
+      "path": "vectorbt/portfolio/nb.py",
+      "url": "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/vectorbt/portfolio/nb.py",
+      "status": "captured",
+      "bytes": 290039,
+      "sha256": "3bc4fcbd9871dcd20fe49037484253d6fe200b88042a942ff98e75bb83ec46c7"
+    },
+    {
+      "wave": 1,
+      "repository": "polakowo/vectorbt",
+      "source_commit": "259d2d89fe2e7638baf3ca76c394937cd32b656d",
+      "path": "tests/test_portfolio.py",
+      "url": "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/tests/test_portfolio.py",
+      "status": "captured",
+      "bytes": 429319,
+      "sha256": "46e871f35869480cb0ea2bf716761695ff4be5dff594537acc622f01ddf65bce"
+    },
+    {
+      "wave": 1,
+      "repository": "kernc/backtesting.py",
+      "source_commit": "ca2e2611621e472542ba90f7243a1fa06a7d7108",
+      "path": "LICENSE.md",
+      "url": "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/LICENSE.md",
+      "status": "captured",
+      "bytes": 34283,
+      "sha256": "ad858d53cae05eed9531ecd4c467440803acffe34c69de7b88e03affc5b6a1bd"
+    },
+    {
+      "wave": 1,
+      "repository": "kernc/backtesting.py",
+      "source_commit": "ca2e2611621e472542ba90f7243a1fa06a7d7108",
+      "path": "pyproject.toml",
+      "url": "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/pyproject.toml",
+      "status": "captured",
+      "bytes": 412,
+      "sha256": "88826d7401884bcc1341248ad51e3064ff2ffd6ea87a7844c87264a7968b7e8d"
+    },
+    {
+      "wave": 1,
+      "repository": "kernc/backtesting.py",
+      "source_commit": "ca2e2611621e472542ba90f7243a1fa06a7d7108",
+      "path": "backtesting/backtesting.py",
+      "url": "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/backtesting/backtesting.py",
+      "status": "captured",
+      "bytes": 75119,
+      "sha256": "30d8b5ed9c69e4891bd41fe6fa157dcdd9915c2aff279056c8975b0918178852"
+    },
+    {
+      "wave": 1,
+      "repository": "kernc/backtesting.py",
+      "source_commit": "ca2e2611621e472542ba90f7243a1fa06a7d7108",
+      "path": "backtesting/test/_test.py",
+      "url": "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/backtesting/test/_test.py",
+      "status": "captured",
+      "bytes": 51206,
+      "sha256": "5291f673cd9fc162c2dd29e6b994e8ff53ba571a2372791ce8ff0dbb8698a9fa"
+    },
+    {
+      "wave": 1,
+      "repository": "stefan-jansen/zipline-reloaded",
+      "source_commit": "943010b9da848e317fc520de87edade2b884d329",
+      "path": "LICENSE",
+      "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/LICENSE",
+      "status": "captured",
+      "bytes": 11347,
+      "sha256": "e35c4578f7db4498e62e278978f6c42e0fce6f21f9993a060b08a33549cd3044"
+    },
+    {
+      "wave": 1,
+      "repository": "stefan-jansen/zipline-reloaded",
+      "source_commit": "943010b9da848e317fc520de87edade2b884d329",
+      "path": "pyproject.toml",
+      "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/pyproject.toml",
+      "status": "captured",
+      "bytes": 8373,
+      "sha256": "76c2818609ee2c8c4f1f7d6540ffc68407a8601a9837dafc6abcbf0845ab2c3b"
+    },
+    {
+      "wave": 1,
+      "repository": "stefan-jansen/zipline-reloaded",
+      "source_commit": "943010b9da848e317fc520de87edade2b884d329",
+      "path": "src/zipline/data/adjustments.py",
+      "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/src/zipline/data/adjustments.py",
+      "status": "captured",
+      "bytes": 25359,
+      "sha256": "a10172de0bbd1e9a42ae57c91128e08c82537e349bcb0098c0b7294fd276ff59"
+    },
+    {
+      "wave": 1,
+      "repository": "stefan-jansen/zipline-reloaded",
+      "source_commit": "943010b9da848e317fc520de87edade2b884d329",
+      "path": "src/zipline/finance/slippage.py",
+      "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/src/zipline/finance/slippage.py",
+      "status": "captured",
+      "bytes": 21742,
+      "sha256": "575b5d6396b09e40253b4810145a36b6846eb69bede8af637dbe6fddbf03e70a"
+    },
+    {
+      "wave": 1,
+      "repository": "stefan-jansen/zipline-reloaded",
+      "source_commit": "943010b9da848e317fc520de87edade2b884d329",
+      "path": "tests/data/test_adjustments.py",
+      "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/tests/data/test_adjustments.py",
+      "status": "captured",
+      "bytes": 11332,
+      "sha256": "0fe18e3572320431f2bf4655f7a4a58f41117faa72f2c95707b2d98ffe512841"
+    },
+    {
+      "wave": 1,
+      "repository": "nkaz001/hftbacktest",
+      "source_commit": "5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+      "path": "LICENSE",
+      "url": "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/LICENSE",
+      "status": "captured",
+      "bytes": 1079,
+      "sha256": "b40367c13dfa67c617d6e8037d45581496d9f0429a3274ab19f117404b519a5a"
+    },
+    {
+      "wave": 1,
+      "repository": "nkaz001/hftbacktest",
+      "source_commit": "5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+      "path": "docs/order_fill.rst",
+      "url": "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/docs/order_fill.rst",
+      "status": "captured",
+      "bytes": 8204,
+      "sha256": "30791dabf9e4d7e752471d3f0d739aab713dfa0bf0bc5b09b9b7b40098409f0a"
+    },
+    {
+      "wave": 1,
+      "repository": "nkaz001/hftbacktest",
+      "source_commit": "5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+      "path": "docs/latency_models.rst",
+      "url": "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/docs/latency_models.rst",
+      "status": "captured",
+      "bytes": 2906,
+      "sha256": "9cf3df207bbe95fde933bfa506f05d4518bcf0d2752d260fdec90eab935e188e"
+    },
+    {
+      "wave": 1,
+      "repository": "nkaz001/hftbacktest",
+      "source_commit": "5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+      "path": "hftbacktest/src/backtest/models/queue.rs",
+      "url": "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/hftbacktest/src/backtest/models/queue.rs",
+      "status": "captured",
+      "bytes": 47423,
+      "sha256": "2e1c26e4ec3cb3afeed6ca31eef7387f8b086a6520ca54834a4a9f9c53cffe1a"
+    },
+    {
+      "wave": 1,
+      "repository": "nkaz001/hftbacktest",
+      "source_commit": "5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+      "path": "hftbacktest/Cargo.toml",
+      "url": "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/hftbacktest/Cargo.toml",
+      "status": "captured",
+      "bytes": 2206,
+      "sha256": "e7ed2c9a546561542dc4626c3b98e116330d7c9a8ddd52fa6c3a4ad530e95c36"
+    },
+    {
+      "wave": 2,
+      "repository": "microsoft/qlib",
+      "source_commit": "be725493eb1a6bbb42bf11b37aa7669f59610ff1",
+      "path": "LICENSE",
+      "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/LICENSE",
+      "status": "captured",
+      "bytes": 1141,
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+    },
+    {
+      "wave": 2,
+      "repository": "microsoft/qlib",
+      "source_commit": "be725493eb1a6bbb42bf11b37aa7669f59610ff1",
+      "path": "pyproject.toml",
+      "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/pyproject.toml",
+      "status": "captured",
+      "bytes": 3861,
+      "sha256": "c47849f143278fef2c114513ca123c6100f007947cdf051928e734985f35a4e9"
+    },
+    {
+      "wave": 2,
+      "repository": "microsoft/qlib",
+      "source_commit": "be725493eb1a6bbb42bf11b37aa7669f59610ff1",
+      "path": "docs/advanced/PIT.rst",
+      "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/docs/advanced/PIT.rst",
+      "status": "captured",
+      "bytes": 7298,
+      "sha256": "719bd98b46d5cadabc91ec278af2594b594b399aa13c5e4853fba9e6e2d2754c"
+    },
+    {
+      "wave": 2,
+      "repository": "microsoft/qlib",
+      "source_commit": "be725493eb1a6bbb42bf11b37aa7669f59610ff1",
+      "path": "qlib/data/pit.py",
+      "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/qlib/data/pit.py",
+      "status": "captured",
+      "bytes": 3232,
+      "sha256": "1a1c3cea3655c38d27b3b3d3d373d915b3e3e08fff99ba2a7eb2fbc0da61894b"
+    },
+    {
+      "wave": 2,
+      "repository": "microsoft/qlib",
+      "source_commit": "be725493eb1a6bbb42bf11b37aa7669f59610ff1",
+      "path": "qlib/backtest/exchange.py",
+      "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/qlib/backtest/exchange.py",
+      "status": "captured",
+      "bytes": 44235,
+      "sha256": "4affc13ab45af464cfb5b55663b80b2fc3dadb4769045d34d0fd218f760d7e08"
+    },
+    {
+      "wave": 2,
+      "repository": "microsoft/qlib",
+      "source_commit": "be725493eb1a6bbb42bf11b37aa7669f59610ff1",
+      "path": "tests/test_pit.py",
+      "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/tests/test_pit.py",
+      "status": "captured",
+      "bytes": 15881,
+      "sha256": "c7aab7b717b9f0b6c8278d019046ea5c3d0674553c6590f6654b81f7f6ac87e3"
+    },
+    {
+      "wave": 2,
+      "repository": "AI4Finance-Foundation/FinRL",
+      "source_commit": "2334a5fe6d30629157f13c3b0319e1637e15e123",
+      "path": "LICENSE",
+      "url": "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/LICENSE",
+      "status": "captured",
+      "bytes": 1093,
+      "sha256": "486a06be9075686b75b35649de0adf9076508c5d0cc5b00af7928b7a96bffe65"
+    },
+    {
+      "wave": 2,
+      "repository": "AI4Finance-Foundation/FinRL",
+      "source_commit": "2334a5fe6d30629157f13c3b0319e1637e15e123",
+      "path": "pyproject.toml",
+      "url": "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/pyproject.toml",
+      "status": "captured",
+      "bytes": 1811,
+      "sha256": "bc28042fbda127047b2ce131f1f319bfaf1103092903b653b72b12f92fe84ca9"
+    },
+    {
+      "wave": 2,
+      "repository": "AI4Finance-Foundation/FinRL",
+      "source_commit": "2334a5fe6d30629157f13c3b0319e1637e15e123",
+      "path": "finrl/meta/env_stock_trading/env_stocktrading.py",
+      "url": "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/finrl/meta/env_stock_trading/env_stocktrading.py",
+      "status": "captured",
+      "bytes": 22228,
+      "sha256": "f49e6639126f40371e1271a668dedc661060afa95b6399eac9bafbe9bbbb6fae"
+    },
+    {
+      "wave": 2,
+      "repository": "AI4Finance-Foundation/FinRL",
+      "source_commit": "2334a5fe6d30629157f13c3b0319e1637e15e123",
+      "path": "examples/FinRL_StockTrading_2026_2_train.py",
+      "url": "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/examples/FinRL_StockTrading_2026_2_train.py",
+      "status": "captured",
+      "bytes": 4626,
+      "sha256": "a25b9f51c9995eaca7797fd2e9ca5b4b02caca498fc4b7d9979e472f94250161"
+    },
+    {
+      "wave": 2,
+      "repository": "AI4Finance-Foundation/FinRL",
+      "source_commit": "2334a5fe6d30629157f13c3b0319e1637e15e123",
+      "path": "examples/FinRL_StockTrading_2026_3_Backtest.py",
+      "url": "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/examples/FinRL_StockTrading_2026_3_Backtest.py",
+      "status": "captured",
+      "bytes": 6534,
+      "sha256": "0a3395a6163c6ea53384b5e67b7939b43beb0482a1d0d9f1f9c819763619a174"
+    },
+    {
+      "wave": 2,
+      "repository": "AI4Finance-Foundation/FinRL-Trading",
+      "source_commit": "4409abe925c904e570be78ebfb5e77ac3491dff8",
+      "path": "LICENSE",
+      "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/LICENSE",
+      "status": "captured",
+      "bytes": 11352,
+      "sha256": "ef3d97b5113a0f224425680aceb7a9ed3baaa4fd9aa21e8ff445cb963fddcbf5"
+    },
+    {
+      "wave": 2,
+      "repository": "AI4Finance-Foundation/FinRL-Trading",
+      "source_commit": "4409abe925c904e570be78ebfb5e77ac3491dff8",
+      "path": "src/trading/trade_executor.py",
+      "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/trading/trade_executor.py",
+      "status": "captured",
+      "bytes": 20433,
+      "sha256": "1b8660cd4c9d5ee54957f93a6f8d3dffb5c002f677f3be704bab1e8a440c92ff"
+    },
+    {
+      "wave": 2,
+      "repository": "AI4Finance-Foundation/FinRL-Trading",
+      "source_commit": "4409abe925c904e570be78ebfb5e77ac3491dff8",
+      "path": "src/strategies/universe_manager.py",
+      "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/strategies/universe_manager.py",
+      "status": "captured",
+      "bytes": 6063,
+      "sha256": "62a82196f4b2a0e2f412e27a9d79da72cd37716820a81b823aa068201f822e9f"
+    },
+    {
+      "wave": 2,
+      "repository": "AI4Finance-Foundation/FinRL-Trading",
+      "source_commit": "4409abe925c904e570be78ebfb5e77ac3491dff8",
+      "path": "src/strategies/adaptive_rotation/walk_forward.py",
+      "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/strategies/adaptive_rotation/walk_forward.py",
+      "status": "captured",
+      "bytes": 19632,
+      "sha256": "581feaf57f666c1bc41b1dcf68c5b27cb00a34e3900a82f5330090bef7d9c545"
+    },
+    {
+      "wave": 2,
+      "repository": "AI4Finance-Foundation/FinRL-Trading",
+      "source_commit": "4409abe925c904e570be78ebfb5e77ac3491dff8",
+      "path": "src/strategies/adaptive_rotation/risk_manager.py",
+      "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/strategies/adaptive_rotation/risk_manager.py",
+      "status": "captured",
+      "bytes": 16580,
+      "sha256": "bc318baab45ff356646f28288a355c057794ac0e00ca3fe7e1574fc510fc9ce1"
+    },
+    {
+      "wave": 2,
+      "repository": "AI4Finance-Foundation/FinRL-Trading",
+      "source_commit": "4409abe925c904e570be78ebfb5e77ac3491dff8",
+      "path": "src/backtest/backtest_engine.py",
+      "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/backtest/backtest_engine.py",
+      "status": "captured",
+      "bytes": 31402,
+      "sha256": "0db265436ba9816d4b07b6834c080f467314abd18ab8c451c7e5cd39eaaa46a0"
+    },
+    {
+      "wave": 2,
+      "repository": "skfolio/skfolio",
+      "source_commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "path": "LICENSE",
+      "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/LICENSE",
+      "status": "captured",
+      "bytes": 1526,
+      "sha256": "07b8dfceb7b319e5145e7b1594d2cdaf94d924d78166d28951d4b360a4dc5844"
+    },
+    {
+      "wave": 2,
+      "repository": "skfolio/skfolio",
+      "source_commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "path": "pyproject.toml",
+      "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/pyproject.toml",
+      "status": "captured",
+      "bytes": 6106,
+      "sha256": "b913fb2b6780603c3f02bf7bd05b96b6a239f2b6045cecf6c36897630e1fef84"
+    },
+    {
+      "wave": 2,
+      "repository": "skfolio/skfolio",
+      "source_commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "path": "src/skfolio/model_selection/_walk_forward.py",
+      "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/src/skfolio/model_selection/_walk_forward.py",
+      "status": "captured",
+      "bytes": 24745,
+      "sha256": "f85cbe8b5a3ff4705a7ab6d35eacdbfafc11b09ec3cc1458fd4a2cf98c563397"
+    },
+    {
+      "wave": 2,
+      "repository": "skfolio/skfolio",
+      "source_commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "path": "src/skfolio/model_selection/_combinatorial.py",
+      "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/src/skfolio/model_selection/_combinatorial.py",
+      "status": "captured",
+      "bytes": 20963,
+      "sha256": "3979268f2274dc991679c1307138409fe7d33fbe6c9b4c73446e8a591240cbd7"
+    },
+    {
+      "wave": 2,
+      "repository": "skfolio/skfolio",
+      "source_commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "path": "tests/test_model_selection/test_walk_forward.py",
+      "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/tests/test_model_selection/test_walk_forward.py",
+      "status": "captured",
+      "bytes": 27973,
+      "sha256": "58a6f14dd0c623343d9411d2795bbfc2de39ec648cb83a714c80f1d0c4a4d6c6"
+    },
+    {
+      "wave": 2,
+      "repository": "skfolio/skfolio",
+      "source_commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "path": "tests/test_model_selection/test_combinatorial.py",
+      "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/tests/test_model_selection/test_combinatorial.py",
+      "status": "captured",
+      "bytes": 15078,
+      "sha256": "8723fe071b0854ac1641caae781ee34c450c52a4bab9b23eecbf7a06163d1c2b"
+    },
+    {
+      "wave": 2,
+      "repository": "stefan-jansen/alphalens-reloaded",
+      "source_commit": "f0a07c22d554e4b4036983cc80320b432714fe7e",
+      "path": "LICENSE",
+      "url": "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/LICENSE",
+      "status": "captured",
+      "bytes": 11346,
+      "sha256": "2b651c2d29c644d1c73417cd96e6cfa506d6de102ed96fc3de96d676e089cf29"
+    },
+    {
+      "wave": 2,
+      "repository": "stefan-jansen/alphalens-reloaded",
+      "source_commit": "f0a07c22d554e4b4036983cc80320b432714fe7e",
+      "path": "src/alphalens/utils.py",
+      "url": "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/src/alphalens/utils.py",
+      "status": "captured",
+      "bytes": 41195,
+      "sha256": "fb09e6c746fac2fc159eab34d6d13d749a618a7d3f48db7882597fe625acd02b"
+    },
+    {
+      "wave": 2,
+      "repository": "stefan-jansen/alphalens-reloaded",
+      "source_commit": "f0a07c22d554e4b4036983cc80320b432714fe7e",
+      "path": "src/alphalens/performance.py",
+      "url": "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/src/alphalens/performance.py",
+      "status": "captured",
+      "bytes": 43929,
+      "sha256": "49cb32d4670314911fb1d205b73ffece0f3cfa49a6b4fea05dc215adac07f505"
+    },
+    {
+      "wave": 2,
+      "repository": "stefan-jansen/alphalens-reloaded",
+      "source_commit": "f0a07c22d554e4b4036983cc80320b432714fe7e",
+      "path": "tests/test_utils.py",
+      "url": "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/tests/test_utils.py",
+      "status": "captured",
+      "bytes": 25797,
+      "sha256": "d964d88ee4c3be278876933127fbad0cd39ca770f10f40685d8785920647d0c0"
+    },
+    {
+      "wave": 2,
+      "repository": "ranaroussi/quantstats",
+      "source_commit": "fbd10daed0227aa0d10da6513f1b15e7e98d7fae",
+      "path": "LICENSE.txt",
+      "url": "https://github.com/ranaroussi/quantstats/blob/fbd10daed0227aa0d10da6513f1b15e7e98d7fae/LICENSE.txt",
+      "status": "captured",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "wave": 2,
+      "repository": "ranaroussi/quantstats",
+      "source_commit": "fbd10daed0227aa0d10da6513f1b15e7e98d7fae",
+      "path": "pyproject.toml",
+      "url": "https://github.com/ranaroussi/quantstats/blob/fbd10daed0227aa0d10da6513f1b15e7e98d7fae/pyproject.toml",
+      "status": "captured",
+      "bytes": 3145,
+      "sha256": "50350a863f81f15df2f23bd56f6dc9d616a1155155862756e322fecb6a7d2328"
+    },
+    {
+      "wave": 2,
+      "repository": "ranaroussi/quantstats",
+      "source_commit": "fbd10daed0227aa0d10da6513f1b15e7e98d7fae",
+      "path": "quantstats/stats.py",
+      "url": "https://github.com/ranaroussi/quantstats/blob/fbd10daed0227aa0d10da6513f1b15e7e98d7fae/quantstats/stats.py",
+      "status": "captured",
+      "bytes": 114246,
+      "sha256": "b3386d94c0e100c616662db1d171a36645c3face16dc15c774c955cf6a95547e"
+    },
+    {
+      "wave": 2,
+      "repository": "ranaroussi/quantstats",
+      "source_commit": "fbd10daed0227aa0d10da6513f1b15e7e98d7fae",
+      "path": "quantstats/reports.py",
+      "url": "https://github.com/ranaroussi/quantstats/blob/fbd10daed0227aa0d10da6513f1b15e7e98d7fae/quantstats/reports.py",
+      "status": "captured",
+      "bytes": 88834,
+      "sha256": "19a0dc22cc37ee73b079fe07dea7dce303455f5a853d4cfb6bd5e712654642a9"
+    },
+    {
+      "wave": 2,
+      "repository": "gerrymanoim/exchange_calendars",
+      "source_commit": "bbda29fed902374bdb75acab008f421fbd567823",
+      "path": "LICENSE",
+      "url": "https://github.com/gerrymanoim/exchange_calendars/blob/bbda29fed902374bdb75acab008f421fbd567823/LICENSE",
+      "status": "captured",
+      "bytes": 11347,
+      "sha256": "e35c4578f7db4498e62e278978f6c42e0fce6f21f9993a060b08a33549cd3044"
+    },
+    {
+      "wave": 2,
+      "repository": "gerrymanoim/exchange_calendars",
+      "source_commit": "bbda29fed902374bdb75acab008f421fbd567823",
+      "path": "pyproject.toml",
+      "url": "https://github.com/gerrymanoim/exchange_calendars/blob/bbda29fed902374bdb75acab008f421fbd567823/pyproject.toml",
+      "status": "captured",
+      "bytes": 3524,
+      "sha256": "7915a8c83d1039992e26c344397b4a5c158b093fdf9c9f971f87b9e13e7066d3"
+    },
+    {
+      "wave": 2,
+      "repository": "gerrymanoim/exchange_calendars",
+      "source_commit": "bbda29fed902374bdb75acab008f421fbd567823",
+      "path": "exchange_calendars/exchange_calendar_xnys.py",
+      "url": "https://github.com/gerrymanoim/exchange_calendars/blob/bbda29fed902374bdb75acab008f421fbd567823/exchange_calendars/exchange_calendar_xnys.py",
+      "status": "captured",
+      "bytes": 9403,
+      "sha256": "baa39f07163abafcf2800b69edc5d920c3db0a64f8bbb30dc7d522883d0b5bd7"
+    },
+    {
+      "wave": 2,
+      "repository": "gerrymanoim/exchange_calendars",
+      "source_commit": "bbda29fed902374bdb75acab008f421fbd567823",
+      "path": "tests/test_xnys_calendar.py",
+      "url": "https://github.com/gerrymanoim/exchange_calendars/blob/bbda29fed902374bdb75acab008f421fbd567823/tests/test_xnys_calendar.py",
+      "status": "captured",
+      "bytes": 3745,
+      "sha256": "8fdbec4d02b8c255ea24af250a9fe60228342b85cb1b5b76c3d49866a101903e"
+    },
+    {
+      "wave": 0,
+      "repository": "paperswithbacktest/awesome-systematic-trading",
+      "source_commit": "4e23dd84c9ff746ddfcbc856316bcbcef0855b81",
+      "path": "README.md",
+      "url": "https://github.com/paperswithbacktest/awesome-systematic-trading/blob/4e23dd84c9ff746ddfcbc856316bcbcef0855b81/README.md",
+      "status": "captured",
+      "bytes": 90734,
+      "sha256": "456caf198b42ef5e8da1c4fd937229af49ade6061482521c4817a35f4d200a09"
+    },
+    {
+      "wave": 0,
+      "repository": "wilsonfreitas/awesome-quant",
+      "source_commit": "48e48a76b2054b5fe6eede6852ffef7783b992ce",
+      "path": "README.md",
+      "url": "https://github.com/wilsonfreitas/awesome-quant/blob/48e48a76b2054b5fe6eede6852ffef7783b992ce/README.md",
+      "status": "captured",
+      "bytes": 138900,
+      "sha256": "fa346fdbc05f651f500795e7ea95e90b6d8c0cb394daee1f7b612470650caa86"
+    },
+    {
+      "wave": 0,
+      "repository": "wangzhe3224/awesome-systematic-trading",
+      "source_commit": "424df5f4acc98dcc3880107188d20f5fa4897653",
+      "path": "README.md",
+      "url": "https://github.com/wangzhe3224/awesome-systematic-trading/blob/424df5f4acc98dcc3880107188d20f5fa4897653/README.md",
+      "status": "failed",
+      "error_type": "HTTPError",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "wave": 0,
+      "repository": "wangzhe3224/awesome-systematic-trading",
+      "source_commit": "424df5f4acc98dcc3880107188d20f5fa4897653",
+      "path": "Readme.md",
+      "url": "https://github.com/wangzhe3224/awesome-systematic-trading/blob/424df5f4acc98dcc3880107188d20f5fa4897653/Readme.md",
+      "status": "captured",
+      "bytes": 97409,
+      "sha256": "6811946f72bb5b049540d18abe9a2a00036427b0331d750393d1a11d5ec98abb"
+    },
+    {
+      "wave": 2,
+      "repository": "edtechre/pybroker",
+      "source_commit": "95e00fecb1006490601aca7e2e8de609f032e12d",
+      "path": "LICENSE",
+      "url": "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/LICENSE",
+      "status": "captured",
+      "bytes": 12318,
+      "sha256": "da959ac23cb6eb2636b9389acc0cfec35e7ffa79a0420bb5469a132a2db18650"
+    },
+    {
+      "wave": 2,
+      "repository": "edtechre/pybroker",
+      "source_commit": "95e00fecb1006490601aca7e2e8de609f032e12d",
+      "path": "pyproject.toml",
+      "url": "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/pyproject.toml",
+      "status": "captured",
+      "bytes": 2190,
+      "sha256": "d12259123e58eb5c9014b7579dbbae983a8aac5962451e69531310f696ed64d0"
+    },
+    {
+      "wave": 2,
+      "repository": "edtechre/pybroker",
+      "source_commit": "95e00fecb1006490601aca7e2e8de609f032e12d",
+      "path": "src/pybroker/strategy.py",
+      "url": "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/src/pybroker/strategy.py",
+      "status": "captured",
+      "bytes": 150482,
+      "sha256": "fee3e2dc35e3fbb568cf34e4b757b87b271f22cb8bef6c10b3e3d31caf006ed1"
+    },
+    {
+      "wave": 2,
+      "repository": "edtechre/pybroker",
+      "source_commit": "95e00fecb1006490601aca7e2e8de609f032e12d",
+      "path": "src/pybroker/eval.py",
+      "url": "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/src/pybroker/eval.py",
+      "status": "captured",
+      "bytes": 57653,
+      "sha256": "211c522bc55347106cd81cff3c5d6f7cb1197e0b8ee94db8760bded3e50735b9"
+    },
+    {
+      "wave": 2,
+      "repository": "edtechre/pybroker",
+      "source_commit": "95e00fecb1006490601aca7e2e8de609f032e12d",
+      "path": "tests/test_eval.py",
+      "url": "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/tests/test_eval.py",
+      "status": "captured",
+      "bytes": 37448,
+      "sha256": "fb5ed22ef8a7c83ebdb43c9bb6d7c86bc222a153dc82261b926e3e0d18b27d84"
+    },
+    {
+      "wave": 2,
+      "repository": "edtechre/pybroker",
+      "source_commit": "95e00fecb1006490601aca7e2e8de609f032e12d",
+      "path": "tests/test_strategy.py",
+      "url": "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/tests/test_strategy.py",
+      "status": "captured",
+      "bytes": 298240,
+      "sha256": "c92ea42cbbf6c6ee35e21f4500ff4b81f12636e8761b16de723d2e369b77152f"
+    },
+    {
+      "wave": 2,
+      "repository": "skfolio/skfolio",
+      "source_commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "path": "docs/user_guide/backtesting_and_evaluation.rst",
+      "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/docs/user_guide/backtesting_and_evaluation.rst",
+      "status": "captured",
+      "bytes": 25471,
+      "sha256": "b0e6a713efba296dca29cd4c8c9b3013ee4fe10d600fd72b5d871ecdaf8db38d"
+    },
+    {
+      "wave": 2,
+      "repository": "skfolio/skfolio",
+      "source_commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "path": "src/skfolio/portfolio/_portfolio.py",
+      "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/src/skfolio/portfolio/_portfolio.py",
+      "status": "captured",
+      "bytes": 62121,
+      "sha256": "4ccda018656ac566c2c4d57b632a120e49c6e097df016d1fb330093a34ce2d42"
+    }
+  ]
+}

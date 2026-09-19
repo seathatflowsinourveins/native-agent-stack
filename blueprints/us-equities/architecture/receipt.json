@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "id": "native-architecture-review-20260919",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "codex",
+    "claude-code",
+    "opentelemetry-collector-contrib",
+    "prometheus",
+    "loki"
+  ],
+  "claim": "Native GPT-6 Astra and Claude Opus 5 independently reviewed the same bounded twelve-fact architecture packet, returned structurally checked source-ID-linked critiques without model tool calls, and their usage reconciled to local monitoring.",
+  "status": "completed",
+  "observed_date_utc": "2026-09-19",
+  "commands": [
+    {
+      "argv": [
+        "$SDK_PYTHON",
+        "blueprints/us-equities/workers/native_worker.py",
+        "run",
+        "--codex-bin",
+        "$CODEX_BIN",
+        "--codex-home",
+        "$NATIVE_CODEX_HOME",
+        "--workspace",
+        "$WORKSPACE",
+        "--receipt",
+        "$PRIVATE_ASTRA_RECEIPT",
+        "--prompt",
+        "$REVIEW_PROMPT",
+        "--turn-deadline-seconds",
+        "180",
+        "--observation-dir",
+        "$SDK_OBSERVATION_DIR"
+      ],
+      "exit_code": 0,
+      "scope": "Existing official SDK bridge; fresh native account/model readiness passed before inference."
+    },
+    {
+      "argv": [
+        "claude",
+        "-p",
+        "--model",
+        "claude-opus-5",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--include-hook-events",
+        "--max-turns",
+        "2",
+        "--tools",
+        "",
+        "--disallowedTools",
+        "*",
+        "--permission-mode",
+        "dontAsk",
+        "--permission-prompts",
+        "none"
+      ],
+      "stdin": "review-prompt.txt",
+      "exit_code": 0,
+      "scope": "Native Claude CLI with no exposed tools and ordinary native account access."
+    }
+  ],
+  "data": {
+    "prompt": {
+      "bytes": 6997,
+      "sha256": "ce5ccf53ffb05a79f6cb86d293f9161e4dd97e1b6cfd7312d948cc5dd34cf9a9",
+      "artifact": "review-prompt.txt",
+      "same_bytes_for_both_workers": true
+    },
+    "astra": {
+      "status": "completed",
+      "configured_model": "gpt-6-astra",
+      "configured_provider": "openai",
+      "duration_ms": 33280,
+      "model_inference_submitted": true,
+      "model_tool_calls": 0,
+      "usage": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 6400,
+        "inputTokens": 21935,
+        "outputTokens": 954,
+        "reasoningOutputTokens": 0,
+        "totalTokens": 22889
+      },
+      "observation_status": "published_local_receipt"
+    },
+    "claude": {
+      "status": "completed",
+      "reported_models": [
+        "claude-opus-5"
+      ],
+      "duration_ms": 28384,
+      "exposed_tools": 0,
+      "hook_events": 16,
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 12269,
+        "cache_read_input_tokens": 3156,
+        "output_tokens": 5898,
+        "total_tokens": 21325,
+        "thinking_tokens_included_in_output": 2847
+      }
+    },
+    "combined_native_reported_token_counts": 44214,
+    "structural_checks": {
+      "status_schema": true,
+      "citations_restricted_to_supplied_fact_ids": true,
+      "reports_parsed_as_json": true
+    },
+    "telemetry": "observation.json",
+    "adjudication": "review-adjudication.md",
+    "offline_sdk_probe": "alpaca-probe.json"
+  },
+  "model_calls": 2,
+  "net_provider_tokens_saved": null,
+  "limitations": [
+    "The models reviewed supplied evidence and did not independently inspect primary sources. Their critiques are advisory and were adjudicated; agreement does not establish correctness or trading performance.",
+    "This is a native architecture-review task, not another LEAN/Dagu backtest run, full MCP/RAG acceptance, broker integration, hosted deployment or universal SOTA census.",
+    "The44,214 combined native reported tokens exclude coordinator and source-research workers. They are usage, not causal tokens saved or a billing measurement across identical tokenizers.",
+    "Astra cached input is included in input and reasoning output in output. Claude thinking is included in output; duplicate per-model/iteration/stream views are not added again.",
+    "Native model selection and terminal usage are not independent provider attestation. Full account/session/process identifiers and raw event streams remain private.",
+    "The offline Alpaca observation detects synthetic field loss only; no client/network/order, valid advanced-order fixture, entitlement or execution adapter was tested.",
+    "New machines must reproduce their own selected native profile and sign-in; these local WSL receipts do not establish macOS or unattended-host acceptance."
+  ]
+}

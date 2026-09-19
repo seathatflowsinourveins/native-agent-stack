@@ -29,6 +29,11 @@ Read the [north-star architecture and acceptance boundaries](north-star.md),
 [grand repository catalog](../../catalogs/us-equities/README.md), and
 [machine-readable harness contract](harness-contract.json) for the integrated path.
 
+The latest [roles and architecture convergence](architecture/README.md) adds
+current source reviews, explicit data/simulation/paper promotion gates, official
+Alpaca constraints and a native two-model critique. It separates platform support
+from actual host acceptance and records the observed advanced-order SDK gap.
+
 ## Selected stack and actual acceptance
 
 | Layer | Upstream selection | Status and evidence |

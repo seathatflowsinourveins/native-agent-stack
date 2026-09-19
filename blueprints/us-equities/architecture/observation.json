@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "kind": "native_cli_e2e",
+  "id": "architecture-native-reviews-observation-20260919",
+  "checked_at_utc": "2026-09-19T20:23:08.260675+00:00",
+  "status": "passed",
+  "claim": "The completed native Astra and Claude architecture reviews are visible in the existing local observation pipeline, with provider usage categories reconciled to native results and bounded logs/metrics.",
+  "scope": "Read-only correlation of the exact two existing architecture-review runs. No inference rerun, readiness probe, service change or general conversation/archive read.",
+  "astra": {
+    "model": "gpt-6-astra",
+    "native_app_version": "0.155.1",
+    "status": "completed",
+    "model_inference_submitted": true,
+    "native_result_duration_ms": 33280,
+    "native_usage": {
+      "input_tokens": 21935,
+      "cached_input_tokens_included_in_input": 6400,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 954,
+      "reasoning_output_tokens_included_in_output": 0,
+      "total_tokens": 22889
+    },
+    "native_last_equals_total": true,
+    "metric_series": 6,
+    "metric_instances": 1,
+    "metrics": {
+      "cache_write_input": 0,
+      "cached_input": 6400,
+      "input": 21935,
+      "output": 954,
+      "reasoning_output": 0,
+      "total": 22889
+    },
+    "sdk_observation": {
+      "bounded_candidate_files": 1,
+      "metadata_and_full_usage_match": true,
+      "mtime_difference_seconds": 0,
+      "loki_matches": 1,
+      "receipt_id_and_observation_id_match": true,
+      "body_redacted": true
+    },
+    "native_log": {
+      "service_name": "codex-app-server",
+      "records": 18,
+      "instances": 1,
+      "conversation_ids": 1,
+      "all_bodies_redacted": true,
+      "final_usage_event_at_utc": "2026-09-19T20:18:52.884Z",
+      "final_usage_matches": true,
+      "usage_events": 2,
+      "provisional_event": {
+        "input_tokens": 12270,
+        "output_tokens": 0,
+        "cached_input_tokens": 0,
+        "accounting": "Intermediate snapshot, not added to the final event."
+      },
+      "event_counts": {
+        "codex.sse_event": 2,
+        "codex.startup_phase": 8,
+        "codex.websocket_request": 2,
+        "codex.websocket_connect": 1,
+        "codex.turn_ttft": 1,
+        "codex.conversation_starts": 1,
+        "codex.user_prompt": 1,
+        "codex.api_request": 1,
+        "unnamed": 1
+      }
+    },
+    "correlation": "Unique local SDK observation matched on bounded native-result time, model, status, duration and complete usage; exact observation ID joins its Loki receipt. Unique native metrics process matches native model/time/all categories and joins its log instance. The retained result does not expose a native conversation ID for a direct result-to-conversation join."
+  },
+  "claude": {
+    "model": "claude-opus-5",
+    "native_app_version": "2.1.278",
+    "status": "completed",
+    "native_result_subtype": "success",
+    "native_is_error": false,
+    "native_turns": 1,
+    "wrapper_duration_ms": 28384,
+    "native_result_duration_ms": 26656,
+    "native_api_duration_ms": 26520,
+    "logged_api_duration_ms": 26517,
+    "native_usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 12269,
+      "cache_read_input_tokens": 3156,
+      "output_tokens": 5898,
+      "thinking_tokens_included_in_output": 2847,
+      "total_tokens": 21325
+    },
+    "metric_series": 4,
+    "metric_instances": 1,
+    "metrics": {
+      "input": 2,
+      "cacheCreation": 12269,
+      "cacheRead": 3156,
+      "output": 5898
+    },
+    "native_session_count": 1,
+    "native_stdout_rows": 34,
+    "native_hook_lifecycle_rows": 16,
+    "native_hook_lifecycle_counts": {
+      "SessionStart": 8,
+      "UserPromptSubmit": 2,
+      "Stop": 6
+    },
+    "exposed_tools": 0,
+    "native_log": {
+      "service_name": "claude-code",
+      "records": 51,
+      "instances": 1,
+      "all_bodies_redacted": true,
+      "api_events": 1,
+      "api_event_at_utc": "2026-09-19T20:19:24.487Z",
+      "api_usage_matches": true,
+      "event_counts": {
+        "api_request": 1,
+        "mcp_server_connection": 10,
+        "assistant_response": 1,
+        "hook_execution_complete": 3,
+        "hook_execution_start": 3,
+        "hook_registered": 27,
+        "managed_settings_resolved": 1,
+        "plugin_loaded": 4,
+        "user_prompt": 1
+      }
+    },
+    "correlation": "The instance recorded by the native launch receipt exactly matches both Prometheus instance and Loki service_instance_id. Native stdout, receipt, metric categories and the single API event agree. Native session IDs are not retained in the redacted Loki records.",
+    "accounting": "Cache creation and cache reads are separate input categories. Thinking is included in output. Per-model, iteration and cache-duration views repeat the same usage and are not added again."
+  },
+  "combined_native_reported_token_counts": 44214,
+  "prometheus_targets": {
+    "checked_at_utc": "2026-09-19T20:23:08.260675+00:00",
+    "active": 7,
+    "up": 7,
+    "down": 0,
+    "unknown": 0,
+    "scrape_errors": 0,
+    "meaning": "Current scrape health snapshot only, not continuous availability or recovery acceptance."
+  },
+  "query_bounds": {
+    "start_utc": "2026-09-19T20:17:23.003784+00:00",
+    "end_utc": "2026-09-19T20:19:54.540905+00:00",
+    "prometheus_evaluation_time": "End of the bounded query window",
+    "prometheus_lookback": "5m",
+    "loki_limit": 150,
+    "truncation_observed": false
+  },
+  "native_commands": [
+    {
+      "purpose": "Match the exact SDK observation receipt",
+      "command": "curl --fail --silent --show-error --max-time 15 --get \"$LOKI_URL/loki/api/v1/query_range\" --data-urlencode \"query={service_name=\\\"codex-sdk-receipt\\\"} | observation_id=\\\"$OBSERVATION_ID\\\"\" --data-urlencode \"start=$START_NS\" --data-urlencode \"end=$END_NS\" --data-urlencode \"limit=150\"",
+      "exit_code": 0,
+      "result": "1 matching redacted record; receipt_id and observation_id both match the unique local observation."
+    },
+    {
+      "purpose": "Read bounded native Astra usage categories",
+      "command": "curl --fail --silent --show-error --max-time 15 --get \"$PROMETHEUS_URL/api/v1/query\" --data-urlencode 'query=last_over_time(ecosystem_codex_turn_token_usage_sum{client_scope=\"sdk-worker\"}[5m])' --data-urlencode \"time=$EVALUATION_TIME_SECONDS\"",
+      "exit_code": 0,
+      "result": "6 categories, 1 process instance; all values match native usage."
+    },
+    {
+      "purpose": "Correlate native Astra log process",
+      "command": "curl --fail --silent --show-error --max-time 15 --get \"$LOKI_URL/loki/api/v1/query_range\" --data-urlencode \"query={service_name=~\\\".+\\\"} | service_instance_id=\\\"$ASTRA_INSTANCE_ID\\\"\" --data-urlencode \"start=$START_NS\" --data-urlencode \"end=$END_NS\" --data-urlencode \"limit=150\"",
+      "exit_code": 0,
+      "result": "18 redacted codex-app-server records; final native SSE usage agrees."
+    },
+    {
+      "purpose": "Read exact native Claude process usage categories",
+      "command": "curl --fail --silent --show-error --max-time 15 --get \"$PROMETHEUS_URL/api/v1/query\" --data-urlencode \"query=last_over_time(ecosystem_claude_code_token_usage_tokens_total{instance=\\\"$CLAUDE_INSTANCE_ID\\\"}[5m])\" --data-urlencode \"time=$EVALUATION_TIME_SECONDS\"",
+      "exit_code": 0,
+      "result": "4 categories; exact instance from the native launch receipt."
+    },
+    {
+      "purpose": "Correlate exact native Claude process logs",
+      "command": "curl --fail --silent --show-error --max-time 15 --get \"$LOKI_URL/loki/api/v1/query_range\" --data-urlencode \"query={service_name=\\\"claude-code\\\"} | service_instance_id=\\\"$CLAUDE_INSTANCE_ID\\\"\" --data-urlencode \"start=$START_NS\" --data-urlencode \"end=$END_NS\" --data-urlencode \"limit=150\"",
+      "exit_code": 0,
+      "result": "51 redacted records; one API event matches all four native categories."
+    },
+    {
+      "purpose": "Read the current target-health snapshot",
+      "command": "curl --fail --silent --show-error --max-time 15 \"$PROMETHEUS_URL/api/v1/targets\"",
+      "exit_code": 0,
+      "result": "7 active targets, 7 up, 0 down, 0 scrape errors."
+    }
+  ],
+  "source_artifact_sha256": {
+    "astra_native_result": "097fd7e3d5b299b5861a4a534ac08417b219194882e50b975aadcba31a1375fa",
+    "claude_native_receipt": "d68df8741be0926b156aa66c08139ae97718cac46f54f6d193d178f969d28646",
+    "claude_native_stdout": "33bb21d9c7ee3be4d5e84a3c3b796b82d5b680f0f646e361b286180a5ea50f71"
+  },
+  "model_calls_by_reconciliation": 0,
+  "net_provider_tokens_saved": null,
+  "limitations": [
+    "Two reviews of one bounded architecture packet demonstrate execution and observation, not the correctness of every model suggestion or a production architecture.",
+    "These are model usage totals, not net token savings, subscription billing or an equivalent-task efficiency comparison. Provider tokenizers can differ.",
+    "Cached input and thinking subsets are never added twice; provisional and cumulative usage views are not separate requests.",
+    "Hook registration, MCP connection events and native lifecycle rows are different measurements. Zero exposed tools means this review does not prove tool execution, every installed MCP, PreToolUse/PostToolUse or PreCompact.",
+    "Logs retain structured telemetry and redact bodies. Exact private IDs and machine paths are intentionally omitted from this public-safe receipt.",
+    "Seven healthy scrape targets do not establish host reboot recovery, unattended operation, off-host recovery, remote paging or broker execution acceptance."
+  ]
+}

@@ -30,7 +30,11 @@
       "catalogs/us-equities/hosting-source-review.json",
       "catalogs/us-equities/model-refresh.json",
       "catalogs/us-equities/model-followup.json",
-      "adoption/research.json"
+      "adoption/research.json",
+      "catalogs/us-equities/architecture/foundation.json",
+      "catalogs/us-equities/architecture/trading.json",
+      "catalogs/us-equities/architecture/coverage.json",
+      "catalogs/us-equities/architecture/alpaca.json"
     ],
     "portability_followup": {
       "candidates": 6,
@@ -47,7 +51,8 @@
     "blueprints/us-equities/convergence-review/receipt.json",
     "blueprints/us-equities/supply-chain/receipt.json",
     "adoption/receipt.json",
-    "adoption/paired/receipt.json"
+    "adoption/paired/receipt.json",
+    "blueprints/us-equities/architecture/receipt.json"
   ],
   "previous_runtime_evidence": [
     "observability/restart-receipt.json",
@@ -99,6 +104,18 @@
       "id": "net-provider-savings",
       "state": "unmeasured",
       "required": "Comparable complete tasks and usage accounting. Tool byte estimates and selected-text reductions do not establish causal provider savings."
+    },
+    {
+      "id": "execution-realism",
+      "state": "source_identified_gap",
+      "required": "Calibrate depth/partial fills, latency, costs and capacity for the selected strategy. Default LEAN equity fills plus price slippage do not establish executable quantity realism; paper also omits material effects.",
+      "evidence": "catalogs/us-equities/architecture/trading.json"
+    },
+    {
+      "id": "elite-adapter-capability",
+      "state": "native_offline_incompatibility_observed",
+      "required": "Current alpaca-py0.44.0 drops advanced_instructions. Keep DMA/VWAP/TWAP unaccepted until reviewed fail-closed intent serialization, valid wire/replace/cancel contracts and actual provider/account support are proved.",
+      "evidence": "blueprints/us-equities/architecture/alpaca-probe.json"
     }
   ],
   "portable_continuation": "adoption/manifest.json",
@@ -110,5 +127,27 @@
       "evidence": "adoption/paired/receipt.json",
       "scope": "Fresh LEAN→Dagu→DuckDB→Astra→Claude prepared-packet task; no model tools, broker, unattended hosting or causal token-savings acceptance"
     }
-  ]
+  ],
+  "architecture_followup": {
+    "checked_at": "2026-09-19",
+    "roles_and_architecture": "blueprints/us-equities/architecture/README.md",
+    "source_review": "catalogs/us-equities/architecture/README.md",
+    "decision_index": "catalogs/us-equities/decision-index.json",
+    "current_repositories": 479,
+    "public_stars": 337,
+    "beyond_public_stars": 142,
+    "typed_source_references": 946,
+    "source_review_finalists": {
+      "foundation": 15,
+      "trading": 15,
+      "governance": 10
+    },
+    "complete_primary_discovery_lists": 12,
+    "extracted_github_links": 7028,
+    "discovery_links_unassessed": 6939,
+    "alpaca_public_organization_repositories": 94,
+    "native_review": "blueprints/us-equities/architecture/receipt.json",
+    "native_review_tokens": 44214,
+    "net_provider_tokens_saved": null
+  }
 }

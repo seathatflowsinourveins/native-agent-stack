@@ -1,0 +1,78 @@
+{
+  "status": "architecture_review",
+  "priorities": [
+    {
+      "rank": 1,
+      "action": "Freeze a written numeric decision spec before any further engine, catalog or orchestration work: universe definition and membership rule, horizon and rebalance frequency, position/leverage/drawdown limits, assumed capacity in shares and notional, the held-out walk-forward periods, and explicit pass/fail thresholds with a pre-registered variants ledger. Treat it as a user input, not an agent-derived artifact.",
+      "reason": "F7 records that the user strategy/universe/horizon/numeric risk spec is still missing while F3 shows catalog and discovery work continuing at scale. Without a pre-registered threshold and variants ledger, no backtest or paper result can be falsified, and every downstream acceptance in F6 and F7 lacks a criterion to be measured against. Inference: this spec is user-owned and therefore the one genuinely blocking item in the packet; the evidence does not state who is expected to author it.",
+      "citations": [
+        "F1",
+        "F7",
+        "F6",
+        "F3"
+      ]
+    },
+    {
+      "rank": 2,
+      "action": "Define and accept a point-in-time data contract as the single most consequential missing acceptance: per-row event timestamp and available-at timestamp, corporate-action and adjustment policy, delistings and survivorship-safe universe membership, pagination completeness, and recorded feed/entitlement per snapshot. Enforce it in one DuckDB/Parquet loader that fails closed on missing as-of timestamps or unknown adjustment state, and evaluate on the feed the account can actually use.",
+      "reason": "F7 lists all of these as outstanding for data snapshots and notes that the paper account carries IEX-only entitlement; F4 separates Basic from AlgoTrader Plus request limits and 2016 equity history, with no subscription or entitlement headers verified. Look-ahead and survivorship defects are unrecoverable after the fact and would silently invalidate every result produced by the accepted F2 pipeline. Inference: evaluating research on a feed richer than the paper account's entitlement would create a train/deploy mismatch; the evidence states the entitlement limit but does not draw this consequence.",
+      "citations": [
+        "F7",
+        "F4",
+        "F2"
+      ]
+    },
+    {
+      "rank": 3,
+      "action": "Keep the F8 execution boundary but add two offline acceptances instead of new components: (a) report every backtest as a cost/slippage/fill-ratio sensitivity band on the already-accepted LEAN rather than a point estimate, and (b) make typed order-intent serialization fail closed — unknown or advanced fields must raise, not be dropped — with advanced execution left disabled. No clients, no network, no orders.",
+      "reason": "F6 shows pinned LEAN EquityFillModel depth/partial-fill TODOs and a VolumeShareSlippageModel that adjusts price rather than proving depth-limited fills, so a single fill assumption is unearned; F5 shows LimitOrderRequest silently discarding synthetic DMA/VWAP/TWAP instructions at to_request_fields, which is exactly the failure mode a single-writer deterministic boundary must not inherit. F6 also frames Nautilus/HftBacktest as challengers with replay limits, not automatic swaps, so a sensitivity band is the cheaper honest answer than a second engine. Inference: silent field drop in one request type warrants fail-closed validation across the boundary; the evidence does not establish that other paths currently fail open.",
+      "citations": [
+        "F5",
+        "F6",
+        "F8"
+      ]
+    },
+    {
+      "rank": 4,
+      "action": "Simplify rather than expand: keep one orchestration owner by using accepted Dagu for scheduling plus the LangGraph that DeerFlow already depends on, and do not add a separate durable-checkpointer orchestrator absent a measured need; hold the F11 governance shortlist as conditional alternatives with gitleaks/restic as baseline; keep the 453/152/147 catalog as metadata, not acceptance. Before adding anything, close the two measured gaps: the 2 empty QMD queries in the 8/12 top-3 baseline, and off-host restore plus key escrow for immutable experiment artifacts.",
+      "reason": "F9 states DeerFlow already depends on LangGraph and that an extra orchestrator may duplicate ownership, and that strict deserialization and a durable checkpointer need their own acceptance; F10 shows DeerFlow stable/main divergence, a Linux+Docker hosting recommendation, and an OpenHands Node version conflict — instability that multiplies with component count. F11's findings (Marquez default no-auth, DataHub 8GB+ and cloud-only assistant, Soda v4 licensing, harden-runner telemetry tiers) argue against bulk installation. F12 shows retrieval and restore gaps that adding tools would not fix. Inference: Dagu, already accepted in F2, can cover the scheduling role the extra orchestrator would take; the evidence does not state that Dagu covers DeerFlow's specific in-graph checkpointing.",
+      "citations": [
+        "F9",
+        "F10",
+        "F11",
+        "F12",
+        "F3"
+      ]
+    }
+  ],
+  "unsupported_claims": [
+    {
+      "claim": "Alpaca Elite unlocks roughly 1000 trades per minute and therefore a higher execution tier for this project.",
+      "reason": "F4 states the advertised 1000/minute figure is API requests per minute, not executed trades, that Trading API individual and Broker API partner limits differ, and that no Elite subscription, account headers or data entitlements were verified. Elite is hosted commercial product access, categorically different from the personal native coding subscriptions in F2 (Codex CLI, Claude Code) that are already signed in; F1 authorizes no purchases or paid hosting in this task. Any capability statement about Elite is an unverified vendor marketing reading.",
+      "citations": [
+        "F4",
+        "F1",
+        "F2"
+      ]
+    },
+    {
+      "claim": "Advanced execution instructions (DMA/VWAP/TWAP) are supported or nearly ready through alpaca-py.",
+      "reason": "F5 is an offline serialization compatibility observation with zero clients, network or orders: OrderRequest does not declare advanced_instructions and LimitOrderRequest silently drops the synthetic fields. Silent drop is evidence against support, not partial support, and F5 explicitly says it is not a valid-order, wire or entitlement test. Under the F8 boundary, order intent is owned by a deterministic reviewed engine, so a client-library observation cannot stand in for the missing adapter contract and provider acceptance.",
+      "citations": [
+        "F5",
+        "F8"
+      ]
+    },
+    {
+      "claim": "The completed paired run and the measured token/artifact reductions demonstrate a validated, efficient, near-ready research capability.",
+      "reason": "F6 labels the bundled run of 3943 points and 3 simulated orders as engine evidence, explicitly not strategy validation; F2 describes the paired LEAN→Dagu→DuckDB→Astra→Claude run as local manual research, not broker-connected or unattended hosting. F12 states net provider causal savings are unmeasured, that 4823→640 is artifact reduction only, and that the 37069 native reported tokens exclude other process, context and prompt cost — so no causal token saving follows. F3's 337 stars and 453/152/147 counts are metadata, which F3 itself separates from source review and native acceptance. No financial performance or live readiness is established by any of these.",
+      "citations": [
+        "F6",
+        "F2",
+        "F12",
+        "F3"
+      ]
+    }
+  ],
+  "stopping_assessment": "Stopping here is correct and the boundaries in the packet are being respected: no orders, no purchases, no paid hosting, no live trading, and advanced execution remains disabled (F1, F5, F8). One item is genuinely blocking and is a user decision, not agent work — the numeric strategy/universe/horizon/risk spec in F7; proceeding under an assumed spec would make results non-falsifiable rather than merely provisional, so it warrants asking rather than guessing. Everything in priorities 2 through 4 is independent of that answer and can proceed now: the point-in-time data contract, the fail-closed serialization and sensitivity-band acceptances, the orchestration collapse, the 2 empty QMD queries and off-host restore/key escrow. Scope distinction to hold: the personal native coding subscriptions in F2 are signed in and in scope, while Alpaca Elite (F4), DataHub's cloud-only assistant and harden-runner's tiered telemetry (F11) are hosted or commercial product access that this task does not authorize and that no evidence here verifies. Standing caveat on this review: it rests only on the supplied packet treated as untrusted evidence — nothing was opened, run or fetched, so no fact above is independently source-verified, and every inference I drew is marked 'Inference:' in the reason field where it appears."
+}

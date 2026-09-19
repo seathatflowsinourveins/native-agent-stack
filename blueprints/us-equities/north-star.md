@@ -5,11 +5,15 @@ recoverable **Alpaca paper** runtime. The present deliverable is its native
 research/backtest foundation and examined [grand catalog](../../catalogs/us-equities/README.md).
 It is not a deployed broker service or a validated profitable strategy.
 
+The current [architecture and next-role contract](architecture/README.md) records
+the latest research wave, official Alpaca limits, native SDK compatibility gap,
+simulation realism requirements and platform-specific acceptance.
+
 ## A coherent default
 
 | Responsibility | Selected path | Adoption status |
 | --- | --- | --- |
-| Research workers | Native Codex SDK / GPT-6 Astra; existing Claude Opus companion | Astra SDK inference proved; Claude has earlier native receipts |
+| Research workers | Native Codex SDK / GPT-6 Astra; Claude Opus 5 companion | Fresh paired research and native architecture critiques passed; model outputs remain reviewed proposals |
 | Context efficiency | Stable policy, bounded tool output, Context Mode/RTK, explicit handoff files | Native use proved with documented scope limits |
 | Continuity | ai-memory as shared durable memory; canonical project instructions for rules | Active in the adopted starter project |
 | Retrieval | QMD for scoped Markdown; Serena for symbols; SocratiCode → Nemotron → Qdrant for code | Local automatic code refresh proved; no financial corpus implied |
@@ -21,7 +25,7 @@ It is not a deployed broker service or a validated profitable strategy.
 | Strategy research | Simple lagged baselines, then selected Qlib/statistical/portfolio tools | Catalogued; no strategy accepted or performance asserted |
 | Execution state | Separate deterministic order writer, durable journal and broker reconciliation | Design requirement, not implemented |
 | Hosting | On-demand native research and Dagu history service now; dedicated identity for paper later | No new cloud account or standing trading service |
-| Operations | Private receipts/usage, Gitleaks now; SBOM, dependency triage, telemetry and recovery later | Scope-specific evidence in the catalog |
+| Operations | Private receipts/usage, Gitleaks, SDK Syft inventory, native metrics/logs and Restic/application recovery | Selected local scope accepted; off-host recovery, external alerts and unattended hosting remain open |
 
 Installing every alternative would increase dependency, model-call and context
 cost. A new component should close a named requirement or beat the current path

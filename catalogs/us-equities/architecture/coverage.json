@@ -1,0 +1,705 @@
+{
+  "schema_version": 1,
+  "base_commit": "a9f40f21a26819cc8fdf109b1b36e2867d792c08",
+  "checked_at_utc": "2026-09-19T20:17:27.781301+00:00",
+  "scope": "Bounded two-wave public discovery and source review, not exhaustive SOTA coverage and not new native E2E.",
+  "public_stars": {
+    "count": 337,
+    "archived": 0,
+    "unknown_or_unclassified_license_metadata": 67,
+    "name_set_sha256": "c3e3abcfa39c36dbb5b86c6917c1b9807376034be83095c1664314d408a02cd1",
+    "added": 0,
+    "removed": 0,
+    "private_filter": "private == false before report output"
+  },
+  "coverage_counts": {
+    "lists_successful": 12,
+    "unique_extracted_github_identities": 7028,
+    "existing_grand_index": 85,
+    "selected_source_review": 4,
+    "discovery_only_unassessed": 6939,
+    "portable_union_before_wave": 458
+  },
+  "source_file_reviews": 40,
+  "candidates": [
+    {
+      "requested": "MarquezProject/marquez",
+      "repository": "MarquezProject/marquez",
+      "id": 139907613,
+      "description": "Collect, aggregate, and visualize a data ecosystem's metadata",
+      "archived": false,
+      "license": "Apache-2.0",
+      "commit": "180f37b22387146187af1ef0279e3ee1d1ccd789",
+      "commit_date": "2026-04-12T18:43:52Z",
+      "default_branch": "main",
+      "exit_code": 0,
+      "role": "OpenLineage event store and lineage UI",
+      "decision": "conditional_when_cross_pipeline_lineage_is_required",
+      "evidence": [
+        "README lines 43-48 provides a Docker entrypoint; lines 83 and 173 explicitly state the default API lacks authentication and authorization.",
+        "The compose file uses PostgreSQL 14 and publishes database/API ports; the selected integration test covers invalid event input.",
+        "OpenLineage ingestion is useful for lineage, but lineage events do not establish point-in-time market correctness."
+      ],
+      "native": [
+        "./docker/up.sh"
+      ],
+      "next": "Retain existing receipts and OpenLineage contract; evaluate a loopback authenticated deployment only when several pipelines need lineage traversal.",
+      "review_level": "selected_primary_files",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://github.com/MarquezProject/marquez/blob/180f37b22387146187af1ef0279e3ee1d1ccd789/README.md",
+          "bytes": 11837,
+          "sha256": "f6b947a608190eae9b65644b57ed186cdbb898f8a6a763fc4a244c7c074150b8",
+          "line_count": 196,
+          "exit_code": 0
+        },
+        {
+          "path": "docker-compose.yml",
+          "url": "https://github.com/MarquezProject/marquez/blob/180f37b22387146187af1ef0279e3ee1d1ccd789/docker-compose.yml",
+          "bytes": 1313,
+          "sha256": "1c27327a365fdd4e28f80fb55f9588bbc569c9eba7da0fabb2a4b7a69629a0ad",
+          "line_count": 46,
+          "exit_code": 0
+        },
+        {
+          "path": "api/src/main/java/marquez/api/OpenLineageResource.java",
+          "url": "https://github.com/MarquezProject/marquez/blob/180f37b22387146187af1ef0279e3ee1d1ccd789/api/src/main/java/marquez/api/OpenLineageResource.java",
+          "bytes": 6243,
+          "sha256": "6534aaea6b3ce29dfd9fb2763c2afb8aa0694950545540589419c5960185f72d",
+          "line_count": 178,
+          "exit_code": 0
+        },
+        {
+          "path": "api/src/test/java/marquez/OpenLineageIntegrationTest.java",
+          "url": "https://github.com/MarquezProject/marquez/blob/180f37b22387146187af1ef0279e3ee1d1ccd789/api/src/test/java/marquez/OpenLineageIntegrationTest.java",
+          "bytes": 64346,
+          "sha256": "8abfe0df45caba9e21ae8790094bf79183c3db4711651c52462e5de2f8b9eb09",
+          "line_count": 1552,
+          "exit_code": 0
+        }
+      ],
+      "runtime_acceptance": false,
+      "native_commands_are_prospective": true,
+      "discovery_sources": [],
+      "discovery_scope": "Capability-led primary-source follow-up beyond directly extracted list identities."
+    },
+    {
+      "requested": "datahub-project/datahub",
+      "repository": "datahub-project/datahub",
+      "id": 46398090,
+      "description": "The Context Platform for your Data and AI Stack",
+      "archived": false,
+      "license": "Apache-2.0",
+      "commit": "aa10be1b29406c406c5702a57607f1d05b0f620c",
+      "commit_date": "2026-09-19T13:56:19Z",
+      "default_branch": "master",
+      "exit_code": 0,
+      "role": "Metadata governance and agent-facing dataset context",
+      "decision": "defer_heavy_platform_until_metadata_consumers_require_it",
+      "evidence": [
+        "README lines 199-201 and 254-270 documents Docker quickstart and 8GB+ allocation.",
+        "datahub-agent-context distinguishes read-only search/lineage/entity tools from the Cloud-only AI assistant.",
+        "Ingestion security guidance distinguishes local secret backends from UI-stored credentials; source connection rights remain a separate gate."
+      ],
+      "native": [
+        "datahub docker quickstart"
+      ],
+      "next": "Use a source/rights/freshness registry first; do not deploy another 8GB metadata platform for the present single local research path.",
+      "review_level": "selected_primary_files",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://github.com/datahub-project/datahub/blob/aa10be1b29406c406c5702a57607f1d05b0f620c/README.md",
+          "bytes": 36831,
+          "sha256": "d1e28e532183e1f446007036f4c10e5bfd183e9f9e8af39ff8ac14dc7c36ec51",
+          "line_count": 880,
+          "exit_code": 0
+        },
+        {
+          "path": "datahub-agent-context/README.md",
+          "url": "https://github.com/datahub-project/datahub/blob/aa10be1b29406c406c5702a57607f1d05b0f620c/datahub-agent-context/README.md",
+          "bytes": 2403,
+          "sha256": "71dae216d3c8ff615ade118a8c8103a39ad7bd0f1b7779313f1de3dff71ea41b",
+          "line_count": 74,
+          "exit_code": 0
+        },
+        {
+          "path": "metadata-ingestion/pyproject.toml",
+          "url": "https://github.com/datahub-project/datahub/blob/aa10be1b29406c406c5702a57607f1d05b0f620c/metadata-ingestion/pyproject.toml",
+          "bytes": 64999,
+          "sha256": "69b8aaa697e2dc8291fbfbd0e50dbd6d160e3b7aacd187eb822f4d64bb46ca08",
+          "line_count": 2070,
+          "exit_code": 0
+        },
+        {
+          "path": "docs/metadata-ingestion-security.md",
+          "url": "https://github.com/datahub-project/datahub/blob/aa10be1b29406c406c5702a57607f1d05b0f620c/docs/metadata-ingestion-security.md",
+          "bytes": 7760,
+          "sha256": "4c68c91c713e581b7f1adc56626d8cc7f01a8dcceea007818fec6f584a027816",
+          "line_count": 122,
+          "exit_code": 0
+        }
+      ],
+      "runtime_acceptance": false,
+      "native_commands_are_prospective": true,
+      "discovery_sources": [
+        "https://github.com/gunnarmorling/awesome-opensource-data-engineering/blob/54b5f56bdea16c4db0d0e372cce16061065ef57d/README.adoc"
+      ],
+      "discovery_scope": "Listed GitHub repository identity, including verified aliases."
+    },
+    {
+      "requested": "sodadata/soda-core",
+      "repository": "sodadata/soda-core",
+      "id": 321458274,
+      "description": "Data Contracts engine for the modern data stack. https://www.soda.io",
+      "archived": false,
+      "license": "NOASSERTION",
+      "commit": "0e376977f398a5ea116517dda31f5da731029294",
+      "commit_date": "2026-09-16T06:32:03Z",
+      "default_branch": "main",
+      "exit_code": 0,
+      "role": "Data contracts and source checks",
+      "decision": "exclude_from_default_due_to_license_and_version_boundary",
+      "evidence": [
+        "Pinned LICENSE identifies Elastic License 2.0 and restricts hosted/managed service use; GitHub metadata alone returned NOASSERTION.",
+        "README distinguishes v4 soda-<source> packages from legacy v3 soda-core-<source> packages.",
+        "Contract verification supports local/no-cloud runs; cloud lifecycle failure tests are present, but were not executed."
+      ],
+      "native": [
+        "soda contract verify -ds ds_config.yml -c contract.yml"
+      ],
+      "next": "Prefer already selected explicit local schema/quality checks; separately evaluate permitted v4 terms or a pinned legacy version if a real contract need emerges.",
+      "review_level": "selected_primary_files",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://github.com/sodadata/soda-core/blob/0e376977f398a5ea116517dda31f5da731029294/README.md",
+          "bytes": 10922,
+          "sha256": "67f07a2f49c48b6fdf8b14ef97073b7e586e8bc3228f3b5ca3d8f7e6bab182d1",
+          "line_count": 248,
+          "exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/sodadata/soda-core/blob/0e376977f398a5ea116517dda31f5da731029294/LICENSE",
+          "bytes": 3804,
+          "sha256": "572dca2c34e2d0443f793d7078b5b882d23ded75aed37638721b0e5eeb6a80f7",
+          "line_count": 91,
+          "exit_code": 0
+        },
+        {
+          "path": "soda-core/src/soda_core/contracts/impl/contract_verification_impl.py",
+          "url": "https://github.com/sodadata/soda-core/blob/0e376977f398a5ea116517dda31f5da731029294/soda-core/src/soda_core/contracts/impl/contract_verification_impl.py",
+          "bytes": 92836,
+          "sha256": "f6276ac60e1cbc9d341b6232e565fe803ba35388e4857336f53a6b417b14d85f",
+          "line_count": 1917,
+          "exit_code": 0
+        },
+        {
+          "path": "soda-tests/tests/unit/test_contract_marks_scan_failed_on_connection_error.py",
+          "url": "https://github.com/sodadata/soda-core/blob/0e376977f398a5ea116517dda31f5da731029294/soda-tests/tests/unit/test_contract_marks_scan_failed_on_connection_error.py",
+          "bytes": 19766,
+          "sha256": "6ba6369668ee8163ec05b1c72cf3bdb3128633543d382c9b34f3cef1cf6eeb42",
+          "line_count": 424,
+          "exit_code": 0
+        }
+      ],
+      "runtime_acceptance": false,
+      "native_commands_are_prospective": true,
+      "discovery_sources": [],
+      "discovery_scope": "Capability-led primary-source follow-up beyond directly extracted list identities."
+    },
+    {
+      "requested": "TobikoData/sqlmesh",
+      "repository": "SQLMesh/sqlmesh",
+      "id": 540527604,
+      "description": "Scalable and efficient data transformation framework - backwards compatible with dbt.",
+      "archived": false,
+      "license": "Apache-2.0",
+      "commit": "ad2377ea9f065b26d957207958a024aaebc0b70f",
+      "commit_date": "2026-09-16T03:13:24Z",
+      "default_branch": "main",
+      "exit_code": 0,
+      "role": "Versioned SQL transformations, backfills and data audits",
+      "decision": "conditional_when_transform_graph_outgrows_current_DuckDB_pipeline",
+      "evidence": [
+        "GitHub API resolves TobikoData/sqlmesh to SQLMesh/sqlmesh with immutable ID 540527604.",
+        "Plan builder no_gaps defaults to false; source presence does not make missing-interval protection automatic.",
+        "Built-in audits include nonblocking variants; integration tests assert bad data and bad audit definitions fail selected plans."
+      ],
+      "native": [
+        "sqlmesh plan",
+        "sqlmesh audit"
+      ],
+      "next": "Use an isolated DuckDB transformation fixture with explicit audits and no-gap policy before any promotion; do not infer market-calendar/PIT semantics from interval coverage.",
+      "review_level": "selected_primary_files",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://github.com/SQLMesh/sqlmesh/blob/ad2377ea9f065b26d957207958a024aaebc0b70f/README.md",
+          "bytes": 7625,
+          "sha256": "5950d181200b01f54510e1f73e8b443c66888ec6d8cc95a0011cfa2808f26970",
+          "line_count": 193,
+          "exit_code": 0
+        },
+        {
+          "path": "sqlmesh/core/plan/builder.py",
+          "url": "https://github.com/SQLMesh/sqlmesh/blob/ad2377ea9f065b26d957207958a024aaebc0b70f/sqlmesh/core/plan/builder.py",
+          "bytes": 46325,
+          "sha256": "604514c4c7df90353f62d55a5563fa32f6a3081580e3339d612cebe3be8ac812",
+          "line_count": 961,
+          "exit_code": 0
+        },
+        {
+          "path": "sqlmesh/core/audit/builtin.py",
+          "url": "https://github.com/SQLMesh/sqlmesh/blob/ad2377ea9f065b26d957207958a024aaebc0b70f/sqlmesh/core/audit/builtin.py",
+          "bytes": 17783,
+          "sha256": "69d03e7050a9841eba8d56389fae9c6f06d14c517515310832b2e1443a5b068d",
+          "line_count": 784,
+          "exit_code": 0
+        },
+        {
+          "path": "tests/core/integration/test_audits.py",
+          "url": "https://github.com/SQLMesh/sqlmesh/blob/ad2377ea9f065b26d957207958a024aaebc0b70f/tests/core/integration/test_audits.py",
+          "bytes": 10487,
+          "sha256": "b23a9f61dab132c708044ea570ada9c0ec110c98d6cdc61c9ab3bfae0a998a61",
+          "line_count": 348,
+          "exit_code": 0
+        }
+      ],
+      "runtime_acceptance": false,
+      "native_commands_are_prospective": true,
+      "discovery_sources": [],
+      "discovery_scope": "Capability-led primary-source follow-up beyond directly extracted list identities."
+    },
+    {
+      "requested": "ariga/atlas",
+      "repository": "ariga/atlas",
+      "id": 363232643,
+      "description": "Declarative schema migrations with schema-as-code workflows",
+      "archived": false,
+      "license": "Apache-2.0",
+      "commit": "dfaf2609bbb159e3eef1dc3394b05e2e0c457031",
+      "commit_date": "2026-09-04T04:31:46Z",
+      "default_branch": "master",
+      "exit_code": 0,
+      "role": "Declarative/versioned schema migration checks",
+      "decision": "conditional_for_owned_application_databases",
+      "evidence": [
+        "README documents schema inspect and migrate lint; the migrate implementation contains dry-run and safety-abort behavior.",
+        "Selected tests include missing migration checksums and SQLite migration cases.",
+        "Current native ai-memory and Qdrant stores remain upstream-owned; an external schema manager should not rewrite them."
+      ],
+      "native": [
+        "atlas migrate lint --dev-url \"$EPHEMERAL_DEV_DATABASE_URL\""
+      ],
+      "next": "Use only for a future application-owned trading/research schema, with explicit backend support and cloud-feature review.",
+      "review_level": "selected_primary_files",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://github.com/ariga/atlas/blob/dfaf2609bbb159e3eef1dc3394b05e2e0c457031/README.md",
+          "bytes": 16180,
+          "sha256": "28d4afa722c206488be1d4df2d72dc47765e9d8f8c8c6bb92ba768d5f7859f88",
+          "line_count": 430,
+          "exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/ariga/atlas/blob/dfaf2609bbb159e3eef1dc3394b05e2e0c457031/LICENSE",
+          "bytes": 11357,
+          "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+          "line_count": 202,
+          "exit_code": 0
+        },
+        {
+          "path": "cmd/atlas/internal/cmdapi/migrate.go",
+          "url": "https://github.com/ariga/atlas/blob/dfaf2609bbb159e3eef1dc3394b05e2e0c457031/cmd/atlas/internal/cmdapi/migrate.go",
+          "bytes": 59067,
+          "sha256": "6eb5ed71aaca523511577245461f7873a20af9530387aea8a224ff3e8dd2512a",
+          "line_count": 1851,
+          "exit_code": 0
+        },
+        {
+          "path": "cmd/atlas/internal/cmdapi/migrate_test.go",
+          "url": "https://github.com/ariga/atlas/blob/dfaf2609bbb159e3eef1dc3394b05e2e0c457031/cmd/atlas/internal/cmdapi/migrate_test.go",
+          "bytes": 55389,
+          "sha256": "0431ca212258f828ffb32e99321a2a859845613a48daeb0521361c88f4b2c7f5",
+          "line_count": 1799,
+          "exit_code": 0
+        }
+      ],
+      "runtime_acceptance": false,
+      "native_commands_are_prospective": true,
+      "discovery_sources": [],
+      "discovery_scope": "Capability-led primary-source follow-up beyond directly extracted list identities."
+    },
+    {
+      "requested": "getsops/sops",
+      "repository": "getsops/sops",
+      "id": 40684033,
+      "description": "Simple and flexible tool for managing secrets",
+      "archived": false,
+      "license": "MPL-2.0",
+      "commit": "f3556a48bee79ce780512cc6023058d027de68b6",
+      "commit_date": "2026-09-18T04:20:46Z",
+      "default_branch": "main",
+      "exit_code": 0,
+      "role": "Encrypted structured configuration transport",
+      "decision": "conditional_after_key_custody_is_defined",
+      "evidence": [
+        "README supports YAML/JSON/ENV/INI/BINARY and age/KMS backends under MPL-2.0.",
+        "CLI source offers encryption/decryption and exec-env; exec-env deliberately injects decrypted values into a child environment.",
+        "Age keysource parses recipients and envelopes the data key; this does not migrate Codex or Claude native sign-in."
+      ],
+      "native": [
+        "sops encrypt --age \"$AGE_RECIPIENT\" \"$CONFIG_INPUT\"",
+        "sops decrypt \"$ENCRYPTED_CONFIG\""
+      ],
+      "next": "Keep native client sign-in local; consider SOPS only for explicitly owned service configuration with recipients/recovery owners defined. Do not inject broker secrets into research workers.",
+      "review_level": "selected_primary_files",
+      "source_files": [
+        {
+          "path": "README.rst",
+          "url": "https://github.com/getsops/sops/blob/f3556a48bee79ce780512cc6023058d027de68b6/README.rst",
+          "bytes": 1909,
+          "sha256": "63cb0a462ce23574365c0b692aa09ea2f632f4b4df2b5f4186d8c004b57e3440",
+          "line_count": 60,
+          "exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/getsops/sops/blob/f3556a48bee79ce780512cc6023058d027de68b6/LICENSE",
+          "bytes": 16725,
+          "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
+          "line_count": 373,
+          "exit_code": 0
+        },
+        {
+          "path": "cmd/sops/main.go",
+          "url": "https://github.com/getsops/sops/blob/f3556a48bee79ce780512cc6023058d027de68b6/cmd/sops/main.go",
+          "bytes": 89751,
+          "sha256": "d26eb0a3de1ce7365ec2a9f460052b7129cce530ba884c4354f6e15541f24214",
+          "line_count": 2628,
+          "exit_code": 0
+        },
+        {
+          "path": "age/keysource.go",
+          "url": "https://github.com/getsops/sops/blob/f3556a48bee79ce780512cc6023058d027de68b6/age/keysource.go",
+          "bytes": 19619,
+          "sha256": "20beeea3afebc72f1f4867573ebf7041d17c1f20bdd2f4fb67ac5c2ad0bff381",
+          "line_count": 586,
+          "exit_code": 0
+        }
+      ],
+      "runtime_acceptance": false,
+      "native_commands_are_prospective": true,
+      "discovery_sources": [],
+      "discovery_scope": "Capability-led primary-source follow-up beyond directly extracted list identities."
+    },
+    {
+      "requested": "FiloSottile/age",
+      "repository": "FiloSottile/age",
+      "id": 187403699,
+      "description": "A simple, modern and secure encryption tool (and Go library) with small explicit keys, no config options, and UNIX-style composability.",
+      "archived": false,
+      "license": "BSD-3-Clause",
+      "commit": "b74dce4cdbe35b5e5f66c06d9612b72f89028758",
+      "commit_date": "2026-08-29T17:40:19Z",
+      "default_branch": "main",
+      "exit_code": 0,
+      "role": "Portable file encryption and recovery-key envelope",
+      "decision": "conditional_for_selected_recovery_artifacts",
+      "evidence": [
+        "README and CLI source provide explicit recipient and identity-file encryption/decryption commands.",
+        "Selected tests exercise recipient-file parsing; the source license is BSD-3-Clause.",
+        "Encryption does not supply off-host storage, independent key custody, or restore/cutover proof."
+      ],
+      "native": [
+        "age --encrypt -r \"$RECIPIENT\" -o \"$ENCRYPTED_OUTPUT\" \"$INPUT\"",
+        "age --decrypt -i \"$IDENTITY_FILE\" -o \"$RESTORED_OUTPUT\" \"$ENCRYPTED_INPUT\""
+      ],
+      "next": "Use only when it improves a chosen recovery design; existing Restic encryption already covers its repositories, so avoid redundant envelopes by default.",
+      "review_level": "selected_primary_files",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://github.com/FiloSottile/age/blob/b74dce4cdbe35b5e5f66c06d9612b72f89028758/README.md",
+          "bytes": 12013,
+          "sha256": "2f715dd7ca55ffeadcca97392dd2f2e97078bc3e21b10a5999f86159f0c05450",
+          "line_count": 325,
+          "exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/FiloSottile/age/blob/b74dce4cdbe35b5e5f66c06d9612b72f89028758/LICENSE",
+          "bytes": 1516,
+          "sha256": "c5d65279d02955c0fc2294ae417c3add650d228f4f5c82bd6d531fc26c89cd96",
+          "line_count": 29,
+          "exit_code": 0
+        },
+        {
+          "path": "cmd/age/age.go",
+          "url": "https://github.com/FiloSottile/age/blob/b74dce4cdbe35b5e5f66c06d9612b72f89028758/cmd/age/age.go",
+          "bytes": 19463,
+          "sha256": "7ae4a2016e85395b4711f02fc8ffdeb679b04dcd031ec000193f7e3a16eb7708",
+          "line_count": 617,
+          "exit_code": 0
+        },
+        {
+          "path": "cmd/age/age_test.go",
+          "url": "https://github.com/FiloSottile/age/blob/b74dce4cdbe35b5e5f66c06d9612b72f89028758/cmd/age/age_test.go",
+          "bytes": 5162,
+          "sha256": "a1f29ec2596db1ffcb059fb1fb65a5367373b20c22922b39b30a0a13bf2fae84",
+          "line_count": 189,
+          "exit_code": 0
+        }
+      ],
+      "runtime_acceptance": false,
+      "native_commands_are_prospective": true,
+      "discovery_sources": [
+        "https://github.com/luong-komorebi/Awesome-Linux-Software/blob/d82162ab61df94cf7f2d7c8e75eb75e9463235c6/README.md"
+      ],
+      "discovery_scope": "Listed GitHub repository identity, including verified aliases."
+    },
+    {
+      "requested": "ossf/scorecard",
+      "repository": "ossf/scorecard",
+      "id": 302670797,
+      "description": "OpenSSF Scorecard - Security health metrics for Open Source",
+      "archived": false,
+      "license": "Apache-2.0",
+      "commit": "f92023a3f77879f96e0c9c1305f289d755be4bb6",
+      "commit_date": "2026-09-08T18:17:11Z",
+      "default_branch": "main",
+      "exit_code": 0,
+      "role": "Repository security-practice signals",
+      "decision": "conditional_read_only_repository_due_diligence",
+      "evidence": [
+        "Upstream check docs describe limitations, including incomplete branch-protection observations without administrative access.",
+        "License check delegates to detected source/license evidence; API classification can be unknown even when a license file exists.",
+        "Scores are heuristic security-practice signals, not quality, correctness, trading performance, or trustworthy dependency proof."
+      ],
+      "native": [
+        "scorecard --repo=github.com/OWNER/REPO --format=json"
+      ],
+      "next": "Optionally inspect selected check findings for adopted dependencies; retain exact version, date, permissions and unknown checks. No score was fetched or invented.",
+      "review_level": "selected_primary_files",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://github.com/ossf/scorecard/blob/f92023a3f77879f96e0c9c1305f289d755be4bb6/README.md",
+          "bytes": 45402,
+          "sha256": "8fed8241afd335db89ba8077e9883a80693c7d7ecda6ef357402207a48ad940a",
+          "line_count": 686,
+          "exit_code": 0
+        },
+        {
+          "path": "docs/checks.md",
+          "url": "https://github.com/ossf/scorecard/blob/f92023a3f77879f96e0c9c1305f289d755be4bb6/docs/checks.md",
+          "bytes": 44967,
+          "sha256": "d1a667647fa408a706e6796a855edc918d1d6dad2d6f6f5aa37802837a66c7d8",
+          "line_count": 720,
+          "exit_code": 0
+        },
+        {
+          "path": "docs/beginner-checks.md",
+          "url": "https://github.com/ossf/scorecard/blob/f92023a3f77879f96e0c9c1305f289d755be4bb6/docs/beginner-checks.md",
+          "bytes": 8942,
+          "sha256": "c628510b6a330c9d1e96df0a1b31506dc11f24b47dd407b904dcc59d6261bf40",
+          "line_count": 76,
+          "exit_code": 0
+        },
+        {
+          "path": "checks/license.go",
+          "url": "https://github.com/ossf/scorecard/blob/f92023a3f77879f96e0c9c1305f289d755be4bb6/checks/license.go",
+          "bytes": 1935,
+          "sha256": "d9e91968003e5e67770233dd181beeadfdb8f150bbd570a8e447899d3dad6dcf",
+          "line_count": 63,
+          "exit_code": 0
+        }
+      ],
+      "runtime_acceptance": false,
+      "native_commands_are_prospective": true,
+      "discovery_sources": [
+        "https://github.com/bureado/awesome-software-supply-chain-security/blob/31252e6810c43a856910e951fb230b72621b8f17/README.md"
+      ],
+      "discovery_scope": "Listed GitHub repository identity, including verified aliases."
+    },
+    {
+      "requested": "step-security/harden-runner",
+      "repository": "step-security/harden-runner",
+      "id": 422287306,
+      "description": "Harden-Runner is a CI/CD security agent that works like an EDR for GitHub Actions runners. It monitors network egress, file integrity, and process activity on those runners, detecting threats in real-time.",
+      "archived": false,
+      "license": "Apache-2.0",
+      "commit": "e14015d583714f6e62063499dc959a02595150a1",
+      "commit_date": "2026-08-30T23:21:59Z",
+      "default_branch": "main",
+      "exit_code": 0,
+      "role": "GitHub Actions runner egress and runtime observation",
+      "decision": "conditional_external_telemetry_and_tier_review_required",
+      "evidence": [
+        "action.yml exposes audit/block egress policy; disable-telemetry can only be true with block mode.",
+        "README states the community tier covers public GitHub-hosted repositories; private/self-hosted use and advanced features require enterprise.",
+        "Policy-store settings introduce API-key or id-token permission requirements; no runner or account setting was changed."
+      ],
+      "native": [
+        "GitHub Actions uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1"
+      ],
+      "next": "Start from existing pinned actions, least permissions and native logs. Consider only after endpoint allowlist and external observation policy are selected.",
+      "review_level": "selected_primary_files",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://github.com/step-security/harden-runner/blob/e14015d583714f6e62063499dc959a02595150a1/README.md",
+          "bytes": 20695,
+          "sha256": "cd519dacd3c39605c39c037d44f6e972bdcb8c5b00a3a0620a6eab8cbec6b120",
+          "line_count": 228,
+          "exit_code": 0
+        },
+        {
+          "path": "action.yml",
+          "url": "https://github.com/step-security/harden-runner/blob/e14015d583714f6e62063499dc959a02595150a1/action.yml",
+          "bytes": 2590,
+          "sha256": "8ccb449974d5f572567ae29026cd80a673afed4115568f742aed0f0904bbeca3",
+          "line_count": 59,
+          "exit_code": 0
+        },
+        {
+          "path": "package.json",
+          "url": "https://github.com/step-security/harden-runner/blob/e14015d583714f6e62063499dc959a02595150a1/package.json",
+          "bytes": 1671,
+          "sha256": "760e7d718fe91251466904321839d3b3fb8dddd84ad489acc614b309bbf5fdd9",
+          "line_count": 53,
+          "exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/step-security/harden-runner/blob/e14015d583714f6e62063499dc959a02595150a1/LICENSE",
+          "bytes": 11357,
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "line_count": 201,
+          "exit_code": 0
+        }
+      ],
+      "runtime_acceptance": false,
+      "native_commands_are_prospective": true,
+      "discovery_sources": [
+        "https://github.com/bureado/awesome-software-supply-chain-security/blob/31252e6810c43a856910e951fb230b72621b8f17/README.md"
+      ],
+      "discovery_scope": "Listed GitHub repository identity, including verified aliases."
+    },
+    {
+      "requested": "pre-commit/pre-commit",
+      "repository": "pre-commit/pre-commit",
+      "id": 17689377,
+      "description": "A framework for managing and maintaining multi-language pre-commit hooks.",
+      "archived": false,
+      "license": "MIT",
+      "commit": "a9bba55a3f74068b53f4bd4d831d7e05e34eae6c",
+      "commit_date": "2026-08-17T23:37:06Z",
+      "default_branch": "main",
+      "exit_code": 0,
+      "role": "Explicit local multi-language validation hooks",
+      "decision": "optional_when_local_check_execution_needs_standardization",
+      "evidence": [
+        "run.py treats files modified by a hook as failure even if the hook command returns zero.",
+        "Selected tests include failing hooks and a hook that modifies files while returning zero.",
+        "A hook framework can execute selected third-party code and create tool environments; it is not a sandbox or runtime evidence."
+      ],
+      "native": [
+        "pre-commit run --all-files"
+      ],
+      "next": "Reuse current validation commands first. If adopted, pin selected hook revisions and preserve native Codex/Claude lifecycle hooks; do not install broad hook packs.",
+      "review_level": "selected_primary_files",
+      "source_files": [
+        {
+          "path": "README.md",
+          "url": "https://github.com/pre-commit/pre-commit/blob/a9bba55a3f74068b53f4bd4d831d7e05e34eae6c/README.md",
+          "bytes": 480,
+          "sha256": "e247ace0ab84c08b12ebee0c304e2e9c66af77f6f43c685ac102d51a02c72cb6",
+          "line_count": 8,
+          "exit_code": 0
+        },
+        {
+          "path": "pre_commit/commands/run.py",
+          "url": "https://github.com/pre-commit/pre-commit/blob/a9bba55a3f74068b53f4bd4d831d7e05e34eae6c/pre_commit/commands/run.py",
+          "bytes": 14163,
+          "sha256": "65a67f03048e3dfbe864d30acd2e0c2ebfec07cd80b442dbf399a6b1247b5693",
+          "line_count": 448,
+          "exit_code": 0
+        },
+        {
+          "path": "tests/commands/run_test.py",
+          "url": "https://github.com/pre-commit/pre-commit/blob/a9bba55a3f74068b53f4bd4d831d7e05e34eae6c/tests/commands/run_test.py",
+          "bytes": 37379,
+          "sha256": "eae0b879f9a8003d81f039098b8d23ec544f2377cc0f5b1301644dc28f645b61",
+          "line_count": 1248,
+          "exit_code": 0
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/pre-commit/pre-commit/blob/a9bba55a3f74068b53f4bd4d831d7e05e34eae6c/LICENSE",
+          "bytes": 1092,
+          "sha256": "ea2ca27cba7cc35822d95a46d59bcd3cc88e196592e6390d1949a359ffc990e8",
+          "line_count": 19,
+          "exit_code": 0
+        }
+      ],
+      "runtime_acceptance": false,
+      "native_commands_are_prospective": true,
+      "discovery_sources": [],
+      "discovery_scope": "Capability-led primary-source follow-up beyond directly extracted list identities."
+    }
+  ],
+  "verified_aliases": [
+    {
+      "from": "TobikoData/sqlmesh",
+      "to": "SQLMesh/sqlmesh",
+      "github_id": 540527604
+    },
+    {
+      "from": "linkedin/datahub",
+      "to": "datahub-project/datahub",
+      "github_id": 46398090
+    }
+  ],
+  "waves": [
+    {
+      "wave": 1,
+      "scope": "Quant, data engineering, LLM examples, agents and MCP list discovery; capability gaps in data governance."
+    },
+    {
+      "wave": 2,
+      "scope": "Skills, memory, macOS/Linux, fintech companies and supply-chain lists; reject defaults with licensing, hosting or external-telemetry mismatch."
+    }
+  ],
+  "governance": {
+    "current_state": "453 indexed identities, 152 cards representing 147 repositories, and a separate six-candidate portability supplement whose five new identities raise the actual reviewed-reference union to 458.",
+    "gap": "validate_catalogs.py validates the four card files, their core coverage and star audit, but not the grand Markdown table or supplemental identity union.",
+    "proposed_index": "Authoritative typed decision-index.json generated from public-star coverage, star reviews, four catalog cards, adopted component records, legacy candidates and explicitly registered research supplements.",
+    "rules": [
+      "Use canonical owner/repository identities with verified aliases; preserve source paths and exact JSON pointers.",
+      "Keep discovery-only links outside reviewed/adopted counts unless explicitly registered with their true depth and disposition.",
+      "Compute counts and references; reject omitted source membership, alias cycles, duplicate canonical records, unsafe pointers and stale counts.",
+      "Preserve historical receipts and source-review limitations; source review never implies native execution.",
+      "Future supplement ingestion must name an explicit repository-entry collection; do not recursively treat every URL in prose as a selected repository."
+    ]
+  },
+  "retained_failures": [
+    "Native gh rejects --slurp with --jq; corrected to paginated JSON lines before public filtering.",
+    "hkdobrev/awesome-fintech returned 404; replaced with the verified jplock company directory, without inferring why the first endpoint failed.",
+    "GitHub README JSON content was absent/truncated for two large lists; repeated with exact pinned raw content and byte-size checks.",
+    "An overlarge extracted-link capture exceeded output allowance; repeated with compact identity strings and aggregate categories."
+  ],
+  "limits": [
+    "7028 extracted GitHub owner/repository links are not 7028 metadata checks or source reviews. Only ten new candidate repositories received selected-file review.",
+    "Six of the ten candidates came from capability-led primary-source follow-up rather than a directly extracted GitHub link; website/relative example links were not exhaustively mapped.",
+    "The list parser covers complete pinned root README files, not every nested index, issue, PR, translation, website or externally linked project.",
+    "The 6939 other linked identities remain discovery-only and unassessed. Their archived flags, licenses and canonical redirects were not fetched.",
+    "No installation, service/model call, provider change, broker call, security score, profitability claim, paid account or recurring automation was performed.",
+    "No universal saturation or definitive-best ranking is claimed. Subsequent source discovery can still uncover missing capabilities."
+  ]
+}

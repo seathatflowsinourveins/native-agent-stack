@@ -2757,7 +2757,9 @@
     "dagu-org/dagu": "dagucloud/dagu",
     "zed-industries/codex-acp": "agentclientprotocol/codex-acp",
     "polygon-io/client-python": "massive-com/client-python",
-    "huangruiteng/loopx": "loopx-project/loopx"
+    "huangruiteng/loopx": "loopx-project/loopx",
+    "tobikodata/sqlmesh": "sqlmesh/sqlmesh",
+    "linkedin/datahub": "datahub-project/datahub"
   },
   "latest_public_refresh": {
     "checked_at": "2026-09-19",

@@ -1,0 +1,1206 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "base_publication_commit": "a9f40f21a26819cc8fdf109b1b36e2867d792c08",
+  "scope": "Two bounded source-review waves: seven event/replay engines, then eight research/evaluation/calendar tools; discovery through three currently maintained primary awesome lists. Selected source sections and tests were inspected, not entire codebases. No provider, broker, model, installation or backtest ran in this lane.",
+  "execution_status": "research_only",
+  "universal_sota_or_completeness_claimed": false,
+  "entries": [
+    {
+      "repository": "QuantConnect/Lean",
+      "source_commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "source_commit_date": "2026-09-18T14:03:24Z",
+      "release_checked": {
+        "tag": "v2.4.0.1",
+        "date": "2017-08-08T20:57:57Z",
+        "meaning": "Old GitHub release marker; selected source and accepted native build are newer."
+      },
+      "license": "Apache-2.0",
+      "decision": "retain_accepted_primary_event_engine",
+      "platform": "C#/.NET plus Python strategies; this ecosystem has accepted a Linux/WSL source-built C# baseline only.",
+      "capabilities": [
+        "EquityFillModel checks order/data timing and uses bid/ask with configured slippage.",
+        "MapFile models historical symbol mappings, first dates and delisting dates; factor infrastructure supports corporate-action normalization.",
+        "Selected upstream fill regression tests exist; the local bundled simulation already has separate native receipts."
+      ],
+      "gaps": [
+        "EquityFillModel contains explicit TODOs for depth-limited partial quantities. A VolumeShareSlippageModel price adjustment is not itself a volume-limited fill model.",
+        "Historical instruments/universe, corporate-action inputs, realistic spread, fees, borrow, fills and latency still need accepted data and calibration.",
+        "Broker adapter entitlement/initialization and advanced Alpaca order-field preservation are separate gates. Installed SDKs do not prove DMA/VWAP/TWAP parity."
+      ],
+      "native_commands": [
+        "dotnet test Tests/QuantConnect.Tests.csproj --filter FullyQualifiedName~EquityFillModelTests",
+        "dotnet test Tests/QuantConnect.Tests.csproj --filter FullyQualifiedName~SlippageModelsTests"
+      ],
+      "acceptance_needed": "Run selected native tests in the already pinned/patched LEAN checkout, then a declared strategy on a hashed PIT universe with pessimistic fill/fee/latency scenarios. Compare order ledger and net returns, not only summary profit.",
+      "command_scope": "Prospective targeted upstream tests, requiring native build/test dependencies; not executed by this review. Existing sample evidence is historical and separate.",
+      "wave": 1,
+      "starred_in_base_public_ledger": false,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/QuantConnect/Lean/commit/985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "release_metadata_url": "https://api.github.com/repos/QuantConnect/Lean/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/LICENSE",
+          "sha256": "522cf0a716ce03f67d46f8fceb5bf78c5b84400ec5cd8d14bf9f02cddc1cb6ba",
+          "bytes": 10737
+        },
+        {
+          "path": "Common/Orders/Fills/EquityFillModel.cs",
+          "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Orders/Fills/EquityFillModel.cs",
+          "sha256": "7f8c0e35eb538f5a63184c9b5ef4b32886e2c7779ccce1e773229a1a1ec18232",
+          "bytes": 52099
+        },
+        {
+          "path": "Common/Orders/Slippage/VolumeShareSlippageModel.cs",
+          "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Orders/Slippage/VolumeShareSlippageModel.cs",
+          "sha256": "1bf775a04e149f70efcb8196ae6530aad455b48e1cc037ec10a30a9d4543f1be",
+          "bytes": 4089
+        },
+        {
+          "path": "Common/Data/Auxiliary/FactorFile.cs",
+          "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Data/Auxiliary/FactorFile.cs",
+          "sha256": "fa0c953fe65c42382b969c61aea95c14f46826661d193392251efa3f24f8907c",
+          "bytes": 5488
+        },
+        {
+          "path": "Common/Data/Auxiliary/MapFile.cs",
+          "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Data/Auxiliary/MapFile.cs",
+          "sha256": "47a177002507105948617fa7313a21d7dd3d764b07233631a1f2c3bb2bf080a7",
+          "bytes": 9650
+        },
+        {
+          "path": "Tests/Common/Orders/Fills/EquityFillModelTests.cs",
+          "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Tests/Common/Orders/Fills/EquityFillModelTests.cs",
+          "sha256": "89bb0db4f60816965c63e91bdde92d2c85e9e570015439b83ca27c97a1e505db",
+          "bytes": 78288
+        }
+      ]
+    },
+    {
+      "repository": "nautechsystems/nautilus_trader",
+      "source_commit": "27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+      "source_commit_date": "2026-08-02T11:26:46Z",
+      "release_checked": {
+        "tag": "v1.231.0",
+        "date": "2026-08-02T18:53:49Z"
+      },
+      "newer_head_observed": "9bafb63e7d75ab7033aff2e04cd6b4d45d14e9b7",
+      "license": "LGPL-3.0-or-later",
+      "decision": "conditional_microstructure_and_recovery_challenger",
+      "platform": "Pinned project metadata requires Python >=3.12,<3.15; Rust/native components and supported platform wheels require a separate environment. No new installation accepted.",
+      "capabilities": [
+        "Pinned documentation specifies L1 probabilistic slippage, L2/L3 book matching, optional liquidity consumption and synthetic fill models.",
+        "Risk engine has maximum notional/order-rate controls plus REDUCING/HALTED states.",
+        "Live reconciliation handles cached versus external orders, order/fill/position reports and startup recovery; focused risk and backtest tests exist."
+      ],
+      "gaps": [
+        "Default L1 settings use certain touch eligibility and zero probabilistic slippage. Immutable historical books and synthetic liquidity require explicit assumptions.",
+        "A narrow reconciliation lookback can miss opening fills; persistent execution events and broker-history coverage remain necessary.",
+        "No accepted Alpaca adapter, US corporate-action/PIT data pipeline, queue calibration or migration result here. Do not mix newer development APIs with this selected release."
+      ],
+      "native_commands": [
+        "python -m pytest -q tests/unit_tests/backtest/test_models.py tests/unit_tests/risk/test_engine.py"
+      ],
+      "acceptance_needed": "Before considering replacement, replay the same hashed US-equity fixture as LEAN; compare ledger semantics, partial fills, cancel races, stale data and restart reconciliation. Prove a supported broker adapter separately.",
+      "command_scope": "Prospective upstream tests after pinned native development setup; neither build nor tests were run.",
+      "wave": 1,
+      "starred_in_base_public_ledger": true,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/nautechsystems/nautilus_trader/commit/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317",
+      "release_metadata_url": "https://api.github.com/repos/nautechsystems/nautilus_trader/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/LICENSE",
+          "sha256": "ee907919ec88c9c017b1f8b608db20960b6598aefcc4fe58820bde955d65ed3c",
+          "bytes": 7651
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/pyproject.toml",
+          "sha256": "5dbc4591408bd65f7b35c2274348a7a02ff7b034a15f46d5f8628d3c8fbafa36",
+          "bytes": 15841
+        },
+        {
+          "path": "docs/concepts/backtesting/fill-models.md",
+          "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/docs/concepts/backtesting/fill-models.md",
+          "sha256": "1ffd8196b3891142ae870f1abb255408ca2abe8eee2f486738afd4bc706905a4",
+          "bytes": 6566
+        },
+        {
+          "path": "docs/concepts/reconciliation.md",
+          "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/docs/concepts/reconciliation.md",
+          "sha256": "8b6df487ac8d00e74bd8098175482dad043dbda51124afa391238ddc760366b6",
+          "bytes": 20913
+        },
+        {
+          "path": "nautilus_trader/risk/engine.pyx",
+          "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/nautilus_trader/risk/engine.pyx",
+          "sha256": "bf51d0d886d98c4e95c1ef1aa74e4dd24a236a9fc149fb646a1f038d7dfb8d84",
+          "bytes": 50544
+        },
+        {
+          "path": "tests/unit_tests/backtest/test_models.py",
+          "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/tests/unit_tests/backtest/test_models.py",
+          "sha256": "cc73cf00c98f1534b6fb77fb9bf45f8a0eb95d15e8c0918523cd0cf73572fa2f",
+          "bytes": 4545
+        },
+        {
+          "path": "tests/unit_tests/risk/test_engine.py",
+          "url": "https://github.com/nautechsystems/nautilus_trader/blob/27a8e54e7ac3c57d6cbf8891f0283dfbaee97317/tests/unit_tests/risk/test_engine.py",
+          "sha256": "27244d8a8e85c379c8b0b7e33762cbab1f0caf0a3b6db03246ad04a091e2ff23",
+          "bytes": 124834
+        }
+      ]
+    },
+    {
+      "repository": "Lumiwealth/lumibot",
+      "source_commit": "f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b",
+      "source_commit_date": "2026-09-06T21:10:38Z",
+      "release_checked": {
+        "tag": "v4.5.91",
+        "date": "2026-09-06T21:16:08Z"
+      },
+      "newer_head_observed": "28afefe8a1078d3ff29f3089c46d1397cebde848",
+      "license": "Conflict: release LICENSE is GPL-3.0; setup.py declares MIT.",
+      "decision": "hold_python_first_alternative_until_license_and_execution_acceptance",
+      "platform": "Python >=3.10 per setup.py; broad data/broker dependency surface. No clean-platform installation accepted.",
+      "capabilities": [
+        "Backtesting broker implements price/quote paths and partial-order handling; TradingSlippage explicitly adds a per-order absolute quote-currency amount.",
+        "Focused unit tests exercise broker position-mark refresh, stale-mark clearing and concurrent snapshot additions.",
+        "Dividend backtests exist, but selected examples use external Yahoo/Polygon data and are not offline acceptance."
+      ],
+      "gaps": [
+        "Resolve conflicting license declarations before adoption/redistribution.",
+        "Slippage defaults to zero; detailed queue, market-impact and latency realism cannot be inferred from same-strategy-class reuse.",
+        "Upstream broker position tests do not prove durable idempotency or actual Alpaca paper integration."
+      ],
+      "native_commands": [
+        "python -m pytest -q tests/test_broker_sync_positions.py"
+      ],
+      "acceptance_needed": "Clarify license, build isolated dependencies, then compare a fixed corporate-action fixture and broker-state failure contract against the primary engine; require explicit paper authority for live endpoints.",
+      "command_scope": "Prospective fake-broker unit tests only; external dividend/API tests deliberately not proposed as account-free checks.",
+      "wave": 1,
+      "starred_in_base_public_ledger": true,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/Lumiwealth/lumibot/commit/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b",
+      "release_metadata_url": "https://api.github.com/repos/Lumiwealth/lumibot/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/Lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/LICENSE",
+          "sha256": "7d8846232c63c8d5c00a0a4d412df1c69c4339a54e59157164c0916ec0eff24d",
+          "bytes": 35130
+        },
+        {
+          "path": "setup.py",
+          "url": "https://github.com/Lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/setup.py",
+          "sha256": "8964f77b43429d46f68602fca8a56f6025da691d0fb0efeb4da366daba95fcea",
+          "bytes": 6179
+        },
+        {
+          "path": "lumibot/backtesting/backtesting_broker.py",
+          "url": "https://github.com/Lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/lumibot/backtesting/backtesting_broker.py",
+          "sha256": "0cb2c26df03a25878dd9bfa2f212ac533f991d1f89c0dec38b1a9b32fcac660f",
+          "bytes": 230589
+        },
+        {
+          "path": "lumibot/entities/trading_slippage.py",
+          "url": "https://github.com/Lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/lumibot/entities/trading_slippage.py",
+          "sha256": "ffa4c30f6f7b1ef5361d6559dfe22e6573a61603ec1bfb7275908143dae27e15",
+          "bytes": 783
+        },
+        {
+          "path": "tests/backtest/test_dividends.py",
+          "url": "https://github.com/Lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/tests/backtest/test_dividends.py",
+          "sha256": "c0786998573e8ec11d3a03bf06c63ecfdf0bd0c24921bbf220dc9f21da65ba4f",
+          "bytes": 10490
+        },
+        {
+          "path": "tests/test_broker_sync_positions.py",
+          "url": "https://github.com/Lumiwealth/lumibot/blob/f987da3e2c81a5ae2cb6edf35457d2aa54aacf8b/tests/test_broker_sync_positions.py",
+          "sha256": "80f29bd7ed16cf16ad8e2cdceb79e7cba427e6693f6232649fede3732ea1aabf",
+          "bytes": 3379
+        }
+      ]
+    },
+    {
+      "repository": "polakowo/vectorbt",
+      "source_commit": "259d2d89fe2e7638baf3ca76c394937cd32b656d",
+      "source_commit_date": "2026-07-05T16:59:59Z",
+      "release_checked": {
+        "tag": "v1.1.0",
+        "date": "2026-07-05T17:17:14Z"
+      },
+      "newer_head_observed": "a3c0f40979648585b4581fc4694fd6e92b3fffca",
+      "license": "Apache-2.0 with Commons Clause; not Apache-only.",
+      "decision": "optional_research_sweeps_not_order_authority",
+      "platform": "Pinned metadata Python >=3.11,<3.15; array/JIT/native dependencies need separate compatibility acceptance.",
+      "capabilities": [
+        "Native array simulation includes proportional/fixed fees, slippage, quantity constraints and cash-limited partial sizing.",
+        "Rolling and expanding splitters expose explicit train/test ranges; extensive portfolio tests use synthetic price arrays."
+      ],
+      "gaps": [
+        "Cash/size partial fills do not prove real market-depth queue behavior.",
+        "Range splitters do not automatically purge overlapping labels or preserve an untouched final holdout.",
+        "Public edition licensing and private PRO features must remain separate; no private PRO source was examined."
+      ],
+      "native_commands": [
+        "python -m pytest -q tests/test_portfolio.py"
+      ],
+      "acceptance_needed": "Use it only if sweep speed is a measured need; ledger-compare selected survivors against LEAN on identical inputs and costs. Count every tried variant.",
+      "command_scope": "Prospective upstream portfolio tests; no speed or profitability benchmark claimed.",
+      "wave": 1,
+      "starred_in_base_public_ledger": false,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/polakowo/vectorbt/commit/259d2d89fe2e7638baf3ca76c394937cd32b656d",
+      "release_metadata_url": "https://api.github.com/repos/polakowo/vectorbt/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE.md",
+          "url": "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/LICENSE.md",
+          "sha256": "a914859a115b70e80956a3cbd613139ad74c04e5d1bd38da8bcc16725822ec84",
+          "bytes": 12321
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/pyproject.toml",
+          "sha256": "a26c19497b7d0a72aa95fa372fedc94b1a7040ddf591d2501ae49230994d398e",
+          "bytes": 2220
+        },
+        {
+          "path": "vectorbt/generic/splitters.py",
+          "url": "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/vectorbt/generic/splitters.py",
+          "sha256": "ca35bbe250352795b519045d7157e20b1aba130529e8c7caf0c71bb88dc8c563",
+          "bytes": 10528
+        },
+        {
+          "path": "vectorbt/portfolio/nb.py",
+          "url": "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/vectorbt/portfolio/nb.py",
+          "sha256": "3bc4fcbd9871dcd20fe49037484253d6fe200b88042a942ff98e75bb83ec46c7",
+          "bytes": 290039
+        },
+        {
+          "path": "tests/test_portfolio.py",
+          "url": "https://github.com/polakowo/vectorbt/blob/259d2d89fe2e7638baf3ca76c394937cd32b656d/tests/test_portfolio.py",
+          "sha256": "46e871f35869480cb0ea2bf716761695ff4be5dff594537acc622f01ddf65bce",
+          "bytes": 429319
+        }
+      ]
+    },
+    {
+      "repository": "kernc/backtesting.py",
+      "source_commit": "ca2e2611621e472542ba90f7243a1fa06a7d7108",
+      "source_commit_date": "2026-08-05T12:39:16Z",
+      "release_checked": {
+        "tag": null,
+        "date": null,
+        "meaning": "GitHub latest-release endpoint returned 404; source pin used, not an invented current release."
+      },
+      "license": "AGPL-3.0",
+      "decision": "optional_small_strategy_prototype",
+      "platform": "Python/pandas/NumPy; source compatibility and optional compiled dependencies need isolated acceptance.",
+      "capabilities": [
+        "Core broker models spread, callable or fixed/proportional commission, next-open versus trade-on-close, stop/limit and contingent exits.",
+        "Native unittest suite covers broker and strategy behavior."
+      ],
+      "gaps": [
+        "OHLC bars cannot establish intrabar event order; core contains explicit warnings/assumptions for contingent orders.",
+        "Not the chosen multi-asset, corporate-action, broker reconciliation or durable order authority."
+      ],
+      "native_commands": [
+        "python -m unittest backtesting.test._test"
+      ],
+      "acceptance_needed": "Compare a tiny declared single-instrument fixture with LEAN and inspect same-bar ambiguity; do not promote an optimized chart into broker authority.",
+      "command_scope": "Prospective upstream tests from pinned checkout after dependency setup.",
+      "wave": 1,
+      "starred_in_base_public_ledger": true,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/kernc/backtesting.py/commit/ca2e2611621e472542ba90f7243a1fa06a7d7108",
+      "release_metadata_url": "https://api.github.com/repos/kernc/backtesting.py/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE.md",
+          "url": "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/LICENSE.md",
+          "sha256": "ad858d53cae05eed9531ecd4c467440803acffe34c69de7b88e03affc5b6a1bd",
+          "bytes": 34283
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/pyproject.toml",
+          "sha256": "88826d7401884bcc1341248ad51e3064ff2ffd6ea87a7844c87264a7968b7e8d",
+          "bytes": 412
+        },
+        {
+          "path": "backtesting/backtesting.py",
+          "url": "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/backtesting/backtesting.py",
+          "sha256": "30d8b5ed9c69e4891bd41fe6fa157dcdd9915c2aff279056c8975b0918178852",
+          "bytes": 75119
+        },
+        {
+          "path": "backtesting/test/_test.py",
+          "url": "https://github.com/kernc/backtesting.py/blob/ca2e2611621e472542ba90f7243a1fa06a7d7108/backtesting/test/_test.py",
+          "sha256": "5291f673cd9fc162c2dd29e6b994e8ff53ba571a2372791ce8ff0dbb8698a9fa",
+          "bytes": 51206
+        }
+      ]
+    },
+    {
+      "repository": "stefan-jansen/zipline-reloaded",
+      "source_commit": "943010b9da848e317fc520de87edade2b884d329",
+      "source_commit_date": "2025-11-13T15:14:32Z",
+      "release_checked": {
+        "tag": "3.1.1",
+        "date": "2025-07-23T21:30:00Z"
+      },
+      "license": "Apache-2.0",
+      "decision": "alternate_equity_data_semantics_reference",
+      "platform": "Python/Cython with compiled data dependencies; wheel, calendar and pandas compatibility must be checked for destination platform.",
+      "capabilities": [
+        "SQLite adjustment reader/writer represents splits, mergers, cash/stock dividends and effective/declaration/ex/payment dates.",
+        "VolumeShareSlippage limits aggregate filled bar volume as well as applying quadratic price impact; adjustment tests exist."
+      ],
+      "gaps": [
+        "Source maintenance observed older than primary engine; stable release age is disclosed, not treated as proof of failure.",
+        "Requires an accepted data bundle/universe and separate execution integration; corporate-action schemas do not supply an entitled PIT dataset."
+      ],
+      "native_commands": [
+        "python -m pytest -q tests/data/test_adjustments.py tests/finance/test_slippage.py"
+      ],
+      "acceptance_needed": "Use as a focused corporate-action/fill cross-check only if LEAN fixture disagreement warrants it; no second production engine by default.",
+      "command_scope": "Prospective upstream tests, requiring native extension build and reviewed fixtures.",
+      "wave": 1,
+      "starred_in_base_public_ledger": false,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/stefan-jansen/zipline-reloaded/commit/943010b9da848e317fc520de87edade2b884d329",
+      "release_metadata_url": "https://api.github.com/repos/stefan-jansen/zipline-reloaded/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/LICENSE",
+          "sha256": "e35c4578f7db4498e62e278978f6c42e0fce6f21f9993a060b08a33549cd3044",
+          "bytes": 11347
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/pyproject.toml",
+          "sha256": "76c2818609ee2c8c4f1f7d6540ffc68407a8601a9837dafc6abcbf0845ab2c3b",
+          "bytes": 8373
+        },
+        {
+          "path": "src/zipline/data/adjustments.py",
+          "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/src/zipline/data/adjustments.py",
+          "sha256": "a10172de0bbd1e9a42ae57c91128e08c82537e349bcb0098c0b7294fd276ff59",
+          "bytes": 25359
+        },
+        {
+          "path": "src/zipline/finance/slippage.py",
+          "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/src/zipline/finance/slippage.py",
+          "sha256": "575b5d6396b09e40253b4810145a36b6846eb69bede8af637dbe6fddbf03e70a",
+          "bytes": 21742
+        },
+        {
+          "path": "tests/data/test_adjustments.py",
+          "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/tests/data/test_adjustments.py",
+          "sha256": "0fe18e3572320431f2bf4655f7a4a58f41117faa72f2c95707b2d98ffe512841",
+          "bytes": 11332
+        }
+      ]
+    },
+    {
+      "repository": "nkaz001/hftbacktest",
+      "source_commit": "5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+      "source_commit_date": "2025-12-23T15:31:05Z",
+      "release_checked": {
+        "tag": "rust-v0.9.4",
+        "date": "2025-12-10T16:17:40Z",
+        "meaning": "Rust release marker; do not equate it with a Python package version."
+      },
+      "license": "MIT",
+      "decision": "microstructure_reference_if_horizon_justifies_tick_data",
+      "platform": "Rust plus Python/Numba bindings; market-data schema and architecture support require separate acceptance.",
+      "capabilities": [
+        "Explicit queue-position, no-partial/partial exchange and fee models; separate feed, entry and response latency.",
+        "Interpolation can consume measured request/exchange/response timing rather than a single invented latency."
+      ],
+      "gaps": [
+        "Replay cannot change historical market depth; no endogenous market impact. Default no-partial liquidity-taking fills can be optimistic regardless of displayed size.",
+        "Docs mix older market-by-price scope text with L3 model interfaces; exact chosen data/model path must be tested.",
+        "No US-equities corporate-action/PIT universe or Alpaca integration accepted; do not add HFT complexity to a daily strategy without need."
+      ],
+      "native_commands": [
+        "cargo test -p hftbacktest --lib"
+      ],
+      "acceptance_needed": "Only after a declared intraday horizon: replay licensed tick/quote data and calibrate queue/latency against authorized observed fills; never infer market-impact accuracy from replay.",
+      "command_scope": "Prospective native Rust library tests; no exchange connector or latency-probing orders are authorized/run.",
+      "wave": 1,
+      "starred_in_base_public_ledger": false,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/nkaz001/hftbacktest/commit/5f3ec40b2afb764e0fea112f941ed85523ef4e88",
+      "release_metadata_url": "https://api.github.com/repos/nkaz001/hftbacktest/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/LICENSE",
+          "sha256": "b40367c13dfa67c617d6e8037d45581496d9f0429a3274ab19f117404b519a5a",
+          "bytes": 1079
+        },
+        {
+          "path": "docs/order_fill.rst",
+          "url": "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/docs/order_fill.rst",
+          "sha256": "30791dabf9e4d7e752471d3f0d739aab713dfa0bf0bc5b09b9b7b40098409f0a",
+          "bytes": 8204
+        },
+        {
+          "path": "docs/latency_models.rst",
+          "url": "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/docs/latency_models.rst",
+          "sha256": "9cf3df207bbe95fde933bfa506f05d4518bcf0d2752d260fdec90eab935e188e",
+          "bytes": 2906
+        },
+        {
+          "path": "hftbacktest/src/backtest/models/queue.rs",
+          "url": "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/hftbacktest/src/backtest/models/queue.rs",
+          "sha256": "2e1c26e4ec3cb3afeed6ca31eef7387f8b086a6520ca54834a4a9f9c53cffe1a",
+          "bytes": 47423
+        },
+        {
+          "path": "hftbacktest/Cargo.toml",
+          "url": "https://github.com/nkaz001/hftbacktest/blob/5f3ec40b2afb764e0fea112f941ed85523ef4e88/hftbacktest/Cargo.toml",
+          "sha256": "e7ed2c9a546561542dc4626c3b98e116330d7c9a8ddd52fa6c3a4ad530e95c36",
+          "bytes": 2206
+        }
+      ]
+    },
+    {
+      "repository": "microsoft/qlib",
+      "source_commit": "be725493eb1a6bbb42bf11b37aa7669f59610ff1",
+      "source_commit_date": "2026-09-16T06:56:07Z",
+      "release_checked": {
+        "tag": "v0.9.7",
+        "date": "2025-08-15T09:49:17Z",
+        "meaning": "Reviewed newer source; release installation does not inherit HEAD changes."
+      },
+      "license": "MIT",
+      "decision": "conditional_financial_ml_and_pit_reference",
+      "platform": "Python with compiled dependencies; data format conversion and chosen US market configuration require acceptance.",
+      "capabilities": [
+        "PIT storage distinguishes publication date, report period and revision chains for quarterly/annual factors; expressions reject future-period references.",
+        "Exchange implementation exposes open/close/minimum costs, impact cost, volume thresholds, suspensions and trade units.",
+        "PIT regression tests explicitly exercise a restated quarterly observation."
+      ],
+      "gaps": [
+        "Example PIT tests download China fixtures; they do not accept US fundamentals or intraday publication timestamps.",
+        "Default exchange assumptions/costs can be market-specific; latest adjusted prices/current constituents are not a PIT universe.",
+        "PIT implementation and research tracking do not establish broker reconciliation or tradability."
+      ],
+      "native_commands": [
+        "python -m pytest -q tests/test_pit.py"
+      ],
+      "acceptance_needed": "If adopted, replace data assumptions with an entitled US snapshot and demonstrate revision/as-of, historical universe and corporate-action contracts before training comparisons.",
+      "command_scope": "Prospective upstream PIT test; setUpClass downloads upstream fixtures and writes/removes test data. Not an offline or US-data acceptance command.",
+      "wave": 2,
+      "starred_in_base_public_ledger": false,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/microsoft/qlib/commit/be725493eb1a6bbb42bf11b37aa7669f59610ff1",
+      "release_metadata_url": "https://api.github.com/repos/microsoft/qlib/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/LICENSE",
+          "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+          "bytes": 1141
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/pyproject.toml",
+          "sha256": "c47849f143278fef2c114513ca123c6100f007947cdf051928e734985f35a4e9",
+          "bytes": 3861
+        },
+        {
+          "path": "docs/advanced/PIT.rst",
+          "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/docs/advanced/PIT.rst",
+          "sha256": "719bd98b46d5cadabc91ec278af2594b594b399aa13c5e4853fba9e6e2d2754c",
+          "bytes": 7298
+        },
+        {
+          "path": "qlib/data/pit.py",
+          "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/qlib/data/pit.py",
+          "sha256": "1a1c3cea3655c38d27b3b3d3d373d915b3e3e08fff99ba2a7eb2fbc0da61894b",
+          "bytes": 3232
+        },
+        {
+          "path": "qlib/backtest/exchange.py",
+          "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/qlib/backtest/exchange.py",
+          "sha256": "4affc13ab45af464cfb5b55663b80b2fc3dadb4769045d34d0fd218f760d7e08",
+          "bytes": 44235
+        },
+        {
+          "path": "tests/test_pit.py",
+          "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/tests/test_pit.py",
+          "sha256": "c7aab7b717b9f0b6c8278d019046ea5c3d0674553c6590f6654b81f7f6ac87e3",
+          "bytes": 15881
+        }
+      ]
+    },
+    {
+      "repository": "AI4Finance-Foundation/FinRL",
+      "source_commit": "2334a5fe6d30629157f13c3b0319e1637e15e123",
+      "source_commit_date": "2026-07-12T06:22:09Z",
+      "release_checked": {
+        "tag": "v0.3.8",
+        "date": "2026-03-20T10:39:25Z"
+      },
+      "license": "MIT",
+      "decision": "research_only_after_simple_baselines_and_data_gates",
+      "platform": "Python/RL/ML dependency stack; package metadata advertises broad older Python ranges, not accepted Python 3.13 compatibility here.",
+      "capabilities": [
+        "Gym-style stock environment deducts separate buy/sell cost rates and exposes turbulence/position constraints.",
+        "2026 examples split training and backtest scripts and save trained policies."
+      ],
+      "gaps": [
+        "Example percentage costs and state-price fills do not model real queue, latency, market impact or broker-state recovery.",
+        "Downloaded benchmark/current-ticker examples are not PIT-universe or leakage-safe feature proof.",
+        "RL complexity, seeds, hyperparameter search and policy retraining count as additional experiments; literature benchmarks do not establish local edge."
+      ],
+      "native_commands": [
+        "python examples/FinRL_StockTrading_2026_3_Backtest.py"
+      ],
+      "acceptance_needed": "Use accepted local train/trade snapshots and frozen pre-existing policies only after deterministic no-trade/equal-weight/simple-signal baselines; assess turnover/cost stress and out-of-sample uncertainty.",
+      "command_scope": "Prospective upstream example requiring CSV inputs, saved policies and external benchmark data. Not run, not proposed as account-free minimal acceptance.",
+      "wave": 2,
+      "starred_in_base_public_ledger": false,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/AI4Finance-Foundation/FinRL/commit/2334a5fe6d30629157f13c3b0319e1637e15e123",
+      "release_metadata_url": "https://api.github.com/repos/AI4Finance-Foundation/FinRL/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/LICENSE",
+          "sha256": "486a06be9075686b75b35649de0adf9076508c5d0cc5b00af7928b7a96bffe65",
+          "bytes": 1093
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/pyproject.toml",
+          "sha256": "bc28042fbda127047b2ce131f1f319bfaf1103092903b653b72b12f92fe84ca9",
+          "bytes": 1811
+        },
+        {
+          "path": "finrl/meta/env_stock_trading/env_stocktrading.py",
+          "url": "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/finrl/meta/env_stock_trading/env_stocktrading.py",
+          "sha256": "f49e6639126f40371e1271a668dedc661060afa95b6399eac9bafbe9bbbb6fae",
+          "bytes": 22228
+        },
+        {
+          "path": "examples/FinRL_StockTrading_2026_2_train.py",
+          "url": "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/examples/FinRL_StockTrading_2026_2_train.py",
+          "sha256": "a25b9f51c9995eaca7797fd2e9ca5b4b02caca498fc4b7d9979e472f94250161",
+          "bytes": 4626
+        },
+        {
+          "path": "examples/FinRL_StockTrading_2026_3_Backtest.py",
+          "url": "https://github.com/AI4Finance-Foundation/FinRL/blob/2334a5fe6d30629157f13c3b0319e1637e15e123/examples/FinRL_StockTrading_2026_3_Backtest.py",
+          "sha256": "0a3395a6163c6ea53384b5e67b7939b43beb0482a1d0d9f1f9c819763619a174",
+          "bytes": 6534
+        }
+      ]
+    },
+    {
+      "repository": "AI4Finance-Foundation/FinRL-Trading",
+      "source_commit": "4409abe925c904e570be78ebfb5e77ac3491dff8",
+      "source_commit_date": "2026-09-18T01:13:20Z",
+      "release_checked": {
+        "tag": "v1.0.0",
+        "date": "2026-03-25T08:24:51Z"
+      },
+      "license": "Apache-2.0",
+      "decision": "reject_current_execution_path_retain_research_reference",
+      "platform": "Python research/execution application; optional data and Alpaca integrations are separate operational dependencies.",
+      "capabilities": [
+        "Walk-forward engine slices expanding/rolling histories; universe manager activates supplied membership rows on the next trading session.",
+        "Target-weight execution includes configurable order-value and turnover checks."
+      ],
+      "gaps": [
+        "trade_executor.py:370-408 has a five-symbol placeholder GVKEY map, returns zero position value after exceptions, and substitutes price 100.0 after quote failure.",
+        "This is not a fail-closed execution path. A datetime slice alone cannot prove historical membership/publication availability.",
+        "No durable client-order idempotency/restart reconciliation was established by the reviewed executor."
+      ],
+      "native_commands": [],
+      "acceptance_needed": "Do not launch upstream trading entrypoints. Require real historical instrument mapping and fail-closed quote/position behavior, then deterministic no-network adapter fixtures and explicit authorization before any paper endpoint.",
+      "command_scope": "No execution acceptance command recommended while concrete unsafe fallback behavior remains; source inspection only.",
+      "wave": 2,
+      "starred_in_base_public_ledger": false,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/commit/4409abe925c904e570be78ebfb5e77ac3491dff8",
+      "release_metadata_url": "https://api.github.com/repos/AI4Finance-Foundation/FinRL-Trading/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/LICENSE",
+          "sha256": "ef3d97b5113a0f224425680aceb7a9ed3baaa4fd9aa21e8ff445cb963fddcbf5",
+          "bytes": 11352
+        },
+        {
+          "path": "src/trading/trade_executor.py",
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/trading/trade_executor.py",
+          "sha256": "1b8660cd4c9d5ee54957f93a6f8d3dffb5c002f677f3be704bab1e8a440c92ff",
+          "bytes": 20433
+        },
+        {
+          "path": "src/strategies/universe_manager.py",
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/strategies/universe_manager.py",
+          "sha256": "62a82196f4b2a0e2f412e27a9d79da72cd37716820a81b823aa068201f822e9f",
+          "bytes": 6063
+        },
+        {
+          "path": "src/strategies/adaptive_rotation/walk_forward.py",
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/strategies/adaptive_rotation/walk_forward.py",
+          "sha256": "581feaf57f666c1bc41b1dcf68c5b27cb00a34e3900a82f5330090bef7d9c545",
+          "bytes": 19632
+        },
+        {
+          "path": "src/strategies/adaptive_rotation/risk_manager.py",
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/strategies/adaptive_rotation/risk_manager.py",
+          "sha256": "bc318baab45ff356646f28288a355c057794ac0e00ca3fe7e1574fc510fc9ce1",
+          "bytes": 16580
+        },
+        {
+          "path": "src/backtest/backtest_engine.py",
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/blob/4409abe925c904e570be78ebfb5e77ac3491dff8/src/backtest/backtest_engine.py",
+          "sha256": "0db265436ba9816d4b07b6834c080f467314abd18ab8c451c7e5cd39eaaa46a0",
+          "bytes": 31402
+        }
+      ]
+    },
+    {
+      "repository": "skfolio/skfolio",
+      "source_commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "source_commit_date": "2026-09-19T14:45:36Z",
+      "release_checked": {
+        "tag": "v1.2.9",
+        "date": "2026-09-19T14:45:39Z"
+      },
+      "license": "BSD-3-Clause",
+      "decision": "preferred_conditional_statistical_evaluation_library",
+      "platform": "Python >=3.10 with scientific/optimization dependencies; isolated compatible environment required.",
+      "capabilities": [
+        "WalkForward provides explicit training/test sizes, date offsets and purge gaps.",
+        "CombinatorialPurgedCV provides purging, embargo and multiple recombined test paths; focused tests include split boundaries and combination-count rejection."
+      ],
+      "gaps": [
+        "Purge/embargo defaults are zero and cannot be treated as safe for overlapping labels.",
+        "Fixed observation gaps must match the declared label interval/decision latency; irregular or event-specific labels need interval-aware exclusion checks.",
+        "CPCV can train on dates later than a test fold; useful robustness evidence, not a causal deployment replay or substitute for a final chronological holdout.",
+        "Portfolio defaults weight_drift=False and compounded=False evaluate target-weight allocation conventions. Its per-observation transaction-cost convention differs from charging actual costs on the execution date. Explicitly separate optimizer objectives from LEAN's realized event/cash ledger."
+      ],
+      "native_commands": [
+        "python -m pytest -q tests/test_model_selection/test_walk_forward.py tests/test_model_selection/test_combinatorial.py"
+      ],
+      "acceptance_needed": "Predeclare label horizon and decision time, assert train-label/test-interval disjointness, nest tuning inside training folds and keep one sealed chronological holdout. Compare simple portfolios before optimization.",
+      "command_scope": "Prospective upstream tests; library not installed/upgraded and no portfolio fit was run.",
+      "wave": 2,
+      "starred_in_base_public_ledger": false,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/skfolio/skfolio/commit/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "release_metadata_url": "https://api.github.com/repos/skfolio/skfolio/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/LICENSE",
+          "sha256": "07b8dfceb7b319e5145e7b1594d2cdaf94d924d78166d28951d4b360a4dc5844",
+          "bytes": 1526
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/pyproject.toml",
+          "sha256": "b913fb2b6780603c3f02bf7bd05b96b6a239f2b6045cecf6c36897630e1fef84",
+          "bytes": 6106
+        },
+        {
+          "path": "src/skfolio/model_selection/_walk_forward.py",
+          "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/src/skfolio/model_selection/_walk_forward.py",
+          "sha256": "f85cbe8b5a3ff4705a7ab6d35eacdbfafc11b09ec3cc1458fd4a2cf98c563397",
+          "bytes": 24745
+        },
+        {
+          "path": "src/skfolio/model_selection/_combinatorial.py",
+          "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/src/skfolio/model_selection/_combinatorial.py",
+          "sha256": "3979268f2274dc991679c1307138409fe7d33fbe6c9b4c73446e8a591240cbd7",
+          "bytes": 20963
+        },
+        {
+          "path": "tests/test_model_selection/test_walk_forward.py",
+          "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/tests/test_model_selection/test_walk_forward.py",
+          "sha256": "58a6f14dd0c623343d9411d2795bbfc2de39ec648cb83a714c80f1d0c4a4d6c6",
+          "bytes": 27973
+        },
+        {
+          "path": "tests/test_model_selection/test_combinatorial.py",
+          "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/tests/test_model_selection/test_combinatorial.py",
+          "sha256": "8723fe071b0854ac1641caae781ee34c450c52a4bab9b23eecbf7a06163d1c2b",
+          "bytes": 15078
+        },
+        {
+          "path": "docs/user_guide/backtesting_and_evaluation.rst",
+          "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/docs/user_guide/backtesting_and_evaluation.rst",
+          "sha256": "b0e6a713efba296dca29cd4c8c9b3013ee4fe10d600fd72b5d871ecdaf8db38d",
+          "bytes": 25471
+        },
+        {
+          "path": "src/skfolio/portfolio/_portfolio.py",
+          "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/src/skfolio/portfolio/_portfolio.py",
+          "sha256": "4ccda018656ac566c2c4d57b632a120e49c6e097df016d1fb330093a34ce2d42",
+          "bytes": 62121
+        }
+      ]
+    },
+    {
+      "repository": "stefan-jansen/alphalens-reloaded",
+      "source_commit": "f0a07c22d554e4b4036983cc80320b432714fe7e",
+      "source_commit_date": "2025-06-02T09:19:47Z",
+      "release_checked": {
+        "tag": "0.4.5",
+        "date": "2025-07-23T21:40:31Z"
+      },
+      "license": "Apache-2.0",
+      "decision": "optional_factor_diagnostics",
+      "platform": "Python/scientific plotting stack; older release and current pandas/calendar compatibility must be tested.",
+      "capabilities": [
+        "Forward-return construction, rank information coefficient, quantile turnover and factor-weighted return diagnostics.",
+        "Selected utility tests exercise factor/forward-return transformations."
+      ],
+      "gaps": [
+        "Forward-return z-score filtering is explicitly documented as introducing lookahead; selected current source defaults filter_zscore=None and that should stay explicit.",
+        "Diagnostics consume already aligned factor/price data and do not supply PIT membership, execution costs, a portfolio risk engine or broker state."
+      ],
+      "native_commands": [
+        "python -m pytest -q tests/test_utils.py tests/test_performance.py"
+      ],
+      "acceptance_needed": "Run only on held-out, availability-aligned factors; retain asset/date coverage and dropped-row reasons, separate gross factor diagnostics from net executable portfolio returns.",
+      "command_scope": "Prospective upstream tests after dependency/fixture inspection; no factor performance accepted.",
+      "wave": 2,
+      "starred_in_base_public_ledger": false,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/stefan-jansen/alphalens-reloaded/commit/f0a07c22d554e4b4036983cc80320b432714fe7e",
+      "release_metadata_url": "https://api.github.com/repos/stefan-jansen/alphalens-reloaded/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/LICENSE",
+          "sha256": "2b651c2d29c644d1c73417cd96e6cfa506d6de102ed96fc3de96d676e089cf29",
+          "bytes": 11346
+        },
+        {
+          "path": "src/alphalens/utils.py",
+          "url": "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/src/alphalens/utils.py",
+          "sha256": "fb09e6c746fac2fc159eab34d6d13d749a618a7d3f48db7882597fe625acd02b",
+          "bytes": 41195
+        },
+        {
+          "path": "src/alphalens/performance.py",
+          "url": "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/src/alphalens/performance.py",
+          "sha256": "49cb32d4670314911fb1d205b73ffece0f3cfa49a6b4fea05dc215adac07f505",
+          "bytes": 43929
+        },
+        {
+          "path": "tests/test_utils.py",
+          "url": "https://github.com/stefan-jansen/alphalens-reloaded/blob/f0a07c22d554e4b4036983cc80320b432714fe7e/tests/test_utils.py",
+          "sha256": "d964d88ee4c3be278876933127fbad0cd39ca770f10f40685d8785920647d0c0",
+          "bytes": 25797
+        }
+      ]
+    },
+    {
+      "repository": "ranaroussi/quantstats",
+      "source_commit": "fbd10daed0227aa0d10da6513f1b15e7e98d7fae",
+      "source_commit_date": "2026-01-13T18:15:47Z",
+      "release_checked": {
+        "tag": "v0.0.81",
+        "date": "2026-01-13T18:17:07Z"
+      },
+      "license": "Apache-2.0",
+      "decision": "preferred_optional_return_reporting",
+      "platform": "Python >=3.10 per metadata; plotting and numerical dependencies need isolated compatibility acceptance.",
+      "capabilities": [
+        "Native reporting accepts supplied return and benchmark Series; annualization frequency and risk-free rate are explicit inputs.",
+        "Stats include drawdown, Sharpe/Sortino and probabilistic-ratio functions."
+      ],
+      "gaps": [
+        "A report does not construct accurate fills, costs, PIT datasets or a multiple-testing correction automatically.",
+        "Ticker-string benchmarks can trigger data downloads; use frozen local Series. Never annualize the five-session engine sample into an investment claim."
+      ],
+      "native_commands": [
+        "python -c \"import pandas as pd, quantstats as qs; d=pd.read_parquet('approved-daily-net-returns.parquet'); qs.reports.html(d['net_return'], benchmark=d['benchmark_return'], periods_per_year=252, output='report.html')\""
+      ],
+      "acceptance_needed": "Reconcile deterministic daily net-return accounting first; verify units, aligned DatetimeIndex, benchmark/currency/cashflows/frequency and known-answer metrics before rendering an eligible research period.",
+      "command_scope": "Prospective upstream Python API on an explicitly approved local daily dataset; 252 is a declared daily convention, not a universal frequency. No download/report ran.",
+      "wave": 2,
+      "starred_in_base_public_ledger": false,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/ranaroussi/quantstats/commit/fbd10daed0227aa0d10da6513f1b15e7e98d7fae",
+      "release_metadata_url": "https://api.github.com/repos/ranaroussi/quantstats/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE.txt",
+          "url": "https://github.com/ranaroussi/quantstats/blob/fbd10daed0227aa0d10da6513f1b15e7e98d7fae/LICENSE.txt",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "bytes": 11358
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://github.com/ranaroussi/quantstats/blob/fbd10daed0227aa0d10da6513f1b15e7e98d7fae/pyproject.toml",
+          "sha256": "50350a863f81f15df2f23bd56f6dc9d616a1155155862756e322fecb6a7d2328",
+          "bytes": 3145
+        },
+        {
+          "path": "quantstats/stats.py",
+          "url": "https://github.com/ranaroussi/quantstats/blob/fbd10daed0227aa0d10da6513f1b15e7e98d7fae/quantstats/stats.py",
+          "sha256": "b3386d94c0e100c616662db1d171a36645c3face16dc15c774c955cf6a95547e",
+          "bytes": 114246
+        },
+        {
+          "path": "quantstats/reports.py",
+          "url": "https://github.com/ranaroussi/quantstats/blob/fbd10daed0227aa0d10da6513f1b15e7e98d7fae/quantstats/reports.py",
+          "sha256": "19a0dc22cc37ee73b079fe07dea7dce303455f5a853d4cfb6bd5e712654642a9",
+          "bytes": 88834
+        }
+      ]
+    },
+    {
+      "repository": "gerrymanoim/exchange_calendars",
+      "source_commit": "bbda29fed902374bdb75acab008f421fbd567823",
+      "source_commit_date": "2026-09-15T09:27:58Z",
+      "release_checked": {
+        "tag": "4.13.2",
+        "date": "2026-03-10T03:24:04Z",
+        "meaning": "Reviewed HEAD contains later calendar work; accepted installed pin remains separately recorded."
+      },
+      "license": "Apache-2.0",
+      "decision": "retain_calendar_contract_dependency",
+      "platform": "Python >=3.10,<4 per metadata; pandas/timezone compatibility and target-date coverage require validation.",
+      "capabilities": [
+        "XNYS source defines session timezone, regular holidays, early closes and dated exceptional closures; dedicated calendar tests exist."
+      ],
+      "gaps": [
+        "A session calendar is not a real-time halt/LULD feed, broker clock, extended-session permission or source of corporate actions.",
+        "Changing timezone/calendar packages can change historical grids; pin and hash relevant session tables and compare date-boundary cases."
+      ],
+      "native_commands": [
+        "python -m pytest -q tests/test_xnys_calendar.py"
+      ],
+      "acceptance_needed": "Check DST, early close, exceptional closure, market-open/close bar semantics and event timestamps against intended feed/broker rules; retain the accepted version until deltas pass.",
+      "command_scope": "Prospective upstream calendar tests; no installed calendar upgrade in this review.",
+      "wave": 2,
+      "starred_in_base_public_ledger": false,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/gerrymanoim/exchange_calendars/commit/bbda29fed902374bdb75acab008f421fbd567823",
+      "release_metadata_url": "https://api.github.com/repos/gerrymanoim/exchange_calendars/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/gerrymanoim/exchange_calendars/blob/bbda29fed902374bdb75acab008f421fbd567823/LICENSE",
+          "sha256": "e35c4578f7db4498e62e278978f6c42e0fce6f21f9993a060b08a33549cd3044",
+          "bytes": 11347
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://github.com/gerrymanoim/exchange_calendars/blob/bbda29fed902374bdb75acab008f421fbd567823/pyproject.toml",
+          "sha256": "7915a8c83d1039992e26c344397b4a5c158b093fdf9c9f971f87b9e13e7066d3",
+          "bytes": 3524
+        },
+        {
+          "path": "exchange_calendars/exchange_calendar_xnys.py",
+          "url": "https://github.com/gerrymanoim/exchange_calendars/blob/bbda29fed902374bdb75acab008f421fbd567823/exchange_calendars/exchange_calendar_xnys.py",
+          "sha256": "baa39f07163abafcf2800b69edc5d920c3db0a64f8bbb30dc7d522883d0b5bd7",
+          "bytes": 9403
+        },
+        {
+          "path": "tests/test_xnys_calendar.py",
+          "url": "https://github.com/gerrymanoim/exchange_calendars/blob/bbda29fed902374bdb75acab008f421fbd567823/tests/test_xnys_calendar.py",
+          "sha256": "8fdbec4d02b8c255ea24af250a9fe60228342b85cb1b5b76c3d49866a101903e",
+          "bytes": 3745
+        }
+      ]
+    },
+    {
+      "repository": "edtechre/pybroker",
+      "source_commit": "95e00fecb1006490601aca7e2e8de609f032e12d",
+      "source_commit_date": "2026-08-28T03:34:58Z",
+      "release_checked": {
+        "tag": "v2.0.1",
+        "date": "2026-08-28T03:33:29Z"
+      },
+      "license": "Apache-2.0 with Commons Clause; not Apache-only.",
+      "decision": "new_discovery_research_alternative_not_default",
+      "platform": "Python/NumPy/Numba research library; declared package/runtime compatibility must be checked in its own environment.",
+      "capabilities": [
+        "Explicit walk-forward windows, target lookahead and train-only shuffling controls; empty test windows now fail explicitly.",
+        "Native bootstrap confidence intervals and evaluation/strategy tests; seeded resampling handles Numba RNG separately."
+      ],
+      "gaps": [
+        "Bootstrap source independently samples row indices; do not label those intervals dependence-aware block bootstrap.",
+        "Commons Clause requires licensing review for hosted/commercial products; no Alpaca order authority or accepted PIT universe implied.",
+        "Adds a second research framework without a demonstrated need over the chosen LEAN plus statistical library path."
+      ],
+      "native_commands": [
+        "python -m pytest -q tests/test_eval.py tests/test_strategy.py"
+      ],
+      "acceptance_needed": "Only if a specific walk-forward research requirement justifies it: known-answer no-leakage fixtures, serial-dependence-aware uncertainty comparison and identical-data engine ledger parity.",
+      "command_scope": "Prospective upstream tests; source-discovered from maintained awesome lists, not installed or benchmarked.",
+      "wave": 2,
+      "starred_in_base_public_ledger": false,
+      "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs.",
+      "runtime_acceptance_this_review": false,
+      "source_url": "https://github.com/edtechre/pybroker/commit/95e00fecb1006490601aca7e2e8de609f032e12d",
+      "release_metadata_url": "https://api.github.com/repos/edtechre/pybroker/releases/latest",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/LICENSE",
+          "sha256": "da959ac23cb6eb2636b9389acc0cfec35e7ffa79a0420bb5469a132a2db18650",
+          "bytes": 12318
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/pyproject.toml",
+          "sha256": "d12259123e58eb5c9014b7579dbbae983a8aac5962451e69531310f696ed64d0",
+          "bytes": 2190
+        },
+        {
+          "path": "src/pybroker/strategy.py",
+          "url": "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/src/pybroker/strategy.py",
+          "sha256": "fee3e2dc35e3fbb568cf34e4b757b87b271f22cb8bef6c10b3e3d31caf006ed1",
+          "bytes": 150482
+        },
+        {
+          "path": "src/pybroker/eval.py",
+          "url": "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/src/pybroker/eval.py",
+          "sha256": "211c522bc55347106cd81cff3c5d6f7cb1197e0b8ee94db8760bded3e50735b9",
+          "bytes": 57653
+        },
+        {
+          "path": "tests/test_eval.py",
+          "url": "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/tests/test_eval.py",
+          "sha256": "fb5ed22ef8a7c83ebdb43c9bb6d7c86bc222a153dc82261b926e3e0d18b27d84",
+          "bytes": 37448
+        },
+        {
+          "path": "tests/test_strategy.py",
+          "url": "https://github.com/edtechre/pybroker/blob/95e00fecb1006490601aca7e2e8de609f032e12d/tests/test_strategy.py",
+          "sha256": "c92ea42cbbf6c6ee35e21f4500ff4b81f12636e8761b16de723d2e369b77152f",
+          "bytes": 298240
+        }
+      ]
+    }
+  ],
+  "discovery_sources": [
+    {
+      "repository": "paperswithbacktest/awesome-systematic-trading",
+      "source_commit": "4e23dd84c9ff746ddfcbc856316bcbcef0855b81",
+      "source_commit_date": "2026-09-03T09:13:55Z",
+      "license_metadata": null,
+      "source": {
+        "path": "README.md",
+        "url": "https://github.com/paperswithbacktest/awesome-systematic-trading/blob/4e23dd84c9ff746ddfcbc856316bcbcef0855b81/README.md",
+        "sha256": "456caf198b42ef5e8da1c4fd937229af49ade6061482521c4817a35f4d200a09",
+        "bytes": 90734
+      },
+      "review_depth": "Selected list sections for candidate discovery, not validation of linked projects or claimed returns."
+    },
+    {
+      "repository": "wilsonfreitas/awesome-quant",
+      "source_commit": "48e48a76b2054b5fe6eede6852ffef7783b992ce",
+      "source_commit_date": "2026-09-13T21:29:05Z",
+      "license_metadata": null,
+      "source": {
+        "path": "README.md",
+        "url": "https://github.com/wilsonfreitas/awesome-quant/blob/48e48a76b2054b5fe6eede6852ffef7783b992ce/README.md",
+        "sha256": "fa346fdbc05f651f500795e7ea95e90b6d8c0cb394daee1f7b612470650caa86",
+        "bytes": 138900
+      },
+      "review_depth": "Selected list sections for candidate discovery, not validation of linked projects or claimed returns."
+    },
+    {
+      "repository": "wangzhe3224/awesome-systematic-trading",
+      "source_commit": "424df5f4acc98dcc3880107188d20f5fa4897653",
+      "source_commit_date": "2026-08-30T20:58:07Z",
+      "license_metadata": "MIT",
+      "source": {
+        "path": "Readme.md",
+        "url": "https://github.com/wangzhe3224/awesome-systematic-trading/blob/424df5f4acc98dcc3880107188d20f5fa4897653/Readme.md",
+        "sha256": "6811946f72bb5b049540d18abe9a2a00036427b0331d750393d1a11d5ec98abb",
+        "bytes": 97409
+      },
+      "review_depth": "Selected list sections for candidate discovery, not validation of linked projects or claimed returns."
+    }
+  ],
+  "discovery_only_leads": [
+    {
+      "repository": "lavs9/quantwave",
+      "pushed_at": "2026-09-15T19:24:42Z",
+      "license_metadata": "MIT",
+      "reason": "Potential batch/stream parity lane; source claims/tests not reviewed here.",
+      "source_url": "https://github.com/lavs9/quantwave",
+      "review_depth": "GitHub repository metadata plus primary-list discovery only",
+      "decision": "not_adopted",
+      "native_commands_executed": false
+    },
+    {
+      "repository": "manifoldbt/manifoldbt",
+      "pushed_at": "2026-09-14T11:12:58Z",
+      "license_metadata": "NOASSERTION",
+      "reason": "Fast research engine lead; license, semantic parity and tests still need review.",
+      "source_url": "https://github.com/manifoldbt/manifoldbt",
+      "review_depth": "GitHub repository metadata plus primary-list discovery only",
+      "decision": "not_adopted",
+      "native_commands_executed": false
+    },
+    {
+      "repository": "HasibVortex369/riskkit",
+      "pushed_at": "2026-07-02T09:08:14Z",
+      "license_metadata": "MIT",
+      "reason": "Composable risk utility lead; not a substitute for deterministic order/recovery acceptance.",
+      "source_url": "https://github.com/HasibVortex369/riskkit",
+      "review_depth": "GitHub repository metadata plus primary-list discovery only",
+      "decision": "not_adopted",
+      "native_commands_executed": false
+    },
+    {
+      "repository": "charlieyanhx/exitkit",
+      "pushed_at": "2026-09-11T21:25:13Z",
+      "license_metadata": "MIT",
+      "reason": "Exit-policy exploration lead; source/tests and hypothesis selection bias not examined.",
+      "source_url": "https://github.com/charlieyanhx/exitkit",
+      "review_depth": "GitHub repository metadata plus primary-list discovery only",
+      "decision": "not_adopted",
+      "native_commands_executed": false
+    },
+    {
+      "repository": "pst-group/pysystemtrade",
+      "pushed_at": "2026-07-18T13:30:24Z",
+      "license_metadata": "GPL-3.0",
+      "reason": "Systematic portfolio framework alternative; futures-oriented/adapter fit and migrated identity need scoped review.",
+      "source_url": "https://github.com/pst-group/pysystemtrade",
+      "review_depth": "GitHub repository metadata plus primary-list discovery only",
+      "decision": "not_adopted",
+      "native_commands_executed": false
+    }
+  ],
+  "excluded_discovery_sources": [
+    {
+      "repository": "joelowj/awesome-algorithmic-trading",
+      "source_commit": "ea5262277c4a78d560d03840f21b41b896ef78d5",
+      "source_commit_date": "2019-05-21T16:52:14Z",
+      "reason": "Not counted as a currently maintained discovery source."
+    }
+  ],
+  "recent_research_leads": [
+    {
+      "id": "arXiv:2608.27734v1",
+      "date": "2026-08-27",
+      "url": "https://arxiv.org/abs/2608.27734v1",
+      "title": "What survives honest evaluation? Leakage-safe, search-aware assessment of LLM-driven trading strategy discovery",
+      "review_depth": "Primary abstract only; preprint, not independently reproduced.",
+      "decision": "Supports keeping information barriers and full search-trial accounting separate; no local performance claim."
+    },
+    {
+      "id": "arXiv:2608.23808v2",
+      "date": "2026-08-26",
+      "url": "https://arxiv.org/abs/2608.23808v2",
+      "title": "Equity Strategy Backtesting: Luck or Edge? The MinervaScore as a Statistical Robustness Grade",
+      "review_depth": "Primary abstract only; preprint, not independently reproduced.",
+      "decision": "Do not turn a statistical reporting score into a probability of profit or automatic promotion; abstract reports no significant forward relation in its stated real-market test."
+    }
+  ],
+  "method": {
+    "native_discovery_commands": [
+      "gh api repos/OWNER/REPO",
+      "gh api repos/OWNER/REPO/commits/REF",
+      "gh api repos/OWNER/REPO/releases/latest",
+      "gh api repos/OWNER/REPO/git/trees/REF?recursive=1",
+      "Read selected raw.githubusercontent.com files at explicit commit SHAs; hash retained bytes."
+    ],
+    "native_acceptance_commands_in_entries": "Prospective only. Execute only after scoped prerequisites/authorization; read command_scope and acceptance_needed first.",
+    "quality_axes": [
+      "Selected implementation semantics",
+      "Tests present and relevant, not claimed passed",
+      "Release versus reviewed source identity",
+      "Maintenance age",
+      "License restrictions/conflicts",
+      "Destination runtime compatibility",
+      "Broker/data integration and support boundaries"
+    ],
+    "not_quality_proof": [
+      "Star counts",
+      "README benchmarks",
+      "Word production",
+      "Recent release date alone",
+      "List inclusion",
+      "LLM-generated strategy approval"
+    ],
+    "bounded_convergence": "Both selected waves complete. New discovery leads remain; no universal saturation or full-landscape completeness claim."
+  },
+  "counts": {
+    "finalists": 15,
+    "wave_1": 7,
+    "wave_2": 8,
+    "finalist_source_files_captured": 81,
+    "maintained_discovery_lists": 3,
+    "total_source_files_captured": 84,
+    "discovery_only_repository_leads": 5,
+    "preprint_abstract_leads": 2,
+    "native_tests_run": 0,
+    "model_calls": 0,
+    "broker_calls": 0
+  },
+  "retained_failures": [
+    {
+      "wave": 0,
+      "repository": "wangzhe3224/awesome-systematic-trading",
+      "source_commit": "424df5f4acc98dcc3880107188d20f5fa4897653",
+      "path": "README.md",
+      "url": "https://github.com/wangzhe3224/awesome-systematic-trading/blob/424df5f4acc98dcc3880107188d20f5fa4897653/README.md",
+      "status": "failed",
+      "error_type": "HTTPError",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "stage": "release_metadata",
+      "repository": "kernc/backtesting.py",
+      "status": "HTTP 404",
+      "resolution": "Record no GitHub latest release and use explicit source pin."
+    },
+    {
+      "stage": "paper_full_page",
+      "url": "https://doi.org/10.2139/ssrn.2460551",
+      "status": "web open internal error",
+      "resolution": "Bibliographic discovery only; no full-paper reading claim."
+    }
+  ],
+  "source_manifest_sha256": "21ec8c13905947c186c5aab55d71fab582fb6fb4ee58402d9c1cd606efd2ea7a",
+  "assembled_at_utc": "2026-09-19T20:26:01.809596+00:00",
+  "limitations": [
+    "Source review and prospective commands do not inherit the separate existing native LEAN/pair receipts.",
+    "The three selected current-list sources are not all possible awesome lists, and the fifteen finalists are not all trading software.",
+    "No paid data, historical universe or financial strategy was accepted by this pass.",
+    "No account, secret, provider, broker or authentication store was accessed.",
+    "Latest GitHub release metadata is separate from registry package freshness and the accepted installed version.",
+    "Package licenses are recorded as observed, not certified legally compatible."
+  ]
+}

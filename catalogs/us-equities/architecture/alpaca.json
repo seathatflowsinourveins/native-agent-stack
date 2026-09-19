@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "scope": "Official Alpaca product/source constraints and bounded SDK source review, with one native offline serialization observation.",
+  "organization_scan": {
+    "repositories": 94,
+    "archived": 29,
+    "forks": 37,
+    "categories_overlap": true,
+    "command": "gh api --paginate 'orgs/alpacahq/repos?per_page=100&type=public'",
+    "evidence": "alpaca-organization.json"
+  },
+  "repositories": [
+    {
+      "repository": "alpacahq/alpaca-py",
+      "commit": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "decision": "retain_current_offline_sdk_baseline",
+      "reason": "Installed0.44.0 field-preservation probe dropped advanced_instructions; advanced execution remains unaccepted.",
+      "evidence_level": "selected_readme_source",
+      "source": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/README.md",
+      "runtime_acceptance": false
+    },
+    {
+      "repository": "alpacahq/alpaca-mcp-server",
+      "commit": "9b0c72beda5579de088413ce9c3720456cde8f5f",
+      "decision": "conditional_separately_scoped_broker_access",
+      "reason": "Current v2 rewrites tools and schemas; no generic worker brokerage access is configured by this research.",
+      "evidence_level": "selected_readme_source",
+      "source": "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/README.md",
+      "runtime_acceptance": false
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-csharp",
+      "commit": "42043eafdefa4fc2314ff24be8c08d533dffeeb8",
+      "decision": "language_alternative_and_adapter_dependency",
+      "reason": "README targets .NET10 and distinguishes data stream factories; actual LEAN adapter acceptance is separate.",
+      "evidence_level": "selected_readme_source",
+      "source": "https://github.com/alpacahq/alpaca-trade-api-csharp/blob/42043eafdefa4fc2314ff24be8c08d533dffeeb8/README.md",
+      "runtime_acceptance": false
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-go",
+      "commit": "5364a1c723677cd8ec5b81beab34e250a6d4f007",
+      "decision": "language_alternative",
+      "reason": "Paper endpoint is explicitly configured; no Go integration was run.",
+      "evidence_level": "selected_readme_source",
+      "source": "https://github.com/alpacahq/alpaca-trade-api-go/blob/5364a1c723677cd8ec5b81beab34e250a6d4f007/README.md",
+      "runtime_acceptance": false
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-js",
+      "commit": "a5fc564f988e248040ab7893a9de87cd6253edae",
+      "decision": "language_alternative",
+      "reason": "Current README documents client routing/auth and native agent skills; no JavaScript brokerage client was adopted.",
+      "evidence_level": "selected_readme_source",
+      "source": "https://github.com/alpacahq/alpaca-trade-api-js/blob/a5fc564f988e248040ab7893a9de87cd6253edae/README.md",
+      "runtime_acceptance": false
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-python",
+      "decision": "omit_archived_legacy_sdk",
+      "evidence_level": "organization_metadata",
+      "reason": "Archived upstream; maintained Python selection is alpaca-py.",
+      "runtime_acceptance": false
+    },
+    {
+      "repository": "alpacahq/example-hftish",
+      "commit": "39205cc265e9964c927f8f660fac3c7d0ee516ce",
+      "decision": "historical_example_only",
+      "evidence_level": "metadata_and_commit_date",
+      "reason": "Head committed2019-10-25; metadata refresh does not establish modern execution suitability or license clearance.",
+      "runtime_acceptance": false
+    },
+    {
+      "repository": "alpacahq/awesome-quant",
+      "decision": "prefer_maintained_upstream_discovery_list",
+      "evidence_level": "organization_metadata",
+      "reason": "A fork with2022push metadata; the discovery wave inspects wilsonfreitas/awesome-quant instead.",
+      "runtime_acceptance": false
+    }
+  ],
+  "selected_source_files": [
+    {
+      "repository": "alpacahq/alpaca-py",
+      "path": "alpaca/trading/requests.py",
+      "commit": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "sha256": "3290cc8b0d90cae87bc67b1e108b1a67b74d5ecc719dd7bb38026a99b6301552",
+      "bytes": 32932
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "path": "alpaca/trading/client.py",
+      "commit": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "sha256": "03f806b3ce6b4fabcc92f9e8eedf5f3ded817b7ec988bc8a854aa9268ea595de",
+      "bytes": 25722
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "path": "pyproject.toml",
+      "commit": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "sha256": "628e35ca4d25ea5f1cd0a8ca1ab24117affbc583dfbd37dab3a4e3f2c1ad7602",
+      "bytes": 1380
+    }
+  ],
+  "primary_documentation": [
+    "https://alpaca.markets/elite",
+    "https://docs.alpaca.markets/us/docs/about-market-data-api",
+    "https://docs.alpaca.markets/us/docs/alpaca-elite-smart-router",
+    "https://docs.alpaca.markets/us/docs/paper-trading",
+    "https://docs.alpaca.markets/us/docs/broker-api-rate-limits"
+  ],
+  "native_observation": "blueprints/us-equities/architecture/alpaca-probe.json",
+  "retained_failures": [
+    {
+      "request": "gh api repos/alpacahq/marketstore",
+      "result": "exit1/unavailable; no inferred transfer"
+    },
+    {
+      "request": "https://docs.alpaca.markets/us/docs/alpaca-elite-smart-router.md via urllib",
+      "result": "HTTP403; earlier official HTML source was available and retained."
+    }
+  ],
+  "limitations": [
+    "Selected source inspection does not establish upstream CI success or full SDK/adapter quality.",
+    "No actual account entitlement, current historical dataset, provider wire contract or orders were exercised.",
+    "Public source and installed artifact can differ; source HEADs are not an automatic update of accepted runtime pins."
+  ]
+}

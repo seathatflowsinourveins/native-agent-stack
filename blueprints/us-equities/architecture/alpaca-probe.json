@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "observed_date_utc": "2026-09-19",
+  "observation_type": "native_offline_serialization_compatibility",
+  "command": "\"$SDK_PYTHON\" blueprints/us-equities/architecture/alpaca_capabilities.py",
+  "exit_code": 2,
+  "sdk": "alpaca-py",
+  "version": "0.44.0",
+  "network_requests": 0,
+  "clients_constructed": 0,
+  "orders_submitted": 0,
+  "scope": "Synthetic field-preservation probe; not a provider-valid advanced-order fixture, wire/API contract or entitlement test. Never submitted; do not reuse as an order adapter.",
+  "advanced_instructions_declared": false,
+  "cases": [
+    {
+      "algorithm": "DMA",
+      "outcome": "dropped_or_changed",
+      "serialized": {
+        "symbol": "SPY",
+        "qty": 1,
+        "side": "buy",
+        "type": "limit",
+        "time_in_force": "day",
+        "client_order_id": "offline-capability-probe",
+        "limit_price": 100
+      }
+    },
+    {
+      "algorithm": "VWAP",
+      "outcome": "dropped_or_changed",
+      "serialized": {
+        "symbol": "SPY",
+        "qty": 1,
+        "side": "buy",
+        "type": "limit",
+        "time_in_force": "day",
+        "client_order_id": "offline-capability-probe",
+        "limit_price": 100
+      }
+    },
+    {
+      "algorithm": "TWAP",
+      "outcome": "dropped_or_changed",
+      "serialized": {
+        "symbol": "SPY",
+        "qty": 1,
+        "side": "buy",
+        "type": "limit",
+        "time_in_force": "day",
+        "client_order_id": "offline-capability-probe",
+        "limit_price": 100
+      }
+    }
+  ],
+  "serialization_preserved": false,
+  "execution_accepted": false,
+  "upstream_request_source": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/alpaca/trading/requests.py",
+  "limits": [
+    "Synthetic instructions are only field-preservation sentinels, not provider-valid order payloads.",
+    "No account/feed/Elite entitlement, wire request, broker behavior or execution adapter was tested."
+  ]
+}

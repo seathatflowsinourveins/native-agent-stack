@@ -15,6 +15,30 @@
       "kind": "catalog_card"
     },
     {
+      "path": "catalogs/us-equities/architecture/alpaca.json",
+      "collection": "/repositories",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/us-equities/architecture/coverage.json",
+      "collection": "/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/us-equities/architecture/foundation.json",
+      "collection": "/repositories",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/us-equities/architecture/trading.json",
+      "collection": "/entries",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/coverage.json",
       "collection": "/stars",
       "repository_field": "repository",
@@ -63,22 +87,24 @@
     "great-expectations/great_expectations": "fivetran/great_expectations",
     "huangruiteng/loopx": "loopx-project/loopx",
     "iterative/dvc": "treeverse/dvc",
+    "linkedin/datahub": "datahub-project/datahub",
     "polygon-io/client-python": "massive-com/client-python",
+    "tobikodata/sqlmesh": "sqlmesh/sqlmesh",
     "ukplab/sentence-transformers": "huggingface/sentence-transformers",
     "zed-industries/codex-acp": "agentclientprotocol/codex-acp",
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 458,
+    "repositories": 479,
     "public_star_repositories": 337,
-    "beyond_public_stars": 121,
-    "references": 898,
+    "beyond_public_stars": 142,
+    "references": 946,
     "repositories_by_record_type": {
       "catalog_card": 147,
       "component_record": 47,
       "legacy_candidate": 19,
       "public_star": 337,
-      "research_supplement": 6,
+      "research_supplement": 54,
       "star_review": 337
     }
   },
@@ -465,9 +491,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/8",
+          "decision": "research_only_after_simple_baselines_and_data_gates",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
@@ -483,9 +517,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/9",
+          "decision": "reject_current_execution_path_retain_research_reference",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
@@ -530,9 +572,17 @@
         "component_record",
         "legacy_candidate",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/1",
+          "decision": "retain",
+          "evidence_depth": "pinned_primary_source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -706,13 +756,38 @@
       ]
     },
     {
+      "repository": "https://github.com/alpacahq/alpaca-mcp-server",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/alpaca.json",
+          "pointer": "/repositories/1",
+          "decision": "conditional_separately_scoped_broker_access",
+          "evidence_level": "selected_readme_source"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/alpacahq/alpaca-py",
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/alpaca.json",
+          "pointer": "/repositories/0",
+          "decision": "retain_current_offline_sdk_baseline",
+          "evidence_level": "selected_readme_source"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
@@ -728,6 +803,108 @@
           "id": "alpaca-py",
           "decision": "default",
           "evidence_level": "source_review"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/alpacahq/alpaca-trade-api-csharp",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/alpaca.json",
+          "pointer": "/repositories/2",
+          "decision": "language_alternative_and_adapter_dependency",
+          "evidence_level": "selected_readme_source"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/alpacahq/alpaca-trade-api-go",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/alpaca.json",
+          "pointer": "/repositories/3",
+          "decision": "language_alternative",
+          "evidence_level": "selected_readme_source"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/alpacahq/alpaca-trade-api-js",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/alpaca.json",
+          "pointer": "/repositories/4",
+          "decision": "language_alternative",
+          "evidence_level": "selected_readme_source"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/alpacahq/alpaca-trade-api-python",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/alpaca.json",
+          "pointer": "/repositories/5",
+          "decision": "omit_archived_legacy_sdk",
+          "evidence_level": "organization_metadata"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/alpacahq/awesome-quant",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/alpaca.json",
+          "pointer": "/repositories/7",
+          "decision": "prefer_maintained_upstream_discovery_list",
+          "evidence_level": "organization_metadata"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/alpacahq/example-hftish",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/alpaca.json",
+          "pointer": "/repositories/6",
+          "decision": "historical_example_only",
+          "evidence_level": "metadata_and_commit_date"
         }
       ]
     },
@@ -913,6 +1090,7 @@
       "record_types": [
         "catalog_card",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
@@ -923,6 +1101,13 @@
           "id": "claude-agent-sdk",
           "decision": "alternative",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/8",
+          "decision": "investigate",
+          "evidence_depth": "pinned_primary_source_review"
         },
         {
           "kind": "public_star",
@@ -1207,6 +1392,23 @@
           "decision": "already_covered",
           "review_level": "prior_catalog",
           "review_depth": "prior_evidence_link"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/ariga/atlas",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/coverage.json",
+          "pointer": "/candidates/4",
+          "decision": "conditional_for_owned_application_databases",
+          "review_level": "selected_primary_files"
         }
       ]
     },
@@ -1864,6 +2066,7 @@
       "record_types": [
         "catalog_card",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
@@ -1874,6 +2077,13 @@
           "id": "deerflow",
           "decision": "conditional",
           "evidence_level": "native_proven"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/6",
+          "decision": "retain",
+          "evidence_depth": "pinned_primary_source_review"
         },
         {
           "kind": "public_star",
@@ -2586,7 +2796,8 @@
       "record_types": [
         "catalog_card",
         "component_record",
-        "legacy_candidate"
+        "legacy_candidate",
+        "research_supplement"
       ],
       "references": [
         {
@@ -2596,6 +2807,13 @@
           "id": "dagu",
           "decision": "conditional",
           "evidence_level": "native_proven"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/4",
+          "decision": "retain",
+          "evidence_depth": "pinned_primary_source_review"
         },
         {
           "kind": "legacy_candidate",
@@ -2626,6 +2844,25 @@
           "id": "data-databento",
           "decision": "conditional",
           "evidence_level": "source_review"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/datahub-project/datahub",
+      "aliases": [
+        "linkedin/datahub"
+      ],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/coverage.json",
+          "pointer": "/candidates/1",
+          "decision": "defer_heavy_platform_until_metadata_consumers_require_it",
+          "review_level": "selected_primary_files"
         }
       ]
     },
@@ -3254,6 +3491,23 @@
       ]
     },
     {
+      "repository": "https://github.com/edtechre/pybroker",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/14",
+          "decision": "new_discovery_research_alternative_not_default",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/egonex-ai/understand-anything",
       "aliases": [],
       "public_star": true,
@@ -3549,6 +3803,23 @@
       ]
     },
     {
+      "repository": "https://github.com/filosottile/age",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/coverage.json",
+          "pointer": "/candidates/6",
+          "decision": "conditional_for_selected_recovery_artifacts",
+          "review_level": "selected_primary_files"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/fincept-corporation/finceptterminal",
       "aliases": [],
       "public_star": true,
@@ -3814,9 +4085,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/13",
+          "decision": "retain_calendar_contract_dependency",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
@@ -3849,6 +4128,23 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/getsops/sops",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/coverage.json",
+          "pointer": "/candidates/5",
+          "decision": "conditional_after_key_custody_is_defined",
+          "review_level": "selected_primary_files"
         }
       ]
     },
@@ -3887,9 +4183,17 @@
         "catalog_card",
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/3",
+          "decision": "retain",
+          "evidence_depth": "pinned_primary_source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -4963,9 +5267,17 @@
       "record_types": [
         "catalog_card",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/4",
+          "decision": "optional_small_strategy_prototype",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -5179,7 +5491,8 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
         {
@@ -5189,6 +5502,13 @@
           "id": "langgraph",
           "decision": "conditional",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/9",
+          "decision": "omit",
+          "evidence_depth": "pinned_primary_source_review"
         }
       ]
     },
@@ -5454,6 +5774,23 @@
       ]
     },
     {
+      "repository": "https://github.com/lima-vm/lima",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/14",
+          "decision": "investigate",
+          "evidence_depth": "pinned_primary_source_review"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/livekit/agents",
       "aliases": [],
       "public_star": true,
@@ -5612,9 +5949,17 @@
       "record_types": [
         "catalog_card",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/2",
+          "decision": "hold_python_first_alternative_until_license_and_execution_acceptance",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -5733,6 +6078,23 @@
       ]
     },
     {
+      "repository": "https://github.com/marquezproject/marquez",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/coverage.json",
+          "pointer": "/candidates/0",
+          "decision": "conditional_when_cross_pipeline_lineage_is_required",
+          "review_level": "selected_primary_files"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/massive-com/client-python",
       "aliases": [
         "polygon-io/client-python"
@@ -5842,9 +6204,17 @@
         "catalog_card",
         "legacy_candidate",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/11",
+          "decision": "omit",
+          "evidence_depth": "pinned_primary_source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -6021,9 +6391,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/7",
+          "decision": "conditional_financial_ml_and_pit_reference",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
@@ -6125,9 +6503,17 @@
         "catalog_card",
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/0",
+          "decision": "retain",
+          "evidence_depth": "pinned_primary_source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -6155,6 +6541,23 @@
           "path": "manifests/stack.json",
           "pointer": "/components/12",
           "id": "context-mode"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/ml-explore/mlx-lm",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/12",
+          "decision": "investigate",
+          "evidence_depth": "pinned_primary_source_review"
         }
       ]
     },
@@ -6509,9 +6912,17 @@
       "record_types": [
         "catalog_card",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/1",
+          "decision": "conditional_microstructure_and_recovery_challenger",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -6670,6 +7081,23 @@
           "id": "statsforecast",
           "decision": "alternative",
           "evidence_level": "source_review"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/nkaz001/hftbacktest",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/6",
+          "decision": "microstructure_reference_if_horizon_justifies_tick_data",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
         }
       ]
     },
@@ -7140,7 +7568,8 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
         {
@@ -7150,6 +7579,13 @@
           "id": "codex-native-sdk",
           "decision": "default",
           "evidence_level": "native_proven"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/7",
+          "decision": "retain",
+          "evidence_depth": "pinned_primary_source_review"
         },
         {
           "kind": "component_record",
@@ -7358,9 +7794,17 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/10",
+          "decision": "omit",
+          "evidence_depth": "pinned_primary_source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -7519,6 +7963,23 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/ossf/scorecard",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/coverage.json",
+          "pointer": "/candidates/7",
+          "decision": "conditional_read_only_repository_due_diligence",
+          "review_level": "selected_primary_files"
         }
       ]
     },
@@ -7865,9 +8326,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/3",
+          "decision": "optional_research_sweeps_not_order_authority",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
@@ -7900,6 +8369,23 @@
           "decision": "outside_north_star",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/pre-commit/pre-commit",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/coverage.json",
+          "pointer": "/candidates/9",
+          "decision": "optional_when_local_check_execution_needs_standardization",
+          "review_level": "selected_primary_files"
         }
       ]
     },
@@ -8236,9 +8722,17 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/0",
+          "decision": "retain_accepted_primary_event_engine",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
@@ -8339,9 +8833,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/12",
+          "decision": "preferred_optional_return_reporting",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
@@ -9140,9 +9642,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/10",
+          "decision": "preferred_conditional_statistical_evaluation_library",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
@@ -9205,6 +9715,42 @@
       ]
     },
     {
+      "repository": "https://github.com/sodadata/soda-core",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/coverage.json",
+          "pointer": "/candidates/2",
+          "decision": "exclude_from_default_due_to_license_and_version_boundary",
+          "review_level": "selected_primary_files"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/sqlmesh/sqlmesh",
+      "aliases": [
+        "tobikodata/sqlmesh"
+      ],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/coverage.json",
+          "pointer": "/candidates/3",
+          "decision": "conditional_when_transform_graph_outgrows_current_DuckDB_pipeline",
+          "review_level": "selected_primary_files"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/stablyai/orca",
       "aliases": [],
       "public_star": true,
@@ -9252,9 +9798,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/11",
+          "decision": "optional_factor_diagnostics",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
@@ -9288,9 +9842,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/trading.json",
+          "pointer": "/entries/5",
+          "decision": "alternate_equity_data_semantics_reference",
+          "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
@@ -9298,6 +9860,23 @@
           "id": "zipline-reloaded",
           "decision": "alternative",
           "evidence_level": "source_review"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/step-security/harden-runner",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/coverage.json",
+          "pointer": "/candidates/8",
+          "decision": "conditional_external_telemetry_and_tier_review_required",
+          "review_level": "selected_primary_files"
         }
       ]
     },
@@ -9474,7 +10053,8 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
         {
@@ -9484,6 +10064,13 @@
           "id": "temporal",
           "decision": "conditional",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/5",
+          "decision": "investigate",
+          "evidence_depth": "pinned_primary_source_review"
         }
       ]
     },
@@ -9726,9 +10313,17 @@
       "record_types": [
         "catalog_card",
         "component_record",
-        "legacy_candidate"
+        "legacy_candidate",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/2",
+          "decision": "retain",
+          "evidence_depth": "pinned_primary_source_review"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/foundation-memory.json",
@@ -10615,7 +11210,8 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
         {
@@ -10625,6 +11221,13 @@
           "id": "vllm",
           "decision": "default",
           "evidence_level": "native_proven"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/13",
+          "decision": "retain",
+          "evidence_depth": "pinned_primary_source_review"
         },
         {
           "kind": "component_record",

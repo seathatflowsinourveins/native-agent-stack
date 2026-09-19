@@ -71,8 +71,17 @@ Use `qmd get` on the exact returned document URI with a bounded range. [Native c
 
 The canonical [open-gate ledger](../catalogs/us-equities/convergence-review.json) retains required inputs and accepted evidence. Priorities are:
 
+The [architecture and role contract](../blueprints/us-equities/architecture/README.md)
+and [latest source reviews](../catalogs/us-equities/architecture/README.md) record
+platform, worker, data, execution-realism and Elite-adapter boundaries. New research
+supplements must be registered with `scripts/catalog_decisions.py --write --supplement
+PATH.json#/collection`; `--check` validates the union, counts and typed source
+pointers. Regenerate after changing aliases or referenced decisions. This does
+not automatically install a candidate or change an accepted native pin.
+
 - Preserve the [accepted native Astra → Claude workflow](paired/README.md). Native device sign-in and fresh allowance checks succeeded on the authoring host; new hosts must establish their own readiness before replay.
 - Select an entitled point-in-time data source and a strategy/universe/horizon/risk specification. The sample backtest is engine evidence, not an investment recommendation or approved strategy.
+- Calibrate fill/latency/cost/capacity assumptions and test deterministic order recovery offline. Keep advanced Alpaca instructions unaccepted until payload preservation, valid wire contracts and actual account support pass.
 - Improve retrieval against new held-out relevance judgments; preserve the measured lexical misses and evaluate the compatible semantic/hybrid lane before changing defaults.
 - Select an independent backup/key destination and intended hosting lifecycle, then exercise recovery and interruption behavior. Same-host restore and a running local history server are narrower results.
 

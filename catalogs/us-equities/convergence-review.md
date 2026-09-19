@@ -7,16 +7,17 @@ finalists across three two-wave research lanes**, refreshed **all 337 public
 stars**, and checked **17 existing HF model identities plus eight publisher
 discovery lists**. It does not establish a universal or final SOTA ranking.
 
-The existing ledger still contains **453 repository identities, 152 decision
-cards for 147 distinct repositories, and 20 model entries**. New discovery-only
-leads below are documented alongside that ledger; they are not silently counted
-as installed components or promoted to default cards.
+This earlier pass used a **453-identity historical index**, 152 decision cards
+for 147 distinct repositories and 20 model entries. The later
+[architecture wave](architecture/README.md) and [validated decision union](decision-index.json)
+now include 479 identities and explicitly registered supplements. These counts
+do not mean installed components or completed native acceptance.
 
 ## Selection and evidence by layer
 
 | Layer | Retained/default path | This follow-up and boundary |
 | --- | --- | --- |
-| Native workers and SDKs | Codex Astra SDK; Claude Opus 5 | Desktop research workers ran. Fresh native Claude critique completed with 19,370 tokens reconciled to monitoring; new paired Linux Astra leg remains account-blocked. |
+| Native workers and SDKs | Codex Astra SDK; Claude Opus 5 | The earlier standalone critique used 19,370 tokens. Native sign-in subsequently restored access: [paired research](../../adoption/paired/receipt.json) and the later [two-model architecture review](../../blueprints/us-equities/architecture/receipt.json) passed with separately reconciled usage. |
 | Context and token efficiency | Context Mode, scoped RTK, QMD, selected Repomix | Direct Context Mode is available after restart. Artifact token reductions and estimated counters remain distinct from provider usage. |
 | Durable memory | ai-memory | Native backup → encrypted Restic → isolated native restore passed for 324 files and verified SQLite/FTS state. Lifecycle/scope quality remains a separate acceptance. |
 | Code RAG and embeddings | SocratiCode + Qdrant + local Nemotron Embed 1B | Qdrant encrypted native recovery preserved 5 collections/201 points and an exact query. No measured reason to switch embeddings. |

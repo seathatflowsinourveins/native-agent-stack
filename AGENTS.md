@@ -22,6 +22,12 @@ numeric/risk/order state. Catalogued candidates are not installed or accepted by
 inclusion; a default is a recommendation with an explicit adoption status.
 Never infer live-trading, paid-hosting or broker-order authority from this catalog.
 
+For architecture or research waves, read `blueprints/us-equities/architecture/README.md`
+and the matching source-review supplement. `catalogs/us-equities/decision-index.json`
+is the validated repository union; register new decision arrays explicitly with
+`scripts/catalog_decisions.py --write --supplement PATH.json#/collection`.
+Metadata, pinned source review and native execution are different evidence levels.
+
 For catalog lookup on a host that adopted the named QMD index, refresh changed
 files with `qmd --index native-agent-stack-catalog update`, then use scoped
 `search` and `get` from `us-equities-catalog` or `us-equities-foundation`.

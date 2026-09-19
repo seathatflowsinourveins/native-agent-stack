@@ -2,7 +2,9 @@
 
 **Dated decision catalog: September 19, 2026.** The north star is native, token-efficient research → reproducible backtesting → Alpaca paper automation. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
 
-The catalog has **152 repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. It connects to the earlier 36-component foundation. The [combined repository index](repository-index.md) contains **453 repository identities**, including all 337 public stars and 116 beyond that snapshot, with overlap removed. Restic's new scoped adoption card promotes an already indexed starred identity; it does not add another repository to the grand index.
+The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **479 repository identities**, including all 337 public stars and 142 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 946 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
+
+The latest [architecture wave](architecture/README.md) reviews 40 finalist records across foundation, trading and governance lanes, plus official Alpaca sources. It refreshes all public stars and audits 12 complete awesome-list snapshots without treating 6,939 unassessed discovery links as reviewed repositories. Read the [roles, selected stack and promotion gates](../../blueprints/us-equities/architecture/README.md) and [native Astra/Claude review evidence](../../blueprints/us-equities/architecture/receipt.json).
 
 ## Read the layer you need
 
@@ -16,7 +18,7 @@ The catalog has **152 repository decision cards covering 147 unique GitHub repos
 
 Start with the [north-star architecture](../../blueprints/us-equities/north-star.md), [native commands and direct results](native-workflows.md), [harness contract](../../blueprints/us-equities/harness-contract.json), and [machine-readable catalog manifest](manifest.json).
 
-The latest [research and native acceptance review](convergence-review.md) links
+The earlier [research and native acceptance review](convergence-review.md) links
 27 source-review finalists, refreshed HF metadata, actual private-state recovery,
 the preserved retrieval misses, the native SDK dependency inventory and a fresh
 Claude critique with independently reconciled usage. Its [machine-readable
