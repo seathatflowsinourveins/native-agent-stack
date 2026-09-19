@@ -50,7 +50,7 @@ Revision: `None`. Actual configured native SDK task receipt; help is not another
 
 - No official HF weights. Native model/route configuration is not independent provider attestation.
 - API context/output limits are distinct from native Codex runtime limits. API billing is separate from subscription allowance.
-- OmniRoute Astra route and output-cap enforcement remain unproved; do not relabel a gateway alias as Astra proof.
+- OmniRoute native Astra text Responses inference has a [dated receipt](../../blueprints/us-equities/routing/astra-receipt.json); output-cap enforcement and native tool/hook/compaction parity remain unproved.
 
 ```bash
 python blueprints/us-equities/workers/native_worker.py --help
@@ -60,9 +60,9 @@ python blueprints/us-equities/workers/native_worker.py --help
 
 Retain existing native model and account flow with shared scoped memory/retrieval.
 
-Revision: `None`. Readiness commands; inference evidence is historical and separately scoped.
+Revision: `None`. Readiness commands; the [dated research-runtime receipt](../../blueprints/us-equities/research-runtime/receipt.json) separately proves a real native Opus 5 report and reconciled usage.
 
-- Historical native evidence is separate from this extension, which did not rerun Claude. Fresh account allowance is required.
+- A fresh standalone native Opus 5 research report completed on September 19 with 14,583 tokens; this does not prove a full 1M-context workload or a new paired Astra run. Fresh account allowance is required for another inference.
 - A router configured at 200K does not reproduce the native/API 1M context behavior. No official HF weights.
 
 ```bash

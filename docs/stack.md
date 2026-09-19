@@ -1,6 +1,6 @@
 # Stack inventory
 
-Snapshot: September 19, 2026. The 42 entries below are adopted tools, integrations or selected references; the profile and receipt specify how each is used. No single row implies every client invoked every command.
+Snapshot: September 19, 2026. The 47 entries below are adopted tools, integrations or selected references; the profile and receipt specify how each is used. No single row implies every client invoked every command.
 
 | Component | Version/pin | Role | Profile |
 | --- | --- | --- | --- |
@@ -40,14 +40,18 @@ Snapshot: September 19, 2026. The 42 entries below are adopted tools, integratio
 | [toon](https://github.com/toon-format/toon/releases/tag/v4.1.1) | 4.1.1 | Compact suitable structured data with explicit decode | supporting |
 | [vllm](https://github.com/vllm-project/vllm) | 0.25.0 | Native GPU serving for pinned recent local embeddings | core |
 | [worktrunk](https://github.com/max-sixty/worktrunk) | 0.78.0 | Native Git worktree convenience CLI | optional |
-
 | [opentelemetry-collector-contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib) | 0.161.0 | Single native core/contrib Collector process; content filtering, metric conversion, upstream exporters and SDK file receiver | observability |
 | [prometheus](https://github.com/prometheus/prometheus) | 3.14.0 | Native operational metric storage and alert evaluation | observability |
 | [loki](https://github.com/grafana/loki) | 3.7.8 | Native structured log storage | observability |
 | [grafana](https://github.com/grafana/grafana) | 13.2.2 | Local native observation dashboard | observability |
 | [alertmanager](https://github.com/prometheus/alertmanager) | 0.34.1 | Native alert grouping and delivery | observability |
 | [ntfy](https://github.com/binwiederhier/ntfy) | 2.28.0 | Local retained notification inbox | observability |
+| [duckdb](https://github.com/duckdb/duckdb) | 1.5.5 | Deterministic local SQL/Parquet research data and exact decimal storage | supporting |
+| [restic](https://github.com/restic/restic) | 0.19.1 | Encrypted same-host backup and verified restore of explicitly selected public files | supporting |
+| [dagu](https://github.com/dagucloud/dagu) | 2.16.6 | Manual native research workflows and private local run history | supporting |
+| [lean](https://github.com/QuantConnect/Lean) | 985ef30 with documented dependency remediation | Deterministic native historical research backtest engine; no broker initialized | supporting |
+| [syft](https://github.com/anchore/syft) | 1.52.0 | Scoped native SDK dependency inventory; no vulnerability verdict | supporting |
 
-The [native observability receipt](../observability/receipt.json) covers the six added services.
+The [native observability receipt](../observability/receipt.json) covers the six local observation services. The [latest research and acceptance review](../catalogs/us-equities/convergence-review.md) adds actual private-state recovery, the selected SDK inventory and retrieval-quality evidence.
 
 The machine-readable [stack manifest](../manifests/stack.json) maps every component to evidence and upstream commands. [Candidate decisions](../manifests/candidates.json) retain researched alternatives and requirements. Read [evidence boundaries](evidence.md) before interpreting savings or E2E claims.

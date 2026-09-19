@@ -1287,18 +1287,18 @@
       "role": "Programmable task/solver/scorer evaluations",
       "decision": "default",
       "rationale": "Use as the first candidate for a small frozen extraction/tool-use acceptance suite, not a standing model benchmark campaign.",
-      "version_or_commit": "inspect-ai0.3.265; source e4b8ad59d8468d41cd5df844ec7100c7a1569cb1",
-      "release_date": "2026-09-17T18:18:06.141751Z",
+      "version_or_commit": "inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26",
+      "release_date": "2026-09-19T13:11:02Z",
       "license": "MIT",
       "us_equities_fit": "Score exact dates, units, provenance and refusal of out-of-scope actions with deterministic checks first.",
       "alpaca_fit": "Use fixtures or explicitly authorized paper mocks; no live-order agent grading.",
       "evidence_level": "source_review",
       "evidence_refs": [
-        "https://pypi.org/project/inspect-ai/0.3.265/"
+        "https://pypi.org/project/inspect-ai/0.3.266/"
       ],
       "native_workflow": [
         "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
-        "python -m pip install inspect-ai==0.3.265",
+        "python -m pip install inspect-ai==0.3.266",
         "inspect --help",
         "inspect eval \"$REVIEWED_EVAL_FILE\" --model \"$EXPLICIT_EVAL_MODEL\""
       ],
@@ -1313,8 +1313,8 @@
       ],
       "sources": [
         "https://github.com/UKGovernmentBEIS/inspect_ai",
-        "https://github.com/UKGovernmentBEIS/inspect_ai/blob/e4b8ad59d8468d41cd5df844ec7100c7a1569cb1/README.md",
-        "https://pypi.org/project/inspect-ai/0.3.265/",
+        "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/README.md",
+        "https://pypi.org/project/inspect-ai/0.3.266/",
         "https://inspect.aisi.org.uk/"
       ]
     },
@@ -1412,22 +1412,24 @@
       "license": "Apache-2.0",
       "us_equities_fit": "Record libraries used by backtests, extraction workers and later broker adapters.",
       "alpaca_fit": "Inventory the adapter artifact without including credential files.",
-      "evidence_level": "source_review",
+      "evidence_level": "native_proven",
       "evidence_refs": [
-        "https://github.com/anchore/syft/blob/v1.52.0/README.md"
+        "https://github.com/anchore/syft/blob/v1.52.0/README.md",
+        "blueprints/us-equities/supply-chain/receipt.json"
       ],
       "native_workflow": [
-        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
-        "gh release view v1.52.0 --repo anchore/syft --json assets",
-        "syft \"dir:$BUILD_ARTIFACT_DIR\" -o syft-json=sbom.syft.json -o cyclonedx-json=sbom.cdx.json"
+        "# Recorded scoped SDK acceptance; use the linked guide for private paths, readonly mounts and native release verification.",
+        "syft version -o json",
+        "syft scan dir:/sdk --base-path /sdk --source-name equity-worker-sdk --parallelism 2 -o syft-json=/output/runtime.syft.json -o cyclonedx-json=/output/runtime.cdx.json"
       ],
       "requirements": [
         "Verified CLI; explicitly scoped build/runtime artifact and private output review",
         "Exclude credentials and unrelated home directories"
       ],
       "limitations": [
-        "Catalog recommendation only; no SBOM generated in this task.",
-        "Inventory coverage depends on detected packages; an SBOM is not a vulnerability or behavior verdict."
+        "Actual native inventory covered 36 Python packages in one selected SDK prefix; no whole-host, external interpreter or complete vendored-library coverage.",
+        "Inventory is not a vulnerability, authenticity, behavior or legal verdict. Release checksums matched; signature verification and vulnerability scanning were not performed.",
+        "License metadata was present for 34/36 packages and SPDX expressions for 31/36. Missing metadata does not establish absent licenses."
       ],
       "sources": [
         "https://github.com/anchore/syft",

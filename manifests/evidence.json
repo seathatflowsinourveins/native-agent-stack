@@ -352,6 +352,104 @@
         "Telemetry correlation uses a unique process instance, timestamp and exact usage. Native session identifiers are not retained in the public receipt."
       ],
       "path": "blueprints/us-equities/research-runtime/receipt.json"
+    },
+    {
+      "path": "blueprints/us-equities/state-recovery/memory/receipt.json",
+      "id": "ai-memory-native-state-recovery-20260919",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory",
+        "restic"
+      ],
+      "claim": "A native ai-memory online SQLite backup and wiki archive survived encrypted Restic backup/restore and isolated native application restore, preserving 324 archived files and verified SQLite/FTS state.",
+      "limitations": [
+        "The SQLite snapshot is consistent; wiki and config are archived afterward without a demonstrated global DB/wiki write lock.",
+        "38 pages table rows include historical versions, not 38 current pages.",
+        "Native backup excludes raw/, model caches, logs and external native session transcripts.",
+        "Restored SQLite/store/FTS accepted; a replacement HTTP/MCP memory server was not launched or selected by live clients.",
+        "Local source, encrypted repository and password share a host; off-host durability and independent key escrow are not established.",
+        "No automatic schedule, retention enforcement, model inference, broker action or provider token savings."
+      ]
+    },
+    {
+      "path": "blueprints/us-equities/state-recovery/qdrant/receipt.json",
+      "id": "qdrant-native-state-recovery-20260919",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "qdrant",
+        "restic"
+      ],
+      "claim": "A native Qdrant full snapshot survived encrypted Restic backup/restore and a fresh native Qdrant restore, preserving five collections, 201 points, collection configuration and one exact query result.",
+      "limitations": [
+        "One same-host drill; repository and password share the host, with no independent key escrow or off-host durability proof.",
+        "Sequential cross-collection observations do not establish a globally atomic transaction; matching source before/after state bounds this observation.",
+        "One exact-query equivalence check is not a semantic retrieval benchmark or SocratiCode MCP rebinding test.",
+        "No automatic schedule, retention deletion, model inference, broker action or provider token savings.",
+        "The native API was exercised; optional static dashboard assets were absent. Raw snapshots and private query payloads are not published."
+      ]
+    },
+    {
+      "path": "blueprints/us-equities/retrieval-evaluation/receipt.json",
+      "id": "qmd-bm25-retrieval-20260919",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "qmd"
+      ],
+      "claim": "Pinned upstream QMD runBenchmark API evaluated 12 fixed queries on an online-backup snapshot of the adopted lexical index; exact intended-source recall at three was 8/12, with all misses retained.",
+      "limitations": [
+        "The upstream benchmark was invoked through its shipped module API, not a fabricated BM25-only CLI flag.",
+        "Twelve curated queries against 18 foundation documents do not establish robust general retrieval, an independent holdout or complete financial RAG.",
+        "Intended source paths are reviewed gold documents, not exhaustive relevance judgments over every returned summary.",
+        "Upstream precision_at_k uses min(k,gold_count) as denominator, not conventional precision at k. Upstream path matching is case-insensitive suffix matching.",
+        "The separate exact-path audit excludes suffix collisions; upstream native metrics are retained unchanged.",
+        "Original queries were frozen before the first run. Four top-three misses remain; no reformulation or models were used to improve the displayed scores.",
+        "Backend exceptions are flattened to zero by the upstream benchmark; direct lexical replay confirmed identical results without errors for all twelve queries.",
+        "The active database was opened only through SQLite read-only online backup; QMD schema initialization ran on the disposable copy, without reindexing, config synchronization or model download.",
+        "Raw native stdout is private because its fixture field contains a local path. This public receipt contains source IDs and bounded results only.",
+        "This measures lexical source retrieval, not answer accuracy, memory isolation, caching, net provider savings or the complete agent task.",
+        "The collection filter limits returned documents to 18 foundation sources, while BM25 statistics use all 33 shared-index FTS documents. All 33 sources and FTS fields are pinned in full-corpus-manifest.json; recreating only the 18 eligible sources would change the scoring corpus."
+      ]
+    },
+    {
+      "path": "blueprints/us-equities/convergence-review/receipt.json",
+      "id": "native-claude-convergence-review-20260919",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "opentelemetry-collector-contrib",
+        "prometheus",
+        "loki"
+      ],
+      "claim": "Native Claude Opus 5 produced a bounded architecture critique with no exposed tools; all four native usage categories matched retained Prometheus and Loki observations. Model reasoning errors are explicitly adjudicated.",
+      "limitations": [
+        "The model reviewed a supplied nine-fact packet; it did not independently inspect sources or verify the entire ecosystem.",
+        "The generated report contains identified reasoning errors; README adjudication records corrections and rejects unsupported conclusions.",
+        "19,370 tokens is actual usage for this invocation, not tokens saved or complete coordinator/worker task usage. Thinking tokens are a subset of output.",
+        "No new paired native Astra-to-Claude execution: native Linux account allowance/sign-in remains unresolved; Desktop worker availability is separate.",
+        "Telemetry correlation uses a unique native process instance, timestamp and usage values; private instance/session identifiers and raw logs are not published.",
+        "No inference rerun, broker action, paid hosting, external alerting or universal SOTA/completeness claim."
+      ]
+    },
+    {
+      "path": "blueprints/us-equities/supply-chain/receipt.json",
+      "id": "syft-sdk-inventory-20260919",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "syft"
+      ],
+      "claim": "Pinned upstream Syft 1.52.0 enumerated the existing equity-worker-sdk directory with networking isolated and source read-only; all 36 package name/version/PURL tuples agree between native Syft and CycloneDX outputs and all 36 installed Python metadata distributions match.",
+      "limitations": [
+        "Inventory is scoped to one existing SDK prefix; it does not cover every Codex/Claude runtime, host OS, external interpreter or services.",
+        "Three symlinks resolving outside the selected prefix were not followed; externally installed interpreter and system libraries are outside this inventory.",
+        "Checksums matched publisher release files and GitHub asset digests. Release signature and build provenance were not verified; this is not a broader authenticity verdict.",
+        "No vulnerability scanner or vulnerability database was run or downloaded; no vulnerability-free claim follows from inventory success.",
+        "License metadata was present for 34 of 36 packages and an SPDX expression for 31. Missing or unparsed metadata is not evidence of absent licenses or an approved compliance policy.",
+        "All 36 installed Python distributions matched native METADATA names/versions after standard case/separator normalization. This does not establish completeness for vendored native libraries or other package types.",
+        "CycloneDX 1.7 contains 36 library components plus 87 file components; file components are not additional installed packages.",
+        "Raw reports and source-file manifest stay private; their hashes and selected public package metadata are published. The source fingerprint includes host-specific symlink targets and is not a portable lockfile.",
+        "This is a point-in-time inventory, not dependency upgrade, recurring scan, model inference, agent quality evaluation or measured provider token savings.",
+        "One initial summary reader assumed every CycloneDX component had a version and raised KeyError. The native scan was unaffected; corrected enumeration separates package and file components."
+      ]
     }
   ],
   "files": [
@@ -387,13 +485,33 @@
     },
     {
       "path": "README.md",
-      "sha256": "9e2b747abdf779a92253dcbaf2771bec86042d7b7388b200aee3b2af9432ec81",
-      "bytes": 8858
+      "sha256": "538f548e20c5d09027c5ba0af1f729fa7d8b34ca44e018863d2bdaacda486d59",
+      "bytes": 9446
     },
     {
       "path": "blueprints/us-equities/README.md",
       "sha256": "d9cac228aaabae1d5566cfaf18c0d9c7dfeb532f8d252c5ca501ea75af3400b2",
       "bytes": 8026
+    },
+    {
+      "path": "blueprints/us-equities/convergence-review/README.md",
+      "sha256": "b6ff348be22962ec205865e707b9684c427e73ccef4f78531a9cebc297c2f02c",
+      "bytes": 5116
+    },
+    {
+      "path": "blueprints/us-equities/convergence-review/model-report.json",
+      "sha256": "7c4b8dbf8a0510bdd71076000b353afcf9a57522c0b94085d8e4f0ca26b70d9d",
+      "bytes": 7949
+    },
+    {
+      "path": "blueprints/us-equities/convergence-review/prompt.txt",
+      "sha256": "2e9ec4f2dc6db4cf7075e090341dc4289a0fcbf8b1e1b25ebcdabc612b0ddc33",
+      "bytes": 4540
+    },
+    {
+      "path": "blueprints/us-equities/convergence-review/receipt.json",
+      "sha256": "f2f5c80626f8e29cae6f91abfd1c0a5d75762cecb90330b6b4413cb5fc07263d",
+      "bytes": 3188
     },
     {
       "path": "blueprints/us-equities/data/README.md",
@@ -687,8 +805,8 @@
     },
     {
       "path": "blueprints/us-equities/manifest.json",
-      "sha256": "e9069446a6de31e44377ff43c388fdb1f8a49a30f9ac2a423a9d5b913e524f97",
-      "bytes": 5839
+      "sha256": "59e054c62c73300307f662ff67c4dc7b1071b56630f65db0aa6c468e745f1af7",
+      "bytes": 7274
     },
     {
       "path": "blueprints/us-equities/north-star.md",
@@ -739,6 +857,36 @@
       "path": "blueprints/us-equities/research-runtime/run_worker.py",
       "sha256": "6ea4f5c6f6a62405bf21310b712f8b5759c439996ffecd68fdb0a6bf0b6d047f",
       "bytes": 18161
+    },
+    {
+      "path": "blueprints/us-equities/retrieval-evaluation/README.md",
+      "sha256": "0da2a95d70b254795d93cca9b854b2b806b2a7ac6b15559b7a845db919a1443c",
+      "bytes": 9140
+    },
+    {
+      "path": "blueprints/us-equities/retrieval-evaluation/fixture.json",
+      "sha256": "2cabf12fa5fa2e97cd1c623a3c60243b48939279d5c3e4c39a4eb13df8c99858",
+      "bytes": 8366
+    },
+    {
+      "path": "blueprints/us-equities/retrieval-evaluation/full-corpus-manifest.json",
+      "sha256": "23ae01991ae5d6443e2998724b71b049588f92bee71b46f54312cc99ba14894e",
+      "bytes": 26965
+    },
+    {
+      "path": "blueprints/us-equities/retrieval-evaluation/receipt.json",
+      "sha256": "19ce8a42ae578f43d5cae7237da37c7020b73811883e12201319eca4fad34f0d",
+      "bytes": 24115
+    },
+    {
+      "path": "blueprints/us-equities/retrieval-evaluation/run-bm25.mjs",
+      "sha256": "5fb6914b26a148e8020bee0f33ee8ae3223e16da7f2a1f806b0d044628a095c0",
+      "bytes": 5389
+    },
+    {
+      "path": "blueprints/us-equities/retrieval-evaluation/source-manifest.json",
+      "sha256": "a6fd6f8ffa408e5fe5293fc2a9430019e70c2f2935e7fb125397833b8bae8fa9",
+      "bytes": 8769
     },
     {
       "path": "blueprints/us-equities/routing/README.md",
@@ -811,6 +959,41 @@
       "bytes": 273
     },
     {
+      "path": "blueprints/us-equities/state-recovery/README.md",
+      "sha256": "bc48a54ba5bc9a0f7c8128cfba5386531b26c12bbe51cc97002ce2148d50e8c7",
+      "bytes": 1381
+    },
+    {
+      "path": "blueprints/us-equities/state-recovery/memory/README.md",
+      "sha256": "c58fd2a181feb488281c5a0a57fe7b6227f085ad44c41c53f539632d26a34965",
+      "bytes": 8477
+    },
+    {
+      "path": "blueprints/us-equities/state-recovery/memory/receipt.json",
+      "sha256": "027c8e9c512ad0edb7a0c1c5ff5b2a98204082649d8520ff01d0c9cd41e22e59",
+      "bytes": 6015
+    },
+    {
+      "path": "blueprints/us-equities/state-recovery/qdrant/README.md",
+      "sha256": "13f5ce8292fcec69e3daa85859c800aecb4e529bf1f94391dc883129623febe0",
+      "bytes": 5252
+    },
+    {
+      "path": "blueprints/us-equities/state-recovery/qdrant/receipt.json",
+      "sha256": "6db569a01981aebf5622f39877ffdc7bd300766fb1b065fb71eed840b29fee59",
+      "bytes": 3951
+    },
+    {
+      "path": "blueprints/us-equities/supply-chain/README.md",
+      "sha256": "7b3e68f52618e8b24fa6e42a3ffeba6fc6082084277db496e29d6756fd36cde3",
+      "bytes": 6536
+    },
+    {
+      "path": "blueprints/us-equities/supply-chain/receipt.json",
+      "sha256": "30e383a96f3b9eb96d6e7311f0c8e9965f76145c65adafcde54f07815e782e0b",
+      "bytes": 13509
+    },
+    {
       "path": "blueprints/us-equities/workers/README.md",
       "sha256": "c2933f498347266c1e8e266ed41002a48b7adf4761452f8dca2c76befc64cca9",
       "bytes": 11076
@@ -822,8 +1005,8 @@
     },
     {
       "path": "blueprints/us-equities/workers/policy.md",
-      "sha256": "087a415199fec6ccda6a7eadee0fbbc21b6c40592b32d1f37b3d57d73cbf77cb",
-      "bytes": 1974
+      "sha256": "c59ef6d88cf5c60bac7971364b75643fd05018e2414b7868f82d1a7bc11d1c31",
+      "bytes": 2353
     },
     {
       "path": "blueprints/us-equities/workers/receipt.json",
@@ -842,23 +1025,43 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "5cec8f3e130e3bddf5f5db9adb779b2476660b1f2b38026df8f0bd79acd431b2",
-      "bytes": 8806
+      "sha256": "93205f1dd052444ac885cd7242cd54b894360efd95b145a20d804b96cb842480",
+      "bytes": 9190
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
-      "sha256": "0c4a44a3d2fa1eacff4cc435f1ba0abdf7515b005fce19aca2b30775c1b2fe0c",
-      "bytes": 97113
+      "sha256": "5e021e4ab1ac59fae856ca8f21e0e499fc7189af832f2dacddfb29904fb86c1c",
+      "bytes": 97526
     },
     {
       "path": "catalogs/us-equities/agents-operations.md",
-      "sha256": "45949cef338c8dd3adf01d4037034de558528b42e190337ed52d7e78dc35beae",
-      "bytes": 26194
+      "sha256": "c59dee9872e258985d893842d2bb1c0524f192274d37b506680128dbf404f80c",
+      "bytes": 26314
+    },
+    {
+      "path": "catalogs/us-equities/convergence-review.json",
+      "sha256": "375cb30c27c0f319a008655992e780eadae26e8b2424d43cab6b81a42e97b79b",
+      "bytes": 4300
+    },
+    {
+      "path": "catalogs/us-equities/convergence-review.md",
+      "sha256": "957fb72ae55d487caf530881b5844f9b47225a625dbd7b9f00999680310f3e82",
+      "bytes": 7948
     },
     {
       "path": "catalogs/us-equities/coverage.json",
-      "sha256": "5e9a668f179eaf4829ea4ae3d3af2a112d7a0d3881ee16563df18a79f5b3a023",
-      "bytes": 81461
+      "sha256": "e0afeb6e680f5f82b77510576b1f2c94488e9ccd90f090bf68579855b0690b95",
+      "bytes": 81724
+    },
+    {
+      "path": "catalogs/us-equities/data-evaluation-followup.json",
+      "sha256": "69d5e63545bee97e392551bfd72eb048c84beaa69c2c462f116a6f461110abaa",
+      "bytes": 23660
+    },
+    {
+      "path": "catalogs/us-equities/data-evaluation-followup.md",
+      "sha256": "8aef44a02489fc8a1e54e7fbcc6d7c93f42c6e999385f932cd5f6c40bb680298",
+      "bytes": 7596
     },
     {
       "path": "catalogs/us-equities/data-research.json",
@@ -882,28 +1085,48 @@
     },
     {
       "path": "catalogs/us-equities/foundation-memory.json",
-      "sha256": "8b603a00886b9222a624a31ba3e476d79c1e0aef1f543fe4df9b118014ed369b",
-      "bytes": 79530
+      "sha256": "d573937b55307370bce1f6bf71c85cc199c141a91f68b7a2af2e3df25617c553",
+      "bytes": 79575
     },
     {
       "path": "catalogs/us-equities/foundation-memory.md",
-      "sha256": "309749db52a34008e4c4c0515b96f2f6cb25a3321d488ecc04145b894f1fea02",
-      "bytes": 47755
+      "sha256": "effe53a745b895b1683634bf0e174a62012a0bb62d2f173d40582cea2476f7d9",
+      "bytes": 47825
+    },
+    {
+      "path": "catalogs/us-equities/foundation-source-review.md",
+      "sha256": "f571612dff192bce6aa0934b4db34a24b516bfdafad95f5f2562b86aa8d933e3",
+      "bytes": 18321
+    },
+    {
+      "path": "catalogs/us-equities/hosting-source-review.json",
+      "sha256": "36973af4a3aee223db652540e86a8708b100143b47413a0032c7b093b42c63f1",
+      "bytes": 13801
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "8551092b6fe8b90856f2c040e9064caa2c620cee767feda2e1fad42c07b433f2",
-      "bytes": 1292
+      "sha256": "327c87eff736512c9591259e0b7caabd1ef73640770bb83f9eac5fbdcef8ec40",
+      "bytes": 1864
+    },
+    {
+      "path": "catalogs/us-equities/model-followup.json",
+      "sha256": "329937c28502fbc3325aaed55182f35e56c4f6619dc5f99e5112846abc9dd0d1",
+      "bytes": 26937
+    },
+    {
+      "path": "catalogs/us-equities/model-refresh.json",
+      "sha256": "674833a68335ef7a97866f56334994b05351cf5926fe27c4eaa3bd93db979635",
+      "bytes": 22290
     },
     {
       "path": "catalogs/us-equities/models.json",
-      "sha256": "4cdb9604ce2c644616fb7b87fd83a72dc3f95ff1cf81964a620e8e0576f6741d",
-      "bytes": 32822
+      "sha256": "9dfe1501414acea4b61103294ca38e76e3555dcfc12b22f3c34e0339d253f56b",
+      "bytes": 33132
     },
     {
       "path": "catalogs/us-equities/models.md",
-      "sha256": "5a157242c590846f0aa4f34f6d0d4c5e705b7b1062ec04e05012901c54df9d69",
-      "bytes": 20947
+      "sha256": "798b07a2703bb53cc253caa5b2a460fb75ed3b81ea9ebce7ecf24ef33671ad76",
+      "bytes": 21253
     },
     {
       "path": "catalogs/us-equities/native-workflows.md",
@@ -912,8 +1135,8 @@
     },
     {
       "path": "catalogs/us-equities/repository-index.md",
-      "sha256": "3073ef26d57de081527f1cae41b2b4ddfadb1a0ff4be3b81698f2aa815599bb9",
-      "bytes": 83473
+      "sha256": "0a88d47c21bc2f66772fce909e48a17462334165b03640d7dee2cb9be1e7aeba",
+      "bytes": 83765
     },
     {
       "path": "catalogs/us-equities/research-receipt.json",
@@ -937,13 +1160,13 @@
     },
     {
       "path": "catalogs/us-equities/star-audit.json",
-      "sha256": "5606cd470232f5833cb65b51c24c323cf1faec0da70630bb072b6f1bd07d5f3c",
-      "bytes": 554610
+      "sha256": "aaea7385d53191bd4ac5aafb5c5fbf7882207b1448365ef5ac38a75b8eaa2076",
+      "bytes": 555287
     },
     {
       "path": "catalogs/us-equities/star-audit.md",
-      "sha256": "bf931ea40351688a3e474469a7528f4b71cba6b62edc494aa7e5bcea0bd6ba92",
-      "bytes": 15793
+      "sha256": "d901919e63bd1f2d0a75a21bbceab23167e3f8807b2b3563329355ecb947e1ee",
+      "bytes": 16183
     },
     {
       "path": "catalogs/us-equities/verification.json",
@@ -977,8 +1200,8 @@
     },
     {
       "path": "docs/stack.md",
-      "sha256": "04780c07f54c730867267c71d71149dcc7d7573997ca5ee74c42a3d95382fa3b",
-      "bytes": 6714
+      "sha256": "58728a1f807256257e7848da15401221eeef0f63d36d0630b4e7cfb195bd35de",
+      "bytes": 7667
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -1207,8 +1430,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "4e9896c47248e1ed28c1d0c77bc687d120504d486e42bac4375a552b35f93fe5",
-      "bytes": 40471
+      "sha256": "3211722ce90292f2d21dbffa6c5a79c53150a4c704d9cee6b3077168fc033954",
+      "bytes": 41801
     },
     {
       "path": "observability/README.md",

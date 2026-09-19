@@ -1,0 +1,65 @@
+{
+  "status": "research_review",
+  "priorities": [
+    {
+      "rank": 1,
+      "action": "Write and freeze a single strategy/universe/horizon/risk specification and name a concrete point-in-time data source before any further LEAN runs or catalog waves. Treat the existing 3943-point/3-simulated-order run as a plumbing smoke test and re-run it against the frozen spec.",
+      "reason": "The runtime executes but has nothing to measure: F1's backtest has no declared strategy, universe or risk bounds, and F7 confirms no point-in-time dataset and no strategy/universe/horizon/risk spec exists. Without these, additional backtest output carries no research meaning and look-ahead bias cannot be ruled out. This is a cheap, spec-writing bottleneck that determines whether every downstream component is measuring anything, and it does not imply or authorize broker connectivity.",
+      "citations": [
+        "F1",
+        "F7"
+      ]
+    },
+    {
+      "rank": 2,
+      "action": "Produce one recorded successful execution of the native Astra-to-Claude paired workflow, gated on restored native Linux Codex access (allowance reset or a completed device login). Until access returns, exercise the workflow's local halves in isolation and record which segments remain unexecuted rather than marking the path implemented.",
+      "reason": "F2 shows the paired workflow is implemented but never executed successfully, so its correctness is unknown, not established. The blocker is provider-side (exhausted allowance, timed-out device login), not a defect in local code, and Desktop Astra worker availability does not substitute because the pairing under test is the native Linux leg. Historical Astra SDK success is dated evidence of a different path. Retrying the timed-out login repeatedly without an allowance change is not a fix.",
+      "citations": [
+        "F2"
+      ]
+    },
+    {
+      "rank": 3,
+      "action": "Fix the two zero-result questions and audit whether the 33-to-18 foundation filter is discarding gold-path documents, then re-run the pinned upstream runBenchmark unchanged. Separately, reconcile or retire the native suffix matcher that reports Recall@1=6/12 against upstream's 5/12.",
+      "reason": "F5 is the only quality measurement in the evidence set and it is weak: strict gold-path Recall@1=5/12, MRR 0.56875, four retained top-3 misses. Zero-result questions and an eligibility filter that halves the corpus are concrete, addressable defects rather than reasons to add retrieval frameworks. The suffix-matcher discrepancy is an evaluation-integrity problem: a local harness that scores its own system higher than the pinned upstream one must be reconciled before its numbers are used. Note that this lexical baseline is not the agent keyword/typed-query workflow actually in use, so it bounds a floor, not production quality.",
+      "citations": [
+        "F5"
+      ]
+    },
+    {
+      "rank": 4,
+      "action": "Extend recovery proof along the consumer path: rebind a live MCP client to the restored Qdrant and the restored ai-memory instance and confirm serving behavior, and make an explicit recorded decision on off-host copy and key escrow (including accepting the risk) rather than adding backup tooling.",
+      "reason": "F3 and F4 establish byte- and count-level restore fidelity, including an independently repeated Qdrant check, but both stop at the artifact boundary: no MCP client rebinding, no off-host or key-escrow proof, and same-host password and repository throughout. A restore that no client has ever consumed is unverified as a recovery path, and a same-host-only encrypted backup does not survive the host. F3's non-atomic wiki/config sequential capture is a known consistency gap that should be stated in the record, not silently carried.",
+      "citations": [
+        "F3",
+        "F4"
+      ]
+    }
+  ],
+  "unsupported_claims": [
+    {
+      "claim": "State recovery for memory and vector state is proven end to end.",
+      "reason": "Both receipts demonstrate same-host restore of artifacts only. F3 uses the same host password and repository with no off-host copy or key escrow and no replacement MCP service, and notes wiki/config capture is not globally atomic; F4 has no MCP client rebinding and no off-host proof. The evidence supports 'restore fidelity verified on-host', not disaster recovery.",
+      "citations": [
+        "F3",
+        "F4"
+      ]
+    },
+    {
+      "claim": "The selection layer delivers roughly an 87 percent token reduction.",
+      "reason": "F6 states the 4,813-to-643 measurement is question-specific lossy selection measured with o200k_base, and that Context Mode counters are context estimates, not provider accounting. Provider usage, cached input and subset thinking are separately counted and must not be combined with this figure. The number describes one selected text, not whole-session provider spend.",
+      "citations": [
+        "F6"
+      ]
+    },
+    {
+      "claim": "The LEAN run and its reconciled telemetry constitute validated backtest evidence for an equities approach.",
+      "reason": "F1 reports 3943 points, 3 simulated orders and a reconciled 5-fact packet with no broker connected, but F7 records no point-in-time dataset and no strategy, universe, horizon or risk specification. Reconciled observability shows the pipeline ran; it says nothing about strategy validity, and three simulated orders is not a statistically meaningful sample.",
+      "citations": [
+        "F1",
+        "F7"
+      ]
+    }
+  ],
+  "stopping_assessment": "Stopping discovery is defensible as a budget decision but not as a completeness claim, and the record should say so in those words. The saturation signal is real within its sampling frame: F7 refreshed 337 public stars with 0 new identities across two waves over 8 candidates and 29 files, F8 converged from 10 hosting candidates to retaining Dagu/restic/SRT+bwrap because new orchestrators would overlap the existing manual workflow, and F9 found 17 catalogued models unchanged across 25 refreshed commands. Three independent sweeps returning no new identities is adequate grounds to stop sampling that frame. What it does not establish is coverage: F7's retained SEC 403 leaves an authoritative source class entirely untested, no point-in-time vendor was evaluated at all, and F9's unbenchmarked Alibaba 8B/9B embeddings plus two Amazon repos that are .gitattributes-only placeholders with no weights or cards show catalog breadth diverging from verified quality; the 20-model catalog is explicitly task-fit selection, not a universal ranking. Saturation of a star-and-metadata sample is therefore weaker evidence than it appears, and further waves of the same kind should not be run \u2014 the remaining gaps are source-class and benchmark gaps that more browsing will not close. Three axes should be kept distinct and not summed into a readiness claim. Local recovery is the strongest axis and still bounded on-host (F3, F4). Quality evaluation is the weakest and is honestly reported as weak (F5: 5/12 strict Recall@1, two zero-result questions, a local matcher that disagrees upward with upstream). Provider usage is the binding external constraint and is not a local engineering property at all (F2 exhausted allowance and timed-out login; F6 estimate-versus-usage separation). Full native paired end-to-end is currently prevented by exactly one thing outside the codebase: no usable native Linux Codex allowance or completed device login, which leaves an implemented-but-never-executed paired workflow of unknown correctness. Desktop Astra availability and historical Astra SDK success are adjacent evidence, not substitutes for the untested leg. Nothing here supports a convergence, full-coverage or state-of-the-art claim, and nothing here authorizes broker orders, live trading or paid hosting; LEAN remains simulated with no broker connected and no broker keys present."
+}

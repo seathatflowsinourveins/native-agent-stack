@@ -9,12 +9,18 @@ The catalog has **152 repository decision cards covering 147 unique GitHub repos
 | Layer | Cards | Guide / structured manifest |
 | --- | ---: | --- |
 | Token efficiency, memory, retrieval, document ingestion | 36 | [foundation-memory](foundation-memory.md) · [JSON](foundation-memory.json) |
-| Agents, OmniRoute, SDKs, orchestration, hosting, security, telemetry | 41 | [agents-operations](agents-operations.md) · [JSON](agents-operations.json) |
+| Agents, OmniRoute, SDKs, orchestration, hosting, security, telemetry | 42 | [agents-operations](agents-operations.md) · [JSON](agents-operations.json) |
 | Market/reference/filing data, storage, quality, lineage | 36 | [data-research](data-research.md) · [JSON](data-research.json) |
 | Engines, broker adapters, portfolios, statistics, strategy research | 38 | [engines-strategies](engines-strategies.md) · [JSON](engines-strategies.json) |
 | Current model choices and older compatible baselines | 20 | [Models](models.md) · [JSON](models.json) |
 
 Start with the [north-star architecture](../../blueprints/us-equities/north-star.md), [native commands and direct results](native-workflows.md), [harness contract](../../blueprints/us-equities/harness-contract.json), and [machine-readable catalog manifest](manifest.json).
+
+The latest [research and native acceptance review](convergence-review.md) links
+27 source-review finalists, refreshed HF metadata, actual private-state recovery,
+the preserved retrieval misses, the native SDK dependency inventory and a fresh
+Claude critique with independently reconciled usage. Its [machine-readable
+summary](convergence-review.json) preserves every remaining gate.
 
 ## Recommended convergence
 

@@ -88,7 +88,8 @@
         "native-memory",
         "desktop-direct-rag",
         "component-history",
-        "native-observability-followup"
+        "native-observability-followup",
+        "ai-memory-native-state-recovery-20260919"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory"
@@ -153,7 +154,8 @@
         "native-rag",
         "component-history",
         "native-observability",
-        "native-research-runtime-20260919"
+        "native-research-runtime-20260919",
+        "native-claude-convergence-review-20260919"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -540,7 +542,8 @@
       "evidence_ids": [
         "native-rag",
         "desktop-direct-rag",
-        "component-history"
+        "component-history",
+        "qdrant-native-state-recovery-20260919"
       ],
       "upstream_sources": [
         "https://github.com/qdrant/qdrant"
@@ -561,7 +564,8 @@
       "evidence_ids": [
         "native-cli-gaps",
         "component-history",
-        "desktop-cli-workflows"
+        "desktop-cli-workflows",
+        "qmd-bm25-retrieval-20260919"
       ],
       "upstream_sources": [
         "https://github.com/tobi/qmd/releases/tag/v2.8.3"
@@ -804,7 +808,8 @@
         "native-observability",
         "native-observability-followup",
         "desktop-restart-acceptance",
-        "native-research-runtime-20260919"
+        "native-research-runtime-20260919",
+        "native-claude-convergence-review-20260919"
       ],
       "source_pin": null,
       "upstream_sources": [
@@ -827,7 +832,8 @@
         "native-observability",
         "native-observability-followup",
         "desktop-restart-acceptance",
-        "native-research-runtime-20260919"
+        "native-research-runtime-20260919",
+        "native-claude-convergence-review-20260919"
       ],
       "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
       "upstream_sources": [
@@ -849,7 +855,8 @@
         "native-observability",
         "native-observability-followup",
         "desktop-restart-acceptance",
-        "native-research-runtime-20260919"
+        "native-research-runtime-20260919",
+        "native-claude-convergence-review-20260919"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [
@@ -954,7 +961,9 @@
         "restic restore latest --target \"$NEW_RESTORE\" --verify"
       ],
       "evidence_ids": [
-        "restic-local-public-reference-20260919"
+        "restic-local-public-reference-20260919",
+        "ai-memory-native-state-recovery-20260919",
+        "qdrant-native-state-recovery-20260919"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1001,6 +1010,26 @@
         "https://github.com/QuantConnect/Lean"
       ],
       "freshness": "Dated native acceptance on 2026-09-19; pins and limits retained, not an automatic latest-update policy."
+    },
+    {
+      "id": "syft",
+      "repository": "https://github.com/anchore/syft",
+      "version": "1.52.0",
+      "license": "Apache-2.0",
+      "role": "Scoped native SDK dependency inventory; no vulnerability verdict",
+      "source_pin": "02ba369d13b4248395b20a504eca94b0cab564d8",
+      "commands": [
+        "syft version -o json",
+        "syft scan dir:/sdk --base-path /sdk --source-name equity-worker-sdk --parallelism 2 -o syft-json=/output/runtime.syft.json -o cyclonedx-json=/output/runtime.cdx.json"
+      ],
+      "evidence_ids": [
+        "syft-sdk-inventory-20260919"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://github.com/anchore/syft/releases/tag/v1.52.0"
+      ],
+      "freshness": "Native acceptance on 2026-09-19; actual selected SDK inventory, not a whole-host or automatic-update policy."
     }
   ],
   "profiles": [
@@ -1045,7 +1074,8 @@
         "duckdb",
         "restic",
         "dagu",
-        "lean"
+        "lean",
+        "syft"
       ]
     },
     {

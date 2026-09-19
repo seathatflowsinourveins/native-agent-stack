@@ -76,7 +76,7 @@ Use native final usage and turn metrics as reconciliation anchors. Codex input i
 
 Use one small Inspect AI suite or Promptfoo configuration for frozen extraction/tool-policy regressions. Exact dates, units, citations, schema conformance and recovery behavior should have deterministic assertions before adding a judge model. Provider/LLM-judge evaluation requires a separate bounded run; none ran for this catalog. Trading outcomes require their own research protocol and execution validation, not an LLM quality score. OpenAI Agents SDK tracing and Promptfoo telemetry default to enabled upstream; the JSON proposes documented per-process opt-outs for initial local checks. [Agents tracing](https://openai.github.io/openai-agents-python/tracing/), [Promptfoo telemetry](https://www.promptfoo.dev/docs/configuration/telemetry/)
 
-The most immediate publication gap is dependency evidence. Keep Gitleaks for redacted secret scans; add Syft for an artifact-scoped SBOM and Grype for a dated vulnerability result. Trivy is an alternative when IaC/container coverage is needed, not a mandatory duplicate scan. Cosign adds signature/producer verification where upstream publishes suitable material; pin both digest and expected identity. OpenBao becomes useful when several unattended services require scoped, rotated credentials. None of these tools independently proves a strategy safe, a package uncompromised, or a service authorized to trade.
+The selected SDK dependency inventory gap is now closed by [native Syft acceptance](../../blueprints/us-equities/supply-chain/README.md): 36 Python packages matched installed metadata, with agreeing Syft/CycloneDX output. Keep Gitleaks for redacted secret scans. A dated vulnerability review with Grype or Trivy remains a separate choice; no vulnerability scanner ran in this follow-up. Cosign adds signature/producer verification where upstream publishes suitable material; pin both digest and expected identity. OpenBao becomes useful when several unattended services require scoped, rotated credentials. None of these tools independently proves a strategy safe, a package uncompromised, or a service authorized to trade.
 
 ## Catalog index
 
@@ -117,7 +117,7 @@ The following decisions refer to architecture selection, not installation status
 | [inspect-ai](https://github.com/UKGovernmentBEIS/inspect_ai) | default | source review | Programmable task/solver/scorer evaluations |
 | [promptfoo](https://github.com/promptfoo/promptfoo) | alternative | source review | Declarative prompt regression and adversarial testing |
 | [gitleaks](https://github.com/gitleaks/gitleaks) | default | bounded native receipt | Redacted secret scanning of code and history |
-| [syft](https://github.com/anchore/syft) | default | source review | Native artifact dependency inventory |
+| [syft](https://github.com/anchore/syft) | default | bounded native receipt | Native artifact dependency inventory |
 | [grype](https://github.com/anchore/grype) | default | source review | Scan a recorded SBOM against vulnerability data |
 | [trivy](https://github.com/aquasecurity/trivy) | alternative | source review | Alternative integrated vulnerability/IaC/secret scanner |
 | [cosign](https://github.com/sigstore/cosign) | conditional | source review | Artifact signature and identity verification |

@@ -418,6 +418,13 @@
   ],
   "model_calls": 0,
   "net_provider_tokens_saved": null,
+  "commands": [
+    {
+      "command": "syft scan dir:/sdk --base-path /sdk --source-name equity-worker-sdk --parallelism 2 -o syft-json=/output/runtime.syft.json -o cyclonedx-json=/output/runtime.cdx.json",
+      "exit_code": 0,
+      "scope": "Executed inside the documented readonly, network-isolated Bubblewrap namespace; paths are namespace mounts."
+    }
+  ],
   "limitations": [
     "Inventory is scoped to one existing SDK prefix; it does not cover every Codex/Claude runtime, host OS, external interpreter or services.",
     "Three symlinks resolving outside the selected prefix were not followed; externally installed interpreter and system libraries are outside this inventory.",

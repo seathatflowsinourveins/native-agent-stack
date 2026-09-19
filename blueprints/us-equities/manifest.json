@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "snapshot_date": "2026-09-19",
-  "scope": "Native US-equities research/backtest extension; Alpaca paper target not connected. Baseline42-component inventory includes the local observation profile.",
+  "scope": "Native US-equities research/backtest extension; Alpaca paper target not connected. The adopted inventory includes local observation, research hosting and scoped recovery.",
   "baseline_manifest": "../../manifests/stack.json",
   "profile": "native Codex Astra research + optional DeerFlow/routers + deterministic LEAN engine + Alpaca paper target",
   "components": [
@@ -106,7 +106,10 @@
     "Standing trading service and in-flight/broker restart/recovery acceptance",
     "Context Mode file-tool workspace override requires normal native MCP approval; trusted ctx_execute already works.",
     "OmniRoute simple text inference accepted; native tool/hook/compaction parity and failed-attempt provider usage remain unproved.",
-    "Existing Desktop exporter activation and off-host operational acceptance remain separate."
+    "Desktop direct Context Mode and parent log export were accepted; final parent usage attribution and off-host operations remain separate.",
+    "Fresh paired native Linux Astra/Claude run needs usable native allowance/sign-in; last device login expired.",
+    "Frozen QMD lexical baseline retains four top-three misses; held-out query-craft and memory lifecycle quality remain unmeasured.",
+    "Native state recovery passed on-host; independent backup/key storage, MCP consumer recovery and unattended resource/operation policy remain separate."
   ],
   "receipt_integrity": [
     {
@@ -144,9 +147,33 @@
     {
       "path": "workers/receipt.json",
       "sha256": "4308f002936d354757ab819b1b537e26db41c76bf8201f58e0ce559750986afc"
+    },
+    {
+      "path": "state-recovery/memory/receipt.json",
+      "sha256": "027c8e9c512ad0edb7a0c1c5ff5b2a98204082649d8520ff01d0c9cd41e22e59"
+    },
+    {
+      "path": "state-recovery/qdrant/receipt.json",
+      "sha256": "6db569a01981aebf5622f39877ffdc7bd300766fb1b065fb71eed840b29fee59"
+    },
+    {
+      "path": "retrieval-evaluation/receipt.json",
+      "sha256": "19ce8a42ae578f43d5cae7237da37c7020b73811883e12201319eca4fad34f0d"
+    },
+    {
+      "path": "convergence-review/receipt.json",
+      "sha256": "f2f5c80626f8e29cae6f91abfd1c0a5d75762cecb90330b6b4413cb5fc07263d"
+    },
+    {
+      "path": "supply-chain/receipt.json",
+      "sha256": "30e383a96f3b9eb96d6e7311f0c8e9965f76145c65adafcde54f07815e782e0b"
     }
   ],
   "gap_resolution": "gap-resolution.json",
   "observability_manifest": "../../observability/receipt.json",
-  "observability_followup": "../../observability/followup-receipt.json"
+  "observability_followup": "../../observability/followup-receipt.json",
+  "convergence_review": "../../catalogs/us-equities/convergence-review.json",
+  "state_recovery": "state-recovery/README.md",
+  "retrieval_evaluation": "retrieval-evaluation/receipt.json",
+  "supply_chain": "supply-chain/receipt.json"
 }

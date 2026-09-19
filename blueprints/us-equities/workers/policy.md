@@ -15,6 +15,12 @@ Context Mode for large tool outputs. Retrieve bounded useful sections. Preserve
 raw errors privately and report their locations. Do not stack compressors on the
 same artifact, repeatedly reread catalogs, or copy full histories to workers.
 
+For QMD lexical search, use concrete domain terms and an explicit collection,
+then fetch the source with get before claiming a fact. If there are no useful
+hits, reformulate the keywords once or consult the scoped source index; a miss
+does not establish absence. Preserve the miss and uncertainty. Model-backed
+hybrid retrieval requires its own configured and accepted runtime.
+
 Use deterministic code/SQL for prices, bars, positions and calculations. Summarize
 aggregates for reasoning instead of sending raw market streams to the model.
 Report source, observation time, event time, data entitlement, adjustment method,

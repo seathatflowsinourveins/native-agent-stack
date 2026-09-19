@@ -1,0 +1,534 @@
+{
+  "schema_version": 1,
+  "kind": "publisher_model_discovery_followup",
+  "observed_at_utc": "2026-09-19T18:51:18.944548+00:00",
+  "scope": {
+    "candidate_models": 5,
+    "metadata_before_after_commands": 10,
+    "card_attempts": 5,
+    "card_successes": 3,
+    "card_missing": 2,
+    "pinned_recursive_inventory_commands": 5,
+    "paper_metadata_commands": 2,
+    "weight_downloads": 0,
+    "inference_runs": 0,
+    "paid_jobs": 0,
+    "public_repo_files_changed": 0
+  },
+  "decision": "Retain accepted nvidia/Nemotron-3-Embed-1B-BF16 and existing 20-entry model catalog. Preserve these five identities as discovery evidence, not adoptions. Two are artifact-empty placeholders; three are larger variants of already catalogued families.",
+  "accepted_baseline": {
+    "id": "nvidia/Nemotron-3-Embed-1B-BF16",
+    "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+    "dimensions": 2048,
+    "existing_evidence_refs": [
+      "evidence/receipts/native-rag.json",
+      "evidence/receipts/vllm-compatibility.json"
+    ],
+    "existing_accepted_server": "vLLM 0.25.0",
+    "new_inference_in_this_followup": false
+  },
+  "rows": [
+    {
+      "id": "amazon/poiss-bge-m3-retriever",
+      "revision": "e849ee5cae41b6a7554827644ce8c108106a48d2",
+      "observed_at_utc": "2026-09-19T18:48:09.416116+00:00",
+      "status": "placeholder_only_not_released_artifact",
+      "catalog_action": "do_not_add_to_20_entry_core_catalog",
+      "replacement_of_accepted_nemotron_1b_justified": false,
+      "role": "Unverified; name suggests retriever",
+      "repository_created_at": "2026-09-18T00:53:24+00:00",
+      "last_modified": "2026-09-18T00:53:24+00:00",
+      "license": null,
+      "license_evidence": "absent",
+      "repository_public": true,
+      "gated": false,
+      "architecture": null,
+      "declared_pipeline_tag": null,
+      "release_evidence": {
+        "public_release_date_verified": null,
+        "paper_date": null,
+        "selected_weight_file_commits": [],
+        "interpretation": "Repository creation is not a model release; only .gitattributes exists."
+      },
+      "artifact_inventory": {
+        "files": 1,
+        "weight_files": 0,
+        "weight_bytes": 0,
+        "weight_formats": [],
+        "only_gitattributes": true
+      },
+      "safetensors_parameter_metadata": null,
+      "task_fit": "No card, configuration, license, pipeline tag or weights at this pin. Do not infer BGE-M3 architecture or capability from the repository name.",
+      "hardware_and_integration": {
+        "measured_inference": false,
+        "measured_peak_vram_bytes": null,
+        "weight_bytes_are_not_peak_vram": true,
+        "assessment": "No usable model artifact available.",
+        "documented_dependencies": [],
+        "integration_limit": "Cannot assess without an artifact."
+      },
+      "native_read_evidence": {
+        "info_before_exit": 0,
+        "card_exit": 1,
+        "info_after_exit": 0,
+        "head_stable_across_card_read": true,
+        "card_body_sha256": null,
+        "card_failure": "File not found in repository: README.md",
+        "card_revision_note": "hf models card has no revision selector; recorded metadata HEAD was identical immediately before and after the card read. Pinned file listing is a separate immutable revision read.",
+        "commands": [
+          {
+            "command": "hf models info amazon/poiss-bge-m3-retriever --expand sha,createdAt,lastModified,cardData,safetensors,config,pipeline_tag,library_name,gated,private --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:48:08.577971+00:00",
+            "finished_at_utc": "2026-09-19T18:48:08.870777+00:00",
+            "stdout_sha256": "b47eb1ae107ba8886d4f08feaaa4928b187736ded5eadb85f3afc6c551fe512a"
+          },
+          {
+            "command": "hf models card amazon/poiss-bge-m3-retriever --text --format human",
+            "exit_code": 1,
+            "started_at_utc": "2026-09-19T18:48:08.870793+00:00",
+            "finished_at_utc": "2026-09-19T18:48:09.148568+00:00",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "command": "hf models info amazon/poiss-bge-m3-retriever --expand sha,lastModified --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:48:09.148589+00:00",
+            "finished_at_utc": "2026-09-19T18:48:09.416116+00:00",
+            "stdout_sha256": "566382ce3c678b7911266aa803abd041bcd997db10660f25b6e81fe83d555e10"
+          },
+          {
+            "command": "hf models list amazon/poiss-bge-m3-retriever --revision e849ee5cae41b6a7554827644ce8c108106a48d2 --recursive --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:49:07.359281+00:00",
+            "finished_at_utc": "2026-09-19T18:49:07.843599+00:00",
+            "stdout_sha256": "ff2de01756aba31f0e769f9e6bc8604a5bcd871268e20354f93eead80b334b61"
+          }
+        ]
+      },
+      "sources": [
+        "https://huggingface.co/amazon/poiss-bge-m3-retriever/tree/e849ee5cae41b6a7554827644ce8c108106a48d2"
+      ]
+    },
+    {
+      "id": "amazon/poiss-bge-m3-reranker",
+      "revision": "b288b9fe0184707c894cc58f0164dd011f4816f4",
+      "observed_at_utc": "2026-09-19T18:48:09.406238+00:00",
+      "status": "placeholder_only_not_released_artifact",
+      "catalog_action": "do_not_add_to_20_entry_core_catalog",
+      "replacement_of_accepted_nemotron_1b_justified": false,
+      "role": "Unverified; name suggests reranker",
+      "repository_created_at": "2026-09-18T00:54:42+00:00",
+      "last_modified": "2026-09-18T00:54:42+00:00",
+      "license": null,
+      "license_evidence": "absent",
+      "repository_public": true,
+      "gated": false,
+      "architecture": null,
+      "declared_pipeline_tag": null,
+      "release_evidence": {
+        "public_release_date_verified": null,
+        "paper_date": null,
+        "selected_weight_file_commits": [],
+        "interpretation": "Repository creation is not a model release; only .gitattributes exists."
+      },
+      "artifact_inventory": {
+        "files": 1,
+        "weight_files": 0,
+        "weight_bytes": 0,
+        "weight_formats": [],
+        "only_gitattributes": true
+      },
+      "safetensors_parameter_metadata": null,
+      "task_fit": "No card, configuration, license, pipeline tag or weights at this pin. A name containing reranker does not establish an implemented model.",
+      "hardware_and_integration": {
+        "measured_inference": false,
+        "measured_peak_vram_bytes": null,
+        "weight_bytes_are_not_peak_vram": true,
+        "assessment": "No usable model artifact available.",
+        "documented_dependencies": [],
+        "integration_limit": "Cannot assess without an artifact."
+      },
+      "native_read_evidence": {
+        "info_before_exit": 0,
+        "card_exit": 1,
+        "info_after_exit": 0,
+        "head_stable_across_card_read": true,
+        "card_body_sha256": null,
+        "card_failure": "File not found in repository: README.md",
+        "card_revision_note": "hf models card has no revision selector; recorded metadata HEAD was identical immediately before and after the card read. Pinned file listing is a separate immutable revision read.",
+        "commands": [
+          {
+            "command": "hf models info amazon/poiss-bge-m3-reranker --expand sha,createdAt,lastModified,cardData,safetensors,config,pipeline_tag,library_name,gated,private --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:48:08.578197+00:00",
+            "finished_at_utc": "2026-09-19T18:48:08.868209+00:00",
+            "stdout_sha256": "4402e0419059e05733e9a247df41d23bcee7b85072bef7a201c955c8ef436fdb"
+          },
+          {
+            "command": "hf models card amazon/poiss-bge-m3-reranker --text --format human",
+            "exit_code": 1,
+            "started_at_utc": "2026-09-19T18:48:08.868237+00:00",
+            "finished_at_utc": "2026-09-19T18:48:09.144833+00:00",
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "command": "hf models info amazon/poiss-bge-m3-reranker --expand sha,lastModified --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:48:09.144859+00:00",
+            "finished_at_utc": "2026-09-19T18:48:09.406238+00:00",
+            "stdout_sha256": "9d400c8d9675cff6fa8149e9a360523bf8e924d3e0cf1a47460dc9b1ca648990"
+          },
+          {
+            "command": "hf models list amazon/poiss-bge-m3-reranker --revision b288b9fe0184707c894cc58f0164dd011f4816f4 --recursive --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:49:07.358726+00:00",
+            "finished_at_utc": "2026-09-19T18:49:07.894327+00:00",
+            "stdout_sha256": "7471fa4099644b15987b3f415eef0575c18f720a68d32fb050fd8aeee2fdbef0"
+          }
+        ]
+      },
+      "sources": [
+        "https://huggingface.co/amazon/poiss-bge-m3-reranker/tree/b288b9fe0184707c894cc58f0164dd011f4816f4"
+      ]
+    },
+    {
+      "id": "Alibaba-NLP/core-emb-8b",
+      "revision": "123aef9e5e9e76fb686420f077fce3ef3b580c2b",
+      "observed_at_utc": "2026-09-19T18:48:09.474789+00:00",
+      "status": "discovery_only_existing_family_larger_variant",
+      "catalog_action": "do_not_add_to_20_entry_core_catalog",
+      "replacement_of_accepted_nemotron_1b_justified": false,
+      "role": "Dense text/image embeddings emphasizing visual compositional retrieval",
+      "repository_created_at": "2026-08-31T02:01:06+00:00",
+      "last_modified": "2026-09-04T02:06:03+00:00",
+      "license": "cc-by-4.0",
+      "license_evidence": "publisher card metadata",
+      "repository_public": true,
+      "gated": false,
+      "architecture": [
+        "Qwen3VLForEmbedding"
+      ],
+      "declared_pipeline_tag": "feature-extraction",
+      "release_evidence": {
+        "public_release_date_verified": null,
+        "paper_date": "2026-09-03",
+        "selected_weight_file_commits": [
+          {
+            "oid": "f0dcd42cb73b6c7a3192552fec68013e43198695",
+            "title": "Upload model.",
+            "date": "2026-08-31T09:21:48+00:00"
+          }
+        ],
+        "interpretation": "Paper submission date and selected weight upload dates are separate observations; neither establishes the first date the repository or weights became public."
+      },
+      "artifact_inventory": {
+        "files": 17,
+        "weight_files": 4,
+        "weight_bytes": 16289848580,
+        "weight_formats": [
+          "bin"
+        ],
+        "only_gitattributes": false
+      },
+      "safetensors_parameter_metadata": null,
+      "task_fit": "Potential visual-attribute and image/text retrieval evaluation; publisher evidence is not a US-equities filing/code retrieval comparison against accepted Nemotron1B.",
+      "hardware_and_integration": {
+        "measured_inference": false,
+        "measured_peak_vram_bytes": null,
+        "weight_bytes_are_not_peak_vram": true,
+        "assessment": "Selected checkpoints are approximately 16-18 GB on disk before runtime, activation, image-token and batching overhead. Card examples use BF16; Core explicitly selects CUDA, while UEmbed suggests FlashAttention2. Do not infer fit, concurrency or latency without a separate native acceptance. Current Nemotron service has a demonstrated 2048-dimensional contract; changing embedding model requires a new collection and re-embedding even if dimensions happen to agree.",
+        "documented_dependencies": [
+          "transformers>=4.57.0",
+          "torch",
+          "qwen-vl-utils",
+          "pillow",
+          "publisher Qwen3-VL wrapper/evaluation source"
+        ],
+        "integration_limit": "Not verified as a drop-in QMD GGUF backend, current vLLM service or SocratiCode embedding contract."
+      },
+      "native_read_evidence": {
+        "info_before_exit": 0,
+        "card_exit": 0,
+        "info_after_exit": 0,
+        "head_stable_across_card_read": true,
+        "card_body_sha256": "91e62d243cdbb158aade88da0f9c88eb0f36da319b959e9c1e6a84ff421bd69b",
+        "card_failure": null,
+        "card_revision_note": "hf models card has no revision selector; recorded metadata HEAD was identical immediately before and after the card read. Pinned file listing is a separate immutable revision read.",
+        "commands": [
+          {
+            "command": "hf models info Alibaba-NLP/core-emb-8b --expand sha,createdAt,lastModified,cardData,safetensors,config,pipeline_tag,library_name,gated,private --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:48:08.578403+00:00",
+            "finished_at_utc": "2026-09-19T18:48:08.854543+00:00",
+            "stdout_sha256": "21cfffa072a3ca03f8c96e72a312c0420ae7503c1c60ed79a7a308078012c0bb"
+          },
+          {
+            "command": "hf models card Alibaba-NLP/core-emb-8b --text --format human",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:48:08.854580+00:00",
+            "finished_at_utc": "2026-09-19T18:48:09.206022+00:00",
+            "stdout_sha256": "91e62d243cdbb158aade88da0f9c88eb0f36da319b959e9c1e6a84ff421bd69b"
+          },
+          {
+            "command": "hf models info Alibaba-NLP/core-emb-8b --expand sha,lastModified --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:48:09.206049+00:00",
+            "finished_at_utc": "2026-09-19T18:48:09.474789+00:00",
+            "stdout_sha256": "c1ee623351b3bf326c018bed4c6049cdbc4b456258d4cefa74a59d601f4fe449"
+          },
+          {
+            "command": "hf models list Alibaba-NLP/core-emb-8b --revision 123aef9e5e9e76fb686420f077fce3ef3b580c2b --recursive --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:49:07.894379+00:00",
+            "finished_at_utc": "2026-09-19T18:49:08.358820+00:00",
+            "stdout_sha256": "75dde25908a7801773f53b6cd5b7b5ba9aff13f370836e58dcb0b745b5e0d3ed"
+          }
+        ]
+      },
+      "sources": [
+        "https://huggingface.co/Alibaba-NLP/core-emb-8b/tree/123aef9e5e9e76fb686420f077fce3ef3b580c2b",
+        "https://huggingface.co/Alibaba-NLP/core-emb-8b/blob/123aef9e5e9e76fb686420f077fce3ef3b580c2b/README.md",
+        "https://arxiv.org/abs/2609.04083"
+      ]
+    },
+    {
+      "id": "Alibaba-NLP/core-reranker-8b",
+      "revision": "d95d36a34300e34b87cc1793827ac798642c4488",
+      "observed_at_utc": "2026-09-19T18:48:10.227277+00:00",
+      "status": "discovery_only_existing_family_larger_variant",
+      "catalog_action": "do_not_add_to_20_entry_core_catalog",
+      "replacement_of_accepted_nemotron_1b_justified": false,
+      "role": "Cross-attentive text/image relevance scoring",
+      "repository_created_at": "2026-08-30T18:19:15+00:00",
+      "last_modified": "2026-09-04T02:09:37+00:00",
+      "license": "cc-by-4.0",
+      "license_evidence": "publisher card metadata",
+      "repository_public": true,
+      "gated": false,
+      "architecture": [
+        "Qwen3VLForConditionalGeneration"
+      ],
+      "declared_pipeline_tag": "feature-extraction",
+      "release_evidence": {
+        "public_release_date_verified": null,
+        "paper_date": "2026-09-03",
+        "selected_weight_file_commits": [
+          {
+            "oid": "eac05384511279650919d6866b47d93456f8eec5",
+            "title": "Upload model.",
+            "date": "2026-08-30T18:42:16+00:00"
+          }
+        ],
+        "interpretation": "Paper submission date and selected weight upload dates are separate observations; neither establishes the first date the repository or weights became public."
+      },
+      "artifact_inventory": {
+        "files": 19,
+        "weight_files": 4,
+        "weight_bytes": 17534339488,
+        "weight_formats": [
+          "safetensors"
+        ],
+        "only_gitattributes": false
+      },
+      "safetensors_parameter_metadata": {
+        "parameters": {
+          "BF16": 8767123696
+        },
+        "total": 8767123696
+      },
+      "task_fit": "Optional future second-stage visual reranking; produces relevance scores, not replacement dense embeddings. Shared card example demonstrates the embedding model and is not a reranker-specific acceptance recipe.",
+      "hardware_and_integration": {
+        "measured_inference": false,
+        "measured_peak_vram_bytes": null,
+        "weight_bytes_are_not_peak_vram": true,
+        "assessment": "Selected checkpoints are approximately 16-18 GB on disk before runtime, activation, image-token and batching overhead. Card examples use BF16; Core explicitly selects CUDA, while UEmbed suggests FlashAttention2. Do not infer fit, concurrency or latency without a separate native acceptance. Current Nemotron service has a demonstrated 2048-dimensional contract; changing embedding model requires a new collection and re-embedding even if dimensions happen to agree.",
+        "documented_dependencies": [
+          "transformers>=4.57.0",
+          "torch",
+          "qwen-vl-utils",
+          "pillow",
+          "publisher Qwen3-VL wrapper/evaluation source"
+        ],
+        "integration_limit": "Not verified as a drop-in QMD GGUF backend, current vLLM service or SocratiCode embedding contract."
+      },
+      "native_read_evidence": {
+        "info_before_exit": 0,
+        "card_exit": 0,
+        "info_after_exit": 0,
+        "head_stable_across_card_read": true,
+        "card_body_sha256": "91e62d243cdbb158aade88da0f9c88eb0f36da319b959e9c1e6a84ff421bd69b",
+        "card_failure": null,
+        "card_revision_note": "hf models card has no revision selector; recorded metadata HEAD was identical immediately before and after the card read. Pinned file listing is a separate immutable revision read.",
+        "commands": [
+          {
+            "command": "hf models info Alibaba-NLP/core-reranker-8b --expand sha,createdAt,lastModified,cardData,safetensors,config,pipeline_tag,library_name,gated,private --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:48:09.406286+00:00",
+            "finished_at_utc": "2026-09-19T18:48:09.668359+00:00",
+            "stdout_sha256": "06576593b5e478ce774707144bb966e5ad6c6e3626e61cffa7d9d3e235a042b2"
+          },
+          {
+            "command": "hf models card Alibaba-NLP/core-reranker-8b --text --format human",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:48:09.668385+00:00",
+            "finished_at_utc": "2026-09-19T18:48:09.977438+00:00",
+            "stdout_sha256": "91e62d243cdbb158aade88da0f9c88eb0f36da319b959e9c1e6a84ff421bd69b"
+          },
+          {
+            "command": "hf models info Alibaba-NLP/core-reranker-8b --expand sha,lastModified --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:48:09.977466+00:00",
+            "finished_at_utc": "2026-09-19T18:48:10.227277+00:00",
+            "stdout_sha256": "3fa4c27494c6573df4cc8700c915742f69b752772cd3e7c1b0c3038a13bae7c8"
+          },
+          {
+            "command": "hf models list Alibaba-NLP/core-reranker-8b --revision d95d36a34300e34b87cc1793827ac798642c4488 --recursive --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:49:07.359055+00:00",
+            "finished_at_utc": "2026-09-19T18:49:07.907099+00:00",
+            "stdout_sha256": "98459d643a8b79d6759475fe1f099d1003ae921c31c6e1cf5c267a3fb0185097"
+          }
+        ]
+      },
+      "sources": [
+        "https://huggingface.co/Alibaba-NLP/core-reranker-8b/tree/d95d36a34300e34b87cc1793827ac798642c4488",
+        "https://huggingface.co/Alibaba-NLP/core-reranker-8b/blob/d95d36a34300e34b87cc1793827ac798642c4488/README.md",
+        "https://arxiv.org/abs/2609.04083"
+      ],
+      "metadata_caveat": "Hub pipeline_tag is feature-extraction, but card role and architecture describe a reranker; do not route it as an embedding endpoint based on that tag."
+    },
+    {
+      "id": "Alibaba-NLP/UEmbed-9B",
+      "revision": "08fffab347965cd9e4bcfdb17a7c27d7d0ebfa4d",
+      "observed_at_utc": "2026-09-19T18:48:10.408936+00:00",
+      "status": "discovery_only_existing_family_larger_variant",
+      "catalog_action": "do_not_add_to_20_entry_core_catalog",
+      "replacement_of_accepted_nemotron_1b_justified": false,
+      "role": "Dense plus SPLADE-style sparse text/image/video embeddings",
+      "repository_created_at": "2026-07-29T08:29:52+00:00",
+      "last_modified": "2026-08-18T06:23:04+00:00",
+      "license": "cc-by-4.0",
+      "license_evidence": "publisher card metadata",
+      "repository_public": true,
+      "gated": false,
+      "architecture": [
+        "Qwen3_5ForConditionalGeneration"
+      ],
+      "declared_pipeline_tag": "feature-extraction",
+      "release_evidence": {
+        "public_release_date_verified": null,
+        "paper_date": "2026-08-03",
+        "selected_weight_file_commits": [
+          {
+            "oid": "dca483d06892c6ffe81ddec1130fb08c98bffe7d",
+            "title": "Initial release",
+            "date": "2026-08-13T12:59:22+00:00"
+          }
+        ],
+        "interpretation": "The Aug 3 family paper states 2B/4B/9B release; the selected current weights have an Aug 13 commit titled Initial release. July 29 is repository creation, not a verified public model release date."
+      },
+      "artifact_inventory": {
+        "files": 39,
+        "weight_files": 17,
+        "weight_bytes": 16785478040,
+        "weight_formats": [
+          "safetensors"
+        ],
+        "only_gitattributes": false
+      },
+      "safetensors_parameter_metadata": {
+        "parameters": {
+          "BF16": 8392695024
+        },
+        "total": 8392695024
+      },
+      "task_fit": "Potential future visual-document and sparse+dense retrieval comparison; 2B family entry already covers this category. No held-out filing/code accuracy, latency or existing service compatibility measured here.",
+      "hardware_and_integration": {
+        "measured_inference": false,
+        "measured_peak_vram_bytes": null,
+        "weight_bytes_are_not_peak_vram": true,
+        "assessment": "Selected checkpoints are approximately 16-18 GB on disk before runtime, activation, image-token and batching overhead. Card examples use BF16; Core explicitly selects CUDA, while UEmbed suggests FlashAttention2. Do not infer fit, concurrency or latency without a separate native acceptance. Current Nemotron service has a demonstrated 2048-dimensional contract; changing embedding model requires a new collection and re-embedding even if dimensions happen to agree.",
+        "documented_dependencies": [
+          "transformers>=5.4.0",
+          "torch",
+          "qwen-vl-utils",
+          "tokenizers",
+          "huggingface-hub",
+          "pillow",
+          "numpy",
+          "publisher wrapper or demonstrated native Transformers/vLLM route"
+        ],
+        "integration_limit": "Not verified as a drop-in QMD GGUF backend, current vLLM service or SocratiCode embedding contract."
+      },
+      "native_read_evidence": {
+        "info_before_exit": 0,
+        "card_exit": 0,
+        "info_after_exit": 0,
+        "head_stable_across_card_read": true,
+        "card_body_sha256": "bce801de39061c8c02c20dc681286393a512bf030f310f211e88f81219749be8",
+        "card_failure": null,
+        "card_revision_note": "hf models card has no revision selector; recorded metadata HEAD was identical immediately before and after the card read. Pinned file listing is a separate immutable revision read.",
+        "commands": [
+          {
+            "command": "hf models info Alibaba-NLP/UEmbed-9B --expand sha,createdAt,lastModified,cardData,safetensors,config,pipeline_tag,library_name,gated,private --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:48:09.416174+00:00",
+            "finished_at_utc": "2026-09-19T18:48:09.674173+00:00",
+            "stdout_sha256": "d7e682bfc961f839add651fcabb0424f26c669fbde75730c3c75c1ef10de7c39"
+          },
+          {
+            "command": "hf models card Alibaba-NLP/UEmbed-9B --text --format human",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:48:09.674198+00:00",
+            "finished_at_utc": "2026-09-19T18:48:10.149594+00:00",
+            "stdout_sha256": "bce801de39061c8c02c20dc681286393a512bf030f310f211e88f81219749be8"
+          },
+          {
+            "command": "hf models info Alibaba-NLP/UEmbed-9B --expand sha,lastModified --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:48:10.149621+00:00",
+            "finished_at_utc": "2026-09-19T18:48:10.408936+00:00",
+            "stdout_sha256": "2abe917906fb090ee412068eb3ba5a6b380f9a59497761f7aa63e87f11c0199f"
+          },
+          {
+            "command": "hf models list Alibaba-NLP/UEmbed-9B --revision 08fffab347965cd9e4bcfdb17a7c27d7d0ebfa4d --recursive --format json",
+            "exit_code": 0,
+            "started_at_utc": "2026-09-19T18:49:07.843652+00:00",
+            "finished_at_utc": "2026-09-19T18:49:08.267515+00:00",
+            "stdout_sha256": "51ee05d5d87a152406560275a4209cdf331c19e97c1342dbebf2ec1e001a30ba"
+          }
+        ]
+      },
+      "sources": [
+        "https://huggingface.co/Alibaba-NLP/UEmbed-9B/tree/08fffab347965cd9e4bcfdb17a7c27d7d0ebfa4d",
+        "https://huggingface.co/Alibaba-NLP/UEmbed-9B/blob/08fffab347965cd9e4bcfdb17a7c27d7d0ebfa4d/README.md",
+        "https://arxiv.org/abs/2608.02583"
+      ],
+      "upstream_card_caveat": "Card states a native Transformers/vLLM route was added Aug 13, but its quick-start still shows the deprecated huggingface-cli command and a 2B wrapper example. This pass does not validate the 9B serving route."
+    }
+  ],
+  "paper_commands": [
+    {
+      "command": "hf papers info 2608.02583 --format json",
+      "exit_code": 0,
+      "started_at_utc": "2026-09-19T18:49:07.907156+00:00",
+      "finished_at_utc": "2026-09-19T18:49:08.136173+00:00",
+      "stdout_sha256": "aef6c1b1141024c97f6c0e0b3cdf76ee9d53b12dec885ac4926ba944228465a3"
+    },
+    {
+      "command": "hf papers info 2609.04083 --format json",
+      "exit_code": 0,
+      "started_at_utc": "2026-09-19T18:49:08.136213+00:00",
+      "finished_at_utc": "2026-09-19T18:49:08.366811+00:00",
+      "stdout_sha256": "b9f5f68b744009d8f804e3f0ec5a30c1c65874c6e095f0e392b6e1a551938273"
+    }
+  ],
+  "limitations": [
+    "Discovery does not establish model superiority or local service acceptance.",
+    "No new held-out retrieval evaluation, latency or memory measurement was performed.",
+    "Checkpoint byte sizes are metadata, not downloaded files or measured peak GPU memory.",
+    "All release, created-at, weight-upload and paper dates are kept distinct.",
+    "The accepted working model is not claimed to be the universal latest or best model."
+  ]
+}

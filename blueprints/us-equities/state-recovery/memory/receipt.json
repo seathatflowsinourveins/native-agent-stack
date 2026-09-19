@@ -1,7 +1,10 @@
 {
   "schema_version": 1,
   "id": "ai-memory-native-state-recovery-20260919",
-  "kind": "native_application_state_recovery",
+  "kind": "native_cli_e2e",
+  "workflow_type": "native_application_state_recovery",
+  "component_ids": ["ai-memory", "restic"],
+  "claim": "A native ai-memory online SQLite backup and wiki archive survived encrypted Restic backup/restore and isolated native application restore, preserving 324 archived files and verified SQLite/FTS state.",
   "status": "passed_same_host_restore",
   "observed_at_utc": "2026-09-19T18:30:56.430020+00:00",
   "scope": "Native live ai-memory backup, isolated original application restore, encrypted local restic backup/restore, and isolated application restore from recovered archive.",

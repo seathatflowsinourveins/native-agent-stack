@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "base_commit": "bfd03bc",
+  "checked_at_utc": "2026-09-19T18:38:27.239866+00:00",
+  "scope": "10 repository candidates in two discovery waves; existing ai-memory/Qdrant/SQLite reviewed separately for native recovery. Prospective command examples remain unexecuted unless linked to a separate native receipt.",
+  "candidates": [
+    {
+      "repository": "https://github.com/dagucloud/dagu",
+      "wave": 1,
+      "release_tag": "v2.16.6",
+      "release_published_at": "2026-09-14T14:45:57Z",
+      "latest_stable_checked_at": "2026-09-19",
+      "license": "GPL-3.0",
+      "sources": [
+        "https://github.com/dagucloud/dagu/releases/tag/v2.16.6",
+        "https://github.com/dagucloud/dagu/blob/v2.16.6/README_SCHEMA.md",
+        "https://github.com/dagucloud/dagu/blob/v2.16.6/internal/cmn/config/config.go",
+        "https://github.com/dagucloud/dagu/blob/v2.16.6/internal/ir/dag.go"
+      ],
+      "decision": "retain_current2.16.6",
+      "net_value_vs_current_stack": "Already hosts authenticated manual run history, failure and cancellation. Make per-task time/concurrency/retry policy explicit and validate interrupted-work semantics before needing a second durable orchestrator. Current service runs server, not scheduler.",
+      "native_commands": [
+        "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id \"$RUN_ID\" \"$WORKFLOW\"",
+        "dagu history --context local --dagu-home \"$RESEARCH_HOME\" --format json"
+      ],
+      "execution_status": "research_only_except_explicit_existing_tool_and_memory_recovery_results"
+    },
+    {
+      "repository": "https://github.com/restatedev/restate",
+      "wave": 1,
+      "release_tag": "v1.7.10",
+      "release_published_at": "2026-09-14T13:25:33Z",
+      "latest_stable_checked_at": "2026-09-19",
+      "license": "BUSL-1.1; changes to Apache-2.0 four years after release; additional use grant limits public Restate platform service",
+      "sources": [
+        "https://github.com/restatedev/restate/releases/tag/v1.7.10",
+        "https://github.com/restatedev/restate/blob/v1.7.10/README.md",
+        "https://github.com/restatedev/restate/blob/v1.7.10/LICENSE"
+      ],
+      "decision": "defer_new_service",
+      "net_value_vs_current_stack": "Durable handlers, replay and timers matter when real cross-process long-running workers need resumable logic. Today this duplicates manual Dagu research coordination and adds persistence/auth/SDK operation. Durable step replay does not prove external broker exactly-once effects.",
+      "native_commands": [
+        "gh release download v1.7.10 --repo restatedev/restate --pattern restate-server-x86_64-unknown-linux-musl.tar.xz --pattern restate-server-x86_64-unknown-linux-musl.tar.xz.sha256",
+        "restate-server --help"
+      ],
+      "execution_status": "research_only_except_explicit_existing_tool_and_memory_recovery_results"
+    },
+    {
+      "repository": "https://github.com/temporalio/temporal",
+      "wave": 1,
+      "release_tag": "v1.32.0",
+      "release_published_at": "2026-09-11T16:10:29Z",
+      "latest_stable_checked_at": "2026-09-19",
+      "license": "MIT",
+      "sources": [
+        "https://github.com/temporalio/temporal/releases/tag/v1.32.0",
+        "https://github.com/temporalio/temporal/blob/v1.32.0/README.md"
+      ],
+      "decision": "defer_new_service",
+      "net_value_vs_current_stack": "Production service adds persistence/visibility databases, schema upgrades, payload encryption, auth and archival. Native start-dev is developer evidence only. Use if requirements outgrow existing Dagu; choose it or Restate rather than both.",
+      "native_commands": [
+        "temporal server start-dev"
+      ],
+      "execution_status": "research_only_except_explicit_existing_tool_and_memory_recovery_results"
+    },
+    {
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "wave": 1,
+      "release_tag": "v0.0.77",
+      "release_published_at": "2026-09-18T22:09:16Z",
+      "latest_stable_checked_at": "2026-09-19",
+      "license": "Apache-2.0",
+      "sources": [
+        "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77",
+        "https://github.com/anthropics/sandbox-runtime/blob/v0.0.77/README.md",
+        "https://github.com/anthropics/sandbox-runtime/blob/v0.0.77/src/cli.ts"
+      ],
+      "decision": "extend_existing_scoped_use",
+      "net_value_vs_current_stack": "Installed package0.0.77 already matches latest. Reuse selected deny-read/allow-read/allow-write/network-deny profiles for deterministic worker data tasks. Installed CLI --version prints1.0.0; package.json is authoritative0.0.77. Do not assume ordinary Dagu or all Claude/Codex activity is automatically wrapped.",
+      "native_commands": [
+        "srt --settings \"$PRIVATE_POLICY\" \"$DETERMINISTIC_COMMAND\""
+      ],
+      "execution_status": "research_only_except_explicit_existing_tool_and_memory_recovery_results"
+    },
+    {
+      "repository": "https://github.com/anchore/syft",
+      "wave": 1,
+      "release_tag": "v1.52.0",
+      "release_published_at": "2026-09-17T14:38:17Z",
+      "latest_stable_checked_at": "2026-09-19",
+      "license": "Apache-2.0",
+      "sources": [
+        "https://github.com/anchore/syft/releases/tag/v1.52.0",
+        "https://github.com/anchore/syft/blob/v1.52.0/README.md"
+      ],
+      "decision": "adopted_scoped_sdk_inventory_after_source_review",
+      "net_value_vs_current_stack": "The initial source review proposed an optional dependency inventory. Subsequent native Syft1.52.0 acceptance enumerated36SDKPython packages, matched installed metadata and produced agreeing Syft/CycloneDX outputs. This covers one selected runtime prefix; no vulnerability or build-provenance verdict.",
+      "native_commands": [
+        "SYFT_CHECK_FOR_APP_UPDATE=false syft \"dir:$SDK_ENV\" -o syft-json=\"$PRIVATE_ARTIFACTS/runtime.syft.json\" -o cyclonedx-json=\"$PRIVATE_ARTIFACTS/runtime.cdx.json\""
+      ],
+      "execution_status": "native_cli_e2e; supersedes earlier research-only installation status",
+      "evidence_ref": "blueprints/us-equities/supply-chain/receipt.json"
+    },
+    {
+      "repository": "https://github.com/google/gvisor",
+      "wave": 2,
+      "release_tag": "release-20260914.0",
+      "release_published_at": "2026-09-16T21:31:30Z",
+      "latest_stable_checked_at": "2026-09-19",
+      "license": "Apache-2.0",
+      "sources": [
+        "https://github.com/google/gvisor/releases/tag/release-20260914.0",
+        "https://github.com/google/gvisor/blob/release-20260914.0/README.md"
+      ],
+      "decision": "defer_oci_platform",
+      "net_value_vs_current_stack": "Stronger container application-kernel boundary is useful for hostile third-party code, but it requires an OCI bundle/runtime and workload/platform acceptance. Existing native tools and bubblewrap suffice for the bounded local restore; no containerized hosting platform currently requires runsc.",
+      "native_commands": [
+        "runsc spec -- /hello",
+        "runsc run hello"
+      ],
+      "execution_status": "research_only_except_explicit_existing_tool_and_memory_recovery_results"
+    },
+    {
+      "repository": "https://github.com/containers/bubblewrap",
+      "wave": 2,
+      "release_tag": "v0.12.0",
+      "release_published_at": "2026-08-26T10:11:18Z",
+      "latest_stable_checked_at": "2026-09-19",
+      "license": "LGPL-2.0-or-later; per bubblewrap.c SPDX, COPYING contains LGPL2.1",
+      "sources": [
+        "https://github.com/containers/bubblewrap/releases/tag/v0.12.0",
+        "https://github.com/containers/bubblewrap/blob/v0.12.0/README.md",
+        "https://github.com/containers/bubblewrap/blob/v0.12.0/bubblewrap.c",
+        "https://github.com/containers/bubblewrap/blob/v0.12.0/COPYING"
+      ],
+      "decision": "reuse_distribution0.9.0",
+      "net_value_vs_current_stack": "Latest upstream0.12.0 is not the installed distro0.9.0. Existing0.9.0 was sufficient for actual isolated ai-memory restore with all namespaces and host-root read-only. Do not replace distro binary just to chase release numbers. Bubblewrap requires explicit policy; namespace isolation is not a complete resource-limit policy.",
+      "native_commands": [
+        "bwrap --unshare-all --die-with-parent --new-session --cap-drop ALL --ro-bind / / --proc /proc --dev /dev --tmpfs /tmp --bind \"$RESTORE_SANDBOX\" \"$RESTORE_SANDBOX\" \"$MEMORY_BIN\" restore --data-dir \"$RESTORE_SANDBOX/data\" --from \"$ARCHIVE\""
+      ],
+      "execution_status": "research_only_except_explicit_existing_tool_and_memory_recovery_results"
+    },
+    {
+      "repository": "https://github.com/aquasecurity/trivy",
+      "wave": 2,
+      "release_tag": "v0.74.0",
+      "release_published_at": "2026-08-14T11:29:11Z",
+      "latest_stable_checked_at": "2026-09-19",
+      "license": "Apache-2.0",
+      "sources": [
+        "https://github.com/aquasecurity/trivy/releases/tag/v0.74.0",
+        "https://github.com/aquasecurity/trivy/blob/v0.74.0/README.md",
+        "https://github.com/aquasecurity/trivy/blob/v0.74.0/docs/guide/target/sbom.md"
+      ],
+      "decision": "defer_until_sbom_and_db_freshness_policy",
+      "net_value_vs_current_stack": "Already catalogued. Adds vulnerability/license/misconfiguration findings, but requires versioned vulnerability DB provenance and fix applicability review. Prefer one scanner after actual inventory; do not layer it with every alternative merely for catalogue breadth.",
+      "native_commands": [
+        "trivy sbom --scanners vuln,license --format json --output \"$PRIVATE_ARTIFACTS/runtime-trivy.json\" \"$PRIVATE_ARTIFACTS/runtime.cdx.json\""
+      ],
+      "execution_status": "research_only_except_explicit_existing_tool_and_memory_recovery_results"
+    },
+    {
+      "repository": "https://github.com/restic/restic",
+      "wave": 2,
+      "release_tag": "v0.19.1",
+      "release_published_at": "2026-07-05T08:13:33Z",
+      "latest_stable_checked_at": "2026-09-19",
+      "license": "BSD-2-Clause",
+      "sources": [
+        "https://github.com/restic/restic/releases/tag/v0.19.1",
+        "https://github.com/restic/restic/blob/v0.19.1/doc/045_working_with_repos.rst",
+        "https://github.com/restic/restic/blob/v0.19.1/doc/050_restore.rst",
+        "https://github.com/restic/restic/blob/v0.19.1/doc/060_forget.rst"
+      ],
+      "decision": "extend_existing_accepted_native_tool",
+      "net_value_vs_current_stack": "Actual app-state restore closes a larger real gap than another scheduler or scanner. Reuse0.19.1 to encrypt native ai-memory and Qdrant snapshots; independent destination and key escrow remain open. No scheduling/deletion without selected operational policy.",
+      "native_commands": [
+        "restic backup --host native-agent-stack-state --tag ai-memory-state --json native-memory-backup.tar.gz",
+        "restic check --read-data",
+        "restic restore \"$SNAPSHOT_ID\" --target \"$NEW_RESTORE\" --verify --overwrite never --json",
+        "restic forget --tag \"$TAG\" --keep-last 7 --dry-run --json"
+      ],
+      "execution_status": "research_only_except_explicit_existing_tool_and_memory_recovery_results"
+    },
+    {
+      "repository": "https://github.com/benbjohnson/litestream",
+      "wave": 2,
+      "release_tag": "v0.5.17",
+      "release_published_at": "2026-08-31T21:59:32Z",
+      "latest_stable_checked_at": "2026-09-19",
+      "license": "Apache-2.0",
+      "sources": [
+        "https://github.com/benbjohnson/litestream/releases/tag/v0.5.17",
+        "https://github.com/benbjohnson/litestream/blob/v0.5.17/README.md"
+      ],
+      "decision": "defer_until_continuous_replication_requirement",
+      "net_value_vs_current_stack": "0.5.17 replicates SQLite continuously, but creates _litestream_lock in sourceDB (explicit README). Adds a standing writer/schema change and replica operational policy; native ai-memory onlinebackup plus restic now supplies the bounded need without another daemon. Latest0.5 restore lacks older Age encryption; independent encrypted destination still needed.",
+      "native_commands": [
+        "litestream replicate -config \"$PRIVATE_CONFIG\"",
+        "litestream restore -o \"$NEW_DATABASE\" -integrity-check full \"$REPLICA_URL\""
+      ],
+      "execution_status": "research_only_except_explicit_existing_tool_and_memory_recovery_results"
+    }
+  ],
+  "primary_docs": [
+    "https://docs.temporal.io/self-hosted-guide",
+    "https://oss.anchore.com/docs/guides/sbom/scan-targets/",
+    "https://gvisor.dev/docs/user_guide/quick_start/oci/",
+    "https://trivy.dev/docs/latest/target/sbom/",
+    "https://litestream.io/reference/restore/",
+    "https://litestream.io/reference/replicate/",
+    "https://docs.astral.sh/uv/concepts/projects/export/"
+  ],
+  "top_executable_additions": [
+    {
+      "priority": 1,
+      "practice": "Native application-consistent local snapshot plus isolated original-application recovery and restic encryption",
+      "status": "Native ai-memory and Qdrant encrypted restore chains accepted; see blueprints/us-equities/state-recovery/README.md.",
+      "new_repository_install_required": false
+    },
+    {
+      "priority": 2,
+      "practice": "Apply existing SRT/bubblewrap and user cgroup time/memory/process limits to one deterministic research step, with allowed-operation and denied-read/write/network evidence",
+      "status": "proposed; do not infer automatic wrapping of unrelated workers",
+      "new_repository_install_required": false
+    }
+  ],
+  "supply_chain_followup": "Native Syft1.52.0 now inventories the existing requirements-only SDK prefix. uv0.12.17 CycloneDX export still requires an actual uv.lock project; no unrelated lockfile was invented. Vulnerability and whole-runtime inventory coverage remain separate."
+}

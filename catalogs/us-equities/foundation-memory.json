@@ -69,7 +69,8 @@
         "evidence/receipts/native-context-memory.json",
         "evidence/receipts/artifact-reductions.json",
         "evidence/receipts/component-history.json",
-        "blueprints/us-equities/workers/receipt.json"
+        "blueprints/us-equities/workers/receipt.json",
+        "observability/restart-receipt.json"
       ],
       "native_workflow": [
         "mcporter --config \"${MCPORTER_CONFIG}\" call context-mode.ctx_doctor --args '{}' --output text --no-oauth"
@@ -80,7 +81,7 @@
       ],
       "limitations": [
         "Counters estimate context reduction, not provider billing savings.",
-        "Current Desktop tool catalog lacks direct ctx tools; native mcporter works. Astra SDK ctx_execute ran, but ephemeral ctx_execute_file scope and new-registration approval remain unresolved."
+        "Restart acceptance proves 11 direct Desktop Context Mode tools and correlated parent logs. The historical ephemeral SDK ctx_execute_file scope/new-registration approval caveat remains separate."
       ],
       "sources": [
         "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md",
@@ -551,7 +552,7 @@
       ],
       "workflow_pin_scope": "Native receipt replays have their own pinned environments. Commands without explicit versions are moving upstream entry points, not reproducible installs of this reviewed snapshot; select and lock the named version/commit before deployment.",
       "requirements": [
-        "Python 3.10\u20133.14 and configured extraction/embedding providers."
+        "Python 3.10–3.14 and configured extraction/embedding providers."
       ],
       "limitations": [
         "Default provider examples invoke OpenAI; local extraction options require configuration.",
@@ -857,7 +858,7 @@
         "Configured supported LLM; local SDK mode and document-tree generation."
       ],
       "limitations": [
-        "Vectorless does not mean zero model tokens; tree construction and reasoning have cost. Publisher benchmark is not this system\u2019s finance evaluation."
+        "Vectorless does not mean zero model tokens; tree construction and reasoning have cost. Publisher benchmark is not this system’s finance evaluation."
       ],
       "sources": [
         "https://github.com/VectifyAI/PageIndex/blob/9a8dd6658278fec90347e8ac3388a205305667a3/README.md",

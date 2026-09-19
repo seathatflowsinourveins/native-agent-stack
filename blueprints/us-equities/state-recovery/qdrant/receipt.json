@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "id": "qdrant-native-state-recovery-20260919",
+  "kind": "native_cli_e2e",
+  "component_ids": ["qdrant", "restic"],
+  "claim": "A native Qdrant full snapshot survived encrypted Restic backup/restore and a fresh native Qdrant restore, preserving five collections, 201 points, collection configuration and one exact query result.",
+  "observed_on": "2026-09-19",
+  "status": "passed_same_host_native_restore",
+  "versions": {"qdrant": "1.19.1", "qdrant_commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de", "restic": "0.19.1"},
+  "native_snapshot": {
+    "response_status": "ok",
+    "bytes": 6960640,
+    "sha256": "10e5d1369b8298aea4b0a9526b001ea3fee617009945d006828370b52bc72e19",
+    "matches_native_size_and_checksum": true
+  },
+  "encrypted_chain": {
+    "backup_files": 1,
+    "restored_files": 1,
+    "restored_bytes": 6960640,
+    "archive_byte_identical": true,
+    "read_data_check_exit_code": 0,
+    "snapshots_checked": 2,
+    "packs_checked": 4,
+    "native_check_conclusion": "no errors were found",
+    "application_loaded_restic_recovered_archive": true
+  },
+  "application_checks": {
+    "green_collections": 5,
+    "total_points": 201,
+    "point_counts_by_role": {"symbol_files": 23, "symbol_index": 36, "symbol_metadata": 1, "code_vectors": 139, "index_metadata": 2},
+    "all_point_ids_payloads_and_vectors_match": true,
+    "source_before_after_match": true,
+    "all_collection_configs_match": true,
+    "all_payload_schemas_match": true,
+    "aliases_match": true,
+    "alias_count": 0,
+    "exact_query": {"named_vector": "dense", "dimensions": 2048, "limit": 5, "ordered_ids_versions_scores_match": true, "maximum_score_delta": 0.0},
+    "independent_live_review_repeated": true
+  },
+  "retained_failures": [
+    {"stage": "initial native restore", "exit_code": 101, "cause": "An explicit shared storage.temp_path collided during outer and nested config.json extraction.", "resolution": "Omit temp_path and use another fresh storage directory, as supported by pinned upstream source."},
+    {"stage": "initial query", "http_status": 400, "cause": "Named-vector object supplied instead of dense numeric array.", "resolution": "Use dense numeric array plus using=dense according to the native query API."}
+  ],
+  "cleanup": {"isolated_process_exit_code": 0, "isolated_listener_closed": true, "live_source_available": true, "live_storage_replaced": false},
+  "commands": [
+    "POST /snapshots; GET /snapshots/{returned-name}",
+    "restic backup full.snapshot --host native-agent-stack-state --tag qdrant-state --json",
+    "restic check --read-data",
+    "restic restore $RESTIC_SNAPSHOT_ID --target $FRESH_TARGET --verify --overwrite never --json",
+    "qdrant --config-path $ISOLATED_CONFIG --storage-snapshot $RESTORED_SNAPSHOT --disable-telemetry",
+    "GET /collections; GET /collections/{name}; POST /collections/{name}/points/scroll; GET /aliases",
+    "POST /collections/{name}/points/query with dense vector, using=dense, exact=true, limit=5"
+  ],
+  "limitations": [
+    "One same-host drill; repository and password share the host, with no independent key escrow or off-host durability proof.",
+    "Sequential cross-collection observations do not establish a globally atomic transaction; matching source before/after state bounds this observation.",
+    "One exact-query equivalence check is not a semantic retrieval benchmark or SocratiCode MCP rebinding test.",
+    "No automatic schedule, retention deletion, model inference, broker action or provider token savings.",
+    "The native API was exercised; optional static dashboard assets were absent. Raw snapshots and private query payloads are not published."
+  ],
+  "sources": [
+    "https://github.com/qdrant/qdrant/blob/v1.19.1/src/snapshots.rs",
+    "https://qdrant.tech/documentation/snapshots/",
+    "https://api.qdrant.tech/api-reference/search/query-points",
+    "https://restic.readthedocs.io/en/stable/050_restore.html"
+  ]
+}

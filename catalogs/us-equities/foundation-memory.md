@@ -78,7 +78,7 @@ Workflow pins: Native receipt replays have their own pinned environments. Comman
 Requirements: Supported runtime, native hooks and trusted MCP registration.
 
 - Counters estimate context reduction, not provider billing savings.
-- Current Desktop tool catalog lacks direct ctx tools; native mcporter works. Astra SDK ctx_execute ran, but ephemeral ctx_execute_file scope and new-registration approval remain unresolved.
+- Restart acceptance proves 11 direct Desktop Context Mode tools and correlated parent logs. The historical ephemeral SDK ctx_execute_file scope/new-registration approval caveat remains separate. See [restart receipt](../../observability/restart-receipt.json).
 
 Evidence: [native-context-memory.json](../../evidence/receipts/native-context-memory.json), [artifact-reductions.json](../../evidence/receipts/artifact-reductions.json), [component-history.json](../../evidence/receipts/component-history.json), [receipt.json](../../blueprints/us-equities/workers/receipt.json).
 

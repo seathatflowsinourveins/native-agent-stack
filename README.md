@@ -30,9 +30,17 @@ net provider savings). [Restic backup/restore](blueprints/us-equities/hosting/ba
 recovered 22/22 selected public files. The new paired Astra → Claude workflow
 awaits native Codex allowance; SEC acquisition retained its HTTP 403 failure.
 
+The [September 19 convergence review](catalogs/us-equities/convergence-review.md)
+adds selected source reviews beyond the refreshed stars, current publisher model
+metadata, [encrypted application-state recovery](blueprints/us-equities/state-recovery/README.md),
+and a [frozen retrieval evaluation](blueprints/us-equities/retrieval-evaluation/README.md).
+The lexical baseline retrieved the intended source in the top three for **8/12
+questions**; its misses remain visible. This is a bounded selection review with
+explicit open gates, not a claim of universal completeness.
+
 ## What is here
 
-- **46 adopted components** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup and local observability.
+- **47 adopted components** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup, dependency inventory and local observability.
 - **19 researched alternatives** with adoption decisions, model requirements and prospective commands.
 - **Four extended catalog layers** covering foundations/memory/RAG, agents/hosting/operations, data, and strategy/engine research; source review remains distinct from native execution.
 - Pinned upstream recipes and inactive configuration examples. Native accounts, tool discovery, caching and compaction remain native.
@@ -88,7 +96,7 @@ The actual provider/GPU runs are opt-in native workflows requiring your own acco
 - **Installed** means a package or selected reference exists; **native CLI E2E** means useful input→output behavior ran; **native model E2E** means an actual client called it and returned useful results.
 - A smaller selected artifact, local embedding tokens, cache reuse and provider usage are different measurements. No paired whole-provider savings claim is established.
 - Memory pages are untrusted historical evidence. Keep project scope, bounded capture and canonical instructions authoritative.
-- A working CLI bridge does not prove an already-running Desktop task hot-reloaded its tool catalog. Future native launches have exporter configuration; this already-running Desktop process was not restarted or hot-reloaded and needs its own fresh exporter proof.
+- A working CLI bridge does not prove Desktop tool loading. The separate [restart acceptance](observability/desktop-restart.md) established direct Context Mode tools and correlated parent logs in this task; final parent usage attribution remains separate.
 - The observability profile retains local metrics/logs and local notifications. It does not add a trace database, external alert destination, paid cloud host or connected broker. A [fresh SDK follow-up](observability/session-e2e.md) resolved the earlier missing native histogram; its receipt and metrics represent the same usage and must not be added together. Explicit loopback OTLP settings are not a claim that all native client telemetry is local.
 
 See the [evidence manifest](manifests/evidence.json), [complete component manifest](manifests/stack.json), and [native replay guide](docs/evidence.md). Original project glue and publication files use the MIT license; upstream products, dependencies, models and any attributed material retain their own licenses. See [licensing](licenses/README.md).

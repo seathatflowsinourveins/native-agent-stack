@@ -23,7 +23,16 @@
     "catalogs/us-equities/retrieval-receipt.json",
     "catalogs/us-equities/verification.json",
     "catalogs/us-equities/source-followup-receipt.json",
-    "catalogs/us-equities/data-evaluation-followup.json"
+    "catalogs/us-equities/data-evaluation-followup.json",
+    "catalogs/us-equities/convergence-review.json",
+    "catalogs/us-equities/hosting-source-review.json",
+    "catalogs/us-equities/model-refresh.json",
+    "catalogs/us-equities/model-followup.json",
+    "blueprints/us-equities/state-recovery/memory/receipt.json",
+    "blueprints/us-equities/state-recovery/qdrant/receipt.json",
+    "blueprints/us-equities/retrieval-evaluation/receipt.json",
+    "blueprints/us-equities/convergence-review/receipt.json",
+    "blueprints/us-equities/supply-chain/receipt.json"
   ],
   "north_star": "blueprints/us-equities/north-star.md",
   "harness_contract": "blueprints/us-equities/harness-contract.json",
