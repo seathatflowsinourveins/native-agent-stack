@@ -1146,7 +1146,7 @@
       "repository": "https://github.com/dgunning/edgartools",
       "version": "5.58.0",
       "license": "MIT",
-      "role": "Native local filing parser and LLM-ready metadata; live SEC acquisition refused and historical availability unaccepted",
+      "role": "Native SEC filing-index acquisition and local parsing; bounded raw-source provenance with historical strategy availability still gated",
       "source_pin": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
       "commands": [
         "uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock",
@@ -1154,14 +1154,15 @@
         "\"$CATALYST_RUNTIME/sdk/bin/python\" blueprints/us-equities/catalyst-provenance/native_document.py --help"
       ],
       "evidence_ids": [
-        "native-edgartools-catalyst-20260919"
+        "native-edgartools-catalyst-20260919",
+        "native-sec-access-resolution-20260919"
       ],
       "profile": "supporting",
       "upstream_sources": [
         "https://github.com/dgunning/edgartools",
         "https://pypi.org/project/edgartools/5.58.0/"
       ],
-      "freshness": "Isolated 42-package version-pinned Linux/WSL adoption verified 2026-09-19. Offline native parsing accepted; one real SEC request returned403. Dependency wheels are not hash-locked."
+      "freshness": "Contact-corrected native request returned HTTP200 on2026-09-19 and selected371indexrows. Separate42-package Linux/WSL environment; dependency wheels are not hash-locked. See follow-up receipt for raw-source and temporal-gate scope."
     }
   ],
   "profiles": [
@@ -1209,10 +1210,10 @@
         "lean",
         "syft",
         "alpaca-py",
-      "systemd",
-      "pandas",
-      "skfolio",
-      "edgartools"
+        "systemd",
+        "pandas",
+        "skfolio",
+        "edgartools"
       ]
     },
     {

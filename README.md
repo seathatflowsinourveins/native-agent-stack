@@ -53,7 +53,9 @@ recovered 22/22 selected public files. The later [paired native acceptance](adop
 completed fresh LEAN → Dagu → DuckDB → Astra → Claude after native sign-in, using
 the recreated SDK: **20,776 Astra tokens and 16,293 Claude tokens**. Its selected
 packet measured **4,823 → 640 tokens**; this is not net provider savings.
-SEC acquisition retains its HTTP 403 failure.
+The earlier SEC HTTP 403 remains in its dated receipt; the subsequent
+[contact-corrected native acquisition](blueprints/us-equities/catalyst-provenance/access-resolution.md)
+returned HTTP 200 and parsed the selected filing index without login.
 
 The [September 19 convergence review](catalogs/us-equities/convergence-review.md)
 adds selected source reviews beyond the refreshed stars, current publisher model

@@ -1,5 +1,12 @@
 # Native EdgarTools and catalyst provenance
 
+**Current follow-up:** [SEC access is working for the tested archive path](access-resolution.md)
+after the user supplied a monitored contact. Native acquisition and the real
+daily-index compatibility fix have separate evidence from the initial wave below.
+The original failure receipts remain unchanged.
+
+## Initial wave
+
 This wave adopts **EdgarTools 5.58.0** in an isolated environment and executes its
 native interfaces. The official SEC metadata request returned **HTTP 403**. The
 network branch stopped. Accepted offline results are a two-member synthetic
@@ -29,7 +36,7 @@ uv pip install --python "$CATALYST_RUNTIME/sdk/bin/python" \
 
 Keep an honest declared identity in the local SEC contact environment file;
 source only that file. Native EdgarTools consumes `EDGAR_IDENTITY`, while the
-existing financial-data recipe consumes `SEC_USER_AGENT`. This host configured
+existing financial-data recipe consumes `SEC_USER_AGENT`. The initial wave configured
 a truthful public project issues URL, not an invented personal email. The native
 SDK accepts that string; its quickstart recommends an email contact, and SEC's
 example header also uses an email. String acceptance does not establish SEC

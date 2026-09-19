@@ -27,7 +27,7 @@
     },
     {
       "id": "sec_catalyst_provenance",
-      "state": "offline native accepted / live SEC refused",
+      "state": "native index and header acquisition accepted / historical PIT pending",
       "purpose": "Install selected upstream EdgarTools, test actual bounded access and retain immutable source/availability evidence."
     },
     {
@@ -59,8 +59,13 @@
     "reserved_selection": "momentum20",
     "selected_underperformed_equalweight": true,
     "new_lean_engine_execution": false,
-    "live_sec_access": "HTTP403 / unresolved",
+    "live_sec_access": "HTTP200 / native index and bounded raw-header acquisition accepted",
     "paper_orders": 0,
-    "net_provider_savings": null
-  }
+    "net_provider_savings": null,
+    "sec_access_followup_receipt": "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+    "raw_sample_headers": 5,
+    "historical_cutoff_eligible": 0,
+    "current_observation_cutoff_eligible": 5
+  },
+  "followup_recorded_at_utc": "2026-09-19T23:52:30Z"
 }

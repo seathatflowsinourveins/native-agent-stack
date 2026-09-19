@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-19T23:18:28Z",
+  "recorded_at_utc": "2026-09-19T23:52:30Z",
   "meaning": "Recorded checkpoint; freshness of emission is separate from source update. Worker states are coordinator checkpoints, not process heartbeats.",
   "lanes": [
     {
@@ -93,8 +93,8 @@
       "kind": "gate",
       "id": "sec-provenance",
       "title": "Native SEC catalyst provenance",
-      "state": "native local parsing accepted / SEC HTTP 403 / temporal gate closed",
-      "evidence_ref": "blueprints/us-equities/catalyst-provenance/receipt.json"
+      "state": "HTTP 200 / 371 index rows / 5 headers / historical PIT pending",
+      "evidence_ref": "blueprints/us-equities/catalyst-provenance/access-resolution.json"
     }
   ],
   "workers": [
@@ -109,8 +109,8 @@
       "kind": "worker",
       "id": "data-worker",
       "title": "SEC and starred data research worker",
-      "state": "native parser and source review complete / SEC access refused",
-      "evidence_ref": "blueprints/us-equities/catalyst-provenance/receipt.json"
+      "state": "native acquisition and temporal packets accepted / research coverage pending",
+      "evidence_ref": "blueprints/us-equities/catalyst-provenance/access-resolution.json"
     },
     {
       "kind": "worker",

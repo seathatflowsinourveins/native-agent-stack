@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "id": "native-sec-access-resolution-20260919",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "edgartools"
+  ],
+  "claim": "Contact-corrected native EdgarTools archive acquisition completed with371 index entries (360 unique accessions). A separate bounded provenance adapter acquired the real daily index and five headers; corrected native-format parsing and hash-verified packets reject all five at the historical cutoff and qualify all five only after current local observation.",
+  "limitations": [
+    "Access now succeeds on this host for the tested paths. Contact changed and time elapsed, so the email alone is not established as the cause of recovery or a guarantee of future access.",
+    "The cohort contains 371 CIK/accession entries and 360 unique accession identifiers; shared co-filer rows are retained separately.",
+    "The five headers are a deterministic acquisition sample, not a historical all-equities universe, validated strategy or complete narrative filing corpus.",
+    "2020 acceptance timestamps do not imply this runtime observed the documents then. All five remain ineligible at the historical cutoff; dissemination lag and historical as-known data remain separate requirements.",
+    "The existing acquisition receipt retains its original quarantined derived events. Later packets re-hash the same immutable bytes and derive corrected header results offline; no additional header download was used for that correction.",
+    "The source/provenance bridge is custom repository code; native upstream get_filings/to_context acceptance is separately identified.",
+    "EdgarTools dependencies remain version-pinned rather than wheel-hash-locked. Other hosts need their own native acceptance.",
+    "No account login, broker order, paid resource, support message or additional native model acceptance run was required. Task-agent inference and net provider token savings are not quantified."
+  ],
+  "recorded_at_utc": "2026-09-19T23:52:30Z",
+  "earlier_receipt": "blueprints/us-equities/catalyst-provenance/receipt.json",
+  "contact": {
+    "real_monitored_email_configured_privately": true,
+    "private_file_mode": "0600",
+    "native_environment_keys": [
+      "SEC_USER_AGENT",
+      "EDGAR_IDENTITY"
+    ],
+    "email_published": false,
+    "interactive_login_required": false
+  },
+  "native_upstream": {
+    "package": "edgartools",
+    "version": "5.58.0",
+    "source_pin": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+    "command": ". \"$SEC_CONTACT_ENV\"; EDGAR_LOCAL_DATA_DIR=\"$CATALYST_RUNTIME/native-cache\" timeout --signal=TERM --kill-after=5s 60s \"$CATALYST_RUNTIME/sdk/bin/python\" blueprints/us-equities/catalyst-provenance/native_edgar.py --out \"$CATALYST_RUNTIME/native-network-contact-complete.json\"",
+    "api": "edgar.get_filings(2020,1,form='8-K',amendments=True,filing_date='2020-03-02'); selected Filings.to_context(detail='minimal')",
+    "exit_code": 0,
+    "status": "complete",
+    "http_status": 200,
+    "cohort_rows": 371,
+    "unique_accessions": 360,
+    "forms": {
+      "8-K": 362,
+      "8-K/A": 9
+    },
+    "selected_context_rows": 5,
+    "context_truncated": false,
+    "completed_at_utc": "2026-09-19T23:41:43.744075Z",
+    "original_source_url": "https://www.sec.gov/Archives/edgar/full-index/2020/QTR1/form.gz",
+    "complete_compressed_source": {
+      "bytes": 5079824,
+      "sha256": "2c509bd306a89a8a685580d15b842797d4ba844ca0f642e7c4fb2c48570d8b41",
+      "gzip_validation": "passed",
+      "decompressed_bytes": 50685481
+    }
+  },
+  "provenance_adapter": {
+    "command": ". \"$SEC_CONTACT_ENV\"; timeout --signal=TERM --kill-after=5s 180s python3 blueprints/us-equities/catalyst-provenance/catalyst.py acquire --root \"$CATALYST_RUNTIME/acquisitions\" --run-id native-format-confirmed-20260919 --member-limit 5",
+    "exit_code": 0,
+    "status": "complete",
+    "request_count": 6,
+    "automatic_retries": 0,
+    "cohort_rows": 371,
+    "selected_headers": 5,
+    "completed_at_utc": "2026-09-19T23:48:29.658563Z",
+    "raw_artifacts": [
+      {
+        "bytes": 630238,
+        "first_observed_at": "2026-09-19T23:48:26.011418Z",
+        "path": "index.idx",
+        "sha256": "5865f91e3d68590389b08760ea256fbaa1693fbc1b0e1350142fc3634a9c3383"
+      },
+      {
+        "bytes": 1099,
+        "first_observed_at": "2026-09-19T23:48:26.727717Z",
+        "path": "2186-0001654954-20-002156.hdr.sgml",
+        "sha256": "73170bbcc48df9289f2721f0000f6bf7504a775372b337b507046e820fdf6813"
+      },
+      {
+        "bytes": 896,
+        "first_observed_at": "2026-09-19T23:48:27.407928Z",
+        "path": "12208-0001193125-20-059087.hdr.sgml",
+        "sha256": "0d222c4b4a4f77538b323fc8d27b34be9449d72a604252f37fe80d11ceac82be"
+      },
+      {
+        "bytes": 1141,
+        "first_observed_at": "2026-09-19T23:48:28.124228Z",
+        "path": "13239-0000013239-20-000002.hdr.sgml",
+        "sha256": "df57a064db2839e0885144347365b5b17f9a65200ec9f9f6d4d323039990232f"
+      },
+      {
+        "bytes": 1165,
+        "first_observed_at": "2026-09-19T23:48:28.857258Z",
+        "path": "16918-0000016918-20-000035.hdr.sgml",
+        "sha256": "1dcebb5b57b9b8aea1d680cdab20ff7fd13d285a9d7a42283858ef2ea85ba0d3"
+      },
+      {
+        "bytes": 917,
+        "first_observed_at": "2026-09-19T23:48:29.649862Z",
+        "path": "18349-0000018349-20-000014.hdr.sgml",
+        "sha256": "1ec80b1966ccd1c5a46d8598d4f80f110594a58d2ba4d8f8f126d3b2a4a80add"
+      }
+    ],
+    "historical_packet": {
+      "command": "python3 blueprints/us-equities/catalyst-provenance/catalyst.py packet --run \"$ACQUISITION_RUN\" --as-of 2020-03-03T00:00:00Z --out \"$ACQUISITION_RUN/packet-native-header-historical.json\"",
+      "exit_code": 0,
+      "as_of": "2020-03-03T00:00:00Z",
+      "eligible_count": 0,
+      "exclusions": {
+        "before_first_availability": 5
+      }
+    },
+    "observed_packet": {
+      "command": "python3 blueprints/us-equities/catalyst-provenance/catalyst.py packet --run \"$ACQUISITION_RUN\" --as-of 2026-09-19T23:48:29.658563Z --out \"$ACQUISITION_RUN/packet-native-header-observed.json\"",
+      "exit_code": 0,
+      "as_of": "2026-09-19T23:48:29.658563Z",
+      "eligible_count": 5,
+      "exclusions": {},
+      "events": [
+        {
+          "cik": 2186,
+          "accession": "0001654954-20-002156",
+          "form": "8-K",
+          "accepted_at": "2020-03-02T21:31:33Z",
+          "first_observed_at": "2026-09-19T23:48:26.727717Z",
+          "available_at": "2026-09-19T23:48:26.727717Z",
+          "status": "qualified"
+        },
+        {
+          "cik": 12208,
+          "accession": "0001193125-20-059087",
+          "form": "8-K",
+          "accepted_at": "2020-03-02T21:50:53Z",
+          "first_observed_at": "2026-09-19T23:48:27.407928Z",
+          "available_at": "2026-09-19T23:48:27.407928Z",
+          "status": "qualified"
+        },
+        {
+          "cik": 13239,
+          "accession": "0000013239-20-000002",
+          "form": "8-K",
+          "accepted_at": "2020-03-02T17:16:10Z",
+          "first_observed_at": "2026-09-19T23:48:28.124228Z",
+          "available_at": "2026-09-19T23:48:28.124228Z",
+          "status": "qualified"
+        },
+        {
+          "cik": 16918,
+          "accession": "0000016918-20-000035",
+          "form": "8-K",
+          "accepted_at": "2020-03-02T21:41:54Z",
+          "first_observed_at": "2026-09-19T23:48:28.857258Z",
+          "available_at": "2026-09-19T23:48:28.857258Z",
+          "status": "qualified"
+        },
+        {
+          "cik": 18349,
+          "accession": "0000018349-20-000014",
+          "form": "8-K",
+          "accepted_at": "2020-03-02T22:13:05Z",
+          "first_observed_at": "2026-09-19T23:48:29.649862Z",
+          "available_at": "2026-09-19T23:48:29.649862Z",
+          "status": "qualified"
+        }
+      ]
+    }
+  },
+  "retained_failures": [
+    {
+      "stage": "Initial wave",
+      "result": "HTTP403",
+      "evidence": "blueprints/us-equities/catalyst-provenance/receipt.json",
+      "status": "Preserved dated result; no longer the current access outcome."
+    },
+    {
+      "stage": "Bounded stream diagnostic",
+      "result": "HTTP200 but partial stream cached",
+      "body_limit": 131072,
+      "observed_content_length": 5079824,
+      "cached_fragment_bytes": 144656
+    },
+    {
+      "stage": "First complete native call after diagnostic",
+      "exit_code": 1,
+      "result": "Cached gzip EOFError",
+      "remedy": "Preserved and renamed only the isolated diagnostic cache, then allowed the full native download to complete."
+    },
+    {
+      "stage": "First real daily-index adapter call",
+      "exit_code": 1,
+      "result": "missing_master_index_header",
+      "remedy": "Support native File Name header, compact dates and valid co-filer identities; retain strict selected-day/duplicate/path validation."
+    },
+    {
+      "stage": "First derived packets after acquisition",
+      "exit_code": 0,
+      "result": "Five headers quarantined by unsupported native TYPE tag",
+      "remedy": "Narrow native TYPE alternative, duplicate/conflicting-field regression checks, and offline re-derivation from immutable raw bytes."
+    }
+  ],
+  "cache_diagnosis": {
+    "package": "httpxthrottlecache",
+    "version": "0.6.1",
+    "installed_transport_sha256": "8cd7e26f732f2dd5210473109ae3f358c17732c8c887a1e43aa1931cd2e80c7c",
+    "independent_source_review": "Partial stream finalization promotes an incomplete cache file; subsequent hit synthesizes200 with cached-length header.",
+    "future_diagnostic": "close_clients() before http_client(bypass_cache=True); do not interrupt cache-writing diagnostic streams."
+  },
+  "private_artifact_hashes": [
+    {
+      "path_hint": "$CATALYST_RUNTIME/native-contact-corrected-diagnostic.json",
+      "bytes": 175794,
+      "sha256": "c005ab13ae842b21327722baa22918b1e2e26cdb811839562c7c52c0307d3343"
+    },
+    {
+      "path_hint": "$CATALYST_RUNTIME/native-network-contact-accepted.json",
+      "bytes": 836,
+      "sha256": "49c937ed0d97fcb0231e2c6ad4879e60c296d55150e3a41e5d2d9934968b816d"
+    },
+    {
+      "path_hint": "$CATALYST_RUNTIME/native-network-contact-complete.json",
+      "bytes": 2184,
+      "sha256": "a5868de8d2d1ccaa55b122cb52d18b2655e3b49f97006e92ac77cc2f86917af0"
+    },
+    {
+      "path_hint": "$CATALYST_RUNTIME/acquisitions/contact-confirmed-20260919/receipt.json",
+      "bytes": 766,
+      "sha256": "477499f820dea1e14b5272ffd9af5a842af8dd069a2c86688ee7aef6b98eb293"
+    },
+    {
+      "path_hint": "$CATALYST_RUNTIME/acquisitions/native-format-confirmed-20260919/receipt.json",
+      "bytes": 6560,
+      "sha256": "9d73682848321accbe95bac0f0fda50ebdef9851a693bfb8bdc6e8229a610e10"
+    },
+    {
+      "path_hint": "$CATALYST_RUNTIME/acquisitions/native-format-confirmed-20260919/packet-native-header-historical.json",
+      "bytes": 321,
+      "sha256": "3df50ef89cf0ac1f332d1fe5084e1b6799fc1b76e9da8eef108cca44cd054e46"
+    },
+    {
+      "path_hint": "$CATALYST_RUNTIME/acquisitions/native-format-confirmed-20260919/packet-native-header-observed.json",
+      "bytes": 2875,
+      "sha256": "86e718eb75fe3c9d81858b981337dc202c8f820010028f250d879e680cd553a0"
+    }
+  ],
+  "validation": {
+    "integrated_tests": {
+      "command": "\"$ADOPTED_SDK_PYTHON\" -m unittest discover -s tests -q",
+      "exit_code": 0,
+      "tests": 236,
+      "skipped": 0,
+      "seconds": 5.404
+    },
+    "focused_tests": 21,
+    "independent_code_review": "accepted; both real-index/co-filer fix and native TYPE/duplicate-field fix",
+    "new_sec_calls_by_reviewers": 0,
+    "dashboard_observation": {
+      "native_browser": "agent-browser / convergence-viewer",
+      "visible_state": "HTTP 200 / 371 index rows / 5 headers / historical PIT pending",
+      "recorded_checkpoint_utc": "2026-09-19T23:52:30Z",
+      "password_fields": 0,
+      "source_ref": "blueprints/us-equities/catalyst-provenance/access-resolution.json"
+    },
+    "independent_evidence_review": {
+      "status": "accepted",
+      "private_artifact_hashes_checked": 7,
+      "raw_source_hashes_checked": 6,
+      "complete_gzip_hash_and_decode_verified": true,
+      "published_events_match_private_packet": true,
+      "no_blocking_findings": true
+    }
+  },
+  "sources": [
+    "https://www.sec.gov/about/webmaster-frequently-asked-questions",
+    "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+    "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/edgar/httpclient.py"
+  ]
+}

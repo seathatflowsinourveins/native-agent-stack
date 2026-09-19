@@ -763,6 +763,25 @@
         "Final publication validation belongs to the GitHub workflow for the published commit; this receipt does not preclaim that external CI outcome."
       ],
       "path": "blueprints/us-equities/simulation-research/receipt.json"
+    },
+    {
+      "id": "native-sec-access-resolution-20260919",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "edgartools"
+      ],
+      "claim": "Contact-corrected native EdgarTools archive acquisition completed with371 index entries (360 unique accessions). A separate bounded provenance adapter acquired the real daily index and five headers; corrected native-format parsing and hash-verified packets reject all five at the historical cutoff and qualify all five only after current local observation.",
+      "limitations": [
+        "Access now succeeds on this host for the tested paths. Contact changed and time elapsed, so the email alone is not established as the cause of recovery or a guarantee of future access.",
+        "The cohort contains 371 CIK/accession entries and 360 unique accession identifiers; shared co-filer rows are retained separately.",
+        "The five headers are a deterministic acquisition sample, not a historical all-equities universe, validated strategy or complete narrative filing corpus.",
+        "2020 acceptance timestamps do not imply this runtime observed the documents then. All five remain ineligible at the historical cutoff; dissemination lag and historical as-known data remain separate requirements.",
+        "The existing acquisition receipt retains its original quarantined derived events. Later packets re-hash the same immutable bytes and derive corrected header results offline; no additional header download was used for that correction.",
+        "The source/provenance bridge is custom repository code; native upstream get_filings/to_context acceptance is separately identified.",
+        "EdgarTools dependencies remain version-pinned rather than wheel-hash-locked. Other hosts need their own native acceptance.",
+        "No account login, broker order, paid resource, support message or additional native model acceptance run was required. Task-agent inference and net provider token savings are not quantified."
+      ],
+      "path": "blueprints/us-equities/catalyst-provenance/access-resolution.json"
     }
   ],
   "files": [
@@ -788,8 +807,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "eb2ee069a25e36261cf52e8bac1dace7535c56aa244335d6b34390f975e09019",
-      "bytes": 4392
+      "sha256": "f717304ec2cb083f858b2dbed6660716ff82fbf7cccff8d5227df4dc538c5207",
+      "bytes": 4655
     },
     {
       "path": "CLAUDE.md",
@@ -803,8 +822,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "157e898230eeff8e47046ef7079045ca00cbdbaacd22d8b55d75ed01c447606f",
-      "bytes": 11465
+      "sha256": "6f8098bdfbad8fc96cdd2edcc1b7966c9b39ae9d192b228c59ab845fcfc629a0",
+      "bytes": 11663
     },
     {
       "path": "adoption/README.md",
@@ -968,13 +987,23 @@
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/README.md",
-      "sha256": "613c22a5c2c2e982ef3da352deb371d5be49cda2b83dafb5f58216a38853b667",
-      "bytes": 7799
+      "sha256": "6ded3d4ef60b0c3a0b90431cf24b44ac0fd6dfae6c19849e2cdc6b6fd4050a0a",
+      "bytes": 8128
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+      "sha256": "79dcaad87740e7f0f1e17cd0244164fd0a29764ba393b2eee39b1ed8dbf32615",
+      "bytes": 12531
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-provenance/access-resolution.md",
+      "sha256": "5196a315acc411406df5b4510b5e850bb87db8b068a2c73802d62fa8b2390507",
+      "bytes": 5539
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/catalyst.py",
-      "sha256": "a02b6c65f692170133ed919285597689a1a8042ac8a86e5f2c8a0915007a0027",
-      "bytes": 12212
+      "sha256": "26a85df727df99a67c800be1c1ed792eec05ec488f65186ac179acb9b1acd13e",
+      "bytes": 13311
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/fixture.idx",
@@ -1723,13 +1752,13 @@
     },
     {
       "path": "blueprints/us-equities/simulation-research/README.md",
-      "sha256": "bada73ee2b73e5085bb636f11b7e2c4e533ce6a16d61357cb227ae37f9cf372d",
-      "bytes": 4854
+      "sha256": "7cbb07d3cfe5e5785485ede029ed32f82d3ce83e75dbf1adb8911dcf133b2b21",
+      "bytes": 5100
     },
     {
       "path": "blueprints/us-equities/simulation-research/plan.json",
-      "sha256": "666e7e5b689198cd8c2ce4d8b920671a2e31b27a35b7ef08c8714a8fd033bf9c",
-      "bytes": 3808
+      "sha256": "9c8a41639ef6c6e110dec5d29009388576d0b0c38f73797d30b11c708c20836e",
+      "bytes": 4151
     },
     {
       "path": "blueprints/us-equities/simulation-research/receipt.json",
@@ -1913,8 +1942,8 @@
     },
     {
       "path": "catalogs/us-equities/convergence-review.json",
-      "sha256": "f989216257b9aa4423781f07c496891a4d05f42319ac331d6661dde78f026f6d",
-      "bytes": 10546
+      "sha256": "3a5a71b35acf089070fc39ef5e748e0751813fd174f3524c9e153a6a71024c3f",
+      "bytes": 10860
     },
     {
       "path": "catalogs/us-equities/convergence-review.md",
@@ -1938,8 +1967,8 @@
     },
     {
       "path": "catalogs/us-equities/data-research.json",
-      "sha256": "517cb3fb6c4ccc99151ccf450a4b5258cb749ddee5307ae13dc1962d5546871e",
-      "bytes": 96253
+      "sha256": "e5bc8f8179605af68aa918c034c69d071f2a89adb6fe7596cccbebf8b776e6e5",
+      "bytes": 96448
     },
     {
       "path": "catalogs/us-equities/data-research.md",
@@ -2318,8 +2347,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "dc71b16730bb14c658ca51c257637180335953558bb7bedf3c4c40a51665751c",
-      "bytes": 48196
+      "sha256": "eb9b90c56cff53eb1b33901ed71558ed93d3aea301a539239817a6794587b94f",
+      "bytes": 48320
     },
     {
       "path": "observability/README.md",
@@ -2478,8 +2507,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "f0b16f6e8b235814e558fac9724cd7224b1e31d9a2cffbe22d3caec31c38fdfd",
-      "bytes": 4424
+      "sha256": "c051e26328dfec61662f8d0a870dd138d380e49b7e25244b1fffd1bfa35f05dc",
+      "bytes": 4454
     },
     {
       "path": "observability/receipt.json",
@@ -2558,8 +2587,8 @@
     },
     {
       "path": "tests/test_catalyst_provenance.py",
-      "sha256": "1770ebb9619c52bd43bad7417129db1e4805663c1c79079ce121a050a59c0f65",
-      "bytes": 7697
+      "sha256": "d97ef06024b15d92c7447ee889c708a2975ec583d947c1e3590471373872164d",
+      "bytes": 12522
     },
     {
       "path": "tests/test_execution_realism.py",

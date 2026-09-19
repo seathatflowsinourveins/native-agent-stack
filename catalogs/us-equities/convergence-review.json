@@ -76,9 +76,9 @@
     },
     {
       "id": "accepted-pit-source",
-      "state": "native_local_parser_accepted_live_sec_refused_pit_pending",
-      "required": "Native EdgarTools5.58.0 local synthetic-index and real upstream8-K parsing accepted; one genuine current SEC metadata request returned403. The real HTML has no acceptance metadata and stays quarantined. Original availability, revisions, historical identifier/universe coverage, issuer-level prices and entitlements remain required; no automatic retry or proxy workaround.",
-      "evidence": "blueprints/us-equities/catalyst-provenance/receipt.json"
+      "state": "native_sec_acquisition_accepted_historical_pit_pending",
+      "required": "Native EdgarTools5.58.0 contact-corrected archive request completed with371indexentries (360uniqueaccessions). Raw daily index and bounded headers are retained. Historical public dissemination/observation, source revisions, identifier/universe coverage, issuer-level prices and entitlements remain separate requirements; see current follow-up.",
+      "evidence": "blueprints/us-equities/catalyst-provenance/access-resolution.json"
     },
     {
       "id": "retrieval-quality",
@@ -190,5 +190,12 @@
     "paper_orders": 0,
     "net_provider_savings": null,
     "scope": "Bounded native APIs/source decisions; no new engine execution, alpha, broker action or universal closure."
+  },
+  "sec_access_followup": {
+    "receipt": "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+    "runbook": "blueprints/us-equities/catalyst-provenance/access-resolution.md",
+    "native_access": "HTTP200 / native index acquisition accepted",
+    "interactive_login_required": false,
+    "historical_pit": false
   }
 }

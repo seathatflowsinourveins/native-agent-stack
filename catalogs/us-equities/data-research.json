@@ -162,10 +162,11 @@
       "evidence_level": "native_proven",
       "evidence_refs": [
         "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",
-        "blueprints/us-equities/catalyst-provenance/receipt.json"
+        "blueprints/us-equities/catalyst-provenance/receipt.json",
+        "blueprints/us-equities/catalyst-provenance/access-resolution.json"
       ],
       "native_workflow": [
-        "# Native local parser accepted; live SEC metadata request returned403. No acquired historical trading dataset.",
+        "# Native SEC archive acquisition now accepted for371indexrows; see access-resolution.md. Historical trading availability remains a separate gate.",
         "uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock",
         "# Source the locally configured SEC_CONTACT_ENV; native SDK uses EDGAR_IDENTITY. Follow bounded commands in catalyst-provenance/README.md."
       ],
@@ -177,7 +178,7 @@
         "Company facts can contain later revisions; fiscal period end is not the date a fact became tradable information.",
         "SEC public availability can lag acceptance. Historical downloads today do not prove what an agent actually observed in the past.",
         "Automated filings parsing requires validation of units, dimensions, duplicate facts and issuer/security mappings.",
-        "Native5.58.0 acceptance covers two synthetic index members and one real pinned upstream8-K HTML parser; missing acceptance metadata keeps the latter quarantined. Live SEC acquisition remains refused.",
+        "Native5.58.0 accepted the selected SEC index request after contact correction:371CIK/accession entries represent360uniqueaccessions. Initial synthetic and real-fixture parser receipts remain dated. Bounded acquired samples do not establish a historical trading universe or strategy.",
         "Dependencies are version-frozen in a separate42-package environment, not wheel-hash-locked; new hosts need native acceptance."
       ],
       "sources": [

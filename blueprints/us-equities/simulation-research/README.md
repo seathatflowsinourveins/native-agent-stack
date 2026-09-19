@@ -1,5 +1,9 @@
 # Chronological simulation and SEC provenance wave
 
+Subsequent [SEC access resolution](../catalyst-provenance/access-resolution.md)
+uses a genuine monitored contact and a corrected real-index adapter. The tested
+archive path now returns HTTP 200; the initial refusal below remains dated evidence.
+
 This wave advances the accepted research stack from fixed stress scenarios to
 chronological selection discipline and native filing-data provenance. The user
 selected historical simulation first, asked to resolve SEC integration using

@@ -43,6 +43,9 @@ results and remaining data gates. Its 2021 control segment is now inspected;
 future experiments must not call it a fresh untouched holdout. Native filing
 parsing, live SEC access and historical information availability are separate
 claims. Keep provider identities local and preserve acquisition refusals.
+The later `blueprints/us-equities/catalyst-provenance/access-resolution.md` records successful native
+SEC access and real-index compatibility. Keep its monitored contact private;
+bounded streaming diagnostics must bypass the upstream cache after closing clients.
 
 For the next research/acceptance work, read `blueprints/us-equities/acceptance-wave/README.md`
 and its research protocol on demand. The selected direction is daily/intraday
