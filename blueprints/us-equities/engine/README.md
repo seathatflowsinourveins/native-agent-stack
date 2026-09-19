@@ -23,6 +23,8 @@ The build passed with **7,855 upstream warnings and zero errors**. NuGet reporte
 Use an explicitly selected clone and SDK prefix. The following are native upstream commands, not a replacement backtesting engine. Dependencies are downloaded during the initial build; the sample data are bundled in the source repository.
 
 ```sh
+(
+set -eu
 LEAN_SOURCE=/absolute/path/to/lean-985ef30
 DOTNET_ROOT=/absolute/path/to/dotnet-equity10
 export DOTNET_ROOT
@@ -37,9 +39,14 @@ git clone https://github.com/QuantConnect/Lean.git "$LEAN_SOURCE"
 git -C "$LEAN_SOURCE" checkout --detach 985ef30ad3ac774218c5ac516b4cb0aa2655730f
 cd "$LEAN_SOURCE"
 "$DOTNET_ROOT/dotnet" build QuantConnect.Lean.sln --disable-build-servers -m:2 --verbosity minimal
-# Continue only if the build succeeds.
+# Verify the pinned, unmodified source configuration before using its build output.
+git diff --exit-code -- Launcher/config.json
+test "$(git rev-parse HEAD)" = 985ef30ad3ac774218c5ac516b4cb0aa2655730f
 cd Launcher/bin/Debug
+cmp ../../config.json config.json
+# The verified pinned default selects backtesting, with live-mode false.
 "$DOTNET_ROOT/dotnet" QuantConnect.Lean.Launcher.dll
+)
 ```
 
 Keep the default `environment` set to `backtesting`. Its selected environment has `live-mode: false`, local data/map/factor providers and no brokerage credentials. Inspect the native completion status, data-point and order counts, error output and saved result files. Preserve warnings and failures. A successful compilation alone does not establish a successful backtest, and the backtest does not establish broker connectivity.

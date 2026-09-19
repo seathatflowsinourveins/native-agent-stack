@@ -35,7 +35,7 @@ CODEX_HOME="$NATIVE_CODEX_HOME" timeout --signal=TERM --kill-after=10s 300s \
   -o "$RESULT_FILE" - < "$PROMPT_FILE" > "$STREAM_FILE"
 ```
 
-This preserves the configured model/provider while limiting the selected child to a read-only task. Verify the actual session reports `gpt-6-astra` before attributing its result to Astra; a native default can change. The timeout bounds the local process lifetime, **not provider billing or guaranteed server-side cancellation**. No hooks or trust checks are bypassed. Explicit cancellation belongs to the owning native session or companion job.
+This preserves the configured model/provider and requests a read-only local shell/filesystem sandbox. That sandbox does not remove mutation authority from inherited MCP tools, hooks or remote services. Before a research dispatch, select an explicit research tool profile with no broker/order capabilities and review inherited hooks. Verify the actual session reports `gpt-6-astra` before attributing its result to Astra; a native default can change. The timeout bounds the local process lifetime, **not provider billing or guaranteed server-side cancellation**. No hooks or trust checks are bypassed. Explicit cancellation belongs to the owning native session or companion job.
 
 The optional upstream companion can start, poll and cancel a bounded task without an outer Claude model turn. `PLUGIN_ROOT` must be the actual installed official plugin directory; retain its normal native environment and selected Codex home:
 

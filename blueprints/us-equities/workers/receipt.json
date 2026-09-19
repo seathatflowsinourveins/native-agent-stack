@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-09-19",
+  "kind": "native_model_e2e",
+  "packages": {
+    "openai-codex": "0.154.0",
+    "native-codex": "0.155.1",
+    "openai": "3.16.2",
+    "alpaca-py": "0.44.0",
+    "duckdb": "1.5.5",
+    "exchange-calendars": "4.13.2"
+  },
+  "authentication": "Native interactive Codex login completed; no credential store copied or inspected.",
+  "before_login": {
+    "model_discovered": "gpt-6-astra",
+    "ordinary_usage_allowed": false,
+    "weekly_used_percent": 100,
+    "inference_submitted": false
+  },
+  "after_login": {
+    "ordinary_usage_allowed": true,
+    "weekly_used_percent_at_discovery": 25
+  },
+  "run": {
+    "status": "completed",
+    "model_inference_submitted": true,
+    "configured_model": "gpt-6-astra",
+    "configured_provider": "openai",
+    "duration_ms": 58410,
+    "usage": {
+      "last": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 24448,
+        "inputTokens": 25096,
+        "outputTokens": 286,
+        "reasoningOutputTokens": 0,
+        "totalTokens": 25382
+      },
+      "modelContextWindow": 258400,
+      "total": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 119424,
+        "inputTokens": 133839,
+        "outputTokens": 1472,
+        "reasoningOutputTokens": 117,
+        "totalTokens": 135311
+      }
+    }
+  },
+  "task": "Read the two public engine/DeerFlow receipts using focused Context Mode extraction and report the exact counts and unproved Alpaca scope.",
+  "result": {
+    "engine_data_points": 3943,
+    "engine_simulated_orders": 3,
+    "engine_failed_data_requests": 0,
+    "deerflow_skills": 23,
+    "acp_configured_model": "gpt-6-astra",
+    "deerflow_acp_prompt_calls": 0
+  },
+  "tools": [
+    {
+      "server": "context-mode",
+      "tool": "ctx_execute",
+      "status": "completed"
+    },
+    {
+      "server": "context-mode",
+      "tool": "ctx_execute",
+      "status": "completed"
+    },
+    {
+      "server": "context-mode",
+      "tool": "ctx_stats",
+      "status": "completed"
+    },
+    {
+      "server": "context-mode",
+      "tool": "ctx_execute_file",
+      "status": "failed"
+    },
+    {
+      "server": "context-mode",
+      "tool": "ctx_execute",
+      "status": "completed"
+    }
+  ],
+  "cache_measurement": {
+    "cached_input_share_percent": 89.23,
+    "input_minus_cached": 14415,
+    "paired_net_provider_savings": null
+  },
+  "context_mode_checkpoint": {
+    "calls": 2,
+    "context_entered_display": "9.5 KB",
+    "estimated_tokens_saved": 0,
+    "scope": "Early checkpoint before later extraction calls; not a final-turn total."
+  },
+  "native_primitives": [
+    "initialize",
+    "model/list",
+    "account/rateLimits/read",
+    "thread/start",
+    "thread/read",
+    "turn/start",
+    "turn.run"
+  ],
+  "command": "$SDK_ENV/bin/python blueprints/us-equities/workers/native_worker.py run --codex-bin \"$NATIVE_CODEX_BIN\" --codex-home \"$NATIVE_CODEX_HOME\" --workspace \"$RESEARCH_WORKSPACE\" --receipt \"$PRIVATE_RUN_DIR/astra-research.json\" --prompt \"$PROMPT_FILE\" --deadline-seconds 180",
+  "limitations": [
+    "Executed wrapper used --deadline-seconds; reviewed replay renames it --turn-deadline-seconds to make its scope explicit and labels unavailable failure usage. The SDK invocation is unchanged.",
+    "SDK configured model/provider are verified, not independent per-request provider attestation; model-reroute notifications were not collected.",
+    "Read-only filesystem mode does not restrict external MCP mutations; the recorded environment supplied no broker keys or broker tools.",
+    "One ctx_execute_file attempt failed the server project-root restriction; ctx_execute extraction completed. No global scope change was made.",
+    "No Alpaca account, order, paid API, DeerFlow inference or new hosting deployment was exercised.",
+    "Scoped native MCP override was accepted by discovery but requires normal tool approval; deny_all blocked it. No trust or permission bypass was attempted, and no further trial was launched."
+  ],
+  "private_fingerprints": [
+    {
+      "name": "astra-research.json",
+      "sha256": "17130c7a25c3bfed4e6a61496a651409f3e17cdce01ca69479c4f29f08777782",
+      "distributed": false
+    },
+    {
+      "name": "post-login-inspect.json",
+      "sha256": "5598ec7d9265168a1bf1d9f5fd9848c12dfcb05ab7abefa1a285f73bebd8d9e6",
+      "distributed": false
+    },
+    {
+      "name": "research-prompt.txt",
+      "sha256": "a02178b7046892c2564ce11d02b1367c068257b4ad5fde36ffd1beb3cbf67499",
+      "distributed": false
+    }
+  ],
+  "follow_up_scope_checks": [
+    {
+      "stage": "parent_environment_scope_attempt",
+      "native_turn_status": "completed",
+      "extraction_task_succeeded": false,
+      "configured_model": "gpt-6-astra",
+      "configured_provider": "openai",
+      "duration_ms": 11797,
+      "usage": {
+        "last": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 16768,
+          "inputTokens": 17296,
+          "outputTokens": 33,
+          "reasoningOutputTokens": 0,
+          "totalTokens": 17329
+        },
+        "modelContextWindow": 258400,
+        "total": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 28288,
+          "inputTokens": 34228,
+          "outputTokens": 240,
+          "reasoningOutputTokens": 0,
+          "totalTokens": 34468
+        }
+      },
+      "result": "The extraction failed because Context Mode rejected the file path as outside its project root; no counts were retrieved, and I stopped without using another tool.",
+      "tools": [
+        {
+          "server": "context-mode",
+          "tool": "ctx_execute_file",
+          "status": "failed"
+        }
+      ],
+      "private_sha256": "17ec3b2dcc346c3e2e416909a9ed5e40e981ad1382fb982c5d0907829ec0c6dd",
+      "private_record_distributed": false
+    },
+    {
+      "stage": "native_mcp_scope_override_attempt",
+      "native_turn_status": "completed",
+      "extraction_task_succeeded": false,
+      "configured_model": "gpt-6-astra",
+      "configured_provider": "openai",
+      "duration_ms": 9735,
+      "usage": {
+        "last": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 16768,
+          "inputTokens": 17165,
+          "outputTokens": 34,
+          "reasoningOutputTokens": 0,
+          "totalTokens": 17199
+        },
+        "modelContextWindow": 258400,
+        "total": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 28288,
+          "inputTokens": 34097,
+          "outputTokens": 215,
+          "reasoningOutputTokens": 0,
+          "totalTokens": 34312
+        }
+      },
+      "result": "The extraction failed because the tool requires approval, but the approval policy is \u201cnever\u201d; no counts were retrieved, and I stopped without using another tool.",
+      "tools": [
+        {
+          "server": "context-mode",
+          "tool": "ctx_execute_file",
+          "status": "failed"
+        }
+      ],
+      "private_sha256": "3549598c5f43bec51fdd7ad2b9f938802ebf5d2abf608ca2c8f4720816d06fcb",
+      "private_record_distributed": false
+    }
+  ],
+  "all_three_native_turns": {
+    "usage": {
+      "inputTokens": 202164,
+      "cachedInputTokens": 176000,
+      "cacheWriteInputTokens": 0,
+      "outputTokens": 1927,
+      "reasoningOutputTokens": 117,
+      "totalTokens": 204091
+    },
+    "cached_input_share_percent": 87.06,
+    "successful_research_tasks": 1,
+    "blocked_file_extraction_tasks": 2,
+    "paired_net_provider_savings": null
+  }
+}

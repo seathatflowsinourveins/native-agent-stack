@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-09-19",
+  "kind": "native_cli_e2e",
+  "result": {
+    "scope": "LEAN bundled historical simulation, not broker fills",
+    "events": 6,
+    "distinct_orders": 3,
+    "statuses": {
+      "filled": 3,
+      "submitted": 3
+    },
+    "calendar": "XNYS",
+    "sample_session": "2013-10-07",
+    "session_open_utc": "2013-10-07T13:30:00+00:00",
+    "session_close_utc": "2013-10-07T20:00:00+00:00",
+    "source_sha256": "8e22c0052e1e769708114064cba69c3ddaec2c5af8148a6cf171e0f296f192de",
+    "parquet_sha256": "48ec550a96771e284bde09f6793b0d064e47bf3a731d8a1ac389a509b616f66d"
+  },
+  "command": "$SDK_ENV/bin/python blueprints/us-equities/data/summarize_backtest.py \"$LEAN_SOURCE/Launcher/bin/Debug/BasicTemplateFrameworkAlgorithm-order-events.json\" \"$PRIVATE_RUN_DIR/order-events.parquet\""
+}

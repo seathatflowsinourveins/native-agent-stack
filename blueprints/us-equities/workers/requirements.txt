@@ -1,0 +1,5 @@
+openai-codex==0.154.0
+openai==3.16.2
+alpaca-py==0.44.0
+duckdb==1.5.5
+exchange-calendars==4.13.2

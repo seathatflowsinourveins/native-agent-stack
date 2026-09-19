@@ -6,6 +6,11 @@ A current, evidence-backed reference for native **Codex + Claude Code**, with sc
 
 The [coverage audit](docs/convergence-audit.md) distinguishes the full starred-list metadata refresh from individual repository decisions and local execution, and records newly found research leads outside the original comparison.
 
+The [US-equities foundation](blueprints/us-equities/README.md) extends this stack
+with native Astra SDK workers, DeerFlow/ACP, OmniRoute recipes, LEAN backtesting
+and a DuckDB/Parquet data path. It records actual native results and leaves
+Alpaca paper execution and unattended hosting explicitly pending.
+
 ## What is here
 
 - **36 adopted components** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation and usage accounting.
