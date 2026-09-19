@@ -1,0 +1,11 @@
+{
+  "model": "gpt-6-astra",
+  "input": "Describe which source dates and units must accompany a public filing excerpt. Do not give an investment recommendation.",
+  "reasoning": {
+    "effort": "low"
+  },
+  "prompt_cache_options": {
+    "ttl": "30m"
+  },
+  "store": false
+}

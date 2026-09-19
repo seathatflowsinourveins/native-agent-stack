@@ -1,0 +1,3 @@
+{
+  "sessionAffinityTtlMs": 3600000
+}

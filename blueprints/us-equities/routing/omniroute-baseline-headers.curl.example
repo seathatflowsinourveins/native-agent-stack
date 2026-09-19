@@ -1,0 +1,5 @@
+# Inactive curl config: OmniRoute per-request baseline only.
+# No credentials. Use separately provisioned private gateway authentication.
+header = "x-omniroute-compression: off"
+header = "X-OmniRoute-No-Cache: true"
+header = "x-omniroute-no-memory: true"

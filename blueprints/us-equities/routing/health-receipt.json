@@ -1,0 +1,32 @@
+{
+  "checked_at_utc": "2026-09-19T05:52:25.852308+00:00",
+  "scope": "One anonymous loopback HTTP GET per router from Linux/WSL. Status-only; no response bodies retained, no credentials supplied, no provider or model calls.",
+  "routes": [
+    {
+      "router": "omniroute",
+      "url": "http://127.0.0.1:20128/api/health",
+      "method": "GET",
+      "attempts": 1,
+      "follow_redirects": false,
+      "authentication_supplied": false,
+      "http_status": 200,
+      "elapsed_seconds": 0.014,
+      "http_success": true
+    },
+    {
+      "router": "freellmapi",
+      "url": "http://127.0.0.1:31415/readyz",
+      "method": "GET",
+      "attempts": 1,
+      "follow_redirects": false,
+      "authentication_supplied": false,
+      "http_status": 200,
+      "elapsed_seconds": 0.002,
+      "http_success": true
+    }
+  ],
+  "limits": [
+    "HTTP success is not model/provider readiness, exact-model entitlement, scheduler acceptance or savings.",
+    "Historical inference records are separate; none were replayed in this check."
+  ]
+}

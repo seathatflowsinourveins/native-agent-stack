@@ -1,0 +1,10 @@
+{
+  "model": "qwen3.827b-mtp-q4km",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Reply with ROUTE_CHECK only. This is a route identity check, not a financial research result."
+    }
+  ],
+  "stream": false
+}
