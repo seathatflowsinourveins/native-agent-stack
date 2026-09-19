@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "id": "native-exact-nanosecond-replay-20260919",
+  "kind": "native_cli_e2e",
+  "checked_at": "2026-09-19",
+  "component_ids": [
+    "duckdb"
+  ],
+  "claim": "Synthetic exact UTC nanosecond event/revision and universe eligibility survived native pandas parsing, DuckDB BIGINT/Parquet and pinned-hash replay; no market-data or broker adapter acceptance.",
+  "data": {
+    "snapshot": {
+      "snapshot_sha256": "66592c36e19f9509294ac5fe1d7bf6907aee324f74dd2ae025619d00e87e1726",
+      "source_sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+      "counts": {
+        "observations": 5,
+        "universe": 2
+      },
+      "synthetic": true,
+      "pandas_version": "3.0.6",
+      "duckdb_version": "1.5.5"
+    },
+    "selections": {
+      "before": {
+        "cutoff_ns": "1738443600000000099",
+        "row_ids": [],
+        "value_texts": []
+      },
+      "early": {
+        "cutoff_ns": "1738443600000000100",
+        "row_ids": [
+          "original"
+        ],
+        "value_texts": [
+          "100"
+        ]
+      },
+      "late": {
+        "cutoff_ns": "1738443600000000200",
+        "row_ids": [
+          "correction",
+          "future-member"
+        ],
+        "value_texts": [
+          "90",
+          "200"
+        ]
+      },
+      "sequence": {
+        "cutoff_ns": "1738443600000000201",
+        "row_ids": [
+          "sequence-correction",
+          "future-member"
+        ],
+        "value_texts": [
+          "85",
+          "200"
+        ]
+      },
+      "early_replay": {
+        "cutoff_ns": "1738443600000000100",
+        "row_ids": [
+          "original"
+        ],
+        "value_texts": [
+          "100"
+        ]
+      }
+    },
+    "rejections": {
+      "precision_rejection": {
+        "status": "rejected",
+        "reason": "rfc3339_explicit_offset_at_most_nine_fractional_digits_required"
+      },
+      "overflow_rejection": {
+        "status": "rejected",
+        "reason": "invalid_or_out_of_range_utc_nanoseconds"
+      },
+      "overwrite": {
+        "status": "rejected",
+        "reason": "FileExistsError"
+      },
+      "corruption": {
+        "status": "rejected",
+        "reason": "snapshot_artifact_hash_mismatch"
+      }
+    },
+    "earlier_replay_identical": true,
+    "native_command_count": 10,
+    "market_data_adapter_accepted": false
+  },
+  "commands": [
+    {
+      "label": "materialize",
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/nanosecond-replay/replay.py",
+        "materialize",
+        "--source",
+        "$STACK_REPO/blueprints/us-equities/nanosecond-replay/fixture.json",
+        "--output",
+        "$PRIVATE_RUN/snapshot"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "261788db6daddfc759996cef36e27abdcd92d3eecb832b57009dcd81523698f3",
+      "stderr_bytes": 0
+    },
+    {
+      "label": "before",
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/nanosecond-replay/replay.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/snapshot",
+        "--snapshot-sha256",
+        "66592c36e19f9509294ac5fe1d7bf6907aee324f74dd2ae025619d00e87e1726",
+        "--universe-id",
+        "fixture-universe",
+        "--feed",
+        "fixture-feed",
+        "--cutoff",
+        "2025-02-01T21:00:00.000000099Z"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "b49c4b0769a3bde25ca667ce32f4b7c948c65bbfc197d8e423213e49ecfe1720",
+      "stderr_bytes": 0
+    },
+    {
+      "label": "early",
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/nanosecond-replay/replay.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/snapshot",
+        "--snapshot-sha256",
+        "66592c36e19f9509294ac5fe1d7bf6907aee324f74dd2ae025619d00e87e1726",
+        "--universe-id",
+        "fixture-universe",
+        "--feed",
+        "fixture-feed",
+        "--cutoff",
+        "2025-02-01T21:00:00.000000100Z"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "874cd91694c733f7ecd6c6cf8bb6e213180ca873877968426f428ea332ab38b7",
+      "stderr_bytes": 0
+    },
+    {
+      "label": "late",
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/nanosecond-replay/replay.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/snapshot",
+        "--snapshot-sha256",
+        "66592c36e19f9509294ac5fe1d7bf6907aee324f74dd2ae025619d00e87e1726",
+        "--universe-id",
+        "fixture-universe",
+        "--feed",
+        "fixture-feed",
+        "--cutoff",
+        "2025-02-01T21:00:00.000000200Z"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "775841c33864759db07249ced76be2fc20c18968a79c5cf29758584978e0ade7",
+      "stderr_bytes": 0
+    },
+    {
+      "label": "sequence",
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/nanosecond-replay/replay.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/snapshot",
+        "--snapshot-sha256",
+        "66592c36e19f9509294ac5fe1d7bf6907aee324f74dd2ae025619d00e87e1726",
+        "--universe-id",
+        "fixture-universe",
+        "--feed",
+        "fixture-feed",
+        "--cutoff",
+        "2025-02-01T21:00:00.000000201Z"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "4995a291c7c5bb28cc65615212db80de9d1d722050ab16eb2435443ac66f727f",
+      "stderr_bytes": 0
+    },
+    {
+      "label": "early_replay",
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/nanosecond-replay/replay.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/snapshot",
+        "--snapshot-sha256",
+        "66592c36e19f9509294ac5fe1d7bf6907aee324f74dd2ae025619d00e87e1726",
+        "--universe-id",
+        "fixture-universe",
+        "--feed",
+        "fixture-feed",
+        "--cutoff",
+        "2025-02-01T21:00:00.000000100Z"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "874cd91694c733f7ecd6c6cf8bb6e213180ca873877968426f428ea332ab38b7",
+      "stderr_bytes": 0
+    },
+    {
+      "label": "precision_rejection",
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/nanosecond-replay/replay.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/snapshot",
+        "--snapshot-sha256",
+        "66592c36e19f9509294ac5fe1d7bf6907aee324f74dd2ae025619d00e87e1726",
+        "--universe-id",
+        "fixture-universe",
+        "--feed",
+        "fixture-feed",
+        "--cutoff",
+        "2025-02-01T21:00:00.0000000001Z"
+      ],
+      "exit_code": 2,
+      "stdout_sha256": "328b7700da9b801bc2748ec4fe79779ef2eb2a7d4392e4b0a9622ff30c48d050",
+      "stderr_bytes": 0
+    },
+    {
+      "label": "overflow_rejection",
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/nanosecond-replay/replay.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/snapshot",
+        "--snapshot-sha256",
+        "66592c36e19f9509294ac5fe1d7bf6907aee324f74dd2ae025619d00e87e1726",
+        "--universe-id",
+        "fixture-universe",
+        "--feed",
+        "fixture-feed",
+        "--cutoff",
+        "2262-04-11T23:47:16.854775808Z"
+      ],
+      "exit_code": 2,
+      "stdout_sha256": "464bf291feec6a042107c606ddcb671893595f3b23e238ea0a88e839209f7224",
+      "stderr_bytes": 0
+    },
+    {
+      "label": "overwrite",
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/nanosecond-replay/replay.py",
+        "materialize",
+        "--source",
+        "$STACK_REPO/blueprints/us-equities/nanosecond-replay/fixture.json",
+        "--output",
+        "$PRIVATE_RUN/snapshot"
+      ],
+      "exit_code": 2,
+      "stdout_sha256": "e343696cf3fb0fc409e0f692232589c0551b6ad6f9ea25b3c289e7ca918bd9a4",
+      "stderr_bytes": 0
+    },
+    {
+      "label": "corruption",
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/nanosecond-replay/replay.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/corrupted",
+        "--snapshot-sha256",
+        "66592c36e19f9509294ac5fe1d7bf6907aee324f74dd2ae025619d00e87e1726",
+        "--universe-id",
+        "fixture-universe",
+        "--feed",
+        "fixture-feed",
+        "--cutoff",
+        "2025-02-01T21:00:00.000000100Z"
+      ],
+      "exit_code": 2,
+      "stdout_sha256": "2045cba8ee99e7d990d19d4775fa6a2b11b3c6f6d22a1bc4bb2616da67c9b44c",
+      "stderr_bytes": 0
+    }
+  ],
+  "limitations": [
+    "Synthetic clocks and symbols only; no authenticated source availability, entitlement, symbol mapping, historical +200% dataset, strategy, margin or broker connectivity.",
+    "Signed int64 UTC nanoseconds exclude the NaT sentinel; finer-than-nanosecond timestamps reject.",
+    "Sequence is comparable only inside the declared source/logical-event scope; no global cross-feed sequence or measured latency claim.",
+    "Native JSON encodes output nanoseconds and source sequence as decimal strings; original input JSON integers require lossless parsing.",
+    "Trusted manifest digest is caller-held; permissions deter edits but do not provide immutable/off-host storage."
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "synthetic": true,
+  "provenance": "Entirely synthetic events and membership; symbols are illustrative. Availability is declared fixture observation time, not authenticated vendor publication or entitled market data.",
+  "observations": [
+    {
+      "event_at": "2025-02-01T21:00:00.000000010Z",
+      "asset_id": "fixture-a",
+      "logical_event_id": "fixture-event-a",
+      "symbol": "AAPL",
+      "feed": "fixture-feed",
+      "row_id": "original",
+      "available_at": "2025-02-01T21:00:00.000000100Z",
+      "source_sequence": 1,
+      "value_text": "100"
+    },
+    {
+      "event_at": "2025-02-01T21:00:00.000000010Z",
+      "asset_id": "fixture-a",
+      "logical_event_id": "fixture-event-a",
+      "symbol": "AAPL",
+      "feed": "fixture-feed",
+      "row_id": "correction",
+      "available_at": "2025-02-01T21:00:00.000000200Z",
+      "source_sequence": 1,
+      "value_text": "90"
+    },
+    {
+      "event_at": "2025-02-01T21:00:00.000000010Z",
+      "asset_id": "fixture-a",
+      "logical_event_id": "fixture-event-a",
+      "symbol": "AAPL",
+      "feed": "fixture-feed",
+      "row_id": "same-clock-lower-sequence",
+      "available_at": "2025-02-01T21:00:00.000000201Z",
+      "source_sequence": 2,
+      "value_text": "88"
+    },
+    {
+      "event_at": "2025-02-01T21:00:00.000000010Z",
+      "asset_id": "fixture-a",
+      "logical_event_id": "fixture-event-a",
+      "symbol": "AAPL",
+      "feed": "fixture-feed",
+      "row_id": "sequence-correction",
+      "available_at": "2025-02-01T21:00:00.000000201Z",
+      "source_sequence": 3,
+      "value_text": "85"
+    },
+    {
+      "event_at": "2025-02-01T21:00:00.000000010Z",
+      "asset_id": "fixture-b",
+      "logical_event_id": "fixture-event-b",
+      "symbol": "MSFT",
+      "feed": "fixture-feed",
+      "row_id": "future-member",
+      "available_at": "2025-02-01T21:00:00.000000150Z",
+      "source_sequence": 1,
+      "value_text": "200"
+    }
+  ],
+  "universe": [
+    {
+      "row_id": "member-a",
+      "asset_id": "fixture-a",
+      "universe_id": "fixture-universe",
+      "available_at": "2025-02-01T21:00:00Z",
+      "effective_at": "2025-02-01T21:00:00Z",
+      "source_sequence": 1,
+      "is_member": true
+    },
+    {
+      "row_id": "member-b-announced",
+      "asset_id": "fixture-b",
+      "universe_id": "fixture-universe",
+      "available_at": "2025-02-01T21:00:00Z",
+      "effective_at": "2025-02-01T21:00:00.000000200Z",
+      "source_sequence": 1,
+      "is_member": true
+    }
+  ]
+}

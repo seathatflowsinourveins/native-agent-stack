@@ -1,0 +1,1723 @@
+{
+  "schema_version": 1,
+  "id": "trading-data-evaluation-convergence-20260919",
+  "checked_at": "2026-09-19",
+  "base_commit": "4898871620fb2b3e4e8c80756b0c9b3039a292bf",
+  "scope": "Bounded trading/data/evaluation continuation for daily and intraday catalyst research, historical +200% discovery, exact event timing, strategy selection and separate simulation/paper/live acceptance.",
+  "execution_scope": "Public upstream source reads and synthetic local pandas/DuckDB replay only; no credentialed financial data, broker orders, model calls, installation, account or plan changes.",
+  "completeness_claim": false,
+  "entries": [
+    {
+      "repository": "QuantConnect/Lean",
+      "decision": "retain_primary_offline_engine",
+      "evidence_level": "retained_prior_native_acceptance",
+      "rationale": "Existing fee/slippage schedule acceptance remains the engine baseline; a current Alpaca account/margin rule match is a separate gate.",
+      "discovery_round": 1,
+      "version": {
+        "reviewed_default_branch_commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+        "default_branch": "master",
+        "pushed_at": "2026-09-18T22:51:33Z",
+        "installed_version": null
+      },
+      "archived": false,
+      "previously_in_decision_index": true,
+      "license": {
+        "github_spdx": "Apache-2.0",
+        "source_note": "Selected root license captured; no exhaustive dependency/license audit."
+      },
+      "primary_sources": [],
+      "source_review": {
+        "selected_file_count": 0,
+        "depth": "Prior pinned engine acceptance retained; current identity metadata refreshed."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/QuantConnect/Lean"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/QuantConnect/Lean/commits/master"
+          ],
+          "status": "executed_metadata"
+        }
+      ],
+      "native_acceptance": "blueprints/us-equities/execution-realism/receipt.json",
+      "next_acceptance": "Use existing execution-realism receipt and frozen LEAN arguments; do not rerun unchanged engine experiments to inflate coverage."
+    },
+    {
+      "repository": "QuantConnect/Lean.Brokerages.Alpaca",
+      "decision": "retain_adapter_pending_current_account_acceptance",
+      "evidence_level": "source_sections_reviewed",
+      "rationale": "Selected history/order paths and tests support an adapter reference. Native model/order mapping is not account eligibility, exact-nanosecond transport, or current broker-margin equivalence.",
+      "discovery_round": 1,
+      "version": {
+        "reviewed_default_branch_commit": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+        "default_branch": "master",
+        "pushed_at": "2026-09-18T22:51:33Z",
+        "installed_version": null
+      },
+      "archived": false,
+      "previously_in_decision_index": true,
+      "license": {
+        "github_spdx": null,
+        "source_note": "GitHub license metadata absent; pinned README License Model and code headers identify Apache-2.0; bundled dependency licensing is separate."
+      },
+      "primary_sources": [
+        "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md",
+        "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/QuantConnect.AlpacaBrokerage/AlpacaBrokerage.HistoryProvider.cs",
+        "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/QuantConnect.AlpacaBrokerage/AlpacaBrokerage.cs",
+        "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/QuantConnect.AlpacaBrokerage.Tests/AlpacaBrokerageAdditionalTests.cs"
+      ],
+      "source_review": {
+        "selected_file_count": 4,
+        "depth": "Selected implementation/docs/test/license sections; not an exhaustive repository audit."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/QuantConnect/Lean.Brokerages.Alpaca"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/QuantConnect/Lean.Brokerages.Alpaca/commits/master"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/QuantConnect/Lean.Brokerages.Alpaca/contents/README.md?ref=1973f6165bee212acf656ed2f9cb0af86d4f2a18"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/QuantConnect/Lean.Brokerages.Alpaca/contents/QuantConnect.AlpacaBrokerage/AlpacaBrokerage.HistoryProvider.cs?ref=1973f6165bee212acf656ed2f9cb0af86d4f2a18"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/QuantConnect/Lean.Brokerages.Alpaca/contents/QuantConnect.AlpacaBrokerage/AlpacaBrokerage.cs?ref=1973f6165bee212acf656ed2f9cb0af86d4f2a18"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/QuantConnect/Lean.Brokerages.Alpaca/contents/QuantConnect.AlpacaBrokerage.Tests/AlpacaBrokerageAdditionalTests.cs?ref=1973f6165bee212acf656ed2f9cb0af86d4f2a18"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        }
+      ],
+      "native_acceptance": null,
+      "next_acceptance": "Replay supported order lifecycle, asset/session restrictions and current account fields before a paper adapter is accepted."
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "decision": "retain_sdk_capture_raw_before_timestamp_conversion",
+      "evidence_level": "source_sections_reviewed",
+      "rationale": "Default WebSocket casting calls timestamp.to_datetime(); raw_data=True returns the original message first. Preserve raw msgpack timestamp seconds/nanoseconds before model conversion.",
+      "discovery_round": 1,
+      "version": {
+        "reviewed_default_branch_commit": "232179c19091fd0f70daf0972a90bf8def329ec0",
+        "default_branch": "master",
+        "pushed_at": "2026-09-18T11:13:19Z",
+        "installed_version": "0.44.0"
+      },
+      "archived": false,
+      "previously_in_decision_index": true,
+      "license": {
+        "github_spdx": "Apache-2.0",
+        "source_note": "Selected root license captured; no exhaustive dependency/license audit."
+      },
+      "primary_sources": [
+        "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/LICENSE",
+        "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/alpaca/data/live/websocket.py",
+        "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/alpaca/data/models/trades.py",
+        "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/tests/data/test_websockets.py"
+      ],
+      "source_review": {
+        "selected_file_count": 4,
+        "depth": "Selected implementation/docs/test/license sections; not an exhaustive repository audit."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/alpacahq/alpaca-py"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/alpacahq/alpaca-py/commits/master"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/alpacahq/alpaca-py/contents/LICENSE?ref=232179c19091fd0f70daf0972a90bf8def329ec0"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/alpacahq/alpaca-py/contents/alpaca/data/live/websocket.py?ref=232179c19091fd0f70daf0972a90bf8def329ec0"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/alpacahq/alpaca-py/contents/alpaca/data/models/trades.py?ref=232179c19091fd0f70daf0972a90bf8def329ec0"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/alpacahq/alpaca-py/contents/tests/data/test_websockets.py?ref=232179c19091fd0f70daf0972a90bf8def329ec0"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        }
+      ],
+      "native_acceptance": null,
+      "next_acceptance": "An offline raw-message conversion test should precede authenticated capture; no DataStream connection or client call was made here."
+    },
+    {
+      "repository": "duckdb/duckdb",
+      "decision": "retain_integer_temporal_replay",
+      "evidence_level": "source_sections_reviewed",
+      "rationale": "Native BIGINT and Parquet satisfy the exact-time acceptance with existing 1.5.5; timezone-aware nanosecond timestamp interchange can downcast and must not be assumed safe.",
+      "discovery_round": 1,
+      "version": {
+        "reviewed_default_branch_commit": "3a604ab6d4d66910ad91bf7669c0b5f648a00190",
+        "default_branch": "v2.0-cyanoptera",
+        "pushed_at": "2026-09-19T19:39:05Z",
+        "installed_version": "1.5.5"
+      },
+      "archived": false,
+      "previously_in_decision_index": true,
+      "license": {
+        "github_spdx": "MIT",
+        "source_note": "Selected root license captured; no exhaustive dependency/license audit."
+      },
+      "primary_sources": [
+        "https://github.com/duckdb/duckdb/blob/3a604ab6d4d66910ad91bf7669c0b5f648a00190/LICENSE",
+        "https://github.com/duckdb/duckdb/blob/3a604ab6d4d66910ad91bf7669c0b5f648a00190/src/include/duckdb/common/types/timestamp.hpp",
+        "https://github.com/duckdb/duckdb/blob/3a604ab6d4d66910ad91bf7669c0b5f648a00190/test/sql/function/timestamp/test_strftime_timestamp_ns.test"
+      ],
+      "source_review": {
+        "selected_file_count": 3,
+        "depth": "Selected implementation/docs/test/license sections; not an exhaustive repository audit."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/duckdb/duckdb"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/duckdb/duckdb/commits/v2.0-cyanoptera"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/duckdb/duckdb/contents/LICENSE?ref=3a604ab6d4d66910ad91bf7669c0b5f648a00190"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/duckdb/duckdb/contents/src/include/duckdb/common/types/timestamp.hpp?ref=3a604ab6d4d66910ad91bf7669c0b5f648a00190"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/duckdb/duckdb/contents/test/sql/function/timestamp/test_strftime_timestamp_ns.test?ref=3a604ab6d4d66910ad91bf7669c0b5f648a00190"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        }
+      ],
+      "native_acceptance": "blueprints/us-equities/nanosecond-replay/receipt.json",
+      "next_acceptance": "This wave executed the linked synthetic pandas/DuckDB replay through native APIs."
+    },
+    {
+      "repository": "pandas-dev/pandas",
+      "decision": "add_existing_dependency_to_catalog_and_accept_exact_parser",
+      "evidence_level": "source_sections_reviewed",
+      "rationale": "Installed pandas 3.0.6 was missing from the central index. Timestamp.as_unit with round_ok=False plus explicit syntax/range guards supplies exact nanosecond integers without another package.",
+      "discovery_round": 1,
+      "version": {
+        "reviewed_default_branch_commit": "e3d2128f083e15d384f61deaad60b56537387671",
+        "default_branch": "main",
+        "pushed_at": "2026-09-19T17:46:54Z",
+        "installed_version": "3.0.6"
+      },
+      "archived": false,
+      "previously_in_decision_index": false,
+      "license": {
+        "github_spdx": "BSD-3-Clause",
+        "source_note": "Selected root license captured; no exhaustive dependency/license audit."
+      },
+      "primary_sources": [
+        "https://github.com/pandas-dev/pandas/blob/e3d2128f083e15d384f61deaad60b56537387671/LICENSE",
+        "https://github.com/pandas-dev/pandas/blob/e3d2128f083e15d384f61deaad60b56537387671/pandas/_libs/tslibs/timestamps.pyx",
+        "https://github.com/pandas-dev/pandas/blob/e3d2128f083e15d384f61deaad60b56537387671/pandas/tests/scalar/timestamp/methods/test_as_unit.py"
+      ],
+      "source_review": {
+        "selected_file_count": 3,
+        "depth": "Selected implementation/docs/test/license sections; not an exhaustive repository audit."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/pandas-dev/pandas"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/pandas-dev/pandas/commits/main"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/pandas-dev/pandas/contents/LICENSE?ref=e3d2128f083e15d384f61deaad60b56537387671"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/pandas-dev/pandas/contents/pandas/_libs/tslibs/timestamps.pyx?ref=e3d2128f083e15d384f61deaad60b56537387671"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/pandas-dev/pandas/contents/pandas/tests/scalar/timestamp/methods/test_as_unit.py?ref=e3d2128f083e15d384f61deaad60b56537387671"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        }
+      ],
+      "native_acceptance": "blueprints/us-equities/nanosecond-replay/receipt.json",
+      "next_acceptance": "This wave executed signed nanosecond parsing/Parquet replay; it did not upgrade to the reviewed main-branch commit."
+    },
+    {
+      "repository": "apache/arrow",
+      "decision": "retain_interchange_candidate_no_install",
+      "evidence_level": "source_sections_reviewed",
+      "rationale": "Parquet 2.6 supports native nanoseconds; coercion controls and tests expose deliberate truncation. Reader behavior remains a separate boundary, so Arrow alone cannot guarantee DuckDB timezone-aware precision.",
+      "discovery_round": 1,
+      "version": {
+        "reviewed_default_branch_commit": "c07de67a7c9a43c7c958ffeb08407b66c38df5b5",
+        "default_branch": "main",
+        "pushed_at": "2026-09-18T14:38:09Z",
+        "installed_version": null
+      },
+      "archived": false,
+      "previously_in_decision_index": true,
+      "license": {
+        "github_spdx": "Apache-2.0",
+        "source_note": "Selected root license captured; no exhaustive dependency/license audit."
+      },
+      "primary_sources": [
+        "https://github.com/apache/arrow/blob/c07de67a7c9a43c7c958ffeb08407b66c38df5b5/LICENSE.txt",
+        "https://github.com/apache/arrow/blob/c07de67a7c9a43c7c958ffeb08407b66c38df5b5/python/pyarrow/parquet/core.py",
+        "https://github.com/apache/arrow/blob/c07de67a7c9a43c7c958ffeb08407b66c38df5b5/python/pyarrow/tests/parquet/test_datetime.py"
+      ],
+      "source_review": {
+        "selected_file_count": 3,
+        "depth": "Selected implementation/docs/test/license sections; not an exhaustive repository audit."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/apache/arrow"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/apache/arrow/commits/main"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/apache/arrow/contents/LICENSE.txt?ref=c07de67a7c9a43c7c958ffeb08407b66c38df5b5"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/apache/arrow/contents/python/pyarrow/parquet/core.py?ref=c07de67a7c9a43c7c958ffeb08407b66c38df5b5"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/apache/arrow/contents/python/pyarrow/tests/parquet/test_datetime.py?ref=c07de67a7c9a43c7c958ffeb08407b66c38df5b5"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        }
+      ],
+      "native_acceptance": null,
+      "next_acceptance": "Only consider a schema-preserving Arrow boundary when required; no pyarrow installation or native Arrow run in this wave."
+    },
+    {
+      "repository": "skfolio/skfolio",
+      "decision": "retain_chronological_evaluation_candidate",
+      "evidence_level": "source_sections_reviewed",
+      "rationale": "WalkForward implementation/tests expose purged_size and the observe/compute/execute latency assumption. Irregular event overlap and nested selector selection remain application-level gates.",
+      "discovery_round": 1,
+      "version": {
+        "reviewed_default_branch_commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+        "default_branch": "main",
+        "pushed_at": "2026-09-19T14:45:39Z",
+        "installed_version": null
+      },
+      "archived": false,
+      "previously_in_decision_index": true,
+      "license": {
+        "github_spdx": "BSD-3-Clause",
+        "source_note": "Selected root license captured; no exhaustive dependency/license audit."
+      },
+      "primary_sources": [
+        "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/LICENSE",
+        "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/src/skfolio/model_selection/_walk_forward.py",
+        "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/tests/test_model_selection/test_walk_forward.py"
+      ],
+      "source_review": {
+        "selected_file_count": 3,
+        "depth": "Selected implementation/docs/test/license sections; not an exhaustive repository audit."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/skfolio/skfolio"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/skfolio/skfolio/commits/main"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/skfolio/skfolio/contents/LICENSE?ref=c99fcf71349e2df4a7a1033ee85ca2e9ced9abee"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/skfolio/skfolio/contents/src/skfolio/model_selection/_walk_forward.py?ref=c99fcf71349e2df4a7a1033ee85ca2e9ced9abee"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/skfolio/skfolio/contents/tests/test_model_selection/test_walk_forward.py?ref=c99fcf71349e2df4a7a1033ee85ca2e9ced9abee"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        }
+      ],
+      "native_acceptance": null,
+      "next_acceptance": "Freeze full trial/candidate ledgers and event-grouped outer evaluation before choosing strategy or selector parameters."
+    },
+    {
+      "repository": "databento/dbn",
+      "decision": "add_conditional_exact_market_record_format",
+      "evidence_level": "source_sections_reviewed",
+      "rationale": "DBN exposes event and capture-receive nanoseconds, venue sequence and validity flags; pinned tests show undefined timestamps. This is a useful beyond-catalog data contract, not an entitled dataset.",
+      "discovery_round": 2,
+      "version": {
+        "reviewed_default_branch_commit": "aa012adc6502e01b01d7b5c7836742dde21e93d8",
+        "default_branch": "main",
+        "pushed_at": "2026-09-18T17:07:54Z",
+        "installed_version": null
+      },
+      "archived": false,
+      "previously_in_decision_index": false,
+      "license": {
+        "github_spdx": "Apache-2.0",
+        "source_note": "Selected root license captured; no exhaustive dependency/license audit."
+      },
+      "primary_sources": [
+        "https://github.com/databento/dbn/blob/aa012adc6502e01b01d7b5c7836742dde21e93d8/LICENSE",
+        "https://github.com/databento/dbn/blob/aa012adc6502e01b01d7b5c7836742dde21e93d8/README.md",
+        "https://github.com/databento/dbn/blob/aa012adc6502e01b01d7b5c7836742dde21e93d8/rust/dbn/src/record.rs",
+        "https://github.com/databento/dbn/blob/aa012adc6502e01b01d7b5c7836742dde21e93d8/rust/dbn/src/record/record_methods_tests.rs"
+      ],
+      "source_review": {
+        "selected_file_count": 4,
+        "depth": "Selected implementation/docs/test/license sections; not an exhaustive repository audit."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/databento/dbn"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/databento/dbn/commits/main"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/databento/dbn/contents/LICENSE?ref=aa012adc6502e01b01d7b5c7836742dde21e93d8"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/databento/dbn/contents/README.md?ref=aa012adc6502e01b01d7b5c7836742dde21e93d8"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/databento/dbn/contents/rust/dbn/src/record.rs?ref=aa012adc6502e01b01d7b5c7836742dde21e93d8"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/databento/dbn/contents/rust/dbn/src/record/record_methods_tests.rs?ref=aa012adc6502e01b01d7b5c7836742dde21e93d8"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        }
+      ],
+      "native_acceptance": null,
+      "next_acceptance": "Evaluate existing local DBN fixtures/decoder only if this source is selected; map u64 sentinels/clock semantics explicitly before our signed-int64 contract."
+    },
+    {
+      "repository": "databento/databento-python",
+      "decision": "retain_conditional_data_provider_sdk",
+      "evidence_level": "source_sections_reviewed",
+      "rationale": "DBNStore exposes dataframe/array conversion and mappings; symbology intervals have explicit start/end boundaries. Mapping dates do not establish when a historical researcher knew the mapping.",
+      "discovery_round": 2,
+      "version": {
+        "reviewed_default_branch_commit": "e675ef30369f5ee9f68b04606080c519adf3be69",
+        "default_branch": "main",
+        "pushed_at": "2026-09-17T15:39:55Z",
+        "installed_version": null
+      },
+      "archived": false,
+      "previously_in_decision_index": true,
+      "license": {
+        "github_spdx": "Apache-2.0",
+        "source_note": "Selected root license captured; no exhaustive dependency/license audit."
+      },
+      "primary_sources": [
+        "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/LICENSE",
+        "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/README.md",
+        "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/databento/common/dbnstore.py",
+        "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/databento/common/symbology.py",
+        "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/tests/test_common_symbology.py"
+      ],
+      "source_review": {
+        "selected_file_count": 5,
+        "depth": "Selected implementation/docs/test/license sections; not an exhaustive repository audit."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/databento/databento-python"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/databento/databento-python/commits/main"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/databento/databento-python/contents/LICENSE?ref=e675ef30369f5ee9f68b04606080c519adf3be69"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/databento/databento-python/contents/README.md?ref=e675ef30369f5ee9f68b04606080c519adf3be69"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/databento/databento-python/contents/databento/common/dbnstore.py?ref=e675ef30369f5ee9f68b04606080c519adf3be69"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/databento/databento-python/contents/databento/common/symbology.py?ref=e675ef30369f5ee9f68b04606080c519adf3be69"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/databento/databento-python/contents/tests/test_common_symbology.py?ref=e675ef30369f5ee9f68b04606080c519adf3be69"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        }
+      ],
+      "native_acceptance": null,
+      "next_acceptance": "No API key, paid historical request or data purchase; require source/rights, pagination, metadata and mapping capture acceptance."
+    },
+    {
+      "repository": "stefan-jansen/zipline-reloaded",
+      "decision": "retain_universe_lifetime_semantics_reference",
+      "evidence_level": "source_sections_reviewed",
+      "rationale": "AssetFinder.lifetimes and tests distinguish first-day inclusion and asset start/end lifetimes. This helps universe masks but cannot provide authenticated availability or complete delisting coverage by itself.",
+      "discovery_round": 2,
+      "version": {
+        "reviewed_default_branch_commit": "943010b9da848e317fc520de87edade2b884d329",
+        "default_branch": "main",
+        "pushed_at": "2026-01-06T13:01:54Z",
+        "installed_version": null
+      },
+      "archived": false,
+      "previously_in_decision_index": true,
+      "license": {
+        "github_spdx": "Apache-2.0",
+        "source_note": "Selected root license captured; no exhaustive dependency/license audit."
+      },
+      "primary_sources": [
+        "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/LICENSE",
+        "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/src/zipline/assets/assets.py",
+        "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/tests/test_assets.py"
+      ],
+      "source_review": {
+        "selected_file_count": 3,
+        "depth": "Selected implementation/docs/test/license sections; not an exhaustive repository audit."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/stefan-jansen/zipline-reloaded"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/stefan-jansen/zipline-reloaded/commits/main"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/stefan-jansen/zipline-reloaded/contents/LICENSE?ref=943010b9da848e317fc520de87edade2b884d329"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/stefan-jansen/zipline-reloaded/contents/src/zipline/assets/assets.py?ref=943010b9da848e317fc520de87edade2b884d329"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/stefan-jansen/zipline-reloaded/contents/tests/test_assets.py?ref=943010b9da848e317fc520de87edade2b884d329"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        }
+      ],
+      "native_acceptance": null,
+      "next_acceptance": "Use as a comparative universe/data-semantics reference; retain LEAN as the primary engine."
+    },
+    {
+      "repository": "cvxgrp/cvxportfolio",
+      "decision": "retain_cost_and_turnover_challenger",
+      "evidence_level": "source_sections_reviewed",
+      "rationale": "TransactionCost uses absolute traded quantity and impact/volume terms, explicitly separating forecast volume during optimization from realized volume in simulation; relevant to strategy-switch accounting.",
+      "discovery_round": 2,
+      "version": {
+        "reviewed_default_branch_commit": "351c782b9b8b395c1a5f886b77e0d55f1bc9396e",
+        "default_branch": "master",
+        "pushed_at": "2026-04-27T14:11:17Z",
+        "installed_version": null
+      },
+      "archived": false,
+      "previously_in_decision_index": true,
+      "license": {
+        "github_spdx": "GPL-3.0",
+        "source_note": "Current README/code header specifies GPL version 3 or later; earlier Apache header is explicitly historical."
+      },
+      "primary_sources": [
+        "https://github.com/cvxgrp/cvxportfolio/blob/351c782b9b8b395c1a5f886b77e0d55f1bc9396e/LICENSE",
+        "https://github.com/cvxgrp/cvxportfolio/blob/351c782b9b8b395c1a5f886b77e0d55f1bc9396e/README.rst",
+        "https://github.com/cvxgrp/cvxportfolio/blob/351c782b9b8b395c1a5f886b77e0d55f1bc9396e/cvxportfolio/costs.py",
+        "https://github.com/cvxgrp/cvxportfolio/blob/351c782b9b8b395c1a5f886b77e0d55f1bc9396e/cvxportfolio/tests/test_costs.py"
+      ],
+      "source_review": {
+        "selected_file_count": 4,
+        "depth": "Selected implementation/docs/test/license sections; not an exhaustive repository audit."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/cvxgrp/cvxportfolio"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/cvxgrp/cvxportfolio/commits/master"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/cvxgrp/cvxportfolio/contents/LICENSE?ref=351c782b9b8b395c1a5f886b77e0d55f1bc9396e"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/cvxgrp/cvxportfolio/contents/README.rst?ref=351c782b9b8b395c1a5f886b77e0d55f1bc9396e"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/cvxgrp/cvxportfolio/contents/cvxportfolio/costs.py?ref=351c782b9b8b395c1a5f886b77e0d55f1bc9396e"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/cvxgrp/cvxportfolio/contents/cvxportfolio/tests/test_costs.py?ref=351c782b9b8b395c1a5f886b77e0d55f1bc9396e"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        }
+      ],
+      "native_acceptance": null,
+      "next_acceptance": "GPL-3.0-or-later code headers need compatibility review for integration. Calibration and financing/margin stress are separate from running its optimizer."
+    },
+    {
+      "repository": "deepcharles/ruptures",
+      "decision": "add_offline_regime_diagnostics_only",
+      "evidence_level": "source_sections_reviewed",
+      "rationale": "The upstream README and PELT API are explicitly offline segmentation. Full-history change points can contain future information and cannot become earlier live regime labels.",
+      "discovery_round": 2,
+      "version": {
+        "reviewed_default_branch_commit": "ee1c8ff8a548d54c641b2bb471562165931f31c7",
+        "default_branch": "master",
+        "pushed_at": "2026-07-06T22:04:14Z",
+        "installed_version": null
+      },
+      "archived": false,
+      "previously_in_decision_index": false,
+      "license": {
+        "github_spdx": "BSD-2-Clause",
+        "source_note": "Selected root license captured; no exhaustive dependency/license audit."
+      },
+      "primary_sources": [
+        "https://github.com/deepcharles/ruptures/blob/ee1c8ff8a548d54c641b2bb471562165931f31c7/LICENSE",
+        "https://github.com/deepcharles/ruptures/blob/ee1c8ff8a548d54c641b2bb471562165931f31c7/README.md",
+        "https://github.com/deepcharles/ruptures/blob/ee1c8ff8a548d54c641b2bb471562165931f31c7/src/ruptures/detection/pelt.py",
+        "https://github.com/deepcharles/ruptures/blob/ee1c8ff8a548d54c641b2bb471562165931f31c7/tests/test_detection.py"
+      ],
+      "source_review": {
+        "selected_file_count": 4,
+        "depth": "Selected implementation/docs/test/license sections; not an exhaustive repository audit."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/deepcharles/ruptures"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/deepcharles/ruptures/commits/master"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/deepcharles/ruptures/contents/LICENSE?ref=ee1c8ff8a548d54c641b2bb471562165931f31c7"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/deepcharles/ruptures/contents/README.md?ref=ee1c8ff8a548d54c641b2bb471562165931f31c7"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/deepcharles/ruptures/contents/src/ruptures/detection/pelt.py?ref=ee1c8ff8a548d54c641b2bb471562165931f31c7"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/deepcharles/ruptures/contents/tests/test_detection.py?ref=ee1c8ff8a548d54c641b2bb471562165931f31c7"
+          ],
+          "status": "executed_source_capture_sections_reviewed"
+        }
+      ],
+      "native_acceptance": null,
+      "next_acceptance": "Potential development-only diagnostic; any causal rolling selector needs frozen fitting windows, delay and nested evaluation. Not installed."
+    },
+    {
+      "repository": "hmmlearn/hmmlearn",
+      "decision": "discovery_only_defer",
+      "evidence_level": "discovery_metadata_only",
+      "rationale": "A regime-modeling lead, metadata checked only; causal filtering versus full-sequence decoding and maintenance need source/test review before use.",
+      "discovery_round": 2,
+      "version": {
+        "reviewed_default_branch_commit": "e01a10e99df1042e4c1e6b7c822fd292dd37502f",
+        "default_branch": "main",
+        "pushed_at": "2024-10-31T09:14:35Z",
+        "installed_version": null
+      },
+      "archived": false,
+      "previously_in_decision_index": false,
+      "license": {
+        "github_spdx": "BSD-3-Clause",
+        "source_note": "Metadata only; no source license review."
+      },
+      "primary_sources": [],
+      "source_review": {
+        "selected_file_count": 0,
+        "depth": "Repository and commit metadata only."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/hmmlearn/hmmlearn"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/hmmlearn/hmmlearn/commits/main"
+          ],
+          "status": "executed_metadata"
+        }
+      ],
+      "native_acceptance": null,
+      "next_acceptance": "No model fitting, source/test review or installation in this wave."
+    },
+    {
+      "repository": "stumpy-dev/stumpy",
+      "decision": "discovery_only_defer",
+      "evidence_level": "discovery_metadata_only",
+      "rationale": "A motif/anomaly lead for event controls, metadata checked only; source semantics, current license and causal-window evaluation remain unreviewed.",
+      "discovery_round": 2,
+      "version": {
+        "reviewed_default_branch_commit": "e4caf8a7ba519d1ba04796cd06aa78d91e9ca6ee",
+        "default_branch": "main",
+        "pushed_at": "2026-09-12T14:30:49Z",
+        "installed_version": null
+      },
+      "archived": false,
+      "previously_in_decision_index": false,
+      "license": {
+        "github_spdx": "NOASSERTION",
+        "source_note": "Metadata only; no source license review."
+      },
+      "primary_sources": [],
+      "source_review": {
+        "selected_file_count": 0,
+        "depth": "Repository and commit metadata only."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/stumpy-dev/stumpy"
+          ],
+          "status": "executed_metadata"
+        },
+        {
+          "argv": [
+            "gh",
+            "api",
+            "repos/stumpy-dev/stumpy/commits/main"
+          ],
+          "status": "executed_metadata"
+        }
+      ],
+      "native_acceptance": null,
+      "next_acceptance": "No native motif run or installation; GitHub license metadata is NOASSERTION and remains unresolved."
+    }
+  ],
+  "counts": {
+    "repository_decisions": 14,
+    "fresh_source_section_reviews": 11,
+    "retained_prior_native_acceptance": 1,
+    "discovery_metadata_only": 2,
+    "captured_source_files": 40,
+    "new_to_prior_decision_index": 5,
+    "new_source_reviewed_identities": 3
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "purpose": "Close exact-timestamp and current adapter/evaluation boundaries in the incumbent path.",
+      "candidates": 7,
+      "selected_source_files": 20,
+      "stop_evidence": "Located default SDK datetime conversion and DuckDB timezone-aware precision loss. Existing pandas plus integer DuckDB/Parquet resolves the representation gap without replacing the engine or adding packages."
+    },
+    {
+      "round": 2,
+      "purpose": "Challenge missing source clocks/sequence, universe masks, switching costs and regime diagnostics.",
+      "candidates": 7,
+      "selected_source_files": 20,
+      "stop_evidence": "Added DBN and offline ruptures source reviews plus two explicitly metadata-only leads. No challenger demonstrated an entitled extreme-mover dataset, authenticated article history or complete simulation/paper/live lifecycle; more names would not close those concrete acceptance gates."
+    }
+  ],
+  "discovery_method": {
+    "basis": [
+      "Existing engines/data/followup/architecture catalogs and current acceptance protocol",
+      "Primary SDK/format dependencies and capability-specific upstream repository discovery",
+      "Root independently refreshes starred/awesome-list coverage; this lane makes no all-star or all-awesome claim"
+    ],
+    "novel_source_reviewed": [
+      "pandas-dev/pandas",
+      "databento/dbn",
+      "deepcharles/ruptures"
+    ],
+    "novel_metadata_only": [
+      "hmmlearn/hmmlearn",
+      "stumpy-dev/stumpy"
+    ],
+    "rejected_claims": [
+      "Latest commit or repository inclusion is not latest installed runtime or an E2E result.",
+      "Offline segmentation is not a contemporaneously observable regime.",
+      "Historical asset lifetime or symbol mapping is not complete point-in-time membership knowledge.",
+      "A public SDK license does not grant market-data acquisition, redistribution or commercial rights."
+    ]
+  },
+  "source_manifest": [
+    {
+      "repository": "QuantConnect/Lean.Brokerages.Alpaca",
+      "path": "README.md",
+      "revision": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+      "url": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md",
+      "sha256": "24e857f41fe59ef86e1817f58a8c3d8a8df3a387f1ad94228e2368c56cd9e143",
+      "bytes": 13036,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/QuantConnect/Lean.Brokerages.Alpaca/contents/README.md?ref=1973f6165bee212acf656ed2f9cb0af86d4f2a18"
+      ]
+    },
+    {
+      "repository": "QuantConnect/Lean.Brokerages.Alpaca",
+      "path": "QuantConnect.AlpacaBrokerage/AlpacaBrokerage.HistoryProvider.cs",
+      "revision": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+      "url": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/QuantConnect.AlpacaBrokerage/AlpacaBrokerage.HistoryProvider.cs",
+      "sha256": "301883c522ba354928923aa98f728c3152d5030571c7655e714f557d7b127570",
+      "bytes": 21016,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/QuantConnect/Lean.Brokerages.Alpaca/contents/QuantConnect.AlpacaBrokerage/AlpacaBrokerage.HistoryProvider.cs?ref=1973f6165bee212acf656ed2f9cb0af86d4f2a18"
+      ]
+    },
+    {
+      "repository": "QuantConnect/Lean.Brokerages.Alpaca",
+      "path": "QuantConnect.AlpacaBrokerage/AlpacaBrokerage.cs",
+      "revision": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+      "url": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/QuantConnect.AlpacaBrokerage/AlpacaBrokerage.cs",
+      "sha256": "4561977263a7449a7b90fa795c91b5d8abc2aa2a9bf3cd1ba69288d8b46663c9",
+      "bytes": 54729,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/QuantConnect/Lean.Brokerages.Alpaca/contents/QuantConnect.AlpacaBrokerage/AlpacaBrokerage.cs?ref=1973f6165bee212acf656ed2f9cb0af86d4f2a18"
+      ]
+    },
+    {
+      "repository": "QuantConnect/Lean.Brokerages.Alpaca",
+      "path": "QuantConnect.AlpacaBrokerage.Tests/AlpacaBrokerageAdditionalTests.cs",
+      "revision": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+      "url": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/QuantConnect.AlpacaBrokerage.Tests/AlpacaBrokerageAdditionalTests.cs",
+      "sha256": "6c4088e0b2d95f0f7add452cc219b40df3f24df30ae29233ff5b07151f96e876",
+      "bytes": 4808,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/QuantConnect/Lean.Brokerages.Alpaca/contents/QuantConnect.AlpacaBrokerage.Tests/AlpacaBrokerageAdditionalTests.cs?ref=1973f6165bee212acf656ed2f9cb0af86d4f2a18"
+      ]
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "path": "LICENSE",
+      "revision": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "url": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/LICENSE",
+      "sha256": "bc84da682744c6dd008cf9ad3306caf18444d613a80c1bcc3de0dd46094787ef",
+      "bytes": 10873,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/alpacahq/alpaca-py/contents/LICENSE?ref=232179c19091fd0f70daf0972a90bf8def329ec0"
+      ]
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "path": "alpaca/data/live/websocket.py",
+      "revision": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "url": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/alpaca/data/live/websocket.py",
+      "sha256": "dcd0afd9c80fafb18095f02c3d929b98952fa86ae0ac24f4a42be8f0c5977c3e",
+      "bytes": 20059,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/alpacahq/alpaca-py/contents/alpaca/data/live/websocket.py?ref=232179c19091fd0f70daf0972a90bf8def329ec0"
+      ]
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "path": "alpaca/data/models/trades.py",
+      "revision": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "url": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/alpaca/data/models/trades.py",
+      "sha256": "c8fb7ed401e00caac26d02e1fa9d26767256854db92fe0f550f4c01765650dbd",
+      "bytes": 6637,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/alpacahq/alpaca-py/contents/alpaca/data/models/trades.py?ref=232179c19091fd0f70daf0972a90bf8def329ec0"
+      ]
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "path": "tests/data/test_websockets.py",
+      "revision": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "url": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/tests/data/test_websockets.py",
+      "sha256": "dcdc25d904656ad1ffb346c83f04f9dbba0806438353e29ca154432c5406dec2",
+      "bytes": 9026,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/alpacahq/alpaca-py/contents/tests/data/test_websockets.py?ref=232179c19091fd0f70daf0972a90bf8def329ec0"
+      ]
+    },
+    {
+      "repository": "duckdb/duckdb",
+      "path": "LICENSE",
+      "revision": "3a604ab6d4d66910ad91bf7669c0b5f648a00190",
+      "url": "https://github.com/duckdb/duckdb/blob/3a604ab6d4d66910ad91bf7669c0b5f648a00190/LICENSE",
+      "sha256": "075c33400ffcb0c586dd106a029d3e733e9da3693f8fcb9cebfc651c8a2f14e3",
+      "bytes": 1072,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/duckdb/duckdb/contents/LICENSE?ref=3a604ab6d4d66910ad91bf7669c0b5f648a00190"
+      ]
+    },
+    {
+      "repository": "duckdb/duckdb",
+      "path": "src/include/duckdb/common/types/timestamp.hpp",
+      "revision": "3a604ab6d4d66910ad91bf7669c0b5f648a00190",
+      "url": "https://github.com/duckdb/duckdb/blob/3a604ab6d4d66910ad91bf7669c0b5f648a00190/src/include/duckdb/common/types/timestamp.hpp",
+      "sha256": "89bd0d5f1752e28731dea6f9b95e6a4ffa971e4d6e12a78d2fdf4bcfb66458ad",
+      "bytes": 6838,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/duckdb/duckdb/contents/src/include/duckdb/common/types/timestamp.hpp?ref=3a604ab6d4d66910ad91bf7669c0b5f648a00190"
+      ]
+    },
+    {
+      "repository": "duckdb/duckdb",
+      "path": "test/sql/function/timestamp/test_strftime_timestamp_ns.test",
+      "revision": "3a604ab6d4d66910ad91bf7669c0b5f648a00190",
+      "url": "https://github.com/duckdb/duckdb/blob/3a604ab6d4d66910ad91bf7669c0b5f648a00190/test/sql/function/timestamp/test_strftime_timestamp_ns.test",
+      "sha256": "096850e55bd3e30fd8598fb88937646f2400e251c691f3ece87ea1de71d320bf",
+      "bytes": 5685,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/duckdb/duckdb/contents/test/sql/function/timestamp/test_strftime_timestamp_ns.test?ref=3a604ab6d4d66910ad91bf7669c0b5f648a00190"
+      ]
+    },
+    {
+      "repository": "pandas-dev/pandas",
+      "path": "LICENSE",
+      "revision": "e3d2128f083e15d384f61deaad60b56537387671",
+      "url": "https://github.com/pandas-dev/pandas/blob/e3d2128f083e15d384f61deaad60b56537387671/LICENSE",
+      "sha256": "9850f6b5bdef7346503065807b878deb8058b976c5c329f4c4d23bf4796ce9ae",
+      "bytes": 1634,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/pandas-dev/pandas/contents/LICENSE?ref=e3d2128f083e15d384f61deaad60b56537387671"
+      ]
+    },
+    {
+      "repository": "pandas-dev/pandas",
+      "path": "pandas/_libs/tslibs/timestamps.pyx",
+      "revision": "e3d2128f083e15d384f61deaad60b56537387671",
+      "url": "https://github.com/pandas-dev/pandas/blob/e3d2128f083e15d384f61deaad60b56537387671/pandas/_libs/tslibs/timestamps.pyx",
+      "sha256": "c2783b93ccefb6ab60d19c602c293beb69484965cd66053b1c3672663c6674c1",
+      "bytes": 138363,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/pandas-dev/pandas/contents/pandas/_libs/tslibs/timestamps.pyx?ref=e3d2128f083e15d384f61deaad60b56537387671"
+      ]
+    },
+    {
+      "repository": "pandas-dev/pandas",
+      "path": "pandas/tests/scalar/timestamp/methods/test_as_unit.py",
+      "revision": "e3d2128f083e15d384f61deaad60b56537387671",
+      "url": "https://github.com/pandas-dev/pandas/blob/e3d2128f083e15d384f61deaad60b56537387671/pandas/tests/scalar/timestamp/methods/test_as_unit.py",
+      "sha256": "5f891b9fe182fea8b4f78f662ca3fbe6f47fb1b0e3c88f89df215c3e6f55b666",
+      "bytes": 2734,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/pandas-dev/pandas/contents/pandas/tests/scalar/timestamp/methods/test_as_unit.py?ref=e3d2128f083e15d384f61deaad60b56537387671"
+      ]
+    },
+    {
+      "repository": "apache/arrow",
+      "path": "LICENSE.txt",
+      "revision": "c07de67a7c9a43c7c958ffeb08407b66c38df5b5",
+      "url": "https://github.com/apache/arrow/blob/c07de67a7c9a43c7c958ffeb08407b66c38df5b5/LICENSE.txt",
+      "sha256": "d1c981370f1ffd4edcdd2fb3565c8939cc40c75e24e1f92d581d04e54f0dff81",
+      "bytes": 112295,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/apache/arrow/contents/LICENSE.txt?ref=c07de67a7c9a43c7c958ffeb08407b66c38df5b5"
+      ]
+    },
+    {
+      "repository": "apache/arrow",
+      "path": "python/pyarrow/parquet/core.py",
+      "revision": "c07de67a7c9a43c7c958ffeb08407b66c38df5b5",
+      "url": "https://github.com/apache/arrow/blob/c07de67a7c9a43c7c958ffeb08407b66c38df5b5/python/pyarrow/parquet/core.py",
+      "sha256": "7ddeb7c367b31e62e669fbcfbc6ba0dca78d6083d1db4f5ba16c65b5cbad88bb",
+      "bytes": 99577,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/apache/arrow/contents/python/pyarrow/parquet/core.py?ref=c07de67a7c9a43c7c958ffeb08407b66c38df5b5"
+      ]
+    },
+    {
+      "repository": "apache/arrow",
+      "path": "python/pyarrow/tests/parquet/test_datetime.py",
+      "revision": "c07de67a7c9a43c7c958ffeb08407b66c38df5b5",
+      "url": "https://github.com/apache/arrow/blob/c07de67a7c9a43c7c958ffeb08407b66c38df5b5/python/pyarrow/tests/parquet/test_datetime.py",
+      "sha256": "03765a463f3cbb422b96108da76298fc0f2dc6b6fbcb6a4a3e0115bc8edeedb5",
+      "bytes": 16398,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/apache/arrow/contents/python/pyarrow/tests/parquet/test_datetime.py?ref=c07de67a7c9a43c7c958ffeb08407b66c38df5b5"
+      ]
+    },
+    {
+      "repository": "skfolio/skfolio",
+      "path": "LICENSE",
+      "revision": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/LICENSE",
+      "sha256": "07b8dfceb7b319e5145e7b1594d2cdaf94d924d78166d28951d4b360a4dc5844",
+      "bytes": 1526,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/skfolio/skfolio/contents/LICENSE?ref=c99fcf71349e2df4a7a1033ee85ca2e9ced9abee"
+      ]
+    },
+    {
+      "repository": "skfolio/skfolio",
+      "path": "src/skfolio/model_selection/_walk_forward.py",
+      "revision": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/src/skfolio/model_selection/_walk_forward.py",
+      "sha256": "f85cbe8b5a3ff4705a7ab6d35eacdbfafc11b09ec3cc1458fd4a2cf98c563397",
+      "bytes": 24745,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/skfolio/skfolio/contents/src/skfolio/model_selection/_walk_forward.py?ref=c99fcf71349e2df4a7a1033ee85ca2e9ced9abee"
+      ]
+    },
+    {
+      "repository": "skfolio/skfolio",
+      "path": "tests/test_model_selection/test_walk_forward.py",
+      "revision": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "url": "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/tests/test_model_selection/test_walk_forward.py",
+      "sha256": "58a6f14dd0c623343d9411d2795bbfc2de39ec648cb83a714c80f1d0c4a4d6c6",
+      "bytes": 27973,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/skfolio/skfolio/contents/tests/test_model_selection/test_walk_forward.py?ref=c99fcf71349e2df4a7a1033ee85ca2e9ced9abee"
+      ]
+    },
+    {
+      "repository": "databento/dbn",
+      "path": "LICENSE",
+      "revision": "aa012adc6502e01b01d7b5c7836742dde21e93d8",
+      "url": "https://github.com/databento/dbn/blob/aa012adc6502e01b01d7b5c7836742dde21e93d8/LICENSE",
+      "sha256": "d3174ad63e721d4c9dccb8ad4320848992d314369bc46319720b5802c9153fe9",
+      "bytes": 9694,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/databento/dbn/contents/LICENSE?ref=aa012adc6502e01b01d7b5c7836742dde21e93d8"
+      ]
+    },
+    {
+      "repository": "databento/dbn",
+      "path": "README.md",
+      "revision": "aa012adc6502e01b01d7b5c7836742dde21e93d8",
+      "url": "https://github.com/databento/dbn/blob/aa012adc6502e01b01d7b5c7836742dde21e93d8/README.md",
+      "sha256": "a36b805546052e5715f853cfcbda32a722d76495bb7d56bbc14f7328e04875c6",
+      "bytes": 1991,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/databento/dbn/contents/README.md?ref=aa012adc6502e01b01d7b5c7836742dde21e93d8"
+      ]
+    },
+    {
+      "repository": "databento/dbn",
+      "path": "rust/dbn/src/record.rs",
+      "revision": "aa012adc6502e01b01d7b5c7836742dde21e93d8",
+      "url": "https://github.com/databento/dbn/blob/aa012adc6502e01b01d7b5c7836742dde21e93d8/rust/dbn/src/record.rs",
+      "sha256": "0658f5d38ae79f48768fe93cb71828a169947eaaff14aea72cd53972288fa744",
+      "bytes": 54760,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/databento/dbn/contents/rust/dbn/src/record.rs?ref=aa012adc6502e01b01d7b5c7836742dde21e93d8"
+      ]
+    },
+    {
+      "repository": "databento/dbn",
+      "path": "rust/dbn/src/record/record_methods_tests.rs",
+      "revision": "aa012adc6502e01b01d7b5c7836742dde21e93d8",
+      "url": "https://github.com/databento/dbn/blob/aa012adc6502e01b01d7b5c7836742dde21e93d8/rust/dbn/src/record/record_methods_tests.rs",
+      "sha256": "589d4e36c098070c50e450011e483a5a82229f563b4a73036c9cec5c0e5b0305",
+      "bytes": 3408,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/databento/dbn/contents/rust/dbn/src/record/record_methods_tests.rs?ref=aa012adc6502e01b01d7b5c7836742dde21e93d8"
+      ]
+    },
+    {
+      "repository": "databento/databento-python",
+      "path": "LICENSE",
+      "revision": "e675ef30369f5ee9f68b04606080c519adf3be69",
+      "url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/LICENSE",
+      "sha256": "d3174ad63e721d4c9dccb8ad4320848992d314369bc46319720b5802c9153fe9",
+      "bytes": 9694,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/databento/databento-python/contents/LICENSE?ref=e675ef30369f5ee9f68b04606080c519adf3be69"
+      ]
+    },
+    {
+      "repository": "databento/databento-python",
+      "path": "README.md",
+      "revision": "e675ef30369f5ee9f68b04606080c519adf3be69",
+      "url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/README.md",
+      "sha256": "987d6ddaec6441f32f54e71fa9dd5a7dd566d60bb81b6128d4f494a0adaef144",
+      "bytes": 5011,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/databento/databento-python/contents/README.md?ref=e675ef30369f5ee9f68b04606080c519adf3be69"
+      ]
+    },
+    {
+      "repository": "databento/databento-python",
+      "path": "databento/common/dbnstore.py",
+      "revision": "e675ef30369f5ee9f68b04606080c519adf3be69",
+      "url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/databento/common/dbnstore.py",
+      "sha256": "fd5e17b68e1f9d0e5ca3b480de706b8b2321d6517055077b2324b65b66919eb9",
+      "bytes": 45934,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/databento/databento-python/contents/databento/common/dbnstore.py?ref=e675ef30369f5ee9f68b04606080c519adf3be69"
+      ]
+    },
+    {
+      "repository": "databento/databento-python",
+      "path": "databento/common/symbology.py",
+      "revision": "e675ef30369f5ee9f68b04606080c519adf3be69",
+      "url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/databento/common/symbology.py",
+      "sha256": "fd724ed01459f3a8e2423b9bf05dd0220981f83f210b7995cbf59fc324f68744",
+      "bytes": 23231,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/databento/databento-python/contents/databento/common/symbology.py?ref=e675ef30369f5ee9f68b04606080c519adf3be69"
+      ]
+    },
+    {
+      "repository": "databento/databento-python",
+      "path": "tests/test_common_symbology.py",
+      "revision": "e675ef30369f5ee9f68b04606080c519adf3be69",
+      "url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/tests/test_common_symbology.py",
+      "sha256": "f97ebee5aa9e39efaa3077f4e159d50df319de9a38dc8aded79a180b65118dde",
+      "bytes": 27265,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/databento/databento-python/contents/tests/test_common_symbology.py?ref=e675ef30369f5ee9f68b04606080c519adf3be69"
+      ]
+    },
+    {
+      "repository": "stefan-jansen/zipline-reloaded",
+      "path": "LICENSE",
+      "revision": "943010b9da848e317fc520de87edade2b884d329",
+      "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/LICENSE",
+      "sha256": "e35c4578f7db4498e62e278978f6c42e0fce6f21f9993a060b08a33549cd3044",
+      "bytes": 11347,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/stefan-jansen/zipline-reloaded/contents/LICENSE?ref=943010b9da848e317fc520de87edade2b884d329"
+      ]
+    },
+    {
+      "repository": "stefan-jansen/zipline-reloaded",
+      "path": "src/zipline/assets/assets.py",
+      "revision": "943010b9da848e317fc520de87edade2b884d329",
+      "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/src/zipline/assets/assets.py",
+      "sha256": "7c9c4d4b012ffc28231865e49c87c4b1c047e411146a4530f182458a41a621a1",
+      "bytes": 54147,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/stefan-jansen/zipline-reloaded/contents/src/zipline/assets/assets.py?ref=943010b9da848e317fc520de87edade2b884d329"
+      ]
+    },
+    {
+      "repository": "stefan-jansen/zipline-reloaded",
+      "path": "tests/test_assets.py",
+      "revision": "943010b9da848e317fc520de87edade2b884d329",
+      "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/tests/test_assets.py",
+      "sha256": "33877a30eaa470b3a7c119d35228218d1c112c9da8cb9879f0e83b345a375a05",
+      "bytes": 90442,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/stefan-jansen/zipline-reloaded/contents/tests/test_assets.py?ref=943010b9da848e317fc520de87edade2b884d329"
+      ]
+    },
+    {
+      "repository": "cvxgrp/cvxportfolio",
+      "path": "LICENSE",
+      "revision": "351c782b9b8b395c1a5f886b77e0d55f1bc9396e",
+      "url": "https://github.com/cvxgrp/cvxportfolio/blob/351c782b9b8b395c1a5f886b77e0d55f1bc9396e/LICENSE",
+      "sha256": "e57f1c320b8cf8798a7d2ff83a6f9e06a33a03585f6e065fea97f1d86db84052",
+      "bytes": 35150,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/cvxgrp/cvxportfolio/contents/LICENSE?ref=351c782b9b8b395c1a5f886b77e0d55f1bc9396e"
+      ]
+    },
+    {
+      "repository": "cvxgrp/cvxportfolio",
+      "path": "README.rst",
+      "revision": "351c782b9b8b395c1a5f886b77e0d55f1bc9396e",
+      "url": "https://github.com/cvxgrp/cvxportfolio/blob/351c782b9b8b395c1a5f886b77e0d55f1bc9396e/README.rst",
+      "sha256": "f5a9e1678978fe960e8f9aaf4931ed0e3d8413e5c87bf6aaf838c39d1882a3eb",
+      "bytes": 13720,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/cvxgrp/cvxportfolio/contents/README.rst?ref=351c782b9b8b395c1a5f886b77e0d55f1bc9396e"
+      ]
+    },
+    {
+      "repository": "cvxgrp/cvxportfolio",
+      "path": "cvxportfolio/costs.py",
+      "revision": "351c782b9b8b395c1a5f886b77e0d55f1bc9396e",
+      "url": "https://github.com/cvxgrp/cvxportfolio/blob/351c782b9b8b395c1a5f886b77e0d55f1bc9396e/cvxportfolio/costs.py",
+      "sha256": "04c0940134d90e98ff9c8dee2c6fd7071977579c262a85b582fb4b6db0bf1aef",
+      "bytes": 44414,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/cvxgrp/cvxportfolio/contents/cvxportfolio/costs.py?ref=351c782b9b8b395c1a5f886b77e0d55f1bc9396e"
+      ]
+    },
+    {
+      "repository": "cvxgrp/cvxportfolio",
+      "path": "cvxportfolio/tests/test_costs.py",
+      "revision": "351c782b9b8b395c1a5f886b77e0d55f1bc9396e",
+      "url": "https://github.com/cvxgrp/cvxportfolio/blob/351c782b9b8b395c1a5f886b77e0d55f1bc9396e/cvxportfolio/tests/test_costs.py",
+      "sha256": "2384e5c5fb1e86359004db9505b296875894efa86df10a6ebfb6fa16fb08a210",
+      "bytes": 12981,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/cvxgrp/cvxportfolio/contents/cvxportfolio/tests/test_costs.py?ref=351c782b9b8b395c1a5f886b77e0d55f1bc9396e"
+      ]
+    },
+    {
+      "repository": "deepcharles/ruptures",
+      "path": "LICENSE",
+      "revision": "ee1c8ff8a548d54c641b2bb471562165931f31c7",
+      "url": "https://github.com/deepcharles/ruptures/blob/ee1c8ff8a548d54c641b2bb471562165931f31c7/LICENSE",
+      "sha256": "f29c48be39fff974e2d631b2317c194409531cc86e16e05f3968ead0456bc920",
+      "bytes": 1332,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/deepcharles/ruptures/contents/LICENSE?ref=ee1c8ff8a548d54c641b2bb471562165931f31c7"
+      ]
+    },
+    {
+      "repository": "deepcharles/ruptures",
+      "path": "README.md",
+      "revision": "ee1c8ff8a548d54c641b2bb471562165931f31c7",
+      "url": "https://github.com/deepcharles/ruptures/blob/ee1c8ff8a548d54c641b2bb471562165931f31c7/README.md",
+      "sha256": "a7762a55fb9555691deb8bd15e7378428b97d26ace48f2297fe1c93c7cc5f16c",
+      "bytes": 7416,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/deepcharles/ruptures/contents/README.md?ref=ee1c8ff8a548d54c641b2bb471562165931f31c7"
+      ]
+    },
+    {
+      "repository": "deepcharles/ruptures",
+      "path": "src/ruptures/detection/pelt.py",
+      "revision": "ee1c8ff8a548d54c641b2bb471562165931f31c7",
+      "url": "https://github.com/deepcharles/ruptures/blob/ee1c8ff8a548d54c641b2bb471562165931f31c7/src/ruptures/detection/pelt.py",
+      "sha256": "136e4636b006ef62ab80ddb585a6df4296cf87a24faf43c6c8020a6acaa76231",
+      "bytes": 5377,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/deepcharles/ruptures/contents/src/ruptures/detection/pelt.py?ref=ee1c8ff8a548d54c641b2bb471562165931f31c7"
+      ]
+    },
+    {
+      "repository": "deepcharles/ruptures",
+      "path": "tests/test_detection.py",
+      "revision": "ee1c8ff8a548d54c641b2bb471562165931f31c7",
+      "url": "https://github.com/deepcharles/ruptures/blob/ee1c8ff8a548d54c641b2bb471562165931f31c7/tests/test_detection.py",
+      "sha256": "3e87718fced6d9ef7af5a74f5d01aa8a7e27173da60d4b600f9554384db758ce",
+      "bytes": 13077,
+      "status": "captured",
+      "command": [
+        "gh",
+        "api",
+        "repos/deepcharles/ruptures/contents/tests/test_detection.py?ref=ee1c8ff8a548d54c641b2bb471562165931f31c7"
+      ]
+    }
+  ],
+  "official_semantics": [
+    {
+      "topic": "exact_timestamp_interchange",
+      "source": "https://duckdb.org/docs/current/sql/data_types/timestamp",
+      "finding": "TIMESTAMPTZ is microsecond; DuckDB warns timezone-aware nanosecond Parquet columns can lose precision. Canonical replay stores UTC nanoseconds as BIGINT and JSON decimal strings."
+    },
+    {
+      "topic": "pandas_precision",
+      "source": "https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.html",
+      "finding": "Use explicit nanosecond conversion and overflow rejection; existing package version 3.0.6 is separate from reviewed repository main."
+    },
+    {
+      "topic": "alpaca_news_versions",
+      "source": "https://docs.alpaca.markets/us/docs/streaming-real-time-news",
+      "finding": "Article created/updated timestamps do not authenticate original receipt or immutable revision history; preserve raw payload versions and original observation."
+    },
+    {
+      "topic": "alpaca_bar_and_tick_revisions",
+      "source": "https://docs.alpaca.markets/us/docs/real-time-stock-pricing-data",
+      "finding": "Trades/quotes support nanosecond timestamps; updated bars, trade corrections and cancellations require observed-version replay."
+    },
+    {
+      "topic": "market_data_request_limits",
+      "source": "https://docs.alpaca.markets/us/docs/about-market-data-api",
+      "finding": "Current individual Basic/Algo Trader Plus table lists historical API 200/10,000 requests per minute, real-time IEX/all-US-exchanges coverage, and distinct symbol/recent-history limits. These count requests, not executions, and do not establish this account's entitlement."
+    },
+    {
+      "topic": "elite_trading_request_limits",
+      "source": "https://alpaca.markets/elite",
+      "finding": "Current retail/Elite Smart Router comparison lists 200/1,000 API calls per minute. Qualification does not automatically switch routing; fees and personal-use data terms remain separate. No account or routing entitlement was probed."
+    },
+    {
+      "topic": "historical_coverage_and_rights",
+      "source": "https://docs.alpaca.markets/us/docs/market-data-faq",
+      "finding": "Historical SIP queries without a subscription require end at least 15 minutes old; IEX is a single exchange, OTC has separate restricted access, and asof symbol mapping is not historical knowledge availability."
+    },
+    {
+      "topic": "paper_simulator_boundary",
+      "source": "https://docs.alpaca.markets/us/docs/paper-trading",
+      "finding": "Paper uses distinct account/credentials and simulated fills; order quantity is not checked against NBBO depth, and paper omits dividends. It cannot establish live capacity or realistic impact/latency."
+    },
+    {
+      "topic": "current_intraday_margin_migration",
+      "source": "https://alpaca.markets/blog/finra-retires-the-pdt-rule-introducing-alpacas-new-intraday-margin-framework/",
+      "finding": "Official update June 4, 2026 says PDT/count/$25,000 logic was removed and legacy day-trading fields were scheduled for removal July 6; use current buying_power and current account/asset requirements instead of old versioned examples."
+    },
+    {
+      "topic": "margin_limits",
+      "source": "https://docs.alpaca.markets/us/docs/margin-and-short-selling",
+      "finding": "Current docs describe up to 4x intraday/2x overnight for eligible leverage-enabled accounts with at least $2,000, subject to security/house/concentration requirements. This is a maximum conditional capability, not an automatic position target."
+    }
+  ],
+  "lane_plan": {
+    "simulation": {
+      "status": "offline_representation_acceptance_plus_proposed_strategy_stress",
+      "factors": "As-known source versions and independently calibrated latency/cost scenarios; +200% discovery cases remain development-only.",
+      "proposed_leverage_stress": [
+        1,
+        1.5,
+        2,
+        3,
+        4
+      ],
+      "boundary": "A hypothetical stress grid can include infeasible scenarios if clearly labeled; financing, gaps, concentration, margin changes, turnover and forced deleveraging must be simulated. No stress-grid strategy results were run here."
+    },
+    "paper": {
+      "status": "not_connected_or_executed_by_this_lane",
+      "factors": "Actually received/versioned live inputs, measured processing delay, feed coverage and current session/asset/account state; same frozen factor definitions with lane differences logged.",
+      "leverage": "Only actual current buying_power, marginable/shortable/borrow status, session constraints and user-declared risk caps can bound any later automatic allocation; no hard-coded 4x or recovery-by-increasing-leverage rule.",
+      "boundary": "Paper verifies broker lifecycle separately and retains independent depth/impact/latency stresses; simulated paper PnL alone is not a live promotion criterion."
+    },
+    "live": {
+      "status": "future_separate_promotion_gate",
+      "criteria": "Frozen statistical/risk criteria, out-of-sample/forward evidence, complete fills/order-state reconciliation, incident/recovery controls and explicit live authority before controlled progression."
+    }
+  },
+  "native_acceptance": {
+    "receipt": "blueprints/us-equities/nanosecond-replay/receipt.json",
+    "tests": "tests/test_nanosecond_replay.py",
+    "native_command_count": 10,
+    "focused_tests_passed": 12,
+    "new_dependencies": 0,
+    "proof": "Five observations and two membership rows retain exact integer clocks; same-microsecond revisions/sequence/effective membership and hash replay behave as declared.",
+    "not_proven": [
+      "real tick/news adapter",
+      "entitled or complete historical +200% cohort",
+      "authenticated availability clocks",
+      "calibrated factors or causal incentives",
+      "validated market regime selector",
+      "simulation leverage performance",
+      "paper account connectivity or broker lifecycle",
+      "live trading"
+    ]
+  },
+  "retained_failures": [
+    {
+      "kind": "tool_environment",
+      "finding": "Context Mode Python initially could not resolve gh on PATH; source reads succeeded using the installed absolute native CLI path."
+    },
+    {
+      "kind": "temporary_artifact_scope",
+      "finding": "An initial context-tool temporary metadata directory was ephemeral; metadata was recaptured into explicit private state. No source-review count was multiplied by that retry."
+    }
+  ],
+  "next_actions": [
+    "Root registers this /entries supplement in the central decision index; metadata-only leads remain explicitly unreviewed.",
+    "Capture entitled original event/news/tick revisions with stable source IDs and exact clocks; validate SDK raw path, flags, offsets and source-specific sequence semantics.",
+    "Acquire/verify complete historical candidate universe and +200% cohort with frozen anchors, corporate actions, mapping and all-candidate controls.",
+    "Implement and evaluate causal factor/selector/portfolio transitions with nested chronological selection and costs on every executed leg.",
+    "Run simulation stress and paper-account acceptance as separate lanes; no installed-repo count substitutes for their receipts."
+  ],
+  "limitations": [
+    "Fourteen bounded candidate decisions do not exhaust trading/data/evaluation repositories or establish a universal SOTA winner.",
+    "Source sections/tests were inspected but upstream repository test suites were not executed; native execution is limited to retained LEAN evidence and this synthetic pandas/DuckDB acceptance.",
+    "No credentials, account eligibility, financial API acquisition, paid data, broker orders, additional model calls or package installs in this lane."
+  ]
+}
