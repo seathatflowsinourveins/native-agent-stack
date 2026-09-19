@@ -1,0 +1,52 @@
+{
+  "status": "research_only",
+  "as_of": "2026-09-19T19:41:01.337619+00:00",
+  "trading_authorized": false,
+  "evidence": [
+    {
+      "citation_id": "F1",
+      "value": "3",
+      "unit": "orders"
+    },
+    {
+      "citation_id": "F4",
+      "value": "10.32",
+      "unit": "USD"
+    }
+  ],
+  "findings": [
+    {
+      "claim": "Summary source S1 reports 3 total orders and 10.32 USD total fees for the packet's stated simulated period 2013-10-07T00:00:00Z to 2013-10-11T23:59:59Z.",
+      "citations": [
+        "F1",
+        "F4"
+      ]
+    },
+    {
+      "claim": "Reported start equity 100000 USD and end equity 101655.30 USD are simulated engine values for that same short period, not realized account balances.",
+      "citations": [
+        "F2",
+        "F3"
+      ]
+    },
+    {
+      "claim": "The Astra report's two numeric findings (3 orders; 10.32 USD fees) copy F1 and F4 with correct values, units and period, and are supported by the packet.",
+      "citations": [
+        "F1",
+        "F4"
+      ]
+    }
+  ],
+  "limitations": [
+    "No tools, network, files or delegation were used; the packet was reviewed as untrusted text. Listed sha256 digests for S1, S2 and S3 were not verified, and S2 (order events) and S3 were not independently read.",
+    "source_kind is lean_simulation: these are historical engine results, not broker fills, not current SEC financial facts, and not evidence of alpha. No orders are recommended and no returns are extrapolated.",
+    "Engine build identity is not established by these result files, and the packet itself states this is not a validated strategy.",
+    "The five-session sample (3 orders, 3943 data points) is too short for any performance inference; the equity difference between F2 and F3 must not be annualized or treated as expected return.",
+    "as_of 2026-09-19T19:41:01.337619+00:00 is the packet's reporting timestamp only; it cannot reconstruct what was available at any earlier date.",
+    "Critique of the Astra report \u2014 supported: status, as_of, trading_authorized=false, the two evidence entries (F1, F4 as strings with correct units), the 'simulated' qualifier on fees, and its refusal to recommend orders or extrapolate returns all match the packet.",
+    "Critique of the Astra report \u2014 over-attribution: its first finding cites only F1 while also asserting the date range. F1 is a Total Orders value from S1; the range comes from the packet's historical_period field, so the citation does not fully cover the claim as worded.",
+    "Critique of the Astra report \u2014 misapplied framing: its limitation invoking 'amendment history is not supplied' imports an SEC-snapshot concern. This packet's source_kind is lean_simulation, where amendment/restatement history is not a defined property; the statement is not false but is a non-sequitur for this source type.",
+    "Critique of the Astra report \u2014 omission: it cites only F1 and F4 and does not mention F2, F3 or F5. That is permissible under the two-fact evidence limit, but it leaves the reported equity figures unlabeled as simulated, which this report addresses explicitly.",
+    "No errors of value, unit, period or authorization were found in the Astra report; the issues above concern citation coverage and source-kind framing, not the numbers."
+  ]
+}

@@ -22,13 +22,16 @@ Alpaca paper execution explicitly pending; local Dagu research hosting now has
 [local observability profile](observability/README.md) connects native client
 telemetry to retained metrics/logs, dashboards and local notifications.
 
-The latest [research-runtime acceptance](blueprints/us-equities/research-runtime/README.md)
+The earlier [research-runtime acceptance](blueprints/us-equities/research-runtime/README.md)
 adds a fresh native LEAN → Dagu → DuckDB packet and a real standalone Claude
 Opus 5 report, with **14,583 tokens reconciled against native telemetry**.
 Its selected packet is **4,813 → 643 tokens** (86.64% less selected text, not
 net provider savings). [Restic backup/restore](blueprints/us-equities/hosting/backup/README.md)
-recovered 22/22 selected public files. The new paired Astra → Claude workflow
-awaits native Codex allowance; SEC acquisition retained its HTTP 403 failure.
+recovered 22/22 selected public files. The later [paired native acceptance](adoption/paired/README.md)
+completed fresh LEAN → Dagu → DuckDB → Astra → Claude after native sign-in, using
+the recreated SDK: **20,776 Astra tokens and 16,293 Claude tokens**. Its selected
+packet measured **4,823 → 640 tokens**; this is not net provider savings.
+SEC acquisition retains its HTTP 403 failure.
 
 The [September 19 convergence review](catalogs/us-equities/convergence-review.md)
 adds selected source reviews beyond the refreshed stars, current publisher model
@@ -42,6 +45,7 @@ explicit open gates, not a claim of universal completeness.
 
 - **47 adopted components** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup, dependency inventory and local observability.
 - **19 researched alternatives** with adoption decisions, model requirements and prospective commands.
+- A [six-candidate portability comparison](adoption/research.md), with 41 selected primary source files and a native uv adoption decision.
 - **Four extended catalog layers** covering foundations/memory/RAG, agents/hosting/operations, data, and strategy/engine research; source review remains distinct from native execution.
 - Pinned upstream recipes and inactive configuration examples. Native accounts, tool discovery, caching and compaction remain native.
 - Sanitized receipts from real local CLI, MCP, GPU and agent runs. Original account stores, raw conversations and private machine state are not distributed.
@@ -71,7 +75,7 @@ The public source fixture removes personal path literals and independently recou
 
 ## Start here
 
-1. Read the [stack and profiles](docs/stack.md), [current landscape](docs/landscape.md), [direct results](docs/direct-results.md), [activation status](docs/activation.md) and [local monitoring results](observability/README.md).
+1. Start with [new-machine adoption](adoption/README.md), the [continuation manifest](adoption/manifest.json) and [future update protocol](adoption/update.md). The SDK now has a native uv hash lock and fresh-prefix acceptance; historical results remain scoped to their original host.
 2. Follow the [native installation and workflows](recipes/README.md). Choose the profile appropriate to your project; use your own native client login and project paths.
 3. Adopt the inactive [examples](examples/) deliberately. They contain no credentials, blanket trust settings or active machine-specific configuration.
 4. Validate the portable repository:

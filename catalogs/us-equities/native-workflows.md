@@ -7,9 +7,10 @@ every catalogued framework was installed or executed.
 
 ## Use the catalog without loading all of it
 
-The native QMD CLI has a dedicated local index and two deliberately scoped
-collections on the authoring host. To adopt a different checkout, set
-`STACK_REPO` to that checkout and add these collections to your own index:
+The native QMD CLI has a dedicated local index. These two catalog/foundation
+collections are the portable setup below; the authoring host also has a third,
+explicitly scoped observation collection. To adopt a different checkout, set
+`STACK_REPO` to that checkout and add only the selected collections:
 
 ```bash
 qmd --index native-agent-stack-catalog collection add \
@@ -17,7 +18,7 @@ qmd --index native-agent-stack-catalog collection add \
 qmd --index native-agent-stack-catalog collection add \
   "$STACK_REPO/blueprints/us-equities" --name us-equities-foundation --mask '**/*.md'
 qmd --index native-agent-stack-catalog update
-qmd --index native-agent-stack-catalog search timesfm -c us-equities-catalog -n 2 --json
+qmd --index native-agent-stack-catalog search timesfm -c us-equities-catalog -n 2 --format json
 qmd --index native-agent-stack-catalog get qmd://us-equities-catalog/models.md:268:27
 ```
 
@@ -108,4 +109,4 @@ The installed Collector is `otelcol-contrib`, built from core and contrib source
 
 ## Source follow-up is separate from runtime acceptance
 
-The [source follow-up receipt](source-followup-receipt.json) records a fresh public-star identity comparison and GitHub stable-release metadata, plus focused source examination. The public set remains 337; two unadopted observability alternatives bring the grand index to 453. No model, service, backup or optional exporter ran for that review. Prospective node_exporter/OpenLIT commands in the cards do not inherit the adopted Collector receipts. See the [follow-up decisions](source-followup.md) for the existing-Collector host-metrics route, the pending restic backup/restore boundary, and abtop JSON versus model-summary modes.
+The [source follow-up receipt](source-followup-receipt.json) records a fresh public-star identity comparison and GitHub stable-release metadata, plus focused source examination. The public set remains 337; two unadopted observability alternatives bring the grand index to 453. No model, service, backup or optional exporter ran for that review. Prospective node_exporter/OpenLIT commands in the cards do not inherit the adopted Collector receipts. The [follow-up decisions](source-followup.md) retain the earlier restic boundary; later [public-file backup](../../blueprints/us-equities/hosting/backup/README.md) and [application-state restore](../../blueprints/us-equities/state-recovery/README.md) passed their scoped native drills. Independent off-host recovery remains pending.

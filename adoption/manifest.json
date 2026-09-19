@@ -1,0 +1,244 @@
+{
+  "schema_version": 1,
+  "kind": "portable_adoption_reference",
+  "updated_at": "2026-09-19",
+  "source": {
+    "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+    "baseline_commit": "8f1da51757e925d319e2a50f080b02742e7e7168",
+    "baseline_meaning": "Parent accepted publication before this adoption addition; local revision is always git rev-parse HEAD."
+  },
+  "supported_platforms": [
+    {
+      "os": "linux",
+      "architecture": "x86_64",
+      "python": "3.13"
+    }
+  ],
+  "default_profile": "foundation-cpu",
+  "acceptance_target": {
+    "sdk_python": "3.13.15",
+    "scope": "Fresh prefix on existing Linux/WSL2 host; second-machine acceptance pending",
+    "other_platforms": "unverified"
+  },
+  "sources": {
+    "components": "manifests/stack.json",
+    "evidence": "manifests/evidence.json",
+    "open_gates": "catalogs/us-equities/convergence-review.json",
+    "instructions": "AGENTS.md",
+    "boundaries": "docs/evidence.md",
+    "current_activation": "observability/desktop-restart.md",
+    "update_protocol": "adoption/update.md",
+    "adoption_receipt": "adoption/receipt.json",
+    "portability_research": "adoption/research.json",
+    "current_paired_acceptance": "adoption/paired/receipt.json"
+  },
+  "recipe_map": {
+    "affaan-m/ECC": "recipes/README.md",
+    "agent-browser": "recipes/README.md",
+    "agentsview": "recipes/README.md",
+    "ai-memory": "recipes/README.md",
+    "ast-grep": "recipes/README.md",
+    "ccusage": "recipes/README.md",
+    "claude-code": "recipes/README.md",
+    "claude-hud": "recipes/README.md",
+    "codebase-memory-mcp": "recipes/README.md",
+    "codex": "recipes/README.md",
+    "codex-for-claude": "recipes/README.md",
+    "context-hub": "recipes/README.md",
+    "context-mode": "recipes/README.md",
+    "davila7/claude-code-templates": "recipes/README.md",
+    "difftastic": "recipes/README.md",
+    "gitleaks": "recipes/README.md",
+    "headroom": "recipes/README.md",
+    "huggingface-hub-native": "recipes/README.md",
+    "markitdown": "recipes/README.md",
+    "mcp-inspector": "recipes/README.md",
+    "mcporter": "recipes/README.md",
+    "openresearch": "recipes/README.md",
+    "playwright-cli": "recipes/README.md",
+    "promptfoo": "recipes/README.md",
+    "qdrant": "recipes/README.md",
+    "qmd": "recipes/README.md",
+    "repomix": "recipes/README.md",
+    "rtk": "recipes/README.md",
+    "sandbox-runtime": "recipes/README.md",
+    "serena": "recipes/README.md",
+    "shanraisshan/claude-code-best-practice": "recipes/README.md",
+    "shellcheck": "recipes/README.md",
+    "socraticode": "recipes/README.md",
+    "toon": "recipes/README.md",
+    "vllm": "recipes/README.md",
+    "worktrunk": "recipes/README.md",
+    "opentelemetry-collector-contrib": "observability/README.md",
+    "prometheus": "observability/backends/README.md",
+    "loki": "observability/backends/README.md",
+    "grafana": "observability/backends/README.md",
+    "alertmanager": "observability/backends/README.md",
+    "ntfy": "observability/backends/README.md",
+    "duckdb": "blueprints/us-equities/data/README.md",
+    "restic": "blueprints/us-equities/hosting/backup/README.md",
+    "dagu": "blueprints/us-equities/hosting/README.md",
+    "lean": "blueprints/us-equities/engine/README.md",
+    "syft": "blueprints/us-equities/supply-chain/README.md"
+  },
+  "profiles": [
+    {
+      "id": "foundation-cpu",
+      "label": "Native clients, context and lexical memory foundation",
+      "required_commands": [
+        "git",
+        "python3",
+        "node",
+        "npm",
+        "uv",
+        "codex",
+        "claude",
+        "qmd",
+        "rtk",
+        "ai-memory",
+        "mcporter"
+      ],
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "context-mode",
+        "qmd",
+        "rtk",
+        "ai-memory",
+        "mcporter"
+      ],
+      "recipe_paths": [
+        "recipes/README.md",
+        "adoption/README.md"
+      ]
+    },
+    {
+      "id": "research-runtime",
+      "label": "Local deterministic research and native SDK workers",
+      "required_commands": [
+        "git",
+        "python3",
+        "uv",
+        "dagu",
+        "dotnet"
+      ],
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "duckdb",
+        "dagu",
+        "lean"
+      ],
+      "recipe_paths": [
+        "adoption/sdk/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/workers/README.md",
+        "blueprints/us-equities/engine/README.md"
+      ]
+    },
+    {
+      "id": "observability",
+      "label": "Local native telemetry backends",
+      "required_commands": [
+        "otelcol-contrib",
+        "prometheus",
+        "promtool",
+        "loki",
+        "grafana",
+        "alertmanager",
+        "amtool",
+        "ntfy"
+      ],
+      "component_ids": [
+        "opentelemetry-collector-contrib",
+        "prometheus",
+        "loki",
+        "grafana",
+        "alertmanager",
+        "ntfy"
+      ],
+      "recipe_paths": [
+        "observability/README.md",
+        "observability/backends/README.md"
+      ]
+    },
+    {
+      "id": "semantic-rag",
+      "label": "Optional explicit project semantic RAG",
+      "required_commands": [
+        "hf",
+        "vllm",
+        "qdrant",
+        "socraticode"
+      ],
+      "component_ids": [
+        "huggingface-hub-native",
+        "vllm",
+        "qdrant",
+        "socraticode"
+      ],
+      "recipe_paths": [
+        "recipes/README.md",
+        "blueprints/us-equities/retrieval-evaluation/README.md"
+      ]
+    },
+    {
+      "id": "recovery",
+      "label": "Selected application-state recovery",
+      "required_commands": [
+        "restic"
+      ],
+      "component_ids": [
+        "restic",
+        "ai-memory",
+        "qdrant"
+      ],
+      "recipe_paths": [
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/hosting/backup/README.md"
+      ]
+    }
+  ],
+  "toolchain": {
+    "uv": {
+      "version": "0.12.17",
+      "repository": "https://github.com/astral-sh/uv",
+      "source": "https://github.com/astral-sh/uv/releases/tag/0.12.17",
+      "purpose": "Existing native dependency tool; hash-locked SDK synchronization",
+      "acceptance_ref": "adoption/receipt.json"
+    },
+    "sdk_lock": "adoption/sdk/requirements-linux-x86_64-py313.lock",
+    "sdk_direct_requirements": "blueprints/us-equities/workers/requirements.txt",
+    "sdk_accepted_constraints": "adoption/sdk/accepted-constraints.txt"
+  },
+  "continuation": {
+    "read_first": [
+      "AGENTS.md",
+      "adoption/manifest.json",
+      "adoption/update.md"
+    ],
+    "read_on_demand": [
+      "catalogs/us-equities/convergence-review.json",
+      "docs/activation.md",
+      "docs/evidence.md"
+    ],
+    "next_action_refs": [
+      "research-specification",
+      "accepted-pit-source",
+      "retrieval-quality",
+      "memory-lifecycle",
+      "off-host-recovery"
+    ],
+    "public_state_is_reference_only": true
+  },
+  "policy": {
+    "historical_acceptance_transfers": false,
+    "authentication_transfer": "native_login_on_target_only",
+    "automatic_model_calls": false,
+    "automatic_service_enablement": false,
+    "automatic_installer_execution": false,
+    "automatic_broker_orders": false,
+    "automatic_catalog_loading": false,
+    "net_provider_savings": "unmeasured"
+  }
+}

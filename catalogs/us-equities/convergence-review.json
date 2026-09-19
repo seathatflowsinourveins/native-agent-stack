@@ -9,7 +9,11 @@
     "existing_index_identities": 453,
     "existing_layer_cards": 152,
     "existing_distinct_card_repositories": 147,
-    "source_review_finalists": {"financial_data": 8, "foundation": 9, "hosting": 10},
+    "source_review_finalists": {
+      "financial_data": 8,
+      "foundation": 9,
+      "hosting": 10
+    },
     "new_discovery_leads_are_not_automatically_adopted": true,
     "hf_curated_models_refreshed": 17,
     "hf_publisher_discovery_lists": 8,
@@ -25,15 +29,25 @@
       "catalogs/us-equities/foundation-source-review.md",
       "catalogs/us-equities/hosting-source-review.json",
       "catalogs/us-equities/model-refresh.json",
-      "catalogs/us-equities/model-followup.json"
-    ]
+      "catalogs/us-equities/model-followup.json",
+      "adoption/research.json"
+    ],
+    "portability_followup": {
+      "candidates": 6,
+      "selected_primary_files": 41,
+      "public_stars": 337,
+      "public_star_delta": 0,
+      "native_install_choice": "Existing uv with36-distribution SDK hash lock; alternative environment managers remain source-reviewed only"
+    }
   },
   "native_acceptance_refs": [
     "blueprints/us-equities/state-recovery/memory/receipt.json",
     "blueprints/us-equities/state-recovery/qdrant/receipt.json",
     "blueprints/us-equities/retrieval-evaluation/receipt.json",
     "blueprints/us-equities/convergence-review/receipt.json",
-    "blueprints/us-equities/supply-chain/receipt.json"
+    "blueprints/us-equities/supply-chain/receipt.json",
+    "adoption/receipt.json",
+    "adoption/paired/receipt.json"
   ],
   "previous_runtime_evidence": [
     "observability/restart-receipt.json",
@@ -46,14 +60,55 @@
   "universal_saturation_claimed": false,
   "all_gaps_closed": false,
   "open_gates": [
-    {"id": "native-paired-access", "state": "blocked_external", "required": "Usable native Linux Codex allowance/sign-in, then a real paired run. Last device sign-in expired; login to an unchanged exhausted account does not reset allowance."},
-    {"id": "research-specification", "state": "needs_product_decision", "required": "User-selected strategy, universe, horizon, source availability and numeric risk limits; bundled LEAN sample remains engine evidence."},
-    {"id": "accepted-pit-source", "state": "blocked_access_and_data", "required": "Approved identity and entitled point-in-time data. SEC403 retained; no unchanged retry."},
-    {"id": "retrieval-quality", "state": "measured_gap", "required": "New held-out queries and relevance judgments for scoped query-craft/hybrid comparison. Frozen12query baseline has8top3hits and2emptyresults."},
-    {"id": "memory-lifecycle", "state": "not_accepted", "required": "Native memory scope/revocation/as-of retrieval acceptance in an isolated test scope, without treating another benchmark's fake adapter as the live system."},
-    {"id": "off-host-recovery", "state": "needs_operational_destination", "required": "Independent backup/key location and consumer recovery; same-host application restores passed."},
-    {"id": "unattended-hosting", "state": "not_accepted", "required": "Selected operational schedule, interruption/resource limits, monitoring destination and retention. Current Dagu history server is manual local hosting."},
-    {"id": "broker-paper", "state": "not_connected", "required": "Entitled paper account/feed plus deterministic risk, journal, idempotency, reconciliation and recovery gates before authorized orders."},
-    {"id": "net-provider-savings", "state": "unmeasured", "required": "Comparable complete tasks and usage accounting. Tool byte estimates and selected-text reductions do not establish causal provider savings."}
+    {
+      "id": "research-specification",
+      "state": "needs_product_decision",
+      "required": "User-selected strategy, universe, horizon, source availability and numeric risk limits; bundled LEAN sample remains engine evidence."
+    },
+    {
+      "id": "accepted-pit-source",
+      "state": "blocked_access_and_data",
+      "required": "Approved identity and entitled point-in-time data. SEC403 retained; no unchanged retry."
+    },
+    {
+      "id": "retrieval-quality",
+      "state": "measured_gap",
+      "required": "New held-out queries and relevance judgments for scoped query-craft/hybrid comparison. Frozen12query baseline has8top3hits and2emptyresults."
+    },
+    {
+      "id": "memory-lifecycle",
+      "state": "not_accepted",
+      "required": "Native memory scope/revocation/as-of retrieval acceptance in an isolated test scope, without treating another benchmark's fake adapter as the live system."
+    },
+    {
+      "id": "off-host-recovery",
+      "state": "needs_operational_destination",
+      "required": "Independent backup/key location and consumer recovery; same-host application restores passed."
+    },
+    {
+      "id": "unattended-hosting",
+      "state": "not_accepted",
+      "required": "Selected operational schedule, interruption/resource limits, monitoring destination and retention. Current Dagu history server is manual local hosting."
+    },
+    {
+      "id": "broker-paper",
+      "state": "not_connected",
+      "required": "Entitled paper account/feed plus deterministic risk, journal, idempotency, reconciliation and recovery gates before authorized orders."
+    },
+    {
+      "id": "net-provider-savings",
+      "state": "unmeasured",
+      "required": "Comparable complete tasks and usage accounting. Tool byte estimates and selected-text reductions do not establish causal provider savings."
+    }
+  ],
+  "portable_continuation": "adoption/manifest.json",
+  "resolved_gates": [
+    {
+      "id": "native-paired-access",
+      "state": "accepted_scoped_native_pair",
+      "resolved_at_utc": "2026-09-19T19:41:50Z",
+      "evidence": "adoption/paired/receipt.json",
+      "scope": "Fresh LEAN→Dagu→DuckDB→Astra→Claude prepared-packet task; no model tools, broker, unattended hosting or causal token-savings acceptance"
+    }
   ]
 }

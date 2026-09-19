@@ -6,7 +6,7 @@ Configuration on disk and tools callable by a running client are separate facts.
 | --- | --- | --- |
 | Native Linux Codex and Claude | Core Context Mode, scoped ai-memory and SocratiCode workflows completed in actual agent tasks | Start the client in the configured project with its native account and local services available |
 | Active Codex Desktop task | Direct ai-memory retrieval and SocratiCode search worked; native QMD, graph and browser workflows also completed | Check the new task's actual tool catalog; do not infer direct availability from a successful CLI bridge |
-| Context Mode in this Desktop task | Installed skill plus successful upstream MCPorter bridge; no direct Context Mode tools exposed in this task | A newly started task may load registered tools; verify discovery before claiming direct activation |
+| Context Mode in the restarted Desktop task | Later restart acceptance discovered 11 direct tools and exercised direct calls; correlated parent logs arrived | A new host/task needs its own discovery and exporter check; see the dated restart receipt |
 | Automatic code RAG | The explicitly selected project's watcher persisted add/change/delete changes in Qdrant | Keep the native MCP watcher and local embedding/vector services running; adopt another project explicitly |
 | Host capacity | Native Collector exported eight metric families and 23 series for CPU, memory, load and root-filesystem usage | Keep the selected receiver and metrics pipeline active; this observes the WSL environment, not the Windows physical backing disk |
 | Document retrieval | An explicit QMD collection provided BM25 search and source retrieval | Refresh the chosen collection when documents change; this is separate from the code watcher |
@@ -43,13 +43,13 @@ OTLP histograms and file observations are alternative views of the same turn,
 not amounts to add. Two earlier SDK observations were imported summaries; the
 new third observation was automatically written by the current helper.
 
-The already-running Desktop parent was not restarted or hot-reloaded. The
-follow-up found **zero correlated exporter records for that parent** and **zero
-direct Context Mode tools** in its live catalog. Those are evidence gaps, not
-zero usage. Its Context Mode bridge works; direct memory and code-RAG retrieval
-were verified, with the code watcher active. A future Desktop process needs its
-own discovery/export check. Other hosts and client homes need explicit adoption;
-there is no global MCP hot-reload claim.
+The earlier follow-up preceded a Desktop restart and found no correlated parent
+exporter records or direct Context Mode tools. The later
+[restart acceptance](../observability/desktop-restart.md) supersedes those gaps:
+11 direct Context Mode tools were discovered, actual calls succeeded, and
+correlated parent logs arrived. This does not make every new process or host
+accepted. Follow [new-machine adoption](../adoption/README.md) for a separate
+client discovery/export check; there is no global MCP hot-reload claim.
 
 A saved Context Mode snapshot covered **9h55m of the retained bridge connection**:
 **50 calls, 208 KB entered context and zero estimated tokens saved**. It is not

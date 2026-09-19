@@ -1,5 +1,12 @@
 # Repository work
 
+For a new machine or resumed ecosystem task, read `adoption/manifest.json` and
+`adoption/update.md` first; follow only the selected profile's native recipes.
+Component pins remain in `manifests/stack.json`; current open gates remain in
+`catalogs/us-equities/convergence-review.json`. Historical receipts are reference
+evidence, never a new host's passed status. Keep host paths and native sign-ins
+private, and use the nonmutating `scripts/adoption_status.py` for prerequisites.
+
 This is a portable reference stack with evidence, native recipes and examples. Preserve the distinction between historical host execution, reproducible artifact checks and live provider/GPU acceptance. Never describe a version check or recorded receipt replay as a new model run.
 
 Use upstream executables and supported integration formats. Keep client accounts, model routes, native caching and tool discovery intact. Load detailed guides only for the current task. Run the repository validation command before committing changed evidence or manifests. Do not fetch private state or authentication stores.

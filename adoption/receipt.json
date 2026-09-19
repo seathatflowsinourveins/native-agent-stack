@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "id": "portable-sdk-adoption-20260919",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "codex",
+    "duckdb"
+  ],
+  "observed_at_utc": "2026-09-19T19:34:26Z",
+  "status": "passed_scoped_sdk_reproduction_native_readiness_restored",
+  "claim": "Native uv 0.12.17 recreated all 36 accepted SDK distributions in a fresh Linux/Python 3.13.15 prefix, then reinstalled without cache using required hashes; installed versions exactly match the prior inventory and useful local SDK/data checks pass. Initial native Codex inspection required sign-in; after native device sign-in, discovery and ordinary-allowance checks passed without inference.",
+  "scope": {
+    "platform": "linux-x86_64-glibc",
+    "environment": "new private prefix on existing WSL host",
+    "python": "3.13.15",
+    "uv": "0.12.17",
+    "second_physical_machine": false,
+    "existing_native_cli_override": "0.155.1",
+    "sdk_bundled_cli": "0.154.0",
+    "source_builds": false
+  },
+  "data": {
+    "direct_dependencies": 5,
+    "locked_distributions": 36,
+    "artifact_sha256_entries": 867,
+    "installed_name_version_match": {
+      "expected": 36,
+      "installed": 36,
+      "exact_name_version_match": true,
+      "sdk_import": true,
+      "duckdb_sql": 10,
+      "python": "3.13.15"
+    },
+    "dependency_check": "All installed packages are compatible",
+    "uncached_reinstall": {
+      "resolved": 36,
+      "prepared": 36,
+      "uninstalled": 36,
+      "installed": 36,
+      "exit_code": 0
+    },
+    "prerequisites": {
+      "default_path": {
+        "foundation_cpu": "prerequisites_present",
+        "research_runtime": "prerequisites_missing",
+        "missing_commands": [
+          "dagu",
+          "dotnet"
+        ],
+        "exit_code": 2
+      },
+      "selected_installation_dirs_added_to_process_path": {
+        "foundation_cpu": "prerequisites_present",
+        "research_runtime": "prerequisites_present",
+        "exit_code": 0
+      },
+      "runtime_acceptance_inferred": false
+    },
+    "native_account_inspection": {
+      "status": "authentication_required",
+      "method": "account/rateLimits/read",
+      "error_code": -32600,
+      "model_inference_submitted": false,
+      "provider_usage": null
+    },
+    "model_metadata": {
+      "source_command": "hf models info nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 --expand sha,pipeline_tag,lastModified --format json",
+      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+      "last_modified": "2026-08-27T23:53:03+00:00",
+      "pipeline_tag": "sentence-similarity",
+      "exit_code": 0,
+      "weights_downloaded": false
+    },
+    "repository_checks": {
+      "status": "passed_fresh_sdk_tests",
+      "tests": 115,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "command": "$SDK_ENV/bin/python -m unittest discover -s tests -q",
+      "elapsed_seconds": 4.375,
+      "exit_code": 0
+    },
+    "native_account_inspection_followup": {
+      "status": "discovery_complete",
+      "model": "gpt-6-astra",
+      "model_available": true,
+      "ordinary_usage_allowed": true,
+      "ready": true,
+      "model_inference_submitted": false,
+      "exit_code": 0,
+      "authentication_store_copied": false
+    },
+    "subsequent_model_pair_receipt": "adoption/paired/receipt.json",
+    "pre_login_observation_receipt": "adoption/pre-login-observation.json"
+  },
+  "commands": [
+    {
+      "command": "uv pip compile blueprints/us-equities/workers/requirements.txt --constraints adoption/sdk/accepted-constraints.txt --python \"$PYTHON_BIN\" --python-version 3.13.15 --python-platform x86_64-unknown-linux-gnu --generate-hashes --no-build --no-sources --default-index https://pypi.org/simple --no-header --output-file adoption/sdk/requirements-linux-x86_64-py313.lock --quiet",
+      "exit_code": 0,
+      "result": "36 fully pinned distributions,867 artifact SHA256 hashes"
+    },
+    {
+      "command": "uv venv --python \"$PYTHON_BIN\" --no-python-downloads \"$SDK_ENV\"",
+      "exit_code": 0,
+      "result": "Fresh Python3.13.15 environment"
+    },
+    {
+      "command": "uv pip sync --python \"$SDK_ENV/bin/python\" --require-hashes --no-build --strict --default-index https://pypi.org/simple --no-sources adoption/sdk/requirements-linux-x86_64-py313.lock",
+      "exit_code": 0,
+      "result": "Installed36 distributions"
+    },
+    {
+      "command": "uv pip sync --python \"$SDK_ENV/bin/python\" --require-hashes --no-build --strict --no-cache --reinstall --default-index https://pypi.org/simple --no-sources adoption/sdk/requirements-linux-x86_64-py313.lock",
+      "exit_code": 0,
+      "result": "Prepared36 packages in4.52s; uninstalled36 in38ms; installed36 in33ms"
+    },
+    {
+      "command": "uv pip check --python \"$SDK_ENV/bin/python\"",
+      "exit_code": 0,
+      "result": "Checked36 packages; all installed packages are compatible"
+    },
+    {
+      "command": "$SDK_ENV/bin/python blueprints/us-equities/workers/native_worker.py inspect --codex-bin \"$NATIVE_CODEX_BIN\" --codex-home \"$NATIVE_CODEX_HOME\" --workspace \"$RESEARCH_WORKSPACE\" --receipt \"$PRIVATE_RUN_DIR/discovery.json\"",
+      "exit_code": 1,
+      "result": "Native account authentication required; no model request"
+    }
+  ],
+  "retained_failures": [
+    {
+      "stage": "initial_lock_compilation",
+      "exit_code": 2,
+      "reason": "uv rejects using --no-build and --only-binary together",
+      "correction": "Remove redundant --only-binary; corrected compile passed"
+    },
+    {
+      "stage": "default_PATH_preflight",
+      "exit_code": 2,
+      "reason": "Dedicated Dagu and dotnet installations are not on default PATH",
+      "correction": "Only the selected process PATH was extended to existing native installation directories"
+    }
+  ],
+  "model_calls": 0,
+  "net_provider_tokens_saved": null,
+  "limitations": [
+    "This is fresh-prefix reproduction on the existing WSL host, not a second physical machine or every OS/architecture.",
+    "The lock fixes the selected Python dependency graph and hashes; native client archives, OS/interpreter, npm packages, models and services retain separate recipes and acceptance.",
+    "The initial install used local uv cache; the subsequent --no-cache --reinstall fetched all36 packages and passed required hashes with source builds disabled.",
+    "Hash matching and dependency compatibility do not establish build provenance, vulnerability freedom or model quality.",
+    "Preflight checks presence and recipe paths only; it does not execute tools, inspect configuration, authenticate, probe services or prove runtime E2E.",
+    "Initial native account inspection required authentication; native sign-in restored readiness. This SDK setup receipt has no model inference; the later paired runtime has separate evidence and complete usage categories.",
+    "Existing account/service/environment configuration was not copied or replaced. Client discovery, optional GPU serving, off-host recovery and unattended hosting require their own target-host evidence."
+  ]
+}

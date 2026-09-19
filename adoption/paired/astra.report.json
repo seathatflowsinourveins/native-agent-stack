@@ -1,0 +1,38 @@
+{
+  "status": "research_only",
+  "as_of": "2026-09-19T19:41:01.337619+00:00",
+  "trading_authorized": false,
+  "evidence": [
+    {
+      "citation_id": "F1",
+      "value": "3",
+      "unit": "orders"
+    },
+    {
+      "citation_id": "F4",
+      "value": "10.32",
+      "unit": "USD"
+    }
+  ],
+  "findings": [
+    {
+      "claim": "The LEAN simulation reports 3 orders for 2013-10-07T00:00:00Z through 2013-10-11T23:59:59Z.",
+      "citations": [
+        "F1"
+      ]
+    },
+    {
+      "claim": "Reported simulated fees for that historical period total 10.32 USD.",
+      "citations": [
+        "F4"
+      ]
+    }
+  ],
+  "limitations": [
+    "Untrusted packet reviewed without independently verifying files or hashes.",
+    "Historical engine evidence concerns simulated SPY events, not actual broker fills or current SEC financial facts.",
+    "Engine build identity is not established by these result files.",
+    "The as_of timestamp does not establish earlier historical availability; amendment history is not supplied.",
+    "This is not a validated strategy and does not demonstrate alpha. Short-sample metrics must not be extrapolated into expected returns."
+  ]
+}

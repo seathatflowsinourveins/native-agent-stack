@@ -155,7 +155,8 @@
         "component-history",
         "native-observability",
         "native-research-runtime-20260919",
-        "native-claude-convergence-review-20260919"
+        "native-claude-convergence-review-20260919",
+        "native-paired-adoption-20260919"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -227,7 +228,9 @@
         "desktop-cli-workflows",
         "native-observability",
         "native-observability-followup",
-        "desktop-restart-acceptance"
+        "desktop-restart-acceptance",
+        "portable-sdk-adoption-20260919",
+        "native-paired-adoption-20260919"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -809,7 +812,8 @@
         "native-observability-followup",
         "desktop-restart-acceptance",
         "native-research-runtime-20260919",
-        "native-claude-convergence-review-20260919"
+        "native-claude-convergence-review-20260919",
+        "native-paired-adoption-20260919"
       ],
       "source_pin": null,
       "upstream_sources": [
@@ -833,7 +837,8 @@
         "native-observability-followup",
         "desktop-restart-acceptance",
         "native-research-runtime-20260919",
-        "native-claude-convergence-review-20260919"
+        "native-claude-convergence-review-20260919",
+        "native-paired-adoption-20260919"
       ],
       "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
       "upstream_sources": [
@@ -856,7 +861,8 @@
         "native-observability-followup",
         "desktop-restart-acceptance",
         "native-research-runtime-20260919",
-        "native-claude-convergence-review-20260919"
+        "native-claude-convergence-review-20260919",
+        "native-paired-adoption-20260919"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [
@@ -940,7 +946,9 @@
       ],
       "evidence_ids": [
         "sec-financial-data-20260919",
-        "native-research-runtime-20260919"
+        "native-research-runtime-20260919",
+        "portable-sdk-adoption-20260919",
+        "native-paired-adoption-20260919"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -984,7 +992,8 @@
         "dagu history --context local --dagu-home \"$RESEARCH_HOME\" --format json"
       ],
       "evidence_ids": [
-        "native-research-runtime-20260919"
+        "native-research-runtime-20260919",
+        "native-paired-adoption-20260919"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1003,7 +1012,8 @@
         "\"$DOTNET\" \"$LEAN_LAUNCHER\" --config \"$LEAN_CONFIG\" --environment backtesting --algorithm-location \"$LEAN_ALGORITHM\" --data-folder \"$LEAN_DATA\" --results-destination-folder \"$LEAN_RESULTS\""
       ],
       "evidence_ids": [
-        "native-research-runtime-20260919"
+        "native-research-runtime-20260919",
+        "native-paired-adoption-20260919"
       ],
       "profile": "supporting",
       "upstream_sources": [

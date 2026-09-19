@@ -30,6 +30,12 @@ Original raw native streams and account data remain private. Receipts publish se
 
 - `native-observability-followup`: a fresh Astra SDK task used Context Mode, automatically published a result receipt and exported matching native histogram categories. Native WSL host metrics also arrived. Direct Desktop memory/RAG/bridge operations worked, while parent Desktop OTLP and direct Context Mode discovery remained unobserved.
 
+- The later [Desktop restart receipt](../observability/restart-receipt.json) supersedes those two pre-restart gaps: 11 direct Context Mode tools were discovered and correlated parent logs arrived. Earlier receipts remain dated evidence, not the current activation summary.
+
+- [Portable SDK adoption](../adoption/receipt.json): native uv recreated the accepted 36-package dependency set in a fresh prefix and reinstalled it without cache using required hashes. Local data/SDK checks and native account readiness have separate outcomes; this is not a second physical machine or a new model-inference result.
+
+- [Paired native adoption](../adoption/paired/receipt.json): subsequent native sign-in restored readiness, and fresh LEAN/Dagu/DuckDB/Astra/Claude execution completed. Astra used 20,776 tokens and Claude 16,293; matching native telemetry reconciled. The scoped account/pair gate is resolved, while unrelated data, hosting, broker and net-savings gates remain open.
+
 ## Reproduce useful native behavior
 
 Configure your own project and client through the [native recipes](../recipes/README.md). Use one retrieval lane for a question: exact code in rg/Serena, conceptual code in SocratiCode, Markdown in QMD, durable decisions in ai-memory, historical transcripts only in explicitly scoped archive retrieval.

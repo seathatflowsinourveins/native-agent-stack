@@ -1,0 +1,719 @@
+{
+  "schema_version": 1,
+  "checked_at_utc": "2026-09-19T19:29:33.166427+00:00",
+  "scope": "Six targeted portability/update candidates in two three-repository waves; public star delta refreshed. Research is not a completeness claim, installation acceptance, or repetition of the prior27-repository selected-source review.",
+  "execution_status": "Read-only source/release metadata research plus existing uv version/help; no installs, service/config changes, container execution or model calls.",
+  "star_refresh": {
+    "checked_at_utc": "2026-09-19T19:20:28.229014+00:00",
+    "source_command": [
+      "gh",
+      "api",
+      "--paginate",
+      "user/starred",
+      "--jq",
+      ".[] | select(.private == false) | {full_name,html_url,archived,description,pushed_at,updated_at,license:(.license.spdx_id // null)} | @json"
+    ],
+    "prior_public_stars": 337,
+    "current_public_stars": 337,
+    "added": [],
+    "removed": [],
+    "candidate_star_membership": {
+      "jdx/mise": true,
+      "astral-sh/uv": false,
+      "devcontainers/cli": false,
+      "twpayne/chezmoi": false,
+      "jetify-com/devbox": false,
+      "DeterminateSystems/nix-installer": false
+    },
+    "private_stars_excluded": true,
+    "retained_failure": "Initial gh command combined unsupported --slurp and --jq; corrected native per-item JSON projection succeeded."
+  },
+  "waves": [
+    {
+      "wave": 1,
+      "purpose": "Native tool/dependency locks versus container boundary",
+      "repositories": [
+        "jdx/mise",
+        "astral-sh/uv",
+        "devcontainers/cli"
+      ]
+    },
+    {
+      "wave": 2,
+      "purpose": "Selected configuration management versus Nix platform adoption",
+      "repositories": [
+        "twpayne/chezmoi",
+        "jetify-com/devbox",
+        "DeterminateSystems/nix-installer"
+      ]
+    }
+  ],
+  "recommendation": {
+    "required_now": [
+      "Reuse native uv0.12.17 with the complete accepted36-package hash lock in a new environment.",
+      "Keep native Codex/Claude login and per-client configuration on the destination machine; use reviewed portable recipes, not copied auth stores.",
+      "Keep CPU SDK acceptance separate from optional GPU/model/server profiles and host OS prerequisites.",
+      "Use explicit native refresh/adoption commands with retained diffs and acceptance evidence; do not silently upgrade the active environment during a session."
+    ],
+    "optional_later": [
+      "mise if multi-language tool/artifact bootstrap has concrete value beyond uv; use scoped config, locked install and committed sidecars.",
+      "chezmoi only for explicitly selected non-secret file ownership when template/drift management is needed.",
+      "One container or Nix environment profile if requirements justify its host dependencies; do not install all three."
+    ],
+    "future_session_refresh": [
+      "Check repository revision and the adopted lock fingerprint; unchanged fingerprints should avoid resolution/install/model work.",
+      "Refresh source/catalog metadata separately from runtime upgrades. A new release is a review candidate, not authority to replace a working pin.",
+      "Create a candidate environment, sync from reviewed hashes, run native metadata/import/CLI checks, then exercise only the authorized model/provider acceptance.",
+      "Retain before/after evidence and route changes; MCP/server connection availability and account allowance remain live checks on each destination."
+    ],
+    "open_boundaries": [
+      "A same-host fresh-prefix acceptance is not proof of a clean second machine, every OS/architecture or GPU driver compatibility.",
+      "SDK hash locking does not make every foundation service, runtime executable, model weight or external data dependency portable. Each adopted profile still needs explicit scoped artifacts and acceptance."
+    ]
+  },
+  "candidates": [
+    {
+      "repository": "https://github.com/jdx/mise",
+      "wave": 1,
+      "starred_in_current_public_list": true,
+      "latest_stable_checked_at": "2026-09-19",
+      "release_tag": "v2026.9.11",
+      "release_published_at": "2026-09-18T01:05:52Z",
+      "release_metadata_source": "GitHub latest stable release API",
+      "source_commit": "ef1f6b1dc814d4e830aff70e0a88450f18998e34",
+      "source_commit_date": "2026-09-17T20:27:20Z",
+      "license": "MIT",
+      "decision": "optional_native_tool_layer_not_required_for_current_uv_only_adoption",
+      "incremental_value": "Adds multi-language tool version management, platform artifact records and task entrypoints if broader native tool bootstrap becomes necessary; current SDK can be reproduced with already adopted uv.",
+      "lock_covers": [
+        "Tool resolutions and backend identity; supported backends record per-platform artifact URLs/checksums.",
+        "Version-2 embedded-aube npm sidecars and uv>=0.12.10 PyPI sidecars record transitive CLI dependency graphs and digests.",
+        "Native task tools can be included in locking without executing task commands."
+      ],
+      "lock_omits_and_limits": [
+        "Application dependencies still need their own native application locks; a tool-manager lock does not replace the SDK hash lock.",
+        "Coverage varies by backend. asdf/plugin and source-build lanes have different guarantees; version-only locks remain possible.",
+        "Commit generated sidecars with mise.lock. Locked installation can need network and authentication; it is not automatically offline.",
+        "CLI dependency graphs do not make lifecycle-script output reproducible. Locked PyPI graphs require a discoverable interpreter and supported wheels; old version-only locks must be explicitly upgraded.",
+        "No lock captures provider accounts, MCP connection readiness, host GPU drivers, service data or provider model availability.",
+        "Update preview JSON reports version changes only; an empty JSON array does not prove there were no checksum/URL changes."
+      ],
+      "native_commands": [
+        {
+          "command": "mise lock --platform linux-x64,macos-arm64,windows-x64",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "mise install --locked",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "MISE_SAFE=1 mise lock --bump --dry-run --json",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "mise lock --upgrade",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "mise exec -- <configured-command>",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "mise run <declared-task>",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        }
+      ],
+      "distribution_verification": {
+        "metadata_check": {
+          "repository": "jdx/mise",
+          "asset": "mise-v2026.9.11-linux-x64.tar.gz",
+          "publisher_checksum": "02a19e4a5eda23cda916503ad09dbc608a249fe7a7d5686c5a74ff3a7ce3b7e0",
+          "checksum_file": "SHASUMS256.txt",
+          "checksum_file_sha256": "a3bbbf6b5bcc60aa7a18a52f3363e6b1941941f8cd671bacdb803a504c4220b3",
+          "checksum_matches_github_asset_digest": true,
+          "binary_downloaded_or_verified": false,
+          "signature_verified": false
+        },
+        "publisher_signature_assets": [
+          "SHASUMS256.asc",
+          "SHASUMS256.txt.minisig",
+          "packslip.sigstore.json"
+        ],
+        "verification_status": "Checksum list metadata matched GitHub asset digest; no binary downloaded, no signature verified in this pass."
+      },
+      "review_scope": "Selected primary documentation, configuration and implementation files; not full source or dependency security audit.",
+      "selected_sources": [
+        {
+          "path": "docs/dev-tools/mise-lock.md",
+          "sha256": "b41bdf5c0e5e726de545e002dae39f2487d086bac7693f2be1e0411a7288b341",
+          "bytes": 34217,
+          "url": "https://github.com/jdx/mise/blob/ef1f6b1dc814d4e830aff70e0a88450f18998e34/docs/dev-tools/mise-lock.md"
+        },
+        {
+          "path": "docs/cli/install.md",
+          "sha256": "1e28b289a405145d42a62b43f22f2bba5c0ddd5a2540f357c51fa91add91dc91",
+          "bytes": 3764,
+          "url": "https://github.com/jdx/mise/blob/ef1f6b1dc814d4e830aff70e0a88450f18998e34/docs/cli/install.md"
+        },
+        {
+          "path": "docs/cli/lock.md",
+          "sha256": "d86194ad3092465089cb38fff18a4697a20986099fe33345fe703eb0de95a6f2",
+          "bytes": 4558,
+          "url": "https://github.com/jdx/mise/blob/ef1f6b1dc814d4e830aff70e0a88450f18998e34/docs/cli/lock.md"
+        },
+        {
+          "path": "docs/security.md",
+          "sha256": "afa06eaeba8ffe4d9fdc4bb6b22297df8c7f2d7d851770d6bc0835486f64e395",
+          "bytes": 9244,
+          "url": "https://github.com/jdx/mise/blob/ef1f6b1dc814d4e830aff70e0a88450f18998e34/docs/security.md"
+        },
+        {
+          "path": "docs/installing-mise.md",
+          "sha256": "f24b96324cf42690771cc8ad8aa836347370efc578e78c8394c6f3b4e973aa8c",
+          "bytes": 22231,
+          "url": "https://github.com/jdx/mise/blob/ef1f6b1dc814d4e830aff70e0a88450f18998e34/docs/installing-mise.md"
+        },
+        {
+          "path": "docs/dev-tools/backends/github.md",
+          "sha256": "dd0ca3a38104e8501573fbe5c2c6d100221a0b031672ad52663eb9503b7cbe0a",
+          "bytes": 22217,
+          "url": "https://github.com/jdx/mise/blob/ef1f6b1dc814d4e830aff70e0a88450f18998e34/docs/dev-tools/backends/github.md"
+        },
+        {
+          "path": "docs/dev-tools/backends/npm.md",
+          "sha256": "e80dd0b4c918176b8efb72b6692030e0a298ca6c5bb1d03d0d9c66c7366bbdda",
+          "bytes": 19445,
+          "url": "https://github.com/jdx/mise/blob/ef1f6b1dc814d4e830aff70e0a88450f18998e34/docs/dev-tools/backends/npm.md"
+        },
+        {
+          "path": "docs/dev-tools/backends/pipx.md",
+          "sha256": "26f339a5e93ca4a6f36291b54eeed32e8385fb329416ca13793c554173eea027",
+          "bytes": 132,
+          "url": "https://github.com/jdx/mise/blob/ef1f6b1dc814d4e830aff70e0a88450f18998e34/docs/dev-tools/backends/pipx.md"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "4d22d6f9222adef0a45ef895bfdd6f71d6394b1784b1001a4bebb4298b8ddc69",
+          "bytes": 1068,
+          "url": "https://github.com/jdx/mise/blob/ef1f6b1dc814d4e830aff70e0a88450f18998e34/LICENSE"
+        },
+        {
+          "path": "docs/dev-tools/backends/pypi.md",
+          "sha256": "1154367c77fa05d4c81b9136f787636260038b6a6e5f928755c676143cd67490",
+          "bytes": 12944,
+          "url": "https://github.com/jdx/mise/blob/ef1f6b1dc814d4e830aff70e0a88450f18998e34/docs/dev-tools/backends/pypi.md"
+        }
+      ],
+      "prior_review_reuse": "Prior catalog review covered README/LICENSE/exec/trust. This pass extends lockfile, installer and npm/PyPI backend semantics without repeating the prior 27-repository deep-review wave."
+    },
+    {
+      "repository": "https://github.com/astral-sh/uv",
+      "wave": 1,
+      "starred_in_current_public_list": false,
+      "latest_stable_checked_at": "2026-09-19",
+      "release_tag": "0.12.17",
+      "release_published_at": "2026-09-18T18:59:24Z",
+      "release_metadata_source": "GitHub latest stable release API",
+      "source_commit": "635500036e1705961315e86447f0fab0a8ddb309",
+      "source_commit_date": "2026-09-18T18:09:21Z",
+      "license": "MIT OR Apache-2.0",
+      "decision": "required_reuse_existing_native_python_layer",
+      "incremental_value": "Smallest required lane: retain uv0.12.17 and sync the accepted SDK package versions from a hash-bearing requirements lock into a new isolated environment; no new environment manager is necessary.",
+      "lock_covers": [
+        "A complete pinned requirements lock with generated hashes constrains the exact listed package versions and accepted distribution bytes for hash-checking pip sync.",
+        "For a true uv project, uv.lock records resolved dependency graph, distribution metadata/hashes and cross-platform/Python marker choices; pyproject.toml remains the dependency intent.",
+        "uv sync --locked checks lock freshness; uv pip sync makes the selected environment match the supplied complete requirements set."
+      ],
+      "lock_omits_and_limits": [
+        "requirements.txt compiled for one environment is not automatically a universal project lock; target Python/platform and accepted wheel coverage must be stated.",
+        "An all-pinned 36-package environment inventory is an observed resolved SDK, not a declaration that all its versions are latest.",
+        "Hashes do not authenticate publishers independently or approve license/vulnerability status. Source builds have additional inputs; --no-build can require wheel-only acceptance.",
+        "Neither uv.lock nor requirements hashes install host GPU drivers, system services, model weights or provider credentials. A Python interpreter/build pin is separate.",
+        "uv --frozen skips freshness checks; it is not interchangeable with --locked. Project sync removes extraneous packages by default, so adopt into a new prefix instead of modifying the active worker SDK."
+      ],
+      "native_commands": [
+        {
+          "command": "uv --version",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "uv pip compile requirements.in --generate-hashes --output-file requirements.lock",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "uv venv --python <selected-python> <new-environment>",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "uv pip sync --python <new-environment>/bin/python --require-hashes --no-build requirements.lock",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "uv pip check --python <new-environment>/bin/python",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "uv lock --check",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "uv sync --locked",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "uv lock --upgrade-package <selected-package>",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        }
+      ],
+      "distribution_verification": {
+        "metadata_check": {
+          "repository": "astral-sh/uv",
+          "asset": "uv-x86_64-unknown-linux-gnu.tar.gz",
+          "publisher_checksum": "fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63",
+          "checksum_file": "uv-x86_64-unknown-linux-gnu.tar.gz.sha256",
+          "checksum_file_sha256": "6c89204e7d1f4efa16a7072915c1776daf6d54d979b910395d7a3780fcb0e3ef",
+          "checksum_matches_github_asset_digest": true,
+          "binary_downloaded_or_verified": false,
+          "signature_verified": false
+        },
+        "native_cli_observation": "Installed uv --version returned 0.12.17 (x86_64-unknown-linux-gnu); pip compile/sync help confirmed generate-hashes, require-hashes, no-build and explicit python flags.",
+        "verification_status": "Version/help read-only checks only in this lane; coordinator owns fresh-environment installation and acceptance evidence."
+      },
+      "review_scope": "Selected primary documentation, configuration and implementation files; not full source or dependency security audit.",
+      "selected_sources": [
+        {
+          "path": "docs/concepts/projects/layout.md",
+          "sha256": "39a4e523e58410f02fd0a6e0cb31d59bf17dd08097f5457aded8b6b7c7ec5b08",
+          "bytes": 5649,
+          "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/docs/concepts/projects/layout.md"
+        },
+        {
+          "path": "docs/concepts/projects/sync.md",
+          "sha256": "5c6a534a81111800ff37455f8c547bbb67f304b9d0cb02543c7185266dbef218",
+          "bytes": 8386,
+          "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/docs/concepts/projects/sync.md"
+        },
+        {
+          "path": "docs/concepts/python-versions.md",
+          "sha256": "724e793680af3744c26e8602859aa3b9b03d3b334ea4e5d5a28a93837a47fa55",
+          "bytes": 18998,
+          "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/docs/concepts/python-versions.md"
+        },
+        {
+          "path": "docs/getting-started/installation.md",
+          "sha256": "38a533f67020bc4ec490217bc3ac3445c2af1b428d42acf0a98cf26c38f1d02c",
+          "bytes": 6964,
+          "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/docs/getting-started/installation.md"
+        },
+        {
+          "path": "docs/reference/policies/license.md",
+          "sha256": "f2036b67208439a49e516cecba970ac4b2c261addffaeaebc222d341308d9b56",
+          "bytes": 575,
+          "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/docs/reference/policies/license.md"
+        },
+        {
+          "path": "docs/pip/compile.md",
+          "sha256": "bea0c8dcc00d12f1895b2ee3e217c321c494d84aa71df97adb1d25880fec3d60",
+          "bytes": 7478,
+          "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/docs/pip/compile.md"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/devcontainers/cli",
+      "wave": 1,
+      "starred_in_current_public_list": false,
+      "latest_stable_checked_at": "2026-09-19",
+      "release_tag": "v0.89.0",
+      "release_published_at": "2026-08-31T07:50:41.687Z",
+      "release_metadata_source": "npm latest dist-tag and version publication timestamp; matching Git tag exists",
+      "source_commit": "5dc7533314b5ba7ec3875c30143dfe1aec644870",
+      "source_commit_date": "2026-08-28T16:10:00Z",
+      "license": "MIT",
+      "decision": "defer_container_profile_until_container_hosting_is_selected",
+      "incremental_value": "Useful optional developer/CI container profile, but adds Docker-compatible runtime and container-specific account, socket and GPU integration to the current native approach.",
+      "lock_covers": [
+        "devcontainer-lock.json pins configured Features and resolved dependencies by version, resolved OCI reference or tarball URL and integrity digest.",
+        "Pinned0.89.0 supports stable --frozen-lockfile, while old experimental flags remain hidden aliases.",
+        "npm distribution declares SHA-512 integrity and available provenance metadata; a separate package-lock pins npm installation."
+      ],
+      "lock_omits_and_limits": [
+        "Feature lock does not pin the base image, Dockerfile apt/curl steps, application dependencies or scripts executed by Features. Pin base-image digest and each application lock separately.",
+        "Features provided only through --additional-features are omitted from generated lock unless also configured.",
+        "Container daemon access, mounted host paths, credentials and GPU driver/runtime compatibility remain external operational boundaries.",
+        "No container was built or executed; no npm artifact signature/provenance verification was performed."
+      ],
+      "native_commands": [
+        {
+          "command": "npm view @devcontainers/cli@0.89.0 version dist.integrity license engines --json",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "devcontainer up --workspace-folder . --frozen-lockfile",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "devcontainer exec --workspace-folder . <command>",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "devcontainer outdated --workspace-folder .",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "devcontainer upgrade --workspace-folder .",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        }
+      ],
+      "distribution_verification": {
+        "npm_package": "@devcontainers/cli",
+        "npm_version": "0.89.0",
+        "registry_integrity": "sha512-LzaoOGKQ/Zql6PsiZ4hVIYVZagzWkD65aG/1ou5/Kly5Y1PtjLg1yn7qu+LZCzVoAl6DZZ/pbz8qOO4RLNlqMg==",
+        "registry_tarball": "https://registry.npmjs.org/@devcontainers/cli/-/cli-0.89.0.tgz",
+        "provenance_metadata_present": true,
+        "minimum_node": ">=20.0.0",
+        "binary_downloaded_or_verified": false,
+        "signature_verified": false
+      },
+      "review_scope": "Selected primary documentation, configuration and implementation files; not full source or dependency security audit.",
+      "selected_sources": [
+        {
+          "path": "README.md",
+          "sha256": "8f9e4c9179d11fb18217f174593a7d4ce55b3218c0622e4b6778b9011cbf5a27",
+          "bytes": 8523,
+          "url": "https://github.com/devcontainers/cli/blob/5dc7533314b5ba7ec3875c30143dfe1aec644870/README.md"
+        },
+        {
+          "path": "package.json",
+          "sha256": "8fc1e9e669a824ff92527fd79fd5a9fdbd9f7e0273908244d6294e2c1159083a",
+          "bytes": 3621,
+          "url": "https://github.com/devcontainers/cli/blob/5dc7533314b5ba7ec3875c30143dfe1aec644870/package.json"
+        },
+        {
+          "path": "src/spec-configuration/lockfile.ts",
+          "sha256": "1067f5f22c01dc789f098ac03eeb4ae97004ecafc90e242d4d89c61f9f63d650",
+          "bytes": 4621,
+          "url": "https://github.com/devcontainers/cli/blob/5dc7533314b5ba7ec3875c30143dfe1aec644870/src/spec-configuration/lockfile.ts"
+        },
+        {
+          "path": "src/spec-node/devContainersSpecCLI.ts",
+          "sha256": "a330fd26f1631c51ed9beb56aeb9037bf6e05a06ca0d96f5021b1a0b20862bf3",
+          "bytes": 85934,
+          "url": "https://github.com/devcontainers/cli/blob/5dc7533314b5ba7ec3875c30143dfe1aec644870/src/spec-node/devContainersSpecCLI.ts"
+        },
+        {
+          "path": "LICENSE.txt",
+          "sha256": "9dc5a42b169ffdf78a925772761436e8bf234deb779e0dc16a03decac0797497",
+          "bytes": 1075,
+          "url": "https://github.com/devcontainers/cli/blob/5dc7533314b5ba7ec3875c30143dfe1aec644870/LICENSE.txt"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/twpayne/chezmoi",
+      "wave": 2,
+      "starred_in_current_public_list": false,
+      "latest_stable_checked_at": "2026-09-19",
+      "release_tag": "v2.72.2",
+      "release_published_at": "2026-09-13T18:28:51Z",
+      "release_metadata_source": "GitHub latest stable release API",
+      "source_commit": "125d00fe730fc9abf456ec312ba85b18c859bc50",
+      "source_commit_date": "2026-09-12T20:17:54Z",
+      "license": "MIT",
+      "decision": "defer_optional_selected_dotfile_management",
+      "incremental_value": "Can manage explicitly selected non-secret cross-machine config with templates and drift review. It is unnecessary for the current SDK-only adoption and should not become a blanket home-directory or authentication-store capture.",
+      "lock_covers": [
+        "Version-controlled source state and host-aware templates express desired selected file content.",
+        "External file/archive sources can carry expected SHA-256/384/512 and size; verify compares target files to their computed target state."
+      ],
+      "lock_omits_and_limits": [
+        "No universal dependency/environment lock. Template values, scripts and unpinned external URLs can vary by host/time.",
+        "chezmoi update applies after pulling by default; --apply=false allows reviewing diff before apply. External refreshPeriod defaults0 and refresh must be explicit when desired.",
+        "Avoid exact-directory adoption over native client configuration without explicit ownership; exact state can remove unmanaged entries.",
+        "Provider account stores, personal secrets, generated service keys and historical memory databases are excluded from a portable public source state."
+      ],
+      "native_commands": [
+        {
+          "command": "chezmoi init <reviewed-source-repository>",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "chezmoi diff",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "chezmoi apply <selected-target>",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "chezmoi verify <selected-target>",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "chezmoi update --apply=false",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        }
+      ],
+      "distribution_verification": {
+        "metadata_check": {
+          "repository": "twpayne/chezmoi",
+          "asset": "chezmoi_2.72.2_linux_amd64.tar.gz",
+          "publisher_checksum": "a2be1b8bcdf06c6f173e070bb3ddbcc52c50478fe9b57f6e6c63d15c7cff4f03",
+          "checksum_file": "chezmoi_2.72.2_checksums.txt",
+          "checksum_file_sha256": "56524925f32990a45b03b6e221e0f1172afc7d91cb5d692204ea19bf0b11e864",
+          "checksum_matches_github_asset_digest": true,
+          "binary_downloaded_or_verified": false,
+          "signature_verified": false
+        },
+        "publisher_signature_assets": [
+          "chezmoi_2.72.2_checksums.txt.sigstore.json",
+          "chezmoi_cosign.pub"
+        ],
+        "verification_status": "Checksum metadata matched release-asset digest; signature metadata was observed, not verified."
+      },
+      "review_scope": "Selected primary documentation, configuration and implementation files; not full source or dependency security audit.",
+      "selected_sources": [
+        {
+          "path": "assets/chezmoi.io/docs/quick-start.md",
+          "sha256": "eb3d4dc5588216502a76d5aa1f099a3053a4e93a45906e26b14a0a9a6d3e68dc",
+          "bytes": 5995,
+          "url": "https://github.com/twpayne/chezmoi/blob/125d00fe730fc9abf456ec312ba85b18c859bc50/assets/chezmoi.io/docs/quick-start.md"
+        },
+        {
+          "path": "assets/chezmoi.io/docs/reference/commands/init.md",
+          "sha256": "857f2e1471293281b90029200b8198519abed0906a9862cdffca3674f49c45df",
+          "bytes": 5767,
+          "url": "https://github.com/twpayne/chezmoi/blob/125d00fe730fc9abf456ec312ba85b18c859bc50/assets/chezmoi.io/docs/reference/commands/init.md"
+        },
+        {
+          "path": "assets/chezmoi.io/docs/reference/commands/update.md",
+          "sha256": "1a41fc34d35cbc80be0cf96f66772a7c2e86994bf57764a824ed1a3b11c7b897",
+          "bytes": 990,
+          "url": "https://github.com/twpayne/chezmoi/blob/125d00fe730fc9abf456ec312ba85b18c859bc50/assets/chezmoi.io/docs/reference/commands/update.md"
+        },
+        {
+          "path": "assets/chezmoi.io/docs/reference/commands/verify.md",
+          "sha256": "c3841de5487a32d6546f51166ef27ade21bfd30e42067204649d751c2b601480",
+          "bytes": 634,
+          "url": "https://github.com/twpayne/chezmoi/blob/125d00fe730fc9abf456ec312ba85b18c859bc50/assets/chezmoi.io/docs/reference/commands/verify.md"
+        },
+        {
+          "path": "assets/chezmoi.io/docs/reference/special-directories/chezmoiexternals.md",
+          "sha256": "c9469a4d0ba91d9f20593b332022e2933f748cc74bb8cac07625586d8b03a3f8",
+          "bytes": 529,
+          "url": "https://github.com/twpayne/chezmoi/blob/125d00fe730fc9abf456ec312ba85b18c859bc50/assets/chezmoi.io/docs/reference/special-directories/chezmoiexternals.md"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "6ce2375d89522ac7a1417320c8406886bc0ecb984baf41e3c27b8a07a81a30b2",
+          "bytes": 1076,
+          "url": "https://github.com/twpayne/chezmoi/blob/125d00fe730fc9abf456ec312ba85b18c859bc50/LICENSE"
+        },
+        {
+          "path": "assets/chezmoi.io/docs/reference/special-files/chezmoiexternal-format.md",
+          "sha256": "093f601c7255d840f097435807fd75ca73c333f202e233218416007055c735b6",
+          "bytes": 14893,
+          "url": "https://github.com/twpayne/chezmoi/blob/125d00fe730fc9abf456ec312ba85b18c859bc50/assets/chezmoi.io/docs/reference/special-files/chezmoiexternal-format.md"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/jetify-com/devbox",
+      "wave": 2,
+      "starred_in_current_public_list": false,
+      "latest_stable_checked_at": "2026-09-19",
+      "release_tag": "0.18.3",
+      "release_published_at": "2026-09-16T17:19:23Z",
+      "release_metadata_source": "GitHub latest stable release API",
+      "source_commit": "6bf4b571c5ecd64d00212ab92fd62f5b7080d3b9",
+      "source_commit_date": "2026-09-16T16:51:18Z",
+      "license": "Apache-2.0",
+      "decision": "defer_nix_environment_platform",
+      "incremental_value": "Adds Nix package/system closure selection through a project shell, but changes the underlying host environment model and overlaps the accepted native uv SDK.",
+      "lock_covers": [
+        "devbox.lock records resolved package source, version, optional plugin version and system-specific Nix store/output paths.",
+        "devbox.json expresses packages, environment, scripts and optional platform selection; lock entries preserve resolution where present."
+      ],
+      "lock_omits_and_limits": [
+        "Application pip/npm dependencies remain separate unless built entirely as Nix derivations. Host drivers, live service data and accounts remain outside the lock.",
+        "Native devbox install calls ensureNixInstalled and can fill missing lock metadata; no immutable-install flag was confirmed in this pin.",
+        "Package plugins and shell hooks may perform setup or start services; they require their own reviewed scope.",
+        "No Nix or Devbox runtime was installed or accepted in this lane."
+      ],
+      "native_commands": [
+        {
+          "command": "devbox install",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "devbox run <declared-script>",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "devbox update --no-install <selected-package>",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        }
+      ],
+      "distribution_verification": {
+        "metadata_check": {
+          "repository": "jetify-com/devbox",
+          "asset": "devbox_0.18.3_linux_amd64.tar.gz",
+          "publisher_checksum": "b2c4f844d8b6917ac8f65bcd145e48d04705a54afc2d80e353ef97929bcdc466",
+          "checksum_file": "checksums.txt",
+          "checksum_file_sha256": "434a544f2e63b60fdc32c9e65171f6287abc67d55397e31d2e6e4972f6728bfd",
+          "checksum_matches_github_asset_digest": true,
+          "binary_downloaded_or_verified": false,
+          "signature_verified": false
+        },
+        "verification_status": "Official checksum-list metadata matched GitHub asset digest; no executable download or signature verification."
+      },
+      "review_scope": "Selected primary documentation, configuration and implementation files; not full source or dependency security audit.",
+      "selected_sources": [
+        {
+          "path": "README.md",
+          "sha256": "7ea3452e30b63bc16e298f3afd16277a9c1b9515715543a4db052ae03ba32c1d",
+          "bytes": 6446,
+          "url": "https://github.com/jetify-com/devbox/blob/6bf4b571c5ecd64d00212ab92fd62f5b7080d3b9/README.md"
+        },
+        {
+          "path": "internal/lock/lockfile.go",
+          "sha256": "4423d3dfaadd9d5dcd3ea7fb04db2656c2a8ff200299e7b9d7997adf5d6b230b",
+          "bytes": 7849,
+          "url": "https://github.com/jetify-com/devbox/blob/6bf4b571c5ecd64d00212ab92fd62f5b7080d3b9/internal/lock/lockfile.go"
+        },
+        {
+          "path": "internal/lock/package.go",
+          "sha256": "820c242e4ff6cc33f9e31a73468dfac3801234292d3e3d863bc0acf7a1e0eb66",
+          "bytes": 3526,
+          "url": "https://github.com/jetify-com/devbox/blob/6bf4b571c5ecd64d00212ab92fd62f5b7080d3b9/internal/lock/package.go"
+        },
+        {
+          "path": "devbox.lock",
+          "sha256": "214363d2e190b810d867808302c398ed33f415cac6bca83c1cf6de00bbfd2e40",
+          "bytes": 7612,
+          "url": "https://github.com/jetify-com/devbox/blob/6bf4b571c5ecd64d00212ab92fd62f5b7080d3b9/devbox.lock"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "43070e2d4e532684de521b885f385d0841030efa2b1a20bafb76133a5e1379c1",
+          "bytes": 11356,
+          "url": "https://github.com/jetify-com/devbox/blob/6bf4b571c5ecd64d00212ab92fd62f5b7080d3b9/LICENSE"
+        },
+        {
+          "path": "internal/boxcli/install.go",
+          "sha256": "6c46d74016cb771aabcaea38a7470975513a23ca3c7b2262c3ca3af30c3ab2ea",
+          "bytes": 1720,
+          "url": "https://github.com/jetify-com/devbox/blob/6bf4b571c5ecd64d00212ab92fd62f5b7080d3b9/internal/boxcli/install.go"
+        },
+        {
+          "path": "internal/boxcli/update.go",
+          "sha256": "95fc4940c1cbd8297ce5017650eaa6a3e7375c7cda688e2cc7dc9375721102d2",
+          "bytes": 2734,
+          "url": "https://github.com/jetify-com/devbox/blob/6bf4b571c5ecd64d00212ab92fd62f5b7080d3b9/internal/boxcli/update.go"
+        },
+        {
+          "path": "internal/boxcli/run.go",
+          "sha256": "4a777e60e98ca6a94703edec5e7182041ffda4f0d9d7fd25398a07bd2a039c6f",
+          "bytes": 9001,
+          "url": "https://github.com/jetify-com/devbox/blob/6bf4b571c5ecd64d00212ab92fd62f5b7080d3b9/internal/boxcli/run.go"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/DeterminateSystems/nix-installer",
+      "wave": 2,
+      "starred_in_current_public_list": false,
+      "latest_stable_checked_at": "2026-09-19",
+      "release_tag": "v3.22.5",
+      "release_published_at": "2026-09-17T22:16:09Z",
+      "release_metadata_source": "GitHub latest stable release API",
+      "source_commit": "76f61b5202e21eab17728915775da4ae5153a993",
+      "source_commit_date": "2026-09-17T22:15:56Z",
+      "license": "LGPL-2.1 (upstream Cargo declaration)",
+      "decision": "defer_privileged_platform_installation",
+      "incremental_value": "A system installer for a Nix-based lane, not an independent SDK lock manager. Current native/WSL setup does not need this additional platform.",
+      "lock_covers": [
+        "Installer records an install plan/receipt describing host installation actions; the Nix project layer separately uses flake.lock to pin input revisions/content hashes."
+      ],
+      "lock_omits_and_limits": [
+        "Installer receipt is not a package dependency lock. Flake input locking does not automatically pin arbitrary imperative shell hooks or pip/npm environments created outside derivations.",
+        "Default installation selects Determinate Nix; upstream Nix is separately selectable but documented as unsupported by this installer project.",
+        "Both install and the inspected plan command enforce root on Linux; systemd/daemon and store changes are a distinct platform adoption.",
+        "Host kernel/GPU drivers, provider accounts, secrets and live state remain separate. No system installation or planning command was run."
+      ],
+      "native_commands": [
+        {
+          "command": "nix-installer install --help",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "sudo nix-installer plan --out-file <private-plan.json> linux",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "nix flake lock",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        },
+        {
+          "command": "nix develop --no-update-lock-file --command <command>",
+          "status": "source-confirmed recipe; not executed by this research pass"
+        }
+      ],
+      "distribution_verification": {
+        "release_asset_name": "nix-installer-x86_64-linux",
+        "release_asset_digest": "sha256:9432d40ec1d0d4ebb6284848cc389bdb1bbf7aeb5c1cea11e7efc9daf0a1ec82",
+        "publisher_checksum_list_observed": false,
+        "verification_status": "GitHub asset digest recorded; no distinct publisher checksum-list asset observed, no binary downloaded, no signature verified."
+      },
+      "review_scope": "Selected primary documentation, configuration and implementation files; not full source or dependency security audit.",
+      "selected_sources": [
+        {
+          "path": "README.md",
+          "sha256": "37c829ae8ac3294329ec44c52e5d9289dd4f1297ca091aa8e9f5f600fde97571",
+          "bytes": 26813,
+          "url": "https://github.com/DeterminateSystems/nix-installer/blob/76f61b5202e21eab17728915775da4ae5153a993/README.md"
+        },
+        {
+          "path": "Cargo.toml",
+          "sha256": "ab12395ce3e49361e56b57395930e071db2516ed38419d4b4cb6f7879abcf7c0",
+          "bytes": 4296,
+          "url": "https://github.com/DeterminateSystems/nix-installer/blob/76f61b5202e21eab17728915775da4ae5153a993/Cargo.toml"
+        },
+        {
+          "path": "src/planner/linux.rs",
+          "sha256": "972cf0fe3834bd78d0b8e725b060d8cc352b75d3d2a3093de5973a88520f749f",
+          "bytes": 9590,
+          "url": "https://github.com/DeterminateSystems/nix-installer/blob/76f61b5202e21eab17728915775da4ae5153a993/src/planner/linux.rs"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "1a1937432384035e6ead86651ef80660adb2b5b8bb6b85cf24865be3753cf768",
+          "bytes": 26443,
+          "url": "https://github.com/DeterminateSystems/nix-installer/blob/76f61b5202e21eab17728915775da4ae5153a993/LICENSE"
+        },
+        {
+          "path": "src/cli/subcommand/plan.rs",
+          "sha256": "14e19594e38a093a3aa6a593790e3c173c626cb8d290ef3c30d4563bf7195946",
+          "bytes": 1900,
+          "url": "https://github.com/DeterminateSystems/nix-installer/blob/76f61b5202e21eab17728915775da4ae5153a993/src/cli/subcommand/plan.rs"
+        }
+      ],
+      "additional_primary_sources": [
+        "https://nix.dev/manual/nix/2.34/command-ref/new-cli/nix3-flake-lock"
+      ]
+    }
+  ],
+  "source_capture": {
+    "selected_primary_files": 41,
+    "all_fetches_succeeded": true,
+    "source_manifest_sha256": "0a404466c90884119abd838d78e2cd6ad59fb6768349166a20c44ca05368ce46"
+  },
+  "retained_research_failures": [
+    "gh --slurp and --jq cannot be combined; corrected native paginated per-item JSON projection returned337 public stars.",
+    "devcontainers GitHub latest-release endpoint returned404; npm latest metadata and matching v0.89.0 tag established its release identity.",
+    "Initial checksum reader matched chezmoi archive and similarly named SBOM; exact filename matching confirmed all four publisher-checksum records without redownload."
+  ],
+  "model_calls": 0,
+  "net_provider_tokens_saved": null
+}

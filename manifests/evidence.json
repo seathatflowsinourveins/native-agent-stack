@@ -450,6 +450,51 @@
         "This is a point-in-time inventory, not dependency upgrade, recurring scan, model inference, agent quality evaluation or measured provider token savings.",
         "One initial summary reader assumed every CycloneDX component had a version and raised KeyError. The native scan was unaffected; corrected enumeration separates package and file components."
       ]
+    },
+    {
+      "path": "adoption/receipt.json",
+      "id": "portable-sdk-adoption-20260919",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "duckdb"
+      ],
+      "claim": "Native uv 0.12.17 recreated all 36 accepted SDK distributions in a fresh Linux/Python 3.13.15 prefix, then reinstalled without cache using required hashes; installed versions exactly match the prior inventory and useful local SDK/data checks pass. Initial native Codex inspection required sign-in; after native device sign-in, discovery and ordinary-allowance checks passed without inference.",
+      "limitations": [
+        "This is fresh-prefix reproduction on the existing WSL host, not a second physical machine or every OS/architecture.",
+        "The lock fixes the selected Python dependency graph and hashes; native client archives, OS/interpreter, npm packages, models and services retain separate recipes and acceptance.",
+        "The initial install used local uv cache; the subsequent --no-cache --reinstall fetched all36 packages and passed required hashes with source builds disabled.",
+        "Hash matching and dependency compatibility do not establish build provenance, vulnerability freedom or model quality.",
+        "Preflight checks presence and recipe paths only; it does not execute tools, inspect configuration, authenticate, probe services or prove runtime E2E.",
+        "Initial native account inspection required authentication; native sign-in restored readiness. This SDK setup receipt has no model inference; the later paired runtime has separate evidence and complete usage categories.",
+        "Existing account/service/environment configuration was not copied or replaced. Client discovery, optional GPU serving, off-host recovery and unattended hosting require their own target-host evidence."
+      ]
+    },
+    {
+      "path": "adoption/paired/receipt.json",
+      "id": "native-paired-adoption-20260919",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "duckdb",
+        "dagu",
+        "lean",
+        "opentelemetry-collector-contrib",
+        "prometheus",
+        "loki"
+      ],
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "limitations": [
+        "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
+        "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
+        "Selected-text reduction is lossy task-specific filtering, not equal-information compression or causal provider savings. Complete coordinator/research-worker usage is outside these native worker counters.",
+        "Native configured-model checks and provider-returned terminal usage are not independent per-request model attestation.",
+        "The complete native streams and original LEAN output remain private; public structured reports and selected hashes do not constitute independent provider attestation.",
+        "Initial authentication failure is preserved separately; native sign-in restored readiness without copying authentication stores or changing account routes.",
+        "Structural numeric/citation/scope checks passed, but Claude identified wording/citation weaknesses in Astra's narrative. Model output is not treated as authoritative strategy or financial advice.",
+        "New hosts must recreate selected runtime prerequisites and native sign-in; historical receipts do not transfer live acceptance."
+      ]
     }
   ],
   "files": [
@@ -470,13 +515,13 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "adda1e0be06874c84ea5dd628c1af4fb92023d862890df1a901dfec3d50c90fc",
-      "bytes": 1984
+      "sha256": "eeaaa3129aba892438af99114f1dc9e81e76f9a789da00801afa69689580333a",
+      "bytes": 2464
     },
     {
       "path": "CLAUDE.md",
-      "sha256": "89874e9b917cecae9b82b4d2edba350470ffc2d49d661435fc56598c35ffb925",
-      "bytes": 254
+      "sha256": "2f73953c200abc59ee69188f5406369db75ffb489723008220a92c6b3cdb2477",
+      "bytes": 391
     },
     {
       "path": "LICENSE",
@@ -485,8 +530,93 @@
     },
     {
       "path": "README.md",
-      "sha256": "538f548e20c5d09027c5ba0af1f729fa7d8b34ca44e018863d2bdaacda486d59",
-      "bytes": 9446
+      "sha256": "517560da4638ff78784a1b88f7f279b083305968ca1e58c8edae2f4f876245a0",
+      "bytes": 9881
+    },
+    {
+      "path": "adoption/README.md",
+      "sha256": "61e0c3d4499da5202ca8ed0cb81196126eabfa4b97da2b15d2cc38057d323a60",
+      "bytes": 8799
+    },
+    {
+      "path": "adoption/host-state.example.json",
+      "sha256": "b0a6d9088e1268e05d9145a43cbd419035d2b0b6c2fa211fb0c099a23931bcd1",
+      "bytes": 1066
+    },
+    {
+      "path": "adoption/manifest.json",
+      "sha256": "78ac187a9044abc6f1d80c02f63fb10f8b89ebb7dd45424eb9968a9d23a1b802",
+      "bytes": 7360
+    },
+    {
+      "path": "adoption/paired/README.md",
+      "sha256": "b187875b97595cd975ddb161464c995cda6690399f0bd0b488b0019394016cf3",
+      "bytes": 5825
+    },
+    {
+      "path": "adoption/paired/astra.report.json",
+      "sha256": "b396469ae54867014a174852e93ab042ecde68a179a2cd6444c22b2688c6573c",
+      "bytes": 1175
+    },
+    {
+      "path": "adoption/paired/claude.report.json",
+      "sha256": "1b65a75fbd41f65bc1c93640436908193f70fec4e75c9405508c9a6f030be179",
+      "bytes": 3311
+    },
+    {
+      "path": "adoption/paired/observation.json",
+      "sha256": "1a24e0d90853d3873665aca278efb668e2ceebe33195eddb7cfa53fd69bab5fe",
+      "bytes": 9317
+    },
+    {
+      "path": "adoption/paired/packet.json",
+      "sha256": "c9c0a26829aa4336e8339dc6da84ead9e29a0e83951c5ef2fe49adb3e2bd8490",
+      "bytes": 1976
+    },
+    {
+      "path": "adoption/paired/receipt.json",
+      "sha256": "9b00455d09dba24ed47cd5be8cc09b573573f122c9ca10e931f68146e7e57730",
+      "bytes": 9338
+    },
+    {
+      "path": "adoption/pre-login-observation.json",
+      "sha256": "db86ad9ea65cc14e14d2e604b63816ce2d70b2747293d05d1be3375da5b2c239",
+      "bytes": 4338
+    },
+    {
+      "path": "adoption/receipt.json",
+      "sha256": "b4dbf9666ef03e19e4715ad37e5afcf42eadca34fd9498635e48128001b0c4bc",
+      "bytes": 7081
+    },
+    {
+      "path": "adoption/research.json",
+      "sha256": "a69cd7a89af9676b20eacbf28ff6f0eb9434d7c1e2fb6ff2d7281ff392007738",
+      "bytes": 39664
+    },
+    {
+      "path": "adoption/research.md",
+      "sha256": "10e83b515760e86ffd1a9b6540aaeea769f94af5d569c001954f0031548ca75b",
+      "bytes": 2735
+    },
+    {
+      "path": "adoption/sdk/README.md",
+      "sha256": "4a6097360b762dae4ab586d74781d0c008282b4b6cd17320da19debafad428fe",
+      "bytes": 3574
+    },
+    {
+      "path": "adoption/sdk/accepted-constraints.txt",
+      "sha256": "5b9c986f61fb63d1d550b4de20f808d7ad7c7b74786f8602865eb299727f257b",
+      "bytes": 810
+    },
+    {
+      "path": "adoption/sdk/requirements-linux-x86_64-py313.lock",
+      "sha256": "f5bb7b8cf4406c5d408cce4083995cd29d4a34066f9d2aedb585837cc8536c5f",
+      "bytes": 77578
+    },
+    {
+      "path": "adoption/update.md",
+      "sha256": "6e7ff644dac9c081eb532ff02b73a9323fa118df2b33e2757e56e73d61fb1881",
+      "bytes": 6560
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -815,8 +945,8 @@
     },
     {
       "path": "blueprints/us-equities/research-runtime/README.md",
-      "sha256": "a02f5473626275dc98089c3a3e31d07b52b274e0a8efc150fe357fc9e712b653",
-      "bytes": 9246
+      "sha256": "26941ae2c64ec137c3a9dc97e8d766d93cf6bdcb103ee290f871fd0a181f2757",
+      "bytes": 9587
     },
     {
       "path": "blueprints/us-equities/research-runtime/accepted-packet.json",
@@ -995,8 +1125,8 @@
     },
     {
       "path": "blueprints/us-equities/workers/README.md",
-      "sha256": "c2933f498347266c1e8e266ed41002a48b7adf4761452f8dca2c76befc64cca9",
-      "bytes": 11076
+      "sha256": "081b85f97ab174d86201b42675ea18f429642e4f77f038e0e9af661a226e4b8a",
+      "bytes": 11279
     },
     {
       "path": "blueprints/us-equities/workers/native_worker.py",
@@ -1040,13 +1170,13 @@
     },
     {
       "path": "catalogs/us-equities/convergence-review.json",
-      "sha256": "375cb30c27c0f319a008655992e780eadae26e8b2424d43cab6b81a42e97b79b",
-      "bytes": 4300
+      "sha256": "6d56781aaac17911e968aca2d360a20a89a22ed77ed45913bb6fc872ef7f656a",
+      "bytes": 5097
     },
     {
       "path": "catalogs/us-equities/convergence-review.md",
-      "sha256": "957fb72ae55d487caf530881b5844f9b47225a625dbd7b9f00999680310f3e82",
-      "bytes": 7948
+      "sha256": "a94beb8cd1416b7cfd2bea0259b43803138464acb0377c7c7b674a12e6b99b3f",
+      "bytes": 8522
     },
     {
       "path": "catalogs/us-equities/coverage.json",
@@ -1130,13 +1260,13 @@
     },
     {
       "path": "catalogs/us-equities/native-workflows.md",
-      "sha256": "69d5da124f8e9b36a54081f40fa535024c4e13b4ff0b6b2687df8d0b558d7076",
-      "bytes": 8306
+      "sha256": "cf1902bd20418fd65d12c54c04464415ba8186f864b8d15fda7d419b60730c93",
+      "bytes": 8544
     },
     {
       "path": "catalogs/us-equities/repository-index.md",
-      "sha256": "0a88d47c21bc2f66772fce909e48a17462334165b03640d7dee2cb9be1e7aeba",
-      "bytes": 83765
+      "sha256": "33407b72602d33e350515880f23843abf56c96b393ba6075098b8d1a1c053b5e",
+      "bytes": 84180
     },
     {
       "path": "catalogs/us-equities/research-receipt.json",
@@ -1175,8 +1305,8 @@
     },
     {
       "path": "docs/activation.md",
-      "sha256": "efbac736b74d7918a63f62503b69c0a71eb6a9dd058442d6b5b8bd9053459210",
-      "bytes": 5172
+      "sha256": "4f60e56f8b949800ff56523cf329118c672d58a2c9aef3f2bca5b0850b119851",
+      "bytes": 5180
     },
     {
       "path": "docs/convergence-audit.md",
@@ -1190,8 +1320,8 @@
     },
     {
       "path": "docs/evidence.md",
-      "sha256": "5d5b443db0a33dbca4701cc70a9ce096acca8e9c01f32dcf4fa65d6d19a1b31e",
-      "bytes": 7372
+      "sha256": "285885e0ae9ccfb9c8fe3cc1381a277bca4ca5d8984cef989252e37d8a0802e4",
+      "bytes": 8345
     },
     {
       "path": "docs/landscape.md",
@@ -1430,8 +1560,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "3211722ce90292f2d21dbffa6c5a79c53150a4c704d9cee6b3077168fc033954",
-      "bytes": 41801
+      "sha256": "892c51e31fe79ab9891d71ab3340b8a64915e792358d4cfdb4f91a00e2ed2bfc",
+      "bytes": 42229
     },
     {
       "path": "observability/README.md",
@@ -1565,8 +1695,13 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "8f70be5c2873bb68b10b07b8f34deeff028b86cd1911901ae08add3b76b9f98d",
-      "bytes": 43911
+      "sha256": "21f393cc918c23d733c360762d6c8fe99d9f075d2c3e0eef3a58920e0baa3d74",
+      "bytes": 44049
+    },
+    {
+      "path": "scripts/adoption_status.py",
+      "sha256": "24d943c6fbc047491ff743c6717cc3bad4b8cebed5c2970e78dee69e952565eb",
+      "bytes": 11297
     },
     {
       "path": "scripts/recount-tokens.cjs",
@@ -1587,6 +1722,16 @@
       "path": "tests/__init__.py",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0
+    },
+    {
+      "path": "tests/test_adoption_contract.py",
+      "sha256": "a473d6ddc5e0104a9d0d5202cfb3363ddc2a1a4323d0b80789325868290fb149",
+      "bytes": 3358
+    },
+    {
+      "path": "tests/test_adoption_status.py",
+      "sha256": "6decac3f2b0a9e752ecfe662c1e32e8790efb8cd60965eeeb103c2388886084a",
+      "bytes": 9430
     },
     {
       "path": "tests/test_catalogs.py",

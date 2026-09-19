@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "kind": "private_host_adoption_example",
+  "revision": null,
+  "component_manifest_sha256": null,
+  "checked_at_utc": null,
+  "host": {
+    "os": null,
+    "architecture": null
+  },
+  "selected_profiles": [],
+  "selected_components": [],
+  "clients": {
+    "native_codex": {
+      "authentication": "not_checked",
+      "allowance": "not_checked",
+      "discovery": "not_checked",
+      "acceptance": "not_checked"
+    },
+    "native_claude": {
+      "authentication": "not_checked",
+      "allowance": "not_checked",
+      "discovery": "not_checked",
+      "acceptance": "not_checked"
+    },
+    "desktop": {
+      "authentication": "not_checked",
+      "allowance": "not_checked",
+      "discovery": "not_checked",
+      "acceptance": "not_checked"
+    }
+  },
+  "projects": [],
+  "local_receipts": [],
+  "open_gate_source": "catalogs/us-equities/convergence-review.json",
+  "notes": "Copy only this empty example into private host state if useful; fill no secret values. No executable, service, model or task is accepted by default."
+}

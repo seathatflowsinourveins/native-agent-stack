@@ -73,11 +73,18 @@ replacement advantage. This is bounded convergence of the examined choices,
 not proof that the landscape contains no other useful repository. Discovery did
 find new candidates and evidence gaps; the word “saturated” must not hide those.
 
+The later [portable adoption follow-up](../../adoption/README.md) adds a complete
+47-component recipe map, a native uv lock for all 36 SDK distributions, fresh-prefix
+acceptance and a small continuation/update contract. Its six-candidate source review
+found the 337 public-star identities unchanged. This is reproducible dependency
+setup on the existing host; a second physical machine remains unverified.
+
 Further useful work is now dominated by acceptance or external inputs:
 
-1. Restore native Linux Codex access and execute the paired Astra/Claude path.
-   The attempted device sign-in expired; a Desktop restart alone does not change
-   that account's allowance or establish native CLI sign-in.
+1. Preserve and adopt the [new native paired acceptance](../../adoption/paired/README.md).
+   Native sign-in restored readiness; fresh LEAN/Dagu/DuckDB/Astra/Claude execution
+   completed. This closes the scoped native-paired-access gate on the authoring
+   host. Other machines still need native account readiness and local acceptance.
 2. Define the user's strategy, universe, horizon, data cutoff and numeric risk
    limits, then obtain an entitled point-in-time source. Preserve SEC403 until
    a meaningful access/input change; do not relabel the bundled LEAN demo.
@@ -92,5 +99,6 @@ Further useful work is now dominated by acceptance or external inputs:
 
 Current-session proof is direct Context Mode plus Desktop research, actual
 native Claude use and monitoring, native snapshot recovery, and lexical
-retrieval execution. Full paired native GPT-6/Claude E2E, whole-task provider
-savings and a production trading system remain unproved.
+retrieval execution, plus the later prepared-packet native GPT-6/Claude pair.
+Whole-task provider savings, unattended production hosting and a production
+trading system remain unproved.

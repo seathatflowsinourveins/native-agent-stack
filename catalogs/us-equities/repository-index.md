@@ -6,6 +6,8 @@ Every starred repository has a [typed disposition](star-audit.json), with overvi
 
 The later [data/evaluation source follow-up](data-evaluation-followup.md) verified the LoopX transfer to `loopx-project/loopx` and DVC's existing `treeverse/dvc` alias without adding identities. Its two new purged-CV discovery leads remain outside this index and are explicitly unadopted.
 
+The [portable-adoption follow-up](../../adoption/research.md) adds a separate six-candidate comparison with 41 selected source files: existing starred mise plus five beyond-star portability identities. Its required uv dependency workflow has fresh native acceptance; the alternative managers remain source-reviewed. This supplement is linked separately and does not change the historical 453-identity table below.
+
 | Repository | Discovery | Decision cards / earlier record | Star review depth |
 | --- | --- | --- | --- |
 | [0xnyk/awesome-hermes-agent](https://github.com/0xNyk/awesome-hermes-agent) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · overlaps_established |

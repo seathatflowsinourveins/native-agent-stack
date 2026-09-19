@@ -11,13 +11,15 @@ and Context Mode tool calls. See [the sanitized receipt](receipt.json).
 Set `SDK_ENV`, `STACK_REPO`, `NATIVE_CODEX_HOME`, `NATIVE_CODEX_BIN`,
 `RESEARCH_WORKSPACE`, `PROMPT_FILE` and `PRIVATE_RUN_DIR` to explicit paths.
 Use a private run directory outside any published repository. Existing files
-are not overwritten. This requirements file pins the top-level versions;
-it does not claim a hash-locked transitive environment.
+are not overwritten. The direct requirements retain the accepted top-level versions;
+the [native uv adoption lock](../../../adoption/sdk/README.md) now pins all 36
+transitive distributions with hashes for the selected Linux/Python target.
 
 ```sh
-uv venv --python 3.13 "$SDK_ENV"
-uv pip install --python "$SDK_ENV/bin/python" \
-  -r "$STACK_REPO/blueprints/us-equities/workers/requirements.txt"
+uv venv --python 3.13.15 "$SDK_ENV"
+uv pip sync --python "$SDK_ENV/bin/python" --require-hashes --no-build --strict \
+  --default-index https://pypi.org/simple --no-sources \
+  "$STACK_REPO/adoption/sdk/requirements-linux-x86_64-py313.lock"
 
 # Native browser sign-in only when needed; the client owns its credentials.
 CODEX_HOME="$NATIVE_CODEX_HOME" "$NATIVE_CODEX_BIN" login

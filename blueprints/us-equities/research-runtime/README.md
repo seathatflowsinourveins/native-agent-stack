@@ -1,5 +1,10 @@
 # Native research runtime acceptance — September 19, 2026
 
+**Later paired acceptance:** native sign-in restored Codex readiness and the
+existing workflow completed fresh LEAN → Dagu → DuckDB → Astra → Claude with
+the recreated SDK. See [the paired receipt and native results](../../../adoption/paired/README.md).
+The standalone run and quota boundary below remain dated historical evidence.
+
 The local path now runs **LEAN → Dagu → DuckDB/Parquet → a cited packet → native
 Claude Opus 5**, with native hooks and recorded usage. The separate **GPT-6 Astra
 → Claude critique** workflow is implemented and validated, but its new paired

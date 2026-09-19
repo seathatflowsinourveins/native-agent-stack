@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "id": "portable-native-model-pair-observation-20260919",
+  "checked_at_utc": "2026-09-19T19:46:08.384378+00:00",
+  "status": "passed_paired_native_usage_reconciliation",
+  "claim": "The completed Astra and Claude research results match their native local usage telemetry. Astra also has an exactly correlated bounded SDK result observation. Seven current Prometheus targets were healthy.",
+  "scope": "Read-only reconciliation of the coordinator's existing successful paired research run; no models or readiness checks were rerun.",
+  "astra": {
+    "native_status": "completed",
+    "configured_model": "gpt-6-astra",
+    "configured_provider": "openai",
+    "model_inference_submitted": true,
+    "native_duration_ms": 13505,
+    "wrapper_duration_ms": 14953,
+    "usage": {
+      "input_tokens_including_cached": 20487,
+      "cached_input_tokens_subset": 6400,
+      "cache_write_input_tokens": 0,
+      "output_tokens_including_reasoning": 289,
+      "reasoning_output_tokens_subset": 0,
+      "total_tokens": 20776
+    },
+    "usage_reconciliation": {
+      "native_and_wrapper_usage_equal": true,
+      "prometheus_category_series": 6,
+      "prometheus_process_instances": 1,
+      "all_six_prometheus_categories_match_native": true,
+      "native_loki_service": "codex-app-server",
+      "native_loki_records": 18,
+      "native_loki_process_instances": 1,
+      "native_loki_conversation_ids": 1,
+      "native_loki_instance_matches_prometheus": true,
+      "native_loki_bodies_redacted": true,
+      "final_sse_timestamp_utc": "2026-09-19T19:41:39.552663+00:00",
+      "final_sse_input_cached_output_reasoning_match_native": true,
+      "provisional_sse_count": 1,
+      "provisional_sse_added_to_total": false
+    },
+    "sdk_result_observation": {
+      "native_publication_status": "published_local_receipt",
+      "unique_local_candidate_count": 1,
+      "matching_loki_records": 1,
+      "observation_id_matches": true,
+      "receipt_id_matches": true,
+      "status": "completed",
+      "usage_status": "reported",
+      "model_and_all_retained_usage_categories_match_native": true,
+      "body_redacted": true,
+      "correlation_method": "Unique local observation within five seconds of native receipt completion, matching model, duration, status and complete total usage; exact private observation_id and receipt_id matched in Loki."
+    }
+  },
+  "claude": {
+    "native_status": "success",
+    "wrapper_status": "completed",
+    "configured_model": "claude-opus-5",
+    "native_turns": 1,
+    "native_duration_ms": 8713,
+    "native_api_duration_ms": 8580,
+    "wrapper_duration_ms": 10538,
+    "usage": {
+      "uncached_input_tokens": 2,
+      "cache_creation_input_tokens": 11142,
+      "cache_read_input_tokens": 3156,
+      "output_tokens_including_thinking": 1993,
+      "thinking_tokens_subset": 852,
+      "total_tokens": 16293
+    },
+    "usage_reconciliation": {
+      "native_and_wrapper_categories_equal": true,
+      "prometheus_category_series": 4,
+      "prometheus_process_instances": 1,
+      "all_four_prometheus_categories_match_native": true,
+      "loki_records": 51,
+      "loki_process_instances": 1,
+      "loki_instance_matches_prometheus": true,
+      "loki_bodies_redacted": true,
+      "matching_api_request_events": 1,
+      "api_request_timestamp_utc": "2026-09-19T19:41:49.760000+00:00",
+      "all_four_api_request_usage_categories_match_native": true,
+      "native_stdout_session_id_consistent": true,
+      "native_session_id_retained_in_loki": false,
+      "native_to_telemetry_correlation": "Unique fresh process in the bounded run window, matching model, timestamp and all four exact usage categories; shared private process instance directly joins Loki and Prometheus."
+    },
+    "native_hook_lifecycle_events": 16,
+    "native_hook_events_by_phase": {
+      "SessionStart": 8,
+      "UserPromptSubmit": 2,
+      "Stop": 6
+    },
+    "native_exposed_tools": 0,
+    "loki_hook_execution_start_events": 3,
+    "loki_hook_execution_complete_events": 3
+  },
+  "combined_native_reported_token_counts": 37069,
+  "prometheus_targets": {
+    "active_targets": 7,
+    "up": 7,
+    "down": 0,
+    "unknown": 0,
+    "nonempty_scrape_errors": 0
+  },
+  "query_bounds": {
+    "start_utc": "2026-09-19T19:40:09.673437+00:00",
+    "end_utc": "2026-09-19T19:43:19.809151+00:00",
+    "prometheus_evaluation_time_utc": "2026-09-19T19:43:19.809151+00:00",
+    "prometheus_lookback": "5m",
+    "sdk_observation_and_claude_log_limit": 150,
+    "astra_process_log_limit": 100,
+    "all_api_requests_succeeded": true,
+    "all_returned_record_counts_below_limits": true
+  },
+  "native_commands": [
+    {
+      "purpose": "Correlate the bounded SDK result observation by exact private ID",
+      "command": "curl --fail --silent --show-error --max-time 15 --get \"$LOKI_URL/loki/api/v1/query_range\" --data-urlencode \"query={service_name=\\\"codex-sdk-receipt\\\"} | observation_id=\\\"$OBSERVATION_ID\\\"\" --data-urlencode \"start=$START_NS\" --data-urlencode \"end=$END_NS\" --data-urlencode 'limit=150'"
+    },
+    {
+      "purpose": "Read the exact Astra process records, discovering its retained service name",
+      "command": "curl --fail --silent --show-error --max-time 15 --get \"$LOKI_URL/loki/api/v1/query_range\" --data-urlencode \"query={service_name=~\\\".+\\\"} | service_instance_id=\\\"$ASTRA_INSTANCE_ID\\\"\" --data-urlencode \"start=$START_NS\" --data-urlencode \"end=$END_NS\" --data-urlencode 'limit=100'"
+    },
+    {
+      "purpose": "Read the bounded Claude research process events; accepted result had one instance",
+      "command": "curl --fail --silent --show-error --max-time 15 --get \"$LOKI_URL/loki/api/v1/query_range\" --data-urlencode 'query={service_name=\"claude-code\"} | ecosystem_client_scope=\"financial-research\"' --data-urlencode \"start=$START_NS\" --data-urlencode \"end=$END_NS\" --data-urlencode 'limit=150'"
+    },
+    {
+      "purpose": "Read Astra's six native token categories at the run's evaluation time",
+      "command": "curl --fail --silent --show-error --max-time 15 --get \"$PROMETHEUS_URL/api/v1/query\" --data-urlencode 'query=last_over_time(ecosystem_codex_turn_token_usage_sum{client_scope=\"sdk-worker\"}[5m])' --data-urlencode \"time=$EVALUATION_TIME_SECONDS\""
+    },
+    {
+      "purpose": "Read Claude's four native token categories at the same evaluation time",
+      "command": "curl --fail --silent --show-error --max-time 15 --get \"$PROMETHEUS_URL/api/v1/query\" --data-urlencode 'query=last_over_time(ecosystem_claude_code_token_usage_tokens_total{client_scope=\"financial-research\"}[5m])' --data-urlencode \"time=$EVALUATION_TIME_SECONDS\""
+    },
+    {
+      "purpose": "Read current scrape-target health; publish counts only",
+      "command": "curl --fail --silent --show-error --max-time 15 \"$PROMETHEUS_URL/api/v1/targets\""
+    }
+  ],
+  "source_artifact_sha256": {
+    "astra.native.json": "fe928672dc1ea757193051ba69284f8d3987584323f5899b93b94106afbb7f14",
+    "astra.receipt.json": "b469233c899514fc535842d34140a12ca550734ffa4db7e39cac76c0c2dd9de5",
+    "claude.stdout": "a306f2180ac86153d2457ba51c4f2ec4b6b2d2b6f7ebdeb36665ea295db70aa9",
+    "claude.receipt.json": "23a0055f4e1766ac6228276a5f985a3543e62a8a9fe2c0586a6da7faf72a8db0"
+  },
+  "model_calls_by_reconciliation": 0,
+  "net_provider_tokens_saved": null,
+  "limitations": [
+    "This reconciles an existing successful native model pair. It does not rerun Dagu/LEAN, establish clean second-machine acceptance or demonstrate every MCP tool or foundation service.",
+    "Astra cached-input tokens are already included in input; reasoning-output tokens are included in output. Last and total usage views and provisional/final SSE events must not be added together.",
+    "Claude thinking tokens are already included in output. Cache-creation duration buckets and per-iteration/model usage views duplicate the top-level usage and are not added again.",
+    "The combined37069 count sums two native model reports. It is not a whole-task token-savings or billing measurement; the models can use different tokenizers.",
+    "Claude's native session ID is not retained in these Loki records. Native-to-telemetry attribution uses the unique bounded process/time/model and exact category agreement, while Loki-to-Prometheus uses an exact private instance ID.",
+    "The SDK result receipt does not persist its observation ID in the native result file. The uniquely matching local observation supplies the ID for exact Loki matching.",
+    "The initial guessed Astra service_name=codex query returned zero. Querying its exact private instance across retained service names found codex-app-server and18 records; the initial empty selector was not treated as missing telemetry.",
+    "Native Claude stdout hook lifecycle records and OTel hook execution events are different views with different counts; neither is added to token usage. Zero exposed tools limits what this inference proves about tool execution.",
+    "Raw IDs, prompts, model response bodies, local paths and authentication stores are excluded from this receipt. All queried log bodies were redacted.",
+    "The pre-login failed readiness observation remains a separate historical receipt. Its unknown usage is not mixed into this completed pair."
+  ]
+}

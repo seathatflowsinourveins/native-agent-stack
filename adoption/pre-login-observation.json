@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "portable-sdk-readiness-failure-observation-20260919",
+  "checked_at_utc": "2026-09-19T19:38:51.676885+00:00",
+  "status": "passed_failure_visibility_acceptance",
+  "claim": "The recreated SDK's pre-login readiness failure published one bounded local observation that matched exactly one redacted Loki record by observation_id and receipt_id. Current Prometheus targets were healthy.",
+  "readiness_run": {
+    "mode": "inspect",
+    "status": "failed",
+    "error_type": "InvalidRequestError",
+    "error_classification": "authentication_required",
+    "model_inference_submitted": false,
+    "observation_status": "published_local_receipt",
+    "usage": null,
+    "usage_status": "unavailable_after_failure",
+    "receipt_mtime_utc": "2026-09-19T19:25:39.148762+00:00",
+    "receipt_sha256": "584901aca12002fb49fc7c4419f4eec594602f6e94bfb8aa3f18440e6c20b6ab"
+  },
+  "correlation": {
+    "method": "Exactly one observation JSON file within five seconds of the readiness receipt matched its status, configured_model, duration_ms, usage_status and null usage. Its file mtime equalled the readiness receipt mtime; its opaque observation_id was used in the bounded native Loki query.",
+    "matching_local_candidates": 1,
+    "observation_file_sha256": "40f849d8f427e198f538be1ed9e7c99b8f6a448b6efa17e03f4638c6906e1f54",
+    "observation_and_readiness_mtime_delta_seconds": 0,
+    "query_window_start_utc": "2026-09-19T19:24:39.148762+00:00",
+    "query_window_end_utc": "2026-09-19T19:26:39.148762+00:00",
+    "query_limit": 20,
+    "loki_api_status": "success",
+    "matching_streams": 1,
+    "matching_records": 1,
+    "loki_record_timestamp_utc": "2026-09-19T19:25:39.158438+00:00",
+    "observation_id_matches": true,
+    "receipt_id_matches": true,
+    "loki_status": "failed",
+    "loki_usage_status": "unavailable_after_failure",
+    "body_redacted": true,
+    "total_token_count_present": false,
+    "private_identifiers_published": false
+  },
+  "prometheus_targets": {
+    "api_status": "success",
+    "active_targets": 7,
+    "up": 7,
+    "down": 0,
+    "unknown": 0,
+    "nonempty_scrape_errors": 0
+  },
+  "native_commands": [
+    {
+      "purpose": "Query only the identified observation in its bounded time window",
+      "command": "curl --fail --silent --show-error --max-time 15 --get \"$LOKI_URL/loki/api/v1/query_range\" --data-urlencode \"query={service_name=\\\"codex-sdk-receipt\\\"} | observation_id=\\\"$OBSERVATION_ID\\\"\" --data-urlencode \"start=$START_NS\" --data-urlencode \"end=$END_NS\" --data-urlencode 'limit=20'",
+      "exit_code": 0
+    },
+    {
+      "purpose": "Read current scrape-target health and summarize only counts",
+      "command": "curl --fail --silent --show-error --max-time 15 \"$PROMETHEUS_URL/api/v1/targets\"",
+      "exit_code": 0
+    }
+  ],
+  "parameter_scope": {
+    "LOKI_URL": "The configured local Loki HTTP endpoint",
+    "PROMETHEUS_URL": "The configured local Prometheus HTTP endpoint",
+    "OBSERVATION_ID": "Private observation_id from the uniquely correlated bounded SDK observation",
+    "START_NS": "Nanoseconds since epoch for query_window_start_utc",
+    "END_NS": "Nanoseconds since epoch for query_window_end_utc"
+  },
+  "model_calls_by_observation_check": 0,
+  "net_provider_tokens_saved": null,
+  "limitations": [
+    "This preserves the earlier pre-login failed readiness run. It is not a statement of the current account state after the subsequent successful native sign-in.",
+    "This proves local failure visibility and current scrape health, not successful native model inference or complete Codex/Claude runtime E2E.",
+    "Failed-run token usage is unknown, not zero. The helper explicitly recorded that no model inference was submitted.",
+    "The readiness receipt lacks a persisted observation_id; correlation therefore combines a unique bounded-time local candidate with exact metadata agreement, followed by exact private-ID matching in Loki.",
+    "The configured collector receipt format intentionally omits the raw error and retains status/usage metadata; authentication classification comes from the private native readiness receipt.",
+    "No general conversations, authentication stores or service-configuration secrets were read. No service changes, account probes or model calls were made for this check."
+  ]
+}

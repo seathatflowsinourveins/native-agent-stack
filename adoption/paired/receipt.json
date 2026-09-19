@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "id": "native-paired-adoption-20260919",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "codex",
+    "claude-code",
+    "duckdb",
+    "dagu",
+    "lean",
+    "opentelemetry-collector-contrib",
+    "prometheus",
+    "loki"
+  ],
+  "observed_at_utc": "2026-09-19T19:41:50Z",
+  "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+  "status": "completed_scoped_native_pair",
+  "scope": {
+    "source": "unchanged bundled historical LEAN sample",
+    "period": "2013-10-07 through 2013-10-11",
+    "trading_authorized": false,
+    "live_or_paper_broker_connected": false,
+    "new_machine": false,
+    "provider_routes": "existing native Codex and Claude subscription authentication",
+    "generation_models": [
+      "gpt-6-astra",
+      "claude-opus-5"
+    ],
+    "prepared_packet_model_tools": "none used; Claude exposed zero tools, Astra accepted only user/agent message items"
+  },
+  "data": {
+    "engine": {
+      "native_exit_code": 0,
+      "processed_data_points": 3943,
+      "simulated_orders": 3,
+      "stderr_bytes": 0,
+      "build": "Existing lean985ef30 remediation build; no rebuild claimed"
+    },
+    "dagu": {
+      "version": "2.16.6",
+      "prepare_evidence": {
+        "status": "succeeded",
+        "exit_code": 0,
+        "started_at": "2026-09-19T19:41:01Z",
+        "finished_at": "2026-09-19T19:41:02Z"
+      },
+      "research_pair": {
+        "status": "succeeded",
+        "exit_code": 0,
+        "started_at": "2026-09-19T19:41:23Z",
+        "finished_at": "2026-09-19T19:41:50Z"
+      },
+      "native_history_status_verified": true
+    },
+    "duckdb": {
+      "version": "1.5.5",
+      "events": 6,
+      "distinct_orders": 3,
+      "submitted": 3,
+      "filled": 3,
+      "parquet_bytes": 1191,
+      "parquet_sha256": "48ec550a96771e284bde09f6793b0d064e47bf3a731d8a1ac389a509b616f66d"
+    },
+    "astra": {
+      "role": "astra",
+      "status": "completed",
+      "usage": {
+        "last": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 6400,
+          "inputTokens": 20487,
+          "outputTokens": 289,
+          "reasoningOutputTokens": 0,
+          "totalTokens": 20776
+        },
+        "modelContextWindow": 258400,
+        "total": {
+          "cacheWriteInputTokens": 0,
+          "cachedInputTokens": 6400,
+          "inputTokens": 20487,
+          "outputTokens": 289,
+          "reasoningOutputTokens": 0,
+          "totalTokens": 20776
+        }
+      },
+      "workflow": "astra_then_claude",
+      "inference_attempted": true,
+      "configured_model": "gpt-6-astra",
+      "packet_sha256": "c9c0a26829aa4336e8339dc6da84ead9e29a0e83951c5ef2fe49adb3e2bd8490",
+      "prompt_bytes": 2323,
+      "prompt_sha256": "9d022a615023dc2a8237e5f24874dc30ebe0219776a4bcf2f5def67dc6159b90",
+      "process_exit_code": 0,
+      "process_timeout": false,
+      "native_status": "completed",
+      "evidence_facts": 2,
+      "findings": 2,
+      "report_validation": "citations_values_units_and_scope_passed",
+      "report_sha256": "b396469ae54867014a174852e93ab042ecde68a179a2cd6444c22b2688c6573c",
+      "duration_ms": 14953
+    },
+    "claude": {
+      "role": "claude",
+      "status": "completed",
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 11142,
+        "cache_read_input_tokens": 3156,
+        "output_tokens": 1993,
+        "total_tokens": 16293,
+        "thinking_tokens_included_in_output": 852
+      },
+      "workflow": "astra_then_claude",
+      "inference_attempted": true,
+      "configured_model": "claude-opus-5",
+      "packet_sha256": "c9c0a26829aa4336e8339dc6da84ead9e29a0e83951c5ef2fe49adb3e2bd8490",
+      "prompt_bytes": 3461,
+      "prompt_sha256": "49af97bafa61fd00dcb6fa54fa40259840f45fc735dc8f2adeba22e9323fd608",
+      "process_exit_code": 0,
+      "process_timeout": false,
+      "native_subtype": "success",
+      "reported_models": [
+        "claude-opus-5"
+      ],
+      "exposed_tool_count": 0,
+      "hook_events": 16,
+      "evidence_facts": 2,
+      "findings": 3,
+      "report_validation": "citations_values_units_and_scope_passed",
+      "report_sha256": "1b65a75fbd41f65bc1c93640436908193f70fec4e75c9405508c9a6f030be179",
+      "duration_ms": 10538
+    },
+    "native_worker_total_tokens": 37069,
+    "token_accounting": "Astra cached input is included in input; Claude ordinary input, cache creation, cache read and output are separate. Claude thinking is included in output. Coordinator/research-worker tokens are not included.",
+    "selected_text_measurement": {
+      "tokenizer": "gpt-tokenizer",
+      "version": "3.4.0",
+      "encoding": "o200k_base",
+      "scope": "Lossy selection for the engine-summary question; not equal-information compression or provider savings",
+      "baseline_files": [
+        "BasicTemplateFrameworkAlgorithm-summary.json",
+        "BasicTemplateFrameworkAlgorithm-order-events.json",
+        "stdout.txt"
+      ],
+      "baseline_join": "one newline between files",
+      "baseline": {
+        "bytes": 15786,
+        "tokens": 4823,
+        "sha256": "6914abefe667f655c2ad45f0898309c76eaf92ba2cd911b300e19645cc746afe"
+      },
+      "packet": {
+        "bytes": 1976,
+        "tokens": 640,
+        "sha256": "c9c0a26829aa4336e8339dc6da84ead9e29a0e83951c5ef2fe49adb3e2bd8490"
+      },
+      "fewer_selected_text_tokens": 4183,
+      "selected_text_reduction_percent": 86.73,
+      "net_provider_tokens_saved": null
+    },
+    "observation_ref": "adoption/paired/observation.json",
+    "review": {
+      "status": "no_blocking_findings",
+      "packet_prompt_report_hashes_checked": 6,
+      "lean_source_hashes_checked": 3,
+      "exact_astra_handoff_in_claude_prompt": true,
+      "qualitative_limit": "Claude identified Astra's incomplete date citation and irrelevant amendment-history wording; structural acceptance is not a claim of flawless analysis."
+    }
+  },
+  "commands": [
+    {
+      "command": "$DOTNET \"$LEAN_LAUNCHER\" --config \"$LEAN_CONFIG\" --environment backtesting --algorithm-location \"$LEAN_ALGORITHM\" --data-folder \"$LEAN_DATA\" --results-destination-folder \"$LEAN_RESULTS\"",
+      "result": "exit0;3,943 data points;3 simulated orders"
+    },
+    {
+      "command": "$DAGU validate --dagu-home \"$RESEARCH_HOME\" blueprints/us-equities/research-runtime/prepare-evidence.yaml",
+      "result": "exit0"
+    },
+    {
+      "command": "$DAGU validate --dagu-home \"$RESEARCH_HOME\" blueprints/us-equities/research-runtime/research-pair.yaml",
+      "result": "exit0"
+    },
+    {
+      "command": "$DAGU start --context local --dagu-home \"$RESEARCH_HOME\" --run-id \"$PREP_RUN_ID\" blueprints/us-equities/research-runtime/prepare-evidence.yaml",
+      "result": "native status succeeded;5-fact packet and6-event Parquet"
+    },
+    {
+      "command": "$DAGU start --context local --dagu-home \"$RESEARCH_HOME\" --run-id \"$MODEL_RUN_ID\" blueprints/us-equities/research-runtime/research-pair.yaml",
+      "result": "native status succeeded;Astra then Claude completed;model process exits0"
+    },
+    {
+      "command": "$DAGU history --context local --dagu-home \"$RESEARCH_HOME\" --format json research-pair",
+      "result": "Selected run status succeeded"
+    },
+    {
+      "command": "TOKENIZER_PREFIX=\"$TOKENIZER_PREFIX\" node blueprints/us-equities/research-runtime/measure_packet.cjs \"$LEAN_RESULTS\" \"$RESEARCH_OUTPUT/packet.json\"",
+      "result": "4,823→640 selected-text tokens;4,183 fewer;86.73%;net-provider saving unknown"
+    }
+  ],
+  "upstream_workflow": "blueprints/us-equities/research-runtime/README.md",
+  "model_calls": 2,
+  "net_provider_tokens_saved": null,
+  "limitations": [
+    "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
+    "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
+    "Selected-text reduction is lossy task-specific filtering, not equal-information compression or causal provider savings. Complete coordinator/research-worker usage is outside these native worker counters.",
+    "Native configured-model checks and provider-returned terminal usage are not independent per-request model attestation.",
+    "The complete native streams and original LEAN output remain private; public structured reports and selected hashes do not constitute independent provider attestation.",
+    "Initial authentication failure is preserved separately; native sign-in restored readiness without copying authentication stores or changing account routes.",
+    "Structural numeric/citation/scope checks passed, but Claude identified wording/citation weaknesses in Astra's narrative. Model output is not treated as authoritative strategy or financial advice.",
+    "New hosts must recreate selected runtime prerequisites and native sign-in; historical receipts do not transfer live acceptance."
+  ]
+}

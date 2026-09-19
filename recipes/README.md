@@ -1,6 +1,6 @@
 # Portable native recipes
 
-These are reproduction instructions for the 36 components in [the stack manifest](../manifests/stack.json). They are not an installer, and reading or running a help command is not functional acceptance. Historical host results remain in [the evidence manifest](../manifests/evidence.json). Choose the components needed for a project; optional entries do not need to run for the core workflow to work.
+This guide covers the original 36 component recipes. The [adoption recipe map](../adoption/manifest.json) covers all 47 components in [the stack manifest](../manifests/stack.json), including 11 later observability/research/recovery additions with their own native guides. Start with [new-machine adoption](../adoption/README.md) for ordered CPU-first setup. These are not a universal installer, and a help/version command is not functional acceptance. Historical host results remain in [the evidence manifest](../manifests/evidence.json).
 
 The examples target Linux/WSL x86_64. Use a current native Node.js 24, npm, Python 3.13, uv, Git and GitHub CLI as applicable. GPU serving additionally requires a compatible NVIDIA driver and enough free device memory. Desktop's Linux runtime and native Codex can have different configuration homes: run each client's own supported setup in its intended home, without copying authentication files between them.
 
