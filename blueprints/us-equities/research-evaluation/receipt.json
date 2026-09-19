@@ -1,0 +1,1793 @@
+{
+  "schema_version": 1,
+  "id": "native-chronological-controls-20260919",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "skfolio",
+    "pandas",
+    "lean"
+  ],
+  "observed_utc": "2026-09-19T22:59:04Z",
+  "status": "accepted_for_causal_raw_price_label_control_only",
+  "claim": "Native skfolio 1.2.9 produced 20 chronological development folds and one reserved 2021Q1 evaluation with 21 frozen selections and 6605 retained candidate records. All training label exits precede their evaluation cutoff; nine bundled LEAN source hashes remained unchanged. This is a raw-price label study, not new LEAN execution or portfolio P&L.",
+  "input_role": {
+    "lean": "Pinned bundled daily, map and factor files only; native engine was not executed in this wave.",
+    "pandas": "Native indexed session frame passed to skfolio splitter.",
+    "skfolio": "Installed upstream WalkForward called on chronological session rows with 252/63/6 and reduce_test=True."
+  },
+  "frozen_plan": {
+    "path": "blueprints/us-equities/research-evaluation/plan.json",
+    "sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+    "frozen_utc": "2026-09-19T22:55:35.365101+00:00",
+    "before": "Parsing or scoring prices; each selection is exclusively persisted before its evaluation labels are materialized."
+  },
+  "runtime": {
+    "python": "3.13.15",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1",
+    "skfolio": "1.2.9",
+    "locked_distributions": 19,
+    "lock": "blueprints/us-equities/research-evaluation/requirements.lock",
+    "walkforward_source_sha256": "f85cbe8b5a3ff4705a7ab6d35eacdbfafc11b09ec3cc1458fd4a2cf98c563397",
+    "native_dependency_check_exit": 0,
+    "upstream": {
+      "repository": "https://github.com/skfolio/skfolio",
+      "reviewed_revision": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "license": "BSD-3-Clause",
+      "wheel_sha256": "a3faab8f2d77d6663e2b541f04da7a0ee855fcb909966a3bd297b13b21c2c053",
+      "wheel_uploaded_utc": "2026-09-19T14:45:52.957577Z"
+    }
+  },
+  "results": {
+    "assets": [
+      "SPY",
+      "QQQ",
+      "IWM"
+    ],
+    "auxiliary": {
+      "IWM": {
+        "covering_factor_rows": 30,
+        "covering_map_rows": 1,
+        "price_factor_values": 30,
+        "split_factors": [
+          "1"
+        ]
+      },
+      "QQQ": {
+        "covering_factor_rows": 31,
+        "covering_map_rows": 1,
+        "price_factor_values": 31,
+        "split_factors": [
+          "1"
+        ]
+      },
+      "SPY": {
+        "covering_factor_rows": 30,
+        "covering_map_rows": 1,
+        "price_factor_values": 30,
+        "split_factors": [
+          "1"
+        ]
+      }
+    },
+    "development_folds": [
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 13
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.007146588985764272937430290531",
+            "mean_raw_price_label": "0.009146588985764272937430290531",
+            "observed_episodes": 13
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 7,
+            "mean_net_cost_proxy_label": "0.004543524184203007696948851146",
+            "mean_raw_price_label": "0.005620447261126084620025774223",
+            "observed_episodes": 13
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 7,
+            "mean_net_cost_proxy_label": "0.0009335990524313457892145340154",
+            "mean_raw_price_label": "0.002010522129354422712291457092",
+            "observed_episodes": 13
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 3,
+            "mean_net_cost_proxy_label": "0.003514191195378247994621163308",
+            "mean_raw_price_label": "0.003975729656916709533082701769",
+            "observed_episodes": 13
+          }
+        },
+        "chosen": "cash",
+        "evaluation_cutoff": "2016-01-12",
+        "id": "development-1",
+        "latest_training_exit": "2016-01-08",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "-0.005035330309773152054244264708",
+          "momentum20": "-0.002242196443337915170828997547",
+          "momentum60": "-0.005680481059632556281712688149"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 0,
+          "mean_net_cost_proxy_label": "0.000",
+          "mean_raw_price_label": "0",
+          "observed_episodes": 13
+        },
+        "selection_sha256": "f2fe53d5aaaceaecd0a6b0b738cfb7b4628cc0c23ec43a9d6e3550385ee26923",
+        "test_first": "2016-01-12",
+        "test_last": "2016-04-12",
+        "test_sessions": 63,
+        "train_first": "2015-01-02",
+        "train_last": "2015-12-31",
+        "train_sessions": 252,
+        "training_episode_count": 51
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 12
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "0.001124918954102158757391317204",
+            "mean_raw_price_label": "0.003124918954102158757391317204",
+            "observed_episodes": 12
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 8,
+            "mean_net_cost_proxy_label": "-0.0004158602843763982425440987167",
+            "mean_raw_price_label": "0.0009174730489569350907892346167",
+            "observed_episodes": 12
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 9,
+            "mean_net_cost_proxy_label": "-0.007438356823010123960625584575",
+            "mean_raw_price_label": "-0.005938356823010123960625584575",
+            "observed_episodes": 12
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "0.003048292148115604834135449075",
+            "mean_raw_price_label": "0.005048292148115604834135449075",
+            "observed_episodes": 12
+          }
+        },
+        "chosen": "cash",
+        "evaluation_cutoff": "2016-04-13",
+        "id": "development-2",
+        "latest_training_exit": "2016-04-06",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "-0.005008720510967508152913962638",
+          "momentum20": "-0.002230828144229547731789205504",
+          "momentum60": "-0.00625734645407707343655085229"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 0,
+          "mean_net_cost_proxy_label": "0.000",
+          "mean_raw_price_label": "0",
+          "observed_episodes": 12
+        },
+        "selection_sha256": "83dd49d44cdfda69ad7c200bb6f7028a9566242baeac32d7980fc7c2a6f5f0a8",
+        "test_first": "2016-04-13",
+        "test_last": "2016-07-12",
+        "test_sessions": 63,
+        "train_first": "2015-04-06",
+        "train_last": "2016-04-04",
+        "train_sessions": 252,
+        "training_episode_count": 50
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 13
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "-0.001159156211482453566763374119",
+            "mean_raw_price_label": "0.0008408437885175464332366258815",
+            "observed_episodes": 13
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "-0.001529212979714721542195388831",
+            "mean_raw_price_label": "0.0004707870202852784578046111692",
+            "observed_episodes": 13
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 11,
+            "mean_net_cost_proxy_label": "-0.001715003972523088742873603892",
+            "mean_raw_price_label": "-0.0000226962802153964351812962",
+            "observed_episodes": 13
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.0009040275004474168553430405692",
+            "mean_raw_price_label": "0.002904027500447416855343040569",
+            "observed_episodes": 13
+          }
+        },
+        "chosen": "cash",
+        "evaluation_cutoff": "2016-07-13",
+        "id": "development-3",
+        "latest_training_exit": "2016-07-08",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "-0.004892691470428641541640177748",
+          "momentum20": "-0.003269113290345118128833988242",
+          "momentum60": "-0.004483459161143675633484595258"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 0,
+          "mean_net_cost_proxy_label": "0.000",
+          "mean_raw_price_label": "0",
+          "observed_episodes": 13
+        },
+        "selection_sha256": "2b450c795b1bd1e5f76453923355d724a6573fc423e1448c35cd66aaf7bb577d",
+        "test_first": "2016-07-13",
+        "test_last": "2016-10-10",
+        "test_sessions": 63,
+        "train_first": "2015-07-06",
+        "train_last": "2016-07-01",
+        "train_sessions": 252,
+        "training_episode_count": 50
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 12
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "0.004539145187009575030867297438",
+            "mean_raw_price_label": "0.006539145187009575030867297438",
+            "observed_episodes": 12
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "0.001760488650597027952712502142",
+            "mean_raw_price_label": "0.003760488650597027952712502142",
+            "observed_episodes": 12
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 8,
+            "mean_net_cost_proxy_label": "0.003263927392452486245482067608",
+            "mean_raw_price_label": "0.004597260725785819578815400942",
+            "observed_episodes": 12
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 11,
+            "mean_net_cost_proxy_label": "0.001681823831132139217757094725",
+            "mean_raw_price_label": "0.003515157164465472551090428058",
+            "observed_episodes": 12
+          }
+        },
+        "chosen": "momentum60",
+        "evaluation_cutoff": "2016-10-11",
+        "id": "development-4",
+        "latest_training_exit": "2016-10-10",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "-0.0003932977402935774943993860667",
+          "momentum20": "-0.001725989475774619586801205322",
+          "momentum60": "0.0006410786719478264446319042373"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 11,
+          "mean_net_cost_proxy_label": "0.001681823831132139217757094725",
+          "mean_raw_price_label": "0.003515157164465472551090428058",
+          "observed_episodes": 12
+        },
+        "selection_sha256": "8664efef859eb7deb2e0210f4d283c1396740438f21615517fbe668e77b979e8",
+        "test_first": "2016-10-11",
+        "test_last": "2017-01-10",
+        "test_sessions": 63,
+        "train_first": "2015-10-02",
+        "train_last": "2016-09-30",
+        "train_sessions": 252,
+        "training_episode_count": 51
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 13
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.0003656172398757000880925473367",
+            "mean_raw_price_label": "0.002365617239875700088092547337",
+            "observed_episodes": 13
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "-0.001932014150126982606823529238",
+            "mean_raw_price_label": "0.00006798584987301739317647076154",
+            "observed_episodes": 13
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.002849215273708301009141263131",
+            "mean_raw_price_label": "0.004849215273708301009141263131",
+            "observed_episodes": 13
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.001249253944718371879140850162",
+            "mean_raw_price_label": "0.003249253944718371879140850162",
+            "observed_episodes": 13
+          }
+        },
+        "chosen": "momentum60",
+        "evaluation_cutoff": "2017-01-11",
+        "id": "development-5",
+        "latest_training_exit": "2017-01-05",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "0.001344249902878087348858135206",
+          "momentum20": "-0.000967210160739504401403984058",
+          "momentum60": "0.002521782877752313251626721702"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 13,
+          "mean_net_cost_proxy_label": "0.001249253944718371879140850162",
+          "mean_raw_price_label": "0.003249253944718371879140850162",
+          "observed_episodes": 13
+        },
+        "selection_sha256": "61712ac9dcdb72fe452cb64b5d3f0ce4ed7a83286de2718eaf2a76f778d31ef0",
+        "test_first": "2017-01-11",
+        "test_last": "2017-04-11",
+        "test_sessions": 63,
+        "train_first": "2016-01-04",
+        "train_last": "2016-12-30",
+        "train_sessions": 252,
+        "training_episode_count": 50
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 13
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.003576556748249561687608798208",
+            "mean_raw_price_label": "0.005576556748249561687608798208",
+            "observed_episodes": 13
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.003778155583698072495544510877",
+            "mean_raw_price_label": "0.005778155583698072495544510877",
+            "observed_episodes": 13
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "0.001471760079764602666453718785",
+            "mean_raw_price_label": "0.003317913925918448820299872631",
+            "observed_episodes": 13
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.003815733257269656432878916854",
+            "mean_raw_price_label": "0.005815733257269656432878916854",
+            "observed_episodes": 13
+          }
+        },
+        "chosen": "momentum60",
+        "evaluation_cutoff": "2017-04-12",
+        "id": "development-6",
+        "latest_training_exit": "2017-04-10",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "0.00006968078709996239455308712157",
+          "momentum20": "-0.0002947756495209000061942125784",
+          "momentum60": "0.002542202264045410503751067473"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 13,
+          "mean_net_cost_proxy_label": "0.003815733257269656432878916854",
+          "mean_raw_price_label": "0.005815733257269656432878916854",
+          "observed_episodes": 13
+        },
+        "selection_sha256": "7dff682665670ee0f10a3723f55d08a3ec3dca20dfa76309574641eaa583da36",
+        "test_first": "2017-04-12",
+        "test_last": "2017-07-12",
+        "test_sessions": 63,
+        "train_first": "2016-04-05",
+        "train_last": "2017-04-03",
+        "train_sessions": 252,
+        "training_episode_count": 51
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 12
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "0.0009793211247390853600129687467",
+            "mean_raw_price_label": "0.002979321124739085360012968747",
+            "observed_episodes": 12
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "0.00033004851410239169108167925",
+            "mean_raw_price_label": "0.00233004851410239169108167925",
+            "observed_episodes": 12
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 11,
+            "mean_net_cost_proxy_label": "0.002445924375054590816259102867",
+            "mean_raw_price_label": "0.0042792577083879241495924362",
+            "observed_episodes": 12
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "-0.0009686188232678716301986545833",
+            "mean_raw_price_label": "0.001031381176732128369801345417",
+            "observed_episodes": 12
+          }
+        },
+        "chosen": "momentum60",
+        "evaluation_cutoff": "2017-07-13",
+        "id": "development-7",
+        "latest_training_exit": "2017-07-06",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "0.000219535015975638816931999684",
+          "momentum20": "0.000865303252982631201011907772",
+          "momentum60": "0.002131996255067939597000844546"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 12,
+          "mean_net_cost_proxy_label": "-0.0009686188232678716301986545833",
+          "mean_raw_price_label": "0.001031381176732128369801345417",
+          "observed_episodes": 12
+        },
+        "selection_sha256": "ba3e35563ef001fccec34df18517067e1189aa9ee79a346cb171fe33ab8f72f4",
+        "test_first": "2017-07-13",
+        "test_last": "2017-10-10",
+        "test_sessions": 63,
+        "train_first": "2016-07-05",
+        "train_last": "2017-07-03",
+        "train_sessions": 252,
+        "training_episode_count": 50
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 13
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.004448062772821234761275557137",
+            "mean_raw_price_label": "0.006448062772821234761275557137",
+            "observed_episodes": 13
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.004797428546104553683856043585",
+            "mean_raw_price_label": "0.006797428546104553683856043585",
+            "observed_episodes": 13
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.002426499129744355133684220131",
+            "mean_raw_price_label": "0.004426499129744355133684220131",
+            "observed_episodes": 13
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.003464361911083633906178117231",
+            "mean_raw_price_label": "0.005464361911083633906178117231",
+            "observed_episodes": 13
+          }
+        },
+        "chosen": "momentum20",
+        "evaluation_cutoff": "2017-10-11",
+        "id": "development-8",
+        "latest_training_exit": "2017-10-06",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "0.00030586134631389601136244161",
+          "momentum20": "0.002127146326812690156500291948",
+          "momentum60": "0.001121394185112348288166880794"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 13,
+          "mean_net_cost_proxy_label": "0.002426499129744355133684220131",
+          "mean_raw_price_label": "0.004426499129744355133684220131",
+          "observed_episodes": 13
+        },
+        "selection_sha256": "f310bf598c0b117d19eeae263ae1cc220ce53160b04e2304466ac10eed04910a",
+        "test_first": "2017-10-11",
+        "test_last": "2018-01-10",
+        "test_sessions": 63,
+        "train_first": "2016-10-03",
+        "train_last": "2017-10-02",
+        "train_sessions": 252,
+        "training_episode_count": 50
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 12
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "-0.003847415296033027203865212363",
+            "mean_raw_price_label": "-0.001847415296033027203865212363",
+            "observed_episodes": 12
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "-0.003087879410040199361365530325",
+            "mean_raw_price_label": "-0.001087879410040199361365530325",
+            "observed_episodes": 12
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 7,
+            "mean_net_cost_proxy_label": "-0.008816354598271458293886348625",
+            "mean_raw_price_label": "-0.007649687931604791627219681958",
+            "observed_episodes": 12
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 11,
+            "mean_net_cost_proxy_label": "-0.005305480794181651865901969575",
+            "mean_raw_price_label": "-0.003472147460848318532568636242",
+            "observed_episodes": 12
+          }
+        },
+        "chosen": "momentum20",
+        "evaluation_cutoff": "2018-01-11",
+        "id": "development-9",
+        "latest_training_exit": "2018-01-10",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "0.001130113455389785313006417604",
+          "momentum20": "0.001654452060830322324364405488",
+          "momentum60": "0.001305233468834983009824205080"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 7,
+          "mean_net_cost_proxy_label": "-0.008816354598271458293886348625",
+          "mean_raw_price_label": "-0.007649687931604791627219681958",
+          "observed_episodes": 12
+        },
+        "selection_sha256": "f1ad609019950172385224d8d0d8d974e4a22abc44b3a976ff0c965709300d47",
+        "test_first": "2018-01-11",
+        "test_last": "2018-04-12",
+        "test_sessions": 63,
+        "train_first": "2017-01-03",
+        "train_last": "2018-01-02",
+        "train_sessions": 252,
+        "training_episode_count": 51
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 13
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.004018832039436834362986841166",
+            "mean_raw_price_label": "0.006018832039436834362986841166",
+            "observed_episodes": 13
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.005575329216508576575207693738",
+            "mean_raw_price_label": "0.007575329216508576575207693738",
+            "observed_episodes": 13
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "0.005208519869760800062306005438",
+            "mean_raw_price_label": "0.007054673715914646216152159285",
+            "observed_episodes": 13
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 10,
+            "mean_net_cost_proxy_label": "0.005642286028517354204396059008",
+            "mean_raw_price_label": "0.007180747566978892665934520546",
+            "observed_episodes": 13
+          }
+        },
+        "chosen": "momentum120",
+        "evaluation_cutoff": "2018-04-13",
+        "id": "development-10",
+        "latest_training_exit": "2018-04-09",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "0.000835063645076216004354193482",
+          "momentum20": "-0.000715840340553163526927755864",
+          "momentum60": "0.000186556354130525488757598064"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 13,
+          "mean_net_cost_proxy_label": "0.005575329216508576575207693738",
+          "mean_raw_price_label": "0.007575329216508576575207693738",
+          "observed_episodes": 13
+        },
+        "selection_sha256": "ad077a9704ce51eb73566eed750345ee41f9bd28818837992f7a89540fbdc734",
+        "test_first": "2018-04-13",
+        "test_last": "2018-07-12",
+        "test_sessions": 63,
+        "train_first": "2017-04-04",
+        "train_last": "2018-04-04",
+        "train_sessions": 252,
+        "training_episode_count": 50
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 13
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "-0.003985733074322497482957220179",
+            "mean_raw_price_label": "-0.00198573307432249748295722018",
+            "observed_episodes": 13
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "-0.003339931490981832291914206846",
+            "mean_raw_price_label": "-0.001339931490981832291914206846",
+            "observed_episodes": 13
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 11,
+            "mean_net_cost_proxy_label": "-0.007986600292276645592540607638",
+            "mean_raw_price_label": "-0.006294292599968953284848299946",
+            "observed_episodes": 13
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "-0.006101634983534357281422055962",
+            "mean_raw_price_label": "-0.004255481137380511127575902115",
+            "observed_episodes": 13
+          }
+        },
+        "chosen": "momentum120",
+        "evaluation_cutoff": "2018-07-13",
+        "id": "development-11",
+        "latest_training_exit": "2018-07-11",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "0.002585074681367900032342353829",
+          "momentum20": "0.0005844528303008784899874571824",
+          "momentum60": "0.0009822399575646815422994340039"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 13,
+          "mean_net_cost_proxy_label": "-0.003339931490981832291914206846",
+          "mean_raw_price_label": "-0.001339931490981832291914206846",
+          "observed_episodes": 13
+        },
+        "selection_sha256": "49ef82009925ce18836489222eb719424dd45b4c0e24e3f620239870380259e1",
+        "test_first": "2018-07-13",
+        "test_last": "2018-10-10",
+        "test_sessions": 63,
+        "train_first": "2017-07-05",
+        "train_last": "2018-07-03",
+        "train_sessions": 252,
+        "training_episode_count": 51
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 12
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "-0.007709015168291204031492981864",
+            "mean_raw_price_label": "-0.005709015168291204031492981853",
+            "observed_episodes": 12
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 4,
+            "mean_net_cost_proxy_label": "-0.006103821614912167023145638825",
+            "mean_raw_price_label": "-0.005437154948245500356478972158",
+            "observed_episodes": 12
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 3,
+            "mean_net_cost_proxy_label": "-0.005813489078086933473154668775",
+            "mean_raw_price_label": "-0.005313489078086933473154668775",
+            "observed_episodes": 12
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 12
+          }
+        },
+        "chosen": "momentum120",
+        "evaluation_cutoff": "2018-10-11",
+        "id": "development-12",
+        "latest_training_exit": "2018-10-04",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "0.002195756051763687478942619084",
+          "momentum20": "-0.00065197386132224381299134857",
+          "momentum60": "0.001063350356357221248407553012"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 4,
+          "mean_net_cost_proxy_label": "-0.006103821614912167023145638825",
+          "mean_raw_price_label": "-0.005437154948245500356478972158",
+          "observed_episodes": 12
+        },
+        "selection_sha256": "8c1ae0b4002ca3f992597e26148ae4a4890a2d7cdfe031d1e70aead543d1c64f",
+        "test_first": "2018-10-11",
+        "test_last": "2019-01-11",
+        "test_sessions": 63,
+        "train_first": "2017-10-03",
+        "train_last": "2018-10-02",
+        "train_sessions": 252,
+        "training_episode_count": 50
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 13
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.006337475984203833694776651564",
+            "mean_raw_price_label": "0.008337475984203833694776651562",
+            "observed_episodes": 13
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 2,
+            "mean_net_cost_proxy_label": "0.0006625149102610335931648589231",
+            "mean_raw_price_label": "0.0009702072179533412854725512308",
+            "observed_episodes": 13
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.007293425059845803759053466338",
+            "mean_raw_price_label": "0.009293425059845803759053466338",
+            "observed_episodes": 13
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 9,
+            "mean_net_cost_proxy_label": "0.0024410572019852460507299113",
+            "mean_raw_price_label": "0.003825672586600630666114526685",
+            "observed_episodes": 13
+          }
+        },
+        "chosen": "cash",
+        "evaluation_cutoff": "2019-01-14",
+        "id": "development-13",
+        "latest_training_exit": "2019-01-09",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "-0.001208798905567135921345108564",
+          "momentum20": "-0.003817457460395655364669575308",
+          "momentum60": "-0.000976740187123538750561966466"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 0,
+          "mean_net_cost_proxy_label": "0.000",
+          "mean_raw_price_label": "0",
+          "observed_episodes": 13
+        },
+        "selection_sha256": "e418690b33c6ff01098f37fa90ab18970f732226b104a67f309b5d85b6b1f287",
+        "test_first": "2019-01-14",
+        "test_last": "2019-04-12",
+        "test_sessions": 63,
+        "train_first": "2018-01-03",
+        "train_last": "2019-01-03",
+        "train_sessions": 252,
+        "training_episode_count": 50
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 12
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "0.0001894320463035214479543237034",
+            "mean_raw_price_label": "0.002189432046303521447954323702",
+            "observed_episodes": 12
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "0.001287428598478226664195435158",
+            "mean_raw_price_label": "0.003287428598478226664195435158",
+            "observed_episodes": 12
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 8,
+            "mean_net_cost_proxy_label": "-0.001067793849799183095128365717",
+            "mean_raw_price_label": "0.0002655394835341502382049676167",
+            "observed_episodes": 12
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 11,
+            "mean_net_cost_proxy_label": "-0.005348342069178434867833413258",
+            "mean_raw_price_label": "-0.003515008735845101534500079925",
+            "observed_episodes": 12
+          }
+        },
+        "chosen": "momentum60",
+        "evaluation_cutoff": "2019-04-15",
+        "id": "development-14",
+        "latest_training_exit": "2019-04-12",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "-0.0002124680492880919971287249863",
+          "momentum20": "-0.0002536564835576269554396836569",
+          "momentum60": "0.0004683944157039593849791727745"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 11,
+          "mean_net_cost_proxy_label": "-0.005348342069178434867833413258",
+          "mean_raw_price_label": "-0.003515008735845101534500079925",
+          "observed_episodes": 12
+        },
+        "selection_sha256": "d444ba303a2c3a3b497e4e7593cdb34a3761579da1fbb20f1afbcb3df6ca30d3",
+        "test_first": "2019-04-15",
+        "test_last": "2019-07-15",
+        "test_sessions": 63,
+        "train_first": "2018-04-05",
+        "train_last": "2019-04-04",
+        "train_sessions": 252,
+        "training_episode_count": 51
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 13
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "-0.001942654069104870715178378041",
+            "mean_raw_price_label": "0.00005734593089512928482162195923",
+            "observed_episodes": 13
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "-0.002785358567820562971388205469",
+            "mean_raw_price_label": "-0.0009392047216667168175420516231",
+            "observed_episodes": 13
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 7,
+            "mean_net_cost_proxy_label": "-0.009691503989149281965630670854",
+            "mean_raw_price_label": "-0.008614580912226205042553747777",
+            "observed_episodes": 13
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 10,
+            "mean_net_cost_proxy_label": "-0.006266272293637325044194908438",
+            "mean_raw_price_label": "-0.0047278107551757865826564469",
+            "observed_episodes": 13
+          }
+        },
+        "chosen": "cash",
+        "evaluation_cutoff": "2019-07-16",
+        "id": "development-15",
+        "latest_training_exit": "2019-07-10",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "-0.00149508262664480519252753816",
+          "momentum20": "-0.001474753454837938697799243836",
+          "momentum60": "-0.001831523696460547907823662014"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 0,
+          "mean_net_cost_proxy_label": "0.000",
+          "mean_raw_price_label": "0",
+          "observed_episodes": 13
+        },
+        "selection_sha256": "63c8c0adb217032f9ba442b12bebfaa1353fa214ef908cee28c17333d91e1258",
+        "test_first": "2019-07-16",
+        "test_last": "2019-10-11",
+        "test_sessions": 63,
+        "train_first": "2018-07-05",
+        "train_last": "2019-07-05",
+        "train_sessions": 252,
+        "training_episode_count": 50
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 13
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.006980840621062352053527922604",
+            "mean_raw_price_label": "0.0089808406210623520535279226",
+            "observed_episodes": 13
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.009039977711902582390435719608",
+            "mean_raw_price_label": "0.01103997771190258239043571961",
+            "observed_episodes": 13
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.006500011523414206315264010023",
+            "mean_raw_price_label": "0.008500011523414206315264010023",
+            "observed_episodes": 13
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 11,
+            "mean_net_cost_proxy_label": "0.008728723927706999189906406462",
+            "mean_raw_price_label": "0.01042103162001469149759871415",
+            "observed_episodes": 13
+          }
+        },
+        "chosen": "cash",
+        "evaluation_cutoff": "2019-10-14",
+        "id": "development-16",
+        "latest_training_exit": "2019-10-10",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "-0.003149343385974273075480198294",
+          "momentum20": "-0.003770907763639219877981143167",
+          "momentum60": "-0.003773995602973330266689885310"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 0,
+          "mean_net_cost_proxy_label": "0.000",
+          "mean_raw_price_label": "0",
+          "observed_episodes": 13
+        },
+        "selection_sha256": "728e27c32f5a2e5e5c85070445f0746f3c84b74cb9119150164e876f6d4440ee",
+        "test_first": "2019-10-14",
+        "test_last": "2020-01-13",
+        "test_sessions": 63,
+        "train_first": "2018-10-03",
+        "train_last": "2019-10-03",
+        "train_sessions": 252,
+        "training_episode_count": 51
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 12
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "-0.01276780865189478196056332771",
+            "mean_raw_price_label": "-0.01076780865189478196056332771",
+            "observed_episodes": 12
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 9,
+            "mean_net_cost_proxy_label": "-0.01473219721296029020100113113",
+            "mean_raw_price_label": "-0.01323219721296029020100113113",
+            "observed_episodes": 12
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 6,
+            "mean_net_cost_proxy_label": "0.0001072508743505308678743923833",
+            "mean_raw_price_label": "0.001107250874350530867874392383",
+            "observed_episodes": 12
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 7,
+            "mean_net_cost_proxy_label": "-0.01704237924857999072960206782",
+            "mean_raw_price_label": "-0.01587571258191332406293540115",
+            "observed_episodes": 12
+          }
+        },
+        "chosen": "momentum120",
+        "evaluation_cutoff": "2020-01-14",
+        "id": "development-17",
+        "latest_training_exit": "2020-01-07",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "0.001381841433080247123739694154",
+          "momentum20": "0.00008463566583326430658533438",
+          "momentum60": "-0.000734286083912266176047680038"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 9,
+          "mean_net_cost_proxy_label": "-0.01473219721296029020100113113",
+          "mean_raw_price_label": "-0.01323219721296029020100113113",
+          "observed_episodes": 12
+        },
+        "selection_sha256": "460908c76ce232255dad6653dfe2bacb6ee1d77bb7084e9568849034a0c7a48e",
+        "test_first": "2020-01-14",
+        "test_last": "2020-04-14",
+        "test_sessions": 63,
+        "train_first": "2019-01-04",
+        "train_last": "2020-01-03",
+        "train_sessions": 252,
+        "training_episode_count": 50
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 13
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.01297890337046822379944266951",
+            "mean_raw_price_label": "0.01497890337046822379944266951",
+            "observed_episodes": 13
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.01531998007904146866321491442",
+            "mean_raw_price_label": "0.01731998007904146866321491442",
+            "observed_episodes": 13
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 13,
+            "mean_net_cost_proxy_label": "0.01266995912203505778440439562",
+            "mean_raw_price_label": "0.01466995912203505778440439562",
+            "observed_episodes": 13
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 8,
+            "mean_net_cost_proxy_label": "0.01191289359820889435615781639",
+            "mean_raw_price_label": "0.01314366282897812512538858562",
+            "observed_episodes": 13
+          }
+        },
+        "chosen": "cash",
+        "evaluation_cutoff": "2020-04-15",
+        "id": "development-18",
+        "latest_training_exit": "2020-04-09",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "-0.002889011736304480771128899118",
+          "momentum20": "-0.002348786601488906774884171176",
+          "momentum60": "-0.004696053851210202265015264472"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 0,
+          "mean_net_cost_proxy_label": "0.000",
+          "mean_raw_price_label": "0",
+          "observed_episodes": 13
+        },
+        "selection_sha256": "c0bf777becb5a8ac33bec6c36ac08e7568667bbdb473c03e11aeaa5ce51ca4ee",
+        "test_first": "2020-04-15",
+        "test_last": "2020-07-14",
+        "test_sessions": 63,
+        "train_first": "2019-04-05",
+        "train_last": "2020-04-03",
+        "train_sessions": 252,
+        "training_episode_count": 50
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 0,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 12
+          },
+          "equalweight": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "0.005907018650707326870367330142",
+            "mean_raw_price_label": "0.007907018650707326870367330142",
+            "observed_episodes": 12
+          },
+          "momentum120": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "0.003777067871439685343889719067",
+            "mean_raw_price_label": "0.005777067871439685343889719067",
+            "observed_episodes": 12
+          },
+          "momentum20": {
+            "censored_episodes": 0,
+            "invested_episodes": 9,
+            "mean_net_cost_proxy_label": "0.00117509652288665014591830915",
+            "mean_raw_price_label": "0.00267509652288665014591830915",
+            "observed_episodes": 12
+          },
+          "momentum60": {
+            "censored_episodes": 0,
+            "invested_episodes": 12,
+            "mean_net_cost_proxy_label": "0.0007756461559761867724937488917",
+            "mean_raw_price_label": "0.002775646155976186772493748892",
+            "observed_episodes": 12
+          }
+        },
+        "chosen": "momentum20",
+        "evaluation_cutoff": "2020-07-15",
+        "id": "development-19",
+        "latest_training_exit": "2020-07-14",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "0.001213583262216053428248630816",
+          "momentum20": "0.001621890197098882359613047743",
+          "momentum60": "-0.001211022954672872496170396714"
+        },
+        "selected": {
+          "censored_episodes": 0,
+          "invested_episodes": 9,
+          "mean_net_cost_proxy_label": "0.00117509652288665014591830915",
+          "mean_raw_price_label": "0.00267509652288665014591830915",
+          "observed_episodes": 12
+        },
+        "selection_sha256": "a09bdff38ac6aaa88448f1e252437af7273063f7bc8b8de87581bb8f0a1ddf8b",
+        "test_first": "2020-07-15",
+        "test_last": "2020-10-12",
+        "test_sessions": 63,
+        "train_first": "2019-07-08",
+        "train_last": "2020-07-06",
+        "train_sessions": 252,
+        "training_episode_count": 51
+      },
+      {
+        "all_candidates": {
+          "cash": {
+            "censored_episodes": 2,
+            "invested_episodes": 0,
+            "mean_net_cost_proxy_label": "0.000",
+            "mean_raw_price_label": "0",
+            "observed_episodes": 10
+          },
+          "equalweight": {
+            "censored_episodes": 2,
+            "invested_episodes": 10,
+            "mean_net_cost_proxy_label": "0.008301542136954408174919904521",
+            "mean_raw_price_label": "0.01030154213695440817491990452",
+            "observed_episodes": 10
+          },
+          "momentum120": {
+            "censored_episodes": 2,
+            "invested_episodes": 10,
+            "mean_net_cost_proxy_label": "0.02141346133426466281112648206",
+            "mean_raw_price_label": "0.02341346133426466281112648206",
+            "observed_episodes": 10
+          },
+          "momentum20": {
+            "censored_episodes": 2,
+            "invested_episodes": 10,
+            "mean_net_cost_proxy_label": "0.01919344732013961255542188951",
+            "mean_raw_price_label": "0.02119344732013961255542188951",
+            "observed_episodes": 10
+          },
+          "momentum60": {
+            "censored_episodes": 2,
+            "invested_episodes": 10,
+            "mean_net_cost_proxy_label": "0.01174544493537483032097825807",
+            "mean_raw_price_label": "0.01374544493537483032097825807",
+            "observed_episodes": 10
+          }
+        },
+        "chosen": "momentum20",
+        "evaluation_cutoff": "2020-10-13",
+        "id": "development-20",
+        "latest_training_exit": "2020-10-07",
+        "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+        "scores": {
+          "cash": "0.000",
+          "momentum120": "0.00373497903732126789810644379",
+          "momentum20": "0.004774543548185575226696762256",
+          "momentum60": "0.00094539241954506248974342982"
+        },
+        "selected": {
+          "censored_episodes": 2,
+          "invested_episodes": 10,
+          "mean_net_cost_proxy_label": "0.01919344732013961255542188951",
+          "mean_raw_price_label": "0.02119344732013961255542188951",
+          "observed_episodes": 10
+        },
+        "selection_sha256": "6f00ade9fbc616cc0eb5430ebb4307650725f73166f35dd3b2062fc363393220",
+        "test_first": "2020-10-13",
+        "test_last": "2020-12-31",
+        "test_sessions": 56,
+        "train_first": "2019-10-04",
+        "train_last": "2020-10-02",
+        "train_sessions": 252,
+        "training_episode_count": 50
+      }
+    ],
+    "freeze_sha256": "8cefddb1be8c6dc0384856d97ba54705e017e43630c912ef1e160e495dfe8fed",
+    "inputs_unchanged": true,
+    "kind": "raw-price-label-study",
+    "ledger_records": 6605,
+    "ledger_sha256": "08ea5309466045574ba4b9c8524608ed66c91edb22cb592a5bad84e1e2f42672",
+    "no_pnl_or_execution_claim": true,
+    "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+    "reserved": {
+      "all_candidates": {
+        "cash": {
+          "censored_episodes": 1,
+          "invested_episodes": 0,
+          "mean_net_cost_proxy_label": "0.000",
+          "mean_raw_price_label": "0",
+          "observed_episodes": 11
+        },
+        "equalweight": {
+          "censored_episodes": 1,
+          "invested_episodes": 11,
+          "mean_net_cost_proxy_label": "0.001622928696130345656850000132",
+          "mean_raw_price_label": "0.003622928696130345656850000132",
+          "observed_episodes": 11
+        },
+        "momentum120": {
+          "censored_episodes": 1,
+          "invested_episodes": 11,
+          "mean_net_cost_proxy_label": "0.004403128517506842397527919636",
+          "mean_raw_price_label": "0.006403128517506842397527919636",
+          "observed_episodes": 11
+        },
+        "momentum20": {
+          "censored_episodes": 1,
+          "invested_episodes": 10,
+          "mean_net_cost_proxy_label": "0.001184071666615635470939591764",
+          "mean_raw_price_label": "0.003002253484797453652757773582",
+          "observed_episodes": 11
+        },
+        "momentum60": {
+          "censored_episodes": 1,
+          "invested_episodes": 11,
+          "mean_net_cost_proxy_label": "0.004403128517506842397527919636",
+          "mean_raw_price_label": "0.006403128517506842397527919636",
+          "observed_episodes": 11
+        }
+      },
+      "chosen": "momentum20",
+      "evaluation_cutoff": "2021-01-04",
+      "id": "reserved-2021q1",
+      "latest_training_exit": "2020-12-24",
+      "plan_sha256": "b8d1beba6eddd0388957ca0d9e9c46ebfb2ca538f076419d5a8dcaaaf82be4a7",
+      "scores": {
+        "cash": "0.000",
+        "momentum120": "0.006522720714197431759787494864",
+        "momentum20": "0.008326706879852623489172828732",
+        "momentum60": "0.002428490049143028157923746934"
+      },
+      "selected": {
+        "censored_episodes": 1,
+        "invested_episodes": 10,
+        "mean_net_cost_proxy_label": "0.001184071666615635470939591764",
+        "mean_raw_price_label": "0.003002253484797453652757773582",
+        "observed_episodes": 11
+      },
+      "selection_sha256": "7c78902a3c8014a62ce6e0eb71093b3ca5c850cb6b9418029873df602adc19fc",
+      "test_first": "2021-01-04",
+      "test_last": "2021-03-31",
+      "test_sessions": 61,
+      "train_first": "2019-12-24",
+      "train_last": "2020-12-22",
+      "train_sessions": 252,
+      "training_episode_count": 50
+    },
+    "session_counts": {
+      "2014": 252,
+      "2015": 252,
+      "2016": 252,
+      "2017": 251,
+      "2018": 251,
+      "2019": 252,
+      "2020": 253,
+      "2021": 61
+    },
+    "versions": {
+      "numpy": "2.5.3",
+      "pandas": "3.0.6",
+      "scikit-learn": "1.9.1",
+      "skfolio": "1.2.9"
+    }
+  },
+  "audit": {
+    "observed_training_candidate_records": 5290,
+    "observed_evaluation_candidate_records": 1300,
+    "censored_evaluation_candidate_records": 15,
+    "all_observed_decision_before_entry_before_exit": true,
+    "all_training_exits_before_evaluation_cutoff": true,
+    "focus_tests": 12,
+    "full_adopted_sdk_tests": 214,
+    "skipped": 0,
+    "reserved_scoring_runs": 1,
+    "prior_scoring_failures": 0
+  },
+  "commands": [
+    {
+      "id": "compile-final",
+      "argv": [
+        "uv",
+        "pip",
+        "compile",
+        "blueprints/us-equities/research-evaluation/requirements.in",
+        "--python",
+        "$SDK_PYTHON",
+        "--generate-hashes",
+        "--no-header",
+        "--output-file",
+        "blueprints/us-equities/research-evaluation/requirements.lock"
+      ],
+      "exit_code": 0
+    },
+    {
+      "id": "venv",
+      "argv": [
+        "uv",
+        "venv",
+        "--python",
+        "$SDK_PYTHON",
+        "$WAVE_DIR/venv"
+      ],
+      "exit_code": 0
+    },
+    {
+      "id": "sync-final",
+      "argv": [
+        "uv",
+        "pip",
+        "sync",
+        "--python",
+        "$WAVE_DIR/venv/bin/python",
+        "--require-hashes",
+        "blueprints/us-equities/research-evaluation/requirements.lock"
+      ],
+      "exit_code": 0
+    },
+    {
+      "id": "check",
+      "argv": [
+        "uv",
+        "pip",
+        "check",
+        "--python",
+        "$WAVE_DIR/venv/bin/python"
+      ],
+      "exit_code": 0,
+      "result": "All 19 installed packages compatible."
+    },
+    {
+      "id": "freeze",
+      "argv": [
+        "uv",
+        "pip",
+        "freeze",
+        "--python",
+        "$WAVE_DIR/venv/bin/python"
+      ],
+      "exit_code": 0
+    },
+    {
+      "id": "run-1",
+      "argv": [
+        "$WAVE_DIR/venv/bin/python",
+        "blueprints/us-equities/research-evaluation/evaluate.py",
+        "--lean-source",
+        "$LEAN_SOURCE",
+        "--out",
+        "$WAVE_DIR/run-1"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 1353,
+        "sha256": "524801ce4afdaef5de44d68525cbbb206a86e67d76385fe4342f4033e514a62b"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "focused-tests",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_research_evaluation.py",
+        "-q"
+      ],
+      "exit_code": 0,
+      "result": "12 passed"
+    },
+    {
+      "id": "full-tests",
+      "argv": [
+        "$SDK_PYTHON",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-q"
+      ],
+      "exit_code": 0,
+      "result": "214 passed, 0 skipped"
+    }
+  ],
+  "setup_history": "Initial compile/sync also included unused DuckDB 1.5.5. It was removed, the 19-distribution lock rebuilt without host-path header, and environment synced before any scoring. Those preparatory output streams are retained in private_artifacts; no working SDK mutation occurred.",
+  "private_artifacts": {
+    "run-1/candidate-ledger.json": {
+      "bytes": 2536508,
+      "sha256": "08ea5309466045574ba4b9c8524608ed66c91edb22cb592a5bad84e1e2f42672"
+    },
+    "run-1/development-1.selection.json": {
+      "bytes": 615,
+      "sha256": "f2fe53d5aaaceaecd0a6b0b738cfb7b4628cc0c23ec43a9d6e3550385ee26923"
+    },
+    "run-1/development-10.selection.json": {
+      "bytes": 621,
+      "sha256": "ad077a9704ce51eb73566eed750345ee41f9bd28818837992f7a89540fbdc734"
+    },
+    "run-1/development-11.selection.json": {
+      "bytes": 622,
+      "sha256": "49ef82009925ce18836489222eb719424dd45b4c0e24e3f620239870380259e1"
+    },
+    "run-1/development-12.selection.json": {
+      "bytes": 620,
+      "sha256": "8c1ae0b4002ca3f992597e26148ae4a4890a2d7cdfe031d1e70aead543d1c64f"
+    },
+    "run-1/development-13.selection.json": {
+      "bytes": 616,
+      "sha256": "e418690b33c6ff01098f37fa90ab18970f732226b104a67f309b5d85b6b1f287"
+    },
+    "run-1/development-14.selection.json": {
+      "bytes": 624,
+      "sha256": "d444ba303a2c3a3b497e4e7593cdb34a3761579da1fbb20f1afbcb3df6ca30d3"
+    },
+    "run-1/development-15.selection.json": {
+      "bytes": 615,
+      "sha256": "63c8c0adb217032f9ba442b12bebfaa1353fa214ef908cee28c17333d91e1258"
+    },
+    "run-1/development-16.selection.json": {
+      "bytes": 616,
+      "sha256": "728e27c32f5a2e5e5c85070445f0746f3c84b74cb9119150164e876f6d4440ee"
+    },
+    "run-1/development-17.selection.json": {
+      "bytes": 620,
+      "sha256": "460908c76ce232255dad6653dfe2bacb6ee1d77bb7084e9568849034a0c7a48e"
+    },
+    "run-1/development-18.selection.json": {
+      "bytes": 616,
+      "sha256": "c0bf777becb5a8ac33bec6c36ac08e7568667bbdb473c03e11aeaa5ce51ca4ee"
+    },
+    "run-1/development-19.selection.json": {
+      "bytes": 620,
+      "sha256": "a09bdff38ac6aaa88448f1e252437af7273063f7bc8b8de87581bb8f0a1ddf8b"
+    },
+    "run-1/development-2.selection.json": {
+      "bytes": 614,
+      "sha256": "83dd49d44cdfda69ad7c200bb6f7028a9566242baeac32d7980fc7c2a6f5f0a8"
+    },
+    "run-1/development-20.selection.json": {
+      "bytes": 617,
+      "sha256": "6f00ade9fbc616cc0eb5430ebb4307650725f73166f35dd3b2062fc363393220"
+    },
+    "run-1/development-3.selection.json": {
+      "bytes": 615,
+      "sha256": "2b450c795b1bd1e5f76453923355d724a6573fc423e1448c35cd66aaf7bb577d"
+    },
+    "run-1/development-4.selection.json": {
+      "bytes": 622,
+      "sha256": "8664efef859eb7deb2e0210f4d283c1396740438f21615517fbe668e77b979e8"
+    },
+    "run-1/development-5.selection.json": {
+      "bytes": 619,
+      "sha256": "61712ac9dcdb72fe452cb64b5d3f0ce4ed7a83286de2718eaf2a76f778d31ef0"
+    },
+    "run-1/development-6.selection.json": {
+      "bytes": 622,
+      "sha256": "7dff682665670ee0f10a3723f55d08a3ec3dca20dfa76309574641eaa583da36"
+    },
+    "run-1/development-7.selection.json": {
+      "bytes": 618,
+      "sha256": "ba3e35563ef001fccec34df18517067e1189aa9ee79a346cb171fe33ab8f72f4"
+    },
+    "run-1/development-8.selection.json": {
+      "bytes": 617,
+      "sha256": "f310bf598c0b117d19eeae263ae1cc220ce53160b04e2304466ac10eed04910a"
+    },
+    "run-1/development-9.selection.json": {
+      "bytes": 618,
+      "sha256": "f1ad609019950172385224d8d0d8d974e4a22abc44b3a976ff0c965709300d47"
+    },
+    "run-1/freeze.json": {
+      "bytes": 6413,
+      "sha256": "8cefddb1be8c6dc0384856d97ba54705e017e43630c912ef1e160e495dfe8fed"
+    },
+    "run-1/reserved-2021q1.selection.json": {
+      "bytes": 620,
+      "sha256": "7c78902a3c8014a62ce6e0eb71093b3ca5c850cb6b9418029873df602adc19fc"
+    },
+    "run-1/results.json": {
+      "bytes": 52052,
+      "sha256": "79d146d0a9506ecea3124ce084bcce701b33427d78fd4bba417deb4c6cd91c49"
+    },
+    "run-1.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "run-1.stdout.txt": {
+      "bytes": 1353,
+      "sha256": "524801ce4afdaef5de44d68525cbbb206a86e67d76385fe4342f4033e514a62b"
+    },
+    "setup/api.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "setup/api.stdout.txt": {
+      "bytes": 421,
+      "sha256": "89f1f4421856fe9ae95307786f306fb2bb3eddb83e119008c2bcd050d1bd46a3"
+    },
+    "setup/check.stderr.txt": {
+      "bytes": 184,
+      "sha256": "58fb6d7725b46ccfd7f3907c8c72150a94c7409a918b98318f0b9d68fcf9c68a"
+    },
+    "setup/check.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "setup/compile-final.stderr.txt": {
+      "bytes": 28,
+      "sha256": "a9e0510c1dad5d20f80dbe71aa818f4239bbe58e93feadb6ec7400bee6646146"
+    },
+    "setup/compile-final.stdout.txt": {
+      "bytes": 39492,
+      "sha256": "bb82ec0446011a74f5d1ee47ef3b02b62e56151d8a2937f6b7554d30fd7bcc27"
+    },
+    "setup/compile.stderr.txt": {
+      "bytes": 30,
+      "sha256": "a805af9d10e1982945defa5677bb6122e6e140dc45e8b629c0e04253749c6852"
+    },
+    "setup/compile.stdout.txt": {
+      "bytes": 42877,
+      "sha256": "028f1db07a3480021e3de9f1e65ff4f03ddc08e05362f8f8066defcb4a508ade"
+    },
+    "setup/freeze.stderr.txt": {
+      "bytes": 116,
+      "sha256": "4e534252a4f7388c88adac94307ee16fb848df70b0aeb2d179648a8d874c7d44"
+    },
+    "setup/freeze.stdout.txt": {
+      "bytes": 319,
+      "sha256": "ac8e8d95c94e10a81ec1735bbd134d6c1a2028e4a185ab704d8155f0329731a8"
+    },
+    "setup/sync-final.stderr.txt": {
+      "bytes": 190,
+      "sha256": "f20e5dcb26bd1dbd957cad32fbaaaf8080d8604432f227eb63a2eac133699391"
+    },
+    "setup/sync-final.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "setup/sync.stderr.txt": {
+      "bytes": 1009,
+      "sha256": "0e662f260a7c6fc5cb00606db4b429d396eeed8dec49ac2c4862957421102876"
+    },
+    "setup/sync.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "setup/venv.stderr.txt": {
+      "bytes": 344,
+      "sha256": "a42af4d1558c3bb69f1269435e8b077a926b6d2bdb57b31dac129cfff5c014a5"
+    },
+    "setup/venv.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "primary_sources": [
+    "https://skfolio.org/generated/skfolio.model_selection.WalkForward.html",
+    "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/src/skfolio/model_selection/_walk_forward.py",
+    "https://pypi.org/pypi/skfolio/1.2.9/json",
+    "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Data/Auxiliary/MapFile.cs",
+    "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Data/Auxiliary/CorporateFactorProvider.cs"
+  ],
+  "limitations": [
+    "Selected ETF sample, not point-in-time equity universe, catalyst/extreme-mover strategy or proof of data rights/original availability.",
+    "Raw prices include ex-dividend moves but omit distributions; price labels are not total returns. Studied factor rows have constant split factor 1 and map intervals preserve each symbol.",
+    "Fixed 20bp round-trip cost proxy per invested episode does not model fills, commissions, funding, turnover netting, liquidity or capacity. No cash/position/fee/dividend reconciliation or new LEAN engine execution.",
+    "Arithmetic five-session labels are not compounded/annualized portfolio performance. Only 11 complete reserved episodes per candidate; no statistical alpha, safety, superiority or promotion claim.",
+    "Reserved 2021Q1 means held separate for this protocol, not globally unseen historical data. It is now inspected evidence; subsequent reuse cannot be called untouched.",
+    "Development labels can cross 63-session fold boundaries within development, while earlier selections use only completed prior labels. A six-row gap plus interval assertions does not prove independent samples.",
+    "Input hashes establish byte identity, not independent source attestation. Annual counts/aligned calendars do not prove complete market coverage.",
+    "Native acceptance is this Linux/WSL Python 3.13.15 environment. macOS and fresh hosts still need their own dependency and execution acceptance."
+  ],
+  "independent_review": {
+    "status": "accepted",
+    "scope": "Read-only independent code and evidence review; no scoring rerun or new label calculation.",
+    "private_artifact_hashes_verified": 42,
+    "private_artifact_hash_mismatches": 0,
+    "public_results_equal_native": true,
+    "freeze_matches_current_plan_source_lock": true,
+    "selection_hashes_verified": 21,
+    "training_exit_boundaries_verified": 21,
+    "candidate_ledger_records_verified": 6605,
+    "focused_tests_passed": 12,
+    "blocking_findings": []
+  }
+}
