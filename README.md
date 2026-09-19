@@ -5,7 +5,7 @@ A current, evidence-backed reference for native **Codex + Claude Code**, with sc
 **Snapshot: September 19, 2026.** This repository records a tested selection and its limits. It is not a claim that every available framework is installed or that an independent universal SOTA benchmark has been won.
 
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
-**146 unique repositories in 151 layer decision cards**, **20 model entries**,
+**147 unique repositories in 152 layer decision cards**, **20 model entries**,
 and an auditable **337-star coverage ledger**. Its combined index includes
 **453 repository identities** across all 337 public stars and 116 beyond them,
 with explicit review depth and adoption decisions.

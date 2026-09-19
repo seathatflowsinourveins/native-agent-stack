@@ -34,7 +34,7 @@ notifications. [Machine-readable evidence](receipt.json) records the exact scope
 
 See the [453-repository landscape index](../catalogs/us-equities/repository-index.md)
 for all recorded identities, including 337 freshly rechecked public stars.
-Its 151 detailed cards represent 146 distinct repositories. Inclusion is not
+Its 152 detailed cards represent 147 distinct repositories. Inclusion is not
 installation, comparative superiority, exhaustive security review, or proof of
 trading profitability. Alternatives such as Phoenix/Langfuse remain candidates;
 this profile has no persistent trace backend and does not stack duplicate agents
