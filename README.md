@@ -4,6 +4,8 @@ A current, evidence-backed reference for native **Codex + Claude Code**, with sc
 
 **Snapshot: September 19, 2026.** This repository records a tested selection and its limits. It is not a claim that every available framework is installed or that an independent universal SOTA benchmark has been won.
 
+The [coverage audit](docs/convergence-audit.md) distinguishes the full starred-list metadata refresh from individual repository decisions and local execution, and records newly found research leads outside the original comparison.
+
 ## What is here
 
 - **36 adopted components** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation and usage accounting.
