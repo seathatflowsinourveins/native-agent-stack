@@ -1,0 +1,65 @@
+{
+  "scope": "First native CLI acceptance metrics; cache and reasoning subsets are not additive.",
+  "result": [
+    {
+      "metric": "ecosystem_claude_code_token_usage_tokens_total",
+      "model": "claude-opus-5[1m]",
+      "category": "cacheCreation",
+      "value": "24283"
+    },
+    {
+      "metric": "ecosystem_claude_code_token_usage_tokens_total",
+      "model": "claude-opus-5[1m]",
+      "category": "cacheRead",
+      "value": "43726"
+    },
+    {
+      "metric": "ecosystem_claude_code_token_usage_tokens_total",
+      "model": "claude-opus-5[1m]",
+      "category": "input",
+      "value": "4"
+    },
+    {
+      "metric": "ecosystem_claude_code_token_usage_tokens_total",
+      "model": "claude-opus-5[1m]",
+      "category": "output",
+      "value": "519"
+    },
+    {
+      "metric": "ecosystem_codex_turn_token_usage_sum",
+      "model": "gpt-6-astra",
+      "category": "cache_write_input",
+      "value": "0"
+    },
+    {
+      "metric": "ecosystem_codex_turn_token_usage_sum",
+      "model": "gpt-6-astra",
+      "category": "cached_input",
+      "value": "14080"
+    },
+    {
+      "metric": "ecosystem_codex_turn_token_usage_sum",
+      "model": "gpt-6-astra",
+      "category": "input",
+      "value": "40745"
+    },
+    {
+      "metric": "ecosystem_codex_turn_token_usage_sum",
+      "model": "gpt-6-astra",
+      "category": "output",
+      "value": "95"
+    },
+    {
+      "metric": "ecosystem_codex_turn_token_usage_sum",
+      "model": "gpt-6-astra",
+      "category": "reasoning_output",
+      "value": "0"
+    },
+    {
+      "metric": "ecosystem_codex_turn_token_usage_sum",
+      "model": "gpt-6-astra",
+      "category": "total",
+      "value": "40840"
+    }
+  ]
+}

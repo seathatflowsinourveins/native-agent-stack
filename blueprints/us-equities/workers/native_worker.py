@@ -7,6 +7,7 @@ import asyncio
 import json
 import math
 import os
+import uuid
 from pathlib import Path
 
 from openai_codex import AsyncCodex, ApprovalMode, CodexConfig, Sandbox
@@ -14,6 +15,37 @@ from openai_codex.client import CodexClient
 from openai_codex.generated.v2_all import GetAccountRateLimitsResponse
 
 MODEL = "gpt-6-astra"
+
+
+def process_telemetry_env(scope: str) -> dict[str, str]:
+    """Identify each native subprocess without reusing a parent's metric writer ID."""
+    retained = [part.strip() for part in os.environ.get("OTEL_RESOURCE_ATTRIBUTES", "").split(",")
+                if part.strip() and part.strip().split("=", 1)[0]
+                not in {"service.instance.id", "ecosystem.client.scope"}]
+    return {"OTEL_RESOURCE_ATTRIBUTES": ",".join([
+        *retained, f"service.instance.id={uuid.uuid4()}", f"ecosystem.client.scope={scope}"])}
+
+
+def write_observation(directory: Path, result: dict) -> None:
+    """Atomically publish bounded SDK result metadata for the native file receiver."""
+    identifier = str(uuid.uuid4())
+    observation = {"observation_id": identifier}
+    observation.update({key: result.get(key) for key in (
+        "status", "configured_model", "duration_ms", "usage_status")})
+    usage = result.get("usage")
+    observation["usage"] = {"total": usage["total"]} if isinstance(usage, dict) and "total" in usage else None
+    temporary = directory / (identifier + ".pending")
+    final = directory / (identifier + ".json")
+    fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    try:
+        with os.fdopen(fd, "w") as output:
+            output.write(json.dumps(observation, indent=2) + "\n")
+            output.flush()
+            os.fsync(output.fileno())
+        # A link publishes the completed file atomically and refuses replacement.
+        os.link(temporary, final)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def readiness(models: dict, limits: dict) -> dict:
@@ -84,7 +116,12 @@ def main() -> int:
                         help="installed upstream start.mjs; scopes this worker's MCP server")
     parser.add_argument("--turn-deadline-seconds", type=float, default=180,
                         help="turn-stream deadline; excludes startup and readiness")
+    parser.add_argument("--observation-dir", type=Path,
+                        default=os.environ.get("ECOSYSTEM_SDK_OBSERVATION_DIR"),
+                        help="optional existing private directory watched by the native Collector file receiver")
     args = parser.parse_args()
+    if args.observation_dir is not None and not args.observation_dir.is_dir():
+        parser.error("observation directory must already exist")
     if not args.workspace.is_dir() or not args.codex_home.is_dir():
         parser.error("workspace and native Codex home must already exist")
     if args.receipt.exists():
@@ -109,10 +146,12 @@ def main() -> int:
                   "env.CONTEXT_MODE_PROJECT_DIR": str(args.workspace.resolve())}
         overrides = tuple("mcp_servers.context-mode." + key + "=" + json.dumps(value)
                           for key, value in fields.items())
-    config = CodexConfig(codex_bin=args.codex_bin, cwd=str(args.workspace.resolve()),
-                         config_overrides=overrides,
-                         env={"CODEX_HOME": str(args.codex_home.resolve()),
-                              "CONTEXT_MODE_PROJECT_DIR": str(args.workspace.resolve())})
+    def config_for_process() -> CodexConfig:
+        return CodexConfig(codex_bin=args.codex_bin, cwd=str(args.workspace.resolve()),
+                           config_overrides=overrides,
+                           env={"CODEX_HOME": str(args.codex_home.resolve()),
+                                "CONTEXT_MODE_PROJECT_DIR": str(args.workspace.resolve()),
+                                **process_telemetry_env("sdk-worker")})
     result = {"mode": args.mode, "model_inference_submitted": False,
               "usage": None, "usage_status": "not_requested"}
     exit_code = 1
@@ -120,7 +159,7 @@ def main() -> int:
     fd = os.open(args.receipt, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     with os.fdopen(fd, "w") as output:
         try:
-            with CodexClient(config) as client:
+            with CodexClient(config_for_process()) as client:
                 client.initialize()
                 models = client.model_list().model_dump(by_alias=True, mode="json")
                 limits = client.request("account/rateLimits/read", {},
@@ -134,16 +173,25 @@ def main() -> int:
                 result["status"] = "blocked_native_allowance_or_model"
                 exit_code = 2
             else:
-                result.update(asyncio.run(run(config, prompt, args.turn_deadline_seconds, result)))
+                result.update(asyncio.run(run(config_for_process(), prompt, args.turn_deadline_seconds, result)))
                 exit_code = 0 if result["status"] == "completed" else 1
         except Exception as error:
             # This PRIVATE artifact may include service errors. Review before sharing.
             result.update(status="failed", error_type=type(error).__name__, error=str(error))
             result["usage_status"] = "unavailable_after_failure"
         finally:
+            if args.observation_dir is not None:
+                try:
+                    write_observation(args.observation_dir, result)
+                    result["observation_status"] = "published_local_receipt"
+                except Exception as error:
+                    result["observation_status"] = "failed"
+                    result["observation_error_type"] = type(error).__name__
+                    exit_code = 1
             output.write(json.dumps(result, indent=2) + "\n")
     print(json.dumps({"status": result["status"],
-                      "model_inference_submitted": result["model_inference_submitted"]}))
+                      "model_inference_submitted": result["model_inference_submitted"],
+                      "observation_status": result.get("observation_status", "not_configured")}))
     return exit_code
 
 

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "checked_at": "2026-09-19",
-  "scope": "Bounded native research/build/hosting gap resolution. Not a complete trading runtime or universal SOTA certification.",
+  "scope": "Bounded native research/build/hosting/observability gap resolution. Not a complete trading runtime or universal SOTA certification.",
   "decision_coverage": {
     "public_stars": 337,
     "prior_records": 51,
@@ -9,10 +9,10 @@
     "selected_file_reviews": 18,
     "unassessed": 0,
     "targeted_candidates": 14,
-    "grand_repository_index": 447,
-    "beyond_star_identities": 110,
-    "core_repository_cards": 145,
-    "core_unique_repositories": 140,
+    "grand_repository_index": 451,
+    "beyond_star_identities": 114,
+    "core_repository_cards": 149,
+    "core_unique_repositories": 144,
     "models": 20,
     "audit": "catalogs/us-equities/star-audit.json"
   },
@@ -46,6 +46,16 @@
       "id": "omniroute_astra_text_responses",
       "evidence": "blueprints/us-equities/routing/astra-receipt.json",
       "scope": "Exact Astra text response after native login and supported client-version alignment; tool/hook/compaction parity untested, failed-attempt provider usage unknown."
+    },
+    {
+      "id": "native_local_observation",
+      "evidence": "observability/receipt.json",
+      "scope": "Six native services, actual both-client tasks/telemetry, seven scrape targets, six backend restart checks, rendered dashboard and one firing/one resolved local notification."
+    },
+    {
+      "id": "sdk_reported_usage_visibility",
+      "evidence": "observability/receipt.json",
+      "scope": "Two prior completed native receipts imported as bounded summaries; native Loki per-record dedup query80770 after Collector restart. Updated helper has offline publication guards; native histogram remains unobserved."
     }
   ],
   "external_or_design_requirements": [
@@ -88,28 +98,54 @@
       "id": "net_provider_savings",
       "status": "not_measured",
       "reason": "Artifact reduction and cached-input counters are not a paired complete-task usage comparison."
+    },
+    {
+      "id": "sdk_native_histogram",
+      "status": "upstream_delivery_unresolved",
+      "reason": "Two completed SDK tasks and bounded flush experiment produced no observed native turn histogram; separate authoritative receipt lane is accepted."
+    },
+    {
+      "id": "desktop_exporter_activation",
+      "status": "client_boundary",
+      "reason": "Native child processes accepted; existing Desktop process not restarted/hot-reloaded. Fresh Desktop process needs observed export."
+    },
+    {
+      "id": "off_host_operations",
+      "status": "not_provisioned",
+      "reason": "Single WSL host depends on active user manager; no external notification destination, backup, replication or always-on host. Retained SDK spool expiry/full-disk recovery not accepted."
     }
   ],
   "privacy": "No account stores, raw sessions, private service password, broker credentials or private star identities are published.",
   "verification": {
-    "offline_tests_passed": 63,
     "scope": "Publication/coverage regression tests; no provider rerun.",
-    "independent_reviews": "Engine, DeerFlow, hosting and root coverage-validation changes independently reviewed; supported findings corrected.",
-    "hash_listed_files": 118,
-    "gitleaks_current_tree_findings": 0,
-    "gitleaks_scanned_bytes_approx": 2225921,
+    "independent_reviews": "Prior engine/DeerFlow/hosting/coverage review retained; current Collector metadata channels, SDK receipt identities/retries and native query independently reviewed with supported corrections.",
     "qmd": {
       "update_exit_code": 0,
       "index": "native-agent-stack-catalog",
       "collections": {
         "us-equities-catalog": 9,
-        "us-equities-foundation": 15
+        "us-equities-foundation": 15,
+        "us-equities-observability": 3
       },
-      "retrieval_query": "gap resolution",
+      "retrieval_query": "SDK receipts",
       "search_exit_code": 0,
       "get_exit_code": 0,
       "new_embedding_models_downloaded": false,
-      "scope": "Native lexical update/search/get, not measured provider-token savings."
-    }
+      "scope": "Native lexical update/search/get;3selected observation guides added within the existing publication project, no embedding models or provider-token saving measurement.",
+      "get_document": "qmd://us-equities-observability/collector/README.md",
+      "get_from_line": 62,
+      "get_lines": 27
+    },
+    "prior_snapshot": {
+      "offline_tests_passed": 63,
+      "hash_listed_files": 118,
+      "gitleaks_current_tree_findings": 0,
+      "gitleaks_scanned_bytes_approx": 2225921
+    },
+    "observability_receipt": "observability/receipt.json",
+    "offline_tests_passed": 68,
+    "hash_listed_files": 146,
+    "gitleaks_current_tree_findings": 0,
+    "gitleaks_scanned_bytes_approx": 3009436
   }
 }

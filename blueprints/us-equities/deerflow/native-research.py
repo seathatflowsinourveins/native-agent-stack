@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 import shutil
 import time
+import uuid
 
 
 def main() -> int:
@@ -63,6 +64,12 @@ def main() -> int:
         "CODEX_HOME": str(args.codex_home.resolve()),
         "APP_SERVER_LOGS": str(state / "adapter-logs"),
     })
+    inherited_attributes = [part.strip() for part in os.environ.get("OTEL_RESOURCE_ATTRIBUTES", "").split(",")
+                            if part.strip() and part.strip().split("=", 1)[0]
+                            not in {"service.instance.id", "ecosystem.client.scope"}]
+    os.environ["OTEL_RESOURCE_ATTRIBUTES"] = ",".join([
+        *inherited_attributes, f"service.instance.id={uuid.uuid4()}",
+        "ecosystem.client.scope=deerflow-acp"])
     import yaml
     from deerflow.config.acp_config import ACPAgentConfig
     from deerflow.tools.builtins.invoke_acp_agent_tool import build_invoke_acp_agent_tool

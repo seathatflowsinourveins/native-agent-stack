@@ -26,6 +26,8 @@ Original raw native streams and account data remain private. Receipts publish se
 - `worktrunk-list`: native worktree inventory on the publication repository, with machine paths omitted.
 - `component-history`: remaining selected CLI/reference tools retain their original host-specific proof. Optional live HUD, outer Claude-to-Codex slash command and native promptfoo use are not claimed as completed.
 
+- `native-observability`: actual Codex/Claude client usage, two completed SDK tasks with a separately validated receipt lane, six native services, seven scrape targets, six restart checks, a rendered dashboard and firing/resolved local notifications. The native SDK histogram remains unobserved; existing Desktop exporter activation remains separate.
+
 ## Reproduce useful native behavior
 
 Configure your own project and client through the [native recipes](../recipes/README.md). Use one retrieval lane for a question: exact code in rg/Serena, conceptual code in SocratiCode, Markdown in QMD, durable decisions in ai-memory, historical transcripts only in explicitly scoped archive retrieval.
@@ -41,6 +43,8 @@ The original full code file contained 2,731 o200k_base tokens; the complete retu
 The historical RTK artifact was 533 → 176 tokens; the selected paper excerpt was 18,533 → 483. These are lossy retained-text comparisons against a whole-input counterfactual. They omit prompts, tool schemas, skill reads, coordination and retries. They do not establish whole-provider savings or subscription billing reductions.
 
 Native Codex input includes its cached-input subset; Claude's ordinary input, cache creation and cache reads are separate categories. Reasoning/thinking is an output subset where reported. Do not sum these conventions blindly or combine cumulative account totals with per-task counters.
+
+The [observation artifact pair](../observability/README.md#token-efficient-operation-and-accounting) recounts to **188,769 → 500** tokens with upstream `gpt-tokenizer3.4.0` and `o200k_base`. The selected ten token series answer one operational question; other metric data is intentionally excluded and retained in the source. Run `node scripts/recount-tokens.cjs --observability` with the documented isolated tokenizer prefix. This is not net provider savings.
 
 ## CI boundary and costs
 

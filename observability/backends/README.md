@@ -139,7 +139,8 @@ TLS, ingress policy, and notification permissions.
 
 The committed [receipt](receipt.json) records archive verification, configuration
 checks, five HTTP readiness checks, seven healthy scrape targets, and six checks
-across one controlled restart. The persistence check writes a clearly labeled
+across one controlled restart. Grafana checks establish that provisioned views
+remain available; they do not independently prove unique SQLite-only user state. The persistence check writes a clearly labeled
 synthetic Loki log and local ntfy message, creates a temporary silence matching
 only `EcosystemPersistenceFixture`, restarts the five new backends, and reads the
 same data back. It expires the temporary silence afterward. It does not stop the
@@ -175,3 +176,5 @@ production availability guarantee.
 - [Grafana OSS 13.2.2 binaries and checksums](https://grafana.com/grafana/download/13.2.2?edition=oss&platform=linux) and [native provisioning](https://grafana.com/docs/grafana/latest/administration/provisioning/).
 - [Alertmanager 0.34.1 release](https://github.com/prometheus/alertmanager/releases/tag/v0.34.1) and [webhook configuration](https://prometheus.io/docs/alerting/latest/configuration/#webhook_config).
 - [ntfy 2.28.0 release](https://github.com/binwiederhier/ntfy/releases/tag/v2.28.0), [configuration](https://docs.ntfy.sh/config/), and [bundled webhook templates](https://docs.ntfy.sh/publish/#message-templating).
+
+Each persistence attempt requires a fresh evidence directory. Existing `persistence-*.json` files cause refusal before network calls or restarts. A reserved attempt marker also prevents simultaneous runs from overwriting the same evidence.

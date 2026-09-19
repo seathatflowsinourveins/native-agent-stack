@@ -1,0 +1,395 @@
+{
+  "schema_version": 1,
+  "id": "native-observability",
+  "kind": "native_cli_e2e",
+  "checked_at": "2026-09-19",
+  "component_ids": [
+    "codex",
+    "claude-code",
+    "agent-browser",
+    "opentelemetry-collector-contrib",
+    "prometheus",
+    "loki",
+    "grafana",
+    "alertmanager",
+    "ntfy"
+  ],
+  "claim": "Both native clients completed real tasks with collected usage; six native observation services, SDK result ingestion, dashboard, retained queries and local firing/resolved notifications were exercised.",
+  "scope": "One Linux/WSL host; fresh native children launched by the current Desktop task. Bounded observed acceptance, not every future process, all catalog candidates or a trading system.",
+  "limitations": [
+    "Existing Desktop process was not restarted or hot-reloaded; fresh Desktop discovery/export requires its own observed acceptance.",
+    "SDK native turn histogram was not observed, including a bounded flush experiment. Separate file-receiver accounting imported bounded summaries of two completed native SDK receipts; no further model inference was run after adding the publication helper.",
+    "Text selection counts are exact for stored artifacts and o200k_base, not provider billing or net complete-task token savings.",
+    "Single-host user services depend on the WSL user manager; no high availability, off-host backup, external notification delivery or exactly-once financial ledger.",
+    "Privacy filters cover tested fields and trusted native instrumentation, not arbitrary-content DLP. Private correlation IDs remain local.",
+    "Broker/data entitlement, strategy/risk specifications and deterministic execution/recovery acceptance remain unresolved. No live trading or paid hosted inference was enabled."
+  ],
+  "components": [
+    {
+      "repo": "open-telemetry/opentelemetry-collector-releases",
+      "version": "0.161.0",
+      "asset": "otelcol-contrib_0.161.0_linux_amd64.tar.gz",
+      "sha256": "778c689efa681ff6e4722ce9f66b9b7f57c3ba009ab2e2b43dc2e0315862c731",
+      "upstream_checksum_matches": true
+    },
+    {
+      "id": "prometheus",
+      "version": "3.14.0",
+      "source_commit": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+      "sha256": "f665c6da19eb7ba399c915d30c7d9793c9b417bf8a749b504bc470678631478d",
+      "checksum_source": "https://github.com/prometheus/prometheus/releases/download/v3.14.0/sha256sums.txt",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "loki",
+      "version": "3.7.8",
+      "source_commit": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "sha256": "62aea42c9cba52cd1642b3666ab37019a0ce4c24ab50b07e85dccc8d812f7d61",
+      "checksum_source": "https://github.com/grafana/loki/releases/download/v3.7.8/SHA256SUMS",
+      "license": "AGPL-3.0-only"
+    },
+    {
+      "id": "grafana",
+      "version": "13.2.2",
+      "source_commit": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+      "sha256": "9662c838a09824fdb072e5f6fbdd45b62cf541b20f3d609ea5011e6e5f544c8f",
+      "checksum_source": "https://grafana.com/grafana/download/13.2.2?edition=oss&platform=linux",
+      "license": "AGPL-3.0-only"
+    },
+    {
+      "id": "alertmanager",
+      "version": "0.34.1",
+      "source_commit": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+      "sha256": "265b9d1e55ef0d5306a436018af6d2b686c2ce051f03d968f7464ecb1372a7e8",
+      "checksum_source": "https://github.com/prometheus/alertmanager/releases/download/v0.34.1/sha256sums.txt",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "ntfy",
+      "version": "2.28.0",
+      "source_commit": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
+      "sha256": "881a1530e30e01f1dec202c7f41e1664e57edfb7844e73e21e345159ac3ea9b7",
+      "checksum_source": "https://github.com/binwiederhier/ntfy/releases/download/v2.28.0/checksums.txt",
+      "license": "Apache-2.0 OR GPL-2.0-only"
+    }
+  ],
+  "commands": [
+    {
+      "command": "otelcol-contrib validate --config=\"$OTEL_CONFIG\"",
+      "exit_code": 0,
+      "result": "Native final Collector configuration accepted."
+    },
+    {
+      "command": "promtool check config \"$PROMETHEUS_CONFIG\"; promtool check rules \"$PROMETHEUS_RULES\"",
+      "exit_code": 0,
+      "result": "Native configuration and six alert rules accepted."
+    },
+    {
+      "command": "loki -config.file=\"$LOKI_CONFIG\" -verify-config=true",
+      "exit_code": 0,
+      "result": "Final native Loki OTLP structured-metadata configuration accepted."
+    },
+    {
+      "command": "amtool check-config \"$ALERTMANAGER_CONFIG\"",
+      "exit_code": 0,
+      "result": "Native webhook route accepted."
+    },
+    {
+      "command": "systemctl --user is-active ecosystem-{otelcol,prometheus,loki,grafana,alertmanager,ntfy}.service",
+      "result": [
+        "active",
+        "active",
+        "active",
+        "active",
+        "active",
+        "active"
+      ]
+    },
+    {
+      "command": "curl --fail --silent --get http://127.0.0.1:19090/api/v1/query --data-urlencode query=up",
+      "http_status": 200,
+      "result": {
+        "qdrant": "1",
+        "collector-health": "1",
+        "prometheus": "1",
+        "loki": "1",
+        "alertmanager": "1",
+        "vllm": "1",
+        "collector-native": "1"
+      }
+    },
+    {
+      "command": "Native Loki GET /loki/api/v1/query; query parameter below",
+      "query": "sum(max by (receipt_id) (max_over_time({service_name=\"codex-sdk-receipt\"} | receipt_id != \"\" | unwrap total_token_count | __error__=\"\" [1h])))",
+      "result": {
+        "status": "success",
+        "total_tokens": "80770"
+      }
+    },
+    {
+      "command": "Native Prometheus GET /api/v1/query; query=max_over_time(ecosystem_review_privacy_canary_total[3h])",
+      "result": {
+        "status": "success",
+        "retained_series_values": [
+          "7",
+          "7"
+        ],
+        "not_additive": true
+      }
+    },
+    {
+      "command": "TOKENIZER_PREFIX=\"$INSTALLED_TOKENIZER_PREFIX\" node scripts/recount-tokens.cjs --observability",
+      "exit_code": 0,
+      "result": {
+        "tokenizer": "gpt-tokenizer",
+        "version": "3.4.0",
+        "encoding": "o200k_base",
+        "counts": [
+          {
+            "file": "evidence/artifacts/observability-metrics.source.json",
+            "tokens": 188769
+          },
+          {
+            "file": "evidence/artifacts/observability-metrics.selected.json",
+            "tokens": 500
+          }
+        ],
+        "removed": 188269,
+        "reduction_percent": 99.73512600056154,
+        "scope": "Public sanitized artifact selection only; not a provider savings measurement."
+      }
+    }
+  ],
+  "native_client_acceptance": {
+    "task": "Read one local fixture and report17+25=42 and service_count4 as JSON; no file writes, agents or network requested.",
+    "fixture_answer_correct": {
+      "codex": true,
+      "claude": true,
+      "sdk_initial": true,
+      "sdk_flush_attempt": true
+    },
+    "command_scope": "Portable parameterized invocation shapes are documented; private absolute paths, correlation IDs and native account stores are intentionally omitted.",
+    "codex": {
+      "version": "0.155.1",
+      "model": "gpt-6-astra",
+      "invocation": "CODEX_HOME=\"$NATIVE_CODEX_HOME\" \"$NATIVE_CODEX_BIN\" exec -C \"$RESEARCH_WORKSPACE\" --json --color never - < \"$PROMPT_FILE\"",
+      "exit_code": 0,
+      "input_tokens": 40745,
+      "cached_input_tokens": 14080,
+      "output_tokens": 95,
+      "reasoning_output_tokens": 0,
+      "total_tokens": 40840,
+      "collected_turn_histogram_matches_native_usage": true,
+      "cached_input_semantics": "Subset of input, not additional tokens.",
+      "extra_sse_event": {
+        "input_tokens": 12886,
+        "output_tokens": 0,
+        "interpretation": "Source-backed inference: native generate:false prewarm reports usage outside inference turn; no explicit prewarm event flag and no billing claim."
+      }
+    },
+    "claude": {
+      "version": "2.1.278",
+      "model": "claude-opus-5",
+      "invocation": "claude -p --verbose --output-format stream-json --max-turns 4 --allowedTools Read --add-dir \"$RESEARCH_WORKSPACE\" < \"$PROMPT_FILE\"",
+      "exit_code": 0,
+      "ordinary_input_tokens": 4,
+      "cache_creation_input_tokens": 24283,
+      "cache_read_input_tokens": 43726,
+      "output_tokens": 519,
+      "thinking_tokens_included_in_output": 367,
+      "total_tokens": 68532,
+      "collected_request_logs_and_metrics_match": true
+    },
+    "sdk": {
+      "model": "gpt-6-astra",
+      "runtime": "Official Python SDK0.154.0 with native Codex0.155.1",
+      "runs": [
+        {
+          "status": "completed",
+          "duration_ms": 14009,
+          "input_tokens": 40066,
+          "cached_input_tokens": 19712,
+          "output_tokens": 121,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 40187
+        },
+        {
+          "status": "completed",
+          "duration_ms": 13843,
+          "input_tokens": 40434,
+          "cached_input_tokens": 19840,
+          "output_tokens": 149,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 40583
+        }
+      ],
+      "correlated_native_logs_observed": true,
+      "native_turn_histogram_observed": false,
+      "flush_experiment": {
+        "metric_interval_ms": 1000,
+        "hold_before_close_ms": 1500,
+        "histogram_observed": false,
+        "experimental_hold_retained_in_production": false
+      },
+      "source_review": "Pinned core emits turn metrics before TurnComplete; not a CLI-only metric. SDK process shutdown is a possible loss point, not an established cause."
+    },
+    "fixture": {
+      "path": "fixtures/observability-check.json",
+      "sha256": "f1d66eb8d1326450331372a159917a6e391e98802f7fbc7d359deeea02a08cb1",
+      "expected_answer": {
+        "check": "native-observability-e2e",
+        "sum": 42,
+        "service_count": 4
+      }
+    }
+  },
+  "sdk_receipt_lane": {
+    "receiver": "file_log/sdk_receipts",
+    "source": "Bounded metadata summaries of two prior completed native SDK receipts, published through write_observation; not two new model calls.",
+    "corrected_records": 2,
+    "distinct_record_ids": 2,
+    "reported_total_tokens": 80770,
+    "after_collector_restart_total_tokens": 80770,
+    "deduplication": "Per-record receipt_id; take max per ID before sum within1h; exclude old records with no ID. Replaying must retain the same ID.",
+    "unknown_usage": "None/absent; never coerced to zero. usage_status preserved.",
+    "delivery": "Atomic private0600 complete files; UUID first in payload protects distinct-file fingerprints. Receiver offsets persisted and downstream refusals retried; native Loki exporter has a bounded persistent queue.",
+    "privacy": "Future helper omits items/final_response/raw errors; earlier raw seed receipts remain private migration inputs. Corrected Loki records contained only allowed metadata and omitted bodies.",
+    "automation_acceptance": "Offline identity, unknown-usage, no-overwrite and query guards plus actual receiver ingestion; modified helper was not followed by another model-inference run.",
+    "limits": "Retained spool has no automatic expiry. No loss/recovery acceptance under full disk or extended backend outage. Same-ID replay grouping is not general exactly-once accounting.",
+    "invalid_input": "Native parser on_error=drop_quiet excludes malformed JSON without content-bearing diagnostics; private source retained. Source/configuration check, not malformed-input acceptance."
+  },
+  "observation_results": {
+    "at": "2026-09-19T14:34:38.578085+00:00",
+    "services": {
+      "otelcol": "active",
+      "prometheus": "active",
+      "loki": "active",
+      "grafana": "active",
+      "alertmanager": "active",
+      "ntfy": "active"
+    },
+    "scrape_targets": {
+      "qdrant": "1",
+      "collector-health": "1",
+      "prometheus": "1",
+      "loki": "1",
+      "alertmanager": "1",
+      "vllm": "1",
+      "collector-native": "1"
+    },
+    "http_probes": {
+      "omniroute_health": 200,
+      "freellmapi_readyz": 200,
+      "collector_readiness": 200,
+      "dagu_unauthenticated_dags": 401
+    },
+    "dagu_scope": "401 proves expected anonymous protection, not authenticated workflow functionality.",
+    "dashboard": {
+      "url": "http://127.0.0.1:13000/d/ecosystem-native",
+      "native_browser": "agent-browser",
+      "rendered": true,
+      "artifact": "evidence/artifacts/observability-dashboard.png",
+      "artifact_scope": "Rendered initial client/service panels; screenshot predates added SDK receipt panel. Final SDK panel query accepted separately.",
+      "secrets_visually_reviewed": true
+    },
+    "backends_receipt": "observability/backends/receipt.json",
+    "persistence": {
+      "status": "passed",
+      "scope": "Five native backend readiness checks; historical metric/log/notification/silence retention and provisioned Grafana views after one restart.",
+      "readiness_checks": 5,
+      "restart_checks": 6,
+      "grafana_scope": "Provisioned dashboard and datasources available after restart; not separate proof of unique SQLite-only user state."
+    },
+    "notifications": {
+      "rule": "EcosystemAcceptanceTargetDown",
+      "route": "Prometheus -> Alertmanager native webhook -> ntfy bundled alertmanager template -> local retained inbox",
+      "fixture": "Dedicated unavailable loopback endpoint; no production service stopped",
+      "firing_notifications": 1,
+      "resolved_notifications": 1,
+      "fixture_restored_empty": true,
+      "external_delivery_tested": false,
+      "elapsed_latency_claimed": false
+    },
+    "privacy_canary": {
+      "kind": "Independent synthetic review; not an inference task",
+      "logs_post_http_status": 200,
+      "metrics_post_http_status": 200,
+      "persisted_file_records": 1,
+      "loki_records": 1,
+      "metric_value": 7,
+      "historical_query_values": [
+        "7",
+        "7"
+      ],
+      "values_are_not_additive": true,
+      "log_event": "ecosystem.metadata_privacy_review_fixed",
+      "file_record_sha256": "a0e1a457132ef7429e4a5e07e13090a399212e01beff5abf9594c97876f9f56f",
+      "forbidden_marker_absent": true,
+      "metadata_channels_normalized": true,
+      "evidence_scope": "Reviewer direct native POST/export observations plus re-read retained log and historical Prometheus query; no invented standalone raw canary receipt."
+    }
+  },
+  "token_selection": {
+    "tokenizer": "gpt-tokenizer",
+    "version": "3.4.0",
+    "encoding": "o200k_base",
+    "counts": [
+      {
+        "file": "evidence/artifacts/observability-metrics.source.json",
+        "tokens": 188769
+      },
+      {
+        "file": "evidence/artifacts/observability-metrics.selected.json",
+        "tokens": 500
+      }
+    ],
+    "removed": 188269,
+    "reduction_percent": 99.73512600056154,
+    "scope": "Public sanitized artifact selection only; not a provider savings measurement.",
+    "source_query": {
+      "query": "last_over_time({job=\"collector-native\"}[2h])",
+      "time": 1789827320.0634394,
+      "http_status": 200,
+      "all_series": 2134,
+      "selected_series": 10
+    },
+    "selection": "Ten token-category series; all other operational series remain recoverable in source artifact. Not equivalent information content.",
+    "observer_model_calls": 0,
+    "acceptance_model_calls": 4
+  },
+  "activation": {
+    "native_codex_configured": true,
+    "native_claude_configured": true,
+    "desktop_user_codex_configured": true,
+    "already_running_desktop_reloaded": false,
+    "native_launcher_fresh_instance_per_process": true,
+    "sdk_and_acp_fresh_instance_per_process": true,
+    "sdk_native_environment_observation_directory_configured": true,
+    "future_scope": "Fresh processes using these native user configs/launchers; other hosts/accounts/homes require explicit installation. Existing MCP tool catalog not retroactively changed."
+  },
+  "retained_failed_attempts": [
+    "Initial privacy review exposed metadata fields outside attribute maps; corrected schema/scope/severity/event-name/metric metadata normalization passed the next canary.",
+    "Initial alert harness was interrupted after fixture activation; a second attempt refused nonempty fixture, then the explicitly identified owned fixture was resumed and restored. No total latency claim.",
+    "Bounded SDK flush experiment did not reveal native histogram; no repeated model retries.",
+    "Initial SDK resource-level identity incorrectly collapsed two records; corrected per-record identity query returns80770. Old no-ID records remain excluded."
+  ],
+  "upstream_sources": [
+    "https://learn.chatgpt.com/docs/config-file/config-advanced",
+    "https://learn.chatgpt.com/docs/config-file/config-reference",
+    "https://code.claude.com/docs/en/monitoring-usage",
+    "https://github.com/openai/codex/tree/rust-v0.155.1",
+    "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/v0.161.0/receiver/filelogreceiver",
+    "https://grafana.com/docs/loki/latest/send-data/otel/",
+    "https://docs.ntfy.sh/publish/#webhooks"
+  ],
+  "result": {
+    "status": "passed_with_explicit_limits",
+    "scope": "Local native collection, querying, storage, dashboard and alert route; known SDK metric and Desktop-process boundaries retained."
+  },
+  "verification": {
+    "offline_tests_passed": 68,
+    "independent_review": "No remaining blocking findings after corrections; five focused observation checks, live receipt query and claim review independently accepted.",
+    "gitleaks_current_tree_findings": 0,
+    "scope": "Local validation; GitHub CI recorded by commit checks. Does not repeat provider/GPU execution."
+  }
+}

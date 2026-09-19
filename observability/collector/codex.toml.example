@@ -1,0 +1,11 @@
+
+# Local ecosystem observation; content is removed before collector persistence.
+[otel]
+environment = "local"
+log_user_prompt = false
+exporter = { otlp-http = { endpoint = "http://127.0.0.1:14318/v1/logs", protocol = "binary" } }
+metrics_exporter = { otlp-http = { endpoint = "http://127.0.0.1:14318/v1/metrics", protocol = "binary" } }
+trace_exporter = "none"
+
+[otel.tool_result]
+max_bytes = 0

@@ -2,7 +2,7 @@
   "uid": "ecosystem-native",
   "title": "Native agent ecosystem",
   "schemaVersion": 39,
-  "version": 2,
+  "version": 5,
   "editable": false,
   "timezone": "browser",
   "refresh": "15s",
@@ -172,6 +172,49 @@
         }
       ],
       "options": {}
+    },
+    {
+      "id": 20,
+      "type": "stat",
+      "title": "SDK reported turn tokens from receipts (1h)",
+      "description": "SDK result receipts, deduplicated by observation identity within the selected window. Separate from request logs and CLI histograms. Cached/reasoning subsets are not added; this is not a provider invoice.",
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 24,
+        "h": 6
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ecosystem-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(max by (receipt_id) (max_over_time({service_name=\"codex-sdk-receipt\"} | receipt_id != \"\" | unwrap total_token_count | __error__=\"\" [1h])))",
+          "queryType": "instant",
+          "legendFormat": "SDK reported tokens"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none"
+      }
     }
   ]
 }

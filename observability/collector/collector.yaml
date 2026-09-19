@@ -1,0 +1,157 @@
+# Native OTLP only. Prompt/tool content and account identifiers are dropped; selected correlation IDs stay private.
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 127.0.0.1:14317
+      http:
+        endpoint: 127.0.0.1:14318
+  file_log/sdk_receipts:
+    include: ["${env:ECOSYSTEM_OBSERVABILITY_DATA}/sdk-receipts/*.json"]
+    start_at: beginning
+    storage: file_storage
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0s
+    include_file_name: true
+    include_file_path: false
+    max_log_size: 4MiB
+    multiline:
+      line_end_pattern: '^}$'
+    operators:
+      - type: json_parser
+        on_error: drop_quiet
+        parse_from: body
+        parse_to: attributes
+  http_check/ecosystem:
+    collection_interval: 30s
+    targets:
+      - endpoint: http://127.0.0.1:20128/api/health
+        timeout: 5s
+      - endpoint: http://127.0.0.1:31415/readyz
+        timeout: 5s
+      - endpoint: http://127.0.0.1:14333/
+        timeout: 5s
+      - endpoint: http://127.0.0.1:18525/api/v1/dags
+        timeout: 5s
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 256
+    spike_limit_mib: 64
+  transform/sdk_receipt:
+    error_mode: propagate
+    log_statements:
+      - context: log
+        statements:
+          - set(resource.attributes["service.name"], "codex-sdk-receipt")
+          - set(resource.attributes["ecosystem.client.scope"], "sdk-receipt")
+          - set(attributes["receipt_id"], attributes["log.file.name"])
+          - set(attributes["receipt_id"], attributes["observation_id"]) where attributes["observation_id"] != nil
+          - set(attributes["event.name"], "ecosystem.sdk_receipt")
+          - set(attributes["model"], attributes["configured_model"])
+          - set(attributes["input_token_count"], attributes["usage"]["total"]["inputTokens"]) where attributes["usage"] != nil and attributes["usage"]["total"] != nil
+          - set(attributes["output_token_count"], attributes["usage"]["total"]["outputTokens"]) where attributes["usage"] != nil and attributes["usage"]["total"] != nil
+          - set(attributes["cached_token_count"], attributes["usage"]["total"]["cachedInputTokens"]) where attributes["usage"] != nil and attributes["usage"]["total"] != nil
+          - set(attributes["reasoning_token_count"], attributes["usage"]["total"]["reasoningOutputTokens"]) where attributes["usage"] != nil and attributes["usage"]["total"] != nil
+          - set(attributes["total_token_count"], attributes["usage"]["total"]["totalTokens"]) where attributes["usage"] != nil and attributes["usage"]["total"] != nil
+  transform/privacy:
+    error_mode: propagate
+    log_statements:
+      - context: resource
+        statements:
+          - keep_keys(attributes, ["service.name", "service.version", "service.instance.id", "deployment.environment", "ecosystem.task.id", "ecosystem.client.scope"])
+      - context: scope
+        statements:
+          - keep_keys(attributes, [])
+      - context: log
+        statements:
+          - set(resource.schema_url, "")
+          - set(instrumentation_scope.schema_url, "")
+          - set(instrumentation_scope.name, "native-agent-telemetry")
+          - set(instrumentation_scope.version, "")
+          - set(severity_text, "")
+          - set(event_name, "")
+          - set(body, "[content omitted]")
+          - keep_keys(attributes, ["receipt_id", "observation_id", "usage_status", "event.name", "event.kind", "event.timestamp", "event.sequence", "session.id", "conversation.id", "thread.id", "turn.id", "model", "model_name", "provider_name", "tool_name", "success", "decision", "duration_ms", "duration", "status_code", "http.response.status_code", "error.type", "input_tokens", "output_tokens", "cached_input_tokens", "cache_read_tokens", "cache_creation_tokens", "input_token_count", "output_token_count", "cached_input_token_count", "cached_token_count", "cache_write_token_count", "reasoning_token_count", "tool_token_count", "tool_result_seq", "tool_namespace", "status", "reasoning_effort", "model_reasoning_effort", "service_tier", "app.version", "query_source", "effort", "error_type", "reasoning_output_token_count", "total_token_count", "cache_read_input_tokens", "cache_creation_input_tokens", "attempt", "ecosystem.task.id", "ecosystem.client.scope"])
+    metric_statements:
+      - context: resource
+        statements:
+          - keep_keys(attributes, ["service.name", "service.version", "service.instance.id", "deployment.environment", "ecosystem.client.scope"])
+      - context: scope
+        statements:
+          - keep_keys(attributes, [])
+      - context: datapoint
+        statements:
+          - set(resource.schema_url, "")
+          - set(instrumentation_scope.schema_url, "")
+          - set(instrumentation_scope.name, "native-agent-telemetry")
+          - set(instrumentation_scope.version, "")
+          - set(metric.description, "")
+          - keep_keys(metric.metadata, [])
+          - set(exemplars, nil) where metric.type != METRIC_DATA_TYPE_SUMMARY
+          - keep_keys(attributes, ["kind", "tool", "query_source", "effort", "app.version", "type", "token_type", "token.type", "model", "model_name", "tool_name", "status", "success", "error.type", "http.response.status_code"])
+          - set(attributes["client_scope"], resource.attributes["ecosystem.client.scope"]) where resource.attributes["ecosystem.client.scope"] != nil
+          - set(resource.attributes["service.instance.id"], "unscoped") where resource.attributes["service.instance.id"] == nil
+  deltatocumulative:
+    max_stale: 1h
+    max_streams: 10000
+  batch:
+    timeout: 1s
+    send_batch_size: 256
+    send_batch_max_size: 512
+exporters:
+  prometheus:
+    endpoint: 127.0.0.1:18889
+    namespace: ecosystem
+    resource_to_telemetry_conversion:
+      enabled: false
+  otlphttp/loki:
+    endpoint: http://127.0.0.1:13100/otlp
+    sending_queue:
+      enabled: true
+      queue_size: 1000
+      storage: file_storage
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 300s
+  file/events:
+    path: ${env:ECOSYSTEM_OBSERVABILITY_DATA}/collector/events.jsonl
+    rotation:
+      max_megabytes: 10
+      max_backups: 3
+    flush_interval: 1s
+extensions:
+  file_storage:
+    directory: ${env:ECOSYSTEM_OBSERVABILITY_DATA}/collector/queue
+  health_check:
+    endpoint: 127.0.0.1:14333
+service:
+  extensions: [file_storage, health_check]
+  telemetry:
+    logs:
+      level: warn
+    metrics:
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: 127.0.0.1
+                port: 18888
+  pipelines:
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, transform/privacy, batch]
+      exporters: [otlphttp/loki, file/events]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, transform/privacy, deltatocumulative, batch]
+      exporters: [prometheus]
+    metrics/health:
+      receivers: [http_check/ecosystem]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus]
+    logs/sdk_receipts:
+      receivers: [file_log/sdk_receipts]
+      processors: [memory_limiter, transform/sdk_receipt, transform/privacy, batch]
+      exporters: [otlphttp/loki, file/events]

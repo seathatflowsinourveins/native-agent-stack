@@ -17,3 +17,15 @@ A new task is appropriate after changing startup configuration or tool registrat
 These practices persist through the installed project instructions, native registrations and service configuration. They do not automatically index all future repositories or start every optional tool. The public examples are inactive templates, not copies of the original machine's active settings. Follow the [native recipes](../recipes/README.md) to adopt the stack for another project.
 
 See the [evidence boundaries](evidence.md) and individual receipts for the exact host, execution level and remaining limits.
+
+## Native observation profile
+
+The [local observation guide](../observability/README.md) records six enabled native
+user services and real Codex/Claude child-process telemetry from this Desktop task.
+User-level native configurations are saved; the existing Desktop process was not
+restarted or hot-reloaded. Fresh native launchers and SDK/ACP examples assign unique
+process identities. Future native SDK launches can publish atomic bounded result
+metadata through `ECOSYSTEM_SDK_OBSERVATION_DIR`; missing usage remains unknown.
+The SDK native histogram was not observed, so its separately labeled file-receiver
+receipt panel is used for reported usage. Other hosts/client homes need explicit
+configuration and observed acceptance. No global MCP hot-reload claim is made.

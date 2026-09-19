@@ -19,6 +19,10 @@ def main():
     p.add_argument('--grafana-env',type=Path,required=True)
     p.add_argument('--evidence-dir',type=Path,required=True)
     a=p.parse_args(); a.evidence_dir.mkdir(parents=True,exist_ok=True)
+    if any(a.evidence_dir.glob('persistence-*.json')):
+        raise SystemExit('Use a fresh evidence directory; prior persistence attempts are preserved.')
+    with (a.evidence_dir/'persistence-attempt.json').open('x') as attempt:
+        json.dump({'status':'started','scope':'private backend persistence acceptance'},attempt)
     env=dict(line.split('=',1) for line in a.grafana_env.read_text().splitlines() if '=' in line)
     auth=base64.b64encode((env['GF_SECURITY_ADMIN_USER']+':'+env['GF_SECURITY_ADMIN_PASSWORD']).encode()).decode()
     def call(url,body=None,method=None,grafana=False):

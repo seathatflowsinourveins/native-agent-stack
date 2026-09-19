@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-19T04:44:41.681441+00:00",
+  "recorded_at_utc": "2026-09-19T14:37:37.362395+00:00",
   "scope": "Linux/WSL x86_64 native Codex/Claude workflow; current evidence-backed selection, not an exhaustive global ranking. Exact native results are dated and host-specific.",
   "source_snapshot_commit": "44750edc",
   "components": [
@@ -42,7 +42,8 @@
       "evidence_ids": [
         "native-cli-gaps",
         "component-history",
-        "desktop-cli-workflows"
+        "desktop-cli-workflows",
+        "native-observability"
       ],
       "upstream_sources": [
         "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1"
@@ -148,7 +149,8 @@
         "native-context-memory",
         "native-memory",
         "native-rag",
-        "component-history"
+        "component-history",
+        "native-observability"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -217,7 +219,8 @@
         "native-memory",
         "native-rag",
         "component-history",
-        "desktop-cli-workflows"
+        "desktop-cli-workflows",
+        "native-observability"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -777,6 +780,123 @@
       "source_pin": null,
       "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
       "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
+    },
+    {
+      "id": "opentelemetry-collector-contrib",
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "version": "0.161.0",
+      "license": "Apache-2.0",
+      "profile": "observability",
+      "role": "Single native core/contrib Collector process; content filtering, metric conversion, upstream exporters and SDK file receiver",
+      "commands": [
+        "otelcol-contrib validate --config=\"$OTEL_CONFIG\""
+      ],
+      "evidence_ids": [
+        "native-observability"
+      ],
+      "source_pin": null,
+      "upstream_sources": [
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib"
+      ],
+      "freshness": "Pinned official release verified on2026-09-19; not an automatic latest-update policy."
+    },
+    {
+      "id": "prometheus",
+      "repository": "https://github.com/prometheus/prometheus",
+      "version": "3.14.0",
+      "license": "Apache-2.0",
+      "profile": "observability",
+      "role": "Native operational metric storage and alert evaluation",
+      "commands": [
+        "promtool check config \"$PROMETHEUS_CONFIG\"",
+        "promtool query instant http://127.0.0.1:19090 up"
+      ],
+      "evidence_ids": [
+        "native-observability"
+      ],
+      "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
+      "upstream_sources": [
+        "https://github.com/prometheus/prometheus"
+      ],
+      "freshness": "Pinned official release verified on2026-09-19; not an automatic latest-update policy."
+    },
+    {
+      "id": "loki",
+      "repository": "https://github.com/grafana/loki",
+      "version": "3.7.8",
+      "license": "AGPL-3.0-only",
+      "profile": "observability",
+      "role": "Native structured log storage",
+      "commands": [
+        "loki -config.file=\"$LOKI_CONFIG\" -verify-config=true"
+      ],
+      "evidence_ids": [
+        "native-observability"
+      ],
+      "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
+      "upstream_sources": [
+        "https://github.com/grafana/loki"
+      ],
+      "freshness": "Pinned official release verified on2026-09-19; not an automatic latest-update policy."
+    },
+    {
+      "id": "grafana",
+      "repository": "https://github.com/grafana/grafana",
+      "version": "13.2.2",
+      "license": "AGPL-3.0-only",
+      "profile": "observability",
+      "role": "Local native observation dashboard",
+      "commands": [
+        "grafana --version",
+        "curl --fail --silent http://127.0.0.1:13000/api/health"
+      ],
+      "evidence_ids": [
+        "native-observability"
+      ],
+      "source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
+      "upstream_sources": [
+        "https://github.com/grafana/grafana"
+      ],
+      "freshness": "Pinned official release verified on2026-09-19; not an automatic latest-update policy."
+    },
+    {
+      "id": "alertmanager",
+      "repository": "https://github.com/prometheus/alertmanager",
+      "version": "0.34.1",
+      "license": "Apache-2.0",
+      "profile": "observability",
+      "role": "Native alert grouping and delivery",
+      "commands": [
+        "amtool check-config \"$ALERTMANAGER_CONFIG\""
+      ],
+      "evidence_ids": [
+        "native-observability"
+      ],
+      "source_pin": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
+      "upstream_sources": [
+        "https://github.com/prometheus/alertmanager"
+      ],
+      "freshness": "Pinned official release verified on2026-09-19; not an automatic latest-update policy."
+    },
+    {
+      "id": "ntfy",
+      "repository": "https://github.com/binwiederhier/ntfy",
+      "version": "2.28.0",
+      "license": "Apache-2.0 OR GPL-2.0-only",
+      "profile": "observability",
+      "role": "Local retained notification inbox",
+      "commands": [
+        "ntfy --version",
+        "curl --fail --silent http://127.0.0.1:18080/v1/health"
+      ],
+      "evidence_ids": [
+        "native-observability"
+      ],
+      "source_pin": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
+      "upstream_sources": [
+        "https://github.com/binwiederhier/ntfy"
+      ],
+      "freshness": "Pinned official release verified on2026-09-19; not an automatic latest-update policy."
     }
   ],
   "profiles": [
@@ -832,6 +952,18 @@
         "promptfoo",
         "shanraisshan/claude-code-best-practice",
         "worktrunk"
+      ]
+    },
+    {
+      "id": "observability",
+      "purpose": "Local native metrics, filtered event storage, dashboards and deterministic notifications",
+      "component_ids": [
+        "opentelemetry-collector-contrib",
+        "prometheus",
+        "loki",
+        "grafana",
+        "alertmanager",
+        "ntfy"
       ]
     }
   ],

@@ -13,7 +13,9 @@ const nativeRequire = createRequire(path.join(prefix, 'package.json'));
 const version = nativeRequire('gpt-tokenizer/package.json').version;
 if (version !== '3.4.0') throw new Error(`Expected tokenizer3.4.0, found ${version}`);
 const { encode } = nativeRequire('gpt-tokenizer/encoding/o200k_base');
-const files = process.argv.includes('--catalog')
+const files = process.argv.includes('--observability')
+  ? ['evidence/artifacts/observability-metrics.source.json', 'evidence/artifacts/observability-metrics.selected.json']
+  : process.argv.includes('--catalog')
   ? ['evidence/artifacts/catalog-models.full.txt', 'evidence/artifacts/catalog-models.selected.txt']
   : ['evidence/artifacts/usage-report.source.txt', 'evidence/artifacts/retrieved-code.txt'];
 const counts = files.map(file => ({ file, tokens: encode(readFileSync(path.join(root, file), 'utf8')).length }));

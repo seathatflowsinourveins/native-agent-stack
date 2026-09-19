@@ -1,0 +1,1 @@
+{"check":"native-observability-e2e","expected_sum":42,"values":[17,25],"services":["collector","prometheus","loki","grafana"]}

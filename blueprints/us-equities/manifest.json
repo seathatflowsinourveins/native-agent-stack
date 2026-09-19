@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "snapshot_date": "2026-09-19",
-  "scope": "Native US-equities research/backtest extension; Alpaca paper target not yet connected. Baseline36-component inventory remains separately versioned.",
+  "scope": "Native US-equities research/backtest extension; Alpaca paper target not connected. Baseline42-component inventory includes the local observation profile.",
   "baseline_manifest": "../../manifests/stack.json",
   "profile": "native Codex Astra research + optional DeerFlow/routers + deterministic LEAN engine + Alpaca paper target",
   "components": [
@@ -105,7 +105,9 @@
     "Full DeerFlow planner/UI/persistent hosting; ACP read-only preset is workspaceWrite",
     "Standing trading service and in-flight/broker restart/recovery acceptance",
     "Context Mode file-tool workspace override requires normal native MCP approval; trusted ctx_execute already works.",
-    "OmniRoute simple text inference accepted; native tool/hook/compaction parity and failed-attempt provider usage remain unproved."
+    "OmniRoute simple text inference accepted; native tool/hook/compaction parity and failed-attempt provider usage remain unproved.",
+    "SDK native turn histogram unobserved; separate native file-receiver receipt accounting accepted.",
+    "Existing Desktop exporter activation and off-host operational acceptance remain separate."
   ],
   "receipt_integrity": [
     {
@@ -145,5 +147,6 @@
       "sha256": "4308f002936d354757ab819b1b537e26db41c76bf8201f58e0ce559750986afc"
     }
   ],
-  "gap_resolution": "gap-resolution.json"
+  "gap_resolution": "gap-resolution.json",
+  "observability_manifest": "../../observability/receipt.json"
 }

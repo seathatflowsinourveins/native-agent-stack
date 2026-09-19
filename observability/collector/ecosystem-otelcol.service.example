@@ -1,0 +1,17 @@
+[Unit]
+Description=Native agent ecosystem OpenTelemetry Collector
+After=network.target
+
+[Service]
+Type=simple
+UMask=0077
+Environment=ECOSYSTEM_OBSERVABILITY_DATA=@DATA_ROOT@
+ExecStart=@COLLECTOR_INSTALL_DIR@/otelcol-contrib --config=@CONFIG_ROOT@/collector.yaml
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+MemoryMax=512M
+
+[Install]
+WantedBy=default.target
