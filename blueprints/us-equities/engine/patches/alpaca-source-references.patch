@@ -1,0 +1,9 @@
+diff --git a/QuantConnect.AlpacaBrokerage/QuantConnect.AlpacaBrokerage.csproj b/QuantConnect.AlpacaBrokerage/QuantConnect.AlpacaBrokerage.csproj
+index 3292319..73e4a15 100644
+--- a/QuantConnect.AlpacaBrokerage/QuantConnect.AlpacaBrokerage.csproj
++++ b/QuantConnect.AlpacaBrokerage/QuantConnect.AlpacaBrokerage.csproj
+@@ -31,2 +31,2 @@
+-		<PackageReference Include="QuantConnect.Brokerages" Version="2.5.*" />
+-		<PackageReference Include="QuantConnect.Lean.Engine" Version="2.5.*" />
++		<ProjectReference Include="..\..\Lean\Brokerages\QuantConnect.Brokerages.csproj" />
++		<ProjectReference Include="..\..\Lean\Engine\QuantConnect.Lean.Engine.csproj" />

@@ -1,0 +1,803 @@
+{
+  "schema_version": 1,
+  "id": "lean-native-dependency-resolution-and-alpaca-build",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-19T12:58:17.944729+00:00",
+  "claim": "Three local LEAN package-reference replacements remove the seven originally reported advisory pairs from the launcher graph; the unchanged bundled backtest passes. The official Alpaca adapter and an explicit source-integration variant compile without broker credentials. Runtime subscription validation was not invoked.",
+  "passed": true,
+  "source_pins": {
+    "lean": {
+      "repository": "https://github.com/QuantConnect/Lean",
+      "commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "upstream_head_matches_when_checked": true,
+      "license": "Apache-2.0"
+    },
+    "alpaca": {
+      "repository": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca",
+      "commit": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+      "upstream_head_matches_when_checked": true,
+      "license": "Apache-2.0"
+    },
+    "dotnet_sdk": "10.0.401"
+  },
+  "local_changes": {
+    "lean_reference_replacements": 3,
+    "adapter_reference_replacements": 2,
+    "strategy_code_changed": false,
+    "launcher_configuration_changed": false,
+    "brokerage_logic_changed": false,
+    "subscription_check_changed": false,
+    "new_warning_suppressions": false,
+    "original_accepted_installation_changed": false,
+    "original_receipt_sha256": "f74599195cbb51ad6c1112dc5af61ccd27bd6aa37f622ed874148f7616f5ede2"
+  },
+  "replacement_packages": [
+    {
+      "id": "ProDotNetZip",
+      "version": "1.20.0",
+      "source_commit": "0c4ac53a75af4fd2409dc7060477c998aff3bef5",
+      "license": "Ms-PL with bundled third-party notices",
+      "nuget": "https://www.nuget.org/packages/ProDotNetZip/1.20.0"
+    },
+    {
+      "id": "NetMQ",
+      "version": "4.0.4.3",
+      "source_commit": "ca87d32d5ca5d8a2675fb7a9925e4b3dc8c35010",
+      "license": "LGPLv3",
+      "nuget": "https://www.nuget.org/packages/NetMQ/4.0.4.3"
+    }
+  ],
+  "results": {
+    "lean_patched_full_solution_build": {
+      "exit_code": 0,
+      "elapsed_seconds": 89.811,
+      "warnings": 7730,
+      "errors": 0,
+      "advisory_pairs": []
+    },
+    "unchanged_backtest": {
+      "exit_code": 0,
+      "elapsed_seconds": 2.07,
+      "status": "Completed",
+      "runtime_error_empty": true,
+      "stack_trace_empty": true,
+      "stderr_bytes": 0,
+      "data_points": 3943,
+      "simulated_orders": 3,
+      "order_events": 6,
+      "order_event_status_counts": {
+        "submitted": 3,
+        "filled": 3
+      },
+      "order_list_hash": "f209ed42701b0419858e0100595b40c0",
+      "matches_original_order_list_hash": true,
+      "algorithm_and_config_bytes_match_original": true,
+      "data_requests": 13,
+      "failed_data_requests": 0,
+      "brokerage_model": "Unchanged upstream default; not Alpaca"
+    },
+    "unmodified_alpaca_build": {
+      "exit_code": 0,
+      "elapsed_seconds": 4.043,
+      "warnings": 11,
+      "errors": 0,
+      "advisory_pairs": [
+        {
+          "warning": "NU1903",
+          "package": "DotNetZip",
+          "version": "1.16.0",
+          "url": "https://github.com/advisories/GHSA-xhg6-9j5j-w4vf"
+        },
+        {
+          "warning": "NU1904",
+          "package": "System.Drawing.Common",
+          "version": "4.7.0",
+          "url": "https://github.com/advisories/GHSA-rxg9-xrhp-64gj"
+        }
+      ]
+    },
+    "source_integrated_alpaca_build": {
+      "exit_code": 0,
+      "elapsed_seconds": 41.425,
+      "warnings": 7471,
+      "errors": 0,
+      "advisory_pairs": []
+    },
+    "vulnerability_audits": {
+      "launcher": {
+        "exit_code": 0,
+        "includes_transitive": true,
+        "format_version": 1,
+        "source": [
+          "https://api.nuget.org/v3/index.json"
+        ],
+        "reported_vulnerable_packages": 0,
+        "reported_problems": 0,
+        "checked_at_utc": "2026-09-19T12:52:37.012022+00:00"
+      },
+      "source_integrated_adapter": {
+        "exit_code": 0,
+        "includes_transitive": true,
+        "format_version": 1,
+        "source": [
+          "https://api.nuget.org/v3/index.json"
+        ],
+        "reported_vulnerable_packages": 0,
+        "reported_problems": 0,
+        "checked_at_utc": "2026-09-19T12:52:39.952512+00:00"
+      }
+    },
+    "locked_restores": {
+      "lean_solution_exit_code": 0,
+      "source_integrated_adapter_exit_code": 0
+    },
+    "original_advisory_pairs_resolved_in_launcher": 7
+  },
+  "resolved_runtime_graphs": {
+    "launcher_selected_packages": [
+      "NetMQ/4.0.4.3",
+      "ProDotNetZip/1.20.0",
+      "System.ServiceModel.Primitives/10.0.652802"
+    ],
+    "adapter_selected_packages": [
+      "ProDotNetZip/1.20.0"
+    ],
+    "original_four_other_package_names_absent_from_both": [
+      "DotNetZip",
+      "System.Drawing.Common",
+      "System.Net.Http.WinHttpHandler",
+      "System.Private.ServiceModel"
+    ],
+    "original_upstream_adapter_qc_package_version": "2.5.18090",
+    "source_integrated_adapter_uses_pinned_lean_projects": true
+  },
+  "retained_failures": [
+    {
+      "attempt": "Source-integrated adapter through symlink to an already-built LEAN checkout",
+      "exit_code": 1,
+      "reason": "Missing Logging reference assembly (CS0006).",
+      "stdout_sha256": "f13d0f5741aadcefd7a8b18c60100d49cb0d0d0543e8867eff15d7abd9df9cbd"
+    },
+    {
+      "attempt": "Same symlink layout with explicit Debug configuration",
+      "exit_code": 1,
+      "reason": "Missing Configuration reference assembly (CS0006).",
+      "stdout_sha256": "730b9feee9c6bf1da4efae4c36aea39d51bf578f5021017a5dc77fb1e8b8ebac"
+    },
+    {
+      "attempt": "Solution-wide list package --vulnerable --include-transitive --no-restore",
+      "exit_code": 1,
+      "reason": "Legacy Algorithm.Python project has no restored assets; final successful audits are scoped to launcher and adapter runtime graphs.",
+      "stdout_sha256": "3ac34bbb887f19f9d5fb07c772bee4b2776a5ed93355696f136b207282d82059"
+    }
+  ],
+  "original_advisories": [
+    {
+      "warning_code": "NU1902",
+      "package": "System.Private.ServiceModel",
+      "version": "4.4.0",
+      "reported_severity": "moderate",
+      "url": "https://github.com/advisories/GHSA-p9wx-v264-q34p"
+    },
+    {
+      "warning_code": "NU1902",
+      "package": "System.ServiceModel.Primitives",
+      "version": "4.4.0",
+      "reported_severity": "moderate",
+      "url": "https://github.com/advisories/GHSA-p9wx-v264-q34p"
+    },
+    {
+      "warning_code": "NU1903",
+      "package": "DotNetZip",
+      "version": "1.16.0",
+      "reported_severity": "high",
+      "url": "https://github.com/advisories/GHSA-xhg6-9j5j-w4vf"
+    },
+    {
+      "warning_code": "NU1903",
+      "package": "System.Net.Http.WinHttpHandler",
+      "version": "4.4.0",
+      "reported_severity": "high",
+      "url": "https://github.com/advisories/GHSA-6xh7-4v2w-36q6"
+    },
+    {
+      "warning_code": "NU1903",
+      "package": "System.Private.ServiceModel",
+      "version": "4.4.0",
+      "reported_severity": "high",
+      "url": "https://github.com/advisories/GHSA-jc8g-xhw5-6x46"
+    },
+    {
+      "warning_code": "NU1903",
+      "package": "System.ServiceModel.Primitives",
+      "version": "4.4.0",
+      "reported_severity": "high",
+      "url": "https://github.com/advisories/GHSA-jc8g-xhw5-6x46"
+    },
+    {
+      "warning_code": "NU1904",
+      "package": "System.Drawing.Common",
+      "version": "4.7.0",
+      "reported_severity": "critical",
+      "url": "https://github.com/advisories/GHSA-rxg9-xrhp-64gj"
+    }
+  ],
+  "commands": [
+    {
+      "scope": "LEAN build",
+      "cwd": "${LEAN_SOURCE}",
+      "argv": [
+        "${DOTNET_ROOT}/dotnet",
+        "build",
+        "QuantConnect.Lean.sln",
+        "--disable-build-servers",
+        "-m:2",
+        "--verbosity",
+        "minimal",
+        "-p:RestorePackagesWithLockFile=true",
+        "-p:NuGetAuditMode=all"
+      ]
+    },
+    {
+      "scope": "Unmodified adapter build",
+      "cwd": "${ALPACA_SOURCE}",
+      "argv": [
+        "${DOTNET_ROOT}/dotnet",
+        "build",
+        "QuantConnect.AlpacaBrokerage/QuantConnect.AlpacaBrokerage.csproj",
+        "--disable-build-servers",
+        "-m:2",
+        "--verbosity",
+        "minimal",
+        "-p:RestorePackagesWithLockFile=true",
+        "-p:NuGetAuditMode=all",
+        "-p:NoWarn="
+      ]
+    },
+    {
+      "scope": "Source-integrated adapter build with fresh physical sibling LEAN",
+      "cwd": "${ALPACA_SOURCE}",
+      "argv": [
+        "${DOTNET_ROOT}/dotnet",
+        "build",
+        "QuantConnect.AlpacaBrokerage/QuantConnect.AlpacaBrokerage.csproj",
+        "-c",
+        "Debug",
+        "--disable-build-servers",
+        "-m:2",
+        "--verbosity",
+        "minimal",
+        "-p:RestorePackagesWithLockFile=true",
+        "-p:NuGetAuditMode=all",
+        "-p:NoWarn="
+      ]
+    },
+    {
+      "scope": "Unchanged bundled backtest",
+      "cwd": "${LEAN_SOURCE}/Launcher/bin/Debug",
+      "argv": [
+        "${DOTNET_ROOT}/dotnet",
+        "QuantConnect.Lean.Launcher.dll"
+      ],
+      "stdin": "DEVNULL"
+    },
+    {
+      "scope": "Runtime advisory audit, repeated for the adapter project",
+      "cwd": "${LEAN_SOURCE}",
+      "argv": [
+        "${DOTNET_ROOT}/dotnet",
+        "list",
+        "Launcher/QuantConnect.Lean.Launcher.csproj",
+        "package",
+        "--vulnerable",
+        "--include-transitive",
+        "--format",
+        "json",
+        "--no-restore"
+      ]
+    }
+  ],
+  "environment_scope": "Build/run child environments contained only selected runtime, path, locale and isolated HOME/CLI/NuGet variables. No inherited broker/provider credentials. No global PATH, account, service or daily tool pointer changed.",
+  "remaining_external_boundary": {
+    "status": "not_exercised_requires_operator_entitlement_and_broker_authorization",
+    "native_source_evidence": "Initialize calls ValidateSubscription; product 347 validated through modules/license/read with QuantConnect user/token/organization settings and machine/network identity. No initialization or validation call was made.",
+    "subscription_check_bypassed": false,
+    "broker_orders_submitted": 0
+  },
+  "limitations": [
+    "Native NuGet advisory results are point-in-time feed checks, not general security certification or proof that older code was unreachable.",
+    "Local dependency/reference patches have not been accepted upstream; sources, licenses and NuGet locks are retained for review.",
+    "The successful source-integrated adapter build is not proof of initialization, brokerage connectivity, Alpaca model simulation, market-data rights or production execution.",
+    "Compiler/analyzer warnings remain; no warning suppression or audit exclusion was introduced. Adapter builds cleared its upstream NoWarn property.",
+    "The full solution package-list audit failed on an unrestored Python project; no clean audit of every solution project is claimed.",
+    "The unmodified adapter build still resolved two advisory pairs through its published QC packages; only the explicitly source-integrated variant avoids those packages.",
+    "The original vulnerable source installation and original backtest receipt remain historical; patched checkouts are separate.",
+    "No strategy profitability, broker reconciliation, restart recovery, paid entitlement or live-order authority was evaluated.",
+    "ProDotNetZip has a different assembly identity from DotNetZip. Dependent source was rebuilt; binary compatibility with unrelated precompiled plugins is not established."
+  ],
+  "reproduction_files": [
+    {
+      "path": "blueprints/us-equities/engine/patches/alpaca-source-references.patch",
+      "sha256": "fc1e2e31e2feaf07fa433bc6478c6769ac8b0aa31d828ada3b53dc306c5b75a6",
+      "bytes": 655
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/alpaca.packages.lock.json",
+      "sha256": "f76d53b5915c799ea56cbffa8583d646de15934477e5e9ff5d70824ae43a401a",
+      "bytes": 13624
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-dependencies.patch",
+      "sha256": "8770d14bf99d130e6fa9ecc460096edb8a7b3728349f8de2dba54b6a5961a058",
+      "bytes": 1892
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Algorithm/packages.lock.json",
+      "sha256": "183848b255b338a19aefffa69c939d388427405db881b5adc80cf0259f9cd8b4",
+      "bytes": 5821
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Algorithm.CSharp/packages.lock.json",
+      "sha256": "a46adb9f04548e24ca81bf3606f938fe6bf5833f44a742ae89bb5e4b861e549c",
+      "bytes": 8664
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Algorithm.Framework/packages.lock.json",
+      "sha256": "57682328d77e84be3a97906e107b49cfe943ec5a1f668e688dec197f1da8b307",
+      "bytes": 7132
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/AlgorithmFactory/packages.lock.json",
+      "sha256": "45b33b147a5d7ec771054a26b941b8375312ef22c8249651e80a18ef8a3a0595",
+      "bytes": 6232
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Api/packages.lock.json",
+      "sha256": "bdc6a6854d60ab0bd6ce7d9aef9f4fa11646856461e5eeeca003c8866cbec97a",
+      "bytes": 5707
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Brokerages/packages.lock.json",
+      "sha256": "8e3dc8c8ab4c3ffc482c5accef4e1545e4239f6c02ce320a06a050444cd2fa82",
+      "bytes": 6274
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Common/packages.lock.json",
+      "sha256": "4fe628fa63dec041dc010abc9ab7928b694cfb86e849a92c470489c5a5234b85",
+      "bytes": 5042
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Compression/packages.lock.json",
+      "sha256": "d65cc3702fea5f1fabf11baeed6ee8e3182730b4e79f11a24d053aefda84565c",
+      "bytes": 1538
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Configuration/packages.lock.json",
+      "sha256": "66b8dffd609a113bfbadd6255a75674031ff1067838fa6f83a3668cc42105a6c",
+      "bytes": 1275
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/DownloaderDataProvider/packages.lock.json",
+      "sha256": "7ebc8c941d27b8d4d3b2b7779abeeb78e32105a6112b58c4f4ab69a30f532c45",
+      "bytes": 11539
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Engine/packages.lock.json",
+      "sha256": "dc1e6573fd82be05ad013b31bfcc835df6df5cb35214fdc18995241d9a543715",
+      "bytes": 10874
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Indicators/packages.lock.json",
+      "sha256": "7e9a17ed58b9807dffe624fcb5a625248f6f8c6860788abb493bb985a1e4e9bb",
+      "bytes": 5468
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Launcher/packages.lock.json",
+      "sha256": "9e02f713cf490d5916f014e62312d03f4253f075b529a57ef85a30bdc411904d",
+      "bytes": 26156
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Logging/packages.lock.json",
+      "sha256": "3dea7c0ae3867c47b5396abba2d5cbac3982095cc7c1e8c3ac6c2db19f50fc47",
+      "bytes": 322
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Messaging/packages.lock.json",
+      "sha256": "17251bbb64c71724b3bf3c55af42217faa6cf220daa02825de8ddf0fa2b31bd5",
+      "bytes": 7445
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Optimizer/packages.lock.json",
+      "sha256": "4007eda50007c324e9aa78170c15103a9051f4897a409eefc5e64c438e0a3573",
+      "bytes": 5438
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Optimizer.Launcher/packages.lock.json",
+      "sha256": "818f5ae40378b30aedfc9969421a3424c0442aefc27e882563f6759845c0de90",
+      "bytes": 5732
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Queues/packages.lock.json",
+      "sha256": "1c16b735afaf437e3fb00330a3cf1e3a816a3843908d24dd075420e0742c6f10",
+      "bytes": 6675
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Report/packages.lock.json",
+      "sha256": "a67125134ac7f1de0c426c73c248f0d5df2659d1122e7f7a7b2398470dae8387",
+      "bytes": 14623
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Research/packages.lock.json",
+      "sha256": "a457b3ef9a128fb3fe01e4170e30b2ac8bad665e3618d1e41b28dd2bb09823db",
+      "bytes": 22087
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/Tests/packages.lock.json",
+      "sha256": "e2cebe0422f87419371ea2bda6e491f1658cc997e7c34b14275729527b27fd99",
+      "bytes": 32030
+    },
+    {
+      "path": "blueprints/us-equities/engine/patches/lean-locks/ToolBox/packages.lock.json",
+      "sha256": "7ebc8c941d27b8d4d3b2b7779abeeb78e32105a6112b58c4f4ab69a30f532c45",
+      "bytes": 11539
+    }
+  ],
+  "private_artifacts": [
+    {
+      "name": "GHSA-6xh7-4v2w-36q6.json",
+      "sha256": "b76282025b894554ebc893445c52197c8839391de0acfeb1b833814563a1a24d",
+      "bytes": 11542
+    },
+    {
+      "name": "GHSA-jc8g-xhw5-6x46.json",
+      "sha256": "a5ca3765adc0f2bfc025d7e9a1f55ca128e342b63981b6c1430844079a3f3124",
+      "bytes": 8468
+    },
+    {
+      "name": "GHSA-p9wx-v264-q34p.json",
+      "sha256": "32886a57ac5527b2aa4b0d63e2afe1147411d42f9d2b4bdd9d4d3de8d5b428aa",
+      "bytes": 10562
+    },
+    {
+      "name": "GHSA-rxg9-xrhp-64gj.json",
+      "sha256": "3bbfe11d87a2ad66562802c028f8053df027f7afc3512e0ad3f91e8b49e6b0dc",
+      "bytes": 2163
+    },
+    {
+      "name": "GHSA-xhg6-9j5j-w4vf.json",
+      "sha256": "775e83ab5b9b8ceefa0eed79a141cfc89bbd56b7f57f05e98d975072bd22ac8f",
+      "bytes": 3842
+    },
+    {
+      "name": "alpaca-build-start.json",
+      "sha256": "0e99ae56a95dd441c7bb15737f48e3d3a255b31a65d2b98495a65488b8084170",
+      "bytes": 900
+    },
+    {
+      "name": "alpaca-build.json",
+      "sha256": "0ba5ea223f38a09dcd2848ee9d6c6f8c07432b4915361c39a3640b5c09a348ab",
+      "bytes": 946
+    },
+    {
+      "name": "alpaca-build.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "alpaca-build.stdout.txt",
+      "sha256": "90a1840c7d33f198bd40b381630763920bb4421b0c43e765e60e88e934693947",
+      "bytes": 7985
+    },
+    {
+      "name": "alpaca-integrated-build-start.json",
+      "sha256": "2a059e114f86a86264ab61f492c554aed4de101c42b120d1789a14d40d16b028",
+      "bytes": 955
+    },
+    {
+      "name": "alpaca-integrated-build.json",
+      "sha256": "628055ac55f1644eacec3b6c2623f24143555f970c2a6953100ff9f0e5295181",
+      "bytes": 1001
+    },
+    {
+      "name": "alpaca-integrated-build.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "alpaca-integrated-build.stdout.txt",
+      "sha256": "f13d0f5741aadcefd7a8b18c60100d49cb0d0d0543e8867eff15d7abd9df9cbd",
+      "bytes": 30363
+    },
+    {
+      "name": "alpaca-integrated-debug-build.json",
+      "sha256": "087609e8eca37d758e6de9bc6341c1cebe950adbc286bdcbb03e73f0620a040b",
+      "bytes": 959
+    },
+    {
+      "name": "alpaca-integrated-debug-build.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "alpaca-integrated-debug-build.stdout.txt",
+      "sha256": "730b9feee9c6bf1da4efae4c36aea39d51bf578f5021017a5dc77fb1e8b8ebac",
+      "bytes": 90744
+    },
+    {
+      "name": "alpaca-integrated-locked-restore.json",
+      "sha256": "3b94ec178032f6c7992116d66a130ab24d9cee42ea58ac50c6fdba2d966e8814",
+      "bytes": 463
+    },
+    {
+      "name": "alpaca-integrated-locked-restore.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "alpaca-integrated-locked-restore.stdout.txt",
+      "sha256": "d71938cbad794b2385321de0a46bbc58ec657f3fb4993eda7156d0e2171cfd91",
+      "bytes": 2685
+    },
+    {
+      "name": "alpaca-integrated-physical-build.json",
+      "sha256": "c429cdaf861ef87ffd73dd1abd25604c846da96754c4f74f496ed09a2c214ecb",
+      "bytes": 986
+    },
+    {
+      "name": "alpaca-integrated-physical-build.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "alpaca-integrated-physical-build.stdout.txt",
+      "sha256": "c8cc20a012d69ceb1bfacb85695eca9966ea362025058130ffe407d9401aa7e3",
+      "bytes": 8067053
+    },
+    {
+      "name": "alpaca-integrated-vulnerability-audit.json",
+      "sha256": "659dcec4e370db23bfbea19b507fbb6f318aa81c141e47e650e305821772424f",
+      "bytes": 476
+    },
+    {
+      "name": "alpaca-integrated-vulnerability-audit.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "alpaca-integrated-vulnerability-audit.stdout.txt",
+      "sha256": "f3d8a03439e0a580a70b5c5e28e1015c3b9c3aca5cc532fe63665144ec33c69c",
+      "bytes": 333
+    },
+    {
+      "name": "alpaca-upstream-head.json",
+      "sha256": "1b8bc7944c25a4c4dd75de1e6e3f613b429aa8de14571fd8d295f1d0c1a78495",
+      "bytes": 8266
+    },
+    {
+      "name": "alpaca-upstream-packages.lock.json",
+      "sha256": "d56bd2de951c0771d80aca66079b063efad067978d1546e928fd8085d5a09e03",
+      "bytes": 16255
+    },
+    {
+      "name": "alpaca-upstream-project.assets.json",
+      "sha256": "62f4b1b92cf8140ad970ee346f277bdff7cc43ae0413e4836a4b0bcd8df79e84",
+      "bytes": 95621
+    },
+    {
+      "name": "dotnetzip.json",
+      "sha256": "75fd1c022d4af9a2a83826aed42c7ed76dfd0a2a10d6ddfea8417a7c31af4d8a",
+      "bytes": 443
+    },
+    {
+      "name": "lean-launcher-vulnerability-audit.json",
+      "sha256": "dde629be9a61ef7e9c9daa541fe45affee228f4dc682dcc6ebdfdba9538e6974",
+      "bytes": 443
+    },
+    {
+      "name": "lean-launcher-vulnerability-audit.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "lean-launcher-vulnerability-audit.stdout.txt",
+      "sha256": "f0039033fc624d52b0c6d26fc530dab6a1f60ce00ab3ef973a279a6c463b123f",
+      "bytes": 298
+    },
+    {
+      "name": "lean-locked-restore.json",
+      "sha256": "b48c4881601c67032c14c9b00e05ad6f0e694e3570b9056a0041a5a82ca32abe",
+      "bytes": 390
+    },
+    {
+      "name": "lean-locked-restore.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "lean-locked-restore.stdout.txt",
+      "sha256": "d9aade1e0f2b81f6c6278c0a4388742654d9d67845501ccc79f965c936731ead",
+      "bytes": 3064
+    },
+    {
+      "name": "lean-patched-BasicTemplateFrameworkAlgorithm-log.txt",
+      "sha256": "aed85b6557610cec95dbfeb8ed324a626c6264de134c12c70f081540d66677fc",
+      "bytes": 594
+    },
+    {
+      "name": "lean-patched-BasicTemplateFrameworkAlgorithm-order-events.json",
+      "sha256": "8e22c0052e1e769708114064cba69c3ddaec2c5af8148a6cf171e0f296f192de",
+      "bytes": 2279
+    },
+    {
+      "name": "lean-patched-BasicTemplateFrameworkAlgorithm-summary.json",
+      "sha256": "b0f2436dc8b53814e19a1b5d77595a929c8c935d16f68e056eedb6ceec657d7e",
+      "bytes": 4847
+    },
+    {
+      "name": "lean-patched-BasicTemplateFrameworkAlgorithm.json",
+      "sha256": "8fd6fe3ac9da02886bba7ce04447ebffc2f554d3200323d00e95904df5e920ed",
+      "bytes": 46063
+    },
+    {
+      "name": "lean-patched-build-start.json",
+      "sha256": "0974d59c829953d5180e711ada0dd6238d5a8694ca688a274d810722a843502b",
+      "bytes": 778
+    },
+    {
+      "name": "lean-patched-build.json",
+      "sha256": "9c74b0d1c61b9612dfad370594606b8798ddba6ee4eda4502ede040d6a1e0ec7",
+      "bytes": 825
+    },
+    {
+      "name": "lean-patched-build.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "lean-patched-build.stdout.txt",
+      "sha256": "45cb1c5bdbf199f2ea2cfa7b9588c4040d5220b6879ebb68e5fbe41918a3d9fd",
+      "bytes": 7240710
+    },
+    {
+      "name": "lean-patched-run.json",
+      "sha256": "6e2a9bf6bf2360d160590a56cc6820428dab7e66ad21e45213c94645b8eb0944",
+      "bytes": 677
+    },
+    {
+      "name": "lean-patched-run.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "lean-patched-run.stdout.txt",
+      "sha256": "c5c2fc0554527cd422362286031fca43bc672553d9d7325ed6e31c9a13d5fdda",
+      "bytes": 8424
+    },
+    {
+      "name": "lean-upstream-head.json",
+      "sha256": "d78f57fa13f839fc34976496e2f76dd88097304ad03d1c07ae4c37dc57bb6102",
+      "bytes": 12836
+    },
+    {
+      "name": "lean-vulnerability-audit.json",
+      "sha256": "5b9915fe56f32b76f7d1a3ad13248086497f7e3b214d3a8a9778b0c907f64485",
+      "bytes": 423
+    },
+    {
+      "name": "lean-vulnerability-audit.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "lean-vulnerability-audit.stdout.txt",
+      "sha256": "3ac34bbb887f19f9d5fb07c772bee4b2776a5ed93355696f136b207282d82059",
+      "bytes": 3893
+    },
+    {
+      "name": "netmq-4.0.4.3.nupkg",
+      "sha256": "c8abb6348677452798c9ae90dbaf78dc455253adbd5b43651ebae18d8606dd48",
+      "bytes": 638828
+    },
+    {
+      "name": "netmq-4.0.4.3.nuspec",
+      "sha256": "1bb26a74b68a5f73cceb5e6a01b0a79a1e0f07a86240a1ca5cd7e04e6ab378ac",
+      "bytes": 2645
+    },
+    {
+      "name": "netmq-index.json",
+      "sha256": "9bba9a42e3a871cb92112647beadc48f496aba30b18dac0ba1f2d4bef5ad6da2",
+      "bytes": 1471
+    },
+    {
+      "name": "prodotnetzip-1.20.0.nupkg",
+      "sha256": "ad4aebf6e306c55288240c5b8a7744bcd1b5b9283f849a7414aee9b049b54f31",
+      "bytes": 429638
+    },
+    {
+      "name": "prodotnetzip-1.20.0.nuspec",
+      "sha256": "3bb58555140c5abf432742da278c16dc1ae49b5e46df9231fb7eeeb1d8f11674",
+      "bytes": 1277
+    },
+    {
+      "name": "prodotnetzip-repo.json",
+      "sha256": "8e335f0237ba170b21dca7b17d2e8ca24cc1afa4e83149c02f363dd414f548cd",
+      "bytes": 16319
+    },
+    {
+      "name": "prodotnetzip.json",
+      "sha256": "7fa9385e1a31e2f124920e22d4aa991315f7b30344560f958c45b080b1402efc",
+      "bytes": 100
+    },
+    {
+      "name": "system.drawing.common.json",
+      "sha256": "2d039f1eb5c824222bb53abb2eac92ee310f28b9871c58ff33d8624058a75c54",
+      "bytes": 3870
+    },
+    {
+      "name": "system.net.http.winhttphandler.json",
+      "sha256": "0b4fd947fc2eb66031b084cc67f0c315e7b9a7e743ef6c96deef9bc0ab34b98e",
+      "bytes": 3925
+    },
+    {
+      "name": "system.private.servicemodel.json",
+      "sha256": "d077520a4cb2851351f7bec51001ae56f6e054224b28801009f12c60e7d50eba",
+      "bytes": 1117
+    },
+    {
+      "name": "system.servicemodel.primitives.json",
+      "sha256": "d5d6c90d382ff111c7dbbf9b90eab97a695284790d04b336a0fa2baadfea74bc",
+      "bytes": 1514
+    },
+    {
+      "name": "lean-patched-project.assets.json",
+      "sha256": "a84998c5088137b36bcf3190f5e4fca6a00080500ab4ad8d77f1e130e28a5ad8",
+      "bytes": 227034
+    },
+    {
+      "name": "lean-patched-launcher.deps.json",
+      "sha256": "b992e04aeb75184757328accbf45b7be258c34b539d785d1bc1c7e298836e08e",
+      "bytes": 68248
+    },
+    {
+      "name": "alpaca-integrated-project.assets.json",
+      "sha256": "287a9c34920e6c0c9378c390101ef359f2077025175337bad4705fd22e22c135",
+      "bytes": 79017
+    },
+    {
+      "name": "alpaca-integrated.deps.json",
+      "sha256": "8cdb643d79b8c3a502a8b68ecead469e3447467153cfcc1ea04c9b7a24c25ef0",
+      "bytes": 26131
+    }
+  ],
+  "sources": [
+    "https://github.com/QuantConnect/Lean/tree/985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+    "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/tree/1973f6165bee212acf656ed2f9cb0af86d4f2a18",
+    "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/QuantConnect.AlpacaBrokerage/AlpacaBrokerage.cs#L994",
+    "https://github.com/mihula/ProDotNetZip/tree/0c4ac53a75af4fd2409dc7060477c998aff3bef5",
+    "https://github.com/zeromq/netmq/tree/ca87d32d5ca5d8a2675fb7a9925e4b3dc8c35010",
+    "https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-package-list",
+    "https://learn.microsoft.com/en-us/nuget/consume-packages/package-references-in-project-files#locking-dependencies",
+    "https://github.com/advisories/GHSA-6xh7-4v2w-36q6",
+    "https://github.com/advisories/GHSA-jc8g-xhw5-6x46",
+    "https://github.com/advisories/GHSA-p9wx-v264-q34p",
+    "https://github.com/advisories/GHSA-rxg9-xrhp-64gj",
+    "https://github.com/advisories/GHSA-xhg6-9j5j-w4vf"
+  ],
+  "compiled_artifacts": [
+    {
+      "name": "patched-lean-launcher",
+      "sha256": "e5bf96c89942f1148c8ab3d9b5f4a0171ae7a1dbfb437232c8bd773da31be8ea",
+      "bytes": 11264
+    },
+    {
+      "name": "official-upstream-alpaca-library",
+      "sha256": "797d6ac1775e3bdc951e7df71ffda924b35b0375ed770222b16e55648502c9b0",
+      "bytes": 79872
+    },
+    {
+      "name": "source-integrated-alpaca-library",
+      "sha256": "c990eb666904d54de1bb062bee15e78dc99e35723410e0493998cd5459dd599e",
+      "bytes": 79872
+    }
+  ]
+}

@@ -4,6 +4,8 @@ This blueprint selects [QuantConnect LEAN](https://github.com/QuantConnect/Lean)
 
 The native check uses the upstream C# `BasicTemplateFrameworkAlgorithm`, its unchanged default backtesting configuration, and bundled SPY minute data for October 7–11, 2013. The sample is an engine acceptance fixture, not a selected investment strategy or evidence of profitable trading. See [the sanitized execution receipt](receipt.json) for the actual result and limitations.
 
+For the current dependency-resolved build, use [the native resolution recipe](resolution.md) and [its separate receipt](resolution-receipt.json). A three-reference local dependency patch removes the seven originally reported package/advisory pairs from the built launcher graph; the unchanged bundled backtest passed again. The official Alpaca adapter also compiled, including a separately labeled variant referencing the patched LEAN source. Its real initialization still requires QuantConnect product-subscription validation and broker authorization. The original source installation and receipt below remain historical evidence, not the recommended dependency graph for new runs.
+
 ## Pins and installation scope
 
 | Component | Recorded identity | Scope |
@@ -16,9 +18,9 @@ LEAN's old GitHub `releases/latest` entry is not the identity of this source bui
 
 The SDK came from [Microsoft's official .NET 10 release metadata](https://builds.dotnet.microsoft.com/dotnet/release-metadata/10.0/releases.json). Select the `10.0.401` Linux x64 SDK asset, verify its published SHA-512 before extracting it into an unused prefix, and preserve the complete archive contents. The recorded archive hash is in the receipt.
 
-The build passed with **7,855 upstream warnings and zero errors**. NuGet reported seven package/advisory pairs across five packages, including a critical report for `System.Drawing.Common 4.7.0` and high-severity reports involving `DotNetZip`, `WinHttpHandler` and `ServiceModel`. These packages also appear in the launcher's resolved dependency manifests. The receipt preserves the advisory links; platform-specific exploitability was not assessed. No dependency version was silently overridden. This is a successful local engine check, not a security approval for unattended deployment or untrusted inputs.
+The original build passed with **7,855 upstream warnings and zero errors**. NuGet reported seven package/advisory pairs across five packages, including a critical report for `System.Drawing.Common 4.7.0` and high-severity reports involving `DotNetZip`, `WinHttpHandler` and `ServiceModel`. These packages also appear in that launcher's resolved dependency manifests. The original receipt preserves the advisory links; the separate resolution documents the replacements and replay instead of rewriting this historical result. Neither build establishes security approval for unattended deployment or untrusted inputs.
 
-## Run the native sample
+## Reproduce the original native sample
 
 Use an explicitly selected clone and SDK prefix. The following are native upstream commands, not a replacement backtesting engine. Dependencies are downloaded during the initial build; the sample data are bundled in the source repository.
 
@@ -62,3 +64,5 @@ Alpaca's official [Python SDK](https://github.com/alpacahq/alpaca-py/releases/ta
 Keep research workers outside the execution boundary: they can propose hypotheses, code and evidence for review. Deterministic code must own account/endpoint checks, instrument permissions, stale-data checks, exposure/order limits, unique order identifiers, persistence and reconciliation. After a timeout or reconnect, reconcile broker order state before considering another submission; a timeout is not proof that no order exists. Alpaca documents this boundary in [its order workflow](https://docs.alpaca.markets/us/docs/working-with-orders).
 
 A broker adapter needs its separately configured paper account and execution scope. Paper fills do not establish live execution quality: [Alpaca's simulation limitations](https://docs.alpaca.markets/us/docs/paper-trading) exclude important latency, liquidity and market-impact effects. No strategy, return, market-data entitlement, live-order authority or autonomous deployment readiness is established by the native sample.
+
+The pinned adapter also invokes QuantConnect's product-347 subscription check during initialization, before establishing its Alpaca clients. Source compilation does not remove this entitlement check. See the [source-backed account boundary](resolution.md#remaining-account-and-runtime-boundaries); neither subscription validation nor brokerage initialization was invoked during native acceptance.
