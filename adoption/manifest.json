@@ -79,7 +79,8 @@
     "restic": "blueprints/us-equities/hosting/backup/README.md",
     "dagu": "blueprints/us-equities/hosting/README.md",
     "lean": "blueprints/us-equities/engine/README.md",
-    "syft": "blueprints/us-equities/supply-chain/README.md"
+    "syft": "blueprints/us-equities/supply-chain/README.md",
+    "alpaca-py": "blueprints/us-equities/order-contract/README.md"
   },
   "profiles": [
     {
@@ -120,20 +121,25 @@
         "python3",
         "uv",
         "dagu",
-        "dotnet"
+        "dotnet",
+        "bwrap"
       ],
       "component_ids": [
         "codex",
         "claude-code",
         "duckdb",
         "dagu",
-        "lean"
+        "lean",
+        "alpaca-py"
       ],
       "recipe_paths": [
         "adoption/sdk/README.md",
         "blueprints/us-equities/research-runtime/README.md",
         "blueprints/us-equities/workers/README.md",
-        "blueprints/us-equities/engine/README.md"
+        "blueprints/us-equities/engine/README.md",
+        "blueprints/us-equities/execution-realism/README.md",
+        "blueprints/us-equities/point-in-time/README.md",
+        "blueprints/us-equities/order-contract/README.md"
       ]
     },
     {
@@ -220,7 +226,8 @@
     "read_on_demand": [
       "catalogs/us-equities/convergence-review.json",
       "docs/activation.md",
-      "docs/evidence.md"
+      "docs/evidence.md",
+      "blueprints/us-equities/acceptance-wave/README.md"
     ],
     "next_action_refs": [
       "research-specification",

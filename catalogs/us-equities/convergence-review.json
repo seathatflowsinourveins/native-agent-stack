@@ -52,7 +52,10 @@
     "blueprints/us-equities/supply-chain/receipt.json",
     "adoption/receipt.json",
     "adoption/paired/receipt.json",
-    "blueprints/us-equities/architecture/receipt.json"
+    "blueprints/us-equities/architecture/receipt.json",
+    "blueprints/us-equities/execution-realism/receipt.json",
+    "blueprints/us-equities/point-in-time/receipt.json",
+    "blueprints/us-equities/order-contract/receipt.json"
   ],
   "previous_runtime_evidence": [
     "observability/restart-receipt.json",
@@ -67,13 +70,15 @@
   "open_gates": [
     {
       "id": "research-specification",
-      "state": "needs_product_decision",
-      "required": "User-selected strategy, universe, horizon, source availability and numeric risk limits; bundled LEAN sample remains engine evidence."
+      "state": "tracks_selected_numeric_spec_pending",
+      "required": "User selected both daily and intraday, focused on catalyst/incentive-driven potential movers and pre-positioning/early entry. Finalize eligible universe, event hypotheses, intervals, labels, latency/cost and numeric risk/capital/promotion criteria; no strategy is yet accepted.",
+      "evidence": "blueprints/us-equities/acceptance-wave/research-protocol.json"
     },
     {
       "id": "accepted-pit-source",
-      "state": "blocked_access_and_data",
-      "required": "Approved identity and entitled point-in-time data. SEC403 retained; no unchanged retry."
+      "state": "synthetic_contract_accepted_real_source_pending",
+      "required": "Obtain an entitled source with authenticated availability, adjustment, identifier and historical universe coverage. Native synthetic DuckDB selection, revision timing and integrity passed; SEC403 remains retained without unchanged retry.",
+      "evidence": "blueprints/us-equities/point-in-time/receipt.json"
     },
     {
       "id": "retrieval-quality",
@@ -107,15 +112,15 @@
     },
     {
       "id": "execution-realism",
-      "state": "source_identified_gap",
-      "required": "Calibrate depth/partial fills, latency, costs and capacity for the selected strategy. Default LEAN equity fills plus price slippage do not establish executable quantity realism; paper also omits material effects.",
-      "evidence": "catalogs/us-equities/architecture/trading.json"
+      "state": "native_cost_sensitivity_accepted_calibration_pending",
+      "required": "Native LEAN constant fee/slippage sensitivity and serialized cash reconciliation passed. Calibrate quantity/partial fills, latency, spread, impact and capacity for the selected strategy and data; the fixed five-day fixture does not satisfy this gate.",
+      "evidence": "blueprints/us-equities/execution-realism/receipt.json"
     },
     {
       "id": "elite-adapter-capability",
-      "state": "native_offline_incompatibility_observed",
-      "required": "Current alpaca-py0.44.0 drops advanced_instructions. Keep DMA/VWAP/TWAP unaccepted until reviewed fail-closed intent serialization, valid wire/replace/cancel contracts and actual provider/account support are proved.",
-      "evidence": "blueprints/us-equities/architecture/alpaca-probe.json"
+      "state": "offline_basic_guard_accepted_advanced_pending",
+      "required": "The strict offline basic create-intent guard rejects advanced fields that alpaca-py0.44.0 drops. Advanced instructions remain unsupported locally. The source-reviewed JS SDK mapping is unexecuted; valid provider wire/replace/cancel, account support and reconciliation remain required.",
+      "evidence": "blueprints/us-equities/order-contract/receipt.json"
     }
   ],
   "portable_continuation": "adoption/manifest.json",
@@ -148,6 +153,15 @@
     "alpaca_public_organization_repositories": 94,
     "native_review": "blueprints/us-equities/architecture/receipt.json",
     "native_review_tokens": 44214,
+    "net_provider_tokens_saved": null
+  },
+  "acceptance_followup": {
+    "date": "2026-09-19",
+    "summary": "blueprints/us-equities/acceptance-wave/README.md",
+    "research_protocol": "blueprints/us-equities/acceptance-wave/research-protocol.json",
+    "independent_offline_capabilities": true,
+    "joined_market_to_broker_workflow": false,
+    "broker_orders": 0,
     "net_provider_tokens_saved": null
   }
 }

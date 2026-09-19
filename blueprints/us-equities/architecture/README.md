@@ -1,5 +1,11 @@
 # Architecture convergence and next roles — September 19, 2026
 
+The subsequent [native acceptance wave](../acceptance-wave/README.md) supplies
+LEAN cost sensitivity, a synthetic temporal-data contract and a strict offline
+Alpaca guard. The user selected [daily and intraday catalyst research](../acceptance-wave/research-protocol.md),
+including historical +200% movers. Remaining numeric, data and broker gates are
+recorded separately from those completed offline checks.
+
 The selected foundation is a **personal research and simulation system**, with
 Alpaca paper integration as a subsequent acceptance milestone. Its design uses
 models for bounded research and review, and deterministic services for data,

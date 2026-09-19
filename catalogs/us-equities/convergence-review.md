@@ -1,5 +1,12 @@
 # Research and native acceptance — September 19, 2026
 
+The later [acceptance wave](../../blueprints/us-equities/acceptance-wave/README.md)
+adds native LEAN fee/slippage sensitivity, synthetic temporal selection and an
+offline Alpaca guard. The component map now has 48 entries. The user selected
+daily/intraday catalyst research and historical +200% mover discovery; real-source,
+execution calibration and numeric promotion gates remain open. Earlier counts
+and receipts below retain their historical scope.
+
 The current selection supports local native Codex/Claude research, bounded
 retrieval, durable memory, code RAG, deterministic LEAN/data processing, manual
 Dagu hosting and local observation. This follow-up examined **27 repository

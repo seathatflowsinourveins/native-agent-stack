@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "id": "daily-intraday-catalyst-reference-v0",
+  "status": "user_selected_tracks_pending_data_and_numeric_criteria",
+  "checked_at": "2026-09-19",
+  "scope": "User-selected daily and intraday research focused on pre-positioning or early entry in potential large movers. Incentive-driven is provisionally interpreted as catalyst/event-driven; detailed hypotheses remain proposals.",
+  "authority": {
+    "mode": "offline_research_only",
+    "broker_orders_allowed": false,
+    "paid_data_or_hosting_allowed": false,
+    "live_promotion_allowed": false
+  },
+  "objective": "Test whether time-known catalysts and early observable price/liquidity signals improve predeclared outcomes after realistic costs, without selecting eventual winners retrospectively.",
+  "hypotheses": [
+    {
+      "id": "H0",
+      "role": "mechanics_reference",
+      "description": "Deterministic fixed schedule to verify accounting and timing, without alpha inference."
+    },
+    {
+      "id": "H1",
+      "role": "pre_event_candidate",
+      "description": "A catalyst schedule known before the decision plus predeclared incentive/fundamental/liquidity features predicts a predeclared outcome relative to controls.",
+      "boundary": "Future event content, surprise, later schedule revisions and eventual mover ranking cannot be features. No pre-positioning on an unscheduled release learned afterward."
+    },
+    {
+      "id": "H2",
+      "role": "post_event_early_entry_candidate",
+      "description": "An actually received catalyst with trailing relative volume, price movement and liquidity features identifies candidates early enough to retain value after costs.",
+      "boundary": "Freeze reaction window, event-to-receipt delay, feature window, eligible quote/fill rules, exit and nonfill treatment before scoring."
+    },
+    {
+      "id": "H3",
+      "role": "event_signal_ablation",
+      "description": "Compare event-only, price/volume-only, combined and no-signal controls using the same eligible universe, information cutoff and execution assumptions.",
+      "boundary": "Track every attempted feature/model/parameter family in the trial ledger, including unsuccessful variants."
+    }
+  ],
+  "data_requirements": [
+    "Entitled immutable raw snapshot and hashes; source, feed, adjustment policy and pagination completeness.",
+    "Availability evidence separate from event time and local ingestion time; revisions selected only when known by the decision cutoff.",
+    "Corporate actions, cash dividends, splits, delistings and any universe membership changes must have explicit treatment.",
+    "An actual accepted dataset is required before market-performance claims. Synthetic temporal fixtures and bundled LEAN data only establish scoped mechanics.",
+    "Catalyst source ID, initial publication, revision/updated time, local received time, snapshot identity and original text hash; event schedules require as-known revision history.",
+    "Versioned complete eligible candidate universe at each cutoff, including nonmovers, delistings, halted and rejected names; price, volume, float/liquidity and session filters must be known then.",
+    "Feed, session, late/corrected bars, quote timestamp/spread, halt/resumption, corporate-action and news duplication semantics are explicit. Historical news timestamps alone do not reconstruct historical ingestion latency.",
+    "Historical +200% event extraction must preserve price anchor/horizon, first crossing, raw/adjusted values, source/feed, IPO/mapping/corporate actions, halt/session/liquidity and bad-tick checks. No case census was acquired in this wave.",
+    "Current microsecond PIT fixture rejects native nanosecond ticks; preserve original timestamp/sequence and require exact finer precision or an independently validated conservative policy."
+  ],
+  "evaluation": {
+    "split_policy": "Chronological train/validation/frozen-holdout intervals chosen and recorded before scoring; no shuffled cross-validation.",
+    "intervals": null,
+    "embargo_and_purge": "Derive from target/holding overlap and information timing; a fixed arbitrary gap is not a guarantee of no leakage.",
+    "trial_ledger": "Record every attempted rule/parameter/version, including rejected variants and failures. A pre-existing historical interval is not automatically an unseen holdout.",
+    "metrics": [
+      "Net and gross return accounting",
+      "Drawdown and exposure",
+      "Turnover, fees and slippage sensitivity",
+      "Fill quantity, latency and capacity assumptions",
+      "Dependence-aware uncertainty where sample size supports it",
+      "Benchmark-relative outcomes under identical information/cost assumptions",
+      "Candidate precision/recall at the frozen forward-move target; lead time and alert count",
+      "Net outcomes including all signals, nonfills, false positives, halted names and missed moves",
+      "Performance by daily/intraday, catalyst type, session, liquidity and regime with minimum-sample rules declared before evaluation"
+    ],
+    "statistical_promotion_thresholds": null,
+    "mechanical_acceptance": [
+      "No post-cutoff observations or revisions selected",
+      "No same-bar signal/execution leakage",
+      "Exact cash, position and fee reconciliation",
+      "Adverse costs worsen a fixed schedule as expected",
+      "Explicit failures for unsupported/unknown order fields",
+      "Repeatable results tied to code/data/config hashes"
+    ],
+    "target_definition": {
+      "mover_label": "Predeclare forward horizon, return/volatility definition and positive/negative direction. Future mover labels are outcomes only.",
+      "candidate_selection": "Score every eligible candidate at each cutoff. Never construct the universe from the eventual top gainers or surviving winners.",
+      "preposition_and_entry": "Evaluate scheduled pre-event and post-signal entry as separate cohorts; report latency, false positives and missed moves.",
+      "parameters": null
+    },
+    "ledgers": {
+      "experiment": [
+        "hypothesis",
+        "feature/parameter family",
+        "model/prompt/code/data/config version",
+        "attempt/failure",
+        "evaluated intervals",
+        "previously inspected results"
+      ],
+      "candidate": [
+        "every eligible/rejected/missing asset-event",
+        "eligibility reason and as-known rank",
+        "source versions and hashes",
+        "decision cutoff and feature-completion",
+        "session/halt state",
+        "fill/nonfill",
+        "future outcome label"
+      ]
+    },
+    "event_grouping": "Keep related issuer-event versions and daily/intraday cohorts from leaking across development/evaluation splits."
+  },
+  "user_owned_decisions": {
+    "research_track": [
+      "daily",
+      "intraday"
+    ],
+    "capital_usd": null,
+    "max_position_notional_usd": null,
+    "max_gross_exposure": null,
+    "max_drawdown_policy": null,
+    "account_and_feed_entitlement": null,
+    "hosting_destination_and_budget": null
+  },
+  "next_gate": "Accept source rights and time-known candidate/catalyst data; freeze cohorts, labels, intervals, latency/cost assumptions and numeric research/risk criteria before scoring and any later paper progression.",
+  "references": [
+    "blueprints/us-equities/architecture/README.md",
+    "catalogs/us-equities/convergence-review.json",
+    "https://skfolio.org/user_guide/model_selection.html",
+    "https://www.quantconnect.com/docs/v2/writing-algorithms/reality-modeling/slippage/supported-models",
+    "https://docs.alpaca.markets/us/docs/streaming-real-time-news",
+    "https://docs.alpaca.markets/us/reference/news-3",
+    "https://docs.alpaca.markets/us/reference/stockbars",
+    "https://docs.alpaca.markets/us/docs/real-time-stock-pricing-data",
+    "https://www.nasdaqtrader.com/Trader.aspx?id=TradeHaltCodes",
+    "https://docs.alpaca.markets/us/docs/orders-at-alpaca",
+    "https://skfolio.org/generated/skfolio.model_selection.WalkForward.html"
+  ],
+  "user_direction": {
+    "tracks": [
+      "daily",
+      "intraday"
+    ],
+    "focus": "Incentive-driven highest movers; preposition or enter at an early stage.",
+    "interpretation": "Catalyst/event-driven hypotheses; no profit, timing or tradability guarantee.",
+    "extreme_move_interest": "Historical US-equity moves of +200% or more.",
+    "factor_and_regime_workflow": "Research factors/incentives and complementary data APIs; evaluate automatic strategy selection according to market status."
+  },
+  "tracks": [
+    {
+      "id": "daily",
+      "asset_class": "US-listed equities and ETFs",
+      "role": "Daily candidate formation and scheduled-event pre-positioning research",
+      "signal_cutoff": "Declared decision time after all required observations are actually available; a close-derived signal cannot execute at that same close.",
+      "earliest_execution": "Next eligible tradable opportunity strictly after information availability and declared decision latency.",
+      "calendar": "Venue-appropriate exchange calendar; XNYS baseline only where applicable.",
+      "mechanics_reference": "Fixed SPY schedule is a separate accounting control, not the target strategy or a survivorship-safe universe."
+    },
+    {
+      "id": "intraday",
+      "asset_class": "Point-in-time eligible US-listed equities",
+      "role": "Early catalyst/relative-volume/price-move detection and post-signal entry research",
+      "signal_cutoff": "Rolling event-time cutoff with received/available timestamps and late-update policy; no final day high, final volume or revised bar available later.",
+      "earliest_execution": "After signal availability plus declared observation/decision/order latency, at an eligible quote or later bar; no retroactive fill on the triggering bar.",
+      "session_scope": "Regular-session first mechanical acceptance. Premarket/after-hours are separate experiments needing entitled data and a supported order/session contract; current offline guard rejects extended_hours."
+    }
+  ],
+  "extreme_mover_cohort": {
+    "status": "discovery_design_no_historical_cases_acquired",
+    "minimum_simple_return": 2,
+    "minimum_price_ratio": 3,
+    "anchor_and_horizon": null,
+    "distinct_measures": [
+      "Prior regular close to intraday high",
+      "First executable post-signal quote to declared exit",
+      "Multiday close-to-close"
+    ],
+    "first_threshold_crossing_separate_from_final_high": true,
+    "corporate_actions_and_bad_ticks_require_source_evidence": true,
+    "ipo_without_prior_close_requires_separate_cohort": true,
+    "retrospective_cases_are_development_data": true,
+    "evaluation_requires_full_as_known_candidate_universe": true
+  },
+  "factor_regime_design": "blueprints/us-equities/acceptance-wave/factors-regimes.md",
+  "regime_selector": {
+    "status": "offline_design_not_implemented_or_accepted",
+    "strategy_pool": [],
+    "automatic_new_strategy_adoption": false,
+    "automatic_broker_orders": false,
+    "states": [
+      "WARMING",
+      "NO_NEW_RISK",
+      "HOLD",
+      "ACTIVE"
+    ],
+    "candidate_feature_families": [
+      "known catalysts and scheduled events",
+      "trailing momentum/trend",
+      "realized volatility",
+      "market/sector breadth",
+      "liquidity/spread and volume participation",
+      "halt/session status",
+      "fundamental/dilution/ownership changes with source availability"
+    ],
+    "decision_boundaries": "Declared completed observations or source events after feature availability; daily context remains frozen between scheduled updates.",
+    "confidence_threshold": null,
+    "minimum_advantage": null,
+    "entry_exit_hysteresis": null,
+    "persistence_observations": null,
+    "cooldown": null,
+    "stale_data_behavior": "Block new risk immediately; keep ownership and management of existing positions and working orders.",
+    "portfolio_transition_policy": null,
+    "evaluation": "Nested chronological evaluation of the entire selector plus strategy pool, with switching costs and fixed-strategy/no-switch controls. No retrospective regime label may guide earlier decisions."
+  }
+}

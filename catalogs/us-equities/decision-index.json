@@ -98,10 +98,10 @@
     "repositories": 479,
     "public_star_repositories": 337,
     "beyond_public_stars": 142,
-    "references": 946,
+    "references": 947,
     "repositories_by_record_type": {
       "catalog_card": 147,
-      "component_record": 47,
+      "component_record": 48,
       "legacy_candidate": 19,
       "public_star": 337,
       "research_supplement": 54,
@@ -778,6 +778,7 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
+        "component_record",
         "research_supplement"
       ],
       "references": [
@@ -803,6 +804,12 @@
           "id": "alpaca-py",
           "decision": "default",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/47",
+          "id": "alpaca-py"
         }
       ]
     },

@@ -175,5 +175,14 @@
   "convergence_review": "../../catalogs/us-equities/convergence-review.json",
   "state_recovery": "state-recovery/README.md",
   "retrieval_evaluation": "retrieval-evaluation/receipt.json",
-  "supply_chain": "supply-chain/receipt.json"
+  "supply_chain": "supply-chain/receipt.json",
+  "acceptance_wave": {
+    "summary": "blueprints/us-equities/acceptance-wave/README.md",
+    "receipts": [
+      "blueprints/us-equities/execution-realism/receipt.json",
+      "blueprints/us-equities/point-in-time/receipt.json",
+      "blueprints/us-equities/order-contract/receipt.json"
+    ],
+    "scope": "Independent offline native capabilities; no joined entitled-data, strategy or broker workflow."
+  }
 }

@@ -69,6 +69,12 @@ Use `qmd get` on the exact returned document URI with a bounded range. [Native c
 
 ## Current next moves
 
+Start with the [latest offline acceptances](../blueprints/us-equities/acceptance-wave/README.md)
+and the selected [daily/intraday catalyst protocol](../blueprints/us-equities/acceptance-wave/research-protocol.md).
+The +200% historical mover cohort is a discovery design, not a collected dataset
+or a strategy result. Preserve all eligible candidates, revisions and failed
+signals when defining the next historical replay.
+
 The canonical [open-gate ledger](../catalogs/us-equities/convergence-review.json) retains required inputs and accepted evidence. Priorities are:
 
 The [architecture and role contract](../blueprints/us-equities/architecture/README.md)

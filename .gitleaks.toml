@@ -1,0 +1,18 @@
+# Upstream configuration: https://github.com/gitleaks/gitleaks#configuration
+# Keep all default detection. Three reviewed native binary hashes, not credentials.
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Exact recorded hashes for the three QuantConnect.Api build artifacts"
+condition = "AND"
+paths = ['''^blueprints/us-equities/execution-realism/inputs\.json$''']
+regexTarget = "line"
+regexes = [
+  '''^\s*"Launcher/bin/Debug/QuantConnect\.Api\.dll": "52b34a1b463455b353e3e3c1a5eb73073423b4566fb33f7b048e4915375c3780",?\s*$''',
+  '''^\s*"Launcher/bin/Debug/QuantConnect\.Api\.pdb": "283f667f1519a38887e94d25b9f2d421575cb93c114c3aa3afe709dc3d96521c",?\s*$''',
+  '''^\s*"Launcher/bin/Debug/QuantConnect\.Api\.xml": "828ef6359e33844b81ca839238ffac8f2dcd10995c5629cb40956bf5d4853e5c",?\s*$'''
+]

@@ -145,7 +145,12 @@
         "https://docs.alpaca.markets/us/docs/paper-trading",
         "https://docs.alpaca.markets/us/docs/about-market-data-api",
         "https://github.com/alpacahq/alpaca-py/blob/v0.44.0/alpaca/trading/client.py"
-      ]
+      ],
+      "offline_acceptance": {
+        "evidence_level": "native_cli_e2e",
+        "receipt": "blueprints/us-equities/order-contract/receipt.json",
+        "scope": "Installed 0.44.0 serialization only; local basic guard rejects unsupported advanced instructions before SDK conversion. The credentialed workflow above remains unexecuted."
+      }
     },
     {
       "id": "nautilustrader",

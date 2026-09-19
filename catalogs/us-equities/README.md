@@ -2,7 +2,17 @@
 
 **Dated decision catalog: September 19, 2026.** The north star is native, token-efficient research → reproducible backtesting → Alpaca paper automation. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
 
-The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **479 repository identities**, including all 337 public stars and 142 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 946 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
+The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **479 repository identities**, including all 337 public stars and 142 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 947 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
+
+The [native acceptance follow-up](../../blueprints/us-equities/acceptance-wave/README.md)
+adds scoped evidence for LEAN, DuckDB and the already installed Alpaca SDK. Its
+[next research protocol](../../blueprints/us-equities/acceptance-wave/research-protocol.md)
+targets daily/intraday catalyst and extreme-mover research. This advances existing
+choices without claiming a new source census or accepted historical market dataset.
+
+The [factor/feed and market-regime design](../../blueprints/us-equities/acceptance-wave/factors-regimes.md)
+maps seven complementary source families and proposed automatic selection among
+validated strategies. Those feeds and selector remain pending acquisition/acceptance.
 
 The latest [architecture wave](architecture/README.md) reviews 40 finalist records across foundation, trading and governance lanes, plus official Alpaca sources. It refreshes all public stars and audits 12 complete awesome-list snapshots without treating 6,939 unassessed discovery links as reviewed repositories. Read the [roles, selected stack and promotion gates](../../blueprints/us-equities/architecture/README.md) and [native Astra/Claude review evidence](../../blueprints/us-equities/architecture/receipt.json).
 

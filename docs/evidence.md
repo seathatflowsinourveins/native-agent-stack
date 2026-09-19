@@ -16,6 +16,10 @@ Original raw native streams and account data remain private. Receipts publish se
 
 ## Native workflow results
 
+- [LEAN cost sensitivity](../blueprints/us-equities/execution-realism/receipt.json): three native fixed-order simulations completed with distinct fee/slippage assumptions and reconciled serialized cash; full execution realism remains open.
+- [Temporal snapshot selection](../blueprints/us-equities/point-in-time/receipt.json): native DuckDB/Parquet exercised synthetic revisions, universe changes, feed/adjustment scope and integrity through 11 command exits; actual historical source availability and entitlement remain unaccepted.
+- [Offline Alpaca guard](../blueprints/us-equities/order-contract/receipt.json): native request-model serialization and strict local rejection under network isolation; no client, broker connection, advanced instructions or replace/cancel acceptance.
+
 - `native-context-memory`: historical native Context Mode/Serena/RTK work, plus fresh Context Mode/memory startup on current clients. PreCompact was not deliberately triggered.
 - `native-memory`: both clients retrieved a scoped durable decision page; native lifecycle observations and a cross-client handoff were recorded. Consolidation/backfill were not enabled.
 - `native-rag`: both clients retrieved relevant code through native SocratiCode; real local Nemotron vectors populated Qdrant; an automatic watcher changed persistent payloads after add/update/delete with no tool-triggered catch-up.

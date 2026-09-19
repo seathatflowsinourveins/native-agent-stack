@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-19T15:10:39.830077+00:00",
+  "recorded_at_utc": "2026-09-19T21:10:00Z",
   "scope": "Linux/WSL x86_64 native Codex/Claude workflow; current evidence-backed selection, not an exhaustive global ranking. Exact native results are dated and host-specific.",
   "source_snapshot_commit": "44750edc",
   "components": [
@@ -953,7 +953,8 @@
         "sec-financial-data-20260919",
         "native-research-runtime-20260919",
         "portable-sdk-adoption-20260919",
-        "native-paired-adoption-20260919"
+        "native-paired-adoption-20260919",
+        "native-point-in-time-contract-20260919"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1018,7 +1019,8 @@
       ],
       "evidence_ids": [
         "native-research-runtime-20260919",
-        "native-paired-adoption-20260919"
+        "native-paired-adoption-20260919",
+        "native-lean-execution-sensitivity-20260919"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1045,6 +1047,27 @@
         "https://github.com/anchore/syft/releases/tag/v1.52.0"
       ],
       "freshness": "Native acceptance on 2026-09-19; actual selected SDK inventory, not a whole-host or automatic-update policy."
+    },
+    {
+      "id": "alpaca-py",
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "version": "0.44.0",
+      "license": "Apache-2.0",
+      "profile": "supporting",
+      "role": "Installed official Python SDK; offline basic order request serialization and strict local intent rejection only",
+      "commands": [
+        "python3 blueprints/us-equities/order-contract/order_contract.py < blueprints/us-equities/order-contract/basic-intent.json",
+        "bwrap --unshare-net --ro-bind / / --proc /proc --dev /dev --die-with-parent \"$SDK_PYTHON\" blueprints/us-equities/order-contract/sdk_probe.py"
+      ],
+      "evidence_ids": [
+        "alpaca-offline-order-contract-20260919"
+      ],
+      "upstream_sources": [
+        "https://github.com/alpacahq/alpaca-py/tree/v0.44.0",
+        "https://pypi.org/project/alpaca-py/0.44.0/"
+      ],
+      "source_pin": null,
+      "freshness": "Installed 0.44.0 from the accepted 36-package SDK hash lock; dated offline acceptance on 2026-09-19. No broker connection or advanced-order support."
     }
   ],
   "profiles": [
@@ -1090,7 +1113,8 @@
         "restic",
         "dagu",
         "lean",
-        "syft"
+        "syft",
+        "alpaca-py"
       ]
     },
     {

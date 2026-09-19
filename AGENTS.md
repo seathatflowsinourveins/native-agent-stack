@@ -28,6 +28,12 @@ is the validated repository union; register new decision arrays explicitly with
 `scripts/catalog_decisions.py --write --supplement PATH.json#/collection`.
 Metadata, pinned source review and native execution are different evidence levels.
 
+For the next research/acceptance work, read `blueprints/us-equities/acceptance-wave/README.md`
+and its research protocol on demand. The selected direction is daily/intraday
+catalyst research, including historical +200% mover discovery. Preserve as-known
+candidate universes and source revisions; the current synthetic temporal fixture
+and fixed LEAN schedule are not an accepted historical strategy dataset.
+
 For catalog lookup on a host that adopted the named QMD index, refresh changed
 files with `qmd --index native-agent-stack-catalog update`, then use scoped
 `search` and `get` from `us-equities-catalog` or `us-equities-foundation`.

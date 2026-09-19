@@ -15,6 +15,12 @@ Start with the [current roles and architecture](blueprints/us-equities/architect
 [north-star architecture](blueprints/us-equities/north-star.md)
 and [native commands with direct results](catalogs/us-equities/native-workflows.md).
 
+The latest [native acceptance wave](blueprints/us-equities/acceptance-wave/README.md)
+adds LEAN cost sensitivity, synthetic DuckDB temporal selection and an offline
+Alpaca order guard. The selected [research direction](blueprints/us-equities/acceptance-wave/research-protocol.md)
+covers daily/intraday catalyst signals and historical +200% mover discovery;
+an entitled historical dataset and validated trading strategy remain pending.
+
 The [complete star audit](catalogs/us-equities/star-audit.md) records every starred repository; the [latest gap-resolution ledger](blueprints/us-equities/gap-resolution.md) links the new runtime proofs. The earlier [coverage audit](docs/convergence-audit.md) distinguishes the full starred-list metadata refresh from individual repository decisions and local execution, and records newly found research leads outside the original comparison.
 
 The [US-equities foundation](blueprints/us-equities/README.md) extends this stack
