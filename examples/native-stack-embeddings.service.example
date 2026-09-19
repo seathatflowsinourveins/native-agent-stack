@@ -1,0 +1,14 @@
+# Inactive systemd USER unit. Replace every absolute placeholder.
+# vLLM 0.25.0 is the working WSL pin; 0.29.0 failed real UVA startup there.
+[Unit]
+Description=Selected local Nemotron embedding endpoint
+
+[Service]
+Type=simple
+WorkingDirectory=/ABSOLUTE/STACK_HOME
+ExecStart=/ABSOLUTE/STACK_HOME/tools/vllm-0.25.0/bin/vllm serve /ABSOLUTE/STACK_HOME/models/nemotron-3-embed-1b-c0c9fea --served-model-name nvidia/Nemotron-3-Embed-1B-BF16 --host 127.0.0.1 --port 8231 --max-model-len 4096 --max-num-seqs 4 --gpu-memory-utilization 0.16 --enforce-eager --no-enable-log-requests
+Restart=no
+UMask=0077
+
+[Install]
+WantedBy=default.target

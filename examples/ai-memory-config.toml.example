@@ -1,0 +1,6 @@
+# Merge these top-level fields into the default data directory's config.toml.
+# Leave llm_provider and reranker unset; literal llm_provider="none" is invalid.
+embedding_provider = "none"
+backfill_on_start = false
+capture_assistant = false
+consolidate_on_session_end = false

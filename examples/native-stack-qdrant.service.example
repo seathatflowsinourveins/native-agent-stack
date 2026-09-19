@@ -1,0 +1,13 @@
+# Inactive systemd USER unit. Replace every absolute placeholder.
+[Unit]
+Description=Selected local Qdrant storage
+
+[Service]
+Type=simple
+WorkingDirectory=/ABSOLUTE/STACK_HOME/state/qdrant
+ExecStart=/ABSOLUTE/STACK_HOME/tools/qdrant-1.19.1/qdrant --config-path /ABSOLUTE/STACK_HOME/config/qdrant.yaml --disable-telemetry
+Restart=no
+UMask=0077
+
+[Install]
+WantedBy=default.target

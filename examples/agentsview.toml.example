@@ -1,0 +1,10 @@
+# Inactive config for a dedicated AGENTSVIEW_DATA_DIR, before first sync.
+# Replace paths with explicitly authorized log directories; no auth stores.
+sync_include_cwd_prefixes = ["/ABSOLUTE/PROJECT_ROOT"]
+watch_exclude_patterns = [".git", "node_modules", ".venv", "private", "secrets"]
+
+[agents.claude]
+dirs = ["/ABSOLUTE/SELECTED_CLAUDE_SESSION_LOG_DIRECTORY"]
+
+[agents.codex]
+dirs = ["/ABSOLUTE/SELECTED_CODEX_SESSION_LOG_DIRECTORY"]

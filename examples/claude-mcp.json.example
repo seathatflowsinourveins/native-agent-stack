@@ -1,0 +1,52 @@
+{
+  "mcpServers": {
+    "serena": {
+      "type": "stdio",
+      "command": "/ABSOLUTE/UVX_EXECUTABLE",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+        "serena",
+        "start-mcp-server",
+        "--transport",
+        "stdio",
+        "--project-from-cwd",
+        "--context",
+        "claude-code",
+        "--enable-web-dashboard",
+        "false",
+        "--open-web-dashboard",
+        "false",
+        "--enable-gui-log-window",
+        "false"
+      ]
+    },
+    "ai-memory": {
+      "type": "http",
+      "url": "http://127.0.0.1:49374/mcp"
+    },
+    "socraticode": {
+      "type": "stdio",
+      "command": "/ABSOLUTE/NODE_EXECUTABLE",
+      "args": [
+        "/ABSOLUTE/STACK_HOME/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"
+      ],
+      "env": {
+        "QDRANT_MODE": "external",
+        "QDRANT_URL": "http://127.0.0.1:16333",
+        "EMBEDDING_PROVIDER": "lmstudio",
+        "LMSTUDIO_URL": "http://127.0.0.1:8231/v1",
+        "EMBEDDING_MODEL": "nvidia/Nemotron-3-Embed-1B-BF16",
+        "EMBEDDING_DIMENSIONS": "2048",
+        "EMBEDDING_CONTEXT_LENGTH": "4096",
+        "EMBEDDING_QUERY_PREFIX": "query: ",
+        "EMBEDDING_DOCUMENT_PREFIX": "passage: ",
+        "EMBEDDING_DOCUMENT_INCLUDE_PATH": "true",
+        "RESPECT_GITIGNORE": "true",
+        "INCLUDE_DOT_FILES": "false",
+        "SOCRATICODE_WATCHER": "auto",
+        "SEARCH_DEFAULT_LIMIT": "3"
+      }
+    }
+  }
+}

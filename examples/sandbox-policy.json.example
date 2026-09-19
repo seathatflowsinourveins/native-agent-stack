@@ -1,0 +1,19 @@
+{
+  "network": {
+    "allowedDomains": [],
+    "deniedDomains": [
+      "*"
+    ]
+  },
+  "filesystem": {
+    "denyRead": [
+      "/ABSOLUTE/STACK_HOME/state/sandbox-fixture/blocked"
+    ],
+    "allowWrite": [
+      "/ABSOLUTE/STACK_HOME/state/sandbox-fixture/allowed"
+    ],
+    "denyWrite": [
+      "/ABSOLUTE/STACK_HOME/state/sandbox-fixture/write-protected"
+    ]
+  }
+}

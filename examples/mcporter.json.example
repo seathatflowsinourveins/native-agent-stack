@@ -1,0 +1,51 @@
+{
+  "imports": [],
+  "mcpServers": {
+    "context-mode": {
+      "command": "/ABSOLUTE/NODE_EXECUTABLE",
+      "args": [
+        "/ABSOLUTE/INSTALLED_CONTEXT_MODE_PLUGIN/start.mjs"
+      ],
+      "cwd": "/ABSOLUTE/PROJECT_ROOT",
+      "env": {
+        "CONTEXT_MODE_PLATFORM": "codex",
+        "CODEX_HOME": "/ABSOLUTE/SELECTED_CODEX_HOME"
+      },
+      "lifecycle": "keep-alive"
+    },
+    "codebase-memory": {
+      "command": "/ABSOLUTE/STACK_HOME/bin/codebase-memory-mcp",
+      "cwd": "/ABSOLUTE/PROJECT_ROOT",
+      "env": {
+        "CBM_ALLOWED_ROOT": "/ABSOLUTE/PROJECT_ROOT"
+      }
+    },
+    "ai-memory": {
+      "baseUrl": "http://127.0.0.1:49374/mcp"
+    },
+    "socraticode": {
+      "command": "/ABSOLUTE/NODE_EXECUTABLE",
+      "args": [
+        "/ABSOLUTE/STACK_HOME/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js"
+      ],
+      "env": {
+        "QDRANT_MODE": "external",
+        "QDRANT_URL": "http://127.0.0.1:16333",
+        "EMBEDDING_PROVIDER": "lmstudio",
+        "LMSTUDIO_URL": "http://127.0.0.1:8231/v1",
+        "EMBEDDING_MODEL": "nvidia/Nemotron-3-Embed-1B-BF16",
+        "EMBEDDING_DIMENSIONS": "2048",
+        "EMBEDDING_CONTEXT_LENGTH": "4096",
+        "EMBEDDING_QUERY_PREFIX": "query: ",
+        "EMBEDDING_DOCUMENT_PREFIX": "passage: ",
+        "EMBEDDING_DOCUMENT_INCLUDE_PATH": "true",
+        "RESPECT_GITIGNORE": "true",
+        "INCLUDE_DOT_FILES": "false",
+        "SOCRATICODE_WATCHER": "auto",
+        "SEARCH_DEFAULT_LIMIT": "3"
+      },
+      "cwd": "/ABSOLUTE/PROJECT_ROOT",
+      "lifecycle": "keep-alive"
+    }
+  }
+}

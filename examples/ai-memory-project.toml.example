@@ -1,0 +1,6 @@
+# Copy only to an explicitly enrolled project's .ai-memory.toml.
+workspace = "local"
+project = "native-agent-stack"
+
+[capture]
+ignore_paths = [".env", ".env.*", "private/**", "secrets/**", "credentials/**"]
