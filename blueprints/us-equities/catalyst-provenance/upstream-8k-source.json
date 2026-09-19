@@ -1,0 +1,20 @@
+{
+  "repository": "dgunning/edgartools",
+  "commit": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+  "path": "tests/fixtures/parity_gate/8-K/0000887919-21-000012.html",
+  "url": "https://raw.githubusercontent.com/dgunning/edgartools/abe44344c56cf4bfb5443e0debca7e39342f6e7a/tests/fixtures/parity_gate/8-K/0000887919-21-000012.html",
+  "sha256": "6f40108c938a9edc73da7477d92d5c6c705e965210e8e62faf60de81f0af4ab2",
+  "bytes": 32434,
+  "first_local_observed_at": "2026-09-19T22:57:47.589804+00:00",
+  "accession_from_upstream_path": "0000887919-21-000012",
+  "form_from_upstream_path": "8-K",
+  "accepted_at": null,
+  "availability_status": "quarantined_missing_acceptance",
+  "provenance": "Pinned upstream test fixture containing historical filing HTML; not direct SEC acquisition and not a complete SGML filing.",
+  "license_url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/LICENSE.txt",
+  "vendored_file": {
+    "bytes": 32435,
+    "sha256": "a1e7ca4772bca52911631c6ba2626878cb8c5ebdf17c662033e89d04ef4a0b17",
+    "normalization": "One final newline appended by text writer. Original bytes recovered by removing one byte and verified against upstream SHA256."
+  }
+}

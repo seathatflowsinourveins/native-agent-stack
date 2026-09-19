@@ -1,0 +1,515 @@
+{
+  "schema_version": 1,
+  "kind": "simulation_data_source_review",
+  "checked_at": "2026-09-19T22:58:55.291562+00:00",
+  "baseline_commit": "ec04758554a3264a30b94f6389163f6828567a47",
+  "scope": "Bounded public README/license source capture for12 repositories; code/API/native acceptance only for EdgarTools selected path. No full repository or universal SOTA completeness claim.",
+  "star_refresh": "blueprints/us-equities/catalyst-provenance/public-stars-refresh.json",
+  "decisions": [
+    {
+      "repository": "dgunning/edgartools",
+      "commit": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+      "id": 581872397,
+      "archived": false,
+      "pushed_at": "2026-09-17T10:29:28Z",
+      "description": "Read and analyze SEC EDGAR filings in Python. 10-K, 8-K, XBRL financials, Form 3/4/5, 13F, ADV — clean API, well-typed, MIT-licensed.",
+      "license_declared": "MIT",
+      "readme": {
+        "path": "README.md",
+        "url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",
+        "sha256": "943bb25c120e0d4965e44f1baa5f3afb82423e5cf9b41155eae5901ca3877f57",
+        "bytes": 14765,
+        "bounded_relevant_lines": [
+          "<a href=\"https://github.com/dgunning/edgartools\">",
+          "<img src=\"https://raw.githubusercontent.com/dgunning/edgartools/main/docs/images/edgartools-mark.svg\" alt=\"EdgarTools logo\" align=\"left\" height=\"80\" hspace=\"20\">",
+          "# EdgarTools — Python Library for SEC EDGAR Filings",
+          "<a href=\"https://pypi.org/project/edgartools\"><img src=\"https://img.shields.io/pypi/v/edgartools.svg\" alt=\"PyPI - Version\"></a>",
+          "<a href=\"https://github.com/dgunning/edgartools/actions\"><img src=\"https://img.shields.io/github/actions/workflow/status/dgunning/edgartools/python-hatch-workflow.yml\" alt=\"GitHub Workflow Status\"></a>",
+          "<a href=\"https://github.com/dgunning/edgartools/actions/workflows/regression-tests.yml\"><img src=\"https://img.shields.io/github/actions/workflow/status/dgunning/edgartools/regression-tests.yml?branch=main&label=regressio",
+          "<a href=\"https://www.codefactor.io/repository/github/dgunning/edgartools\"><img src=\"https://www.codefactor.io/repository/github/dgunning/edgartools/badge\" alt=\"CodeFactor\"></a>",
+          "<a href=\"https://github.com/dgunning/edgartools/blob/main/LICENSE\"><img src=\"https://img.shields.io/github/license/dgunning/edgartools\" alt=\"GitHub\"></a>",
+          "<a href=\"https://edgartools.readthedocs.io/\"><img alt=\"Documentation\" src=\"https://img.shields.io/badge/docs-edgartools-blue\"></a>",
+          "<img alt=\"Pepy Total Downloads\" src=\"https://img.shields.io/pepy/dt/edgartools\">",
+          "<a href=\"https://pepy.tech/project/edgartools\"><img alt=\"Pepy Monthly Downloads\" src=\"https://static.pepy.tech/badge/edgartools/month\"></a>",
+          "<a href=\"https://github.com/dgunning/edgartools/stargazers\"><img alt=\"GitHub stars\" src=\"https://img.shields.io/github/stars/dgunning/edgartools?style=social\"></a>"
+        ]
+      },
+      "license_capture": {
+        "path": "LICENSE.txt",
+        "sha256": "249fb5021f07689c5fb17925c4d8bcd04fd9e2cee4b4b789499fb80b1e9dfe0c",
+        "bytes": 1100,
+        "url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/LICENSE.txt",
+        "spdx": "MIT"
+      },
+      "starred": true,
+      "new_star": false,
+      "decision": "adopt_native_parser_bounded",
+      "reason": "Native5.58.0 parser and LLM metadata summary accepted offline; SEC metadata request403, so no fresh SEC dataset accepted.",
+      "evidence_level": "native_sdk_offline_and_network_failure"
+    },
+    {
+      "repository": "tradermonty/claude-trading-skills",
+      "commit": "a7a46f099fdced13067a558a08e65c44a6d78e99",
+      "id": 1079356098,
+      "archived": false,
+      "pushed_at": "2026-09-19T21:03:30Z",
+      "description": "Claude Code skills for equity investors and traders — market analysis, technical charting, economic calendars, screeners, and trading strategy development.",
+      "license_declared": "MIT",
+      "readme": {
+        "path": "README.md",
+        "url": "https://github.com/tradermonty/claude-trading-skills/blob/a7a46f099fdced13067a558a08e65c44a6d78e99/README.md",
+        "sha256": "d728ec8f41495053bf4c690ddabf4b141dd5b15f972c6bbfb9cbfc272183250f",
+        "bytes": 45450,
+        "bounded_relevant_lines": [
+          "# Claude Trading Skills",
+          "Claude Trading Skills started as a personal project to use AI to improve my own trading process.",
+          "Claude Trading Skills is a Claude Skills-based trading workflow toolkit for time-constrained individual investors.",
+          "This is not a signal service or a promise of profitability. It is a toolkit for traders who want to build a better decision process.",
+          "The project follows a **first for self, open for others** stance: it is built first as a practical workflow the author uses, then shared openly for others who face similar constraints.",
+          "📖 **Documentation site:** <https://tradermonty.github.io/claude-trading-skills/>",
+          "The project is provided under the MIT License, **AS IS, WITHOUT WARRANTY**.",
+          "New users should start with one of these operational workflows. Each link points to a machine-readable manifest under [`workflows/`](workflows/) that names the exact skills, decision gates, and artifacts in order.",
+          "| Goal | Workflow | Anchor Skills | API Profile |",
+          "| Weekly long-term portfolio review | [`core-portfolio-weekly`](workflows/core-portfolio-weekly.yaml) ([sample](examples/workflows/core-portfolio-weekly/sample-run/)) | portfolio-manager, kanchi-dividend-review-monitor, ",
+          "| Find swing candidates only when risk is allowed | [`swing-opportunity-daily`](workflows/swing-opportunity-daily.yaml) ([sample](examples/workflows/swing-opportunity-daily/sample-run/)) | vcp-screener, drawdown-circuit-",
+          "See [`workflows/README.md`](workflows/README.md) for how to read a manifest and run it manually. For a one-page \"which workflow fits my situation?\" guide, see [Find Your Workflow](docs/en/find-your-workflow.md) ([日本語](do"
+        ]
+      },
+      "license_capture": {
+        "path": "LICENSE",
+        "sha256": "87c93cde8c3a000c19b0c790cd4f7a4e4cb8da5bc6b11e0939bf6df99e245d15",
+        "bytes": 1068,
+        "url": "https://github.com/tradermonty/claude-trading-skills/blob/a7a46f099fdced13067a558a08e65c44a6d78e99/LICENSE",
+        "spdx": "MIT"
+      },
+      "starred": true,
+      "new_star": false,
+      "decision": "retain_source_review_candidate",
+      "reason": "Trading research workflow guidance; skills do not supply point-in-time data or establish strategy merit. No new hooks installed.",
+      "evidence_level": "readme_and_license"
+    },
+    {
+      "repository": "ZhuLinsen/daily_stock_analysis",
+      "commit": "f9e7b778c48c914af4e0c69dd301e6907d7ea5f9",
+      "id": 1131513930,
+      "archived": false,
+      "pushed_at": "2026-09-19T15:09:08Z",
+      "description": "LLM 驱动的多市场股票智能分析系统：多源行情、实时新闻、决策看板与自动推送，支持零成本定时运行。  LLM-powered multi-market stock analysis system with multi-source market data, real-time news, decision dashboard, automated notifications, and cost-free scheduled runs.",
+      "license_declared": "MIT",
+      "readme": {
+        "path": "README.md",
+        "url": "https://github.com/ZhuLinsen/daily_stock_analysis/blob/f9e7b778c48c914af4e0c69dd301e6907d7ea5f9/README.md",
+        "sha256": "846b0f2fe2749ebd0134090c20fc227a8228d53cdc5a862c996ac0ea19df8c4e",
+        "bytes": 15489,
+        "bounded_relevant_lines": [
+          "[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)",
+          "<img src=\"https://trendshift.io/api/badge/trendshift/repositories/18527/daily?language=Python\" alt=\"#1 Python Repository Of The Day | Trendshift\" width=\"250\" height=\"55\"/>&nbsp;<a href=\"https://hellogithub.com/repository",
+          "[**产品预览**](#-产品预览) · [**功能特性**](#-功能特性) · [**快速开始**](#-快速开始) · [**推送效果**](#-推送效果) · [**文档中心**](docs/INDEX.md) · [**完整指南**](docs/full-guide.md)",
+          "> 功能细节、字段契约、基本面 P0 超时语义、交易纪律、数据源优先级、Web/API 行为请看 [完整配置与部署指南](docs/full-guide.md)。",
+          "> 项目默认内置 AkShare、Baostock、YFinance 等免费行情源，可零配置运行；免费源受上游限流、接口变动和网络波动影响，稳定性不保证。长期定时、批量分析或更稳定行情建议配置 TickFlow、Tushare、Longbridge 等 token 型数据源，适用市场、Actions 映射和 fallback 规则见 [数据源配置](docs/full-guide.md#数据源配置)。",
+          "#### 2. 配置 Secrets",
+          "`Settings` → `Secrets and variables` → `Actions` → `New repository secret`",
+          "默认先选一个模型服务商并填写 API Key；需要多模型、图片识别、本地模型或高级路由时，再参考 [LLM 配置指南](docs/LLM_CONFIG_GUIDE.md)。",
+          "| Secret 名称 | 说明 | 必填 |",
+          "| `ANSPIRE_API_KEYS` | [Anspire](https://open.anspire.cn/dsa?share_code=QFBC0FYC) API Key，一Key同时启用全球热门大模型和联网搜索，本项目新用户提供30元等额的免费额度（GLM5.2、GPT等模型特惠中） | **推荐** |",
+          "| `AIHUBMIX_KEY` | [AIHubMix](https://inferera.com/?aff=CfMq) API Key，一Key切换使用全系模型，无需科学上网，本项目可享 10% 优惠 | **推荐** |",
+          "| `GEMINI_API_KEY` | Google Gemini API Key | 可选 |"
+        ]
+      },
+      "license_capture": {
+        "path": "LICENSE",
+        "sha256": "87915011a44adbd0b2b085dbf931a21bd082f65c4a0824d61c1dec50dc54f2a4",
+        "bytes": 1066,
+        "url": "https://github.com/ZhuLinsen/daily_stock_analysis/blob/f9e7b778c48c914af4e0c69dd301e6907d7ea5f9/LICENSE",
+        "spdx": "MIT"
+      },
+      "starred": true,
+      "new_star": false,
+      "decision": "defer_secondary_analysis_runtime",
+      "reason": "Multi-market analysis/dashboard is adjacent; current temporal receipt and US-equity universe requirements are not established by README. No replacement data plane adopted.",
+      "evidence_level": "readme_and_license"
+    },
+    {
+      "repository": "Open-Dev-Society/OpenStock",
+      "commit": "53553ec7189da1e1904815ee17cd56669aaf6ee5",
+      "id": 1065936302,
+      "archived": false,
+      "pushed_at": "2026-09-19T13:13:19Z",
+      "description": "OpenStock is an open-source alternative to expensive market platforms. Track real-time prices, set personalized alerts, and explore detailed company insights — built openly, for everyone, forever free.",
+      "license_declared": "AGPL-3.0",
+      "readme": {
+        "path": "README.md",
+        "url": "https://github.com/Open-Dev-Society/OpenStock/blob/53553ec7189da1e1904815ee17cd56669aaf6ee5/README.md",
+        "sha256": "d88966d6164a06f42e51c52e8cf73588c302fa60c3447beeb9df40c2c16ab422",
+        "bytes": 20699,
+        "bounded_relevant_lines": [
+          "<b>New from Open Dev Society:</b> <a href=\"https://github.com/Open-Dev-Society/kitbash\"><b>kitbash</b></a>. Before you build, find out which parts already exist on GitHub. Borrow them, adapt them, or write the rest.",
+          "<a href=\"https://www.star-history.com/open-dev-society/openstock\">",
+          "<picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://api.star-history.com/badge?repo=Open-Dev-Society/OpenStock&type=rank&theme=dark\" /><source media=\"(prefers-color-scheme: light)\" srcset=\"https://api.s",
+          "© Open Dev Society. This project is licensed under AGPL-3.0; if you modify, redistribute, or deploy it (including as a web service), you must release your source code under the same license and credit the original author",
+          "<img src=\"https://img.shields.io/badge/-shadcn/ui-black?style=for-the-badge&logoColor=white&logo=shadcnui&color=000000\"/>",
+          "<img src=\"https://img.shields.io/badge/-Radix%20UI-black?style=for-the-badge&logoColor=white&logo=radixui&color=000000\"/>",
+          "<img src=\"https://img.shields.io/badge/-Finnhub-black?style=for-the-badge&logoColor=white&color=30B27A\"/>",
+          "OpenStock is an open-source alternative to expensive market platforms. Track real-time prices, set personalized alerts, and explore detailed company insights — built openly, for everyone, forever free.",
+          "Note: OpenStock is community-built and not a brokerage. Market data may be delayed based on provider rules and your configuration. Nothing here is financial advice.",
+          "5. 🤸 [Quick Start](#quick-start)",
+          "13. 🛡️ [Security](#security)",
+          "14. 📜 [License](#license)"
+        ]
+      },
+      "license_capture": {
+        "path": "LICENSE",
+        "sha256": "8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef",
+        "bytes": 34523,
+        "url": "https://github.com/Open-Dev-Society/OpenStock/blob/53553ec7189da1e1904815ee17cd56669aaf6ee5/LICENSE",
+        "spdx": "AGPL-3.0"
+      },
+      "starred": true,
+      "new_star": false,
+      "decision": "defer_parallel_dashboard",
+      "reason": "AGPL-3.0 dashboard platform duplicates present observation surface; README does not establish immutable historical catalyst delivery.",
+      "evidence_level": "readme_and_license"
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "commit": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "id": 461335313,
+      "archived": false,
+      "pushed_at": "2026-09-18T11:13:19Z",
+      "description": "The Official Python SDK for Alpaca API",
+      "license_declared": "Apache-2.0",
+      "readme": {
+        "path": "README.md",
+        "url": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/README.md",
+        "sha256": "9105b8901d9225d4e1a532b908d85f54d3604acb3846af39f608bee90d242c3c",
+        "bytes": 15423,
+        "bounded_relevant_lines": [
+          "[![Alpaca-py](https://github.com/alpacahq/alpaca-py/blob/master/docs/images/alpaca-py-banner.png?raw=true)](https://alpaca.markets/docs/python-sdk)",
+          "[![Downloads](https://pepy.tech/badge/alpaca-py/month)](https://pepy.tech/project/alpaca-py)",
+          "[![Python Versions](https://img.shields.io/pypi/pyversions/alpaca-py.svg?logo=python&logoColor=white)](https://pypi.org/project/alpaca-py)",
+          "[![GitHub](https://img.shields.io/github/license/alpacahq/alpaca-py?color=blue)](https://github.com/alpacahq/alpaca-py/blob/master/LICENSE)",
+          "[![PyPI](https://img.shields.io/pypi/v/alpaca-py?color=blue)](https://pypi.org/project/alpaca-py/)",
+          "[![GitHub Issues](https://img.shields.io/github/issues/alpacahq/alpaca-py)](https://github.com/alpacahq/alpaca-py/issues)",
+          "[![Forum](https://img.shields.io/badge/Forum-Alpaca%20Community-blue?logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAGuElEQVRogcWaXYhdVxXHf2udr3vHVCmtlcYHsXaKD%2B2DVixJDdpWIT4oFakQLMUvRH",
+          "[![Slack](https://img.shields.io/badge/Slack-Alpaca%20Community-4A154B?logo=slack&logoColor=white)](https://alpaca.markets/slack)",
+          "- [API Keys](#api-keys)",
+          "1.  [Trading and Market Data API Keys](#trading-api-keys)",
+          "2.  [Broker API Keys](#trading-api-keys)",
+          "- [Contributing](https://github.com/alpacahq/alpaca-py/blob/master/CONTRIBUTING.md)"
+        ]
+      },
+      "license_capture": {
+        "path": "LICENSE",
+        "sha256": "bc84da682744c6dd008cf9ad3306caf18444d613a80c1bcc3de0dd46094787ef",
+        "bytes": 10873,
+        "url": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/LICENSE",
+        "spdx": "Apache-2.0"
+      },
+      "starred": false,
+      "new_star": false,
+      "decision": "retain_existing_native_sdk",
+      "reason": "Existing0.44.0 SDK remains selected for authenticated news/market data and eventual dedicated paper; credential/entitlement and temporal-data acceptance remain separate.",
+      "evidence_level": "readme_and_license_existing_pin"
+    },
+    {
+      "repository": "jadchaar/sec-edgar-downloader",
+      "commit": "185a5548e49fd37afb9871df8aa9485075f21e21",
+      "id": 162630779,
+      "archived": false,
+      "pushed_at": "2026-06-22T02:13:06Z",
+      "description": "📈 Download filings from the SEC EDGAR database using Python",
+      "license_declared": "MIT",
+      "readme": {
+        "path": "README.rst",
+        "url": "https://github.com/jadchaar/sec-edgar-downloader/blob/185a5548e49fd37afb9871df8aa9485075f21e21/README.rst",
+        "sha256": "80d82eae50c9b0ea37e80cb9d554734978993ad61e40408f9bbe67b167166324",
+        "bytes": 9521,
+        "bounded_relevant_lines": [
+          "sec-edgar-downloader",
+          ".. image:: https://github.com/jadchaar/sec-edgar-downloader/actions/workflows/continuous_integration.yml/badge.svg?branch=master",
+          ":alt: Build Status",
+          ":target: https://github.com/jadchaar/sec-edgar-downloader/actions/workflows/continuous_integration.yml?query=branch%3Amaster+workflow%3Atests",
+          ".. image:: https://codecov.io/gh/jadchaar/sec-edgar-downloader/branch/master/graph/badge.svg",
+          ":target: https://codecov.io/gh/jadchaar/sec-edgar-downloader",
+          ".. image:: https://img.shields.io/pypi/v/sec-edgar-downloader.svg",
+          ":target: https://python.org/pypi/sec-edgar-downloader",
+          ".. image:: https://img.shields.io/pypi/pyversions/sec-edgar-downloader.svg",
+          ":target: https://python.org/pypi/sec-edgar-downloader",
+          ".. image:: https://img.shields.io/pypi/l/sec-edgar-downloader.svg",
+          ":alt: License"
+        ]
+      },
+      "license_capture": {
+        "path": "LICENSE",
+        "sha256": "4473e5d58a81d85f44fa119b4c96865b13f32024e8dc89e03b4ff015fb76bacc",
+        "bytes": 1066,
+        "url": "https://github.com/jadchaar/sec-edgar-downloader/blob/185a5548e49fd37afb9871df8aa9485075f21e21/LICENSE",
+        "spdx": "MIT"
+      },
+      "starred": false,
+      "new_star": false,
+      "decision": "defer_redundant_downloader",
+      "reason": "MIT filing downloader is useful for bulk retrieval but adds a second acquisition layer without resolving current403 or historical availability provenance.",
+      "evidence_level": "readme_and_license"
+    },
+    {
+      "repository": "wilsonfreitas/awesome-quant",
+      "commit": "48e48a76b2054b5fe6eede6852ffef7783b992ce",
+      "id": 43425480,
+      "archived": false,
+      "pushed_at": "2026-09-19T01:14:05Z",
+      "description": "A curated list of insanely awesome libraries, packages and resources for Quants (Quantitative Finance)",
+      "license_declared": null,
+      "readme": {
+        "path": "README.md",
+        "url": "https://github.com/wilsonfreitas/awesome-quant/blob/48e48a76b2054b5fe6eede6852ffef7783b992ce/README.md",
+        "sha256": "fa346fdbc05f651f500795e7ea95e90b6d8c0cb394daee1f7b612470650caa86",
+        "bytes": 138900,
+        "bounded_relevant_lines": [
+          "- [Historical & Archived Projects](#historical--archived-projects)",
+          "- [pandas](https://pandas.pydata.org) - `Python` - pandas is an open source, BSD-licensed library providing high-performance, easy-to-use data structures and data analysis tools for the Python programming language. [GitH",
+          "- [statistics](https://docs.python.org/3/library/statistics.html) - `Python` - Builtin Python library for all basic statistical calculations.",
+          "- [tfplot](https://cran.r-project.org/web/packages/tfplot/index.html) - `R` - Utilities for simple manipulation and quick plotting of time series data.",
+          "- [jacobian](https://github.com/morluto/jacobian) - `Python` `MCP` - Exact computation and conjecture testing across polynomial maps, linear algebra, and graph algorithms for agent-driven mathematical research.",
+          "- [FinancePy](https://github.com/domokane/FinancePy) - `Python` - A Python Finance Library that focuses on the pricing and risk-management of Financial Derivatives, including fixed-income, equity, FX and credit derivativ",
+          "- [pypme](https://github.com/ymyke/pypme) - `Python` - PME (Public Market Equivalent) calculation.",
+          "- [AbsBox](https://github.com/yellowbean/AbsBox) - `Python` - A Python based library to model cashflow for structured product like Asset-backed securities (ABS) and Mortgage-backed securities (MBS).",
+          "- [Intrinsic-Value-Calculator](https://github.com/akashaero/Intrinsic-Value-Calculator) - `Python` - A Python tool for quick calculations of a stock's fair value using Discounted Cash Flow analysis.",
+          "- [quantra](https://github.com/joseprupi/quantraserver) - `Python` - High-performance pricing engine built on QuantLib. It exposes QuantLib's functionality through gRPC and REST APIs, enabling distributed computations wi",
+          "- [QuantOracle](https://github.com/QuantOracledev/quantoracle) - `Python` - Free quant finance API with 63 deterministic endpoints + 15 free interactive calculators at [quantoracle.dev](https://quantoracle.dev). Options ",
+          "- [BDE Score](https://github.com/hbhqq9/bde-score) - `Python` - Multi-factor quantitative stock analysis MCP server for US, HK, and CN A-share markets. Transparent 0-100 scoring from 40+ indicators. Listed on Official MC"
+        ]
+      },
+      "license_capture": null,
+      "starred": true,
+      "new_star": false,
+      "decision": "discovery_only",
+      "reason": "Discovery breadth is useful; listing is not code review, data rights or runtime acceptance. License metadata was unavailable in this bounded capture.",
+      "evidence_level": "readme_license_metadata_unknown"
+    },
+    {
+      "repository": "Storybloq/storybloq",
+      "commit": "beed5cbdcbc3704ecc4ff1b4ec9bed40b500e720",
+      "id": 1213015951,
+      "archived": false,
+      "pushed_at": "2026-09-19T04:21:04Z",
+      "description": "Project memory and workflows for Claude Code and Codex. Keep stories, plans, handovers, and review evidence in your repo. Resume across sessions and follow progress in the Mac app.",
+      "license_declared": "NOASSERTION",
+      "readme": {
+        "path": "README.md",
+        "url": "https://github.com/Storybloq/storybloq/blob/beed5cbdcbc3704ecc4ff1b4ec9bed40b500e720/README.md",
+        "sha256": "36c0b4c078e6cd75042c968d868414e05b12004223285782f18c20382849a6d7",
+        "bytes": 51797,
+        "bounded_relevant_lines": [
+          "<img src=\"https://raw.githubusercontent.com/Storybloq/storybloq/main/assets/logo.png\" width=\"120\" alt=\"Storybloq logo\" />",
+          "<h1 align=\"center\">Storybloq</h1>",
+          "<a href=\"https://www.npmjs.com/package/@storybloq/storybloq\"><img src=\"https://img.shields.io/npm/v/@storybloq/storybloq?color=333&label=npm\" alt=\"npm version\" /></a>",
+          "<a href=\"https://github.com/Storybloq/storybloq/blob/main/LICENSE\"><img src=\"https://img.shields.io/badge/license-PolyForm--Shield%201.0-blue\" alt=\"License\" /></a>",
+          "<a href=\"https://storybloq.com\">storybloq.com</a> ·",
+          "<a href=\"https://storybloq.com/mac\">Mac app</a> ·",
+          "<a href=\"https://github.com/Storybloq/lenses\">Review lenses</a> ·",
+          "<a href=\"https://storybloq.com/privacy\">Privacy</a>",
+          "Every project gets a `.story/` directory of JSON and markdown files. Stories, issues, roadmap phases, session handovers, and lessons learned live there as readable files you can track with Git. Stories use ticket records",
+          "- **CLI:** `storybloq` - inspect and mutate `.story/` from the terminal.",
+          "- **MCP server:** structured tools Claude Code and Codex can call directly to read and update the project and guide supported workflows.",
+          "- **Skill:** invoke `/story` in Claude Code or `$story` in Codex to load project state at the start of a session."
+        ]
+      },
+      "license_capture": {
+        "path": "LICENSE",
+        "sha256": "67530f8e9adfcc5d2e9d72b804500cebb7472ff84c34a6729a80a2a9be901ee6",
+        "bytes": 5748,
+        "url": "https://github.com/Storybloq/storybloq/blob/beed5cbdcbc3704ecc4ff1b4ec9bed40b500e720/LICENSE",
+        "spdx": "NOASSERTION"
+      },
+      "starred": true,
+      "new_star": true,
+      "decision": "defer_memory_workflow_overlap",
+      "reason": "Potential cross-harness project-memory workflow, overlapping existing ai-memory and repo task records. PolyForm Shield1.0 requires deliberate license/behavior review before adoption.",
+      "evidence_level": "readme_and_license"
+    },
+    {
+      "repository": "Nexting-ai/nexting",
+      "commit": "a4b75f0429d3b1bf35eef68a296b2e72aa9c7483",
+      "id": 1177640089,
+      "archived": false,
+      "pushed_at": "2026-09-11T03:12:02Z",
+      "description": "Remote control for Claude Code, Codex, Grok, and Cursor on Mac or PC. View sessions, send tasks, and drive them remotely from your phone, PIN, or Ring. OpenClaw supported.",
+      "license_declared": "MIT",
+      "readme": {
+        "path": "README.md",
+        "url": "https://github.com/Nexting-ai/nexting/blob/a4b75f0429d3b1bf35eef68a296b2e72aa9c7483/README.md",
+        "sha256": "5675986c7d4f0fd0ca501a0b66db9464db4bfd4ca5a5e8932a27ef9170f160ad",
+        "bytes": 11958,
+        "bounded_relevant_lines": [
+          "**3 seconds to dispatch a task** — vs. ~30s pulling out your phone, unlocking, and typing.",
+          "| **Grok** | Attach to a [Grok Build](https://grok.com) session on your Mac and drive it from your PIN — live. | Free |",
+          "**macOS**",
+          "Then just run `claude` as usual (on Windows, fully quit and reopen your terminal first) — your sessions appear in the Nexting app, live. Uninstall anytime: `nexting-cc-bridge uninstall`.",
+          "**macOS**",
+          "<summary><img src=\"public/logos/grok.svg\" width=\"16\" alt=\"\" /> <strong>Grok</strong> — same idea, for Grok Build on your Mac</summary>",
+          "Nexting is the first hardware product built for [OpenClaw](https://github.com/openclaw/openclaw). Install the plugin and link your account:",
+          "Purpose-built for voice-first interaction. No screen — by design.",
+          "| Microphone | PDM MEMS (built into XIAO Sense) |",
+          "The [`hardware-opensource/`](hardware-opensource/) directory is a complete **Co-Builder Edition**: firmware source, 3D-printable enclosure files, and a schematic PDF — everything you need to build a Nexting PIN yourself.",
+          "Your phone isn't just a pipe — it's the bridge between you and your AI. The Nexting app registers native iOS capabilities as skills your agent can call:",
+          "├── hardware-opensource/       # DIY Co-Builder Kit"
+        ]
+      },
+      "license_capture": {
+        "path": "LICENSE",
+        "sha256": "d6cdb65de242a668066586573a36ec5a893160f9aa88442ddcf081ce3b711d2f",
+        "bytes": 1072,
+        "url": "https://github.com/Nexting-ai/nexting/blob/a4b75f0429d3b1bf35eef68a296b2e72aa9c7483/LICENSE",
+        "spdx": "MIT"
+      },
+      "starred": true,
+      "new_star": true,
+      "decision": "defer_remote_operator_surface",
+      "reason": "Remote harness control is relevant hosting research, but no current requirement justifies another privileged remote session surface. No bridge or hook installed.",
+      "evidence_level": "readme_and_license"
+    },
+    {
+      "repository": "tw93/Mole",
+      "commit": "0ee920304ad5ee1dfad6a7176d45de715a911f12",
+      "id": 1062356571,
+      "archived": false,
+      "pushed_at": "2026-09-19T15:05:06Z",
+      "description": "🐹 Clean, uninstall, analyze, optimize, and monitor your Mac. Free open-source CLI, plus a native Mac app.",
+      "license_declared": "GPL-3.0",
+      "readme": {
+        "path": "README.md",
+        "url": "https://github.com/tw93/Mole/blob/0ee920304ad5ee1dfad6a7176d45de715a911f12/README.md",
+        "sha256": "1bd67f438ea7f3fc43f3c6f3e0122c867bb2443b051495f79a698a18b2a23ded",
+        "bytes": 20467,
+        "bounded_relevant_lines": [
+          "<a href=\"LICENSE\"><img src=\"https://img.shields.io/badge/license-GPL_v3-blue.svg?style=flat-square\" alt=\"License\"></a>",
+          "> 💡 This repo is the free open-source CLI (`mo`). Prefer a native app? [Mole for Mac](https://mole.fit/) is a separate download: cleanup, app management, maintenance, disk maps, and live status in one lightweight, VoiceO",
+          "- **Disk insights**: Visualizes usage, finds large files, **rebuilds caches**, and refreshes system services",
+          "## Quick Start",
+          "Mole requires macOS 12 or newer and supports both Intel and Apple Silicon Macs.",
+          "If Homebrew no longer supports your macOS version, use the script below instead.",
+          "Mole is built for macOS. An experimental Windows version lives in the [windows branch](https://github.com/tw93/Mole/tree/windows).",
+          "mo purge                     # Clean project build artifacts",
+          "mo update --nightly          # Update to latest unreleased main build, script install only",
+          "mo history",
+          "mo history --json",
+          "- Cleanup activity is recorded in `~/Library/Logs/mole/operations.log`; review it with `mo history` or disable it with `MO_NO_OPLOG=1`."
+        ]
+      },
+      "license_capture": {
+        "path": "LICENSE",
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "bytes": 35149,
+        "url": "https://github.com/tw93/Mole/blob/0ee920304ad5ee1dfad6a7176d45de715a911f12/LICENSE",
+        "spdx": "GPL-3.0"
+      },
+      "starred": true,
+      "new_star": true,
+      "decision": "catalog_macos_host_maintenance",
+      "reason": "GPL-3.0 Mac maintenance candidate; no macOS host execution or cleanup authorized by this simulation wave.",
+      "evidence_level": "readme_and_license"
+    },
+    {
+      "repository": "clash-verge-rev/clash-verge-rev",
+      "commit": "04a2a09368f76620d3eeb51eafeb1791b41e00ae",
+      "id": 721767116,
+      "archived": false,
+      "pushed_at": "2026-09-19T15:59:37Z",
+      "description": "A modern GUI client based on Tauri, designed to run in Windows, macOS and Linux for tailored proxy experience",
+      "license_declared": "GPL-3.0",
+      "readme": {
+        "path": "README.md",
+        "url": "https://github.com/clash-verge-rev/clash-verge-rev/blob/04a2a09368f76620d3eeb51eafeb1791b41e00ae/README.md",
+        "sha256": "5933df9276fc9f5a11fe8056a6b8cb709cb941d8cee5d868c970283abc080d36",
+        "bytes": 6222,
+        "bounded_relevant_lines": [
+          "A Clash Meta GUI based on <a href=\"https://github.com/tauri-apps/tauri\">Tauri</a>.",
+          "Supports Windows (x64/x86), Linux (x64/arm64) and macOS 11+ (intel/apple).",
+          "| AutoBuild   | 滚动更新版，适合测试反馈，可能存在缺陷。 | [AutoBuild](https://github.com/clash-verge-rev/clash-verge-rev/releases/tag/autobuild) |",
+          "### ✈️ [AI云边 -- 全新架构机场 ClaudeBorder](https://cruise.54678999.xyz/#/register?code=58q5UJZc)",
+          "🔥热销中使用本链接注册即送 3 天免费试用**，每日 **1GB 流量**：👉 [点此注册](https://cruise.54678999.xyz/#/register?code=58q5UJZc)",
+          "🌐 官网：👉 [https://www.claudeborder.com](https://cruise.54678999.xyz/#/register?code=58q5UJZc)",
+          "To run the development server, execute the following commands after all prerequisites for **Tauri** are installed:",
+          "pnpm run prebuild",
+          "- [zzzgydi/clash-verge](https://github.com/zzzgydi/clash-verge): A Clash GUI based on tauri. Supports Windows, macOS and Linux.",
+          "- [tauri-apps/tauri](https://github.com/tauri-apps/tauri): Build smaller, faster, and more secure desktop applications with a web frontend.",
+          "- [Fndroid/clash_for_windows_pkg](https://github.com/Fndroid/clash_for_windows_pkg): A Windows/macOS GUI based on Clash.",
+          "- [vitejs/vite](https://github.com/vitejs/vite): Next generation frontend tooling. It's fast!"
+        ]
+      },
+      "license_capture": {
+        "path": "LICENSE",
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+        "bytes": 35149,
+        "url": "https://github.com/clash-verge-rev/clash-verge-rev/blob/04a2a09368f76620d3eeb51eafeb1791b41e00ae/LICENSE",
+        "spdx": "GPL-3.0"
+      },
+      "starred": true,
+      "new_star": true,
+      "decision": "catalog_network_client_only",
+      "reason": "GPL-3.0 GUI proxy client; not a SEC data source or a remedy to apply to a refused acquisition. No network routing changed.",
+      "evidence_level": "readme_and_license"
+    },
+    {
+      "repository": "jaywcjlove/awesome-mac",
+      "commit": "31718871dfbac3cc17139b3958759f5a3e47675c",
+      "id": 63539055,
+      "archived": false,
+      "pushed_at": "2026-09-17T08:01:12Z",
+      "description": " This project is dedicated to collecting high-quality macOS software and organizing them systematically by different categories for easy search and use.",
+      "license_declared": "CC0-1.0",
+      "readme": {
+        "path": "README.md",
+        "url": "https://github.com/jaywcjlove/awesome-mac/blob/31718871dfbac3cc17139b3958759f5a3e47675c/README.md",
+        "sha256": "e3929967dd724f29d153f7b0202e7ccfcffaa1cfa40ee5bf9319f3131ff90b35",
+        "bytes": 262869,
+        "bounded_relevant_lines": [
+          "<a href=\"https://screensage.pro/\">ScreenSage Pro, record beautiful screen recordings in minutes on macOS</a>",
+          "<img alt=\"LIZHI.SHOP - Selected Software. 100% Genuine. Best Deals.\" width=\"400\" src=\"https://jaywcjlove.github.io/sponsor/lizhi.shop.png\">",
+          "<a href=\"https://lizhi.shop/?cid=nboxz71a\">LIZHI.SHOP - Selected Software. 100% Genuine. Best Deals.</a>",
+          "<a target=\"_blank\" href=\"https://jaywcjlove.github.io/maslink/?id=6758053530\" title=\"Scap: Screenshot & Markup Edit for macOS\"><img alt=\"Scap: Screenshot & Markup Edit\" height=\"52\" src=\"https://wangchujiang.com/appicon/s",
+          "<a target=\"_blank\" href=\"https://jaywcjlove.github.io/maslink/?id=6757317079\" title=\"Screen Test for macOS\"><img alt=\"Screen Test\" height=\"52\" src=\"https://wangchujiang.com/appicon/screen-test.png\"></a>",
+          "<a target=\"_blank\" href=\"https://jaywcjlove.github.io/maslink/?id=6755948110\" title=\"Deskmark for macOS\"><img alt=\"Deskmark\" height=\"52\" src=\"https://wangchujiang.com/appicon/deskmark.png\"></a>",
+          "<a target=\"_blank\" href=\"https://jaywcjlove.github.io/maslink/?id=6500434773\" title=\"Keyzer for macOS\"><img alt=\"Keyzer\" height=\"52\" src=\"https://wangchujiang.com/appicon/keyzer.png\"></a>",
+          "<a target=\"_blank\" href=\"https://github.com/jaywcjlove/vidwall-hub\" title=\"Vidwall Hub for macOS\"><img alt=\"Vidwall Hub\" height=\"52\" src=\"https://wangchujiang.com/appicon/vidwall-hub.png\"></a>",
+          "<a target=\"_blank\" href=\"https://jaywcjlove.github.io/maslink/?id=6752624705\" title=\"VidCrop for macOS\"><img alt=\"VidCrop\" height=\"52\" src=\"https://wangchujiang.com/appicon/vidcrop.png\"></a>",
+          "<a target=\"_blank\" href=\"https://jaywcjlove.github.io/maslink/?id=6747587746\" title=\"Vidwall for macOS\"><img alt=\"Vidwall\" height=\"52\" src=\"https://wangchujiang.com/appicon/vidwall.png\"></a>",
+          "<a target=\"_blank\" href=\"https://wangchujiang.com/mousio-hint/\" title=\"Mousio Hint for macOS\"><img alt=\"Mousio Hint\" height=\"52\" src=\"https://wangchujiang.com/appicon/mousio-hint.png\"></a>",
+          "<a target=\"_blank\" href=\"https://jaywcjlove.github.io/maslink/?id=6746747327\" title=\"Mousio for macOS\"><img alt=\"Mousio\" height=\"52\" src=\"https://wangchujiang.com/appicon/mousio.png\"></a>"
+        ]
+      },
+      "license_capture": {
+        "path": "LICENSE",
+        "sha256": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673",
+        "bytes": 6555,
+        "url": "https://github.com/jaywcjlove/awesome-mac/blob/31718871dfbac3cc17139b3958759f5a3e47675c/LICENSE",
+        "spdx": "CC0-1.0"
+      },
+      "starred": true,
+      "new_star": true,
+      "decision": "discovery_only",
+      "reason": "CC0 discovery catalog for future macOS adoption review; listed applications retain their own licenses and acceptance requirements.",
+      "evidence_level": "readme_and_license"
+    }
+  ],
+  "primary_data_sources": [
+    {
+      "url": "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+      "finding": "No-key current submissions/XBRL APIs; snapshot history does not prove historical receipt."
+    },
+    {
+      "url": "https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data",
+      "finding": "Declared agent, max10requests/sec, indexes and post-acceptance changes; our bounded recipe selects2/sec."
+    },
+    {
+      "url": "https://www.sec.gov/about/webmaster-frequently-asked-questions",
+      "finding": "EDGAR public content free to access/reuse; acceptance differs from unguaranteed dissemination and firstlocal observation."
+    },
+    {
+      "url": "https://docs.alpaca.markets/us/docs/historical-news-data",
+      "finding": "Historical Benzinga news since2015; account access and revision/availability acceptance still required."
+    }
+  ],
+  "saturation_statement": "The five newly observed stars and seven selected financial/discovery candidates are dispositioned. This bounded wave does not establish landscape completeness or install every repository."
+}

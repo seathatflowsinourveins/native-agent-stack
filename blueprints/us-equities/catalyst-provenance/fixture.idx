@@ -1,0 +1,13 @@
+Description: Synthetic master index for offline parser acceptance ONLY
+Creation date: Synthetic
+This is not SEC production data.
+This fixture represents no securities or prices.
+No retrieval claim is made.
+No market performance is represented.
+Two amendment-aware catalyst members and one non-catalyst member.
+The ten-line preamble matches the pinned native parser contract.
+CIK|Company Name|Form Type|Date Filed|Filename
+--------------------------------------------------------------------------------
+2|Example B|8-K/A|2020-03-02|edgar/data/2/0000000002-20-000002.txt
+1|Example A|8-K|2020-03-02|edgar/data/1/0000000001-20-000001.txt
+3|Example C|10-K|2020-03-02|edgar/data/3/0000000003-20-000003.txt

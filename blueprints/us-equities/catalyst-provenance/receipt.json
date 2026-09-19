@@ -1,0 +1,310 @@
+{
+  "schema_version": 1,
+  "id": "native-edgartools-catalyst-20260919",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "edgartools"
+  ],
+  "claim": "EdgarTools 5.58.0 installed in an environment of 42 version-pinned packages; native local index/context and one pinned real 8-K HTML parser accepted. Official SEC metadata request observed 403; no fresh SEC dataset or historical point-in-time strategy data accepted.",
+  "limitations": [
+    "The official SEC network branch stopped after one observed403; changing empty proxy configuration was a local pre-request correction, not an access bypass.",
+    "Upstream quarterly-index metadata filtering does not cap downloaded rows or capture immutable raw index bytes.",
+    "catalyst.py is custom contract glue with offline behavior acceptance; its direct SEC acquisition was not run after the native403.",
+    "First observation means the completion time in a specific run, not globally earliest observation across all prior runs.",
+    "The real pinned historical8-K HTML fixture lacks acceptance metadata and stays quarantined before and after local observation.",
+    "Synthetic index fixtures establish parser/gate behavior, not market-data acquisition, a candidate universe, prediction quality or profit.",
+    "Native text/byte counts are not provider token savings.",
+    "Version-frozen dependencies are not wheel-hash-locked and a new platform must repeat acceptance."
+  ],
+  "commands": [
+    {
+      "command": "uv venv $CATALYST_RUNTIME/sdk --python $RESEARCH_PYTHON",
+      "exit_code": 0
+    },
+    {
+      "command": "uv pip install --python $CATALYST_RUNTIME/sdk/bin/python edgartools==5.58.0",
+      "exit_code": 0,
+      "packages": 42
+    },
+    {
+      "command": "source $SEC_CONTACT_ENV; EDGAR_LOCAL_DATA_DIR=$CATALYST_RUNTIME/native-cache timeout --signal=TERM --kill-after=5s 60s $CATALYST_RUNTIME/sdk/bin/python blueprints/us-equities/catalyst-provenance/native_edgar.py --out $CATALYST_RUNTIME/native-network.json",
+      "exit_code": 1,
+      "evidence": "native-network.json",
+      "diagnosis": "Local empty proxy URL rejected beforeHTTP; offline network-sentinel diagnostic confirmedValueError Unknown scheme for proxy URL URL('')."
+    },
+    {
+      "command": "source $SEC_CONTACT_ENV; EDGAR_LOCAL_DATA_DIR=$CATALYST_RUNTIME/native-cache timeout --signal=TERM --kill-after=5s 60s $CATALYST_RUNTIME/sdk/bin/python blueprints/us-equities/catalyst-provenance/native_edgar.py --out $CATALYST_RUNTIME/native-network-configured.json",
+      "exit_code": 1,
+      "evidence": "native-network-configured.json",
+      "change": "Omit only empty proxy variables inside isolated process; preserve all nonempty proxy settings."
+    },
+    {
+      "command": "$CATALYST_RUNTIME/sdk/bin/python blueprints/us-equities/catalyst-provenance/native_edgar.py --fixture blueprints/us-equities/catalyst-provenance/fixture.idx --out $CATALYST_RUNTIME/native-offline.json",
+      "exit_code": 0,
+      "evidence": "native-offline.json"
+    },
+    {
+      "command": "$CATALYST_RUNTIME/sdk/bin/python blueprints/us-equities/catalyst-provenance/native_document.py --out $CATALYST_RUNTIME/native-document-gated.json",
+      "exit_code": 0,
+      "evidence": "native-document-gated.json"
+    },
+    {
+      "command": "python3 -m unittest tests.test_catalyst_provenance",
+      "exit_code": 0,
+      "tests": 13
+    },
+    {
+      "command": "$RESEARCH_PYTHON -m unittest",
+      "exit_code": 0,
+      "tests": 215,
+      "skipped": 0
+    }
+  ],
+  "retained_local_integration_failures": [
+    {
+      "command": "native_document.py initial local attempt",
+      "exit_code": 1,
+      "reason": "Missing vendored_file metadata field raisedKeyError before parsing; corrected source manifest, reran native parser successfully."
+    }
+  ],
+  "native_artifacts": {
+    "native-network.json": {
+      "sha256": "e80c0cce859aa4b65829fd15aac5a4e4dd9250ae93fbb12950c1ebfd1b997a81",
+      "bytes": 595,
+      "result": {
+        "automatic_retries": 0,
+        "day": "2020-03-02",
+        "edgartools": "5.58.0",
+        "error_code": "native_call_failed",
+        "error_type": "ValueError",
+        "finished_at": "2026-09-19T22:53:17.023529Z",
+        "forms": [
+          "8-K",
+          "8-K/A"
+        ],
+        "historical_point_in_time": false,
+        "http_status": null,
+        "identity_sha256": "cb7c8ac38b81dc5389a09af34c99a8dcc27135d8a24caa1e11a5f86e6fc9e66e",
+        "method": "get_filings(2020, 1, form='8-K', amendments=True, filing_date='2020-03-02')",
+        "mode": "native_network",
+        "schema_version": 1,
+        "started_at": "2026-09-19T22:53:17.021972Z",
+        "status": "failed"
+      }
+    },
+    "native-network-configured.json": {
+      "sha256": "5247b1fe4d73a3d9cbc24560a364d0dee2befde0b34b6aa9e4fc00773781a5ac",
+      "bytes": 832,
+      "result": {
+        "automatic_retries": 0,
+        "day": "2020-03-02",
+        "edgartools": "5.58.0",
+        "error_code": "http_403",
+        "error_type": "HTTPStatusError",
+        "finished_at": "2026-09-19T22:54:58.501626Z",
+        "forms": [
+          "8-K",
+          "8-K/A"
+        ],
+        "historical_point_in_time": false,
+        "http_observations": [
+          {
+            "method": "GET",
+            "status": 403,
+            "url": "https://www.sec.gov/Archives/edgar/full-index/2020/QTR1/form.gz"
+          }
+        ],
+        "http_status": 403,
+        "identity_sha256": "cb7c8ac38b81dc5389a09af34c99a8dcc27135d8a24caa1e11a5f86e6fc9e66e",
+        "method": "get_filings(2020, 1, form='8-K', amendments=True, filing_date='2020-03-02')",
+        "mode": "native_network",
+        "omitted_empty_proxy_variables": [
+          "HTTP_PROXY",
+          "HTTPS_PROXY"
+        ],
+        "schema_version": 1,
+        "started_at": "2026-09-19T22:54:58.418829Z",
+        "status": "failed"
+      }
+    },
+    "native-offline.json": {
+      "sha256": "2df56ab1e10646a25447b7df55b2f33749cca7e6c85fa813e29d1c92e9b09051",
+      "bytes": 1305,
+      "result": {
+        "automatic_retries": 0,
+        "cohort_count": 2,
+        "day": "2020-03-02",
+        "edgartools": "5.58.0",
+        "finished_at": "2026-09-19T22:53:32.037857Z",
+        "first_observed_at": "2026-09-19T22:53:32.034455Z",
+        "fixture_sha256": "136ce3e0dba2fd3b34ecf79d4ee3f666ea4c8a3a9e21371b7bb852226bec92ba",
+        "forms": [
+          "8-K",
+          "8-K/A"
+        ],
+        "historical_point_in_time": false,
+        "method": "read_pipe_delimited_index / Filings.filter",
+        "mode": "offline_fixture",
+        "native_context": "FILINGS COLLECTION\n\nTotal: 2 filings\nForms: 8-K, 8-K/A\nDate Range: 2020-03-02 to 2020-03-02\n\nAVAILABLE ACTIONS:\n  - Use .latest() to get most recent filing\n  - Use [index] to access specific filing (e.g., filings[0])\n  - Use .filter(form='C') to narrow by form type\n  - Use .docs for detailed API documentation",
+        "native_context_truncated": false,
+        "schema_version": 1,
+        "selected": [
+          {
+            "accession_number": "0000000001-20-000001",
+            "cik": 1,
+            "company": "Example A",
+            "filing_date": "2020-03-02T00:00:00.000",
+            "form": "8-K"
+          },
+          {
+            "accession_number": "0000000002-20-000002",
+            "cik": 2,
+            "company": "Example B",
+            "filing_date": "2020-03-02T00:00:00.000",
+            "form": "8-K/A"
+          }
+        ],
+        "started_at": "2026-09-19T22:53:32.013135Z",
+        "status": "complete"
+      }
+    },
+    "native-document.json": {
+      "sha256": "440844c224b0e0333c36d86ef290f2a45aaadbcb7b2b2a2426d6b95e62dbd681",
+      "bytes": 2371,
+      "result": {
+        "edgartools": "5.58.0",
+        "eligible_after_first_observation": false,
+        "eligible_before_first_observation": false,
+        "historical_point_in_time": false,
+        "limitations": [
+          "Fixture lineage is pinned upstream test data, not a fresh SEC response.",
+          "No SGML acceptance header exists; all trading cutoffs remain quarantined.",
+          "Text conversion and byte counts do not measure model token savings or strategy quality."
+        ],
+        "mode": "real_upstream_fixture_offline",
+        "native_api": "edgar.documents.HTMLParser().parse(raw).to_markdown()",
+        "native_markdown_bytes": 5325,
+        "native_markdown_sha256": "0c7253e2ffaf1937296fdccf9b297994e86ecae233b13b5a9c4dd438859117f8",
+        "schema_version": 1,
+        "sec_network_requests": 0,
+        "source": {
+          "accepted_at": null,
+          "accession_from_upstream_path": "0000887919-21-000012",
+          "availability_status": "quarantined_missing_acceptance",
+          "bytes": 32434,
+          "commit": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+          "first_local_observed_at": "2026-09-19T22:57:47.589804+00:00",
+          "form_from_upstream_path": "8-K",
+          "license_url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/LICENSE.txt",
+          "path": "tests/fixtures/parity_gate/8-K/0000887919-21-000012.html",
+          "provenance": "Pinned upstream test fixture containing historical filing HTML; not direct SEC acquisition and not a complete SGML filing.",
+          "repository": "dgunning/edgartools",
+          "sha256": "6f40108c938a9edc73da7477d92d5c6c705e965210e8e62faf60de81f0af4ab2",
+          "url": "https://raw.githubusercontent.com/dgunning/edgartools/abe44344c56cf4bfb5443e0debca7e39342f6e7a/tests/fixtures/parity_gate/8-K/0000887919-21-000012.html",
+          "vendored_file": {
+            "bytes": 32435,
+            "normalization": "One final newline appended by text writer. Original bytes recovered by removing one byte and verified against upstream SHA256.",
+            "sha256": "a1e7ca4772bca52911631c6ba2626878cb8c5ebdf17c662033e89d04ef4a0b17"
+          }
+        },
+        "status": "complete",
+        "temporal_gate": {
+          "acceptance_raw": null,
+          "accepted_at": null,
+          "accession": "0000887919-21-000012",
+          "available_at": null,
+          "cik": null,
+          "exclusion_reason": "missing_or_duplicate_header_field",
+          "filed_date": null,
+          "first_observed_at": "2026-09-19T22:57:47.589804+00:00",
+          "form": "8-K",
+          "status": "quarantined"
+        }
+      }
+    },
+    "native-document-gated.json": {
+      "sha256": "440844c224b0e0333c36d86ef290f2a45aaadbcb7b2b2a2426d6b95e62dbd681",
+      "bytes": 2371,
+      "result": {
+        "edgartools": "5.58.0",
+        "eligible_after_first_observation": false,
+        "eligible_before_first_observation": false,
+        "historical_point_in_time": false,
+        "limitations": [
+          "Fixture lineage is pinned upstream test data, not a fresh SEC response.",
+          "No SGML acceptance header exists; all trading cutoffs remain quarantined.",
+          "Text conversion and byte counts do not measure model token savings or strategy quality."
+        ],
+        "mode": "real_upstream_fixture_offline",
+        "native_api": "edgar.documents.HTMLParser().parse(raw).to_markdown()",
+        "native_markdown_bytes": 5325,
+        "native_markdown_sha256": "0c7253e2ffaf1937296fdccf9b297994e86ecae233b13b5a9c4dd438859117f8",
+        "schema_version": 1,
+        "sec_network_requests": 0,
+        "source": {
+          "accepted_at": null,
+          "accession_from_upstream_path": "0000887919-21-000012",
+          "availability_status": "quarantined_missing_acceptance",
+          "bytes": 32434,
+          "commit": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+          "first_local_observed_at": "2026-09-19T22:57:47.589804+00:00",
+          "form_from_upstream_path": "8-K",
+          "license_url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/LICENSE.txt",
+          "path": "tests/fixtures/parity_gate/8-K/0000887919-21-000012.html",
+          "provenance": "Pinned upstream test fixture containing historical filing HTML; not direct SEC acquisition and not a complete SGML filing.",
+          "repository": "dgunning/edgartools",
+          "sha256": "6f40108c938a9edc73da7477d92d5c6c705e965210e8e62faf60de81f0af4ab2",
+          "url": "https://raw.githubusercontent.com/dgunning/edgartools/abe44344c56cf4bfb5443e0debca7e39342f6e7a/tests/fixtures/parity_gate/8-K/0000887919-21-000012.html",
+          "vendored_file": {
+            "bytes": 32435,
+            "normalization": "One final newline appended by text writer. Original bytes recovered by removing one byte and verified against upstream SHA256.",
+            "sha256": "a1e7ca4772bca52911631c6ba2626878cb8c5ebdf17c662033e89d04ef4a0b17"
+          }
+        },
+        "status": "complete",
+        "temporal_gate": {
+          "acceptance_raw": null,
+          "accepted_at": null,
+          "accession": "0000887919-21-000012",
+          "available_at": null,
+          "cik": null,
+          "exclusion_reason": "missing_or_duplicate_header_field",
+          "filed_date": null,
+          "first_observed_at": "2026-09-19T22:57:47.589804+00:00",
+          "form": "8-K",
+          "status": "quarantined"
+        }
+      }
+    }
+  },
+  "upstream": {
+    "repository": "dgunning/edgartools",
+    "version": "5.58.0",
+    "commit": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+    "license": "MIT",
+    "released_at": "2026-09-11T15:41:47Z"
+  },
+  "star_refresh": {
+    "previous": 337,
+    "current": 342,
+    "added": 5,
+    "removed": 0,
+    "path": "blueprints/us-equities/catalyst-provenance/public-stars-refresh.json"
+  },
+  "source_review": "catalogs/us-equities/simulation-data-review.json",
+  "independent_review": {
+    "status": "accepted",
+    "reviewer": "independent_read_only_worker",
+    "scope": "Native temporal gate, immutable artifact verification, fixture provenance and public claims",
+    "checks": [
+      "13 focused tests passed independently.",
+      "Five retained native JSON artifacts matched published embedded results and bytes/SHA256.",
+      "Original upstream and vendored fixture hashes matched; nativeMarkdown5325bytes verified.",
+      "Real fixture remained quarantined before and after first local observation.",
+      "One native403 correctly remains separate from accepted offline parser behavior and custom bridge.",
+      "342publicstar identities and12bounded source decisions accurately scoped."
+    ],
+    "blocking_findings": 0
+  },
+  "scope": "Native SDK provenance: local parser/context acceptance and actual SEC network refusal; custom causal bridge offline acceptance."
+}
