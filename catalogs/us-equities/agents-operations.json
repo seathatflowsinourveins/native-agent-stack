@@ -1,0 +1,1444 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "layer": "agents-operations",
+  "entries": [
+    {
+      "id": "codex-native-sdk",
+      "repository": "https://github.com/openai/codex",
+      "layers": [
+        "native-workers",
+        "sdk",
+        "token-efficiency"
+      ],
+      "role": "Native Codex CLI and Python app-server SDK",
+      "decision": "default",
+      "rationale": "Keep the existing proven native worker and account flow; avoid a second model router merely to launch a research task.",
+      "version_or_commit": "CLI rust-v0.155.1; Python openai-codex 0.154.0",
+      "release_date": "2026-09-18T20:03:04Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Read scoped filings and backtest artifacts; return cited structured research with actual turn usage.",
+      "alpaca_fit": "No broker credentials or order tools in the research worker; separate deterministic adapter owns any later approved paper-order work.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "blueprints/us-equities/workers/receipt.json",
+        "blueprints/us-equities/workers/policy.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "python -m pip install openai-codex==0.154.0",
+        "npm install --global --prefix \"$CODEX_PREFIX\" @openai/codex@0.155.1",
+        "\"$CODEX_PREFIX/bin/codex\" --version",
+        "python blueprints/us-equities/workers/native_worker.py --help"
+      ],
+      "requirements": [
+        "Python >=3.10; explicit native Codex executable/home; native login and fresh usage allowance",
+        "Normal plugin/MCP trust and a broker-free environment"
+      ],
+      "limitations": [
+        "CLI0.155.1 and Python SDK0.154.0 are distinct pins; released SDK otherwise chooses its bundled runtime.",
+        "Native research task passed, but configured model/provider are not independent per-request attestation.",
+        "Context Mode ctx_execute_file workspace failed in ephemeral SDK plugin transport; custom registration required approval and remained blocked. Failed-turn usage is retained.",
+        "A turn-stream deadline is not a full-process timeout or a provider spending cap."
+      ],
+      "sources": [
+        "https://github.com/openai/codex",
+        "https://github.com/openai/codex/releases/tag/rust-v0.155.1",
+        "https://github.com/openai/codex/blob/rust-v0.155.1/README.md",
+        "https://pypi.org/project/openai-codex/0.154.0/",
+        "https://developers.openai.com/codex/sdk",
+        "https://developers.openai.com/codex/app-server",
+        "https://learn.chatgpt.com/docs/extend/mcp"
+      ]
+    },
+    {
+      "id": "codex-acp",
+      "repository": "https://github.com/agentclientprotocol/codex-acp",
+      "layers": [
+        "native-workers",
+        "agent-protocol"
+      ],
+      "role": "ACP adapter to native Codex app-server",
+      "decision": "conditional",
+      "rationale": "Use only when an ACP host such as DeerFlow needs Codex; direct SDK remains simpler for a single worker.",
+      "version_or_commit": "v1.12.0",
+      "release_date": "2026-09-15T20:59:35Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Exposes native sessions, model choices and approval controls to another application.",
+      "alpaca_fit": "Protocol integration is not brokerage integration; do not forward order MCP servers.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "blueprints/us-equities/deerflow/native-receipt.json"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "npm install --global --prefix \"$ACP_PREFIX\" @agentclientprotocol/codex-acp@1.12.0",
+        "\"$ACP_PREFIX/bin/codex-acp\" --version",
+        "CODEX_PATH=\"$NATIVE_CODEX_BIN\" \"$ACP_PREFIX/bin/codex-acp\""
+      ],
+      "requirements": [
+        "An ACP client over stdio; selected native login; normal approval flow",
+        "CODEX_PATH optionally selects the intended native binary rather than bundled dependency"
+      ],
+      "limitations": [
+        "Predecessor zed-industries/codex-acp directs new installs here.",
+        "Receipt proves initialize and read-only session discovery, zero prompt calls; no DeerFlow delegation inference was tested.",
+        "Do not map an advertised model choice to present quota availability."
+      ],
+      "sources": [
+        "https://github.com/agentclientprotocol/codex-acp",
+        "https://github.com/agentclientprotocol/codex-acp/releases/tag/v1.12.0",
+        "https://github.com/agentclientprotocol/codex-acp/blob/v1.12.0/README.md",
+        "https://github.com/agentclientprotocol/codex-acp/blob/v1.12.0/LICENSE"
+      ]
+    },
+    {
+      "id": "omniroute",
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "layers": [
+        "routing",
+        "token-efficiency"
+      ],
+      "role": "Optional explicit provider gateway",
+      "decision": "conditional",
+      "rationale": "Retain as one alternative route only when exact identity, protocol fidelity and account authorization are established.",
+      "version_or_commit": "v3.8.50",
+      "release_date": "2026-08-26T19:30:30Z",
+      "license": "MIT",
+      "us_equities_fit": "Can route bounded research calls to a specifically selected local or authorized cloud provider.",
+      "alpaca_fit": "Exclude order tools and execution credentials; router availability cannot authorize a broker action.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "blueprints/us-equities/routing/health-receipt.json",
+        "blueprints/us-equities/routing/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "npm install --global --prefix \"$OMNI_PREFIX\" omniroute@3.8.50",
+        "\"$OMNI_PREFIX/bin/omniroute\" --version",
+        "curl --fail --silent --show-error http://127.0.0.1:20128/api/health"
+      ],
+      "requirements": [
+        "Reviewed local deployment; independently authorized provider connection",
+        "Explicit provider/model route; cache/compression fidelity baseline; private management credentials"
+      ],
+      "limitations": [
+        "Latest GitHub release v3.8.50 differs from default development branch release/v3.8.51; do not label development head installed.",
+        "Native /v1/responses is documented, but gateway Astra was unverified; historical exact Opus and local Qwen evidence is dated.",
+        "Codex executor strips max_output_tokens; this is not an enforceable gateway token budget.",
+        "Thinking passthrough and optional sessionAffinityTtlMs preserve different semantics; affinity is not a cost proof.",
+        "Response caching, compression and extra memory/skill injection remain off for the baseline; headline reduction claims are not measured savings."
+      ],
+      "sources": [
+        "https://github.com/diegosouzapw/OmniRoute",
+        "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",
+        "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/README.md",
+        "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/docs/reference/API_REFERENCE.md",
+        "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/docs/guides/THINKING_BUDGET.md",
+        "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/open-sse/executors/codex.ts",
+        "https://developers.openai.com/api/docs/guides/prompt-caching"
+      ]
+    },
+    {
+      "id": "freellmapi",
+      "repository": "https://github.com/tashfeenahmed/freellmapi",
+      "layers": [
+        "routing"
+      ],
+      "role": "Alternative local-provider and free-tier router",
+      "decision": "alternative",
+      "rationale": "Use instead of OmniRoute for an explicitly selected supported route, not in series or as silent identity fallback.",
+      "version_or_commit": "v0.11.0",
+      "release_date": "2026-09-16T11:01:30Z",
+      "license": "MIT",
+      "us_equities_fit": "Potential low-cost local preprocessing; preserve source dates, decimals and model identity.",
+      "alpaca_fit": "No order endpoint or Alpaca authentication integration is established.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "blueprints/us-equities/routing/health-receipt.json",
+        "blueprints/us-equities/routing/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "gh release view v0.11.0 --repo tashfeenahmed/freellmapi --json assets",
+        "curl --fail --silent --show-error http://127.0.0.1:31415/readyz"
+      ],
+      "requirements": [
+        "Selected official desktop asset for the host; independently authorized providers",
+        "Compression off and response cache disabled through native settings"
+      ],
+      "limitations": [
+        "Existing evidence is Windows deployment reachable from WSL, not a new Linux install.",
+        "Claude-looking compatibility aliases can select local Qwen; they do not establish Anthropic entitlement.",
+        "Free provider capacity and signed catalog freshness are not guaranteed service capacity.",
+        "Readiness200 is transport health only; no Astra route proof."
+      ],
+      "sources": [
+        "https://github.com/tashfeenahmed/freellmapi",
+        "https://github.com/tashfeenahmed/freellmapi/releases/tag/v0.11.0",
+        "https://github.com/tashfeenahmed/freellmapi/blob/v0.11.0/README.md",
+        "https://github.com/tashfeenahmed/freellmapi/blob/v0.11.0/server/src/services/anthropic-map.ts",
+        "https://github.com/tashfeenahmed/freellmapi/blob/v0.11.0/docs/en/install/01-install.md"
+      ]
+    },
+    {
+      "id": "deerflow",
+      "repository": "https://github.com/bytedance/deer-flow",
+      "layers": [
+        "research-orchestration",
+        "agent-protocol"
+      ],
+      "role": "Optional research application and subagent host",
+      "decision": "watch",
+      "rationale": "Keep the pinned discovery experiment; do not replace a working native worker until a concrete research workflow needs the broader application.",
+      "version_or_commit": "stable v2.0.0; discovery commit 42334f26d7025d905678f9075b079fc65f9beaf9 (2.1.0-rc0)",
+      "release_date": "2026-06-25T16:23:22Z",
+      "license": "MIT",
+      "us_equities_fit": "Research UI, skills and ACP delegation can coordinate filings/report work.",
+      "alpaca_fit": "Discovery has no account/order connectivity; broker capabilities must remain outside forwarded tools.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "blueprints/us-equities/deerflow/native-receipt.json"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "git clone https://github.com/bytedance/deer-flow.git \"$DEERFLOW_SRC\"",
+        "git -C \"$DEERFLOW_SRC\" checkout --detach 42334f26d7025d905678f9075b079fc65f9beaf9",
+        "uv sync --locked --project \"$DEERFLOW_SRC/backend\""
+      ],
+      "requirements": [
+        "Backend Python environment plus Node22+ for full UI; reviewed explicit configuration",
+        "Memory, scheduling and host-shell choices separately scoped; normal ACP permissions"
+      ],
+      "limitations": [
+        "Latest stable release is v2.0.0 (2026-06-25); examined development commit reports backend2.1.0-rc0 and includes newer integration surfaces.",
+        "Receipt proves23skills, gateway health and ACP discovery only; invoke_acp_agent was not invoked.",
+        "Do not reuse raw native OAuth stores through its separate model-provider adapters.",
+        "No standing service, production scheduler or provider-token saving demonstrated."
+      ],
+      "sources": [
+        "https://github.com/bytedance/deer-flow",
+        "https://github.com/bytedance/deer-flow/releases/tag/v2.0.0",
+        "https://github.com/bytedance/deer-flow/blob/v2.0.0/README.md",
+        "https://github.com/bytedance/deer-flow/tree/42334f26d7025d905678f9075b079fc65f9beaf9",
+        "https://github.com/bytedance/deer-flow/blob/42334f26d7025d905678f9075b079fc65f9beaf9/config.example.yaml"
+      ]
+    },
+    {
+      "id": "langgraph",
+      "repository": "https://github.com/langchain-ai/langgraph",
+      "layers": [
+        "agent-orchestration"
+      ],
+      "role": "Explicit agent-state graph and checkpoints",
+      "decision": "conditional",
+      "rationale": "Add only when branch/review/resume logic exceeds a bounded SDK task; avoid adding both an agent graph and an application host for the same loop.",
+      "version_or_commit": "langgraph 1.2.11; separately released langgraph SDK0.4.4",
+      "release_date": "2026-08-11T14:00:35.494718Z",
+      "license": "MIT",
+      "us_equities_fit": "Version research state and human-review checkpoints around source extraction and synthesis.",
+      "alpaca_fit": "Checkpoints do not make a retried broker side effect idempotent.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/langchain-ai/langgraph/blob/sdk==0.4.4/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "python -m pip install langgraph==1.2.11",
+        "python -c \"from langgraph.graph import StateGraph; from langgraph.checkpoint.memory import InMemorySaver; print('graph/checkpointer imports available')\""
+      ],
+      "requirements": [
+        "Python>=3.10; persistent checkpointer for restart recovery; application-defined graph",
+        "Separate model client/account if graph nodes invoke a provider"
+      ],
+      "limitations": [
+        "GitHub latest sdk==0.4.4 is a different package; core graph pin comes from PyPI.",
+        "InMemorySaver loses state on restart; checkpoints are not a durable broker ledger.",
+        "Import command is installation smoke only, not a working agent."
+      ],
+      "sources": [
+        "https://github.com/langchain-ai/langgraph",
+        "https://github.com/langchain-ai/langgraph/releases/tag/sdk%3D%3D0.4.4",
+        "https://github.com/langchain-ai/langgraph/blob/sdk==0.4.4/README.md",
+        "https://pypi.org/project/langgraph/1.2.11/",
+        "https://docs.langchain.com/oss/python/langgraph/persistence"
+      ]
+    },
+    {
+      "id": "dagu",
+      "repository": "https://github.com/dagucloud/dagu",
+      "layers": [
+        "durable-jobs"
+      ],
+      "role": "Single-binary scheduler for existing native commands",
+      "decision": "conditional",
+      "rationale": "First candidate for a small single-host research schedule; choose this or a Python/data orchestrator initially.",
+      "version_or_commit": "v2.16.6",
+      "release_date": "2026-09-14T14:45:57Z",
+      "license": "GPL-3.0",
+      "us_equities_fit": "Schedule bounded fetch, deterministic backtest and report steps with explicit timeouts and retry rules.",
+      "alpaca_fit": "Never let a generic retry policy blindly resubmit orders; research DAGs receive no broker keys.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/dagucloud/dagu/blob/v2.16.6/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "gh release download v2.16.6 --repo dagucloud/dagu --pattern dagu_2.16.6_linux_amd64.tar.gz --pattern checksums.txt --dir \"$ARTIFACT_DIR\"",
+        "dagu start \"$REVIEWED_RESEARCH_DAG\""
+      ],
+      "requirements": [
+        "Verified host binary and persisted state/log directory; reviewed YAML DAG",
+        "Explicit authentication for any exposed UI; chosen retry and concurrency limits"
+      ],
+      "limitations": [
+        "Current canonical repository is dagucloud/dagu. GPL3 license differs from older permissive assumptions.",
+        "start runs a supplied DAG; no DAG, timer or background service is installed by this catalog.",
+        "Dynamic tool auto-provisioning and third-party actions need their own pins; optional paid governance features are distinct."
+      ],
+      "sources": [
+        "https://github.com/dagucloud/dagu",
+        "https://github.com/dagucloud/dagu/releases/tag/v2.16.6",
+        "https://github.com/dagucloud/dagu/blob/v2.16.6/README.md",
+        "https://docs.dagu.sh/getting-started/cli"
+      ]
+    },
+    {
+      "id": "temporal",
+      "repository": "https://github.com/temporalio/temporal",
+      "layers": [
+        "durable-jobs"
+      ],
+      "role": "Durable workflow history, activities and cancellation",
+      "decision": "conditional",
+      "rationale": "Preferred escalation when jobs must survive host loss, await approvals or span days; heavier than the present bounded worker.",
+      "version_or_commit": "server v1.32.0; CLI1.9.1; Python SDK1.33.0",
+      "release_date": "2026-09-11T16:10:29Z",
+      "license": "MIT",
+      "us_equities_fit": "Durable research lifecycle with explicit activity timeouts, nonretryable quota/auth failures and recorded artifacts.",
+      "alpaca_fit": "Use idempotency and reconciliation at an external broker boundary; workflow replay does not guarantee exactly-once order submission.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/temporalio/temporal/blob/v1.32.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "gh release download v1.9.1 --repo temporalio/cli --pattern temporal_cli_1.9.1_linux_amd64.tar.gz --pattern checksums.txt --dir \"$ARTIFACT_DIR\"",
+        "temporal server start-dev",
+        "python -m pip install temporalio==1.33.0"
+      ],
+      "requirements": [
+        "Server1.32.0, CLI1.9.1 and Python SDK1.33.0 are separate pins",
+        "Production persistence, operators and explicit bounded retry policies"
+      ],
+      "limitations": [
+        "start-dev is local development infrastructure, not production availability.",
+        "Activities retry by default; unlimited defaults are unsuitable for quota errors or uncertain broker writes.",
+        "Network and LLM effects belong in activities, not deterministic workflow code."
+      ],
+      "sources": [
+        "https://github.com/temporalio/temporal",
+        "https://github.com/temporalio/temporal/releases/tag/v1.32.0",
+        "https://github.com/temporalio/temporal/blob/v1.32.0/README.md",
+        "https://docs.temporal.io/encyclopedia/retry-policies",
+        "https://github.com/temporalio/cli/releases/tag/v1.9.1",
+        "https://pypi.org/project/temporalio/1.33.0/"
+      ]
+    },
+    {
+      "id": "prefect",
+      "repository": "https://github.com/PrefectHQ/prefect",
+      "layers": [
+        "durable-jobs",
+        "data-orchestration"
+      ],
+      "role": "Python flow scheduling and operations",
+      "decision": "alternative",
+      "rationale": "Prefer when the research pipeline is already Python and needs schedules/retries without a full event-sourced workflow design.",
+      "version_or_commit": "3.8.6",
+      "release_date": "2026-09-14T14:18:53Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Coordinate daily data checks, feature computation and report jobs with concurrency controls.",
+      "alpaca_fit": "A failed flow rerun still requires broker-side deduplication; keep this research-only.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/PrefectHQ/prefect/blob/3.8.6/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "python -m pip install prefect==3.8.6",
+        "prefect server start --host 127.0.0.1",
+        "prefect version"
+      ],
+      "requirements": [
+        "Persistent server/database or separately authorized managed service",
+        "Defined flow/deployment and process worker or serve lifecycle"
+      ],
+      "limitations": [
+        "No flow is supplied or scheduled here.",
+        "Choose instead of Dagu for the first scheduler, not an extra coordinator above it.",
+        "Cloud hosting is a separate account and expense."
+      ],
+      "sources": [
+        "https://github.com/PrefectHQ/prefect",
+        "https://github.com/PrefectHQ/prefect/releases/tag/3.8.6",
+        "https://github.com/PrefectHQ/prefect/blob/3.8.6/README.md",
+        "https://docs.prefect.io/v3/how-to-guides/deployment_infra/run-flows-in-local-processes",
+        "https://docs.prefect.io/v3/advanced/transactions"
+      ]
+    },
+    {
+      "id": "dagster",
+      "repository": "https://github.com/dagster-io/dagster",
+      "layers": [
+        "data-orchestration"
+      ],
+      "role": "Partitioned data assets, lineage and backfills",
+      "decision": "alternative",
+      "rationale": "Prefer when point-in-time datasets and backfill lineage dominate the problem; not needed just to start three agents.",
+      "version_or_commit": "1.13.23",
+      "release_date": "2026-09-16T21:25:17Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Track symbol/session/date partitions, corporate-action revisions and derived dataset materializations.",
+      "alpaca_fit": "Supports upstream data lineage, not order-state reconciliation.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/dagster-io/dagster/blob/1.13.23/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "python -m pip install dagster==1.13.23 dagster-webserver==1.13.23",
+        "dagster dev -f \"$ASSET_DEFINITIONS\""
+      ],
+      "requirements": [
+        "Python project defining assets; persistent metadata database and storage",
+        "Reviewed partitions, IO managers and retention"
+      ],
+      "limitations": [
+        "Definitions file is application work not included here.",
+        "Backfill correctness depends on as-of data and adjustment choices; orchestration alone does not remove look-ahead bias.",
+        "Prefer one data orchestrator initially."
+      ],
+      "sources": [
+        "https://github.com/dagster-io/dagster",
+        "https://github.com/dagster-io/dagster/releases/tag/1.13.23",
+        "https://github.com/dagster-io/dagster/blob/1.13.23/README.md",
+        "https://docs.dagster.io/guides/build/partitions-and-backfills/partitioning-assets"
+      ]
+    },
+    {
+      "id": "vllm",
+      "repository": "https://github.com/vllm-project/vllm",
+      "layers": [
+        "model-serving",
+        "token-efficiency"
+      ],
+      "role": "Existing local GPU serving runtime",
+      "decision": "default",
+      "rationale": "Keep the working compatibility pin on the present host; review latest releases in isolation rather than replacing a working service on version number alone.",
+      "version_or_commit": "active0.25.0 (702f4814fe54fabff350d43cb753ae3e47c0c276); latest0.29.0",
+      "release_date": "2026-09-09T08:54:49Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Local inference infrastructure for the separately documented retrieval/research models.",
+      "alpaca_fit": "No Alpaca adapter; GPU throughput is unrelated to broker execution quality.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "evidence/receipts/vllm-compatibility.json",
+        "evidence/receipts/desktop-direct-rag.json"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "uv pip install --python \"$VLLM_ENV/bin/python\" vllm==0.25.0",
+        "\"$VLLM_ENV/bin/vllm\" --version",
+        "\"$VLLM_ENV/bin/vllm\" serve --help"
+      ],
+      "requirements": [
+        "Compatible GPU/driver/runtime and explicitly pinned model files",
+        "Loopback service, bounded context/concurrency and a rollback environment"
+      ],
+      "limitations": [
+        "Current upstream0.29.0 installed and CLI passed, but GPU startup failed with UVA unavailable on the recorded WSL host. Active0.25.0 restored.",
+        "The0.25pin is compatible, not latest; do not generalize host failure to all Linux.",
+        "This catalog adds no model, inference or serving benchmark."
+      ],
+      "sources": [
+        "https://github.com/vllm-project/vllm",
+        "https://github.com/vllm-project/vllm/releases/tag/v0.29.0",
+        "https://github.com/vllm-project/vllm/blob/v0.29.0/README.md",
+        "https://docs.vllm.ai/en/latest/getting_started/installation/gpu/index.html"
+      ]
+    },
+    {
+      "id": "sglang",
+      "repository": "https://github.com/sgl-project/sglang",
+      "layers": [
+        "model-serving",
+        "token-efficiency"
+      ],
+      "role": "Alternative GPU serving engine with prefix caching",
+      "decision": "alternative",
+      "rationale": "Evaluate only for a supported target model/hardware workload that the current serving engine cannot meet.",
+      "version_or_commit": "v0.5.20",
+      "release_date": "2026-09-18T22:41:33Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Batch repetitive extraction with shared prefixes; compare correctness and latency on the same frozen workload.",
+      "alpaca_fit": "No broker integration; do not move live decisions onto an unvalidated serving route.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/sgl-project/sglang/blob/v0.5.20/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "uv pip install --python \"$SGLANG_ENV/bin/python\" --prerelease=allow sglang==0.5.20",
+        "\"$SGLANG_ENV/bin/python\" -m sglang.launch_server --model-path \"$PINNED_MODEL_DIR\" --host 127.0.0.1 --port 30000"
+      ],
+      "requirements": [
+        "Python>=3.10 and supported GPU platform; current NVIDIA lane requires CUDA13",
+        "Pinned local model files and compatible parser/tool schema"
+      ],
+      "limitations": [
+        "Official install page says0.5.19 was last CUDA12 lane; do not assume current WSL compatibility.",
+        "Prefix caching and performance claims are source features, not measured workload savings.",
+        "Do not stack vLLM and SGLang as serial model gateways."
+      ],
+      "sources": [
+        "https://github.com/sgl-project/sglang",
+        "https://github.com/sgl-project/sglang/releases/tag/v0.5.20",
+        "https://github.com/sgl-project/sglang/blob/v0.5.20/README.md",
+        "https://docs.sglang.io/docs/get-started/install",
+        "https://docs.sglang.io/docs/basic_usage/send_request"
+      ]
+    },
+    {
+      "id": "ray-serve",
+      "repository": "https://github.com/ray-project/ray",
+      "layers": [
+        "model-serving",
+        "distributed-compute"
+      ],
+      "role": "Distributed compute and model-service composition",
+      "decision": "conditional",
+      "rationale": "Add when one GPU/process no longer fits the measured workload; unnecessary control-plane overhead for the current single-host setup.",
+      "version_or_commit": "ray-2.58.0",
+      "release_date": "2026-08-23T05:42:08Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Parallel backtest/research batch computation and separately scalable local models.",
+      "alpaca_fit": "Task retries do not supply order idempotency; restrict worker network/credentials.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/ray-project/ray/blob/ray-2.58.0/README.rst"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "python -m pip install \"ray[serve]==2.58.0\"",
+        "serve run \"$SERVE_APP_IMPORT_PATH\""
+      ],
+      "requirements": [
+        "A reviewed importable Serve application; resource/concurrency limits",
+        "Private cluster network and administrative access controls"
+      ],
+      "limitations": [
+        "Application path must identify code prepared separately; the command is not a turnkey financial service.",
+        "Cluster control APIs are powerful; do not expose to untrusted networks.",
+        "No distributed performance or failover acceptance performed."
+      ],
+      "sources": [
+        "https://github.com/ray-project/ray",
+        "https://github.com/ray-project/ray/releases/tag/ray-2.58.0",
+        "https://github.com/ray-project/ray/blob/ray-2.58.0/README.rst",
+        "https://docs.ray.io/en/latest/serve/getting_started.html"
+      ]
+    },
+    {
+      "id": "bentoml",
+      "repository": "https://github.com/bentoml/BentoML",
+      "layers": [
+        "model-serving",
+        "packaging"
+      ],
+      "role": "Model service packaging and deployment",
+      "decision": "alternative",
+      "rationale": "Choose instead of custom model service packaging when reproducible Bento artifacts and deployment workflow are needed.",
+      "version_or_commit": "v1.4.39",
+      "release_date": "2026-05-07T10:37:29Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Package a deterministic feature/scoring service independently of the agent runtime.",
+      "alpaca_fit": "No order-state or brokerage semantics.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/bentoml/BentoML/blob/v1.4.39/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "python -m pip install bentoml==1.4.39",
+        "bentoml serve \"$BENTO_SERVICE\"",
+        "bentoml build"
+      ],
+      "requirements": [
+        "Reviewed service and bento configuration; model dependencies and explicit artifacts",
+        "Container runtime only for containerization; BentoCloud account only if separately selected"
+      ],
+      "limitations": [
+        "Local server and BentoCloud are different deployment paths.",
+        "Supplied service/config required; no cloud deployment or model call executed.",
+        "Prefer direct vLLM for a single supported model endpoint until packaging adds value."
+      ],
+      "sources": [
+        "https://github.com/bentoml/BentoML",
+        "https://github.com/bentoml/BentoML/releases/tag/v1.4.39",
+        "https://github.com/bentoml/BentoML/blob/v1.4.39/README.md",
+        "https://docs.bentoml.com/en/latest/get-started/hello-world.html"
+      ]
+    },
+    {
+      "id": "modal",
+      "repository": "https://github.com/modal-labs/modal-client",
+      "layers": [
+        "hosting",
+        "managed-compute"
+      ],
+      "role": "Managed elastic Python/GPU jobs and sandboxes",
+      "decision": "conditional",
+      "rationale": "Useful for sporadic approved GPU batches that exceed local capacity; avoid permanent hosting until cost/egress policies are set.",
+      "version_or_commit": "Python modal1.5.5; source be5f129326efe4864d666d263d249214bd9b4ed2",
+      "release_date": "2026-08-28T19:51:32.404254Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Run isolated data transformations/backtests with retained input/version/output receipts.",
+      "alpaca_fit": "Do not place live broker credentials in general GPU job secrets.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://pypi.org/project/modal/1.5.5/"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "python -m pip install modal==1.5.5",
+        "modal --help",
+        "modal run \"$REVIEWED_MODAL_APP\""
+      ],
+      "requirements": [
+        "Separate Modal account, native login and compute budget",
+        "Reviewed app, image, region, timeout and durable output storage"
+      ],
+      "limitations": [
+        "Open-source SDK license does not make hosted compute free or self-hostable.",
+        "modal run executes cloud code and may incur charges; not run here.",
+        "Do not assume native Codex subscription credentials belong in cloud containers."
+      ],
+      "sources": [
+        "https://github.com/modal-labs/modal-client",
+        "https://github.com/modal-labs/modal-client/blob/be5f129326efe4864d666d263d249214bd9b4ed2/README.md",
+        "https://pypi.org/project/modal/1.5.5/",
+        "https://modal.com/docs/guide"
+      ]
+    },
+    {
+      "id": "e2b",
+      "repository": "https://github.com/e2b-dev/E2B",
+      "layers": [
+        "hosting",
+        "sandbox"
+      ],
+      "role": "Managed isolated code execution environments",
+      "decision": "conditional",
+      "rationale": "Choose when untrusted generated research code needs a separate VM boundary and managed lifecycle.",
+      "version_or_commit": "e2b@2.51.0",
+      "release_date": "2026-09-18T12:07:13Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Run downloaded notebooks or generated analyses against copied public fixtures, with explicit timeout and deletion.",
+      "alpaca_fit": "Never inherit broker secrets into a general code sandbox.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/e2b-dev/E2B/blob/e2b@2.51.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "python -m pip install e2b==2.51.0",
+        "python -c \"from e2b import Sandbox; print('SDK import only; no sandbox created')\""
+      ],
+      "requirements": [
+        "E2B account/API credential and cloud usage budget for actual sandboxes",
+        "Explicit network/data scope and cleanup; self-hosting is a separate infrastructure project"
+      ],
+      "limitations": [
+        "Import is not sandbox E2E.",
+        "Self-host guide targets AWS/GCP infrastructure; not a drop-in local Linux binary.",
+        "SDK, code-interpreter package and platform have separate versions."
+      ],
+      "sources": [
+        "https://github.com/e2b-dev/E2B",
+        "https://github.com/e2b-dev/E2B/releases/tag/e2b%402.51.0",
+        "https://github.com/e2b-dev/E2B/blob/e2b@2.51.0/README.md",
+        "https://pypi.org/project/e2b/2.51.0/",
+        "https://github.com/e2b-dev/infra/blob/main/self-host.md"
+      ]
+    },
+    {
+      "id": "daytona",
+      "repository": "https://github.com/daytonaio/daytona",
+      "layers": [
+        "hosting",
+        "sandbox"
+      ],
+      "role": "Managed development sandbox alternative",
+      "decision": "watch",
+      "rationale": "Public core is no longer maintained; evaluate current managed offering separately instead of adopting an old public server as the latest stack.",
+      "version_or_commit": "last public serverv0.190.0; Python SDK0.214.0 (2026-09-15)",
+      "release_date": "2026-06-23T13:25:53Z",
+      "license": "Public server AGPL-3.0; Python SDK Apache-2.0",
+      "us_equities_fit": "Potential long-lived research workspaces with snapshots, subject to service/account review.",
+      "alpaca_fit": "No Alpaca integration proven; keep order secrets outside shared agent workspaces.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/daytonaio/daytona/blob/v0.190.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "python -m pip install daytona==0.214.0",
+        "python -c \"from daytona import Daytona; print('SDK import only; no sandbox created')\""
+      ],
+      "requirements": [
+        "Separate service account/API credential for current hosted service",
+        "Independent review of retention, region and networking controls"
+      ],
+      "limitations": [
+        "Current README states core development moved private June2026 and public repo receives no updates/fixes/releases.",
+        "Last public serverv0.190.0 is distinct from Python SDK0.214.0; package freshness does not prove public server maintenance.",
+        "Public server AGPL3 and Python SDK Apache2 are distinct scopes."
+      ],
+      "sources": [
+        "https://github.com/daytonaio/daytona",
+        "https://github.com/daytonaio/daytona/releases/tag/v0.190.0",
+        "https://github.com/daytonaio/daytona/blob/v0.190.0/README.md",
+        "https://pypi.org/project/daytona/0.214.0/",
+        "https://github.com/daytonaio/daytona/blob/v0.190.0/LICENSE",
+        "https://github.com/daytonaio/daytona/blob/ec4c21b2d597091ac09ecc278f3bcc172575a987/README.md",
+        "https://www.daytona.io/docs/"
+      ]
+    },
+    {
+      "id": "opensandbox",
+      "repository": "https://github.com/opensandbox-group/OpenSandbox",
+      "layers": [
+        "sandbox",
+        "hosting"
+      ],
+      "role": "Self-hostable sandbox control API and SDKs",
+      "decision": "conditional",
+      "rationale": "Prefer a deliberate self-hosted isolation project when Docker/Kubernetes operations are justified; not an automatic dependency of native workers.",
+      "version_or_commit": "server/v0.2.3; Python SDK0.1.16",
+      "release_date": "2026-08-26T09:39:29Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Create disposable code-analysis environments with scoped network and lifecycle controls.",
+      "alpaca_fit": "No broker credentials in sandbox templates or broad MCP catalog.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/opensandbox-group/OpenSandbox/blob/server/v0.2.3/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "uvx --from opensandbox-server==0.2.3 opensandbox-server --help",
+        "python -m pip install opensandbox==0.1.16"
+      ],
+      "requirements": [
+        "Reviewed server configuration; Docker or Kubernetes runtime and image provenance",
+        "Authentication, loopback/private ingress and explicit sandbox lifetime"
+      ],
+      "limitations": [
+        "Canonical repository moved to opensandbox-group/OpenSandbox.",
+        "Server0.2.3 and Python SDK0.1.16 are separate; help/import is not isolation proof.",
+        "Container sandbox strength depends on configured runtime and host isolation."
+      ],
+      "sources": [
+        "https://github.com/opensandbox-group/OpenSandbox",
+        "https://github.com/opensandbox-group/OpenSandbox/releases/tag/server/v0.2.3",
+        "https://github.com/opensandbox-group/OpenSandbox/blob/server/v0.2.3/README.md",
+        "https://pypi.org/project/opensandbox/0.1.16/",
+        "https://github.com/opensandbox-group/OpenSandbox/tree/server/v0.2.3/server",
+        "https://pypi.org/project/opensandbox-server/0.2.3/"
+      ]
+    },
+    {
+      "id": "sandbox-runtime",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "layers": [
+        "sandbox"
+      ],
+      "role": "Native filesystem/network restriction for selected commands",
+      "decision": "default",
+      "rationale": "Reuse the existing small native isolation layer before adding a sandbox service.",
+      "version_or_commit": "v0.0.77",
+      "release_date": "2026-09-18T22:09:16Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Execute selected parsers/scans with only owned fixture paths and necessary network scope.",
+      "alpaca_fit": "Filesystem read-only mode does not revoke external APIs; broker credentials stay absent.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "evidence/receipts/runtime-tools.json"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "npm install --global --prefix \"$SRT_PREFIX\" --ignore-scripts @anthropic-ai/sandbox-runtime@0.0.77",
+        "\"$SRT_PREFIX/bin/srt\" --settings \"$REVIEWED_SRT_SETTINGS\" -- sh -c \"printf isolated\""
+      ],
+      "requirements": [
+        "Linux bubblewrap/socat and supported kernel or supported macOS backend",
+        "Explicit reviewed policy and minimal child environment"
+      ],
+      "limitations": [
+        "Filesystem allowed/denied operations were proven; network denial was configured but not independently exercised.",
+        "Overlapping denied-read/write paths can produce an ephemeral hidden mount: first write exit0 left host unchanged; separate protected-write fixture denied correctly.",
+        "Not a VM boundary or complete secret-isolation certification."
+      ],
+      "sources": [
+        "https://github.com/anthropics/sandbox-runtime",
+        "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77",
+        "https://github.com/anthropics/sandbox-runtime/blob/v0.0.77/README.md"
+      ]
+    },
+    {
+      "id": "opentelemetry-collector",
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector",
+      "layers": [
+        "observability"
+      ],
+      "role": "Vendor-neutral telemetry collection and export",
+      "decision": "conditional",
+      "rationale": "Start with one local OTLP collector when persistent workers/services exist; avoid installing multiple automatic trace exporters.",
+      "version_or_commit": "v0.161.0",
+      "release_date": "2026-09-14T22:49:14Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Correlate task status, data freshness, queue latency and usage metadata without prompt bodies.",
+      "alpaca_fit": "Keep order/account identifiers out of broad labels; privileged audit logs need a separate restricted sink.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/open-telemetry/opentelemetry-collector/blob/v0.161.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "gh release view v0.161.0 --repo open-telemetry/opentelemetry-collector-releases --json assets",
+        "otelcol validate --config=\"$OTEL_CONFIG\"",
+        "otelcol --config=\"$OTEL_CONFIG\""
+      ],
+      "requirements": [
+        "Verified core or contrib distribution; explicit receivers/processors/exporters",
+        "Loopback/private endpoints, bounded queues, redaction and retention"
+      ],
+      "limitations": [
+        "Core/contrib component inventories differ; collector is not a trace database or accounting source.",
+        "Config validation is not exporter delivery or sensitive-data review.",
+        "No endpoint, exporter or instrumentation enabled here."
+      ],
+      "sources": [
+        "https://github.com/open-telemetry/opentelemetry-collector",
+        "https://github.com/open-telemetry/opentelemetry-collector/releases/tag/v0.161.0",
+        "https://github.com/open-telemetry/opentelemetry-collector/blob/v0.161.0/README.md",
+        "https://opentelemetry.io/docs/collector/configuration/",
+        "https://opentelemetry.io/docs/security/handling-sensitive-data/",
+        "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.161.0"
+      ]
+    },
+    {
+      "id": "prometheus",
+      "repository": "https://github.com/prometheus/prometheus",
+      "layers": [
+        "observability"
+      ],
+      "role": "Metrics scraping, time-series retention and alert rules",
+      "decision": "conditional",
+      "rationale": "Add with long-running services; first metrics should be freshness, queue failures and provider throttle state.",
+      "version_or_commit": "v3.14.0",
+      "release_date": "2026-08-18T08:49:40Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Monitor delayed inputs, failed jobs, service capacity and missing reports.",
+      "alpaca_fit": "Alpaca adapter metrics must expose bounded status categories, never secrets or high-cardinality order IDs.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/prometheus/prometheus/blob/v3.14.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "gh release view v3.14.0 --repo prometheus/prometheus --json assets",
+        "promtool check config \"$PROMETHEUS_CONFIG\"",
+        "prometheus --config.file=\"$PROMETHEUS_CONFIG\" --web.listen-address=127.0.0.1:9090"
+      ],
+      "requirements": [
+        "Native verified release binary; explicit scrape targets and disk retention",
+        "Reviewed rule files and separate notification transport if alerts are required"
+      ],
+      "limitations": [
+        "No targets, alert delivery or availability policy configured here.",
+        "Metrics are aggregated operational indicators, not an immutable transaction ledger or exact provider bill."
+      ],
+      "sources": [
+        "https://github.com/prometheus/prometheus",
+        "https://github.com/prometheus/prometheus/releases/tag/v3.14.0",
+        "https://github.com/prometheus/prometheus/blob/v3.14.0/README.md",
+        "https://prometheus.io/docs/prometheus/latest/getting_started/"
+      ]
+    },
+    {
+      "id": "grafana",
+      "repository": "https://github.com/grafana/grafana",
+      "layers": [
+        "observability"
+      ],
+      "role": "Operations dashboards and visualization",
+      "decision": "conditional",
+      "rationale": "Use after metrics/traces exist; a dashboard alone adds no evidence or failure handling.",
+      "version_or_commit": "v13.2.2",
+      "release_date": "2026-09-15T12:21:32Z",
+      "license": "AGPL-3.0-only with documented component exceptions",
+      "us_equities_fit": "Visualize data age, model/task health and backtest metadata with clear units.",
+      "alpaca_fit": "Separate research views from restricted broker dashboards.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/grafana/grafana/blob/v13.2.2/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "gh release view v13.2.2 --repo grafana/grafana",
+        "grafana server --help"
+      ],
+      "requirements": [
+        "Supported OSS distribution; explicit data-source credentials and authentication",
+        "Retention handled by underlying stores; dashboard provisioning/versioning"
+      ],
+      "limitations": [
+        "AGPL3 applies to Grafana with component exceptions; managed service terms are separate.",
+        "Help command is discovery only; no dashboards or external access created."
+      ],
+      "sources": [
+        "https://github.com/grafana/grafana",
+        "https://github.com/grafana/grafana/releases/tag/v13.2.2",
+        "https://github.com/grafana/grafana/blob/v13.2.2/README.md",
+        "https://grafana.com/docs/grafana/latest/setup-grafana/installation/",
+        "https://github.com/grafana/grafana/blob/v13.2.2/LICENSE"
+      ]
+    },
+    {
+      "id": "langfuse",
+      "repository": "https://github.com/langfuse/langfuse",
+      "layers": [
+        "observability",
+        "agent-evaluation"
+      ],
+      "role": "Shared LLM trace, prompt and evaluation platform",
+      "decision": "alternative",
+      "rationale": "Choose if team-wide prompt/dataset operations justify its services; do not install alongside Phoenix and MLflow just for catalog coverage.",
+      "version_or_commit": "v4.38.0",
+      "release_date": "2026-09-17T15:26:11Z",
+      "license": "MIT core; separate enterprise license in ee directories",
+      "us_equities_fit": "Compare extraction quality against versioned reference fixtures with request usage linked to outcomes.",
+      "alpaca_fit": "Redact account identifiers and exclude trading credentials from traces.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/langfuse/langfuse/blob/v4.38.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "git clone --branch v4.38.0 --depth 1 https://github.com/langfuse/langfuse.git \"$LANGFUSE_SRC\"",
+        "docker compose --project-directory \"$LANGFUSE_SRC\" config --quiet"
+      ],
+      "requirements": [
+        "Reviewed self-host Compose/Helm deployment or separate cloud account",
+        "Database/queue/object storage dependencies and retention; explicit SDK instrumentation"
+      ],
+      "limitations": [
+        "Compose validation does not start services or secure defaults; no deployment performed.",
+        "MIT core; enterprise directories have separate license.",
+        "Telemetry and prompt/trace export require explicit scope; provider usage still comes from actual requests."
+      ],
+      "sources": [
+        "https://github.com/langfuse/langfuse",
+        "https://github.com/langfuse/langfuse/releases/tag/v4.38.0",
+        "https://github.com/langfuse/langfuse/blob/v4.38.0/README.md",
+        "https://langfuse.com/self-hosting",
+        "https://langfuse.com/self-hosting/security/telemetry",
+        "https://github.com/langfuse/langfuse/blob/v4.38.0/LICENSE"
+      ]
+    },
+    {
+      "id": "phoenix",
+      "repository": "https://github.com/Arize-ai/phoenix",
+      "layers": [
+        "observability",
+        "agent-evaluation"
+      ],
+      "role": "Local trace inspection and evaluation workspace",
+      "decision": "conditional",
+      "rationale": "First trace-analysis candidate when the current file receipts become unwieldy; use one trace UI initially.",
+      "version_or_commit": "arize-phoenix-v20.14.0",
+      "release_date": "2026-09-18T02:52:36Z",
+      "license": "Elastic-2.0",
+      "us_equities_fit": "Inspect source extraction, failed tool calls and usage in versioned evaluation datasets.",
+      "alpaca_fit": "Broker/account content must be excluded or access-controlled before export.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/Arize-ai/phoenix/blob/arize-phoenix-v20.14.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "python -m pip install arize-phoenix==20.14.0",
+        "PHOENIX_HOST=127.0.0.1 PHOENIX_TELEMETRY_ENABLED=false PHOENIX_ENABLE_MCP_SERVER=false PHOENIX_ALLOWED_PROVIDERS=NONE phoenix serve"
+      ],
+      "requirements": [
+        "Dedicated environment and local/private bind configured before startup",
+        "OTLP/OpenInference instrumentation and retention policy"
+      ],
+      "limitations": [
+        "ELv2 permits self-host use with restrictions; not Apache2 or unrestricted managed-service redistribution.",
+        "Server launch is prospective; no app instrumented and no judge-model calls run.",
+        "Auto-instrumentation can capture prompt/tool contents; scrub at source.",
+        "The proposed local inspection launch disables its optional MCP endpoint and playground providers; enabling them is a separate scope decision."
+      ],
+      "sources": [
+        "https://github.com/Arize-ai/phoenix",
+        "https://github.com/Arize-ai/phoenix/releases/tag/arize-phoenix-v20.14.0",
+        "https://github.com/Arize-ai/phoenix/blob/arize-phoenix-v20.14.0/README.md",
+        "https://arize.com/docs/phoenix/self-hosting",
+        "https://github.com/Arize-ai/phoenix/blob/arize-phoenix-v20.14.0/LICENSE",
+        "https://arize.com/docs/phoenix/self-hosting/configuration"
+      ]
+    },
+    {
+      "id": "inspect-ai",
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "layers": [
+        "agent-evaluation"
+      ],
+      "role": "Programmable task/solver/scorer evaluations",
+      "decision": "default",
+      "rationale": "Use as the first candidate for a small frozen extraction/tool-use acceptance suite, not a standing model benchmark campaign.",
+      "version_or_commit": "inspect-ai0.3.265; source e4b8ad59d8468d41cd5df844ec7100c7a1569cb1",
+      "release_date": "2026-09-17T18:18:06.141751Z",
+      "license": "MIT",
+      "us_equities_fit": "Score exact dates, units, provenance and refusal of out-of-scope actions with deterministic checks first.",
+      "alpaca_fit": "Use fixtures or explicitly authorized paper mocks; no live-order agent grading.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://pypi.org/project/inspect-ai/0.3.265/"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "python -m pip install inspect-ai==0.3.265",
+        "inspect --help",
+        "inspect eval \"$REVIEWED_EVAL_FILE\" --model \"$EXPLICIT_EVAL_MODEL\""
+      ],
+      "requirements": [
+        "Python>=3.10; reviewed dataset/scorers; explicitly authorized model backend for eval",
+        "Per-run concurrency, sample and token limits appropriate to backend"
+      ],
+      "limitations": [
+        "Eval command would perform model calls; not run here.",
+        "A judge score is not trading profitability or paper execution correctness.",
+        "Current release pin/date from PyPI because repository has no latest GitHub release."
+      ],
+      "sources": [
+        "https://github.com/UKGovernmentBEIS/inspect_ai",
+        "https://github.com/UKGovernmentBEIS/inspect_ai/blob/e4b8ad59d8468d41cd5df844ec7100c7a1569cb1/README.md",
+        "https://pypi.org/project/inspect-ai/0.3.265/",
+        "https://inspect.aisi.org.uk/"
+      ]
+    },
+    {
+      "id": "promptfoo",
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "layers": [
+        "agent-evaluation",
+        "security"
+      ],
+      "role": "Declarative prompt regression and adversarial testing",
+      "decision": "alternative",
+      "rationale": "Choose for YAML/API contract checks instead of a second overlapping evaluation engine; use deterministic assertions before model judges.",
+      "version_or_commit": "0.123.1",
+      "release_date": "2026-09-18T01:07:54Z",
+      "license": "MIT",
+      "us_equities_fit": "Catch changed output schemas, unsupported citations and prompt-injected order requests.",
+      "alpaca_fit": "Test a fake order interface only; red-team providers or brokers require explicit scope.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/promptfoo/promptfoo/blob/0.123.1/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "npm install --global --prefix \"$PROMPTFOO_PREFIX\" promptfoo@0.123.1",
+        "PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1 \"$PROMPTFOO_PREFIX/bin/promptfoo\" --help",
+        "PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1 \"$PROMPTFOO_PREFIX/bin/promptfoo\" eval -c \"$REVIEWED_EVAL_CONFIG\""
+      ],
+      "requirements": [
+        "Node>=22.22.0; explicit provider and assertion configuration",
+        "Separate authorization for provider/judge calls or external red-team generation"
+      ],
+      "limitations": [
+        "Eval can incur model cost; not run here.",
+        "Telemetry enabled by default upstream; suggested flags are per-process only.",
+        "A green prompt suite is not a security certificate or financial-validity test."
+      ],
+      "sources": [
+        "https://github.com/promptfoo/promptfoo",
+        "https://github.com/promptfoo/promptfoo/releases/tag/0.123.1",
+        "https://github.com/promptfoo/promptfoo/blob/0.123.1/README.md",
+        "https://www.promptfoo.dev/docs/configuration/telemetry/",
+        "https://www.promptfoo.dev/docs/configuration/reference/"
+      ]
+    },
+    {
+      "id": "gitleaks",
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "layers": [
+        "security"
+      ],
+      "role": "Redacted secret scanning of code and history",
+      "decision": "default",
+      "rationale": "Reuse installed native scanner before publication and artifact sharing.",
+      "version_or_commit": "v8.30.1",
+      "release_date": "2026-03-21T02:17:58Z",
+      "license": "MIT",
+      "us_equities_fit": "Scan research recipes, lockfiles and broker-adapter code for accidental credentials.",
+      "alpaca_fit": "Protect keys from committed fixtures; no need to read actual account stores.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "evidence/receipts/runtime-tools.json"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "gh release view v8.30.1 --repo gitleaks/gitleaks --json assets",
+        "gitleaks git \"$PROJECT_ROOT\" --redact=100 --no-banner"
+      ],
+      "requirements": [
+        "Explicit repository scope; verified native binary",
+        "Private report handling even with secret redaction"
+      ],
+      "limitations": [
+        "Existing22-commit scan had0findings; this is a dated scoped result, not proof no secrets exist anywhere.",
+        "Patterns can miss novel secrets or flag benign text; avoid scanning native auth directories."
+      ],
+      "sources": [
+        "https://github.com/gitleaks/gitleaks",
+        "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
+        "https://github.com/gitleaks/gitleaks/blob/v8.30.1/README.md"
+      ]
+    },
+    {
+      "id": "syft",
+      "repository": "https://github.com/anchore/syft",
+      "layers": [
+        "security",
+        "sbom"
+      ],
+      "role": "Native artifact dependency inventory",
+      "decision": "default",
+      "rationale": "Most useful publication addition: generate an SBOM from the actual selected runtime/image rather than treating a curated manifest as installed dependency evidence.",
+      "version_or_commit": "v1.52.0",
+      "release_date": "2026-09-17T14:38:17Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Record libraries used by backtests, extraction workers and later broker adapters.",
+      "alpaca_fit": "Inventory the adapter artifact without including credential files.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/anchore/syft/blob/v1.52.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "gh release view v1.52.0 --repo anchore/syft --json assets",
+        "syft \"dir:$BUILD_ARTIFACT_DIR\" -o syft-json=sbom.syft.json -o cyclonedx-json=sbom.cdx.json"
+      ],
+      "requirements": [
+        "Verified CLI; explicitly scoped build/runtime artifact and private output review",
+        "Exclude credentials and unrelated home directories"
+      ],
+      "limitations": [
+        "Catalog recommendation only; no SBOM generated in this task.",
+        "Inventory coverage depends on detected packages; an SBOM is not a vulnerability or behavior verdict."
+      ],
+      "sources": [
+        "https://github.com/anchore/syft",
+        "https://github.com/anchore/syft/releases/tag/v1.52.0",
+        "https://github.com/anchore/syft/blob/v1.52.0/README.md",
+        "https://oss.anchore.com/docs/guides/sbom/getting-started/"
+      ]
+    },
+    {
+      "id": "grype",
+      "repository": "https://github.com/anchore/grype",
+      "layers": [
+        "security",
+        "vulnerability-analysis"
+      ],
+      "role": "Scan a recorded SBOM against vulnerability data",
+      "decision": "default",
+      "rationale": "Pair with Syft so security results are tied to the same artifact; preserve database age and advisory context.",
+      "version_or_commit": "v0.119.0",
+      "release_date": "2026-09-17T16:45:23Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Identify affected runtime dependencies before deploying unattended research services.",
+      "alpaca_fit": "Triage actual adapter dependency exposure without using broker credentials.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/anchore/grype/blob/v0.119.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "gh release view v0.119.0 --repo anchore/grype --json assets",
+        "grype sbom:sbom.syft.json --fail-on high"
+      ],
+      "requirements": [
+        "Verified CLI and vulnerability database with recorded update time",
+        "Reviewed severity policy, false-positive/VEX handling and remediation owner"
+      ],
+      "limitations": [
+        "Database download/network access may occur; not executed here.",
+        "Known-CVE matches do not prove exploitability, and0matches do not prove safety."
+      ],
+      "sources": [
+        "https://github.com/anchore/grype",
+        "https://github.com/anchore/grype/releases/tag/v0.119.0",
+        "https://github.com/anchore/grype/blob/v0.119.0/README.md",
+        "https://oss.anchore.com/docs/guides/vulnerability/scan-targets/"
+      ]
+    },
+    {
+      "id": "trivy",
+      "repository": "https://github.com/aquasecurity/trivy",
+      "layers": [
+        "security",
+        "sbom"
+      ],
+      "role": "Alternative integrated vulnerability/IaC/secret scanner",
+      "decision": "alternative",
+      "rationale": "Choose instead of duplicate Grype scans when IaC/container checks are the main gap.",
+      "version_or_commit": "v0.74.0",
+      "release_date": "2026-08-14T11:29:11Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Review container and deployment configurations for hosted research workers.",
+      "alpaca_fit": "Check deployment files without broker/account access.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/aquasecurity/trivy/blob/v0.74.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "gh release view v0.74.0 --repo aquasecurity/trivy --json assets",
+        "trivy fs --scanners vuln,misconfig --exit-code 1 --severity HIGH,CRITICAL \"$BUILD_ARTIFACT_DIR\""
+      ],
+      "requirements": [
+        "Verified release and updated vulnerability/check databases",
+        "Explicit scan target and reviewed handling of reports"
+      ],
+      "limitations": [
+        "No scan performed here; external database fetch may occur.",
+        "Secret scanning overlaps Gitleaks; this proposed command leaves that lane to the existing tool."
+      ],
+      "sources": [
+        "https://github.com/aquasecurity/trivy",
+        "https://github.com/aquasecurity/trivy/releases/tag/v0.74.0",
+        "https://github.com/aquasecurity/trivy/blob/v0.74.0/README.md",
+        "https://trivy.dev/docs/latest/"
+      ]
+    },
+    {
+      "id": "cosign",
+      "repository": "https://github.com/sigstore/cosign",
+      "layers": [
+        "security",
+        "provenance"
+      ],
+      "role": "Artifact signature and identity verification",
+      "decision": "conditional",
+      "rationale": "Add when chosen upstreams publish signed artifacts or release CI can sign our outputs.",
+      "version_or_commit": "v3.1.3",
+      "release_date": "2026-08-06T01:09:23Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Bind reviewed container/model-service artifacts to expected producer identities and digests.",
+      "alpaca_fit": "Verify the deployed broker adapter artifact; signatures do not authorize an order.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/sigstore/cosign/blob/v3.1.3/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "gh release view v3.1.3 --repo sigstore/cosign --json assets",
+        "cosign verify --certificate-identity \"$EXPECTED_RELEASE_IDENTITY\" --certificate-oidc-issuer \"$EXPECTED_OIDC_ISSUER\" \"$IMAGE_AT_DIGEST\""
+      ],
+      "requirements": [
+        "Pinned artifact digest and independently expected publisher identity/issuer",
+        "Native verification material and appropriate network access"
+      ],
+      "limitations": [
+        "Do not replace exact identity with a permissive wildcard merely to pass verification.",
+        "Signing can use OIDC and publish transparency records; no signing or identity flow initiated here.",
+        "Not all upstreams publish signatures; keep checksum evidence labeled as such."
+      ],
+      "sources": [
+        "https://github.com/sigstore/cosign",
+        "https://github.com/sigstore/cosign/releases/tag/v3.1.3",
+        "https://github.com/sigstore/cosign/blob/v3.1.3/README.md",
+        "https://docs.sigstore.dev/cosign/verifying/verify/"
+      ]
+    },
+    {
+      "id": "openbao",
+      "repository": "https://github.com/openbao/openbao",
+      "layers": [
+        "security",
+        "secrets"
+      ],
+      "role": "Separate service identity and secret lifecycle",
+      "decision": "conditional",
+      "rationale": "Justified when moving from one operator host to unattended multi-service deployment; avoid copying native OAuth files into a generic vault.",
+      "version_or_commit": "v2.6.2",
+      "release_date": "2026-08-18T16:21:00Z",
+      "license": "MPL-2.0",
+      "us_equities_fit": "Issue scoped data-provider credentials and rotate service secrets outside prompts/logs.",
+      "alpaca_fit": "A dedicated execution service may receive narrow broker credentials; research agents should not.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/openbao/openbao/blob/v2.6.2/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "gh release view v2.6.2 --repo openbao/openbao --json assets",
+        "bao version",
+        "bao server -config=\"$REVIEWED_BAO_CONFIG\""
+      ],
+      "requirements": [
+        "Operated storage/unseal or seal mechanism, TLS, authentication and audit policies",
+        "Separately reviewed service secret provisioning; production backup/recovery"
+      ],
+      "limitations": [
+        "Server config is not supplied and no service starts in this task.",
+        "Development mode is unsuitable for persistent secrets; no dev-mode recipe offered.",
+        "Secret management does not reduce a token\u2019s authority by itself."
+      ],
+      "sources": [
+        "https://github.com/openbao/openbao",
+        "https://github.com/openbao/openbao/releases/tag/v2.6.2",
+        "https://github.com/openbao/openbao/blob/v2.6.2/README.md",
+        "https://openbao.org/docs/"
+      ]
+    },
+    {
+      "id": "openai-agents-sdk",
+      "repository": "https://github.com/openai/openai-agents-python",
+      "layers": [
+        "sdk",
+        "agent-orchestration"
+      ],
+      "role": "API-backed agent loops and explicit function tools",
+      "decision": "alternative",
+      "rationale": "Use for an application-owned API agent when native Codex behavior is not required; do not treat it as a subscription-backed Codex replacement.",
+      "version_or_commit": "v0.22.3",
+      "release_date": "2026-09-17T22:19:05Z",
+      "license": "MIT",
+      "us_equities_fit": "Typed extraction tools and constrained handoffs for a separately authorized research API service.",
+      "alpaca_fit": "Tool schemas and application validation must keep broker execution outside autonomous research loops.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/openai/openai-agents-python/blob/v0.22.3/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "python -m pip install openai-agents==0.22.3",
+        "OPENAI_AGENTS_DISABLE_TRACING=1 python -c \"from agents import Agent, Runner; print('SDK import only')\""
+      ],
+      "requirements": [
+        "Python>=3.10; separately authorized model API/provider access",
+        "Explicit tool permissions, run limits, tracing destination and sensitive-data policy"
+      ],
+      "limitations": [
+        "Tracing is enabled by default; proposed command disables it for this smoke check.",
+        "No provider API call or model comparison performed.",
+        "Does not inherit Codex account entitlement merely because both are OpenAI software."
+      ],
+      "sources": [
+        "https://github.com/openai/openai-agents-python",
+        "https://github.com/openai/openai-agents-python/releases/tag/v0.22.3",
+        "https://github.com/openai/openai-agents-python/blob/v0.22.3/README.md",
+        "https://openai.github.io/openai-agents-python/tracing/",
+        "https://openai.github.io/openai-agents-python/"
+      ]
+    },
+    {
+      "id": "claude-agent-sdk",
+      "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+      "layers": [
+        "sdk",
+        "native-workers"
+      ],
+      "role": "Programmatic Claude Code agent loop",
+      "decision": "alternative",
+      "rationale": "Use when Claude-native skills/hooks and a sanctioned SDK authentication route are specifically needed; preserve existing daily client defaults.",
+      "version_or_commit": "PyPI0.2.157; GitHub latest release tagv0.2.156",
+      "release_date": "2026-09-18T18:21:15.969863Z",
+      "license": "MIT SDK bindings; separate bundled CLI/service terms",
+      "us_equities_fit": "Parallel read-only research capability after model/account and permission choices are independently approved.",
+      "alpaca_fit": "Do not give default Write/Bash/external MCP access to a broker credential environment.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.156/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "python -m pip install claude-agent-sdk==0.2.157",
+        "python -c \"from claude_agent_sdk import ClaudeAgentOptions; print('SDK import only')\""
+      ],
+      "requirements": [
+        "Python>=3.10; bundled CLI or explicit cli_path",
+        "Authorized SDK authentication; review settings_sources, tool deny rules and permission callback"
+      ],
+      "limitations": [
+        "Latest PyPI0.2.157 is newer than GitHub latest tag0.2.156; versions are explicitly distinguished.",
+        "allowed_tools controls auto-approval, not removal of other tools; use actual deny/tool controls.",
+        "Official docs prohibit offering third-party products with claude.ai login/rate limits without prior approval; do not import native OAuth stores.",
+        "SDK bindings MIT; bundled CLI and service use have their own terms."
+      ],
+      "sources": [
+        "https://github.com/anthropics/claude-agent-sdk-python",
+        "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.156",
+        "https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.156/README.md",
+        "https://pypi.org/project/claude-agent-sdk/0.2.157/",
+        "https://code.claude.com/docs/en/agent-sdk/overview"
+      ]
+    },
+    {
+      "id": "mlflow",
+      "repository": "https://github.com/mlflow/mlflow",
+      "layers": [
+        "experiment-tracking",
+        "observability"
+      ],
+      "role": "Versioned experiment artifacts, model lineage and optional traces",
+      "decision": "conditional",
+      "rationale": "Add when strategy/feature experiments require a durable registry; not just another prompt-trace dashboard.",
+      "version_or_commit": "v3.16.1",
+      "release_date": "2026-09-17T02:40:08Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Log dataset as-of hashes, code revision, parameters, transaction-cost assumptions and held-out metrics.",
+      "alpaca_fit": "Track a candidate strategy artifact; do not let registry promotion itself activate live trading.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "https://github.com/mlflow/mlflow/blob/v3.16.1/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
+        "python -m pip install mlflow==3.16.1",
+        "mlflow server --host 127.0.0.1 --port 5000"
+      ],
+      "requirements": [
+        "Explicit artifact/metadata stores and access control before remote exposure",
+        "Deterministic run metadata and an experiment protocol"
+      ],
+      "limitations": [
+        "No tracking server or experiment recorded by this task.",
+        "Autologging can capture requests and artifacts; enable selected integrations deliberately.",
+        "A registry score is not an out-of-sample financial guarantee."
+      ],
+      "sources": [
+        "https://github.com/mlflow/mlflow",
+        "https://github.com/mlflow/mlflow/releases/tag/v3.16.1",
+        "https://github.com/mlflow/mlflow/blob/v3.16.1/README.md",
+        "https://mlflow.org/docs/latest/"
+      ]
+    }
+  ]
+}
