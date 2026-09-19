@@ -643,9 +643,10 @@
       "component_ids": [
         "grafana",
         "loki",
-        "prometheus"
+        "prometheus",
+        "dagu"
       ],
-      "claim": "Native local dashboard displays current-generation public research checkpoints with live service/usage telemetry; generation deletion/readdition, timer and browser acceptance retained.",
+      "claim": "Native local dashboard displays current-generation public research checkpoints with live service/usage telemetry; generation deletion/readdition, timer and browser acceptance retained. The follow-up verifies passwordless local Viewer access and bounded native Dagu history.",
       "limitations": [
         "Worker/decision/gate rows are coordinator checkpoints, not live process discovery.",
         "A recent emission does not establish recent source review; table checkpoint dates and linked source receipts remain authoritative.",
@@ -655,7 +656,8 @@
         "Display rounds currency/percent fields to two decimals; exact simulation results remain in source receipt.",
         "No financial execution, exact-once audit, full monitoring coverage or causal token savings established.",
         "Recorded worker/decision state is not a live process registry.",
-        "No broker execution, exact-once accounting, universal coverage or net token savings."
+        "No broker execution, exact-once accounting, universal coverage or net token savings.",
+        "Anonymous Viewer is loopback-only and can query permitted local organization telemetry; Dagu operator authentication and native provider sign-in remain required for their protected actions."
       ]
     },
     {
@@ -727,8 +729,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "20154c0e7a610b5d5be4e6d354c99079059b4c5f338aad054acd5361223efb92",
-      "bytes": 3687
+      "sha256": "23d25081eaaf3d0256b4e33386915dbe71faefd064afbfdddb818cf91def6001",
+      "bytes": 3925
     },
     {
       "path": "CLAUDE.md",
@@ -2152,8 +2154,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "37c25f949411c838046f11d349f1a1721fb222a9843cc011082dd23268ae4b65",
-      "bytes": 45633
+      "sha256": "2e2662e048edd56591006c6e63214bcb3a53dada4a8551d7a6754bb6ba39c194",
+      "bytes": 45676
     },
     {
       "path": "observability/README.md",
@@ -2162,8 +2164,8 @@
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "8768433e6991c7a89d963b59631be35cc90ae410978d1379cf6918290f1b2af9",
-      "bytes": 11720
+      "sha256": "1493e365b67413712ddcdde4b826799e37b0351adc5cbf3568ba269cf8bc6473",
+      "bytes": 12207
     },
     {
       "path": "observability/backends/check_persistence.py",
@@ -2212,8 +2214,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-grafana.ini.example",
-      "sha256": "84e9bf08e71229aff0d1533bcea9f6ced488180432533f050b0d2b4c60a5a3fe",
-      "bytes": 621
+      "sha256": "be775eef44806b29294d183425709401e0d315c839f5cb2421483671e555e9b5",
+      "bytes": 659
     },
     {
       "path": "observability/backends/templates/ecosystem-loki.yml.example",
@@ -2272,8 +2274,8 @@
     },
     {
       "path": "observability/grand-dashboard/README.md",
-      "sha256": "dbf2c5e0950823c626aea0e96fcc472e2fafaf31e8bf44c92c3886759ef9cdd5",
-      "bytes": 5195
+      "sha256": "18258cf83a9abbf1d5e00d44d9f1ac1057a0767d2293868e8fc32020c1c41732",
+      "bytes": 6321
     },
     {
       "path": "observability/grand-dashboard/acceptance.py",
@@ -2282,23 +2284,33 @@
     },
     {
       "path": "observability/grand-dashboard/install.py",
-      "sha256": "f8205f3d10b69301fdf3391f4354bc0c9cf39cdc125135050ed63cb5e7acb571",
-      "bytes": 1747
+      "sha256": "5c210245bdf154dbe70f0cc26f8290a9aab508d7908c475fb4cc6df2df06abc9",
+      "bytes": 2345
+    },
+    {
+      "path": "observability/grand-dashboard/passwordless.json",
+      "sha256": "77d1f641ee4449ce9f29e9d410088ce3f32652fc05585e965942f1dd940e1dba",
+      "bytes": 6784
+    },
+    {
+      "path": "observability/grand-dashboard/passwordless.md",
+      "sha256": "686719345c736aa29830d3afca74bc06cb0dc45d8c0283860dc83018db207a0b",
+      "bytes": 4976
     },
     {
       "path": "observability/grand-dashboard/progress.py",
-      "sha256": "6994eabf526d12f62112c0aa6d67a7a700141b0d629391666e64e17d9bcc8dcc",
-      "bytes": 7567
+      "sha256": "1997cde2825674ecb41a2e349bbb9db3ce7b5fe64262e1734923d9f81bc59605",
+      "bytes": 13269
     },
     {
       "path": "observability/grand-dashboard/receipt.json",
-      "sha256": "f98156a1d1764888bded8df360d07a6c761d79eda14a27b6a9321d3e7c5d7d18",
-      "bytes": 5662
+      "sha256": "93d0f7752f2e31e3aefda3e44246310d3b7f7093b561afa087018055e963c940",
+      "bytes": 6038
     },
     {
       "path": "observability/grand-dashboard/render.py",
-      "sha256": "98f424ab825b7c98ef998684f5730781b5ae347fc7cc255101a5583c54267efa",
-      "bytes": 6090
+      "sha256": "f74f18deb9a125d7291286b5a9554579caa97dfc79cf0174a113614731f7a0ec",
+      "bytes": 8112
     },
     {
       "path": "observability/grand-dashboard/state.json",
@@ -2392,8 +2404,8 @@
     },
     {
       "path": "tests/test_grand_dashboard.py",
-      "sha256": "713e07c156f0c42b38dc51fc6b8923cb458b26ac30b1fbe84265ab2d48283bfc",
-      "bytes": 3188
+      "sha256": "028e50bebb8ec6b582553105b8d4ec69c76e5d002de064a25e2f223589cd3e3f",
+      "bytes": 9301
     },
     {
       "path": "tests/test_historical_simulation.py",

@@ -1,11 +1,13 @@
 {
   "schema_version": 1,
+  "passwordless_followup": "observability/grand-dashboard/passwordless.json",
   "id": "native-grand-dashboard-20260919",
   "kind": "native_cli_e2e",
   "component_ids": [
     "grafana",
     "loki",
-    "prometheus"
+    "prometheus",
+    "dagu"
   ],
   "observed_date": "2026-09-19",
   "scope": "Existing local Linux/WSL observability backends, public checkpoint emitter and native browser; no broker or remote host.",
@@ -153,7 +155,8 @@
     "Display rounds currency/percent fields to two decimals; exact simulation results remain in source receipt.",
     "No financial execution, exact-once audit, full monitoring coverage or causal token savings established.",
     "Recorded worker/decision state is not a live process registry.",
-    "No broker execution, exact-once accounting, universal coverage or net token savings."
+    "No broker execution, exact-once accounting, universal coverage or net token savings.",
+    "Anonymous Viewer is loopback-only and can query permitted local organization telemetry; Dagu operator authentication and native provider sign-in remain required for their protected actions."
   ],
-  "claim": "Native local dashboard displays current-generation public research checkpoints with live service/usage telemetry; generation deletion/readdition, timer and browser acceptance retained."
+  "claim": "Native local dashboard displays current-generation public research checkpoints with live service/usage telemetry; generation deletion/readdition, timer and browser acceptance retained. The follow-up verifies passwordless local Viewer access and bounded native Dagu history."
 }

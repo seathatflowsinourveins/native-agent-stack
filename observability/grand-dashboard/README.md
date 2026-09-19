@@ -3,8 +3,10 @@
 Open [the local dashboard](http://127.0.0.1:13000/d/research-grand?refresh=30s).
 It combines live native service health and exported usage with recorded research
 lanes, acceptance gates, worker checkpoints, repository decisions and experiment
-outcomes. The header links the existing telemetry dashboard, Dagu history and
-published architecture. Grafana's existing private sign-in remains in effect.
+outcomes. The header links the existing telemetry dashboard, workflow evidence and
+published architecture. Local viewing is passwordless through native Grafana
+anonymous **Viewer** access. Administrative changes retain native sign-in.
+See the [seamless workflow contract](passwordless.md).
 
 Simulation/backtesting is the selected lane. Dedicated paper credentials are
 pending; live trading has no authority. A successful engineering fixture or a
@@ -20,7 +22,8 @@ the existing dashboard, datasource provisioning and authentication.
 ```sh
 python3 observability/grand-dashboard/install.py \
   --repo "$STACK_REPO" --config "$OBSERVABILITY_CONFIG" \
-  --units "$USER_UNIT_ROOT" --data "$OBSERVABILITY_DATA"
+  --units "$USER_UNIT_ROOT" --data "$OBSERVABILITY_DATA" \
+  --dagu-bin "$DAGU_BIN" --dagu-home "$RESEARCH_HOME"
 systemctl --user daemon-reload
 systemctl --user enable --now ecosystem-research-progress.timer
 systemctl --user show ecosystem-research-progress.timer \
@@ -37,6 +40,13 @@ or a ten-minute heartbeat. The one-shot service is normally inactive after a
 successful run. An active user manager/WSL VM and these local backends are
 required; this is not an always-on remote hosting promise. Stop this feature with
 `systemctl --user disable --now ecosystem-research-progress.timer`.
+
+The two Dagu flags are optional and must be supplied together, using absolute
+native paths. They enable a read-only history query for `research-pair`, limited
+to ten runs within 30 days. Without them the workflow table says not configured.
+No provider login, workflow start or operator-UI authentication is performed by
+this adapter. Query failures replace prior successful observations with an
+explicit unavailable state.
 
 ## What freshness means
 
@@ -55,7 +65,10 @@ If input validation or ingestion fails, the cache does not advance. Emission
 age grows; after the 24-hour query window the table reports no matching data.
 No matching data is not success or a count of zero.
 
-The emitter sends only bounded, validated metadata from explicit public files.
+The emitter sends bounded, validated metadata from explicit public files and,
+when configured, allowlisted native Dagu history fields. Workflow state counts,
+UTC start/finish times and duration are observed; raw run IDs, private paths,
+parameters and errors are excluded.
 No environment, credentials, account balances, user prompts, raw memory content,
 or provider transcripts are read. Evidence paths must stay within the repository.
 Only service and record kind are ingestion labels; entity/state fields are
@@ -76,6 +89,11 @@ Two integration failures were retained and corrected: Loki rejected PromQL's
 uses the supported 30-second interval. The generation filter and reference-path
 containment fixes were independently reviewed. Final counts and hashes are in
 the [receipt](receipt.json).
+
+The [passwordless follow-up](passwordless.json) adds a fifteenth panel and the
+native workflow adapter. Ten native queries and three generation checks passed;
+a fresh browser without credentials displayed two succeeded research runs, each
+27 seconds. This bounded history is separate from recorded worker checkpoints.
 
 SDK receipt totals, native client histograms, Claude terminal usage and RTK/
 Context Mode estimates have different accounting scopes. They are not summed

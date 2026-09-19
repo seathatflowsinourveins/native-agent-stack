@@ -1007,7 +1007,8 @@
       "evidence_ids": [
         "native-research-runtime-20260919",
         "native-paired-adoption-20260919",
-        "native-convergence-review-20260919"
+        "native-convergence-review-20260919",
+        "native-grand-dashboard-20260919"
       ],
       "profile": "supporting",
       "upstream_sources": [

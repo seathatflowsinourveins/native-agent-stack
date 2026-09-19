@@ -58,6 +58,13 @@ existing credential file. Read it privately for sign-in; never paste it into a
 prompt, terminal transcript, repository, or public receipt. Do not delete or
 regenerate it during an ordinary upgrade of an existing Grafana database.
 
+The loopback-only Grafana template now enables native anonymous `Viewer` access
+for `Main Org.`. Dashboard observation needs no password; the stored administrator
+credential is for administrative operations. Verify the configured organization
+name if it was renamed. This recipe binds `127.0.0.1`; it is not a public-host
+anonymous-access deployment. The [native passwordless acceptance](../grand-dashboard/passwordless.md)
+records fresh-session reads and denied administrative access.
+
 Validate the native configurations before starting services:
 
 ```bash

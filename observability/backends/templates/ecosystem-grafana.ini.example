@@ -14,7 +14,9 @@ cookie_samesite = strict
 [users]
 allow_sign_up = false
 [auth.anonymous]
-enabled = false
+enabled = true
+org_name = Main Org.
+org_role = Viewer
 [analytics]
 reporting_enabled = false
 check_for_updates = false
