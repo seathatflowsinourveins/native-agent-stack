@@ -11,6 +11,8 @@ import argparse
 import hashlib
 import json
 import re
+import struct
+import zlib
 from pathlib import Path, PurePosixPath
 
 
@@ -40,6 +42,41 @@ def _json_without_duplicates(pairs):
             raise ValueError(f"duplicate JSON key: {key}")
         result[key] = value
     return result
+
+
+def is_structural_png(content: bytes) -> bool:
+    """Check PNG framing and checksums, not visual content or pixel decoding."""
+    if not content.startswith(b"\x89PNG\r\n\x1a\n"):
+        return False
+    offset, seen_header, seen_data = 8, False, False
+    while offset + 12 <= len(content):
+        size = int.from_bytes(content[offset:offset + 4], "big")
+        kind = content[offset + 4:offset + 8]
+        end = offset + 12 + size
+        if end > len(content) or not re.fullmatch(b"[A-Za-z]{4}", kind):
+            return False
+        payload = content[offset + 8:end - 4]
+        checksum = int.from_bytes(content[end - 4:end], "big")
+        if zlib.crc32(kind + payload) != checksum:
+            return False
+        if not seen_header:
+            if kind != b"IHDR" or size != 13:
+                return False
+            width, height, depth, color, compression, filtering, interlace = struct.unpack(">IIBBBBB", payload)
+            depths = {0: {1, 2, 4, 8, 16}, 2: {8, 16}, 3: {1, 2, 4, 8}, 4: {8, 16}, 6: {8, 16}}
+            if (not 0 < width < 2**31 or not 0 < height < 2**31
+                    or depth not in depths.get(color, set())
+                    or compression != 0 or filtering != 0 or interlace not in {0, 1}):
+                return False
+            seen_header = True
+        elif kind == b"IHDR":
+            return False
+        if kind == b"IDAT":
+            seen_data = True
+        if kind == b"IEND":
+            return size == 0 and seen_data and end == len(content)
+        offset = end
+    return False
 
 
 class Validator:
@@ -124,7 +161,7 @@ class Validator:
             self.error(f"{relative_path}: unsupported schema_version")
         return result
 
-    def scan_publication(self) -> None:
+    def scan_publication(self, hashed_paths=()) -> None:
         for path in sorted(self.root.rglob("*")):
             relative = path.relative_to(self.root)
             if ".git" in relative.parts or "__pycache__" in relative.parts:
@@ -137,7 +174,19 @@ class Validator:
             if path.name in {".env", ".credentials.json", "auth.json"}:
                 self.error(f"{relative}: private authentication/environment file is forbidden")
             try:
-                content = path.read_text(encoding="utf-8")
+                raw = path.read_bytes()
+                if path.suffix.lower() == ".png":
+                    if relative.parts[:2] != ("evidence", "artifacts") or relative.as_posix() not in hashed_paths:
+                        self.error(f"{relative}: PNG must be a hash-listed evidence artifact")
+                        continue
+                    if not is_structural_png(raw):
+                        self.error(f"{relative}: invalid PNG structure or checksum")
+                        continue
+                    # Still catch obvious uncompressed metadata; image content
+                    # requires the separate visual review recorded by the author.
+                    content = raw.decode("latin-1")
+                else:
+                    content = raw.decode("utf-8")
             except (OSError, UnicodeError):
                 self.error(f"{relative}: cannot inspect as UTF-8 publication text")
                 continue
@@ -263,7 +312,7 @@ class Validator:
             for receipt_id in self.identifiers(model.get("evidence_ids", []), "model.evidence_ids"):
                 if receipt_id not in receipts:
                     self.error(f"model: unknown evidence {receipt_id}")
-        self.scan_publication()
+        self.scan_publication(files)
         if self.errors:
             raise InvalidPublication("\n".join(self.errors))
         return {"components": len(components), "profiles": len(profiles), "receipts": len(receipts), "hashed_files": len(files)}

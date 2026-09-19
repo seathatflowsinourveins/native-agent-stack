@@ -3,8 +3,10 @@
 import hashlib
 import json
 from pathlib import Path
+import struct
 import tempfile
 import unittest
+import zlib
 
 from scripts.validate import InvalidPublication, validate
 
@@ -162,6 +164,46 @@ class PublicationValidationTests(unittest.TestCase):
         self.evidence["files"][0]["bytes"] = True
         self.save()
         self.assert_invalid("expected nonempty string")
+
+    @staticmethod
+    def png_fixture():
+        def chunk(kind, payload):
+            return struct.pack(">I", len(payload)) + kind + payload + struct.pack(">I", zlib.crc32(kind + payload))
+        return (b"\x89PNG\r\n\x1a\n"
+                + chunk(b"IHDR", struct.pack(">IIBBBBB", 1, 1, 8, 2, 0, 0, 0))
+                + chunk(b"IDAT", zlib.compress(b"\x00\xff\xff\xff"))
+                + chunk(b"IEND", b""))
+
+    def write_binary(self, relative, content, hashed=True):
+        path = self.root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(content)
+        if hashed:
+            self.evidence["files"].append({"path": relative, "sha256": hashlib.sha256(content).hexdigest(), "bytes": len(content)})
+        self.save()
+
+    def test_hash_listed_structural_png_evidence_is_allowed(self):
+        self.write_binary("evidence/artifacts/screenshot.png", self.png_fixture())
+        self.assertEqual(validate(self.root)["hashed_files"], 3)
+
+    def test_fake_corrupt_and_trailing_png_bytes_are_rejected(self):
+        valid = self.png_fixture()
+        for content in (b"not actually a PNG", valid[:8], valid[:40] + b"\x00" + valid[41:], valid + b"trailing"):
+            with self.subTest(content_size=len(content)):
+                self.write_binary("evidence/artifacts/screenshot.png", content)
+                self.assert_invalid("invalid PNG structure or checksum")
+                self.evidence["files"].pop()
+
+    def test_unlisted_png_and_png_outside_evidence_are_rejected(self):
+        self.write_binary("evidence/artifacts/screenshot.png", self.png_fixture(), hashed=False)
+        self.assert_invalid("PNG must be a hash-listed evidence artifact")
+        (self.root / "evidence/artifacts/screenshot.png").unlink()
+        self.write_binary("screenshots/other.png", self.png_fixture())
+        self.assert_invalid("PNG must be a hash-listed evidence artifact")
+
+    def test_other_binary_formats_are_rejected_even_if_hash_listed(self):
+        self.write_binary("evidence/artifacts/binary.dat", b"\xff\xfe\x00\x01")
+        self.assert_invalid("cannot inspect as UTF-8")
 
 
 if __name__ == "__main__":
