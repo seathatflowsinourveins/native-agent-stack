@@ -1,8 +1,8 @@
 # Grand repository index
 
-Checked September 19, 2026. **451 repository identities: 337 public stars plus 114 beyond that snapshot**. The catalog core contains 144 unique repositories in 149 layer cards; 103 of those repositories are beyond the stars. Eleven additional beyond-star identities come from earlier foundation/candidate records. These counts are references, not installations.
+Checked September 19, 2026. **453 repository identities: 337 public stars plus 116 beyond that snapshot**. The catalog core contains 146 unique repositories in 151 layer cards; 105 of those repositories are beyond the stars. Eleven additional beyond-star identities come from earlier foundation/candidate records. These counts are references, not installations.
 
-Every starred repository has a [typed disposition](star-audit.json), with overview and selected-file inspection kept distinct. The 144-repository core plus 24 additional older records form the 168-reference subset. The fresh public-star identity comparison is recorded in [coverage](coverage.json); prior source reviews were not repeated. Existing receipts retain their original runtime scope. Collector core and contrib are two source identities for one adopted Collector process; the release-packaging repository is provenance, not another runtime card.
+Every starred repository has a [typed disposition](star-audit.json), with overview and selected-file inspection kept distinct. The 146-repository core plus 24 additional older records form the 170-reference subset. The fresh public-star identity comparison is recorded in [coverage](coverage.json); prior source reviews were not repeated. Existing receipts retain their original runtime scope. Collector core and contrib are two source identities for one adopted Collector process; the release-packaging repository is provenance, not another runtime card.
 
 | Repository | Discovery | Decision cards / earlier record | Star review depth |
 | --- | --- | --- | --- |
@@ -296,6 +296,7 @@ Every starred repository has a [typed disposition](star-audit.json), with overvi
 | [opengeos/geolibre](https://github.com/opengeos/GeoLibre) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · outside_north_star |
 | [openhands/openhands](https://github.com/OpenHands/OpenHands) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
 | [openlineage/openlineage](https://github.com/openlineage/openlineage) | Beyond stars | [data-research: conditional](data-research.json) | See linked core/earlier record |
+| [openlit/openlit](https://github.com/openlit/openlit) | Beyond stars | [agents-operations: alternative](agents-operations.json) | See linked core/earlier record |
 | [opensandbox-group/opensandbox](https://github.com/opensandbox-group/opensandbox) | Beyond stars | [agents-operations: conditional](agents-operations.json) | See linked core/earlier record |
 | [oraios/serena](https://github.com/oraios/serena) | Starred | [foundation-memory: default](foundation-memory.json); [adopted baseline](../../manifests/stack.json) | prior_evidence_link · already_covered |
 | [orchestra-research/ai-research-skills](https://github.com/Orchestra-Research/AI-Research-SKILLs) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
@@ -319,6 +320,7 @@ Every starred repository has a [typed disposition](star-audit.json), with overvi
 | [prefecthq/prefect](https://github.com/prefecthq/prefect) | Starred | [agents-operations: alternative](agents-operations.json) | prior_evidence_link · already_covered |
 | [primeintellect-ai/prime-agent](https://github.com/PrimeIntellect-ai/prime-agent) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
 | [prometheus/alertmanager](https://github.com/prometheus/alertmanager) | Beyond stars | [agents-operations: default](agents-operations.json) | See linked core/earlier record |
+| [prometheus/node_exporter](https://github.com/prometheus/node_exporter) | Beyond stars | [agents-operations: alternative](agents-operations.json) | See linked core/earlier record |
 | [prometheus/prometheus](https://github.com/prometheus/prometheus) | Beyond stars | [agents-operations: default](agents-operations.json) | See linked core/earlier record |
 | [promptfoo/promptfoo](https://github.com/promptfoo/promptfoo) | Starred | [agents-operations: alternative](agents-operations.json); [adopted baseline](../../manifests/stack.json) | prior_evidence_link · already_covered |
 | [public-apis/public-apis](https://github.com/public-apis/public-apis) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · outside_north_star |

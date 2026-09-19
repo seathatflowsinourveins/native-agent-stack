@@ -2505,6 +2505,12 @@
       ]
     },
     {
+      "repository": "https://github.com/openlit/openlit",
+      "catalog_entry_ids": [
+        "openlit"
+      ]
+    },
+    {
       "repository": "https://github.com/opensandbox-group/opensandbox",
       "catalog_entry_ids": [
         "opensandbox"
@@ -2538,6 +2544,12 @@
       "repository": "https://github.com/prometheus/alertmanager",
       "catalog_entry_ids": [
         "alertmanager"
+      ]
+    },
+    {
+      "repository": "https://github.com/prometheus/node_exporter",
+      "catalog_entry_ids": [
+        "node-exporter"
       ]
     },
     {
@@ -2746,13 +2758,14 @@
   },
   "latest_public_refresh": {
     "checked_at": "2026-09-19",
-    "endpoint": "GET /users/{account}/starred?per_page=100 (paginated; account omitted)",
+    "endpoint": "GET /users/{account}/starred?sort=created&direction=desc&per_page=100 (paginated; account omitted)",
     "public_flag_filter": "private == false",
     "public_repositories": 337,
     "added_since_recorded_snapshot": 0,
     "removed_since_recorded_snapshot": 0,
     "public_set_sha256": "aa8458fd3838d4a2cd72cd9abd13027274be81d15f11883fdac94682ac561c50",
     "hash_method": "Lowercase public owner/repository identities sorted, joined with newline and one final newline; SHA-256.",
-    "scope": "Fresh identity comparison only; prior per-repository source review and runtime evidence were not repeated."
+    "scope": "Fresh identity comparison only; prior per-repository source review and runtime evidence were not repeated.",
+    "source_receipt": "catalogs/us-equities/source-followup-receipt.json"
   }
 }

@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "kind": "source_review_refresh",
+  "scope": "Bounded primary-source delta review of eight repositories and fresh public-star identities; no new installation, model call, service acceptance or exhaustive landscape review.",
+  "runtime_acceptance_performed": false,
+  "public_stars": {
+    "endpoint": "GET /users/{account}/starred?sort=created&direction=desc&per_page=100",
+    "account_published": false,
+    "private_filter": "private == false",
+    "pagination": "all pages",
+    "public_count": 337,
+    "added": 0,
+    "removed": 0,
+    "absent_from_prior_451_index": 0,
+    "identity_sha256": "aa8458fd3838d4a2cd72cd9abd13027274be81d15f11883fdac94682ac561c50",
+    "hash_method": "Lowercase public owner/repository identities sorted, joined with newline and one final newline; SHA-256.",
+    "comparison_refs": [
+      "catalogs/us-equities/coverage.json",
+      "catalogs/us-equities/star-audit.json",
+      "catalogs/us-equities/repository-index.md"
+    ]
+  },
+  "release_scope": "Latest non-prerelease GitHub release returned by official releases/latest API on the checked date. This is not an npm/PyPI/channel-wide claim; a newer default-branch commit does not establish a released upgrade.",
+  "recorded_pin_source": "manifests/stack.json",
+  "checks": [
+    {
+      "repository": "https://github.com/mksglu/context-mode",
+      "recorded_installed_pin": "1.0.169",
+      "latest_github_stable_release": "v1.0.169",
+      "published_at": "2026-06-29T18:18:53Z",
+      "latest_default_branch_commit": "5283a70780305994433cb65d6a0275386e797172",
+      "status": "recorded_pin_matches_latest_github_stable",
+      "sources": [
+        "https://api.github.com/repos/mksglu/context-mode/releases/latest",
+        "https://github.com/mksglu/context-mode/releases/tag/v1.0.169"
+      ]
+    },
+    {
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "recorded_installed_pin": "2.3.1",
+      "latest_github_stable_release": "v2.3.1",
+      "published_at": "2026-09-17T18:26:44Z",
+      "latest_default_branch_commit": "bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025",
+      "status": "recorded_pin_matches_latest_github_stable",
+      "sources": [
+        "https://api.github.com/repos/akitaonrails/ai-memory/releases/latest",
+        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.1"
+      ]
+    },
+    {
+      "repository": "https://github.com/rtk-ai/rtk",
+      "recorded_installed_pin": "0.49.0",
+      "latest_github_stable_release": "v0.49.0",
+      "published_at": "2026-09-11T08:52:38Z",
+      "latest_default_branch_commit": "0924356b4caba4989607227b7c8824d3d8098719",
+      "status": "recorded_pin_matches_latest_github_stable",
+      "sources": [
+        "https://api.github.com/repos/rtk-ai/rtk/releases/latest",
+        "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0"
+      ]
+    },
+    {
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "recorded_installed_pin": "1.14.0",
+      "latest_github_stable_release": "v1.14.0",
+      "published_at": "2026-09-16T14:26:47Z",
+      "latest_default_branch_commit": "b67f1328ff52ca869f642bb6b068bb0d3f2c3646",
+      "status": "recorded_pin_matches_latest_github_stable",
+      "sources": [
+        "https://api.github.com/repos/giancarloerra/SocratiCode/releases/latest",
+        "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.14.0"
+      ]
+    },
+    {
+      "repository": "https://github.com/graykode/abtop",
+      "recorded_installed_pin": null,
+      "latest_github_stable_release": "v0.5.5",
+      "published_at": "2026-09-14T04:23:59Z",
+      "latest_default_branch_commit": "4b96568666c1f3b887202d14b0a1c6171315e520",
+      "status": "not_adopted_source_candidate",
+      "sources": [
+        "https://api.github.com/repos/graykode/abtop/releases/latest",
+        "https://github.com/graykode/abtop/releases/tag/v0.5.5"
+      ]
+    },
+    {
+      "repository": "https://github.com/openlit/openlit",
+      "recorded_installed_pin": null,
+      "latest_github_stable_release": "openlit-2.1.0",
+      "published_at": "2026-09-10T10:55:59Z",
+      "latest_default_branch_commit": "cc00e010c0392f0059b4892ab43e9d72f046c135",
+      "status": "not_adopted_source_candidate",
+      "sources": [
+        "https://api.github.com/repos/openlit/openlit/releases/latest",
+        "https://github.com/openlit/openlit/releases/tag/openlit-2.1.0"
+      ]
+    },
+    {
+      "repository": "https://github.com/restic/restic",
+      "recorded_installed_pin": null,
+      "latest_github_stable_release": "v0.19.1",
+      "published_at": "2026-07-05T08:13:33Z",
+      "latest_default_branch_commit": "ba802d42b7294c98b62c16d1157ea3e80820c019",
+      "status": "not_adopted_source_candidate",
+      "sources": [
+        "https://api.github.com/repos/restic/restic/releases/latest",
+        "https://github.com/restic/restic/releases/tag/v0.19.1"
+      ]
+    },
+    {
+      "repository": "https://github.com/prometheus/node_exporter",
+      "recorded_installed_pin": null,
+      "latest_github_stable_release": "v1.12.1",
+      "published_at": "2026-07-14T12:34:45Z",
+      "latest_default_branch_commit": "17ddd77c59ba27e1508e9f7894b1e55b44d6aed3",
+      "status": "not_adopted_source_candidate",
+      "sources": [
+        "https://api.github.com/repos/prometheus/node_exporter/releases/latest",
+        "https://github.com/prometheus/node_exporter/releases/tag/v1.12.1"
+      ]
+    }
+  ],
+  "operational_decisions": [
+    {
+      "repository": "https://github.com/graykode/abtop",
+      "decision": "Keep optional private operator view; no installation performed.",
+      "source_ref": "v0.5.5",
+      "findings": [
+        "src/lib.rs --json branch calls tick_no_summaries(), avoiding Claude summary subprocesses.",
+        "The --once branch calls app.tick() and waits/retries summaries; TUI summaries can run claude --print. Do not describe all modes as model-free.",
+        "JSON snapshots contain bounded transcript-derived chat, tool previews and local metadata; no raw snapshot should enter public telemetry."
+      ],
+      "sources": [
+        "https://github.com/graykode/abtop/blob/v0.5.5/README.md",
+        "https://github.com/graykode/abtop/blob/v0.5.5/src/lib.rs"
+      ]
+    },
+    {
+      "repository": "https://github.com/restic/restic",
+      "decision": "Already catalogued as a star disposition; useful encrypted backup/restore candidate. Off-host destination and restore acceptance remain pending.",
+      "source_ref": "v0.19.1",
+      "prospective_workflow": [
+        "restic -r \"$RESTIC_REPOSITORY\" init",
+        "restic -r \"$RESTIC_REPOSITORY\" backup \"$CONSISTENT_EXPORT_DIR\"",
+        "restic -r \"$RESTIC_REPOSITORY\" check --read-data",
+        "restic -r \"$RESTIC_REPOSITORY\" restore latest --target \"$EMPTY_RESTORE_DIR\""
+      ],
+      "limitations": [
+        "Back up application-consistent database exports/snapshots or a quiesced store, not arbitrary active database files.",
+        "An encrypted repository on the same machine alone does not establish off-host disaster recovery; secrets and the backup password need a separate recovery policy.",
+        "No backup, storage destination or restore was accepted in this source review."
+      ],
+      "sources": [
+        "https://github.com/restic/restic/releases/tag/v0.19.1",
+        "https://github.com/restic/restic/blob/v0.19.1/README.md",
+        "https://restic.readthedocs.io/en/stable/045_working_with_repos.html",
+        "https://restic.readthedocs.io/en/stable/050_restore.html"
+      ]
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "decision": "Prefer existing host_metrics receiver for basic CPU/memory/filesystem monitoring before a second exporter.",
+      "source_ref": "v0.161.0",
+      "baseline_observation": "The baseline b4cdcaa Collector configuration had no host_metrics receiver. Coordinator follow-up implementation/acceptance is separate from this catalog source check.",
+      "source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/receiver/hostmetricsreceiver/README.md",
+      "acceptance_required": [
+        "Validate the exact installed Collector component/configuration.",
+        "Read actual host-capacity metrics and verify scope/labels without adding process command lines or user identifiers."
+      ]
+    }
+  ],
+  "limitations": [
+    "Raw API responses and signed-in account identity are not published.",
+    "Source-only cards and prospective commands do not imply native execution or token/provider savings.",
+    "Four adopted versions are recorded manifest pins; installed executables were not rerun in this review.",
+    "The prior 337-star source-review depth and existing runtime evidence are preserved, not upgraded by this identity refresh."
+  ]
+}

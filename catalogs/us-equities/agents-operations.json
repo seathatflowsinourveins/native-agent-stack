@@ -1094,6 +1094,100 @@
       ]
     },
     {
+      "id": "node-exporter",
+      "repository": "https://github.com/prometheus/node_exporter",
+      "layers": [
+        "observability",
+        "host-capacity"
+      ],
+      "role": "Alternative native operating-system and hardware metrics exporter",
+      "decision": "alternative",
+      "rationale": "Use only when Prometheus node dashboards or a specific node collector justify a separate exporter. The selected otelcol-contrib distribution already provides host_metrics, so basic CPU, memory and filesystem collection should extend that existing process first. Not adopted by this source review.",
+      "version_or_commit": "v1.12.1",
+      "release_date": "2026-07-14T12:34:45Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Observe research-host capacity and disk exhaustion independently of strategy signals.",
+      "alpaca_fit": "Host health does not establish market-feed freshness, broker connectivity or order reconciliation.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "catalogs/us-equities/source-followup-receipt.json",
+        "https://github.com/prometheus/node_exporter/blob/v1.12.1/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective upstream commands; not executed for this catalog. Installation/configuration changes require a separately accepted scope.",
+        "# After separately verifying and installing the official v1.12.1 release binary:",
+        "node_exporter --web.listen-address=127.0.0.1:19100 --collector.disable-defaults --collector.cpu --collector.meminfo --collector.loadavg --collector.filesystem",
+        "curl --fail --silent http://127.0.0.1:19100/metrics"
+      ],
+      "requirements": [
+        "Verified native release binary, private listener and explicit Prometheus scrape configuration.",
+        "Select collectors and exclude irrelevant mounts; assess metric volume before adding per-process or device detail."
+      ],
+      "limitations": [
+        "No installation or metric scrape was executed for this card; commands are prospective.",
+        "The Linux exporter observes the Linux/WSL environment; it is not a Windows host or NVIDIA GPU monitoring proof.",
+        "A separate exporter duplicates basic host metrics available in the already adopted Collector. Enable only for a concrete missing collector or dashboard requirement."
+      ],
+      "sources": [
+        "https://github.com/prometheus/node_exporter/releases/tag/v1.12.1",
+        "https://github.com/prometheus/node_exporter/blob/v1.12.1/README.md",
+        "https://github.com/prometheus/node_exporter/blob/v1.12.1/node_exporter.go",
+        "https://github.com/prometheus/node_exporter/blob/v1.12.1/LICENSE",
+        "https://prometheus.io/docs/guides/node-exporter/",
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/receiver/hostmetricsreceiver/README.md"
+      ]
+    },
+    {
+      "id": "openlit",
+      "repository": "https://github.com/openlit/openlit",
+      "layers": [
+        "observability",
+        "agent-evaluation"
+      ],
+      "role": "Alternative OpenTelemetry instrumentation and AI trace/evaluation platform",
+      "decision": "alternative",
+      "rationale": "Consider only for a concrete trace or evaluation investigation that the adopted native OTLP metrics/log pipeline cannot answer. Native coding-agent instrumentation exists in the reviewed release, but adding another hook/trace collector now duplicates collection and expands transcript processing. Not installed or configured by this review.",
+      "version_or_commit": "openlit-2.1.0",
+      "release_date": "2026-09-10T10:55:59Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Potential research-agent trace diagnosis and evaluation; separate this from deterministic strategy validation.",
+      "alpaca_fit": "Do not include broker secrets, account identifiers or trading authority in instrumentation or trace destinations.",
+      "evidence_level": "source_review",
+      "evidence_refs": [
+        "catalogs/us-equities/source-followup-receipt.json",
+        "https://github.com/openlit/openlit/blob/openlit-2.1.0/README.md"
+      ],
+      "native_workflow": [
+        "# Prospective upstream commands; not executed for this catalog. Installation/configuration changes require a separately accepted scope.",
+        "git clone --branch openlit-2.1.0 --depth 1 https://github.com/openlit/openlit.git \"$OPENLIT_SRC\"",
+        "# The following are release-documented CLI entry points, not a CLI binary version/pin or adopted configuration:",
+        "openlit doctor",
+        "openlit configure --endpoint http://127.0.0.1:14318",
+        "# After reviewing content capture, existing hooks and a separate trace/retention policy:",
+        "openlit coding install --vendor=codex",
+        "openlit coding install --vendor=claude-code"
+      ],
+      "requirements": [
+        "Separately pin and verify the OpenLIT CLI artifact; the platform GitHub release tag is not proof that every SDK and CLI package shares version 2.1.0.",
+        "A compatible telemetry destination, reviewed hook changes, explicit content policy and trace storage if traces are required.",
+        "The reviewed CLI source declares Go 1.25.0; a source build has further dependencies and was not attempted."
+      ],
+      "limitations": [
+        "No OpenLIT install, hook invocation, inference or telemetry delivery was executed.",
+        "The current adopted stack intentionally does not accept/store traces; pointing a CLI at its OTLP listener does not establish trace support.",
+        "Release source includes rollout/transcript parsing and advertises prompt/tool capture. Existing sanitized native metrics/logs should not be replaced without content and counter reconciliation.",
+        "The reviewed README installer follows a moving main branch; it is not used as a pinned installation recipe here."
+      ],
+      "sources": [
+        "https://github.com/openlit/openlit/releases/tag/openlit-2.1.0",
+        "https://github.com/openlit/openlit/blob/openlit-2.1.0/README.md",
+        "https://github.com/openlit/openlit/blob/openlit-2.1.0/LICENSE",
+        "https://github.com/openlit/openlit/blob/openlit-2.1.0/cli/go.mod",
+        "https://github.com/openlit/openlit/blob/openlit-2.1.0/cli/internal/coding/cmd.go",
+        "https://github.com/openlit/openlit/blob/openlit-2.1.0/cli/internal/coding/hook/codex/transcript.go"
+      ]
+    },
+    {
       "id": "langfuse",
       "repository": "https://github.com/langfuse/langfuse",
       "layers": [

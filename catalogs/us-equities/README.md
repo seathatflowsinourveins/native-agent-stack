@@ -2,14 +2,14 @@
 
 **Dated decision catalog: September 19, 2026.** The north star is native, token-efficient research → reproducible backtesting → Alpaca paper automation. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
 
-The catalog has **149 repository decision cards covering 144 unique GitHub repositories**, and **20 model entries**. It connects to the earlier 36-component foundation. The [combined repository index](repository-index.md) contains **451 repository identities**, including all 337 public stars and 114 beyond that snapshot, with overlap removed.
+The catalog has **151 repository decision cards covering 146 unique GitHub repositories**, and **20 model entries**. It connects to the earlier 36-component foundation. The [combined repository index](repository-index.md) contains **453 repository identities**, including all 337 public stars and 116 beyond that snapshot, with overlap removed.
 
 ## Read the layer you need
 
 | Layer | Cards | Guide / structured manifest |
 | --- | ---: | --- |
 | Token efficiency, memory, retrieval, document ingestion | 36 | [foundation-memory](foundation-memory.md) · [JSON](foundation-memory.json) |
-| Agents, OmniRoute, SDKs, orchestration, hosting, security, telemetry | 39 | [agents-operations](agents-operations.md) · [JSON](agents-operations.json) |
+| Agents, OmniRoute, SDKs, orchestration, hosting, security, telemetry | 41 | [agents-operations](agents-operations.md) · [JSON](agents-operations.json) |
 | Market/reference/filing data, storage, quality, lineage | 36 | [data-research](data-research.md) · [JSON](data-research.json) |
 | Engines, broker adapters, portfolios, statistics, strategy research | 38 | [engines-strategies](engines-strategies.md) · [JSON](engines-strategies.json) |
 | Current model choices and older compatible baselines | 20 | [Models](models.md) · [JSON](models.json) |
@@ -20,7 +20,7 @@ Start with the [north-star architecture](../../blueprints/us-equities/north-star
 
 Use native **Codex SDK/Astra + Claude Opus**, **Context Mode/RTK**, **ai-memory**, scoped **QMD/Serena/SocratiCode**, and existing **Nemotron/vLLM/Qdrant**. Keep **DuckDB/Parquet + exchange calendars** for deterministic data work and **LEAN** as the accepted source-built backtest engine. The official **Alpaca adapter** is the paper target, with the SDK as a read-only observer and one future order writer. QuantStats is a proposed reporting layer; selected statistical/ML tools follow only after point-in-time data exists.
 
-**OmniRoute** remains an optional route with explicit model fidelity and usage checks; **DeerFlow** remains a research orchestration candidate whose backend and ACP discovery ran but full inference chain did not. Add document RAG, a temporal graph, durable scheduling, remote sandboxes or managed hosting only for a concrete requirement. A healthy endpoint, installed SDK or paper simulator is not a complete automated trading runtime.
+**OmniRoute** remains an optional route with explicit model fidelity and usage checks; **DeerFlow** remains a research orchestration candidate whose backend, ACP discovery and later bounded native task have separate [receipts](../../blueprints/us-equities/deerflow/research-receipt.json). Add document RAG, a temporal graph, durable scheduling, remote sandboxes or managed hosting only for a concrete requirement. A healthy endpoint, installed SDK or paper simulator is not a complete automated trading runtime.
 
 ## What the evidence establishes
 
@@ -34,7 +34,7 @@ The later [native observability receipt](../../observability/receipt.json) estab
 
 ## Starred repositories and beyond
 
-The latest native public-endpoint refresh contained **337 public stars**, unchanged from the recorded snapshot. **41** have current catalog cards; **10** more have adopted baseline records; **286** have no current catalog/baseline card. All337 now also have individual dispositions in the [complete star audit](star-audit.md), with README/license overview separated from deeper source inspection. Absence of a full catalog card is no longer an unreviewed identity. **103** catalog repositories are beyond the starred snapshot. [All identities and joins](coverage.json).
+The latest native public-endpoint refresh contained **337 public stars**, unchanged from the recorded snapshot. **41** have current catalog cards; **10** more have adopted baseline records; **286** have no current catalog/baseline card. All337 now also have individual dispositions in the [complete star audit](star-audit.md), with README/license overview separated from deeper source inspection. Absence of a full catalog card is no longer an unreviewed identity. **105** catalog repositories are beyond the starred snapshot. [All identities and joins](coverage.json).
 
 Source review covered current official metadata, README/license text and relevant API/source documentation at the depth stated per record. It did not deeply benchmark all 337stars or every project beyond them. Repository freshness, stars, model launch dates and author benchmarks do not establish superiority. The catalog exposes missing acceptance work rather than turning a list into a deployment claim.
 
@@ -65,3 +65,5 @@ The underlying source citations and precise scopes appear in the layer guides. S
 ## Subsequent native gap resolution
 
 See the [resolution ledger](../../blueprints/us-equities/gap-resolution.md) for real DeerFlow→native Astra inference, the patched LEAN/adaptor build, Dagu workflow hosting and the current gateway/account boundary. Historical receipts above retain their original scope and counts.
+
+The [bounded source follow-up](source-followup.md) refreshed the unchanged public-star identities and four adopted release pins. Two additional observability alternatives expand the index to 453; neither was installed. The follow-up also distinguishes abtop modes that can invoke a model from its private model-free JSON snapshot.

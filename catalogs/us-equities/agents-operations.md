@@ -110,6 +110,8 @@ The following decisions refer to architecture selection, not installation status
 | [loki](https://github.com/grafana/loki) | default | bounded native receipt | Retained local sanitized operational logs and LogQL queries |
 | [alertmanager](https://github.com/prometheus/alertmanager) | default | bounded native receipt | Local alert grouping, deduplication and routing |
 | [ntfy](https://github.com/binwiederhier/ntfy) | default | bounded native receipt | Self-hosted local notification receipt and retrieval |
+| [node-exporter](https://github.com/prometheus/node_exporter) | alternative | source review | Alternative native operating-system and hardware metrics exporter |
+| [openlit](https://github.com/openlit/openlit) | alternative | source review | Alternative OpenTelemetry instrumentation and AI trace/evaluation platform |
 | [langfuse](https://github.com/langfuse/langfuse) | alternative | source review | Shared LLM trace, prompt and evaluation platform |
 | [phoenix](https://github.com/Arize-ai/phoenix) | conditional | source review | Local trace inspection and evaluation workspace |
 | [inspect-ai](https://github.com/UKGovernmentBEIS/inspect_ai) | default | source review | Programmable task/solver/scorer evaluations |
@@ -135,3 +137,7 @@ The following decisions refer to architecture selection, not installation status
 ## Accepted follow-up integrations
 
 [DeerFlow/ACP](../../blueprints/us-equities/deerflow/research-receipt.json) completed one native Astra task: 41,737 input (24,320 cached) and608 output tokens. ACP's `read-only` mode actually maps to workspaceWrite with approvals; strict read-only workers should use the native SDK. [Dagu](../../blueprints/us-equities/hosting/README.md) now has a completed three-step local research DAG, authenticated loopback status service, failure/cancellation evidence and persistent completed history after restart. Neither result establishes autonomous trading or net provider savings.
+
+## Scoped observability alternatives
+
+The [source follow-up](source-followup.md) adds **node_exporter v1.12.1** and **OpenLIT openlit-2.1.0** as alternatives, with no new runtime acceptance. For basic host capacity, extend the adopted Collector with its existing `host_metrics` receiver before running another exporter. Node exporter remains useful for a specific collector or compatible node dashboard. OpenLIT adds coding-agent hooks and transcript processing; the native OTLP path already covers accepted metrics and sanitized logs, so a separate trace requirement, content policy and backend acceptance should precede its adoption. Release/platform tags and independently distributed CLI/SDK versions must not be conflated.
