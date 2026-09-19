@@ -1,0 +1,392 @@
+{
+  "schema_version": 1,
+  "id": "native-point-in-time-contract-20260919",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "duckdb"
+  ],
+  "observed_at_utc": "2026-09-19T20:57:09.048027+00:00",
+  "claim": "DuckDB 1.5.5 materialized and selected a synthetic temporal snapshot; late revisions, universe state, feed/adjustment scope and pinned snapshot integrity were exercised through native Python SDK/SQL commands.",
+  "limitations": [
+    "Synthetic observations only; no entitled or accepted market dataset, SEC download, vendor API, model or broker call occurred.",
+    "Availability timestamps and evidence references are declarations, not independently authenticated vendor publication evidence.",
+    "Local snapshot ingestion time is separate from source publication and original capture time.",
+    "Scope is realized observations and effective universe state; it does not model every corporate action, event forecast, symbol mapping or delisting history.",
+    "Hash checks require the caller to retain a trusted manifest digest independently; local file permissions are not immutable storage or off-host recovery."
+  ],
+  "data": {
+    "snapshot": {
+      "snapshot_sha256": "961135fd9b40a412dd96a9b100b512823eae1c74ba102393712d69c7469013e3",
+      "source_sha256": "f5d0ebf62889db580fdfd5e2f774c1ada9d01434dcba904019247f23f8ac2f3a",
+      "counts": {
+        "observations": 7,
+        "universe": 5
+      },
+      "synthetic": true,
+      "duckdb_version": "1.5.5",
+      "entitlement_verified": false
+    },
+    "selections": {
+      "early": {
+        "cutoff": "2025-02-10T00:00:00Z",
+        "values": {
+          "AAPL": "100",
+          "MSFT": "200"
+        },
+        "row_ids": [
+          "aapl-original",
+          "msft-source-publication"
+        ],
+        "universe_row_ids": [
+          "membership-aapl",
+          "membership-msft"
+        ]
+      },
+      "late": {
+        "cutoff": "2025-03-10T00:00:00Z",
+        "values": {
+          "AAPL": "90"
+        },
+        "row_ids": [
+          "aapl-correction"
+        ],
+        "universe_row_ids": [
+          "membership-aapl"
+        ]
+      },
+      "future_universe": {
+        "cutoff": "2025-04-10T00:00:00Z",
+        "values": {
+          "AAPL": "90",
+          "SPY": "300"
+        },
+        "row_ids": [
+          "aapl-correction",
+          "spy-future-universe"
+        ],
+        "universe_row_ids": [
+          "membership-aapl",
+          "membership-spy-announced"
+        ]
+      },
+      "early_replay": {
+        "cutoff": "2025-02-10T00:00:00Z",
+        "values": {
+          "AAPL": "100",
+          "MSFT": "200"
+        },
+        "row_ids": [
+          "aapl-original",
+          "msft-source-publication"
+        ],
+        "universe_row_ids": [
+          "membership-aapl",
+          "membership-msft"
+        ]
+      },
+      "other_feed": {
+        "values": {
+          "AAPL": "999"
+        },
+        "row_ids": [
+          "aapl-other-feed"
+        ]
+      },
+      "adjusted": {
+        "values": {
+          "AAPL": "50"
+        },
+        "row_ids": [
+          "aapl-adjusted"
+        ]
+      }
+    },
+    "rejections": {
+      "missing_availability": {
+        "status": "rejected",
+        "reason": "row_schema_mismatch"
+      },
+      "overwrite": {
+        "status": "rejected",
+        "reason": "FileExistsError"
+      },
+      "corruption": {
+        "status": "rejected",
+        "reason": "snapshot_artifact_hash_mismatch"
+      },
+      "excessive_timestamp_precision": {
+        "status": "rejected",
+        "reason": "timestamp_requires_rfc3339_microsecond_precision"
+      }
+    },
+    "late_correction_excluded_before_availability": true,
+    "future_universe_membership_waited_until_effective": true,
+    "earlier_replay_identical": true,
+    "entitlement_verified": false,
+    "availability_evidence_authenticated": false,
+    "native_command_count": 11
+  },
+  "commands": [
+    {
+      "label": "snapshot",
+      "exit_code": 0,
+      "stdout_sha256": "946dbf21910327e47e4a0a405b21e22409134a1593381f4f45d4b039564cd30b",
+      "stderr_bytes": 0,
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/point-in-time/temporal_snapshot.py",
+        "snapshot",
+        "--source",
+        "$STACK_REPO/blueprints/us-equities/point-in-time/fixture.json",
+        "--output",
+        "$PRIVATE_RUN/snapshot"
+      ]
+    },
+    {
+      "label": "early",
+      "exit_code": 0,
+      "stdout_sha256": "34f80a557dcb594798845e23f89b48c39790cc4cb5466b30e1b1b9fa6486c1fd",
+      "stderr_bytes": 0,
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/point-in-time/temporal_snapshot.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/snapshot",
+        "--snapshot-sha256",
+        "961135fd9b40a412dd96a9b100b512823eae1c74ba102393712d69c7469013e3",
+        "--cutoff",
+        "2025-02-10T00:00:00Z",
+        "--universe-id",
+        "fixture-selected",
+        "--feed",
+        "fixture-feed-a",
+        "--adjustment",
+        "raw",
+        "--field",
+        "Assets",
+        "--unit",
+        "USD"
+      ]
+    },
+    {
+      "label": "late",
+      "exit_code": 0,
+      "stdout_sha256": "132a37070df3197f2576c0fa3d57a1930dc3c9f6aeaf398e587862ae851e3a34",
+      "stderr_bytes": 0,
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/point-in-time/temporal_snapshot.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/snapshot",
+        "--snapshot-sha256",
+        "961135fd9b40a412dd96a9b100b512823eae1c74ba102393712d69c7469013e3",
+        "--cutoff",
+        "2025-03-10T00:00:00Z",
+        "--universe-id",
+        "fixture-selected",
+        "--feed",
+        "fixture-feed-a",
+        "--adjustment",
+        "raw",
+        "--field",
+        "Assets",
+        "--unit",
+        "USD"
+      ]
+    },
+    {
+      "label": "future_universe",
+      "exit_code": 0,
+      "stdout_sha256": "d1f58cda97b99c2c3c1b16f21882eb17f3b2aebfcc004d082a933a04ee10e89b",
+      "stderr_bytes": 0,
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/point-in-time/temporal_snapshot.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/snapshot",
+        "--snapshot-sha256",
+        "961135fd9b40a412dd96a9b100b512823eae1c74ba102393712d69c7469013e3",
+        "--cutoff",
+        "2025-04-10T00:00:00Z",
+        "--universe-id",
+        "fixture-selected",
+        "--feed",
+        "fixture-feed-a",
+        "--adjustment",
+        "raw",
+        "--field",
+        "Assets",
+        "--unit",
+        "USD"
+      ]
+    },
+    {
+      "label": "early_replay",
+      "exit_code": 0,
+      "stdout_sha256": "34f80a557dcb594798845e23f89b48c39790cc4cb5466b30e1b1b9fa6486c1fd",
+      "stderr_bytes": 0,
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/point-in-time/temporal_snapshot.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/snapshot",
+        "--snapshot-sha256",
+        "961135fd9b40a412dd96a9b100b512823eae1c74ba102393712d69c7469013e3",
+        "--cutoff",
+        "2025-02-10T00:00:00Z",
+        "--universe-id",
+        "fixture-selected",
+        "--feed",
+        "fixture-feed-a",
+        "--adjustment",
+        "raw",
+        "--field",
+        "Assets",
+        "--unit",
+        "USD"
+      ]
+    },
+    {
+      "label": "other_feed",
+      "exit_code": 0,
+      "stdout_sha256": "c5d50abfd4f09669f270e3e06a68fe60b4484061076ebd514be897adae82d208",
+      "stderr_bytes": 0,
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/point-in-time/temporal_snapshot.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/snapshot",
+        "--snapshot-sha256",
+        "961135fd9b40a412dd96a9b100b512823eae1c74ba102393712d69c7469013e3",
+        "--cutoff",
+        "2025-02-10T00:00:00Z",
+        "--universe-id",
+        "fixture-selected",
+        "--feed",
+        "fixture-feed-b",
+        "--adjustment",
+        "raw",
+        "--field",
+        "Assets",
+        "--unit",
+        "USD"
+      ]
+    },
+    {
+      "label": "adjusted",
+      "exit_code": 0,
+      "stdout_sha256": "4011242538f97a4efad349b172dfa0f3c686a643ceb4ee623beafb2b3e6fb10a",
+      "stderr_bytes": 0,
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/point-in-time/temporal_snapshot.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/snapshot",
+        "--snapshot-sha256",
+        "961135fd9b40a412dd96a9b100b512823eae1c74ba102393712d69c7469013e3",
+        "--cutoff",
+        "2025-02-10T00:00:00Z",
+        "--universe-id",
+        "fixture-selected",
+        "--feed",
+        "fixture-feed-a",
+        "--adjustment",
+        "split",
+        "--field",
+        "Assets",
+        "--unit",
+        "USD"
+      ]
+    },
+    {
+      "label": "missing_availability",
+      "exit_code": 2,
+      "stdout_sha256": "4ef1461df6b9f6a532ada8ebe233b3d1ca45bbf79fe09faa53cb27d6898c2679",
+      "stderr_bytes": 0,
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/point-in-time/temporal_snapshot.py",
+        "snapshot",
+        "--source",
+        "$PRIVATE_RUN/missing-availability.json",
+        "--output",
+        "$PRIVATE_RUN/rejected"
+      ]
+    },
+    {
+      "label": "overwrite",
+      "exit_code": 2,
+      "stdout_sha256": "e343696cf3fb0fc409e0f692232589c0551b6ad6f9ea25b3c289e7ca918bd9a4",
+      "stderr_bytes": 0,
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/point-in-time/temporal_snapshot.py",
+        "snapshot",
+        "--source",
+        "$STACK_REPO/blueprints/us-equities/point-in-time/fixture.json",
+        "--output",
+        "$PRIVATE_RUN/snapshot"
+      ]
+    },
+    {
+      "label": "corruption",
+      "exit_code": 2,
+      "stdout_sha256": "2045cba8ee99e7d990d19d4775fa6a2b11b3c6f6d22a1bc4bb2616da67c9b44c",
+      "stderr_bytes": 0,
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/point-in-time/temporal_snapshot.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/corrupted-snapshot",
+        "--snapshot-sha256",
+        "961135fd9b40a412dd96a9b100b512823eae1c74ba102393712d69c7469013e3",
+        "--cutoff",
+        "2025-02-10T00:00:00Z",
+        "--universe-id",
+        "fixture-selected",
+        "--feed",
+        "fixture-feed-a",
+        "--adjustment",
+        "raw",
+        "--field",
+        "Assets",
+        "--unit",
+        "USD"
+      ]
+    },
+    {
+      "label": "excessive_timestamp_precision",
+      "exit_code": 2,
+      "stdout_sha256": "ec106bd6cca569b7932c9b1b9c31045f6707d5c535e95b59daf9ee56fa77c5ef",
+      "stderr_bytes": 0,
+      "command": [
+        "$SDK_PYTHON",
+        "$STACK_REPO/blueprints/us-equities/point-in-time/temporal_snapshot.py",
+        "select",
+        "--snapshot",
+        "$PRIVATE_RUN/snapshot",
+        "--snapshot-sha256",
+        "961135fd9b40a412dd96a9b100b512823eae1c74ba102393712d69c7469013e3",
+        "--cutoff",
+        "2025-02-01T21:00:00.0000001Z",
+        "--universe-id",
+        "fixture-selected",
+        "--feed",
+        "fixture-feed-a",
+        "--adjustment",
+        "raw",
+        "--field",
+        "Assets",
+        "--unit",
+        "USD"
+      ]
+    }
+  ]
+}
