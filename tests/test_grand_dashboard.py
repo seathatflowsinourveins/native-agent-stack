@@ -42,6 +42,25 @@ class GrandDashboardTests(unittest.TestCase):
             p = Path(d)/'outside.json';p.symlink_to(ROOT/'manifests/stack.json')
             with self.assertRaises(ValueError):progress.read(Path(d),'outside.json')
 
+    def test_active_plan_drives_wave_rows_with_reference_containment(self):
+        original = progress.read
+        def current(root, relative):
+            data = original(root, relative)
+            if relative.endswith('/state.json'):
+                data['plan_ref'] = 'blueprints/us-equities/simulation-research/plan.json'
+            return data
+        with patch.object(progress, 'read', current):
+            waves = [r for r in progress.snapshot(ROOT) if r['record_kind'] == 'wave']
+        self.assertTrue(any(r['entity_id'] == 'chronological_evaluation' for r in waves))
+        self.assertTrue(all(r['evidence_ref'] == 'blueprints/us-equities/simulation-research/plan.json' for r in waves))
+        for ref in ['/etc/passwd', '../outside']:
+            def unsafe(root, relative):
+                data = original(root, relative)
+                if relative.endswith('/state.json'): data['plan_ref'] = ref
+                return data
+            with self.subTest(ref=ref), patch.object(progress,'read',unsafe), self.assertRaises(ValueError):
+                progress.snapshot(ROOT)
+
     def test_arbitrary_source_fields_never_emitted(self):
         original = progress.read
         def mutated(root, relative):

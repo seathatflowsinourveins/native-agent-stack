@@ -1,13 +1,14 @@
 {
   "schema_version": 1,
   "checked_at": "2026-09-19",
-  "scope": "Decision coverage of every public repository in the refreshed 337-star snapshot. This is not a claim of exhaustive ecosystem discovery, full code/security audit, installation, performance superiority or profitable trading.",
+  "scope": "Decision coverage of every public repository in the latest 342-star snapshot; the earlier 337-star review remains a dated baseline. This is not a claim of exhaustive ecosystem discovery, full code/security audit, installation, performance superiority or profitable trading.",
   "method": {
-    "discovery": "Native GitHub CLI paginated starred endpoint with star+json media type; private flag checked before inclusion. Repository set matched the prior snapshot.",
+    "discovery": "Latest discovery uses the paginated public users/seathatflowsinourveins/starred endpoint recorded in latest_public_refresh: 342 public repositories, five additions and no removals. Private-star inventory was not observed by this refresh.",
+    "baseline_discovery": "Earlier 2026-09-19 337-star audit: native GitHub CLI paginated authenticated starred endpoint with star+json media type; private flag checked before inclusion. That repository set matched its prior snapshot.",
     "source_capture": "For each previously unassessed public repository, resolve default-branch HEAD, then request README and license at that commit. One oversized README used a successful raw-media fallback. Full captures remain private; only typed conclusions and public source links are published.",
     "review": "Individually authored dispositions after primary README purpose/heading and license-declaration inspection. Selected candidates received additional documentation/API/source-section inspection. Mechanical excerpt selection was used to bound reading; no keyword score made the decisions.",
     "depth_boundary": "readme_license_overview is a narrow source screen, not a deep review. selected_primary_files means only the enumerated sections were inspected; it does not certify the whole repository. prior_evidence_link retains earlier scope without re-review.",
-    "private_handling": "Only public repositories are included. No account identity, star-user timeline, private repository names, raw source cache or native session identifiers are published.",
+    "private_handling": "Only public repositories are included. No credentials, private account data, star-user timeline, private repository names, raw source cache or native session identifiers are published; the public GitHub username identifies the discovery endpoint.",
     "runtime_boundary": "No new runtime/model/broker work in this audit. Existing native evidence remains in linked typed receipts.",
     "source_pin_scope": "Default-branch source snapshots are not necessarily published releases or installed versions. Null source_date on prior evidence means no fresh commit-date lookup.",
     "decision_meanings": {
@@ -21,28 +22,33 @@
     }
   },
   "counts": {
-    "public_stars": 337,
+    "public_stars": 342,
     "private_stars_excluded": 0,
     "previously_covered": 51,
-    "new_source_dispositions": 286,
+    "new_source_dispositions": 291,
     "unassessed": 0,
     "by_review_level": {
-      "prior_baseline": 10,
+      "source_review": 291,
       "prior_catalog": 41,
-      "source_review": 286
+      "prior_baseline": 10
     },
     "by_review_depth": {
+      "readme_license_overview": 273,
       "prior_evidence_link": 51,
-      "readme_license_overview": 268,
       "selected_primary_files": 18
     },
     "by_decision": {
-      "already_covered": 51,
-      "alternative": 156,
-      "obsolete_or_ineligible": 13,
       "outside_north_star": 53,
       "overlaps_established": 50,
-      "targeted_candidate": 14
+      "already_covered": 51,
+      "alternative": 156,
+      "targeted_candidate": 14,
+      "obsolete_or_ineligible": 13,
+      "defer_memory_workflow_overlap": 1,
+      "defer_remote_operator_surface": 1,
+      "catalog_macos_host_maintenance": 1,
+      "catalog_network_client_only": 1,
+      "discovery_only": 1
     }
   },
   "entries": [
@@ -12391,24 +12397,131 @@
       "reviewed_files": [],
       "archived": false,
       "relevance": "Existing selected or compared component; relevance inherited from the linked card."
+    },
+    {
+      "repository": "https://github.com/Storybloq/storybloq",
+      "source_commit": "beed5cbdcbc3704ecc4ff1b4ec9bed40b500e720",
+      "source_date": "2026-09-19T04:21:04Z",
+      "review_level": "source_review",
+      "review_depth": "readme_license_overview",
+      "decision": "defer_memory_workflow_overlap",
+      "role": "Cross-harness project memory and workflow candidate",
+      "rationale": "Potential cross-harness project-memory workflow, overlapping existing ai-memory and repo task records. PolyForm Shield1.0 requires deliberate license/behavior review before adoption.",
+      "license": null,
+      "sources": [
+        "https://github.com/Storybloq/storybloq/blob/beed5cbdcbc3704ecc4ff1b4ec9bed40b500e720/README.md",
+        "https://github.com/Storybloq/storybloq/blob/beed5cbdcbc3704ecc4ff1b4ec9bed40b500e720/LICENSE"
+      ],
+      "limitations": [
+        "Bounded metadata, selected README sections and license review; no installation or native execution for this repository.",
+        "Discovery or star membership does not authorize cleanup, remote control, network-routing changes or a data-access workaround."
+      ],
+      "catalog_entry_ids": [],
+      "evidence_refs": [
+        "catalogs/us-equities/simulation-data-review.json"
+      ]
+    },
+    {
+      "repository": "https://github.com/Nexting-ai/nexting",
+      "source_commit": "a4b75f0429d3b1bf35eef68a296b2e72aa9c7483",
+      "source_date": "2026-09-11T03:12:02Z",
+      "review_level": "source_review",
+      "review_depth": "readme_license_overview",
+      "decision": "defer_remote_operator_surface",
+      "role": "Remote native-agent operator and hardware interface candidate",
+      "rationale": "Remote harness control is relevant hosting research, but no current requirement justifies another privileged remote session surface. No bridge or hook installed.",
+      "license": "MIT",
+      "sources": [
+        "https://github.com/Nexting-ai/nexting/blob/a4b75f0429d3b1bf35eef68a296b2e72aa9c7483/README.md",
+        "https://github.com/Nexting-ai/nexting/blob/a4b75f0429d3b1bf35eef68a296b2e72aa9c7483/LICENSE"
+      ],
+      "limitations": [
+        "Bounded metadata, selected README sections and license review; no installation or native execution for this repository.",
+        "Discovery or star membership does not authorize cleanup, remote control, network-routing changes or a data-access workaround."
+      ],
+      "catalog_entry_ids": [],
+      "evidence_refs": [
+        "catalogs/us-equities/simulation-data-review.json"
+      ]
+    },
+    {
+      "repository": "https://github.com/tw93/Mole",
+      "source_commit": "0ee920304ad5ee1dfad6a7176d45de715a911f12",
+      "source_date": "2026-09-19T15:05:06Z",
+      "review_level": "source_review",
+      "review_depth": "readme_license_overview",
+      "decision": "catalog_macos_host_maintenance",
+      "role": "macOS maintenance candidate",
+      "rationale": "GPL-3.0 Mac maintenance candidate; no macOS host execution or cleanup authorized by this simulation wave.",
+      "license": "GPL-3.0",
+      "sources": [
+        "https://github.com/tw93/Mole/blob/0ee920304ad5ee1dfad6a7176d45de715a911f12/README.md",
+        "https://github.com/tw93/Mole/blob/0ee920304ad5ee1dfad6a7176d45de715a911f12/LICENSE"
+      ],
+      "limitations": [
+        "Bounded metadata, selected README sections and license review; no installation or native execution for this repository.",
+        "Discovery or star membership does not authorize cleanup, remote control, network-routing changes or a data-access workaround."
+      ],
+      "catalog_entry_ids": [],
+      "evidence_refs": [
+        "catalogs/us-equities/simulation-data-review.json"
+      ]
+    },
+    {
+      "repository": "https://github.com/clash-verge-rev/clash-verge-rev",
+      "source_commit": "04a2a09368f76620d3eeb51eafeb1791b41e00ae",
+      "source_date": "2026-09-19T15:59:37Z",
+      "review_level": "source_review",
+      "review_depth": "readme_license_overview",
+      "decision": "catalog_network_client_only",
+      "role": "Cross-platform proxy client reference",
+      "rationale": "GPL-3.0 GUI proxy client; not a SEC data source or a remedy to apply to a refused acquisition. No network routing changed.",
+      "license": "GPL-3.0",
+      "sources": [
+        "https://github.com/clash-verge-rev/clash-verge-rev/blob/04a2a09368f76620d3eeb51eafeb1791b41e00ae/README.md",
+        "https://github.com/clash-verge-rev/clash-verge-rev/blob/04a2a09368f76620d3eeb51eafeb1791b41e00ae/LICENSE"
+      ],
+      "limitations": [
+        "Bounded metadata, selected README sections and license review; no installation or native execution for this repository.",
+        "Discovery or star membership does not authorize cleanup, remote control, network-routing changes or a data-access workaround."
+      ],
+      "catalog_entry_ids": [],
+      "evidence_refs": [
+        "catalogs/us-equities/simulation-data-review.json"
+      ]
+    },
+    {
+      "repository": "https://github.com/jaywcjlove/awesome-mac",
+      "source_commit": "31718871dfbac3cc17139b3958759f5a3e47675c",
+      "source_date": "2026-09-17T08:01:12Z",
+      "review_level": "source_review",
+      "review_depth": "readme_license_overview",
+      "decision": "discovery_only",
+      "role": "macOS application discovery directory",
+      "rationale": "CC0 discovery catalog for future macOS adoption review; listed applications retain their own licenses and acceptance requirements.",
+      "license": "CC0-1.0",
+      "sources": [
+        "https://github.com/jaywcjlove/awesome-mac/blob/31718871dfbac3cc17139b3958759f5a3e47675c/README.md",
+        "https://github.com/jaywcjlove/awesome-mac/blob/31718871dfbac3cc17139b3958759f5a3e47675c/LICENSE"
+      ],
+      "limitations": [
+        "Bounded metadata, selected README sections and license review; no installation or native execution for this repository.",
+        "Discovery or star membership does not authorize cleanup, remote control, network-routing changes or a data-access workaround."
+      ],
+      "catalog_entry_ids": [],
+      "evidence_refs": [
+        "catalogs/us-equities/simulation-data-review.json"
+      ]
     }
   ],
   "latest_public_refresh": {
-    "checked_at": "2026-09-19",
-    "endpoint": "GET /user/starred?sort=created&direction=desc&per_page=100 (all four pages; signed-in account omitted)",
-    "public_flag_filter": "private == false",
-    "public_repositories": 337,
-    "added_since_recorded_snapshot": 0,
+    "checked_at_utc": "2026-09-19T22:56:04.023626+00:00",
+    "endpoint": "GET /users/seathatflowsinourveins/starred?per_page=100 (all pages)",
+    "public_repositories": 342,
+    "added_since_recorded_snapshot": 5,
     "removed_since_recorded_snapshot": 0,
-    "raw_names_added": [
-      "loopx-project/loopx"
-    ],
-    "raw_names_removed": [
-      "huangruiteng/loopx"
-    ],
-    "public_set_sha256": "c3e3abcfa39c36dbb5b86c6917c1b9807376034be83095c1664314d408a02cd1",
-    "hash_method": "Lowercase current public owner/repository names sorted, joined with newline and one final newline; SHA-256. Raw names change on a repository transfer.",
-    "scope": "Fresh identity comparison with immutable GitHub ID verification for the changed name; prior source reviews and native executions were not repeated.",
-    "source_receipt": "catalogs/us-equities/data-evaluation-followup.json"
+    "duplicate_ids": 0,
+    "evidence_ref": "blueprints/us-equities/catalyst-provenance/public-stars-refresh.json",
+    "scope": "Public endpoint identity refresh; no private-star inventory or source-execution claim."
   }
 }

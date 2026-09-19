@@ -27,6 +27,8 @@ SOURCES = {
 
 
 def read(root, relative):
+    if not isinstance(relative, str) or not re.fullmatch(r'[A-Za-z0-9_./-]{1,200}', relative) or relative.startswith('/') or '..' in relative:
+        raise ValueError('invalid public source reference')
     path = root / relative
     if path.is_symlink() or not path.resolve().is_relative_to(root.resolve()):
         raise ValueError('source must remain inside the public repository')
@@ -145,8 +147,9 @@ def workflow_snapshot(dagu_bin=None, dagu_home=None):
 
 def snapshot(root, dagu_bin=None, dagu_home=None):
     root = Path(root)
-    plan = read(root, 'blueprints/us-equities/convergence-program/plan.json')
     state = read(root, 'observability/grand-dashboard/state.json')
+    plan_path = state.get('plan_ref', 'blueprints/us-equities/convergence-program/plan.json')
+    plan = read(root, plan_path)
     updated = stamp(state['recorded_at_utc'])
     rows = []
 
@@ -166,7 +169,7 @@ def snapshot(root, dagu_bin=None, dagu_home=None):
         add(kind, row['id'], row['title'], row['state'], ref)
     for wave in plan['waves']:
         add('wave', wave['id'], wave['id'].replace('_', ' '), wave['state'],
-            'blueprints/us-equities/convergence-program/plan.json')
+            plan_path)
     for group, (relative, key) in SOURCES.items():
         data = read(root, relative)
         for item in data[key]:
@@ -195,12 +198,13 @@ def snapshot(root, dagu_bin=None, dagu_home=None):
                 raise ValueError('invalid experiment count')
             rows[-1][source] = value
     add('summary', 'receipts', 'Registered evidence receipts', 'recorded', 'manifests/evidence.json', len(evidence['receipts']))
-    add('summary', 'decisions', 'Decisions examined this wave', 'recorded', 'blueprints/us-equities/convergence-program/plan.json', sum(r['record_kind'] == 'decision' for r in rows))
-    stars = read(root, 'catalogs/us-equities/convergence-program/public-stars-refresh.json')
+    add('summary', 'decisions', 'Source-reviewed repository decisions', 'recorded', 'blueprints/us-equities/convergence-program/plan.json', sum(r['record_kind'] == 'decision' for r in rows))
+    stars_path = state.get('stars_ref', 'catalogs/us-equities/convergence-program/public-stars-refresh.json')
+    stars = read(root, stars_path)
     count = stars['current_count']
     if type(count) is not int or count < 0 or count != len(stars['repositories']):
         raise ValueError('public star count mismatch')
-    add('summary', 'stars', 'Public stars enumerated', 'identity audit', 'catalogs/us-equities/convergence-program/public-stars-refresh.json', count)
+    add('summary', 'stars', 'Public stars enumerated', 'identity audit', stars_path, count)
     add('summary', 'snapshot', 'Snapshot marker', 'recorded', 'observability/grand-dashboard/state.json')
     rows.extend(workflow_snapshot(dagu_bin, dagu_home))
     if len(rows) > 80 or len({r['entity_id'] for r in rows}) != len(rows):

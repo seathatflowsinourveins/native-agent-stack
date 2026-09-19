@@ -1,25 +1,125 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-19T22:12:00Z",
+  "recorded_at_utc": "2026-09-19T23:18:28Z",
   "meaning": "Recorded checkpoint; freshness of emission is separate from source update. Worker states are coordinator checkpoints, not process heartbeats.",
   "lanes": [
-    {"kind":"lane","id":"simulation","title":"Historical simulation / backtest","state":"six stress cases accepted / research continues","evidence_ref":"blueprints/us-equities/historical-simulation/receipt.json"},
-    {"kind":"lane","id":"paper","title":"Dedicated Alpaca paper account","state":"deferred by user / credentials pending","evidence_ref":"blueprints/us-equities/convergence-program/plan.json"},
-    {"kind":"lane","id":"live","title":"Live trading","state":"future promotion / no authority","evidence_ref":"blueprints/us-equities/convergence-program/plan.json"}
+    {
+      "kind": "lane",
+      "id": "simulation",
+      "title": "Historical simulation / backtest",
+      "state": "chronological price-label controls accepted / research continues",
+      "evidence_ref": "blueprints/us-equities/research-evaluation/receipt.json"
+    },
+    {
+      "kind": "lane",
+      "id": "paper",
+      "title": "Dedicated Alpaca paper account",
+      "state": "deferred by user / credentials pending",
+      "evidence_ref": "blueprints/us-equities/convergence-program/plan.json"
+    },
+    {
+      "kind": "lane",
+      "id": "live",
+      "title": "Live trading",
+      "state": "future promotion / no authority",
+      "evidence_ref": "blueprints/us-equities/convergence-program/plan.json"
+    }
   ],
   "gates": [
-    {"kind":"gate","id":"memory-lifecycle","title":"Isolated memory lifecycle","state":"native acceptance / reviewed","evidence_ref":"blueprints/us-equities/memory-lifecycle/receipt.json"},
-    {"kind":"gate","id":"nanosecond-replay","title":"Exact nanosecond synthetic replay","state":"native acceptance / reviewed","evidence_ref":"blueprints/us-equities/nanosecond-replay/receipt.json"},
-    {"kind":"gate","id":"worker-supervision","title":"Worker process tree termination","state":"native acceptance / reviewed","evidence_ref":"blueprints/us-equities/worker-supervision/receipt.json"},
-    {"kind":"gate","id":"historical-universe","title":"Historical extreme mover universe","state":"licensed PIT coverage pending","evidence_ref":"blueprints/us-equities/acceptance-wave/research-protocol.json"},
-    {"kind":"gate","id":"execution-realism","title":"Cost and leverage stress","state":"six historical cases accepted","evidence_ref":"blueprints/us-equities/historical-simulation/receipt.json"},
-    {"kind":"gate","id":"data-entitlements","title":"Alpaca data and margin entitlements","state":"actual account verification pending","evidence_ref":"blueprints/us-equities/architecture/README.md"},
-    {"kind":"gate","id":"macos","title":"macOS native acceptance","state":"target host pending","evidence_ref":"adoption/README.md"},
-    {"kind":"gate","id":"net-token-savings","title":"Causal net token savings","state":"not measured","evidence_ref":"observability/README.md"}
+    {
+      "kind": "gate",
+      "id": "memory-lifecycle",
+      "title": "Isolated memory lifecycle",
+      "state": "native acceptance / reviewed",
+      "evidence_ref": "blueprints/us-equities/memory-lifecycle/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "nanosecond-replay",
+      "title": "Exact nanosecond synthetic replay",
+      "state": "native acceptance / reviewed",
+      "evidence_ref": "blueprints/us-equities/nanosecond-replay/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "worker-supervision",
+      "title": "Worker process tree termination",
+      "state": "native acceptance / reviewed",
+      "evidence_ref": "blueprints/us-equities/worker-supervision/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "historical-universe",
+      "title": "Historical extreme mover universe",
+      "state": "licensed PIT coverage pending",
+      "evidence_ref": "blueprints/us-equities/acceptance-wave/research-protocol.json"
+    },
+    {
+      "kind": "gate",
+      "id": "execution-realism",
+      "title": "Cost and leverage stress",
+      "state": "six historical cases accepted",
+      "evidence_ref": "blueprints/us-equities/historical-simulation/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "data-entitlements",
+      "title": "Alpaca data and margin entitlements",
+      "state": "actual account verification pending",
+      "evidence_ref": "blueprints/us-equities/architecture/README.md"
+    },
+    {
+      "kind": "gate",
+      "id": "macos",
+      "title": "macOS native acceptance",
+      "state": "target host pending",
+      "evidence_ref": "adoption/README.md"
+    },
+    {
+      "kind": "gate",
+      "id": "net-token-savings",
+      "title": "Causal net token savings",
+      "state": "not measured",
+      "evidence_ref": "observability/README.md"
+    },
+    {
+      "kind": "gate",
+      "id": "chronological-evaluation",
+      "title": "Chronological selection and reserved segment",
+      "state": "selected 0.118407 pct / equal weight 0.162293 pct / price labels",
+      "evidence_ref": "blueprints/us-equities/research-evaluation/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "sec-provenance",
+      "title": "Native SEC catalyst provenance",
+      "state": "native local parsing accepted / SEC HTTP 403 / temporal gate closed",
+      "evidence_ref": "blueprints/us-equities/catalyst-provenance/receipt.json"
+    }
   ],
   "workers": [
-    {"kind":"worker","id":"foundation-worker","title":"Foundation research worker","state":"source and native review complete","evidence_ref":"catalogs/us-equities/convergence-program/foundation.json"},
-    {"kind":"worker","id":"trading-worker","title":"Trading research worker","state":"source and simulation review complete","evidence_ref":"blueprints/us-equities/historical-simulation/receipt.json"},
-    {"kind":"worker","id":"hosting-worker","title":"Hosting research worker","state":"source and cross reviews complete","evidence_ref":"catalogs/us-equities/convergence-program/hosting.json"}
-  ]
+    {
+      "kind": "worker",
+      "id": "evaluation-worker",
+      "title": "Chronological evaluation worker",
+      "state": "native study complete / independent review accepted",
+      "evidence_ref": "blueprints/us-equities/research-evaluation/receipt.json"
+    },
+    {
+      "kind": "worker",
+      "id": "data-worker",
+      "title": "SEC and starred data research worker",
+      "state": "native parser and source review complete / SEC access refused",
+      "evidence_ref": "blueprints/us-equities/catalyst-provenance/receipt.json"
+    },
+    {
+      "kind": "worker",
+      "id": "independent-reviewer",
+      "title": "Independent evidence reviewer",
+      "state": "worker and integration reviews accepted / publication tracked by GitHub CI",
+      "evidence_ref": "blueprints/us-equities/simulation-research/plan.json"
+    }
+  ],
+  "plan_ref": "blueprints/us-equities/simulation-research/plan.json",
+  "stars_ref": "blueprints/us-equities/catalyst-provenance/public-stars-refresh.json"
 }

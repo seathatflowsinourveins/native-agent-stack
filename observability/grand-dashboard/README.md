@@ -52,6 +52,9 @@ explicit unavailable state.
 
 [state.json](state.json) is a coordinator checkpoint. Its timestamp describes
 when the lane/gate/worker state was recorded. It is not a live process registry.
+Its optional `plan_ref` and `stars_ref` select the current public wave and dated
+star refresh within this repository. Old receipts keep their original snapshots;
+the dashboard does not mistake a previous completed goal for current work.
 The emitter also reads the public program plan and three decision matrices;
 review their own dates and source pins before reopening a decision. The dashboard
 refreshes every 30 seconds. Changing its JSON definition requires Grafana's

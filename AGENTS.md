@@ -37,6 +37,13 @@ Normal local observation uses Grafana anonymous Viewer on loopback; native model
 clients retain their own sign-ins. Keep Dagu operator authentication distinct from
 the passwordless observation path; auth:none is not a global Viewer role.
 
+The subsequent simulation-research wave adopts isolated EdgarTools and skfolio
+recipes. Read `blueprints/us-equities/simulation-research/README.md` for current
+results and remaining data gates. Its 2021 control segment is now inspected;
+future experiments must not call it a fresh untouched holdout. Native filing
+parsing, live SEC access and historical information availability are separate
+claims. Keep provider identities local and preserve acquisition refusals.
+
 For the next research/acceptance work, read `blueprints/us-equities/acceptance-wave/README.md`
 and its research protocol on demand. The selected direction is daily/intraday
 catalyst research, including historical +200% mover discovery. Preserve as-known

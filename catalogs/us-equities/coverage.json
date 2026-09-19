@@ -2,7 +2,8 @@
   "schema_version": 1,
   "checked_at": "2026-09-19",
   "scope": "Public-star catalog membership ledger. no_catalog_card means no current full catalog or adopted baseline card; every public star also has a separate source disposition and review depth in star-audit.json. Membership does not imply native execution.",
-  "source_command": "gh api --paginate user/starred --jq '.[] | {full_name,private,html_url}'",
+  "source_command": "gh api --paginate --slurp users/seathatflowsinourveins/starred?per_page=100",
+  "baseline_source_command": "Earlier 337-star snapshot: gh api --paginate user/starred --jq '.[] | {full_name,private,html_url}'",
   "stars": [
     {
       "repository": "https://github.com/0xNyk/awesome-hermes-agent",
@@ -356,6 +357,12 @@
     },
     {
       "repository": "https://github.com/citrolabs/ego-lite",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/clash-verge-rev/clash-verge-rev",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
       "prior_candidate_decision": false
@@ -825,12 +832,6 @@
       "prior_candidate_decision": false
     },
     {
-      "repository": "https://github.com/loopx-project/loopx",
-      "disposition": "no_catalog_card",
-      "catalog_entry_ids": [],
-      "prior_candidate_decision": false
-    },
-    {
       "repository": "https://github.com/humanlayer/humanlayer",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
@@ -859,6 +860,12 @@
     {
       "repository": "https://github.com/jarrodwatts/claude-hud",
       "disposition": "baseline_record",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/jaywcjlove/awesome-mac",
+      "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
       "prior_candidate_decision": false
     },
@@ -1022,6 +1029,12 @@
     },
     {
       "repository": "https://github.com/looplj/axonhub",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/loopx-project/loopx",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
       "prior_candidate_decision": false
@@ -1207,6 +1220,12 @@
       "catalog_entry_ids": [
         "nautilustrader"
       ],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/nexting-ai/nexting",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
       "prior_candidate_decision": false
     },
     {
@@ -1668,6 +1687,12 @@
       "prior_candidate_decision": false
     },
     {
+      "repository": "https://github.com/storybloq/storybloq",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
       "repository": "https://github.com/SuperClaude-Org/SuperClaude_Framework",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
@@ -1801,6 +1826,12 @@
     },
     {
       "repository": "https://github.com/tursodatabase/turso",
+      "disposition": "no_catalog_card",
+      "catalog_entry_ids": [],
+      "prior_candidate_decision": false
+    },
+    {
+      "repository": "https://github.com/tw93/mole",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
       "prior_candidate_decision": false
@@ -2762,21 +2793,13 @@
     "linkedin/datahub": "datahub-project/datahub"
   },
   "latest_public_refresh": {
-    "checked_at": "2026-09-19",
-    "endpoint": "GET /user/starred?sort=created&direction=desc&per_page=100 (all four pages; signed-in account omitted)",
-    "public_flag_filter": "private == false",
-    "public_repositories": 337,
-    "added_since_recorded_snapshot": 0,
+    "checked_at_utc": "2026-09-19T22:56:04.023626+00:00",
+    "endpoint": "GET /users/seathatflowsinourveins/starred?per_page=100 (all pages)",
+    "public_repositories": 342,
+    "added_since_recorded_snapshot": 5,
     "removed_since_recorded_snapshot": 0,
-    "raw_names_added": [
-      "loopx-project/loopx"
-    ],
-    "raw_names_removed": [
-      "huangruiteng/loopx"
-    ],
-    "public_set_sha256": "c3e3abcfa39c36dbb5b86c6917c1b9807376034be83095c1664314d408a02cd1",
-    "hash_method": "Lowercase current public owner/repository names sorted, joined with newline and one final newline; SHA-256. Raw names change on a repository transfer.",
-    "scope": "Fresh identity comparison with immutable GitHub ID verification for the changed name; prior source reviews and native executions were not repeated.",
-    "source_receipt": "catalogs/us-equities/data-evaluation-followup.json"
+    "duplicate_ids": 0,
+    "evidence_ref": "blueprints/us-equities/catalyst-provenance/public-stars-refresh.json",
+    "scope": "Public endpoint identity refresh; no private-star inventory or source-execution claim."
   }
 }

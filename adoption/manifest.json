@@ -85,7 +85,9 @@
     "syft": "blueprints/us-equities/supply-chain/README.md",
     "alpaca-py": "blueprints/us-equities/order-contract/README.md",
     "pandas": "blueprints/us-equities/nanosecond-replay/README.md",
-    "systemd": "blueprints/us-equities/worker-supervision/README.md"
+    "systemd": "blueprints/us-equities/worker-supervision/README.md",
+    "skfolio": "blueprints/us-equities/research-evaluation/README.md",
+    "edgartools": "blueprints/us-equities/catalyst-provenance/README.md"
   },
   "profiles": [
     {
@@ -139,7 +141,9 @@
         "lean",
         "alpaca-py",
         "pandas",
-        "systemd"
+        "systemd",
+        "skfolio",
+        "edgartools"
       ],
       "recipe_paths": [
         "adoption/sdk/README.md",
@@ -151,7 +155,10 @@
         "blueprints/us-equities/order-contract/README.md",
         "blueprints/us-equities/nanosecond-replay/README.md",
         "blueprints/us-equities/worker-supervision/README.md",
-        "blueprints/us-equities/historical-simulation/README.md"
+        "blueprints/us-equities/historical-simulation/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/catalyst-provenance/README.md",
+        "blueprints/us-equities/simulation-research/README.md"
       ]
     },
     {

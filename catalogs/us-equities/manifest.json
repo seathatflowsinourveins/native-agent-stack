@@ -13,7 +13,7 @@
     "repository_entries": 152,
     "unique_catalog_repositories": 147,
     "models": 20,
-    "public_stars": 337,
+    "public_stars": 342,
     "starred_catalog_repositories": 42,
     "beyond_star_catalog_repositories": 105
   },
@@ -32,13 +32,16 @@
     "blueprints/us-equities/state-recovery/qdrant/receipt.json",
     "blueprints/us-equities/retrieval-evaluation/receipt.json",
     "blueprints/us-equities/convergence-review/receipt.json",
-    "blueprints/us-equities/supply-chain/receipt.json"
+    "blueprints/us-equities/supply-chain/receipt.json",
+    "blueprints/us-equities/research-evaluation/receipt.json",
+    "blueprints/us-equities/catalyst-provenance/receipt.json",
+    "catalogs/us-equities/simulation-data-review.json"
   ],
   "north_star": "blueprints/us-equities/north-star.md",
   "harness_contract": "blueprints/us-equities/harness-contract.json",
   "broader_reference_union": 171,
   "star_audit_file": "catalogs/us-equities/star-audit.json",
-  "grand_index_repositories": 494,
+  "grand_index_repositories": 499,
   "grand_index_beyond_stars": 157,
   "decision_index_file": "catalogs/us-equities/decision-index.json"
 }

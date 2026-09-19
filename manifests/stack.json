@@ -872,7 +872,8 @@
         "native-claude-convergence-review-20260919",
         "native-paired-adoption-20260919",
         "native-architecture-review-20260919",
-        "native-grand-dashboard-20260919"
+        "native-grand-dashboard-20260919",
+        "native-simulation-research-dashboard-20260919"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [
@@ -895,7 +896,8 @@
         "native-observability",
         "native-observability-followup",
         "desktop-restart-acceptance",
-        "native-grand-dashboard-20260919"
+        "native-grand-dashboard-20260919",
+        "native-simulation-research-dashboard-20260919"
       ],
       "source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
       "upstream_sources": [
@@ -1030,7 +1032,8 @@
         "native-research-runtime-20260919",
         "native-paired-adoption-20260919",
         "native-lean-execution-sensitivity-20260919",
-        "native-historical-leverage-stress-20260919"
+        "native-historical-leverage-stress-20260919",
+        "native-chronological-controls-20260919"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1108,13 +1111,57 @@
         "python blueprints/us-equities/nanosecond-replay/replay.py --help"
       ],
       "evidence_ids": [
-        "native-exact-nanosecond-replay-20260919"
+        "native-exact-nanosecond-replay-20260919",
+        "native-chronological-controls-20260919"
       ],
       "profile": "supporting",
       "upstream_sources": [
         "https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.as_unit.html"
       ],
       "freshness": "Already installed version accepted on this Linux/WSL host; no package upgrade."
+    },
+    {
+      "id": "skfolio",
+      "repository": "https://github.com/skfolio/skfolio",
+      "version": "1.2.9",
+      "license": "BSD-3-Clause",
+      "role": "Native chronological splitter accepted for a frozen raw-price control study; portfolio optimizers remain unaccepted",
+      "source_pin": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "commands": [
+        "uv pip sync --python \"$WAVE_DIR/venv/bin/python\" --require-hashes blueprints/us-equities/research-evaluation/requirements.lock",
+        "\"$WAVE_DIR/venv/bin/python\" blueprints/us-equities/research-evaluation/evaluate.py --lean-source \"$LEAN_SOURCE\" --out \"$WAVE_DIR/run-1\""
+      ],
+      "evidence_ids": [
+        "native-chronological-controls-20260919"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://skfolio.org/generated/skfolio.model_selection.WalkForward.html",
+        "https://pypi.org/project/skfolio/1.2.9/"
+      ],
+      "freshness": "Release and native isolated-environment acceptance verified 2026-09-19; no upgrade of working SDK."
+    },
+    {
+      "id": "edgartools",
+      "repository": "https://github.com/dgunning/edgartools",
+      "version": "5.58.0",
+      "license": "MIT",
+      "role": "Native local filing parser and LLM-ready metadata; live SEC acquisition refused and historical availability unaccepted",
+      "source_pin": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+      "commands": [
+        "uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock",
+        "\"$CATALYST_RUNTIME/sdk/bin/python\" blueprints/us-equities/catalyst-provenance/native_edgar.py --help",
+        "\"$CATALYST_RUNTIME/sdk/bin/python\" blueprints/us-equities/catalyst-provenance/native_document.py --help"
+      ],
+      "evidence_ids": [
+        "native-edgartools-catalyst-20260919"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://github.com/dgunning/edgartools",
+        "https://pypi.org/project/edgartools/5.58.0/"
+      ],
+      "freshness": "Isolated 42-package version-pinned Linux/WSL adoption verified 2026-09-19. Offline native parsing accepted; one real SEC request returned403. Dependency wheels are not hash-locked."
     }
   ],
   "profiles": [
@@ -1162,8 +1209,10 @@
         "lean",
         "syft",
         "alpaca-py",
-        "systemd",
-        "pandas"
+      "systemd",
+      "pandas",
+      "skfolio",
+      "edgartools"
       ]
     },
     {

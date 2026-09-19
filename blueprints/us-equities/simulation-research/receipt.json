@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "id": "native-simulation-research-dashboard-20260919",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "grafana",
+    "loki"
+  ],
+  "claim": "The local passwordless Grafana/Loki dashboard presents the reviewed chronological-study and SEC provenance gates from the active research plan. Native query acceptance passed; catalog coverage and upstream worker evidence are linked with explicit acquisition and historical-data limitations.",
+  "limitations": [
+    "This is native local Linux/WSL dashboard observation and evidence integration, not fresh macOS or remote-host acceptance.",
+    "Recorded lane, gate, plan and worker checkpoints are not process heartbeats; emission freshness does not establish source freshness.",
+    "The single observed native SEC request returned HTTP 403. Local parser acceptance does not establish live SEC acquisition or historically available trading data.",
+    "The curated chronological price-label study is not an all-equities mover universe, engine portfolio return or profitable strategy; its reserved segment has now been inspected.",
+    "Public-star discovery covers 342 public repository identities and not private-star inventory; catalog inclusion does not establish installation or exhaustive SOTA coverage.",
+    "No additional native model CLI/SDK inference acceptance run, broker orders, paid data or hosting was performed in this wave. Task-agent inference is not quantified here; provider token savings were not measured.",
+    "Final publication validation belongs to the GitHub workflow for the published commit; this receipt does not preclaim that external CI outcome."
+  ],
+  "recorded_at_utc": "2026-09-19T23:18:28Z",
+  "source_plan": "blueprints/us-equities/simulation-research/plan.json",
+  "child_receipts": [
+    "blueprints/us-equities/research-evaluation/receipt.json",
+    "blueprints/us-equities/catalyst-provenance/receipt.json"
+  ],
+  "native_commands": [
+    {
+      "command": "systemctl --user start ecosystem-research-progress.service",
+      "exit_code": 0,
+      "scope": "Existing local timer/service emits reviewed public-file checkpoints; no broker or model calls."
+    },
+    {
+      "command": "python3 observability/grand-dashboard/acceptance.py --output \"$WAVE_DIR/dashboard-acceptance.json\"",
+      "exit_code": 0,
+      "result": {
+        "native_queries": 10,
+        "successful_queries": 10,
+        "generation_checks": 3,
+        "generation_checks_passed": 3,
+        "completed_at_utc": "2026-09-19T23:13:14Z"
+      }
+    },
+    {
+      "command": "\"$ADOPTED_SDK_PYTHON\" -m unittest discover -s tests -q",
+      "exit_code": 0,
+      "result": {
+        "tests_run": 228,
+        "skipped": 0,
+        "elapsed_seconds": 5.594
+      },
+      "scope": "Integrated offline behavioral suite using the already-adopted SDK environment. No reserved scoring or SEC access rerun."
+    },
+    {
+      "command": "agent-browser --session convergence-viewer open 'http://127.0.0.1:13000/d/research-grand?refresh=30s'",
+      "exit_code": 0,
+      "result": "Existing Grafana dashboard loads without a password form; native scroll-container and table scrolling exposes the study and SEC gate."
+    }
+  ],
+  "dashboard_acceptance_artifact": {
+    "path_hint": "$WAVE_DIR/dashboard-acceptance.json",
+    "bytes": 4168,
+    "sha256": "21e78bc7a8b81d57c8ff64887f99d1eabb7dd32353bcf4cc7d9533d3628668b0",
+    "storage": "Private local observation artifact; compact non-secret results retained above."
+  },
+  "browser_observation": {
+    "route": "http://127.0.0.1:13000/d/research-grand/research-grand-dashboard",
+    "authentication": "Existing anonymous Viewer on loopback; optional Sign in link remains.",
+    "password_fields": 0,
+    "refresh_seconds": 30,
+    "visible_chronological_gate": "selected 0.118407 pct / equal weight 0.162293 pct / price labels",
+    "visible_sec_gate": "native local parsing accepted / SEC HTTP 403 / temporal gate closed",
+    "visible_native_workflow_summary": {
+      "sample_runs": 2,
+      "succeeded": 2,
+      "scope": "Existing bounded workflow history, not a new workflow execution in this wave."
+    }
+  },
+  "bounded_emission": {
+    "worst_case_records": 77,
+    "record_limit": 80,
+    "history_sample_limit": 10,
+    "focused_dashboard_tests": 13
+  },
+  "source_review": {
+    "public_stars": 342,
+    "added_public_stars": 5,
+    "removed_public_stars": 0,
+    "repository_union": 499,
+    "beyond_public_stars": 157,
+    "typed_source_pointers": 1012,
+    "selected_decisions": 12,
+    "adopted_components": 52
+  },
+  "independent_review": {
+    "status": "accepted with supported integration fixes",
+    "evaluation": {
+      "private_artifacts_checked": 42,
+      "selection_hashes_checked": 21,
+      "candidate_records_checked": 6605,
+      "focused_tests": 12
+    },
+    "catalyst": {
+      "native_json_artifacts_checked": 5,
+      "real_fixture_original_hash_checked": true,
+      "focused_tests": 13
+    },
+    "dashboard": {
+      "focused_tests": 13,
+      "path_containment_and_backward_compatibility": true
+    },
+    "integration_fix": "Dated the original 337-star authenticated discovery separately from the latest 342-star public endpoint refresh; corrected current scope and source command."
+  },
+  "access_status": {
+    "interactive_login_needed_now": false,
+    "sec_http403_is_login_prompt": false,
+    "truthful_contact_configured_locally": true,
+    "email_not_invented": true,
+    "future_user_action": "Request sign-in, consent or entitlement only when a dependent native step establishes that it is required; dedicated paper credentials remain deferred."
+  },
+  "continuation_gates": [
+    "Resolve permitted SEC acquisition and verify genuine acceptance/publication/observation clocks before historical catalyst eligibility.",
+    "Acquire and validate as-known security-master, corporate-action, delisted-name and mover-universe coverage within actual entitlements.",
+    "Freeze a new future experiment before examining unused evaluation data; retain the underperforming selected result.",
+    "Reconcile candidate decisions with calibrated execution and native engine accounting before considering the deferred dedicated paper lane."
+  ]
+}

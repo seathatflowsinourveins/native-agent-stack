@@ -159,15 +159,15 @@
       "license": "MIT",
       "us_equities_fit": "10-K/10-Q/8-K, insider filings and 13F can enrich US-company research; CIK is an issuer identifier, not a security/share-class identifier.",
       "alpaca_fit": "Adds research context to a symbol-linked data plane; filing analysis must not directly submit Alpaca orders.",
-      "evidence_level": "source_review",
+      "evidence_level": "native_proven",
       "evidence_refs": [
-        "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md"
+        "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",
+        "blueprints/us-equities/catalyst-provenance/receipt.json"
       ],
       "native_workflow": [
-        "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
-        "python -m pip install 'edgartools==5.58.0'",
-        "# Network to SEC; set a real organization/contact identity privately and obey aggregate rate limits.",
-        "python - <<'PY'\nimport os\nfrom edgar import get_filings, set_identity\nset_identity(os.environ['SEC_IDENTITY'])\nfilings = get_filings(2024, 1, form='10-K')\nprint(filings.head(2))\nPY"
+        "# Native local parser accepted; live SEC metadata request returned403. No acquired historical trading dataset.",
+        "uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock",
+        "# Source the locally configured SEC_CONTACT_ENV; native SDK uses EDGAR_IDENTITY. Follow bounded commands in catalyst-provenance/README.md."
       ],
       "requirements": [
         "Python >=3.10; SEC identifying User-Agent/contact and fair-access controls across all workers.",
@@ -176,7 +176,9 @@
       "limitations": [
         "Company facts can contain later revisions; fiscal period end is not the date a fact became tradable information.",
         "SEC public availability can lag acceptance. Historical downloads today do not prove what an agent actually observed in the past.",
-        "Automated filings parsing requires validation of units, dimensions, duplicate facts and issuer/security mappings."
+        "Automated filings parsing requires validation of units, dimensions, duplicate facts and issuer/security mappings.",
+        "Native5.58.0 acceptance covers two synthetic index members and one real pinned upstream8-K HTML parser; missing acceptance metadata keeps the latter quarantined. Live SEC acquisition remains refused.",
+        "Dependencies are version-frozen in a separate42-package environment, not wheel-hash-locked; new hosts need native acceptance."
       ],
       "sources": [
         "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",

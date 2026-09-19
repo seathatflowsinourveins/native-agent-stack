@@ -2,13 +2,18 @@
 
 **Dated decision catalog: September 19, 2026.** The north star is native, token-efficient research → reproducible backtesting → Alpaca paper automation. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
 
-The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **494 repository identities**, including all 337 public stars and 157 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 988 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
+The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **499 repository identities**, including all 342 public stars and 157 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 1,012 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
 
 The [latest convergence program](../../blueprints/us-equities/convergence-program/README.md)
 adds 36 bounded decisions across foundation, trading/data and hosting, with two
 challenge rounds per matrix. Its [coverage map](../../blueprints/us-equities/convergence-program/coverage.md)
 states the current defaults and open requirements. Native historical simulation
 results and the grand dashboard are linked separately from source-only candidates.
+
+The [next simulation/SEC wave](../../blueprints/us-equities/simulation-research/README.md)
+adds native chronological selection evidence and EdgarTools adoption with explicit
+data-access boundaries. Existing source-only catalog cards gain only the native
+capabilities established by their linked receipts.
 
 The [native acceptance follow-up](../../blueprints/us-equities/acceptance-wave/README.md)
 adds scoped evidence for LEAN, DuckDB and the already installed Alpaca SDK. Its

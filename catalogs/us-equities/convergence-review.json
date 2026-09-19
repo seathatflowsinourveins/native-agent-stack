@@ -70,15 +70,15 @@
   "open_gates": [
     {
       "id": "research-specification",
-      "state": "tracks_selected_numeric_spec_pending",
-      "required": "User selected both daily and intraday, focused on catalyst/incentive-driven potential movers and pre-positioning/early entry. Finalize eligible universe, event hypotheses, intervals, labels, latency/cost and numeric risk/capital/promotion criteria; no strategy is yet accepted.",
+      "state": "curated_control_protocol_executed_catalyst_spec_pending",
+      "required": "User selected both daily and intraday, focused on catalyst/incentive-driven potential movers and pre-positioning/early entry. Finalize eligible universe, event hypotheses, intervals, labels, latency/cost and numeric risk/capital/promotion criteria; no strategy is yet accepted. Subsequent frozen curated ETF price-label control executed20folds/21selections;2021Q1 is now inspected. Catalyst/extreme-mover universe and numeric live promotion remain unaccepted.",
       "evidence": "blueprints/us-equities/acceptance-wave/research-protocol.json"
     },
     {
       "id": "accepted-pit-source",
-      "state": "synthetic_exact_nanosecond_contract_accepted_real_source_pending",
-      "required": "Obtain an entitled source with authenticated availability, adjustment, identifier and historical universe coverage. Native synthetic DuckDB selection, revision timing and integrity passed; SEC403 remains retained without unchanged retry. Exact signed-nanosecond representation and correction/universe replay now pass; actual authenticated source timing remains pending.",
-      "evidence": "blueprints/us-equities/nanosecond-replay/receipt.json"
+      "state": "native_local_parser_accepted_live_sec_refused_pit_pending",
+      "required": "Native EdgarTools5.58.0 local synthetic-index and real upstream8-K parsing accepted; one genuine current SEC metadata request returned403. The real HTML has no acceptance metadata and stays quarantined. Original availability, revisions, historical identifier/universe coverage, issuer-level prices and entitlements remain required; no automatic retry or proxy workaround.",
+      "evidence": "blueprints/us-equities/catalyst-provenance/receipt.json"
     },
     {
       "id": "retrieval-quality",
@@ -172,5 +172,23 @@
     "dashboard": "observability/grand-dashboard/receipt.json",
     "paired_review": "blueprints/us-equities/convergence-program/review-receipt.json",
     "public_star_refresh": "catalogs/us-equities/convergence-program/public-stars-refresh.json"
+  },
+  "simulation_research_followup": {
+    "plan": "blueprints/us-equities/simulation-research/plan.json",
+    "evaluation_receipt": "blueprints/us-equities/research-evaluation/receipt.json",
+    "catalyst_receipt": "blueprints/us-equities/catalyst-provenance/receipt.json",
+    "source_review": "catalogs/us-equities/simulation-data-review.json",
+    "public_stars": 342,
+    "new_public_stars": 5,
+    "development_folds": 20,
+    "frozen_selections": 21,
+    "candidate_records": 6605,
+    "reserved_selection": "momentum20",
+    "selected_underperformed_equalweight": true,
+    "new_lean_engine_execution": false,
+    "live_sec_access": "HTTP403 / unresolved",
+    "paper_orders": 0,
+    "net_provider_savings": null,
+    "scope": "Bounded native APIs/source decisions; no new engine execution, alpha, broker action or universal closure."
   }
 }

@@ -734,30 +734,31 @@
       "role": "Portfolio estimators with chronological validation",
       "decision": "conditional",
       "rationale": "Preferred research module when comparing allocations; explicit WalkForward/CPCV helps make split policy reviewable.",
-      "version_or_commit": "1.2.8",
-      "release_date": "2026-09-16T12:13:24.532236Z",
+      "version_or_commit": "1.2.9; WalkForward source c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "release_date": "2026-09-19T14:45:52.957577Z",
       "license": "BSD-3-Clause",
       "us_equities_fit": "US equities fit through researcher-supplied returns, constraints and dated factor inputs.",
       "alpaca_fit": "No broker execution; weights remain inputs to the order-risk service.",
-      "evidence_level": "source_review",
+      "evidence_level": "native_proven",
       "evidence_refs": [
-        "https://github.com/skfolio/skfolio/blob/v1.2.8/README.rst"
+        "https://github.com/skfolio/skfolio/blob/v1.2.8/README.rst",
+        "blueprints/us-equities/research-evaluation/receipt.json"
       ],
       "native_workflow": [
-        "# Prospective and unexecuted. inspect chronological split indices; choose purge length from actual decision/label horizon.",
-        "python -m pip install skfolio==1.2.8",
-        "python - <<'PY'\nimport pandas as pd\nfrom skfolio.model_selection import WalkForward\nr=pd.read_csv('returns.csv',index_col=0,parse_dates=True)\ncv=WalkForward(train_size=252,test_size=21,purged_size=1)\nfor train,test in cv.split(r):\n    print(r.index[train[-1]],r.index[test[0]],len(test))\nPY"
+        "# Executed only for the bounded chronological raw-price label study; no portfolio optimization or new LEAN engine execution.",
+        "uv pip sync --python \"$WAVE_DIR/venv/bin/python\" --require-hashes blueprints/us-equities/research-evaluation/requirements.lock",
+        "\"$WAVE_DIR/venv/bin/python\" blueprints/us-equities/research-evaluation/evaluate.py --lean-source \"$LEAN_SOURCE\" --out \"$WAVE_DIR/run-1\""
       ],
       "requirements": [
-        "Python >=3.10; use a separate environment for this package.",
-        "At least 274 valid time-ordered observations for the example; explicit split/embargo and execution-delay policy.",
-        "CVXPY and an appropriate solver for later allocation fitting."
+        "Isolated locked environment; this recipe requires Python 3.12 or newer.",
+        "Nine pinned LEAN sample daily/map/factor inputs; frozen session, holding-horizon and selection contract.",
+        "A new evaluation interval for any future untouched-holdout claim; the accepted 2021 segment has now been inspected."
       ],
       "limitations": [
         "WalkForward/CPCV purge and embargo default to zero; installing the library does not prevent leakage.",
         "Fixed observation-count purging must be mapped to overlapping labels and timestamps; retain a final chronological holdout.",
         "Optimization/risk estimates are not pre-trade enforcement or broker reconciliation.",
-        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+        "Native acceptance covers WalkForward and the raw-price control study only; no new engine fills, dividend-inclusive performance, catalyst universe, alpha or broker execution."
       ],
       "sources": [
         "https://github.com/skfolio/skfolio/blob/v1.2.8/README.rst",
@@ -767,7 +768,9 @@
         "https://github.com/skfolio/skfolio/releases/tag/v1.2.8",
         "https://github.com/skfolio/skfolio/blob/v1.2.8/src/skfolio/model_selection/_walk_forward.py",
         "https://github.com/skfolio/skfolio/blob/v1.2.8/src/skfolio/model_selection/_combinatorial.py",
-        "https://skfolio.org/generated/skfolio.optimization.MeanRisk.html"
+        "https://skfolio.org/generated/skfolio.optimization.MeanRisk.html",
+        "https://pypi.org/pypi/skfolio/1.2.9/json",
+        "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/src/skfolio/model_selection/_walk_forward.py"
       ]
     },
     {

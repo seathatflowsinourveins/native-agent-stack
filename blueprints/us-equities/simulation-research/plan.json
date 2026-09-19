@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "simulation-research-wave-20260919",
+  "base_commit": "ec04758554a3264a30b94f6389163f6828567a47",
+  "recorded_date": "2026-09-19",
+  "objective": "Advance causal historical evaluation and native SEC catalyst provenance using the existing research stack, then publish reviewed evidence and dashboard checkpoints.",
+  "user_direction": "Continue the next goal; resolve SEC practice independently using EdgarTools and related starred repositories; historical simulation remains active and paper is deferred.",
+  "scope": {
+    "market_universe": "SPY, QQQ and IWM are a curated engine sample control, not a historical all-equities or extreme-mover universe.",
+    "development": "2015 through 2020, including the previously inspected SPY crash interval.",
+    "reserved_segment": "2021-01-04 through 2021-03-31 is reserved within the new experiment, not asserted globally unseen.",
+    "catalyst": "Bounded native EdgarTools filing acquisition/provenance; source acceptance and first observation remain distinct.",
+    "broker_orders": false,
+    "paid_resources": false,
+    "automatic_live_promotion": false
+  },
+  "waves": [
+    {
+      "id": "primary_source_review",
+      "state": "completed",
+      "purpose": "Compare current primary APIs, data coverage, native tools and relevant starred sources."
+    },
+    {
+      "id": "chronological_evaluation",
+      "state": "completed / native label study",
+      "purpose": "Freeze candidate controls and intervals, use native chronological splitting, reject label leakage and retain all outcomes."
+    },
+    {
+      "id": "sec_catalyst_provenance",
+      "state": "offline native accepted / live SEC refused",
+      "purpose": "Install selected upstream EdgarTools, test actual bounded access and retain immutable source/availability evidence."
+    },
+    {
+      "id": "independent_review_publication",
+      "state": "reviewed locally / publication tracked by GitHub CI",
+      "purpose": "Resolve supported findings, update catalog/adoption/evidence/dashboard and verify published-commit CI."
+    }
+  ],
+  "acceptance": [
+    "Freeze protocol before examining reserved-segment outcomes; preserve plan/input/output hashes.",
+    "All assets for a session stay together; training selection never reads validation or reserved labels.",
+    "Native splitter gap is independently checked against actual future label intervals.",
+    "Costs, corporate actions, next-session timing and sample limitations remain explicit; signal returns are not broker returns.",
+    "SEC identity is truthful, requests are bounded, failures are retained and retries do not bypass an access refusal.",
+    "No past historical eligibility is inferred from a present-day filing download or current symbol mapping.",
+    "Every adoption has a concrete need, source pin, native command result and platform/account scope.",
+    "Independent review and required repository checks pass before publication."
+  ],
+  "continuation": "After this bounded wave, prioritize entitled historical security-master/corporate-action/catalyst data and calibrated execution; do not promote a best sample control into live trading.",
+  "results": {
+    "evaluation_receipt": "blueprints/us-equities/research-evaluation/receipt.json",
+    "catalyst_receipt": "blueprints/us-equities/catalyst-provenance/receipt.json",
+    "source_review": "catalogs/us-equities/simulation-data-review.json",
+    "public_stars": 342,
+    "new_public_stars": 5,
+    "development_folds": 20,
+    "frozen_selections": 21,
+    "candidate_records": 6605,
+    "reserved_selection": "momentum20",
+    "selected_underperformed_equalweight": true,
+    "new_lean_engine_execution": false,
+    "live_sec_access": "HTTP403 / unresolved",
+    "paper_orders": 0,
+    "net_provider_savings": null
+  }
+}

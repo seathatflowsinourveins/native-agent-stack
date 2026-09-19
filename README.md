@@ -6,8 +6,8 @@ A current, evidence-backed reference for native **Codex + Claude Code**, with sc
 
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
-and an auditable **337-star coverage ledger**. Its combined index includes
-**494 repository identities** across all 337 public stars and 157 beyond them,
+and an auditable **342-star coverage ledger**. Its combined index includes
+**499 repository identities** across all 342 public stars and 157 beyond them,
 with typed, validated pointers to decisions and evidence. The latest
 [architecture research wave](catalogs/us-equities/architecture/README.md) adds
 source reviews, awesome-list coverage and official Alpaca constraints.
@@ -22,6 +22,11 @@ lifecycle, exact-nanosecond replay, process-tree supervision and a fresh hosted
 Astra/Claude review. The [grand dashboard](observability/grand-dashboard/README.md)
 shows telemetry, research decisions and lane readiness. The user's current
 priority is historical simulation/backtesting; dedicated paper setup follows.
+
+The subsequent [simulation and SEC wave](blueprints/us-equities/simulation-research/README.md)
+adds frozen chronological control evaluation and native EdgarTools provenance
+work. Price-label results, actual engine execution, filing parsing and live SEC
+access are recorded separately; follow the receipts before adopting a capability.
 
 The latest [native acceptance wave](blueprints/us-equities/acceptance-wave/README.md)
 adds LEAN cost sensitivity, synthetic DuckDB temporal selection and an offline

@@ -1,6 +1,13 @@
 # Public-star decision audit
 
-Checked **2026-09-19**. The refreshed native GitHub listing contains **337 public repositories**, unchanged from the earlier snapshot. No private repositories were returned. Every public star now has an explicit disposition in [star-audit.json](star-audit.json).
+Checked **2026-09-19**. The latest native GitHub listing contains **342 public repositories**, five additions since the earlier 337-row snapshot. The public endpoint does not inventory private stars. Every public star has an explicit disposition in [star-audit.json](star-audit.json).
+
+The [simulation/data follow-up](simulation-data-review.md) records the five new
+README/license reviews: Storybloq, Nexting, Mole, Clash Verge Rev and awesome-mac.
+Their roles cover memory/workflows, remote operation, macOS maintenance, network
+clients and discovery. None was installed by this research wave. Combined counts
+are 291 source dispositions, 51 retained prior records and zero undecided stars;
+the tables below preserve the earlier audit's counts and provenance.
 
 This closes the **unassessed-star decision gap**. It does not certify that every repository is secure, maintained, compatible, installed or useful, and it does not establish an exhaustive list of everything beyond the stars. Source review cannot prove strategy returns, broker behavior or token savings.
 
