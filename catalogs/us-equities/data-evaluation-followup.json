@@ -1,0 +1,485 @@
+{
+  "observed_at_utc": "2026-09-19T18:27:14.770941+00:00",
+  "public_stars": 337,
+  "pages": 4,
+  "public_star_sha256": "c3e3abcfa39c36dbb5b86c6917c1b9807376034be83095c1664314d408a02cd1",
+  "renames": [
+    {
+      "from": "huangruiteng/loopx",
+      "to": "loopx-project/loopx",
+      "github_id": 1255217938,
+      "same_identity_verified": true
+    },
+    {
+      "from": "iterative/dvc",
+      "to": "treeverse/dvc",
+      "github_id": 83878269,
+      "same_identity_verified": true
+    }
+  ],
+  "indexed_identities_before": 453,
+  "new_public_star_identities": 0,
+  "entries": [
+    {
+      "repository": "dgunning/edgartools",
+      "pin": "e23d04eba952e70310c0f62402f4c2523f9a44bf",
+      "date": "2026-09-17T10:29:27Z",
+      "license": "MIT",
+      "wave": 1,
+      "reviewed_paths": [
+        "edgar/settings.py",
+        "edgar/httpclient.py",
+        "edgar/httprequests.py"
+      ],
+      "source_urls": [
+        "https://github.com/dgunning/edgartools/blob/e23d04eba952e70310c0f62402f4c2523f9a44bf/edgar/settings.py",
+        "https://github.com/dgunning/edgartools/blob/e23d04eba952e70310c0f62402f4c2523f9a44bf/edgar/httpclient.py",
+        "https://github.com/dgunning/edgartools/blob/e23d04eba952e70310c0f62402f4c2523f9a44bf/edgar/httprequests.py"
+      ],
+      "gap_addressed": "Structured filing/XBRL parsing and explicit SEC identity/transport handling",
+      "limitations": "Existing catalog; cannot supply a missing contact, make 403 disappear, or reconstruct historical knowledge. Network retry/cache policy needs explicit review.",
+      "prospective_upstream_acceptance_command": "python -m pytest tests/issues/regression/test_07lk121_settings_extraction.py -q",
+      "acceptance_executed": false,
+      "decision": "hold_access_prerequisite",
+      "catalog_status": "already_indexed",
+      "license_evidence": "GitHub repository SPDX metadata at discovery; existing source/license records where available. Unknown is retained as null, not inferred."
+    },
+    {
+      "repository": "unionai-oss/pandera",
+      "pin": "1c9a139436ae2657dd2cb100655b84138d7da443",
+      "date": "2026-09-14T13:20:29Z",
+      "license": "MIT",
+      "wave": 1,
+      "reviewed_paths": [
+        "pandera/api/pandas/container.py",
+        "pandera/backends/pandas/container.py"
+      ],
+      "source_urls": [
+        "https://github.com/unionai-oss/pandera/blob/1c9a139436ae2657dd2cb100655b84138d7da443/pandera/api/pandas/container.py",
+        "https://github.com/unionai-oss/pandera/blob/1c9a139436ae2657dd2cb100655b84138d7da443/pandera/backends/pandas/container.py"
+      ],
+      "gap_addressed": "Reusable dataframe schema/unit/uniqueness contract and aggregated failures",
+      "limitations": "Existing catalog; strict=False and coerce=False defaults require deliberate settings. Schema correctness does not prove data provenance or temporal availability.",
+      "prospective_upstream_acceptance_command": "python -m pytest tests/polars/test_polars_container.py -q",
+      "acceptance_executed": false,
+      "decision": "conditional_existing_candidate",
+      "catalog_status": "already_indexed",
+      "license_evidence": "GitHub repository SPDX metadata at discovery; existing source/license records where available. Unknown is retained as null, not inferred."
+    },
+    {
+      "repository": "skfolio/skfolio",
+      "pin": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "date": "2026-09-19T14:45:36Z",
+      "license": "BSD-3-Clause",
+      "wave": 1,
+      "reviewed_paths": [
+        "src/skfolio/model_selection/_walk_forward.py",
+        "src/skfolio/model_selection/_combinatorial.py"
+      ],
+      "source_urls": [
+        "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/src/skfolio/model_selection/_walk_forward.py",
+        "https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/src/skfolio/model_selection/_combinatorial.py"
+      ],
+      "gap_addressed": "Chronological walk-forward and purge/embargo evaluation for a declared horizon",
+      "limitations": "Existing catalog; purged_size defaults to 0. CPCV uses row-count gaps, not event-end intervals. Can train on later folds; not a substitute for final chronological holdout or PIT data.",
+      "prospective_upstream_acceptance_command": "python -m pytest tests/test_model_selection/test_walk_forward.py tests/test_model_selection/test_combinatorial.py -q",
+      "acceptance_executed": false,
+      "decision": "first_evaluation_candidate",
+      "catalog_status": "already_indexed",
+      "license_evidence": "GitHub repository SPDX metadata at discovery; existing source/license records where available. Unknown is retained as null, not inferred."
+    },
+    {
+      "repository": "xbtlin/ai-berkshire",
+      "pin": "d608cf3c900f05f072415fe39d503393cf5edc8e",
+      "date": "2026-09-19T17:42:30Z",
+      "license": "MIT",
+      "wave": 1,
+      "reviewed_paths": [
+        "tools/report_audit.py",
+        "tools/financial_rigor.py",
+        "tests/test_report_audit.py",
+        "scripts/install-codex-skills.sh"
+      ],
+      "source_urls": [
+        "https://github.com/xbtlin/ai-berkshire/blob/d608cf3c900f05f072415fe39d503393cf5edc8e/tools/report_audit.py",
+        "https://github.com/xbtlin/ai-berkshire/blob/d608cf3c900f05f072415fe39d503393cf5edc8e/tools/financial_rigor.py",
+        "https://github.com/xbtlin/ai-berkshire/blob/d608cf3c900f05f072415fe39d503393cf5edc8e/tests/test_report_audit.py",
+        "https://github.com/xbtlin/ai-berkshire/blob/d608cf3c900f05f072415fe39d503393cf5edc8e/scripts/install-codex-skills.sh"
+      ],
+      "gap_addressed": "Deterministic sampled report-number extraction and independent checking patterns",
+      "limitations": "Existing star/index; report extraction converts to float and defaults to 15% sampling/cap 30. Installer removes existing same-name skill directories. Not authoritative exact-decimal/full-claim validation or native data ingestion.",
+      "prospective_upstream_acceptance_command": "python tests/test_report_audit.py",
+      "acceptance_executed": false,
+      "decision": "select_patterns_no_installer",
+      "catalog_status": "already_indexed",
+      "license_evidence": "GitHub repository SPDX metadata at discovery; existing source/license records where available. Unknown is retained as null, not inferred."
+    },
+    {
+      "repository": "virattt/dexter",
+      "pin": "ecaed3011f24ea24ef687ab536aa7f22f7294038",
+      "date": "2026-08-04T15:19:48Z",
+      "license": null,
+      "wave": 1,
+      "reviewed_paths": [
+        "src/tools/finance/api.ts",
+        "src/evals/evaluator.ts",
+        "package.json"
+      ],
+      "source_urls": [
+        "https://github.com/virattt/dexter/blob/ecaed3011f24ea24ef687ab536aa7f22f7294038/src/tools/finance/api.ts",
+        "https://github.com/virattt/dexter/blob/ecaed3011f24ea24ef687ab536aa7f22f7294038/src/evals/evaluator.ts",
+        "https://github.com/virattt/dexter/blob/ecaed3011f24ea24ef687ab536aa7f22f7294038/package.json"
+      ],
+      "gap_addressed": "Agent research rubric/evaluation patterns and financial tool routing",
+      "limitations": "Existing star/index; FinancialDatasets key entitlement, extra model-judge calls, Playwright postinstall, unknown repository SPDX. Overlaps existing native worker; no free/PIT/quality guarantee.",
+      "prospective_upstream_acceptance_command": "bun test src/evals/evaluator.test.ts",
+      "acceptance_executed": false,
+      "decision": "do_not_adopt_extra_framework",
+      "catalog_status": "already_indexed",
+      "license_evidence": "GitHub repository SPDX metadata at discovery; existing source/license records where available. Unknown is retained as null, not inferred."
+    },
+    {
+      "repository": "treeverse/dvc",
+      "pin": "56e59829512ff134aa269099a2099587b810b4dd",
+      "date": "2026-08-06T04:17:40Z",
+      "license": "Apache-2.0",
+      "wave": 1,
+      "reviewed_paths": [
+        "dvc/stage/serialize.py",
+        "dvc/commands/repro.py"
+      ],
+      "source_urls": [
+        "https://github.com/treeverse/dvc/blob/56e59829512ff134aa269099a2099587b810b4dd/dvc/stage/serialize.py",
+        "https://github.com/treeverse/dvc/blob/56e59829512ff134aa269099a2099587b810b4dd/dvc/commands/repro.py"
+      ],
+      "gap_addressed": "Dataset/parameter dependency graph and reproducible lock identity",
+      "limitations": "Existing beyond-star identity now treeverse/dvc; repeated identity ID 83878269. Current hash receipts already cover small workflow. Hashes do not establish PIT or data entitlement; dry-run is not execution.",
+      "prospective_upstream_acceptance_command": "python -m pytest tests/unit/stage/test_serialize_pipeline_lock.py -q; dvc repro --dry",
+      "acceptance_executed": false,
+      "decision": "later_when_dataset_branches_grow",
+      "catalog_status": "already_indexed",
+      "license_evidence": "GitHub repository SPDX metadata at discovery; existing source/license records where available. Unknown is retained as null, not inferred."
+    },
+    {
+      "repository": "eslazarev/purged-cross-validation",
+      "pin": "f742966834457b9b6e6c49f4498d8d6c86872223",
+      "date": "2026-09-04T06:57:50Z",
+      "license": "MIT",
+      "wave": 2,
+      "reviewed_paths": [
+        "src/purgedcv/_purge.py",
+        "src/purgedcv/_intervals.py",
+        "tests/test_purge_embargo_properties.py",
+        "pyproject.toml"
+      ],
+      "source_urls": [
+        "https://github.com/eslazarev/purged-cross-validation/blob/f742966834457b9b6e6c49f4498d8d6c86872223/src/purgedcv/_purge.py",
+        "https://github.com/eslazarev/purged-cross-validation/blob/f742966834457b9b6e6c49f4498d8d6c86872223/src/purgedcv/_intervals.py",
+        "https://github.com/eslazarev/purged-cross-validation/blob/f742966834457b9b6e6c49f4498d8d6c86872223/tests/test_purge_embargo_properties.py",
+        "https://github.com/eslazarev/purged-cross-validation/blob/f742966834457b9b6e6c49f4498d8d6c86872223/pyproject.toml"
+      ],
+      "gap_addressed": "Event-time interval purge/embargo with property-testable leakage invariants",
+      "limitations": "New beyond-index candidate, same known evaluation category; small 0.1.6 project requires local independent acceptance. Distribution/import purgedcv collides with landtml implementation. Half-open interval convention must match label definition.",
+      "prospective_upstream_acceptance_command": "python -m pytest tests/test_purge_embargo_properties.py tests/test_walk_forward.py -q",
+      "acceptance_executed": false,
+      "decision": "conditional_variable_horizon_alternative",
+      "catalog_status": "uncatalogued_discovery_only",
+      "license_evidence": "GitHub repository SPDX metadata at discovery; existing source/license records where available. Unknown is retained as null, not inferred."
+    },
+    {
+      "repository": "landtml/purgedcv",
+      "pin": "aee3396422192d18bc30d376dfe9e31b2399abab",
+      "date": "2026-08-12T21:11:09Z",
+      "license": "MIT",
+      "wave": 2,
+      "reviewed_paths": [
+        "src/purgedcv/_splitter.py",
+        "tests/test_cpcv.py",
+        "verify_leakage.py",
+        "pyproject.toml"
+      ],
+      "source_urls": [
+        "https://github.com/landtml/purgedcv/blob/aee3396422192d18bc30d376dfe9e31b2399abab/src/purgedcv/_splitter.py",
+        "https://github.com/landtml/purgedcv/blob/aee3396422192d18bc30d376dfe9e31b2399abab/tests/test_cpcv.py",
+        "https://github.com/landtml/purgedcv/blob/aee3396422192d18bc30d376dfe9e31b2399abab/verify_leakage.py",
+        "https://github.com/landtml/purgedcv/blob/aee3396422192d18bc30d376dfe9e31b2399abab/pyproject.toml"
+      ],
+      "gap_addressed": "Alternative event-end CPCV and independent interval checks",
+      "limitations": "New beyond-index alternative; same purgedcv package/import name as eslazarev. verify_leakage.py downloads external market data and is not an offline/no-entitlement acceptance. One alternative only; no new operational category.",
+      "prospective_upstream_acceptance_command": "python -m pytest tests/test_cpcv.py tests/test_sklearn.py -q",
+      "acceptance_executed": false,
+      "decision": "alternative_not_additional_stack",
+      "catalog_status": "uncatalogued_discovery_only",
+      "license_evidence": "GitHub repository SPDX metadata at discovery; existing source/license records where available. Unknown is retained as null, not inferred."
+    }
+  ],
+  "waves": [
+    {
+      "wave": 1,
+      "repositories": 6,
+      "categories": [
+        "SEC/PIT acquisition",
+        "data contracts",
+        "temporal evaluation",
+        "report provenance",
+        "dataset versioning"
+      ]
+    },
+    {
+      "wave": 2,
+      "repositories": 2,
+      "new_actionable_categories": 0,
+      "new_implementation_alternatives": 2
+    }
+  ],
+  "bounded_saturation": "Within the two explicit discovery waves, second-wave projects duplicate the existing temporal-evaluation category. This is not a universal or permanent completeness claim.",
+  "top_actions": [
+    "Resolve honest SEC identity/access prerequisite without bypassing403; no replacement repository closes missing source evidence.",
+    "Use existing skfolio first for a declared horizon/chronological holdout; shortlist exactly one interval-aware purgedcv alternative only if variable-duration event labels require it."
+  ],
+  "no_installation_or_model_calls": true,
+  "no_sec_or_broker_requests": true,
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "kind": "upstream_provenance",
+  "scope": "Read-only public-star identity refresh and selected primary-source review of eight data/research-evaluation repositories over two bounded discovery waves. No new native acceptance.",
+  "historical_base_commit": "bfd03bc",
+  "source_review_extent": "29 source/configuration/test files downloaded at immutable commit pins; selected definitions, control flow, defaults, package metadata, tests and command entrypoints inspected. Not whole-repository or full-file security review.",
+  "native_discovery_commands": [
+    "gh api --paginate --slurp \"user/starred?sort=created&direction=desc&per_page=100\"",
+    "gh api \"repos/$REPOSITORY\"",
+    "gh api \"repos/$REPOSITORY/commits/$DEFAULT_BRANCH\"",
+    "gh api \"repos/$REPOSITORY/git/trees/$COMMIT?recursive=1\"",
+    "gh api -H \"Accept: application/vnd.github.raw+json\" \"repos/$REPOSITORY/contents/$SOURCE_PATH?ref=$COMMIT\""
+  ],
+  "acceptance_command_scope": "All candidate acceptance commands are prospective and unexecuted in this review. They require an isolated checkout at the recorded pin and its declared development dependencies. Offline test source paths are not proof the full upstream test environment has no external activity.",
+  "catalog_identity_effect": {
+    "prior_grand_index": 453,
+    "current_grand_index": 453,
+    "new_public_star_identities": 0,
+    "raw_star_names_added": [
+      "loopx-project/loopx"
+    ],
+    "raw_star_names_removed": [
+      "huangruiteng/loopx"
+    ],
+    "interpretation": "LoopX transfer preserves repository identity. DVC was already canonicalized in the catalog; its old/new API routes were independently verified to resolve to the same immutable repository ID.",
+    "uncatalogued_discovery_only": [
+      "eslazarev/purged-cross-validation",
+      "landtml/purgedcv"
+    ],
+    "uncatalogued_candidates_added_to_index": false
+  },
+  "reviewed_file_manifest": [
+    {
+      "repository": "dgunning/edgartools",
+      "commit": "e23d04eba952e70310c0f62402f4c2523f9a44bf",
+      "path": "edgar/core.py",
+      "sha256": "a3ac193d1b295925b8ca4f44b50f8b1dcf45699f3f64b9ee2f3ab21fd8a5b228",
+      "bytes": 16520
+    },
+    {
+      "repository": "dgunning/edgartools",
+      "commit": "e23d04eba952e70310c0f62402f4c2523f9a44bf",
+      "path": "edgar/httpclient.py",
+      "sha256": "63675da6f438d5e06422882a07b20802eded59a944a8357242969b53d7876ecc",
+      "bytes": 22754
+    },
+    {
+      "repository": "dgunning/edgartools",
+      "commit": "e23d04eba952e70310c0f62402f4c2523f9a44bf",
+      "path": "edgar/httprequests.py",
+      "sha256": "d1d6b54f3388b7540503717a0f380ed677610afe7d254525535c14f850463322",
+      "bytes": 59585
+    },
+    {
+      "repository": "dgunning/edgartools",
+      "commit": "e23d04eba952e70310c0f62402f4c2523f9a44bf",
+      "path": "edgar/settings.py",
+      "sha256": "b325d56442f92f7d6957c045df22342229e4f0daa2665916db37ee62c11f1848",
+      "bytes": 6391
+    },
+    {
+      "repository": "eslazarev/purged-cross-validation",
+      "commit": "f742966834457b9b6e6c49f4498d8d6c86872223",
+      "path": "pyproject.toml",
+      "sha256": "343d9b8af210bb55f7c2c50351d54578821da070b8d4d1ae387b2ff3cf7ae8c5",
+      "bytes": 3783
+    },
+    {
+      "repository": "eslazarev/purged-cross-validation",
+      "commit": "f742966834457b9b6e6c49f4498d8d6c86872223",
+      "path": "src/purgedcv/_intervals.py",
+      "sha256": "bbf6ebf566721a98a1a50c24d74cc31361d550441f26a0072a2139149dc45c28",
+      "bytes": 4067
+    },
+    {
+      "repository": "eslazarev/purged-cross-validation",
+      "commit": "f742966834457b9b6e6c49f4498d8d6c86872223",
+      "path": "src/purgedcv/_purge.py",
+      "sha256": "95cedcda9958883d2eec7e9fba84b0a29e6c4d009632881a0f760681ed17646d",
+      "bytes": 3195
+    },
+    {
+      "repository": "eslazarev/purged-cross-validation",
+      "commit": "f742966834457b9b6e6c49f4498d8d6c86872223",
+      "path": "tests/test_purge_embargo_properties.py",
+      "sha256": "a93bb611917a0d2e5bf7d4fa2d821b2515707395c9d9217ed5cde0cff7bd2789",
+      "bytes": 8757
+    },
+    {
+      "repository": "treeverse/dvc",
+      "commit": "56e59829512ff134aa269099a2099587b810b4dd",
+      "path": "dvc/commands/repro.py",
+      "sha256": "845cc9afd0e6ba02ba2d322a3ba880d634ca778ccd15647a67c86687cb9eefcd",
+      "bytes": 5728
+    },
+    {
+      "repository": "treeverse/dvc",
+      "commit": "56e59829512ff134aa269099a2099587b810b4dd",
+      "path": "dvc/stage/serialize.py",
+      "sha256": "e855fc26150b8d29591ae3eb0f085f6656926dabe8c8b563cec324ebcfcfc3f9",
+      "bytes": 7260
+    },
+    {
+      "repository": "treeverse/dvc",
+      "commit": "56e59829512ff134aa269099a2099587b810b4dd",
+      "path": "pyproject.toml",
+      "sha256": "7c9a77d69f45b5d260c374c49132cb60439cb1e5d19c739987c693beba92b9ac",
+      "bytes": 8705
+    },
+    {
+      "repository": "landtml/purgedcv",
+      "commit": "aee3396422192d18bc30d376dfe9e31b2399abab",
+      "path": "pyproject.toml",
+      "sha256": "957d13994cb37e149cd4295a69b756c2b50b420ad3cf4d44d3019f941a3db392",
+      "bytes": 1206
+    },
+    {
+      "repository": "landtml/purgedcv",
+      "commit": "aee3396422192d18bc30d376dfe9e31b2399abab",
+      "path": "src/purgedcv/_splitter.py",
+      "sha256": "6b9879d7a50d4e833f7fa517b5892bfc6f018e97089bfaaf6b3684045c7432e3",
+      "bytes": 24874
+    },
+    {
+      "repository": "landtml/purgedcv",
+      "commit": "aee3396422192d18bc30d376dfe9e31b2399abab",
+      "path": "tests/test_cpcv.py",
+      "sha256": "410e41242a384d1fa6f59639ec07d93d82e735fc6fbfff337a0df769c2acc9f6",
+      "bytes": 24679
+    },
+    {
+      "repository": "landtml/purgedcv",
+      "commit": "aee3396422192d18bc30d376dfe9e31b2399abab",
+      "path": "verify_leakage.py",
+      "sha256": "16d8312ec97d504481057da60ea528920ea3757df0b3eeac62a52ffa8cedfd2e",
+      "bytes": 9174
+    },
+    {
+      "repository": "skfolio/skfolio",
+      "commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "path": "pyproject.toml",
+      "sha256": "b913fb2b6780603c3f02bf7bd05b96b6a239f2b6045cecf6c36897630e1fef84",
+      "bytes": 6106
+    },
+    {
+      "repository": "skfolio/skfolio",
+      "commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "path": "src/skfolio/model_selection/_combinatorial.py",
+      "sha256": "3979268f2274dc991679c1307138409fe7d33fbe6c9b4c73446e8a591240cbd7",
+      "bytes": 20963
+    },
+    {
+      "repository": "skfolio/skfolio",
+      "commit": "c99fcf71349e2df4a7a1033ee85ca2e9ced9abee",
+      "path": "src/skfolio/model_selection/_walk_forward.py",
+      "sha256": "f85cbe8b5a3ff4705a7ab6d35eacdbfafc11b09ec3cc1458fd4a2cf98c563397",
+      "bytes": 24745
+    },
+    {
+      "repository": "unionai-oss/pandera",
+      "commit": "1c9a139436ae2657dd2cb100655b84138d7da443",
+      "path": "pandera/api/pandas/container.py",
+      "sha256": "3d12c96884bbe6c1f77688671c908671a1ec942be09730a09a15d03cb691fa6e",
+      "bytes": 14147
+    },
+    {
+      "repository": "unionai-oss/pandera",
+      "commit": "1c9a139436ae2657dd2cb100655b84138d7da443",
+      "path": "pandera/backends/pandas/container.py",
+      "sha256": "70d4dc6f59ac2dce5c827c1aac60a57b8334bda90966ac95c6c1d740385eae5f",
+      "bytes": 36696
+    },
+    {
+      "repository": "unionai-oss/pandera",
+      "commit": "1c9a139436ae2657dd2cb100655b84138d7da443",
+      "path": "pyproject.toml",
+      "sha256": "30cb9310adad8d0ea1465f151e484236c5cb241637e4c561a2e715bcf3890ccb",
+      "bytes": 4575
+    },
+    {
+      "repository": "virattt/dexter",
+      "commit": "ecaed3011f24ea24ef687ab536aa7f22f7294038",
+      "path": "package.json",
+      "sha256": "842fc69f9ce394bb87ea7e0de967761548aa3a6ca674e2161012d417cc825d9f",
+      "bytes": 1730
+    },
+    {
+      "repository": "virattt/dexter",
+      "commit": "ecaed3011f24ea24ef687ab536aa7f22f7294038",
+      "path": "src/evals/evaluator.ts",
+      "sha256": "a621782f649effdcfd2b0348685a197988d3b04ac6f56ba8a760ffc246e155e6",
+      "bytes": 4697
+    },
+    {
+      "repository": "virattt/dexter",
+      "commit": "ecaed3011f24ea24ef687ab536aa7f22f7294038",
+      "path": "src/tools/finance/api.ts",
+      "sha256": "b6dd3f8974a340d95ca409b7bca38f1ad64570ef0e96f8f79ca5643357144976",
+      "bytes": 5655
+    },
+    {
+      "repository": "xbtlin/ai-berkshire",
+      "commit": "d608cf3c900f05f072415fe39d503393cf5edc8e",
+      "path": "scripts/install-codex-skills.sh",
+      "sha256": "2a41c5353a42323faa8d825667e66224c6bed14317f2d6063d8b372edd2bc600",
+      "bytes": 609
+    },
+    {
+      "repository": "xbtlin/ai-berkshire",
+      "commit": "d608cf3c900f05f072415fe39d503393cf5edc8e",
+      "path": "tests/test_financial_rigor.py",
+      "sha256": "1ee71d46284f70e67091ebd0d86b9b83a507cd84fbc27f221528c9dfb8c7fc50",
+      "bytes": 4829
+    },
+    {
+      "repository": "xbtlin/ai-berkshire",
+      "commit": "d608cf3c900f05f072415fe39d503393cf5edc8e",
+      "path": "tests/test_report_audit.py",
+      "sha256": "ca94e6ed9f7f46768b8f1c63926f39f4fb97e1c1cd01616899f5f4f39601a08d",
+      "bytes": 6465
+    },
+    {
+      "repository": "xbtlin/ai-berkshire",
+      "commit": "d608cf3c900f05f072415fe39d503393cf5edc8e",
+      "path": "tools/financial_rigor.py",
+      "sha256": "dee5c9de8c2dd71f1fd1cd7467dda6e5315ffa98132b82ce393b3e3e8c74fce7",
+      "bytes": 17844
+    },
+    {
+      "repository": "xbtlin/ai-berkshire",
+      "commit": "d608cf3c900f05f072415fe39d503393cf5edc8e",
+      "path": "tools/report_audit.py",
+      "sha256": "8848c1f4db06cd7145c519161d15e895ce14b39a437bd8859b72ba74b94b7e7b",
+      "bytes": 22091
+    }
+  ],
+  "limitations": [
+    "Two bounded discovery waves are not a universal or permanent completeness guarantee.",
+    "No installation, new model inference, candidate tests, broker calls, SEC retries, paid compute or private-star publication.",
+    "Current source metadata/pins are not performance evidence; optional upstream acceptance commands remain unexecuted.",
+    "The two purgedcv alternatives remain uncatalogued discovery leads and are not simultaneously installable interchangeable APIs.",
+    "Raw public metadata and selected source files remain private operational research artifacts; only summarized findings and integrity metadata are published."
+  ]
+}

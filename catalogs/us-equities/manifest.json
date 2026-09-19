@@ -22,7 +22,8 @@
     "catalogs/us-equities/research-receipt.json",
     "catalogs/us-equities/retrieval-receipt.json",
     "catalogs/us-equities/verification.json",
-    "catalogs/us-equities/source-followup-receipt.json"
+    "catalogs/us-equities/source-followup-receipt.json",
+    "catalogs/us-equities/data-evaluation-followup.json"
   ],
   "north_star": "blueprints/us-equities/north-star.md",
   "harness_contract": "blueprints/us-equities/harness-contract.json",

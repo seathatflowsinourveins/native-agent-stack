@@ -825,7 +825,7 @@
       "prior_candidate_decision": false
     },
     {
-      "repository": "https://github.com/huangruiteng/loopx",
+      "repository": "https://github.com/loopx-project/loopx",
       "disposition": "no_catalog_card",
       "catalog_entry_ids": [],
       "prior_candidate_decision": false
@@ -2756,18 +2756,25 @@
     "great-expectations/great_expectations": "fivetran/great_expectations",
     "dagu-org/dagu": "dagucloud/dagu",
     "zed-industries/codex-acp": "agentclientprotocol/codex-acp",
-    "polygon-io/client-python": "massive-com/client-python"
+    "polygon-io/client-python": "massive-com/client-python",
+    "huangruiteng/loopx": "loopx-project/loopx"
   },
   "latest_public_refresh": {
     "checked_at": "2026-09-19",
-    "endpoint": "GET /users/{account}/starred?sort=created&direction=desc&per_page=100 (paginated; account omitted)",
+    "endpoint": "GET /user/starred?sort=created&direction=desc&per_page=100 (all four pages; signed-in account omitted)",
     "public_flag_filter": "private == false",
     "public_repositories": 337,
     "added_since_recorded_snapshot": 0,
     "removed_since_recorded_snapshot": 0,
-    "public_set_sha256": "aa8458fd3838d4a2cd72cd9abd13027274be81d15f11883fdac94682ac561c50",
-    "hash_method": "Lowercase public owner/repository identities sorted, joined with newline and one final newline; SHA-256.",
-    "scope": "Fresh identity comparison only; prior per-repository source review and runtime evidence were not repeated.",
-    "source_receipt": "catalogs/us-equities/source-followup-receipt.json"
+    "raw_names_added": [
+      "loopx-project/loopx"
+    ],
+    "raw_names_removed": [
+      "huangruiteng/loopx"
+    ],
+    "public_set_sha256": "c3e3abcfa39c36dbb5b86c6917c1b9807376034be83095c1664314d408a02cd1",
+    "hash_method": "Lowercase current public owner/repository names sorted, joined with newline and one final newline; SHA-256. Raw names change on a repository transfer.",
+    "scope": "Fresh identity comparison with immutable GitHub ID verification for the changed name; prior source reviews and native executions were not repeated.",
+    "source_receipt": "catalogs/us-equities/data-evaluation-followup.json"
   }
 }

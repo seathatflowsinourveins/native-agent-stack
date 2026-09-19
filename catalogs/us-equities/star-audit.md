@@ -4,6 +4,8 @@ Checked **2026-09-19**. The refreshed native GitHub listing contains **337 publi
 
 This closes the **unassessed-star decision gap**. It does not certify that every repository is secure, maintained, compatible, installed or useful, and it does not establish an exhaustive list of everything beyond the stars. Source review cannot prove strategy returns, broker behavior or token savings.
 
+The subsequent [data/evaluation source follow-up](data-evaluation-followup.md) refreshed all four public-star pages and verified that `huangruiteng/loopx` moved to `loopx-project/loopx` with the same repository ID. The public count stays 337. Canonical identity fields now use the current name; original immutable source links and audit decisions below retain their historical provenance.
+
 ## What was actually reviewed
 
 | Evidence depth | Repositories | Scope |

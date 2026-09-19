@@ -588,7 +588,7 @@
       "relevance": "Outside the current research-first US-equity and native-agent scope."
     },
     {
-      "repository": "https://github.com/huangruiteng/loopx",
+      "repository": "https://github.com/loopx-project/loopx",
       "source_commit": "4077b87a54d37ca008533739079cedf5898a1fad",
       "source_date": "2026-09-19T11:41:58Z",
       "review_level": "source_review",
@@ -637,7 +637,14 @@
         "loopx status"
       ],
       "workflow_scope": "Upstream CLI/API examples inspected, not executed. Use the recorded source pin in isolation; resolve prerequisites and data/model/permission costs first. Placeholder paths and issue IDs are operator-selected.",
-      "relevance": "Specific potential gap justifies bounded acceptance work before adoption."
+      "relevance": "Specific potential gap justifies bounded acceptance work before adoption.",
+      "canonical_identity_followup": {
+        "prior_name": "huangruiteng/loopx",
+        "repository_id": 1255217938,
+        "checked_at": "2026-09-19",
+        "source": "catalogs/us-equities/data-evaluation-followup.json",
+        "scope": "Canonical identity update only; original source URLs, pins, dates, review depth and decisions retained."
+      }
     },
     {
       "repository": "https://github.com/paperswithbacktest/awesome-systematic-trading",
@@ -12388,13 +12395,20 @@
   ],
   "latest_public_refresh": {
     "checked_at": "2026-09-19",
-    "endpoint": "GET /users/{account}/starred?per_page=100 (paginated; account omitted)",
+    "endpoint": "GET /user/starred?sort=created&direction=desc&per_page=100 (all four pages; signed-in account omitted)",
     "public_flag_filter": "private == false",
     "public_repositories": 337,
     "added_since_recorded_snapshot": 0,
     "removed_since_recorded_snapshot": 0,
-    "public_set_sha256": "aa8458fd3838d4a2cd72cd9abd13027274be81d15f11883fdac94682ac561c50",
-    "hash_method": "Lowercase public owner/repository identities sorted, joined with newline and one final newline; SHA-256.",
-    "scope": "Fresh identity comparison only; prior per-repository source review and runtime evidence were not repeated."
+    "raw_names_added": [
+      "loopx-project/loopx"
+    ],
+    "raw_names_removed": [
+      "huangruiteng/loopx"
+    ],
+    "public_set_sha256": "c3e3abcfa39c36dbb5b86c6917c1b9807376034be83095c1664314d408a02cd1",
+    "hash_method": "Lowercase current public owner/repository names sorted, joined with newline and one final newline; SHA-256. Raw names change on a repository transfer.",
+    "scope": "Fresh identity comparison with immutable GitHub ID verification for the changed name; prior source reviews and native executions were not repeated.",
+    "source_receipt": "catalogs/us-equities/data-evaluation-followup.json"
   }
 }

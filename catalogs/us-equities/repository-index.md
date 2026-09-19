@@ -4,6 +4,8 @@ Checked September 19, 2026. **453 repository identities: 337 public stars plus 1
 
 Every starred repository has a [typed disposition](star-audit.json), with overview and selected-file inspection kept distinct. The 147-repository core plus 24 additional older records form the 171-reference subset. Restic's adoption promotes an existing starred identity, so the grand total stays 453. The fresh public-star identity comparison is recorded in [coverage](coverage.json); prior source reviews were not repeated. Existing receipts retain their original runtime scope. Collector core and contrib are two source identities for one adopted Collector process; the release-packaging repository is provenance, not another runtime card.
 
+The later [data/evaluation source follow-up](data-evaluation-followup.md) verified the LoopX transfer to `loopx-project/loopx` and DVC's existing `treeverse/dvc` alias without adding identities. Its two new purged-CV discovery leads remain outside this index and are explicitly unadopted.
+
 | Repository | Discovery | Decision cards / earlier record | Star review depth |
 | --- | --- | --- | --- |
 | [0xnyk/awesome-hermes-agent](https://github.com/0xNyk/awesome-hermes-agent) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · overlaps_established |
@@ -181,7 +183,6 @@ Every starred repository has a [typed disposition](star-audit.json), with overvi
 | [hkuds/openharness](https://github.com/HKUDS/OpenHarness) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
 | [hkuds/rag-anything](https://github.com/HKUDS/RAG-Anything) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
 | [hkuds/vibe-trading](https://github.com/HKUDS/Vibe-Trading) | Starred | [Individual source disposition](star-audit.json) | selected_primary_files · targeted_candidate |
-| [huangruiteng/loopx](https://github.com/huangruiteng/loopx) | Starred | [Individual source disposition](star-audit.json) | selected_primary_files · targeted_candidate |
 | [huggingface/huggingface_hub](https://github.com/huggingface/huggingface_hub) | Beyond stars | [adopted baseline](../../manifests/stack.json) | See linked core/earlier record |
 | [huggingface/sentence-transformers](https://github.com/huggingface/sentence-transformers) | Beyond stars | [foundation-memory: conditional](foundation-memory.json) | See linked core/earlier record |
 | [humanlayer/humanlayer](https://github.com/humanlayer/humanlayer) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · obsolete_or_ineligible |
@@ -224,6 +225,7 @@ Every starred repository has a [typed disposition](star-audit.json), with overvi
 | [llm-d/llm-d](https://github.com/llm-d/llm-d) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
 | [lmcache/lmcache](https://github.com/LMCache/LMCache) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
 | [looplj/axonhub](https://github.com/looplj/axonhub) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
+| [loopx-project/loopx](https://github.com/loopx-project/loopx) | Starred | [Individual source disposition](star-audit.json) | selected_primary_files · targeted_candidate |
 | [lsdefine/genericagent](https://github.com/lsdefine/GenericAgent) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
 | [lumiwealth/lumibot](https://github.com/lumiwealth/lumibot) | Starred | [engines-strategies: alternative](engines-strategies.json) | prior_evidence_link · already_covered |
 | [luongnv89/claude-howto](https://github.com/luongnv89/claude-howto) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · outside_north_star |
