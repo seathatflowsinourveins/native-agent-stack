@@ -1,0 +1,1520 @@
+{
+  "schema_version": 1,
+  "kind": "hosting_operations_convergence",
+  "checked_at": "2026-09-19",
+  "base_commit": "4898871620fb2b3e4e8c80756b0c9b3039a292bf",
+  "scope": {
+    "candidate_count": 12,
+    "source_files": 70,
+    "source_discovery_inputs": 3,
+    "full_star_refresh": "Coordinator responsibility; not repeated here.",
+    "native_addition": "One disposable synthetic systemd supervision acceptance; no model, broker, account, installation, paid-host or recurring-service operation.",
+    "not_claimed": [
+      "Exhaustive or definitive SOTA coverage",
+      "Upstream main equals accepted installed release",
+      "Source CI definitions establish executed test success",
+      "macOS, new-machine or continuous remote-host E2E",
+      "Whole-task counterfactual token savings"
+    ]
+  },
+  "method": {
+    "native_metadata_commands": [
+      "gh api \"repos/$REPOSITORY\"",
+      "gh api \"repos/$REPOSITORY/commits/$BRANCH\"",
+      "gh api \"repos/$REPOSITORY/releases/latest\"",
+      "gh api \"repos/$REPOSITORY/git/trees/$COMMIT?recursive=1\"",
+      "gh api -H \"Accept: application/vnd.github.raw+json\" \"repos/$REPOSITORY/contents/$SELECTED_FILE?ref=$COMMIT\""
+    ],
+    "source_hash_meaning": "SHA256 of exact selected primary source bytes retained privately. They bind reviewed text, not build provenance or publisher authenticity. Current stable tags, current main commits, and local execution versions are separate.",
+    "quality_dimensions": [
+      "Release freshness and archive status from native public metadata",
+      "File-specific licensing rather than star popularity",
+      "Selected implementation primitives and failure handling",
+      "Selected test/CI source presence; no invented passing status or numerical quality score",
+      "Operational overlap and the smallest unmet responsibility"
+    ],
+    "failed_document_fetches": [
+      "freedesktop latest-man HTML returned403; pinned v255 upstream XML and installed manual used instead.",
+      "OpenAI /docs/app-server returned404 and localized URL timed out; /codex/app-server resolved successfully to official learn.chatgpt.com docs."
+    ]
+  },
+  "rounds": [
+    {
+      "number": 1,
+      "focus": "Incumbent native research hosting and durable workflow challenger",
+      "candidates": [
+        "https://github.com/dagucloud/dagu",
+        "https://github.com/bytedance/deer-flow",
+        "https://github.com/diegosouzapw/OmniRoute",
+        "https://github.com/openai/codex",
+        "https://github.com/anthropics/claude-agent-sdk-python",
+        "https://github.com/temporalio/temporal"
+      ],
+      "discovery": "Pinned awesome-selfhosted automation entry nominates Dagu; current primary README links deployment models/actions. Incumbent acceptance/adoption receipts determine baseline.",
+      "new_findings": [
+        "Current Dagu source separates server/scheduler/coordinator roles; keep accepted manual/server-only scope.",
+        "DeerFlow current main remains a2.1 prerelease with checkpoint restart caveats; stable2.0 is not main parity.",
+        "OmniRoute A2A now records best-effort SQLite history but live Map/TTL remains; no durability promotion.",
+        "Native SDK interruption is a distinct operation from killing a process."
+      ],
+      "decision_change": "No new orchestration framework selected; native session lifecycle plus a missing host supervision gate emerged."
+    },
+    {
+      "number": 2,
+      "focus": "Host lifecycle, isolation, telemetry/recovery durability and portable supervision challenger",
+      "candidates": [
+        "https://github.com/containers/bubblewrap",
+        "https://github.com/systemd/systemd",
+        "https://github.com/lima-vm/lima",
+        "https://github.com/restic/restic",
+        "https://github.com/F1bonacc1/process-compose",
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib"
+      ],
+      "discovery": "Pinned awesome-sysadmin restic/systemd-nspawn entries plus Devbox service-manager source led to process-compose comparison; upstream filelog documentation led to its fault-tolerant collection example.",
+      "new_findings": [
+        "Existing systemd can enforce a bounded process lifecycle without a new package; native synthetic acceptance completed.",
+        "process-compose has useful portable development supervision but overlaps Linux owners and is not a sandbox.",
+        "Persistent file offsets and exporter delivery queues are separate; current visibility does not prove outage resilience.",
+        "Local restic restore is accepted historically, but off-host recovery and key custody remain open."
+      ],
+      "decision_change": "Adopt a scoped Linux supervision recipe only. Keep process-compose/Lima/Temporal/DeerFlow conditional and prioritize provider-aware cancellation, disposable telemetry replay and authorized off-host restore."
+    }
+  ],
+  "convergence": {
+    "selected_architecture": [
+      "Dagu owns manual research workflow dependencies/history.",
+      "Native Codex/Claude SDKs own model sessions and provider-visible lifecycle.",
+      "systemd owns Linux processes/resources; explicit sandbox profiles own access.",
+      "OTel/Loki/Prometheus own observation; native app snapshots plus restic own recovery."
+    ],
+    "token_efficiency": "Use one orchestration owner, a stable minimal worker policy, bounded immutable evidence packets and role-scoped tools. Preserve exact model routes, native cache accounting and failure receipts. This architecture avoids duplicated context and uncontrolled retries; this lane measures no counterfactual token reduction.",
+    "next_executable_gates": [
+      "Native-client cancellation plus partial-result/provider-usage reconciliation under a selected worker timeout.",
+      "Disposable OTel sink-outage/restart/replay test using synthetic records and persistent delivery queue.",
+      "App-state recovery on an explicitly authorized off-host destination with separate key custody and RPO/RTO."
+    ]
+  },
+  "discovery_sources": [
+    {
+      "repository": "awesome-selfhosted/awesome-selfhosted",
+      "commit": "16189dbd4cacec0b2a4982c628c30e82c8473662",
+      "path": "README.md",
+      "url": "https://github.com/awesome-selfhosted/awesome-selfhosted/blob/16189dbd4cacec0b2a4982c628c30e82c8473662/README.md",
+      "bytes": 328353,
+      "sha256": "0b12e6985747323fcf0cfa2c9f5d41d5da27607aa3010d18817f0ff6dd02f2f7",
+      "quality_status": "discovery_only",
+      "outcome": "Dagu automation entry confirmed an incumbent, not a new quality score."
+    },
+    {
+      "repository": "n1trux/awesome-sysadmin",
+      "commit": "a0f64294fa6c672767f4dffc978023194bf99550",
+      "path": "README.md",
+      "url": "https://github.com/n1trux/awesome-sysadmin/blob/a0f64294fa6c672767f4dffc978023194bf99550/README.md",
+      "bytes": 76102,
+      "sha256": "c86e591abee4eed1f47675c81f2cfc1b07fa3f568bb2e54f280b508e8784849b",
+      "quality_status": "discovery_only",
+      "outcome": "Restic and systemd-nspawn entries support discovery; Backrest remains an unreviewed UI alternative rather than another accepted backup owner."
+    },
+    {
+      "repository": "jetify-com/devbox",
+      "commit": "9704c95c3294c24d259388777cf5059cb37f56bd",
+      "path": "README.md",
+      "url": "https://github.com/jetify-com/devbox/blob/9704c95c3294c24d259388777cf5059cb37f56bd/README.md",
+      "bytes": 6446,
+      "sha256": "7ea3452e30b63bc16e298f3afd16277a9c1b9515715543a4db052ae03ba32c1d",
+      "quality_status": "discovery_only",
+      "outcome": "README did not establish process-compose usage; followed selected official service-manager implementation."
+    },
+    {
+      "repository": "jetify-com/devbox",
+      "commit": "9704c95c3294c24d259388777cf5059cb37f56bd",
+      "path": "internal/services/manager.go",
+      "url": "https://github.com/jetify-com/devbox/blob/9704c95c3294c24d259388777cf5059cb37f56bd/internal/services/manager.go",
+      "bytes": 10400,
+      "sha256": "858f20c6ad636f2046db6bc2dad7f1f58656582e9fc4c68d482eb448eadfc487",
+      "quality_status": "discovery_only",
+      "outcome": "Implementation references process-compose; direct upstream comparison recorded."
+    }
+  ],
+  "supplemental_primary_docs": [
+    {
+      "url": "https://learn.chatgpt.com/docs/codex-sdk",
+      "checked_at": "2026-09-19",
+      "claim": "Python SDK controls local app-server; intentional local binary override is supported."
+    },
+    {
+      "url": "https://learn.chatgpt.com/docs/app-server",
+      "checked_at": "2026-09-19",
+      "claim": "turn/interrupt requests cancellation and final turn/completed status is interrupted."
+    }
+  ],
+  "candidates": [
+    {
+      "repository": "https://github.com/dagucloud/dagu",
+      "wave": 1,
+      "decision": "retain",
+      "evidence_depth": "selected_primary_source_review",
+      "reviewed_source": {
+        "commit": "0a8edff8e55c281c2f217ef4383fbf5262138def",
+        "committed_at": "2026-09-19T16:09:41Z",
+        "default_branch": "main",
+        "archived": false
+      },
+      "latest_github_stable_release": {
+        "tag_name": "v2.16.6",
+        "published_at": "2026-09-14T14:45:57Z",
+        "html_url": "https://github.com/dagucloud/dagu/releases/tag/v2.16.6",
+        "prerelease": false
+      },
+      "license": "GPL-3.0-or-later; optional licensed SSO/RBAC/audit features are separate",
+      "responsibility": "One owner of manual research workflow dependencies, status and history.",
+      "architectural_fit": "The accepted CLI pipeline and history server already cover the immediate research use case. Current README distinguishes server, scheduler, coordinator and worker roles; adding start-all would activate more responsibilities than the accepted server-only service.",
+      "upstream_primitives": [
+        "Native start/history/stop/retry and explicit workflow YAML.",
+        "Single-machine, temporary-worker and distributed-worker topologies are documented; neither distributed topology is locally accepted."
+      ],
+      "quality_evidence": "Selected conformance tests cover reexecution, step-only retry and missing-run-ID rejection; scheduler command tests exist. These source tests were read, not run.",
+      "security_and_operational_boundary": "Pin action revisions and tools; workflow shell execution inherits granted host capabilities. Do not treat paid identity/audit features as free community defaults.",
+      "existing_or_separate_native_evidence": [
+        "blueprints/us-equities/hosting/README.md",
+        "adoption/paired/receipt.json"
+      ],
+      "acceptance_gate": "Interrupt a synthetic in-flight DAG, inspect its terminal state and prove explicit retry/replay does not duplicate a committed output before enabling recurring or distributed runs.",
+      "prospective_native_commands": [
+        "dagu version",
+        "dagu validate \"$SYNTHETIC_DAG\"",
+        "dagu history --context local --dagu-home \"$PRIVATE_DAGU_HOME\" --format json",
+        "dagu stop --context local --dagu-home \"$PRIVATE_DAGU_HOME\" --run-id \"$RUN_ID\" \"$DAG_NAME\""
+      ],
+      "command_status": "Source-derived or existing-recipe templates only; not executed by this research lane. Commands that start processes require a selected disposable/authorized scope.",
+      "platform_matrix": {
+        "macos": "Upstream single binary; this lane has no Mac execution.",
+        "wsl": "Prior local Dagu2.16.6 paired pipeline accepted; WSL shutdown stops this host.",
+        "linux": "Candidate continuous host; production uptime/reboot/remote-worker durability not accepted."
+      },
+      "source_manifest_paths": [
+        {
+          "commit": "0a8edff8e55c281c2f217ef4383fbf5262138def",
+          "path": "README.md"
+        },
+        {
+          "commit": "0a8edff8e55c281c2f217ef4383fbf5262138def",
+          "path": "LICENSE"
+        },
+        {
+          "commit": "0a8edff8e55c281c2f217ef4383fbf5262138def",
+          "path": "README_SCHEMA.md"
+        },
+        {
+          "commit": "0a8edff8e55c281c2f217ef4383fbf5262138def",
+          "path": "conformance/cli/retry_test.go"
+        },
+        {
+          "commit": "0a8edff8e55c281c2f217ef4383fbf5262138def",
+          "path": "internal/cmd/scheduler_test.go"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/bytedance/deer-flow",
+      "wave": 1,
+      "decision": "investigate",
+      "evidence_depth": "selected_primary_source_review",
+      "reviewed_source": {
+        "commit": "aa4e43a2bcc8ffc3838b012c4583f561a0e199be",
+        "committed_at": "2026-09-19T07:09:36Z",
+        "default_branch": "main",
+        "archived": false
+      },
+      "latest_github_stable_release": {
+        "tag_name": "v2.0.0",
+        "published_at": "2026-06-25T16:23:22Z",
+        "html_url": "https://github.com/bytedance/deer-flow/releases/tag/v2.0.0",
+        "prerelease": false
+      },
+      "license": "MIT",
+      "responsibility": "Optional interactive research harness when its UI, sandbox and checkpoint workflows justify the additional application.",
+      "architectural_fit": "Retain optional status. Main declares2.1.0-rc0 while latest stable release remains2.0.0; current-main behavior is not automatically in the installed or stable release. LangGraph is already embedded; a parallel standalone graph default would duplicate ownership.",
+      "upstream_primitives": [
+        "Persistent deployment documents sqlite/postgres for checkpoints, Store and application data.",
+        "Current-main checkpoint channel mode and delta snapshot frequency freeze on first agent construction and require restart; other config changes may be picked up dynamically.",
+        "Linux+Docker is the documented persistent-server preference; macOS/Windows are evaluation/development targets."
+      ],
+      "quality_evidence": "Selected real-image sandbox smoke workflow pins pulled images to digests before live tests and distinguishes those tests from offline unit tests. CI result and image supply-chain provenance were not verified.",
+      "security_and_operational_boundary": "Local sandbox backend and deployment sizing are source-reviewed only; Docker access and mounted secrets remain host privileges. Main's advanced checkpoint/cache/auth changes require a pinned upgrade review.",
+      "existing_or_separate_native_evidence": [
+        "blueprints/us-equities/architecture/README.md"
+      ],
+      "acceptance_gate": "A disposable pinned deployment must prove persistent checkpoint restore, cancellation, bounded concurrency, sandbox mount/network denial and native model-route parity before becoming a shared service.",
+      "prospective_native_commands": [
+        "docker compose version",
+        "make docker-init",
+        "make docker-start",
+        "make up"
+      ],
+      "command_status": "Source-derived or existing-recipe templates only; not executed by this research lane. Commands that start processes require a selected disposable/authorized scope.",
+      "platform_matrix": {
+        "macos": "Source-supported local evaluation; no Mac acceptance.",
+        "wsl": "Source Docker/Linux path; no new DeerFlow deployment in this wave.",
+        "linux": "Documented persistent-server preference, source-only; no host provisioned."
+      },
+      "source_manifest_paths": [
+        {
+          "commit": "aa4e43a2bcc8ffc3838b012c4583f561a0e199be",
+          "path": "README.md"
+        },
+        {
+          "commit": "aa4e43a2bcc8ffc3838b012c4583f561a0e199be",
+          "path": "LICENSE"
+        },
+        {
+          "commit": "aa4e43a2bcc8ffc3838b012c4583f561a0e199be",
+          "path": "backend/pyproject.toml"
+        },
+        {
+          "commit": "aa4e43a2bcc8ffc3838b012c4583f561a0e199be",
+          "path": ".github/workflows/sandbox-image-smoke.yml"
+        },
+        {
+          "commit": "aa4e43a2bcc8ffc3838b012c4583f561a0e199be",
+          "path": "backend/packages/harness/deerflow/community/aio_sandbox/local_backend.py"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "wave": 1,
+      "decision": "retain_conditional",
+      "evidence_depth": "selected_primary_source_review",
+      "reviewed_source": {
+        "commit": "7a921299c5b4c28dcf837f56a1c312b61414a646",
+        "committed_at": "2026-09-19T05:54:34Z",
+        "default_branch": "release/v3.8.51",
+        "archived": false
+      },
+      "latest_github_stable_release": {
+        "tag_name": "v3.8.50",
+        "published_at": "2026-08-26T19:30:30Z",
+        "html_url": "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",
+        "prerelease": false
+      },
+      "license": "MIT",
+      "responsibility": "Explicit model routing boundary; not the workflow scheduler or durable-memory authority.",
+      "architectural_fit": "Keep the existing gateway and exact route acceptance. Do not install a second gateway or replace the native Codex/Claude default. Current source can add features beyond the accepted3.8.50 runtime; a latest-main review is not upgrade acceptance.",
+      "upstream_primitives": [
+        "Codex executor removes max_tokens/max_output_tokens; a requested output cap is not an enforced provider spending ceiling.",
+        "Current A2A task manager has best-effort SQLite history but live state remains an in-memory Map, default TTL5minutes, and persistence failures are swallowed after warning.",
+        "A2A task history does not establish durable task recovery; gateway200 does not establish exact model/tool readiness."
+      ],
+      "quality_evidence": "Selected executor and A2A implementation were inspected. No new routing/model test or whole-suite CI result was obtained.",
+      "security_and_operational_boundary": "Keep provider account scopes and explicit model identity. Memory/compression/fallback features need scoped adoption and complete usage accounting; no automatic strategy promotion.",
+      "existing_or_separate_native_evidence": [
+        "blueprints/us-equities/routing/README.md"
+      ],
+      "acceptance_gate": "For any gateway upgrade, separately verify exact model, tools, cache/usage categories, cancellation and failure semantics; persist workload state in the orchestration owner.",
+      "prospective_native_commands": [
+        "omniroute --version",
+        "omniroute health"
+      ],
+      "command_status": "Source-derived or existing-recipe templates only; not executed by this research lane. Commands that start processes require a selected disposable/authorized scope.",
+      "platform_matrix": {
+        "macos": "Source package capability only; native account and gateway acceptance required.",
+        "wsl": "Existing Windows gateway is reachable from WSL per historical receipt; no duplicate install.",
+        "linux": "Dedicated gateway is optional; deployment and entitlement unaccepted."
+      },
+      "source_manifest_paths": [
+        {
+          "commit": "7a921299c5b4c28dcf837f56a1c312b61414a646",
+          "path": "README.md"
+        },
+        {
+          "commit": "7a921299c5b4c28dcf837f56a1c312b61414a646",
+          "path": "LICENSE"
+        },
+        {
+          "commit": "7a921299c5b4c28dcf837f56a1c312b61414a646",
+          "path": "package.json"
+        },
+        {
+          "commit": "7a921299c5b4c28dcf837f56a1c312b61414a646",
+          "path": "docs/frameworks/A2A-SERVER.md"
+        },
+        {
+          "commit": "7a921299c5b4c28dcf837f56a1c312b61414a646",
+          "path": "open-sse/executors/codex.ts"
+        },
+        {
+          "commit": "7a921299c5b4c28dcf837f56a1c312b61414a646",
+          "path": "src/lib/a2a/taskManager.ts"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/openai/codex",
+      "wave": 1,
+      "decision": "retain",
+      "evidence_depth": "selected_primary_source_review",
+      "reviewed_source": {
+        "commit": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+        "committed_at": "2026-09-19T20:41:55Z",
+        "default_branch": "main",
+        "archived": false
+      },
+      "latest_github_stable_release": {
+        "tag_name": "rust-v0.155.1",
+        "published_at": "2026-09-18T20:03:04Z",
+        "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.155.1",
+        "prerelease": false
+      },
+      "license": "Apache-2.0 code; model/service terms and account entitlement remain separate",
+      "responsibility": "Native Codex session and tool execution, controlled through its supported Python SDK/app-server interface.",
+      "architectural_fit": "Accepted nativeCLI0.155.1 remains current stable. Existing PythonSDK0.154.0 intentionally selects that CLI through CodexConfig(codex_bin=...). No upgrade is pending merely because package and CLI versions differ.",
+      "upstream_primitives": [
+        "Python SDK controls local app-server over JSON-RPC; explicit binary override is documented.",
+        "turn/interrupt requests cancellation and turn/completed carries interrupted status.",
+        "A session profile must select sandbox, tools and settings; source availability does not prove this Desktop session or another machine loaded them."
+      ],
+      "quality_evidence": "Selected upstream test_turn_interrupt_stops_active_turn_and_follow_up_runs covers interruption then follow-up behavior in source. It was not executed in this lane.",
+      "security_and_operational_boundary": "Native sign-in/account remains on the authorized host; never copy authstores. A process kill is weaker evidence than native cancellation plus provider-usage reconciliation.",
+      "existing_or_separate_native_evidence": [
+        "adoption/paired/receipt.json",
+        "adoption/sdk/README.md"
+      ],
+      "acceptance_gate": "Integrate explicit native cancellation into a bounded real worker only with authorization and retain final status, partial output, tool state and usage; fresh host acceptance is separate.",
+      "prospective_native_commands": [
+        "codex --version",
+        "codex app-server --help"
+      ],
+      "command_status": "Source-derived or existing-recipe templates only; not executed by this research lane. Commands that start processes require a selected disposable/authorized scope.",
+      "platform_matrix": {
+        "macos": "Native client/SDK source support; no Mac model acceptance here.",
+        "wsl": "Historical locked-SDK native Astra worker accepted; this lane made no model call.",
+        "linux": "Personal research worker hosting is distinct from commercial multi-user service entitlement."
+      },
+      "source_manifest_paths": [
+        {
+          "commit": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+          "path": "LICENSE"
+        },
+        {
+          "commit": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+          "path": "sdk/python/README.md"
+        },
+        {
+          "commit": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+          "path": "sdk/python/tests/test_app_server_turn_controls.py"
+        },
+        {
+          "commit": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+          "path": "docs/exec.md"
+        },
+        {
+          "commit": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+          "path": "sdk/python/src/openai_codex/client.py"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+      "wave": 1,
+      "decision": "retain",
+      "evidence_depth": "selected_primary_source_review",
+      "reviewed_source": {
+        "commit": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+        "committed_at": "2026-09-19T03:11:07Z",
+        "default_branch": "main",
+        "archived": false
+      },
+      "latest_github_stable_release": {
+        "tag_name": "v0.2.156",
+        "published_at": "2026-09-18T02:28:01Z",
+        "html_url": "https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.156",
+        "prerelease": false
+      },
+      "license": "MIT SDK code; Claude product/service terms are separate",
+      "responsibility": "Native Claude programmable research worker with explicit session/tool/settings scope.",
+      "architectural_fit": "Use the existing accepted native worker rather than stacking another generic agent runner. Latest GitHub release is recorded separately from any PyPI or bundled CLI version; no package upgrade in this lane.",
+      "upstream_primitives": [
+        "allowed_tools is a permission preapproval list, not a tool exposure allowlist; use tools for exposure selection.",
+        "ClaudeSDKClient.interrupt() is a streaming-mode control operation.",
+        "Options expose settings sources, tool configuration and sandbox controls, whose selected values require actual launch evidence."
+      ],
+      "quality_evidence": "Selected transport tests cover split JSON, buffer bounds, malformed messages and final-message handling; source presence is not a new SDK pass.",
+      "security_and_operational_boundary": "Avoid ambient skills/MCPs/auth configuration in packet-only workers unless deliberately selected. Native account readiness does not authorize account transfer or paid multi-user hosting.",
+      "existing_or_separate_native_evidence": [
+        "adoption/paired/receipt.json"
+      ],
+      "acceptance_gate": "On a selected streaming worker, reconcile native interrupt result and complete usage without counting cache/thinking subsets twice. Verify settings/tools/hooks at launch per host.",
+      "prospective_native_commands": [
+        "claude --version",
+        "claude --help"
+      ],
+      "command_status": "Source-derived or existing-recipe templates only; not executed by this research lane. Commands that start processes require a selected disposable/authorized scope.",
+      "platform_matrix": {
+        "macos": "Native development capability source-only in this lane.",
+        "wsl": "Historical native Claude paired run accepted; no new model call here.",
+        "linux": "Optional always-on research worker needs explicit lifecycle/entitlement acceptance."
+      },
+      "source_manifest_paths": [
+        {
+          "commit": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+          "path": "README.md"
+        },
+        {
+          "commit": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+          "path": "LICENSE"
+        },
+        {
+          "commit": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+          "path": "src/claude_agent_sdk/types.py"
+        },
+        {
+          "commit": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+          "path": "tests/test_subprocess_buffering.py"
+        },
+        {
+          "commit": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+          "path": "src/claude_agent_sdk/client.py"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/temporalio/temporal",
+      "wave": 1,
+      "decision": "defer",
+      "evidence_depth": "selected_primary_source_review",
+      "reviewed_source": {
+        "commit": "ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a",
+        "committed_at": "2026-09-19T05:32:51Z",
+        "default_branch": "main",
+        "archived": false
+      },
+      "latest_github_stable_release": {
+        "tag_name": "v1.32.0",
+        "published_at": "2026-09-11T16:10:29Z",
+        "html_url": "https://github.com/temporalio/temporal/releases/tag/v1.32.0",
+        "prerelease": false
+      },
+      "license": "MIT",
+      "responsibility": "Challenger for durable workflows only if requirements exceed the accepted Dagu/manual lane.",
+      "architectural_fit": "The server's durable workflow state is a different primitive from local process supervision. Its server, database and SDK worker lifecycle add substantial operations; do not add it to solve a missing process timeout.",
+      "upstream_primitives": [
+        "Durable workflow execution and event history are core platform responsibilities.",
+        "The README's temporal server start-dev is a development command, not production hosting acceptance.",
+        "Production activity retries and external-effect idempotency require application design; engine adoption cannot create exactly-once broker effects."
+      ],
+      "quality_evidence": "Selected workflow integration suite and development persistence configuration were reviewed; no server, database or replay test was run.",
+      "security_and_operational_boundary": "A production deployment needs authenticated transport, namespace/retention policy, versioned workers and independently restored storage.",
+      "existing_or_separate_native_evidence": [
+        "catalogs/us-equities/architecture/foundation.json"
+      ],
+      "acceptance_gate": "Adopt only after a written unmet durability requirement and a small synthetic replay/duplicate-suppression experiment outperform the retained lane operationally.",
+      "prospective_native_commands": [
+        "temporal server start-dev"
+      ],
+      "command_status": "Source-derived or existing-recipe templates only; not executed by this research lane. Commands that start processes require a selected disposable/authorized scope.",
+      "platform_matrix": {
+        "macos": "Development server/tooling candidate, source-only.",
+        "wsl": "Development candidate; not installed or accepted by this review.",
+        "linux": "Potential continuous-host platform; database and operational burden remains unaccepted."
+      },
+      "source_manifest_paths": [
+        {
+          "commit": "ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a",
+          "path": "README.md"
+        },
+        {
+          "commit": "ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a",
+          "path": "LICENSE"
+        },
+        {
+          "commit": "ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a",
+          "path": "config/development.yaml"
+        },
+        {
+          "commit": "ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a",
+          "path": "tests/workflow_test.go"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/containers/bubblewrap",
+      "wave": 2,
+      "decision": "retain",
+      "evidence_depth": "selected_primary_source_review",
+      "reviewed_source": {
+        "commit": "9e243df5b57e119a8ca4611761dd5f0c6716cbb6",
+        "committed_at": "2026-09-18T13:10:43Z",
+        "default_branch": "main",
+        "archived": false
+      },
+      "latest_github_stable_release": {
+        "tag_name": "v0.12.0",
+        "published_at": "2026-08-26T10:11:18Z",
+        "html_url": "https://github.com/containers/bubblewrap/releases/tag/v0.12.0",
+        "prerelease": false
+      },
+      "license": "LGPL-2.1 license texts in COPYING/COPYING.LIB; individual file notices govern",
+      "responsibility": "Linux namespace and mount/network isolation primitive beneath selected workers.",
+      "architectural_fit": "Existing isolated native restore/SDK probes used bubblewrap successfully. Preserve explicit profile arguments; a blanket read-only host bind still grants broad read visibility and is not a confidential-data boundary.",
+      "upstream_primitives": [
+        "Protection is determined by caller-supplied arguments; upstream explicitly says bubblewrap is not a complete ready-made sandbox policy.",
+        "Current source uses unprivileged user namespaces; historical setuid mode has been removed.",
+        "Process cgroups/resource limits and filesystem/network access boundaries serve different purposes."
+      ],
+      "quality_evidence": "Selected native shell tests cover empty path rejection, --die-with-parent and namespace/process behavior; this wave did not run upstream tests.",
+      "security_and_operational_boundary": "Mount only selected inputs, use a fresh writable output, isolate network where unnecessary, and evaluate symlinks/inherited descriptors. Actual host kernel policy can block user namespaces.",
+      "existing_or_separate_native_evidence": [
+        "blueprints/us-equities/state-recovery/memory/receipt.json",
+        "blueprints/us-equities/order-contract/receipt.json"
+      ],
+      "acceptance_gate": "Reuse a reviewed profile and prove both an allowed operation and denied out-of-scope file/network operation on the exact host; do not infer macOS parity.",
+      "prospective_native_commands": [
+        "bwrap --version",
+        "bwrap --unshare-all --die-with-parent --new-session --ro-bind /usr /usr --ro-bind /lib /lib --ro-bind /lib64 /lib64 --proc /proc --dev /dev /usr/bin/true"
+      ],
+      "command_status": "Source-derived or existing-recipe templates only; not executed by this research lane. Commands that start processes require a selected disposable/authorized scope.",
+      "platform_matrix": {
+        "macos": "No native bubblewrap; a LinuxVM is a separate boundary and acceptance.",
+        "wsl": "Existing namespace probes accepted historically; no bubblewrap update here.",
+        "linux": "Host-kernel/user-namespace prerequisites apply; same profile must be accepted."
+      },
+      "source_manifest_paths": [
+        {
+          "commit": "9e243df5b57e119a8ca4611761dd5f0c6716cbb6",
+          "path": "README.md"
+        },
+        {
+          "commit": "9e243df5b57e119a8ca4611761dd5f0c6716cbb6",
+          "path": "COPYING"
+        },
+        {
+          "commit": "9e243df5b57e119a8ca4611761dd5f0c6716cbb6",
+          "path": "COPYING.LIB"
+        },
+        {
+          "commit": "9e243df5b57e119a8ca4611761dd5f0c6716cbb6",
+          "path": "tests/test-run.sh"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/systemd/systemd",
+      "wave": 2,
+      "decision": "adopt_scoped_supervision_recipe",
+      "evidence_depth": "selected_primary_source_review",
+      "reviewed_source": {
+        "commit": "e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb",
+        "committed_at": "2026-09-18T20:16:58Z",
+        "default_branch": "main",
+        "archived": false
+      },
+      "latest_github_stable_release": {
+        "tag_name": "v261.3",
+        "published_at": "2026-09-10T19:49:12Z",
+        "html_url": "https://github.com/systemd/systemd/releases/tag/v261.3",
+        "prerelease": false
+      },
+      "license": "LGPL-2.1-or-later predominantly; udev/other components include GPL-2.0-or-later and file-specific exceptions",
+      "responsibility": "Linux host process lifecycle and cgroup resource supervision.",
+      "architectural_fit": "Existing distribution systemd already supplies the missing primitive. A new dependency or custom supervisor is unnecessary. Current upstream261.3 and accepted Ubuntu255.4 are different records; no host upgrade was performed.",
+      "upstream_primitives": [
+        "Transient Type=exec units with RuntimeMaxSec and TimeoutStopSec.",
+        "KillMode=control-group plus SendSIGKILL terminates descendants after the grace period.",
+        "MemoryMax, TasksMax and CPUQuota map to native cgroup values."
+      ],
+      "quality_evidence": "This wave's offline native timeout fixture observed three TERM-ignoring processes, SIGKILL cleanup, native failure, actual cgroup values and separate fresh success. Upstreamv255 XML docs pin the applicable semantics; distribution patches are not source-audited.",
+      "security_and_operational_boundary": "NoNewPrivileges and resource supervision are not filesystem/network isolation. Same-user adversarial escape and remote provider cancellation are outside the observed result.",
+      "existing_or_separate_native_evidence": [
+        "blueprints/us-equities/worker-supervision/receipt.json"
+      ],
+      "acceptance_gate": "Select real workload resource budgets; add native cancellation/final usage handling and a reviewed sandbox before adopting this wrapper for model workers. Remote host reboot/sleep behavior remains open.",
+      "prospective_native_commands": [
+        "systemctl --user is-system-running",
+        "systemd-run --user --wait --unit=\"$UNIQUE_UNIT\" --property=Type=exec --property=RuntimeMaxSec=4s --property=TimeoutStopSec=1s --property=KillMode=control-group --property=MemoryMax=64M --property=TasksMax=16 --property=CPUQuota=25% /usr/bin/true",
+        "systemctl --user show \"$UNIQUE_UNIT.service\" --property=Result,ExecMainCode,ExecMainStatus"
+      ],
+      "command_status": "Actual full synthetic command and result are in worker-supervision/README.md and receipt; short commands here are templates.",
+      "platform_matrix": {
+        "macos": "No native systemd; launchd or a dedicated Linux host requires separate acceptance.",
+        "wsl": "Actual synthetic acceptance on systemd255.4/cgroupv2 in this wave.",
+        "linux": "Same primitive source-supported; other host/controller delegation needs acceptance."
+      },
+      "source_manifest_paths": [
+        {
+          "commit": "e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb",
+          "path": "LICENSES/README.md"
+        },
+        {
+          "commit": "e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb",
+          "path": "man/systemd-run.xml"
+        },
+        {
+          "commit": "e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb",
+          "path": "man/systemd.kill.xml"
+        },
+        {
+          "commit": "e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb",
+          "path": "man/systemd.service.xml"
+        },
+        {
+          "commit": "e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb",
+          "path": "man/systemd.resource-control.xml"
+        },
+        {
+          "commit": "db11bab38ccf1ed257f310d29070843d4c58ea01",
+          "path": "man/systemd-run.xml"
+        },
+        {
+          "commit": "db11bab38ccf1ed257f310d29070843d4c58ea01",
+          "path": "man/systemd.kill.xml"
+        },
+        {
+          "commit": "db11bab38ccf1ed257f310d29070843d4c58ea01",
+          "path": "man/systemd.service.xml"
+        },
+        {
+          "commit": "db11bab38ccf1ed257f310d29070843d4c58ea01",
+          "path": "man/systemd.resource-control.xml"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/lima-vm/lima",
+      "wave": 2,
+      "decision": "investigate_when_needed",
+      "evidence_depth": "selected_primary_source_review",
+      "reviewed_source": {
+        "commit": "376d310483786938d59284ede8f60bff940325a5",
+        "committed_at": "2026-09-19T04:04:10Z",
+        "default_branch": "master",
+        "archived": false
+      },
+      "latest_github_stable_release": {
+        "tag_name": "v2.2.0",
+        "published_at": "2026-07-21T15:05:43Z",
+        "html_url": "https://github.com/lima-vm/lima/releases/tag/v2.2.0",
+        "prerelease": false
+      },
+      "license": "Apache-2.0",
+      "responsibility": "Optional Linux development VM on macOS or another supported host.",
+      "architectural_fit": "Use only for a concrete Linux-only tool requirement. It does not make macOS a continuously available production host or establish local GPU/backend parity.",
+      "upstream_primitives": [
+        "VZ driver uses macOS Virtualization.Framework and documents macOS13+ requirement.",
+        "Windows WSL2 driver exists but documents unsupported Lima options.",
+        "Automatic mounts and port forwarding are convenience features whose security scope must be selected explicitly."
+      ],
+      "quality_evidence": "Selected CI definitions include Ubuntu, macOS and Windows/WSL2 jobs plus port-forwarding checks; source matrix is not evidence those jobs passed or this user has run them.",
+      "security_and_operational_boundary": "Keep native account stores outside guest mounts; pin image revisions and intended shares. VM isolation and host sleep/shutdown need real tests.",
+      "existing_or_separate_native_evidence": [
+        "catalogs/us-equities/architecture/foundation.json"
+      ],
+      "acceptance_gate": "On the actual target Mac, prove selected mount denial, guest start/stop/restart, port exposure, resource bounds and output persistence before adopting.",
+      "prospective_native_commands": [
+        "limactl --version",
+        "limactl start --name=research --vm-type=vz template://ubuntu",
+        "limactl shell research uname -a",
+        "limactl stop research"
+      ],
+      "command_status": "Source-derived or existing-recipe templates only; not executed by this research lane. Commands that start processes require a selected disposable/authorized scope.",
+      "platform_matrix": {
+        "macos": "VZ support source-reviewed; no actual Mac acceptance.",
+        "wsl": "Existing WSL does not need a nested Lima VM by default.",
+        "linux": "Optional VM tool, not a production-host requirement."
+      },
+      "source_manifest_paths": [
+        {
+          "commit": "376d310483786938d59284ede8f60bff940325a5",
+          "path": "README.md"
+        },
+        {
+          "commit": "376d310483786938d59284ede8f60bff940325a5",
+          "path": "LICENSE"
+        },
+        {
+          "commit": "376d310483786938d59284ede8f60bff940325a5",
+          "path": ".github/workflows/test.yml"
+        },
+        {
+          "commit": "376d310483786938d59284ede8f60bff940325a5",
+          "path": "website/content/en/docs/config/vmtype/vz.md"
+        },
+        {
+          "commit": "376d310483786938d59284ede8f60bff940325a5",
+          "path": "website/content/en/docs/config/vmtype/wsl2.md"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/restic/restic",
+      "wave": 2,
+      "decision": "retain",
+      "evidence_depth": "selected_primary_source_review",
+      "reviewed_source": {
+        "commit": "ba802d42b7294c98b62c16d1157ea3e80820c019",
+        "committed_at": "2026-08-29T20:11:48Z",
+        "default_branch": "master",
+        "archived": false
+      },
+      "latest_github_stable_release": {
+        "tag_name": "v0.19.1",
+        "published_at": "2026-07-05T08:13:33Z",
+        "html_url": "https://github.com/restic/restic/releases/tag/v0.19.1",
+        "prerelease": false
+      },
+      "license": "BSD-2-Clause",
+      "responsibility": "Encrypted backup and verified restore of app-consistent selected state.",
+      "architectural_fit": "Keep native restic and app-native SQLite/Qdrant snapshots. A backup UI/scheduler adds another owner without resolving off-host destination, key custody or actual restore readiness.",
+      "upstream_primitives": [
+        "check --read-data validates stored data, not just repository metadata.",
+        "restore to a fresh isolated directory supports native recovery verification.",
+        "forget supports dry-run retention review; no destructive retention action is authorized by this catalog."
+      ],
+      "quality_evidence": "Selected upstream restore integration tests include filtering and permission failure. Earlier local native encrypted app-state restore is preserved as historical evidence; no backup or restore rerun in this wave.",
+      "security_and_operational_boundary": "Local encrypted backup is not off-host resilience. Avoid live database file copies that bypass app consistency, copy no authstores, and keep password/key custody separate from public manifests.",
+      "existing_or_separate_native_evidence": [
+        "blueprints/us-equities/state-recovery/memory/receipt.json",
+        "blueprints/us-equities/hosting/backup/README.md"
+      ],
+      "acceptance_gate": "Select an authorized off-host destination, RPO/RTO and key recovery process; rehearse isolated restore and compare logical state before claiming disaster recovery.",
+      "prospective_native_commands": [
+        "restic version",
+        "restic --repo \"$PRIVATE_REPOSITORY\" --password-file \"$PRIVATE_PASSWORD_FILE\" snapshots",
+        "restic --repo \"$PRIVATE_REPOSITORY\" --password-file \"$PRIVATE_PASSWORD_FILE\" check --read-data",
+        "restic --repo \"$PRIVATE_REPOSITORY\" --password-file \"$PRIVATE_PASSWORD_FILE\" restore \"$SNAPSHOT_ID\" --target \"$FRESH_RESTORE_DIRECTORY\"",
+        "restic --repo \"$PRIVATE_REPOSITORY\" --password-file \"$PRIVATE_PASSWORD_FILE\" forget --keep-last 7 --dry-run"
+      ],
+      "command_status": "Source-derived or existing-recipe templates only; not executed by this research lane. Commands that start processes require a selected disposable/authorized scope.",
+      "platform_matrix": {
+        "macos": "Native upstream candidate; exact Mac app-state consistency untested.",
+        "wsl": "Earlier local encrypted recovery accepted; this wave reads evidence only.",
+        "linux": "Suitable candidate with explicit destination/restore gate; no remote backup configured."
+      },
+      "source_manifest_paths": [
+        {
+          "commit": "ba802d42b7294c98b62c16d1157ea3e80820c019",
+          "path": "LICENSE"
+        },
+        {
+          "commit": "ba802d42b7294c98b62c16d1157ea3e80820c019",
+          "path": "doc/045_working_with_repos.rst"
+        },
+        {
+          "commit": "ba802d42b7294c98b62c16d1157ea3e80820c019",
+          "path": "doc/050_restore.rst"
+        },
+        {
+          "commit": "ba802d42b7294c98b62c16d1157ea3e80820c019",
+          "path": "doc/060_forget.rst"
+        },
+        {
+          "commit": "ba802d42b7294c98b62c16d1157ea3e80820c019",
+          "path": "cmd/restic/cmd_restore_integration_test.go"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/F1bonacc1/process-compose",
+      "wave": 2,
+      "decision": "investigate_macos_development_only",
+      "evidence_depth": "selected_primary_source_review",
+      "reviewed_source": {
+        "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+        "committed_at": "2026-08-17T22:59:01Z",
+        "default_branch": "main",
+        "archived": false
+      },
+      "latest_github_stable_release": {
+        "tag_name": "v1.122.0",
+        "published_at": "2026-08-17T23:01:55Z",
+        "html_url": "https://github.com/F1bonacc1/process-compose/releases/tag/v1.122.0",
+        "prerelease": false
+      },
+      "license": "Apache-2.0",
+      "responsibility": "Challenger for portable local multi-process development supervision.",
+      "architectural_fit": "A concrete additional lead from Devbox's service-manager source. It can provide health/dependency/start-stop UX on developer machines; Linux already has Dagu plus systemd, so another default controller would overlap.",
+      "upstream_primitives": [
+        "Native process dependencies, readiness/liveness probes, explicit shutdown signal/timeout and manual restart.",
+        "Current source sends configured process-group signals and escalates to SIGKILL when a shutdown timeout is configured.",
+        "Its YAML shell commands and probe implementations need OS-specific compatibility; binary availability does not make every service recipe portable."
+      ],
+      "quality_evidence": "Selected probe tests, ordered-shutdown fixture and shutdown implementation were inspected. No installation or process-compose execution in this wave.",
+      "security_and_operational_boundary": "Same-user process supervision is not a sandbox or durable workflow engine. Its optional MCP/control API and scheduling are not enabled by adopting source documentation.",
+      "existing_or_separate_native_evidence": [],
+      "acceptance_gate": "If macOS local multi-service work needs it, compare one disposable readiness/failure/descendant-cleanup workload against native launchd or manual operation; keep one scheduling owner.",
+      "prospective_native_commands": [
+        "process-compose version",
+        "process-compose up \"$SYNTHETIC_PROCESS\"",
+        "process-compose process stop \"$SYNTHETIC_PROCESS\""
+      ],
+      "command_status": "Source-derived or existing-recipe templates only; not executed by this research lane. Commands that start processes require a selected disposable/authorized scope.",
+      "platform_matrix": {
+        "macos": "Upstream installation and shutdown fixture cover Mac concerns; source-only.",
+        "wsl": "Available challenger but no demonstrated missing local responsibility.",
+        "linux": "Omit as a second default supervisor; no installation."
+      },
+      "source_manifest_paths": [
+        {
+          "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+          "path": "README.md"
+        },
+        {
+          "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+          "path": "LICENSE"
+        },
+        {
+          "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+          "path": "www/docs/health.md"
+        },
+        {
+          "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+          "path": "src/health/health_checks_test.go"
+        },
+        {
+          "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+          "path": "fixtures-code/process-compose-shutdown-inorder.yaml"
+        },
+        {
+          "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+          "path": "src/app/process.go"
+        },
+        {
+          "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+          "path": "www/docs/launcher.md"
+        },
+        {
+          "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+          "path": "www/docs/installation.md"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "wave": 2,
+      "decision": "retain_and_investigate_delivery_durability",
+      "evidence_depth": "selected_primary_source_review",
+      "reviewed_source": {
+        "commit": "c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4",
+        "committed_at": "2026-09-19T17:55:12Z",
+        "default_branch": "main",
+        "archived": false
+      },
+      "latest_github_stable_release": {
+        "tag_name": "v0.161.0",
+        "published_at": "2026-09-15T15:05:47Z",
+        "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.161.0",
+        "prerelease": false
+      },
+      "license": "Apache-2.0",
+      "responsibility": "Telemetry collection and durable local delivery buffering, separate from model execution.",
+      "architectural_fit": "Existing local usage correlation and seven targets establish visibility. The next useful question is what survives an unavailable downstream sink or collector crash, not another dashboard.",
+      "upstream_primitives": [
+        "filelog storage persists file offsets; upstream warns logs can still be dropped downstream.",
+        "Official fault-tolerant example combines file storage with exporter persistent queue.",
+        "File storage fsync, size bounds and compaction trade integrity/disk limits against performance."
+      ],
+      "quality_evidence": "Selected storage tests cover max-size rejection, compaction/error paths and transactions. No current collector outage/replay test was run in this lane.",
+      "security_and_operational_boundary": "Keep logs bounded and private; dropped-event/queue-full visibility and disk retention must be explicit. A successful scrape is not an alert-delivery guarantee.",
+      "existing_or_separate_native_evidence": [
+        "adoption/paired/observation.json",
+        "observability/README.md"
+      ],
+      "acceptance_gate": "A separate disposable collector and synthetic unique records should prove sink outage, queue persistence, restart and bounded replay counts without touching current telemetry or exposing prompts.",
+      "prospective_native_commands": [
+        "otelcol-contrib --version",
+        "otelcol-contrib validate --config=\"$DISPOSABLE_COLLECTOR_CONFIG\"",
+        "otelcol-contrib --config=\"$DISPOSABLE_COLLECTOR_CONFIG\""
+      ],
+      "command_status": "Source-derived or existing-recipe templates only; not executed by this research lane. Commands that start processes require a selected disposable/authorized scope.",
+      "platform_matrix": {
+        "macos": "Source distribution capability; config and lifecycle require actual Mac acceptance.",
+        "wsl": "Historical native visibility accepted; loss/replay resilience remains an open gate.",
+        "linux": "Candidate continuous observation layer; destination, retention and alert channel must be selected."
+      },
+      "source_manifest_paths": [
+        {
+          "commit": "c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4",
+          "path": "LICENSE"
+        },
+        {
+          "commit": "c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4",
+          "path": "extension/storage/filestorage/README.md"
+        },
+        {
+          "commit": "c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4",
+          "path": "extension/storage/filestorage/client_test.go"
+        },
+        {
+          "commit": "c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4",
+          "path": "receiver/filelogreceiver/README.md"
+        },
+        {
+          "commit": "c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4",
+          "path": "examples/fault-tolerant-logs-collection/README.md"
+        }
+      ]
+    }
+  ],
+  "source_manifest": [
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "0a8edff8e55c281c2f217ef4383fbf5262138def",
+      "path": "README.md",
+      "url": "https://github.com/dagucloud/dagu/blob/0a8edff8e55c281c2f217ef4383fbf5262138def/README.md",
+      "bytes": 52639,
+      "sha256": "b652813bb7a60ffe9bc8ff4638dd92b7d632361536a2c4c83f7301b23a390132"
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "0a8edff8e55c281c2f217ef4383fbf5262138def",
+      "path": "LICENSE",
+      "url": "https://github.com/dagucloud/dagu/blob/0a8edff8e55c281c2f217ef4383fbf5262138def/LICENSE",
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "0a8edff8e55c281c2f217ef4383fbf5262138def",
+      "path": "README_SCHEMA.md",
+      "url": "https://github.com/dagucloud/dagu/blob/0a8edff8e55c281c2f217ef4383fbf5262138def/README_SCHEMA.md",
+      "bytes": 16061,
+      "sha256": "b89b1911cbafd088adb3abb345679be27d8875bffee36c2ffaf2a5a953e276c0"
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "0a8edff8e55c281c2f217ef4383fbf5262138def",
+      "path": "conformance/cli/retry_test.go",
+      "url": "https://github.com/dagucloud/dagu/blob/0a8edff8e55c281c2f217ef4383fbf5262138def/conformance/cli/retry_test.go",
+      "bytes": 2267,
+      "sha256": "3c2a847854a304b14999b6878dc26468cb076dbb7ceab3c8409d9853f8e8a049"
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "commit": "0a8edff8e55c281c2f217ef4383fbf5262138def",
+      "path": "internal/cmd/scheduler_test.go",
+      "url": "https://github.com/dagucloud/dagu/blob/0a8edff8e55c281c2f217ef4383fbf5262138def/internal/cmd/scheduler_test.go",
+      "bytes": 897,
+      "sha256": "7ff49c84b387dcfcf76f6ec35312a1dcdba99235d64c81364c52394d84064222"
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "aa4e43a2bcc8ffc3838b012c4583f561a0e199be",
+      "path": "README.md",
+      "url": "https://github.com/bytedance/deer-flow/blob/aa4e43a2bcc8ffc3838b012c4583f561a0e199be/README.md",
+      "bytes": 175869,
+      "sha256": "907df0f3d875a6498c1a2d638146dfbf111805faa886fb04c35f7d49c3a5ce69"
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "aa4e43a2bcc8ffc3838b012c4583f561a0e199be",
+      "path": "LICENSE",
+      "url": "https://github.com/bytedance/deer-flow/blob/aa4e43a2bcc8ffc3838b012c4583f561a0e199be/LICENSE",
+      "bytes": 1134,
+      "sha256": "b23dff4d4bac8d17b6efaaa7e88c2b730149c4dda45699ce676b719cfdffe7e1"
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "aa4e43a2bcc8ffc3838b012c4583f561a0e199be",
+      "path": "backend/pyproject.toml",
+      "url": "https://github.com/bytedance/deer-flow/blob/aa4e43a2bcc8ffc3838b012c4583f561a0e199be/backend/pyproject.toml",
+      "bytes": 5122,
+      "sha256": "c104c504d25b075117ffce1e447dcb8c54c694a648b413db017b148d2989d869"
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "aa4e43a2bcc8ffc3838b012c4583f561a0e199be",
+      "path": ".github/workflows/sandbox-image-smoke.yml",
+      "url": "https://github.com/bytedance/deer-flow/blob/aa4e43a2bcc8ffc3838b012c4583f561a0e199be/.github/workflows/sandbox-image-smoke.yml",
+      "bytes": 3187,
+      "sha256": "ab4ef439f36112dcc366c6b89c8ef57198ce46d7024bbc0987df8cc7e220a346"
+    },
+    {
+      "repository": "bytedance/deer-flow",
+      "commit": "aa4e43a2bcc8ffc3838b012c4583f561a0e199be",
+      "path": "backend/packages/harness/deerflow/community/aio_sandbox/local_backend.py",
+      "url": "https://github.com/bytedance/deer-flow/blob/aa4e43a2bcc8ffc3838b012c4583f561a0e199be/backend/packages/harness/deerflow/community/aio_sandbox/local_backend.py",
+      "bytes": 90848,
+      "sha256": "2f91197586948175f5cf4741da94e86211a3a9cbac43f6f25e564cdcf156122d"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "commit": "7a921299c5b4c28dcf837f56a1c312b61414a646",
+      "path": "README.md",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/7a921299c5b4c28dcf837f56a1c312b61414a646/README.md",
+      "bytes": 134956,
+      "sha256": "458399525821ef741e5b340ca3908f8959f65127f80caffa2a426c7978b9e949"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "commit": "7a921299c5b4c28dcf837f56a1c312b61414a646",
+      "path": "LICENSE",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/7a921299c5b4c28dcf837f56a1c312b61414a646/LICENSE",
+      "bytes": 1069,
+      "sha256": "5f3caa52b2c2ce5dfb40c85404a370d23b6dc3e26a1447d17dc7e56f773b91de"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "commit": "7a921299c5b4c28dcf837f56a1c312b61414a646",
+      "path": "package.json",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/7a921299c5b4c28dcf837f56a1c312b61414a646/package.json",
+      "bytes": 35345,
+      "sha256": "3872d3c766d19b4760611d7eb46fc746f2b6b3fec6d2ecb1f8fc6c9ac0b0218f"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "commit": "7a921299c5b4c28dcf837f56a1c312b61414a646",
+      "path": "docs/frameworks/A2A-SERVER.md",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/7a921299c5b4c28dcf837f56a1c312b61414a646/docs/frameworks/A2A-SERVER.md",
+      "bytes": 12410,
+      "sha256": "9c132a2f85f7d809acfc51d38efc7f5c077ad83f3b162f68e0d470c2fcff74c1"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "commit": "7a921299c5b4c28dcf837f56a1c312b61414a646",
+      "path": "open-sse/executors/codex.ts",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/7a921299c5b4c28dcf837f56a1c312b61414a646/open-sse/executors/codex.ts",
+      "bytes": 63164,
+      "sha256": "f375ca710e4be615e189f27353f5316c6b6019a05d6123fec9e05f0420ba33ca"
+    },
+    {
+      "repository": "openai/codex",
+      "commit": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+      "path": "LICENSE",
+      "url": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/LICENSE",
+      "bytes": 10926,
+      "sha256": "d17f227e4df5da1600391338865ce0f3055211760a36688f816941d58232d8dc"
+    },
+    {
+      "repository": "openai/codex",
+      "commit": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+      "path": "sdk/python/README.md",
+      "url": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/sdk/python/README.md",
+      "bytes": 1910,
+      "sha256": "e81cdb5f96e4e00862bb567f6a84864169033423c80fbbe4f19a56aff3597ed5"
+    },
+    {
+      "repository": "openai/codex",
+      "commit": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+      "path": "sdk/python/tests/test_app_server_turn_controls.py",
+      "url": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/sdk/python/tests/test_app_server_turn_controls.py",
+      "bytes": 2988,
+      "sha256": "99fcdfd32b63c23ad8fba32f491652d5cf844ca383535977d5ed83c13ecaeb64"
+    },
+    {
+      "repository": "openai/codex",
+      "commit": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+      "path": "docs/exec.md",
+      "url": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/docs/exec.md",
+      "bytes": 146,
+      "sha256": "49eac6fd452d21763683c9f224075d6c5c74ffa28217fbe50c279fa6a543200b"
+    },
+    {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "commit": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+      "path": "README.md",
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/README.md",
+      "bytes": 13250,
+      "sha256": "c38a933bf8fef26316ea38635989b254e69a26d21d80b96bf5731cba4e88bcc6"
+    },
+    {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "commit": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+      "path": "LICENSE",
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/LICENSE",
+      "bytes": 1070,
+      "sha256": "cebdde8a8fb9ee59e5eaaed19578bf8085aa7047562259c31f38f225c26f6812"
+    },
+    {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "commit": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+      "path": "src/claude_agent_sdk/types.py",
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/src/claude_agent_sdk/types.py",
+      "bytes": 89729,
+      "sha256": "fa526a35292a7463c35793cc4246364caa2e286c5c229cf0cfe2fa3cbd7efafe"
+    },
+    {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "commit": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+      "path": "tests/test_subprocess_buffering.py",
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/tests/test_subprocess_buffering.py",
+      "bytes": 21280,
+      "sha256": "3bbec7d2893851542fe6107d2402915402f37b0c5d0d64dfdd10630e41d0fac7"
+    },
+    {
+      "repository": "temporalio/temporal",
+      "commit": "ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a",
+      "path": "README.md",
+      "url": "https://github.com/temporalio/temporal/blob/ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a/README.md",
+      "bytes": 3888,
+      "sha256": "269838d3de5da90d4c2c0b45bf7fc745b384a5a05c0932582e923638e8994189"
+    },
+    {
+      "repository": "temporalio/temporal",
+      "commit": "ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a",
+      "path": "LICENSE",
+      "url": "https://github.com/temporalio/temporal/blob/ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a/LICENSE",
+      "bytes": 1152,
+      "sha256": "6aab9afd99ceb1dcaf6a0d91386b46baef9bce17ae4006044e0f231e31430b69"
+    },
+    {
+      "repository": "temporalio/temporal",
+      "commit": "ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a",
+      "path": "config/development.yaml",
+      "url": "https://github.com/temporalio/temporal/blob/ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a/config/development.yaml",
+      "bytes": 2997,
+      "sha256": "dbf440e477e5ba4a1789451f9dddba24e774fa7be3bee1f57452583cf23f373e"
+    },
+    {
+      "repository": "temporalio/temporal",
+      "commit": "ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a",
+      "path": "tests/workflow_test.go",
+      "url": "https://github.com/temporalio/temporal/blob/ea83bf5f6d85d2e9a6236e948bc56ef36d1aa24a/tests/workflow_test.go",
+      "bytes": 87348,
+      "sha256": "caf7e335d2250fab1cd4e52cfc07acce410780c80b59d6525be51f221f762269"
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "commit": "9e243df5b57e119a8ca4611761dd5f0c6716cbb6",
+      "path": "README.md",
+      "url": "https://github.com/containers/bubblewrap/blob/9e243df5b57e119a8ca4611761dd5f0c6716cbb6/README.md",
+      "bytes": 10687,
+      "sha256": "0c1dc12c6d94017c45e220fc0e5b679f24c0f09494bdd4bc7157d8abcd75c001"
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "commit": "9e243df5b57e119a8ca4611761dd5f0c6716cbb6",
+      "path": "COPYING",
+      "url": "https://github.com/containers/bubblewrap/blob/9e243df5b57e119a8ca4611761dd5f0c6716cbb6/COPYING",
+      "bytes": 26539,
+      "sha256": "a9a3b30b43ce18db2dc71339f8429be10f14dafa45cb77895da604b30467e9fb"
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "commit": "9e243df5b57e119a8ca4611761dd5f0c6716cbb6",
+      "path": "COPYING.LIB",
+      "url": "https://github.com/containers/bubblewrap/blob/9e243df5b57e119a8ca4611761dd5f0c6716cbb6/COPYING.LIB",
+      "bytes": 26539,
+      "sha256": "a9a3b30b43ce18db2dc71339f8429be10f14dafa45cb77895da604b30467e9fb"
+    },
+    {
+      "repository": "containers/bubblewrap",
+      "commit": "9e243df5b57e119a8ca4611761dd5f0c6716cbb6",
+      "path": "tests/test-run.sh",
+      "url": "https://github.com/containers/bubblewrap/blob/9e243df5b57e119a8ca4611761dd5f0c6716cbb6/tests/test-run.sh",
+      "bytes": 29982,
+      "sha256": "5c32fab358396a507a669b8477679814441115bb15e83492ab4001c2b07a6187"
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb",
+      "path": "LICENSES/README.md",
+      "url": "https://github.com/systemd/systemd/blob/e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb/LICENSES/README.md",
+      "bytes": 4206,
+      "sha256": "a817486a61df66ef79f96032763c861abd0edf4199cf39a7b1515a7e29f6e6d0"
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb",
+      "path": "man/systemd-run.xml",
+      "url": "https://github.com/systemd/systemd/blob/e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb/man/systemd-run.xml",
+      "bytes": 41067,
+      "sha256": "a4bced6f776449de6acee0c8b0dca4143484a666bd1958b2350714c6a04f82a8"
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb",
+      "path": "man/systemd.kill.xml",
+      "url": "https://github.com/systemd/systemd/blob/e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb/man/systemd.kill.xml",
+      "bytes": 11224,
+      "sha256": "448322830dbbd02c64cca99941ba92705afe9648241fc917db7a8d6ae7910e72"
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb",
+      "path": "man/systemd.service.xml",
+      "url": "https://github.com/systemd/systemd/blob/e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb/man/systemd.service.xml",
+      "bytes": 120642,
+      "sha256": "12770f86a26dcdf32873225669f5aa9421283c303bbc72bddb04530850f66d44"
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb",
+      "path": "man/systemd.resource-control.xml",
+      "url": "https://github.com/systemd/systemd/blob/e96ff3b5b92dc06ed6f623eaa0c44e97e1650dbb/man/systemd.resource-control.xml",
+      "bytes": 110159,
+      "sha256": "d57641df40e45811403de91e55059b6a8f7506c6812a85cbe9c6ba22900587d8"
+    },
+    {
+      "repository": "lima-vm/lima",
+      "commit": "376d310483786938d59284ede8f60bff940325a5",
+      "path": "README.md",
+      "url": "https://github.com/lima-vm/lima/blob/376d310483786938d59284ede8f60bff940325a5/README.md",
+      "bytes": 5042,
+      "sha256": "b1f921a59f492918a7e502319cf159127f966c998ffb9a6e027868945705b36d"
+    },
+    {
+      "repository": "lima-vm/lima",
+      "commit": "376d310483786938d59284ede8f60bff940325a5",
+      "path": "LICENSE",
+      "url": "https://github.com/lima-vm/lima/blob/376d310483786938d59284ede8f60bff940325a5/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "repository": "lima-vm/lima",
+      "commit": "376d310483786938d59284ede8f60bff940325a5",
+      "path": ".github/workflows/test.yml",
+      "url": "https://github.com/lima-vm/lima/blob/376d310483786938d59284ede8f60bff940325a5/.github/workflows/test.yml",
+      "bytes": 26379,
+      "sha256": "f8346223ec65d902054d84136862481c3fe66da55c1107dadb7f72e92037cc0a"
+    },
+    {
+      "repository": "lima-vm/lima",
+      "commit": "376d310483786938d59284ede8f60bff940325a5",
+      "path": "website/content/en/docs/config/vmtype/vz.md",
+      "url": "https://github.com/lima-vm/lima/blob/376d310483786938d59284ede8f60bff940325a5/website/content/en/docs/config/vmtype/vz.md",
+      "bytes": 1322,
+      "sha256": "8b9692965d47c3bf6caaace5628ef7ab8e9cb0a22211f756d198e7c35b4fda3e"
+    },
+    {
+      "repository": "lima-vm/lima",
+      "commit": "376d310483786938d59284ede8f60bff940325a5",
+      "path": "website/content/en/docs/config/vmtype/wsl2.md",
+      "url": "https://github.com/lima-vm/lima/blob/376d310483786938d59284ede8f60bff940325a5/website/content/en/docs/config/vmtype/wsl2.md",
+      "bytes": 3156,
+      "sha256": "8e8b5dcb857f6aa3cc472753059fc30096f17a4d5b2101fea88896bd2791653c"
+    },
+    {
+      "repository": "restic/restic",
+      "commit": "ba802d42b7294c98b62c16d1157ea3e80820c019",
+      "path": "LICENSE",
+      "url": "https://github.com/restic/restic/blob/ba802d42b7294c98b62c16d1157ea3e80820c019/LICENSE",
+      "bytes": 1345,
+      "sha256": "6f08a01a9fab5b24e139a09f15cc24a73087c7bc09e3bacf099fdf2d767bf897"
+    },
+    {
+      "repository": "restic/restic",
+      "commit": "ba802d42b7294c98b62c16d1157ea3e80820c019",
+      "path": "doc/045_working_with_repos.rst",
+      "url": "https://github.com/restic/restic/blob/ba802d42b7294c98b62c16d1157ea3e80820c019/doc/045_working_with_repos.rst",
+      "bytes": 28606,
+      "sha256": "56bfbe763b9cae005700f9472f73f69acaa28eea07d6fe258471af729ffffcd6"
+    },
+    {
+      "repository": "restic/restic",
+      "commit": "ba802d42b7294c98b62c16d1157ea3e80820c019",
+      "path": "doc/050_restore.rst",
+      "url": "https://github.com/restic/restic/blob/ba802d42b7294c98b62c16d1157ea3e80820c019/doc/050_restore.rst",
+      "bytes": 14214,
+      "sha256": "3bd90fa53326bd5161431df0868e5c40a6cb6b88f96cf70c7bd3dda9f716e278"
+    },
+    {
+      "repository": "restic/restic",
+      "commit": "ba802d42b7294c98b62c16d1157ea3e80820c019",
+      "path": "doc/060_forget.rst",
+      "url": "https://github.com/restic/restic/blob/ba802d42b7294c98b62c16d1157ea3e80820c019/doc/060_forget.rst",
+      "bytes": 26875,
+      "sha256": "deed2c7aa2cd6fb5c5bd2da0daab184281aac4f92e17b11e3355f88cbd130aee"
+    },
+    {
+      "repository": "F1bonacc1/process-compose",
+      "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+      "path": "README.md",
+      "url": "https://github.com/F1bonacc1/process-compose/blob/23b0acacc937d745279fb1551337f4031c4fc865/README.md",
+      "bytes": 4680,
+      "sha256": "beb08eadf2bdb0ae67c6970e15f76aae196ebc2023ead30b561430b65998e422"
+    },
+    {
+      "repository": "F1bonacc1/process-compose",
+      "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+      "path": "LICENSE",
+      "url": "https://github.com/F1bonacc1/process-compose/blob/23b0acacc937d745279fb1551337f4031c4fc865/LICENSE",
+      "bytes": 11343,
+      "sha256": "3a8b61ac54f1969a21279c9026641d28b7523ed22cea75fadc44fddadc1a8ceb"
+    },
+    {
+      "repository": "F1bonacc1/process-compose",
+      "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+      "path": "www/docs/health.md",
+      "url": "https://github.com/F1bonacc1/process-compose/blob/23b0acacc937d745279fb1551337f4031c4fc865/www/docs/health.md",
+      "bytes": 4423,
+      "sha256": "1554ed89fa0ccee86da73034515646582d3f6ee81aabfa9db5e9bbb33b776760"
+    },
+    {
+      "repository": "F1bonacc1/process-compose",
+      "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+      "path": "src/health/health_checks_test.go",
+      "url": "https://github.com/F1bonacc1/process-compose/blob/23b0acacc937d745279fb1551337f4031c4fc865/src/health/health_checks_test.go",
+      "bytes": 2976,
+      "sha256": "062494a83f1da9860cbdb2dd6789fa5001f150b5bd1d8a49741f4cd908b1386c"
+    },
+    {
+      "repository": "F1bonacc1/process-compose",
+      "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+      "path": "fixtures-code/process-compose-shutdown-inorder.yaml",
+      "url": "https://github.com/F1bonacc1/process-compose/blob/23b0acacc937d745279fb1551337f4031c4fc865/fixtures-code/process-compose-shutdown-inorder.yaml",
+      "bytes": 1457,
+      "sha256": "f9ab48ba9070323405af5a5d83e93cf529cc2d0eb7ac50591049ff5c0e3233bc"
+    },
+    {
+      "repository": "open-telemetry/opentelemetry-collector-contrib",
+      "commit": "c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4",
+      "path": "LICENSE",
+      "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4/LICENSE",
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+    },
+    {
+      "repository": "open-telemetry/opentelemetry-collector-contrib",
+      "commit": "c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4",
+      "path": "extension/storage/filestorage/README.md",
+      "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4/extension/storage/filestorage/README.md",
+      "bytes": 13668,
+      "sha256": "ba6b58efb9ed9a6bbb7e9a684733d7ae2a2a7cd1764915ce00aa37d8234d14bd"
+    },
+    {
+      "repository": "open-telemetry/opentelemetry-collector-contrib",
+      "commit": "c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4",
+      "path": "extension/storage/filestorage/client_test.go",
+      "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4/extension/storage/filestorage/client_test.go",
+      "bytes": 34175,
+      "sha256": "a616817a0986e882eb0113549012a8c40ba97d86bfed82453369e9077be2e4d4"
+    },
+    {
+      "repository": "open-telemetry/opentelemetry-collector-contrib",
+      "commit": "c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4",
+      "path": "receiver/filelogreceiver/README.md",
+      "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4/receiver/filelogreceiver/README.md",
+      "bytes": 35597,
+      "sha256": "eb653a39f3b2c8c89890d8f7345fe792968240273715d903db182a276d816cfc"
+    },
+    {
+      "repository": "awesome-selfhosted/awesome-selfhosted",
+      "commit": "16189dbd4cacec0b2a4982c628c30e82c8473662",
+      "path": "README.md",
+      "url": "https://github.com/awesome-selfhosted/awesome-selfhosted/blob/16189dbd4cacec0b2a4982c628c30e82c8473662/README.md",
+      "bytes": 328353,
+      "sha256": "0b12e6985747323fcf0cfa2c9f5d41d5da27607aa3010d18817f0ff6dd02f2f7"
+    },
+    {
+      "repository": "n1trux/awesome-sysadmin",
+      "commit": "a0f64294fa6c672767f4dffc978023194bf99550",
+      "path": "README.md",
+      "url": "https://github.com/n1trux/awesome-sysadmin/blob/a0f64294fa6c672767f4dffc978023194bf99550/README.md",
+      "bytes": 76102,
+      "sha256": "c86e591abee4eed1f47675c81f2cfc1b07fa3f568bb2e54f280b508e8784849b"
+    },
+    {
+      "repository": "jetify-com/devbox",
+      "commit": "9704c95c3294c24d259388777cf5059cb37f56bd",
+      "path": "README.md",
+      "url": "https://github.com/jetify-com/devbox/blob/9704c95c3294c24d259388777cf5059cb37f56bd/README.md",
+      "bytes": 6446,
+      "sha256": "7ea3452e30b63bc16e298f3afd16277a9c1b9515715543a4db052ae03ba32c1d"
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "db11bab38ccf1ed257f310d29070843d4c58ea01",
+      "path": "man/systemd-run.xml",
+      "url": "https://github.com/systemd/systemd/blob/db11bab38ccf1ed257f310d29070843d4c58ea01/man/systemd-run.xml",
+      "bytes": 34509,
+      "sha256": "a8fcbe161d2543ccbd56b35dc790ea8cca03df6cb05f7ac6d794406c23b0d7ee"
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "db11bab38ccf1ed257f310d29070843d4c58ea01",
+      "path": "man/systemd.kill.xml",
+      "url": "https://github.com/systemd/systemd/blob/db11bab38ccf1ed257f310d29070843d4c58ea01/man/systemd.kill.xml",
+      "bytes": 10992,
+      "sha256": "609de8880bb64f97ee8bb9c0df28d886b8965e088f44c2555c08418824fd1cf6"
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "db11bab38ccf1ed257f310d29070843d4c58ea01",
+      "path": "man/systemd.service.xml",
+      "url": "https://github.com/systemd/systemd/blob/db11bab38ccf1ed257f310d29070843d4c58ea01/man/systemd.service.xml",
+      "bytes": 105777,
+      "sha256": "439322b120014971f37e0a96adc6cb827367846ff6c16f193e9ec4b15931033b"
+    },
+    {
+      "repository": "systemd/systemd",
+      "commit": "db11bab38ccf1ed257f310d29070843d4c58ea01",
+      "path": "man/systemd.resource-control.xml",
+      "url": "https://github.com/systemd/systemd/blob/db11bab38ccf1ed257f310d29070843d4c58ea01/man/systemd.resource-control.xml",
+      "bytes": 96926,
+      "sha256": "5666a4f337073cc42482775831f44e07a6a0ca31f7f4db5ba98925e943ecde80"
+    },
+    {
+      "repository": "F1bonacc1/process-compose",
+      "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+      "path": "src/app/process.go",
+      "url": "https://github.com/F1bonacc1/process-compose/blob/23b0acacc937d745279fb1551337f4031c4fc865/src/app/process.go",
+      "bytes": 37904,
+      "sha256": "6f5a279ecb739db94b9f2d82de27ef6e37e9675c148baf19c858dbad51b816a0"
+    },
+    {
+      "repository": "F1bonacc1/process-compose",
+      "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+      "path": "www/docs/launcher.md",
+      "url": "https://github.com/F1bonacc1/process-compose/blob/23b0acacc937d745279fb1551337f4031c4fc865/www/docs/launcher.md",
+      "bytes": 15658,
+      "sha256": "65faf4599c345cfed3888753f629031653db4e80ddd4e1564480afae80dabe0a"
+    },
+    {
+      "repository": "F1bonacc1/process-compose",
+      "commit": "23b0acacc937d745279fb1551337f4031c4fc865",
+      "path": "www/docs/installation.md",
+      "url": "https://github.com/F1bonacc1/process-compose/blob/23b0acacc937d745279fb1551337f4031c4fc865/www/docs/installation.md",
+      "bytes": 1826,
+      "sha256": "019f5c9388825982a3fc176ad10a1f5d4859a66d0541fbc5f5d4ea750469c3e5"
+    },
+    {
+      "repository": "restic/restic",
+      "commit": "ba802d42b7294c98b62c16d1157ea3e80820c019",
+      "path": "cmd/restic/cmd_restore_integration_test.go",
+      "url": "https://github.com/restic/restic/blob/ba802d42b7294c98b62c16d1157ea3e80820c019/cmd/restic/cmd_restore_integration_test.go",
+      "bytes": 13905,
+      "sha256": "bee70a8bda40bd934f583298f938b57310efc18d2f305136425f37cd0b827aa1"
+    },
+    {
+      "repository": "open-telemetry/opentelemetry-collector-contrib",
+      "commit": "c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4",
+      "path": "examples/fault-tolerant-logs-collection/README.md",
+      "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/c99c5bb4046f707f2a91ceda617fe0bebb3bc6d4/examples/fault-tolerant-logs-collection/README.md",
+      "bytes": 696,
+      "sha256": "cf22a219e127e4cca4c4a31798337ad666723807e8da0b20fffe8e803e6ee26d"
+    },
+    {
+      "repository": "openai/codex",
+      "commit": "daed4b9755a4215a149ae7e5538d8cd34709cb40",
+      "path": "sdk/python/src/openai_codex/client.py",
+      "url": "https://github.com/openai/codex/blob/daed4b9755a4215a149ae7e5538d8cd34709cb40/sdk/python/src/openai_codex/client.py",
+      "bytes": 33781,
+      "sha256": "8452afbd8148ea212c94e8a6727468054b175acb0daf95002c84b66b604d05a6"
+    },
+    {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "commit": "3cb0f73e6234408b5883b1e7e2875a46a3049cb9",
+      "path": "src/claude_agent_sdk/client.py",
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/3cb0f73e6234408b5883b1e7e2875a46a3049cb9/src/claude_agent_sdk/client.py",
+      "bytes": 25488,
+      "sha256": "feb85541077eb9b059f9a7daebee32b847092321c90ccaa639a288ef275a7bf7"
+    },
+    {
+      "repository": "diegosouzapw/OmniRoute",
+      "commit": "7a921299c5b4c28dcf837f56a1c312b61414a646",
+      "path": "src/lib/a2a/taskManager.ts",
+      "url": "https://github.com/diegosouzapw/OmniRoute/blob/7a921299c5b4c28dcf837f56a1c312b61414a646/src/lib/a2a/taskManager.ts",
+      "bytes": 12516,
+      "sha256": "b4fc6379c9cf4b1f3b40e2e9dfae86df77c631014121ed1fa8f87637cb606e4a"
+    },
+    {
+      "repository": "jetify-com/devbox",
+      "commit": "9704c95c3294c24d259388777cf5059cb37f56bd",
+      "path": "internal/services/manager.go",
+      "url": "https://github.com/jetify-com/devbox/blob/9704c95c3294c24d259388777cf5059cb37f56bd/internal/services/manager.go",
+      "bytes": 10400,
+      "sha256": "858f20c6ad636f2046db6bc2dad7f1f58656582e9fc4c68d482eb448eadfc487"
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "id": "native-worker-supervision-20260919",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "systemd"
+  ],
+  "checked_at": "2026-09-19T21:35:30Z",
+  "claim": "The existing Linux/WSL2 user service manager enforced a transient worker runtime deadline, killed a TERM-ignoring parent and its two descendants, preserved a native timeout failure, and accepted a separate fresh successful run.",
+  "host_scope": {
+    "os": "Linux/WSL2",
+    "architecture": "x86_64",
+    "systemd": "255.4-1ubuntu8.17",
+    "cgroup": "v2 unified",
+    "user_manager": "running",
+    "installed_or_upgraded": false
+  },
+  "native_observation": {
+    "started_at": "2026-09-19T21:35:25.154962+00:00",
+    "finished_at": "2026-09-19T21:35:30.659859+00:00",
+    "deadline_cli_exit": 1,
+    "Type": "exec",
+    "RuntimeMaxUSec": "4s",
+    "TimeoutStopUSec": "1s",
+    "KillMode": "control-group",
+    "SendSIGKILL": "yes",
+    "Restart": "no",
+    "NRestarts": "0",
+    "NoNewPrivileges": "yes",
+    "Result": "timeout",
+    "ExecMainCode": "2",
+    "ExecMainStatus": "9",
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "service_runtime": "5.374s",
+    "cpu_time_consumed": "21ms",
+    "memory_peak_display": "8.9M",
+    "memory_swap_peak_display": "0B",
+    "active_cgroup_values": {
+      "memory.max": "67108864",
+      "pids.max": "16",
+      "cpu.max": "25000 100000"
+    },
+    "fixture_process_count": 3,
+    "active_cgroup_process_count": 3,
+    "all_roles_ignored_sigterm": true,
+    "all_roles_in_expected_cgroup": true,
+    "original_pid_starttime_identities_absent": 3,
+    "remaining_cgroup_processes": 0,
+    "cgroup_directory_removed": true,
+    "fresh_service": {
+      "command": "/usr/bin/env -i /usr/bin/true",
+      "cli_exit": 0,
+      "result": "success",
+      "process_exit": 0,
+      "service_runtime": "2ms"
+    },
+    "synthetic_failed_unit_reset_exit": 0
+  },
+  "fixture": {
+    "path": "blueprints/us-equities/worker-supervision/fixture.py",
+    "sha256": "845f11b5e5eb72115f2c8e9213dcd7eb1f8ce0b403a904be87b388f3d4cc6562"
+  },
+  "private_raw_artifacts": [
+    {
+      "name": "supervision_run.py",
+      "bytes": 5010,
+      "sha256": "ce460671e14fc87481c9c63db1924f5df535efbb25b0c85c3cd346f0e8b97e40"
+    },
+    {
+      "name": "commands.private.json",
+      "bytes": 3256,
+      "sha256": "2f9ba3d82c25069ec1d30ce6b52ae76505eeec67c48d50cb4cfeef1d26e301dc"
+    },
+    {
+      "name": "active-cgroup.json",
+      "bytes": 124,
+      "sha256": "d4d63c0edeeb84c1fdc75cfcd6bdd7355fda0868fe9d6ef2fbe235a13aebae2a"
+    },
+    {
+      "name": "active-show.stdout",
+      "bytes": 462,
+      "sha256": "a6b6ec70e8c8013693a218c19f6924e8410fa3214087da30efa7a02be6f45907"
+    },
+    {
+      "name": "deadline-final-show.stdout",
+      "bytes": 356,
+      "sha256": "8667207f42225a1831a7286a3f2c323720303ac6680890d82057cfd4c468412f"
+    },
+    {
+      "name": "deadline.stderr",
+      "bytes": 299,
+      "sha256": "c365f3bd17118e0f9881af21b99c040fd8f7818781d1451ed79d7701fead4b56"
+    },
+    {
+      "name": "deadline-journal.stdout",
+      "bytes": 2256,
+      "sha256": "73d7e00039d5cc94899da75da51b19bb575a4a1814abc1fd545abba84b1ea68f"
+    },
+    {
+      "name": "fresh-success.stderr",
+      "bytes": 300,
+      "sha256": "b2c032501957cf343297e10057a770e9df47b7516a0f180128a4c0de4b0d497f"
+    },
+    {
+      "name": "result.private.json",
+      "bytes": 1495,
+      "sha256": "9e85fdf28f9013154bc0c53b9014bf05fc4ee5bd22414904fe3c84fb9ca56e9d"
+    },
+    {
+      "name": "systemd-version.stdout",
+      "bytes": 330,
+      "sha256": "24e682030f54829600ce9c96ef9d8be4297eb4cd1b11eca8fa7f83c5c4595fc7"
+    }
+  ],
+  "limitations": [
+    "Synthetic offline worker only; no Codex, Claude, broker, model, account, network, or paid-host calls.",
+    "The successful second unit was explicitly launched; this does not prove checkpoint resume, automatic retry, duplicate suppression, or preservation of unfinished application state.",
+    "CPU, memory and task cgroup values were observed while active; quota saturation, OOM behavior and production sizing were not tested.",
+    "NoNewPrivileges and cgroup supervision are not filesystem or network isolation. This same-user fixture is not an adversarial sandbox escape test.",
+    "No persistent unit, scheduler, timer or existing service configuration was changed. The synthetic failed unit was reset after evidence capture.",
+    "Linux/WSL2 host only; no native macOS, Windows, host reboot, WSL shutdown recovery or always-on remote-host acceptance.",
+    "Local process termination does not establish remote provider cancellation, stopped billing or reversal of external effects.",
+    "systemd latest upstream release is distinct from the accepted distribution build; no systemd upgrade was performed.",
+    "Hashes bind retained evidence bytes; they do not independently attest the execution."
+  ]
+}
