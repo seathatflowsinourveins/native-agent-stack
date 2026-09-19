@@ -189,6 +189,24 @@ class FinancialDataTests(unittest.TestCase):
         self.assertEqual([r["status"] for r in rows], ["excluded", "excluded"])
         self.assertEqual(SEC.select_facts(rows, OBSERVED)[0], [])
 
+    def test_decimal_storage_boundaries_do_not_use_context_rounded_absolute_value(self):
+        from decimal import Decimal
+        for value, expected_status in [
+            ("99999999999999999999999999.999999999999", "available"),
+            ("-99999999999999999999999999.999999999999", "available"),
+            ("100000000000000000000000000", "excluded"),
+            ("-100000000000000000000000000", "excluded"),
+        ]:
+            with self.subTest(value=value):
+                data = facts()
+                data["facts"]["us-gaap"]["Assets"]["units"]["USD"][0]["val"] = Decimal(value)
+                row = normalize(data=data)[0]
+                self.assertEqual(row["status"], expected_status)
+                if expected_status == "available":
+                    self.assertEqual(row["value_decimal"], value)
+                else:
+                    self.assertEqual(row["exclusion_reason"], "invalid_or_unrepresentable_numeric")
+
     def test_partial_acquisition_retains_source_and_failure_but_no_dataset(self):
         def responses(url, user_agent):
             if "/submissions/" in url:

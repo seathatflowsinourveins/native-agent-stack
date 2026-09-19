@@ -64,7 +64,7 @@
       "failures": 0,
       "skip_reason": "DuckDB is intentionally installed only in the pinned research environment",
       "skips": 2,
-      "tests": 83
+      "tests": 84
     },
     "diff_check": "passed",
     "duckdb_version": "1.5.5",
@@ -75,10 +75,10 @@
     "research_environment_suite": {
       "failures": 0,
       "skips": 0,
-      "tests": 83
+      "tests": 84
     },
     "targeted_failures": 0,
-    "targeted_tests": 15
+    "targeted_tests": 16
   },
   "public_contact_used": "https://github.com/seathatflowsinourveins/native-agent-stack",
   "schema_version": 1,

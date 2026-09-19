@@ -268,7 +268,7 @@ def normalize_facts(symbol, cik, data, submissions, fact_source, submission_sour
                 try:
                     value = Decimal(row["value_text"])
                     # Fixed decimal storage never rounds a value into acceptance.
-                    if not value.is_finite() or abs(value) >= Decimal(10) ** 26 or value.as_tuple().exponent < -12:
+                    if not value.is_finite() or value.copy_abs() >= Decimal("1e26") or value.as_tuple().exponent < -12:
                         raise ValueError("numeric_bound")
                     row["value_decimal"] = str(value)
                 except (InvalidOperation, ValueError):
