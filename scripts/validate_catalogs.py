@@ -8,6 +8,7 @@ presence and declared class cannot establish that it supports every prose claim.
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 from datetime import date, datetime
 import json
 from pathlib import Path, PurePosixPath
@@ -21,7 +22,7 @@ CATALOG_FILES = tuple(f"{BASE}/{name}.json" for name in (
 ))
 DECISIONS = {"default", "conditional", "alternative", "watch", "excluded"}
 EVIDENCE_LEVELS = {"source_review", "native_proven", "metadata_only"}
-DISPOSITIONS = {"catalog_reviewed", "baseline_record", "metadata_only_unassessed"}
+DISPOSITIONS = {"catalog_reviewed", "baseline_record", "no_catalog_card", "metadata_only_unassessed"}
 NATIVE_RECEIPT_KINDS = {
     "native_model_e2e", "native_cli_e2e", "artifact_measurement", "historical_inventory",
 }
@@ -350,6 +351,9 @@ class Validator:
         coverage = self.load(manifest["coverage_file"])
         self.header(coverage, "coverage", checked_at)
         self.read_aliases(coverage)
+        audit_path = f"{BASE}/star-audit.json"
+        require(manifest.get("star_audit_file") == audit_path, "manifest.star_audit_file",
+                f"expected {audit_path}")
         repositories: dict[str, set[str]] = {}
         for relative in catalogs:
             for name, ids in self.catalog(relative, checked_at).items():
@@ -360,12 +364,84 @@ class Validator:
             "models": self.models(manifest["model_file"], checked_at),
             **self.coverage(coverage, repositories),
         }
+        self.star_audit(self.load(audit_path), coverage, checked_at)
         declared = object_value(manifest.get("counts"), "manifest.counts")
         require(set(declared) == set(counts), "manifest.counts", "missing or unknown count fields")
         for key, actual in counts.items():
             require(type(declared[key]) is int and declared[key] >= 0, f"manifest.counts.{key}", "expected nonnegative integer")
             require(declared[key] == actual, f"manifest.counts.{key}", f"declared {declared[key]}, computed {actual}")
         return counts
+
+    def star_audit(self, audit: dict, coverage: dict, checked_at: str) -> None:
+        """Require a disposition for every star without upgrading review to E2E."""
+        self.header(audit, "star-audit", checked_at)
+        text(audit.get("scope"), "star-audit.scope")
+        expected = {}
+        for value in sequence(coverage.get("stars"), "coverage.stars", nonempty=False):
+            item = object_value(value, "coverage.star")
+            name = self.canonical(repository(item.get("repository"), "coverage.repository"))
+            expected[name] = item
+        seen = set()
+        actual_levels, actual_depths, actual_decisions = Counter(), Counter(), Counter()
+        levels = {"prior_catalog", "prior_baseline", "source_review", "metadata_only", "unavailable"}
+        for index, value in enumerate(sequence(audit.get("entries"), "star-audit.entries")):
+            label = f"star-audit.entries[{index}]"
+            item = object_value(value, label)
+            name = self.canonical(repository(item.get("repository"), label + ".repository"))
+            require(name not in seen, label, "duplicate canonical repository")
+            seen.add(name)
+            level = enum(item.get("review_level"), levels, label + ".review_level")
+            actual_levels[level] += 1
+            depth = enum(item.get("review_depth"), {
+                "readme_license_overview", "selected_primary_files", "prior_evidence_link",
+                "metadata_only", "unavailable",
+            }, label + ".review_depth")
+            actual_depths[depth] += 1
+            for field in ("decision", "role", "rationale"):
+                text(item.get(field), label + "." + field)
+            actual_decisions[item["decision"]] += 1
+            ids = set(strings(item.get("catalog_entry_ids"), label + ".catalog_entry_ids", nonempty=False))
+            require(ids == set(expected.get(name, {}).get("catalog_entry_ids", [])), label,
+                    "catalog_entry_ids do not match the coverage record")
+            refs = strings(item.get("evidence_refs"), label + ".evidence_refs", nonempty=False)
+            if refs:
+                self.evidence(refs, label + ".evidence_refs")
+            strings(item.get("limitations"), label + ".limitations")
+            for source in strings(item.get("sources"), label + ".sources"):
+                https(source, label + ".sources")
+            if level == "source_review":
+                require(isinstance(item.get("source_commit"), str)
+                        and bool(SHA.fullmatch(item["source_commit"])), label,
+                        "source review requires a pinned commit")
+                require(depth in {"readme_license_overview", "selected_primary_files"}, label,
+                        "source review must declare an actual source inspection depth")
+            if level in {"prior_catalog", "prior_baseline"}:
+                disposition = "catalog_reviewed" if level == "prior_catalog" else "baseline_record"
+                require(expected.get(name, {}).get("disposition") == disposition, label,
+                        "prior review must match the referenced coverage record")
+                require(depth == "prior_evidence_link" and bool(refs), label,
+                        "prior review requires its prior evidence link and references")
+        require(seen == set(expected), "star-audit", "entries must cover exactly the public-star snapshot")
+        counts = object_value(audit.get("counts"), "star-audit.counts")
+        def integer_counts(values, label):
+            for key, value in values.items():
+                if isinstance(value, dict):
+                    integer_counts(value, label + "." + key)
+                else:
+                    require(type(value) is int and value >= 0, label + "." + key,
+                            "expected nonnegative integer")
+        integer_counts(counts, "star-audit.counts")
+        calculated = {
+            "public_stars": len(seen),
+            "previously_covered": actual_levels["prior_catalog"] + actual_levels["prior_baseline"],
+            "new_source_dispositions": actual_levels["source_review"],
+            "unassessed": actual_levels["metadata_only"] + actual_levels["unavailable"],
+            "by_review_level": dict(actual_levels), "by_review_depth": dict(actual_depths),
+            "by_decision": dict(actual_decisions),
+        }
+        for key, actual in calculated.items():
+            require(counts.get(key) == actual, "star-audit.counts." + key,
+                    "declared count does not match entries")
 
 
 def validate(root: Path) -> dict[str, int]:

@@ -1,0 +1,17 @@
+host: 127.0.0.1
+port: 18525
+check_updates: false
+metrics: private
+env_passthrough:
+  - STACK_REPO
+  - SDK_ENV
+  - LEAN_EVENTS
+  - RESEARCH_OUTPUT
+auth:
+  mode: basic
+  basic:
+    username: local-research
+    password: REPLACE_WITH_A_PRIVATE_RANDOM_PASSWORD
+permissions:
+  write_dags: false
+  run_dags: false

@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "scope": "Bounded native research/build/hosting gap resolution. Not a complete trading runtime or universal SOTA certification.",
+  "decision_coverage": {
+    "public_stars": 337,
+    "prior_records": 51,
+    "readme_license_overviews": 268,
+    "selected_file_reviews": 18,
+    "unassessed": 0,
+    "targeted_candidates": 14,
+    "grand_repository_index": 447,
+    "beyond_star_identities": 110,
+    "core_repository_cards": 145,
+    "core_unique_repositories": 140,
+    "models": 20,
+    "audit": "catalogs/us-equities/star-audit.json"
+  },
+  "closed_within_scope": [
+    {
+      "id": "star_decision_coverage",
+      "evidence": "catalogs/us-equities/star-audit.json",
+      "scope": "Every public star has a typed disposition; not exhaustive file/security review."
+    },
+    {
+      "id": "deerflow_embedded_native_inference",
+      "evidence": "blueprints/us-equities/deerflow/research-receipt.json",
+      "scope": "One actual native ACP research task; effective workspaceWrite preset disclosed."
+    },
+    {
+      "id": "lean_runtime_dependency_advisories",
+      "evidence": "blueprints/us-equities/engine/resolution-receipt.json",
+      "scope": "Two checked runtime graphs; local source patches, compiler warnings retained."
+    },
+    {
+      "id": "alpaca_adapter_native_compilation",
+      "evidence": "blueprints/us-equities/engine/resolution-receipt.json",
+      "scope": "Build only; no initialization, broker call or subscription-validation request."
+    },
+    {
+      "id": "local_research_workflow_hosting",
+      "evidence": "blueprints/us-equities/hosting/receipt.json",
+      "scope": "Manual native DAG and authenticated status server; completed-history restart only."
+    },
+    {
+      "id": "omniroute_astra_text_responses",
+      "evidence": "blueprints/us-equities/routing/astra-receipt.json",
+      "scope": "Exact Astra text response after native login and supported client-version alignment; tool/hook/compaction parity untested, failed-attempt provider usage unknown."
+    }
+  ],
+  "external_or_design_requirements": [
+    {
+      "id": "paper_account_data_and_adapter_entitlement",
+      "status": "requires_user_access",
+      "reason": "No configured paper credentials; official adapter runtime validates QuantConnect product347 entitlement."
+    },
+    {
+      "id": "versioned_strategy_and_risk",
+      "status": "requires_specification_and_acceptance",
+      "reason": "Universe, horizon and numeric limits are unset; no strategy edge established."
+    },
+    {
+      "id": "deterministic_execution_and_recovery",
+      "status": "not_implemented",
+      "reason": "No broker order writer/journal/reconciliation/kill-switch or paper reconnect acceptance."
+    },
+    {
+      "id": "full_deerflow_host",
+      "status": "optional_not_deployed",
+      "reason": "Embedded tool acceptance does not deploy planner/UI/storage/scheduler."
+    },
+    {
+      "id": "acp_strict_read_only",
+      "status": "upstream_limitation",
+      "reason": "Preset read-only is workspaceWrite; use accepted official native SDK strict read-only instead."
+    },
+    {
+      "id": "desktop_context_tool_discovery",
+      "status": "client_boundary",
+      "reason": "Native tools work; existing Desktop catalog does not gain newly registered MCP tools without normal discovery/reload."
+    },
+    {
+      "id": "context_mode_sdk_file_scope",
+      "status": "normal_approval_required",
+      "reason": "Existing ctx_execute works; new ephemeral file-tool transport override still needs normal native MCP approval."
+    },
+    {
+      "id": "net_provider_savings",
+      "status": "not_measured",
+      "reason": "Artifact reduction and cached-input counters are not a paired complete-task usage comparison."
+    }
+  ],
+  "privacy": "No account stores, raw sessions, private service password, broker credentials or private star identities are published.",
+  "verification": {
+    "offline_tests_passed": 63,
+    "scope": "Publication/coverage regression tests; no provider rerun.",
+    "independent_reviews": "Engine, DeerFlow, hosting and root coverage-validation changes independently reviewed; supported findings corrected.",
+    "hash_listed_files": 118,
+    "gitleaks_current_tree_findings": 0,
+    "gitleaks_scanned_bytes_approx": 2225921,
+    "qmd": {
+      "update_exit_code": 0,
+      "index": "native-agent-stack-catalog",
+      "collections": {
+        "us-equities-catalog": 9,
+        "us-equities-foundation": 15
+      },
+      "retrieval_query": "gap resolution",
+      "search_exit_code": 0,
+      "get_exit_code": 0,
+      "new_embedding_models_downloaded": false,
+      "scope": "Native lexical update/search/get, not measured provider-token savings."
+    }
+  }
+}

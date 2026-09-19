@@ -13,14 +13,14 @@ It is not a deployed broker service or a validated profitable strategy.
 | Context efficiency | Stable policy, bounded tool output, Context Mode/RTK, explicit handoff files | Native use proved with documented scope limits |
 | Continuity | ai-memory as shared durable memory; canonical project instructions for rules | Active in the adopted starter project |
 | Retrieval | QMD for scoped Markdown; Serena for symbols; SocratiCode → Nemotron → Qdrant for code | Local automatic code refresh proved; no financial corpus implied |
-| Optional routing | OmniRoute for deliberately selected, independently verified routes | Healthy; prior Opus/Qwen proof; Astra route unproved |
-| Optional research orchestration | DeerFlow stable 2.0 reference; pinned development backend/ACP exploration | Backend/discovery proved; full inference orchestration pending |
+| Optional routing | OmniRoute for deliberately selected, independently verified routes | Healthy; prior Opus/Qwen and new bounded Astra text proof; full native parity unproved |
+| Optional research orchestration | DeerFlow stable 2.0 reference; pinned development backend/ACP exploration | Embedded native ACP inference proved; full planner/UI hosting pending |
 | Market/filing ingestion | Alpaca SDK plus SEC-sourced filings; alternative commercial feeds only with entitlement | SDK installed; financial ingestion and account access pending |
 | Research data | Immutable raw snapshots, Parquet and DuckDB; exchange calendars | Native sample-event pipeline proved |
-| Engine | LEAN native source build, one engine-owned paper adapter later | Bundled backtest proved; dependency advisories and adapter acceptance pending |
+| Engine | LEAN native source build, one engine-owned paper adapter later | Bundled backtest proved; patched build and source-integrated adapter evidence recorded; credentialed runtime pending |
 | Strategy research | Simple lagged baselines, then selected Qlib/statistical/portfolio tools | Catalogued; no strategy accepted or performance asserted |
 | Execution state | Separate deterministic order writer, durable journal and broker reconciliation | Design requirement, not implemented |
-| Hosting | On-demand native research now; dedicated Linux service identity for paper later | No new cloud account or standing trading service |
+| Hosting | On-demand native research and Dagu history service now; dedicated identity for paper later | No new cloud account or standing trading service |
 | Operations | Private receipts/usage, Gitleaks now; SBOM, dependency triage, telemetry and recovery later | Scope-specific evidence in the catalog |
 
 Installing every alternative would increase dependency, model-call and context
@@ -88,8 +88,9 @@ backtest Sharpe alone do not demonstrate deployable alpha. See the
 
 The completed LEAN sample proves an engine/data path: 3,943 data points and three
 simulated orders. Its 2013 sample is not a contemporary strategy evaluation.
-The native build's seven advisory/package pairs require triage before a standing
-service. Do not interpret a successful build as dependency security acceptance.
+The original build's seven advisory/package pairs were resolved in the
+[pinned local patch](engine/resolution.md); standing trading deployment still needs
+broker, risk and recovery acceptance. Do not interpret a successful build as dependency security acceptance.
 
 ## Paper runtime acceptance
 

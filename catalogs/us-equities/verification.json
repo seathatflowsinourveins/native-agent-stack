@@ -39,9 +39,11 @@
   "remaining_acceptance": [
     "No universal SOTA or exhaustive deep review of all stars claimed.",
     "Most catalog workflows remain source-reviewed and unexecuted.",
-    "No full DeerFlow inference chain or Astra gateway route proved.",
+    "At this checkpoint neither DeerFlow inference nor the Astra gateway route had been proved; later receipts are separate.",
     "No financial data ingestion, accepted strategy, Alpaca paper connection, risk/reconciliation service or unattended hosting proved.",
-    "LEAN dependency advisories remain open before unattended deployment.",
+    "At this historical checkpoint LEAN advisories were open; later remediation is recorded separately.",
     "Artifact token reduction and native SDK cache reuse do not establish whole-task provider or billing savings."
-  ]
+  ],
+  "follow_up": "Later runtime results supersede these historical checkpoint limitations; see blueprints/us-equities/gap-resolution.md.",
+  "limitations": []
 }

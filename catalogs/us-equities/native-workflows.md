@@ -69,9 +69,9 @@ first-weight and research-paper dates from repository creation/card edits.
 | Native Codex SDK → configured GPT-6 Astra → Context Mode | Useful research task completed in 58,410 ms; 3 execute calls and 1 stats call succeeded; file-scope attempt failed | [Worker commands/receipt](../../blueprints/us-equities/workers/README.md) |
 | All three native SDK turns, including two failed file checks | 202,164 input; 176,000 cached input; 1,927 output; 204,091 total | Cache share 87.06%; not net token savings |
 | DeerFlow SDK + native Gateway | 0 configured models, 23 skills; health200/protected-models401 | [DeerFlow commands](../../blueprints/us-equities/deerflow/README.md) |
-| Maintained Codex ACP | Protocol1 session discovery, configured Astra/high/read-only; zero prompt calls | Full DeerFlow inference remains unproved |
+| Maintained Codex ACP | Protocol1 session discovery, configured Astra/high/read-only; zero prompt calls | Later [embedded native inference completed](../../blueprints/us-equities/deerflow/research-receipt.json); strict read-only sandbox was not provided by ACP |
 | OmniRoute / FreeLLMAPI health | HTTP200 / HTTP200, no inference in this health check | [Routing guide](../../blueprints/us-equities/routing/README.md); historical Opus/Qwen separate |
-| Native LEAN source build/backtest | 3,943 data points; 3 simulated orders; 13/13 local data requests; matching upstream order hash | [Engine commands](../../blueprints/us-equities/engine/README.md); advisories unresolved |
+| Native LEAN source build/backtest | 3,943 data points; 3 simulated orders; 13/13 local data requests; matching upstream order hash | [Engine commands](../../blueprints/us-equities/engine/README.md); [local dependency patches and native audits completed](../../blueprints/us-equities/engine/resolution.md) |
 | DuckDB JSON → Parquet → SQL + XNYS calendar | 6 events / 3 distinct simulated orders; session13:30–20:00UTC | [Data commands](../../blueprints/us-equities/data/README.md) |
 | Existing automatic local code RAG | 35 files / 139 chunks; add/change/delete about3s each | [Baseline results](../../docs/direct-results.md); scope is the adopted starter project |
 
@@ -95,3 +95,7 @@ python3 -m unittest discover -s tests
 
 These are offline structural, reference, hash, privacy and validation-regression
 checks. They do not rerun provider inference, GPU services, market data or orders.
+
+The [local Dagu workflow](../../blueprints/us-equities/hosting/README.md) subsequently ran the deterministic summary and both evidence validators, then retained successful/failed/cancelled history across a service restart. [Current gap ledger](../../blueprints/us-equities/gap-resolution.md).
+
+The later [OmniRoute Astra receipt](../../blueprints/us-equities/routing/astra-receipt.json) records one completed exact-model text response (81 input +55 output), the supported native-client-version configuration and both earlier failures. Failed-attempt provider usage is unknown; no aggregate savings or hook/tool parity is inferred.

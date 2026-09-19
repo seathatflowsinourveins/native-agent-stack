@@ -68,7 +68,8 @@
       "alpaca_fit": "Protocol integration is not brokerage integration; do not forward order MCP servers.",
       "evidence_level": "native_proven",
       "evidence_refs": [
-        "blueprints/us-equities/deerflow/native-receipt.json"
+        "blueprints/us-equities/deerflow/native-receipt.json",
+        "blueprints/us-equities/deerflow/research-receipt.json"
       ],
       "native_workflow": [
         "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
@@ -82,8 +83,9 @@
       ],
       "limitations": [
         "Predecessor zed-industries/codex-acp directs new installs here.",
-        "Receipt proves initialize and read-only session discovery, zero prompt calls; no DeerFlow delegation inference was tested.",
-        "Do not map an advertised model choice to present quota availability."
+        "Do not map an advertised model choice to present quota availability.",
+        "One real embedded ACP research prompt completed; no full planner/UI or persistent DeerFlow service was accepted.",
+        "ACP 1.12.0 mode ID read-only maps to workspaceWrite/on-request, not strict filesystem read-only. Use the official native SDK for enforced read-only research."
       ],
       "sources": [
         "https://github.com/agentclientprotocol/codex-acp",
@@ -110,7 +112,8 @@
       "evidence_level": "native_proven",
       "evidence_refs": [
         "blueprints/us-equities/routing/health-receipt.json",
-        "blueprints/us-equities/routing/README.md"
+        "blueprints/us-equities/routing/README.md",
+        "blueprints/us-equities/routing/astra-receipt.json"
       ],
       "native_workflow": [
         "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
@@ -127,7 +130,8 @@
         "Native /v1/responses is documented, but gateway Astra was unverified; historical exact Opus and local Qwen evidence is dated.",
         "Codex executor strips max_output_tokens; this is not an enforceable gateway token budget.",
         "Thinking passthrough and optional sessionAffinityTtlMs preserve different semantics; affinity is not a cost proof.",
-        "Response caching, compression and extra memory/skill injection remain off for the baseline; headline reduction claims are not measured savings."
+        "Response caching, compression and extra memory/skill injection remain off for the baseline; headline reduction claims are not measured savings.",
+        "Subsequent supported CODEX_CLIENT_VERSION alignment and native login enabled an exact Astra text response; 136 tokens reported for completed request only, prior submitted failed usage unknown."
       ],
       "sources": [
         "https://github.com/diegosouzapw/OmniRoute",
@@ -189,8 +193,8 @@
         "agent-protocol"
       ],
       "role": "Optional research application and subagent host",
-      "decision": "watch",
-      "rationale": "Keep the pinned discovery experiment; do not replace a working native worker until a concrete research workflow needs the broader application.",
+      "decision": "conditional",
+      "rationale": "Use the proven embedded ACP research lane when a concrete workflow needs DeerFlow; direct native SDK remains the default.",
       "version_or_commit": "stable v2.0.0; discovery commit 42334f26d7025d905678f9075b079fc65f9beaf9 (2.1.0-rc0)",
       "release_date": "2026-06-25T16:23:22Z",
       "license": "MIT",
@@ -198,7 +202,8 @@
       "alpaca_fit": "Discovery has no account/order connectivity; broker capabilities must remain outside forwarded tools.",
       "evidence_level": "native_proven",
       "evidence_refs": [
-        "blueprints/us-equities/deerflow/native-receipt.json"
+        "blueprints/us-equities/deerflow/native-receipt.json",
+        "blueprints/us-equities/deerflow/research-receipt.json"
       ],
       "native_workflow": [
         "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
@@ -212,9 +217,10 @@
       ],
       "limitations": [
         "Latest stable release is v2.0.0 (2026-06-25); examined development commit reports backend2.1.0-rc0 and includes newer integration surfaces.",
-        "Receipt proves23skills, gateway health and ACP discovery only; invoke_acp_agent was not invoked.",
         "Do not reuse raw native OAuth stores through its separate model-provider adapters.",
-        "No standing service, production scheduler or provider-token saving demonstrated."
+        "No standing service, production scheduler or provider-token saving demonstrated.",
+        "One real embedded ACP research prompt completed; no full planner/UI or persistent DeerFlow service was accepted.",
+        "ACP 1.12.0 mode ID read-only maps to workspaceWrite/on-request, not strict filesystem read-only. Use the official native SDK for enforced read-only research."
       ],
       "sources": [
         "https://github.com/bytedance/deer-flow",
@@ -272,15 +278,15 @@
       ],
       "role": "Single-binary scheduler for existing native commands",
       "decision": "conditional",
-      "rationale": "First candidate for a small single-host research schedule; choose this or a Python/data orchestrator initially.",
+      "rationale": "Adopted for manual local research DAGs and authenticated persistent run history; scheduling remains deliberately inactive.",
       "version_or_commit": "v2.16.6",
       "release_date": "2026-09-14T14:45:57Z",
       "license": "GPL-3.0",
       "us_equities_fit": "Schedule bounded fetch, deterministic backtest and report steps with explicit timeouts and retry rules.",
       "alpaca_fit": "Never let a generic retry policy blindly resubmit orders; research DAGs receive no broker keys.",
-      "evidence_level": "source_review",
+      "evidence_level": "native_proven",
       "evidence_refs": [
-        "https://github.com/dagucloud/dagu/blob/v2.16.6/README.md"
+        "blueprints/us-equities/hosting/receipt.json"
       ],
       "native_workflow": [
         "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
@@ -293,8 +299,8 @@
       ],
       "limitations": [
         "Current canonical repository is dagucloud/dagu. GPL3 license differs from older permissive assumptions.",
-        "start runs a supplied DAG; no DAG, timer or background service is installed by this catalog.",
-        "Dynamic tool auto-provisioning and third-party actions need their own pins; optional paid governance features are distinct."
+        "Dynamic tool auto-provisioning and third-party actions need their own pins; optional paid governance features are distinct.",
+        "Local 3-step research DAG, failure/cancellation and completed-history restart were accepted; no model-worker queue, in-flight recovery or trading host is established."
       ],
       "sources": [
         "https://github.com/dagucloud/dagu",

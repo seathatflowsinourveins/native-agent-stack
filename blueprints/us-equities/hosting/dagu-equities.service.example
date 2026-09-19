@@ -1,0 +1,15 @@
+[Unit]
+Description=Local research workflow history (Dagu)
+After=network.target
+
+[Service]
+Type=simple
+# Install the pinned binary and private config first; see README.md.
+ExecStart=/usr/bin/env -i HOME=%h PATH=/usr/bin:/bin DAGU_HOME=%h/.local/share/codex-ecosystem/dagu-equities %h/.local/share/codex-ecosystem/tools/dagu-2.16.6/dagu server
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

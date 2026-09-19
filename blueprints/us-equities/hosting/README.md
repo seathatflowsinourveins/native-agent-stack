@@ -1,0 +1,76 @@
+# Native research workflow hosting
+
+Dagu 2.16.6 now hosts local research run history on loopback port 18525. Its
+upstream CLI completed the three-step [workflow](research-evidence.yaml): DuckDB
+summarized six LEAN simulated events into three orders, then both evidence
+validators passed. The native history retained successful, failed and cancelled
+runs after a service restart. This is local research hosting, not broker recovery
+or a hosted autonomous trading system.
+
+The pinned Linux amd64 release archive matched the publisher's SHA-256:
+`06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717`.
+The [receipt](receipt.json) retains the initial schema/environment failures and
+the corrected run. Dagu step IDs require underscores; execution requires explicit
+environment passthrough in this version. No model inference was needed.
+
+## Native commands
+
+Set `DAGU`, `RESEARCH_HOME`, `STACK_REPO`, `SDK_ENV`, `LEAN_EVENTS` and a fresh
+`RESEARCH_OUTPUT` directory to your own installed paths. The environment names are
+explicitly allowed in [config.yaml.example](config.yaml.example). Install that
+configuration privately with a generated password and mode 0600; never publish
+the real file or use the placeholder password. The release contains the binary,
+license and current workflow schema. No Docker or cloud account is required.
+
+```sh
+gh release download v2.16.6 --repo dagucloud/dagu \
+  --pattern dagu_2.16.6_linux_amd64.tar.gz --pattern checksums.txt
+sha256sum dagu_2.16.6_linux_amd64.tar.gz
+awk '$2 == "dagu_2.16.6_linux_amd64.tar.gz"' checksums.txt | sha256sum --check --strict
+"$DAGU" version
+mkdir -p "$RESEARCH_OUTPUT"
+env -i HOME="$HOME" PATH=/usr/bin:/bin \
+  STACK_REPO="$STACK_REPO" SDK_ENV="$SDK_ENV" \
+  LEAN_EVENTS="$LEAN_EVENTS" RESEARCH_OUTPUT="$RESEARCH_OUTPUT" \
+  "$DAGU" start --context local --dagu-home "$RESEARCH_HOME" \
+  --run-id "$RUN_ID" "$STACK_REPO/blueprints/us-equities/hosting/research-evidence.yaml"
+"$DAGU" history --context local --dagu-home "$RESEARCH_HOME" --format json
+```
+
+For a new host, adapt the binary/home paths in the example user unit, install it
+as `~/.config/systemd/user/dagu-equities.service`, and then run:
+
+```sh
+systemctl --user daemon-reload
+systemctl --user enable --now dagu-equities.service
+systemctl --user restart dagu-equities.service
+"$DAGU" history --context local --dagu-home "$RESEARCH_HOME" --format json
+```
+
+Choose a new `RUN_ID` and output directory for each run. The summarizer refuses
+to overwrite an existing Parquet. Native `dagu stop --run-id ... <dag-name>`
+cancelled an intentionally long local step; `history` reported `aborted` even
+though that cancelled CLI process returned zero. Consumers must inspect native
+status, not only process exit codes. A separate exit-23 fixture recorded `failed`
+and aborted its dependent step.
+
+## Service boundary
+
+The installed [user service](dagu-equities.service.example) runs `dagu server`,
+not the scheduler, with a minimal inherited environment and no provider or broker
+credentials. It is enabled for future user-service sessions. Anonymous API
+requests returned 401; authenticated requests returned 200. The UI cannot write
+or run workflows. Manual native CLI commands are the execution lane. Private
+configuration and history are stored beneath the user's local application data.
+
+`systemctl --user disable --now dagu-equities.service` stops and disables it
+without deleting evidence. The service restarts on process failure; the accepted
+restart check establishes history persistence, not resumption of in-flight work.
+Windows/WSL shutdown stops this host. No availability guarantee, remote access,
+automatic schedule, cloud deployment, recurring model dispatch or broker order
+writer is implied. Same-user host commands are not a security sandbox.
+
+Upstream: [release](https://github.com/dagucloud/dagu/releases/tag/v2.16.6),
+[pinned schema](https://github.com/dagucloud/dagu/blob/v2.16.6/README_SCHEMA.md),
+[native CLI](https://docs.dagu.sh/getting-started/cli),
+[systemd deployment](https://docs.dagu.sh/server-admin/deployment/systemd).

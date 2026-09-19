@@ -2,7 +2,7 @@
 
 **Dated decision catalog: September 19, 2026.** The north star is native, token-efficient research → reproducible backtesting → Alpaca paper automation. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
 
-The catalog has **145 repository decision cards covering 140 unique GitHub repositories**, and **20 model entries**. It connects to the earlier 36-component foundation. The [combined repository index](repository-index.md) contains **164 repositories**, with overlap removed.
+The catalog has **145 repository decision cards covering 140 unique GitHub repositories**, and **20 model entries**. It connects to the earlier 36-component foundation. The [combined repository index](repository-index.md) contains **447 repository identities**, including all 337 public stars and 110 beyond that snapshot, with overlap removed.
 
 ## Read the layer you need
 
@@ -28,13 +28,13 @@ Use native **Codex SDK/Astra + Claude Opus**, **Context Mode/RTK**, **ai-memory*
 - Native LEAN source build and unchanged bundled backtest passed: 3,943 data points, 3 simulated orders, 13/13 local-data requests. Data transformed through DuckDB/Parquet successfully.
 - New native QMD catalog retrieval produced 490 tokens versus 6,398 for the full model-guide output: 5,908 fewer, 92.34% less retrieved text. Both artifacts and upstream tokenizer replay are retained.
 - Native HF discovery returned 17 model metadata records and 11 model cards. Only separately cited earlier/native runs establish inference; model-card retrieval does not.
-- New catalog recipes are prospective unless their referenced receipt explicitly establishes execution. No Alpaca connection, strategy edge, deterministic risk service or unattended host was accepted.
+- New catalog recipes are prospective unless their referenced receipt explicitly establishes execution. No Alpaca connection, strategy edge or deterministic risk service was accepted. A later manual research DAG and authenticated local Dagu history host were accepted; this is not unattended trading.
 
 ## Starred repositories and beyond
 
-The fresh authenticated listing contained **337 public stars**. **41** have current catalog cards; **10** more have adopted baseline records; **286** have no current catalog/baseline card. Some of the last group have older candidate notes, flagged explicitly. **99** catalog repositories are beyond the starred snapshot. [All identities and joins](coverage.json).
+The fresh authenticated listing contained **337 public stars**. **41** have current catalog cards; **10** more have adopted baseline records; **286** have no current catalog/baseline card. All337 now also have individual dispositions in the [complete star audit](star-audit.md), with README/license overview separated from deeper source inspection. Absence of a full catalog card is no longer an unreviewed identity. **99** catalog repositories are beyond the starred snapshot. [All identities and joins](coverage.json).
 
-Source review covered the selected repositories’ current official metadata, README/license text and relevant API/source documentation. It did not deeply benchmark all 337stars or every project beyond them. Repository freshness, stars, model launch dates and author benchmarks do not establish superiority. The catalog exposes missing acceptance work rather than turning a list into a deployment claim.
+Source review covered current official metadata, README/license text and relevant API/source documentation at the depth stated per record. It did not deeply benchmark all 337stars or every project beyond them. Repository freshness, stars, model launch dates and author benchmarks do not establish superiority. The catalog exposes missing acceptance work rather than turning a list into a deployment claim.
 
 ## Decision and evidence vocabulary
 
@@ -59,3 +59,7 @@ Every card supplies role, selection reason, version/source, license, US-equity/A
 - GitHub latest-release tags can refer to SDKs/plugins rather than core packages. Mem0, LangGraph, OpenBB, Darts and forecasting models need artifact-specific version labels.
 
 The underlying source citations and precise scopes appear in the layer guides. See [publication coverage history](../../docs/convergence-audit.md) for the earlier, smaller audit.
+
+## Subsequent native gap resolution
+
+See the [resolution ledger](../../blueprints/us-equities/gap-resolution.md) for real DeerFlow→native Astra inference, the patched LEAN/adaptor build, Dagu workflow hosting and the current gateway/account boundary. Historical receipts above retain their original scope and counts.

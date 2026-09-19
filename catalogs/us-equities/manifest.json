@@ -25,5 +25,8 @@
   ],
   "north_star": "blueprints/us-equities/north-star.md",
   "harness_contract": "blueprints/us-equities/harness-contract.json",
-  "broader_reference_union": 164
+  "broader_reference_union": 164,
+  "star_audit_file": "catalogs/us-equities/star-audit.json",
+  "grand_index_repositories": 447,
+  "grand_index_beyond_stars": 110
 }

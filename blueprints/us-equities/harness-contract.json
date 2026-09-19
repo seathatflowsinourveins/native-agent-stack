@@ -13,26 +13,33 @@
     "Bounded prompt size, stream deadline and documented outer process timeout",
     "Private exclusive receipts with returned usage or explicit unknown status",
     "Shared research/token policy passed as developer instructions",
-    "Deterministic sample backtest and JSON-to-Parquet aggregation"
+    "Deterministic sample backtest and JSON-to-Parquet aggregation",
+    "One real embedded DeerFlow ACP-to-native-Astra research invocation, with actual ACP workspaceWrite approval preset disclosed",
+    "Patched LEAN backtest and native source-integrated Alpaca library compilation; no brokerage initialization",
+    "Dagu manual research DAG, authenticated local history server, failure/cancellation and completed-history persistence across restart",
+    "One exact Astra Responses text task through existing OmniRoute; failed attempts and usage uncertainty retained"
   ],
   "not_implemented": [
     "Host-enforced removal of all inherited secrets and remote MCP capabilities",
     "Provider spending cap or independently attested per-request model route",
     "Durable worker queue, retries and full-process cancellation guarantees",
-    "DeerFlow-to-ACP completed model inference",
-    "Astra inference through OmniRoute",
     "Alpaca account/data/broker adapter acceptance",
     "Financial point-in-time ingestion or validated trading strategy",
     "Persistent order journal, deterministic risk checks, broker reconciliation and kill switch",
-    "Unattended hosting, operational alerts and recovery acceptance"
+    "Unattended trading hosting, operational alerts and in-flight/broker recovery acceptance",
+    "Native hook/tool/compaction parity and provider-budget enforcement through OmniRoute"
   ],
   "broker_authority": "No broker keys or order tools supplied to the recorded research worker; no orders submitted.",
-  "future_sessions": "Installed native tools and project instructions persist. New tool registrations require normal client discovery/reload; other projects need deliberate scoped adoption. No blanket all-project hook or service deployment is implied.",
+  "future_sessions": "Installed native tools and project instructions persist. New tool registrations require normal client discovery/reload; other projects need deliberate scoped adoption. No blanket all-project hook or service deployment is implied. The Dagu user service is enabled for future local user-service sessions; it schedules no work and requires no conversation restart.",
   "evidence_refs": [
     "blueprints/us-equities/workers/receipt.json",
     "blueprints/us-equities/deerflow/native-receipt.json",
     "blueprints/us-equities/routing/health-receipt.json",
     "blueprints/us-equities/engine/receipt.json",
-    "blueprints/us-equities/data/receipt.json"
+    "blueprints/us-equities/data/receipt.json",
+    "blueprints/us-equities/deerflow/research-receipt.json",
+    "blueprints/us-equities/engine/resolution-receipt.json",
+    "blueprints/us-equities/hosting/receipt.json",
+    "blueprints/us-equities/routing/astra-receipt.json"
   ]
 }

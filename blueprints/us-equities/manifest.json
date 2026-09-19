@@ -17,22 +17,22 @@
       "upstream": "https://github.com/bytedance/deer-flow",
       "pin": "42334f26d7025d905678f9075b079fc65f9beaf9",
       "version": "2.1.0-rc0 development snapshot",
-      "status": "installed_backend_discovery_health",
-      "receipt": "deerflow/native-receipt.json"
+      "status": "installed_native_embedded_acp_research_completed",
+      "receipt": "deerflow/research-receipt.json"
     },
     {
       "id": "codex-acp",
       "upstream": "https://github.com/agentclientprotocol/codex-acp",
       "version": "1.12.0",
-      "status": "installed_protocol_discovery_no_prompt",
-      "receipt": "deerflow/native-receipt.json"
+      "status": "installed_native_embedded_acp_research_completed",
+      "receipt": "deerflow/research-receipt.json"
     },
     {
       "id": "omniroute",
       "upstream": "https://github.com/diegosouzapw/OmniRoute",
       "version": "3.8.50",
-      "status": "existing_install_health_only_this_run",
-      "receipt": "routing/health-receipt.json"
+      "status": "existing_install_native_astra_text_responses_completed",
+      "receipt": "routing/astra-receipt.json"
     },
     {
       "id": "freellmapi",
@@ -45,8 +45,8 @@
       "id": "lean",
       "upstream": "https://github.com/QuantConnect/Lean",
       "pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
-      "status": "installed_native_sample_backtest",
-      "receipt": "engine/receipt.json"
+      "status": "installed_locally_patched_native_backtest",
+      "receipt": "engine/resolution-receipt.json"
     },
     {
       "id": "dotnet",
@@ -80,7 +80,8 @@
       "id": "lean-alpaca",
       "upstream": "https://github.com/QuantConnect/Lean.Brokerages.Alpaca",
       "pin": "1973f6165bee212acf656ed2f9cb0af86d4f2a18",
-      "status": "reviewed_selected_not_installed"
+      "status": "native_build_and_patched_source_build_no_account_runtime",
+      "receipt": "engine/resolution-receipt.json"
     },
     {
       "id": "openai-python",
@@ -88,38 +89,61 @@
       "version": "3.16.2",
       "status": "installed_no_paid_api_call",
       "receipt": "workers/receipt.json"
+    },
+    {
+      "id": "dagu",
+      "upstream": "https://github.com/dagucloud/dagu",
+      "version": "2.16.6",
+      "status": "installed_native_research_dag_and_local_history_service",
+      "receipt": "hosting/receipt.json"
     }
   ],
   "unresolved": [
-    "Alpaca paper account and feed entitlement",
-    "Versioned strategy and risk limits",
-    "LEAN advisory triage",
-    "Deterministic broker journal, risk and reconciliation implementation",
-    "DeerFlow completed inference workflow",
-    "GPT-6 gateway route",
-    "Standing service and restart/recovery acceptance",
-    "Context Mode file-tool workspace override requires normal native MCP approval; trusted ctx_execute already works."
+    "Alpaca paper account, feed entitlement and QuantConnect adapter runtime entitlement",
+    "Versioned strategy, universe, horizon and numeric risk limits",
+    "Deterministic broker journal, risk, reconciliation and recovery acceptance",
+    "Full DeerFlow planner/UI/persistent hosting; ACP read-only preset is workspaceWrite",
+    "Standing trading service and in-flight/broker restart/recovery acceptance",
+    "Context Mode file-tool workspace override requires normal native MCP approval; trusted ctx_execute already works.",
+    "OmniRoute simple text inference accepted; native tool/hook/compaction parity and failed-attempt provider usage remain unproved."
   ],
   "receipt_integrity": [
     {
-      "path": "workers/receipt.json",
-      "sha256": "4308f002936d354757ab819b1b537e26db41c76bf8201f58e0ce559750986afc"
-    },
-    {
       "path": "data/receipt.json",
       "sha256": "9a2338f3d064571c6f60a5b9a15c618252b281fd9df84349340d07abe8b7d75c"
-    },
-    {
-      "path": "engine/receipt.json",
-      "sha256": "f74599195cbb51ad6c1112dc5af61ccd27bd6aa37f622ed874148f7616f5ede2"
     },
     {
       "path": "deerflow/native-receipt.json",
       "sha256": "7cbe9e489ff57c47619302e0cae728bfc451539d5370dd7278eca4058d6f5fb3"
     },
     {
+      "path": "deerflow/research-receipt.json",
+      "sha256": "b34779394c4fbc2a8444075ea002627e2e6bc4ec187e2cfa436d5c646101e95f"
+    },
+    {
+      "path": "engine/receipt.json",
+      "sha256": "f74599195cbb51ad6c1112dc5af61ccd27bd6aa37f622ed874148f7616f5ede2"
+    },
+    {
+      "path": "engine/resolution-receipt.json",
+      "sha256": "6cf4af6a0ccb70f4412755db0b864272ee4ac39fbe89635fe35e49f3db09816a"
+    },
+    {
+      "path": "hosting/receipt.json",
+      "sha256": "a7311c35dfb25d6c8f5212435095c1bbc91cde407490a9d61bf895cd1fe9f6cc"
+    },
+    {
+      "path": "routing/astra-receipt.json",
+      "sha256": "d241143ae1f4da387e82c94edbb593ec85fafbdc87805d720e85ea5785f823d5"
+    },
+    {
       "path": "routing/health-receipt.json",
       "sha256": "d3ebd61dec8496e4b8de3cf9a9e371f816790c45fb563eba5b46718e021352e8"
+    },
+    {
+      "path": "workers/receipt.json",
+      "sha256": "4308f002936d354757ab819b1b537e26db41c76bf8201f58e0ce559750986afc"
     }
-  ]
+  ],
+  "gap_resolution": "gap-resolution.json"
 }

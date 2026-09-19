@@ -1,9 +1,12 @@
 # Native hosting path
 
-Current installations are persistent local tools; their acceptance processes
-exited when work completed. Existing memory/RAG services keep their own scoped
+A native Dagu user service now provides authenticated local research run history.
+Its accepted workflow, failure/cancellation checks and restart result are in the
+[hosting receipt and replay guide](hosting/README.md). Other new tool acceptance
+processes exited when work completed. Existing memory/RAG services keep their own scoped
 lifecycle. No new cloud resources, paid hosts, public ports or standing trading
-service were created. Restarting this conversation is unnecessary for the native
+service were created. Dagu binds loopback and runs the status server only; its UI
+cannot submit or edit jobs. Restarting this conversation is unnecessary for the native
 commands; old Desktop tool catalogs still need their normal reload to gain newly
 registered tools.
 
@@ -29,15 +32,18 @@ restart, independent risk checks and a kill switch. Research workers can be
 stopped without disabling broker-state recovery. A gateway's expiring A2A task
 record or an LLM retry is not durable execution state.
 
-The native source-build LEAN path needs no paid QuantConnect account. LEAN CLI
+The native LEAN engine source-build/backtest path needs no paid QuantConnect
+account. Initializing its Alpaca adapter separately requires the documented
+[QuantConnect entitlement](engine/resolution.md#remaining-account-and-runtime-boundaries). LEAN CLI
 local engine commands require Docker and the documented QuantConnect account
 tier. QuantConnect-managed cloud hosting has its own account/tier requirements;
 neither path was enabled here. No managed-host deployment result is
 claimed. Docker, Kubernetes, Temporal and Redis are not prerequisites for the
 completed native proof and were not added speculatively.
 
-Before a standing service, resolve the recorded LEAN dependency advisories,
+Before a standing trading service, use the patched dependency build and
 exercise restart/reconnect and duplicate-order handling in paper mode, establish
 data entitlements and session rules, and check actual model-worker cancellation
-and usage reporting. These are unresolved trading-runtime requirements, not
+and usage reporting. Local Dagu subprocess cancellation is distinct from provider
+request cancellation. These are unresolved trading-runtime requirements, not
 checks that this documentation marks passed.

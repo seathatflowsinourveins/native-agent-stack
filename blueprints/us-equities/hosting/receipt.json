@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-19",
+  "scope": "Native local research workflow and read-only status service; no broker or model calls",
+  "upstream": "https://github.com/dagucloud/dagu",
+  "version": "2.16.6",
+  "release_published_at": "2026-09-14T14:45:57Z",
+  "archive_sha256": "06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717",
+  "publisher_checksum_matched": true,
+  "initial_failures": [
+    {
+      "stage": "schema",
+      "exit_code": 1,
+      "cause": "Hyphenated step IDs rejected; changed to underscores."
+    },
+    {
+      "stage": "first_execution",
+      "exit_code": 1,
+      "cause": "Execution environment omitted named variables; added exact env_passthrough entries.",
+      "status": "failed",
+      "dependent_steps": "aborted"
+    }
+  ],
+  "acceptance": {
+    "failure_fixture": {
+      "requested_step_exit": 23,
+      "cli_exit": 1,
+      "status": "failed",
+      "dependent_step": "aborted"
+    },
+    "cancellation_fixture": {
+      "native_command": "dagu stop --context local --dagu-home \"$RESEARCH_HOME\" --run-id cancel-20260919 research-cancel-acceptance",
+      "stop_exit": 0,
+      "cancelled_cli_exit": 0,
+      "status": "aborted"
+    },
+    "service_restart_exit": 0,
+    "prior_history_rows_preserved": true,
+    "http_after_restart": {
+      "anonymous": 401,
+      "authenticated": 200
+    },
+    "service_active": true,
+    "service_enabled": true
+  },
+  "history_after_restart": [
+    {
+      "name": "research-cancel-acceptance",
+      "dagRunId": "cancel-20260919",
+      "status": "aborted",
+      "startedAt": "2026-09-19T08:52:03-04:00",
+      "finishedAt": "2026-09-19T08:52:04-04:00",
+      "duration": "1s",
+      "workerId": "local"
+    },
+    {
+      "name": "research-failure-acceptance",
+      "dagRunId": "failure-20260919",
+      "status": "failed",
+      "startedAt": "2026-09-19T08:52:03-04:00",
+      "finishedAt": "2026-09-19T08:52:03-04:00",
+      "duration": "< 1s",
+      "workerId": "local"
+    },
+    {
+      "name": "equity-research-evidence",
+      "dagRunId": "evidence-20260919-ready",
+      "status": "succeeded",
+      "startedAt": "2026-09-19T08:50:45-04:00",
+      "finishedAt": "2026-09-19T08:50:46-04:00",
+      "duration": "1s",
+      "workerId": "local"
+    },
+    {
+      "name": "equity-research-evidence",
+      "dagRunId": "evidence-20260919",
+      "status": "failed",
+      "startedAt": "2026-09-19T08:50:26-04:00",
+      "finishedAt": "2026-09-19T08:50:26-04:00",
+      "duration": "< 1s",
+      "workerId": "local"
+    }
+  ],
+  "service": {
+    "bind": "127.0.0.1:18525",
+    "command": "dagu server",
+    "auth": "basic; generated password private, config mode0600",
+    "ui_write_dags": false,
+    "ui_run_dags": false,
+    "recurring_schedule": false,
+    "automatic_model_dispatch": false,
+    "inherited_environment": "HOME PATH DAGU_HOME only",
+    "supervisor": "systemd user service",
+    "restart_policy": "on-failure"
+  },
+  "model_calls": 0,
+  "broker_calls": 0,
+  "limitations": [
+    "Historical run validates the then-current catalog, not future changes.",
+    "Restart acceptance preserves completed history; it does not prove in-flight resumption.",
+    "A user service runs while its Linux/WSL user service manager runs; Windows shutdown stops it.",
+    "Native host shell execution is not a sandbox.",
+    "No automatic trading, cloud hosting, scheduler or standing model worker is installed."
+  ],
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "1b250e423ed208695a87f86517b527a98cd9cfd1daf16dea11ce52f03ba90d2f"
+    },
+    {
+      "path": "config.yaml.example",
+      "sha256": "4d485285e805db7fb29066e9cd07e6467ec28ed4ad2f91781e27a9b42618e484"
+    },
+    {
+      "path": "dagu-equities.service.example",
+      "sha256": "b7e1814daa569c7b8484f600c13d98956ac3efb6d955e87a768591a38fa7d855"
+    },
+    {
+      "path": "research-evidence.yaml",
+      "sha256": "12834f94024d25cfb9fcc423a640e7af8734182a30bc5ab57e06fa8a730be18c"
+    }
+  ],
+  "kind": "native_cli_e2e",
+  "result": {
+    "native_command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\"",
+    "exit_code": 0,
+    "status": "succeeded",
+    "steps": {
+      "summarize": {
+        "status": "succeeded",
+        "events": 6,
+        "distinct_orders": 3
+      },
+      "baseline_evidence": {
+        "status": "succeeded",
+        "components": 36,
+        "hashed_files": 53,
+        "receipts": 12
+      },
+      "catalog_evidence": {
+        "status": "succeeded",
+        "repository_entries": 145,
+        "unique_catalog_repositories": 140,
+        "public_stars": 337
+      }
+    },
+    "input": "Bundled LEAN historical simulation 2013-10-07 through 2013-10-11",
+    "input_sha256": "8e22c0052e1e769708114064cba69c3ddaec2c5af8148a6cf171e0f296f192de",
+    "run_seconds_reported": 1
+  }
+}

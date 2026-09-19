@@ -7,16 +7,18 @@ A current, evidence-backed reference for native **Codex + Claude Code**, with sc
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **140 unique repositories in 145 layer decision cards**, **20 model entries**,
 and an auditable **337-star coverage ledger**. Its combined index includes
-**164 repositories** when earlier foundation/candidate records are included.
+**447 repository identities** across all 337 public stars and 110 beyond them,
+with explicit review depth and adoption decisions.
 Start with the [north-star architecture](blueprints/us-equities/north-star.md)
 and [native commands with direct results](catalogs/us-equities/native-workflows.md).
 
-The [coverage audit](docs/convergence-audit.md) distinguishes the full starred-list metadata refresh from individual repository decisions and local execution, and records newly found research leads outside the original comparison.
+The [complete star audit](catalogs/us-equities/star-audit.md) records every starred repository; the [latest gap-resolution ledger](blueprints/us-equities/gap-resolution.md) links the new runtime proofs. The earlier [coverage audit](docs/convergence-audit.md) distinguishes the full starred-list metadata refresh from individual repository decisions and local execution, and records newly found research leads outside the original comparison.
 
 The [US-equities foundation](blueprints/us-equities/README.md) extends this stack
 with native Astra SDK workers, DeerFlow/ACP, OmniRoute recipes, LEAN backtesting
 and a DuckDB/Parquet data path. It records actual native results and leaves
-Alpaca paper execution and unattended hosting explicitly pending.
+Alpaca paper execution explicitly pending; local Dagu research hosting now has
+[workflow and restart evidence](blueprints/us-equities/hosting/README.md).
 
 ## What is here
 

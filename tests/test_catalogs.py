@@ -64,12 +64,28 @@ class CatalogValidationTests(unittest.TestCase):
         self.manifest = {
             **self.header, "catalog_files": list(CATALOG_FILES),
             "model_file": f"{BASE}/models.json", "coverage_file": f"{BASE}/coverage.json",
+            "star_audit_file": f"{BASE}/star-audit.json",
             "counts": {"repository_entries": 4, "unique_catalog_repositories": 4, "models": 1,
                        "public_stars": 3, "starred_catalog_repositories": 1, "beyond_star_catalog_repositories": 3},
         }
         self.write("manifests/stack.json", {"components": [{"repository": "https://github.com/example/baseline/releases/tag/v1"}]})
         self.write("evidence/metadata.json", {"schema_version": 1, "kind": "native_metadata_commands", "scope": "Metadata retrieval.", "commands": [{"exit_code": 0}]})
         self.write("evidence/receipt.json", {"schema_version": 1, "kind": "native_model_e2e", "claim": "Synthetic model fixture.", "data": {"exit_code": 0}})
+        self.audit = {
+            **self.header, "scope": "Synthetic overview decisions, not runtime proof.",
+            "counts": {"public_stars": 3, "previously_covered": 0,
+                       "new_source_dispositions": 3, "unassessed": 0,
+                       "by_review_level": {"source_review": 3},
+                       "by_review_depth": {"readme_license_overview": 3},
+                       "by_decision": {"conditional": 3}},
+            "entries": [{"repository": item["repository"], "review_level": "source_review",
+                         "source_commit": "a" * 40, "review_depth": "readme_license_overview",
+                         "decision": "conditional", "role": "Synthetic reference",
+                         "catalog_entry_ids": item["catalog_entry_ids"], "evidence_refs": [],
+                         "rationale": "Selected for this fixture.", "limitations": ["Not executed."],
+                         "sources": [item["repository"]]} for item in self.coverage["stars"]],
+        }
+        self.write(f"{BASE}/star-audit.json", self.audit)
         self.save()
 
     @property
@@ -94,6 +110,55 @@ class CatalogValidationTests(unittest.TestCase):
 
     def test_valid_counts_and_metadata_only_model(self):
         self.assertEqual(validate(self.root), self.manifest["counts"])
+
+    def test_star_audit_missing_or_extra_identity_fails(self):
+        self.audit["entries"].pop()
+        self.write(f"{BASE}/star-audit.json", self.audit)
+        self.assert_invalid("exactly the public-star snapshot")
+
+    def test_star_audit_duplicate_identity_fails(self):
+        self.audit["entries"].append(self.audit["entries"][0])
+        self.write(f"{BASE}/star-audit.json", self.audit)
+        self.assert_invalid("duplicate canonical")
+
+    def test_star_source_review_needs_pin_and_depth(self):
+        self.audit["entries"][0]["source_commit"] = "main"
+        self.write(f"{BASE}/star-audit.json", self.audit)
+        self.assert_invalid("pinned commit")
+
+    def test_star_audit_cannot_label_source_review_native_proven(self):
+        self.audit["entries"][0]["review_level"] = "native_proven"
+        self.write(f"{BASE}/star-audit.json", self.audit)
+        self.assert_invalid("review_level")
+
+    def test_star_audit_rejects_inflated_review_depth_count(self):
+        self.audit["counts"]["by_review_depth"] = {"deep_review": 3}
+        self.write(f"{BASE}/star-audit.json", self.audit)
+        self.assert_invalid("by_review_depth")
+
+    def test_malformed_star_records_fail_with_catalog_error(self):
+        self.coverage["stars"] = [None]
+        self.save()
+        self.assert_invalid("expected object")
+
+    def test_star_audit_references_and_catalog_ids_are_checked(self):
+        for field, value, message in (
+            ("evidence_refs", ["../outside.json"], "path must be canonical"),
+            ("catalog_entry_ids", ["nonexistent"], "catalog_entry_ids"),
+            ("review_depth", "full_security_audit", "review_depth"),
+        ):
+            with self.subTest(field=field):
+                altered = copy.deepcopy(self.audit)
+                altered["entries"][0][field] = value
+                self.write(f"{BASE}/star-audit.json", altered)
+                self.assert_invalid(message)
+
+    def test_star_audit_counts_reject_boolean_and_float(self):
+        for value in (False, 0.0):
+            with self.subTest(value=value):
+                self.audit["counts"]["unassessed"] = value
+                self.write(f"{BASE}/star-audit.json", self.audit)
+                self.assert_invalid("expected nonnegative integer")
 
     def test_missing_manifest_or_catalog_fails(self):
         for path in (f"{BASE}/manifest.json", CATALOG_FILES[2]):
@@ -138,6 +203,7 @@ class CatalogValidationTests(unittest.TestCase):
         self.manifest["counts"]["unique_catalog_repositories"] = 3
         self.manifest["counts"]["beyond_star_catalog_repositories"] = 2
         self.save()
+        self.write(f"{BASE}/star-audit.json", self.audit)
         self.assertEqual(validate(self.root), self.manifest["counts"])
 
     def test_enums_and_meaningful_lists(self):

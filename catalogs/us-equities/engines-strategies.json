@@ -21,7 +21,8 @@
       "evidence_level": "native_proven",
       "evidence_refs": [
         "blueprints/us-equities/engine/receipt.json",
-        "blueprints/us-equities/engine/README.md"
+        "blueprints/us-equities/engine/README.md",
+        "blueprints/us-equities/engine/resolution-receipt.json"
       ],
       "native_workflow": [
         "# Historical commands already executed in the linked receipt; replay only in a dedicated source checkout.",
@@ -37,9 +38,10 @@
       ],
       "limitations": [
         "Proof: Completed, 3,943 bundled data points, 3 simulated orders; no broker connection or strategy validation.",
-        "Native restore reported 7 advisory pairs across 5 runtime packages, including high/critical classifications; exploitability was not assessed and remediation remains open.",
+        "Native restore reported 7 advisory pairs across 5 runtime packages, including high/critical classifications; exploitability was not assessed and historical advisories were later resolved in the linked local patch.",
         "GitHub latest release v2.4.0.1 is from 2017; this is a 2026 source pin, not that old release.",
-        "LEAN CLI is a separate paid-organization/Docker workflow; the accepted source build required neither."
+        "LEAN CLI is a separate paid-organization/Docker workflow; the accepted source build required neither.",
+        "Follow-up: pinned local dependency patches and source-integrated Alpaca compilation passed native runtime graph audits. This does not initialize the adapter; QuantConnect product347 entitlement and separately authorized paper access are still required."
       ],
       "sources": [
         "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/readme.md",
@@ -65,9 +67,10 @@
       "license": "Apache-2.0 (README and source-header declaration)",
       "us_equities_fit": "Equity order conversion and broker state integration exist in source.",
       "alpaca_fit": "Factory reads alpaca-paper-trading and selects Alpaca paper/live environments.",
-      "evidence_level": "source_review",
+      "evidence_level": "native_proven",
       "evidence_refs": [
-        "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md"
+        "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md",
+        "blueprints/us-equities/engine/resolution-receipt.json"
       ],
       "native_workflow": [
         "# Prospective and unexecuted. source/build inspection only; do not start a brokerage session.",
@@ -82,11 +85,12 @@
         "Later paper use requires a separately provisioned Alpaca paper account, private credentials, market-data entitlement, and explicit paper configuration."
       ],
       "limitations": [
-        "Adapter build/connection not executed here; no Alpaca paper orders accepted yet.",
+        "Native adapter builds were later accepted; account connection remains unexecuted; no Alpaca paper orders accepted yet.",
         "Brokerage model defaults include NullSlippageModel; explicitly calibrate spread, slippage, fees and liquidity before evaluating a strategy.",
         "README deployment/account prose contains dated details; use current broker docs and pinned implementation for operational decisions.",
         "License is declared Apache-2.0 in README/source headers; GitHub license API is empty.",
-        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance."
+        "Prospective workflow is unexecuted; source review is not installation, broker connectivity, or performance acceptance.",
+        "Follow-up: pinned local dependency patches and source-integrated Alpaca compilation passed native runtime graph audits. This does not initialize the adapter; QuantConnect product347 entitlement and separately authorized paper access are still required."
       ],
       "sources": [
         "https://github.com/QuantConnect/Lean.Brokerages.Alpaca/blob/1973f6165bee212acf656ed2f9cb0af86d4f2a18/README.md",
