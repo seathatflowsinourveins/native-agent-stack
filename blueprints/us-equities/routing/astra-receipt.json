@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "id": "omniroute-native-astra-responses",
+  "kind": "native_model_e2e",
+  "checked_at": "2026-09-19",
+  "component_ids": [
+    "omniroute"
+  ],
+  "claim": "The existing OmniRoute gateway completed a bounded official Responses SDK task on the explicit Codex Astra route after the supported deployment version was aligned with the installed Windows Codex client and the SDK streaming wrapper was corrected.",
+  "versions": {
+    "omniroute": "3.8.50",
+    "source_commit": "5458026c216f77a3da68ea49152dc33470cfe2cb",
+    "openai_python": "3.16.2",
+    "installed_windows_codex": "0.155.0",
+    "installed_linux_codex": "0.155.1",
+    "upstream_default_codex_client_version": "0.149.0",
+    "configured_codex_client_version": "0.155.0"
+  },
+  "configuration_change": {
+    "setting": "CODEX_CLIENT_VERSION",
+    "value_source": "Actual installed Windows Codex JS launcher --version, parsed on each start. Native Linux version remains separate.",
+    "surface": "Existing private Windows gateway startup helper; ordinary process environment only.",
+    "upstream_patch": false,
+    "unshipped_release_installed": false,
+    "provider_store_import": false,
+    "global_native_client_proxy": false,
+    "auth_disabled": false
+  },
+  "restart": {
+    "pre_restart_inflight": 0,
+    "pre_restart_active": 0,
+    "pre_restart_queued": 0,
+    "listener_unreachable_after_stop": true,
+    "saved_powershell_launcher": "Blocked by Windows script policy; no policy change.",
+    "recovery": "Started installed upstream Node CLI serve with existing private DATA_DIR, auth, loopback binding and installed-client version.",
+    "native_argv": [
+      "${NATIVE_NODE}",
+      "${OMNIROUTE_ENTRY}",
+      "serve",
+      "--port",
+      "20128",
+      "--no-open",
+      "--no-tray",
+      "--no-recovery"
+    ],
+    "final_health": {
+      "http_status": 200,
+      "timestamp": "2026-09-19T13:09:57.273Z",
+      "status": "healthy",
+      "version": "3.8.50",
+      "dedup_inflight_requests": 0,
+      "active_count": 0,
+      "queued_count": 0
+    },
+    "standing_service_restored": true,
+    "stop_sequence_exit_code": 1
+  },
+  "request": {
+    "path": "blueprints/us-equities/routing/omniroute-astra-request.json",
+    "sha256": "ba3ae800266fcbf4f99e91f57472de56917ea8223d1db1a99f36565bf0073ff5",
+    "model": "cx/gpt-6-astra",
+    "stream": true,
+    "reasoning_effort": "low",
+    "sdk_automatic_retries": 0,
+    "timeout_seconds": 60,
+    "headers": {
+      "x-omniroute-compression": "off",
+      "X-OmniRoute-No-Cache": "true",
+      "x-omniroute-no-memory": "true"
+    }
+  },
+  "attempts": [
+    {
+      "sequence": 1,
+      "status": "http_error",
+      "http_status": 400,
+      "error_type": "BadRequestError",
+      "error": "The gpt-6-astra model requires a newer version of Codex.",
+      "elapsed_seconds": 1.479,
+      "provider_usage": null,
+      "usage_status": "unreported, not assumed zero"
+    },
+    {
+      "sequence": 2,
+      "status": "client_error_after_submission",
+      "error_type": "TypeError",
+      "error": "'LegacyAPIResponse' object does not support the context manager protocol",
+      "elapsed_seconds": 3.849,
+      "gateway_status": 499,
+      "gateway_error": "Client disconnected: request_signal_aborted",
+      "gateway_duration_ms": 11061,
+      "gateway_reported_tokens": {
+        "in": 0,
+        "out": 0,
+        "cacheRead": null,
+        "cacheWrite": null,
+        "reasoning": null,
+        "compressed": null
+      },
+      "provider_usage": null,
+      "usage_status": "Gateway zeros after client disconnect do not establish zero provider consumption."
+    },
+    {
+      "sequence": 3,
+      "status": "response.completed",
+      "http_status": 200,
+      "elapsed_seconds": 3.001,
+      "requested_model": "cx/gpt-6-astra",
+      "returned_model": "gpt-6-astra",
+      "route_headers": {
+        "X-OmniRoute-Provider": "cx",
+        "X-OmniRoute-Model": "gpt-6-astra"
+      },
+      "usage": {
+        "input_tokens": 81,
+        "input_tokens_details": {
+          "cache_write_tokens": 0,
+          "cached_tokens": 0
+        },
+        "output_tokens": 55,
+        "output_tokens_details": {
+          "reasoning_tokens": 0
+        },
+        "total_tokens": 136
+      },
+      "response_text": "The local simulation summarized 6 LEAN order events into 3 distinct orders, and the source-build backtest processed 3,943 points with zero failed data requests. This does not establish paper-trading readiness because no broker connection was made or validated."
+    }
+  ],
+  "usage_accounting": {
+    "completed_request_total_tokens": 136,
+    "all_attempts_total_tokens": null,
+    "reason": "Attempts 1 and 2 did not return authoritative provider usage. Successful-request totals exclude those attempts.",
+    "savings_claim": null
+  },
+  "limitations": [
+    "Simple text Responses acceptance. No model tools, native hooks, MCP, memory, deferred tools, full context, compaction or multi-agent parity demonstrated.",
+    "Gateway-reported provider/model identity agrees with requested and returned model; no independent provider attestation.",
+    "Input counts were supplied in the task. No market data retrieval, entitlement check, broker connection, order submission or investment decision occurred.",
+    "Existing native Codex SDK remains the preferred worker route. The gateway compatibility setting does not make the gateway a native Codex client.",
+    "The portable replay helper is a reviewed adaptation of the successful private script, not an additional submitted model request.",
+    "The native SDK transport timeout is not a hard provider spending limit; this gateway strips max_output_tokens.",
+    "Private logs and raw response event identifiers remain private. Hashes bind the retained originals but do not expose them for public independent verification.",
+    "The launcher update applies on future starts; the host script execution policy remains unchanged. The current gateway was restored with native Node CLI."
+  ],
+  "private_evidence_sha256": {
+    "result.json": "d445fb34ff470c34cc8cc224bae8755073e27e3c0e8c6ed4719378ab4e551560",
+    "retry-installed-client-version/result.json": "4262e980c76f373424664f298e2a0b546b11898675cd2aedbdc22945f027536b",
+    "retry-installed-client-version/gateway-recovery.json": "31b1333bbc70b49625fab13735d0a80492ce18c3421243039f38b41101ebe337",
+    "retry-sdk-streaming/result.json": "4d983b6fedad6957bdf64b4a5a6f0901f74e843b2a7a66e94111a7bbf59984cc",
+    "retry-sdk-streaming/events.json": "55426180895e28c04b90498f163a50ee2c917dacd00da3ecf0c346401b753cd5",
+    "activity-pre-restart.json": "c081ae059ecd517e95bf6ce4646f7eebe772722761831c7f02134f1d890c7fb7",
+    "activity-final.json": "9e806fe3dc14341b4f2a0da371dffd230a4c975122a7f7db7a46264c2de157c6",
+    "startup-sha256.json": "4b4134fdceeba58489dc9e6e7faa154939f58e5a945a7d70e658e3c87dcbea9b"
+  },
+  "sources": [
+    "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",
+    "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/src/shared/constants/codexClient.ts",
+    "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/open-sse/config/codexClient.ts",
+    "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/open-sse/executors/codex.ts",
+    "https://github.com/diegosouzapw/OmniRoute/blob/release/v3.8.51/open-sse/config/codexClient.ts",
+    "https://github.com/openai/openai-python#with_streaming_response"
+  ],
+  "result": {
+    "status": "response.completed",
+    "completed_attempt": 3,
+    "requested_model": "cx/gpt-6-astra",
+    "returned_model": "gpt-6-astra",
+    "route_headers": {
+      "X-OmniRoute-Provider": "cx",
+      "X-OmniRoute-Model": "gpt-6-astra"
+    },
+    "scope": "One completed two-sentence review of supplied public simulation counts; no market-data retrieval, tools, broker or native-worker parity acceptance.",
+    "aggregate_usage_known": false,
+    "native_worker_remains_default": true
+  }
+}

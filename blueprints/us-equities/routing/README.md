@@ -1,6 +1,8 @@
 # Native workers and optional research routes
 
-This is an inactive routing recipe for a US-equities **research queue**. It does not install a scheduler, enforce an account budget, submit orders or change a client's account/model defaults. All commands below are proposed operator actions and were **not executed** for this blueprint, except the two anonymous HTTP health requests recorded separately in [health-receipt.json](health-receipt.json).
+This contains native worker recipes and an accepted OmniRoute Astra route for US-equities research. On September 19, 2026, the existing gateway completed one two-sentence Astra evidence task: **HTTP 200, 81 input tokens + 55 output tokens = 136**, with zero reported cached, cache-write or reasoning tokens. [astra-receipt.json](astra-receipt.json) preserves the initial version rejection, interrupted SDK attempt and successful completion separately. Their unreported provider usage remains unknown; 136 is the successful request's total, not the whole repair session's total.
+
+The native worker, other gateway examples and policy fragments below remain prospective unless their dated evidence is explicitly cited. This subtree does not install a scheduler, submit orders, enforce an account budget or change native clients' account/model defaults.
 
 ## Evidence and pins
 
@@ -10,7 +12,7 @@ This is an inactive routing recipe for a US-equities **research queue**. It does
 | OmniRoute → Claude OAuth → `claude-opus-5` | September 18 exact-model Messages and native file/shell task passed. Requested route was `claude/claude-opus-5`. Gateway context reported 200K; 1M context, deferred tools, compaction and multi-agent equivalence were not established. |
 | OmniRoute → Ollama | Explicit `ollama-local/qwen3.8:27b-mtp-q4_K_M` chat/tool roundtrip passed September 18. Returned model was `qwen3.8:27b-mtp-q4_K_M`. |
 | FreeLLMAPI → custom Ollama | Explicit `qwen3.827b-mtp-q4km` chat/tool roundtrip passed September 18. Returned model was `qwen3.8:27b-mtp-q4_K_M`; `X-Routed-Via` identified the custom route. |
-| Either gateway → GPT-6 Astra | **Unverified.** The recorded OmniRoute Codex OAuth attempt timed out. Native Astra access did not establish a gateway connection or exact-model entitlement. |
+| OmniRoute → Codex OAuth → GPT-6 Astra | September 19 completed native Responses stream: requested `cx/gpt-6-astra`, returned `gpt-6-astra`, provider header `cx`, model header `gpt-6-astra`, 136 reported tokens. Simple text fidelity passed; tools, compaction, deferred tools, full context and worker parity remain unproved. FreeLLMAPI → Astra remains unverified. |
 
 Historical route results were inspected in the existing host's sanitized routing records; they were not rerun or copied as raw transcripts. Broader native component evidence is in [the stack evidence manifest](../../../manifests/evidence.json). Neither historical success nor an advertised model list certifies current provider readiness.
 
@@ -22,6 +24,68 @@ Historical route results were inspected in the existing host's sanitized routing
 | [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc/tree/v1.0.6) | Optional official companion 1.0.6; source `db52e28f4d9ded852ab3942cea316258ae4ef346` | Apache-2.0; existing native Codex backend, separate from gateway routing. |
 
 The recorded deployment uses existing Windows gateways reachable from WSL loopback. There is no proposed second Linux gateway installation. For a new host, the native OmniRoute package is `npm install --global --prefix "$TOOLS_PREFIX/omniroute-3.8.50" omniroute@3.8.50`; FreeLLMAPI is the selected official desktop asset from its pinned release. Review upstream setup rather than copying another machine's state or account stores.
+
+## Accepted OmniRoute Astra route
+
+The user completed the gateway's normal interactive Codex authorization. No native
+provider credential store was read, imported or copied. The first Responses
+attempt then returned HTTP 400 because this OmniRoute release advertised its
+bundled Codex client default, **0.149.0**.
+
+Upstream explicitly supports the deployment variable `CODEX_CLIENT_VERSION` and
+documents keeping it aligned with the actual installed client. The Windows native
+client reported **0.155.0**; the separate Linux native client reported **0.155.1**.
+The existing Windows launcher now derives its value from that Windows executable
+on each start. This uses the shipped compatibility setting and does not patch
+provider checks, install an unshipped release or invent a client version.
+Caller-supplied `Version` alone is ineffective here: v3.8.50 overwrites it. The
+unshipped `release/v3.8.51` source proposes caller forwarding; it was not installed.
+See [upstream deployment-version guidance](https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/src/shared/constants/codexClient.ts),
+[supported environment lookup](https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/open-sse/config/codexClient.ts),
+and the portable [launcher fragment](omniroute-codex-version.ps1.example).
+
+Before restart, upstream `/api/monitoring/health` reported zero in-flight, active
+and queued requests. The native stop command returned a failure and the listener
+became unreachable. Windows then blocked loading the saved PowerShell script.
+No execution policy was changed: the existing gateway was restored with the
+installed upstream Node `serve --port 20128 --no-open --no-tray --no-recovery`
+command, the same private `DATA_DIR` and authentication, loopback binding, and the
+derived version. Final native health was **200 / healthy**, with zero active or
+queued requests. The startup-fragment change persists for the existing launcher;
+running it remains subject to the host's normal script policy.
+
+An initial retry exposed a separate test-client mistake: the official SDK's
+`with_raw_response.create(...)` returns `LegacyAPIResponse`, which is not a
+context manager. That submitted request ended as gateway HTTP **499**, client
+disconnected. Its provider usage was unavailable; gateway zero counters are not
+proof that the provider consumed zero tokens. After changing to the official
+`with_streaming_response.create(...)` context manager, one additional authorized
+request completed in **3.001 seconds** with the exact requested route. No model
+fallback or additional unchanged retry occurred.
+
+The exact returned text was:
+
+> The local simulation summarized 6 LEAN order events into 3 distinct orders, and the source-build backtest processed 3,943 points with zero failed data requests. This does not establish paper-trading readiness because no broker connection was made or validated.
+
+For a deliberate replay, use the already installed official SDK environment and
+the existing local gateway inference key in `OMNIROUTE_API_KEY`; this is not an
+OpenAI provider API key. Choose a new private output directory outside the repo.
+
+```sh
+"$WORKER_PYTHON" "$STACK_REPO/blueprints/us-equities/routing/omniroute-astra.py" \
+  --base-url http://127.0.0.1:20128/v1 \
+  --output-dir "$PRIVATE_RUN/astra-replay"
+```
+
+[omniroute-astra.py](omniroute-astra.py) is a portable adaptation of the successful
+private script, with the same upstream SDK streaming call and exact
+[request](omniroute-astra-request.json). It adds output containment and a route
+identity check; those guard changes did not trigger another inference. SDK retries
+are disabled. The 60-second SDK timeout is a transport timeout, not a token or
+spending cap. Raw events may contain request IDs and must stay private. Requested
+model, returned model and gateway headers agree, but are not independent provider
+attestation. The two-sentence task validates supplied facts; it did not retrieve
+market data or exercise a broker, model tools, native hooks, memory or compaction.
 
 ## Native Codex worker default
 
@@ -119,6 +183,6 @@ OmniRoute's [A2A interface](https://github.com/diegosouzapw/OmniRoute/blob/v3.8.
 
 ## Verification performed for this change
 
-Exactly one anonymous GET reached each supported health endpoint: OmniRoute `/api/health` and FreeLLMAPI `/readyz`. Both returned HTTP 200 on September 19, 2026. Requests followed no redirects, supplied no credentials, and retained no response bodies. [The receipt](health-receipt.json) records precise timestamps and scope. No model calls, provider reauthentication, settings updates, installations or benchmarks were performed.
+The original model-free check made exactly one anonymous GET to each supported health endpoint: OmniRoute `/api/health` and FreeLLMAPI `/readyz`. Both returned HTTP 200 on September 19, 2026. [That receipt](health-receipt.json) retains its original scope. The later Astra resolution above separately records actual model requests, the native version-setting change, restart failures and recovery, and the successful Responses stream; it does not rewrite the earlier check as inference.
 
 The remaining checks are repository validation, example parsing, whitespace and privacy scans. A static example that parses is not a new gateway or native-worker E2E. New deployments require normal upstream installation, account/project consent and one appropriately scoped acceptance task before claiming readiness.

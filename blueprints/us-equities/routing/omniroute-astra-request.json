@@ -1,0 +1,9 @@
+{
+  "model": "cx/gpt-6-astra",
+  "input": "A local research workflow summarized 6 simulated LEAN order events into 3 distinct simulated orders. Source build backtest processed 3943 points with zero failed data requests. No broker connection was made. Return two short sentences: state the counts and explain whether this establishes paper-trading readiness. Do not call tools.",
+  "reasoning": {
+    "effort": "low"
+  },
+  "store": false,
+  "stream": true
+}

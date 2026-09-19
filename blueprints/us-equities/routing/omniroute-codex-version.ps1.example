@@ -1,0 +1,10 @@
+# Insert into the existing private launcher after selecting its native paths.
+# Keep DATA_DIR, authentication, loopback binding and other settings unchanged.
+# $NativeNode and $NativeCodexCli identify the actual installed Codex JS launcher.
+$codexVersionText = (& $NativeNode $NativeCodexCli --version | Out-String).Trim()
+if ($LASTEXITCODE -ne 0 -or $codexVersionText -notmatch '^codex-cli (\d+\.\d+\.\d+)$') {
+    throw 'Cannot determine the installed native Codex version.'
+}
+$env:CODEX_CLIENT_VERSION = $Matches[1]
+# Run the existing upstream serve command only after checking gateway activity.
+# This is a process environment setting, not a provider-store import or policy change.
