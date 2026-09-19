@@ -1,0 +1,92 @@
+{
+  "commands": [
+    "$RESEARCH_PYTHON $STACK_REPO/blueprints/us-equities/financial-data/sec_data.py acquire --root $FINANCIAL_DATA_ROOT --run-id acceptance",
+    "$RESEARCH_PYTHON -m unittest tests.test_financial_data",
+    "$RESEARCH_PYTHON -m unittest",
+    "python3 scripts/validate.py",
+    "python3 -m unittest",
+    "git diff --check"
+  ],
+  "kind": "compatibility_attempt",
+  "limitations": [
+    "HTTP403 does not establish whether the user-agent, network policy, or another condition caused rejection.",
+    "No automatic retry; a further acquisition needs a material change or renewed SEC accessibility.",
+    "No native Astra/Claude financial report can cite a newly acquired live packet from this attempt.",
+    "Current API snapshots do not reconstruct historical point-in-time knowledge.",
+    "Recent submissions and four numerical concepts only; no filing narrative corpus, vector RAG, market prices, backtest, broker orders or off-host service.",
+    "Provider token savings and quality-equivalent full-task savings were not measured by this recipe."
+  ],
+  "live_acquisition": {
+    "automatic_retries": 0,
+    "availability_policy": "max(acceptance_at, first_observed_at of both source snapshots)",
+    "error_code": "http_403",
+    "finished_at": "2026-09-19T16:07:37.323601Z",
+    "historical_point_in_time_reconstruction": false,
+    "kind": "official_sec_acquisition",
+    "per_request_timeout_seconds": 20,
+    "request_limit_per_second": 2,
+    "requests": [
+      {
+        "error_code": "http_403",
+        "finished_at": "2026-09-19T16:07:37.323523Z",
+        "kind": "submissions",
+        "started_at": "2026-09-19T16:07:37.247581Z",
+        "status": "failed",
+        "symbol": "AAPL",
+        "url": "https://data.sec.gov/submissions/CIK0000320193.json"
+      }
+    ],
+    "response_limit_bytes": 26214400,
+    "schema_version": 1,
+    "selection": {
+      "concepts": [
+        "Assets",
+        "Liabilities",
+        "StockholdersEquity",
+        "NetIncomeLoss"
+      ],
+      "illustrative_symbols": [
+        "AAPL",
+        "MSFT"
+      ]
+    },
+    "started_at": "2026-09-19T16:07:37.247397Z",
+    "status": "failed",
+    "user_agent_sha256": "106a0fb6085fc9fc85426d15f91814374f812c7ecb6e937844ffbc98441ed4f6"
+  },
+  "live_artifacts": {
+    "parquet_datasets": 0,
+    "ready_financial_packets": 0,
+    "source_payloads": 0
+  },
+  "offline_verification": {
+    "base_python_suite": {
+      "failures": 0,
+      "skip_reason": "DuckDB is intentionally installed only in the pinned research environment",
+      "skips": 2,
+      "tests": 83
+    },
+    "diff_check": "passed",
+    "duckdb_version": "1.5.5",
+    "fixtures": "Artificial test values and SEC-shaped metadata; no fixture is represented as live financial evidence",
+    "integrity_validation": "passed before coordinator integration; existing153 hash-listed artifacts unchanged",
+    "native_roundtrip": "Exact DECIMAL(38,12) values including 12345678901234567890123456.123456789012 survive Parquet and the packet CLI",
+    "packet_contract": "Eight unique fact citations required; incomplete returns exit2; JSON and Markdown each <=8192 bytes",
+    "research_environment_suite": {
+      "failures": 0,
+      "skips": 0,
+      "tests": 83
+    },
+    "targeted_failures": 0,
+    "targeted_tests": 15
+  },
+  "public_contact_used": "https://github.com/seathatflowsinourveins/native-agent-stack",
+  "schema_version": 1,
+  "scope": "Native SEC financial-data research recipe; offline synthetic fixtures are separate from live acquisition",
+  "sources": [
+    "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+    "https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data",
+    "https://duckdb.org/docs/stable/data/parquet/overview"
+  ],
+  "status": "blocked_live_acquisition"
+}
