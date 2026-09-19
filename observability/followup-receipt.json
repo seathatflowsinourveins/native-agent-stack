@@ -1,0 +1,302 @@
+{
+  "schema_version": 1,
+  "id": "native-observability-followup",
+  "kind": "native_model_e2e",
+  "checked_at": "2026-09-19",
+  "component_ids": [
+    "codex",
+    "context-mode",
+    "ai-memory",
+    "socraticode",
+    "agent-browser",
+    "opentelemetry-collector-contrib",
+    "prometheus",
+    "loki",
+    "grafana"
+  ],
+  "claim": "A fresh native Astra SDK task used Context Mode and exported a turn histogram exactly matching its automatically published result receipt; direct Desktop memory/RAG/bridge operations and native WSL host observations also worked.",
+  "scope": "Bounded follow-up to the earlier both-client acceptance. One new native SDK inference; not another Claude run, a Desktop-parent exporter acceptance or universal SOTA certification.",
+  "limitations": [
+    "The current Desktop parent has zero correlated telemetry records and no directly exposed Context Mode tools. Its native bridge and direct memory/RAG calls work; native child proof is separate.",
+    "Native analytics.enabled changed from unset to true only in the two selected user homes. Explicit local OTLP metrics are selected; separate first-party analytics events retain the previous native unset behavior. This is not an all-telemetry-local claim and explicit opt-outs must not be overwritten.",
+    "The retained Context Mode bridge reports zero estimated tokens saved. The earlier188769-to500 artifact comparison is separate and not provider billing or complete-task savings.",
+    "WSL host metrics cover CPU, memory, load and only the virtual root filesystem. They do not measure Windows physical backing-disk capacity.",
+    "Absent failure-counter series and empty unknown-usage queries remain unknown/no matching data. A receipt-based view does not identify tasks that never emitted a receipt.",
+    "The receipt spool has no automatic expiry; exactly-once accounting, full-disk recovery, external backup/paging, continuous host availability and broker/trading acceptance remain outside this proof."
+  ],
+  "cause_and_fix": {
+    "cause": "App Server disables analytics/metrics by default; the native SDK launch does not opt in. The metrics provider was disabled despite an explicit OTLP exporter, while native logs continued.",
+    "fix": "Set analytics.enabled=true in selected user-level native configurations only when previously unset; retain explicit otlp-http endpoint http://127.0.0.1:14318/v1/metrics. No SDK code patch, export-delay loop, model change or proxy required.",
+    "config_changes": [
+      {
+        "home": "native",
+        "previous": "unset",
+        "changed": true,
+        "analytics_enabled": true,
+        "metrics_exporter": "explicit_loopback_otlp",
+        "first_party_analytics_behavior": "unchanged from native unset baseline"
+      },
+      {
+        "home": "desktop",
+        "previous": "unset",
+        "changed": true,
+        "analytics_enabled": true,
+        "metrics_exporter": "explicit_loopback_otlp",
+        "first_party_analytics_behavior": "unchanged from native unset baseline"
+      }
+    ],
+    "source_evidence": [
+      "https://github.com/openai/codex/blob/rust-v0.155.1/codex-rs/core/src/otel_init.rs#L68",
+      "https://github.com/openai/codex/blob/rust-v0.155.1/codex-rs/cli/src/main.rs#L584",
+      "https://github.com/openai/codex/blob/rust-v0.155.1/codex-rs/otel/src/provider.rs#L267",
+      "https://github.com/openai/codex/blob/rust-v0.155.1/codex-rs/analytics/src/client.rs#L239",
+      "https://github.com/openai/codex/blob/rust-v0.155.1/codex-rs/analytics/src/client.rs#L139",
+      "https://learn.chatgpt.com/docs/config-file/config-advanced"
+    ],
+    "native_discovery_command": "codex app-server --help",
+    "native_option": "--analytics-default-enabled (SDK otherwise inherits the disabled App Server default unless user config opts in)",
+    "historical_receipts_preserved": "observability/receipt.json records the earlier two successful tasks with missing histograms and the ineffective interval/hold experiment. This later proof does not rewrite those observations."
+  },
+  "native_sdk": {
+    "command": "\"$SDK_ENV/bin/python\" \"$STACK_REPO/blueprints/us-equities/workers/native_worker.py\" run --codex-bin \"$NATIVE_CODEX_BIN\" --codex-home \"$NATIVE_CODEX_HOME\" --workspace \"$RESEARCH_WORKSPACE\" --receipt \"$PRIVATE_RUN_DIR/sdk-live-receipt.json\" --prompt \"$PROMPT_FILE\" --turn-deadline-seconds 90 --observation-dir \"$STACK_DATA_ROOT/sdk-receipts\"",
+    "configuration": "Uses the native user configuration and existing account, with a bounded inherited environment excluding service/broker secrets. The helper itself has no analytics override.",
+    "native_readiness": {
+      "ready": true,
+      "model_available": true,
+      "ordinary_usage_allowed": true
+    },
+    "task": "One Context Mode Python calculation of17+25 and the number of four service labels; no files, network or delegation requested.",
+    "model": "gpt-6-astra",
+    "provider": "openai",
+    "status": "completed",
+    "duration_ms": 12493,
+    "exit_code": 0,
+    "mcp_calls": [
+      {
+        "server": "context-mode",
+        "tool": "ctx_execute",
+        "status": "completed",
+        "count": 1
+      }
+    ],
+    "answer": {
+      "check": "native-observability-e2e",
+      "sum": 42,
+      "service_count": 4
+    },
+    "usage": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 26240,
+      "inputTokens": 40369,
+      "outputTokens": 149,
+      "reasoningOutputTokens": 0,
+      "totalTokens": 40518
+    },
+    "usage_status": "reported",
+    "observation_status": "published_local_receipt",
+    "native_histogram": {
+      "query": "ecosystem_codex_turn_token_usage_sum{client_scope=\"sdk-worker\"}",
+      "http_status": 200,
+      "matched_categories": {
+        "input": 40369,
+        "cached_input": 26240,
+        "output": 149,
+        "total": 40518,
+        "cache_write_input": 0,
+        "reasoning_output": 0
+      },
+      "one_distinct_metric_writer": true,
+      "all_categories_equal_sdk_total": true
+    },
+    "cache_semantics": "Cached input is included in input, not additional usage or measured net savings.",
+    "result_receipt": "Fresh task automatically published its own bounded0600 observation; unlike the earlier migration acceptance, no receipt was manually imported for this new task.",
+    "provider_attestation": "Configured native model/provider and reported usage; not independent billing attestation.",
+    "retained_histogram_query": {
+      "query": "last_over_time(ecosystem_codex_turn_token_usage_sum{client_scope=\"sdk-worker\"}[6h])",
+      "status": "success",
+      "values": {
+        "cache_write_input": "0",
+        "cached_input": "26240",
+        "input": "40369",
+        "output": "149",
+        "reasoning_output": "0",
+        "total": "40518"
+      }
+    }
+  },
+  "current_desktop": {
+    "direct_context_mode_tools_exposed": 0,
+    "context_mode_native_bridge_call_completed": true,
+    "direct_ai_memory": {
+      "tool": "memory_query",
+      "query": "observability OR telemetry",
+      "scope": "Explicit agent-lab workspace/project",
+      "compiled_page_hits": 0,
+      "raw_observation_hits": 2,
+      "result": "Relevant scoped lifecycle observations returned. Historical untrusted evidence, not a new durable memory write."
+    },
+    "direct_socraticode": {
+      "status": "green",
+      "indexed_chunks": 139,
+      "watcher": "active in another process",
+      "search_query": "native provider usage normalization cached input output cost omission",
+      "limit": 1,
+      "matches": 1,
+      "matched_file": "tools/ecosystem/linux-usage-report.cjs",
+      "lines": [
+        113,
+        120
+      ],
+      "result": "Returned native usage normalization and deduplication scope."
+    },
+    "correlated_otel_records": 0,
+    "query_scope": "All-service Loki24h metadata query and retained local event metadata; current task correlation checked privately.",
+    "service_name_caveat": "Records labeled Codex Desktop can belong to native children;24 sampled prior records had native-codex scope. A service name alone does not prove parent Desktop export.",
+    "activation": "Selected user configs are saved for fresh starts; the running Desktop parent was not restarted or hot-reloaded."
+  },
+  "context_mode_counter": {
+    "command": "mcporter --config \"$MCPORTER_CONFIG\" call context-mode.ctx_stats --output text --no-oauth",
+    "version": "1.0.169",
+    "retained_duration": "9h55m",
+    "calls": 50,
+    "entered_context_display": "208 KB",
+    "estimated_tokens_saved": 0,
+    "scope": "Retained native bridge connection, not this entire Desktop session or provider usage. Adapter detection in this bridge view skips Claude/Codex CLI despite separate real native-call evidence.",
+    "stdout_excerpt": "context-mode  9h 55m  50 calls\n\n208 KB entered context  |  0 tokens saved\n",
+    "full_private_stdout_sha256": "521dcb90f9d92b986bdcffba95be49e57342939d8307b19140da2226a8ae844d",
+    "cost_display": "Upstream lifetime/session savings displays are not treated as subscription bills or measured provider savings."
+  },
+  "host_metrics": {
+    "upstream": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/receiver/hostmetricsreceiver/README.md",
+    "receiver": "host_metrics",
+    "version": "0.161.0",
+    "collection_interval_seconds": 30,
+    "scrapers": [
+      "cpu",
+      "memory",
+      "load",
+      "filesystem"
+    ],
+    "filesystem_include_mount_points": [
+      "/"
+    ],
+    "native_validation_exit_code": 0,
+    "native_query": "count by (__name__) ({__name__=~\"ecosystem_system_.*\"})",
+    "families": 8,
+    "series": 23,
+    "observed_family_counts": {
+      "ecosystem_system_cpu_load_average_15m": 1,
+      "ecosystem_system_cpu_load_average_1m": 1,
+      "ecosystem_system_cpu_load_average_5m": 1,
+      "ecosystem_system_cpu_logical_count": 1,
+      "ecosystem_system_cpu_time_seconds_total": 8,
+      "ecosystem_system_filesystem_inodes_usage": 2,
+      "ecosystem_system_filesystem_usage_bytes": 3,
+      "ecosystem_system_memory_usage_bytes": 6
+    },
+    "new_alert_rules": [
+      "EcosystemRootFilesystemLowSpace",
+      "EcosystemHostFilesystemMetricsMissing"
+    ],
+    "promtool_total_rules_accepted": 8,
+    "alert_scope": "New expressions/configuration accepted and current data observed; no disk exhaustion was induced. The prior firing/resolved route proof remains separately dated."
+  },
+  "dashboard": {
+    "sdk_aggregation": "Selected dashboard range, max per nonempty receipt_id before sum; no fixed1h expiry imposed by the panel. Loki retention and selected window still limit visibility.",
+    "queries": {
+      "sdk_receipts_6h": {
+        "query": "sum(max by (receipt_id) (max_over_time({service_name=\"codex-sdk-receipt\"} | receipt_id != \"\" | unwrap total_token_count | __error__=\"\" [6h])))",
+        "status": "success",
+        "values": [
+          "121288"
+        ]
+      },
+      "sdk_unknown_receipts_6h": {
+        "query": "count(sum by (receipt_id) (count_over_time({service_name=\"codex-sdk-receipt\"} | receipt_id != \"\" | usage_status != \"reported\" [6h])))",
+        "status": "success",
+        "values": []
+      }
+    },
+    "receipt_arithmetic": {
+      "prior_two_tasks": 80770,
+      "fresh_task": 40518,
+      "three_task_total": 121288
+    },
+    "unknown_usage": "New panel shows No matching data for an empty query; it does not coerce missing records/counters to zero.",
+    "new_resource_panels": [
+      "WSL CPU load averages",
+      "WSL memory by state",
+      "WSL root filesystem by state"
+    ],
+    "layout": "SDK panels moved below the log panel to remove a grid overlap.",
+    "visual_acceptance": {
+      "native_browser": "agent-browser",
+      "rendered": true,
+      "artifact": "evidence/artifacts/observability-followup-dashboard.png",
+      "visible_sdk_total": 121288,
+      "visible_unknown_usage": "No matching data",
+      "host_resource_charts_rendered": true,
+      "privacy_review": "Visible text/labels reviewed: no account credentials, private paths, session IDs or raw event bodies.",
+      "capture_scope": "Live dashboard one-hour selected window; native six-hour query separately recorded and also matched121288."
+    }
+  },
+  "service_checks": {
+    "active_services": 6,
+    "scrape_targets_up": 7,
+    "collector_export_queue": {
+      "size": 0,
+      "capacity": 1000
+    },
+    "loki_flush_queue": 0,
+    "collector_loki_journal_entries_last15m": 0,
+    "scope": "Read-only live review; source receipts retain sample time. Absent failure-counter series are not asserted zero."
+  },
+  "landscape": {
+    "public_stars": 337,
+    "star_identity_changes": 0,
+    "grand_repository_identities": 453,
+    "detailed_cards": 151,
+    "distinct_core_repositories": 146,
+    "baseline_components": 42,
+    "new_reference_alternatives": [
+      "prometheus/node_exporter",
+      "openlit/openlit"
+    ],
+    "new_alternatives_installed": false,
+    "source_receipt": "catalogs/us-equities/source-followup-receipt.json"
+  },
+  "retained_non_inference_failures": [
+    "Initial SDK discovery used a nonexistent binary path and failed before model submission. Correct path was resolved from the native runtime manifest, readiness then passed.",
+    "Two guessed optional host-scraper README paths returned404; the pinned receiver README and native configuration validation supplied the supported setup."
+  ],
+  "result": {
+    "status": "passed_with_explicit_limits",
+    "new_native_model_calls": 1,
+    "sdk_histogram_gap": "resolved by native user configuration",
+    "fresh_automatic_receipt_writer_gap": "resolved by real task",
+    "parent_desktop_export": "not_observed"
+  },
+  "verification": {
+    "independent_sdk_reconciliation": "All six categories, one native writer, completed Context Mode call, correct response and automatic receipt independently reconciled.",
+    "independent_host_review": "Deployed files match repository,8families/23series,8healthy rules with600s/120s holds,121288SDK query, empty unknown query and no grid overlaps independently checked.",
+    "offline_tests_passed": 68,
+    "hash_listed_files": 151,
+    "gitleaks_current_tree_findings": 0,
+    "gitleaks_scanned_bytes_approx": 3073715,
+    "relative_guide_links_checked": 25,
+    "relative_guide_links_missing": 0,
+    "qmd": {
+      "collections": {
+        "us-equities-catalog": 10,
+        "us-equities-foundation": 15,
+        "us-equities-observability": 4
+      },
+      "update_exit_code": 0,
+      "search_query": "SDK histogram",
+      "search_exit_code": 0,
+      "get_document": "qmd://us-equities-observability/session-e2e.md",
+      "get_exit_code": 0,
+      "new_embedding_models_downloaded": false
+    }
+  }
+}

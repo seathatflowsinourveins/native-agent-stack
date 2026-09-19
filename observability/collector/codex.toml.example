@@ -9,3 +9,8 @@ trace_exporter = "none"
 
 [otel.tool_result]
 max_bytes = 0
+
+# App Server/SDK otherwise defaults metrics off. Review existing explicit opt-outs.
+# Unset -> true retains native first-party analytics behavior; not all telemetry is local.
+[analytics]
+enabled = true

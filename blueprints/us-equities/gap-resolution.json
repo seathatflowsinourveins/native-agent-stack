@@ -9,10 +9,10 @@
     "selected_file_reviews": 18,
     "unassessed": 0,
     "targeted_candidates": 14,
-    "grand_repository_index": 451,
-    "beyond_star_identities": 114,
-    "core_repository_cards": 149,
-    "core_unique_repositories": 144,
+    "grand_repository_index": 453,
+    "beyond_star_identities": 116,
+    "core_repository_cards": 151,
+    "core_unique_repositories": 146,
     "models": 20,
     "audit": "catalogs/us-equities/star-audit.json"
   },
@@ -56,6 +56,26 @@
       "id": "sdk_reported_usage_visibility",
       "evidence": "observability/receipt.json",
       "scope": "Two prior completed native receipts imported as bounded summaries; native Loki per-record dedup query80770 after Collector restart. Updated helper has offline publication guards; native histogram remains unobserved."
+    },
+    {
+      "id": "sdk_native_histogram",
+      "evidence": "observability/followup-receipt.json",
+      "scope": "Native App Server metrics enabled by supported user config when previously unset; fresh Astra Context Mode task histogram exactly matches40518reported tokens. Earlier failure receipts remain historical."
+    },
+    {
+      "id": "fresh_sdk_observation_publication",
+      "evidence": "observability/followup-receipt.json",
+      "scope": "The current SDK example automatically published a fresh completed task receipt; native Loki now matches121288across three distinct observations. No import for the new task."
+    },
+    {
+      "id": "wsl_host_resource_visibility",
+      "evidence": "observability/followup-receipt.json",
+      "scope": "Existing upstream Collector host_metrics receiver supplies8families/23series. Root-filesystem inclusion only; virtual filesystem capacity is not Windows physical backing storage."
+    },
+    {
+      "id": "receipt_dashboard_selected_range",
+      "evidence": "observability/followup-receipt.json",
+      "scope": "Receipt aggregation follows selected dashboard range, with separate unreported-usage view and neutral empty-data semantics; no financial-ledger or complete-task coverage claim."
     }
   ],
   "external_or_design_requirements": [
@@ -100,11 +120,6 @@
       "reason": "Artifact reduction and cached-input counters are not a paired complete-task usage comparison."
     },
     {
-      "id": "sdk_native_histogram",
-      "status": "upstream_delivery_unresolved",
-      "reason": "Two completed SDK tasks and bounded flush experiment produced no observed native turn histogram; separate authoritative receipt lane is accepted."
-    },
-    {
       "id": "desktop_exporter_activation",
       "status": "client_boundary",
       "reason": "Native child processes accepted; existing Desktop process not restarted/hot-reloaded. Fresh Desktop process needs observed export."
@@ -118,23 +133,23 @@
   "privacy": "No account stores, raw sessions, private service password, broker credentials or private star identities are published.",
   "verification": {
     "scope": "Publication/coverage regression tests; no provider rerun.",
-    "independent_reviews": "Prior engine/DeerFlow/hosting/coverage review retained; current Collector metadata channels, SDK receipt identities/retries and native query independently reviewed with supported corrections.",
+    "independent_reviews": "Prior engine/DeerFlow/hosting/coverage review retained; current Collector metadata channels, SDK receipt identities/retries and native query independently reviewed with supported corrections. Later native SDK histogram/automatic receipt reconciliation and current Desktop correlation audited independently.",
     "qmd": {
       "update_exit_code": 0,
       "index": "native-agent-stack-catalog",
       "collections": {
-        "us-equities-catalog": 9,
+        "us-equities-catalog": 10,
         "us-equities-foundation": 15,
-        "us-equities-observability": 3
+        "us-equities-observability": 4
       },
-      "retrieval_query": "SDK receipts",
+      "retrieval_query": "SDK histogram",
       "search_exit_code": 0,
       "get_exit_code": 0,
       "new_embedding_models_downloaded": false,
       "scope": "Native lexical update/search/get;3selected observation guides added within the existing publication project, no embedding models or provider-token saving measurement.",
-      "get_document": "qmd://us-equities-observability/collector/README.md",
-      "get_from_line": 62,
-      "get_lines": 27
+      "get_document": "qmd://us-equities-observability/session-e2e.md",
+      "get_from_line": 3,
+      "get_lines": 15
     },
     "prior_snapshot": {
       "offline_tests_passed": 63,
@@ -144,8 +159,9 @@
     },
     "observability_receipt": "observability/receipt.json",
     "offline_tests_passed": 68,
-    "hash_listed_files": 146,
+    "hash_listed_files": 151,
     "gitleaks_current_tree_findings": 0,
-    "gitleaks_scanned_bytes_approx": 3009436
+    "gitleaks_scanned_bytes_approx": 3073715,
+    "observability_followup_receipt": "observability/followup-receipt.json"
   }
 }

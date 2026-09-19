@@ -59,3 +59,21 @@ groups:
         annotations:
           summary: 'Controlled local acceptance target is unavailable'
           description: 'Synthetic closed-port fixture only; no production service was stopped.'
+      - alert: EcosystemRootFilesystemLowSpace
+        expr: 'sum(ecosystem_system_filesystem_usage_bytes{mountpoint="/",state="free"}) < 5368709120'
+        for: 10m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem has less than 5 GiB free'
+          description: 'Local WSL filesystem only; Windows backing-disk capacity is separate.'
+      - alert: EcosystemHostFilesystemMetricsMissing
+        expr: 'absent(ecosystem_system_filesystem_usage_bytes{mountpoint="/"})'
+        for: 2m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem observations are missing'
+          description: 'Missing data is unknown, not proof of available space.'

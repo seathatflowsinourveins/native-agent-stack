@@ -106,7 +106,6 @@
     "Standing trading service and in-flight/broker restart/recovery acceptance",
     "Context Mode file-tool workspace override requires normal native MCP approval; trusted ctx_execute already works.",
     "OmniRoute simple text inference accepted; native tool/hook/compaction parity and failed-attempt provider usage remain unproved.",
-    "SDK native turn histogram unobserved; separate native file-receiver receipt accounting accepted.",
     "Existing Desktop exporter activation and off-host operational acceptance remain separate."
   ],
   "receipt_integrity": [
@@ -148,5 +147,6 @@
     }
   ],
   "gap_resolution": "gap-resolution.json",
-  "observability_manifest": "../../observability/receipt.json"
+  "observability_manifest": "../../observability/receipt.json",
+  "observability_followup": "../../observability/followup-receipt.json"
 }

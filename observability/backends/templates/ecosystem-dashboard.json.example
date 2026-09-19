@@ -2,7 +2,7 @@
   "uid": "ecosystem-native",
   "title": "Native agent ecosystem",
   "schemaVersion": 39,
-  "version": 5,
+  "version": 7,
   "editable": false,
   "timezone": "browser",
   "refresh": "15s",
@@ -176,12 +176,12 @@
     {
       "id": 20,
       "type": "stat",
-      "title": "SDK reported turn tokens from receipts (1h)",
-      "description": "SDK result receipts, deduplicated by observation identity within the selected window. Separate from request logs and CLI histograms. Cached/reasoning subsets are not added; this is not a provider invoice.",
+      "title": "SDK reported turn tokens (selected range)",
+      "description": "Deduplicated per receipt ID in the selected dashboard range. Receipt totals are separate from native histograms; never add them together.",
       "gridPos": {
         "x": 0,
-        "y": 32,
-        "w": 24,
+        "y": 36,
+        "w": 12,
         "h": 6
       },
       "datasource": {
@@ -191,14 +191,28 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(max by (receipt_id) (max_over_time({service_name=\"codex-sdk-receipt\"} | receipt_id != \"\" | unwrap total_token_count | __error__=\"\" [1h])))",
+          "expr": "sum(max by (receipt_id) (max_over_time({service_name=\"codex-sdk-receipt\"} | receipt_id != \"\" | unwrap total_token_count | __error__=\"\" [$__range])))",
           "queryType": "instant",
           "legendFormat": "SDK reported tokens"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "short"
+          "unit": "none",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
         },
         "overrides": []
       },
@@ -215,6 +229,164 @@
         "colorMode": "value",
         "graphMode": "none"
       }
+    },
+    {
+      "id": 21,
+      "title": "WSL CPU load averages",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ecosystem-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 42,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{__name__=~\"ecosystem_system_cpu_load_average_.*\"}",
+          "legendFormat": "{{__name__}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "description": "Native Collector host_metrics receiver for the Linux/WSL host. Filesystem capacity is the WSL virtual root, not Windows physical backing storage."
+    },
+    {
+      "id": 22,
+      "title": "WSL memory by state",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ecosystem-prometheus"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 42,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "ecosystem_system_memory_usage_bytes",
+          "legendFormat": "{{state}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "description": "Native Collector host_metrics receiver for the Linux/WSL host. Filesystem capacity is the WSL virtual root, not Windows physical backing storage."
+    },
+    {
+      "id": 23,
+      "title": "WSL root filesystem by state",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ecosystem-prometheus"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 42,
+        "w": 8,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "ecosystem_system_filesystem_usage_bytes{mountpoint=\"/\"}",
+          "legendFormat": "{{state}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "description": "Native Collector host_metrics receiver for the Linux/WSL host. Filesystem capacity is the WSL virtual root, not Windows physical backing storage."
+    },
+    {
+      "id": 24,
+      "title": "SDK receipts without reported usage (selected range)",
+      "type": "stat",
+      "datasource": {
+        "type": "loki",
+        "uid": "ecosystem-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 36,
+        "w": 12,
+        "h": 6
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count(sum by (receipt_id) (count_over_time({service_name=\"codex-sdk-receipt\"} | receipt_id != \"\" | usage_status != \"reported\" [$__range])))",
+          "queryType": "instant"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "noValue": "No matching data",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#8e8e8e"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#8e8e8e",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "description": "Counts observed receipt IDs with unreported usage. No data is not zero usage or proof that every task reached the receiver."
     }
   ]
 }

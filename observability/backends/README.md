@@ -178,3 +178,13 @@ production availability guarantee.
 - [ntfy 2.28.0 release](https://github.com/binwiederhier/ntfy/releases/tag/v2.28.0), [configuration](https://docs.ntfy.sh/config/), and [bundled webhook templates](https://docs.ntfy.sh/publish/#message-templating).
 
 Each persistence attempt requires a fresh evidence directory. Existing `persistence-*.json` files cause refusal before network calls or restarts. A reserved attempt marker also prevents simultaneous runs from overwriting the same evidence.
+
+## Later observation follow-up
+
+The [current-session receipt](../followup-receipt.json) adds real SDK native
+histogram delivery, a fresh automatically published result receipt, and WSL
+host metrics from the existing Collector. Dashboard receipt aggregation follows
+the selected range; empty unreported-usage results remain “No matching data.”
+Two native root-filesystem rules bring the rule count to 8. Their configuration
+and live inputs were checked without inducing disk exhaustion. The original
+six backend restart checks retain their earlier scope.

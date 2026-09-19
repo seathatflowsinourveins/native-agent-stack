@@ -1,5 +1,11 @@
 # Native agent observability
 
+**Latest:** the [current-session follow-up](session-e2e.md) resolved native SDK
+metrics with the supported App Server setting and one real Context Mode task:
+**40,518 tokens**, matching native histogram and automatic receipt. It also adds
+WSL host resources and selected range receipt views. The original acceptance
+results below remain a dated checkpoint.
+
 This local profile connects native Codex and Claude telemetry to an OpenTelemetry
 Collector, Prometheus, Loki, Grafana, Alertmanager and ntfy. The September 19, 2026
 acceptance includes actual native client tasks, a native Astra SDK worker,
@@ -16,9 +22,9 @@ notifications. [Machine-readable evidence](receipt.json) records the exact scope
 | Alert delivery | prometheus/alertmanager 0.34.1; binwiederhier/ntfy 2.28.0 | Native webhook and bundled ntfy template; local inbox only |
 | Workflow/research | Dagu; DeerFlow; native Astra SDK; LEAN | Existing execution receipts plus local service observation; no connected broker |
 
-See the [451-repository landscape index](../catalogs/us-equities/repository-index.md)
+See the [453-repository landscape index](../catalogs/us-equities/repository-index.md)
 for all recorded identities, including 337 freshly rechecked public stars.
-Its 149 detailed cards represent 144 distinct repositories. Inclusion is not
+Its 151 detailed cards represent 146 distinct repositories. Inclusion is not
 installation, comparative superiority, exhaustive security review, or proof of
 trading profitability. Alternatives such as Phoenix/Langfuse remain candidates;
 this profile has no persistent trace backend and does not stack duplicate agents
@@ -50,7 +56,7 @@ flowchart LR
   80,770 tokens**. The Collector file receiver ingested bounded summaries of both
   results; the native Loki query matched **80,770**, including after a Collector
   restart. Its native turn histogram was not observed, even with a bounded
-  flush experiment. The receipt lane is separate and does not claim that repair.
+  flush experiment. That historical gap is now resolved in the [fresh follow-up](session-e2e.md); the original receipt remains intact.
 - All seven configured scrape targets were up. Gateway/Collector probes returned
   200; the unauthenticated Dagu API probe returned the expected 401.
 - Six checks passed across a controlled restart of the five new backends.
@@ -140,7 +146,9 @@ private and has no automatic age-based cleanup yet.
 private logs; low-cardinality client-scope labels support dashboards. Direct
 clients without an instance ID are labeled `unscoped`; their metrics do not
 establish safe multi-writer accounting. The first CLI calibration predates that
-identity refinement and is reconciled against its own native receipts.
+identity refinement and is reconciled against its own native receipts. The later
+[SDK histogram fix](session-e2e.md#what-fixed-the-sdk-histogram) is persisted in the
+selected user configurations.
 
 ## Token-efficient operation and accounting
 

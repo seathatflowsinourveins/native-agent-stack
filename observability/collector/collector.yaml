@@ -23,6 +23,17 @@ receivers:
         on_error: drop_quiet
         parse_from: body
         parse_to: attributes
+  host_metrics:
+    collection_interval: 30s
+    initial_delay: 1s
+    scrapers:
+      cpu: {}
+      memory: {}
+      load: {}
+      filesystem:
+        include_mount_points:
+          mount_points: ["/"]
+          match_type: strict
   http_check/ecosystem:
     collection_interval: 30s
     targets:
@@ -155,3 +166,7 @@ service:
       receivers: [file_log/sdk_receipts]
       processors: [memory_limiter, transform/sdk_receipt, transform/privacy, batch]
       exporters: [otlphttp/loki, file/events]
+    metrics/host:
+      receivers: [host_metrics]
+      processors: [memory_limiter, batch]
+      exporters: [prometheus]

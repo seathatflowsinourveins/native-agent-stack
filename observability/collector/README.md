@@ -72,8 +72,8 @@ have different file fingerprints. Unknown usage remains absent, never zero.
 Per-record `receipt_id` survives as structured metadata. It must not be stored
 on the shared resource: multiple records can share one resource group. The
 Grafana panel excludes historical records lacking `receipt_id` and takes the
-maximum reported total per receipt before summing within its selected one-hour
-window. This avoids counting a replay of the same receipt twice; it is not a
+maximum reported total per receipt before summing within the selected dashboard
+time range. This avoids counting a replay of the same receipt twice; it is not a
 permanent financial ledger or a way to merge independent receipts for one turn.
 Reuse the original ID when replaying an observation; assigning a new ID to the
 same turn creates a new accounting record.
@@ -82,7 +82,23 @@ Acceptance imported bounded summaries of two already-completed native SDK runs
 through the same helper; it made no new inference after adding this publication
 helper. Earlier private raw migration inputs remain private. Published summaries
 omit final responses, items and raw errors; the Collector further filters them.
-The SDK's native turn histogram was not observed. Receipt visibility provides a
-separate authoritative result lane rather than claiming that metric was repaired.
+The initial SDK histogram was not observed. The [later native configuration
+fix and fresh task](../session-e2e.md) now establish both histogram and automatic
+receipt delivery. The two sources stay separate to prevent double counting.
 The spool and receiver checkpoints are private retained files; no automatic
 spool expiry or disk-pressure recovery acceptance is claimed.
+
+## WSL host resources
+
+The pinned upstream `host_metrics` receiver now collects CPU time/count, load,
+memory and only the `/` filesystem every 30 seconds. Native validation and the
+Prometheus query observed 8 families / 23 series. This pipeline uses trusted local
+instrumentation, has no process-command-line scraper, and does not enumerate
+other mountpoints. WSL virtual filesystem capacity is distinct from physical
+Windows backing storage. Two new rules detect root free space below 5 GiB for 10 min
+and absent root filesystem observations for 2 min; no disk exhaustion was induced.
+The original full local notification route proof remains separately dated.
+
+SDK/App Server metrics need the `[analytics]` opt-in in the complete Codex
+user-config example. Review existing opt-outs and native first-party event
+semantics before merging; see [the exact cause and repair](../session-e2e.md).

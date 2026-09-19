@@ -244,6 +244,31 @@
         "Broker/data entitlement, strategy/risk specifications and deterministic execution/recovery acceptance remain unresolved. No live trading or paid hosted inference was enabled."
       ],
       "path": "observability/receipt.json"
+    },
+    {
+      "id": "native-observability-followup",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "context-mode",
+        "ai-memory",
+        "socraticode",
+        "agent-browser",
+        "opentelemetry-collector-contrib",
+        "prometheus",
+        "loki",
+        "grafana"
+      ],
+      "claim": "A fresh native Astra SDK task used Context Mode and exported a turn histogram exactly matching its automatically published result receipt; direct Desktop memory/RAG/bridge operations and native WSL host observations also worked.",
+      "limitations": [
+        "The current Desktop parent has zero correlated telemetry records and no directly exposed Context Mode tools. Its native bridge and direct memory/RAG calls work; native child proof is separate.",
+        "Native analytics.enabled changed from unset to true only in the two selected user homes. Explicit local OTLP metrics are selected; separate first-party analytics events retain the previous native unset behavior. This is not an all-telemetry-local claim and explicit opt-outs must not be overwritten.",
+        "The retained Context Mode bridge reports zero estimated tokens saved. The earlier188769-to500 artifact comparison is separate and not provider billing or complete-task savings.",
+        "WSL host metrics cover CPU, memory, load and only the virtual root filesystem. They do not measure Windows physical backing-disk capacity.",
+        "Absent failure-counter series and empty unknown-usage queries remain unknown/no matching data. A receipt-based view does not identify tasks that never emitted a receipt.",
+        "The receipt spool has no automatic expiry; exactly-once accounting, full-disk recovery, external backup/paging, continuous host availability and broker/trading acceptance remain outside this proof."
+      ],
+      "path": "observability/followup-receipt.json"
     }
   ],
   "files": [
@@ -459,13 +484,13 @@
     },
     {
       "path": "blueprints/us-equities/gap-resolution.json",
-      "sha256": "a542e835be77935a15b7f6138b792d8ecd6ccab4445976d0eee82ce2781b1d10",
-      "bytes": 6770
+      "sha256": "c081edec3871c96eb3ac5867598b98a9818dade29bed4f2036c0842e505c1263",
+      "bytes": 7954
     },
     {
       "path": "blueprints/us-equities/gap-resolution.md",
-      "sha256": "411697587bdebd015d1b6c3d52ee76746e297ce2e8144acd1c63996888d0bb54",
-      "bytes": 8428
+      "sha256": "e656616f28e864b611ed094f3021ba38f888d70e7d1ff15aac2ed09d84bb900d",
+      "bytes": 9592
     },
     {
       "path": "blueprints/us-equities/harness-contract.json",
@@ -504,8 +529,8 @@
     },
     {
       "path": "blueprints/us-equities/manifest.json",
-      "sha256": "175f6bf760de393887890e2c90d2196c0c7fa140684ee08d80727d1f6e251f0e",
-      "bytes": 5870
+      "sha256": "e9069446a6de31e44377ff43c388fdb1f8a49a30f9ac2a423a9d5b913e524f97",
+      "bytes": 5839
     },
     {
       "path": "blueprints/us-equities/north-star.md",
@@ -584,8 +609,8 @@
     },
     {
       "path": "blueprints/us-equities/workers/README.md",
-      "sha256": "c9b5b37b17696e783b615756f4cddd696117f73a55c2896dce464c179794983e",
-      "bytes": 9971
+      "sha256": "c2933f498347266c1e8e266ed41002a48b7adf4761452f8dca2c76befc64cca9",
+      "bytes": 11076
     },
     {
       "path": "blueprints/us-equities/workers/native_worker.py",
@@ -609,23 +634,23 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "c62a8e209f00c4ce9028d24e9f15d10eacd492302106804a8bd46e05d6614795",
-      "bytes": 7775
+      "sha256": "88a9afb5e5ba48bdc44562732aadb2468e26cde7fd284bfcdc85b346f8c8aaa4",
+      "bytes": 8183
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
-      "sha256": "cf9f01c4d2eaf725400fc6aebefac751e69477c6e49d427e0a6cf9612eeb4f8c",
-      "bytes": 85967
+      "sha256": "76eeccef66be533e6829f37233276a2d5518230d2eadfe01c34adc124473de28",
+      "bytes": 92432
     },
     {
       "path": "catalogs/us-equities/agents-operations.md",
-      "sha256": "8a8b9822b7c7bd2e10d490557751862eaaecdc19760a7ce8fe010b3ebb3b12b5",
-      "bytes": 23899
+      "sha256": "c5ff3bf9ebc9b92104f2d018e7726009a9624581905425118268c240b3a71f5a",
+      "bytes": 24948
     },
     {
       "path": "catalogs/us-equities/coverage.json",
-      "sha256": "f7beccd3b3aa8a0adc66346b0f147b94c453de64ba9bff5defdb3b0654e8ea54",
-      "bytes": 81066
+      "sha256": "4199a71bf9ca3ccd8e009c9403cc7f7347cef3fbb139465df2215c23db80bcf2",
+      "bytes": 81436
     },
     {
       "path": "catalogs/us-equities/data-research.json",
@@ -659,8 +684,8 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "209be9bd9ab667a4123315565d68d5c7c0d51a556947ec62c285ff0564a10f4d",
-      "bytes": 1235
+      "sha256": "b0f38d2444ad50a634d95e0c95e1a0f54b1406ce23e7778922150ea34f470b6d",
+      "bytes": 1292
     },
     {
       "path": "catalogs/us-equities/models.json",
@@ -674,13 +699,13 @@
     },
     {
       "path": "catalogs/us-equities/native-workflows.md",
-      "sha256": "9993211210d798ddc9fb94ed591de49cf25ae2937318d685c27158c4870a2f19",
-      "bytes": 7616
+      "sha256": "69d5da124f8e9b36a54081f40fa535024c4e13b4ff0b6b2687df8d0b558d7076",
+      "bytes": 8306
     },
     {
       "path": "catalogs/us-equities/repository-index.md",
-      "sha256": "6de8bed6a05419a1e66b503cc0283605217da473f42505545af241e0d0e375f8",
-      "bytes": 82863
+      "sha256": "8849af5add8f402cca24309955d241a0ed8eb561c7ad166b96a5fded7391fa5f",
+      "bytes": 83211
     },
     {
       "path": "catalogs/us-equities/research-receipt.json",
@@ -691,6 +716,16 @@
       "path": "catalogs/us-equities/retrieval-receipt.json",
       "sha256": "d42e225d314b077f91768d821f4990932ad76376d421d48295c8cfad5a02de64",
       "bytes": 1995
+    },
+    {
+      "path": "catalogs/us-equities/source-followup-receipt.json",
+      "sha256": "24640944f704acdf1cc62f0fd68613c422b2c521ff87e1282c10d5d8fd32408e",
+      "bytes": 8869
+    },
+    {
+      "path": "catalogs/us-equities/source-followup.md",
+      "sha256": "c4e39f56b1ab9d633e1fee9c0a717a06fbbdc6811a8346db6dfc36cbd43e4845",
+      "bytes": 5752
     },
     {
       "path": "catalogs/us-equities/star-audit.json",
@@ -736,6 +771,11 @@
       "path": "evidence/artifacts/observability-dashboard.png",
       "sha256": "3fd996f22320f31bd54decff339374be80f7d20fed07d83a66fa7eabaee59cd2",
       "bytes": 80748
+    },
+    {
+      "path": "evidence/artifacts/observability-followup-dashboard.png",
+      "sha256": "c165629e78a7b1369582b067b79a87d69681a2a10ce6eff2f9e61b2af865d5e0",
+      "bytes": 138381
     },
     {
       "path": "evidence/artifacts/observability-metrics.selected.json",
@@ -859,13 +899,13 @@
     },
     {
       "path": "observability/README.md",
-      "sha256": "f8377cdbdd22cdc35c1b78e4bd53b5618cb11c1c8649e2554b36b757ea85b3e2",
-      "bytes": 11594
+      "sha256": "86a51a926fdc9636e5e421790e033833b44011b3195a6ee77dd7c389c734660c",
+      "bytes": 12131
     },
     {
       "path": "observability/backends/README.md",
-      "sha256": "632c85fbc37b4c54907d23c3daa353afc3ae172ed5fb197c9508b1d7b9b8eb77",
-      "bytes": 11161
+      "sha256": "8768433e6991c7a89d963b59631be35cc90ae410978d1379cf6918290f1b2af9",
+      "bytes": 11720
     },
     {
       "path": "observability/backends/check_persistence.py",
@@ -889,8 +929,8 @@
     },
     {
       "path": "observability/backends/receipt.json",
-      "sha256": "10a97f00d70a368991e5f8afdd516d28bd4d74d4fe010d5074c8b0782c17782b",
-      "bytes": 6992
+      "sha256": "960bd456b9c0eb5cb1c5141a0d0113e3daa3eab840e3b85bb4795788455f5f2f",
+      "bytes": 7242
     },
     {
       "path": "observability/backends/templates/ecosystem-alertmanager.yml.example",
@@ -899,8 +939,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-dashboard.json.example",
-      "sha256": "9ee2f569c33d89d1432fec8427e9213028e21f24c770ade11a1cbd9fe7d1d3eb",
-      "bytes": 5569
+      "sha256": "2ef932ec6a2093a7623a742d758427cff460bc326a1275cc5368e3e9372775d5",
+      "bytes": 9845
     },
     {
       "path": "observability/backends/templates/ecosystem-grafana-dashboards.yml.example",
@@ -929,8 +969,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus-rules.yml.example",
-      "sha256": "aff9099d70ab3bfbfcd9eb59cfb51adcff8e4c8dbb0d1855741232f3c23c9b09",
-      "bytes": 2996
+      "sha256": "332e9cdcf787f25a55e312c196041667d41e1db4da42c0fd49ff53e0a73c5214",
+      "bytes": 3815
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus.yml.example",
@@ -939,8 +979,8 @@
     },
     {
       "path": "observability/collector/README.md",
-      "sha256": "a6fcc26275faf1c7d8fa0af2ec95ecbadaf02d0035d15d12f763eab961e47cb7",
-      "bytes": 5422
+      "sha256": "4a63f6dadfaad5ac4609bbb4a48d7eba04e094e2031ce05a0eae09e4ac513702",
+      "bytes": 6391
     },
     {
       "path": "observability/collector/claude-settings.json.example",
@@ -949,13 +989,13 @@
     },
     {
       "path": "observability/collector/codex.toml.example",
-      "sha256": "85934730701450e0722c1acc87a7643075957fc88d65546624ab518d46964df8",
-      "bytes": 395
+      "sha256": "e96de4fa8931cbadd1112d0244ac9d194293c8997193a507c0f3f51d659d3d83",
+      "bytes": 598
     },
     {
       "path": "observability/collector/collector.yaml",
-      "sha256": "b2422eb051805840a39871177f978865b3987adcfd9c676b52cce4cb6517cd7a",
-      "bytes": 7189
+      "sha256": "c6aa902c52bd61677c5b964cc7d7db8e16e25bbca4e34671efa8a7a70977a0d8",
+      "bytes": 7545
     },
     {
       "path": "observability/collector/ecosystem-otelcol.service.example",
@@ -963,9 +1003,19 @@
       "bytes": 381
     },
     {
+      "path": "observability/followup-receipt.json",
+      "sha256": "792b2df379b1836e570d237f05fc5566412b99c476715b0854abeb64fcdbe598",
+      "bytes": 14735
+    },
+    {
       "path": "observability/receipt.json",
       "sha256": "22a7c2d84e16af7dcb2e0fe911845754a7585fc2ce06fb13adec3aee693030b4",
       "bytes": 17628
+    },
+    {
+      "path": "observability/session-e2e.md",
+      "sha256": "3b4b454df7e113924eb7ff54d6ddb5ece75ca01b7aeda170bfa937ac78f8fcb4",
+      "bytes": 7234
     },
     {
       "path": "scripts/recount-tokens.cjs",

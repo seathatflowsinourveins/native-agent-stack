@@ -28,6 +28,8 @@ Original raw native streams and account data remain private. Receipts publish se
 
 - `native-observability`: actual Codex/Claude client usage, two completed SDK tasks with a separately validated receipt lane, six native services, seven scrape targets, six restart checks, a rendered dashboard and firing/resolved local notifications. The native SDK histogram remains unobserved; existing Desktop exporter activation remains separate.
 
+- `native-observability-followup`: a fresh Astra SDK task used Context Mode, automatically published a result receipt and exported matching native histogram categories. Native WSL host metrics also arrived. Direct Desktop memory/RAG/bridge operations worked, while parent Desktop OTLP and direct Context Mode discovery remained unobserved.
+
 ## Reproduce useful native behavior
 
 Configure your own project and client through the [native recipes](../recipes/README.md). Use one retrieval lane for a question: exact code in rg/Serena, conceptual code in SocratiCode, Markdown in QMD, durable decisions in ai-memory, historical transcripts only in explicitly scoped archive retrieval.

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-19T14:37:37.362395+00:00",
+  "recorded_at_utc": "2026-09-19T15:10:39.830077+00:00",
   "scope": "Linux/WSL x86_64 native Codex/Claude workflow; current evidence-backed selection, not an exhaustive global ranking. Exact native results are dated and host-specific.",
   "source_snapshot_commit": "44750edc",
   "components": [
@@ -43,7 +43,8 @@
         "native-cli-gaps",
         "component-history",
         "desktop-cli-workflows",
-        "native-observability"
+        "native-observability",
+        "native-observability-followup"
       ],
       "upstream_sources": [
         "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1"
@@ -86,7 +87,8 @@
       "evidence_ids": [
         "native-memory",
         "desktop-direct-rag",
-        "component-history"
+        "component-history",
+        "native-observability-followup"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory"
@@ -220,7 +222,8 @@
         "native-rag",
         "component-history",
         "desktop-cli-workflows",
-        "native-observability"
+        "native-observability",
+        "native-observability-followup"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -285,7 +288,8 @@
       "evidence_ids": [
         "native-context-memory",
         "artifact-reductions",
-        "component-history"
+        "component-history",
+        "native-observability-followup"
       ],
       "upstream_sources": [
         "https://github.com/mksglu/context-mode"
@@ -709,7 +713,8 @@
         "desktop-direct-rag",
         "artifact-reductions",
         "component-history",
-        "vllm-compatibility"
+        "vllm-compatibility",
+        "native-observability-followup"
       ],
       "upstream_sources": [
         "https://github.com/giancarloerra/SocratiCode"
@@ -792,7 +797,8 @@
         "otelcol-contrib validate --config=\"$OTEL_CONFIG\""
       ],
       "evidence_ids": [
-        "native-observability"
+        "native-observability",
+        "native-observability-followup"
       ],
       "source_pin": null,
       "upstream_sources": [
@@ -812,7 +818,8 @@
         "promtool query instant http://127.0.0.1:19090 up"
       ],
       "evidence_ids": [
-        "native-observability"
+        "native-observability",
+        "native-observability-followup"
       ],
       "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
       "upstream_sources": [
@@ -831,7 +838,8 @@
         "loki -config.file=\"$LOKI_CONFIG\" -verify-config=true"
       ],
       "evidence_ids": [
-        "native-observability"
+        "native-observability",
+        "native-observability-followup"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [
@@ -851,7 +859,8 @@
         "curl --fail --silent http://127.0.0.1:13000/api/health"
       ],
       "evidence_ids": [
-        "native-observability"
+        "native-observability",
+        "native-observability-followup"
       ],
       "source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
       "upstream_sources": [

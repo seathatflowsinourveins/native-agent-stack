@@ -112,18 +112,18 @@
     "https://github.com/prometheus/alertmanager/releases/tag/v0.34.1",
     "https://github.com/binwiederhier/ntfy/releases/tag/v2.28.0"
   ],
-  "final_rule_count": 6,
+  "final_rule_count": 8,
   "final_rule_config_validation_exit_code": 0,
-  "runtime_checks_note": "Six-rule Prometheus configuration accepted. Root subsequently refined Loki resource labels and the SDK receipt dashboard; final Loki/Collector native validation and corrected native query accepted. Earlier six backend restart checks retain their original scope.",
+  "runtime_checks_note": "Six-rule Prometheus configuration accepted. Root subsequently refined Loki resource labels and the SDK receipt dashboard; final Loki/Collector native validation and corrected native query accepted. Earlier six backend restart checks retain their original scope. Later native host-resource expressions bring the validated rule count to8; selected-range SDK/unknown-usage and WSL host panels are covered by observability/followup-receipt.json, not the earlier restart check.",
   "configuration_sha256": {
     "templates/ecosystem-prometheus.yml.example": "4bfbe5b6fb4d78e1813f68410b84dd2a663ccc31ba4dfe9bcfa4a296b32463c1",
     "templates/ecosystem-ntfy.yml.example": "4fa2642cc3b94cd5337e2057018e4501eff79f1f5e541943abaa80839c6ab91d",
-    "templates/ecosystem-prometheus-rules.yml.example": "aff9099d70ab3bfbfcd9eb59cfb51adcff8e4c8dbb0d1855741232f3c23c9b09",
+    "templates/ecosystem-prometheus-rules.yml.example": "332e9cdcf787f25a55e312c196041667d41e1db4da42c0fd49ff53e0a73c5214",
     "templates/ecosystem-loki.yml.example": "05503fabdf9138968d7855f016512fc1c0432e28547817f1dc28247798d13eb9",
     "templates/ecosystem-grafana-dashboards.yml.example": "3d5167abe5a15ea207994ec3f9983f53cb284811a5978d81978c782108ff532e",
     "templates/ecosystem-grafana-datasources.yml.example": "9f8c8d035a2c968a4ab29c44e314207f8f3b20ca3a609ffec29ff02274d78452",
     "templates/ecosystem-alertmanager.yml.example": "68a204ad1f470fd8559ea220289a9a0e768689595c2a0eca9e0bc16fee88d479",
-    "templates/ecosystem-dashboard.json.example": "9ee2f569c33d89d1432fec8427e9213028e21f24c770ade11a1cbd9fe7d1d3eb",
+    "templates/ecosystem-dashboard.json.example": "2ef932ec6a2093a7623a742d758427cff460bc326a1275cc5368e3e9372775d5",
     "templates/ecosystem-grafana.ini.example": "84e9bf08e71229aff0d1533bcea9f6ced488180432533f050b0d2b4c60a5a3fe"
   },
   "version_commands": {
@@ -154,5 +154,6 @@
     "readiness_checks": 5,
     "restart_checks": 6,
     "grafana_scope": "Provisioned dashboard and datasources available after restart; not separate proof of unique SQLite-only user state."
-  }
+  },
+  "original_acceptance_rule_count": 6
 }
