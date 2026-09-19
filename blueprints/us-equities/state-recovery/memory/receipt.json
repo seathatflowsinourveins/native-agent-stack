@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "id": "ai-memory-native-state-recovery-20260919",
+  "kind": "native_application_state_recovery",
+  "status": "passed_same_host_restore",
+  "observed_at_utc": "2026-09-19T18:30:56.430020+00:00",
+  "scope": "Native live ai-memory backup, isolated original application restore, encrypted local restic backup/restore, and isolated application restore from recovered archive.",
+  "versions": {
+    "ai_memory": "2.3.1",
+    "restic": "0.19.1",
+    "bubblewrap": "0.9.0",
+    "verification_sqlite": "3.45.1"
+  },
+  "native_backup": {
+    "exit_code": 0,
+    "duration_ms": 389,
+    "archive_bytes": 3202145,
+    "archive_sha256": "67a8973c66c4d3f6e7a327bbf6e85438214d39d071471662a826334b9c768766",
+    "regular_files": 324,
+    "wiki_files": 322,
+    "sqlite_snapshots": 1,
+    "service_config_files": 1,
+    "uncompressed_file_bytes": 10233011,
+    "sqlite_online_backup": true,
+    "global_db_wiki_atomicity_claimed": false
+  },
+  "native_restore": {
+    "exit_code": 0,
+    "duration_ms": 64,
+    "restored_original_files_byte_equal": 324,
+    "uses_force": false,
+    "process_guard_disabled": false,
+    "live_server_stopped": false,
+    "namespace": "bubblewrap --unshare-all; new proc; read-only host root; fresh writable restore directory; empty network namespace"
+  },
+  "sqlite_verification": {
+    "integrity_check": [
+      "ok"
+    ],
+    "foreign_key_violations": 0,
+    "sqlite_bytes_exact": true,
+    "all_56_table_counts_match": true,
+    "fts_counts": {
+      "observations_fts": 184,
+      "pages_fts": 0,
+      "workstream_events_fts": 0
+    },
+    "selected_counts": {
+      "workspaces": 1,
+      "projects": 1,
+      "pages": 38,
+      "sessions": 19,
+      "observations": 5710
+    }
+  },
+  "encrypted_backup": {
+    "native_backup_summary": {
+      "message_type": "summary",
+      "files_new": 1,
+      "files_changed": 0,
+      "files_unmodified": 0,
+      "dirs_new": 0,
+      "dirs_changed": 0,
+      "dirs_unmodified": 0,
+      "data_blobs": 4,
+      "tree_blobs": 1,
+      "data_added": 3202749,
+      "data_added_packed": 3202994,
+      "total_files_processed": 1,
+      "total_bytes_processed": 3202145,
+      "total_duration": 0.762548295,
+      "backup_start": "2026-09-19T14:30:15.600093519-04:00",
+      "backup_end": "2026-09-19T14:30:16.362641813-04:00",
+      "snapshot_id": "ef89e80fea06b6377e96a4901f6805071446fe0a017fe5d4ebcaba7001271973"
+    },
+    "snapshot_count_at_acceptance": 1,
+    "full_data_check": {
+      "exit_code": 0,
+      "packs_read": 2,
+      "output_conclusion": "no errors were found"
+    },
+    "native_restore_summary": {
+      "message_type": "summary",
+      "total_files": 1,
+      "files_restored": 1,
+      "total_bytes": 3202145,
+      "bytes_restored": 3202145
+    },
+    "archive_bytes_equal": true,
+    "archive_sha256": "67a8973c66c4d3f6e7a327bbf6e85438214d39d071471662a826334b9c768766",
+    "retention_deletions": 0,
+    "off_host": false
+  },
+  "after_encrypted_restore": {
+    "native_application_restore_exit_code": 0,
+    "native_application_restore_duration_ms": 64,
+    "sqlite_bytes_equal": true,
+    "integrity_check": "ok",
+    "foreign_key_violations": 0,
+    "all_56_table_counts_match": true,
+    "fts_counts_match": true
+  },
+  "private_material": {
+    "root_mode": "0700",
+    "archive_mode": "0o600",
+    "password_file_mode": "0o600",
+    "raw_archive_database_config_passwords_published": false,
+    "separate_key_escrow": false
+  },
+  "live_service_status_after": {
+    "native_ai_memory_status_exit_code": 0
+  },
+  "commands": [
+    "ai-memory backup --to \"$RECOVERY_ROOT/native-memory-backup.tar.gz\"",
+    "bwrap --unshare-all --die-with-parent --new-session --cap-drop ALL --ro-bind / / --proc /proc --dev /dev --tmpfs /tmp --bind \"$RESTORE_SANDBOX\" \"$RESTORE_SANDBOX\" --chdir \"$RESTORE_SANDBOX\" \"$MEMORY_BIN\" restore --data-dir \"$RESTORE_SANDBOX/data\" --from \"$ARCHIVE\"",
+    "restic init --json",
+    "restic backup --host native-agent-stack-state --tag ai-memory-state --json native-memory-backup.tar.gz",
+    "restic snapshots --tag ai-memory-state --json",
+    "restic check --read-data",
+    "restic restore \"$SNAPSHOT_ID\" --target \"$RECOVERY_ROOT/restic-restored\" --verify --overwrite never --json",
+    "PRAGMA integrity_check",
+    "PRAGMA foreign_key_check",
+    "SELECT count(*) FROM observations_fts WHERE observations_fts MATCH ?"
+  ],
+  "limitations": [
+    "The SQLite snapshot is consistent; wiki and config are archived afterward without a demonstrated global DB/wiki write lock.",
+    "38 pages table rows include historical versions, not 38 current pages.",
+    "Native backup excludes raw/, model caches, logs and external native session transcripts.",
+    "Restored SQLite/store/FTS accepted; a replacement HTTP/MCP memory server was not launched or selected by live clients.",
+    "Local source, encrypted repository and password share a host; off-host durability and independent key escrow are not established.",
+    "No automatic schedule, retention enforcement, model inference, broker action or provider token savings."
+  ],
+  "sources": [
+    "https://github.com/akitaonrails/ai-memory/blob/v2.3.1/crates/ai-memory-cli/src/commands/backup.rs",
+    "https://github.com/akitaonrails/ai-memory/blob/v2.3.1/crates/ai-memory-mcp/src/admin.rs#L815",
+    "https://github.com/akitaonrails/ai-memory/blob/v2.3.1/crates/ai-memory-cli/src/commands/restore.rs",
+    "https://github.com/containers/bubblewrap/blob/v0.9.0/README.md",
+    "https://sqlite.org/backup.html",
+    "https://docs.python.org/3/library/sqlite3.html",
+    "https://restic.readthedocs.io/en/stable/045_working_with_repos.html",
+    "https://restic.readthedocs.io/en/stable/050_restore.html"
+  ]
+}
