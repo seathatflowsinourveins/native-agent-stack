@@ -2,7 +2,7 @@
 
 **Dated decision catalog: September 19, 2026.** The north star is native, token-efficient research → reproducible backtesting → Alpaca paper automation. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
 
-The catalog has **151 repository decision cards covering 146 unique GitHub repositories**, and **20 model entries**. It connects to the earlier 36-component foundation. The [combined repository index](repository-index.md) contains **453 repository identities**, including all 337 public stars and 116 beyond that snapshot, with overlap removed.
+The catalog has **152 repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. It connects to the earlier 36-component foundation. The [combined repository index](repository-index.md) contains **453 repository identities**, including all 337 public stars and 116 beyond that snapshot, with overlap removed. Restic's new scoped adoption card promotes an already indexed starred identity; it does not add another repository to the grand index.
 
 ## Read the layer you need
 
@@ -34,7 +34,7 @@ The later [native observability receipt](../../observability/receipt.json) estab
 
 ## Starred repositories and beyond
 
-The latest native public-endpoint refresh contained **337 public stars**, unchanged from the recorded snapshot. **41** have current catalog cards; **10** more have adopted baseline records; **286** have no current catalog/baseline card. All337 now also have individual dispositions in the [complete star audit](star-audit.md), with README/license overview separated from deeper source inspection. Absence of a full catalog card is no longer an unreviewed identity. **105** catalog repositories are beyond the starred snapshot. [All identities and joins](coverage.json).
+The latest native public-endpoint refresh contained **337 public stars**, unchanged from the recorded snapshot. **42** have current catalog cards; **10** more have adopted baseline records; **285** have no current catalog/baseline card. All337 now also have individual dispositions in the [complete star audit](star-audit.md), with README/license overview separated from deeper source inspection. Absence of a full catalog card is no longer an unreviewed identity. **105** catalog repositories are beyond the starred snapshot. [All identities and joins](coverage.json).
 
 Source review covered current official metadata, README/license text and relevant API/source documentation at the depth stated per record. It did not deeply benchmark all 337stars or every project beyond them. Repository freshness, stars, model launch dates and author benchmarks do not establish superiority. The catalog exposes missing acceptance work rather than turning a list into a deployment claim.
 
@@ -67,3 +67,5 @@ The underlying source citations and precise scopes appear in the layer guides. S
 See the [resolution ledger](../../blueprints/us-equities/gap-resolution.md) for real DeerFlow→native Astra inference, the patched LEAN/adaptor build, Dagu workflow hosting and the current gateway/account boundary. Historical receipts above retain their original scope and counts.
 
 The [bounded source follow-up](source-followup.md) refreshed the unchanged public-star identities and four adopted release pins. Two additional observability alternatives expand the index to 453; neither was installed. The follow-up also distinguishes abtop modes that can invoke a model from its private model-free JSON snapshot.
+
+The later [research-runtime evidence](../../blueprints/us-equities/research-runtime/receipt.json) adds real Dagu packet/Parquet preparation and a standalone Claude report. The new paired Astra run is allowance-blocked and the SEC acquisition returned HTTP 403. [Restic acceptance](../../blueprints/us-equities/hosting/backup/receipt.json) establishes only a same-host backup and verified restore of selected static public files; it does not establish off-host or live-database recovery.

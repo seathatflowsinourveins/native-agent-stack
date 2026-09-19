@@ -1,8 +1,8 @@
 # Grand repository index
 
-Checked September 19, 2026. **453 repository identities: 337 public stars plus 116 beyond that snapshot**. The catalog core contains 146 unique repositories in 151 layer cards; 105 of those repositories are beyond the stars. Eleven additional beyond-star identities come from earlier foundation/candidate records. These counts are references, not installations.
+Checked September 19, 2026. **453 repository identities: 337 public stars plus 116 beyond that snapshot**. The catalog core contains 147 unique repositories in 152 layer cards; 105 of those repositories are beyond the stars. Eleven additional beyond-star identities come from earlier foundation/candidate records. These counts are references, not installations.
 
-Every starred repository has a [typed disposition](star-audit.json), with overview and selected-file inspection kept distinct. The 146-repository core plus 24 additional older records form the 170-reference subset. The fresh public-star identity comparison is recorded in [coverage](coverage.json); prior source reviews were not repeated. Existing receipts retain their original runtime scope. Collector core and contrib are two source identities for one adopted Collector process; the release-packaging repository is provenance, not another runtime card.
+Every starred repository has a [typed disposition](star-audit.json), with overview and selected-file inspection kept distinct. The 147-repository core plus 24 additional older records form the 171-reference subset. Restic's adoption promotes an existing starred identity, so the grand total stays 453. The fresh public-star identity comparison is recorded in [coverage](coverage.json); prior source reviews were not repeated. Existing receipts retain their original runtime scope. Collector core and contrib are two source identities for one adopted Collector process; the release-packaging repository is provenance, not another runtime card.
 
 | Repository | Discovery | Decision cards / earlier record | Star review depth |
 | --- | --- | --- | --- |
@@ -340,7 +340,7 @@ Every starred repository has a [typed disposition](star-audit.json), with overvi
 | [ray-project/ray](https://github.com/ray-project/ray) | Beyond stars | [agents-operations: conditional](agents-operations.json) | See linked core/earlier record |
 | [redpanda-data/redpanda](https://github.com/redpanda-data/redpanda) | Beyond stars | [data-research: alternative](data-research.json) | See linked core/earlier record |
 | [refactoringhq/tolaria](https://github.com/refactoringhq/tolaria) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
-| [restic/restic](https://github.com/restic/restic) | Starred | [Individual source disposition](star-audit.json) | selected_primary_files · targeted_candidate |
+| [restic/restic](https://github.com/restic/restic) | Starred | [agents-operations: default, scoped native backup](agents-operations.json); [native receipt](../../blueprints/us-equities/hosting/backup/receipt.json) | selected_primary_files · targeted_candidate in original source audit; subsequently adopted for selected static files |
 | [revfactory/harness](https://github.com/revfactory/harness) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · overlaps_established |
 | [ripienaar/free-for-dev](https://github.com/ripienaar/free-for-dev) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · outside_north_star |
 | [rohitg00/agentmemory](https://github.com/rohitg00/agentmemory) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |

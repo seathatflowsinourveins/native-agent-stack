@@ -1,6 +1,6 @@
 # Agents and operations for the US-equities research stack
 
-Checked **2026-09-19**. This is a curated architecture decision record covering **39 upstream repositories**, not a claim that installing them creates an automated trading system. The [machine-readable catalog](agents-operations.json) contains release dates, license scope, requirements, primary sources and proposed native commands for every entry. The repository's [US-equities blueprint](../../blueprints/us-equities/README.md) records what actually ran.
+Checked **2026-09-19**. This is a curated architecture decision record covering **42 upstream repositories**, not a claim that installing them creates an automated trading system. The [machine-readable catalog](agents-operations.json) contains release dates, license scope, requirements, primary sources and native command recipes for every entry. The repository's [US-equities blueprint](../../blueprints/us-equities/README.md) records what actually ran.
 
 The useful baseline is the existing native Codex worker, deterministic data/backtest code, an explicit artifact contract, and the existing command sandbox and secret scanner. Add a scheduler when work must recur or resume, dependency evidence before publishing runtime artifacts, and telemetry when services become persistent. Choose an alternative when it solves a concrete problem; running several agent frameworks, gateways, schedulers or trace databases together is not a completeness criterion.
 
@@ -125,6 +125,7 @@ The following decisions refer to architecture selection, not installation status
 | [openai-agents-sdk](https://github.com/openai/openai-agents-python) | alternative | source review | API-backed agent loops and explicit function tools |
 | [claude-agent-sdk](https://github.com/anthropics/claude-agent-sdk-python) | alternative | source review | Programmatic Claude Code agent loop |
 | [mlflow](https://github.com/mlflow/mlflow) | conditional | source review | Versioned experiment artifacts, model lineage and optional traces |
+| [restic](https://github.com/restic/restic) | default | bounded native receipt | Encrypted selected-file local backup and verified restore |
 
 ## Recommended next adoption sequence
 
@@ -137,6 +138,10 @@ The following decisions refer to architecture selection, not installation status
 ## Accepted follow-up integrations
 
 [DeerFlow/ACP](../../blueprints/us-equities/deerflow/research-receipt.json) completed one native Astra task: 41,737 input (24,320 cached) and608 output tokens. ACP's `read-only` mode actually maps to workspaceWrite with approvals; strict read-only workers should use the native SDK. [Dagu](../../blueprints/us-equities/hosting/README.md) now has a completed three-step local research DAG, authenticated loopback status service, failure/cancellation evidence and persistent completed history after restart. Neither result establishes autonomous trading or net provider savings.
+
+The subsequent [research-runtime receipt](../../blueprints/us-equities/research-runtime/receipt.json) records a fresh LEAN bundled simulation and successful Dagu `packet`/`order_table` preparation. A **standalone** native Claude Opus 5 report cited that evidence; its 14,583 total tokens matched the native metrics and logs. The new paired Astra-to-Claude graph was validated but **not executed because Codex allowance was exhausted**. This is local manual research hosting, not a paired-model completion or a validated financial strategy.
+
+[Restic 0.19.1](../../blueprints/us-equities/hosting/backup/README.md) is now adopted for the tested static-file scope: 22 public reference files, 160,642 bytes, an encrypted same-host backup, `check --read-data`, and a fresh verified restore with identical file hashes. Its publisher-signed release checks and exact commands are in the [native receipt](../../blueprints/us-equities/hosting/backup/receipt.json). No live database, credentials or order journal was included; off-host recovery, separate key escrow, scheduling and external alerts remain unresolved.
 
 ## Scoped observability alternatives
 

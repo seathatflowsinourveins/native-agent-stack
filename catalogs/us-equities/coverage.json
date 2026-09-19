@@ -1515,8 +1515,10 @@
     },
     {
       "repository": "https://github.com/restic/restic",
-      "disposition": "no_catalog_card",
-      "catalog_entry_ids": [],
+      "disposition": "catalog_reviewed",
+      "catalog_entry_ids": [
+        "restic"
+      ],
       "prior_candidate_decision": false
     },
     {

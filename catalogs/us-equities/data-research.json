@@ -356,7 +356,7 @@
       ],
       "role": "Embedded SQL over immutable Parquet research snapshots",
       "decision": "default",
-      "rationale": "Small local analytical core; existing native receipt already demonstrates bounded LEAN-event conversion and reread.",
+      "rationale": "Small local analytical core; native LEAN-event conversion and reread were repeated through a bounded Dagu preparation workflow. Separate adversarial SEC-recipe fixtures prove conservative availability and exact decimal boundaries; live SEC acquisition returned 403.",
       "version_or_commit": "v1.5.5; source d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
       "release_date": "2026-07-22",
       "license": "MIT",
@@ -367,14 +367,18 @@
         "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/README.md",
         "blueprints/us-equities/data/receipt.json",
         "blueprints/us-equities/data/summarize_backtest.py",
-        "blueprints/us-equities/workers/requirements.txt"
+        "blueprints/us-equities/workers/requirements.txt",
+        "blueprints/us-equities/financial-data/receipt.json",
+        "blueprints/us-equities/research-runtime/receipt.json"
       ],
       "native_workflow": [
         "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
         "python -m pip install 'duckdb==1.5.5'",
         "python - <<'PY'\nimport duckdb\nprint(duckdb.sql('SELECT version()').fetchone())\nprint(duckdb.sql('SELECT sum(i) FROM range(4) AS t(i)').fetchone())\nPY",
         "# Existing native evidence is in blueprints/us-equities/data/receipt.json. The following replay is prospective and requires its declared local inputs.",
-        "python blueprints/us-equities/data/summarize_backtest.py \"$LEAN_SOURCE/Launcher/bin/Debug/BasicTemplateFrameworkAlgorithm-order-events.json\" \"$PRIVATE_RUN_DIR/order-events.parquet\""
+        "python blueprints/us-equities/data/summarize_backtest.py \"$LEAN_SOURCE/Launcher/bin/Debug/BasicTemplateFrameworkAlgorithm-order-events.json\" \"$PRIVATE_RUN_DIR/order-events.parquet\"",
+        "# The financial-data tests execute native DuckDB/Parquet against clearly artificial adversarial fixtures; they are not a successful SEC acquisition.",
+        "$RESEARCH_PYTHON -m unittest tests.test_financial_data"
       ],
       "requirements": [
         "Python >=3.10 for the package; local disk and an explicit schema/session/version contract.",
@@ -383,7 +387,9 @@
       "limitations": [
         "Native evidence covers six bundled historical simulation events, three order IDs, Parquet reread and one XNYS session; it proves neither market-data ingestion nor live trading.",
         "ASOF join alone cannot remove revised fundamentals or reconstruct unavailable historical universes.",
-        "Decimal/timestamp schemas and immutable snapshot selection are application responsibilities."
+        "Decimal/timestamp schemas and immutable snapshot selection are application responsibilities.",
+        "The later Dagu workflow prepared six fresh bundled-simulation order events and a cited packet; standalone Claude report acceptance is separate from the unexecuted allowance-blocked paired Astra-to-Claude graph.",
+        "The SEC recipe passed offline artificial-fixture temporal, amendment, unit and DECIMAL(38,12) boundary checks. Its first official SEC request returned HTTP 403: no live SEC source payload, Parquet dataset or ready financial packet was obtained."
       ],
       "sources": [
         "https://github.com/duckdb/duckdb/blob/d8cdaa33fda8df955cc76ef58a280f68f4cd43fa/README.md",

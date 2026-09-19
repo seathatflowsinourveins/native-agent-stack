@@ -16,6 +16,8 @@ This closes the **unassessed-star decision gap**. It does not certify that every
 
 The 286 new records have current default-branch commit pins and commit dates. These are **source snapshots**, not an assertion that a release, package or local installation has the same version. The 51 earlier records retain prior evidence; missing historical commit dates remain null. A license value is the observed declaration/classification, not a legal review of every file, binary, model or dependency.
 
+These review-depth and decision counts preserve the original audit. A later [restic acceptance](../../blueprints/us-equities/hosting/backup/receipt.json) promotes that already reviewed starred identity into a scoped adopted catalog card. Current coverage therefore has 42 starred catalog repositories; the original selected-file review is not relabeled as a new source audit.
+
 Native `gh api` pagination supplied the public/private flags. README and license requests used resolved commit hashes. One oversized README initially returned no body and was recovered with GitHub's raw-content media type. Excerpt selection bounded the reading; it did not score or decide repository quality. Full downloaded sources and account-bearing discovery responses are not published. The public JSON contains conclusions, exact source links, review extents and existing receipt references.
 
 ## Decisions
@@ -83,6 +85,8 @@ restic --repo "${BACKUP_REPOSITORY}" restore latest --target "${RESTORE_DIRECTOR
 ```
 
 A dry run is not a backup. Acceptance requires a real application-consistent export, separate storage, password recovery arrangements and a verified restore into a new directory. Never assume copying a live database file is a consistent snapshot.
+
+Subsequent [native restic 0.19.1 acceptance](../../blueprints/us-equities/hosting/backup/README.md) backed up and restored 22 selected static public files (160,642 bytes) with a full-data check and independent hashes. This closes that narrow local-file case. Same-host storage/password placement, absent scheduling, off-host recovery and application-consistent live-database restores remain limitations.
 
 [mise exec](https://github.com/jdx/mise/blob/3fed64c0713554b7f5bc60d4d208ac11ec385015/docs/cli/exec.md) could standardize project runtime selection. Its trust step and downloaded executables remain review boundaries; the documented `mise exec node@20 -- node ./app.js` syntax is an example, not an exact runtime lock.
 

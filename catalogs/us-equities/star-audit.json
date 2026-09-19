@@ -6525,8 +6525,12 @@
         "No installation, model inference, broker call or native acceptance was performed by this audit.",
         "Default restic check checks structure; --read-data also reads stored data. Restore latest to a separate target is documented. Application-consistent database exports and independent/off-host storage remain operator work."
       ],
-      "evidence_refs": [],
-      "catalog_entry_ids": [],
+      "evidence_refs": [
+        "blueprints/us-equities/hosting/backup/receipt.json"
+      ],
+      "catalog_entry_ids": [
+        "restic"
+      ],
       "reviewed_files": [
         {
           "path": "README.md",
@@ -6556,7 +6560,13 @@
         "restic --repo \"${BACKUP_REPOSITORY}\" restore latest --target \"${RESTORE_DIRECTORY}\""
       ],
       "workflow_scope": "Upstream CLI/API examples inspected, not executed. Use the recorded source pin in isolation; resolve prerequisites and data/model/permission costs first. Placeholder paths and issue IDs are operator-selected.",
-      "relevance": "Specific potential gap justifies bounded acceptance work before adoption."
+      "relevance": "Specific potential gap justifies bounded acceptance work before adoption.",
+      "follow_up_adoption": {
+        "checked_at": "2026-09-19",
+        "status": "adopted_selected_static_file_local_backup",
+        "receipt": "blueprints/us-equities/hosting/backup/receipt.json",
+        "scope": "22 public reference files, 160642 bytes; same-host encrypted backup and fresh verified restore. Original source-review decision/depth retained as historical. No off-host or live-database recovery."
+      }
     },
     {
       "repository": "https://github.com/pytest-dev/pytest",
