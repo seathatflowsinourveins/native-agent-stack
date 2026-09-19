@@ -1,0 +1,11 @@
+apiVersion: 1
+providers:
+  - name: ecosystem
+    orgId: 1
+    folder: Ecosystem
+    type: file
+    disableDeletion: true
+    editable: false
+    updateIntervalSeconds: 30
+    options:
+      path: '@CONFIG_ROOT@/ecosystem-grafana-dashboards'

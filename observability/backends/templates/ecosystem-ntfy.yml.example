@@ -1,0 +1,12 @@
+base-url: 'http://127.0.0.1:18080'
+listen-http: '127.0.0.1:18080'
+cache-file: '@DATA_ROOT@/ecosystem-ntfy/cache.db'
+cache-duration: '72h'
+behind-proxy: false
+upstream-base-url: ''
+attachment-cache-dir: ''
+visitor-request-limit-burst: 120
+visitor-request-limit-replenish: '5s'
+visitor-message-daily-limit: 1000
+message-size-limit: 16K
+log-level: warn

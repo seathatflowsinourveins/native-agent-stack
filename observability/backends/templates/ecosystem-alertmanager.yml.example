@@ -1,0 +1,13 @@
+global:
+  resolve_timeout: 1m
+route:
+  receiver: local-ntfy
+  group_by: [alertname, job, scope]
+  group_wait: 5s
+  group_interval: 30s
+  repeat_interval: 4h
+receivers:
+  - name: local-ntfy
+    webhook_configs:
+      - url: 'http://127.0.0.1:18080/ecosystem-alerts?template=alertmanager'
+        send_resolved: true

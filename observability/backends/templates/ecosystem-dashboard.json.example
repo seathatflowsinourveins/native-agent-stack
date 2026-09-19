@@ -1,0 +1,177 @@
+{
+  "uid": "ecosystem-native",
+  "title": "Native agent ecosystem",
+  "schemaVersion": 39,
+  "version": 2,
+  "editable": false,
+  "timezone": "browser",
+  "refresh": "15s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "tags": [
+    "ecosystem",
+    "local"
+  ],
+  "description": "Native exported counters and local service health. Token panels are native-client telemetry, not estimates of savings. Cache/reasoning subsets must not be added again. Synthetic acceptance alerts are explicitly labeled. Raw prompt/tool bodies are omitted upstream by the collector.",
+  "panels": [
+    {
+      "id": 1,
+      "title": "Codex native token counters",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ecosystem-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (token_type) (ecosystem_codex_turn_token_usage_sum)",
+          "legendFormat": "{{token_type}}"
+        }
+      ],
+      "options": {},
+      "description": "Native exported per-turn histogram sums by token_type. Cached input is an input subset; reasoning output is an output subset. The native total series is separate; do not add all lines together."
+    },
+    {
+      "id": 2,
+      "title": "Claude native token counters",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ecosystem-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (type) (ecosystem_claude_code_token_usage_tokens_total)",
+          "legendFormat": "{{type}}"
+        }
+      ],
+      "options": {},
+      "description": "Native cumulative counters by type. Keep input, output, cacheRead and cacheCreation distinct; these are not a measured savings percentage or an invoice."
+    },
+    {
+      "id": 3,
+      "title": "Service scrape health",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ecosystem-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up",
+          "legendFormat": "{{job}} \u00b7 {{instance}}"
+        }
+      ],
+      "options": {}
+    },
+    {
+      "id": 4,
+      "title": "HTTP response status (401 expected for Dagu)",
+      "type": "table",
+      "datasource": {
+        "uid": "ecosystem-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 9,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by (http_url, http_status_code) (ecosystem_httpcheck_status == 1)",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "options": {},
+      "description": "Active status class/code only. A Dagu401 proves its API is protected, not that a job can execute. Gateway200 proves local readiness, not provider access."
+    },
+    {
+      "id": 5,
+      "title": "Active alerts",
+      "type": "table",
+      "datasource": {
+        "uid": "ecosystem-prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 18,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "ALERTS{alertstate=\"firing\"}",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "options": {}
+    },
+    {
+      "id": 6,
+      "title": "Collector rejected telemetry",
+      "type": "timeseries",
+      "datasource": {
+        "uid": "ecosystem-prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 18,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{__name__=~\"otelcol_.*(refused|failed).*\"}"
+        }
+      ],
+      "options": {}
+    },
+    {
+      "id": 7,
+      "title": "Sanitized client events",
+      "type": "logs",
+      "datasource": {
+        "uid": "ecosystem-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 27,
+        "w": 24,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service_name=~\".+\"}"
+        }
+      ],
+      "options": {}
+    }
+  ]
+}

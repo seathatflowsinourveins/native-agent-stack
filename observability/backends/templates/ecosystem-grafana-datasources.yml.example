@@ -1,0 +1,26 @@
+apiVersion: 1
+datasources:
+  - name: Ecosystem Prometheus
+    uid: ecosystem-prometheus
+    type: prometheus
+    access: proxy
+    url: http://127.0.0.1:19090
+    isDefault: true
+    editable: false
+    jsonData:
+      timeInterval: 15s
+  - name: Ecosystem Loki
+    uid: ecosystem-loki
+    type: loki
+    access: proxy
+    url: http://127.0.0.1:13100
+    editable: false
+  - name: Ecosystem Alertmanager
+    uid: ecosystem-alertmanager
+    type: alertmanager
+    access: proxy
+    url: http://127.0.0.1:19093
+    editable: false
+    jsonData:
+      implementation: prometheus
+      handleGrafanaManagedAlerts: false

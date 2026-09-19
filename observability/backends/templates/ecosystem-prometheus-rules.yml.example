@@ -1,0 +1,61 @@
+groups:
+  - name: ecosystem-local
+    rules:
+      - alert: EcosystemServiceUnavailable
+        expr: up{job!="acceptance-fixture"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'Local service {{ $labels.job }} is unavailable'
+          description: 'Prometheus could not scrape {{ $labels.instance }} for two minutes.'
+      - alert: EcosystemOmniRouteHealthUnexpected
+        expr: '(max(ecosystem_httpcheck_status{http_url="http://127.0.0.1:20128/api/health",http_status_class="2xx"}) or vector(0)) < 1'
+        for: 2m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+          component: OmniRoute
+        annotations:
+          summary: 'Local OmniRoute health response is unexpected or missing'
+          description: 'Expected 2xx at http://127.0.0.1:20128/api/health; this checks transport/protection, not provider or job execution.'
+      - alert: EcosystemFreeLLMAPIHealthUnexpected
+        expr: '(max(ecosystem_httpcheck_status{http_url="http://127.0.0.1:31415/readyz",http_status_class="2xx"}) or vector(0)) < 1'
+        for: 2m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+          component: FreeLLMAPI
+        annotations:
+          summary: 'Local FreeLLMAPI health response is unexpected or missing'
+          description: 'Expected 2xx at http://127.0.0.1:31415/readyz; this checks transport/protection, not provider or job execution.'
+      - alert: EcosystemCollectorHealthUnexpected
+        expr: '(max(ecosystem_httpcheck_status{http_url="http://127.0.0.1:14333/",http_status_class="2xx"}) or vector(0)) < 1'
+        for: 2m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+          component: Collector
+        annotations:
+          summary: 'Local Collector health response is unexpected or missing'
+          description: 'Expected 2xx at http://127.0.0.1:14333/; this checks transport/protection, not provider or job execution.'
+      - alert: EcosystemDaguAuthenticationHealthUnexpected
+        expr: '(max(ecosystem_httpcheck_status{http_url="http://127.0.0.1:18525/api/v1/dags",http_status_code="401"}) or vector(0)) < 1'
+        for: 2m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+          component: DaguAuthentication
+        annotations:
+          summary: 'Local DaguAuthentication health response is unexpected or missing'
+          description: 'Expected 401 at http://127.0.0.1:18525/api/v1/dags; this checks transport/protection, not provider or job execution.'
+      - alert: EcosystemAcceptanceTargetDown
+        expr: up{job="acceptance-fixture"} == 0
+        for: 10s
+        labels:
+          severity: test
+          scope: synthetic-acceptance
+        annotations:
+          summary: 'Controlled local acceptance target is unavailable'
+          description: 'Synthetic closed-port fixture only; no production service was stopped.'
