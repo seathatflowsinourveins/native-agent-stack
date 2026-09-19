@@ -269,6 +269,31 @@
         "The receipt spool has no automatic expiry; exactly-once accounting, full-disk recovery, external backup/paging, continuous host availability and broker/trading acceptance remain outside this proof."
       ],
       "path": "observability/followup-receipt.json"
+    },
+    {
+      "id": "desktop-restart-acceptance",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "context-mode",
+        "mcporter",
+        "opentelemetry-collector-contrib",
+        "prometheus",
+        "loki",
+        "grafana",
+        "alertmanager",
+        "ntfy"
+      ],
+      "claim": "The restarted Desktop parent exposes 11 direct Context Mode tools and exports exact-conversation metadata to Loki; 14 successful direct Context Mode results were correlated, and its native command bridge was recovered.",
+      "limitations": [
+        "Ongoing task snapshot, not final Desktop token accounting. Parent metrics lack unique process/client-scope labels; unscoped series cannot identify this task.",
+        "Context Mode reports zero saved tokens at the captured snapshot. Connection estimates and earlier selected-artifact reductions are not net provider savings.",
+        "Doctor verifies six hooks registered, not every lifecycle hook exercised. Four language runtimes available; Bun performance warning retained.",
+        "The exact Desktop tool-catalog refresh trigger was not observed. No further app restart or explicit reload command was performed after the Node path fix.",
+        "Independent review established initial telemetry and service health; final source/publication review was interrupted by quota and authentication failures, with no retry.",
+        "Local observations do not establish off-host durability/paging, continuous hosting, automatic receipt expiry/recovery or broker/trading acceptance."
+      ],
+      "path": "observability/restart-receipt.json"
     }
   ],
   "files": [
@@ -484,13 +509,13 @@
     },
     {
       "path": "blueprints/us-equities/gap-resolution.json",
-      "sha256": "c081edec3871c96eb3ac5867598b98a9818dade29bed4f2036c0842e505c1263",
-      "bytes": 7954
+      "sha256": "7654d5526329be1f966a112525cb3e3803f6374204ca8c120bebc7a3a717c05c",
+      "bytes": 8089
     },
     {
       "path": "blueprints/us-equities/gap-resolution.md",
-      "sha256": "e656616f28e864b611ed094f3021ba38f888d70e7d1ff15aac2ed09d84bb900d",
-      "bytes": 9592
+      "sha256": "e2b2557e7fa10ad711bdebb85f7e73e8e9d6f5e87d98495b591ac6f34d1ad403",
+      "bytes": 9604
     },
     {
       "path": "blueprints/us-equities/harness-contract.json",
@@ -899,8 +924,8 @@
     },
     {
       "path": "observability/README.md",
-      "sha256": "86a51a926fdc9636e5e421790e033833b44011b3195a6ee77dd7c389c734660c",
-      "bytes": 12131
+      "sha256": "2c0441b799c5dd891c05581f2b6a149e2cd4ffc7a298888de21693009633171d",
+      "bytes": 12422
     },
     {
       "path": "observability/backends/README.md",
@@ -1003,6 +1028,11 @@
       "bytes": 381
     },
     {
+      "path": "observability/desktop-restart.md",
+      "sha256": "39e4ee70ea568d8f30182715566c287abc0b6b06c6176634c93fdae2e7dbc711",
+      "bytes": 6238
+    },
+    {
       "path": "observability/followup-receipt.json",
       "sha256": "792b2df379b1836e570d237f05fc5566412b99c476715b0854abeb64fcdbe598",
       "bytes": 14735
@@ -1013,9 +1043,14 @@
       "bytes": 17628
     },
     {
+      "path": "observability/restart-receipt.json",
+      "sha256": "2b73275770f471b89bb1e74fa97768752da7ce004b554ef560d3a05e0ad91f5c",
+      "bytes": 8168
+    },
+    {
       "path": "observability/session-e2e.md",
-      "sha256": "3b4b454df7e113924eb7ff54d6ddb5ece75ca01b7aeda170bfa937ac78f8fcb4",
-      "bytes": 7234
+      "sha256": "843e8f4dff03e7f81d260b060ed3f140c2f6574555680beb84f3f7c0b2888712",
+      "bytes": 7704
     },
     {
       "path": "scripts/recount-tokens.cjs",

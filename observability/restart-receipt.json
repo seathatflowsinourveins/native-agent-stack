@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "id": "desktop-restart-acceptance",
+  "kind": "native_cli_e2e",
+  "checked_at": "2026-09-19T15:41:40.084709+00:00",
+  "component_ids": [
+    "codex",
+    "context-mode",
+    "mcporter",
+    "opentelemetry-collector-contrib",
+    "prometheus",
+    "loki",
+    "grafana",
+    "alertmanager",
+    "ntfy"
+  ],
+  "claim": "The restarted Desktop parent exposes 11 direct Context Mode tools and exports exact-conversation metadata to Loki; 14 successful direct Context Mode results were correlated, and its native command bridge was recovered.",
+  "limitations": [
+    "Ongoing task snapshot, not final Desktop token accounting. Parent metrics lack unique process/client-scope labels; unscoped series cannot identify this task.",
+    "Context Mode reports zero saved tokens at the captured snapshot. Connection estimates and earlier selected-artifact reductions are not net provider savings.",
+    "Doctor verifies six hooks registered, not every lifecycle hook exercised. Four language runtimes available; Bun performance warning retained.",
+    "The exact Desktop tool-catalog refresh trigger was not observed. No further app restart or explicit reload command was performed after the Node path fix.",
+    "Independent review established initial telemetry and service health; final source/publication review was interrupted by quota and authentication failures, with no retry.",
+    "Local observations do not establish off-host durability/paging, continuous hosting, automatic receipt expiry/recovery or broker/trading acceptance."
+  ],
+  "scope": "This very Desktop task: direct MCP calls and parent exporter acceptance. No new standalone Codex/SDK/Claude model fixture. Existing model/account routes retained.",
+  "runtime_repair": {
+    "cause": "Upstream plugin command node was absent from the Desktop app-server PATH; native startup reported os error 2.",
+    "fix": "No-clobber /usr/local/bin/node symlink to the existing pinned Node 24.21.0; plugin transport and hook files unchanged.",
+    "native_version_result": "v24.21.0",
+    "rollback": "Verify the link target before removing only that link; retain the installed runtime and all account/configuration stores.",
+    "sources": [
+      "https://github.com/mksglu/context-mode/blob/v1.0.169/.codex-plugin/mcp.json",
+      "https://learn.chatgpt.com/docs/extend/mcp"
+    ]
+  },
+  "direct_context_mode": {
+    "version": "1.0.169",
+    "tool_count": 11,
+    "operations_observed": [
+      "ctx_execute",
+      "ctx_doctor",
+      "ctx_stats"
+    ],
+    "execution": "Python; explicit user-session bus environment yielded six active services, each exit 0.",
+    "doctor": {
+      "server_test": "PASS",
+      "fts5_sqlite": "PASS",
+      "registered_hooks": 6,
+      "available_runtimes": [
+        "javascript",
+        "shell",
+        "python",
+        "perl"
+      ],
+      "warning": "Bun not available in this MCP runtime PATH"
+    },
+    "stats_snapshot": {
+      "calls": 15,
+      "elapsed_display": "5 min",
+      "context_entered_display": "52.4 KB",
+      "estimated_tokens_saved": 0,
+      "scope": "Direct MCP connection snapshot; not final task/provider usage"
+    }
+  },
+  "parent_loki": {
+    "checked_at": "2026-09-19T15:41:40.084709+00:00",
+    "query_template": "{service_name=~\".+\"} | conversation_id = \"$CURRENT_DESKTOP_THREAD\"",
+    "query_start_utc": "2026-09-19T15:29:19Z",
+    "status": "success",
+    "parent_records": 155,
+    "exact_conversation_matches": 155,
+    "non_omitted_bodies": 0,
+    "limit": 2000,
+    "context_mode_tool_records": 14,
+    "context_mode_tools": {
+      "ctx_execute": 12,
+      "ctx_doctor": 1,
+      "ctx_stats": 1
+    },
+    "context_mode_result_success": {
+      "true": 14
+    },
+    "event_names": {
+      "codex.sse_event": 26,
+      "codex.tool_decision": 25,
+      "codex.startup_phase": 1,
+      "codex.tool_result": 69,
+      "codex.websocket_request": 28,
+      "codex.turn_ttft": 2,
+      "codex.websocket_connect": 2,
+      "codex.user_prompt": 2
+    },
+    "parsing_policy": "Use event_name for native event classification; compare raw line with Collector literal [content omitted]. event_kind is optional sub-event metadata."
+  },
+  "initial_independent_observation": {
+    "checked_at": "2026-09-19T15:34:30.206802+00:00",
+    "exact_parent_records_in_loki": 75,
+    "services": {
+      "otelcol": {
+        "state": "active",
+        "exit_code": 0
+      },
+      "prometheus": {
+        "state": "active",
+        "exit_code": 0
+      },
+      "loki": {
+        "state": "active",
+        "exit_code": 0
+      },
+      "grafana": {
+        "state": "active",
+        "exit_code": 0
+      },
+      "alertmanager": {
+        "state": "active",
+        "exit_code": 0
+      },
+      "ntfy": {
+        "state": "active",
+        "exit_code": 0
+      }
+    },
+    "scrape_targets": [
+      {
+        "job": "alertmanager",
+        "health": "up",
+        "last_error_present": false
+      },
+      {
+        "job": "collector-health",
+        "health": "up",
+        "last_error_present": false
+      },
+      {
+        "job": "collector-native",
+        "health": "up",
+        "last_error_present": false
+      },
+      {
+        "job": "loki",
+        "health": "up",
+        "last_error_present": false
+      },
+      {
+        "job": "prometheus",
+        "health": "up",
+        "last_error_present": false
+      },
+      {
+        "job": "qdrant",
+        "health": "up",
+        "last_error_present": false
+      },
+      {
+        "job": "vllm",
+        "health": "up",
+        "last_error_present": false
+      }
+    ],
+    "native_metric_scope": "Current parent log export and local persistence are observed. A completed parent turn usage total is not established by this ongoing-turn snapshot.",
+    "unscoped_series_count": 12
+  },
+  "bridge_recovery": {
+    "version": "0.13.13",
+    "guard": "Previous daemon retirement unverified",
+    "retirement_checks": {
+      "previous_pid_alive": false,
+      "socket_connects": false,
+      "metadata_predates_current_boot": true
+    },
+    "action": "Archived only stale metadata after retirement checks; kept key/configuration. Upstream start replaced inactive socket.",
+    "native_start_stdout": "Single-user daemon started.",
+    "discovered_tools": 11,
+    "native_execute_stdout": "bridge-recovered",
+    "automatic_recovery": false,
+    "source": "https://github.com/openclaw/mcporter/blob/v0.13.13/src/daemon/host.ts"
+  },
+  "retained_failed_checks": [
+    "Initial bridge call refused stale daemon metadata; deliberate start timed out after 45 seconds; foreground start exposed ownership guard.",
+    "Initial direct service probe lacked user-bus environment and returned empty stdout; corrected explicit-bus probe passed. Empty stdout was not service failure evidence.",
+    "Initial Loki summary used event_kind and the wrong omitted-body literal; corrected parsing uses event_name and [content omitted]. Only corrected summary published.",
+    "One independent reviewer exhausted quota after initial evidence; another failed authentication. No additional model review dispatched.",
+    "Initial static validation batch could not resolve gitleaks in direct MCP PATH; corrected to the existing absolute executable, and all four checks returned exit 0."
+  ],
+  "result": "accepted_direct_desktop_context_mode_and_parent_log_path",
+  "verification": {
+    "native_execution": "observed",
+    "native_loki_correlation": "observed",
+    "public_static_validation": {
+      "command": "python3 scripts/validate.py",
+      "status": "passed",
+      "components": 42,
+      "profiles": 4,
+      "receipts": 15,
+      "hashed_files": 153
+    },
+    "catalog_validation": {
+      "command": "python3 scripts/validate_catalogs.py",
+      "status": "passed",
+      "repository_entries": 151,
+      "unique_catalog_repositories": 146,
+      "public_stars": 337,
+      "models": 20
+    },
+    "gitleaks": {
+      "command": "gitleaks dir . --redact --no-banner --report-format json --report-path \"$PRIVATE_REPORT\"",
+      "exit_code": 0,
+      "findings": 0
+    },
+    "diff_check": {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  }
+}

@@ -76,6 +76,11 @@
       "id": "receipt_dashboard_selected_range",
       "evidence": "observability/followup-receipt.json",
       "scope": "Receipt aggregation follows selected dashboard range, with separate unreported-usage view and neutral empty-data semantics; no financial-ledger or complete-task coverage claim."
+    },
+    {
+      "id": "desktop_direct_context_mode_and_parent_logs",
+      "evidence": "observability/restart-receipt.json",
+      "scope": "11 direct tools; 155 exact-task Loki records including 14 successful Context Mode results. Final parent usage and every-hook coverage not established."
     }
   ],
   "external_or_design_requirements": [
@@ -105,9 +110,9 @@
       "reason": "Preset read-only is workspaceWrite; use accepted official native SDK strict read-only instead."
     },
     {
-      "id": "desktop_context_tool_discovery",
-      "status": "client_boundary",
-      "reason": "Native tools work; existing Desktop catalog does not gain newly registered MCP tools without normal discovery/reload."
+      "id": "desktop_final_usage_attribution",
+      "status": "not_established",
+      "reason": "Direct Context Mode and parent log activation resolved in restart receipt. Unscoped metric writer identity cannot establish final task usage; ongoing request fields are not a completed-turn bill."
     },
     {
       "id": "context_mode_sdk_file_scope",
@@ -118,11 +123,6 @@
       "id": "net_provider_savings",
       "status": "not_measured",
       "reason": "Artifact reduction and cached-input counters are not a paired complete-task usage comparison."
-    },
-    {
-      "id": "desktop_exporter_activation",
-      "status": "client_boundary",
-      "reason": "Native child processes accepted; existing Desktop process not restarted/hot-reloaded. Fresh Desktop process needs observed export."
     },
     {
       "id": "off_host_operations",

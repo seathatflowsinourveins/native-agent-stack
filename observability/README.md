@@ -1,6 +1,11 @@
 # Native agent observability
 
-**Latest:** the [current-session follow-up](session-e2e.md) resolved native SDK
+**Latest:** [Desktop restart acceptance](desktop-restart.md) confirms 11 direct
+Context Mode tools, 155 exact-task Loki records and 14 successful Context Mode
+tool results. Six services are active. Its saved Context Mode counter reports
+0 tokens saved; parent turn totals remain unestablished.
+
+The [earlier current-session follow-up](session-e2e.md) resolved native SDK
 metrics with the supported App Server setting and one real Context Mode task:
 **40,518 tokens**, matching native histogram and automatic receipt. It also adds
 WSL host resources and selected range receipt views. The original acceptance

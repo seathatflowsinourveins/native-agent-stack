@@ -1,19 +1,25 @@
 # Current-session native E2E — September 19, 2026
 
+**Post-restart update:** this Desktop task now exposes **11 direct Context Mode
+tools**. Native execution and diagnostics passed, and **155 exact-task records**
+reached Loki, including **14 successful Context Mode tool results**. All 155
+log bodies were omitted. No further restart is needed for this observed tool
+and log path. See the [restart acceptance and upstream commands](desktop-restart.md)
+and [machine-readable receipt](restart-receipt.json). The earlier results below
+remain historical; they do not establish a final Desktop token total.
+
 The fresh native SDK path now works end to end:
 **Astra SDK → native Context Mode → native usage histogram → Collector →
 Prometheus**, with the same task's atomic result receipt reaching **Loki and
 Grafana**. Its exact total is **40,518 tokens**. The [machine-readable follow-up
 receipt](followup-receipt.json) records commands, results, source evidence and limits.
 
-The running Desktop parent is a separate boundary. Direct ai-memory retrieval
+Before the restart, the Desktop parent was a separate unaccepted boundary. Direct ai-memory retrieval
 returned two scoped lifecycle observations, SocratiCode retrieved the relevant
 usage-normalization code from the 139-chunk index, and the native Context Mode
-bridge worked. This Desktop task exposes **zero direct Context Mode tools** and
-has **zero correlated OTLP records** in the bounded check. Native child success
-does not establish Desktop-parent exporter activation. Start/reload the intended
-Desktop process normally, then observe its own export; the saved user config is
-ready, but no hot-reload result is claimed.
+bridge worked, but that earlier snapshot had **zero direct Context Mode tools**
+and **zero correlated OTLP records**. The later [restart acceptance](desktop-restart.md)
+resolved discovery and parent log export with actual direct-call evidence.
 
 ## Exact native results
 
@@ -118,7 +124,7 @@ no duplicate exporter or model-observability platform was installed. Context
 Mode, ai-memory, RTK and SocratiCode match the reviewed latest stable releases.
 Source review is not installation or a universal state-of-the-art benchmark.
 
-Remaining requirements are explicit: Desktop-parent activation, off-host
+Remaining requirements are explicit: uniquely attributable final Desktop usage, off-host
 backup/paging and availability, receipt-spool retention/recovery, broker/data
 access, and versioned strategy/risk/execution acceptance. None is established by
 a healthy local monitor or a longer repository list.
