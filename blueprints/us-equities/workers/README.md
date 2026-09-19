@@ -109,6 +109,50 @@ extraction task. [The receipt](receipt.json) distinguishes those outcomes.
 These totals cover those three SDK turns only, excluding the coordinator and
 separate catalog-research agents; they are not a whole-task cost measurement.
 
+## Local observation and native usage
+
+The later [observability acceptance](../../../observability/README.md) ran two
+additional native SDK tasks. They completed with **40,187 and 40,583 total
+input-plus-output tokens**, or **80,770 combined**. These are separate from the
+three earlier research/file-scope turns above. Their native receipts and
+correlated logs remain the evidence anchors: the SDK's native turn histogram
+was **not observed**, including after a bounded flush attempt. Missing telemetry
+is not zero usage, and a completed task does not establish delivery of every
+metric family. [Exact monitoring receipt](../../../observability/receipt.json).
+
+The helper now assigns a fresh opaque telemetry instance identity for each
+readiness/execution process, preserving the inherited native exporter settings.
+It can also publish a small local observation after a turn through
+`--observation-dir "$PRIVATE_OBSERVATION_DIR"` or the equivalent environment
+variable. The directory must already exist and be private; choose it explicitly
+and configure the native Collector file receiver to watch that directory:
+
+```bash
+install -d -m 700 "$PRIVATE_OBSERVATION_DIR"
+export ECOSYSTEM_SDK_OBSERVATION_DIR="$PRIVATE_OBSERVATION_DIR"
+# Subsequent native_worker.py run invocations use this optional observation sink.
+```
+
+The optional file is published atomically, mode `0600`, with a unique
+`observation_id`, task status, configured model, duration, usage availability and
+aggregate usage. It contains no prompt, response/items, raw errors, account
+identity or native thread identifier. Unavailable usage remains JSON `null`.
+Its identifier is a local ingestion/deduplication key, not a public session ID.
+The detailed `--receipt` remains private and is a different artifact.
+
+The helper change has offline validation. The monitoring acceptance imported
+bounded summaries from the already-completed SDK receipts to exercise the
+separate file-ingestion route; **it did not run new inference through the changed
+helper**. Consult the monitoring receipt for that route's final delivery status.
+Do not add imported observations, OTLP counters and native receipts together as
+independent usage. The file route does not repair or prove the missing native
+histogram, and there is no automatic model retry to obtain a metric.
+
+These exporter/identity settings apply to fresh native children. They do not
+hot-reload the current Desktop process, instrument every third-party SDK, or
+change model/account/sandbox policy. No broker connection, external notification
+or paid cloud service was introduced.
+
 Receipts contain private native item records. Review and select fields before
 publishing. Failed SDK turns can raise before returning previously observed
 usage, so failure/timeout receipts say `usage: null` with an explicit status.

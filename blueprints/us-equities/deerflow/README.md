@@ -195,6 +195,23 @@ to 240 seconds, refuses an existing output directory and writes private evidence
 It forwards ordinary process variables and the existing native home rather than
 credentials. It is a small replay example, not a persistent research scheduler.
 
+## Local observability follow-up
+
+The [local observation profile](../../../observability/README.md) now provides
+native metrics/log collection, retained storage, dashboards and local alerts.
+`native-research.py` assigns a fresh opaque `service.instance.id` and an ACP
+client-scope label while preserving other inherited telemetry attributes. This
+separates future ACP process metrics from other native writers when the native
+exporter and Collector are configured. It does not change the ACP permission
+mapping or turn the embedded tool into a durable DeerFlow application.
+
+**No DeerFlow inference was rerun after this identity change.** The completed
+31.027-second research task above retains its original scope and counters;
+newer Codex/Claude/SDK monitoring receipts do not retroactively prove ACP exporter
+delivery. A future ACP acceptance needs its own fresh observation. The current
+Desktop process was not restarted or hot-reloaded, and no trace database,
+external alert destination, paid cloud host or broker was added.
+
 ## Research and execution remain separate
 
 A future research worker may produce timestamped claims, citations and structured
