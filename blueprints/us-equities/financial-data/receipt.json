@@ -88,5 +88,10 @@
     "https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data",
     "https://duckdb.org/docs/stable/data/parquet/overview"
   ],
-  "status": "blocked_live_acquisition"
+  "status": "blocked_live_acquisition",
+  "id": "sec-financial-data-20260919",
+  "component_ids": [
+    "duckdb"
+  ],
+  "claim": "The official SEC acquisition stopped after its first request returned HTTP 403; separate synthetic-fixture checks passed conservative availability, exact-decimal DuckDB/Parquet roundtrip and bounded cited-packet behavior."
 }

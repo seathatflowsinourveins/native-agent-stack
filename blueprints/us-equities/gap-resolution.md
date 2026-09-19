@@ -6,6 +6,13 @@ net provider-token savings were measured, or an autonomous trading system is
 ready. The selected operating mode remains research/backtesting before Alpaca
 paper execution.
 
+The [new research-runtime acceptance](research-runtime/README.md) adds fresh
+LEAN → Dagu → DuckDB evidence and a real standalone Claude Opus 5 report,
+reconciled at 14,583 tokens. The [restic proof](hosting/backup/README.md) recovered
+22/22 selected public files. Newly attempted [SEC acquisition](financial-data/README.md)
+stopped at HTTP 403; the new paired Astra → Claude execution awaits native Linux
+Codex allowance. These boundaries remain open rather than being counted as passes.
+
 | Area | Direct result | Evidence / native replay |
 | --- | --- | --- |
 | Star coverage | 337 public stars accounted for: 51 prior records, 268 README/license overviews and 18 selected-file reviews; 14 targeted candidates | [Complete decisions and exact review depth](../../catalogs/us-equities/star-audit.md) |
@@ -31,6 +38,8 @@ later proofs do not retroactively turn discovery checks into inference.
 
 | Requirement | Why it remains | Concrete next boundary |
 | --- | --- | --- |
+| Native paired research | Standalone Claude completed; Linux Codex reports exhausted allowance, separately from the available Desktop account | Complete native Codex sign-in and confirm readiness, then run the already validated paired DAG in a fresh private directory |
+| SEC numerical acquisition | First official request returned HTTP 403; no dataset was manufactured or substituted | Supply an honest declared public contact and establish allowed SEC access; one bounded acquisition before a financial report |
 | Broker access and data rights | No paper credentials were configured for this acceptance; the official LEAN Alpaca runtime also validates a QuantConnect product entitlement | Authorized private Alpaca paper credentials, feed selection, and valid QuantConnect entitlement before that adapter is initialized |
 | Strategy and risk specification | No universe, holding horizon, position/loss limits or validated strategy has been approved | A versioned research specification, held-out validation and explicit numeric risk parameters |
 | Actual trading execution/recovery | No broker order writer, journal, reconciliation, kill switch or paper reconnect/duplicate-order acceptance has been deployed | Implement and accept those controls in paper mode before any standing trading service |

@@ -22,9 +22,17 @@ Alpaca paper execution explicitly pending; local Dagu research hosting now has
 [local observability profile](observability/README.md) connects native client
 telemetry to retained metrics/logs, dashboards and local notifications.
 
+The latest [research-runtime acceptance](blueprints/us-equities/research-runtime/README.md)
+adds a fresh native LEAN → Dagu → DuckDB packet and a real standalone Claude
+Opus 5 report, with **14,583 tokens reconciled against native telemetry**.
+Its selected packet is **4,813 → 643 tokens** (86.64% less selected text, not
+net provider savings). [Restic backup/restore](blueprints/us-equities/hosting/backup/README.md)
+recovered 22/22 selected public files. The new paired Astra → Claude workflow
+awaits native Codex allowance; SEC acquisition retained its HTTP 403 failure.
+
 ## What is here
 
-- **42 adopted components** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting and local observability.
+- **46 adopted components** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup and local observability.
 - **19 researched alternatives** with adoption decisions, model requirements and prospective commands.
 - **Four extended catalog layers** covering foundations/memory/RAG, agents/hosting/operations, data, and strategy/engine research; source review remains distinct from native execution.
 - Pinned upstream recipes and inactive configuration examples. Native accounts, tool discovery, caching and compaction remain native.
@@ -49,7 +57,7 @@ telemetry to retained metrics/logs, dashboards and local notifications.
 | Native Astra SDK / LEAN / deterministic data path | Actual worker inference; 3,943 backtest points and 3 simulated orders; JSON→Parquet→SQL accepted, with explicit remaining trading gaps |
 | Exact original retrieved-text comparison | 2,731 → 491 tokens: 2,240 fewer, 82.02% smaller; **not overall provider savings** |
 
-The [current-session follow-up](observability/session-e2e.md) distinguishes fresh native children from the existing Desktop parent: direct memory/RAG and the Context Mode CLI bridge work, while direct Context Mode tool discovery and correlated exporter records remain unproved for that already-running parent. The retained bridge statistics report zero estimated savings; artifact selection measurements are separate.
+The [Desktop restart acceptance](observability/desktop-restart.md) confirms direct Context Mode tools and correlated parent logs. The earlier [session follow-up](observability/session-e2e.md) remains dated evidence of the pre-restart limitations. Saved Context Mode counters and selected-artifact measurements remain separate from provider usage.
 
 The public source fixture removes personal path literals and independently recounts to **2,730 → 491 tokens**. Historical original numbers are retained separately, avoiding a false byte-for-byte reproduction claim.
 

@@ -1,0 +1,11 @@
+description: Prepare cited native LEAN evidence and its native DuckDB order table.
+type: graph
+working_dir: ${STACK_REPO}
+timeout_sec: 120
+max_active_runs: 1
+steps:
+  - id: packet
+    run: '"${SDK_ENV}/bin/python" "${STACK_REPO}/blueprints/us-equities/research-runtime/prepare_lean_packet.py" --results "${LEAN_RESULTS}" --out "${RESEARCH_OUTPUT}/packet.json"'
+  - id: order_table
+    run: '"${SDK_ENV}/bin/python" "${STACK_REPO}/blueprints/us-equities/data/summarize_backtest.py" "${LEAN_RESULTS}/BasicTemplateFrameworkAlgorithm-order-events.json" "${RESEARCH_OUTPUT}/order-events.parquet"'
+    depends: [packet]

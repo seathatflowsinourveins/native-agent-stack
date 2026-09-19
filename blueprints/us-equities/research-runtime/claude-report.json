@@ -1,0 +1,49 @@
+{
+  "status": "research_only",
+  "as_of": "2026-09-19T16:21:44.596607+00:00",
+  "trading_authorized": false,
+  "evidence": [
+    {
+      "citation_id": "F2",
+      "value": "100000",
+      "unit": "USD"
+    },
+    {
+      "citation_id": "F3",
+      "value": "101655.30",
+      "unit": "USD"
+    }
+  ],
+  "findings": [
+    {
+      "claim": "The simulation summary reports a start equity of 100000 USD and an end equity of 101655.30 USD as engine output for the stated historical window.",
+      "citations": [
+        "F2",
+        "F3"
+      ]
+    },
+    {
+      "claim": "Both equity figures are USD amounts covering only the 2013-10-07 to 2013-10-11 historical period, a five-calendar-day sample.",
+      "citations": [
+        "F2",
+        "F3"
+      ]
+    },
+    {
+      "claim": "The end-versus-start equity difference is a simulated engine result, not realized broker fills, and does not demonstrate alpha.",
+      "citations": [
+        "F2",
+        "F3"
+      ]
+    }
+  ],
+  "limitations": [
+    "Native engine result packet; not a validated strategy.",
+    "Engine build identity is not established by these result files.",
+    "Simulated historical SPY events, not broker fills or current SEC financial facts.",
+    "Short sample metrics must not be extrapolated into expected returns.",
+    "source_kind is lean_simulation: historical backtest-engine evidence only, with no live execution, slippage, or fill realism established.",
+    "Values are copied verbatim from the packet and were not independently verified; no files, network, or tools were accessed.",
+    "No performance, risk, or alpha conclusion is supported, and no order or allocation is recommended or authorized."
+  ]
+}

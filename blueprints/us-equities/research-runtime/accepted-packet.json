@@ -1,0 +1,73 @@
+{
+  "status": "ready",
+  "source_kind": "lean_simulation",
+  "as_of": "2026-09-19T16:21:44.596607+00:00",
+  "artifact_prefix": "BasicTemplateFrameworkAlgorithm",
+  "historical_period": {
+    "start": "2013-10-07T00:00:00Z",
+    "end": "2013-10-11T23:59:59Z"
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "kind": "native_lean_simulation",
+      "file": "BasicTemplateFrameworkAlgorithm-summary.json",
+      "sha256": "b67e8913cc1f126436434bd8663248da0004883f1c4c68bc8296f616f64c2fcf"
+    },
+    {
+      "id": "S2",
+      "kind": "native_lean_simulation",
+      "file": "BasicTemplateFrameworkAlgorithm-order-events.json",
+      "sha256": "8e22c0052e1e769708114064cba69c3ddaec2c5af8148a6cf171e0f296f192de"
+    },
+    {
+      "id": "S3",
+      "kind": "native_lean_simulation",
+      "file": "stdout.txt",
+      "sha256": "1eb9d3913fd227ded72acd90abb4afbcf654281a01d385dbe7071585f0cfd11d"
+    }
+  ],
+  "numerical_facts": [
+    {
+      "citation_id": "F1",
+      "source_id": "S1",
+      "concept": "Total Orders",
+      "value": "3",
+      "unit": "orders"
+    },
+    {
+      "citation_id": "F2",
+      "source_id": "S1",
+      "concept": "Start Equity",
+      "value": "100000",
+      "unit": "USD"
+    },
+    {
+      "citation_id": "F3",
+      "source_id": "S1",
+      "concept": "End Equity",
+      "value": "101655.30",
+      "unit": "USD"
+    },
+    {
+      "citation_id": "F4",
+      "source_id": "S1",
+      "concept": "Total Fees",
+      "value": "10.32",
+      "unit": "USD"
+    },
+    {
+      "citation_id": "F5",
+      "source_id": "S3",
+      "concept": "Processed data points",
+      "value": "3943",
+      "unit": "data_points"
+    }
+  ],
+  "limitations": [
+    "Native engine result packet; not a validated strategy.",
+    "Engine build identity is not established by these result files.",
+    "Simulated historical SPY events, not broker fills or current SEC financial facts.",
+    "Short sample metrics must not be extrapolated into expected returns."
+  ]
+}

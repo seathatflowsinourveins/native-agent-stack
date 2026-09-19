@@ -1,0 +1,23 @@
+description: One native Astra report followed by one tool-free native Claude critique; no retries.
+type: graph
+working_dir: ${STACK_REPO}
+timeout_sec: 560
+max_active_runs: 1
+steps:
+  - id: astra
+    run: >-
+      "${SDK_ENV}/bin/python" "${STACK_REPO}/blueprints/us-equities/research-runtime/run_worker.py" astra
+      --packet "${RESEARCH_OUTPUT}/packet.json" --run-dir "${RESEARCH_OUTPUT}"
+      --workspace "${RESEARCH_WORKSPACE}" --codex-home "${NATIVE_CODEX_HOME}"
+      --codex-bin "${NATIVE_CODEX_BIN}" --claude-bin "${NATIVE_CLAUDE_BIN}"
+      --sdk-python "${SDK_ENV}/bin/python" --runtime-path "${NATIVE_RUNTIME_PATH}"
+      --observation-dir "${SDK_OBSERVATION_DIR}"
+  - id: claude
+    run: >-
+      "${SDK_ENV}/bin/python" "${STACK_REPO}/blueprints/us-equities/research-runtime/run_worker.py" claude
+      --packet "${RESEARCH_OUTPUT}/packet.json" --run-dir "${RESEARCH_OUTPUT}"
+      --workspace "${RESEARCH_WORKSPACE}" --codex-home "${NATIVE_CODEX_HOME}"
+      --codex-bin "${NATIVE_CODEX_BIN}" --claude-bin "${NATIVE_CLAUDE_BIN}"
+      --sdk-python "${SDK_ENV}/bin/python" --runtime-path "${NATIVE_RUNTIME_PATH}"
+      --observation-dir "${SDK_OBSERVATION_DIR}"
+    depends: [astra]

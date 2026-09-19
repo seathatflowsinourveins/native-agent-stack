@@ -1,5 +1,13 @@
 {
   "schema_version": 1,
+  "commands": [
+    "restic init --json",
+    "restic backup --files-from-verbatim \"$SELECTION\" --host native-agent-stack-reference --tag public-reference --json",
+    "restic snapshots --tag public-reference --json",
+    "restic check --read-data",
+    "restic restore \"$SNAPSHOT_ID\" --target \"$NEW_RESTORE\" --verify --overwrite never --json",
+    "restic forget --tag public-reference --group-by host,paths,tags --keep-last 7 --dry-run --json"
+  ],
   "id": "restic-local-public-reference-20260919",
   "observed_at_utc": "2026-09-19T16:03:18Z",
   "status": "passed_selected_file_local_backup_restore",
@@ -120,5 +128,10 @@
   ],
   "evidence_processing_notes": [
     "The initial retention JSON summary reader encountered remove:null; it was corrected to count the absent remove list as empty. The native retention command itself exited 0 and was not rerun."
-  ]
+  ],
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "restic"
+  ],
+  "claim": "Native restic 0.19.1 backed up 22 selected public reference files, checked all repository data, and restored the same 160642 bytes into a fresh local directory; independent file hashes matched."
 }

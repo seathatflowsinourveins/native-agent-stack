@@ -1,5 +1,12 @@
 # Native research workflow hosting
 
+**Latest:** [Cited research runtime](../research-runtime/README.md) adds a fresh
+two-step native Dagu packet/Parquet acceptance and a standalone Claude Opus 5
+report with reconciled telemetry. The paired Astra → Claude recipe is validated
+but allowance-blocked. [Native restic acceptance](backup/README.md) demonstrates
+encrypted backup and byte-identical restore of 22 selected public reference files.
+Neither adds a scheduled broker service or off-host durability.
+
 Dagu 2.16.6 now hosts local research run history on loopback port 18525. Its
 upstream CLI completed the three-step [workflow](research-evidence.yaml): DuckDB
 summarized six LEAN simulated events into three orders, then both evidence

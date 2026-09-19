@@ -1,5 +1,10 @@
 # Native agent observability
 
+**New research acceptance:** [Native runtime receipt](../blueprints/us-equities/research-runtime/receipt.json)
+reconciles a real Claude Opus 5 report across its result, Prometheus and Loki:
+**14,583 tokens**. One matching process instance exported 51 filtered Loki events;
+six services and seven scrape targets were healthy. See [commands and exact scope](../blueprints/us-equities/research-runtime/README.md).
+
 **Latest:** [Desktop restart acceptance](desktop-restart.md) confirms 11 direct
 Context Mode tools, 155 exact-task Loki records and 14 successful Context Mode
 tool results. Six services are active. Its saved Context Mode counter reports

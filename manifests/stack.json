@@ -152,7 +152,8 @@
         "native-memory",
         "native-rag",
         "component-history",
-        "native-observability"
+        "native-observability",
+        "native-research-runtime-20260919"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -802,7 +803,8 @@
       "evidence_ids": [
         "native-observability",
         "native-observability-followup",
-        "desktop-restart-acceptance"
+        "desktop-restart-acceptance",
+        "native-research-runtime-20260919"
       ],
       "source_pin": null,
       "upstream_sources": [
@@ -824,7 +826,8 @@
       "evidence_ids": [
         "native-observability",
         "native-observability-followup",
-        "desktop-restart-acceptance"
+        "desktop-restart-acceptance",
+        "native-research-runtime-20260919"
       ],
       "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
       "upstream_sources": [
@@ -845,7 +848,8 @@
       "evidence_ids": [
         "native-observability",
         "native-observability-followup",
-        "desktop-restart-acceptance"
+        "desktop-restart-acceptance",
+        "native-research-runtime-20260919"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [
@@ -915,6 +919,88 @@
         "https://github.com/binwiederhier/ntfy"
       ],
       "freshness": "Pinned official release verified on2026-09-19; not an automatic latest-update policy."
+    },
+    {
+      "id": "duckdb",
+      "repository": "https://github.com/duckdb/duckdb",
+      "version": "1.5.5",
+      "license": "MIT",
+      "role": "Deterministic local SQL/Parquet research data and exact decimal storage",
+      "source_pin": "d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
+      "commands": [
+        "python -c \"import duckdb; print(duckdb.__version__)\"",
+        "python blueprints/us-equities/data/summarize_backtest.py \"$LEAN_EVENTS\" \"$NEW_PARQUET\""
+      ],
+      "evidence_ids": [
+        "sec-financial-data-20260919",
+        "native-research-runtime-20260919"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://github.com/duckdb/duckdb"
+      ],
+      "freshness": "Dated native acceptance on 2026-09-19; pins and limits retained, not an automatic latest-update policy."
+    },
+    {
+      "id": "restic",
+      "repository": "https://github.com/restic/restic",
+      "version": "0.19.1",
+      "license": "BSD-2-Clause",
+      "role": "Encrypted same-host backup and verified restore of explicitly selected public files",
+      "source_pin": "v0.19.1",
+      "commands": [
+        "restic backup --files-from \"$SELECTION\" --json",
+        "restic check --read-data",
+        "restic restore latest --target \"$NEW_RESTORE\" --verify"
+      ],
+      "evidence_ids": [
+        "restic-local-public-reference-20260919"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://github.com/restic/restic"
+      ],
+      "freshness": "Dated native acceptance on 2026-09-19; pins and limits retained, not an automatic latest-update policy."
+    },
+    {
+      "id": "dagu",
+      "repository": "https://github.com/dagucloud/dagu",
+      "version": "2.16.6",
+      "license": "GPL-3.0",
+      "role": "Manual native research workflows and private local run history",
+      "source_pin": "v2.16.6",
+      "commands": [
+        "dagu validate --dagu-home \"$RESEARCH_HOME\" \"$DAG\"",
+        "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id \"$NEW_RUN_ID\" \"$DAG\"",
+        "dagu history --context local --dagu-home \"$RESEARCH_HOME\" --format json"
+      ],
+      "evidence_ids": [
+        "native-research-runtime-20260919"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://github.com/dagucloud/dagu"
+      ],
+      "freshness": "Dated native acceptance on 2026-09-19; pins and limits retained, not an automatic latest-update policy."
+    },
+    {
+      "id": "lean",
+      "repository": "https://github.com/QuantConnect/Lean",
+      "version": "985ef30 with documented dependency remediation",
+      "license": "Apache-2.0",
+      "role": "Deterministic native historical research backtest engine; no broker initialized",
+      "source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "commands": [
+        "\"$DOTNET\" \"$LEAN_LAUNCHER\" --config \"$LEAN_CONFIG\" --environment backtesting --algorithm-location \"$LEAN_ALGORITHM\" --data-folder \"$LEAN_DATA\" --results-destination-folder \"$LEAN_RESULTS\""
+      ],
+      "evidence_ids": [
+        "native-research-runtime-20260919"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://github.com/QuantConnect/Lean"
+      ],
+      "freshness": "Dated native acceptance on 2026-09-19; pins and limits retained, not an automatic latest-update policy."
     }
   ],
   "profiles": [
@@ -955,7 +1041,11 @@
         "ccusage",
         "openresearch",
         "sandbox-runtime",
-        "gitleaks"
+        "gitleaks",
+        "duckdb",
+        "restic",
+        "dagu",
+        "lean"
       ]
     },
     {

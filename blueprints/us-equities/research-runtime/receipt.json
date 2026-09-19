@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "id": "native-research-runtime-20260919",
+  "kind": "native_model_e2e",
+  "observed_at_utc": "2026-09-19T16:21:52Z",
+  "component_ids": [
+    "claude-code",
+    "dagu",
+    "lean",
+    "duckdb",
+    "opentelemetry-collector-contrib",
+    "prometheus",
+    "loki"
+  ],
+  "claim": "A fresh native LEAN simulation fed a successful Dagu packet/Parquet workflow and a standalone native Claude Opus 5 cited report; native usage matched Prometheus and Loki. The new paired Astra-to-Claude run remains allowance-blocked.",
+  "limitations": [
+    "Historical bundled LEAN simulation, not a validated strategy, SEC dataset, broker fill or trading authorization.",
+    "The new paired Astra-to-Claude workflow is implemented and native-schema-validated, but native Linux Codex allowance was exhausted; no new Astra inference was submitted.",
+    "SEC acquisition returned HTTP 403. No ready live SEC source packet was obtained.",
+    "Report checks establish citation identifiers, exact numerical values, units, cutoff and research scope, not complete prose entailment or investment quality.",
+    "Selected-text reduction is lossy question-specific retrieval measured by o200k_base; net provider savings and complete coordinator/worker task usage were not measured.",
+    "Local manual Dagu hosting is not continuous off-host operation. Raw private stdout/stderr are time-limited but not byte-capped.",
+    "Native account homes and hooks remain accessible. Environment filtering and final tool-result audits are not a general operating-system sandbox.",
+    "Telemetry correlation uses a unique process instance, timestamp and exact usage. Native session identifiers are not retained in the public receipt."
+  ],
+  "native_lean": {
+    "data_points": 3943,
+    "simulated_orders": 3,
+    "order_events": 6,
+    "order_list_hash": "f209ed42701b0419858e0100595b40c0",
+    "source_commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+    "build": "Previously documented local dependency-remediation build",
+    "broker_initialized": false,
+    "configuration_changed": false
+  },
+  "dagu": {
+    "version": "2.16.6",
+    "final_validation_exit_codes": [
+      0,
+      0
+    ],
+    "native_history_status": "succeeded",
+    "steps": {
+      "packet": "succeeded",
+      "order_table": "succeeded"
+    },
+    "packet_bytes": 1976,
+    "numerical_facts": 5,
+    "order_event_statuses": {
+      "submitted": 3,
+      "filled": 3
+    },
+    "parquet_sha256": "48ec550a96771e284bde09f6793b0d064e47bf3a731d8a1ac389a509b616f66d",
+    "paired_model_workflow_executed": false,
+    "environment_passthrough_updated": true,
+    "private_auth_preserved": true,
+    "ui_run_edit_disabled": true
+  },
+  "claude": {
+    "role": "claude",
+    "status": "completed",
+    "usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 13018,
+      "cache_read_input_tokens": 531,
+      "output_tokens": 1032,
+      "total_tokens": 14583,
+      "thinking_tokens_included_in_output": 423
+    },
+    "workflow": "independent_report",
+    "inference_attempted": true,
+    "configured_model": "claude-opus-5",
+    "packet_sha256": "8cdce12b2b518b1bb8f047f07012fc04dbb834e7b22eac546c13ba09ed5f20d7",
+    "prompt_bytes": 2323,
+    "prompt_sha256": "edb3f3f1e0e7af6d591df1e0ef4acc3ef87a021dbca3ff9b8a2e8d1cb6984445",
+    "process_exit_code": 0,
+    "process_timeout": false,
+    "native_subtype": "success",
+    "reported_models": [
+      "claude-opus-5"
+    ],
+    "exposed_tool_count": 0,
+    "hook_events": 16,
+    "evidence_facts": 2,
+    "findings": 3,
+    "report_validation": "citations_values_units_and_scope_passed",
+    "report_sha256": "adf4d63b42f47ce8444f7841fd30482dd4d0bbe3bf95f1d756b3ad5a82e6baf0",
+    "duration_ms": 7480
+  },
+  "codex_readiness": {
+    "model": "gpt-6-astra",
+    "model_available": true,
+    "ordinary_usage_allowed": false,
+    "windows": {
+      "primary": {
+        "usedPercent": 100,
+        "resetsAt": 1790398209,
+        "windowDurationMins": 10080
+      }
+    },
+    "ready": false
+  },
+  "telemetry": {
+    "services_running": 6,
+    "scrape_targets_up": 7,
+    "loki_records_for_instance": 51,
+    "matching_api_requests": 1,
+    "all_bodies_content_omitted": true,
+    "native_hook_responses_successful": 8,
+    "native_hook_events": 16,
+    "loki_hook_execution_pairs": 3,
+    "native_usage_equals_prometheus_and_loki": true,
+    "prometheus_query": "last_over_time(ecosystem_claude_code_token_usage_tokens_total{client_scope=\"financial-research\"}[30m])",
+    "loki_query": "{service_name=\"claude-code\"} | ecosystem_client_scope=\"financial-research\"",
+    "correlation": "Unique matching process instance, timestamp and exact token categories; identifiers omitted from publication"
+  },
+  "selected_text_measurement": {
+    "tokenizer": "gpt-tokenizer",
+    "version": "3.4.0",
+    "encoding": "o200k_base",
+    "baseline_files": [
+      "BasicTemplateFrameworkAlgorithm-summary.json",
+      "BasicTemplateFrameworkAlgorithm-order-events.json",
+      "stdout.txt"
+    ],
+    "baseline_join": "one newline between files",
+    "baseline": {
+      "bytes": 15752,
+      "tokens": 4813,
+      "sha256": "3de13c77fb212cdbf0ca9d1263560fc34aa7f5ee715c7f59e1236ae250da0174"
+    },
+    "packet": {
+      "bytes": 1976,
+      "tokens": 643,
+      "sha256": "8cdce12b2b518b1bb8f047f07012fc04dbb834e7b22eac546c13ba09ed5f20d7"
+    },
+    "fewer_selected_text_tokens": 4170,
+    "selected_text_reduction_percent": 86.64,
+    "net_provider_tokens_saved": null
+  },
+  "retained_failures": [
+    {
+      "operation": "Initial native Dagu validation",
+      "exit_code": 1,
+      "reason": "entrypoint document must not define name",
+      "resolution": "Removed name fields; both final YAML files validated and final preparation reran successfully in a fresh directory."
+    },
+    {
+      "operation": "Native Codex device sign-in",
+      "reason": "First device code expired after 15 minutes; second interactive sign-in initiated.",
+      "resolved": false
+    }
+  ],
+  "verification": {
+    "supervisor_targeted_tests_passed": 12,
+    "independent_reviews": [
+      "process-group cancellation and descendant retirement",
+      "hash-bound handoff and explicit independent mode",
+      "LEAN period provenance",
+      "native telemetry reconciliation"
+    ],
+    "full_repository_validation": "See repository CI for the final committed tree."
+  },
+  "commands": [
+    "\"$DOTNET\" \"$LEAN_LAUNCHER\" --config \"$LEAN_CONFIG\" --environment backtesting --algorithm-location \"$LEAN_ALGORITHM\" --data-folder \"$LEAN_DATA\" --results-destination-folder \"$LEAN_RESULTS\"",
+    "\"$DAGU\" validate --dagu-home \"$RESEARCH_HOME\" \"$STACK_REPO/blueprints/us-equities/research-runtime/prepare-evidence.yaml\"",
+    "\"$DAGU\" start --context local --dagu-home \"$RESEARCH_HOME\" --run-id \"$PREP_RUN_ID\" \"$STACK_REPO/blueprints/us-equities/research-runtime/prepare-evidence.yaml\"",
+    "\"$DAGU\" history --context local --dagu-home \"$RESEARCH_HOME\" --format json prepare-evidence",
+    "claude -p --model claude-opus-5 --output-format stream-json --verbose --include-hook-events --max-turns 2 --tools '' --disallowedTools '*' --permission-mode dontAsk --permission-prompts none",
+    "TOKENIZER_PREFIX=\"$ISOLATED_TOKENIZER_PREFIX\" node \"$STACK_REPO/blueprints/us-equities/research-runtime/measure_packet.cjs\" \"$LEAN_RESULTS\" \"$RESEARCH_OUTPUT/packet.json\""
+  ]
+}
