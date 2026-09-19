@@ -78,7 +78,7 @@ first-weight and research-paper dates from repository creation/card edits.
 The existing native Codex/Claude tools and hooks have separate earlier receipts.
 The SDK token totals cover only the three recorded SDK turns; they exclude the
 coordinator and catalog-research agents and are not the total cost of this task.
-This catalog expansion did not rerun Claude or deploy a broker. A fresh Desktop
+The original catalog expansion did not rerun Claude or deploy a broker; the subsequent observability acceptance ran bounded native Codex and Claude tasks without broker access. A fresh Desktop
 session discovers newly registered tools; installed CLIs can be used now. New
 projects need their own memory/index scope. The existing native Astra SDK worker
 already used Context Mode in this task, but its file-tool override still needs
@@ -99,3 +99,9 @@ checks. They do not rerun provider inference, GPU services, market data or order
 The [local Dagu workflow](../../blueprints/us-equities/hosting/README.md) subsequently ran the deterministic summary and both evidence validators, then retained successful/failed/cancelled history across a service restart. [Current gap ledger](../../blueprints/us-equities/gap-resolution.md).
 
 The later [OmniRoute Astra receipt](../../blueprints/us-equities/routing/astra-receipt.json) records one completed exact-model text response (81 input +55 output), the supported native-client-version configuration and both earlier failures. Failed-attempt provider usage is unknown; no aggregate savings or hook/tool parity is inferred.
+
+## Adopted local observability
+
+The [native observability receipt](../../observability/receipt.json) records actual native Codex/Claude tasks and exporter reconciliation. The [backend receipt](../../observability/backends/receipt.json) records the separate Collector, retained metrics/log stores, dashboard/query and local-alert checks. See the [operations cards](agents-operations.json) for exact versions, licenses and portable upstream command entry points.
+
+The installed Collector is `otelcol-contrib`, built from core and contrib sources and distributed through the official collector-releases repository. Commands such as `otelcol-contrib validate --config="$OTEL_CONFIG"`, `promtool check config "$PROMETHEUS_CONFIG"` and `amtool check-config "$ALERTMANAGER_CONFIG"` check reviewed configuration; they are not substitutes for delivery evidence. Existing records keep setup failures and initial metric identity limitations visible. No trace database, external notification destination, broker integration or measured maximum/net provider-token savings is implied.

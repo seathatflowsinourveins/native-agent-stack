@@ -2,14 +2,14 @@
 
 **Dated decision catalog: September 19, 2026.** The north star is native, token-efficient research → reproducible backtesting → Alpaca paper automation. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
 
-The catalog has **145 repository decision cards covering 140 unique GitHub repositories**, and **20 model entries**. It connects to the earlier 36-component foundation. The [combined repository index](repository-index.md) contains **447 repository identities**, including all 337 public stars and 110 beyond that snapshot, with overlap removed.
+The catalog has **149 repository decision cards covering 144 unique GitHub repositories**, and **20 model entries**. It connects to the earlier 36-component foundation. The [combined repository index](repository-index.md) contains **451 repository identities**, including all 337 public stars and 114 beyond that snapshot, with overlap removed.
 
 ## Read the layer you need
 
 | Layer | Cards | Guide / structured manifest |
 | --- | ---: | --- |
 | Token efficiency, memory, retrieval, document ingestion | 36 | [foundation-memory](foundation-memory.md) · [JSON](foundation-memory.json) |
-| Agents, OmniRoute, SDKs, orchestration, hosting, security, telemetry | 35 | [agents-operations](agents-operations.md) · [JSON](agents-operations.json) |
+| Agents, OmniRoute, SDKs, orchestration, hosting, security, telemetry | 39 | [agents-operations](agents-operations.md) · [JSON](agents-operations.json) |
 | Market/reference/filing data, storage, quality, lineage | 36 | [data-research](data-research.md) · [JSON](data-research.json) |
 | Engines, broker adapters, portfolios, statistics, strategy research | 38 | [engines-strategies](engines-strategies.md) · [JSON](engines-strategies.json) |
 | Current model choices and older compatible baselines | 20 | [Models](models.md) · [JSON](models.json) |
@@ -30,9 +30,11 @@ Use native **Codex SDK/Astra + Claude Opus**, **Context Mode/RTK**, **ai-memory*
 - Native HF discovery returned 17 model metadata records and 11 model cards. Only separately cited earlier/native runs establish inference; model-card retrieval does not.
 - New catalog recipes are prospective unless their referenced receipt explicitly establishes execution. No Alpaca connection, strategy edge or deterministic risk service was accepted. A later manual research DAG and authenticated local Dagu history host were accepted; this is not unattended trading.
 
+The later [native observability receipt](../../observability/receipt.json) establishes actual Codex/Claude log and metric export through the local Collector. [Backend evidence](../../observability/backends/receipt.json) covers Prometheus, Loki, Grafana and local alert delivery. These are bounded local runtime results; trace storage, broker monitoring, external alerts and maximum/net token-savings claims remain outside acceptance.
+
 ## Starred repositories and beyond
 
-The fresh authenticated listing contained **337 public stars**. **41** have current catalog cards; **10** more have adopted baseline records; **286** have no current catalog/baseline card. All337 now also have individual dispositions in the [complete star audit](star-audit.md), with README/license overview separated from deeper source inspection. Absence of a full catalog card is no longer an unreviewed identity. **99** catalog repositories are beyond the starred snapshot. [All identities and joins](coverage.json).
+The latest native public-endpoint refresh contained **337 public stars**, unchanged from the recorded snapshot. **41** have current catalog cards; **10** more have adopted baseline records; **286** have no current catalog/baseline card. All337 now also have individual dispositions in the [complete star audit](star-audit.md), with README/license overview separated from deeper source inspection. Absence of a full catalog card is no longer an unreviewed identity. **103** catalog repositories are beyond the starred snapshot. [All identities and joins](coverage.json).
 
 Source review covered current official metadata, README/license text and relevant API/source documentation at the depth stated per record. It did not deeply benchmark all 337stars or every project beyond them. Repository freshness, stars, model launch dates and author benchmarks do not establish superiority. The catalog exposes missing acceptance work rather than turning a list into a deployment claim.
 

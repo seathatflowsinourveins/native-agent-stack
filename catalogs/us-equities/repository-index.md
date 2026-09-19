@@ -1,8 +1,8 @@
 # Grand repository index
 
-Checked September 19, 2026. **447 repository identities: 337 public stars plus 110 beyond that snapshot**. The source-reviewed core still contains 140 unique repositories in 145 layer cards; 99 of those core repositories are beyond the stars. Eleven additional beyond-star identities come from earlier foundation/candidate records. These counts are references, not installations.
+Checked September 19, 2026. **451 repository identities: 337 public stars plus 114 beyond that snapshot**. The catalog core contains 144 unique repositories in 149 layer cards; 103 of those repositories are beyond the stars. Eleven additional beyond-star identities come from earlier foundation/candidate records. These counts are references, not installations.
 
-Every starred repository has a [typed disposition](star-audit.json), with overview and selected-file inspection kept distinct. The 140-repository core plus 24 additional older records form the earlier 164-reference subset. Existing receipts retain their original runtime scope.
+Every starred repository has a [typed disposition](star-audit.json), with overview and selected-file inspection kept distinct. The 144-repository core plus 24 additional older records form the 168-reference subset. The fresh public-star identity comparison is recorded in [coverage](coverage.json); prior source reviews were not repeated. Existing receipts retain their original runtime scope. Collector core and contrib are two source identities for one adopted Collector process; the release-packaging repository is provenance, not another runtime card.
 
 | Repository | Discovery | Decision cards / earlier record | Star review depth |
 | --- | --- | --- | --- |
@@ -69,6 +69,7 @@ Every starred repository has a [typed disposition](star-audit.json), with overvi
 | [bigpizzav3/codexplusplus](https://github.com/BigPizzaV3/CodexPlusPlus) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
 | [bigskysoftware/htmx](https://github.com/bigskysoftware/htmx) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
 | [bilawalsidhu/gods-eye-view](https://github.com/bilawalsidhu/gods-eye-view) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · outside_north_star |
+| [binwiederhier/ntfy](https://github.com/binwiederhier/ntfy) | Beyond stars | [agents-operations: default](agents-operations.json) | See linked core/earlier record |
 | [blader/humanizer](https://github.com/blader/humanizer) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · outside_north_star |
 | [blue-yonder/tsfresh](https://github.com/blue-yonder/tsfresh) | Beyond stars | [data-research: conditional](data-research.json) | See linked core/earlier record |
 | [bradautomates/claude-video](https://github.com/bradautomates/claude-video) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
@@ -166,7 +167,8 @@ Every starred repository has a [typed disposition](star-audit.json), with overvi
 | [google-labs-code/stitch-skills](https://github.com/google-labs-code/stitch-skills) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · outside_north_star |
 | [google-research/timesfm](https://github.com/google-research/timesfm) | Starred | [engines-strategies: conditional](engines-strategies.json) | prior_evidence_link · already_covered |
 | [google/googletest](https://github.com/google/googletest) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · outside_north_star |
-| [grafana/grafana](https://github.com/grafana/grafana) | Beyond stars | [agents-operations: conditional](agents-operations.json) | See linked core/earlier record |
+| [grafana/grafana](https://github.com/grafana/grafana) | Beyond stars | [agents-operations: default](agents-operations.json) | See linked core/earlier record |
+| [grafana/loki](https://github.com/grafana/loki) | Beyond stars | [agents-operations: default](agents-operations.json) | See linked core/earlier record |
 | [graphify-labs/graphify](https://github.com/Graphify-Labs/graphify) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
 | [graykode/abtop](https://github.com/graykode/abtop) | Starred | [Individual source disposition](star-audit.json) | selected_primary_files · targeted_candidate |
 | [h4ckf0r0day/obscura](https://github.com/h4ckf0r0day/obscura) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
@@ -281,7 +283,8 @@ Every starred repository has a [typed disposition](star-audit.json), with overvi
 | [open-dev-society/openstock](https://github.com/Open-Dev-Society/OpenStock) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
 | [open-llm-vtuber/open-llm-vtuber](https://github.com/Open-LLM-VTuber/Open-LLM-VTuber) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · outside_north_star |
 | [open-multi-agent/open-multi-agent](https://github.com/open-multi-agent/open-multi-agent) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
-| [open-telemetry/opentelemetry-collector](https://github.com/open-telemetry/opentelemetry-collector) | Beyond stars | [agents-operations: conditional](agents-operations.json) | See linked core/earlier record |
+| [open-telemetry/opentelemetry-collector](https://github.com/open-telemetry/opentelemetry-collector) | Beyond stars | [agents-operations: default](agents-operations.json) | See linked core/earlier record |
+| [open-telemetry/opentelemetry-collector-contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib) | Beyond stars | [agents-operations: default](agents-operations.json) | See linked core/earlier record |
 | [openai/codex](https://github.com/openai/codex) | Beyond stars | [agents-operations: default](agents-operations.json); [adopted baseline](../../manifests/stack.json) | See linked core/earlier record |
 | [openai/codex-plugin-cc](https://github.com/openai/codex-plugin-cc) | Starred | [adopted baseline](../../manifests/stack.json) | prior_evidence_link · already_covered |
 | [openai/openai-agents-python](https://github.com/openai/openai-agents-python) | Starred | [agents-operations: alternative](agents-operations.json) | prior_evidence_link · already_covered |
@@ -315,7 +318,8 @@ Every starred repository has a [typed disposition](star-audit.json), with overvi
 | [posthog/posthog](https://github.com/PostHog/posthog) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · outside_north_star |
 | [prefecthq/prefect](https://github.com/prefecthq/prefect) | Starred | [agents-operations: alternative](agents-operations.json) | prior_evidence_link · already_covered |
 | [primeintellect-ai/prime-agent](https://github.com/PrimeIntellect-ai/prime-agent) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · alternative |
-| [prometheus/prometheus](https://github.com/prometheus/prometheus) | Beyond stars | [agents-operations: conditional](agents-operations.json) | See linked core/earlier record |
+| [prometheus/alertmanager](https://github.com/prometheus/alertmanager) | Beyond stars | [agents-operations: default](agents-operations.json) | See linked core/earlier record |
+| [prometheus/prometheus](https://github.com/prometheus/prometheus) | Beyond stars | [agents-operations: default](agents-operations.json) | See linked core/earlier record |
 | [promptfoo/promptfoo](https://github.com/promptfoo/promptfoo) | Starred | [agents-operations: alternative](agents-operations.json); [adopted baseline](../../manifests/stack.json) | prior_evidence_link · already_covered |
 | [public-apis/public-apis](https://github.com/public-apis/public-apis) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · outside_north_star |
 | [punkpeye/awesome-mcp-servers](https://github.com/punkpeye/awesome-mcp-servers) | Starred | [Individual source disposition](star-audit.json) | readme_license_overview · overlaps_established |

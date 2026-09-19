@@ -1,6 +1,6 @@
 # Agents and operations for the US-equities research stack
 
-Checked **2026-09-19**. This is a curated architecture decision record covering **35 upstream repositories**, not a claim that installing them creates an automated trading system. The [machine-readable catalog](agents-operations.json) contains release dates, license scope, requirements, primary sources and proposed native commands for every entry. The repository's [US-equities blueprint](../../blueprints/us-equities/README.md) records what actually ran.
+Checked **2026-09-19**. This is a curated architecture decision record covering **39 upstream repositories**, not a claim that installing them creates an automated trading system. The [machine-readable catalog](agents-operations.json) contains release dates, license scope, requirements, primary sources and proposed native commands for every entry. The repository's [US-equities blueprint](../../blueprints/us-equities/README.md) records what actually ran.
 
 The useful baseline is the existing native Codex worker, deterministic data/backtest code, an explicit artifact contract, and the existing command sandbox and secret scanner. Add a scheduler when work must recur or resume, dependency evidence before publishing runtime artifacts, and telemetry when services become persistent. Choose an alternative when it solves a concrete problem; running several agent frameworks, gateways, schedulers or trace databases together is not a completeness criterion.
 
@@ -28,7 +28,7 @@ The existing [native SDK receipt](../../blueprints/us-equities/workers/receipt.j
 
 Use native Codex for the current worker. Add ACP only for a host that speaks ACP. DeerFlow now has one completed native ACP research task; it remains an optional embedded research lane, without an accepted durable application service. LangGraph is useful for explicit branching/checkpoints when a simple task becomes insufficient. OpenAI Agents SDK and Claude Agent SDK are alternatives for application-owned loops, each with its own authentication, tool and tracing semantics. They are not interchangeable paths to the user's native subscription. Claude's current documentation specifically limits offering third-party products using claude.ai login/rate limits without prior approval. [Claude SDK authentication scope](https://code.claude.com/docs/en/agent-sdk/overview)
 
-The future broker execution service needs a separate identity, durable intent ledger, deterministic preflight, deduplication, reconciliation and explicit activation policy. These are **requirements, not implemented capabilities in this catalog**. Research workers receive neither broker secrets nor order-capable MCP tools. A filesystem sandbox, a model's refusal instruction, or a scheduler's retry setting is insufficient to establish that boundary. None of the 35 operations components is itself a complete Alpaca execution adapter.
+The future broker execution service needs a separate identity, durable intent ledger, deterministic preflight, deduplication, reconciliation and explicit activation policy. These are **requirements, not implemented capabilities in this catalog**. Research workers receive neither broker secrets nor order-capable MCP tools. A filesystem sandbox, a model's refusal instruction, or a scheduler's retry setting is insufficient to establish that boundary. None of the 39 operations components is itself a complete Alpaca execution adapter.
 
 ## Choose one scheduling path
 
@@ -66,9 +66,13 @@ Reuse the current native sandbox for small scoped commands. Existing filesystem 
 
 ## Observability, evaluations and release evidence
 
-Start with typed job receipts, then an OpenTelemetry collector plus Prometheus when long-running services need monitoring. Add Grafana only when there is operational data to display. Record data age, job state, retry count, queue duration, actual provider usage availability and service health using bounded labels. Prompt text, raw tool payloads, account identifiers and credentials should not be default metric labels or exported trace fields. Redact before export and set retention. [OpenTelemetry data handling](https://opentelemetry.io/docs/security/handling-sensitive-data/)
+The adopted local path is **native Codex/Claude → OpenTelemetry Collector contrib 0.161.0 → Prometheus 3.14.0 and Loki 3.7.8 → Grafana 13.2.2**, with **Alertmanager 0.34.1 → a local ntfy 2.28.0 sink** for the receipt-specific notification route. The [native-client receipt](../../observability/receipt.json) and [backend receipt](../../observability/backends/receipt.json) distinguish real client tasks, delivery/redaction canaries, retained storage, dashboard/query checks and local alerts. Core Collector and contrib source cards describe one installed distribution, not two parallel collection services. The official binary assets come from [collector-releases](https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.161.0).
 
-Choose one initial trace/evaluation UI: Phoenix for local trace investigation, Langfuse for shared prompt/dataset operations, or MLflow where experiment/model artifacts are the main need. They have different licenses and infrastructure costs. Phoenix is Elastic-2.0; Langfuse has MIT core and separately licensed enterprise directories; Grafana is AGPL-3.0-only with component exceptions. Open-source clients do not imply free hosted services or unrestricted managed redistribution. Phoenix’s provider visibility setting hides UI/catalog choices; it does not itself deny backend inference. Keep the inspection environment free of provider credentials and apply access controls.
+Native exporters preserve the existing subscription accounts and models. Keep prompt/response/tool-content capture off, suppress Codex tool-output previews, and apply a collector allowlist before storage; those client switches alone do not remove identity fields or every argument. Keep opaque metric-writer identities distinct, retain task/session correlation only in restricted local evidence, and publish sanitized aggregates. Freshly configured native processes and an already-running Desktop process have different activation boundaries. [Codex telemetry](https://learn.chatgpt.com/docs/config-file/config-advanced), [Claude monitoring](https://code.claude.com/docs/en/monitoring-usage).
+
+Use native final usage and turn metrics as reconciliation anchors. Codex input includes cached subsets and output includes reasoning subsets; Claude exposes ordinary input, cache creation, cache reads and output separately. A startup prewarm can produce a Codex token-bearing transport log without belonging to a model turn, so summing every completed transport event is not exact inference accounting. Local alerts and dashboards do not establish maximum token efficiency, subscription billing or a profitable strategy.
+
+**No trace database or distributed tracing acceptance is claimed.** Phoenix, Langfuse and MLflow remain conditional/alternative choices for a concrete trace/evaluation need; they were not silently adopted with Grafana. Phoenix is Elastic-2.0; Langfuse has MIT core and separately licensed enterprise directories. Grafana and Loki are AGPL-3.0-only with component exceptions. ntfy is dual Apache-2.0/GPLv2 with third-party notices. The accepted notification destination is local: no phone, email, Slack, external push subscription, broker monitor or automatic remediation is implied.
 
 Use one small Inspect AI suite or Promptfoo configuration for frozen extraction/tool-policy regressions. Exact dates, units, citations, schema conformance and recovery behavior should have deterministic assertions before adding a judge model. Provider/LLM-judge evaluation requires a separate bounded run; none ran for this catalog. Trading outcomes require their own research protocol and execution validation, not an LLM quality score. OpenAI Agents SDK tracing and Promptfoo telemetry default to enabled upstream; the JSON proposes documented per-process opt-outs for initial local checks. [Agents tracing](https://openai.github.io/openai-agents-python/tracing/), [Promptfoo telemetry](https://www.promptfoo.dev/docs/configuration/telemetry/)
 
@@ -84,7 +88,7 @@ The following decisions refer to architecture selection, not installation status
 | [codex-acp](https://github.com/agentclientprotocol/codex-acp) | conditional | bounded native receipt | ACP adapter to native Codex app-server |
 | [omniroute](https://github.com/diegosouzapw/OmniRoute) | conditional | bounded native receipt | Optional explicit provider gateway |
 | [freellmapi](https://github.com/tashfeenahmed/freellmapi) | alternative | bounded native receipt | Alternative local-provider and free-tier router |
-| [deerflow](https://github.com/bytedance/deer-flow) | watch | bounded native receipt | Optional research application and subagent host |
+| [deerflow](https://github.com/bytedance/deer-flow) | conditional | bounded native receipt | Optional research application and subagent host |
 | [langgraph](https://github.com/langchain-ai/langgraph) | conditional | source review | Explicit agent-state graph and checkpoints |
 | [dagu](https://github.com/dagucloud/dagu) | conditional | bounded native receipt | Single-binary scheduler for existing native commands |
 | [temporal](https://github.com/temporalio/temporal) | conditional | source review | Durable workflow history, activities and cancellation |
@@ -99,9 +103,13 @@ The following decisions refer to architecture selection, not installation status
 | [daytona](https://github.com/daytonaio/daytona) | watch | source review | Managed development sandbox alternative |
 | [opensandbox](https://github.com/opensandbox-group/OpenSandbox) | conditional | source review | Self-hostable sandbox control API and SDKs |
 | [sandbox-runtime](https://github.com/anthropics/sandbox-runtime) | default | bounded native receipt | Native filesystem/network restriction for selected commands |
-| [opentelemetry-collector](https://github.com/open-telemetry/opentelemetry-collector) | conditional | source review | Vendor-neutral telemetry collection and export |
-| [prometheus](https://github.com/prometheus/prometheus) | conditional | source review | Metrics scraping, time-series retention and alert rules |
-| [grafana](https://github.com/grafana/grafana) | conditional | source review | Operations dashboards and visualization |
+| [opentelemetry-collector](https://github.com/open-telemetry/opentelemetry-collector) | default | bounded native receipt | OpenTelemetry core runtime used by the adopted contrib distribution |
+| [opentelemetry-collector-contrib](https://github.com/open-telemetry/opentelemetry-collector-contrib) | default | bounded native receipt | Adopted native otelcol-contrib distribution and collection components |
+| [prometheus](https://github.com/prometheus/prometheus) | default | bounded native receipt | Metrics scraping, time-series retention and alert rules |
+| [grafana](https://github.com/grafana/grafana) | default | bounded native receipt | Operations dashboards and visualization |
+| [loki](https://github.com/grafana/loki) | default | bounded native receipt | Retained local sanitized operational logs and LogQL queries |
+| [alertmanager](https://github.com/prometheus/alertmanager) | default | bounded native receipt | Local alert grouping, deduplication and routing |
+| [ntfy](https://github.com/binwiederhier/ntfy) | default | bounded native receipt | Self-hosted local notification receipt and retrieval |
 | [langfuse](https://github.com/langfuse/langfuse) | alternative | source review | Shared LLM trace, prompt and evaluation platform |
 | [phoenix](https://github.com/Arize-ai/phoenix) | conditional | source review | Local trace inspection and evaluation workspace |
 | [inspect-ai](https://github.com/UKGovernmentBEIS/inspect_ai) | default | source review | Programmable task/solver/scorer evaluations |
@@ -121,7 +129,7 @@ The following decisions refer to architecture selection, not installation status
 1. Preserve the native worker and existing evidence; resolve native plugin workspace attribution upstream before claiming SDK file-tool parity.
 2. Add artifact-scoped SBOM and vulnerability reporting to the publication pipeline, with version, database timestamp and reviewable findings.
 3. Select one scheduler only when a concrete recurring research job is defined; prove cancellation and failure recovery using public fixtures before any broker integration.
-4. Add bounded metrics and one trace destination for persistent jobs; avoid exporting raw sessions by default.
+4. Maintain the adopted metrics/log/dashboard/local-alert path; add tracing only if a specific investigation requires it, with separate acceptance and retention.
 5. Treat managed hosting, distributed inference and the broker execution service as separate deployments with their own identity, operating costs and acceptance.
 
 ## Accepted follow-up integrations

@@ -807,32 +807,31 @@
       "layers": [
         "observability"
       ],
-      "role": "Vendor-neutral telemetry collection and export",
-      "decision": "conditional",
-      "rationale": "Start with one local OTLP collector when persistent workers/services exist; avoid installing multiple automatic trace exporters.",
+      "role": "OpenTelemetry core runtime used by the adopted contrib distribution",
+      "decision": "default",
+      "rationale": "Use one local Collector pipeline to receive native Codex/Claude metrics and sanitized operational logs. The accepted executable is otelcol-contrib; this core repository is a source dependency, not a second installed collector.",
       "version_or_commit": "v0.161.0",
       "release_date": "2026-09-14T22:49:14Z",
       "license": "Apache-2.0",
       "us_equities_fit": "Correlate task status, data freshness, queue latency and usage metadata without prompt bodies.",
       "alpaca_fit": "Keep order/account identifiers out of broad labels; privileged audit logs need a separate restricted sink.",
-      "evidence_level": "source_review",
+      "evidence_level": "native_proven",
       "evidence_refs": [
-        "https://github.com/open-telemetry/opentelemetry-collector/blob/v0.161.0/README.md"
+        "observability/receipt.json"
       ],
       "native_workflow": [
-        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
-        "gh release view v0.161.0 --repo open-telemetry/opentelemetry-collector-releases --json assets",
-        "otelcol validate --config=\"$OTEL_CONFIG\"",
-        "otelcol --config=\"$OTEL_CONFIG\""
+        "# Portable upstream commands; configure owned loopback endpoints and storage first. Executed scope is limited to the linked receipts.",
+        "otelcol-contrib validate --config=\"$OTEL_CONFIG\"",
+        "otelcol-contrib --config=\"$OTEL_CONFIG\""
       ],
       "requirements": [
         "Verified core or contrib distribution; explicit receivers/processors/exporters",
         "Loopback/private endpoints, bounded queues, redaction and retention"
       ],
       "limitations": [
-        "Core/contrib component inventories differ; collector is not a trace database or accounting source.",
-        "Config validation is not exporter delivery or sensitive-data review.",
-        "No endpoint, exporter or instrumentation enabled here."
+        "Native proof is through the contrib distribution using this core version; the standalone otelcol core binary was not separately exercised.",
+        "Collector delivery/redaction and native client task evidence are bounded by the receipt; no trace database, broker monitoring or external alert destination was accepted.",
+        "Local filter estimates and cache shares are not measured net provider savings; raw sessions remain outside public evidence."
       ],
       "sources": [
         "https://github.com/open-telemetry/opentelemetry-collector",
@@ -840,7 +839,51 @@
         "https://github.com/open-telemetry/opentelemetry-collector/blob/v0.161.0/README.md",
         "https://opentelemetry.io/docs/collector/configuration/",
         "https://opentelemetry.io/docs/security/handling-sensitive-data/",
-        "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.161.0"
+        "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.161.0",
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/v0.161.0",
+        "https://github.com/open-telemetry/opentelemetry-collector-releases/blob/v0.161.0/distributions/otelcol-contrib/manifest.yaml"
+      ]
+    },
+    {
+      "id": "opentelemetry-collector-contrib",
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "layers": [
+        "observability"
+      ],
+      "role": "Adopted native otelcol-contrib distribution and collection components",
+      "decision": "default",
+      "rationale": "The native distribution supplies the privacy transform, local file sink, Prometheus exporter and OTLP delivery to Loki used by the accepted stack; one process serves both native clients.",
+      "version_or_commit": "v0.161.0",
+      "release_date": "2026-09-15T15:05:47Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Correlate task status, data freshness, queue latency and usage metadata without prompt bodies.",
+      "alpaca_fit": "Keep order/account identifiers out of broad labels; privileged audit logs need a separate restricted sink.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "observability/receipt.json"
+      ],
+      "native_workflow": [
+        "# Portable upstream commands; configure owned loopback endpoints and storage first. Executed scope is limited to the linked receipts.",
+        "otelcol-contrib validate --config=\"$OTEL_CONFIG\"",
+        "otelcol-contrib --config=\"$OTEL_CONFIG\""
+      ],
+      "requirements": [
+        "Verified otelcol-contrib 0.161.0 binary from the official collector-releases repository; core and contrib are distinct source repositories.",
+        "Reviewed loopback receiver/exporter configuration, privacy allowlist, bounded queues/storage and distinct metric writer identities."
+      ],
+      "limitations": [
+        "The binary release was published on 2026-09-16; the contrib source release was published on 2026-09-15. Neither date is the core source release date.",
+        "Accepted scope: native metrics/log delivery, sanitized canary and real Codex/Claude tasks; traces are disabled and no trace database was deployed.",
+        "Restart/retry and writer-identity details remain receipt-specific; this is not high availability or exact whole-account billing."
+      ],
+      "sources": [
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.161.0",
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/README.md",
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.161.0/LICENSE",
+        "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.161.0",
+        "https://github.com/open-telemetry/opentelemetry-collector-releases/blob/v0.161.0/distributions/otelcol-contrib/manifest.yaml",
+        "https://opentelemetry.io/docs/security/handling-sensitive-data/"
       ]
     },
     {
@@ -850,30 +893,32 @@
         "observability"
       ],
       "role": "Metrics scraping, time-series retention and alert rules",
-      "decision": "conditional",
-      "rationale": "Add with long-running services; first metrics should be freshness, queue failures and provider throttle state.",
+      "decision": "default",
+      "rationale": "Adopted local metric store and rule evaluator for native client and service telemetry; independent per-process writers must remain distinguishable.",
       "version_or_commit": "v3.14.0",
       "release_date": "2026-08-18T08:49:40Z",
       "license": "Apache-2.0",
       "us_equities_fit": "Monitor delayed inputs, failed jobs, service capacity and missing reports.",
       "alpaca_fit": "Alpaca adapter metrics must expose bounded status categories, never secrets or high-cardinality order IDs.",
-      "evidence_level": "source_review",
+      "evidence_level": "native_proven",
       "evidence_refs": [
-        "https://github.com/prometheus/prometheus/blob/v3.14.0/README.md"
+        "observability/receipt.json",
+        "observability/backends/receipt.json"
       ],
       "native_workflow": [
-        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
-        "gh release view v3.14.0 --repo prometheus/prometheus --json assets",
+        "# Portable upstream commands; configure owned loopback endpoints and storage first. Executed scope is limited to the linked receipts.",
         "promtool check config \"$PROMETHEUS_CONFIG\"",
-        "prometheus --config.file=\"$PROMETHEUS_CONFIG\" --web.listen-address=127.0.0.1:9090"
+        "prometheus --config.file=\"$PROMETHEUS_CONFIG\" --storage.tsdb.path=\"$PROMETHEUS_DATA\" --web.listen-address=127.0.0.1:19090",
+        "curl --fail --silent --get http://127.0.0.1:19090/api/v1/query --data-urlencode query=up"
       ],
       "requirements": [
         "Native verified release binary; explicit scrape targets and disk retention",
         "Reviewed rule files and separate notification transport if alerts are required"
       ],
       "limitations": [
-        "No targets, alert delivery or availability policy configured here.",
-        "Metrics are aggregated operational indicators, not an immutable transaction ledger or exact provider bill."
+        "Accepted metrics ingestion/query, retained local storage and local rule/alert path only; no broker account, market-feed completeness or production availability claim.",
+        "Metrics are operational indicators, not an immutable transaction ledger or a subscription invoice.",
+        "Compare native final usage and completed-turn metrics; Codex transport startup prewarm can add token-bearing log events outside model-turn totals."
       ],
       "sources": [
         "https://github.com/prometheus/prometheus",
@@ -889,29 +934,31 @@
         "observability"
       ],
       "role": "Operations dashboards and visualization",
-      "decision": "conditional",
-      "rationale": "Use after metrics/traces exist; a dashboard alone adds no evidence or failure handling.",
+      "decision": "default",
+      "rationale": "Adopted local dashboards query the accepted Prometheus and Loki stores; visualization is tied to receipts rather than a new model-evaluation framework.",
       "version_or_commit": "v13.2.2",
       "release_date": "2026-09-15T12:21:32Z",
       "license": "AGPL-3.0-only with documented component exceptions",
       "us_equities_fit": "Visualize data age, model/task health and backtest metadata with clear units.",
       "alpaca_fit": "Separate research views from restricted broker dashboards.",
-      "evidence_level": "source_review",
+      "evidence_level": "native_proven",
       "evidence_refs": [
-        "https://github.com/grafana/grafana/blob/v13.2.2/README.md"
+        "observability/receipt.json",
+        "observability/backends/receipt.json"
       ],
       "native_workflow": [
-        "# Prospective commands; not executed for this catalog. Historical proof, if any, is only in evidence_refs.",
-        "gh release view v13.2.2 --repo grafana/grafana",
-        "grafana server --help"
+        "# Portable upstream commands; configure owned loopback endpoints and storage first. Executed scope is limited to the linked receipts.",
+        "grafana server --homepath \"$GRAFANA_HOME\" --config \"$GRAFANA_CONFIG\"",
+        "curl --fail --silent http://127.0.0.1:13000/api/health"
       ],
       "requirements": [
-        "Supported OSS distribution; explicit data-source credentials and authentication",
-        "Retention handled by underlying stores; dashboard provisioning/versioning"
+        "Verified Grafana OSS 13.2.2 distribution, explicit loopback binding and reviewed local authentication.",
+        "Provisioned Prometheus/Loki data sources and dashboards; underlying stores own retention."
       ],
       "limitations": [
-        "AGPL3 applies to Grafana with component exceptions; managed service terms are separate.",
-        "Help command is discovery only; no dashboards or external access created."
+        "Native proof covers local health, provisioned data sources/dashboard queries and the receipt-specific UI checks; no external dashboard publication or high availability.",
+        "AGPL-3.0-only applies with documented component exceptions; hosted-service terms are separate.",
+        "A successful dashboard query does not validate profitable strategy performance or maximum token efficiency."
       ],
       "sources": [
         "https://github.com/grafana/grafana",
@@ -919,6 +966,131 @@
         "https://github.com/grafana/grafana/blob/v13.2.2/README.md",
         "https://grafana.com/docs/grafana/latest/setup-grafana/installation/",
         "https://github.com/grafana/grafana/blob/v13.2.2/LICENSE"
+      ]
+    },
+    {
+      "id": "loki",
+      "repository": "https://github.com/grafana/loki",
+      "layers": [
+        "observability"
+      ],
+      "role": "Retained local sanitized operational logs and LogQL queries",
+      "decision": "default",
+      "rationale": "Use one local log store behind the same privacy-filtered Collector, complementing Prometheus metrics without storing raw conversations.",
+      "version_or_commit": "v3.7.8",
+      "release_date": "2026-09-17T15:51:10Z",
+      "license": "AGPL-3.0-only with Apache-2.0 component exceptions",
+      "us_equities_fit": "Retain bounded task/error/tool-event metadata for research incident review.",
+      "alpaca_fit": "Observes research/runtime status only; no broker connection, order submission or broker reconciliation was exercised.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "observability/backends/receipt.json",
+        "observability/receipt.json"
+      ],
+      "native_workflow": [
+        "# Portable upstream commands; configure owned loopback endpoints and storage first. Executed scope is limited to the linked receipts.",
+        "loki -config.file=\"$LOKI_CONFIG\"",
+        "curl --fail --silent http://127.0.0.1:13100/ready"
+      ],
+      "requirements": [
+        "Verified native Loki binary; explicit loopback listener, schema, storage and retention configuration.",
+        "Collector sanitization before ingestion; bounded indexed labels and restricted local data directory."
+      ],
+      "limitations": [
+        "Accepted local ingestion/query and receipt-specific storage retention/restart evidence only; no high-availability cluster or full transcript archive.",
+        "Loki indexes labels rather than all log content; sanitized logs cannot reconstruct removed prompt/tool payloads.",
+        "No tracing database or external telemetry destination was installed."
+      ],
+      "sources": [
+        "https://github.com/grafana/loki/releases/tag/v3.7.8",
+        "https://github.com/grafana/loki/blob/v3.7.8/README.md",
+        "https://github.com/grafana/loki/blob/v3.7.8/LICENSE",
+        "https://github.com/grafana/loki/blob/v3.7.8/LICENSING.md",
+        "https://grafana.com/docs/loki/latest/send-data/otel/"
+      ]
+    },
+    {
+      "id": "alertmanager",
+      "repository": "https://github.com/prometheus/alertmanager",
+      "layers": [
+        "observability"
+      ],
+      "role": "Local alert grouping, deduplication and routing",
+      "decision": "default",
+      "rationale": "Separate rule evaluation in Prometheus from grouping/routing and retained local alert delivery; keep receivers on loopback for this acceptance.",
+      "version_or_commit": "v0.34.1",
+      "release_date": "2026-09-17T08:12:07Z",
+      "license": "Apache-2.0",
+      "us_equities_fit": "Route operational research failures while preserving bounded retries and alert identity.",
+      "alpaca_fit": "Observes research/runtime status only; no broker connection, order submission or broker reconciliation was exercised.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "observability/backends/receipt.json",
+        "observability/receipt.json"
+      ],
+      "native_workflow": [
+        "# Portable upstream commands; configure owned loopback endpoints and storage first. Executed scope is limited to the linked receipts.",
+        "amtool check-config \"$ALERTMANAGER_CONFIG\"",
+        "alertmanager --config.file=\"$ALERTMANAGER_CONFIG\" --storage.path=\"$ALERTMANAGER_DATA\" --web.listen-address=127.0.0.1:19093 --cluster.listen-address=",
+        "amtool --alertmanager.url=http://127.0.0.1:19093 alert query"
+      ],
+      "requirements": [
+        "Verified Alertmanager/amtool release; reviewed routes/receivers and owned storage.",
+        "Native ntfy Alertmanager template endpoint (?template=alertmanager) as configured in the accepted local webhook route; no custom notification bridge is required."
+      ],
+      "limitations": [
+        "Receipt proves the local alert path only; no external phone, email, Slack or paging destination was configured.",
+        "Alert deduplication does not provide broker-order idempotency or reconciliation.",
+        "No high-availability cluster or unattended remediation was accepted."
+      ],
+      "sources": [
+        "https://github.com/prometheus/alertmanager/releases/tag/v0.34.1",
+        "https://github.com/prometheus/alertmanager/blob/v0.34.1/README.md",
+        "https://github.com/prometheus/alertmanager/blob/v0.34.1/LICENSE",
+        "https://prometheus.io/docs/alerting/latest/configuration/"
+      ]
+    },
+    {
+      "id": "ntfy",
+      "repository": "https://github.com/binwiederhier/ntfy",
+      "layers": [
+        "observability"
+      ],
+      "role": "Self-hosted local notification receipt and retrieval",
+      "decision": "default",
+      "rationale": "Provide an inspectable local notification sink for the accepted alert chain without configuring external messaging or push accounts.",
+      "version_or_commit": "v2.28.0",
+      "release_date": "2026-08-27T20:27:10Z",
+      "license": "Apache-2.0 OR GPL-2.0-only (dual license; third-party assets have separate notices)",
+      "us_equities_fit": "Retain local incident notifications for research workflow observation.",
+      "alpaca_fit": "Observes research/runtime status only; no broker connection, order submission or broker reconciliation was exercised.",
+      "evidence_level": "native_proven",
+      "evidence_refs": [
+        "observability/backends/receipt.json",
+        "observability/receipt.json"
+      ],
+      "native_workflow": [
+        "# Portable upstream commands; configure owned loopback endpoints and storage first. Executed scope is limited to the linked receipts.",
+        "ntfy serve --config \"$NTFY_CONFIG\"",
+        "curl --fail --silent http://127.0.0.1:18080/v1/health"
+      ],
+      "requirements": [
+        "Verified native ntfy binary; explicit loopback base/listen URL, owned cache and reviewed topic authorization.",
+        "Local alert delivery integration; external push services and mobile clients are separate decisions."
+      ],
+      "limitations": [
+        "Accepted local message publication/retrieval and retained storage only; no delivery to a phone, email address or external topic.",
+        "The accepted webhook uses ntfy's native ?template=alertmanager integration; a plain arbitrary webhook endpoint is not equivalent.",
+        "No claim of guaranteed delivery, remote alerting or operational response coverage."
+      ],
+      "sources": [
+        "https://github.com/binwiederhier/ntfy/releases/tag/v2.28.0",
+        "https://github.com/binwiederhier/ntfy/blob/v2.28.0/README.md",
+        "https://github.com/binwiederhier/ntfy/blob/v2.28.0/LICENSE",
+        "https://github.com/binwiederhier/ntfy/blob/v2.28.0/LICENSE.GPLv2",
+        "https://docs.ntfy.sh/config/",
+        "https://docs.ntfy.sh/publish/",
+        "https://docs.ntfy.sh/publish/#webhooks-publish-templates"
       ]
     },
     {

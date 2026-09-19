@@ -2221,6 +2221,12 @@
       ]
     },
     {
+      "repository": "https://github.com/binwiederhier/ntfy",
+      "catalog_entry_ids": [
+        "ntfy"
+      ]
+    },
+    {
       "repository": "https://github.com/blue-yonder/tsfresh",
       "catalog_entry_ids": [
         "data-tsfresh"
@@ -2338,6 +2344,12 @@
       "repository": "https://github.com/grafana/grafana",
       "catalog_entry_ids": [
         "grafana"
+      ]
+    },
+    {
+      "repository": "https://github.com/grafana/loki",
+      "catalog_entry_ids": [
+        "loki"
       ]
     },
     {
@@ -2463,6 +2475,12 @@
       ]
     },
     {
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "catalog_entry_ids": [
+        "opentelemetry-collector-contrib"
+      ]
+    },
+    {
       "repository": "https://github.com/openai/codex",
       "catalog_entry_ids": [
         "codex-native-sdk"
@@ -2514,6 +2532,12 @@
       "repository": "https://github.com/polakowo/vectorbt",
       "catalog_entry_ids": [
         "vectorbt"
+      ]
+    },
+    {
+      "repository": "https://github.com/prometheus/alertmanager",
+      "catalog_entry_ids": [
+        "alertmanager"
       ]
     },
     {
@@ -2719,5 +2743,16 @@
     "dagu-org/dagu": "dagucloud/dagu",
     "zed-industries/codex-acp": "agentclientprotocol/codex-acp",
     "polygon-io/client-python": "massive-com/client-python"
+  },
+  "latest_public_refresh": {
+    "checked_at": "2026-09-19",
+    "endpoint": "GET /users/{account}/starred?per_page=100 (paginated; account omitted)",
+    "public_flag_filter": "private == false",
+    "public_repositories": 337,
+    "added_since_recorded_snapshot": 0,
+    "removed_since_recorded_snapshot": 0,
+    "public_set_sha256": "aa8458fd3838d4a2cd72cd9abd13027274be81d15f11883fdac94682ac561c50",
+    "hash_method": "Lowercase public owner/repository identities sorted, joined with newline and one final newline; SHA-256.",
+    "scope": "Fresh identity comparison only; prior per-repository source review and runtime evidence were not repeated."
   }
 }

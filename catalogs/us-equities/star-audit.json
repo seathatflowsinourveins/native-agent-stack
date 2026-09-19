@@ -12375,5 +12375,16 @@
       "archived": false,
       "relevance": "Existing selected or compared component; relevance inherited from the linked card."
     }
-  ]
+  ],
+  "latest_public_refresh": {
+    "checked_at": "2026-09-19",
+    "endpoint": "GET /users/{account}/starred?per_page=100 (paginated; account omitted)",
+    "public_flag_filter": "private == false",
+    "public_repositories": 337,
+    "added_since_recorded_snapshot": 0,
+    "removed_since_recorded_snapshot": 0,
+    "public_set_sha256": "aa8458fd3838d4a2cd72cd9abd13027274be81d15f11883fdac94682ac561c50",
+    "hash_method": "Lowercase public owner/repository identities sorted, joined with newline and one final newline; SHA-256.",
+    "scope": "Fresh identity comparison only; prior per-repository source review and runtime evidence were not repeated."
+  }
 }
