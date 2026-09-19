@@ -1,0 +1,13 @@
+# Adapt paths before installing as a user service. No timer is supplied.
+[Unit]
+Description=Native restic backup of selected public agent stack reference files
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/code/native-agent-stack
+EnvironmentFile=%h/.config/native-agent-backup/backup.env
+ExecStart=%h/.local/share/codex-ecosystem/bin/restic backup --files-from-verbatim blueprints/us-equities/hosting/backup/selected-files.txt --host native-agent-stack-reference --tag public-reference --json
+UMask=0077
+NoNewPrivileges=true
+Nice=10
+TimeoutStartSec=30min

@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "id": "restic-local-public-reference-20260919",
+  "observed_at_utc": "2026-09-19T16:03:18Z",
+  "status": "passed_selected_file_local_backup_restore",
+  "source_git_commit": "1d6c3d2f67aaef8e381193385360bb81b1b022d9",
+  "scope": "Explicit public reference files only; same-host encrypted repository and fresh restore directory.",
+  "upstream": {
+    "repository": "https://github.com/restic/restic",
+    "release_url": "https://github.com/restic/restic/releases/tag/v0.19.1",
+    "release_tag": "v0.19.1",
+    "release_published_at": "2026-07-05T08:13:33Z",
+    "latest_stable_verified_at_utc": "2026-09-19",
+    "native_version_output": "restic 0.19.1 compiled with go1.26.4 on linux/amd64",
+    "platform": "linux/amd64",
+    "asset": "restic_0.19.1_linux_amd64.bz2",
+    "archive_sha256": "f415415624dcc452f2a02b8c33641791a8c6d6d3b65bbb3543fcf9a25151585c",
+    "binary_sha256": "20d4142678d0d95ec11a4759def1b73fd9190abc9ca19e4b62d067c0b387e639",
+    "publisher_signature_primary_fingerprint": "CF8F18F2844575973F79D4E191A6868BD3F7A907",
+    "signed_checksums_verified": true
+  },
+  "source": {
+    "selection_file": "selected-files.txt",
+    "hash_file": "source.sha256",
+    "regular_files": 22,
+    "bytes": 160642,
+    "symlinks": 0,
+    "live_databases": 0
+  },
+  "native_results": {
+    "init": {
+      "exit_code": 0,
+      "repository_format_version": 2
+    },
+    "backup": {
+      "exit_code": 0,
+      "message_type": "summary",
+      "files_new": 22,
+      "files_changed": 0,
+      "files_unmodified": 0,
+      "dirs_new": 8,
+      "dirs_changed": 0,
+      "dirs_unmodified": 0,
+      "data_blobs": 22,
+      "tree_blobs": 9,
+      "data_added": 172105,
+      "data_added_packed": 56711,
+      "total_files_processed": 22,
+      "total_bytes_processed": 160642,
+      "total_duration": 0.747856994,
+      "backup_start": "2026-09-19T12:03:14.543459756-04:00",
+      "backup_end": "2026-09-19T12:03:15.291316749-04:00",
+      "snapshot_id": "926fe5f06854393a84dd693bddda367f9cd15367a1d04da07eb9e09a94ac6c73"
+    },
+    "snapshots": {
+      "exit_code": 0,
+      "count": 1,
+      "snapshot_id": "926fe5f06854393a84dd693bddda367f9cd15367a1d04da07eb9e09a94ac6c73"
+    },
+    "check_read_data": {
+      "exit_code": 0,
+      "snapshots_checked": 1,
+      "packs_read": 2,
+      "output_conclusion": "no errors were found"
+    },
+    "restore_verify": {
+      "exit_code": 0,
+      "message_type": "summary",
+      "total_files": 30,
+      "files_restored": 30,
+      "total_bytes": 160642,
+      "bytes_restored": 160642,
+      "interpretation": "Native total_files counts 22 regular files plus 8 directories."
+    },
+    "sha256sum_check": {
+      "exit_code": 0,
+      "ok_lines": 22
+    },
+    "independent_byte_comparison": {
+      "same_file_set": true,
+      "matched_regular_files": 22,
+      "matched_bytes": 160642
+    },
+    "retention_dry_run": {
+      "exit_code": 0,
+      "policy": "keep-last 7, grouped by host,paths,tags; tag public-reference",
+      "keep": 1,
+      "remove": 0,
+      "deletions_performed": 0
+    },
+    "systemd_unit_example_verify": {
+      "command": "systemd-analyze --user verify native-agent-reference-backup.service",
+      "exit_code": 0,
+      "installed_or_run": false,
+      "initial_attempt": "Failed before unit validation because the sandbox lacked the user runtime directory. Repeated with the existing user runtime environment; passed."
+    }
+  },
+  "private_material": {
+    "repository_encrypted": true,
+    "password_file_mode": "0600",
+    "private_root_mode": "0700",
+    "raw_outputs_retained_privately": true,
+    "password_generated_without_prompt_or_log_exposure": true,
+    "separate_key_escrow": "not_configured"
+  },
+  "operational_status": {
+    "native_binary_installed": true,
+    "backup_timer_enabled": false,
+    "backup_service_enabled": false,
+    "off_host_destination": false,
+    "model_calls": 0,
+    "token_savings_claimed": false
+  },
+  "limitations": [
+    "Only listed static public files at the recorded source commit were backed up. This does not include future integration changes.",
+    "The local repository, restore, and password share the source host; host or volume loss remains unprotected.",
+    "No live SQLite, Qdrant, Loki, Prometheus, broker/order journal, client credentials, or transcript backup was attempted.",
+    "No application-consistent database restore, retention deletion, automatic scheduling, or external paging acceptance.",
+    "Credential loss recovery requires separately approved secure key escrow."
+  ],
+  "evidence_processing_notes": [
+    "The initial retention JSON summary reader encountered remove:null; it was corrected to count the absent remove list as empty. The native retention command itself exited 0 and was not rerun."
+  ]
+}
