@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "id": "deerflow-native-discovery",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-19T05:56:32.640247+00:00",
+  "component_ids": [
+    "deerflow",
+    "codex-acp"
+  ],
+  "claim": "Pinned DeerFlow backend discovery and local health passed; native ACP initialized and created a read-only Astra session without a prompt.",
+  "limitations": [
+    "Model-free infrastructure acceptance; no research prompt, model inference, provider-token saving, broker call or trade was demonstrated.",
+    "ACP discovery uses the upstream SDK primitives used by DeerFlow; DeerFlow invoke_acp_agent was not invoked because it always submits a prompt.",
+    "Development source snapshot, distinct from the older stable v2.0.0 release.",
+    "Memory, scheduling and host shell execution were disabled; the discovery database is in memory.",
+    "Native raw logs remain private; public fields are selected, sanitized observations.",
+    "Both temporary native processes exited after the acceptance; no standing service was configured."
+  ],
+  "sources": {
+    "deerflow": {
+      "repository": "https://github.com/bytedance/deer-flow",
+      "commit": "42334f26d7025d905678f9075b079fc65f9beaf9",
+      "backend_version": "2.1.0-rc0",
+      "license": "MIT"
+    },
+    "codex_acp": {
+      "repository": "https://github.com/agentclientprotocol/codex-acp",
+      "npm_package": "@agentclientprotocol/codex-acp",
+      "version": "1.12.0",
+      "license": "Apache-2.0"
+    }
+  },
+  "results": {
+    "install": {
+      "uv_exit_code": 0,
+      "uv_packages_resolved": 250,
+      "uv_packages_installed": 224,
+      "npm_exit_code": 0,
+      "npm_packages_added": 20
+    },
+    "sdk": {
+      "exit_code": 0,
+      "configured_model_count": 0,
+      "upstream_skill_count": 23
+    },
+    "gateway": {
+      "health_http_status": 200,
+      "health_response": {
+        "status": "healthy",
+        "service": "deer-flow-gateway"
+      },
+      "unauthenticated_models_http_status": 401,
+      "graceful_shutdown_observed": true
+    },
+    "acp": {
+      "exit_code": 0,
+      "protocol_version": 1,
+      "adapter": {
+        "name": "@agentclientprotocol/codex-acp",
+        "title": "Codex",
+        "version": "1.12.0"
+      },
+      "session_configuration": {
+        "mode": "read-only",
+        "collaboration_mode": "default",
+        "model": "gpt-6-astra",
+        "reasoning_effort": "high",
+        "fast-mode": "off"
+      },
+      "native_model_choices": [
+        "gpt-6-astra",
+        "gpt-5.6-sol",
+        "gpt-5.6-terra",
+        "gpt-5.6-luna",
+        "gpt-5.5"
+      ],
+      "prompt_calls": 0,
+      "authentication_method_calls": 0,
+      "model_inference_submitted": false
+    },
+    "cleanup": {
+      "gateway_process_exited": true,
+      "acp_process_exited": true
+    }
+  },
+  "commands": [
+    "uv sync --locked --project backend",
+    "npm install --global --prefix \"$ACP_PREFIX\" --ignore-scripts --no-audit --no-fund @agentclientprotocol/codex-acp@1.12.0",
+    "uv run --locked python -c 'from deerflow.client import DeerFlowClient; import json; c=DeerFlowClient(config_path=\"../config.yaml\"); print(json.dumps({\"models\":c.list_models(),\"skills\":c.list_skills()}))'",
+    "uv run --locked uvicorn app.gateway.app:app --host 127.0.0.1 --port 8232",
+    "GET http://127.0.0.1:8232/health",
+    "GET http://127.0.0.1:8232/api/models",
+    "uv run --locked python \"$STACK_REPO/blueprints/us-equities/deerflow/acp-discovery.py\""
+  ],
+  "private_record_fingerprints": [
+    {
+      "name": "uv-sync.log",
+      "sha256": "788b89d3fadf53ec37c0424be61dbfaa4f4b75b753aab5b861ebef0bc29e6ce0",
+      "bytes": 7589,
+      "distributed": false
+    },
+    {
+      "name": "acp-install.log",
+      "sha256": "90c78431f521fdbc38ea9a86f54b369f44eea4efafeed1a79f4dd23c79e20f7a",
+      "bytes": 25,
+      "distributed": false
+    },
+    {
+      "name": "sdk-discovery.json",
+      "sha256": "fe5a80a02a0993f52b9ff734dafeb9c1c5b3ecfb3dbfc714bedb8bbb4ace975e",
+      "bytes": 10325,
+      "distributed": false
+    },
+    {
+      "name": "gateway-health.json",
+      "sha256": "9b2ee16d989ac9ca12717ddba2f5d10270de693221abd8e0e4964dff806812b4",
+      "bytes": 269,
+      "distributed": false
+    },
+    {
+      "name": "acp-discovery.json",
+      "sha256": "42312a8b0523f6652f75662ed7ef1d33d8628776741f19eb276f27ce1c7e449e",
+      "bytes": 13061,
+      "distributed": false
+    },
+    {
+      "name": "process-cleanup.json",
+      "sha256": "e3955b05e6cd25829469ddd4277a22bd9a6014b25e08db628c37343d33e1a308",
+      "bytes": 180,
+      "distributed": false
+    }
+  ]
+}

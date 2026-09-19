@@ -1,0 +1,17 @@
+# Model-free infrastructure acceptance. No chat, background work or host shell.
+models: []
+tools: []
+tool_groups: []
+sandbox:
+  use: deerflow.sandbox.local:LocalSandboxProvider
+  allow_host_bash: false
+memory:
+  enabled: false
+  injection_enabled: false
+  manager_class: noop
+scheduler:
+  enabled: false
+database:
+  backend: memory
+token_usage:
+  enabled: true
