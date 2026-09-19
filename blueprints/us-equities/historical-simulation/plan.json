@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "spy-known-crash-exposure-stress-v1",
+  "frozen_before_native_execution": true,
+  "start": "2019-12-02",
+  "end": "2020-04-30",
+  "initial_cash_usd": "100000",
+  "entry_decision": "2019-12-31 completed regular session; next-session market-on-open",
+  "exit_decision": "2020-04-29 completed regular session; next-session market-on-open",
+  "requested_target_sizing_multiplier": "0.98",
+  "adaptive_rule": "At a completed 16:00 New York session close, if portfolio equity is at least 5% below its observed peak, reduce requested gross target from 2 to 0.5 at the next market open. One-way latch; no retuning or recovery switch.",
+  "risk_peak": "Mark-to-market equity observed at each received hourly bar; decision only at session close. Excludes unobserved intrabar path.",
+  "buying_power_model": "Upstream SecurityMarginModel(2m), constant illustrative 50% initial/maintenance requirement; native DefaultMarginCallModel remains enabled. This is not Alpaca compliance.",
+  "price_data": "Bundled LEAN SPY hourly trade bars, raw normalization; no tick/quote or availability attestation.",
+  "dividends": "Record native raw-data cash distributions and include them in reconciliation; reject unexpected splits.",
+  "financing": "No financing/borrow interest configured; no funding-inclusive investment claim.",
+  "cases": [
+    {"id": "one_zero", "target": "1", "fee_usd": "0", "slippage": "0", "adaptive": false, "reject": false},
+    {"id": "one_stress", "target": "1", "fee_usd": "1", "slippage": "0.002", "adaptive": false, "reject": false},
+    {"id": "two_zero", "target": "2", "fee_usd": "0", "slippage": "0", "adaptive": false, "reject": false},
+    {"id": "two_stress", "target": "2", "fee_usd": "1", "slippage": "0.002", "adaptive": false, "reject": false},
+    {"id": "adaptive_stress", "target": "2", "fee_usd": "1", "slippage": "0.002", "adaptive": true, "reject": false},
+    {"id": "over_limit", "target": "4", "fee_usd": "1", "slippage": "0.002", "adaptive": false, "reject": true}
+  ],
+  "acceptance": [
+    "Native completion and no data request failures",
+    "Every discretionary fill strictly after its recorded decision",
+    "Flat final positions and fill/fee/distribution cash reconciliation",
+    "Actual insufficient-buying-power rejection and zero fills in over_limit",
+    "Exactly one adaptive reduction decision; observe margin calls rather than suppressing them",
+    "Preserve all six outcomes, input hashes and exact commands; do not rank or promote a winner"
+  ],
+  "scope": "Known-stress development interval chosen before runs, not an untouched holdout. Mechanics only; no catalyst, +200% mover, full PIT universe, actual margin account, capacity or strategy validation."
+}

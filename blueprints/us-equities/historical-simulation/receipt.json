@@ -1,0 +1,1745 @@
+{
+  "schema_version": 1,
+  "id": "native-historical-leverage-stress-20260919",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "lean"
+  ],
+  "observed_utc": "2026-09-19T22:01:06Z",
+  "status": "accepted_for_known_stress_exposure_and_margin_mechanics_only",
+  "claim": "Six frozen local LEAN simulations completed: five invested scenarios finished flat with native fill/fee/dividend cash reconciliation; an over-limit scenario received one native buying-power rejection and zero fills. Native default margin liquidations are retained, not suppressed.",
+  "engine": {
+    "repository": "QuantConnect/Lean",
+    "source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+    "variant": "Previously accepted three-package-reference remediation; this wave compiles only the local algorithm.",
+    "dotnet_sdk": "10.0.401",
+    "launcher_sha256": "e5bf96c89942f1148c8ab3d9b5f4a0171ae7a1dbfb437232c8bd773da31be8ea"
+  },
+  "plan": {
+    "path": "plan.json",
+    "bytes": 2740,
+    "sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632",
+    "written_before_native_commands": true,
+    "parameter_tuning_after_results": false
+  },
+  "data": {
+    "symbol": "SPY",
+    "source": "Bundled upstream LEAN sample files, not an acquired/accepted vendor dataset",
+    "first_session": "2019-12-02",
+    "last_session": "2020-04-30",
+    "expected_xnys_sessions": 104,
+    "daily_rows_in_window": 104,
+    "hourly_rows_in_window": 725,
+    "missing_session_dates": [],
+    "extra_session_dates": [],
+    "session_date_check": "Existing exchange-calendars XNYS schedule; date coverage does not prove row/market coverage or source availability.",
+    "native_data_points_per_case": 1457,
+    "callback_marks_per_case": 725,
+    "requested_paths": [
+      "/equity/usa/hour/spy.zip",
+      "/alternative/interest-rate/usa/interest-rate.csv",
+      "/equity/usa/daily/spy.zip"
+    ],
+    "normalization": "Raw",
+    "selected_file_hashes": {
+      "Data/equity/usa/hour/spy.zip": "27af83adec03a3dff2bfda0d4edc077a5085f83a8b71f4ac156af3480e2e99d4",
+      "Data/equity/usa/daily/spy.zip": "aaa1febad0cb8f91011212c92ff7caac6d4d6415a3b7f73c4b98c438db4274ad",
+      "Data/equity/usa/map_files/spy.csv": "4765f330a156d4b0c521c094abf9747c4c7ccaf8e10c15ca50db16887d36d3cf",
+      "Data/equity/usa/factor_files/spy.csv": "ad53e292de2e7076ff36721e1dcffd1db0d04fe6813b59aeece8620fb0d4cec1",
+      "Data/alternative/interest-rate/usa/interest-rate.csv": "1d0e6f2ab20e61a4330e8a38735bc73cde4034e7293a45d23b5ebdc6467f7899"
+    }
+  },
+  "cases": [
+    {
+      "end_cash_usd": "90734.080",
+      "native_end_equity_usd": "90734.08",
+      "cash_pnl_usd": "-9265.920",
+      "fees_usd": "0.0",
+      "dividends_usd": "428.64",
+      "fill_count": 2,
+      "invalid_count": 0,
+      "mark_count": 725,
+      "max_observed_gross": "0.9844074907649778604104997921",
+      "max_observed_drawdown": "0.3398044743988061746214252514",
+      "minimum_observed_margin_remaining": "35573.28000",
+      "margin_warning_count": 0,
+      "margin_calls": [],
+      "reductions": [],
+      "intents": [
+        {
+          "kind": "intent",
+          "utc_seconds": 1577826000,
+          "local": "2019-12-31T16:00:00.0000000",
+          "order_id": 1,
+          "quantity": 304,
+          "target": 1,
+          "reason": "entry",
+          "status": "Submitted"
+        },
+        {
+          "kind": "intent",
+          "utc_seconds": 1588190400,
+          "local": "2020-04-29T16:00:00.0000000",
+          "order_id": 2,
+          "quantity": -304,
+          "target": 0,
+          "reason": "exit",
+          "status": "Submitted"
+        }
+      ],
+      "fills": [
+        {
+          "orderId": 1,
+          "time": "1577977200.0",
+          "fillPrice": "323.58",
+          "fillQuantity": "304.0",
+          "orderFeeAmount": "0.0",
+          "message": 0
+        },
+        {
+          "orderId": 2,
+          "time": "1588255200.0",
+          "fillPrice": "291.69",
+          "fillQuantity": "-304.0",
+          "orderFeeAmount": "0.0",
+          "message": 0
+        }
+      ],
+      "final_quantity": "0",
+      "id": "one_zero",
+      "specification": {
+        "id": "one_zero",
+        "target": "1",
+        "fee_usd": "0",
+        "slippage": "0",
+        "adaptive": false,
+        "reject": false
+      },
+      "failed_data_request_bytes": 0,
+      "succeeded_data_requests": [
+        "/equity/usa/hour/spy.zip",
+        "/alternative/interest-rate/usa/interest-rate.csv",
+        "/equity/usa/daily/spy.zip"
+      ],
+      "summary_sha256": "d1b136f013c20578d8c191b0319e1d950b74088df032d3f30fd04fcb0b973bee",
+      "events_sha256": "e5c8a1f18a3591e0fd334669a3ed2d82f3377b48687d2564e21affe0eb8f0133",
+      "audit_sha256": "92e0a9354ae413a23e39c0b2658a20854e2b2c3fa69f94073cc1706e43627dcb",
+      "native_result_sha256": "17f01267d2f88eb53b0abe5e4f0b49532adebd7478fa2097b74fefd0fb08bfd6",
+      "margin_call_count": 0,
+      "reduction_count": 0,
+      "status": "completed_historical_stress_only"
+    },
+    {
+      "end_cash_usd": "90357.995840",
+      "native_end_equity_usd": "90358.00",
+      "cash_pnl_usd": "-9642.004160",
+      "fees_usd": "2.0",
+      "dividends_usd": "428.64",
+      "fill_count": 2,
+      "invalid_count": 0,
+      "mark_count": 725,
+      "max_observed_gross": "0.9862711413740484920081007954",
+      "max_observed_drawdown": "0.3404477819941050938741295816",
+      "minimum_observed_margin_remaining": "35375.54336",
+      "margin_warning_count": 0,
+      "margin_calls": [],
+      "reductions": [],
+      "intents": [
+        {
+          "kind": "intent",
+          "utc_seconds": 1577826000,
+          "local": "2019-12-31T16:00:00.0000000",
+          "order_id": 1,
+          "quantity": 304,
+          "target": 1,
+          "reason": "entry",
+          "status": "Submitted"
+        },
+        {
+          "kind": "intent",
+          "utc_seconds": 1588190400,
+          "local": "2020-04-29T16:00:00.0000000",
+          "order_id": 2,
+          "quantity": -304,
+          "target": 0,
+          "reason": "exit",
+          "status": "Submitted"
+        }
+      ],
+      "fills": [
+        {
+          "orderId": 1,
+          "time": "1577977200.0",
+          "fillPrice": "324.22716",
+          "fillQuantity": "304.0",
+          "orderFeeAmount": "1.0",
+          "message": 0
+        },
+        {
+          "orderId": 2,
+          "time": "1588255200.0",
+          "fillPrice": "291.10662",
+          "fillQuantity": "-304.0",
+          "orderFeeAmount": "1.0",
+          "message": 0
+        }
+      ],
+      "final_quantity": "0",
+      "id": "one_stress",
+      "specification": {
+        "id": "one_stress",
+        "target": "1",
+        "fee_usd": "1",
+        "slippage": "0.002",
+        "adaptive": false,
+        "reject": false
+      },
+      "failed_data_request_bytes": 0,
+      "succeeded_data_requests": [
+        "/equity/usa/hour/spy.zip",
+        "/alternative/interest-rate/usa/interest-rate.csv",
+        "/equity/usa/daily/spy.zip"
+      ],
+      "summary_sha256": "a89830fedf930e4a1a92249a1161c23926be0c3d2f72301dd51a5da7e8a1440b",
+      "events_sha256": "c489d559d66f386381cc68d209c9087b50b6039460f98a30a90c3d345e5ab606",
+      "audit_sha256": "a3bf226d9244c77e5683b0464f7512e59cf1df51357b37c4c5fffffe738d9bd5",
+      "native_result_sha256": "c889380fbff1d95b292978da46492affaa212ae0a2c6aaf8507f27c693380c6b",
+      "margin_call_count": 0,
+      "reduction_count": 0,
+      "status": "completed_historical_stress_only"
+    },
+    {
+      "end_cash_usd": "76310.340",
+      "native_end_equity_usd": "76310.34",
+      "cash_pnl_usd": "-23689.660",
+      "fees_usd": "0.0",
+      "dividends_usd": "613.35",
+      "fill_count": 5,
+      "invalid_count": 0,
+      "mark_count": 725,
+      "max_observed_gross": "2.185250333632878013997828888",
+      "max_observed_drawdown": "0.585196354221566353958047855",
+      "minimum_observed_margin_remaining": "-6293.60000",
+      "margin_warning_count": 264,
+      "margin_calls": [
+        {
+          "kind": "margin_call",
+          "utc_seconds": 1582902000,
+          "count": 1,
+          "equity": "78118.0800",
+          "margin_remaining": "-9309.28000"
+        },
+        {
+          "kind": "margin_call",
+          "utc_seconds": 1584021600,
+          "count": 1,
+          "equity": "62387.3700",
+          "margin_remaining": "-7827.96000"
+        },
+        {
+          "kind": "margin_call",
+          "utc_seconds": 1584550800,
+          "count": 1,
+          "equity": "51354.3900",
+          "margin_remaining": "-5456.54000"
+        }
+      ],
+      "reductions": [],
+      "intents": [
+        {
+          "kind": "intent",
+          "utc_seconds": 1577826000,
+          "local": "2019-12-31T16:00:00.0000000",
+          "order_id": 1,
+          "quantity": 608,
+          "target": 2,
+          "reason": "entry",
+          "status": "Submitted"
+        },
+        {
+          "kind": "intent",
+          "utc_seconds": 1588190400,
+          "local": "2020-04-29T16:00:00.0000000",
+          "order_id": 5,
+          "quantity": -435,
+          "target": 0,
+          "reason": "exit",
+          "status": "Submitted"
+        }
+      ],
+      "fills": [
+        {
+          "orderId": 1,
+          "time": "1577977200.0",
+          "fillPrice": "323.58",
+          "fillQuantity": "608.0",
+          "orderFeeAmount": "0.0",
+          "message": 0
+        },
+        {
+          "orderId": 2,
+          "time": "1582902000.0",
+          "fillPrice": "287.59",
+          "fillQuantity": "-65.0",
+          "orderFeeAmount": "0.0",
+          "message": "Warning: No quote information available at 02/28/2020 10:00:00 America/New_York, order filled using TradeBar data"
+        },
+        {
+          "orderId": 3,
+          "time": "1584021600.0",
+          "fillPrice": "258.62",
+          "fillQuantity": "-61.0",
+          "orderFeeAmount": "0.0",
+          "message": "Warning: No quote information available at 03/12/2020 10:00:00 America/New_York, order filled using TradeBar data"
+        },
+        {
+          "orderId": 4,
+          "time": "1584550800.0",
+          "fillPrice": "235.73",
+          "fillQuantity": "-47.0",
+          "orderFeeAmount": "0.0",
+          "message": "Warning: No quote information available at 03/18/2020 13:00:00 America/New_York, order filled using TradeBar data"
+        },
+        {
+          "orderId": 5,
+          "time": "1588255200.0",
+          "fillPrice": "291.69",
+          "fillQuantity": "-435.0",
+          "orderFeeAmount": "0.0",
+          "message": 0
+        }
+      ],
+      "final_quantity": "0",
+      "id": "two_zero",
+      "specification": {
+        "id": "two_zero",
+        "target": "2",
+        "fee_usd": "0",
+        "slippage": "0",
+        "adaptive": false,
+        "reject": false
+      },
+      "failed_data_request_bytes": 0,
+      "succeeded_data_requests": [
+        "/equity/usa/hour/spy.zip",
+        "/alternative/interest-rate/usa/interest-rate.csv",
+        "/equity/usa/daily/spy.zip"
+      ],
+      "summary_sha256": "57face1bdaa2c2e242e4f08df7c9cfca8a11d213ca9a229faff87d15587e8ca9",
+      "events_sha256": "042b637e4e5a778fda70a9b229d7813028e90c3e42804a3e5b79d8f17341c290",
+      "audit_sha256": "f1c56d7f711a1d3216969d34f004039a7eed1b5f8080ecc830ae6aefa1161692",
+      "native_result_sha256": "9efce2870f577f8dbbe31de978a7916af5cb205c6c05b74b8128a239b89d17a6",
+      "margin_call_count": 3,
+      "reduction_count": 0,
+      "status": "completed_historical_stress_only"
+    },
+    {
+      "end_cash_usd": "75607.752140",
+      "native_end_equity_usd": "75607.75",
+      "cash_pnl_usd": "-24392.247860",
+      "fees_usd": "5.0",
+      "dividends_usd": "610.53",
+      "fill_count": 5,
+      "invalid_count": 0,
+      "mark_count": 725,
+      "max_observed_gross": "2.1849123549899267591626995969",
+      "max_observed_drawdown": "0.5865089430356140845215034269",
+      "minimum_observed_margin_remaining": "-6688.07328",
+      "margin_warning_count": 290,
+      "margin_calls": [
+        {
+          "kind": "margin_call",
+          "utc_seconds": 1582902000,
+          "count": 1,
+          "equity": "77723.60672",
+          "margin_remaining": "-9703.75328"
+        },
+        {
+          "kind": "margin_call",
+          "utc_seconds": 1584021600,
+          "count": 1,
+          "equity": "62039.69448",
+          "margin_remaining": "-7787.70552"
+        },
+        {
+          "kind": "margin_call",
+          "utc_seconds": 1584550800,
+          "count": 1,
+          "equity": "51042.83284",
+          "margin_remaining": "-5414.50216"
+        }
+      ],
+      "reductions": [],
+      "intents": [
+        {
+          "kind": "intent",
+          "utc_seconds": 1577826000,
+          "local": "2019-12-31T16:00:00.0000000",
+          "order_id": 1,
+          "quantity": 608,
+          "target": 2,
+          "reason": "entry",
+          "status": "Submitted"
+        },
+        {
+          "kind": "intent",
+          "utc_seconds": 1588190400,
+          "local": "2020-04-29T16:00:00.0000000",
+          "order_id": 5,
+          "quantity": -433,
+          "target": 0,
+          "reason": "exit",
+          "status": "Submitted"
+        }
+      ],
+      "fills": [
+        {
+          "orderId": 1,
+          "time": "1577977200.0",
+          "fillPrice": "324.22716",
+          "fillQuantity": "608.0",
+          "orderFeeAmount": "1.0",
+          "message": 0
+        },
+        {
+          "orderId": 2,
+          "time": "1582902000.0",
+          "fillPrice": "287.01482",
+          "fillQuantity": "-68.0",
+          "orderFeeAmount": "1.0",
+          "message": "Warning: No quote information available at 02/28/2020 10:00:00 America/New_York, order filled using TradeBar data"
+        },
+        {
+          "orderId": 3,
+          "time": "1584021600.0",
+          "fillPrice": "258.10276",
+          "fillQuantity": "-61.0",
+          "orderFeeAmount": "1.0",
+          "message": "Warning: No quote information available at 03/12/2020 10:00:00 America/New_York, order filled using TradeBar data"
+        },
+        {
+          "orderId": 4,
+          "time": "1584550800.0",
+          "fillPrice": "235.25854",
+          "fillQuantity": "-46.0",
+          "orderFeeAmount": "1.0",
+          "message": "Warning: No quote information available at 03/18/2020 13:00:00 America/New_York, order filled using TradeBar data"
+        },
+        {
+          "orderId": 5,
+          "time": "1588255200.0",
+          "fillPrice": "291.10662",
+          "fillQuantity": "-433.0",
+          "orderFeeAmount": "1.0",
+          "message": 0
+        }
+      ],
+      "final_quantity": "0",
+      "id": "two_stress",
+      "specification": {
+        "id": "two_stress",
+        "target": "2",
+        "fee_usd": "1",
+        "slippage": "0.002",
+        "adaptive": false,
+        "reject": false
+      },
+      "failed_data_request_bytes": 0,
+      "succeeded_data_requests": [
+        "/equity/usa/hour/spy.zip",
+        "/alternative/interest-rate/usa/interest-rate.csv",
+        "/equity/usa/daily/spy.zip"
+      ],
+      "summary_sha256": "5efe53d4d469bda49395fb6e440a0d535dcb4e06cfd4eec42e05babe41917174",
+      "events_sha256": "b9ee692244bf855b7010771cc7064b77a0f80f634918730fae6d17787ccdde88",
+      "audit_sha256": "fa7aebd8fc3bcf7d92bfe34c04633d74dc278c52d86f07e2b1785e566b27d30b",
+      "native_result_sha256": "d7c22d913f28518fcf53cbb32fae5a5838dfdec476974a6c849de75b8b73f721",
+      "margin_call_count": 3,
+      "reduction_count": 0,
+      "status": "completed_historical_stress_only"
+    },
+    {
+      "end_cash_usd": "95324.104760",
+      "native_end_equity_usd": "95324.10",
+      "cash_pnl_usd": "-4675.895240",
+      "fees_usd": "3.0",
+      "dividends_usd": "211.50",
+      "fill_count": 3,
+      "invalid_count": 0,
+      "mark_count": 725,
+      "max_observed_gross": "1.9870878896251505230295710931",
+      "max_observed_drawdown": "0.1940055040180580456724561525",
+      "minimum_observed_margin_remaining": "635.28672",
+      "margin_warning_count": 119,
+      "margin_calls": [],
+      "reductions": [
+        {
+          "kind": "reduction",
+          "utc_seconds": 1580158800,
+          "equity": "99556.88672",
+          "peak": "105126.16672",
+          "drawdown": "0.0529771052608965517885859426"
+        }
+      ],
+      "intents": [
+        {
+          "kind": "intent",
+          "utc_seconds": 1577826000,
+          "local": "2019-12-31T16:00:00.0000000",
+          "order_id": 1,
+          "quantity": 608,
+          "target": 2,
+          "reason": "entry",
+          "status": "Submitted"
+        },
+        {
+          "kind": "intent",
+          "utc_seconds": 1580158800,
+          "local": "2020-01-27T16:00:00.0000000",
+          "order_id": 2,
+          "quantity": -458,
+          "target": "0.5",
+          "reason": "reduce",
+          "status": "Submitted"
+        },
+        {
+          "kind": "intent",
+          "utc_seconds": 1588190400,
+          "local": "2020-04-29T16:00:00.0000000",
+          "order_id": 3,
+          "quantity": -150,
+          "target": 0,
+          "reason": "exit",
+          "status": "Submitted"
+        }
+      ],
+      "fills": [
+        {
+          "orderId": 1,
+          "time": "1577977200.0",
+          "fillPrice": "324.22716",
+          "fillQuantity": "608.0",
+          "orderFeeAmount": "1.0",
+          "message": 0
+        },
+        {
+          "orderId": 2,
+          "time": "1580223600.0",
+          "fillPrice": "324.40988",
+          "fillQuantity": "-458.0",
+          "orderFeeAmount": "1.0",
+          "message": 0
+        },
+        {
+          "orderId": 3,
+          "time": "1588255200.0",
+          "fillPrice": "291.10662",
+          "fillQuantity": "-150.0",
+          "orderFeeAmount": "1.0",
+          "message": 0
+        }
+      ],
+      "final_quantity": "0",
+      "id": "adaptive_stress",
+      "specification": {
+        "id": "adaptive_stress",
+        "target": "2",
+        "fee_usd": "1",
+        "slippage": "0.002",
+        "adaptive": true,
+        "reject": false
+      },
+      "failed_data_request_bytes": 0,
+      "succeeded_data_requests": [
+        "/equity/usa/hour/spy.zip",
+        "/alternative/interest-rate/usa/interest-rate.csv",
+        "/equity/usa/daily/spy.zip"
+      ],
+      "summary_sha256": "87c91f746da52f5c7cb8551793164563044c732174fa8aa62c1613510564b3f5",
+      "events_sha256": "c0ec9f05b8c66ef5334acb84dc1e577ddff48cf5ddbe6e82964c9ba8f485fc1d",
+      "audit_sha256": "82935c33a035276ed35caf03476cf11120214426d4e76546e4130f7e30025c11",
+      "native_result_sha256": "5f77dc22d2fa5d638bf9a53bd0577bf67e00cc1e3fd9485bc92cfa76813983f5",
+      "margin_call_count": 0,
+      "reduction_count": 1,
+      "status": "completed_historical_stress_only"
+    },
+    {
+      "end_cash_usd": "100000.00",
+      "native_end_equity_usd": "100000",
+      "cash_pnl_usd": "0.00",
+      "fees_usd": "0",
+      "dividends_usd": "0.00",
+      "fill_count": 0,
+      "invalid_count": 1,
+      "mark_count": 725,
+      "max_observed_gross": "0",
+      "max_observed_drawdown": "0.0",
+      "minimum_observed_margin_remaining": "100000.0",
+      "margin_warning_count": 0,
+      "margin_calls": [],
+      "reductions": [],
+      "intents": [
+        {
+          "kind": "intent",
+          "utc_seconds": 1577826000,
+          "local": "2019-12-31T16:00:00.0000000",
+          "order_id": 1,
+          "quantity": 1217,
+          "target": 4,
+          "reason": "entry",
+          "status": "Invalid"
+        }
+      ],
+      "fills": [],
+      "final_quantity": "0",
+      "id": "over_limit",
+      "specification": {
+        "id": "over_limit",
+        "target": "4",
+        "fee_usd": "1",
+        "slippage": "0.002",
+        "adaptive": false,
+        "reject": true
+      },
+      "failed_data_request_bytes": 0,
+      "succeeded_data_requests": [
+        "/equity/usa/hour/spy.zip",
+        "/alternative/interest-rate/usa/interest-rate.csv",
+        "/equity/usa/daily/spy.zip"
+      ],
+      "summary_sha256": "2196ed0220dc801f0b46ff97281262c39578c163e60c1e06d46f4eab10644a9e",
+      "events_sha256": "139313001294917bae7a03ee9ad6d5c0f3f428f988b259f1261206910e3794aa",
+      "audit_sha256": "b26b715d71cc3ac599a9243725aa0dccca77736690ff08a370fba724c431d819",
+      "native_result_sha256": "1ab75f400d8ae330b544d32c01bba898e9e620811ee7dc0f77418d9be3b4c794",
+      "margin_call_count": 0,
+      "reduction_count": 0,
+      "status": "expected_buying_power_rejection"
+    }
+  ],
+  "commands": [
+    {
+      "id": "compile",
+      "argv": [
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--new-session",
+        "--cap-drop",
+        "ALL",
+        "--clearenv",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--ro-bind",
+        "/lib",
+        "/lib",
+        "--ro-bind",
+        "/lib64",
+        "/lib64",
+        "--ro-bind",
+        "/etc/ld.so.cache",
+        "/etc/ld.so.cache",
+        "--ro-bind",
+        "$DOTNET_ROOT",
+        "/dotnet",
+        "--ro-bind",
+        "$LEAN_SOURCE/Launcher/bin/Debug",
+        "/engine",
+        "--ro-bind",
+        "$LEAN_SOURCE/Data",
+        "/data",
+        "--bind",
+        "$PRIVATE_RUN",
+        "/run",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--chdir",
+        "/run",
+        "--setenv",
+        "HOME",
+        "/run/home",
+        "--setenv",
+        "PATH",
+        "/usr/bin:/bin",
+        "--setenv",
+        "DOTNET_ROOT",
+        "/dotnet",
+        "--setenv",
+        "DOTNET_CLI_HOME",
+        "/run/home",
+        "--setenv",
+        "LANG",
+        "C.UTF-8",
+        "--setenv",
+        "DOTNET_CLI_TELEMETRY_OPTOUT",
+        "1",
+        "--setenv",
+        "DOTNET_SKIP_FIRST_TIME_EXPERIENCE",
+        "1",
+        "--setenv",
+        "DOTNET_GENERATE_ASPNET_CERTIFICATE",
+        "false",
+        "--setenv",
+        "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE",
+        "true",
+        "--setenv",
+        "MSBuildEnableWorkloadResolver",
+        "false",
+        "--setenv",
+        "DOTNET_NOLOGO",
+        "1",
+        "/dotnet/dotnet",
+        "/dotnet/sdk/10.0.401/Roslyn/bincore/csc.dll",
+        "@/run/build/compiler.rsp"
+      ],
+      "started_utc": "2026-09-19T22:00:53.771984+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "one_zero",
+      "argv": [
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--new-session",
+        "--cap-drop",
+        "ALL",
+        "--clearenv",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--ro-bind",
+        "/lib",
+        "/lib",
+        "--ro-bind",
+        "/lib64",
+        "/lib64",
+        "--ro-bind",
+        "/etc/ld.so.cache",
+        "/etc/ld.so.cache",
+        "--ro-bind",
+        "$DOTNET_ROOT",
+        "/dotnet",
+        "--ro-bind",
+        "$LEAN_SOURCE/Launcher/bin/Debug",
+        "/engine",
+        "--ro-bind",
+        "$LEAN_SOURCE/Data",
+        "/data",
+        "--bind",
+        "$PRIVATE_RUN",
+        "/run",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--chdir",
+        "/run",
+        "--setenv",
+        "HOME",
+        "/run/home",
+        "--setenv",
+        "PATH",
+        "/usr/bin:/bin",
+        "--setenv",
+        "DOTNET_ROOT",
+        "/dotnet",
+        "--setenv",
+        "DOTNET_CLI_HOME",
+        "/run/home",
+        "--setenv",
+        "LANG",
+        "C.UTF-8",
+        "--setenv",
+        "DOTNET_CLI_TELEMETRY_OPTOUT",
+        "1",
+        "--setenv",
+        "DOTNET_SKIP_FIRST_TIME_EXPERIENCE",
+        "1",
+        "--setenv",
+        "DOTNET_GENERATE_ASPNET_CERTIFICATE",
+        "false",
+        "--setenv",
+        "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE",
+        "true",
+        "--setenv",
+        "MSBuildEnableWorkloadResolver",
+        "false",
+        "--setenv",
+        "DOTNET_NOLOGO",
+        "1",
+        "/dotnet/dotnet",
+        "/engine/QuantConnect.Lean.Launcher.dll",
+        "--config",
+        "/run/one_zero/config.json"
+      ],
+      "started_utc": "2026-09-19T22:00:54.337319+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 7782,
+        "sha256": "7a6d71ae91f9e9617b7670b0e83094b8a024611fc2c7dea6b60a42c0c97fdad0"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "one_stress",
+      "argv": [
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--new-session",
+        "--cap-drop",
+        "ALL",
+        "--clearenv",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--ro-bind",
+        "/lib",
+        "/lib",
+        "--ro-bind",
+        "/lib64",
+        "/lib64",
+        "--ro-bind",
+        "/etc/ld.so.cache",
+        "/etc/ld.so.cache",
+        "--ro-bind",
+        "$DOTNET_ROOT",
+        "/dotnet",
+        "--ro-bind",
+        "$LEAN_SOURCE/Launcher/bin/Debug",
+        "/engine",
+        "--ro-bind",
+        "$LEAN_SOURCE/Data",
+        "/data",
+        "--bind",
+        "$PRIVATE_RUN",
+        "/run",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--chdir",
+        "/run",
+        "--setenv",
+        "HOME",
+        "/run/home",
+        "--setenv",
+        "PATH",
+        "/usr/bin:/bin",
+        "--setenv",
+        "DOTNET_ROOT",
+        "/dotnet",
+        "--setenv",
+        "DOTNET_CLI_HOME",
+        "/run/home",
+        "--setenv",
+        "LANG",
+        "C.UTF-8",
+        "--setenv",
+        "DOTNET_CLI_TELEMETRY_OPTOUT",
+        "1",
+        "--setenv",
+        "DOTNET_SKIP_FIRST_TIME_EXPERIENCE",
+        "1",
+        "--setenv",
+        "DOTNET_GENERATE_ASPNET_CERTIFICATE",
+        "false",
+        "--setenv",
+        "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE",
+        "true",
+        "--setenv",
+        "MSBuildEnableWorkloadResolver",
+        "false",
+        "--setenv",
+        "DOTNET_NOLOGO",
+        "1",
+        "/dotnet/dotnet",
+        "/engine/QuantConnect.Lean.Launcher.dll",
+        "--config",
+        "/run/one_stress/config.json"
+      ],
+      "started_utc": "2026-09-19T22:00:56.309367+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 7788,
+        "sha256": "5850dc7189656dcdbbad58d6dac6a32593dc7353be192c1c04d8609bb14d3506"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "two_zero",
+      "argv": [
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--new-session",
+        "--cap-drop",
+        "ALL",
+        "--clearenv",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--ro-bind",
+        "/lib",
+        "/lib",
+        "--ro-bind",
+        "/lib64",
+        "/lib64",
+        "--ro-bind",
+        "/etc/ld.so.cache",
+        "/etc/ld.so.cache",
+        "--ro-bind",
+        "$DOTNET_ROOT",
+        "/dotnet",
+        "--ro-bind",
+        "$LEAN_SOURCE/Launcher/bin/Debug",
+        "/engine",
+        "--ro-bind",
+        "$LEAN_SOURCE/Data",
+        "/data",
+        "--bind",
+        "$PRIVATE_RUN",
+        "/run",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--chdir",
+        "/run",
+        "--setenv",
+        "HOME",
+        "/run/home",
+        "--setenv",
+        "PATH",
+        "/usr/bin:/bin",
+        "--setenv",
+        "DOTNET_ROOT",
+        "/dotnet",
+        "--setenv",
+        "DOTNET_CLI_HOME",
+        "/run/home",
+        "--setenv",
+        "LANG",
+        "C.UTF-8",
+        "--setenv",
+        "DOTNET_CLI_TELEMETRY_OPTOUT",
+        "1",
+        "--setenv",
+        "DOTNET_SKIP_FIRST_TIME_EXPERIENCE",
+        "1",
+        "--setenv",
+        "DOTNET_GENERATE_ASPNET_CERTIFICATE",
+        "false",
+        "--setenv",
+        "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE",
+        "true",
+        "--setenv",
+        "MSBuildEnableWorkloadResolver",
+        "false",
+        "--setenv",
+        "DOTNET_NOLOGO",
+        "1",
+        "/dotnet/dotnet",
+        "/engine/QuantConnect.Lean.Launcher.dll",
+        "--config",
+        "/run/two_zero/config.json"
+      ],
+      "started_utc": "2026-09-19T22:00:58.132934+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 7783,
+        "sha256": "097c0a1db83e46c5b9ad33dfb190e2b5bf40dd4065af7259ffc26a5e9465cb22"
+      },
+      "stderr": {
+        "bytes": 381,
+        "sha256": "d26390a9bf2bcce652a6bef24e350a1cb2d69f288a06bd1ba9912b2b66396855"
+      }
+    },
+    {
+      "id": "two_stress",
+      "argv": [
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--new-session",
+        "--cap-drop",
+        "ALL",
+        "--clearenv",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--ro-bind",
+        "/lib",
+        "/lib",
+        "--ro-bind",
+        "/lib64",
+        "/lib64",
+        "--ro-bind",
+        "/etc/ld.so.cache",
+        "/etc/ld.so.cache",
+        "--ro-bind",
+        "$DOTNET_ROOT",
+        "/dotnet",
+        "--ro-bind",
+        "$LEAN_SOURCE/Launcher/bin/Debug",
+        "/engine",
+        "--ro-bind",
+        "$LEAN_SOURCE/Data",
+        "/data",
+        "--bind",
+        "$PRIVATE_RUN",
+        "/run",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--chdir",
+        "/run",
+        "--setenv",
+        "HOME",
+        "/run/home",
+        "--setenv",
+        "PATH",
+        "/usr/bin:/bin",
+        "--setenv",
+        "DOTNET_ROOT",
+        "/dotnet",
+        "--setenv",
+        "DOTNET_CLI_HOME",
+        "/run/home",
+        "--setenv",
+        "LANG",
+        "C.UTF-8",
+        "--setenv",
+        "DOTNET_CLI_TELEMETRY_OPTOUT",
+        "1",
+        "--setenv",
+        "DOTNET_SKIP_FIRST_TIME_EXPERIENCE",
+        "1",
+        "--setenv",
+        "DOTNET_GENERATE_ASPNET_CERTIFICATE",
+        "false",
+        "--setenv",
+        "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE",
+        "true",
+        "--setenv",
+        "MSBuildEnableWorkloadResolver",
+        "false",
+        "--setenv",
+        "DOTNET_NOLOGO",
+        "1",
+        "/dotnet/dotnet",
+        "/engine/QuantConnect.Lean.Launcher.dll",
+        "--config",
+        "/run/two_stress/config.json"
+      ],
+      "started_utc": "2026-09-19T22:01:01.394469+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 7786,
+        "sha256": "90879b93cec4a983bbe5c494893b353dff5970ea152c47b5590655101597f79b"
+      },
+      "stderr": {
+        "bytes": 390,
+        "sha256": "2e80eafacc0c6578cdfec02f8299e7f7e2f7c2c67b06bc5ec88d4fe1ccd496a4"
+      }
+    },
+    {
+      "id": "adaptive_stress",
+      "argv": [
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--new-session",
+        "--cap-drop",
+        "ALL",
+        "--clearenv",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--ro-bind",
+        "/lib",
+        "/lib",
+        "--ro-bind",
+        "/lib64",
+        "/lib64",
+        "--ro-bind",
+        "/etc/ld.so.cache",
+        "/etc/ld.so.cache",
+        "--ro-bind",
+        "$DOTNET_ROOT",
+        "/dotnet",
+        "--ro-bind",
+        "$LEAN_SOURCE/Launcher/bin/Debug",
+        "/engine",
+        "--ro-bind",
+        "$LEAN_SOURCE/Data",
+        "/data",
+        "--bind",
+        "$PRIVATE_RUN",
+        "/run",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--chdir",
+        "/run",
+        "--setenv",
+        "HOME",
+        "/run/home",
+        "--setenv",
+        "PATH",
+        "/usr/bin:/bin",
+        "--setenv",
+        "DOTNET_ROOT",
+        "/dotnet",
+        "--setenv",
+        "DOTNET_CLI_HOME",
+        "/run/home",
+        "--setenv",
+        "LANG",
+        "C.UTF-8",
+        "--setenv",
+        "DOTNET_CLI_TELEMETRY_OPTOUT",
+        "1",
+        "--setenv",
+        "DOTNET_SKIP_FIRST_TIME_EXPERIENCE",
+        "1",
+        "--setenv",
+        "DOTNET_GENERATE_ASPNET_CERTIFICATE",
+        "false",
+        "--setenv",
+        "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE",
+        "true",
+        "--setenv",
+        "MSBuildEnableWorkloadResolver",
+        "false",
+        "--setenv",
+        "DOTNET_NOLOGO",
+        "1",
+        "/dotnet/dotnet",
+        "/engine/QuantConnect.Lean.Launcher.dll",
+        "--config",
+        "/run/adaptive_stress/config.json"
+      ],
+      "started_utc": "2026-09-19T22:01:03.169750+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 7811,
+        "sha256": "b90a8703e5f5327d822d36eac2957077cc3981b6ce1373fd088baf7872bd5252"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "id": "over_limit",
+      "argv": [
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--new-session",
+        "--cap-drop",
+        "ALL",
+        "--clearenv",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--ro-bind",
+        "/lib",
+        "/lib",
+        "--ro-bind",
+        "/lib64",
+        "/lib64",
+        "--ro-bind",
+        "/etc/ld.so.cache",
+        "/etc/ld.so.cache",
+        "--ro-bind",
+        "$DOTNET_ROOT",
+        "/dotnet",
+        "--ro-bind",
+        "$LEAN_SOURCE/Launcher/bin/Debug",
+        "/engine",
+        "--ro-bind",
+        "$LEAN_SOURCE/Data",
+        "/data",
+        "--bind",
+        "$PRIVATE_RUN",
+        "/run",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--chdir",
+        "/run",
+        "--setenv",
+        "HOME",
+        "/run/home",
+        "--setenv",
+        "PATH",
+        "/usr/bin:/bin",
+        "--setenv",
+        "DOTNET_ROOT",
+        "/dotnet",
+        "--setenv",
+        "DOTNET_CLI_HOME",
+        "/run/home",
+        "--setenv",
+        "LANG",
+        "C.UTF-8",
+        "--setenv",
+        "DOTNET_CLI_TELEMETRY_OPTOUT",
+        "1",
+        "--setenv",
+        "DOTNET_SKIP_FIRST_TIME_EXPERIENCE",
+        "1",
+        "--setenv",
+        "DOTNET_GENERATE_ASPNET_CERTIFICATE",
+        "false",
+        "--setenv",
+        "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE",
+        "true",
+        "--setenv",
+        "MSBuildEnableWorkloadResolver",
+        "false",
+        "--setenv",
+        "DOTNET_NOLOGO",
+        "1",
+        "/dotnet/dotnet",
+        "/engine/QuantConnect.Lean.Launcher.dll",
+        "--config",
+        "/run/over_limit/config.json"
+      ],
+      "started_utc": "2026-09-19T22:01:04.942307+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "bytes": 7694,
+        "sha256": "f11638345b09b77af96de3ea69ba585b2164ed9217173a08fb0fa105862b25fa"
+      },
+      "stderr": {
+        "bytes": 202,
+        "sha256": "1ba81334cb20859f43ddaf47b9e443918ad5f3dc562ad1e7cc513bb8c1ebfc2f"
+      }
+    }
+  ],
+  "post_run_audit": {
+    "argv": [
+      "python3",
+      "blueprints/us-equities/historical-simulation/analysis.py",
+      "--run",
+      "$PRIVATE_RUN"
+    ],
+    "exit_code": 0,
+    "output": {
+      "bytes": 17248,
+      "sha256": "f3395200be0abf9448f9cb580d93654ee24f1eb9e09680cb253956d522c140a6"
+    },
+    "reason": "Strengthened terminal-result, native order tag/type/quantity, margin timestamp/count and request-log attribution after initial result reconciliation. Original native artifacts were audited; no engine rerun or parameter change.",
+    "original_runner": {
+      "bytes": 6921,
+      "sha256": "d4cbcff1b44badd47396ee12271aaad257534b81928a64c3ceb234c77feecf1a"
+    },
+    "initial_analyzer": {
+      "bytes": 4842,
+      "sha256": "91bdd62da87172afefcf21560149914d7a3e0eb85e68285048ed5249ed333d3d"
+    },
+    "current_analyzer": {
+      "bytes": 8056,
+      "sha256": "cfe0f3411f9893bd76021e24f343888f538223608268ddf90f5a7d5aa7ea14c1"
+    }
+  },
+  "upstream_models": [
+    {
+      "path": "Common/Securities/SecurityMarginModel.cs",
+      "bytes": 2643,
+      "sha256": "fa48ba1daf65f8a447a05665c003f4c22fec4a2f491be25ead6912f5207ad858",
+      "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Securities/SecurityMarginModel.cs"
+    },
+    {
+      "path": "Common/Securities/BuyingPowerModel.cs",
+      "bytes": 29527,
+      "sha256": "70447794a729be06c0b84db827647fcaec217b05ac3c43a5d51a279d05f12ecd",
+      "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Securities/BuyingPowerModel.cs"
+    },
+    {
+      "path": "Common/Securities/DefaultMarginCallModel.cs",
+      "bytes": 10924,
+      "sha256": "f66ff5a89516442e230cd8ab77e14a97f1584856628d0b230be1dd361e436dff",
+      "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Securities/DefaultMarginCallModel.cs"
+    },
+    {
+      "path": "Common/Orders/Fills/EquityFillModel.cs",
+      "bytes": 52099,
+      "sha256": "7f8c0e35eb538f5a63184c9b5ef4b32886e2c7779ccce1e773229a1a1ec18232",
+      "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Orders/Fills/EquityFillModel.cs"
+    },
+    {
+      "path": "Common/Orders/Fees/ConstantFeeModel.cs",
+      "bytes": 2034,
+      "sha256": "08ef92a38ef554a51c983661d1c94d709a008c27fc3a9b7123a175c11e5d853f",
+      "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Orders/Fees/ConstantFeeModel.cs"
+    },
+    {
+      "path": "Common/Orders/Slippage/ConstantSlippageModel.cs",
+      "bytes": 2071,
+      "sha256": "1b2b775444957ac5ebd70d50e0acc8a5bc0061f3f914a870c0db5535e80f5375",
+      "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Orders/Slippage/ConstantSlippageModel.cs"
+    }
+  ],
+  "local_source": {
+    "HistoricalSimulationAlgorithm.cs": {
+      "path": "blueprints/us-equities/historical-simulation/HistoricalSimulationAlgorithm.cs",
+      "bytes": 5870,
+      "sha256": "a8f0bf3c6b48fdcac8fe756ecb56611e6d54cbe90eeef29cdd901bb502eb1d15"
+    },
+    "plan.json": {
+      "path": "blueprints/us-equities/historical-simulation/plan.json",
+      "bytes": 2740,
+      "sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632"
+    },
+    "analysis.py": {
+      "path": "blueprints/us-equities/historical-simulation/analysis.py",
+      "bytes": 8056,
+      "sha256": "cfe0f3411f9893bd76021e24f343888f538223608268ddf90f5a7d5aa7ea14c1"
+    },
+    "run.py": {
+      "path": "blueprints/us-equities/historical-simulation/run.py",
+      "bytes": 6186,
+      "sha256": "110caaa800321b83f7ad22e2c8bf213818a834d3c3c92129d005601c9f9cb276"
+    }
+  },
+  "reused_helpers": {
+    "path": "blueprints/us-equities/execution-realism/run.py",
+    "bytes": 8993,
+    "sha256": "d42ab4b8d6a311fd3dc033b5faba975a9e97f58965905ffe4d98c60543f6b061",
+    "scope": "Native sandbox, compiler-command execution, hashing and JSON persistence; no prior tests or native scenarios rerun unchanged."
+  },
+  "private_artifacts": {
+    "adaptive_stress/HistoricalSimulationAlgorithm-log.txt": {
+      "bytes": 259,
+      "sha256": "f8f242d91de1944a95f6c9ce46bf66ffff4c0a052eb567f8838121e7daf89147"
+    },
+    "adaptive_stress/HistoricalSimulationAlgorithm-order-events.json": {
+      "bytes": 2246,
+      "sha256": "c0ec9f05b8c66ef5334acb84dc1e577ddff48cf5ddbe6e82964c9ba8f485fc1d"
+    },
+    "adaptive_stress/HistoricalSimulationAlgorithm-summary.json": {
+      "bytes": 5997,
+      "sha256": "87c91f746da52f5c7cb8551793164563044c732174fa8aa62c1613510564b3f5"
+    },
+    "adaptive_stress/HistoricalSimulationAlgorithm.json": {
+      "bytes": 139527,
+      "sha256": "5f77dc22d2fa5d638bf9a53bd0577bf67e00cc1e3fd9485bc92cfa76813983f5"
+    },
+    "adaptive_stress/audit.jsonl": {
+      "bytes": 254419,
+      "sha256": "82935c33a035276ed35caf03476cf11120214426d4e76546e4130f7e30025c11"
+    },
+    "adaptive_stress/config.json": {
+      "bytes": 1836,
+      "sha256": "504f5b2f301cda5f82629f9e335969013a79fe2b492c28f1f428ac34c88d4a64"
+    },
+    "adaptive_stress/data-monitor-report-20260919220104897.json": {
+      "bytes": 327,
+      "sha256": "b3305122e4660a8bae23c8c32624c3b227c296258eb5e9d1eae8192b425f9930"
+    },
+    "adaptive_stress/failed-data-requests-20260919220104047.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "adaptive_stress/log.txt": {
+      "bytes": 7844,
+      "sha256": "20c899b7c4c182120de82e75296fed7754768a7c803c2e9e54f2aaa31555b798"
+    },
+    "adaptive_stress/succeeded-data-requests-20260919220104047.txt": {
+      "bytes": 100,
+      "sha256": "efe3382376050f8907d76784f44358ede6366c70d6e8b3d95d973476ed18c4b3"
+    },
+    "adaptive_stress.command.private.json": {
+      "bytes": 1751,
+      "sha256": "821b288e5eb9ecb3427aa03f96416b4525f82e56110bfb357fb4682a945557cc"
+    },
+    "adaptive_stress.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "adaptive_stress.stdout.txt": {
+      "bytes": 7811,
+      "sha256": "b90a8703e5f5327d822d36eac2957077cc3981b6ce1373fd088baf7872bd5252"
+    },
+    "build/HistoricalSimulation.dll": {
+      "bytes": 25600,
+      "sha256": "c6f1acb47d1dbc74b4cece62949761bcea273b5804df4de7c98a4983bd75fd7b"
+    },
+    "build/HistoricalSimulationAlgorithm.cs": {
+      "bytes": 5870,
+      "sha256": "a8f0bf3c6b48fdcac8fe756ecb56611e6d54cbe90eeef29cdd901bb502eb1d15"
+    },
+    "build/compiler.rsp": {
+      "bytes": 17486,
+      "sha256": "32f6a9cbf3d9b119697675f45f03006922be6077f08d7ff1bce8d1a71a5553e5"
+    },
+    "compile.command.private.json": {
+      "bytes": 1732,
+      "sha256": "464b9a82a868b9502d97b415cfc20b4b3ce141064410e30310499afd476a70a2"
+    },
+    "compile.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "compile.stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "initial-analysis.py": {
+      "bytes": 4842,
+      "sha256": "91bdd62da87172afefcf21560149914d7a3e0eb85e68285048ed5249ed333d3d"
+    },
+    "input-hashes.private.json": {
+      "bytes": 177861,
+      "sha256": "9a65ffd4d97f1a4ba899480b23155a4720a016691d9b35ff22756d917973dcea"
+    },
+    "native-runner.py": {
+      "bytes": 6921,
+      "sha256": "d4cbcff1b44badd47396ee12271aaad257534b81928a64c3ceb234c77feecf1a"
+    },
+    "one_stress/HistoricalSimulationAlgorithm-log.txt": {
+      "bytes": 259,
+      "sha256": "6a5c7014b43a5d227fffee23bef1f7140abc1dfc274de779ac70a15c6e5570b4"
+    },
+    "one_stress/HistoricalSimulationAlgorithm-order-events.json": {
+      "bytes": 1496,
+      "sha256": "c489d559d66f386381cc68d209c9087b50b6039460f98a30a90c3d345e5ab606"
+    },
+    "one_stress/HistoricalSimulationAlgorithm-summary.json": {
+      "bytes": 5918,
+      "sha256": "a89830fedf930e4a1a92249a1161c23926be0c3d2f72301dd51a5da7e8a1440b"
+    },
+    "one_stress/HistoricalSimulationAlgorithm.json": {
+      "bytes": 135970,
+      "sha256": "c889380fbff1d95b292978da46492affaa212ae0a2c6aaf8507f27c693380c6b"
+    },
+    "one_stress/audit.jsonl": {
+      "bytes": 240599,
+      "sha256": "a3bf226d9244c77e5683b0464f7512e59cf1df51357b37c4c5fffffe738d9bd5"
+    },
+    "one_stress/config.json": {
+      "bytes": 1821,
+      "sha256": "d935b02c184fbb55149384ce9084474a60bd94aa04c0d2eca817b510868df5e6"
+    },
+    "one_stress/data-monitor-report-20260919220058082.json": {
+      "bytes": 327,
+      "sha256": "b3305122e4660a8bae23c8c32624c3b227c296258eb5e9d1eae8192b425f9930"
+    },
+    "one_stress/failed-data-requests-20260919220057176.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "one_stress/log.txt": {
+      "bytes": 7826,
+      "sha256": "2ef086cdfe17a061fa28ab6f70111b07072431706b1812f5857eb1aef2859062"
+    },
+    "one_stress/succeeded-data-requests-20260919220057175.txt": {
+      "bytes": 100,
+      "sha256": "efe3382376050f8907d76784f44358ede6366c70d6e8b3d95d973476ed18c4b3"
+    },
+    "one_stress.command.private.json": {
+      "bytes": 1746,
+      "sha256": "2ba3800cefdab0adb0a614899015ce70e520c3cbb81cc499d8c9fe385f3e795f"
+    },
+    "one_stress.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "one_stress.stdout.txt": {
+      "bytes": 7788,
+      "sha256": "5850dc7189656dcdbbad58d6dac6a32593dc7353be192c1c04d8609bb14d3506"
+    },
+    "one_zero/HistoricalSimulationAlgorithm-log.txt": {
+      "bytes": 259,
+      "sha256": "9353948045a9af342dc25ed6d6478f97588b74f723d56cce74429f0a80ddf20d"
+    },
+    "one_zero/HistoricalSimulationAlgorithm-order-events.json": {
+      "bytes": 1490,
+      "sha256": "e5c8a1f18a3591e0fd334669a3ed2d82f3377b48687d2564e21affe0eb8f0133"
+    },
+    "one_zero/HistoricalSimulationAlgorithm-summary.json": {
+      "bytes": 5885,
+      "sha256": "d1b136f013c20578d8c191b0319e1d950b74088df032d3f30fd04fcb0b973bee"
+    },
+    "one_zero/HistoricalSimulationAlgorithm.json": {
+      "bytes": 129654,
+      "sha256": "17f01267d2f88eb53b0abe5e4f0b49532adebd7478fa2097b74fefd0fb08bfd6"
+    },
+    "one_zero/audit.jsonl": {
+      "bytes": 237775,
+      "sha256": "92e0a9354ae413a23e39c0b2658a20854e2b2c3fa69f94073cc1706e43627dcb"
+    },
+    "one_zero/config.json": {
+      "bytes": 1811,
+      "sha256": "16c293607f8cc2581c51e046bd01009e1884b43efcf11c5d7a7a614de2c592f5"
+    },
+    "one_zero/data-monitor-report-20260919220056248.json": {
+      "bytes": 327,
+      "sha256": "b3305122e4660a8bae23c8c32624c3b227c296258eb5e9d1eae8192b425f9930"
+    },
+    "one_zero/failed-data-requests-20260919220055387.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "one_zero/log.txt": {
+      "bytes": 7822,
+      "sha256": "f925e9ab0eacb3533e671f48a1da019d1ee9d9f0e6b80a5bf9e348a53fb3a5af"
+    },
+    "one_zero/succeeded-data-requests-20260919220055387.txt": {
+      "bytes": 100,
+      "sha256": "efe3382376050f8907d76784f44358ede6366c70d6e8b3d95d973476ed18c4b3"
+    },
+    "one_zero.command.private.json": {
+      "bytes": 1744,
+      "sha256": "ce78248c45df863e52709a58ea3531c0439d4aee05d54bc23123d42546c52d71"
+    },
+    "one_zero.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "one_zero.stdout.txt": {
+      "bytes": 7782,
+      "sha256": "7a6d71ae91f9e9617b7670b0e83094b8a024611fc2c7dea6b60a42c0c97fdad0"
+    },
+    "over_limit/HistoricalSimulationAlgorithm-log.txt": {
+      "bytes": 431,
+      "sha256": "dc4521add9570d0200dd7ec8a60f61386cbacaab63331b4cf5dfbbed91e2f269"
+    },
+    "over_limit/HistoricalSimulationAlgorithm-order-events.json": {
+      "bytes": 511,
+      "sha256": "139313001294917bae7a03ee9ad6d5c0f3f428f988b259f1261206910e3794aa"
+    },
+    "over_limit/HistoricalSimulationAlgorithm-summary.json": {
+      "bytes": 5558,
+      "sha256": "2196ed0220dc801f0b46ff97281262c39578c163e60c1e06d46f4eab10644a9e"
+    },
+    "over_limit/HistoricalSimulationAlgorithm.json": {
+      "bytes": 119691,
+      "sha256": "1ab75f400d8ae330b544d32c01bba898e9e620811ee7dc0f77418d9be3b4c794"
+    },
+    "over_limit/audit.jsonl": {
+      "bytes": 196574,
+      "sha256": "b26b715d71cc3ac599a9243725aa0dccca77736690ff08a370fba724c431d819"
+    },
+    "over_limit/config.json": {
+      "bytes": 1821,
+      "sha256": "984de68eac7137d467de4804fd50dbfa49f9b55f66bbf64b338fd540b381716a"
+    },
+    "over_limit/data-monitor-report-20260919220106571.json": {
+      "bytes": 327,
+      "sha256": "b3305122e4660a8bae23c8c32624c3b227c296258eb5e9d1eae8192b425f9930"
+    },
+    "over_limit/failed-data-requests-20260919220105781.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "over_limit/log.txt": {
+      "bytes": 7941,
+      "sha256": "72ce6d7b13f00d46907589b78b3757b65f7fcc8f762527e06a9079b31b0a9130"
+    },
+    "over_limit/succeeded-data-requests-20260919220105781.txt": {
+      "bytes": 100,
+      "sha256": "efe3382376050f8907d76784f44358ede6366c70d6e8b3d95d973476ed18c4b3"
+    },
+    "over_limit.command.private.json": {
+      "bytes": 1746,
+      "sha256": "c5617b6a0e28cd66fb5702c5c6c8cc97c5a90c70d8b4321ff7e9111469fb8be5"
+    },
+    "over_limit.stderr.txt": {
+      "bytes": 202,
+      "sha256": "1ba81334cb20859f43ddaf47b9e443918ad5f3dc562ad1e7cc513bb8c1ebfc2f"
+    },
+    "over_limit.stdout.txt": {
+      "bytes": 7694,
+      "sha256": "f11638345b09b77af96de3ea69ba585b2164ed9217173a08fb0fa105862b25fa"
+    },
+    "partial-results.json": {
+      "bytes": 14349,
+      "sha256": "bbdcacedee0156cc766298aa5c6b106fd59e53f6bf344abb981300439c476e02"
+    },
+    "plan.json": {
+      "bytes": 2740,
+      "sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632"
+    },
+    "results.json": {
+      "bytes": 15535,
+      "sha256": "965a6ea5e65501838390250d56501dc4fa4ac0fce9545ce949923d94dff41763"
+    },
+    "two_stress/HistoricalSimulationAlgorithm-log.txt": {
+      "bytes": 559,
+      "sha256": "53d4199214ab7d662054c56cf65c0f181f48f559e517f5fa373669a9d224d6fa"
+    },
+    "two_stress/HistoricalSimulationAlgorithm-order-events.json": {
+      "bytes": 4115,
+      "sha256": "b9ee692244bf855b7010771cc7064b77a0f80f634918730fae6d17787ccdde88"
+    },
+    "two_stress/HistoricalSimulationAlgorithm-summary.json": {
+      "bytes": 5948,
+      "sha256": "5efe53d4d469bda49395fb6e440a0d535dcb4e06cfd4eec42e05babe41917174"
+    },
+    "two_stress/HistoricalSimulationAlgorithm.json": {
+      "bytes": 142589,
+      "sha256": "d7c22d913f28518fcf53cbb32fae5a5838dfdec476974a6c849de75b8b73f721"
+    },
+    "two_stress/audit.jsonl": {
+      "bytes": 272484,
+      "sha256": "fa7aebd8fc3bcf7d92bfe34c04633d74dc278c52d86f07e2b1785e566b27d30b"
+    },
+    "two_stress/config.json": {
+      "bytes": 1821,
+      "sha256": "73c7d0f0274e954fdd107df2df8f4505b618e8173968785caa10a60bcc29201c"
+    },
+    "two_stress/data-monitor-report-20260919220103145.json": {
+      "bytes": 327,
+      "sha256": "b3305122e4660a8bae23c8c32624c3b227c296258eb5e9d1eae8192b425f9930"
+    },
+    "two_stress/failed-data-requests-20260919220102257.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "two_stress/log.txt": {
+      "bytes": 8235,
+      "sha256": "d8598f4f1668975a5d5c477884ec6bfbe4c2edc8aec0be0c29a8abb10c1b5355"
+    },
+    "two_stress/succeeded-data-requests-20260919220102257.txt": {
+      "bytes": 100,
+      "sha256": "efe3382376050f8907d76784f44358ede6366c70d6e8b3d95d973476ed18c4b3"
+    },
+    "two_stress.command.private.json": {
+      "bytes": 1746,
+      "sha256": "44081b64be2c80c1f8ad35c1a692929aae34771cdf173471a73386c5534893be"
+    },
+    "two_stress.stderr.txt": {
+      "bytes": 390,
+      "sha256": "2e80eafacc0c6578cdfec02f8299e7f7e2f7c2c67b06bc5ec88d4fe1ccd496a4"
+    },
+    "two_stress.stdout.txt": {
+      "bytes": 7786,
+      "sha256": "90879b93cec4a983bbe5c494893b353dff5970ea152c47b5590655101597f79b"
+    },
+    "two_zero/HistoricalSimulationAlgorithm-log.txt": {
+      "bytes": 550,
+      "sha256": "b3148e85a15aab291e13f17718bc24e8597c0577c35caa7d089f4bea479914e8"
+    },
+    "two_zero/HistoricalSimulationAlgorithm-order-events.json": {
+      "bytes": 4100,
+      "sha256": "042b637e4e5a778fda70a9b229d7813028e90c3e42804a3e5b79d8f17341c290"
+    },
+    "two_zero/HistoricalSimulationAlgorithm-summary.json": {
+      "bytes": 5926,
+      "sha256": "57face1bdaa2c2e242e4f08df7c9cfca8a11d213ca9a229faff87d15587e8ca9"
+    },
+    "two_zero/HistoricalSimulationAlgorithm.json": {
+      "bytes": 136484,
+      "sha256": "9efce2870f577f8dbbe31de978a7916af5cb205c6c05b74b8128a239b89d17a6"
+    },
+    "two_zero/audit.jsonl": {
+      "bytes": 266759,
+      "sha256": "f1c56d7f711a1d3216969d34f004039a7eed1b5f8080ecc830ae6aefa1161692"
+    },
+    "two_zero/config.json": {
+      "bytes": 1811,
+      "sha256": "178e3042939e295ed40aa6d71d29364b755e888b3bed70da262e286919dc64b8"
+    },
+    "two_zero/data-monitor-report-20260919220101330.json": {
+      "bytes": 327,
+      "sha256": "b3305122e4660a8bae23c8c32624c3b227c296258eb5e9d1eae8192b425f9930"
+    },
+    "two_zero/failed-data-requests-20260919220100386.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "two_zero/log.txt": {
+      "bytes": 8225,
+      "sha256": "77cea40267c4ea2fb7d98f5da5576f53b421fc4d2067c88a4f4feca8b6938b40"
+    },
+    "two_zero/succeeded-data-requests-20260919220100386.txt": {
+      "bytes": 100,
+      "sha256": "efe3382376050f8907d76784f44358ede6366c70d6e8b3d95d973476ed18c4b3"
+    },
+    "two_zero.command.private.json": {
+      "bytes": 1744,
+      "sha256": "13b79814fd81eee6749dbdcf2fcd00788699102719276b88e368f67a613db251"
+    },
+    "two_zero.stderr.txt": {
+      "bytes": 381,
+      "sha256": "d26390a9bf2bcce652a6bef24e350a1cb2d69f288a06bd1ba9912b2b66396855"
+    },
+    "two_zero.stdout.txt": {
+      "bytes": 7783,
+      "sha256": "097c0a1db83e46c5b9ad33dfb190e2b5bf40dd4065af7259ffc26a5e9465cb22"
+    },
+    "verified-results.json": {
+      "bytes": 17248,
+      "sha256": "f3395200be0abf9448f9cb580d93654ee24f1eb9e09680cb253956d522c140a6"
+    }
+  },
+  "isolation": {
+    "platform": "Linux x86_64 / WSL2",
+    "mechanism": "Existing Bubblewrap --unshare-all --die-with-parent --new-session --cap-drop ALL --clearenv",
+    "engine_sdk_data_mounts": "read-only",
+    "model_calls": 0,
+    "broker_clients_constructed": 0,
+    "broker_orders": 0,
+    "downloads_or_package_restores": 0,
+    "native_account_stores_mounted": false,
+    "mounted_input_files": 1476,
+    "mounted_input_hashes_unchanged": true,
+    "mounted_input_manifest": {
+      "bytes": 177861,
+      "sha256": "9a65ffd4d97f1a4ba899480b23155a4720a016691d9b35ff22756d917973dcea"
+    }
+  },
+  "limitations": [
+    "Known 2020 crash development interval selected for stress; no untouched holdout, alpha estimate, automatic winner selection or profitability claim.",
+    "One SPY instrument; no historical +200% mover/catalyst census, full point-in-time eligible universe, delisting or strategy-factor acceptance.",
+    "Every discretionary intent used native next-session MarketOnOpen. Hourly-data fills are recorded at 10:00 New York with bar-open proxies; no exact 09:30 auction/tick/queue/depth or latency acceptance.",
+    "Native default margin calls use same-event market fills and trade-bar fallback warnings. Their timing is an engine stress behavior, not a calibrated broker risk/liquidation model.",
+    "2% sizing buffer and 2x SecurityMarginModel are declared simulation assumptions; actual gross can rise above 2x after losses. No present Alpaca account or leverage eligibility was queried.",
+    "Drawdown/gross metrics use 725 hourly callback observations after engine processing. Intrabar risk and pre-liquidation risk can be worse; margin callback values are retained separately.",
+    "Raw-data dividends are included. Source feed, corporate-action completeness, original availability and contemporary entitlement are not authenticated by bundled file hashes.",
+    "No financing/borrow interest configured. The engine reads an interest-rate reference file for its own calculations; this does not establish financing-inclusive cash PnL.",
+    "All fills assume full quantity. Fixed $1/order and 20 basis points are illustrative stresses, not estimated broker fees or attainable liquidity.",
+    "Stderr contains three margin-liquidation log entries in each 2x case and the expected insufficient-buying-power rejection in over_limit; exit zero is not described as empty stderr.",
+    "Cash reconciliation is exact over exported values with a one-cent comparison tolerance; omitted internal precision is not recovered.",
+    "Hashes establish byte identity, not independent attestation. Native integration is this local fixture around upstream APIs, not an unchanged upstream sample."
+  ]
+}
