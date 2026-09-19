@@ -15,6 +15,11 @@ from pathlib import Path, PurePosixPath
 import re
 from urllib.parse import urlsplit
 
+try:
+    from scripts.catalog_decisions import INDEX as DECISION_INDEX, InvalidDecisionIndex, validate_index
+except ModuleNotFoundError:  # Native invocation: python3 scripts/validate_catalogs.py
+    from catalog_decisions import INDEX as DECISION_INDEX, InvalidDecisionIndex, validate_index
+
 
 BASE = "catalogs/us-equities"
 CATALOG_FILES = tuple(f"{BASE}/{name}.json" for name in (
@@ -370,6 +375,11 @@ class Validator:
         for key, actual in counts.items():
             require(type(declared[key]) is int and declared[key] >= 0, f"manifest.counts.{key}", "expected nonnegative integer")
             require(declared[key] == actual, f"manifest.counts.{key}", f"declared {declared[key]}, computed {actual}")
+        if "decision_index_file" in manifest or (self.root / DECISION_INDEX).exists():
+            try:
+                validate_index(self.root, manifest)
+            except InvalidDecisionIndex as error:
+                raise InvalidCatalog(f"decision-index: {error}") from error
         return counts
 
     def star_audit(self, audit: dict, coverage: dict, checked_at: str) -> None:

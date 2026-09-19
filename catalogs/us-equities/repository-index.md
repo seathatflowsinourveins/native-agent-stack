@@ -1,12 +1,35 @@
 # Grand repository index
 
-Checked September 19, 2026. **453 repository identities: 337 public stars plus 116 beyond that snapshot**. The catalog core contains 147 unique repositories in 152 layer cards; 105 of those repositories are beyond the stars. Eleven additional beyond-star identities come from earlier foundation/candidate records. These counts are references, not installations.
+The [authoritative decision index](decision-index.json) now joins the public-star snapshot, all four layer catalogs, component records, earlier candidate records, and explicitly registered research supplements. Its computed counts and typed source pointers are checked together; inclusion does not establish installation or E2E. The catalog manifest's `grand_index_repositories` and `grand_index_beyond_stars` refer to that current union.
+
+Check the registered union offline:
+
+```sh
+python3 scripts/catalog_decisions.py --check
+python3 scripts/validate_catalogs.py
+```
+
+After adding a reviewed public research file, register only its intended repository-record array. Records must contain `repository`; JSON pointers may select differently named arrays. This updates the index and its two manifest counts, preserves existing registered sources, and performs no network or runtime calls:
+
+```sh
+python3 scripts/catalog_decisions.py --write \
+  --supplement 'catalogs/us-equities/architecture/coverage.json#/candidates' \
+  --supplement 'catalogs/us-equities/architecture/foundation.json#/repositories' \
+  --supplement 'catalogs/us-equities/architecture/trading.json#/entries' \
+  --supplement 'catalogs/us-equities/architecture/alpaca.json#/repositories'
+```
+
+Run that example only after those reviewed files exist. References retain each source's declared decision/review fields and exact JSON pointer; an additional record cannot upgrade earlier evidence. The index is regenerated from explicit source collections, not every repository URL mentioned in prose or a raw organization listing. Refresh publication hashes separately after changes.
+
+## Historical table — September 19, 2026, before portable-adoption supplements
+
+This frozen table contains **453 repository identities: 337 public stars plus 116 beyond that snapshot**. The catalog core contains 147 unique repositories in 152 layer cards; 105 of those repositories are beyond the stars. Eleven additional beyond-star identities come from earlier foundation/candidate records. These counts are references, not installations, and are superseded by the current machine-readable union above.
 
 Every starred repository has a [typed disposition](star-audit.json), with overview and selected-file inspection kept distinct. The 147-repository core plus 24 additional older records form the 171-reference subset. Restic's adoption promotes an existing starred identity, so the grand total stays 453. The fresh public-star identity comparison is recorded in [coverage](coverage.json); prior source reviews were not repeated. Existing receipts retain their original runtime scope. Collector core and contrib are two source identities for one adopted Collector process; the release-packaging repository is provenance, not another runtime card.
 
 The later [data/evaluation source follow-up](data-evaluation-followup.md) verified the LoopX transfer to `loopx-project/loopx` and DVC's existing `treeverse/dvc` alias without adding identities. Its two new purged-CV discovery leads remain outside this index and are explicitly unadopted.
 
-The [portable-adoption follow-up](../../adoption/research.md) adds a separate six-candidate comparison with 41 selected source files: existing starred mise plus five beyond-star portability identities. Its required uv dependency workflow has fresh native acceptance; the alternative managers remain source-reviewed. This supplement is linked separately and does not change the historical 453-identity table below.
+The [portable-adoption follow-up](../../adoption/research.md) adds six candidates with 41 selected source files: existing starred mise plus five beyond-star portability identities. These are registered in the current decision index, producing 458 identities before later research supplements. Its required uv dependency workflow has fresh native acceptance; the alternative managers remain source-reviewed. The historical table below remains unchanged.
 
 | Repository | Discovery | Decision cards / earlier record | Star review depth |
 | --- | --- | --- | --- |
