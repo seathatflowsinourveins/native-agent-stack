@@ -1,0 +1,360 @@
+"""Offline catalog regressions use small synthetic records, not private evidence."""
+
+from contextlib import redirect_stdout
+import copy
+import io
+import json
+from pathlib import Path
+import tempfile
+import unittest
+
+from scripts.validate_catalogs import BASE, CATALOG_FILES, InvalidCatalog, main, validate
+
+
+class CatalogValidationTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        self.header = {"schema_version": 1, "checked_at": "2026-09-19"}
+        self.catalogs = []
+        for index, path in enumerate(CATALOG_FILES):
+            entry = {
+                "id": f"repo-{index}", "repository": f"https://github.com/example/repo-{index}",
+                "layers": ["research"], "role": "Offline catalog fixture",
+                "decision": "conditional", "rationale": "Illustrates a separate capability.",
+                "version_or_commit": "v1.0.0", "release_date": "2026-09-18T10:00:00Z",
+                "license": "MIT", "us_equities_fit": "Research only.",
+                "alpaca_fit": "No broker actions.", "evidence_level": "source_review",
+                "evidence_refs": ["https://github.com/example/source"],
+                "native_workflow": ["# Prospective: example --help"],
+                "requirements": ["An operator-selected local runtime."],
+                "limitations": ["Synthetic source review, not installed or executed."],
+                "sources": ["https://github.com/example/source"],
+            }
+            self.catalogs.append({**self.header, "layer": Path(path).stem, "entries": [entry]})
+        self.model = {
+            "id": "example/model", "provider": "Example publisher", "role": "Embedding candidate",
+            "decision": "conditional", "revision": "a" * 40,
+            "release_evidence_date": None, "release_evidence_kind": "Release date unknown",
+            "license": None, "task_fit": "Candidate retrieval model.",
+            "limitations": ["Metadata does not prove local inference."],
+            "evidence_level": "metadata_only", "evidence_refs": ["evidence/metadata.json"],
+            "native_workflow": ["# Prospective: hf models info example/model"],
+            "workflow_scope": "Metadata only; no weights or inference.",
+            "sources": ["https://huggingface.co/example/model"],
+        }
+        self.models = {
+            **self.header, "layer": "models", "recent_window": ["2026-06-21", "2026-09-19"],
+            "scope": "Synthetic model records.", "entries": [self.model],
+        }
+        self.coverage = {
+            **self.header,
+            "stars": [
+                {"repository": "https://github.com/example/repo-0", "disposition": "catalog_reviewed", "catalog_entry_ids": ["repo-0"]},
+                {"repository": "https://github.com/example/unassessed", "disposition": "metadata_only_unassessed", "catalog_entry_ids": []},
+                {"repository": "https://github.com/example/baseline", "disposition": "baseline_record", "catalog_entry_ids": []},
+            ],
+            "beyond_stars": [
+                {"repository": f"https://github.com/example/repo-{index}", "catalog_entry_ids": [f"repo-{index}"]}
+                for index in range(1, 4)
+            ],
+            "aliases": {},
+        }
+        self.manifest = {
+            **self.header, "catalog_files": list(CATALOG_FILES),
+            "model_file": f"{BASE}/models.json", "coverage_file": f"{BASE}/coverage.json",
+            "counts": {"repository_entries": 4, "unique_catalog_repositories": 4, "models": 1,
+                       "public_stars": 3, "starred_catalog_repositories": 1, "beyond_star_catalog_repositories": 3},
+        }
+        self.write("manifests/stack.json", {"components": [{"repository": "https://github.com/example/baseline/releases/tag/v1"}]})
+        self.write("evidence/metadata.json", {"schema_version": 1, "kind": "native_metadata_commands", "scope": "Metadata retrieval.", "commands": [{"exit_code": 0}]})
+        self.write("evidence/receipt.json", {"schema_version": 1, "kind": "native_model_e2e", "claim": "Synthetic model fixture.", "data": {"exit_code": 0}})
+        self.save()
+
+    @property
+    def entry(self):
+        return self.catalogs[0]["entries"][0]
+
+    def write(self, relative, data):
+        target = self.root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+    def save(self):
+        for path, catalog in zip(CATALOG_FILES, self.catalogs):
+            self.write(path, catalog)
+        self.write(f"{BASE}/models.json", self.models)
+        self.write(f"{BASE}/coverage.json", self.coverage)
+        self.write(f"{BASE}/manifest.json", self.manifest)
+
+    def assert_invalid(self, message):
+        with self.assertRaisesRegex(InvalidCatalog, message):
+            validate(self.root)
+
+    def test_valid_counts_and_metadata_only_model(self):
+        self.assertEqual(validate(self.root), self.manifest["counts"])
+
+    def test_missing_manifest_or_catalog_fails(self):
+        for path in (f"{BASE}/manifest.json", CATALOG_FILES[2]):
+            with self.subTest(path=path):
+                (self.root / path).unlink()
+                self.assert_invalid("file missing")
+                self.save()
+
+    def test_manifest_cannot_silently_omit_a_catalog(self):
+        self.manifest["catalog_files"].pop()
+        self.save()
+        self.assert_invalid("all four repository catalogs")
+
+    def test_duplicate_json_keys_fail(self):
+        (self.root / f"{BASE}/manifest.json").write_text('{"schema_version": 1, "schema_version": 1}')
+        self.assert_invalid("duplicate key")
+
+    def test_invalid_schema_versions_and_layer_fail(self):
+        for value in (2, True, "1"):
+            with self.subTest(value=value):
+                self.catalogs[0]["schema_version"] = value
+                self.save()
+                self.assert_invalid("schema_version must be 1")
+        self.catalogs[0]["schema_version"] = 1
+        self.catalogs[0]["layer"] = "other"
+        self.save()
+        self.assert_invalid("layer differs")
+
+    def test_duplicate_ids_across_layers_and_models_fail(self):
+        self.catalogs[1]["entries"][0]["id"] = self.entry["id"]
+        self.save()
+        self.assert_invalid("duplicate global id")
+        self.catalogs[1]["entries"][0]["id"] = "repo-1"
+        self.model["id"] = self.entry["id"]
+        self.save()
+        self.assert_invalid("duplicate global id")
+
+    def test_same_repository_in_two_layers_is_allowed_and_counted_once(self):
+        self.catalogs[1]["entries"][0]["repository"] = self.entry["repository"]
+        self.coverage["stars"][0]["catalog_entry_ids"].append("repo-1")
+        self.coverage["beyond_stars"].pop(0)
+        self.manifest["counts"]["unique_catalog_repositories"] = 3
+        self.manifest["counts"]["beyond_star_catalog_repositories"] = 2
+        self.save()
+        self.assertEqual(validate(self.root), self.manifest["counts"])
+
+    def test_enums_and_meaningful_lists(self):
+        for key, value in (("decision", "installed"), ("evidence_level", "passed"),
+                           ("requirements", []), ("limitations", [" "]), ("layers", "research"),
+                           ("sources", []), ("native_workflow", []), ("role", "")):
+            with self.subTest(key=key):
+                old = self.entry[key]
+                self.entry[key] = value
+                self.save()
+                self.assert_invalid(key)
+                self.entry[key] = old
+
+    def test_excluded_model_can_have_no_proposed_execution(self):
+        self.model["decision"] = "excluded"
+        self.model["native_workflow"] = []
+        self.save()
+        validate(self.root)
+
+    def test_release_dates_are_real_iso_dates_and_unknown_is_explicit(self):
+        for value in ("2026-02-30", "09/19/2026", "2026-09-18T10:00:00", 0):
+            with self.subTest(value=value):
+                self.entry["release_date"] = value
+                self.save()
+                self.assert_invalid("release_date")
+        self.entry["release_date"] = None
+        self.save()
+        validate(self.root)
+        del self.entry["release_date"]
+        self.save()
+        self.assert_invalid("missing release_date")
+
+    def test_catalog_dates_match_manifest(self):
+        self.catalogs[2]["checked_at"] = "2026-09-18"
+        self.save()
+        self.assert_invalid("checked_at differs")
+
+    def test_model_recent_window_order_and_revision(self):
+        self.models["recent_window"].reverse()
+        self.save()
+        self.assert_invalid("recent_window ordering")
+        self.models["recent_window"].reverse()
+        self.model["revision"] = "main"
+        self.save()
+        self.assert_invalid("revision must be null")
+
+    def test_optional_source_commit_is_validated_without_requiring_it(self):
+        self.entry["source_commit"] = "not-a-sha"
+        self.save()
+        self.assert_invalid("source_commit")
+        self.entry["source_commit"] = "a" * 40
+        self.save()
+        validate(self.root)
+
+    def test_repository_urls_are_canonical_and_case_insensitive_for_joins(self):
+        original = self.entry["repository"]
+        for value in ("http://github.com/example/repo-0", original + "/", original + ".git",
+                      original + "/tree/main", original + "?x=1", "https://github.com.evil/example/repo-0"):
+            with self.subTest(value=value):
+                self.entry["repository"] = value
+                self.save()
+                self.assert_invalid("repository")
+        self.entry["repository"] = "https://github.com/Example/Repo-0"
+        self.save()
+        validate(self.root)
+
+    def test_sources_require_https_without_embedded_credentials(self):
+        for value in ("http://example.org/source", "https://user:password@example.org/source", "https://", "https://example.org/a b"):
+            with self.subTest(value=value):
+                self.entry["sources"] = [value]
+                self.save()
+                self.assert_invalid("HTTPS URL")
+
+    def test_evidence_paths_reject_missing_traversal_absolute_and_symlinks(self):
+        for value in ("missing.json", "../outside.json", "/etc/passwd", "evidence/../receipt.json",
+                      "evidence//receipt.json", "C:\\private.json", "evidence/receipt.json#section"):
+            with self.subTest(value=value):
+                self.entry["evidence_refs"] = [value]
+                self.save()
+                self.assert_invalid("file missing|path must")
+        target = self.root / "evidence/linked.json"
+        target.symlink_to(self.root / "evidence/receipt.json")
+        self.entry["evidence_refs"] = ["evidence/linked.json"]
+        self.save()
+        self.assert_invalid("symlinks are forbidden")
+        target.unlink()
+        target.parent.rename(self.root / "real-evidence")
+        target.parent.symlink_to(self.root / "real-evidence", target_is_directory=True)
+        self.entry["evidence_refs"] = ["evidence/receipt.json"]
+        self.save()
+        self.assert_invalid("symlinks are forbidden")
+
+    def test_policy_or_metadata_json_is_not_native_evidence(self):
+        self.entry["evidence_level"] = "native_proven"
+        for record in ({"policy": "Use native tools."}, {"kind": "native_metadata_commands", "scope": "Metadata", "commands": [{}]},
+                       {"schema_version": 1, "kind": "native_cli_e2e"}, {"kind": []}):
+            with self.subTest(record=record):
+                self.write("evidence/policy.json", record)
+                self.entry["evidence_refs"] = ["evidence/policy.json"]
+                self.save()
+                self.assert_invalid("local execution receipt")
+
+    def test_native_model_needs_model_execution_not_cli_or_metadata_receipt(self):
+        self.model["evidence_level"] = "native_proven"
+        self.model["evidence_refs"] = ["evidence/metadata.json"]
+        self.save()
+        self.assert_invalid("metadata is not inference proof")
+        self.write("evidence/cli.json", {"schema_version": 1, "kind": "native_cli_e2e", "claim": "CLI help.", "data": {"exit_code": 0}})
+        self.model["evidence_refs"] = ["evidence/cli.json"]
+        self.save()
+        self.assert_invalid("native_model_e2e")
+        self.model["evidence_refs"] = ["evidence/receipt.json"]
+        self.save()
+        validate(self.root)
+
+    def test_native_cli_receipt_can_declare_scope_inside_its_result(self):
+        self.write("evidence/cli.json", {
+            "schema_version": 1, "kind": "native_cli_e2e", "recorded_date": "2026-09-19",
+            "result": {"scope": "Synthetic offline conversion.", "rows": 3},
+            "command": "example convert fixture.json",
+        })
+        self.entry["evidence_level"] = "native_proven"
+        self.entry["evidence_refs"] = ["evidence/cli.json"]
+        self.save()
+        validate(self.root)
+
+    def test_legacy_health_receipt_is_native_cli_evidence_only(self):
+        self.write("evidence/health.json", {
+            "checked_at_utc": "2026-09-19T00:00:00+00:00", "scope": "Anonymous health only.",
+            "limits": ["No provider call."], "routes": [{"method": "GET", "authentication_supplied": False,
+                "attempts": 1, "http_status": 200, "url": "http://127.0.0.1:10000/health"}],
+        })
+        self.entry["evidence_level"] = "native_proven"
+        self.entry["evidence_refs"] = ["evidence/health.json"]
+        self.save()
+        validate(self.root)
+        self.model["evidence_level"] = "native_proven"
+        self.model["evidence_refs"] = ["evidence/health.json"]
+        self.save()
+        self.assert_invalid("native_model_e2e")
+
+    def test_alias_chain_joins_without_double_counting(self):
+        self.coverage["aliases"] = {"old/repo": "renamed/repo", "renamed/repo": "example/repo-0"}
+        self.coverage["stars"][0]["repository"] = "https://github.com/old/repo"
+        self.save()
+        self.assertEqual(validate(self.root), self.manifest["counts"])
+
+    def test_alias_cycles_and_noncanonical_names_fail(self):
+        for aliases in ({"old/repo": "old/repo"}, {"old/repo": "new/repo", "new/repo": "old/repo"},
+                        {"Old/repo": "new/repo"}, {"old/repo": ["new/repo"]}):
+            with self.subTest(aliases=aliases):
+                self.coverage["aliases"] = aliases
+                self.save()
+                self.assert_invalid("alias cycle|aliases must")
+
+    def test_wrong_or_missing_join_ids_fail(self):
+        for ids in (["repo-1"], [], ["repo-0", "unknown"], ["repo-0", "repo-0"]):
+            with self.subTest(ids=ids):
+                self.coverage["stars"][0]["catalog_entry_ids"] = ids
+                self.save()
+                self.assert_invalid("catalog_entry_ids")
+
+    def test_star_disposition_cannot_claim_or_hide_catalog_review(self):
+        self.coverage["stars"][0]["disposition"] = "metadata_only_unassessed"
+        self.save()
+        self.assert_invalid("disposition must match catalog membership")
+        self.coverage["stars"][0]["disposition"] = "catalog_reviewed"
+        self.coverage["stars"][1]["disposition"] = "catalog_reviewed"
+        self.save()
+        self.assert_invalid("disposition must match catalog membership")
+
+    def test_baseline_disposition_requires_a_real_baseline_repository(self):
+        self.coverage["stars"][1]["disposition"] = "baseline_record"
+        self.save()
+        self.assert_invalid("absent from manifests/stack.json")
+
+    def test_coverage_must_partition_every_catalog_repository(self):
+        original = copy.deepcopy(self.coverage)
+        self.coverage["beyond_stars"].pop()
+        self.save()
+        self.assert_invalid("missing from coverage")
+        self.coverage = original
+        self.coverage["beyond_stars"].append({"repository": self.entry["repository"], "catalog_entry_ids": [self.entry["id"]]})
+        self.save()
+        self.assert_invalid("overlap")
+
+    def test_duplicate_alias_and_case_stars_do_not_inflate_counts(self):
+        self.coverage["aliases"] = {"old/repo": "example/repo-0"}
+        self.coverage["stars"].append({"repository": "https://github.com/Old/Repo", "disposition": "catalog_reviewed", "catalog_entry_ids": ["repo-0"]})
+        self.save()
+        self.assert_invalid("duplicate canonical repository")
+
+    def test_unknown_beyond_repository_is_not_counted(self):
+        self.coverage["beyond_stars"].append({"repository": "https://github.com/example/other", "catalog_entry_ids": []})
+        self.save()
+        self.assert_invalid("beyond_stars must refer")
+
+    def test_every_declared_count_is_recomputed_and_booleans_rejected(self):
+        for key, actual in self.manifest["counts"].copy().items():
+            with self.subTest(key=key):
+                self.manifest["counts"][key] = actual + 1
+                self.save()
+                self.assert_invalid(f"counts.{key}")
+                self.manifest["counts"][key] = actual
+        self.manifest["counts"]["models"] = True
+        self.save()
+        self.assert_invalid("nonnegative integer")
+
+    def test_cli_reports_success_and_missing_manifest_failure(self):
+        output = io.StringIO()
+        with redirect_stdout(output):
+            self.assertEqual(main(["--root", str(self.root)]), 0)
+        self.assertIn("source claims and native executions were not rerun", output.getvalue())
+        (self.root / f"{BASE}/manifest.json").unlink()
+        with redirect_stdout(io.StringIO()):
+            self.assertEqual(main(["--root", str(self.root)]), 1)
+
+
+if __name__ == "__main__":
+    unittest.main()
