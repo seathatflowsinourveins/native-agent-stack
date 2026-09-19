@@ -1,0 +1,193 @@
+{
+  "checked_at": "2026-09-19T20:56:20.927026+00:00",
+  "sources": [
+    {
+      "repository": "alpacahq/alpaca-py",
+      "commit": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "path": "alpaca/trading/requests.py",
+      "bytes": 32932,
+      "sha256": "3290cc8b0d90cae87bc67b1e108b1a67b74d5ecc719dd7bb38026a99b6301552",
+      "source": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/alpaca/trading/requests.py"
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "commit": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "path": "alpaca/common/requests.py",
+      "bytes": 2842,
+      "sha256": "7829e913172031ed7162251b60452ff71df546c59c28ffa64b58e9a542576cb4",
+      "source": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/alpaca/common/requests.py"
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "commit": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "path": "alpaca/trading/client.py",
+      "bytes": 25722,
+      "sha256": "03f806b3ce6b4fabcc92f9e8eedf5f3ded817b7ec988bc8a854aa9268ea595de",
+      "source": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/alpaca/trading/client.py"
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "commit": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "path": "LICENSE",
+      "bytes": 10873,
+      "sha256": "bc84da682744c6dd008cf9ad3306caf18444d613a80c1bcc3de0dd46094787ef",
+      "source": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/LICENSE"
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-go",
+      "commit": "5364a1c723677cd8ec5b81beab34e250a6d4f007",
+      "path": "alpaca/entities.go",
+      "bytes": 24283,
+      "sha256": "bd00e1b4181fba6befeb6345db8c536878797e44fe943f98ca523e24f136a28e",
+      "source": "https://github.com/alpacahq/alpaca-trade-api-go/blob/5364a1c723677cd8ec5b81beab34e250a6d4f007/alpaca/entities.go"
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-go",
+      "commit": "5364a1c723677cd8ec5b81beab34e250a6d4f007",
+      "path": "alpaca/rest.go",
+      "bytes": 36279,
+      "sha256": "39947a79f7b8b8e23316263dfee78a0d9b3e9880c2a5b68e2d748eb1f6600c89",
+      "source": "https://github.com/alpacahq/alpaca-trade-api-go/blob/5364a1c723677cd8ec5b81beab34e250a6d4f007/alpaca/rest.go"
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-go",
+      "commit": "5364a1c723677cd8ec5b81beab34e250a6d4f007",
+      "path": "LICENSE",
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "source": "https://github.com/alpacahq/alpaca-trade-api-go/blob/5364a1c723677cd8ec5b81beab34e250a6d4f007/LICENSE"
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-js",
+      "commit": "a5fc564f988e248040ab7893a9de87cd6253edae",
+      "path": "src/orders.ts",
+      "bytes": 15069,
+      "sha256": "73193dcd2c0203639a9acf9af5be24f982dbc6ccda723be00259e188d2267ed9",
+      "source": "https://github.com/alpacahq/alpaca-trade-api-js/blob/a5fc564f988e248040ab7893a9de87cd6253edae/src/orders.ts"
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-js",
+      "commit": "a5fc564f988e248040ab7893a9de87cd6253edae",
+      "path": "LICENSE",
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "source": "https://github.com/alpacahq/alpaca-trade-api-js/blob/a5fc564f988e248040ab7893a9de87cd6253edae/LICENSE"
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-js",
+      "commit": "a5fc564f988e248040ab7893a9de87cd6253edae",
+      "path": "package.json",
+      "bytes": 3991,
+      "sha256": "c631cd7fbbc5f6faf610e9beeda90eee2392086e1bc422b5755c4876efca45a2",
+      "source": "https://github.com/alpacahq/alpaca-trade-api-js/blob/a5fc564f988e248040ab7893a9de87cd6253edae/package.json"
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-js",
+      "commit": "a5fc564f988e248040ab7893a9de87cd6253edae",
+      "path": "src/trading/models/AdvancedInstructions.ts",
+      "bytes": 4225,
+      "sha256": "2a270a5d911f57cabce8e6a820383420606d33d01c6a1159eebee299ef09cc95",
+      "source": "https://github.com/alpacahq/alpaca-trade-api-js/blob/a5fc564f988e248040ab7893a9de87cd6253edae/src/trading/models/AdvancedInstructions.ts"
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-js",
+      "commit": "a5fc564f988e248040ab7893a9de87cd6253edae",
+      "path": "src/trading/models/PostOrderRequest.ts",
+      "bytes": 9401,
+      "sha256": "eec972c52b7e77240dd881f4023ad787d60e4a6b3a27cdb962ea37254afe77ce",
+      "source": "https://github.com/alpacahq/alpaca-trade-api-js/blob/a5fc564f988e248040ab7893a9de87cd6253edae/src/trading/models/PostOrderRequest.ts"
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-js",
+      "commit": "a5fc564f988e248040ab7893a9de87cd6253edae",
+      "path": "src/trading/models/PatchOrderRequest.ts",
+      "bytes": 5178,
+      "sha256": "b8bb86b343ead16de936dc1466055b947f3e47f1e28ae891a21a6163d6b01ed6",
+      "source": "https://github.com/alpacahq/alpaca-trade-api-js/blob/a5fc564f988e248040ab7893a9de87cd6253edae/src/trading/models/PatchOrderRequest.ts"
+    }
+  ],
+  "scope": "Selected primary source review; no JavaScript/Go installation, wire acceptance or upstream CI execution.",
+  "repositories": [
+    {
+      "repository": "alpacahq/alpaca-py",
+      "commit": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "license": "Apache-2.0",
+      "installed_version": "0.44.0",
+      "latest_release_reviewed": "v0.44.0",
+      "release_published_at": "2026-08-11T10:11:55Z",
+      "decision": "retain installed offline request baseline; reject advanced fields locally",
+      "evidence_depth": "selected source plus installed request-model serialization",
+      "findings": [
+        "OrderRequest and ReplaceOrderRequest do not declare advanced_instructions.",
+        "NonEmptyRequest serializes model_dump; installed request fields use float for quantities/prices."
+      ]
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-go",
+      "commit": "5364a1c723677cd8ec5b81beab34e250a6d4f007",
+      "license": "Apache-2.0",
+      "decision": "language alternative only",
+      "evidence_depth": "selected source only",
+      "findings": [
+        "PlaceOrderRequest and ReplaceOrderRequest omit advanced_instructions; quantities/prices use decimal.Decimal pointers."
+      ]
+    },
+    {
+      "repository": "alpacahq/alpaca-trade-api-js",
+      "commit": "a5fc564f988e248040ab7893a9de87cd6253edae",
+      "license": "Apache-2.0",
+      "source_package_version": "4.0.2",
+      "decision": "investigate supported advanced extension only after provider/state gates",
+      "evidence_depth": "selected source only",
+      "findings": [
+        "OrderInput exposes advancedInstructions; buildOrder preserves it at src/orders.ts:399.",
+        "Generated PostOrderRequest.ts:252 and PatchOrderRequest.ts:138 invoke AdvancedInstructionsToJSON for advanced_instructions.",
+        "AdvancedInstructionsToJSON maps destination, display_qty, start_time/end_time and max_percentage; times serialize through Date.toISOString. No native execution or provider validation."
+      ]
+    }
+  ],
+  "documentation": [
+    {
+      "topic": "create",
+      "url": "https://docs.alpaca.markets/us/reference/postorder",
+      "accessed": "2026-09-19",
+      "evidence_depth": "official live documentation read; not immutable"
+    },
+    {
+      "topic": "replace",
+      "url": "https://docs.alpaca.markets/us/reference/patchorderbyorderid-1",
+      "accessed": "2026-09-19",
+      "evidence_depth": "official live documentation read; not immutable"
+    },
+    {
+      "topic": "cancel",
+      "url": "https://docs.alpaca.markets/us/reference/deleteorderbyorderid-1",
+      "accessed": "2026-09-19",
+      "evidence_depth": "official live documentation read; not immutable"
+    },
+    {
+      "topic": "client_order_id",
+      "url": "https://docs.alpaca.markets/us/reference/getorderbyclientorderid",
+      "accessed": "2026-09-19",
+      "evidence_depth": "official live documentation read; not immutable"
+    },
+    {
+      "topic": "price_increments_order_state",
+      "url": "https://docs.alpaca.markets/us/docs/orders-at-alpaca",
+      "accessed": "2026-09-19",
+      "evidence_depth": "official live documentation read; not immutable"
+    },
+    {
+      "topic": "advanced_contract",
+      "url": "https://docs.alpaca.markets/us/docs/alpaca-elite-smart-router",
+      "accessed": "2026-09-19",
+      "evidence_depth": "official live documentation read; not immutable"
+    }
+  ],
+  "commands": [
+    "gh api repos/alpacahq/alpaca-py/commits/master",
+    "gh api repos/alpacahq/alpaca-py/releases/latest",
+    "gh api repos/alpacahq/alpaca-trade-api-go/commits/master",
+    "gh api 'repos/REPOSITORY/contents/PATH?ref=PINNED_COMMIT'"
+  ]
+}

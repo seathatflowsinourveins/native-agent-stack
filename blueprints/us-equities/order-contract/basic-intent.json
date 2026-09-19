@@ -1,0 +1,9 @@
+{
+  "symbol": "SPY",
+  "qty": "2",
+  "side": "buy",
+  "type": "limit",
+  "time_in_force": "day",
+  "limit_price": "100.10",
+  "client_order_id": "offline-example-001"
+}

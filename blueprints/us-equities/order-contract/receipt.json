@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "id": "alpaca-offline-order-contract-20260919",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "alpaca-py"
+  ],
+  "checked_at": "2026-09-19",
+  "claim": "Installed alpaca-py request models silently dropped synthetic advanced fields; this explicit broker-disconnected basic-intent boundary rejected those inputs and eight additional negative cases while preserving canonical decimal strings.",
+  "status": "passed_with_declared_scope",
+  "commands": [
+    {
+      "command": "python3 blueprints/us-equities/order-contract/order_contract.py < blueprints/us-equities/order-contract/basic-intent.json",
+      "purpose": "Local boundary only; no upstream equivalent is claimed."
+    },
+    {
+      "command": "bwrap --unshare-net --ro-bind / / --proc /proc --dev /dev --die-with-parent \"$SDK_PYTHON\" blueprints/us-equities/order-contract/sdk_probe.py",
+      "exit_code": 0,
+      "purpose": "Native installed LimitOrderRequest(...).to_request_fields() in Linux network namespace; no broker client."
+    },
+    {
+      "command": "python3 -m unittest tests.test_order_contract -v",
+      "python": "3.12.3",
+      "passed_tests": 9
+    },
+    {
+      "command": "\"$SDK_PYTHON\" -m unittest tests.test_order_contract -v",
+      "python": "3.13.15",
+      "passed_tests": 9
+    }
+  ],
+  "native_observation": {
+    "accepted_offline_basic": true,
+    "advanced_cases": [
+      {
+        "boundary_result": "rejected_before_sdk",
+        "case": "DMA",
+        "native_sdk_serialized": {
+          "client_order_id": "offline-example-001",
+          "limit_price": 100.1,
+          "qty": 2,
+          "side": "buy",
+          "symbol": "SPY",
+          "time_in_force": "day",
+          "type": "limit"
+        },
+        "sdk_advanced_field_present": false
+      },
+      {
+        "boundary_result": "rejected_before_sdk",
+        "case": "VWAP",
+        "native_sdk_serialized": {
+          "client_order_id": "offline-example-001",
+          "limit_price": 100.1,
+          "qty": 2,
+          "side": "buy",
+          "symbol": "SPY",
+          "time_in_force": "day",
+          "type": "limit"
+        },
+        "sdk_advanced_field_present": false
+      },
+      {
+        "boundary_result": "rejected_before_sdk",
+        "case": "TWAP",
+        "native_sdk_serialized": {
+          "client_order_id": "offline-example-001",
+          "limit_price": 100.1,
+          "qty": 2,
+          "side": "buy",
+          "symbol": "SPY",
+          "time_in_force": "day",
+          "type": "limit"
+        },
+        "sdk_advanced_field_present": false
+      }
+    ],
+    "advanced_execution_accepted": false,
+    "blocked_transport_audit_events": [],
+    "broker_execution_accepted": false,
+    "canonical_basic": {
+      "intent": {
+        "client_order_id": "offline-example-001",
+        "extended_hours": false,
+        "limit_price": "100.1",
+        "order_class": "simple",
+        "qty": "2",
+        "side": "buy",
+        "symbol": "SPY",
+        "time_in_force": "day",
+        "type": "limit"
+      },
+      "mode": "offline",
+      "schema_version": 1,
+      "submission_enabled": false
+    },
+    "canonical_utf8_sha256": "48acfe76d0809497068b3a52dcf19917fb3dab4399a261f0deb00c62e3d807e2",
+    "clients_constructed": 0,
+    "native_sdk_basic_serialized": {
+      "client_order_id": "offline-example-001",
+      "limit_price": 100.1,
+      "qty": 2,
+      "side": "buy",
+      "symbol": "SPY",
+      "time_in_force": "day",
+      "type": "limit"
+    },
+    "native_sdk_unknown_field_present": false,
+    "negative_cases": {
+      "fractional_qty": "rejected",
+      "live_switch": "rejected",
+      "network_endpoint": "rejected",
+      "nonfinite": "rejected",
+      "notional": "rejected",
+      "python_float": "rejected",
+      "subpenny": "rejected",
+      "unknown_field": "rejected"
+    },
+    "order_request_declares_advanced_instructions": false,
+    "orders_submitted": 0,
+    "python_version": "3.13.15",
+    "replace_request_declares_advanced_instructions": false,
+    "scope": "Offline synthetic serialization and local validation; no provider-valid advanced fixture or wire acceptance.",
+    "sdk": "alpaca-py",
+    "socket_constructor_events": 1,
+    "transport_guard": "Python audit hook blocks audited connect, DNS, datagram send and process launch; run in the documented network namespace. Socket construction alone is not a sent request.",
+    "version": "0.44.0"
+  },
+  "raw_evidence": [
+    {
+      "artifact": "native-sdk-probe.stdout",
+      "sha256": "28d048602c9c73304b4c9cf53fe43aecc6344c7e260355af9a6b1b404097f989",
+      "bytes": 2908
+    },
+    {
+      "artifact": "initial-native-sdk-probe.stdout",
+      "sha256": "b99be01079028dacc03c59cd25ed9fea6a0f0d6c8cf701cca93a644df83074e1",
+      "bytes": 2704
+    },
+    {
+      "artifact": "import-socket-diagnostic.json",
+      "sha256": "b8292a0d4ac0b1dc7343e5f17709ec83257fecf3137631ff914e18f7674768fc",
+      "bytes": 1107
+    }
+  ],
+  "retained_failures": [
+    {
+      "attempt": "Initial audit rejected every socket constructor",
+      "exit_code": 2,
+      "reason": "urllib3 import-time _has_ipv6 triggered a blocked socket.__new__; rejection cases themselves passed. This was not a sent network request.",
+      "resolution": "Retained stack diagnostic and initial output; final bwrap network namespace with selective connect/DNS/send/process guard allowed one constructor and observed no blocked transport events."
+    },
+    {
+      "attempt": "System-Python diagnostic import",
+      "exit_code": 1,
+      "reason": "alpaca was absent from system Python; repeated once with the already installed locked SDK interpreter. No packages installed."
+    }
+  ],
+  "limitations": [
+    "Local contract is not wired into unrelated SDK calls or existing workers; explicit future adapter adoption is required.",
+    "No broker account, key, asset lookup, risk approval, live/paper order or provider wire behavior was exercised.",
+    "Whole-share basic create-intent subset only; advanced, replacement, cancellation, retries, order journals and reconciliation remain gated.",
+    "Input representation cap and symbol/client-ID syntax are local conservative policies, not provider or risk authorization.",
+    "Python SDK float conversion is observed; the canonical exact decimal envelope is deliberately not serialized through those float fields.",
+    "JavaScript advanced support is pinned-source evidence only; no alternative SDK was installed or executed.",
+    "Python audit events and the Linux namespace substantiate this scoped probe, not a universal sandbox or macOS acceptance.",
+    "Canonical content hashes do not establish client-ID uniqueness, deduplication or safe retry semantics.",
+    "No token-saving claim or model inference belongs to this deterministic task."
+  ]
+}
