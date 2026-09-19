@@ -9,6 +9,12 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('progress', ROOT/'observability/grand-dashboard/progress.py')
 progress = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(progress)
+render_spec = importlib.util.spec_from_file_location('render', ROOT/'observability/grand-dashboard/render.py')
+render = importlib.util.module_from_spec(render_spec)
+render_spec.loader.exec_module(render)
+install_spec = importlib.util.spec_from_file_location('install', ROOT/'observability/grand-dashboard/install.py')
+installer = importlib.util.module_from_spec(install_spec)
+install_spec.loader.exec_module(installer)
 
 
 class GrandDashboardTests(unittest.TestCase):
@@ -18,7 +24,8 @@ class GrandDashboardTests(unittest.TestCase):
         self.assertGreater(sum(r['record_kind'] == 'decision' for r in rows), 0)
         allowed = {'record_kind','entity_id','title','state','evidence_ref','source_updated_at','number'}
         extra = {'equity_usd','drawdown_pct','fees_usd','fill_count','margin_call_count'}
-        self.assertTrue(all(set(r) == allowed | (extra if r['record_kind']=='experiment' else set()) for r in rows))
+        self.assertTrue(all(set(r) == allowed | (extra if r['record_kind']=='experiment' else set()) for r in rows if r['record_kind']!='workflow'))
+        self.assertEqual(progress.workflow_snapshot(), [r for r in rows if r['record_kind']=='workflow'])
         self.assertEqual(1, sum(r['entity_id'] == 'snapshot' for r in rows))
 
     def test_absolute_and_symlink_evidence_rejected(self):
@@ -63,6 +70,90 @@ class GrandDashboardTests(unittest.TestCase):
 
     def test_timestamp_requires_zone(self):
         with self.assertRaises(ValueError):progress.stamp('2026-09-19T12:00:00')
+
+    def test_workflow_history_allowlist_and_native_time(self):
+        raw = [dict(name='research-pair', status='failed', startedAt='2026-09-19T17:58:33-04:00',
+                    finishedAt='2026-09-19T17:59:00-04:00', dagRunId='PRIVATE_SENTINEL',
+                    error='PRIVATE_SENTINEL', params='PRIVATE_SENTINEL', workerId='PRIVATE_SENTINEL')]
+        self.assertTrue(hasattr(progress, 'workflow_rows'), 'workflow adapter missing')
+        rows = progress.workflow_rows(raw)
+        self.assertNotIn('PRIVATE_SENTINEL', json.dumps(rows))
+        self.assertEqual(rows[0]['history_count'], 1)
+        self.assertEqual(rows[0]['failed_count'], 1)
+        self.assertEqual(rows[1]['state'], 'failed')
+        self.assertEqual(rows[1]['finished_at'], '2026-09-19T21:59:00+00:00')
+        self.assertEqual(rows[1]['duration_seconds'], 27)
+
+    def test_workflow_unknown_is_not_zero_or_success(self):
+        self.assertTrue(hasattr(progress, 'workflow_snapshot'), 'workflow adapter missing')
+        rows = progress.workflow_snapshot()
+        self.assertEqual(rows[0]['state'], 'not configured / unknown')
+        self.assertNotIn('history_count', rows[0])
+        with tempfile.TemporaryDirectory() as d:
+            rows = progress.workflow_snapshot(Path(d)/'missing', Path(d))
+        self.assertEqual(rows[0]['state'], 'unavailable / native history failed')
+        self.assertNotIn('history_count', rows[0])
+
+    def test_workflow_rejects_wrong_scope_status_and_invalid_time(self):
+        self.assertTrue(hasattr(progress, 'workflow_rows'), 'workflow adapter missing')
+        good = dict(name='research-pair', status='succeeded', startedAt='2026-09-19T21:00:00Z', finishedAt='2026-09-19T21:01:00Z')
+        for change in [dict(name='private-other-dag'), dict(status='secret'),
+                       dict(startedAt='2026-09-19T21:00:00'), dict(finishedAt='2026-09-19T20:00:00Z')]:
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                progress.workflow_rows([good | change])
+        with self.assertRaises(ValueError):progress.workflow_rows([good]*11)
+        empty = progress.workflow_rows([])[0]
+        self.assertEqual(empty['history_count'], 0)
+        self.assertEqual(empty['state'], 'no history / last 30 days')
+
+    def test_native_reader_bounds_and_discards_raw_error(self):
+        self.assertTrue(hasattr(progress, 'history_output'), 'bounded reader missing')
+        import sys
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaises(ValueError):
+                progress.history_output([sys.executable, '-c', 'import os;os.write(1,b"x"*200000)'], Path(d), timeout=2)
+            with self.assertRaises(TimeoutError):
+                progress.history_output([sys.executable, '-c', 'import time;time.sleep(2)'], Path(d), timeout=.05)
+            with self.assertRaisesRegex(ValueError, '^native history failed$'):
+                progress.history_output([sys.executable, '-c', 'import sys;sys.stderr.write("PRIVATE_SENTINEL");sys.exit(7)'], Path(d))
+
+    def test_configured_adapter_fixed_command_and_failed_generation(self):
+        with tempfile.TemporaryDirectory() as d:
+            home = Path(d)
+            binary = home/'dagu-fixture'
+            expected = ['history','research-pair','--context','local','--dagu-home',d,
+                        '--format','json','--last','30d','--limit','10']
+            binary.write_text('#!/usr/bin/python3\nimport sys,json\nassert sys.argv[1:] == ' + repr(expected) +
+                              '\nprint(json.dumps([dict(name="research-pair",status="running",startedAt="2026-09-19T22:00:00Z")]))\n')
+            binary.chmod(0o700)
+            rows = progress.snapshot(ROOT, binary, home)
+            workflow = [r for r in rows if r['record_kind']=='workflow']
+            self.assertEqual(workflow[0]['running_count'], 1)
+            self.assertEqual(workflow[1]['finished_at'], 'unknown')
+            self.assertNotIn('duration_seconds', workflow[1])
+            binary.write_text('#!/usr/bin/python3\nimport sys\nsys.stderr.write("PRIVATE_SENTINEL")\nsys.exit(7)\n')
+            rows = progress.snapshot(ROOT, binary, home)
+            workflow = [r for r in rows if r['record_kind']=='workflow']
+            self.assertEqual(len(workflow), 1)
+            self.assertNotIn('history_count', workflow[0])
+            self.assertEqual(workflow[0]['state'], 'unavailable / native history failed')
+            encoded = json.dumps(progress.payload(rows, 1789855000123456789))
+            self.assertNotIn('PRIVATE_SENTINEL', encoded)
+            self.assertNotIn('workflow/recent-1', encoded)
+
+    def test_workflow_dashboard_and_optional_unit_paths(self):
+        board = render.dashboard()
+        self.assertNotIn('127.0.0.1:18525', board['panels'][0]['options']['content'])
+        table = next(p for p in board['panels'] if p['title'].startswith('Native workflow history'))
+        self.assertIn('record_kind="workflow"', table['targets'][0]['expr'])
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            binary = root/'dagu'; binary.touch()
+            with patch.object(installer.subprocess, 'run'):
+                installer.install(ROOT, root/'config', root/'units', root/'data', binary, root)
+            service = (root/'units/ecosystem-research-progress.service').read_text()
+            self.assertIn(f'--dagu-bin {binary} --dagu-home {root}', service)
+            with self.assertRaises(ValueError):installer.install(ROOT, root/'c', root/'u', root/'d', binary, None)
 
 
 if __name__=='__main__':unittest.main()

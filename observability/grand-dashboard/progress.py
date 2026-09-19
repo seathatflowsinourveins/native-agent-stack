@@ -5,12 +5,20 @@ from datetime import datetime, timezone
 from decimal import Decimal
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
+import selectors
+import subprocess
 import time
 import urllib.request
 
 MAX_BYTES = 2_000_000
+HISTORY_BYTES = 131_072
+HISTORY_LIMIT = 10
+HISTORY_STATUSES = ('not_started', 'running', 'succeeded', 'failed', 'aborted',
+                    'queued', 'waiting', 'rejected', 'partially_succeeded')
+WORKFLOW_EVIDENCE = 'adoption/paired/README.md'
 SOURCES = {
     'foundation': ('catalogs/us-equities/convergence-program/foundation.json', 'repositories'),
     'trading': ('catalogs/us-equities/convergence-program/trading.json', 'entries'),
@@ -40,7 +48,102 @@ def stamp(value):
     return parsed.astimezone(timezone.utc).isoformat()
 
 
-def snapshot(root):
+def history_output(command, home, timeout=5):
+    """Bound the native CLI's stdout and lifetime; never retain raw stderr."""
+    output = bytearray()
+    deadline = time.monotonic() + timeout
+    with subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                          stderr=subprocess.DEVNULL, cwd=home,
+                          env={'HOME': str(Path.home()), 'PATH': '/usr/bin:/bin', 'TZ': 'UTC'}) as process:
+        try:
+            with selectors.DefaultSelector() as reader:
+                reader.register(process.stdout, selectors.EVENT_READ)
+                while reader.get_map():
+                    remaining = deadline - time.monotonic()
+                    if remaining <= 0:
+                        raise TimeoutError('native history timed out')
+                    for key, _ in reader.select(remaining):
+                        chunk = os.read(key.fileobj.fileno(), 8192)
+                        if not chunk:
+                            reader.unregister(key.fileobj)
+                            break
+                        output.extend(chunk)
+                        if len(output) > HISTORY_BYTES:
+                            raise ValueError('native history output exceeds limit')
+            try:
+                result = process.wait(timeout=max(.001, deadline - time.monotonic()))
+            except subprocess.TimeoutExpired:
+                raise TimeoutError('native history timed out') from None
+            if result:
+                raise ValueError('native history failed')
+        finally:
+            if process.poll() is None:
+                process.kill()
+                process.wait()
+    return json.loads(output)
+
+
+def workflow_unknown(state):
+    return [dict(record_kind='workflow', entity_id='workflow/history',
+                 title='Research pair / last 10 runs within 30 days', state=state,
+                 evidence_ref=WORKFLOW_EVIDENCE, source_updated_at='unknown')]
+
+
+def workflow_rows(entries):
+    """Accept only the fixed native history scope; no IDs, parameters or errors."""
+    if not isinstance(entries, list) or len(entries) > HISTORY_LIMIT:
+        raise ValueError('invalid native history result count')
+    rows = workflow_unknown('observed / bounded local history' if entries else 'no history / last 30 days')
+    summary = rows[0]
+    summary['history_count'] = len(entries)
+    summary.update({status + '_count': 0 for status in HISTORY_STATUSES})
+    known_times = []
+    for i, entry in enumerate(entries, 1):
+        if not isinstance(entry, dict) or entry.get('name') != 'research-pair' or entry.get('status') not in HISTORY_STATUSES:
+            raise ValueError('unexpected native history scope or status')
+        times = {}
+        for native, field in [('startedAt', 'started_at'), ('finishedAt', 'finished_at')]:
+            value = entry.get(native)
+            if value is not None and value != '':
+                if not isinstance(value, str) or len(value) > 40:
+                    raise ValueError('invalid native timestamp')
+                times[field] = stamp(value)
+        duration = None
+        if len(times) == 2:
+            duration = (datetime.fromisoformat(times['finished_at']) - datetime.fromisoformat(times['started_at'])).total_seconds()
+            if duration < 0:
+                raise ValueError('native finish precedes start')
+        updated = times.get('finished_at', times.get('started_at', 'unknown'))
+        known_times.extend(times.values())
+        row = dict(record_kind='workflow', entity_id=f'workflow/recent-{i}',
+                   title=f'Research pair / recent entry {i}', state=entry['status'],
+                   evidence_ref=WORKFLOW_EVIDENCE, source_updated_at=updated,
+                   started_at=times.get('started_at', 'unknown'), finished_at=times.get('finished_at', 'unknown'))
+        if duration is not None:
+            row['duration_seconds'] = duration
+        summary[entry['status'] + '_count'] += 1
+        rows.append(row)
+    if known_times:
+        summary['source_updated_at'] = max(known_times)
+    return rows
+
+
+def workflow_snapshot(dagu_bin=None, dagu_home=None):
+    if dagu_bin is None and dagu_home is None:
+        return workflow_unknown('not configured / unknown')
+    try:
+        binary, home = Path(dagu_bin), Path(dagu_home)
+        if not binary.is_absolute() or not home.is_absolute() or not binary.is_file() or not home.is_dir():
+            raise ValueError('invalid native history paths')
+        command = [str(binary), 'history', 'research-pair', '--context', 'local',
+                   '--dagu-home', str(home), '--format', 'json', '--last', '30d', '--limit', str(HISTORY_LIMIT)]
+        return workflow_rows(history_output(command, home))
+    except (OSError, ValueError, TypeError, TimeoutError):
+        # Failure must replace previous successful rows in the same generation.
+        return workflow_unknown('unavailable / native history failed')
+
+
+def snapshot(root, dagu_bin=None, dagu_home=None):
     root = Path(root)
     plan = read(root, 'blueprints/us-equities/convergence-program/plan.json')
     state = read(root, 'observability/grand-dashboard/state.json')
@@ -99,6 +202,7 @@ def snapshot(root):
         raise ValueError('public star count mismatch')
     add('summary', 'stars', 'Public stars enumerated', 'identity audit', 'catalogs/us-equities/convergence-program/public-stars-refresh.json', count)
     add('summary', 'snapshot', 'Snapshot marker', 'recorded', 'observability/grand-dashboard/state.json')
+    rows.extend(workflow_snapshot(dagu_bin, dagu_home))
     if len(rows) > 80 or len({r['entity_id'] for r in rows}) != len(rows):
         raise ValueError('too many or duplicate dashboard entities')
     return rows
@@ -114,8 +218,8 @@ def payload(rows, now_ns):
                         for kind, values in streams.items()]}
 
 
-def publish(root, cache, now_ns=None):
-    rows = snapshot(root)
+def publish(root, cache, now_ns=None, dagu_bin=None, dagu_home=None):
+    rows = snapshot(root, dagu_bin, dagu_home)
     digest = hashlib.sha256(json.dumps(rows, sort_keys=True).encode()).hexdigest()
     now_ns = time.time_ns() if now_ns is None else now_ns
     cache = Path(cache)
@@ -139,11 +243,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo', type=Path, required=True)
     parser.add_argument('--cache', type=Path)
+    parser.add_argument('--dagu-bin', type=Path)
+    parser.add_argument('--dagu-home', type=Path)
     args = parser.parse_args()
+    if (args.dagu_bin is None) != (args.dagu_home is None):
+        parser.error('--dagu-bin and --dagu-home must be supplied together')
     if args.cache:
-        print(json.dumps(publish(args.repo, args.cache)))
+        print(json.dumps(publish(args.repo, args.cache, dagu_bin=args.dagu_bin, dagu_home=args.dagu_home)))
     else:
-        print(json.dumps(snapshot(args.repo), indent=2))
+        print(json.dumps(snapshot(args.repo, args.dagu_bin, args.dagu_home), indent=2))
 
 
 if __name__ == '__main__':

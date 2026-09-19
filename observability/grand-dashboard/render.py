@@ -22,7 +22,7 @@ def dashboard():
         panels.append(value)
         return value
     panel(1, 'Research control room', 'text', 0,0,24,5,
-          options={'mode':'markdown','content':'# US equities · research control room\nHistorical simulation is the active lane. Paper is deferred; live trading has no authority.\n\n**Live:** service health and exported usage. **Recorded:** lanes, decisions, gates and worker checkpoints, refreshed from public files. Emission age does not prove source freshness. Unknown usage is not zero; counters are not savings.\n\n[Native telemetry](/d/ecosystem-native) · [Dagu workflow history](http://127.0.0.1:18525) · [Architecture](https://github.com/seathatflowsinourveins/native-agent-stack/tree/main/blueprints/us-equities/convergence-program)'})
+          options={'mode':'markdown','content':'# US equities · research control room\nHistorical simulation is the active lane. Paper is deferred; live trading has no authority.\n\n**Observed:** service health, exported usage and bounded native workflow history. **Recorded:** lanes, decisions, gates and worker checkpoints, refreshed from public files. Emission age does not prove source freshness or an active worker. Unknown usage is not zero; counters are not savings.\n\n[Native telemetry](/d/ecosystem-native) · [Workflow evidence](https://github.com/seathatflowsinourveins/native-agent-stack/tree/main/adoption/paired) · [Architecture](https://github.com/seathatflowsinourveins/native-agent-stack/tree/main/blueprints/us-equities/convergence-program)'})
     panel(2,'Last progress emission', 'stat',0,5,8,4,
           '1000 * max(last_over_time({service_name="agent-stack-progress",record_kind="summary"} | json | entity_id="snapshot" | unwrap observed_unix | __error__="" [24h]))',
           description='Relative age of the last emitted snapshot. Checkpoint UTC in each table records source age separately. More than 12 minutes suggests an emitter/backend failure.',
@@ -42,9 +42,20 @@ def dashboard():
     panel(11,'Live host memory usage','timeseries',12,64,12,8,'ecosystem_system_memory_usage_bytes',source='ecosystem-prometheus')
     panel(12,'Progress history · recorded checkpoints','logs',0,72,24,9,'{service_name="agent-stack-progress",record_kind=~"wave|lane|worker"}', options={'showTime':True,'sortOrder':'Descending','wrapLogMessage':True})
     panel(14,'Native agent activity · sanitized telemetry','logs',0,81,24,9,'{service_name=~"Codex Desktop|codex-app-server|claude-code|codex-sdk-receipt"}',options={'showTime':True,'sortOrder':'Descending','wrapLogMessage':True})
+    panel(15,'Native workflow history · research pair','table',0,9,24,9,latest('workflow'),
+          description='Read-only local Dagu history: up to 10 research-pair runs within 30 days. Native times and statuses describe stored runs, not a process heartbeat or new model acceptance. Counts cover only this returned sample. Missing configuration or failed observation is unknown; an empty successful query reports zero. Entry numbers are display positions, not run identifiers.',
+          transformations=[{'id':'labelsToFields','options':{'mode':'columns'}},
+            {'id':'organize','options':{'excludeByName':{'Time':True,'Value':True,'Value #A':True,'record_kind':True,'record_kind_extracted':True,'detected_level':True,'service_name':True,'entity_id':True,'source_updated_at':True},
+              'indexByName':{'title':0,'state':1,'started_at':2,'finished_at':3,'duration_seconds':4,'history_count':5,'succeeded_count':6,'failed_count':7,'running_count':8,'evidence_ref':20},
+              'renameByName':{'title':'Workflow / sample','state':'Native state / observation','started_at':'Native started UTC','finished_at':'Native finished UTC','duration_seconds':'Elapsed seconds','history_count':'Sample runs','succeeded_count':'Succeeded','failed_count':'Failed','running_count':'Running','evidence_ref':'Evidence path'}}}],
+          options={'showHeader':True,'cellHeight':'sm','footer':{'show':False}},
+          fieldConfig={'defaults':{'noValue':'—','custom':{'align':'auto','cellOptions':{'type':'auto'},'wrapText':True}},
+            'overrides':[{'matcher':{'id':'byName','options':'Evidence path'},'properties':[{'id':'links','value':[{'title':'Open workflow evidence','url':'https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/${__value.raw}','targetBlank':True}]}]}]})
     panels[0]['gridPos']['h']=7
-    for item in panels[1:]:item['gridPos']['y']+=2
-    return dict(uid='research-grand',title='Research grand dashboard',schemaVersion=39,version=4,editable=False,
+    for item in panels[1:]:
+        if item['id'] != 15 and item['gridPos']['y'] >= 9:item['gridPos']['y']+=9
+        item['gridPos']['y']+=2
+    return dict(uid='research-grand',title='Research grand dashboard',schemaVersion=39,version=5,editable=False,
                 timezone='browser',refresh='30s',time={'from':'now-6h','to':'now'},tags=['ecosystem','research'],panels=panels)
 
 
