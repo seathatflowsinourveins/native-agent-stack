@@ -1,0 +1,723 @@
+{
+  "schema_version": 1,
+  "observed_at_utc": "2026-09-19T18:32:37.068Z",
+  "status": "completed_with_scores_and_misses_preserved",
+  "qmd_version": "2.8.3",
+  "collection": "us-equities-foundation",
+  "query_count": 12,
+  "fixture_sha256": "2cabf12fa5fa2e97cd1c623a3c60243b48939279d5c3e4c39a4eb13df8c99858",
+  "upstream_module_sha256": {
+    "dist/bench/bench.js": "c64b97ab88fb646c258a9bb592905755a7c2835ea6fcea9a6c0361e1af95c412",
+    "dist/bench/score.js": "f87ce485979d78e6a355921610239c475dc017a00680685fb61c717898ce8011",
+    "dist/index.js": "f56cd4d8484419e522420e637e47c7be36ae9e8d1008fb338a520123ee0a9387",
+    "dist/store.js": "affbc9cc67f9bbfeee0bedccd8658195ce89fa8f6bdc9abc6c9c61c50b0a590b"
+  },
+  "native_summary": {
+    "bm25": {
+      "avg_precision": 0.6666666666666666,
+      "avg_recall": 0.8333333333333334,
+      "avg_recall_at_1": 0.5,
+      "avg_recall_at_3": 0.6666666666666666,
+      "avg_recall_at_5": 0.75,
+      "avg_mrr": 0.6104166666666667,
+      "avg_f1": 0.6666666666666666,
+      "avg_latency_ms": 0.8333333333333334
+    }
+  },
+  "native_results": [
+    {
+      "id": "sec-availability",
+      "query": "SEC first observation cutoff",
+      "type": "topical",
+      "backends": {
+        "bm25": {
+          "precision_at_k": 1,
+          "recall": 1,
+          "recall_at_1": 1,
+          "recall_at_3": 1,
+          "recall_at_5": 1,
+          "mrr": 1,
+          "f1": 1,
+          "hits_at_k": 1,
+          "matched_files": [
+            "financial-data/README.md"
+          ],
+          "unmatched_expected_files": [],
+          "total_expected": 1,
+          "latency_ms": 3,
+          "top_files": [
+            "qmd://us-equities-foundation/financial-data/README.md",
+            "qmd://us-equities-foundation/workers/policy.md",
+            "qmd://us-equities-foundation/north-star.md",
+            "qmd://us-equities-foundation/research-runtime/README.md"
+          ]
+        }
+      }
+    },
+    {
+      "id": "backup-host-loss",
+      "query": "machine failure recover backup key",
+      "type": "alias",
+      "backends": {
+        "bm25": {
+          "precision_at_k": 0,
+          "recall": 0,
+          "recall_at_1": 0,
+          "recall_at_3": 0,
+          "recall_at_5": 0,
+          "mrr": 0,
+          "f1": 0,
+          "hits_at_k": 0,
+          "matched_files": [],
+          "unmatched_expected_files": [
+            "hosting/backup/README.md"
+          ],
+          "total_expected": 1,
+          "latency_ms": 1,
+          "top_files": []
+        }
+      }
+    },
+    {
+      "id": "acp-readonly",
+      "query": "ACP read-only workspaceWrite",
+      "type": "exact",
+      "backends": {
+        "bm25": {
+          "precision_at_k": 1,
+          "recall": 1,
+          "recall_at_1": 1,
+          "recall_at_3": 1,
+          "recall_at_5": 1,
+          "mrr": 1,
+          "f1": 1,
+          "hits_at_k": 1,
+          "matched_files": [
+            "deerflow/README.md"
+          ],
+          "unmatched_expected_files": [],
+          "total_expected": 1,
+          "latency_ms": 0,
+          "top_files": [
+            "qmd://us-equities-foundation/README.md",
+            "qmd://us-equities-foundation/deerflow/README.md",
+            "qmd://us-equities-foundation/gap-resolution.md"
+          ]
+        }
+      }
+    },
+    {
+      "id": "native-token-subsets",
+      "query": "cached reasoning tokens included",
+      "type": "topical",
+      "backends": {
+        "bm25": {
+          "precision_at_k": 0,
+          "recall": 1,
+          "recall_at_1": 0,
+          "recall_at_3": 0,
+          "recall_at_5": 1,
+          "mrr": 0.2,
+          "f1": 0,
+          "hits_at_k": 0,
+          "matched_files": [
+            "workers/README.md"
+          ],
+          "unmatched_expected_files": [],
+          "total_expected": 1,
+          "latency_ms": 1,
+          "top_files": [
+            "qmd://us-equities-foundation/routing/README.md",
+            "qmd://us-equities-foundation/deerflow/README.md",
+            "qmd://us-equities-foundation/north-star.md",
+            "qmd://us-equities-foundation/gap-resolution.md",
+            "qmd://us-equities-foundation/workers/README.md"
+          ]
+        }
+      }
+    },
+    {
+      "id": "restart-allowance",
+      "query": "restart exhausted allowance",
+      "type": "cross-domain",
+      "backends": {
+        "bm25": {
+          "precision_at_k": 1,
+          "recall": 1,
+          "recall_at_1": 1,
+          "recall_at_3": 1,
+          "recall_at_5": 1,
+          "mrr": 1,
+          "f1": 1,
+          "hits_at_k": 1,
+          "matched_files": [
+            "research-runtime/README.md"
+          ],
+          "unmatched_expected_files": [],
+          "total_expected": 1,
+          "latency_ms": 1,
+          "top_files": [
+            "qmd://us-equities-foundation/research-runtime/README.md",
+            "qmd://us-equities-foundation/gap-resolution.md"
+          ]
+        }
+      }
+    },
+    {
+      "id": "broker-timeout",
+      "query": "timeout reconcile broker order",
+      "type": "topical",
+      "backends": {
+        "bm25": {
+          "precision_at_k": 1,
+          "recall": 1,
+          "recall_at_1": 0,
+          "recall_at_3": 1,
+          "recall_at_5": 1,
+          "mrr": 0.5,
+          "f1": 1,
+          "hits_at_k": 1,
+          "matched_files": [
+            "engine/README.md"
+          ],
+          "unmatched_expected_files": [],
+          "total_expected": 1,
+          "latency_ms": 1,
+          "top_files": [
+            "qmd://us-equities-foundation/workers/README.md",
+            "qmd://us-equities-foundation/engine/README.md",
+            "qmd://us-equities-foundation/README.md",
+            "qmd://us-equities-foundation/north-star.md"
+          ]
+        }
+      }
+    },
+    {
+      "id": "alpaca-entitlement",
+      "query": "Alpaca product subscription entitlement",
+      "type": "topical",
+      "backends": {
+        "bm25": {
+          "precision_at_k": 1,
+          "recall": 1,
+          "recall_at_1": 0,
+          "recall_at_3": 1,
+          "recall_at_5": 1,
+          "mrr": 0.5,
+          "f1": 1,
+          "hits_at_k": 1,
+          "matched_files": [
+            "engine/resolution.md"
+          ],
+          "unmatched_expected_files": [],
+          "total_expected": 1,
+          "latency_ms": 1,
+          "top_files": [
+            "qmd://us-equities-foundation/engine/README.md",
+            "qmd://us-equities-foundation/engine/resolution.md",
+            "qmd://us-equities-foundation/gap-resolution.md"
+          ]
+        }
+      }
+    },
+    {
+      "id": "dagu-recovery",
+      "query": "Dagu history restart in-flight",
+      "type": "cross-domain",
+      "backends": {
+        "bm25": {
+          "precision_at_k": 1,
+          "recall": 1,
+          "recall_at_1": 1,
+          "recall_at_3": 1,
+          "recall_at_5": 1,
+          "mrr": 1,
+          "f1": 1,
+          "hits_at_k": 1,
+          "matched_files": [
+            "hosting/README.md"
+          ],
+          "unmatched_expected_files": [],
+          "total_expected": 1,
+          "latency_ms": 0,
+          "top_files": [
+            "qmd://us-equities-foundation/hosting/README.md"
+          ]
+        }
+      }
+    },
+    {
+      "id": "gateway-parity",
+      "query": "gateway compaction deferred tools",
+      "type": "cross-domain",
+      "backends": {
+        "bm25": {
+          "precision_at_k": 1,
+          "recall": 1,
+          "recall_at_1": 1,
+          "recall_at_3": 1,
+          "recall_at_5": 1,
+          "mrr": 1,
+          "f1": 1,
+          "hits_at_k": 1,
+          "matched_files": [
+            "routing/README.md"
+          ],
+          "unmatched_expected_files": [],
+          "total_expected": 1,
+          "latency_ms": 0,
+          "top_files": [
+            "qmd://us-equities-foundation/routing/README.md"
+          ]
+        }
+      }
+    },
+    {
+      "id": "paper-risk-controls",
+      "query": "kill switch numeric limits",
+      "type": "topical",
+      "backends": {
+        "bm25": {
+          "precision_at_k": 1,
+          "recall": 1,
+          "recall_at_1": 1,
+          "recall_at_3": 1,
+          "recall_at_5": 1,
+          "mrr": 1,
+          "f1": 1,
+          "hits_at_k": 1,
+          "matched_files": [
+            "north-star.md"
+          ],
+          "unmatched_expected_files": [],
+          "total_expected": 1,
+          "latency_ms": 1,
+          "top_files": [
+            "qmd://us-equities-foundation/north-star.md",
+            "qmd://us-equities-foundation/README.md",
+            "qmd://us-equities-foundation/gap-resolution.md"
+          ]
+        }
+      }
+    },
+    {
+      "id": "worker-cancellation",
+      "query": "stop worker orphan subprocess",
+      "type": "semantic",
+      "backends": {
+        "bm25": {
+          "precision_at_k": 0,
+          "recall": 0,
+          "recall_at_1": 0,
+          "recall_at_3": 0,
+          "recall_at_5": 0,
+          "mrr": 0,
+          "f1": 0,
+          "hits_at_k": 0,
+          "matched_files": [],
+          "unmatched_expected_files": [
+            "research-runtime/README.md"
+          ],
+          "total_expected": 1,
+          "latency_ms": 0,
+          "top_files": []
+        }
+      }
+    },
+    {
+      "id": "savings-scope",
+      "query": "selected text provider savings",
+      "type": "topical",
+      "backends": {
+        "bm25": {
+          "precision_at_k": 0,
+          "recall": 1,
+          "recall_at_1": 0,
+          "recall_at_3": 0,
+          "recall_at_5": 0,
+          "mrr": 0.125,
+          "f1": 0,
+          "hits_at_k": 0,
+          "matched_files": [
+            "research-runtime/README.md"
+          ],
+          "unmatched_expected_files": [],
+          "total_expected": 1,
+          "latency_ms": 1,
+          "top_files": [
+            "qmd://us-equities-foundation/gap-resolution.md",
+            "qmd://us-equities-foundation/routing/README.md",
+            "qmd://us-equities-foundation/north-star.md",
+            "qmd://us-equities-foundation/workers/README.md",
+            "qmd://us-equities-foundation/financial-data/README.md",
+            "qmd://us-equities-foundation/workers/policy.md",
+            "qmd://us-equities-foundation/deerflow/README.md",
+            "qmd://us-equities-foundation/research-runtime/README.md",
+            "qmd://us-equities-foundation/hosting/backup/README.md"
+          ]
+        }
+      }
+    }
+  ],
+  "exact_path_audit_summary": {
+    "mean_recall_at_1": 0.4166666666666667,
+    "mean_recall_at_3": 0.6666666666666666,
+    "mean_recall_at_5": 0.75,
+    "mean_reciprocal_rank": 0.56875,
+    "queries_with_gold_at_3": 8,
+    "queries_without_gold_at_3": 4,
+    "native_recall_at_3_disagreements": 0
+  },
+  "per_query_audit": [
+    {
+      "id": "sec-availability",
+      "question": "Can a fact be used before we first observed the SEC snapshot containing it?",
+      "query": "SEC first observation cutoff",
+      "expected_ids": [
+        "qmd://us-equities-foundation/financial-data/README.md"
+      ],
+      "retrieved_ids": [
+        "qmd://us-equities-foundation/financial-data/README.md",
+        "qmd://us-equities-foundation/workers/policy.md",
+        "qmd://us-equities-foundation/north-star.md",
+        "qmd://us-equities-foundation/research-runtime/README.md"
+      ],
+      "direct_search_error": null,
+      "native_replay_identical": true,
+      "exact_path_audit": {
+        "recall_at_1": 1,
+        "recall_at_3": 1,
+        "recall_at_5": 1,
+        "reciprocal_rank": 1,
+        "matched_at_3": [
+          "qmd://us-equities-foundation/financial-data/README.md"
+        ],
+        "missing_at_3": []
+      },
+      "native_recall_at_3": 1,
+      "native_and_exact_recall_at_3_agree": true
+    },
+    {
+      "id": "backup-host-loss",
+      "question": "What can we recover if this machine and its backup password are lost?",
+      "query": "machine failure recover backup key",
+      "expected_ids": [
+        "qmd://us-equities-foundation/hosting/backup/README.md"
+      ],
+      "retrieved_ids": [],
+      "direct_search_error": null,
+      "native_replay_identical": true,
+      "exact_path_audit": {
+        "recall_at_1": 0,
+        "recall_at_3": 0,
+        "recall_at_5": 0,
+        "reciprocal_rank": 0,
+        "matched_at_3": [],
+        "missing_at_3": [
+          "qmd://us-equities-foundation/hosting/backup/README.md"
+        ]
+      },
+      "native_recall_at_3": 0,
+      "native_and_exact_recall_at_3_agree": true
+    },
+    {
+      "id": "acp-readonly",
+      "question": "Does the ACP read-only mode actually prohibit workspace writes?",
+      "query": "ACP read-only workspaceWrite",
+      "expected_ids": [
+        "qmd://us-equities-foundation/deerflow/README.md"
+      ],
+      "retrieved_ids": [
+        "qmd://us-equities-foundation/README.md",
+        "qmd://us-equities-foundation/deerflow/README.md",
+        "qmd://us-equities-foundation/gap-resolution.md"
+      ],
+      "direct_search_error": null,
+      "native_replay_identical": true,
+      "exact_path_audit": {
+        "recall_at_1": 0,
+        "recall_at_3": 1,
+        "recall_at_5": 1,
+        "reciprocal_rank": 0.5,
+        "matched_at_3": [
+          "qmd://us-equities-foundation/deerflow/README.md"
+        ],
+        "missing_at_3": []
+      },
+      "native_recall_at_3": 1,
+      "native_and_exact_recall_at_3_agree": true
+    },
+    {
+      "id": "native-token-subsets",
+      "question": "Which cached input and reasoning counters are already included in native totals?",
+      "query": "cached reasoning tokens included",
+      "expected_ids": [
+        "qmd://us-equities-foundation/workers/README.md"
+      ],
+      "retrieved_ids": [
+        "qmd://us-equities-foundation/routing/README.md",
+        "qmd://us-equities-foundation/deerflow/README.md",
+        "qmd://us-equities-foundation/north-star.md",
+        "qmd://us-equities-foundation/gap-resolution.md",
+        "qmd://us-equities-foundation/workers/README.md"
+      ],
+      "direct_search_error": null,
+      "native_replay_identical": true,
+      "exact_path_audit": {
+        "recall_at_1": 0,
+        "recall_at_3": 0,
+        "recall_at_5": 1,
+        "reciprocal_rank": 0.2,
+        "matched_at_3": [],
+        "missing_at_3": [
+          "qmd://us-equities-foundation/workers/README.md"
+        ]
+      },
+      "native_recall_at_3": 0,
+      "native_and_exact_recall_at_3_agree": true
+    },
+    {
+      "id": "restart-allowance",
+      "question": "Can restarting Desktop restore exhausted native worker allowance?",
+      "query": "restart exhausted allowance",
+      "expected_ids": [
+        "qmd://us-equities-foundation/research-runtime/README.md"
+      ],
+      "retrieved_ids": [
+        "qmd://us-equities-foundation/research-runtime/README.md",
+        "qmd://us-equities-foundation/gap-resolution.md"
+      ],
+      "direct_search_error": null,
+      "native_replay_identical": true,
+      "exact_path_audit": {
+        "recall_at_1": 1,
+        "recall_at_3": 1,
+        "recall_at_5": 1,
+        "reciprocal_rank": 1,
+        "matched_at_3": [
+          "qmd://us-equities-foundation/research-runtime/README.md"
+        ],
+        "missing_at_3": []
+      },
+      "native_recall_at_3": 1,
+      "native_and_exact_recall_at_3_agree": true
+    },
+    {
+      "id": "broker-timeout",
+      "question": "What should happen before retrying an order after a connection timeout?",
+      "query": "timeout reconcile broker order",
+      "expected_ids": [
+        "qmd://us-equities-foundation/engine/README.md"
+      ],
+      "retrieved_ids": [
+        "qmd://us-equities-foundation/workers/README.md",
+        "qmd://us-equities-foundation/engine/README.md",
+        "qmd://us-equities-foundation/README.md",
+        "qmd://us-equities-foundation/north-star.md"
+      ],
+      "direct_search_error": null,
+      "native_replay_identical": true,
+      "exact_path_audit": {
+        "recall_at_1": 0,
+        "recall_at_3": 1,
+        "recall_at_5": 1,
+        "reciprocal_rank": 0.5,
+        "matched_at_3": [
+          "qmd://us-equities-foundation/engine/README.md"
+        ],
+        "missing_at_3": []
+      },
+      "native_recall_at_3": 1,
+      "native_and_exact_recall_at_3_agree": true
+    },
+    {
+      "id": "alpaca-entitlement",
+      "question": "What non-credential prerequisites can block initialization of the official Alpaca adapter?",
+      "query": "Alpaca product subscription entitlement",
+      "expected_ids": [
+        "qmd://us-equities-foundation/engine/resolution.md"
+      ],
+      "retrieved_ids": [
+        "qmd://us-equities-foundation/engine/README.md",
+        "qmd://us-equities-foundation/engine/resolution.md",
+        "qmd://us-equities-foundation/gap-resolution.md"
+      ],
+      "direct_search_error": null,
+      "native_replay_identical": true,
+      "exact_path_audit": {
+        "recall_at_1": 0,
+        "recall_at_3": 1,
+        "recall_at_5": 1,
+        "reciprocal_rank": 0.5,
+        "matched_at_3": [
+          "qmd://us-equities-foundation/engine/resolution.md"
+        ],
+        "missing_at_3": []
+      },
+      "native_recall_at_3": 1,
+      "native_and_exact_recall_at_3_agree": true
+    },
+    {
+      "id": "dagu-recovery",
+      "question": "Does retained Dagu history prove that an interrupted workflow resumes?",
+      "query": "Dagu history restart in-flight",
+      "expected_ids": [
+        "qmd://us-equities-foundation/hosting/README.md"
+      ],
+      "retrieved_ids": [
+        "qmd://us-equities-foundation/hosting/README.md"
+      ],
+      "direct_search_error": null,
+      "native_replay_identical": true,
+      "exact_path_audit": {
+        "recall_at_1": 1,
+        "recall_at_3": 1,
+        "recall_at_5": 1,
+        "reciprocal_rank": 1,
+        "matched_at_3": [
+          "qmd://us-equities-foundation/hosting/README.md"
+        ],
+        "missing_at_3": []
+      },
+      "native_recall_at_3": 1,
+      "native_and_exact_recall_at_3_agree": true
+    },
+    {
+      "id": "gateway-parity",
+      "question": "Does a gateway text response prove native tool, compaction and full-context equivalence?",
+      "query": "gateway compaction deferred tools",
+      "expected_ids": [
+        "qmd://us-equities-foundation/routing/README.md"
+      ],
+      "retrieved_ids": [
+        "qmd://us-equities-foundation/routing/README.md"
+      ],
+      "direct_search_error": null,
+      "native_replay_identical": true,
+      "exact_path_audit": {
+        "recall_at_1": 1,
+        "recall_at_3": 1,
+        "recall_at_5": 1,
+        "reciprocal_rank": 1,
+        "matched_at_3": [
+          "qmd://us-equities-foundation/routing/README.md"
+        ],
+        "missing_at_3": []
+      },
+      "native_recall_at_3": 1,
+      "native_and_exact_recall_at_3_agree": true
+    },
+    {
+      "id": "paper-risk-controls",
+      "question": "What independent controls are required before unattended paper execution?",
+      "query": "kill switch numeric limits",
+      "expected_ids": [
+        "qmd://us-equities-foundation/north-star.md"
+      ],
+      "retrieved_ids": [
+        "qmd://us-equities-foundation/north-star.md",
+        "qmd://us-equities-foundation/README.md",
+        "qmd://us-equities-foundation/gap-resolution.md"
+      ],
+      "direct_search_error": null,
+      "native_replay_identical": true,
+      "exact_path_audit": {
+        "recall_at_1": 1,
+        "recall_at_3": 1,
+        "recall_at_5": 1,
+        "reciprocal_rank": 1,
+        "matched_at_3": [
+          "qmd://us-equities-foundation/north-star.md"
+        ],
+        "missing_at_3": []
+      },
+      "native_recall_at_3": 1,
+      "native_and_exact_recall_at_3_agree": true
+    },
+    {
+      "id": "worker-cancellation",
+      "question": "How do cancelled model workers avoid leaving child processes running?",
+      "query": "stop worker orphan subprocess",
+      "expected_ids": [
+        "qmd://us-equities-foundation/research-runtime/README.md"
+      ],
+      "retrieved_ids": [],
+      "direct_search_error": null,
+      "native_replay_identical": true,
+      "exact_path_audit": {
+        "recall_at_1": 0,
+        "recall_at_3": 0,
+        "recall_at_5": 0,
+        "reciprocal_rank": 0,
+        "matched_at_3": [],
+        "missing_at_3": [
+          "qmd://us-equities-foundation/research-runtime/README.md"
+        ]
+      },
+      "native_recall_at_3": 0,
+      "native_and_exact_recall_at_3_agree": true
+    },
+    {
+      "id": "savings-scope",
+      "question": "Does the smaller research packet establish complete provider token savings?",
+      "query": "selected text provider savings",
+      "expected_ids": [
+        "qmd://us-equities-foundation/research-runtime/README.md"
+      ],
+      "retrieved_ids": [
+        "qmd://us-equities-foundation/gap-resolution.md",
+        "qmd://us-equities-foundation/routing/README.md",
+        "qmd://us-equities-foundation/north-star.md",
+        "qmd://us-equities-foundation/workers/README.md",
+        "qmd://us-equities-foundation/financial-data/README.md",
+        "qmd://us-equities-foundation/workers/policy.md",
+        "qmd://us-equities-foundation/deerflow/README.md",
+        "qmd://us-equities-foundation/research-runtime/README.md",
+        "qmd://us-equities-foundation/hosting/backup/README.md"
+      ],
+      "direct_search_error": null,
+      "native_replay_identical": true,
+      "exact_path_audit": {
+        "recall_at_1": 0,
+        "recall_at_3": 0,
+        "recall_at_5": 0,
+        "reciprocal_rank": 0.125,
+        "matched_at_3": [],
+        "missing_at_3": [
+          "qmd://us-equities-foundation/research-runtime/README.md"
+        ]
+      },
+      "native_recall_at_3": 0,
+      "native_and_exact_recall_at_3_agree": true
+    }
+  ],
+  "model_calls": 0,
+  "embedding_downloads_requested": false,
+  "active_index_passed_to_qmd": false,
+  "net_provider_tokens_saved": null,
+  "id": "qmd-bm25-retrieval-20260919",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "qmd"
+  ],
+  "claim": "Pinned upstream QMD runBenchmark API evaluated 12 fixed queries on an online-backup snapshot of the adopted lexical index; exact intended-source recall at three was 8/12, with all misses retained.",
+  "limitations": [
+    "The upstream benchmark was invoked through its shipped module API, not a fabricated BM25-only CLI flag.",
+    "Twelve curated queries against 18 foundation documents do not establish robust general retrieval, an independent holdout or complete financial RAG.",
+    "Intended source paths are reviewed gold documents, not exhaustive relevance judgments over every returned summary.",
+    "Upstream precision_at_k uses min(k,gold_count) as denominator, not conventional precision at k. Upstream path matching is case-insensitive suffix matching.",
+    "The separate exact-path audit excludes suffix collisions; upstream native metrics are retained unchanged.",
+    "Original queries were frozen before the first run. Four top-three misses remain; no reformulation or models were used to improve the displayed scores.",
+    "Backend exceptions are flattened to zero by the upstream benchmark; direct lexical replay confirmed identical results without errors for all twelve queries.",
+    "The active database was opened only through SQLite read-only online backup; QMD schema initialization ran on the disposable copy, without reindexing, config synchronization or model download.",
+    "Raw native stdout is private because its fixture field contains a local path. This public receipt contains source IDs and bounded results only.",
+    "This measures lexical source retrieval, not answer accuracy, memory isolation, caching, net provider savings or the complete agent task.",
+    "The collection filter limits returned documents to 18 foundation sources, while BM25 statistics use all 33 shared-index FTS documents. All 33 sources and FTS fields are pinned in full-corpus-manifest.json; recreating only the 18 eligible sources would change the scoring corpus."
+  ],
+  "full_corpus_provenance": {
+    "path": "full-corpus-manifest.json",
+    "sha256": "23ae01991ae5d6443e2998724b71b049588f92bee71b46f54312cc99ba14894e",
+    "global_fts_documents": 33,
+    "eligible_foundation_documents": 18
+  }
+}

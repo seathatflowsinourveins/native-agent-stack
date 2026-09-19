@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "source_repository_commit": "bfd03bc38a87d90e46702c88103d93ea1d4a75a3",
+  "collection": "us-equities-foundation",
+  "collection_documents": 18,
+  "snapshot_total_active_documents": 33,
+  "snapshot_total_collections": 3,
+  "logical_document_manifest_sha256": "66d4c27eea81f42a97b1aa80b6f7fce81d4ef1577b95d06a74b34981a8570abe",
+  "snapshot_initial_sha256": "d738ccc6a34a1933111d7539824f00fd4e893064ee53a5b4b051fca860948e50",
+  "snapshot_after_sha256": "d738ccc6a34a1933111d7539824f00fd4e893064ee53a5b4b051fca860948e50",
+  "source_documents": [
+    {
+      "path": "README.md",
+      "repository_path": "blueprints/us-equities/README.md",
+      "indexed_content_sha256": "d9cac228aaabae1d5566cfaf18c0d9c7dfeb532f8d252c5ca501ea75af3400b2",
+      "utf8_bytes": 8026,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "d9cac228aaabae1d5566cfaf18c0d9c7dfeb532f8d252c5ca501ea75af3400b2",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "data/README.md",
+      "repository_path": "blueprints/us-equities/data/README.md",
+      "indexed_content_sha256": "2d638a5f76fb1b3cb850425b125c9df20d2eaf7021135fa7e9d2d424ba4feafe",
+      "utf8_bytes": 1717,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "2d638a5f76fb1b3cb850425b125c9df20d2eaf7021135fa7e9d2d424ba4feafe",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "deerflow/README.md",
+      "repository_path": "blueprints/us-equities/deerflow/README.md",
+      "indexed_content_sha256": "e1bec08e3b2d0e9ed78223b65091a2fd98d8513d660f3e3bdbed87a3c9c1004a",
+      "utf8_bytes": 13076,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "e1bec08e3b2d0e9ed78223b65091a2fd98d8513d660f3e3bdbed87a3c9c1004a",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "deerflow/research-result.md",
+      "repository_path": "blueprints/us-equities/deerflow/research-result.md",
+      "indexed_content_sha256": "4aa4f228b0a976353c61adeb2d9f51d030081f3b359b2bfc8c388fbdc0b9d613",
+      "utf8_bytes": 2614,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "4aa4f228b0a976353c61adeb2d9f51d030081f3b359b2bfc8c388fbdc0b9d613",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "deerflow/research-task.md",
+      "repository_path": "blueprints/us-equities/deerflow/research-task.md",
+      "indexed_content_sha256": "ea9a6c975597ca3ae135c657d07262b7f106f1d70a6cda3f660f24ab22b1445c",
+      "utf8_bytes": 1052,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "ea9a6c975597ca3ae135c657d07262b7f106f1d70a6cda3f660f24ab22b1445c",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "engine/README.md",
+      "repository_path": "blueprints/us-equities/engine/README.md",
+      "indexed_content_sha256": "b23a63340fb54ef709620052e0a7b8760963be035446a340b5b51b4dafea990f",
+      "utf8_bytes": 7898,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "b23a63340fb54ef709620052e0a7b8760963be035446a340b5b51b4dafea990f",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "engine/resolution.md",
+      "repository_path": "blueprints/us-equities/engine/resolution.md",
+      "indexed_content_sha256": "aa46db23be0c20b279026e24f1727e0bd3120df3349bb244cfa30f66725bc4ad",
+      "utf8_bytes": 10783,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "aa46db23be0c20b279026e24f1727e0bd3120df3349bb244cfa30f66725bc4ad",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "financial-data/README.md",
+      "repository_path": "blueprints/us-equities/financial-data/README.md",
+      "indexed_content_sha256": "4bc6c3bec788aad0f05e1eedc1887cf51e1856794c53c86a7b3b6e1510ef9aed",
+      "utf8_bytes": 8176,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "4bc6c3bec788aad0f05e1eedc1887cf51e1856794c53c86a7b3b6e1510ef9aed",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "gap-resolution.md",
+      "repository_path": "blueprints/us-equities/gap-resolution.md",
+      "indexed_content_sha256": "5859a13cd7250327161f334fc7d6f5eb8e5dda4764c54708643fbddc3f66f35a",
+      "utf8_bytes": 10614,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "5859a13cd7250327161f334fc7d6f5eb8e5dda4764c54708643fbddc3f66f35a",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "hosting.md",
+      "repository_path": "blueprints/us-equities/hosting.md",
+      "indexed_content_sha256": "ceed30aa8f9b8db1da4fe0e3735ae7bf2b8ebd14d5c45e36d21c31a9d9b4e1cf",
+      "utf8_bytes": 3219,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "ceed30aa8f9b8db1da4fe0e3735ae7bf2b8ebd14d5c45e36d21c31a9d9b4e1cf",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "hosting/README.md",
+      "repository_path": "blueprints/us-equities/hosting/README.md",
+      "indexed_content_sha256": "a851df2da74345fe34717d7c5f74f805d236bbbb1893e9c25a61db8642ab3811",
+      "utf8_bytes": 4549,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "a851df2da74345fe34717d7c5f74f805d236bbbb1893e9c25a61db8642ab3811",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "hosting/backup/README.md",
+      "repository_path": "blueprints/us-equities/hosting/backup/README.md",
+      "indexed_content_sha256": "ad00db7f83ee024c78518f4932701ac8a17f277a4111766ceff777c90b527ca5",
+      "utf8_bytes": 7193,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "ad00db7f83ee024c78518f4932701ac8a17f277a4111766ceff777c90b527ca5",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "north-star.md",
+      "repository_path": "blueprints/us-equities/north-star.md",
+      "indexed_content_sha256": "19ccc73438955a78fb0c6a9ddb17c0b6e7c7aed5987890abbfb5fdfcb4cb9092",
+      "utf8_bytes": 9701,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "19ccc73438955a78fb0c6a9ddb17c0b6e7c7aed5987890abbfb5fdfcb4cb9092",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "research-runtime/README.md",
+      "repository_path": "blueprints/us-equities/research-runtime/README.md",
+      "indexed_content_sha256": "a02f5473626275dc98089c3a3e31d07b52b274e0a8efc150fe357fc9e712b653",
+      "utf8_bytes": 9246,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "a02f5473626275dc98089c3a3e31d07b52b274e0a8efc150fe357fc9e712b653",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "routing/README.md",
+      "repository_path": "blueprints/us-equities/routing/README.md",
+      "indexed_content_sha256": "c5e0abfd9d914c46ef58810427c5bf71b2d3bf8476c8e1314b4d486a1589a2bd",
+      "utf8_bytes": 20346,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "c5e0abfd9d914c46ef58810427c5bf71b2d3bf8476c8e1314b4d486a1589a2bd",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "workers/README.md",
+      "repository_path": "blueprints/us-equities/workers/README.md",
+      "indexed_content_sha256": "c2933f498347266c1e8e266ed41002a48b7adf4761452f8dca2c76befc64cca9",
+      "utf8_bytes": 11076,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "c2933f498347266c1e8e266ed41002a48b7adf4761452f8dca2c76befc64cca9",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "workers/policy.md",
+      "repository_path": "blueprints/us-equities/workers/policy.md",
+      "indexed_content_sha256": "087a415199fec6ccda6a7eadee0fbbc21b6c40592b32d1f37b3d57d73cbf77cb",
+      "utf8_bytes": 1974,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "087a415199fec6ccda6a7eadee0fbbc21b6c40592b32d1f37b3d57d73cbf77cb",
+      "repository_bytes_match_indexed_content": true
+    },
+    {
+      "path": "workers/research-task.md",
+      "repository_path": "blueprints/us-equities/workers/research-task.md",
+      "indexed_content_sha256": "743c1f63d87ea9c4186b1d569ff02fc3a9dd32b3a7283048201ffee32b481cf5",
+      "utf8_bytes": 1309,
+      "index_content_matches_hash": true,
+      "repository_bytes_sha256": "743c1f63d87ea9c4186b1d569ff02fc3a9dd32b3a7283048201ffee32b481cf5",
+      "repository_bytes_match_indexed_content": true
+    }
+  ],
+  "full_corpus_provenance": {
+    "path": "full-corpus-manifest.json",
+    "sha256": "23ae01991ae5d6443e2998724b71b049588f92bee71b46f54312cc99ba14894e",
+    "global_fts_documents": 33,
+    "eligible_foundation_documents": 18
+  }
+}

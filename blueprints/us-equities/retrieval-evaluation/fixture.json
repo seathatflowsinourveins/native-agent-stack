@@ -1,0 +1,223 @@
+{
+  "description": "Twelve fixed research/operations retrieval needs against a snapshot of the adopted foundation collection. Gold paths name reviewed intended sources, not exhaustive relevance judgments. No queries are changed after observing scores.",
+  "version": 1,
+  "collection": "us-equities-foundation",
+  "queries": [
+    {
+      "id": "sec-availability",
+      "query": "SEC first observation cutoff",
+      "question": "Can a fact be used before we first observed the SEC snapshot containing it?",
+      "type": "topical",
+      "description": "The acquisition guide defines conservative observation and filing-acceptance cutoffs.",
+      "expected_files": [
+        "financial-data/README.md"
+      ],
+      "expected_in_top_k": 3,
+      "source_evidence": [
+        {
+          "path": "financial-data/README.md",
+          "indexed_content_sha256": "4bc6c3bec788aad0f05e1eedc1887cf51e1856794c53c86a7b3b6e1510ef9aed",
+          "utf8_bytes": 8176
+        }
+      ]
+    },
+    {
+      "id": "backup-host-loss",
+      "query": "machine failure recover backup key",
+      "question": "What can we recover if this machine and its backup password are lost?",
+      "type": "alias",
+      "description": "The backup guide states that repository, restore and password share one host and off-host recovery is unproved.",
+      "expected_files": [
+        "hosting/backup/README.md"
+      ],
+      "expected_in_top_k": 3,
+      "source_evidence": [
+        {
+          "path": "hosting/backup/README.md",
+          "indexed_content_sha256": "ad00db7f83ee024c78518f4932701ac8a17f277a4111766ceff777c90b527ca5",
+          "utf8_bytes": 7193
+        }
+      ]
+    },
+    {
+      "id": "acp-readonly",
+      "query": "ACP read-only workspaceWrite",
+      "question": "Does the ACP read-only mode actually prohibit workspace writes?",
+      "type": "exact",
+      "description": "The effective ACP sandbox is explicitly workspaceWrite despite the read-only mode identifier.",
+      "expected_files": [
+        "deerflow/README.md"
+      ],
+      "expected_in_top_k": 3,
+      "source_evidence": [
+        {
+          "path": "deerflow/README.md",
+          "indexed_content_sha256": "e1bec08e3b2d0e9ed78223b65091a2fd98d8513d660f3e3bdbed87a3c9c1004a",
+          "utf8_bytes": 13076
+        }
+      ]
+    },
+    {
+      "id": "native-token-subsets",
+      "query": "cached reasoning tokens included",
+      "question": "Which cached input and reasoning counters are already included in native totals?",
+      "type": "topical",
+      "description": "The worker guide labels cached input and reasoning as subsets of input/output and forbids adding duplicate views.",
+      "expected_files": [
+        "workers/README.md"
+      ],
+      "expected_in_top_k": 3,
+      "source_evidence": [
+        {
+          "path": "workers/README.md",
+          "indexed_content_sha256": "c2933f498347266c1e8e266ed41002a48b7adf4761452f8dca2c76befc64cca9",
+          "utf8_bytes": 11076
+        }
+      ]
+    },
+    {
+      "id": "restart-allowance",
+      "query": "restart exhausted allowance",
+      "question": "Can restarting Desktop restore exhausted native worker allowance?",
+      "type": "cross-domain",
+      "description": "The guide separates Desktop activation from native account allowance and says restart cannot restore quota.",
+      "expected_files": [
+        "research-runtime/README.md"
+      ],
+      "expected_in_top_k": 3,
+      "source_evidence": [
+        {
+          "path": "research-runtime/README.md",
+          "indexed_content_sha256": "a02f5473626275dc98089c3a3e31d07b52b274e0a8efc150fe357fc9e712b653",
+          "utf8_bytes": 9246
+        }
+      ]
+    },
+    {
+      "id": "broker-timeout",
+      "query": "timeout reconcile broker order",
+      "question": "What should happen before retrying an order after a connection timeout?",
+      "type": "topical",
+      "description": "The engine guide requires broker-state reconciliation before considering another submission.",
+      "expected_files": [
+        "engine/README.md"
+      ],
+      "expected_in_top_k": 3,
+      "source_evidence": [
+        {
+          "path": "engine/README.md",
+          "indexed_content_sha256": "b23a63340fb54ef709620052e0a7b8760963be035446a340b5b51b4dafea990f",
+          "utf8_bytes": 7898
+        }
+      ]
+    },
+    {
+      "id": "alpaca-entitlement",
+      "query": "Alpaca product subscription entitlement",
+      "question": "What non-credential prerequisites can block initialization of the official Alpaca adapter?",
+      "type": "topical",
+      "description": "The dependency-resolution guide retains runtime product subscription and entitlement validation.",
+      "expected_files": [
+        "engine/resolution.md"
+      ],
+      "expected_in_top_k": 3,
+      "source_evidence": [
+        {
+          "path": "engine/resolution.md",
+          "indexed_content_sha256": "aa46db23be0c20b279026e24f1727e0bd3120df3349bb244cfa30f66725bc4ad",
+          "utf8_bytes": 10783
+        }
+      ]
+    },
+    {
+      "id": "dagu-recovery",
+      "query": "Dagu history restart in-flight",
+      "question": "Does retained Dagu history prove that an interrupted workflow resumes?",
+      "type": "cross-domain",
+      "description": "The hosting guide says completed-history persistence does not establish in-flight recovery.",
+      "expected_files": [
+        "hosting/README.md"
+      ],
+      "expected_in_top_k": 3,
+      "source_evidence": [
+        {
+          "path": "hosting/README.md",
+          "indexed_content_sha256": "a851df2da74345fe34717d7c5f74f805d236bbbb1893e9c25a61db8642ab3811",
+          "utf8_bytes": 4549
+        }
+      ]
+    },
+    {
+      "id": "gateway-parity",
+      "query": "gateway compaction deferred tools",
+      "question": "Does a gateway text response prove native tool, compaction and full-context equivalence?",
+      "type": "cross-domain",
+      "description": "The gateway guide limits its acceptance to text and lists deferred tools, compaction and context parity as unproved.",
+      "expected_files": [
+        "routing/README.md"
+      ],
+      "expected_in_top_k": 3,
+      "source_evidence": [
+        {
+          "path": "routing/README.md",
+          "indexed_content_sha256": "c5e0abfd9d914c46ef58810427c5bf71b2d3bf8476c8e1314b4d486a1589a2bd",
+          "utf8_bytes": 20346
+        }
+      ]
+    },
+    {
+      "id": "paper-risk-controls",
+      "query": "kill switch numeric limits",
+      "question": "What independent controls are required before unattended paper execution?",
+      "type": "topical",
+      "description": "The north-star paper acceptance requires numeric limits, allowed universe and an independent kill switch.",
+      "expected_files": [
+        "north-star.md"
+      ],
+      "expected_in_top_k": 3,
+      "source_evidence": [
+        {
+          "path": "north-star.md",
+          "indexed_content_sha256": "19ccc73438955a78fb0c6a9ddb17c0b6e7c7aed5987890abbfb5fdfcb4cb9092",
+          "utf8_bytes": 9701
+        }
+      ]
+    },
+    {
+      "id": "worker-cancellation",
+      "query": "stop worker orphan subprocess",
+      "question": "How do cancelled model workers avoid leaving child processes running?",
+      "type": "semantic",
+      "description": "The runtime guide describes deadlines and process-group cleanup including TERM-ignoring descendants.",
+      "expected_files": [
+        "research-runtime/README.md"
+      ],
+      "expected_in_top_k": 3,
+      "source_evidence": [
+        {
+          "path": "research-runtime/README.md",
+          "indexed_content_sha256": "a02f5473626275dc98089c3a3e31d07b52b274e0a8efc150fe357fc9e712b653",
+          "utf8_bytes": 9246
+        }
+      ]
+    },
+    {
+      "id": "savings-scope",
+      "query": "selected text provider savings",
+      "question": "Does the smaller research packet establish complete provider token savings?",
+      "type": "topical",
+      "description": "The runtime guide separates lossy selected-text measurement from unmeasured whole-task provider savings.",
+      "expected_files": [
+        "research-runtime/README.md"
+      ],
+      "expected_in_top_k": 3,
+      "source_evidence": [
+        {
+          "path": "research-runtime/README.md",
+          "indexed_content_sha256": "a02f5473626275dc98089c3a3e31d07b52b274e0a8efc150fe357fc9e712b653",
+          "utf8_bytes": 9246
+        }
+      ]
+    }
+  ]
+}
