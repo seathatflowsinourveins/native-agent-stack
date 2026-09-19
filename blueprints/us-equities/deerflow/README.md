@@ -129,7 +129,9 @@ uv run --locked python "$STACK_REPO/blueprints/us-equities/deerflow/acp-discover
 The response may contain local session identifiers or paths; retain it privately
 and publish only reviewed fields, as in `native-receipt.json`. Configuring a
 future DeerFlow ACP worker should keep `auto_approve_permissions: false`, use
-the maintained adapter and preserve the native read-only session preset.
+the maintained adapter and preserve its explicit approval-mode selection. The
+ACP `read-only` ID permits workspace writes; choose the official SDK worker
+instead when strict `Sandbox.read_only` enforcement is required.
 
 ## Real embedded research invocation
 
