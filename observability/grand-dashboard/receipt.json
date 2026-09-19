@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "id": "native-grand-dashboard-20260919",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "grafana",
+    "loki",
+    "prometheus"
+  ],
+  "observed_date": "2026-09-19",
+  "scope": "Existing local Linux/WSL observability backends, public checkpoint emitter and native browser; no broker or remote host.",
+  "native_commands": [
+    {
+      "command": "python3 observability/grand-dashboard/install.py --repo $STACK_REPO --config $OBSERVABILITY_CONFIG --units $USER_UNIT_ROOT --data $OBSERVABILITY_DATA",
+      "exit_code": 0
+    },
+    {
+      "command": "systemctl --user daemon-reload",
+      "exit_code": 0
+    },
+    {
+      "command": "systemctl --user enable --now ecosystem-research-progress.timer",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 observability/grand-dashboard/acceptance.py --output $NEW_PRIVATE_ACCEPTANCE",
+      "exit_code": 0,
+      "result": {
+        "native_queries": 9,
+        "generation_checks": 3,
+        "status": "passed"
+      }
+    },
+    {
+      "command": "systemctl --user show ecosystem-research-progress.timer ecosystem-research-progress.service -p Id -p ActiveState -p Result -p ExecMainStatus",
+      "exit_code": 0,
+      "result": {
+        "timer_active_state": "active",
+        "timer_result": "success",
+        "oneshot_active_state": "inactive",
+        "oneshot_result": "success",
+        "oneshot_exit": 0
+      }
+    },
+    {
+      "command": "agent-browser --session $DEDICATED_BROWSER open http://127.0.0.1:13000/d/research-grand?refresh=30s",
+      "exit_code": 0
+    }
+  ],
+  "native_api_results": {
+    "grafana_dashboard": {
+      "http_status": 200,
+      "uid": "research-grand",
+      "panels": 14,
+      "refresh": "30s",
+      "provisioned": true
+    },
+    "loki_queries": {
+      "status": "success",
+      "lane_rows": 3,
+      "gate_rows": 8,
+      "worker_rows": 3,
+      "wave_rows": 4,
+      "decision_rows": 36,
+      "experiment_rows": 6
+    },
+    "generation_fixture": [
+      {
+        "phase": "initial",
+        "states": [
+          "first"
+        ]
+      },
+      {
+        "phase": "removed",
+        "states": []
+      },
+      {
+        "phase": "readded",
+        "states": [
+          "changed"
+        ]
+      }
+    ],
+    "prometheus_host_memory_series": 6
+  },
+  "browser_acceptance": [
+    "Rendered header, freshness and usage panels inspected",
+    "Lane table shows source checkpoint and evidence links",
+    "Historical scenario rows match the accepted native simulation receipt",
+    "Native browser confirms supported 30-second auto refresh",
+    "Screenshots inspected locally; no credentials or raw provider bodies published"
+  ],
+  "checks": {
+    "focused_tests_passed": 6,
+    "independent_review": "accepted after generation and reference-containment fixes"
+  },
+  "retained_failures": [
+    {
+      "attempt": "PromQL time() in Loki",
+      "result": "HTTP 400 parse error",
+      "resolution": "Use native observed timestamp and Grafana relative-time display"
+    },
+    {
+      "attempt": "15-second Grafana refresh",
+      "result": "Interval absent from installed choices; UI showed Off",
+      "resolution": "30-second configured interval accepted in browser and native dashboard API"
+    },
+    {
+      "attempt": "old browser references after reload",
+      "result": "Unknown or absent reference",
+      "resolution": "Fresh browser snapshot before subsequent actions"
+    },
+    {
+      "attempt": "service file rewritten by installer",
+      "result": "systemd requested daemon reload",
+      "resolution": "Explicit daemon-reload; final unit result success"
+    }
+  ],
+  "private_artifacts": [
+    {
+      "name": "native-acceptance.json",
+      "bytes": 3323,
+      "sha256": "a42ca7f17181e979870dda0fa055fee7c3473d642ce0550e03f0e2442260923f"
+    },
+    {
+      "name": "native-acceptance-final.json",
+      "bytes": 3746,
+      "sha256": "a30711d154e8192beff6859848a994947ae1cb5aa79bc9b41d19d710ba1d538a"
+    },
+    {
+      "name": "research-grand.json",
+      "bytes": 25805,
+      "sha256": "d04cf36af833ed1ab184253bade0329a7dbb0b8c98d2a52379dc6856f32a3786"
+    },
+    {
+      "name": "ecosystem-research-progress.service",
+      "bytes": 441,
+      "sha256": "71c01d1369ca28572cd56ce481bed3d03efc98a52857d75efdb76a0394e70cbe"
+    },
+    {
+      "name": "ecosystem-research-progress.timer",
+      "bytes": 192,
+      "sha256": "15439048aa8b150fb313e449c552422f5a07d4f7edc80c4b56c3beab6b729227"
+    }
+  ],
+  "limitations": [
+    "Worker/decision/gate rows are coordinator checkpoints, not live process discovery.",
+    "A recent emission does not establish recent source review; table checkpoint dates and linked source receipts remain authoritative.",
+    "Live telemetry omits bodies and allowlists attributes; correlation identifiers remain in private local storage.",
+    "Generation replacement is native query behavior, not a claim of transactional multi-stream Loki ingestion.",
+    "Same-host Linux/WSL timer depends on active user manager/backends; Mac and always-on remote hosting unaccepted.",
+    "Display rounds currency/percent fields to two decimals; exact simulation results remain in source receipt.",
+    "No financial execution, exact-once audit, full monitoring coverage or causal token savings established.",
+    "Recorded worker/decision state is not a live process registry.",
+    "No broker execution, exact-once accounting, universal coverage or net token savings."
+  ],
+  "claim": "Native local dashboard displays current-generation public research checkpoints with live service/usage telemetry; generation deletion/readdition, timer and browser acceptance retained."
+}

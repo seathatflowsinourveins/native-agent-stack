@@ -107,9 +107,9 @@
     "Context Mode file-tool workspace override requires normal native MCP approval; trusted ctx_execute already works.",
     "OmniRoute simple text inference accepted; native tool/hook/compaction parity and failed-attempt provider usage remain unproved.",
     "Desktop direct Context Mode and parent log export were accepted; final parent usage attribution and off-host operations remain separate.",
-    "Fresh paired native Linux Astra/Claude run needs usable native allowance/sign-in; last device login expired.",
-    "Frozen QMD lexical baseline retains four top-three misses; held-out query-craft and memory lifecycle quality remain unmeasured.",
-    "Native state recovery passed on-host; independent backup/key storage, MCP consumer recovery and unattended resource/operation policy remain separate."
+    "New host native sign-in and allowance readiness; original-host paired Astra/Claude acceptance completed.",
+    "Frozen QMD lexical baseline retains four top-three misses; held-out quality remains unmeasured despite accepted isolated memory lifecycle.",
+    "Native on-host recovery and synthetic process-tree supervision passed; independent recovery, provider cancellation and actual unattended operating policy remain separate."
   ],
   "receipt_integrity": [
     {
@@ -184,5 +184,11 @@
       "blueprints/us-equities/order-contract/receipt.json"
     ],
     "scope": "Independent offline native capabilities; no joined entitled-data, strategy or broker workflow."
+  },
+  "convergence_program": {
+    "plan": "convergence-program/plan.json",
+    "review": "convergence-program/review-receipt.json",
+    "historical_simulation": "historical-simulation/receipt.json",
+    "dashboard": "../../observability/grand-dashboard/receipt.json"
   }
 }

@@ -76,9 +76,9 @@
     },
     {
       "id": "accepted-pit-source",
-      "state": "synthetic_contract_accepted_real_source_pending",
-      "required": "Obtain an entitled source with authenticated availability, adjustment, identifier and historical universe coverage. Native synthetic DuckDB selection, revision timing and integrity passed; SEC403 remains retained without unchanged retry.",
-      "evidence": "blueprints/us-equities/point-in-time/receipt.json"
+      "state": "synthetic_exact_nanosecond_contract_accepted_real_source_pending",
+      "required": "Obtain an entitled source with authenticated availability, adjustment, identifier and historical universe coverage. Native synthetic DuckDB selection, revision timing and integrity passed; SEC403 remains retained without unchanged retry. Exact signed-nanosecond representation and correction/universe replay now pass; actual authenticated source timing remains pending.",
+      "evidence": "blueprints/us-equities/nanosecond-replay/receipt.json"
     },
     {
       "id": "retrieval-quality",
@@ -87,8 +87,9 @@
     },
     {
       "id": "memory-lifecycle",
-      "state": "not_accepted",
-      "required": "Native memory scope/revocation/as-of retrieval acceptance in an isolated test scope, without treating another benchmark's fake adapter as the live system."
+      "state": "isolated_native_lifecycle_accepted_live_quality_pending",
+      "required": "Disposable native lifecycle passed 31 MCP calls and 23 checks. Exact-path access can retain expired content until sweep; deletion does not erase Git/backups. Live-store policy, passage-of-time TTL, scoped retrieval quality and evaluated learning remain separate.",
+      "evidence": "blueprints/us-equities/memory-lifecycle/receipt.json"
     },
     {
       "id": "off-host-recovery",
@@ -97,13 +98,14 @@
     },
     {
       "id": "unattended-hosting",
-      "state": "not_accepted",
-      "required": "Selected operational schedule, interruption/resource limits, monitoring destination and retention. Current Dagu history server is manual local hosting."
+      "state": "local_tree_supervision_accepted_operational_host_pending",
+      "required": "Native systemd synthetic timeout/tree cleanup and configured limits passed; the dashboard metadata timer is active locally. Native provider interruption, actual workload limits, independent host availability and recovery remain unaccepted. Dagu research execution remains manually dispatched.",
+      "evidence": "blueprints/us-equities/worker-supervision/receipt.json"
     },
     {
       "id": "broker-paper",
-      "state": "not_connected",
-      "required": "Entitled paper account/feed plus deterministic risk, journal, idempotency, reconciliation and recovery gates before authorized orders."
+      "state": "dedicated_account_selected_user_deferred_execution",
+      "required": "User selected dedicated research paper account and will configure credentials locally. Current priority is historical simulation/backtests. Actual account/feed, numeric risk, journal, idempotency, reconciliation and recovery remain required; no orders submitted."
     },
     {
       "id": "net-provider-savings",
@@ -112,9 +114,9 @@
     },
     {
       "id": "execution-realism",
-      "state": "native_cost_sensitivity_accepted_calibration_pending",
-      "required": "Native LEAN constant fee/slippage sensitivity and serialized cash reconciliation passed. Calibrate quantity/partial fills, latency, spread, impact and capacity for the selected strategy and data; the fixed five-day fixture does not satisfy this gate.",
-      "evidence": "blueprints/us-equities/execution-realism/receipt.json"
+      "state": "native_historical_leverage_stress_accepted_calibration_pending",
+      "required": "Six fixed SPY hourly cases across 104 sessions passed deterministic cash/dividend/fee/margin and causal-order checks. This known-stress window uses hourly MOO proxies and native default liquidations; no financing, tick calibration, actual broker compliance, holdout strategy or full mover dataset accepted.",
+      "evidence": "blueprints/us-equities/historical-simulation/receipt.json"
     },
     {
       "id": "elite-adapter-capability",
@@ -163,5 +165,12 @@
     "joined_market_to_broker_workflow": false,
     "broker_orders": 0,
     "net_provider_tokens_saved": null
+  },
+  "convergence_program_followup": {
+    "plan": "blueprints/us-equities/convergence-program/plan.json",
+    "coverage": "blueprints/us-equities/convergence-program/coverage.md",
+    "dashboard": "observability/grand-dashboard/receipt.json",
+    "paired_review": "blueprints/us-equities/convergence-program/review-receipt.json",
+    "public_star_refresh": "catalogs/us-equities/convergence-program/public-stars-refresh.json"
   }
 }

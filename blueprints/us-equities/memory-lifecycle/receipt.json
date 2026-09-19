@@ -213,11 +213,16 @@
     "31 calls are a small deterministic fixture, not a memory retrieval-quality benchmark or an application-level answer evaluation.",
     "No provider inference, write-path LLM, semantic embedding, scheduler, secure multi-tenant access, restart durability, or net provider token saving was measured.",
     "Tests cover an already-expired timestamp and a future timestamp, not passage of a short TTL across the wall-clock boundary.",
-    "Linux/WSL Bubblewrap recipe; macOS and Windows native execution require separately accepted isolation."
+    "Linux/WSL Bubblewrap recipe; macOS and Windows native execution require separately accepted isolation.",
+    "Isolated fixture, not the live memory store or all client hooks.",
+    "TTL is default-search visibility until sweep, not immediate access revocation.",
+    "Ingestion-time as_of is not market availability; no retrieval quality or net savings claim."
   ],
   "provider_usage": {
     "model_calls": 0,
     "token_savings": null,
     "reason": "No provider calls; tool/context compression counters were not measured."
-  }
+  },
+  "id": "native-memory-lifecycle-20260919",
+  "claim": "A disposable, network-isolated native ai-memory fixture passed 23 lifecycle/routing checks across 31 MCP calls; exact-path TTL behavior and explicit sweep limits retained."
 }

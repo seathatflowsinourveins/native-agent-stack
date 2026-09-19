@@ -30,7 +30,10 @@
     "update_protocol": "adoption/update.md",
     "adoption_receipt": "adoption/receipt.json",
     "portability_research": "adoption/research.json",
-    "current_paired_acceptance": "adoption/paired/receipt.json"
+    "current_paired_acceptance": "adoption/paired/receipt.json",
+    "current_convergence": "blueprints/us-equities/convergence-program/plan.json",
+    "grand_dashboard": "observability/grand-dashboard/README.md",
+    "current_historical_simulation": "blueprints/us-equities/historical-simulation/receipt.json"
   },
   "recipe_map": {
     "affaan-m/ECC": "recipes/README.md",
@@ -80,7 +83,9 @@
     "dagu": "blueprints/us-equities/hosting/README.md",
     "lean": "blueprints/us-equities/engine/README.md",
     "syft": "blueprints/us-equities/supply-chain/README.md",
-    "alpaca-py": "blueprints/us-equities/order-contract/README.md"
+    "alpaca-py": "blueprints/us-equities/order-contract/README.md",
+    "pandas": "blueprints/us-equities/nanosecond-replay/README.md",
+    "systemd": "blueprints/us-equities/worker-supervision/README.md"
   },
   "profiles": [
     {
@@ -122,7 +127,9 @@
         "uv",
         "dagu",
         "dotnet",
-        "bwrap"
+        "bwrap",
+        "systemd-run",
+        "systemctl"
       ],
       "component_ids": [
         "codex",
@@ -130,7 +137,9 @@
         "duckdb",
         "dagu",
         "lean",
-        "alpaca-py"
+        "alpaca-py",
+        "pandas",
+        "systemd"
       ],
       "recipe_paths": [
         "adoption/sdk/README.md",
@@ -139,7 +148,10 @@
         "blueprints/us-equities/engine/README.md",
         "blueprints/us-equities/execution-realism/README.md",
         "blueprints/us-equities/point-in-time/README.md",
-        "blueprints/us-equities/order-contract/README.md"
+        "blueprints/us-equities/order-contract/README.md",
+        "blueprints/us-equities/nanosecond-replay/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/historical-simulation/README.md"
       ]
     },
     {
@@ -165,7 +177,8 @@
       ],
       "recipe_paths": [
         "observability/README.md",
-        "observability/backends/README.md"
+        "observability/backends/README.md",
+        "observability/grand-dashboard/README.md"
       ]
     },
     {
@@ -227,7 +240,9 @@
       "catalogs/us-equities/convergence-review.json",
       "docs/activation.md",
       "docs/evidence.md",
-      "blueprints/us-equities/acceptance-wave/README.md"
+      "blueprints/us-equities/acceptance-wave/README.md",
+      "blueprints/us-equities/convergence-program/coverage.md",
+      "observability/grand-dashboard/README.md"
     ],
     "next_action_refs": [
       "research-specification",

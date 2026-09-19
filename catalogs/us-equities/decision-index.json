@@ -39,6 +39,30 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/us-equities/convergence-program/foundation.json",
+      "collection": "/discovery_only_leads",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/us-equities/convergence-program/foundation.json",
+      "collection": "/repositories",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/us-equities/convergence-program/hosting.json",
+      "collection": "/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/us-equities/convergence-program/trading.json",
+      "collection": "/entries",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/coverage.json",
       "collection": "/stars",
       "repository_field": "repository",
@@ -95,16 +119,16 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 479,
+    "repositories": 494,
     "public_star_repositories": 337,
-    "beyond_public_stars": 142,
-    "references": 947,
+    "beyond_public_stars": 157,
+    "references": 988,
     "repositories_by_record_type": {
       "catalog_card": 147,
-      "component_record": 48,
+      "component_record": 50,
       "legacy_candidate": 19,
       "public_star": 337,
-      "research_supplement": 54,
+      "research_supplement": 78,
       "star_review": 337
     }
   },
@@ -584,6 +608,13 @@
           "evidence_depth": "pinned_primary_source_review"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/foundation.json",
+          "pointer": "/repositories/0",
+          "decision": "retain",
+          "evidence_level": "native_lifecycle_acceptance"
+        },
+        {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
           "pointer": "/stars/14",
@@ -788,6 +819,13 @@
           "pointer": "/repositories/0",
           "decision": "retain_current_offline_sdk_baseline",
           "evidence_level": "selected_readme_source"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/trading.json",
+          "pointer": "/entries/2",
+          "decision": "retain_sdk_capture_raw_before_timestamp_conversion",
+          "evidence_level": "source_sections_reviewed"
         },
         {
           "kind": "catalog_card",
@@ -1117,6 +1155,20 @@
           "evidence_depth": "pinned_primary_source_review"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/foundation.json",
+          "pointer": "/repositories/5",
+          "decision": "retain_native_cli_conditional_sdk",
+          "evidence_level": "pinned_primary_source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/hosting.json",
+          "pointer": "/candidates/4",
+          "decision": "retain",
+          "evidence_depth": "selected_primary_source_review"
+        },
+        {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
           "pointer": "/stars/23",
@@ -1294,9 +1346,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/trading.json",
+          "pointer": "/entries/5",
+          "decision": "retain_interchange_candidate_no_install",
+          "evidence_level": "source_sections_reviewed"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
@@ -1399,6 +1459,23 @@
           "decision": "already_covered",
           "review_level": "prior_catalog",
           "review_depth": "prior_evidence_link"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/arcticfox2029/chamnan",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/foundation.json",
+          "pointer": "/discovery_only_leads/2",
+          "decision": "discovery_only",
+          "evidence_level": "list_reference_only"
         }
       ]
     },
@@ -1731,6 +1808,23 @@
       ]
     },
     {
+      "repository": "https://github.com/basicmachines-co/basic-memory",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/foundation.json",
+          "pointer": "/repositories/8",
+          "decision": "alternative_not_parallel_default",
+          "evidence_level": "pinned_primary_source_review"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/bbfamily/abu",
       "aliases": [],
       "public_star": true,
@@ -1895,6 +1989,23 @@
           "decision": "outside_north_star",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/blaizzy/mlx-embeddings",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/foundation.json",
+          "pointer": "/repositories/7",
+          "decision": "conditional_macos",
+          "evidence_level": "pinned_primary_source_review"
         }
       ]
     },
@@ -2091,6 +2202,13 @@
           "pointer": "/repositories/6",
           "decision": "retain",
           "evidence_depth": "pinned_primary_source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/hosting.json",
+          "pointer": "/candidates/1",
+          "decision": "investigate",
+          "evidence_depth": "selected_primary_source_review"
         },
         {
           "kind": "public_star",
@@ -2659,6 +2777,23 @@
       ]
     },
     {
+      "repository": "https://github.com/containers/bubblewrap",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/hosting.json",
+          "pointer": "/candidates/6",
+          "decision": "retain",
+          "evidence_depth": "selected_primary_source_review"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/cordiverse/cordis",
       "aliases": [],
       "public_star": true,
@@ -2738,9 +2873,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/trading.json",
+          "pointer": "/entries/10",
+          "decision": "retain_cost_and_turnover_challenger",
+          "evidence_level": "source_sections_reviewed"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
@@ -2823,6 +2966,13 @@
           "evidence_depth": "pinned_primary_source_review"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/hosting.json",
+          "pointer": "/candidates/0",
+          "decision": "retain",
+          "evidence_depth": "selected_primary_source_review"
+        },
+        {
           "kind": "legacy_candidate",
           "path": "manifests/candidates.json",
           "pointer": "/candidates/17",
@@ -2841,9 +2991,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/trading.json",
+          "pointer": "/entries/8",
+          "decision": "retain_conditional_data_provider_sdk",
+          "evidence_level": "source_sections_reviewed"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
@@ -2851,6 +3009,23 @@
           "id": "data-databento",
           "decision": "conditional",
           "evidence_level": "source_review"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/databento/dbn",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/trading.json",
+          "pointer": "/entries/7",
+          "decision": "add_conditional_exact_market_record_format",
+          "evidence_level": "source_sections_reviewed"
         }
       ]
     },
@@ -2963,6 +3138,23 @@
           "id": "riskfolio-lib",
           "decision": "alternative",
           "evidence_level": "source_review"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/deepcharles/ruptures",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/trading.json",
+          "pointer": "/entries/11",
+          "decision": "add_offline_regime_diagnostics_only",
+          "evidence_level": "source_sections_reviewed"
         }
       ]
     },
@@ -3216,6 +3408,7 @@
       "record_types": [
         "catalog_card",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
@@ -3226,6 +3419,13 @@
           "id": "omniroute",
           "decision": "conditional",
           "evidence_level": "native_proven"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/hosting.json",
+          "pointer": "/candidates/2",
+          "decision": "retain_conditional",
+          "evidence_depth": "selected_primary_source_review"
         },
         {
           "kind": "public_star",
@@ -3410,9 +3610,17 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/trading.json",
+          "pointer": "/entries/3",
+          "decision": "retain_integer_temporal_replay",
+          "evidence_level": "source_sections_reviewed"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
@@ -3738,6 +3946,23 @@
           "decision": "overlaps_established",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/f1bonacc1/process-compose",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/hosting.json",
+          "pointer": "/candidates/10",
+          "decision": "investigate_macos_development_only",
+          "evidence_depth": "selected_primary_source_review"
         }
       ]
     },
@@ -4298,6 +4523,23 @@
       ]
     },
     {
+      "repository": "https://github.com/giulioder/agent-memory-bench",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/foundation.json",
+          "pointer": "/discovery_only_leads/0",
+          "decision": "discovery_only",
+          "evidence_level": "list_reference_only"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/goabstract/awesome-design-tools",
       "aliases": [],
       "public_star": true,
@@ -4825,6 +5067,23 @@
       ]
     },
     {
+      "repository": "https://github.com/hmmlearn/hmmlearn",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/trading.json",
+          "pointer": "/entries/12",
+          "decision": "discovery_only_defer",
+          "evidence_level": "discovery_metadata_only"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/huggingface/huggingface_hub",
       "aliases": [],
       "public_star": false,
@@ -4984,6 +5243,23 @@
           "decision": "already_covered",
           "review_level": "prior_catalog",
           "review_depth": "prior_evidence_link"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/ipiton/agent-memory-mcp",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/foundation.json",
+          "pointer": "/repositories/9",
+          "decision": "alternative_not_parallel_default",
+          "evidence_level": "pinned_primary_source_review"
         }
       ]
     },
@@ -5794,6 +6070,13 @@
           "pointer": "/repositories/14",
           "decision": "investigate",
           "evidence_depth": "pinned_primary_source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/hosting.json",
+          "pointer": "/candidates/8",
+          "decision": "investigate_when_needed",
+          "evidence_depth": "selected_primary_source_review"
         }
       ]
     },
@@ -6522,6 +6805,13 @@
           "evidence_depth": "pinned_primary_source_review"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/foundation.json",
+          "pointer": "/repositories/1",
+          "decision": "retain",
+          "evidence_level": "pinned_primary_source_reuse"
+        },
+        {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
           "pointer": "/stars/180",
@@ -6666,6 +6956,23 @@
           "decision": "overlaps_established",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/modelcontextprotocol/python-sdk",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/foundation.json",
+          "pointer": "/repositories/6",
+          "decision": "conditional",
+          "evidence_level": "pinned_primary_source_review"
         }
       ]
     },
@@ -7550,7 +7857,8 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
         {
@@ -7560,6 +7868,13 @@
           "id": "opentelemetry-collector-contrib",
           "decision": "default",
           "evidence_level": "native_proven"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/hosting.json",
+          "pointer": "/candidates/11",
+          "decision": "retain_and_investigate_delivery_durability",
+          "evidence_depth": "selected_primary_source_review"
         },
         {
           "kind": "component_record",
@@ -7593,6 +7908,20 @@
           "pointer": "/repositories/7",
           "decision": "retain",
           "evidence_depth": "pinned_primary_source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/foundation.json",
+          "pointer": "/repositories/4",
+          "decision": "retain",
+          "evidence_level": "pinned_primary_source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/hosting.json",
+          "pointer": "/candidates/3",
+          "decision": "retain",
+          "evidence_depth": "selected_primary_source_review"
         },
         {
           "kind": "component_record",
@@ -8062,6 +8391,30 @@
           "decision": "overlaps_established",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/pandas-dev/pandas",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "component_record",
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/trading.json",
+          "pointer": "/entries/4",
+          "decision": "add_existing_dependency_to_catalog_and_accept_exact_parser",
+          "evidence_level": "source_sections_reviewed"
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/49",
+          "id": "pandas"
         }
       ]
     },
@@ -8741,6 +9094,13 @@
           "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/trading.json",
+          "pointer": "/entries/0",
+          "decision": "retain_primary_offline_engine",
+          "evidence_level": "retained_prior_native_acceptance"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
           "pointer": "/entries/0",
@@ -8761,9 +9121,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/trading.json",
+          "pointer": "/entries/1",
+          "decision": "retain_adapter_pending_current_account_acceptance",
+          "evidence_level": "source_sections_reviewed"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
@@ -8948,6 +9316,7 @@
         "catalog_card",
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
@@ -8958,6 +9327,13 @@
           "id": "restic",
           "decision": "default",
           "evidence_level": "native_proven"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/hosting.json",
+          "pointer": "/candidates/9",
+          "decision": "retain",
+          "evidence_depth": "selected_primary_source_review"
         },
         {
           "kind": "public_star",
@@ -9028,6 +9404,23 @@
           "decision": "outside_north_star",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/rocke2020/open-agent-memory-benchmark",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/foundation.json",
+          "pointer": "/discovery_only_leads/1",
+          "decision": "discovery_only",
+          "evidence_level": "list_reference_only"
         }
       ]
     },
@@ -9157,9 +9550,17 @@
         "catalog_card",
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/foundation.json",
+          "pointer": "/repositories/2",
+          "decision": "retain_conditional_hook_review",
+          "evidence_level": "pinned_primary_source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -9661,6 +10062,13 @@
           "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/trading.json",
+          "pointer": "/entries/6",
+          "decision": "retain_chronological_evaluation_candidate",
+          "evidence_level": "source_sections_reviewed"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
           "pointer": "/entries/16",
@@ -9861,6 +10269,13 @@
           "review_depth": "Selected implementation/documentation/test/license sections; source and metadata review only, no native tests or model runs."
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/trading.json",
+          "pointer": "/entries/9",
+          "decision": "retain_universe_lifetime_semantics_reference",
+          "evidence_level": "source_sections_reviewed"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
           "pointer": "/entries/8",
@@ -9884,6 +10299,23 @@
           "pointer": "/candidates/8",
           "decision": "conditional_external_telemetry_and_tier_review_required",
           "review_level": "selected_primary_files"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/stumpy-dev/stumpy",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/trading.json",
+          "pointer": "/entries/13",
+          "decision": "discovery_only_defer",
+          "evidence_level": "discovery_metadata_only"
         }
       ]
     },
@@ -9968,6 +10400,30 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/systemd/systemd",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "component_record",
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/hosting.json",
+          "pointer": "/candidates/7",
+          "decision": "adopt_scoped_supervision_recipe",
+          "evidence_depth": "selected_primary_source_review"
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/48",
+          "id": "systemd"
         }
       ]
     },
@@ -10078,6 +10534,13 @@
           "pointer": "/repositories/5",
           "decision": "investigate",
           "evidence_depth": "pinned_primary_source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/hosting.json",
+          "pointer": "/candidates/5",
+          "decision": "defer",
+          "evidence_depth": "selected_primary_source_review"
         }
       ]
     },
@@ -10330,6 +10793,13 @@
           "pointer": "/repositories/2",
           "decision": "retain",
           "evidence_depth": "pinned_primary_source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/foundation.json",
+          "pointer": "/repositories/3",
+          "decision": "retain",
+          "evidence_level": "pinned_primary_source_reuse"
         },
         {
           "kind": "catalog_card",

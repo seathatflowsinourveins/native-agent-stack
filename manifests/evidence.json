@@ -571,6 +571,137 @@
         "Canonical content hashes do not establish client-ID uniqueness, deduplication or safe retry semantics.",
         "No token-saving claim or model inference belongs to this deterministic task."
       ]
+    },
+    {
+      "id": "native-memory-lifecycle-20260919",
+      "path": "blueprints/us-equities/memory-lifecycle/receipt.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory"
+      ],
+      "claim": "A disposable, network-isolated native ai-memory fixture passed 23 lifecycle/routing checks across 31 MCP calls; exact-path TTL behavior and explicit sweep limits retained.",
+      "limitations": [
+        "No live store or client hooks were exercised; this does not certify all current Codex/Claude sessions.",
+        "Project routing is not authentication or tenant authorization. This fixture deliberately permits creating its two projects.",
+        "An already expired pinned page is hidden from default query, but exact-path read and include_expired can read it until explicit sweep; TTL alone is not immediate access revocation.",
+        "as_of selects ingestion-time versions; it is not real-world/market valid time and does not reproduce historical BM25 ranking.",
+        "Deletion removes current and as_of query results. Git checkpoints and backups can retain historical content; secure erasure was not tested.",
+        "31 calls are a small deterministic fixture, not a memory retrieval-quality benchmark or an application-level answer evaluation.",
+        "No provider inference, write-path LLM, semantic embedding, scheduler, secure multi-tenant access, restart durability, or net provider token saving was measured.",
+        "Tests cover an already-expired timestamp and a future timestamp, not passage of a short TTL across the wall-clock boundary.",
+        "Linux/WSL Bubblewrap recipe; macOS and Windows native execution require separately accepted isolation.",
+        "Isolated fixture, not the live memory store or all client hooks.",
+        "TTL is default-search visibility until sweep, not immediate access revocation.",
+        "Ingestion-time as_of is not market availability; no retrieval quality or net savings claim."
+      ]
+    },
+    {
+      "id": "native-exact-nanosecond-replay-20260919",
+      "path": "blueprints/us-equities/nanosecond-replay/receipt.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "duckdb",
+        "pandas"
+      ],
+      "claim": "Synthetic exact UTC nanosecond event/revision and universe eligibility survived native pandas parsing, DuckDB BIGINT/Parquet and pinned-hash replay; no market-data or broker adapter acceptance.",
+      "limitations": [
+        "Synthetic clocks and symbols only; no authenticated source availability, entitlement, symbol mapping, historical +200% dataset, strategy, margin or broker connectivity.",
+        "Signed int64 UTC nanoseconds exclude the NaT sentinel; finer-than-nanosecond timestamps reject.",
+        "Sequence is comparable only inside the declared source/logical-event scope; no global cross-feed sequence or measured latency claim.",
+        "Native JSON encodes output nanoseconds and source sequence as decimal strings; original input JSON integers require lossless parsing.",
+        "Trusted manifest digest is caller-held; permissions deter edits but do not provide immutable/off-host storage.",
+        "Synthetic opaque-text fixture, not provider-origin availability, market ticks or a price contract.",
+        "No broker, trading strategy, actual feed or net token-saving acceptance."
+      ]
+    },
+    {
+      "id": "native-worker-supervision-20260919",
+      "path": "blueprints/us-equities/worker-supervision/receipt.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "systemd"
+      ],
+      "claim": "The existing Linux/WSL2 user service manager enforced a transient worker runtime deadline, killed a TERM-ignoring parent and its two descendants, preserved a native timeout failure, and accepted a separate fresh successful run.",
+      "limitations": [
+        "Synthetic offline worker only; no Codex, Claude, broker, model, account, network, or paid-host calls.",
+        "The successful second unit was explicitly launched; this does not prove checkpoint resume, automatic retry, duplicate suppression, or preservation of unfinished application state.",
+        "CPU, memory and task cgroup values were observed while active; quota saturation, OOM behavior and production sizing were not tested.",
+        "NoNewPrivileges and cgroup supervision are not filesystem or network isolation. This same-user fixture is not an adversarial sandbox escape test.",
+        "No persistent unit, scheduler, timer or existing service configuration was changed. The synthetic failed unit was reset after evidence capture.",
+        "Linux/WSL2 host only; no native macOS, Windows, host reboot, WSL shutdown recovery or always-on remote-host acceptance.",
+        "Local process termination does not establish remote provider cancellation, stopped billing or reversal of external effects.",
+        "systemd latest upstream release is distinct from the accepted distribution build; no systemd upgrade was performed.",
+        "Hashes bind retained evidence bytes; they do not independently attest the execution.",
+        "Linux/WSL local synthetic tree, not provider cancellation or Mac hosting.",
+        "Configured resource limits were inspected, not saturation-tested."
+      ]
+    },
+    {
+      "id": "native-grand-dashboard-20260919",
+      "path": "observability/grand-dashboard/receipt.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "grafana",
+        "loki",
+        "prometheus"
+      ],
+      "claim": "Native local dashboard displays current-generation public research checkpoints with live service/usage telemetry; generation deletion/readdition, timer and browser acceptance retained.",
+      "limitations": [
+        "Worker/decision/gate rows are coordinator checkpoints, not live process discovery.",
+        "A recent emission does not establish recent source review; table checkpoint dates and linked source receipts remain authoritative.",
+        "Live telemetry omits bodies and allowlists attributes; correlation identifiers remain in private local storage.",
+        "Generation replacement is native query behavior, not a claim of transactional multi-stream Loki ingestion.",
+        "Same-host Linux/WSL timer depends on active user manager/backends; Mac and always-on remote hosting unaccepted.",
+        "Display rounds currency/percent fields to two decimals; exact simulation results remain in source receipt.",
+        "No financial execution, exact-once audit, full monitoring coverage or causal token savings established.",
+        "Recorded worker/decision state is not a live process registry.",
+        "No broker execution, exact-once accounting, universal coverage or net token savings."
+      ]
+    },
+    {
+      "id": "native-convergence-review-20260919",
+      "path": "blueprints/us-equities/convergence-program/review-receipt.json",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "dagu"
+      ],
+      "claim": "Native Dagu completed Astra SDK then tool-free Claude review with 37,151 reported tokens and matching exported Astra observation.",
+      "limitations": [
+        "Models checked packet/report consistency, not original sources or underlying native artifacts.",
+        "Both models overgeneralized memory ingestion-time as_of to the packet review date; see coordinator adjudication.",
+        "Prior accepted historical backtests remain valid within their scope; this engineering packet contains no new strategy validation.",
+        "No broker orders, provider cancellation, remote host, net savings or universally final SOTA selection established.",
+        "Models checked packet consistency; source acceptance and interpretive corrections were independently reviewed.",
+        "Usage belongs to this pair only; not whole-goal consumption or causal savings."
+      ]
+    },
+    {
+      "id": "native-historical-leverage-stress-20260919",
+      "path": "blueprints/us-equities/historical-simulation/receipt.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "lean"
+      ],
+      "claim": "Six frozen local LEAN simulations completed: five invested scenarios finished flat with native fill/fee/dividend cash reconciliation; an over-limit scenario received one native buying-power rejection and zero fills. Native default margin liquidations are retained, not suppressed.",
+      "limitations": [
+        "Known 2020 crash development interval selected for stress; no untouched holdout, alpha estimate, automatic winner selection or profitability claim.",
+        "One SPY instrument; no historical +200% mover/catalyst census, full point-in-time eligible universe, delisting or strategy-factor acceptance.",
+        "Every discretionary intent used native next-session MarketOnOpen. Hourly-data fills are recorded at 10:00 New York with bar-open proxies; no exact 09:30 auction/tick/queue/depth or latency acceptance.",
+        "Native default margin calls use same-event market fills and trade-bar fallback warnings. Their timing is an engine stress behavior, not a calibrated broker risk/liquidation model.",
+        "2% sizing buffer and 2x SecurityMarginModel are declared simulation assumptions; actual gross can rise above 2x after losses. No present Alpaca account or leverage eligibility was queried.",
+        "Drawdown/gross metrics use 725 hourly callback observations after engine processing. Intrabar risk and pre-liquidation risk can be worse; margin callback values are retained separately.",
+        "Raw-data dividends are included. Source feed, corporate-action completeness, original availability and contemporary entitlement are not authenticated by bundled file hashes.",
+        "No financing/borrow interest configured. The engine reads an interest-rate reference file for its own calculations; this does not establish financing-inclusive cash PnL.",
+        "All fills assume full quantity. Fixed $1/order and 20 basis points are illustrative stresses, not estimated broker fees or attainable liquidity.",
+        "Stderr contains three margin-liquidation log entries in each 2x case and the expected insufficient-buying-power rejection in over_limit; exit zero is not described as empty stderr.",
+        "Cash reconciliation is exact over exported values with a one-cent comparison tolerance; omitted internal precision is not recovered.",
+        "Hashes establish byte identity, not independent attestation. Native integration is this local fixture around upstream APIs, not an unchanged upstream sample.",
+        "Known crash-period engineering stress, not holdout alpha or a historical extreme-mover strategy.",
+        "Hourly MOO proxies and default margin liquidation are not calibrated tick/broker fills; financing was not modeled.",
+        "No paper/live orders or automatic promotion."
+      ]
     }
   ],
   "files": [
@@ -596,8 +727,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "175768554c9a3b33c7a78dbb75b2289b8d6f4cb1ddb85ec0a3368af32e94e20c",
-      "bytes": 3287
+      "sha256": "20154c0e7a610b5d5be4e6d354c99079059b4c5f338aad054acd5361223efb92",
+      "bytes": 3687
     },
     {
       "path": "CLAUDE.md",
@@ -611,13 +742,13 @@
     },
     {
       "path": "README.md",
-      "sha256": "7494a5326ad448ee2b5dd8fcf209e36e3d9f1e5ca57d7df130fe678ef7ac49eb",
-      "bytes": 10566
+      "sha256": "c2b8b6408913cc3ffdaec584a32afc0f69cf05c1b713fe34f8670bef13652af9",
+      "bytes": 11129
     },
     {
       "path": "adoption/README.md",
-      "sha256": "c195b079f1103295641dbdc26836a304235d91f6d23f33276f8698fcca87b51c",
-      "bytes": 9111
+      "sha256": "0dde05109ea1892c6fc2802b6b9b2bbf6eefade16854386234af8130d860892d",
+      "bytes": 9783
     },
     {
       "path": "adoption/host-state.example.json",
@@ -626,8 +757,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "ae149c57bd8c557e504baaf930e3ece16f36ce3c3ba850e965bb7e152a77bd14",
-      "bytes": 7703
+      "sha256": "7f94751488526033372e5b602d61a4ecce6fcad4fa817e18d86b63538c90c0e7",
+      "bytes": 8524
     },
     {
       "path": "adoption/paired/README.md",
@@ -726,8 +857,8 @@
     },
     {
       "path": "blueprints/us-equities/architecture/README.md",
-      "sha256": "ca92b8b4fc85b3a8ecbb2251d54f4eaaa7e34d8a1b38e10fd3cd97b549d4c919",
-      "bytes": 13837
+      "sha256": "f3d659b54386c89c08b6bb92bfdcac508e43903989ea0d8cfdabf0eb1b8a5025",
+      "bytes": 14555
     },
     {
       "path": "blueprints/us-equities/architecture/alpaca-probe.json",
@@ -773,6 +904,46 @@
       "path": "blueprints/us-equities/architecture/review-prompt.txt",
       "sha256": "ce5ccf53ffb05a79f6cb86d293f9161e4dd97e1b6cfd7312d948cc5dd34cf9a9",
       "bytes": 6997
+    },
+    {
+      "path": "blueprints/us-equities/convergence-program/README.md",
+      "sha256": "7d760175397e417b807fa664c352773b260aa7b937a7b87e87a72375b4994927",
+      "bytes": 3273
+    },
+    {
+      "path": "blueprints/us-equities/convergence-program/astra.report.json",
+      "sha256": "f0b76422a81da5db87e88ab9053c48e47aa0a0138fef19e45bd546c02a367398",
+      "bytes": 1473
+    },
+    {
+      "path": "blueprints/us-equities/convergence-program/claude.report.json",
+      "sha256": "9a0ae677187aaf7c83f487d57598d05b18f0c05e8098edf263d7cf5c1ea344a9",
+      "bytes": 2976
+    },
+    {
+      "path": "blueprints/us-equities/convergence-program/coverage.md",
+      "sha256": "64ed61b784d9b713c493d786ce8614027b7a52970f566d577e174300a6108156",
+      "bytes": 3786
+    },
+    {
+      "path": "blueprints/us-equities/convergence-program/plan.json",
+      "sha256": "92ce2776b94f00e79eee6e1b187b2f3401039ccf41320476dacd11886c30f77e",
+      "bytes": 10090
+    },
+    {
+      "path": "blueprints/us-equities/convergence-program/review-adjudication.md",
+      "sha256": "91a084140bc3e2a2ce614dcced99e63fba5e73353286d48dd2411c112dc10948",
+      "bytes": 2217
+    },
+    {
+      "path": "blueprints/us-equities/convergence-program/review-packet.json",
+      "sha256": "5c91749ca09f294d119d70cdb1c9601221b3628aa97fc07897422531e163fc19",
+      "bytes": 2010
+    },
+    {
+      "path": "blueprints/us-equities/convergence-program/review-receipt.json",
+      "sha256": "d7b940fcd8433fb422ae2a24b2b735e0a9c00da7cab41a5991a17c83479eb77b",
+      "bytes": 6460
     },
     {
       "path": "blueprints/us-equities/convergence-review/README.md",
@@ -1060,6 +1231,36 @@
       "bytes": 3091
     },
     {
+      "path": "blueprints/us-equities/historical-simulation/HistoricalSimulationAlgorithm.cs",
+      "sha256": "a8f0bf3c6b48fdcac8fe756ecb56611e6d54cbe90eeef29cdd901bb502eb1d15",
+      "bytes": 5870
+    },
+    {
+      "path": "blueprints/us-equities/historical-simulation/README.md",
+      "sha256": "e962ff9f834e81ab88cbb8fadf06decad1c41a24f90031419f5a39e7bfc9841e",
+      "bytes": 7875
+    },
+    {
+      "path": "blueprints/us-equities/historical-simulation/analysis.py",
+      "sha256": "cfe0f3411f9893bd76021e24f343888f538223608268ddf90f5a7d5aa7ea14c1",
+      "bytes": 8056
+    },
+    {
+      "path": "blueprints/us-equities/historical-simulation/plan.json",
+      "sha256": "60959a050a3b004abf5346d376930b3b2f563096c725dc96e5427703ea203632",
+      "bytes": 2740
+    },
+    {
+      "path": "blueprints/us-equities/historical-simulation/receipt.json",
+      "sha256": "06ec065647abd91a0ca2b13da25dd75c3ccd159a3244a241a3207c58b36f95d9",
+      "bytes": 56665
+    },
+    {
+      "path": "blueprints/us-equities/historical-simulation/run.py",
+      "sha256": "110caaa800321b83f7ad22e2c8bf213818a834d3c3c92129d005601c9f9cb276",
+      "bytes": 6186
+    },
+    {
       "path": "blueprints/us-equities/hosting.md",
       "sha256": "ceed30aa8f9b8db1da4fe0e3735ae7bf2b8ebd14d5c45e36d21c31a9d9b4e1cf",
       "bytes": 3219
@@ -1116,8 +1317,63 @@
     },
     {
       "path": "blueprints/us-equities/manifest.json",
-      "sha256": "22a7c53686b6e5defe8a280645e9152ef8d9da096db73404412c289071a94f6f",
-      "bytes": 7685
+      "sha256": "3660237d92c99c90d09464315288b8cffd78c4a1c501ca41b8100ef1e74260b7",
+      "bytes": 7982
+    },
+    {
+      "path": "blueprints/us-equities/memory-lifecycle/README.md",
+      "sha256": "309fc735617e7b939a91866301614707a713bd9e38d1b4f241722ecd5925a6cf",
+      "bytes": 4321
+    },
+    {
+      "path": "blueprints/us-equities/memory-lifecycle/analyze.py",
+      "sha256": "98faf6eb991b98f2aed71ef1b65cc479fe3a192aa9f7e0562b8794cc093c19f2",
+      "bytes": 4271
+    },
+    {
+      "path": "blueprints/us-equities/memory-lifecycle/exercise.py",
+      "sha256": "c49b87977250016cd39402c45bc3aa9978c8ac6027259783b412148690723ef0",
+      "bytes": 8271
+    },
+    {
+      "path": "blueprints/us-equities/memory-lifecycle/outcomes.json",
+      "sha256": "fff42297d32a773fa4026b53d293afb8cbc09fd6cbbc233f9fc345679d3a01de",
+      "bytes": 11485
+    },
+    {
+      "path": "blueprints/us-equities/memory-lifecycle/receipt.json",
+      "sha256": "970de5c2170bb0b55384ada8876bacca46c679ac8bc48e2b2d851d56f27c2431",
+      "bytes": 9614
+    },
+    {
+      "path": "blueprints/us-equities/memory-lifecycle/run.py",
+      "sha256": "4ad8d0ae8478b3d924fe1455f5b40cfe33684c6b6c46a9bcefacc831964045f8",
+      "bytes": 3775
+    },
+    {
+      "path": "blueprints/us-equities/nanosecond-replay/README.md",
+      "sha256": "de230378bc13af4ffd17d39a142ae8c8a624a80bcc95272487ae0f0693b63644",
+      "bytes": 5819
+    },
+    {
+      "path": "blueprints/us-equities/nanosecond-replay/fixture.json",
+      "sha256": "40aeafbc144eb39ebd017af449d6d136f5539caf484ebd8b310bb4fbf213eb5d",
+      "bytes": 2522
+    },
+    {
+      "path": "blueprints/us-equities/nanosecond-replay/receipt.json",
+      "sha256": "8ca7ad473299d90473614de8556c7f87ef5838d7e7ba6a0346484e8b0c284d1f",
+      "bytes": 9335
+    },
+    {
+      "path": "blueprints/us-equities/nanosecond-replay/replay.py",
+      "sha256": "e8935d6971d49fdac1eca8ae69d64ea0d59871689f53fdb5c4c6094b844c8206",
+      "bytes": 10184
+    },
+    {
+      "path": "blueprints/us-equities/nanosecond-replay/select.sql",
+      "sha256": "5612f05d1f01e054e50bf9102527ae87a8abbbe4c370f666d8c54ea38972e6af",
+      "bytes": 1008
     },
     {
       "path": "blueprints/us-equities/north-star.md",
@@ -1360,6 +1616,21 @@
       "bytes": 13509
     },
     {
+      "path": "blueprints/us-equities/worker-supervision/README.md",
+      "sha256": "a0b55860e727e2bd7e631f7070e50bf5aa6c98974fd94dea7ac72362d1aca695",
+      "bytes": 5670
+    },
+    {
+      "path": "blueprints/us-equities/worker-supervision/fixture.py",
+      "sha256": "845f11b5e5eb72115f2c8e9213dcd7eb1f8ce0b403a904be87b388f3d4cc6562",
+      "bytes": 1139
+    },
+    {
+      "path": "blueprints/us-equities/worker-supervision/receipt.json",
+      "sha256": "48dd2483477adfcb21cb8c33b7bdb0022db94f1becef0502ff988d5b4dc4d814",
+      "bytes": 5041
+    },
+    {
       "path": "blueprints/us-equities/workers/README.md",
       "sha256": "081b85f97ab174d86201b42675ea18f429642e4f77f038e0e9af661a226e4b8a",
       "bytes": 11279
@@ -1391,8 +1662,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "70423cbd5ab70618aceeae632ef176c741a74b0649212b6b740987d6e6d6e876",
-      "bytes": 10504
+      "sha256": "5e120395b178b98da4303c91acc6907fd325bb50ef5a285f6b6169205bd75dbf",
+      "bytes": 10951
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -1450,13 +1721,48 @@
       "bytes": 69055
     },
     {
+      "path": "catalogs/us-equities/convergence-program/foundation.json",
+      "sha256": "b4da344b3530f45770011df55fb0dcfcd90e536e32c45b0ddeec4fe6798c78c3",
+      "bytes": 68024
+    },
+    {
+      "path": "catalogs/us-equities/convergence-program/foundation.md",
+      "sha256": "af8ae8d1b62d41c3062fdfa9b79044fb98abd8ab7eb2bcf292800057bfe920f8",
+      "bytes": 5249
+    },
+    {
+      "path": "catalogs/us-equities/convergence-program/hosting.json",
+      "sha256": "be602fc5ece78c9a393eaecd4ee4b09b92c35b14e1eafcb92373b0cf9900c999",
+      "bytes": 79819
+    },
+    {
+      "path": "catalogs/us-equities/convergence-program/hosting.md",
+      "sha256": "6d4f5623c52eaab64b9e73b43fda48e15a50bccb6fffa52e0fd55c2fc6b1e8bb",
+      "bytes": 6983
+    },
+    {
+      "path": "catalogs/us-equities/convergence-program/public-stars-refresh.json",
+      "sha256": "09fad6d0a2502170ebef48e8fa86923fe94bdef451312ca012b7435005f77f38",
+      "bytes": 58480
+    },
+    {
+      "path": "catalogs/us-equities/convergence-program/trading.json",
+      "sha256": "f29cdf87b8b85afaa492bf640c1699f400d4f305f4627260a108c7ce1e32e684",
+      "bytes": 73773
+    },
+    {
+      "path": "catalogs/us-equities/convergence-program/trading.md",
+      "sha256": "44c160349044fa485d9fc09e14fd3c055c0e77b4026564151cd8d086fceef57e",
+      "bytes": 10535
+    },
+    {
       "path": "catalogs/us-equities/convergence-review.json",
-      "sha256": "ae17a36b72898840945ac38069d19f915abe8e5be966b79ce42369be73b4010a",
-      "bytes": 8200
+      "sha256": "5b3a0b150008e45fe2c6ede61c4d2d2988b3414ab77972e1f269655f1fa6327e",
+      "bytes": 9503
     },
     {
       "path": "catalogs/us-equities/convergence-review.md",
-      "sha256": "f79fcbdd26a13bc6af9ee4bce3e1a0b338b01081d51b4a8b1d5f70b2a6186bdf",
+      "sha256": "c3457ecf76e4c8570b463100a645ed4897baea2d292d123173cea71802b2bedc",
       "bytes": 9194
     },
     {
@@ -1486,8 +1792,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "a12d179c87a0e6144c8069bae773d852501efb9bc55e6e99fd9cf4c0ac17da9a",
-      "bytes": 345855
+      "sha256": "3798866d7b6842365f6f1a045dd15c512ebefbf92e15806d8880b10df3171741",
+      "bytes": 361687
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -1521,7 +1827,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "17a504b563d6f85e3a42870f0558bf5efdd2f702e2ae0282a518b9df2653a4a1",
+      "sha256": "675de1bac78c48a437e84aec959ac000b830efb32bb5600dc110fe1b6976497a",
       "bytes": 1933
     },
     {
@@ -1846,13 +2152,13 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "df67096a6a2f830f6f2a3c87098c6903deb0aea8f2a59530228fcf8882ba935c",
-      "bytes": 43639
+      "sha256": "37c25f949411c838046f11d349f1a1721fb222a9843cc011082dd23268ae4b65",
+      "bytes": 45633
     },
     {
       "path": "observability/README.md",
-      "sha256": "69ee09c4a971a104bfe9fc27b9df751447cea860fdac1c60a1f531ffc1b480d8",
-      "bytes": 12834
+      "sha256": "685bf9adc109e0e478f3c0e675399046bc182948294154e83cf5619863e6df4c",
+      "bytes": 13227
     },
     {
       "path": "observability/backends/README.md",
@@ -1965,6 +2271,41 @@
       "bytes": 14735
     },
     {
+      "path": "observability/grand-dashboard/README.md",
+      "sha256": "dbf2c5e0950823c626aea0e96fcc472e2fafaf31e8bf44c92c3886759ef9cdd5",
+      "bytes": 5195
+    },
+    {
+      "path": "observability/grand-dashboard/acceptance.py",
+      "sha256": "453a8fc3aa900559b5edd575319a4233233e1b52b433e6d228c2cdf2a79cece8",
+      "bytes": 2611
+    },
+    {
+      "path": "observability/grand-dashboard/install.py",
+      "sha256": "f8205f3d10b69301fdf3391f4354bc0c9cf39cdc125135050ed63cb5e7acb571",
+      "bytes": 1747
+    },
+    {
+      "path": "observability/grand-dashboard/progress.py",
+      "sha256": "6994eabf526d12f62112c0aa6d67a7a700141b0d629391666e64e17d9bcc8dcc",
+      "bytes": 7567
+    },
+    {
+      "path": "observability/grand-dashboard/receipt.json",
+      "sha256": "f98156a1d1764888bded8df360d07a6c761d79eda14a27b6a9321d3e7c5d7d18",
+      "bytes": 5662
+    },
+    {
+      "path": "observability/grand-dashboard/render.py",
+      "sha256": "98f424ab825b7c98ef998684f5730781b5ae347fc7cc255101a5583c54267efa",
+      "bytes": 6090
+    },
+    {
+      "path": "observability/grand-dashboard/state.json",
+      "sha256": "05e808708ae49e8d2a59552537cf7887c22d0c6805f02ff54ccf7acac912290e",
+      "bytes": 2934
+    },
+    {
       "path": "observability/receipt.json",
       "sha256": "22a7c2d84e16af7dcb2e0fe911845754a7585fc2ce06fb13adec3aee693030b4",
       "bytes": 17628
@@ -2048,6 +2389,26 @@
       "path": "tests/test_financial_data.py",
       "sha256": "6303511331f894835e167945d7d734204ab48f8fc825670ffed94652cfe535d1",
       "bytes": 15154
+    },
+    {
+      "path": "tests/test_grand_dashboard.py",
+      "sha256": "713e07c156f0c42b38dc51fc6b8923cb458b26ac30b1fbe84265ab2d48283bfc",
+      "bytes": 3188
+    },
+    {
+      "path": "tests/test_historical_simulation.py",
+      "sha256": "05359d5a861e3eeed3ebbcbf87a8f805332a1ba9cd10b213a4de0703604090fa",
+      "bytes": 5155
+    },
+    {
+      "path": "tests/test_memory_lifecycle.py",
+      "sha256": "d61a864ed272d9f8c796751c2d78ce27ec1ae18645ffeea455ce83bd212600c0",
+      "bytes": 2188
+    },
+    {
+      "path": "tests/test_nanosecond_replay.py",
+      "sha256": "50c4be832b9b7fe1dadc196fcc6dcfa854267d2b1de89eec2c95fb6cc6776b48",
+      "bytes": 6756
     },
     {
       "path": "tests/test_observability.py",

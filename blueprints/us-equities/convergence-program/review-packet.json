@@ -1,0 +1,16 @@
+{
+  "status": "ready",
+  "as_of": "2026-09-19",
+  "source_kind": "native engineering acceptance and bounded repository convergence",
+  "review_focus": "Assess which gates these results actually close and which remain for historical simulation and future dedicated paper trading. Memory TTL is search visibility until sweep, not immediate access revocation; as_of is ingestion time. Nanosecond replay is synthetic and uses integer times/opaque text. Supervision only killed a local synthetic process tree; provider cancellation and Mac hosting are untested. Repository counts do not establish universal quality or full source coverage. No net token savings measured. No broker orders or live authority.",
+  "numerical_facts": [
+    {"citation_id":"public-star-identities","value":"337","unit":"repository identities","source":"catalogs/us-equities/convergence-program/public-stars-refresh.json"},
+    {"citation_id":"wave-decisions","value":"36","unit":"repository decisions","source":"three convergence-program matrices: foundation 10, trading 14, hosting 12"},
+    {"citation_id":"new-source-captures","value":"169","unit":"pinned source files","source":"foundation 59, trading 40, hosting 70; selected sections reviewed, not complete files"},
+    {"citation_id":"memory-native-checks","value":"23","unit":"checks","source":"blueprints/us-equities/memory-lifecycle/receipt.json"},
+    {"citation_id":"memory-tool-calls","value":"31","unit":"native MCP calls","source":"blueprints/us-equities/memory-lifecycle/receipt.json"},
+    {"citation_id":"exact-replay-commands","value":"10","unit":"native commands","source":"blueprints/us-equities/nanosecond-replay/receipt.json"},
+    {"citation_id":"supervision-tree","value":"3","unit":"synthetic processes terminated","source":"blueprints/us-equities/worker-supervision/receipt.json"},
+    {"citation_id":"dashboard-replacement","value":"3","unit":"native generation checks","source":"observability/grand-dashboard/acceptance.py: initial, removed, readded"}
+  ]
+}

@@ -1740,6 +1740,9 @@
     "All fills assume full quantity. Fixed $1/order and 20 basis points are illustrative stresses, not estimated broker fees or attainable liquidity.",
     "Stderr contains three margin-liquidation log entries in each 2x case and the expected insufficient-buying-power rejection in over_limit; exit zero is not described as empty stderr.",
     "Cash reconciliation is exact over exported values with a one-cent comparison tolerance; omitted internal precision is not recovered.",
-    "Hashes establish byte identity, not independent attestation. Native integration is this local fixture around upstream APIs, not an unchanged upstream sample."
+    "Hashes establish byte identity, not independent attestation. Native integration is this local fixture around upstream APIs, not an unchanged upstream sample.",
+    "Known crash-period engineering stress, not holdout alpha or a historical extreme-mover strategy.",
+    "Hourly MOO proxies and default margin liquidation are not calibrated tick/broker fills; financing was not modeled.",
+    "No paper/live orders or automatic promotion."
   ]
 }

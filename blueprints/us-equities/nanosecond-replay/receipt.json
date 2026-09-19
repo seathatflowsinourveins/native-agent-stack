@@ -4,7 +4,8 @@
   "kind": "native_cli_e2e",
   "checked_at": "2026-09-19",
   "component_ids": [
-    "duckdb"
+    "duckdb",
+    "pandas"
   ],
   "claim": "Synthetic exact UTC nanosecond event/revision and universe eligibility survived native pandas parsing, DuckDB BIGINT/Parquet and pinned-hash replay; no market-data or broker adapter acceptance.",
   "data": {
@@ -293,6 +294,8 @@
     "Signed int64 UTC nanoseconds exclude the NaT sentinel; finer-than-nanosecond timestamps reject.",
     "Sequence is comparable only inside the declared source/logical-event scope; no global cross-feed sequence or measured latency claim.",
     "Native JSON encodes output nanoseconds and source sequence as decimal strings; original input JSON integers require lossless parsing.",
-    "Trusted manifest digest is caller-held; permissions deter edits but do not provide immutable/off-host storage."
+    "Trusted manifest digest is caller-held; permissions deter edits but do not provide immutable/off-host storage.",
+    "Synthetic opaque-text fixture, not provider-origin availability, market ticks or a price contract.",
+    "No broker, trading strategy, actual feed or net token-saving acceptance."
   ]
 }

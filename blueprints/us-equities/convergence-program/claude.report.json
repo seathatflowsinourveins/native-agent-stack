@@ -1,0 +1,52 @@
+{
+  "status": "research_only",
+  "as_of": "2026-09-19",
+  "trading_authorized": false,
+  "evidence": [
+    {
+      "citation_id": "memory-native-checks",
+      "value": "23",
+      "unit": "checks"
+    },
+    {
+      "citation_id": "supervision-tree",
+      "value": "3",
+      "unit": "synthetic processes terminated"
+    }
+  ],
+  "findings": [
+    {
+      "claim": "Astra's two evidence items copy the packet exactly in value and unit, and its two findings stay inside packet-stated bounds (TTL as search visibility until sweep; termination of a local synthetic process tree only, with provider cancellation and Mac hosting untested); both are supported.",
+      "citations": [
+        "memory-native-checks",
+        "supervision-tree"
+      ]
+    },
+    {
+      "claim": "Astra's limitation citing unspecified reporting periods and amendments imports SEC/LEAN framing absent from this packet, whose source_kind is native engineering acceptance and bounded repository convergence; no SEC snapshot or simulation fact is present, so that limitation is misapplied though harmlessly conservative.",
+      "citations": [
+        "wave-decisions",
+        "new-source-captures"
+      ]
+    },
+    {
+      "claim": "These counts close only bounded native engineering acceptance gates; replay commands are synthetic with integer times and opaque text, and dashboard checks cover generation only, so historical simulation and future dedicated paper trading remain unestablished, as Astra also states.",
+      "citations": [
+        "exact-replay-commands",
+        "dashboard-replacement"
+      ]
+    }
+  ],
+  "limitations": [
+    "Packet contents were not independently verified; no tools, files, network or delegation were used, so all figures are as-reported.",
+    "as_of 2026-09-19 is ingestion time and does not establish earlier historical availability; a snapshot cannot reconstruct prior states.",
+    "Reporting periods and amendments are not applicable to this packet's engineering-acceptance source_kind; where such framing appears in the Astra report it is unsupported by the packet rather than contradicted by it.",
+    "Memory TTL governs search visibility until the sweep, not immediate access revocation.",
+    "Nanosecond replay is synthetic and uses integer times and opaque text; it is not evidence of real-time behavior.",
+    "Supervision evidence covers only a local synthetic process tree; provider cancellation and Mac hosting are untested.",
+    "Repository counts (337 identities, 36 decisions, 169 pinned files from selected sections) do not establish universal quality or complete source coverage.",
+    "No net token savings were measured.",
+    "No broker orders, actual fills, live authority or alpha are evidenced; historical simulation and dedicated paper-trading acceptance remain open gates.",
+    "This critique covers only the Astra report's consistency with the packet; it cannot validate the underlying receipts or artifacts it cites."
+  ]
+}

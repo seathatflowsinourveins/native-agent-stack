@@ -67,6 +67,15 @@ all arrows are implemented. Dagu currently hosts manual local research runs.
 
 ## Alpaca constraints that change the design
 
+Current margin behavior must come from the actual account and current provider
+rules. Alpaca's [June 2026 margin transition](https://alpaca.markets/blog/finra-retires-the-pdt-rule-introducing-alpacas-new-intraday-margin-framework/)
+retired its prior PDT restrictions and legacy PDT-specific fields. Use the
+current [margin documentation](https://docs.alpaca.markets/us/docs/margin-and-short-selling)
+and account `buying_power`, including security/house/session constraints. An
+installed LEAN legacy PDT margin model is not evidence of present broker
+compliance. The new [historical stress experiment](../historical-simulation/README.md)
+uses explicitly modeled simulation leverage and keeps that distinction visible.
+
 The [Elite page](https://alpaca.markets/elite) advertises **1,000 API requests per
 minute**, not 1,000 executed trades per minute. Treat trading requests as an
 account-level budget that includes order management and reconciliation. Reserve

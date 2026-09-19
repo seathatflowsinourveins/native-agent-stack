@@ -1,0 +1,2397 @@
+{
+  "schema_version": 1,
+  "kind": "public_identity_refresh",
+  "checked_at_utc": "2026-09-19 21:32:21 UTC",
+  "prior_count": 337,
+  "current_count": 337,
+  "added": [],
+  "removed": [],
+  "duplicate_ids": 0,
+  "native_command": [
+    "gh",
+    "api",
+    "--paginate",
+    "users/seathatflowsinourveins/starred?per_page=100",
+    "--jq",
+    ".[] | {id,full_name,pushed_at,archived,fork}"
+  ],
+  "exit_code": 0,
+  "retained_attempts": [
+    {
+      "command": [
+        "gh",
+        "api",
+        "--paginate",
+        "--slurp",
+        "users/seathatflowsinourveins/starred?per_page=100",
+        "--jq",
+        "[.[][] | {id,full_name,pushed_at,archived,fork}]"
+      ],
+      "exit_code": 1,
+      "error": "--slurp is not supported with --jq or --template; corrected to supported per-page --jq output without --slurp."
+    }
+  ],
+  "baseline": "catalogs/us-equities/decision-index.json",
+  "scope": "Complete public-star identity enumeration, compared with the prior 337-star decision union. No new identities. Existing source-review depths remain dated; unchanged membership does not establish unchanged code.",
+  "repositories": [
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "enaqx/awesome-react",
+      "id": 22670857,
+      "pushed_at": "2026-09-04T01:13:20Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "tech-leads-club/agent-skills",
+      "id": 1137515077,
+      "pushed_at": "2026-09-19T14:45:51Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Tencent/WeKnora",
+      "id": 1024118326,
+      "pushed_at": "2026-09-19T16:17:11Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "n8n-io/n8n",
+      "id": 193215554,
+      "pushed_at": "2026-09-19T20:30:25Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "cline/cline",
+      "id": 824874689,
+      "pushed_at": "2026-09-19T21:27:49Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "alphaXiv/OpenResearch",
+      "id": 1261663145,
+      "pushed_at": "2026-09-19T05:26:17Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "alibaba/open-code-review",
+      "id": 1241960226,
+      "pushed_at": "2026-09-19T12:30:32Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "toon-format/toon",
+      "id": 1081397957,
+      "pushed_at": "2026-09-03T07:09:24Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "xbtlin/ai-berkshire",
+      "id": 1203777920,
+      "pushed_at": "2026-09-19T17:42:32Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "screenpipe/screenpipe",
+      "id": 817326197,
+      "pushed_at": "2026-09-19T20:34:18Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Leonxlnx/taste-skill",
+      "id": 1162099055,
+      "pushed_at": "2026-09-16T15:01:43Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "id": 1106996539,
+      "pushed_at": "2026-09-19T00:58:38Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "langgenius/dify",
+      "id": 626805178,
+      "pushed_at": "2026-09-19T10:30:07Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "magnitudedev/magnitude",
+      "id": 1267145484,
+      "pushed_at": "2026-09-19T19:56:10Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "fmtlib/fmt",
+      "id": 7056202,
+      "pushed_at": "2026-09-19T14:49:16Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "loopx-project/loopx",
+      "id": 1255217938,
+      "pushed_at": "2026-09-19T20:41:39Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "paperswithbacktest/awesome-systematic-trading",
+      "id": 455982203,
+      "pushed_at": "2026-09-03T09:13:55Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "fmzquant/strategies",
+      "id": 55355650,
+      "pushed_at": "2025-04-30T04:08:14Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "bbfamily/abu",
+      "id": 68619379,
+      "pushed_at": "2026-01-24T09:00:29Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "asavinov/intelligent-trading-bot",
+      "id": 420628968,
+      "pushed_at": "2026-08-30T13:11:26Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "kernc/backtesting.py",
+      "id": 163788469,
+      "pushed_at": "2026-08-05T12:39:16Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "whchien/ai-trader",
+      "id": 816848129,
+      "pushed_at": "2026-03-28T11:16:18Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "jdx/mise",
+      "id": 586920414,
+      "pushed_at": "2026-09-19T21:18:00Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "pola-rs/polars",
+      "id": 263727855,
+      "pushed_at": "2026-09-19T19:00:39Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "warp-tech/warpgate",
+      "id": 455878073,
+      "pushed_at": "2026-09-19T20:08:00Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "ZSeven-W/openpencil",
+      "id": 1159938129,
+      "pushed_at": "2026-09-17T15:34:46Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "eugr/spark-vllm-docker",
+      "id": 1104120047,
+      "pushed_at": "2026-09-18T22:40:32Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "llm-d/llm-d",
+      "id": 975070903,
+      "pushed_at": "2026-09-19T13:13:01Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "gastownhall/beads",
+      "id": 1074561042,
+      "pushed_at": "2026-09-19T12:44:08Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "superplanehq/superplane",
+      "id": 979560403,
+      "pushed_at": "2026-09-19T03:19:55Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "gitleaks/gitleaks",
+      "id": 119190187,
+      "pushed_at": "2026-09-09T04:18:49Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "infiniflow/ragflow",
+      "id": 730534580,
+      "pushed_at": "2026-09-19T15:32:27Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "ollama/ollama",
+      "id": 658928958,
+      "pushed_at": "2026-09-19T20:41:40Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "cli/cli",
+      "id": 212613049,
+      "pushed_at": "2026-09-19T00:29:50Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "flyteorg/flyte",
+      "id": 216628419,
+      "pushed_at": "2026-09-18T23:39:48Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "livekit/agents",
+      "id": 707441527,
+      "pushed_at": "2026-09-19T00:23:57Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "ayghri/i-have-adhd",
+      "id": 1238120057,
+      "pushed_at": "2026-09-19T16:44:46Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "unclebob/swarm-forge",
+      "id": 1213616615,
+      "pushed_at": "2026-09-07T14:45:22Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "omacom/omarchy",
+      "id": 994093166,
+      "pushed_at": "2026-09-19T19:53:11Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "public-apis/public-apis",
+      "id": 54346799,
+      "pushed_at": "2026-09-18T19:39:43Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "awesome-foss/awesome-sysadmin",
+      "id": 28387406,
+      "pushed_at": "2026-09-17T15:16:20Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "avelino/awesome-go",
+      "id": 21540759,
+      "pushed_at": "2026-09-18T19:40:49Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "awesome-selfhosted/awesome-selfhosted",
+      "id": 36633370,
+      "pushed_at": "2026-09-19T17:28:15Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "sdras/awesome-actions",
+      "id": 153500249,
+      "pushed_at": "2024-09-01T20:32:39Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "e2b-dev/awesome-ai-agents",
+      "id": 655459367,
+      "pushed_at": "2026-08-21T18:52:45Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "wilsonfreitas/awesome-quant",
+      "id": 43425480,
+      "pushed_at": "2026-09-19T01:14:05Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "abhisheknaiidu/awesome-github-profile-readme",
+      "id": 279064706,
+      "pushed_at": "2026-09-11T23:08:19Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "veggiemonk/awesome-docker",
+      "id": 24297122,
+      "pushed_at": "2026-09-12T10:37:31Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "alebcay/awesome-shell",
+      "id": 21552971,
+      "pushed_at": "2025-08-28T14:40:51Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "github/awesome-copilot",
+      "id": 1000362065,
+      "pushed_at": "2026-09-19T20:53:58Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "goabstract/Awesome-Design-Tools",
+      "id": 170326929,
+      "pushed_at": "2024-07-28T19:57:31Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "docker/awesome-compose",
+      "id": 240215314,
+      "pushed_at": "2026-09-19T01:45:50Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "DovAmir/awesome-design-patterns",
+      "id": 136062240,
+      "pushed_at": "2024-10-25T19:57:00Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "tiimgreen/github-cheat-sheet",
+      "id": 18708860,
+      "pushed_at": "2024-04-15T20:15:56Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "fffaraz/awesome-cpp",
+      "id": 21935031,
+      "pushed_at": "2026-09-19T02:12:42Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "sindresorhus/awesome-nodejs",
+      "id": 21737266,
+      "pushed_at": "2026-09-02T02:11:34Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "sindresorhus/awesome",
+      "id": 21737465,
+      "pushed_at": "2026-09-02T02:10:47Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Osmantic/ODS",
+      "id": 1153579168,
+      "pushed_at": "2026-09-19T21:00:25Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "JetBrains/go-modern-guidelines",
+      "id": 1103108740,
+      "pushed_at": "2026-09-10T12:29:04Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "THU-MAIC/OpenMAIC",
+      "id": 1178737655,
+      "pushed_at": "2026-09-19T20:08:42Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "bilawalsidhu/gods-eye-view",
+      "id": 1277471539,
+      "pushed_at": "2026-09-17T00:37:30Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "abi/screenshot-to-code",
+      "id": 718741813,
+      "pushed_at": "2026-09-09T17:27:34Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "bigskysoftware/htmx",
+      "id": 255378816,
+      "pushed_at": "2026-09-18T00:23:47Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "google/googletest",
+      "id": 39840932,
+      "pushed_at": "2026-09-17T17:24:09Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "weave-os/router",
+      "id": 1222789989,
+      "pushed_at": "2026-09-19T07:35:19Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "apache/maka",
+      "id": 1251460378,
+      "pushed_at": "2026-09-19T19:58:17Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "PostHog/posthog",
+      "id": 235901813,
+      "pushed_at": "2026-09-19T21:09:21Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "actions/checkout",
+      "id": 197814629,
+      "pushed_at": "2026-09-10T03:02:44Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "chaitanyagiri/munder-difflin",
+      "id": 1255237198,
+      "pushed_at": "2026-09-17T19:12:15Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "browser-use/browser-use",
+      "id": 881458615,
+      "pushed_at": "2026-09-18T22:34:42Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "tt-a1i/archify",
+      "id": 1211139949,
+      "pushed_at": "2026-09-19T21:08:58Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "VeejaLiu/ScienceFictionCollection",
+      "id": 434085185,
+      "pushed_at": "2026-08-14T10:24:16Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "virgiliojr94/book-to-skill",
+      "id": 1226123343,
+      "pushed_at": "2026-09-18T13:41:35Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "bradautomates/claude-video",
+      "id": 1219644159,
+      "pushed_at": "2026-07-01T01:26:49Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "donnemartin/system-design-primer",
+      "id": 83222441,
+      "pushed_at": "2026-09-15T01:10:09Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "volcengine/OpenViking",
+      "id": 1128123594,
+      "pushed_at": "2026-09-19T20:26:19Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "immich-app/immich",
+      "id": 455229168,
+      "pushed_at": "2026-09-19T17:51:43Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "AlexsJones/llmfit",
+      "id": 1158588224,
+      "pushed_at": "2026-09-19T17:17:14Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "akitaonrails/ai-memory",
+      "id": 1246148135,
+      "pushed_at": "2026-09-19T20:08:57Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "opengeos/GeoLibre",
+      "id": 1251648409,
+      "pushed_at": "2026-09-19T21:13:40Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "paperclipai/paperclip",
+      "id": 1170821064,
+      "pushed_at": "2026-09-19T21:25:54Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "cursor/plugins",
+      "id": 1140229822,
+      "pushed_at": "2026-09-18T23:49:54Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "cordiverse/cordis",
+      "id": 493376588,
+      "pushed_at": "2026-09-08T18:15:04Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "TencentCloud/TencentDB-Agent-Memory",
+      "id": 1203558071,
+      "pushed_at": "2026-09-18T08:25:50Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "vitali87/code-graph-rag",
+      "id": 1003043071,
+      "pushed_at": "2026-09-19T21:13:27Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "NVIDIA-NeMo/Switchyard",
+      "id": 1243889840,
+      "pushed_at": "2026-09-19T15:13:45Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "PrimeIntellect-ai/prime-agent",
+      "id": 1232493406,
+      "pushed_at": "2026-09-19T20:24:50Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "cathrynlavery/diagram-design",
+      "id": 1212769188,
+      "pushed_at": "2026-09-19T17:47:52Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "ankitects/anki",
+      "id": 7270538,
+      "pushed_at": "2026-09-19T01:46:47Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "dependabot/dependabot-core",
+      "id": 93163073,
+      "pushed_at": "2026-09-18T23:13:00Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "usekaneo/kaneo",
+      "id": 910422636,
+      "pushed_at": "2026-09-19T20:53:46Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Chachamaru127/claude-code-harness",
+      "id": 1114903449,
+      "pushed_at": "2026-09-14T01:25:25Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "VoltAgent/awesome-claude-design",
+      "id": 1214125715,
+      "pushed_at": "2026-06-20T17:54:18Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "SeemSeam/claude_codex_bridge",
+      "id": 1083162948,
+      "pushed_at": "2026-09-19T03:44:23Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "deta/surf",
+      "id": 1079906817,
+      "pushed_at": "2026-08-24T17:05:49Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "KnockOutEZ/wigolo",
+      "id": 1208642537,
+      "pushed_at": "2026-09-19T09:28:21Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "eugeniughelbur/obsidian-second-brain",
+      "id": 1190557545,
+      "pushed_at": "2026-09-18T06:48:19Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "atilaahmettaner/tradingview-mcp",
+      "id": 1034736943,
+      "pushed_at": "2026-09-01T15:15:48Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "0xNyk/council-of-high-intelligence",
+      "id": 1170548091,
+      "pushed_at": "2026-09-19T10:13:00Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "open-compass/VLMEvalKit",
+      "id": 725956246,
+      "pushed_at": "2026-09-18T11:51:18Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "looplj/axonhub",
+      "id": 1053598893,
+      "pushed_at": "2026-09-19T03:54:06Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "tradesdontlie/tradingview-mcp",
+      "id": 1195329660,
+      "pushed_at": "2026-07-28T17:28:37Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "brianpetro/obsidian-smart-connections",
+      "id": 582432706,
+      "pushed_at": "2026-09-16T15:51:49Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "uditgoenka/autoresearch",
+      "id": 1180917769,
+      "pushed_at": "2026-08-12T22:28:18Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "tw93/Waza",
+      "id": 1179363570,
+      "pushed_at": "2026-09-19T14:41:00Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "open-multi-agent/open-multi-agent",
+      "id": 1197656406,
+      "pushed_at": "2026-09-18T19:14:04Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "firecrawl/firecrawl-mcp-server",
+      "id": 899407931,
+      "pushed_at": "2026-09-19T21:18:12Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "open-compass/opencompass",
+      "id": 654124617,
+      "pushed_at": "2026-09-18T11:52:08Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "di-sukharev/opencommit",
+      "id": 610217037,
+      "pushed_at": "2026-09-09T15:32:24Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "NirDiamant/Prompt_Engineering",
+      "id": 870554327,
+      "pushed_at": "2026-09-19T02:18:01Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "omnigent-ai/omnigent",
+      "id": 1266212515,
+      "pushed_at": "2026-09-19T21:05:32Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "google-labs-code/stitch-skills",
+      "id": 1135847870,
+      "pushed_at": "2026-08-17T20:20:23Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "nexu-io/html-anything",
+      "id": 1235403234,
+      "pushed_at": "2026-09-15T03:36:24Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "cobusgreyling/loop-engineering",
+      "id": 1263648864,
+      "pushed_at": "2026-09-19T10:43:04Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "mcp-use/mcp-use",
+      "id": 956472076,
+      "pushed_at": "2026-09-18T23:57:03Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "1jehuang/jcode",
+      "id": 1128204614,
+      "pushed_at": "2026-09-19T06:15:20Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "khoj-ai/khoj",
+      "id": 396569538,
+      "pushed_at": "2026-08-02T01:55:40Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "composio-community/awesome-claude-plugins",
+      "id": 1080989149,
+      "pushed_at": "2026-07-26T09:02:02Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Maciek-roboblog/Claude-Code-Usage-Monitor",
+      "id": 1004631442,
+      "pushed_at": "2026-07-05T04:52:21Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "zebbern/claude-code-guide",
+      "id": 1006251566,
+      "pushed_at": "2026-09-19T00:55:54Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "tradermonty/claude-trading-skills",
+      "id": 1079356098,
+      "pushed_at": "2026-09-19T21:03:30Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "drona23/claude-token-efficient",
+      "id": 1196181411,
+      "pushed_at": "2026-06-16T03:10:06Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "FlorianBruniaux/claude-code-ultimate-guide",
+      "id": 1131107802,
+      "pushed_at": "2026-09-19T13:58:30Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "awarexone/Agentic-Bug-Hunter",
+      "id": 1175748759,
+      "pushed_at": "2026-09-19T14:41:49Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "ykdojo/claude-code-tips",
+      "id": 1105657641,
+      "pushed_at": "2026-09-02T21:51:40Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "frankbria/ralph-claude-code",
+      "id": 1045721921,
+      "pushed_at": "2026-09-19T02:33:45Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "SuperClaude-Org/SuperClaude_Framework",
+      "id": 1006496207,
+      "pushed_at": "2026-09-15T03:10:21Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "musistudio/claude-code-router",
+      "id": 938468965,
+      "pushed_at": "2026-09-18T02:27:33Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "anthropics/claude-quickstarts",
+      "id": 849553306,
+      "pushed_at": "2026-09-18T19:15:32Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "anthropics/claude-plugins-official",
+      "id": 1100776768,
+      "pushed_at": "2026-09-18T19:05:53Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "catchorg/Catch2",
+      "id": 1062572,
+      "pushed_at": "2026-09-14T12:08:29Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "kvcache-ai/ktransformers",
+      "id": 833984877,
+      "pushed_at": "2026-09-19T03:06:55Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "earendil-works/pi",
+      "id": 1035029907,
+      "pushed_at": "2026-09-19T21:28:16Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "OtterMind/Chat2DB",
+      "id": 656227652,
+      "pushed_at": "2026-09-19T08:45:20Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "diegosouzapw/OmniRoute",
+      "id": 1157102282,
+      "pushed_at": "2026-09-19T08:30:04Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "yorukot/superfile",
+      "id": 774468912,
+      "pushed_at": "2026-09-18T02:50:00Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "citrolabs/ego-lite",
+      "id": 1212503250,
+      "pushed_at": "2026-09-18T09:27:56Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "likec4/likec4",
+      "id": 618351200,
+      "pushed_at": "2026-09-19T12:13:27Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "langchain-ai/openwiki",
+      "id": 1277477208,
+      "pushed_at": "2026-09-19T08:08:32Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "nashsu/llm_wiki",
+      "id": 1204828304,
+      "pushed_at": "2026-08-25T06:42:02Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "dgunning/edgartools",
+      "id": 581872397,
+      "pushed_at": "2026-09-17T10:29:28Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "tirth8205/code-review-graph",
+      "id": 1167788341,
+      "pushed_at": "2026-09-18T19:41:29Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "stablyai/orca",
+      "id": 1183888342,
+      "pushed_at": "2026-09-19T21:31:07Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Zackriya-Solutions/meetily",
+      "id": 908589694,
+      "pushed_at": "2026-09-15T18:32:32Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "wonderwhy-er/DesktopCommanderMCP",
+      "id": 898345892,
+      "pushed_at": "2026-09-19T20:30:48Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "virattt/ai-hedge-fund",
+      "id": 896144595,
+      "pushed_at": "2026-09-18T14:54:26Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "ColeMurray/background-agents",
+      "id": 1141974122,
+      "pushed_at": "2026-09-19T21:27:22Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Crosstalk-Solutions/project-nomad",
+      "id": 1007827531,
+      "pushed_at": "2026-09-13T19:33:25Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "PrefectHQ/prefect",
+      "id": 139199684,
+      "pushed_at": "2026-09-19T08:16:48Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "giancarloerra/SocratiCode",
+      "id": 1167732163,
+      "pushed_at": "2026-09-17T19:14:39Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "graykode/abtop",
+      "id": 1195165448,
+      "pushed_at": "2026-09-14T04:45:00Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "bytebase/dbhub",
+      "id": 945530209,
+      "pushed_at": "2026-09-19T16:51:07Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "lsdefine/GenericAgent",
+      "id": 1135791677,
+      "pushed_at": "2026-09-19T01:57:31Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "jgravelle/jcodemunch-mcp",
+      "id": 1153178500,
+      "pushed_at": "2026-09-19T19:54:40Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "BuilderIO/agent-native",
+      "id": 1179959183,
+      "pushed_at": "2026-09-19T21:32:00Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "DeusData/codebase-memory-mcp",
+      "id": 1166102148,
+      "pushed_at": "2026-09-19T20:24:19Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "HKUDS/Vibe-Trading",
+      "id": 1198306812,
+      "pushed_at": "2026-09-19T17:10:12Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "dbt-labs/dbt",
+      "id": 53548867,
+      "pushed_at": "2026-09-19T12:02:38Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "topoteretes/cognee",
+      "id": 679343504,
+      "pushed_at": "2026-09-19T10:54:09Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "ripienaar/free-for-dev",
+      "id": 32484381,
+      "pushed_at": "2026-09-18T18:29:20Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "unclecode/crawl4ai",
+      "id": 798201435,
+      "pushed_at": "2026-09-18T07:00:43Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "D4Vinci/Scrapling",
+      "id": 872119017,
+      "pushed_at": "2026-09-19T16:15:36Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "searxng/searxng",
+      "id": 357241735,
+      "pushed_at": "2026-09-19T13:05:01Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "h4ckf0r0day/obscura",
+      "id": 1209343409,
+      "pushed_at": "2026-09-19T18:33:43Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "trailofbits/skills",
+      "id": 1134447175,
+      "pushed_at": "2026-09-16T22:05:12Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "AgriciDaniel/claude-obsidian",
+      "id": 1203670949,
+      "pushed_at": "2026-09-10T17:44:23Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "tursodatabase/turso",
+      "id": 683347556,
+      "pushed_at": "2026-09-19T21:26:00Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "agentskills/agentskills",
+      "id": 1117639997,
+      "pushed_at": "2026-08-09T20:36:04Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "microsoft/SkillOpt",
+      "id": 1232669890,
+      "pushed_at": "2026-09-05T17:33:48Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "mlflow/mlflow",
+      "id": 136202695,
+      "pushed_at": "2026-09-19T15:19:31Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "ClickHouse/ClickHouse",
+      "id": 60246359,
+      "pushed_at": "2026-09-19T21:27:27Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "MiroMindAI/MiroThinker",
+      "id": 1033873680,
+      "pushed_at": "2026-07-06T14:50:39Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "JuliusBrussee/caveman",
+      "id": 1201173969,
+      "pushed_at": "2026-09-19T07:26:40Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "NVIDIA-NeMo/Speech",
+      "id": 200722670,
+      "pushed_at": "2026-09-19T18:56:47Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "virattt/dexter",
+      "id": 1076426995,
+      "pushed_at": "2026-08-04T15:20:42Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "restic/restic",
+      "id": 19205896,
+      "pushed_at": "2026-09-01T01:43:58Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "pytest-dev/pytest",
+      "id": 37489525,
+      "pushed_at": "2026-09-18T06:25:34Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Kong/insomnia",
+      "id": 56899284,
+      "pushed_at": "2026-09-18T23:24:25Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "google-research/timesfm",
+      "id": 793784055,
+      "pushed_at": "2026-09-15T20:02:45Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "DietrichGebert/ponytail",
+      "id": 1266797999,
+      "pushed_at": "2026-09-14T14:34:56Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "SigNoz/signoz",
+      "id": 326404870,
+      "pushed_at": "2026-09-19T15:19:11Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Lumiwealth/lumibot",
+      "id": 294371636,
+      "pushed_at": "2026-09-19T17:59:33Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "odysseus-dev/odysseus",
+      "id": 1255180606,
+      "pushed_at": "2026-09-17T17:38:42Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "openai/plugins",
+      "id": 1172963839,
+      "pushed_at": "2026-09-18T16:58:15Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "x1xhlol/system-prompts-and-models-of-ai-tools",
+      "id": 943398999,
+      "pushed_at": "2026-08-11T13:01:09Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "microsoft/PowerToys",
+      "id": 184456251,
+      "pushed_at": "2026-09-19T20:42:32Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "LMCache/LMCache",
+      "id": 807305060,
+      "pushed_at": "2026-09-19T15:22:51Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "kenn-io/agentsview",
+      "id": 1162021647,
+      "pushed_at": "2026-09-19T21:07:35Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Panniantong/Agent-Reach",
+      "id": 1165277268,
+      "pushed_at": "2026-09-15T16:16:24Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "router-for-me/CLIProxyAPI",
+      "id": 1012087571,
+      "pushed_at": "2026-09-19T18:58:27Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "anthropics/claude-code",
+      "id": 937253475,
+      "pushed_at": "2026-09-19T19:16:54Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "microsoft/markitdown",
+      "id": 888092115,
+      "pushed_at": "2026-09-16T17:23:11Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "revfactory/harness",
+      "id": 1193082155,
+      "pushed_at": "2026-07-24T23:35:08Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "lfnovo/open-notebook",
+      "id": 876286167,
+      "pushed_at": "2026-09-18T01:46:29Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "phuryn/pm-skills",
+      "id": 1170266927,
+      "pushed_at": "2026-09-14T21:15:33Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Andyyyy64/whichllm",
+      "id": 1172574522,
+      "pushed_at": "2026-09-19T16:22:49Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "refactoringhq/tolaria",
+      "id": 1158096951,
+      "pushed_at": "2026-09-17T13:42:59Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "codejunkie99/agentic-stack",
+      "id": 1211537500,
+      "pushed_at": "2026-09-16T19:37:54Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "NousResearch/hermes-agent-self-evolution",
+      "id": 1176753219,
+      "pushed_at": "2026-06-17T11:53:04Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "0xNyk/awesome-hermes-agent",
+      "id": 1189234446,
+      "pushed_at": "2026-09-19T10:10:28Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "anthropics/claude-agent-sdk-python",
+      "id": 1000486904,
+      "pushed_at": "2026-09-19T05:41:13Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "openai/openai-agents-python",
+      "id": 946380199,
+      "pushed_at": "2026-09-18T21:37:55Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "walkinglabs/learn-harness-engineering",
+      "id": 1195243030,
+      "pushed_at": "2026-08-26T01:08:59Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "headroomlabs-ai/headroom",
+      "id": 1129940957,
+      "pushed_at": "2026-09-19T19:07:21Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "modelcontextprotocol/modelcontextprotocol",
+      "id": 862570523,
+      "pushed_at": "2026-09-19T11:01:53Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "modelcontextprotocol/servers",
+      "id": 890668799,
+      "pushed_at": "2026-09-03T01:42:26Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "mvanhorn/last30days-skill",
+      "id": 1140843380,
+      "pushed_at": "2026-09-19T20:00:45Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "aquasecurity/trivy",
+      "id": 180687624,
+      "pushed_at": "2026-09-18T12:42:01Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "HKUDS/AI-Trader",
+      "id": 1081891045,
+      "pushed_at": "2026-06-11T09:26:03Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "pydantic/pydantic",
+      "id": 90194616,
+      "pushed_at": "2026-09-18T08:12:38Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "VoltAgent/awesome-openclaw-skills",
+      "id": 1141704318,
+      "pushed_at": "2026-09-14T09:56:58Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "yusufkaraaslan/Skill_Seekers",
+      "id": 1078319457,
+      "pushed_at": "2026-09-16T20:32:39Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "VoltAgent/awesome-claude-code-subagents",
+      "id": 1029036679,
+      "pushed_at": "2026-09-14T09:59:52Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "oraios/serena",
+      "id": 953683578,
+      "pushed_at": "2026-09-19T10:02:09Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "blader/humanizer",
+      "id": 1136666433,
+      "pushed_at": "2026-09-06T20:26:10Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "K-Dense-AI/scientific-agent-skills",
+      "id": 1079456184,
+      "pushed_at": "2026-09-14T09:27:38Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "davila7/claude-code-templates",
+      "id": 1013480284,
+      "pushed_at": "2026-09-19T21:31:25Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "xingkongliang/skills-manager",
+      "id": 1170291083,
+      "pushed_at": "2026-09-17T03:16:02Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "HKUDS/RAG-Anything",
+      "id": 997220241,
+      "pushed_at": "2026-09-15T02:37:26Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "mindfold-ai/Trellis",
+      "id": 1142423471,
+      "pushed_at": "2026-09-11T18:03:19Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "humanlayer/humanlayer",
+      "id": 838542536,
+      "pushed_at": "2026-06-19T03:27:53Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "BigPizzaV3/CodexPlusPlus",
+      "id": 1230751102,
+      "pushed_at": "2026-09-16T18:38:51Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "openai/skills",
+      "id": 1103643573,
+      "pushed_at": "2026-09-08T20:35:26Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "farion1231/cc-switch",
+      "id": 1031912724,
+      "pushed_at": "2026-09-17T18:35:01Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "breferrari/obsidian-mind",
+      "id": 1169560166,
+      "pushed_at": "2026-09-02T13:32:14Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "nyldn/claude-octopus",
+      "id": 1134819911,
+      "pushed_at": "2026-09-19T16:21:32Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "VoltAgent/awesome-codex-subagents",
+      "id": 1184268220,
+      "pushed_at": "2026-09-14T10:04:38Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "max-sixty/worktrunk",
+      "id": 1078528927,
+      "pushed_at": "2026-09-19T16:30:24Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "getagentseal/codeburn",
+      "id": 1209889782,
+      "pushed_at": "2026-09-19T19:33:30Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "UfoMiao/zcf",
+      "id": 1028832403,
+      "pushed_at": "2026-08-31T03:02:03Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "smtg-ai/claude-squad",
+      "id": 945605057,
+      "pushed_at": "2026-08-20T05:09:53Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Yeachan-Heo/oh-my-codex",
+      "id": 1148052330,
+      "pushed_at": "2026-09-19T17:33:59Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "kepano/obsidian-skills",
+      "id": 1126947080,
+      "pushed_at": "2026-09-15T14:43:57Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "can1357/oh-my-pi",
+      "id": 1125856365,
+      "pushed_at": "2026-09-19T19:36:13Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "nautechsystems/nautilus_trader",
+      "id": 138552196,
+      "pushed_at": "2026-09-19T14:16:14Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "shanraisshan/codex-cli-best-practice",
+      "id": 1168270795,
+      "pushed_at": "2026-06-04T18:46:09Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "modelscope/FunASR",
+      "id": 569959091,
+      "pushed_at": "2026-09-19T02:42:10Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Open-LLM-VTuber/Open-LLM-VTuber",
+      "id": 722844356,
+      "pushed_at": "2026-05-15T07:18:04Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "supermemoryai/supermemory",
+      "id": 764287615,
+      "pushed_at": "2026-09-18T22:02:30Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Orchestra-Research/AI-Research-SKILLs",
+      "id": 1088558237,
+      "pushed_at": "2026-06-16T01:36:46Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "assafelovic/gpt-researcher",
+      "id": 639835356,
+      "pushed_at": "2026-08-27T19:34:56Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "bytedance/deer-flow",
+      "id": 979115477,
+      "pushed_at": "2026-09-19T07:09:37Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Piebald-AI/claude-code-system-prompts",
+      "id": 1099328966,
+      "pushed_at": "2026-09-19T14:37:57Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "teng-lin/notebooklm-py",
+      "id": 1129786550,
+      "pushed_at": "2026-09-18T22:50:52Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "openai/codex-plugin-cc",
+      "id": 1196321162,
+      "pushed_at": "2026-07-08T00:17:31Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "VoltAgent/awesome-agent-skills",
+      "id": 1084853233,
+      "pushed_at": "2026-09-15T07:12:04Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "yamadashy/repomix",
+      "id": 828119367,
+      "pushed_at": "2026-09-19T21:09:55Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Yeachan-Heo/oh-my-claudecode",
+      "id": 1130809465,
+      "pushed_at": "2026-09-18T13:15:08Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "sickn33/agentic-awesome-skills",
+      "id": 1134426800,
+      "pushed_at": "2026-09-19T18:30:54Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "code-yeongyu/oh-my-openagent",
+      "id": 1108837393,
+      "pushed_at": "2026-09-19T16:45:00Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "LearningCircuit/local-deep-research",
+      "id": 929868765,
+      "pushed_at": "2026-09-19T20:23:37Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "DenisSergeevitch/agents-best-practices",
+      "id": 1240191065,
+      "pushed_at": "2026-09-19T17:30:40Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "EveryInc/compound-engineering-plugin",
+      "id": 1073224021,
+      "pushed_at": "2026-09-19T19:23:28Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "anthropics/claude-cookbooks",
+      "id": 678973052,
+      "pushed_at": "2026-09-18T19:07:33Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "paperless-ngx/paperless-ngx",
+      "id": 458648791,
+      "pushed_at": "2026-09-19T21:17:56Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Fincept-Corporation/FinceptTerminal",
+      "id": 849406496,
+      "pushed_at": "2026-09-19T12:41:43Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "anthropics/knowledge-work-plugins",
+      "id": 1140828898,
+      "pushed_at": "2026-09-19T07:30:50Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Untrivial-ai/agent-orchestrator",
+      "id": 1156994049,
+      "pushed_at": "2026-09-19T21:10:54Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Graphify-Labs/graphify",
+      "id": 1200597263,
+      "pushed_at": "2026-09-18T21:16:28Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "OpenHands/OpenHands",
+      "id": 771302083,
+      "pushed_at": "2026-09-19T18:02:49Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "OthmanAdi/planning-with-files",
+      "id": 1127110039,
+      "pushed_at": "2026-09-19T18:57:17Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Egonex-AI/Understand-Anything",
+      "id": 1182081931,
+      "pushed_at": "2026-09-12T05:31:43Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "ComposioHQ/composio",
+      "id": 762304524,
+      "pushed_at": "2026-09-18T20:05:47Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "oven-sh/bun",
+      "id": 357728969,
+      "pushed_at": "2026-09-19T21:30:54Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "CloakHQ/CloakBrowser",
+      "id": 1163834030,
+      "pushed_at": "2026-09-18T17:48:44Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "tinyhumansai/openhuman",
+      "id": 1161163182,
+      "pushed_at": "2026-09-19T18:53:29Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Imbad0202/academic-research-skills",
+      "id": 1167300963,
+      "pushed_at": "2026-09-19T14:01:55Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "colbymchenry/codegraph",
+      "id": 1137078255,
+      "pushed_at": "2026-09-16T18:43:52Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "HKUDS/CLI-Anything",
+      "id": 1176011916,
+      "pushed_at": "2026-08-21T07:26:58Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "rohitg00/ai-engineering-from-scratch",
+      "id": 1185590488,
+      "pushed_at": "2026-09-07T11:42:35Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "rohitg00/agentmemory",
+      "id": 1166408297,
+      "pushed_at": "2026-09-14T06:11:28Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "punkpeye/awesome-mcp-servers",
+      "id": 896335270,
+      "pushed_at": "2026-09-15T23:17:39Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "ComposioHQ/awesome-claude-skills",
+      "id": 1078079172,
+      "pushed_at": "2026-09-18T07:16:11Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "f/prompts.chat",
+      "id": 574523116,
+      "pushed_at": "2026-09-09T10:27:05Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "addyosmani/agent-skills",
+      "id": 1158722119,
+      "pushed_at": "2026-09-18T03:32:22Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Open-Dev-Society/OpenStock",
+      "id": 1065936302,
+      "pushed_at": "2026-09-19T13:13:19Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "akfamily/akshare",
+      "id": 212037775,
+      "pushed_at": "2026-09-17T03:40:12Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "ZhuLinsen/daily_stock_analysis",
+      "id": 1131513930,
+      "pushed_at": "2026-09-19T15:09:08Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "wangzhe3224/awesome-systematic-trading",
+      "id": 437352558,
+      "pushed_at": "2026-08-30T20:58:30Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "rtk-ai/rtk",
+      "id": 1139971460,
+      "pushed_at": "2026-09-19T21:14:12Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "composio-community/awesome-codex-skills",
+      "id": 1132750706,
+      "pushed_at": "2026-07-26T01:14:54Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "warpdotdev/warp",
+      "id": 384219990,
+      "pushed_at": "2026-09-19T16:31:16Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "sirmalloc/ccstatusline",
+      "id": 1034425196,
+      "pushed_at": "2026-09-18T17:45:35Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "vercel-labs/agent-skills",
+      "id": 1112540808,
+      "pushed_at": "2026-08-28T13:36:31Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "multica-ai/multica",
+      "id": 1133707766,
+      "pushed_at": "2026-09-19T10:18:03Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "rowboatlabs/rowboat",
+      "id": 916009087,
+      "pushed_at": "2026-09-18T18:16:08Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "mksglu/context-mode",
+      "id": 1164477708,
+      "pushed_at": "2026-09-19T12:05:41Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "zilliztech/claude-context",
+      "id": 997125912,
+      "pushed_at": "2026-07-14T12:00:38Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "HKUDS/DeepTutor",
+      "id": 1124219907,
+      "pushed_at": "2026-09-19T08:40:16Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "AsyncFuncAI/deepwiki-open",
+      "id": 975318071,
+      "pushed_at": "2026-09-03T20:29:26Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "aaif-goose/goose",
+      "id": 846698999,
+      "pushed_at": "2026-09-19T18:33:03Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "thedotmack/claude-mem",
+      "id": 1048065319,
+      "pushed_at": "2026-09-19T18:14:21Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "coleam00/Archon",
+      "id": 929121414,
+      "pushed_at": "2026-09-18T12:55:28Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "shiyu-coder/Kronos",
+      "id": 1011567289,
+      "pushed_at": "2026-04-13T12:38:49Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "mem0ai/mem0",
+      "id": 656099147,
+      "pushed_at": "2026-09-19T01:14:39Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Tracer-Cloud/opensre",
+      "id": 1133141258,
+      "pushed_at": "2026-09-19T11:38:06Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "garrytan/gbrain",
+      "id": 1202057891,
+      "pushed_at": "2026-09-17T21:00:26Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "MemPalace/mempalace",
+      "id": 1201656210,
+      "pushed_at": "2026-09-18T07:55:23Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "vinta/awesome-python",
+      "id": 21289110,
+      "pushed_at": "2026-09-18T22:11:03Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "alirezarezvani/claude-skills",
+      "id": 1079084637,
+      "pushed_at": "2026-08-30T09:46:16Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "unslothai/unsloth",
+      "id": 725205304,
+      "pushed_at": "2026-09-19T13:27:05Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "hesreallyhim/awesome-claude-code",
+      "id": 969302809,
+      "pushed_at": "2026-09-19T21:07:33Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "mattpocock/skills",
+      "id": 1148788086,
+      "pushed_at": "2026-09-18T10:12:48Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "TauricResearch/TradingAgents",
+      "id": 909213664,
+      "pushed_at": "2026-09-18T05:43:45Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "onyx-dot-app/onyx",
+      "id": 633262635,
+      "pushed_at": "2026-09-19T10:13:40Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "luongnv89/claude-howto",
+      "id": 1092047360,
+      "pushed_at": "2026-09-06T09:04:15Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "google-ai-edge/gallery",
+      "id": 958136139,
+      "pushed_at": "2026-09-18T21:55:53Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "google-ai-edge/LiteRT-LM",
+      "id": 966386486,
+      "pushed_at": "2026-09-19T02:33:39Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "YishenTu/claudian",
+      "id": 1110782890,
+      "pushed_at": "2026-09-19T16:54:38Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "multica-ai/andrej-karpathy-skills",
+      "id": 1142983825,
+      "pushed_at": "2026-04-20T10:05:04Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "Shubhamsaboo/awesome-llm-apps",
+      "id": 793375104,
+      "pushed_at": "2026-09-19T07:54:25Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "HKUDS/OpenHarness",
+      "id": 1198616956,
+      "pushed_at": "2026-06-04T02:42:40Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "quemsah/awesome-claude-plugins",
+      "id": 1086692156,
+      "pushed_at": "2026-09-19T07:37:46Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "karpathy/autoresearch",
+      "id": 1174820787,
+      "pushed_at": "2026-03-26T00:07:37Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "shanraisshan/claude-code-best-practice",
+      "id": 1087192965,
+      "pushed_at": "2026-09-19T06:40:19Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "abhigyanpatwari/GitNexus",
+      "id": 1031059905,
+      "pushed_at": "2026-09-19T15:09:39Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "vectorize-io/hindsight",
+      "id": 1086419061,
+      "pushed_at": "2026-09-19T14:30:38Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "wanshuiyin/Auto-claude-code-research-in-sleep",
+      "id": 1177608268,
+      "pushed_at": "2026-09-18T18:05:10Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "wshobson/agents",
+      "id": 1025856648,
+      "pushed_at": "2026-09-19T02:36:23Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "EverMind-AI/EverOS",
+      "id": 1085086903,
+      "pushed_at": "2026-09-09T02:59:13Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "promptfoo/promptfoo",
+      "id": 633927609,
+      "pushed_at": "2026-09-19T21:08:12Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "langchain-ai/deepagents",
+      "id": 1027384981,
+      "pushed_at": "2026-09-19T21:17:02Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "NousResearch/hermes-agent",
+      "id": 1024554267,
+      "pushed_at": "2026-09-19T21:32:17Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "pbakaus/impeccable",
+      "id": 1097346685,
+      "pushed_at": "2026-09-19T01:09:27Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "andrewyng/context-hub",
+      "id": 1086436947,
+      "pushed_at": "2026-05-31T18:41:45Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "msitarzewski/agency-agents",
+      "id": 1075372545,
+      "pushed_at": "2026-09-12T16:57:21Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "lightpanda-io/browser",
+      "id": 598667202,
+      "pushed_at": "2026-09-19T05:38:17Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "666ghj/MiroFish",
+      "id": 1104332987,
+      "pushed_at": "2026-09-16T03:31:58Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "shareAI-lab/learn-claude-code",
+      "id": 1010681419,
+      "pushed_at": "2026-08-26T16:38:22Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "obra/superpowers",
+      "id": 1073224795,
+      "pushed_at": "2026-09-19T00:32:57Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "langchain-ai/open-swe",
+      "id": 987975584,
+      "pushed_at": "2026-09-19T21:00:13Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "jarrodwatts/claude-hud",
+      "id": 1126473386,
+      "pushed_at": "2026-09-12T21:32:41Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "koala73/worldmonitor",
+      "id": 1130564872,
+      "pushed_at": "2026-09-19T20:34:16Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "VectifyAI/PageIndex",
+      "id": 958531089,
+      "pushed_at": "2026-09-19T13:53:40Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "ruvnet/ruflo",
+      "id": 995029641,
+      "pushed_at": "2026-09-19T06:23:46Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "comet-ml/opik",
+      "id": 638951438,
+      "pushed_at": "2026-09-19T09:37:41Z"
+    },
+    {
+      "archived": false,
+      "fork": false,
+      "full_name": "affaan-m/ECC",
+      "id": 1136590548,
+      "pushed_at": "2026-09-19T21:09:21Z"
+    }
+  ]
+}

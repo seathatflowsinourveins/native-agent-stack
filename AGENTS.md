@@ -28,6 +28,12 @@ is the validated repository union; register new decision arrays explicitly with
 `scripts/catalog_decisions.py --write --supplement PATH.json#/collection`.
 Metadata, pinned source review and native execution are different evidence levels.
 
+The latest convergence-program coverage/plan and historical-simulation receipts
+extend that architecture. Keep the public grand-dashboard checkpoint current
+when accepted work changes a lane, worker or gate. Its timer publishes bounded
+metadata; emitter freshness is distinct from checkpoint age and process liveness.
+Read `observability/grand-dashboard/README.md` only when operating that feature.
+
 For the next research/acceptance work, read `blueprints/us-equities/acceptance-wave/README.md`
 and its research protocol on demand. The selected direction is daily/intraday
 catalyst research, including historical +200% mover discovery. Preserve as-known

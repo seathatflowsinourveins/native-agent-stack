@@ -190,6 +190,12 @@ identified by an explicit event flag and not declared extra billed inference.
 
 ## Limits and remaining trading requirements
 
+The [grand research dashboard](grand-dashboard/README.md) now combines native
+service/usage telemetry with explicitly recorded lanes, gates, worker checkpoints,
+repository decisions and historical simulation outcomes. It uses these existing
+Grafana/Loki/Prometheus backends; a bounded local emitter reads public metadata,
+with a separate checkpoint timestamp and no prompt/account ingestion.
+
 This is a local single-host observation profile, not a replicated operations
 service or financial audit ledger. User services depend on the WSL user manager
 being active; no paid host, always-on machine, off-host backup, broker account,

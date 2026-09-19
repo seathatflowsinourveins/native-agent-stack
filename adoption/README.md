@@ -77,6 +77,15 @@ Transfer public configuration templates and explicitly selected private **applic
 
 ## Continue in a future session
 
+After the native observability services are accepted on the new host, install the
+[grand dashboard and progress emitter](../observability/grand-dashboard/README.md)
+using explicit checkout/config/data paths. Its native user timer refreshes public
+checkpoint metadata automatically while the Linux/WSL user manager runs. It does
+not transfer credentials or make another machine's historical results local E2E.
+The current [seventeen-requirement map](../blueprints/us-equities/convergence-program/coverage.md)
+and [program plan](../blueprints/us-equities/convergence-program/plan.json) identify
+the next concrete acceptance without reloading the entire repository catalog.
+
 Load `AGENTS.md`, this guide, then [the small continuation map](manifest.json). Follow [the update protocol](update.md) and only the layer needed for the task. Open gates remain in [the convergence ledger](../catalogs/us-equities/convergence-review.json); a new checkout cannot clear them. Distinguish latest upstream metadata from the compatible version actually accepted locally.
 
 Primary references: [uv locking and synchronization](https://docs.astral.sh/uv/pip/compile/), [official Codex SDK](https://learn.chatgpt.com/docs/codex-sdk), [Codex authentication](https://learn.chatgpt.com/docs/auth), [Claude authentication](https://code.claude.com/docs/en/authentication), [Claude settings](https://code.claude.com/docs/en/settings).

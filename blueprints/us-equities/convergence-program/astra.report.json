@@ -1,0 +1,40 @@
+{
+  "status": "research_only",
+  "as_of": "2026-09-19",
+  "trading_authorized": false,
+  "evidence": [
+    {
+      "citation_id": "memory-native-checks",
+      "value": "23",
+      "unit": "checks"
+    },
+    {
+      "citation_id": "supervision-tree",
+      "value": "3",
+      "unit": "synthetic processes terminated"
+    }
+  ],
+  "findings": [
+    {
+      "claim": "Reported memory checks support bounded native engineering acceptance; TTL governs search visibility until sweep, not immediate access revocation.",
+      "citations": [
+        "memory-native-checks"
+      ]
+    },
+    {
+      "claim": "Supervision evidence covers termination of a local synthetic process tree; provider cancellation and Mac hosting remain untested.",
+      "citations": [
+        "supervision-tree"
+      ]
+    }
+  ],
+  "limitations": [
+    "Packet claims were not independently verified.",
+    "The as_of date represents ingestion time, not historical source availability; reporting periods and amendments are unspecified.",
+    "Historical simulation and future dedicated paper-trading acceptance remain unestablished.",
+    "Nanosecond replay is synthetic and uses integer times and opaque text.",
+    "Repository counts and selected source sections do not establish universal quality or complete source coverage.",
+    "No net token savings were measured.",
+    "These results establish neither actual broker fills nor alpha; no broker orders or live authority are evidenced."
+  ]
+}

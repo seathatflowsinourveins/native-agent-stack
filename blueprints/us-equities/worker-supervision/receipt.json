@@ -122,6 +122,8 @@
     "Linux/WSL2 host only; no native macOS, Windows, host reboot, WSL shutdown recovery or always-on remote-host acceptance.",
     "Local process termination does not establish remote provider cancellation, stopped billing or reversal of external effects.",
     "systemd latest upstream release is distinct from the accepted distribution build; no systemd upgrade was performed.",
-    "Hashes bind retained evidence bytes; they do not independently attest the execution."
+    "Hashes bind retained evidence bytes; they do not independently attest the execution.",
+    "Linux/WSL local synthetic tree, not provider cancellation or Mac hosting.",
+    "Configured resource limits were inspected, not saturation-tested."
   ]
 }

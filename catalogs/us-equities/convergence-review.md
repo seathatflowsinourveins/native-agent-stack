@@ -17,7 +17,7 @@ discovery lists**. It does not establish a universal or final SOTA ranking.
 This earlier pass used a **453-identity historical index**, 152 decision cards
 for 147 distinct repositories and 20 model entries. The later
 [architecture wave](architecture/README.md) and [validated decision union](decision-index.json)
-now include 479 identities and explicitly registered supplements. These counts
+now include 494 identities and explicitly registered supplements. These counts
 do not mean installed components or completed native acceptance.
 
 ## Selection and evidence by layer

@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "id": "convergence-program-20260919",
+  "status": "locally_complete_with_external_gates",
+  "started_at_utc": "2026-09-19T21:26:10Z",
+  "base_commit": "4898871620fb2b3e4e8c80756b0c9b3039a292bf",
+  "objective": "Evidence-based current architecture and repository selection across the native coding/research foundation and US-equities north star, with justified native acceptances and GitHub publication.",
+  "user_direction": {
+    "tracks": [
+      "daily",
+      "intraday"
+    ],
+    "research_focus": [
+      "catalysts/incentives",
+      "historical +200% movers",
+      "pre-positioning",
+      "early entry",
+      "market-state strategy selection"
+    ],
+    "platforms": [
+      "macOS",
+      "WSL/Linux"
+    ],
+    "eventual_broker": "Alpaca paper, with future separately accepted live capability",
+    "lanes": [
+      "simulation",
+      "dedicated_or_selected_paper_account",
+      "future_live_after_promotion"
+    ],
+    "lane_specific_factors": true,
+    "aggressive_simulation_and_paper_tests": true,
+    "automatic_leverage_research": true,
+    "paper_account_choice": "dedicated_research_paper_account",
+    "grand_dashboard": "Show all workflow actions, decisions/progress, workers, gates, native evidence and simulation/paper/live readiness using the existing observability stack.",
+    "current_priority": "Historical simulation/backtesting now; user will configure dedicated paper credentials locally later."
+  },
+  "scope": {
+    "orders_allowed": false,
+    "paid_resources_allowed": false,
+    "credential_transfer_allowed": false,
+    "automatic_unreviewed_upgrades": false,
+    "universal_sota_claimed": false,
+    "net_provider_savings_claimed": false,
+    "paper_e2e_requested": true,
+    "paper_execution_state": "User chose dedicated research paper account and will configure credentials locally; current priority is historical simulation/backtests, no orders submitted.",
+    "live_promotion_authorized": false
+  },
+  "roles": [
+    {
+      "role": "user",
+      "owns": [
+        "objectives",
+        "risk/capital",
+        "account/data rights",
+        "operating budget",
+        "broker progression decisions"
+      ]
+    },
+    {
+      "role": "coordinator",
+      "owns": [
+        "goal and stopping criteria",
+        "full identity coverage audit",
+        "bounded native research hosting",
+        "integration",
+        "evidence and GitHub sync"
+      ]
+    },
+    {
+      "role": "foundation_worker",
+      "owns": [
+        "Codex/Claude SDK/hooks",
+        "token-efficient architecture",
+        "memory/RAG",
+        "platform capability comparison",
+        "disposable native memory lifecycle acceptance"
+      ]
+    },
+    {
+      "role": "trading_worker",
+      "owns": [
+        "data/catalyst/PIT representation",
+        "engine/strategy/evaluation challengers",
+        "native exact-nanosecond synthetic replay"
+      ]
+    },
+    {
+      "role": "hosting_worker",
+      "owns": [
+        "orchestration/runtime/operations challengers",
+        "native transient worker-tree supervision"
+      ]
+    },
+    {
+      "role": "independent_review",
+      "owns": [
+        "cross-worker code/provenance checks",
+        "supported correction resolution",
+        "claim and source adjudication"
+      ]
+    }
+  ],
+  "requirements": [
+    "Native Codex/Claude clients and official SDKs",
+    "Context/tool-output selection and architectural token efficiency",
+    "Shared memory lifecycle and compounding learning",
+    "Code/document/financial retrieval boundaries and quality",
+    "Embedding/model identity, version and serving compatibility",
+    "Agent skills, community guidance and orchestration",
+    "macOS/WSL/Linux portability and reproducible environments",
+    "Worker hosting, interruption, resource and process lifecycle",
+    "Observation, usage accounting and alerts",
+    "Recovery, versioning and supply-chain evidence",
+    "Historical/PIT/universe/corporate-action data",
+    "News/catalyst/event/revision and exact-time inputs",
+    "Research factors, historical extreme movers and all-candidate ledgers",
+    "Backtest engines, execution realism and statistical evaluation",
+    "Market-state selection and strategy/portfolio transition semantics",
+    "Alpaca SDK, paper readiness, rate limits and data entitlements",
+    "Grand decision/progress dashboard with explicit live/recorded/unknown evidence states"
+  ],
+  "quality_contract": {
+    "required": [
+      "Concrete requirement/gap fit",
+      "Primary repository/source identity and dated revision",
+      "License/dependency/maintenance constraints",
+      "Selected implementation and upstream test evidence for finalists",
+      "Native API/command compatibility and failure semantics",
+      "Information timing and reproducibility where relevant",
+      "Platform/hosting/runtime scope",
+      "Measured advantage before replacing an accepted incumbent"
+    ],
+    "evidence_depths": [
+      "discovery_only",
+      "metadata_review",
+      "source_review",
+      "native_cli_acceptance",
+      "native_model_acceptance",
+      "operational_acceptance"
+    ],
+    "not_quality_proof": [
+      "star count",
+      "release novelty alone",
+      "awesome-list inclusion",
+      "model agreement",
+      "version command success",
+      "synthetic benchmark extrapolation"
+    ],
+    "selection": "Retain the smallest coherent set that meets requirements. Compare challengers against incumbents and preserve rejected/deferred candidates."
+  },
+  "waves": [
+    {
+      "id": "source_round_1",
+      "purpose": "Refresh public-star identity delta; inspect meaningful gaps and incumbent/challenger sources.",
+      "state": "completed"
+    },
+    {
+      "id": "source_round_2",
+      "purpose": "Challenge initial choices using beyond-star/awesome-list primary references and unresolved capability evidence.",
+      "state": "completed"
+    },
+    {
+      "id": "native_acceptance",
+      "purpose": "Run only justified native improvements: isolated memory lifecycle, exact-time replay and transient supervision, plus one bounded hosted research review.",
+      "state": "completed"
+    },
+    {
+      "id": "adjudication_publication",
+      "purpose": "Review results, update typed decisions/requirements/evidence, verify integrity and exact-commit GitHub CI.",
+      "state": "local_review_complete"
+    }
+  ],
+  "convergence_criteria": [
+    "Every listed requirement maps to a current incumbent, conditional alternative, or explicit unmet gate.",
+    "Every public-star identity is accounted for in the refreshed ledger; deep review depth is stated separately from enumeration.",
+    "Both source rounds retain candidate decisions and explain whether additional candidates add demonstrated value.",
+    "Justified native acceptance attempts retain commands, results, failure recovery and limitations, without silently retrying unchanged account errors.",
+    "Selected hosts and models have only their actual native evidence credited; macOS/other-host gaps remain explicit.",
+    "No supported review finding remains unresolved in integrated artifacts.",
+    "GitHub contains current references, source/command manifests, validation results and continuation instructions."
+  ],
+  "stopping_rule": "Converge the examined requirement/candidate sets when a further bounded challenge round adds no justified adoption or unaddressed architecture responsibility. If it does, evaluate the new candidate rather than declaring saturation. External data/account/host gates remain explicit and are not inferred closed.",
+  "continuation": "Start with coverage.md and one explicit remaining gate. Current priority is accepted historical/PIT data and held-out catalyst/extreme-mover research, not repeated fixed stress runs. Paper setup is user-deferred; keep dedicated account credentials local. Refresh only changed candidates and preserve commands, failures, review and usage scope.",
+  "baseline": {
+    "repository_identities": 479,
+    "public_stars": 337,
+    "beyond_public_stars": 142,
+    "typed_references": 947,
+    "components": 48,
+    "receipts": 29,
+    "hashed_files": 300,
+    "tests_passed": 161
+  },
+  "results": {
+    "public_stars": 337,
+    "identity_delta_added": 0,
+    "identity_delta_removed": 0,
+    "repository_identities": 494,
+    "selected_decisions": 36,
+    "new_pinned_source_captures": 169,
+    "explicitly_reused_source_references": 10,
+    "native_acceptances_completed": [
+      "isolated memory lifecycle",
+      "exact nanosecond synthetic replay",
+      "transient process-tree supervision",
+      "native Dagu Astra-to-Claude review",
+      "local grand dashboard",
+      "six native historical leverage/cost/causal-reduction scenarios"
+    ],
+    "native_acceptance_running": [],
+    "native_review_reported_tokens": 37151,
+    "net_provider_savings": null,
+    "scope": "Bounded examined candidates and requirements, not a definitive universal ranking.",
+    "components": 50,
+    "receipts": 35,
+    "distinct_new_source_files": 167,
+    "local_tests_passed": 196,
+    "local_tests_skipped": 0,
+    "publication_verification": "Repository validators, content hashes, secret scan and exact published-commit GitHub CI are required; check the recorded task handoff and Actions for final commit outcome."
+  },
+  "lane_contract": {
+    "simulation": "Synthetic/historical stress tests may examine aggressive leverage with explicit funding, liquidity, margin and liquidation assumptions; simulated feasibility does not prove broker support.",
+    "paper": "Use an explicitly selected paper endpoint/account. Preserve existing positions unless the user selects isolated disposable scope. Apply actual account/asset/session constraints, risk caps, order journal and reconciliation. Aggression is a frozen experiment parameter, not unlimited leverage.",
+    "live": "Future separate promotion with actual account/risk/operating readiness and explicit user decision. No automatic policy promotion from a winning simulation/paper run."
+  },
+  "completed_locally_at_utc": "2026-09-19T22:17:12Z"
+}

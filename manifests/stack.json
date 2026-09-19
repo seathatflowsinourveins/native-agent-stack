@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-19T21:10:00Z",
+  "recorded_at_utc": "2026-09-19T22:03:00Z",
   "scope": "Linux/WSL x86_64 native Codex/Claude workflow; current evidence-backed selection, not an exhaustive global ranking. Exact native results are dated and host-specific.",
   "source_snapshot_commit": "44750edc",
   "components": [
@@ -89,7 +89,8 @@
         "desktop-direct-rag",
         "component-history",
         "native-observability-followup",
-        "ai-memory-native-state-recovery-20260919"
+        "ai-memory-native-state-recovery-20260919",
+        "native-memory-lifecycle-20260919"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory"
@@ -157,7 +158,8 @@
         "native-research-runtime-20260919",
         "native-claude-convergence-review-20260919",
         "native-paired-adoption-20260919",
-        "native-architecture-review-20260919"
+        "native-architecture-review-20260919",
+        "native-convergence-review-20260919"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -232,7 +234,8 @@
         "desktop-restart-acceptance",
         "portable-sdk-adoption-20260919",
         "native-paired-adoption-20260919",
-        "native-architecture-review-20260919"
+        "native-architecture-review-20260919",
+        "native-convergence-review-20260919"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -842,7 +845,8 @@
         "native-research-runtime-20260919",
         "native-claude-convergence-review-20260919",
         "native-paired-adoption-20260919",
-        "native-architecture-review-20260919"
+        "native-architecture-review-20260919",
+        "native-grand-dashboard-20260919"
       ],
       "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
       "upstream_sources": [
@@ -867,7 +871,8 @@
         "native-research-runtime-20260919",
         "native-claude-convergence-review-20260919",
         "native-paired-adoption-20260919",
-        "native-architecture-review-20260919"
+        "native-architecture-review-20260919",
+        "native-grand-dashboard-20260919"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [
@@ -889,7 +894,8 @@
       "evidence_ids": [
         "native-observability",
         "native-observability-followup",
-        "desktop-restart-acceptance"
+        "desktop-restart-acceptance",
+        "native-grand-dashboard-20260919"
       ],
       "source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
       "upstream_sources": [
@@ -954,7 +960,8 @@
         "native-research-runtime-20260919",
         "portable-sdk-adoption-20260919",
         "native-paired-adoption-20260919",
-        "native-point-in-time-contract-20260919"
+        "native-point-in-time-contract-20260919",
+        "native-exact-nanosecond-replay-20260919"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -999,7 +1006,8 @@
       ],
       "evidence_ids": [
         "native-research-runtime-20260919",
-        "native-paired-adoption-20260919"
+        "native-paired-adoption-20260919",
+        "native-convergence-review-20260919"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1020,7 +1028,8 @@
       "evidence_ids": [
         "native-research-runtime-20260919",
         "native-paired-adoption-20260919",
-        "native-lean-execution-sensitivity-20260919"
+        "native-lean-execution-sensitivity-20260919",
+        "native-historical-leverage-stress-20260919"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1068,6 +1077,43 @@
       ],
       "source_pin": null,
       "freshness": "Installed 0.44.0 from the accepted 36-package SDK hash lock; dated offline acceptance on 2026-09-19. No broker connection or advanced-order support."
+    },
+    {
+      "id": "systemd",
+      "repository": "https://github.com/systemd/systemd",
+      "version": "255.4-1ubuntu8.17",
+      "license": "LGPL-2.1-or-later and GPL-2.0-or-later components",
+      "role": "Existing Linux user manager; bounded transient research process-tree supervision",
+      "commands": [
+        "systemd-run --user --wait --property=RuntimeMaxSec=4s --property=TimeoutStopSec=1s --property=KillMode=control-group ...",
+        "systemctl --user show \"$SYNTHETIC_UNIT\""
+      ],
+      "evidence_ids": [
+        "native-worker-supervision-20260919"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://www.freedesktop.org/software/systemd/man/latest/systemd-run.html"
+      ],
+      "freshness": "Existing distribution version executed; upstream v261.3 reviewed separately, not installed."
+    },
+    {
+      "id": "pandas",
+      "repository": "https://github.com/pandas-dev/pandas",
+      "version": "3.0.6",
+      "license": "BSD-3-Clause",
+      "role": "Existing dependency accepted for strict exact nanosecond timestamp parsing",
+      "commands": [
+        "python blueprints/us-equities/nanosecond-replay/replay.py --help"
+      ],
+      "evidence_ids": [
+        "native-exact-nanosecond-replay-20260919"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://pandas.pydata.org/docs/reference/api/pandas.Timestamp.as_unit.html"
+      ],
+      "freshness": "Already installed version accepted on this Linux/WSL host; no package upgrade."
     }
   ],
   "profiles": [
@@ -1114,7 +1160,9 @@
         "dagu",
         "lean",
         "syft",
-        "alpaca-py"
+        "alpaca-py",
+        "systemd",
+        "pandas"
       ]
     },
     {
