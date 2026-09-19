@@ -141,6 +141,26 @@ class PublicationValidationTests(unittest.TestCase):
         self.write("README.md", 'Use "${HOME}/.codex" and "${PROJECT_ROOT}"; /dev/null is valid. Anonymized /home/example and /mnt/c/Users/example are permitted.')
         validate(self.root)
 
+    def test_session_identifiers_rejected_even_when_glued_to_words(self):
+        session_id = "-".join(("01234567", "89ab", "cdef", "0123", "456789abcdef"))
+        for content in (session_id, "task" + session_id, "thread" + session_id.upper() + "suffix"):
+            with self.subTest(content_style=content[:6]):
+                self.write("README.md", content)
+                with self.assertRaises(InvalidPublication) as error:
+                    validate(self.root)
+                self.assertIn("local session identifier", str(error.exception))
+                self.assertNotIn(content, str(error.exception))
+
+    def test_companion_task_handles_rejected_without_echoing(self):
+        handle = "-".join(("task", "a" * 8, "b" * 6))
+        for content in (handle, "backend" + handle.upper() + "completed"):
+            with self.subTest(content_style=content[:6]):
+                self.write("README.md", content)
+                with self.assertRaises(InvalidPublication) as error:
+                    validate(self.root)
+                self.assertIn("local companion task handle", str(error.exception))
+                self.assertNotIn(content, str(error.exception))
+
     def test_native_tool_and_source_only_references_are_valid(self):
         self.stack["components"][0]["commands"] = [
             {"tool": "find_symbol", "arguments": {"name": "example"}},

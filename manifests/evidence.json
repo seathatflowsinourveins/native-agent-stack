@@ -249,8 +249,8 @@
     },
     {
       "path": "evidence/receipts/component-history.json",
-      "sha256": "24df9f1df053adf8a247a21f994ae51a181f567997bae03b20852c9f357a9431",
-      "bytes": 28894
+      "sha256": "43a1badf70c33922b45a959e5ee64f2ad411b8a5218d1b69ad11fdfd18269d88",
+      "bytes": 28885
     },
     {
       "path": "evidence/receipts/desktop-cli-workflows.json",

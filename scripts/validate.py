@@ -21,6 +21,9 @@ RECEIPT_KINDS = {
     "historical_inventory", "upstream_provenance", "compatibility_attempt",
 }
 PRIVATE_CONTENT = (
+    # Historical prose can glue a UUID to a word; word boundaries miss it.
+    ("local session identifier", re.compile(r"[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}", re.I)),
+    ("local companion task handle", re.compile(r"task-[a-z0-9]{8}-[a-z0-9]{6}", re.I)),
     ("personal home path", re.compile(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+(?:/|\b)")),
     ("Windows user path", re.compile(r"(?:[A-Za-z]:[/\\]+|/mnt/[A-Za-z]/)Users[/\\]+(?!example(?:[/\\]|\b))[A-Za-z0-9_.-]+", re.I)),
     ("Hugging Face token", re.compile(r"\bhf_[A-Za-z0-9]{20,}\b")),

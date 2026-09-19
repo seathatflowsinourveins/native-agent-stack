@@ -66,7 +66,7 @@
       "id": "claude-code",
       "version": "2.1.278",
       "proof": {
-        "native_claude": "Successful session [local-session-id]; actual claude-opus-5[1m], 9 turns; headless auth worked despite interactive onboarding chooser. Subsequent2.1.278 SocratiCode native taska2ca1ca5-dcfa-4e55-93a4-2b541ea3d6b4 passed with17successful hook responses.",
+        "native_claude": "Successful session [local-session-id]; actual claude-opus-5[1m], 9 turns; headless auth worked despite interactive onboarding chooser. Subsequent2.1.278 SocratiCode native task [local-session-id] passed with17successful hook responses.",
         "native_codex": "not independently demonstrated",
         "current_desktop": "Root launched native child client, distinct from Desktop model.",
         "external_offline": "not separately demonstrated"
@@ -88,7 +88,7 @@
         "external_offline": "Historical matched native coding pilot and raw recovery reviewed."
       },
       "notes": [
-        "Raw/filtered six-commit artifact:533→176 o200k tokens,66.98% removed; RTK custom baseline estimate184→168. Neither is whole-provider savings.",
+        "Raw/filtered six-commit artifact:533\u2192176 o200k tokens,66.98% removed; RTK custom baseline estimate184\u2192168. Neither is whole-provider savings.",
         "Native Claude short commands showed zero estimated reduction."
       ],
       "installation_scope": "Linux native",
@@ -133,10 +133,10 @@
         "native_claude": "not independently demonstrated",
         "native_codex": "not independently demonstrated",
         "current_desktop": "not independently demonstrated",
-        "external_offline": "CLI encode/decode and local precision guard validated;337-star JSON semantic roundtrip30414→23635 o200k tokens."
+        "external_offline": "CLI encode/decode and local precision guard validated;337-star JSON semantic roundtrip30414\u219223635 o200k tokens."
       },
       "notes": [
-        "TOON --stats heuristic differs from exact o200k artifact count; nested fixture grew69→94 and guard retained original.",
+        "TOON --stats heuristic differs from exact o200k artifact count; nested fixture grew69\u219294 and guard retained original.",
         "Not a native client traffic transformer."
       ],
       "installation_scope": "Linux native",
@@ -209,7 +209,7 @@
         "external_offline": "not separately demonstrated"
       },
       "notes": [
-        "One real source artifact3679→645 o200k tokens; compressed outline is lossy, not whole-task savings."
+        "One real source artifact3679\u2192645 o200k tokens; compressed outline is lossy, not whole-task savings."
       ],
       "installation_scope": "Linux native",
       "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
@@ -264,7 +264,7 @@
         "native_claude": "not independently demonstrated",
         "native_codex": "not independently demonstrated",
         "current_desktop": "Root native local HTML fixture conversion passed.",
-        "external_offline": "Worker saved public real HTML389920→26322bytes conversion accepted."
+        "external_offline": "Worker saved public real HTML389920\u219226322bytes conversion accepted."
       },
       "notes": [],
       "installation_scope": "Linux native",
@@ -349,8 +349,8 @@
       "version": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
       "proof": {
         "native_claude": "Plugin installed after prior Claude pass; outer Claude slash command not invoked.",
-        "native_codex": "Separate backend thread01a0b765-66bb-7a13-a051-13f29fb2baab completed through native upstream Codex app-server.",
-        "current_desktop": "Root directly exercised official companion backend task-mu7qqxvu-ttw57r; read-only real pin task passed via gpt-6-astra.",
+        "native_codex": "Separate backend thread [local-session-id] completed through native upstream Codex app-server.",
+        "current_desktop": "Root directly exercised the official companion backend; a read-only pin task passed via gpt-6-astra. Local task handle omitted.",
         "external_offline": "not separately demonstrated"
       },
       "notes": [],
