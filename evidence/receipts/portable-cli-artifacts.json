@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "id": "portable-cli-artifacts",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "shellcheck",
+    "difftastic",
+    "markitdown",
+    "ast-grep",
+    "toon",
+    "repomix"
+  ],
+  "claim": "Native upstream commands processed the public shell, structural-code, HTML, JSON and selected-file fixtures; TOON roundtrip preserved data.",
+  "limitations": [
+    "Fixture-specific native behavior, not an LLM invocation or general quality benchmark.",
+    "Initial ast-grep filename selection returned no matches; corrected stdin input found8functions. Difft defaultexit0 was normal; --exit-code produced expected1."
+  ],
+  "data": {
+    "initial_commands": [
+      {
+        "id": "shellcheck",
+        "argv": [
+          "shellcheck",
+          "fixtures/example.sh"
+        ],
+        "exit_code": 0,
+        "expected_exit": 0,
+        "matched": true
+      },
+      {
+        "id": "difftastic",
+        "argv": [
+          "difft",
+          "--color",
+          "never",
+          "fixtures/before.py",
+          "fixtures/after.py"
+        ],
+        "exit_code": 0,
+        "expected_exit": 1,
+        "matched": false
+      },
+      {
+        "id": "markitdown",
+        "argv": [
+          "markitdown",
+          "fixtures/greeting.html"
+        ],
+        "exit_code": 0,
+        "expected_exit": 0,
+        "matched": true
+      },
+      {
+        "id": "ast-grep",
+        "argv": [
+          "ast-grep",
+          "run",
+          "--lang",
+          "javascript",
+          "--pattern",
+          "function $NAME($$$ARGS) { $$$BODY }",
+          "--json=compact",
+          "evidence/artifacts/usage-report.source.txt"
+        ],
+        "exit_code": 1,
+        "expected_exit": 0,
+        "matched": false
+      },
+      {
+        "id": "toon-encode",
+        "argv": [
+          "toon",
+          "fixtures/records.json",
+          "--stats",
+          "-o",
+          "${OUTPUT_DIR}/records.toon"
+        ],
+        "exit_code": 0,
+        "expected_exit": 0,
+        "matched": true
+      },
+      {
+        "id": "toon-decode",
+        "argv": [
+          "toon",
+          "${OUTPUT_DIR}/records.toon",
+          "--decode",
+          "--strict",
+          "-o",
+          "${OUTPUT_DIR}/recovered.json"
+        ],
+        "exit_code": 0,
+        "expected_exit": 0,
+        "matched": true
+      },
+      {
+        "id": "repomix",
+        "argv": [
+          "repomix",
+          "--include",
+          "fixtures/records.json,fixtures/example.sh",
+          "--output",
+          "${OUTPUT_DIR}/repomix.xml"
+        ],
+        "exit_code": 0,
+        "expected_exit": 0,
+        "matched": true
+      }
+    ],
+    "corrected_commands": {
+      "ast_grep": {
+        "argv": [
+          "ast-grep",
+          "run",
+          "--lang",
+          "javascript",
+          "--pattern",
+          "function $NAME($$$ARGS) { $$$BODY }",
+          "--json=compact",
+          "--stdin"
+        ],
+        "stdin_fixture": "evidence/artifacts/usage-report.source.txt",
+        "exit_code": 0,
+        "matches": 8,
+        "initial_no_matches": "Explicit .txt file selection skipped language discovery; native --stdin with --lang javascript parses the actual content."
+      },
+      "difftastic": {
+        "argv": [
+          "difft",
+          "--exit-code",
+          "--color",
+          "never",
+          "fixtures/before.py",
+          "fixtures/after.py"
+        ],
+        "exit_code": 1,
+        "expected_exit": 1,
+        "initial_status": "Without --exit-code native difft returns0 even for differences; actual diff output existed. Explicit native flag returns1."
+      }
+    },
+    "toon_roundtrip_equal": true,
+    "repomix_contains_selected_paths": true,
+    "markitdown_contains_heading": true,
+    "final_all_expected_results": true
+  }
+}

@@ -1,0 +1,7 @@
+Exercise the configured native document, static graph and browser tools in this public repository. Read the relevant installed upstream skill before using a tool. Keep all work scoped to this repository and an owned browser session.
+
+1. Use the native QMD collection native-stack-docs to search for local code retrieval, then retrieve the matching passage. Report its document identifier and the actual passage.
+2. Use the configured codebase-memory project native-stack-demo to find greeting in fixtures/. Report the returned source file and line range. This is a static graph lookup; do not describe it as runtime execution.
+3. Use native agent-browser with examples/agent-browser.json to open fixtures/greeting.html. Use an isolated namespace/session, inspect the actual element references, enter Native, click Greet, read #status, and close the owned session. The expected result is Hello, Native!.
+
+Do not install tools, change configuration, write durable memory, read private histories, or retry an unchanged quota error. If a prerequisite is missing, report the exact blocker rather than inventing a successful result. Return a concise factual report with observed outcomes and limitations. Raw transcripts and account data stay local.

@@ -1,5 +1,341 @@
 {
   "schema_version": 1,
-  "receipts": [],
-  "files": []
+  "receipts": [
+    {
+      "id": "native-rag",
+      "path": "evidence/receipts/native-rag.json",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "socraticode",
+        "qdrant",
+        "vllm",
+        "huggingface-hub-native"
+      ],
+      "claim": "Both native clients retrieved correct project code; real local embeddings and automatic add/update/delete persisted in vector store.",
+      "limitations": [
+        "Historical execution on the documented Linux/WSL GPU host; not repeated by CI.",
+        "Provider counters are usage, not savings. Model/service restart acceptance is recorded separately."
+      ]
+    },
+    {
+      "id": "native-memory",
+      "path": "evidence/receipts/native-memory.json",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "ai-memory",
+        "codex",
+        "claude-code"
+      ],
+      "claim": "A scoped durable page was retrieved by both clients; native lifecycle observations and cross-client handoff recorded.",
+      "limitations": [
+        "Historical bounded acceptance; capture sanitization does not make memory prose trusted.",
+        "No historical archive backfill or LLM/embedding consolidation pipeline enabled."
+      ]
+    },
+    {
+      "id": "native-context-memory",
+      "path": "evidence/receipts/native-context-memory.json",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "context-mode",
+        "serena",
+        "rtk"
+      ],
+      "claim": "Native Context Mode/Serena/explicit RTK calls passed; fresh both-client Context Mode+memory startup passed on updated clients.",
+      "limitations": [
+        "Earlier Serena/RTK run uses its original CLI version.",
+        "PreCompact was not induced; current Desktop catalog is distinct from child native clients."
+      ]
+    },
+    {
+      "id": "runtime-tools",
+      "path": "evidence/receipts/runtime-tools.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "gitleaks",
+        "sandbox-runtime"
+      ],
+      "claim": "Explicit repository secret scan and permitted/protected filesystem operations completed.",
+      "limitations": [
+        "No claim of full security certification.",
+        "Sandbox network denial configured but not separately exercised."
+      ]
+    },
+    {
+      "id": "artifact-reductions",
+      "path": "evidence/receipts/artifact-reductions.json",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "rtk",
+        "socraticode",
+        "openresearch",
+        "context-mode"
+      ],
+      "claim": "Recorded exact selected-text reductions, distinct from model usage.",
+      "limitations": [
+        "Lossy selections compare retained text to full-file/paper counterfactuals.",
+        "Public source fixture replaces personal path literals; historical original hashes/counters remain distinct from public fixture recount."
+      ]
+    },
+    {
+      "id": "component-history",
+      "path": "evidence/receipts/component-history.json",
+      "kind": "historical_inventory",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "rtk",
+        "serena",
+        "context-mode",
+        "toon",
+        "headroom",
+        "context-hub",
+        "qmd",
+        "ast-grep",
+        "repomix",
+        "mcp-inspector",
+        "mcporter",
+        "codebase-memory-mcp",
+        "markitdown",
+        "agentsview",
+        "agent-browser",
+        "claude-hud",
+        "difftastic",
+        "shellcheck",
+        "codex-for-claude",
+        "ccusage",
+        "promptfoo",
+        "worktrunk",
+        "affaan-m/ECC",
+        "shanraisshan/claude-code-best-practice",
+        "davila7/claude-code-templates",
+        "playwright-cli",
+        "huggingface-hub-native",
+        "ai-memory",
+        "openresearch",
+        "socraticode",
+        "qdrant",
+        "vllm",
+        "sandbox-runtime",
+        "gitleaks"
+      ],
+      "claim": "Dated per-component proof and limitations imported from the local reviewed inventory.",
+      "limitations": [
+        "Historical inventory is a provenance statement, not a new live test.",
+        "Detailed raw private paths/session logs are not distributed. Optional components retain unexercised statuses."
+      ]
+    },
+    {
+      "id": "native-cli-gaps",
+      "path": "evidence/receipts/native-cli-gaps.json",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "qmd",
+        "codebase-memory-mcp",
+        "agent-browser"
+      ],
+      "claim": "Claude executed document, static graph and isolated local browser workflows; Codex attempt quota-blocked before tool use.",
+      "limitations": [
+        "Codex counterpart pending restored allowance; earlier core Codex proof remains separate.",
+        "Claude final126-word handoff exceeded requested120; runtime acceptance passed, fullinstructionadherence false."
+      ]
+    },
+    {
+      "id": "worktrunk-list",
+      "path": "evidence/receipts/worktrunk-list.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "worktrunk"
+      ],
+      "claim": "Native wt list enumerated the actual publication worktree set.",
+      "limitations": [
+        "Model-free repository inventory, not multi-agent correctness."
+      ]
+    },
+    {
+      "id": "desktop-direct-rag",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "socraticode",
+        "qdrant",
+        "vllm",
+        "ai-memory"
+      ],
+      "claim": "The running Desktop task directly retrieved the relevant code through SocratiCode after tool rediscovery; direct scoped ai-memory page retrieval also succeeded.",
+      "limitations": [
+        "This does not establish Context Mode direct discovery; its current-task bridge remains separate.",
+        "No whole-task provider usage/savings attribution is claimed."
+      ],
+      "path": "evidence/receipts/desktop-direct-rag.json"
+    },
+    {
+      "id": "vllm-compatibility",
+      "kind": "compatibility_attempt",
+      "component_ids": [
+        "vllm",
+        "socraticode"
+      ],
+      "claim": "Latest vLLM0.29.0 native install succeeded but GPU startup failed on WSL; publisher-validated0.25.0 restored and direct retrieval passed.",
+      "limitations": [
+        "This is a host-specific failure, not a claim0.29is universally unusable.",
+        "The resolver success does not establish GPU/runtime compatibility."
+      ],
+      "path": "evidence/receipts/vllm-compatibility.json"
+    },
+    {
+      "id": "desktop-cli-workflows",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "qmd",
+        "codebase-memory-mcp",
+        "agent-browser"
+      ],
+      "claim": "The active Codex Desktop task used native QMD search/get, static graph search/trace and isolated browser interaction successfully.",
+      "limitations": [
+        "Desktop execution is distinct from the separate quota-blocked native Codex CLI follow-up.",
+        "No isolated provider usage or savings is attributed to these individual calls."
+      ],
+      "path": "evidence/receipts/desktop-cli-workflows.json"
+    },
+    {
+      "id": "portable-cli-artifacts",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "shellcheck",
+        "difftastic",
+        "markitdown",
+        "ast-grep",
+        "toon",
+        "repomix"
+      ],
+      "claim": "Native upstream commands processed the public shell, structural-code, HTML, JSON and selected-file fixtures; TOON roundtrip preserved data.",
+      "limitations": [
+        "Fixture-specific native behavior, not an LLM invocation or general quality benchmark.",
+        "Initial ast-grep filename selection returned no matches; corrected stdin input found8functions. Difft defaultexit0 was normal; --exit-code produced expected1."
+      ],
+      "path": "evidence/receipts/portable-cli-artifacts.json"
+    }
+  ],
+  "files": [
+    {
+      "path": "evidence/artifacts/desktop-browser.png",
+      "sha256": "87b71779f55e4ab120b33a30ee41641f3dd61b5a44876c3f0e3c1ae7ea8240b9",
+      "bytes": 18114
+    },
+    {
+      "path": "evidence/artifacts/direct-desktop-search.txt",
+      "sha256": "228c4bc674c606fc6cfbbb57fba4164fe30066de34bba396fe68a335799f035f",
+      "bytes": 2166
+    },
+    {
+      "path": "evidence/artifacts/retrieved-code.txt",
+      "sha256": "228c4bc674c606fc6cfbbb57fba4164fe30066de34bba396fe68a335799f035f",
+      "bytes": 2166
+    },
+    {
+      "path": "evidence/artifacts/usage-report.source.txt",
+      "sha256": "e5ba2fc9e397b97888a4929069434321e4ea17ea298a536ae20360638a304d50",
+      "bytes": 11763
+    },
+    {
+      "path": "evidence/receipts/artifact-reductions.json",
+      "sha256": "7d222b20b6f42dd340137df3ea46c012c8d10cb47efc911ab839aa3ad135d7dc",
+      "bytes": 3450
+    },
+    {
+      "path": "evidence/receipts/component-history.json",
+      "sha256": "24df9f1df053adf8a247a21f994ae51a181f567997bae03b20852c9f357a9431",
+      "bytes": 28894
+    },
+    {
+      "path": "evidence/receipts/desktop-cli-workflows.json",
+      "sha256": "5f46f0cd4cce73966107ac738749d8c24e761850a432dfa7f90f0a8a35ad99f4",
+      "bytes": 2839
+    },
+    {
+      "path": "evidence/receipts/desktop-direct-rag.json",
+      "sha256": "aa3f9b5605471f70f53bbcab135b685327445aeb05d2a2046f68e704c49fba15",
+      "bytes": 1298
+    },
+    {
+      "path": "evidence/receipts/native-cli-gaps.json",
+      "sha256": "09d43dcb40c328c2982d5013d87eb2ff84c9ec4ec37eb56419935d9d93e43327",
+      "bytes": 9150
+    },
+    {
+      "path": "evidence/receipts/native-context-memory.json",
+      "sha256": "1392135f3c28983e8e6bb93210d2e324ddb56c71b48f76c64e506bfbf0bcb225",
+      "bytes": 5886
+    },
+    {
+      "path": "evidence/receipts/native-memory.json",
+      "sha256": "25ceb9a940c2c3783215dfe23134cb1d701b64ea27ba3d32b636070a13e50d26",
+      "bytes": 4126
+    },
+    {
+      "path": "evidence/receipts/native-rag.json",
+      "sha256": "6ebec8e45f2f590b41eb4cddd022e808e80596e861eb115832723c665213cd76",
+      "bytes": 5070
+    },
+    {
+      "path": "evidence/receipts/portable-cli-artifacts.json",
+      "sha256": "b7395ccdce92a201eed15851b1d71a8b1fca198d267c66e24ffedf3575b43a1d",
+      "bytes": 3799
+    },
+    {
+      "path": "evidence/receipts/runtime-tools.json",
+      "sha256": "67b25345616bf4ff12abb62439b69f4f38d9589ca94134fd455ef61ea0e24540",
+      "bytes": 1840
+    },
+    {
+      "path": "evidence/receipts/vllm-compatibility.json",
+      "sha256": "33adf727233d608e0d76bf8da12e30909b279582e2f73bc74ceccde520fb8a99",
+      "bytes": 1939
+    },
+    {
+      "path": "evidence/receipts/worktrunk-list.json",
+      "sha256": "ba277663d33930ff5e65623525a86686c2b108fb0346bc4593c43b01570ebb6c",
+      "bytes": 547
+    },
+    {
+      "path": "fixtures/after.py",
+      "sha256": "7808434453a0975ee01a5eae460e8866b78f9b3a8401f93f2b905b1f3a778e54",
+      "bytes": 54
+    },
+    {
+      "path": "fixtures/before.py",
+      "sha256": "6724464b3eb5cc16b761ca03ef2c278c28d1e8cd4af7788b449beda3b205fb60",
+      "bytes": 48
+    },
+    {
+      "path": "fixtures/example.sh",
+      "sha256": "87d8220c327077583a84920d02a5d609e17431655a81f499a2c39858110704b5",
+      "bytes": 75
+    },
+    {
+      "path": "fixtures/greeting.html",
+      "sha256": "f0654d8d0af3a2db6adc9fc3c35c24438faef9ab49680d08ea071e3a1a8dcbc2",
+      "bytes": 474
+    },
+    {
+      "path": "fixtures/native-gap-prompt.txt",
+      "sha256": "ddb3fc831535dd21f0adaf9a5894c8a1429054d36cc70a017b204ecd18f8bb9d",
+      "bytes": 1244
+    },
+    {
+      "path": "fixtures/rag-note.md",
+      "sha256": "27680cf43a65121fc1affbde0dba8021ea21180bb8db0a9c0f80a09b831257cc",
+      "bytes": 351
+    },
+    {
+      "path": "fixtures/records.json",
+      "sha256": "3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc617ade4df8b0cb6e85c",
+      "bytes": 96
+    }
+  ]
 }

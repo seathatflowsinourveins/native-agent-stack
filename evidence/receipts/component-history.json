@@ -1,0 +1,590 @@
+{
+  "schema_version": 1,
+  "id": "component-history",
+  "kind": "historical_inventory",
+  "recorded_at_utc": "2026-09-19T04:55:03.859972+00:00",
+  "component_ids": [
+    "codex",
+    "claude-code",
+    "rtk",
+    "serena",
+    "context-mode",
+    "toon",
+    "headroom",
+    "context-hub",
+    "qmd",
+    "ast-grep",
+    "repomix",
+    "mcp-inspector",
+    "mcporter",
+    "codebase-memory-mcp",
+    "markitdown",
+    "agentsview",
+    "agent-browser",
+    "claude-hud",
+    "difftastic",
+    "shellcheck",
+    "codex-for-claude",
+    "ccusage",
+    "promptfoo",
+    "worktrunk",
+    "affaan-m/ECC",
+    "shanraisshan/claude-code-best-practice",
+    "davila7/claude-code-templates",
+    "playwright-cli",
+    "huggingface-hub-native",
+    "ai-memory",
+    "openresearch",
+    "socraticode",
+    "qdrant",
+    "vllm",
+    "sandbox-runtime",
+    "gitleaks"
+  ],
+  "claim": "Dated per-component proof and limitations imported from the local reviewed inventory.",
+  "limitations": [
+    "Historical inventory is a provenance statement, not a new live test.",
+    "Detailed raw private paths/session logs are not distributed. Optional components retain unexercised statuses."
+  ],
+  "data": [
+    {
+      "id": "codex",
+      "version": "0.155.1",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "Successful post-login session [local-session-id]; gpt-6-astra; seven actual native tool calls. New 0.155.1 memory task [local-session-id] also passed.",
+        "current_desktop": "Current Desktop task is separate app runtime 0.155.0-alpha.9.2 and mounted Codex home; root launched native client as child.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [
+        "Version0.155.1 now has actual native MCP/model acceptance; earlier0.155.0 evidence retained."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "claude-code",
+      "version": "2.1.278",
+      "proof": {
+        "native_claude": "Successful session [local-session-id]; actual claude-opus-5[1m], 9 turns; headless auth worked despite interactive onboarding chooser. Subsequent2.1.278 SocratiCode native taska2ca1ca5-dcfa-4e55-93a4-2b541ea3d6b4 passed with17successful hook responses.",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "Root launched native child client, distinct from Desktop model.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [
+        "Alignment audit upgraded to2.1.278; checksum/version/plugin checks passed. Historical native inference acceptance remains2.1.277.",
+        "Actual2.1.278 semantic code retrieval supersedes earlier no-new-model-trial limitation; see runtime-layer-manifest.json."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "rtk",
+      "version": "0.49.0",
+      "proof": {
+        "native_claude": "Automatic Bash hook: 3 successful RTK hook responses; git status and ShellCheck rewrites actually occurred. Difft deferred.",
+        "native_codex": "Explicit rtk git log -6 succeeded in post-login session. Automatic RTK was not established; disabled candidate remains optional evidence.",
+        "current_desktop": "Root shell executed native RTK; matching six-commit raw and filtered artifacts retained.",
+        "external_offline": "Historical matched native coding pilot and raw recovery reviewed."
+      },
+      "notes": [
+        "Raw/filtered six-commit artifact:533→176 o200k tokens,66.98% removed; RTK custom baseline estimate184→168. Neither is whole-provider savings.",
+        "Native Claude short commands showed zero estimated reduction."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "serena",
+      "version": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "proof": {
+        "native_claude": "Actual fetch symbol and 3 references retrieved.",
+        "native_codex": "Actual fetch symbol and references retrieved.",
+        "current_desktop": "23 Serena tools directly exposed in current Desktop task; Bash project active; initial_instructions/list_memories used, list_memories returned {}.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [
+        "License/version verified from installed dist-info METADATA; do not call Serena MIT."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "context-mode",
+      "version": "1.0.169",
+      "proof": {
+        "native_claude": "Native MCP file processing corrected FILE_PATH to FILE_CONTENT; stats succeeded; 11 Context Mode hook responses plus one cache-heal hook.",
+        "native_codex": "Native ctx_execute_file/ctx_stats succeeded; actual automatic SessionStart, UserPromptSubmit, PreToolUse, PostToolUse, Stop proof. PreCompact untriggered.",
+        "current_desktop": "Not directly exposed in this running Desktop tool catalog. Upstream MCPorter CLI bridge doctor/index/search succeeded; 11 tools, five runtimes, five guide sections.",
+        "external_offline": "Prior isolated stdio acceptance and native index/search accepted."
+      },
+      "notes": [
+        "Native plugin source6f0cc684; earlier isolated npm source589d8214, both1.0.169.",
+        "Recent native task stats were0%; captured-byte/dollar narratives inconsistent. Native provider logs remain usage authority.",
+        "Current Desktop CLI bridge does not establish current Desktop automatic hooks."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "toon",
+      "version": "4.1.1",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "not independently demonstrated",
+        "external_offline": "CLI encode/decode and local precision guard validated;337-star JSON semantic roundtrip30414→23635 o200k tokens."
+      },
+      "notes": [
+        "TOON --stats heuristic differs from exact o200k artifact count; nested fixture grew69→94 and guard retained original.",
+        "Not a native client traffic transformer."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "headroom",
+      "version": "0.37.0",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "not independently demonstrated",
+        "external_offline": "Seven guarded offline fixtures passed; ANSI restoration failure retained exact original."
+      },
+      "notes": [
+        "Representative command is the local safety adapter around installed upstream Headroom, not a claimed upstream CLI verb.",
+        "No native agent/gateway traffic automatically compressed; no stacking on RTK output."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "context-hub",
+      "version": "0.1.4",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "Root native search and chub get pytest/asyncio --lang py -o ARTIFACT succeeded after guessed ID failed.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [
+        "Selected curated pytest-asyncio version lagged official documentation; retrieval is not freshness guarantee."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "qmd",
+      "version": "2.8.3",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "Root native BM25 search/get/update accepted.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "ast-grep",
+      "version": "0.45.3",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "Root direct CLI and Context Mode via Inspector returned actual subprocess.run call.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "repomix",
+      "version": "1.18.0",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "Root native pack/full/outline comparison accepted.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [
+        "One real source artifact3679→645 o200k tokens; compressed outline is lossy, not whole-task savings."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "mcp-inspector",
+      "version": "2.7.0",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "Root native Inspector executed Context Mode processing; separate fresh stats connection correctly had empty counters.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "mcporter",
+      "version": "0.13.13",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "Current root CLI bridge executed doctor/index/search; earlier same-connection counters verified across calls.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [
+        "Historical five-call ctx_stats2.7K/62.3% estimate; earlier80% was an earlier scope, not current/global savings."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "codebase-memory-mcp",
+      "version": "0.11.0",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "Root CLI bridge search_graph/trace_path retrieved collect and4callees.",
+        "external_offline": "Worker upstream Inspector full index accepted1118nodes/1755edges."
+      },
+      "notes": [
+        "Static code graph, not LLM memory or semantic conversation retrieval."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "markitdown",
+      "version": "0.1.7",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "Root native local HTML fixture conversion passed.",
+        "external_offline": "Worker saved public real HTML389920→26322bytes conversion accepted."
+      },
+      "notes": [],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "agentsview",
+      "version": "0.43.0",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "Root upstream CLI retrieved this exact Desktop task and a native Claude pytest event from scoped archive; loopback daemon stopped afterward.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [
+        "Do not dump generated archive config: contains local service keys.",
+        "Retrieving native sessions is not proof that native clients invoked AgentsView."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "agent-browser",
+      "version": "0.38.1",
+      "proof": {
+        "native_claude": "Official skill discovered in native init; no browser call in Claude inference session.",
+        "native_codex": "Skill installed; invocation not demonstrated in native Codex inference session.",
+        "current_desktop": "Root native local open/snapshot/fill/click/text/close passed; Hello,CodexDesktop output.14matchingChromeprocesses checked; no observed sandbox-disabling flags.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [
+        "Official3457-byte skill installed to all three native skill roots. Followups use same config/namespace/session, snapshot -i -c --json, refs, close."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "claude-hud",
+      "version": "0.8.0",
+      "proof": {
+        "native_claude": "Plugin/statusLine configured; live interactive UI display not observed because welcome/theme/subscription chooser was stopped without auth changes.",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "Root upstream renderer succeeded with representative synthetic input.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [
+        "Synthetic25%context/12%usage are renderer test inputs, not real account usage."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "difftastic",
+      "version": "0.71.0",
+      "proof": {
+        "native_claude": "Native call succeeded with expected difference exit1.",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "Root native diff showed actual repaired helper; exit1expected.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [
+        "Upgraded September19 UTC. Earlier native/model evidence remains at 0.70.0; upgrade checks are in latest-model-landscape.json."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "shellcheck",
+      "version": "0.11.0",
+      "proof": {
+        "native_claude": "Native launcher review exit0; RTK rewrite retained outcome.",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "Root native actual launcher review exit0.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "codex-for-claude",
+      "version": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "proof": {
+        "native_claude": "Plugin installed after prior Claude pass; outer Claude slash command not invoked.",
+        "native_codex": "Separate backend thread01a0b765-66bb-7a13-a051-13f29fb2baab completed through native upstream Codex app-server.",
+        "current_desktop": "Root directly exercised official companion backend task-mu7qqxvu-ttw57r; read-only real pin task passed via gpt-6-astra.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "ccusage",
+      "version": "20.0.23",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "Root combined upstream Codex daily and native Claude daily parsers exercised through local ecosystem-usage.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "promptfoo",
+      "version": "0.123.1",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "not independently demonstrated",
+        "external_offline": "Parent reports six historical Windows convergence fixtures passed; native installed adapter inspection only. No native provider benchmark executed."
+      },
+      "notes": [
+        "No native provider benchmark. Six Windows optional replay fixtures are historical; source receipts required before repeating."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "worktrunk",
+      "version": "0.78.0",
+      "proof": {
+        "native_claude": "not independently demonstrated",
+        "native_codex": "not independently demonstrated",
+        "current_desktop": "not independently demonstrated",
+        "external_offline": "Binary installed; separate local controller/Git staging demonstrated3distinct worktrees and cap. Receipt does not establish wt invocation."
+      },
+      "notes": [
+        "Do not attribute local controller worktree acceptance to Worktrunk CLI."
+      ],
+      "installation_scope": "Linux native",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "affaan-m/ECC",
+      "version": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+      "proof": {
+        "native_claude": "Selected skill files mirrored to project .claude/skills; no invocation claimed.",
+        "native_codex": "Selected skill files in project .agents/skills; no invocation claimed.",
+        "current_desktop": "Selected skills exposed; search-first applied in this audit. This is instruction use, not installation of the entire ECC plugin.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [
+        "Full upstream plugin/catalog/orchestration/memory hooks not installed."
+      ],
+      "installation_scope": "Project skill files / source references",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "shanraisshan/claude-code-best-practice",
+      "version": "15969ed2471a177d938c889255d2f23f07e4742a",
+      "proof": {
+        "native_claude": "Reference only; no full plugin installed.",
+        "native_codex": "Reference only; no full plugin installed.",
+        "current_desktop": "Reviewed source reference only.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [
+        "Full upstream plugin/catalog/orchestration/memory hooks not installed."
+      ],
+      "installation_scope": "Project skill files / source references",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "davila7/claude-code-templates",
+      "version": "c840d6f626be7ba418da60aeb0f2080413562451",
+      "proof": {
+        "native_claude": "Selected skill files mirrored to project .claude/skills; no invocation claimed.",
+        "native_codex": "Selected skill files in project .agents/skills; no invocation claimed.",
+        "current_desktop": "Selected skills listed in current task catalog.",
+        "external_offline": "not separately demonstrated"
+      },
+      "notes": [
+        "Full upstream plugin/catalog/orchestration/memory hooks not installed."
+      ],
+      "installation_scope": "Project skill files / source references",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "playwright-cli",
+      "version": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
+      "proof": {
+        "native_claude": "Skill mirrored; native Linux CLI execution not established.",
+        "native_codex": "Skill present; native Linux CLI execution not established.",
+        "current_desktop": "Project skill discoverable; current Linux browser execution proven separately with agent-browser.",
+        "external_offline": "Historical Windows status records actual browser/dashboard acceptance; not repeated or attributed to Linux."
+      },
+      "notes": [
+        "No playwright-cli in audited Linux runtime bin. Do not download a replacement implicitly.",
+        "Upgraded September19 UTC. Earlier native/model evidence remains at 0.1.20; Playwright1.64.0-alpha-2026-09-14; upgrade checks are in latest-model-landscape.json."
+      ],
+      "installation_scope": "Windows CLI plus shared project skills; no native Linux CLI in audited PATH",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "huggingface-hub-native",
+      "version": "1.32.0",
+      "proof": {
+        "native_claude": "Upstream HF skill linked; no new Claude model-driven invocation",
+        "native_codex": "Central upstream HF skill installed; no new Codex model-driven invocation",
+        "current_desktop": "Auth exit0; 12 models-info and 12 pinned metadata-download commands passed; 32 files/473174 bytes",
+        "external_offline": "Existing Windows HF1.32.0 installation retained"
+      },
+      "notes": [
+        "No model-serving readiness claim from metadata retrieval."
+      ],
+      "installation_scope": "Linux native isolated uv tool environment; Windows installation separate",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "ai-memory",
+      "version": "2.3.1",
+      "proof": {
+        "native_codex": "0.155.1 real MCP read and eight lifecycle observations passed",
+        "native_claude": "Post-login Opus5 real MCP read and nine lifecycle observations passed; Codex handoff received",
+        "current_desktop": "Native write/search/read and MCPorter read passed",
+        "external_offline": "Not a Windows-native server installation"
+      },
+      "notes": [
+        "Automatic heuristic handoff injection remains active despite disabled briefing",
+        "No blanket model-token savings claim"
+      ],
+      "installation_scope": "WSL upstream binary + user service; project MCP/skills + allowlisted global native hooks in both Codex homes and native Claude",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "openresearch",
+      "version": "0.2.4",
+      "proof": {
+        "native_codex": "CLI available; no separate model-driven orx invocation",
+        "native_claude": "CLI available; no separate model-driven orx invocation",
+        "current_desktop": "Discovery/full-paper/index/search passed; 21 sections and selected model-size result",
+        "external_offline": "No dashboard/orchestration adoption"
+      },
+      "notes": [
+        "Full-paper/excerpt artifact count 18533 to483 tokens is lossy and not provider savings"
+      ],
+      "installation_scope": "WSL upstream orx binary, isolated versioned package",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "socraticode",
+      "version": "1.14.0",
+      "proof": {
+        "native_codex": "tools/ecosystem/linux-usage-report.cjs lines2-39, score0.6429",
+        "native_claude": "tools/ecosystem/linux-usage-report.cjs lines2-39, score0.6429",
+        "current_desktop": "Root native CLI/MCP bridge execution; direct catalog not hot-reloaded",
+        "external_offline": "26 MCP tools;35 indexed files,139 chunks; actual native Codex/Claude search and independently observed add/change/delete watching"
+      },
+      "notes": [],
+      "installation_scope": "Linux native; agent-lab service/MCP scope",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "qdrant",
+      "version": "1.19.1",
+      "proof": {
+        "native_codex": "Supporting local service/CLI; host-specific use per runtime-layer manifest",
+        "native_claude": "Supporting local service/CLI; host-specific use per runtime-layer manifest",
+        "current_desktop": "Root native CLI/MCP bridge execution; direct catalog not hot-reloaded",
+        "external_offline": "enabled active loopback service; health200; persisted vectors and real add/change/delete payloads"
+      },
+      "notes": [],
+      "installation_scope": "Linux native; agent-lab service/MCP scope",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "vllm",
+      "version": "0.25.0",
+      "proof": {
+        "native_codex": "Supporting local service/CLI; host-specific use per runtime-layer manifest",
+        "native_claude": "Supporting local service/CLI; host-specific use per runtime-layer manifest",
+        "current_desktop": "Root native CLI/MCP bridge execution; direct catalog not hot-reloaded",
+        "external_offline": "enabled active;2048 finite normalized floats from actual local model; used for actual code index/search"
+      },
+      "notes": [],
+      "installation_scope": "Linux native; agent-lab service/MCP scope",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "sandbox-runtime",
+      "version": "0.0.77",
+      "proof": {
+        "native_codex": "Supporting local service/CLI; host-specific use per runtime-layer manifest",
+        "native_claude": "Supporting local service/CLI; host-specific use per runtime-layer manifest",
+        "current_desktop": "Root native CLI/MCP bridge execution; direct catalog not hot-reloaded",
+        "external_offline": "allowed write0;denied read1;separate denied write1;host files protected;network policy not separately exercised"
+      },
+      "notes": [],
+      "installation_scope": "Linux native; agent-lab service/MCP scope",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    },
+    {
+      "id": "gitleaks",
+      "version": "8.30.1",
+      "proof": {
+        "native_codex": "Supporting local service/CLI; host-specific use per runtime-layer manifest",
+        "native_claude": "Supporting local service/CLI; host-specific use per runtime-layer manifest",
+        "current_desktop": "Root native CLI/MCP bridge execution; direct catalog not hot-reloaded",
+        "external_offline": {
+          "exit_code": 0,
+          "commits_scanned": 22,
+          "bytes_scanned": 1174704,
+          "findings": 0,
+          "redaction": "100 percent",
+          "scope": "Observed native history scan; not a general security certificate"
+        }
+      },
+      "notes": [],
+      "installation_scope": "Linux native; agent-lab service/MCP scope",
+      "claim_limit": "Only specifically recorded executions; shared PATH does not imply native-agent E2E."
+    }
+  ],
+  "provenance": [
+    {
+      "name": "full-stack-manifest.json",
+      "sha256": "830e3ff37764185e9070585acda035952f05fe28cb0c01c5c5f2a70a87052667",
+      "disclosure": "Selected typed fields exported; raw local artifact retained privately."
+    }
+  ]
+}

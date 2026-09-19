@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "vllm-compatibility",
+  "kind": "compatibility_attempt",
+  "component_ids": [
+    "vllm",
+    "socraticode"
+  ],
+  "claim": "Latest vLLM0.29.0 native install succeeded but GPU startup failed on WSL; publisher-validated0.25.0 restored and direct retrieval passed.",
+  "limitations": [
+    "This is a host-specific failure, not a claim0.29is universally unusable.",
+    "The resolver success does not establish GPU/runtime compatibility."
+  ],
+  "data": {
+    "current_upstream_version": "0.29.0",
+    "release_date": "2026-09-09",
+    "source_pin": "98dff2a81d747d1dba01a47f939f48c3526d4206",
+    "wheel_sha256": "09d48617fc2be9c6cdcd5db480651ab0d84817b257204f2cc2e3ecbb70bbb635",
+    "clean_resolver_exit": 0,
+    "version_exit": 0,
+    "version_output": "0.29.0",
+    "help_exit": 0,
+    "runtime_error": "RuntimeError: UVA is not available",
+    "one_automatic_service_restart_before_stop": true,
+    "active_version_after_rollback": "0.25.0",
+    "active_source_pin": "702f4814fe54fabff350d43cb753ae3e47c0c276",
+    "restoration_evidence_id": "desktop-direct-rag",
+    "model_weights_changed": false,
+    "qdrant_data_changed": false,
+    "dependency_override_or_source_patch": false
+  },
+  "provenance": [
+    {
+      "name": "vllm029-install.stderr",
+      "sha256": "7fa5666a634392e607f71f1ff1c0eb55717eab60bc0d0b6004db07cce50bdb87",
+      "disclosure": "Original machine log retained privately; only factual result exported."
+    },
+    {
+      "name": "vllm029-startup-full.log",
+      "sha256": "c9c2dff467c322b9a02e1b29ba37dc6d5e1d24e4aa73bc797a2a21a68f064129",
+      "disclosure": "Original machine log retained privately; only factual result exported."
+    },
+    {
+      "name": "vllm029-rollback.json",
+      "sha256": "9e118d07f516896c83cc39da723e84236f717afaada690d1a698f834e5ba8ff6",
+      "disclosure": "Original machine log retained privately; only factual result exported."
+    }
+  ]
+}

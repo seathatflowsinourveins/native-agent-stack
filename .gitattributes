@@ -1,0 +1,5 @@
+# Keep hashed text fixtures consistent across Linux and Windows checkouts.
+* text=auto eol=lf
+# Preserve exact delivered tool-output bytes for hashing and token recounts.
+evidence/artifacts/retrieved-code.txt whitespace=-blank-at-eof
+evidence/artifacts/direct-desktop-search.txt whitespace=-blank-at-eof

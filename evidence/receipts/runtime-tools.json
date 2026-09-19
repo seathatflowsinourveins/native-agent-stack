@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "runtime-tools",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-19T04:55:03.857045+00:00",
+  "component_ids": [
+    "gitleaks",
+    "sandbox-runtime"
+  ],
+  "claim": "Explicit repository secret scan and permitted/protected filesystem operations completed.",
+  "limitations": [
+    "No claim of full security certification.",
+    "Sandbox network denial configured but not separately exercised."
+  ],
+  "data": {
+    "gitleaks": {
+      "exit_code": 0,
+      "commits_scanned": 22,
+      "bytes_scanned": 1174704,
+      "findings": 0,
+      "redaction": "100 percent",
+      "scope": "Observed native history scan; not a general security certificate",
+      "bytes_scanned_is_approximate": true
+    },
+    "sandbox": {
+      "allowed_write_exit": 0,
+      "denied_read_exit": 1,
+      "separate_denied_write_exit": 1,
+      "host_file_created": false,
+      "overlapping_read_write_exclusion": "First write entered ephemeral hidden sandbox mount; exit0 with host unchanged. Separate write fixture establishes direct denial.",
+      "clean_child_environment": "HOME and PATH only"
+    }
+  },
+  "provenance": [
+    {
+      "name": "gitleaks-result.json",
+      "sha256": "037da4490cddcbd88a24233744dbef962dc6953791e3e6062fa5d4fffec5e9bb",
+      "disclosure": "Selected typed fields exported; raw local artifact retained privately."
+    },
+    {
+      "name": "results.json",
+      "sha256": "52effd9c03a3358d571dd8bf8179312694cb88861406f678370aabef07b1bf2b",
+      "disclosure": "Selected typed fields exported; raw local artifact retained privately."
+    },
+    {
+      "name": "separated-write-result.json",
+      "sha256": "075194713b0782f5c755bc21a250bef2e4f99220720a821a30b3bb2663628b12",
+      "disclosure": "Selected typed fields exported; raw local artifact retained privately."
+    }
+  ]
+}

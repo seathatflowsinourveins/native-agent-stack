@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "desktop-direct-rag",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "socraticode",
+    "qdrant",
+    "vllm",
+    "ai-memory"
+  ],
+  "claim": "The running Desktop task directly retrieved the relevant code through SocratiCode after tool rediscovery; direct scoped ai-memory page retrieval also succeeded.",
+  "limitations": [
+    "This does not establish Context Mode direct discovery; its current-task bridge remains separate.",
+    "No whole-task provider usage/savings attribution is claimed."
+  ],
+  "data": {
+    "tool": "mcp__socraticode__codebase_search",
+    "scope": "explicit agent-lab project",
+    "query": "collect agent usage totals separately for native Linux and Desktop configuration homes",
+    "limit": 1,
+    "returned_path": "tools/ecosystem/linux-usage-report.cjs",
+    "line_start": 2,
+    "line_end": 39,
+    "score": 0.6429,
+    "is_error": false,
+    "active_model_service_version": "0.25.0",
+    "ai_memory_direct_read": "decisions/shared-project-memory.md",
+    "source_receipt_sha256": "5d107e58f4ef55584b94167c01bd74104c55c7c05d349a0c3fd6e4c201352081",
+    "ai_memory_provenance": "Coordinator observed successful direct memory_query and memory_read_page in this task; source hash below only supports SocratiCode result."
+  }
+}

@@ -1,0 +1,362 @@
+{
+  "schema_version": 1,
+  "checked_date_utc": "2026-09-19",
+  "scope": "Current primary upstream release metadata for core components. Release freshness is not runtime acceptance or benchmark ranking.",
+  "current_core_releases": [
+    {
+      "tag_name": "rust-v0.155.1",
+      "published_at": "2026-09-18T20:03:04Z",
+      "prerelease": false,
+      "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.155.1",
+      "target_commitish": "main",
+      "repo": "openai/codex",
+      "source_commit": "be2951ea34f0d295ed0becf97079f92fa5f6950e"
+    },
+    {
+      "tag_name": "v2.1.278",
+      "published_at": "2026-09-19T03:10:40Z",
+      "prerelease": false,
+      "html_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.278",
+      "target_commitish": "main",
+      "repo": "anthropics/claude-code",
+      "source_commit": "bf7d404e26a5fb6167d21b46c93a2bf6c22ab274"
+    },
+    {
+      "tag_name": "v1.0.169",
+      "published_at": "2026-06-29T18:18:53Z",
+      "prerelease": false,
+      "html_url": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169",
+      "target_commitish": "main",
+      "repo": "mksglu/context-mode",
+      "source_commit": "589d8214d56740a28b5f7bf63167743d586b0b40"
+    },
+    {
+      "tag_name": "v2.3.1",
+      "published_at": "2026-09-17T18:26:44Z",
+      "prerelease": false,
+      "html_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.1",
+      "target_commitish": "main",
+      "repo": "akitaonrails/ai-memory",
+      "source_commit": "5b2426f73db69ee45a6805dabf74b061ed2c63dd"
+    },
+    {
+      "tag_name": "v1.14.0",
+      "published_at": "2026-09-16T14:26:47Z",
+      "prerelease": false,
+      "html_url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.14.0",
+      "target_commitish": "main",
+      "repo": "giancarloerra/SocratiCode",
+      "source_commit": "2218f25153d0f3f4a76ee240a5643dbc873e80be"
+    },
+    {
+      "tag_name": "v0.29.0",
+      "published_at": "2026-09-09T08:54:49Z",
+      "prerelease": false,
+      "html_url": "https://github.com/vllm-project/vllm/releases/tag/v0.29.0",
+      "target_commitish": "main",
+      "repo": "vllm-project/vllm",
+      "source_commit": "98dff2a81d747d1dba01a47f939f48c3526d4206"
+    },
+    {
+      "tag_name": "v1.19.1",
+      "published_at": "2026-09-04T07:59:14Z",
+      "prerelease": false,
+      "html_url": "https://github.com/qdrant/qdrant/releases/tag/v1.19.1",
+      "target_commitish": "master",
+      "repo": "qdrant/qdrant",
+      "source_commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de"
+    },
+    {
+      "tag_name": "v0.0.77",
+      "published_at": "2026-09-18T22:09:16Z",
+      "prerelease": false,
+      "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77",
+      "target_commitish": "main",
+      "repo": "anthropics/sandbox-runtime",
+      "source_commit": "6fa731368807419ee157f9a3fac955fefe1019c6"
+    }
+  ],
+  "vllm_compatibility": "Current upstream0.29.0 resolves/installs/startsCLI, but actualWSLGPUmodel initialization failedRuntimeError:UVAisnotavailable. Publisher-validated0.25.0restored; directDesktopsemanticquerypassedafterrestoration. No dependency/source overrides.",
+  "practice_sources": [
+    "https://learn.chatgpt.com/docs/build-skills",
+    "https://code.claude.com/docs/en/best-practices",
+    "https://docs.github.com/en/actions/reference/security/secure-use",
+    "https://docs.github.com/en/billing/concepts/product-billing/github-actions"
+  ],
+  "recent_models": [
+    {
+      "id": "Qwen/Qwen3.8-27B",
+      "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+      "release_evidence_date": "2026-08-14",
+      "release_evidence_kind": "Publisher README News release announcement",
+      "license": "Apache-2.0",
+      "parameters": {
+        "card_language_model_total_billions": 27,
+        "hf_safetensors_elements": 27781427952,
+        "dense": true
+      },
+      "task_fit": "Best practical starting point among this set for local coding and bounded structured memory extraction; extraction accuracy and latency were not evaluated.",
+      "local_feasibility": "Existing Windows Ollama 0.34.2 qwen3.8:27b-mtp-q4_K_M has historical fully GPU inference evidence at context 8192. This is the demonstrated local baseline; no new inference was performed. Full BF16 checkpoint is substantially larger than the existing quantized build.",
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3.8-27B",
+        "https://github.com/QwenLM/Qwen3.8",
+        "https://huggingface.co/Qwen/Qwen3.8-27B/raw/1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0/config.json"
+      ],
+      "limitations": [
+        "Repository creation August 5 is not the August 14 public release. An official new post-trained release does not establish newly pretrained base weights.",
+        "Card maximum context does not establish that the installed quant can serve that context on this hardware."
+      ],
+      "status": "Research metadata only, except historical local Qwen3.8 quant execution noted separately."
+    },
+    {
+      "id": "Qwen/Qwen3.8-Flash-Next",
+      "revision": "de4b8e4d43b917e7706784d8bb445c9af86a3540",
+      "release_evidence_date": "2026-08-26",
+      "release_evidence_kind": "Publisher README News release announcement",
+      "license": "Qwen Community License 1.0 (custom)",
+      "parameters": {
+        "card_language_model_total_billions": 125,
+        "card_active_billions": 6,
+        "ngram_embedding_billions": 51,
+        "mtp_billions": 4,
+        "hf_safetensors_elements": 179999981459
+      },
+      "task_fit": "Candidate for efficient advanced coding/multimodal agents on appropriate high-memory hardware; not justified as a background memory extractor on this PC.",
+      "local_feasibility": "Not a drop-in replacement for the validated 27B quant. Roughly 180B stored parameters and substantial memory/offload requirements despite 6B active per token; exact hardware minimum and compatibility with the installed Ollama version were not verified.",
+      "sources": [
+        "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
+        "https://github.com/QwenLM/Qwen3.8-Flash-Next/blob/main/README.md",
+        "https://huggingface.co/Qwen/Qwen3.8-Flash-Next/blob/de4b8e4d43b917e7706784d8bb445c9af86a3540/LICENSE"
+      ],
+      "limitations": [
+        "Custom terms include restrictions for certain commercial model services and AI work assistants; do not label Apache-2.0.",
+        "Active parameter count does not describe required weight storage."
+      ],
+      "status": "Research metadata only; no local inference performed."
+    },
+    {
+      "id": "deepseek-ai/DeepSeek-V4.1-Flash",
+      "revision": "dba1be0a40aa45a94ad051997016db3960a90277",
+      "release_evidence_date": "2026-09-10",
+      "release_evidence_kind": "Dated publisher release news",
+      "license": "MIT",
+      "parameters": {
+        "card_backbone_billions": 552,
+        "engram_memory_billions": 196,
+        "card_active_prefill_billions": 8,
+        "card_active_decode_billions": 16
+      },
+      "task_fit": "Advanced multimodal coding and agent workloads; too large to assume practical local background memory extraction.",
+      "local_feasibility": "Cluster/high-memory deployment candidate, not proven on this PC or its current Ollama runtime. Large total backbone plus Engram storage remains even with low per-token activation.",
+      "sources": [
+        "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash",
+        "https://www.deepseek.com/en/news/deepseek-v4-1-flash/",
+        "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash/raw/dba1be0a40aa45a94ad051997016db3960a90277/config.json"
+      ],
+      "limitations": [
+        "Quantized/packed safetensor element counts are not interchangeable with logical parameter counts.",
+        "Earlier DeepSeek-V4 release is outside the requested window; V4.1-Flash is the recent entry.",
+        "Publisher benchmark claims do not establish global SOTA across tasks or this local stack."
+      ],
+      "status": "Research metadata only; no local inference performed."
+    },
+    {
+      "id": "zai-org/GLM-5.3-Flash",
+      "revision": "eb9eb208eb0d988989d07a6a12d0fdeb5f52574a",
+      "release_evidence_date": "2026-08-26",
+      "release_evidence_kind": "HF first weight-upload commits; public announcement day not independently established",
+      "license": "MIT",
+      "parameters": {
+        "card_total_billions": 320,
+        "card_active_billions": 18,
+        "hf_safetensors_elements": 321323031390
+      },
+      "task_fit": "Visual coding and multimodal agents; evaluate only if hardware and deployment support are justified. No measured local memory-extraction benefit.",
+      "local_feasibility": "Hundreds of billions of stored weights: high-memory/multi-GPU class, not demonstrated compatible with the existing local 27B setup. No exact GPU requirement was verified.",
+      "sources": [
+        "https://huggingface.co/zai-org/GLM-5.3-Flash",
+        "https://huggingface.co/api/models/zai-org/GLM-5.3-Flash/commits/main",
+        "https://github.com/zai-org/GLM-5"
+      ],
+      "limitations": [
+        "First weight-upload commit dbc994b51d397ed58a57878f520434ec4292d0d3 is dated 2026-08-26T13:07:52Z.",
+        "September 7 last modification is not a new model release date."
+      ],
+      "status": "Research metadata only; no local inference performed."
+    },
+    {
+      "id": "zai-org/GLM-5.3",
+      "revision": "aca966e4e02791568aa6a4ced368624b3d897f42",
+      "release_evidence_date": "2026-08-27",
+      "release_evidence_kind": "Initial HF model-tree commit at 17:16:19 UTC (August 28 in UTC+8); not asserted as hosted-model launch date",
+      "license": "GLM-5.3 License (custom)",
+      "parameters": {
+        "hf_safetensors_elements": 753329940480,
+        "logical_total_billions": null,
+        "active_billions": null,
+        "note": "Approximately 753B tensor elements recorded by HF; exact logical total/active card counts were not verified."
+      },
+      "task_fit": "Long coding and text-agent tasks; deployment overhead makes this an unjustified local memory service addition without separate evidence.",
+      "local_feasibility": "Very large high-memory/multi-accelerator deployment candidate. No existing-PC fit or Ollama compatibility established; do not treat per-token sparse activation as total storage.",
+      "sources": [
+        "https://huggingface.co/zai-org/GLM-5.3",
+        "https://huggingface.co/api/models/zai-org/GLM-5.3/commits/main",
+        "https://huggingface.co/zai-org/GLM-5.3/blob/aca966e4e02791568aa6a4ced368624b3d897f42/LICENSE",
+        "https://recipes.vllm.ai/zai-org/GLM-5.3",
+        "https://cookbook.sglang.io/autoregressive/GLM/GLM-5.3"
+      ],
+      "limitations": [
+        "Initial model-tree commit 7cda81930d6e4cef42f48555de830aa32ecdde28 is dated 2026-08-27T17:16:19Z and titled Initial commit0828.",
+        "Custom license includes an additional review requirement for certain very large model-service businesses; not MIT.",
+        "Hosted availability, weight publication, repository creation and last modification are distinct dates."
+      ],
+      "status": "Research metadata only; no local inference performed."
+    },
+    {
+      "id": "moonshotai/Kimi-K3",
+      "revision": "f831ab66814297da540d832a5235f8e904f29d06",
+      "release_evidence_date": "2026-07-16",
+      "release_evidence_kind": "Dated official Kimi Code product announcement; HF initial weights commit July 27",
+      "license": "Kimi K3 License (custom)",
+      "parameters": {
+        "card_total_billions": 2800,
+        "card_active_billions": 104
+      },
+      "task_fit": "Long-horizon coding and multimodal knowledge work on suitable infrastructure; disproportionate for routine local memory extraction.",
+      "local_feasibility": "2.8T total weights is cluster-class. Not a plausible drop-in for this PC based on the available local evidence. No weights downloaded or inference attempted.",
+      "sources": [
+        "https://huggingface.co/moonshotai/Kimi-K3",
+        "https://www.kimi.com/code/docs/en/kimi-code/whats-new.html",
+        "https://www.kimi.ai/blog/kimi-k3",
+        "https://huggingface.co/api/models/moonshotai/Kimi-K3/commits/main",
+        "https://huggingface.co/moonshotai/Kimi-K3/blob/f831ab66814297da540d832a5235f8e904f29d06/LICENSE"
+      ],
+      "limitations": [
+        "Initial HF model-tree commit c5d1dd4c428bd1ce8b88c5044f3b6ccde9e3b721 is dated 2026-07-27T13:31:26Z.",
+        "June 13 repository creation precedes the requested window; July announcement/weight publication meet the window.",
+        "September 2 README/evaluation update is not a September base-model release.",
+        "Custom terms include additional agreements for qualifying model-service businesses; do not label MIT or Apache."
+      ],
+      "status": "Research metadata only; no local inference performed."
+    },
+    {
+      "id": "jinaai/jina-reranker-v3.5",
+      "url": "https://huggingface.co/jinaai/jina-reranker-v3.5",
+      "license": "cc-by-nc-4.0",
+      "parameter_count": 596836352,
+      "role": "Multilingual listwise document reranker",
+      "release_date": "2026-08-03",
+      "release_evidence": "Official publisher announcement Aug3; author paper submittedJuly20. Public repository creationJuly14 is recorded separately.",
+      "paper_date": "2026-07-20",
+      "release_sources": [
+        "https://jina.ai/news/jina-reranker-v3-5-faster-listwise-reranking-hybrid-attention-self-distillation/",
+        "https://arxiv.org/abs/2607.18152"
+      ],
+      "architecture": "596.8M parameters; Qwen3-0.6B derived,28layers with hybrid3L2G attention and a separate MLP projection/scoring layer.",
+      "qmd_compatibility_status": "Not a drop-in QMD reranker. Its listwise scoring and MLP projector differ from QMD\u2019s node-llama-cpp createRankingContext contract. Publisher GGUF card requires llama.cpp fork; upstreamPR26286 remains open as checked.",
+      "practical_assessment": "Recent compact reranker worth tracking, but noncommercial license and runtime/scoring incompatibility prevent an immediate native QMD substitution.",
+      "status": "Metadata/research only; not installed or inferred"
+    },
+    {
+      "id": "jinaai/jina-reranker-v3.5-GGUF",
+      "url": "https://huggingface.co/jinaai/jina-reranker-v3.5-GGUF",
+      "license": "cc-by-nc-4.0",
+      "parameter_count": null,
+      "role": "Official format/quantization variant of the above model, not a sixth independently released model",
+      "release_date": null,
+      "release_evidence": "Repository createdJuly24; no separate public announcement date verified. Parent model announcementAug3.",
+      "qmd_compatibility_status": "Not compatible merely by pointing QMD_RERANK_MODEL at the GGUF. Requires non-causal encoder/output-token-ids changes, external projector and separate listwise scorer.",
+      "status": "Metadata/research only; not installed or inferred"
+    },
+    {
+      "id": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+      "license": "OpenMDW-1.1",
+      "parameter_count": 1140918272,
+      "role": "Dense multilingual text/code embedding",
+      "release_date": "2026-07-16",
+      "release_evidence": "Publisher model card explicitly lists07/16/2026; same-day NVIDIA publisher announcement states the release.",
+      "release_sources": [
+        "https://huggingface.co/blog/nvidia/nemotron-3-embed-wins-rteb",
+        "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16"
+      ],
+      "architecture": "Ministral3 bidirectional encoder; 1B variant produced by structured pruning/distillation of a3B backbone;8B variant adapts Ministral3-8B.",
+      "qmd_compatibility_status": "No official GGUF in inspected publisher repo. QMD2.8.3 loads local GGUF via node-llama-cpp and formats inputs as Gemma/nomic or Qwen3, whereas this model requires query:/passage: prefixes and mean pooling. A local vLLM endpoint is not automatically used by QMD\u2019s local adapter.",
+      "practical_assessment": "1B is the strongest practical recent dense-embedding candidate for a separately supported local retrieval service;8B is a heavier quality-oriented option, not a default PC upgrade.",
+      "status": "Actual local GPU inference and code retrieval"
+    },
+    {
+      "id": "nvidia/Nemotron-3-Embed-8B-BF16",
+      "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16",
+      "license": "OpenMDW-1.1",
+      "parameter_count": 7952683008,
+      "role": "Dense multilingual text/code embedding",
+      "release_date": "2026-07-16",
+      "release_evidence": "Publisher model card explicitly lists07/16/2026; same-day NVIDIA publisher announcement states the release.",
+      "release_sources": [
+        "https://huggingface.co/blog/nvidia/nemotron-3-embed-wins-rteb",
+        "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16"
+      ],
+      "architecture": "Ministral3 bidirectional encoder; 1B variant produced by structured pruning/distillation of a3B backbone;8B variant adapts Ministral3-8B.",
+      "qmd_compatibility_status": "No official GGUF in inspected publisher repo. QMD2.8.3 loads local GGUF via node-llama-cpp and formats inputs as Gemma/nomic or Qwen3, whereas this model requires query:/passage: prefixes and mean pooling. A local vLLM endpoint is not automatically used by QMD\u2019s local adapter.",
+      "practical_assessment": "1B is the strongest practical recent dense-embedding candidate for a separately supported local retrieval service;8B is a heavier quality-oriented option, not a default PC upgrade.",
+      "status": "Metadata/research only; not installed or inferred"
+    },
+    {
+      "id": "Alibaba-NLP/UEmbed-2B",
+      "url": "https://huggingface.co/Alibaba-NLP/UEmbed-2B",
+      "license": "cc-by-4.0",
+      "parameter_count": 2213241664,
+      "role": "Unified dense and SPLADE-style sparse multimodal embedding",
+      "release_date": null,
+      "release_evidence": "Author paper onAug3 explicitly says models at2B/4B/9B are released. Exact weight-publication day not independently established. Card has datedAug13 native Transformers/vLLM update andAug15 evaluation news; repository createdJuly29.",
+      "paper_date": "2026-08-03",
+      "release_sources": [
+        "https://arxiv.org/abs/2608.02583",
+        "https://github.com/Alibaba-NLP/UEmbed",
+        "https://alibaba-nlp.github.io/UEmbed"
+      ],
+      "architecture": "2.213B parameters, Qwen3.5-based decoder-only model; dense and sparse outputs in one forward pass; text/image/video mixed inputs.",
+      "qmd_compatibility_status": "No official GGUF verified. Model-specific multimodal processing and sparse outputs are outside QMD2.8.3 local dense-GGUF path; support in Transformers does not establish node-llama-cpp/QMD compatibility.",
+      "practical_assessment": "Recent research option if image/document and sparse+dense retrieval are needed; more specialized than coding-doc retrieval.",
+      "status": "Metadata/research only; not installed or inferred"
+    },
+    {
+      "id": "Alibaba-NLP/core-reranker-2b",
+      "url": "https://huggingface.co/Alibaba-NLP/core-reranker-2b",
+      "license": "cc-by-4.0",
+      "parameter_count": 2127532032,
+      "role": "Text/image relevance reranker for compositional matching",
+      "release_date": null,
+      "release_evidence": "Author research paper submittedSep3; public HF repository createdAug30 and updatedSep4. Exact public weight-release announcement not verified; recent research evidence must not be mislabeled as a dated release.",
+      "paper_date": "2026-09-03",
+      "release_sources": [
+        "https://arxiv.org/abs/2609.04083"
+      ],
+      "architecture": "2.128B Qwen3VLForConditionalGeneration; model-family table identifies this exact ID as a relevance-score reranker, distinct from core-emb dense models.",
+      "qmd_compatibility_status": "No official GGUF verified and multimodal conditional-generation relevance scoring is outside the tested QMD ranking-context path.",
+      "practical_assessment": "Newest research watchlist candidate, but not yet a practical drop-in recommendation because exact release and serving evidence are incomplete.",
+      "status": "Metadata/research only; not installed or inferred"
+    }
+  ],
+  "model_date_rules": [
+    "Repository creation, lastModified, model announcement and first weights publication are distinct.",
+    "Only supported observed deployments are marked active; author benchmark claims are not independent local results."
+  ],
+  "additional_supply_chain_candidates": [
+    {
+      "repo": "anchore/syft",
+      "version": "v1.52.0",
+      "published_at": "2026-09-17T14:38:17Z",
+      "source_commit": "02ba369d13b4248395b20a504eca94b0cab564d8",
+      "url": "https://github.com/anchore/syft/releases/tag/v1.52.0"
+    },
+    {
+      "repo": "google/osv-scanner",
+      "version": "v2.6.0",
+      "published_at": "2026-09-14T02:55:16Z",
+      "source_commit": "e840a6e8adb14b7777c78e26cfbf6e2abc1d1fc6",
+      "url": "https://github.com/google/osv-scanner/releases/tag/v2.6.0"
+    }
+  ]
+}

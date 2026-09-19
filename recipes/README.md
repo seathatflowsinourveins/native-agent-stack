@@ -195,6 +195,9 @@ curl --fail --silent --show-error http://127.0.0.1:8231/v1/embeddings \
 mcporter --config "$MCPORTER_CONFIG" call socraticode.codebase_health --args '{}' --output text --no-oauth
 INDEX_ARGS=$(python3 -c 'import json,sys; print(json.dumps({"projectPath":sys.argv[1]}))' "$PROJECT_ROOT")
 mcporter --config "$MCPORTER_CONFIG" call socraticode.codebase_index --args "$INDEX_ARGS" --output text --no-oauth
+# Indexing is asynchronous. Check status and wait until completion before searching.
+mcporter --config "$MCPORTER_CONFIG" call socraticode.codebase_status --args "$INDEX_ARGS" --output text --no-oauth
+# Run the following search only after status reports the index is complete.
 SEARCH_ARGS=$(python3 -c 'import json,sys; print(json.dumps({"projectPath":sys.argv[1],"query":"read a greeting from the browser fixture","limit":3}))' "$PROJECT_ROOT")
 mcporter --config "$MCPORTER_CONFIG" call socraticode.codebase_search --args "$SEARCH_ARGS" --output text --no-oauth
 mcporter --config "$MCPORTER_CONFIG" call socraticode.codebase_watch --args '{"action":"status"}' --output text --no-oauth
@@ -202,7 +205,7 @@ mcporter --config "$MCPORTER_CONFIG" call socraticode.codebase_watch --args '{"a
 
 Acceptance means a finite 2048-value embedding, successful native health/index results, and a relevant returned file that can be checked against source. Scores are relevance signals, not benchmark rankings. A watcher status alone does not prove add/change/delete propagation. To validate freshness, make one owned disposable source-file change, observe native index payload changes without search-triggered catch-up, then remove it. Avoid indexing unrelated directories or implicitly adding external artifacts.
 
-**Compatibility exception:** vLLM 0.29.0 was the latest observed release. A clean resolver, installation and CLI help succeeded, but real WSL GPU startup failed with `RuntimeError: UVA is not available under WSL`. The working 0.25.0 recipe was restored; direct semantic search subsequently passed. Keep the 0.25.0 source pin `702f4814fe54fabff350d43cb753ae3e47c0c276` and rollback environment. Do not override dependencies or patch upstream just to claim the newest version is active.
+**Compatibility exception:** vLLM 0.29.0 was the latest observed release. A clean resolver, installation and CLI help succeeded, but real WSL GPU startup failed with `RuntimeError: UVA is not available`. The working 0.25.0 recipe was restored; direct semantic search subsequently passed. Keep the 0.25.0 source pin `702f4814fe54fabff350d43cb753ae3e47c0c276` and rollback environment. Do not override dependencies or patch upstream just to claim the newest version is active.
 
 ## Project memory
 
@@ -299,7 +302,7 @@ agent-browser --config examples/agent-browser.json --namespace native-stack --se
 # Set NAME_REF and BUTTON_REF to the actual refs returned by that snapshot.
 agent-browser --config examples/agent-browser.json --namespace native-stack --session selected-owned-session fill "$NAME_REF" Native
 agent-browser --config examples/agent-browser.json --namespace native-stack --session selected-owned-session click "$BUTTON_REF"
-agent-browser --config examples/agent-browser.json --namespace native-stack --session selected-owned-session snapshot -i -c --json
+agent-browser --config examples/agent-browser.json --namespace native-stack --session selected-owned-session get text '#status'
 agent-browser --config examples/agent-browser.json --namespace native-stack --session selected-owned-session close
 ```
 
@@ -310,16 +313,19 @@ Check for the actual `Hello, Native!` result and use returned element refs, neve
 Set `AGENTSVIEW_DATA_DIR` to a dedicated archive directory and merge [agentsview.toml.example](../examples/agentsview.toml.example) into that directory's `config.toml` before any sync. Its explicit cwd allowlist and selected session directories prevent unrelated default histories from being imported. Point directories only at authorized native session logs, not authentication stores. Preserve private archive permissions.
 
 ```sh
-AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview sync
+AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 AGENTSVIEW_NO_DAEMON=1 agentsview sync
+AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 \
+  agentsview serve --host 127.0.0.1 --port 17384 --no-sync --no-browser --no-update-check --background
 AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview projects
 AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 \
   agentsview session search 'selected task' --fts --project "$HISTORY_PROJECT_ID" --limit 3 --json
+AGENTSVIEW_DATA_DIR="$STACK_HOME/state/selected-history" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview daemon stop
 
 # Select one native source home for this invocation; do not export it globally.
 CODEX_HOME="$SELECTED_CODEX_HOME" ccusage codex daily --offline --no-cost --json --timezone UTC --config /dev/null
 ```
 
-Use the project ID returned by the archive. Empty results, unreadable logs and parser failure are distinct outcomes. Native and Desktop roots can overlap or contain copied sessions: deduplicate by stable session identity and retain per-root scope before combining totals. Cached input is a subset of input, reasoning output a subset of output; do not add either subset again to provider totals. Local estimates and model subscription usage remain separate.
+Choose an available loopback port and start/stop only the daemon belonging to this dedicated archive. The query commands require the service; the sync command above runs explicitly without it. Use the project ID returned by the archive. Empty results, unreadable logs and parser failure are distinct outcomes. Native and Desktop roots can overlap or contain copied sessions: deduplicate by stable session identity and retain per-root scope before combining totals. Cached input is a subset of input, reasoning output a subset of output; do not add either subset again to provider totals. Local estimates and model subscription usage remain separate.
 
 ## On-demand isolation
 
@@ -355,7 +361,7 @@ codex exec -C "$PROJECT_ROOT" --json - < fixtures/native-gap-prompt.txt
 claude -p --output-format stream-json --verbose --max-turns 14 < fixtures/native-gap-prompt.txt
 ```
 
-These commands use provider capacity. Run only when an actual native client check is intended; a quota error is a stopped attempt, not functional success. Keep transcripts and raw provider records private. Publish only sanitized result fields, precise scope and observed usage, with cached/reasoning subsets explained. A completed CLI/bridge workflow proves that path; it does not prove automatic tool discovery or hooks in a previously open Desktop task.
+The included prompt is a portable replay template, not the original private run prompt. These commands use provider capacity. Run only when an actual native client check is intended; a quota error is a stopped attempt, not functional success. Keep transcripts and raw provider records private. Publish only sanitized result fields, precise scope and observed usage, with cached/reasoning subsets explained. A completed CLI/bridge workflow proves that path; it does not prove automatic tool discovery or hooks in a previously open Desktop task.
 
 ## User service templates and lifecycle
 

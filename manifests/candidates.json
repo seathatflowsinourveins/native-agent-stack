@@ -1,0 +1,417 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-19T04:44:41.681441+00:00",
+  "scope": "Bounded researched alternatives, not installations or provider-account grants.",
+  "candidates": [
+    {
+      "repository": "akitaonrails/ai-memory",
+      "url": "https://github.com/akitaonrails/ai-memory",
+      "version": "v2.3.1",
+      "reviewed_commit": "bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025",
+      "license": "MIT",
+      "status": "ADOPTED: native CLI/MCP/service/hooks/skills installed; native Codex and post-login Claude model reads passed",
+      "decision": "Selected shared durable layer; do not install a competing default capture stack",
+      "model_requirements": "Capture/search/handoff work without LLM or API key. As of2.0, best-effort local all-MiniLM-L6-v2 (384-dimensional) embedding is default, ~87MB checksum-pinned background download; hybrid search enables after restart. embedding_provider=\"none\" opts out; no GPU required. LLM-written consolidation and larger/remote embeddings optional.",
+      "sources": [
+        "https://github.com/akitaonrails/ai-memory/blob/bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025/README.md",
+        "https://github.com/akitaonrails/ai-memory/blob/bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025/docs/install.md",
+        "https://github.com/akitaonrails/ai-memory/blob/bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025/docs/support-matrix.md",
+        "https://github.com/akitaonrails/ai-memory/blob/bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025/docs/local-embeddings.md",
+        "https://github.com/akitaonrails/ai-memory/blob/bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025/docs/security.md"
+      ]
+    },
+    {
+      "repository": "MemPalace/mempalace",
+      "url": "https://github.com/MemPalace/mempalace",
+      "version": "3.10.0",
+      "reviewed_commit": "36ec72f95e2e9f2bd6112891752edff457229f93",
+      "license": "MIT",
+      "status": "researched, not installed in managed runtime/client caches",
+      "decision": "Conditional alternative for exact historical conversation retrieval; choose only if a real archive corpus needs semantic recall beyond AgentsView/QMD. Do not co-install as a second default memory layer.",
+      "model_requirements": "Default ChromaDB plus local embedding model; docs describe MiniLM or embeddinggemma-300m. README size estimates differ by install path (~80MB MiniLM container/~30MB onboarding; ~300MB Gemma). No LLM/API needed for basic retrieval. Optional LLM reranking requires configured model; local endpoint embedding supported.",
+      "commands_not_executed": [
+        "uv tool install mempalace==3.10.0",
+        "mempalace init ${PROJECT_ROOT}",
+        "claude plugin marketplace add MemPalace/mempalace",
+        "claude plugin install --scope user mempalace",
+        "codex plugin marketplace add MemPalace/mempalace",
+        "codex plugin add mempalace@mempalace",
+        "mempalace mine <explicit-approved-corpus>",
+        "mempalace search <question>"
+      ],
+      "sources": [
+        "https://github.com/MemPalace/mempalace/blob/36ec72f95e2e9f2bd6112891752edff457229f93/README.md",
+        "https://github.com/MemPalace/mempalace/blob/36ec72f95e2e9f2bd6112891752edff457229f93/.codex-plugin/README.md",
+        "https://github.com/MemPalace/mempalace/blob/36ec72f95e2e9f2bd6112891752edff457229f93/website/guide/claude-code.md",
+        "https://github.com/MemPalace/mempalace/blob/36ec72f95e2e9f2bd6112891752edff457229f93/website/guide/hooks.md",
+        "https://github.com/MemPalace/mempalace/blob/36ec72f95e2e9f2bd6112891752edff457229f93/website/guide/getting-started.md"
+      ]
+    },
+    {
+      "repository": "vectorize-io/hindsight",
+      "url": "https://github.com/vectorize-io/hindsight",
+      "version": "0.10.0",
+      "reviewed_commit": "79a2fb152f17ad03e94882e9cb6b8b25049f38c0",
+      "license": "MIT",
+      "status": "researched, not installed in managed runtime/client caches",
+      "decision": "Research option for structured long-term memory that extracts facts, consolidates beliefs and reflects. Heavier than the current coding stack; do not activate merely for a higher benchmark claim.",
+      "model_requirements": "Retention/extraction, consolidation and reflection require an LLM. Hybrid recall includes embeddings and cross-encoder reranking; local defaults need no API key but require model assets/compute. A daemon/server and database are additional dependencies; cloud, self-hosted and local-daemon choices are distinct.",
+      "commands_not_executed": [
+        "npx @vectorize-io/hindsight-coding-agents@0.6.1 install claude-code codex --server daemon",
+        "npx @vectorize-io/hindsight-coding-agents@0.6.1 stats",
+        "pip install hindsight-api==0.10.0"
+      ],
+      "sources": [
+        "https://github.com/vectorize-io/hindsight/blob/79a2fb152f17ad03e94882e9cb6b8b25049f38c0/README.md",
+        "https://github.com/vectorize-io/hindsight/blob/79a2fb152f17ad03e94882e9cb6b8b25049f38c0/hindsight-docs/docs-integrations/coding-agents.md",
+        "https://github.com/vectorize-io/hindsight/blob/79a2fb152f17ad03e94882e9cb6b8b25049f38c0/hindsight-docs/docs/developer/models.mdx",
+        "https://github.com/vectorize-io/hindsight/blob/79a2fb152f17ad03e94882e9cb6b8b25049f38c0/hindsight-api-slim/hindsight_api/engine/providers/codex_auth.py"
+      ]
+    },
+    {
+      "repository": "volcengine/OpenViking",
+      "url": "https://github.com/volcengine/OpenViking",
+      "version": "0.4.20",
+      "reviewed_commit": "535f0e003444fb2869d2cbeca95c65b027420780",
+      "license": "AGPL-3.0",
+      "status": "researched, not installed in managed runtime/client caches",
+      "decision": "Conditional multimodal document/skill-memory server if the user has an actual heterogeneous knowledge corpus; defer for this small coding repository.",
+      "model_requirements": "Requires embedding model AND VLM/LLM access, cloud or local. Configuration supports local Ollama and several hosted providers; advertised benchmark used Doubao2.0Pro plus Doubao visual embeddings, not this machine/native model.",
+      "commands_not_executed": [
+        "pip install openviking==0.4.20",
+        "openviking-server init",
+        "openviking-server doctor",
+        "openviking-server",
+        "codex plugin marketplace add volcengine/OpenViking",
+        "codex plugin add openviking-memory@openviking",
+        "claude plugin marketplace add https://raw.githubusercontent.com/volcengine/OpenViking/main/.claude-plugin/marketplace.json",
+        "claude plugin install openviking-memory@openviking"
+      ],
+      "sources": [
+        "https://github.com/volcengine/OpenViking/blob/535f0e003444fb2869d2cbeca95c65b027420780/README.md",
+        "https://github.com/volcengine/OpenViking/blob/535f0e003444fb2869d2cbeca95c65b027420780/docs/en/agent-integrations/02-claude-code.md",
+        "https://github.com/volcengine/OpenViking/blob/535f0e003444fb2869d2cbeca95c65b027420780/docs/en/agent-integrations/04-codex.md",
+        "https://github.com/volcengine/OpenViking/blob/535f0e003444fb2869d2cbeca95c65b027420780/docs/en/guides/01-configuration.md"
+      ]
+    },
+    {
+      "repository": "topoteretes/cognee",
+      "url": "https://github.com/topoteretes/cognee",
+      "version": "1.6.0",
+      "reviewed_commit": "4294605f20324b250fd0edf8893cb69dc4215369",
+      "license": "Apache-2.0",
+      "status": "researched, not installed in managed runtime/client caches",
+      "decision": "Conditional framework for building a connected document/code/session knowledge graph; native plugins exist, but this is not a lightweight default memory addition.",
+      "model_requirements": "LLM extraction plus embedding model required for normal connected-memory pipeline; local Ollama incl local embeddings supported. Graph/vector/storage services vary by deployment. The local UI path additionally needs Node and Docker.",
+      "commands_not_executed": [
+        "pip install cognee==1.6.0",
+        "claude plugin marketplace add topoteretes/cognee-integrations",
+        "claude plugin install cognee-memory@cognee",
+        "codex plugin marketplace add topoteretes/cognee-integrations --ref main",
+        "codex plugin add cognee@cognee"
+      ],
+      "sources": [
+        "https://github.com/topoteretes/cognee/blob/4294605f20324b250fd0edf8893cb69dc4215369/README.md",
+        "https://github.com/topoteretes/cognee/blob/4294605f20324b250fd0edf8893cb69dc4215369/cognee-mcp/README.md",
+        "https://github.com/topoteretes/cognee/blob/4294605f20324b250fd0edf8893cb69dc4215369/.env.template",
+        "https://github.com/topoteretes/cognee/blob/4294605f20324b250fd0edf8893cb69dc4215369/docs/ollama_models.md"
+      ]
+    },
+    {
+      "repository": "thedotmack/claude-mem",
+      "url": "https://github.com/thedotmack/claude-mem",
+      "version": "13.25.1",
+      "reviewed_commit": "4d323afe728514e772d4d25dac8cd1e4af0fd5ed",
+      "license": "Apache-2.0",
+      "status": "researched, not installed in managed runtime/client caches",
+      "decision": "Alternative automatic summarizing memory layer; avoid stacking on current Context Mode capture and do not install with unreviewed online defaults.",
+      "model_requirements": "Automatic semantic compression uses an observer model. Current configuration docs default Claude provider/subscription and claude-haiku-4-5-20251001; installer also offers hosted observer, OpenRouter or Gemini. Local storage does not mean model-free processing.",
+      "commands_not_executed": [
+        "npx claude-mem@13.25.1 install",
+        "npx claude-mem@13.25.1 install --ide codex",
+        "claude plugin marketplace add thedotmack/claude-mem",
+        "claude plugin install claude-mem",
+        "npx claude-mem@13.25.1 telemetry disable"
+      ],
+      "sources": [
+        "https://github.com/thedotmack/claude-mem/blob/4d323afe728514e772d4d25dac8cd1e4af0fd5ed/README.md",
+        "https://github.com/thedotmack/claude-mem/blob/4d323afe728514e772d4d25dac8cd1e4af0fd5ed/src/services/integrations/CodexCliInstaller.ts",
+        "https://github.com/thedotmack/claude-mem/blob/4d323afe728514e772d4d25dac8cd1e4af0fd5ed/src/cli/adapters/codex.ts",
+        "https://github.com/thedotmack/claude-mem/blob/4d323afe728514e772d4d25dac8cd1e4af0fd5ed/docs/public/configuration.mdx",
+        "https://github.com/thedotmack/claude-mem/blob/4d323afe728514e772d4d25dac8cd1e4af0fd5ed/docs/public/telemetry.mdx"
+      ]
+    },
+    {
+      "repository": "mem0ai/mem0",
+      "url": "https://github.com/mem0ai/mem0",
+      "version": "core2.1.0;codingplugin0.3.1;OpenClaw release is separate",
+      "reviewed_commit": "a39a802bbc93e85b820078cd3c4dbaf53af25dbe",
+      "license": "Apache-2.0",
+      "status": "researched, not installed in managed runtime/client caches",
+      "decision": "Useful application memory infrastructure or deliberate hosted cross-agent memory; defer for this local native-only stack without a Mem0 account requirement.",
+      "model_requirements": "OSS library normally needs LLM extraction and embeddings; current README defaults gpt-5-mini + text-embedding-3-small, alternatives including local Ollama. Native coding plugins documented here target hosted Mem0 Platform, not automatically this self-hosted library.",
+      "commands_not_executed": [
+        "pip install mem0ai==2.1.0",
+        "claude plugin marketplace add mem0ai/mem0",
+        "claude plugin install mem0@mem0-plugins --scope user --config api_key=\"$MEM0_API_KEY\"",
+        "codex plugin marketplace add mem0ai/mem0",
+        "codex plugin add mem0@mem0-plugins",
+        "codex mcp add mem0 --url https://mcp.mem0.ai/mcp/ --bearer-token-env-var MEM0_API_KEY"
+      ],
+      "sources": [
+        "https://github.com/mem0ai/mem0/blob/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/README.md",
+        "https://github.com/mem0ai/mem0/blob/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/docs/integrations/claude-code.mdx",
+        "https://github.com/mem0ai/mem0/blob/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/docs/integrations/codex.mdx",
+        "https://github.com/mem0ai/mem0/blob/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/integrations/claude-code-plugin/README.md"
+      ]
+    },
+    {
+      "repository": "tobi/qmd",
+      "url": "https://github.com/tobi/qmd",
+      "version": "v2.8.3",
+      "reviewed_commit": "04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+      "license": "MIT",
+      "status": "installed BM25; semantic mode not activated",
+      "decision": "First evaluate semantic mode of existing install",
+      "model_requirements": {
+        "embedding": "EmbeddingGemma300M Q8 (~300MB)",
+        "reranker": "Qwen3 Reranker0.6B Q8 (~640MB)",
+        "query_expansion": "QMD1.7B Q4 (~1.1GB)",
+        "execution": "Local node-llama-cpp/GGUF; initial model downloads required"
+      },
+      "commands_not_executed": [
+        "qmd --index agent-lab-docs embed",
+        "qmd --index agent-lab-docs vsearch \"why preserve raw test failures\" -c agent-lab-docs -n 5 --json",
+        "qmd --index agent-lab-docs query \"why preserve raw test failures\" -c agent-lab-docs -n 5 --json",
+        "qmd --index agent-lab-docs mcp"
+      ],
+      "sources": [
+        "https://github.com/tobi/qmd/tree/v2.8.3",
+        "https://github.com/tobi/qmd#quick-start",
+        "https://github.com/tobi/qmd#mcp-server"
+      ]
+    },
+    {
+      "repository": "qdrant/mcp-server-qdrant",
+      "url": "https://github.com/qdrant/mcp-server-qdrant",
+      "version": "v0.8.1",
+      "reviewed_commit": "c56ae5adf62bb78d852bf7bbcbc5d7b75e2bbe41",
+      "license": "Apache-2.0",
+      "status": "researched, not installed in managed stack",
+      "decision": "Conditional second choice: explicit small decision store",
+      "model_requirements": {
+        "embedding": "Local FastEmbed; default sentence-transformers/all-MiniLM-L6-v2",
+        "reranker": "None required by this MCP",
+        "llm": "None for store/find",
+        "server": "QDRANT_LOCAL_PATH embedded database OR separate Qdrant server; not both"
+      },
+      "commands_not_executed": [
+        "QDRANT_LOCAL_PATH=/absolute/project-memory COLLECTION_NAME=agent-lab EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2 QDRANT_SEARCH_LIMIT=5 uvx mcp-server-qdrant==0.8.1"
+      ],
+      "sources": [
+        "https://github.com/qdrant/mcp-server-qdrant",
+        "https://github.com/qdrant/mcp-server-qdrant/releases/tag/v0.8.1",
+        "https://github.com/qdrant/qdrant/releases/tag/v1.19.1"
+      ]
+    },
+    {
+      "repository": "getzep/graphiti",
+      "url": "https://github.com/getzep/graphiti",
+      "version": "v0.30.2",
+      "reviewed_commit": "de8eb5b896c05ed1b5b329d4cb52015446d65e21",
+      "license": "Apache-2.0",
+      "status": "researched, not installed in managed stack",
+      "decision": "Defer unless temporal relationship questions become real workload",
+      "model_requirements": {
+        "llm": "Entity/edge extraction and dedup require structured-output model; OpenAI default, other APIs or local OpenAI-compatible endpoints",
+        "embedding": "OpenAI default; alternatives including local Sentence Transformers",
+        "reranker": "Configurable graph search/cross-encoder path; not assumed model-free",
+        "database": "FalkorDB default MCP; Neo4j alternative"
+      },
+      "commands_not_executed": [
+        "pip install graphiti-core==0.30.2",
+        "cd graphiti/mcp_server",
+        "uv sync",
+        "docker compose up"
+      ],
+      "sources": [
+        "https://github.com/getzep/graphiti",
+        "https://github.com/getzep/graphiti/blob/main/mcp_server/README.md",
+        "https://github.com/getzep/graphiti/releases/tag/v0.30.2"
+      ]
+    },
+    {
+      "repository": "HKUDS/LightRAG",
+      "url": "https://github.com/HKUDS/LightRAG",
+      "version": "v1.5.7",
+      "reviewed_commit": "83caec6544c1c2e5872ff5463d2d13c630286219",
+      "license": "MIT",
+      "status": "researched, not installed in managed stack",
+      "decision": "Defer until a substantial document relationship corpus exists",
+      "model_requirements": {
+        "llm": "Extraction, keyword selection and answer generation; local or provider APIs",
+        "embedding": "Required; local bge-m3 recommended by upstream",
+        "reranker": "Optional, upstream recommends local bge-reranker-v2-m3",
+        "storage": "Local working directory or configured graph/vector/KV backends"
+      },
+      "commands_not_executed": [
+        "pip install \"lightrag-hku[api]==1.5.7\"",
+        "cp env.example .env",
+        "lightrag-server"
+      ],
+      "sources": [
+        "https://github.com/HKUDS/LightRAG",
+        "https://github.com/HKUDS/LightRAG/releases/tag/v1.5.7"
+      ]
+    },
+    {
+      "repository": "letta-ai/letta-code",
+      "url": "https://github.com/letta-ai/letta-code",
+      "version": "v0.32.13",
+      "reviewed_commit": "8994497c7f5bc29da97fdad8703e4531152ca631",
+      "license": "Apache-2.0",
+      "status": "researched, not installed in managed stack",
+      "decision": "Defer: alternative agent runtime overlaps current clients",
+      "model_requirements": {
+        "llm": "Agent model required; local Ollama/LM Studio/llama.cpp supported for local agents",
+        "embedding": "No required separate default established in reviewed current runtime docs",
+        "reranker": "No required default established",
+        "runtime": "Separate Letta harness/App Server"
+      },
+      "commands_not_executed": [
+        "npm install -g @letta-ai/letta-code@0.32.13",
+        "letta",
+        "letta server",
+        "letta connect"
+      ],
+      "sources": [
+        "https://github.com/letta-ai/letta-code",
+        "https://docs.letta.com/configuration/models",
+        "https://github.com/letta-ai/letta"
+      ]
+    },
+    {
+      "repository": "gastownhall/beads",
+      "url": "https://github.com/gastownhall/beads",
+      "license": "MIT",
+      "status": "Researched; deferred, not installed",
+      "decision": "conditional backlog tool; defer installation until durable dependency/claimable-task queue is a real requirement",
+      "commands_not_executed": [
+        "BEADS_DIR=/absolute/owned-project-task-state/.beads bd init --quiet --stealth",
+        "BEADS_DIR=/absolute/owned-project-task-state/.beads bd create \"Review memory retrieval acceptance\" -p 1 -t task",
+        "BEADS_DIR=/absolute/owned-project-task-state/.beads bd ready --json",
+        "BEADS_DIR=/absolute/owned-project-task-state/.beads bd update ACTUAL_RETURNED_ID --claim",
+        "BEADS_DIR=/absolute/owned-project-task-state/.beads bd show ACTUAL_RETURNED_ID",
+        "BEADS_DIR=/absolute/owned-project-task-state/.beads bd close ACTUAL_RETURNED_ID \"Acceptance recorded\""
+      ],
+      "sources": [
+        "https://github.com/gastownhall/beads/blob/v1.3.0/README.md",
+        "https://github.com/gastownhall/beads/blob/v1.3.0/docs/getting-started/installation.md",
+        "https://github.com/gastownhall/beads/blob/v1.3.0/docs/getting-started/ide-setup.md"
+      ]
+    },
+    {
+      "repository": "EverMind-AI/EverOS",
+      "url": "https://github.com/EverMind-AI/EverOS",
+      "license": "Apache-2.0",
+      "status": "Researched; deferred, not installed",
+      "decision": "defer; do not add a competing memory capture/extraction stack during ai-memory adoption",
+      "commands_not_executed": [
+        "everos demo --plain",
+        "everos init --root /absolute/new-memory-root",
+        "everos server start --root /absolute/new-memory-root",
+        "everos cascade status --root /absolute/new-memory-root"
+      ],
+      "sources": [
+        "https://github.com/EverMind-AI/EverOS/blob/v1.3.1/README.md",
+        "https://github.com/EverMind-AI/EverOS/blob/v1.3.1/docs/configuration.md",
+        "https://github.com/EverMind-AI/EverOS/blob/v1.3.1/docs/cli.md",
+        "https://pypi.org/project/everos/1.3.1/"
+      ]
+    },
+    {
+      "repository": "agentskills/agentskills",
+      "url": "https://github.com/agentskills/agentskills",
+      "reviewed_commit": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+      "license": "Apache-2.0",
+      "status": "Reference validator researched; permanent installation deferred",
+      "decision": "Demo-only portable-format linter; native client extensions differ. Existing official Codex quick_validate helper already passed for selected task-checkpoint skills."
+    },
+    {
+      "repository": "Tencent/WeKnora",
+      "url": "https://github.com/Tencent/WeKnora",
+      "version": "v0.8.0",
+      "reviewed_commit": "1edcd54b43606d9079bb36650efe3f68707a79ea",
+      "license": "MIT for first-party code; LICENSE includes separately licensed bundled dependencies (GitHub API reports NOASSERTION).",
+      "status": "researched, not installed",
+      "decision": "Conditional document warehouse, maintained Wiki and remote connector synchronization. No local filesystem watcher verified. Local code watcher requirement now served by SocratiCode.",
+      "commands_not_executed": [
+        "weknora profile add local-rag --host http://127.0.0.1:18080 --use",
+        "weknora auth login",
+        "weknora kb list",
+        "weknora link --kb SELECTED_KB",
+        "weknora doc upload SELECTED_DOCUMENT.md",
+        "weknora doc wait DOCUMENT_ID",
+        "weknora search chunks \"selected question\"",
+        "weknora mcp serve"
+      ]
+    },
+    {
+      "repository": "tech-leads-club/agent-skills",
+      "url": "https://github.com/tech-leads-club/agent-skills",
+      "version": "source pin",
+      "reviewed_commit": "ff0ef495d5a1b7d6d0ae3527e9d0f81d41a83a13",
+      "license": "MIT source; CC-BY-4.0 maintainer SKILL.md content unless separately specified",
+      "status": "researched, not installed",
+      "decision": "Selective source for a specific missing skill; existing native pinned skill installation suffices. No bulk catalog added.",
+      "commands_not_executed": [
+        "npx @tech-leads-club/agent-skills"
+      ],
+      "sources": [
+        "https://raw.githubusercontent.com/tech-leads-club/agent-skills/ff0ef495d5a1b7d6d0ae3527e9d0f81d41a83a13/LICENSE",
+        "https://github.com/tech-leads-club/agent-skills/blob/ff0ef495d5a1b7d6d0ae3527e9d0f81d41a83a13/README.md"
+      ]
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "url": "https://github.com/dagucloud/dagu",
+      "version": "v2.16.6",
+      "reviewed_commit": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "license": "GPL-3.0-or-later",
+      "status": "researched, not installed",
+      "decision": "Conditional: select when a real multi-step local refresh/report workflow needs persisted run state, retries or human tasks. No persistent job proposed this turn.",
+      "commands_not_executed": [
+        "dagu --dagu-home /ABS/OWNED/dagu dry /ABS/OWNED/workflow.yaml",
+        "dagu --dagu-home /ABS/OWNED/dagu start /ABS/OWNED/workflow.yaml",
+        "dagu --dagu-home /ABS/OWNED/dagu history --format json --limit 5",
+        "dagu --dagu-home /ABS/OWNED/dagu retry --run-id=ACTUAL_RUN_ID /ABS/OWNED/workflow.yaml"
+      ],
+      "sources": [
+        "https://github.com/dagucloud/dagu/releases/tag/v2.16.6",
+        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/LICENSING.md",
+        "https://docs.dagu.sh/getting-started/cli",
+        "https://docs.dagu.sh/server-admin/opentelemetry"
+      ]
+    },
+    {
+      "repository": "ymtdzzz/otel-tui",
+      "url": "https://github.com/ymtdzzz/otel-tui",
+      "version": "v0.7.5",
+      "reviewed_commit": "3b25779a083469b732e3c628b4a412ee05cf9948",
+      "license": "Apache-2.0",
+      "status": "researched, not installed",
+      "decision": "Conditional: use a deliberate local instrumented session or deterministic workflow when runtime latency/events are being diagnosed; no persistent exporter proposed.",
+      "commands_not_executed": [
+        "otel-tui --host 127.0.0.1 --grpc 4317 --http 4318",
+        "otel-tui --host 127.0.0.1 --from-json-file /ABS/OWNED/exported-otel.json"
+      ],
+      "sources": [
+        "https://github.com/ymtdzzz/otel-tui/releases/tag/v0.7.5",
+        "https://github.com/ymtdzzz/otel-tui/blob/3b25779a083469b732e3c628b4a412ee05cf9948/README.md",
+        "https://code.claude.com/docs/en/monitoring-usage",
+        "https://learn.chatgpt.com/docs/config-file/config-reference"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "id": "artifact-reductions",
+  "kind": "artifact_measurement",
+  "recorded_at_utc": "2026-09-19T04:55:03.858407+00:00",
+  "component_ids": [
+    "rtk",
+    "socraticode",
+    "openresearch",
+    "context-mode"
+  ],
+  "claim": "Recorded exact selected-text reductions, distinct from model usage.",
+  "limitations": [
+    "Lossy selections compare retained text to full-file/paper counterfactuals.",
+    "Public source fixture replaces personal path literals; historical original hashes/counters remain distinct from public fixture recount."
+  ],
+  "data": {
+    "native_code_retrieval": {
+      "tokenizer": {
+        "package": "gpt-tokenizer",
+        "version": "3.4.0",
+        "license": "MIT",
+        "encoding": "o200k_base",
+        "native_api": "encode(text).length",
+        "runtime": "v24.21.0"
+      },
+      "tokens_removed": 2240,
+      "reduction_percent": 82.02123764188941,
+      "scope": "Exact UTF-8 artifacts, comparing the full source file to the complete single-result text delivered by the successful native Codex SocratiCode search, including its server preamble. This is lossy retrieval selection versus a whole-file counterfactual; the full file was not fed to a baseline model. Excludes prompts, skill content, tool schemas, protocol envelope and other tool output. This is not provider token savings, a matched benchmark, or a retrieval quality score.",
+      "model_requests_for_measurement": 0
+    },
+    "original_full_source_tokens": 2731,
+    "original_result_tokens": 491,
+    "original_source_sha256": "d8050a34ace0b4f16a9345ffeca798ca5d8ce897ed614936e530115699e1fdf9",
+    "original_result_sha256": "228c4bc674c606fc6cfbbb57fba4164fe30066de34bba396fe68a335799f035f",
+    "public_fixture_source_modified": "Only personal home path literals replaced; recount separately.",
+    "historical_rtk": {
+      "full_output_tokens": 533,
+      "retained_tokens": 176,
+      "removed": 357,
+      "percent": 66.98,
+      "encoding": "o200k_base"
+    },
+    "historical_paper": {
+      "full_tokens": 18533,
+      "retrieved_tokens": 483,
+      "removed": 18050,
+      "percent": 97.393838,
+      "encoding": "o200k_base"
+    },
+    "public_artifact_recount": {
+      "tokenizer": "gpt-tokenizer",
+      "version": "3.4.0",
+      "encoding": "o200k_base",
+      "counts": [
+        {
+          "file": "evidence/artifacts/usage-report.source.txt",
+          "tokens": 2730
+        },
+        {
+          "file": "evidence/artifacts/retrieved-code.txt",
+          "tokens": 491
+        }
+      ],
+      "removed": 2239,
+      "reduction_percent": 82.01465201465201,
+      "scope": "Public sanitized artifact selection only; not a provider savings measurement."
+    }
+  },
+  "provenance": [
+    {
+      "name": "artifact-token-counts.json",
+      "sha256": "dce03c284f03f7ecbab52f31d44e41fa0ef3f62d2ad4b7fcfc805fb611b658af",
+      "disclosure": "Selected typed fields exported; raw local artifact retained privately."
+    },
+    {
+      "name": "artifact-token-counts.json",
+      "sha256": "964734fb37d5fe11b68811ebc31fcf00772eee321f9b45eab0c7b836c9756a09",
+      "disclosure": "Selected typed fields exported; raw local artifact retained privately."
+    },
+    {
+      "name": "native-memory-manifest.json",
+      "sha256": "50c886c0010a77576213263b92ec2e4dcdbdf36d1666951df0c54f7b505eeb9d",
+      "disclosure": "Selected typed fields exported; raw local artifact retained privately."
+    }
+  ]
+}

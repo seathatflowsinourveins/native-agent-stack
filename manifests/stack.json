@@ -1,8 +1,871 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-19T04:42:15.552095+00:00",
-  "scope": "Linux/WSL x86_64 native Codex and Claude reference stack; evidence statuses distinguish live and historical runs.",
-  "components": [],
-  "models": [],
-  "profiles": []
+  "recorded_at_utc": "2026-09-19T04:44:41.681441+00:00",
+  "scope": "Linux/WSL x86_64 native Codex/Claude workflow; current evidence-backed selection, not an exhaustive global ranking. Exact native results are dated and host-specific.",
+  "source_snapshot_commit": "44750edc",
+  "components": [
+    {
+      "id": "affaan-m/ECC",
+      "repository": "https://github.com/affaan-m/ECC",
+      "version": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+      "license": "MIT",
+      "profile": "optional",
+      "role": "Selective on-demand community guidance",
+      "commands": [
+        {
+          "skill_invocation": [
+            "search-first"
+          ],
+          "source_only": false
+        }
+      ],
+      "evidence_ids": [
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/affaan-m/ECC"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
+    },
+    {
+      "id": "agent-browser",
+      "repository": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
+      "version": "0.38.1",
+      "license": "Apache-2.0",
+      "profile": "core",
+      "role": "Local native browser snapshot/ref interaction",
+      "commands": [
+        "agent-browser --config examples/agent-browser.json --namespace native-stack --session selected-owned-session open \"file://${PROJECT_ROOT}/fixtures/greeting.html\""
+      ],
+      "evidence_ids": [
+        "native-cli-gaps",
+        "component-history",
+        "desktop-cli-workflows"
+      ],
+      "upstream_sources": [
+        "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "agentsview",
+      "repository": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
+      "version": "0.43.0",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Scoped historical Codex/Claude transcript lexical search",
+      "commands": [
+        "agentsview --help"
+      ],
+      "evidence_ids": [
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
+    },
+    {
+      "id": "ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "version": "2.3.1",
+      "license": "MIT",
+      "profile": "core",
+      "role": "Shared scoped Markdown decisions and automatic heuristic cross-client handoffs",
+      "commands": [
+        "ai-memory --version",
+        "ai-memory install-mcp --client codex --apply",
+        "ai-memory install-mcp --client claude-code --apply"
+      ],
+      "evidence_ids": [
+        "native-memory",
+        "desktop-direct-rag",
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/akitaonrails/ai-memory"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "ast-grep",
+      "repository": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+      "version": "0.45.3",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Structural source search",
+      "commands": [
+        "ast-grep run --lang javascript --pattern 'function $NAME($$$ARGS) { $$$BODY }' --json=compact --stdin < evidence/artifacts/usage-report.source.txt"
+      ],
+      "evidence_ids": [
+        "component-history",
+        "portable-cli-artifacts"
+      ],
+      "upstream_sources": [
+        "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "ccusage",
+      "repository": "https://github.com/ccusage/ccusage",
+      "version": "20.0.23",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Read existing native provider usage logs",
+      "commands": [
+        "ccusage --help"
+      ],
+      "evidence_ids": [
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/ccusage/ccusage"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
+    },
+    {
+      "id": "claude-code",
+      "repository": "https://github.com/anthropics/claude-code",
+      "version": "2.1.278",
+      "license": "proprietary CLI; no OSS license inferred from issue repository",
+      "profile": "core",
+      "role": "Native subscription coding client",
+      "commands": [
+        "claude --version",
+        "claude -p --output-format stream-json --verbose --max-turns 14 < fixtures/native-gap-prompt.txt"
+      ],
+      "evidence_ids": [
+        "native-context-memory",
+        "native-memory",
+        "native-rag",
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/anthropics/claude-code"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "claude-hud",
+      "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
+      "version": "0.8.0",
+      "license": "MIT",
+      "profile": "optional",
+      "role": "Claude statusline rendering",
+      "commands": [
+        {
+          "skill_invocation": null,
+          "source_only": true
+        }
+      ],
+      "evidence_ids": [
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core.",
+      "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
+    },
+    {
+      "id": "codebase-memory-mcp",
+      "repository": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
+      "version": "0.11.0",
+      "license": "MIT",
+      "profile": "core",
+      "role": "Persistent static code graph and call tracing",
+      "commands": [
+        "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory.search_graph --args \"${GRAPH_QUERY_ARGS}\" --output json --no-oauth"
+      ],
+      "evidence_ids": [
+        "native-cli-gaps",
+        "component-history",
+        "desktop-cli-workflows"
+      ],
+      "upstream_sources": [
+        "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "codex",
+      "repository": "https://github.com/openai/codex",
+      "version": "0.155.1",
+      "license": "Apache-2.0",
+      "profile": "core",
+      "role": "Native subscription coding client",
+      "commands": [
+        "codex --version",
+        "codex exec -C \"${PROJECT_ROOT}\" --json - < fixtures/native-gap-prompt.txt"
+      ],
+      "evidence_ids": [
+        "native-context-memory",
+        "native-memory",
+        "native-rag",
+        "component-history",
+        "desktop-cli-workflows"
+      ],
+      "upstream_sources": [
+        "https://github.com/openai/codex"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "codex-for-claude",
+      "repository": "https://github.com/openai/codex-plugin-cc/tree/v1.0.6",
+      "version": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "license": "Apache-2.0",
+      "profile": "optional",
+      "role": "Official Claude plugin and native Codex companion delegation",
+      "commands": [
+        {
+          "skill_invocation": [
+            "codex"
+          ],
+          "source_only": false
+        }
+      ],
+      "evidence_ids": [
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/openai/codex-plugin-cc/tree/v1.0.6"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
+    },
+    {
+      "id": "context-hub",
+      "repository": "https://github.com/andrewyng/context-hub",
+      "version": "0.1.4",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Retrieve selected curated developer documentation",
+      "commands": [
+        "chub search \"python json\" --json"
+      ],
+      "evidence_ids": [
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/andrewyng/context-hub"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "context-mode",
+      "repository": "https://github.com/mksglu/context-mode",
+      "version": "1.0.169",
+      "license": "Elastic-2.0",
+      "profile": "core",
+      "role": "Local execution, file processing, indexed retrieval, native context hooks",
+      "commands": [
+        "mcporter --config \"${MCPORTER_CONFIG}\" call context-mode.ctx_doctor --args '{}' --output text --no-oauth"
+      ],
+      "evidence_ids": [
+        "native-context-memory",
+        "artifact-reductions",
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/mksglu/context-mode"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "davila7/claude-code-templates",
+      "repository": "https://github.com/davila7/claude-code-templates",
+      "version": "c840d6f626be7ba418da60aeb0f2080413562451",
+      "license": "MIT",
+      "profile": "optional",
+      "role": "Selective on-demand community guidance",
+      "commands": [
+        {
+          "skill_invocation": [
+            "concise-planning"
+          ],
+          "source_only": false
+        }
+      ],
+      "evidence_ids": [
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/davila7/claude-code-templates"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
+    },
+    {
+      "id": "difftastic",
+      "repository": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+      "version": "0.71.0",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Syntax-aware source difference review",
+      "commands": [
+        "difft --exit-code --color never fixtures/before.py fixtures/after.py"
+      ],
+      "evidence_ids": [
+        "component-history",
+        "portable-cli-artifacts"
+      ],
+      "upstream_sources": [
+        "https://github.com/Wilfred/difftastic/releases/tag/0.71.0"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "gitleaks",
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "version": "8.30.1",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Redacted Git history secret detection",
+      "commands": [
+        "gitleaks dir --redact=100 --no-banner --no-color --report-format json --report-path \"${REPORT_PATH}\" \"${PROJECT_ROOT}\""
+      ],
+      "evidence_ids": [
+        "runtime-tools",
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/gitleaks/gitleaks"
+      ],
+      "source_pin": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "headroom",
+      "repository": "https://github.com/chopratejas/headroom",
+      "version": "0.37.0",
+      "license": "Apache-2.0",
+      "profile": "supporting",
+      "role": "Optional guarded offline compression of supported artifacts",
+      "commands": [
+        "python -m pip show headroom-ai"
+      ],
+      "evidence_ids": [
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/chopratejas/headroom"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
+    },
+    {
+      "id": "huggingface-hub-native",
+      "repository": "https://github.com/huggingface/huggingface_hub",
+      "version": "1.32.0",
+      "license": "Apache-2.0",
+      "profile": "core",
+      "role": "Native authenticated model discovery and revision-pinned downloads",
+      "commands": [
+        "hf --version",
+        "hf download nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 --local-dir \"${MODEL_DIRECTORY}\" --max-workers 2 --json"
+      ],
+      "evidence_ids": [
+        "component-history",
+        "native-rag"
+      ],
+      "upstream_sources": [
+        "https://github.com/huggingface/huggingface_hub"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "markitdown",
+      "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.7",
+      "version": "0.1.7",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Convert supported source documents to readable Markdown",
+      "commands": [
+        "markitdown fixtures/greeting.html"
+      ],
+      "evidence_ids": [
+        "component-history",
+        "portable-cli-artifacts"
+      ],
+      "upstream_sources": [
+        "https://github.com/microsoft/markitdown/releases/tag/v0.1.7"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "mcp-inspector",
+      "repository": "https://github.com/modelcontextprotocol/inspector",
+      "version": "2.7.0",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Upstream direct stdio tool inspection/calls",
+      "commands": [
+        "npx @modelcontextprotocol/inspector@2.7.0 --help"
+      ],
+      "evidence_ids": [
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/modelcontextprotocol/inspector"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
+    },
+    {
+      "id": "mcporter",
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.13.13",
+      "version": "0.13.13",
+      "license": "MIT",
+      "profile": "core",
+      "role": "Native CLI bridge with persistent MCP daemon connection",
+      "commands": [
+        "mcporter --config \"${MCPORTER_CONFIG}\" list --brief --no-oauth"
+      ],
+      "evidence_ids": [
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/openclaw/mcporter/tree/v0.13.13"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "openresearch",
+      "repository": "https://github.com/alphaXiv/OpenResearch",
+      "version": "0.2.4",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Selected public literature discovery and extracted paper retrieval",
+      "commands": [
+        "orx --no-telemetry discover keyword \"local code retrieval\" --limit 3",
+        "orx --no-telemetry paper \"${PAPER_ID}\" --full"
+      ],
+      "evidence_ids": [
+        "component-history",
+        "artifact-reductions"
+      ],
+      "upstream_sources": [
+        "https://github.com/alphaXiv/OpenResearch"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "playwright-cli",
+      "repository": "https://github.com/microsoft/playwright-cli",
+      "version": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
+      "license": "Apache-2.0",
+      "profile": "optional",
+      "role": "Browser workflow instructions from installed official CLI",
+      "commands": [
+        "playwright-cli --help"
+      ],
+      "evidence_ids": [
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/microsoft/playwright-cli"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
+    },
+    {
+      "id": "promptfoo",
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "version": "0.123.1",
+      "license": "MIT",
+      "profile": "optional",
+      "role": "Explicit evaluation configuration/fixtures",
+      "commands": [
+        "promptfoo --help"
+      ],
+      "evidence_ids": [
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/promptfoo/promptfoo"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
+    },
+    {
+      "id": "qdrant",
+      "repository": "https://github.com/qdrant/qdrant",
+      "version": "1.19.1",
+      "license": "Apache-2.0",
+      "profile": "core",
+      "role": "Local persistent vector and payload storage",
+      "commands": [
+        "qdrant --config-path \"${QDRANT_CONFIG}\" --disable-telemetry"
+      ],
+      "evidence_ids": [
+        "native-rag",
+        "desktop-direct-rag",
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/qdrant/qdrant"
+      ],
+      "source_pin": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "qmd",
+      "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+      "version": "2.8.3",
+      "license": "MIT",
+      "profile": "core",
+      "role": "Local lexical retrieval over selected documentation",
+      "commands": [
+        "qmd --index \"${QMD_INDEX}\" search \"automatic local code RAG Nemotron\" -c \"${QMD_COLLECTION}\" -n 2 --json"
+      ],
+      "evidence_ids": [
+        "native-cli-gaps",
+        "component-history",
+        "desktop-cli-workflows"
+      ],
+      "upstream_sources": [
+        "https://github.com/tobi/qmd/releases/tag/v2.8.3"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "repomix",
+      "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.0",
+      "version": "1.18.0",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Explicit repository packing and structural compression",
+      "commands": [
+        "repomix --include fixtures/records.json,fixtures/example.sh --output \"${OUTPUT_DIR}/repomix.xml\""
+      ],
+      "evidence_ids": [
+        "component-history",
+        "portable-cli-artifacts"
+      ],
+      "upstream_sources": [
+        "https://github.com/yamadashy/repomix/releases/tag/v1.18.0"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "rtk",
+      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
+      "version": "0.49.0",
+      "license": "Apache-2.0",
+      "profile": "core",
+      "role": "Compact supported command outputs, retain failure/raw recovery",
+      "commands": [
+        "rtk git status"
+      ],
+      "evidence_ids": [
+        "native-context-memory",
+        "artifact-reductions",
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "sandbox-runtime",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "version": "0.0.77",
+      "license": "Apache-2.0",
+      "profile": "supporting",
+      "role": "On-demand OS isolation for selected native commands",
+      "commands": [
+        "srt --settings \"${SANDBOX_POLICY}\" -- COMMAND"
+      ],
+      "evidence_ids": [
+        "runtime-tools",
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/anthropics/sandbox-runtime"
+      ],
+      "source_pin": "6fa731368807419ee157f9a3fac955fefe1019c6",
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "serena",
+      "repository": "https://github.com/oraios/serena",
+      "version": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "license": "GPL-3.0-or-later",
+      "profile": "core",
+      "role": "Language-server symbol and reference retrieval",
+      "commands": [
+        {
+          "tool": "find_symbol",
+          "arguments": {
+            "name_path_pattern": "greeting",
+            "relative_path": "fixtures/after.py",
+            "include_body": true
+          }
+        }
+      ],
+      "evidence_ids": [
+        "native-context-memory",
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/oraios/serena"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "command_scope": "Native MCP example after configuring this selected project/language; existing historical native acceptance used a Bash symbol in its own project."
+    },
+    {
+      "id": "shanraisshan/claude-code-best-practice",
+      "repository": "https://github.com/shanraisshan/claude-code-best-practice",
+      "version": "15969ed2471a177d938c889255d2f23f07e4742a",
+      "license": "MIT",
+      "profile": "optional",
+      "role": "Selective on-demand community guidance",
+      "commands": [
+        {
+          "skill_invocation": null,
+          "source_only": true
+        }
+      ],
+      "evidence_ids": [
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/shanraisshan/claude-code-best-practice"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
+    },
+    {
+      "id": "shellcheck",
+      "repository": "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0",
+      "version": "0.11.0",
+      "license": "GPL-3.0-or-later",
+      "profile": "supporting",
+      "role": "Static shell review",
+      "commands": [
+        "shellcheck fixtures/example.sh"
+      ],
+      "evidence_ids": [
+        "component-history",
+        "portable-cli-artifacts"
+      ],
+      "upstream_sources": [
+        "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "socraticode",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "version": "1.14.0",
+      "license": "AGPL-3.0-only; upstream commercial alternative",
+      "profile": "core",
+      "role": "Automatically refreshed semantic code retrieval and native code graph",
+      "commands": [
+        "mcporter --config \"${MCPORTER_CONFIG}\" call socraticode.codebase_health --args '{}' --output text --no-oauth",
+        "mcporter --config \"${MCPORTER_CONFIG}\" call socraticode.codebase_search --args \"${SEARCH_ARGS}\" --output text --no-oauth"
+      ],
+      "evidence_ids": [
+        "native-rag",
+        "desktop-direct-rag",
+        "artifact-reductions",
+        "component-history",
+        "vllm-compatibility"
+      ],
+      "upstream_sources": [
+        "https://github.com/giancarloerra/SocratiCode"
+      ],
+      "source_pin": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "toon",
+      "repository": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+      "version": "4.1.1",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Compact suitable structured data with explicit decode",
+      "commands": [
+        "toon fixtures/records.json --stats -o \"${OUTPUT_DIR}/records.toon\"",
+        "toon \"${OUTPUT_DIR}/records.toon\" --decode --strict -o \"${OUTPUT_DIR}/recovered.json\""
+      ],
+      "evidence_ids": [
+        "component-history",
+        "portable-cli-artifacts"
+      ],
+      "upstream_sources": [
+        "https://github.com/toon-format/toon/releases/tag/v4.1.1"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+    },
+    {
+      "id": "vllm",
+      "repository": "https://github.com/vllm-project/vllm",
+      "version": "0.25.0",
+      "license": "Apache-2.0",
+      "profile": "core",
+      "role": "Native GPU serving for pinned recent local embeddings",
+      "commands": [
+        "vllm serve \"${MODEL_DIRECTORY}\" --served-model-name nvidia/Nemotron-3-Embed-1B-BF16 --host 127.0.0.1 --port 8231 --max-model-len 4096 --max-num-seqs 4 --gpu-memory-utilization 0.16 --enforce-eager --no-enable-log-requests"
+      ],
+      "evidence_ids": [
+        "native-rag",
+        "vllm-compatibility",
+        "desktop-direct-rag",
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/vllm-project/vllm"
+      ],
+      "source_pin": "702f4814fe54fabff350d43cb753ae3e47c0c276",
+      "freshness": "Latest upstream0.29.0 tested but WSL GPU startup failed; supported0.25.0 retained with explicit compatibility evidence."
+    },
+    {
+      "id": "worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "version": "0.78.0",
+      "license": "MIT OR Apache-2.0",
+      "profile": "optional",
+      "role": "Native Git worktree convenience CLI",
+      "commands": [
+        "wt list"
+      ],
+      "evidence_ids": [
+        "worktrunk-list",
+        "component-history"
+      ],
+      "upstream_sources": [
+        "https://github.com/max-sixty/worktrunk"
+      ],
+      "source_pin": null,
+      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
+    }
+  ],
+  "profiles": [
+    {
+      "id": "core",
+      "purpose": "Native client/context/memory/code/doc/browser retrieval",
+      "component_ids": [
+        "agent-browser",
+        "ai-memory",
+        "claude-code",
+        "codebase-memory-mcp",
+        "codex",
+        "context-mode",
+        "huggingface-hub-native",
+        "mcporter",
+        "qdrant",
+        "qmd",
+        "rtk",
+        "serena",
+        "socraticode",
+        "vllm"
+      ]
+    },
+    {
+      "id": "supporting",
+      "purpose": "Selected CLI transformation, verification, research and usage tasks",
+      "component_ids": [
+        "toon",
+        "headroom",
+        "context-hub",
+        "ast-grep",
+        "repomix",
+        "mcp-inspector",
+        "markitdown",
+        "agentsview",
+        "difftastic",
+        "shellcheck",
+        "ccusage",
+        "openresearch",
+        "sandbox-runtime",
+        "gitleaks"
+      ]
+    },
+    {
+      "id": "optional",
+      "purpose": "Specialist integrations or references with explicit limitations",
+      "component_ids": [
+        "affaan-m/ECC",
+        "claude-hud",
+        "codex-for-claude",
+        "davila7/claude-code-templates",
+        "playwright-cli",
+        "promptfoo",
+        "shanraisshan/claude-code-best-practice",
+        "worktrunk"
+      ]
+    }
+  ],
+  "models": [
+    {
+      "id": "gpt-6-astra",
+      "route": "Native Codex account",
+      "distribution": "Hosted; no local weights or CI calls"
+    },
+    {
+      "id": "claude-opus-5[1m]",
+      "canonical_id": "claude-opus-5",
+      "route": "Native Claude account",
+      "distribution": "Hosted; no local weights or CI calls"
+    },
+    {
+      "id": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+      "release_date": "2026-07-16",
+      "license": "OpenMDW-1.1",
+      "runtime": "vllm",
+      "query_prefix": "query: ",
+      "document_prefix": "passage: ",
+      "dimensions": 2048,
+      "evidence_ids": [
+        "native-rag"
+      ]
+    }
+  ],
+  "policy": {
+    "native_accounts": "Use each client's native login; never copy authentication stores.",
+    "context": "Preserve native cache/tool discovery/compaction; retrieve only relevant context.",
+    "evidence": "Separate actual model execution, CLI execution, receipt validation and prospective commands.",
+    "sharing": "No personal host paths, raw conversations or private service keys in publication.",
+    "ci": "Standard hosted Linux runner, no model calls, stored artifacts, caches or credentials."
+  }
 }

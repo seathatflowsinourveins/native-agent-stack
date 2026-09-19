@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "id": "native-cli-gaps",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "qmd",
+    "codebase-memory-mcp",
+    "agent-browser"
+  ],
+  "claim": "Claude executed document, static graph and isolated local browser workflows; Codex attempt quota-blocked before tool use.",
+  "limitations": [
+    "Codex counterpart pending restored allowance; earlier core Codex proof remains separate.",
+    "Claude final126-word handoff exceeded requested120; runtime acceptance passed, fullinstructionadherence false."
+  ],
+  "data": {
+    "schema_version": 1,
+    "recorded_date_utc": "2026-09-19",
+    "scope": "One bounded native attempt per client for selected document/static-graph/browser workflow gaps. Historical core MCP/RTK/memory/semantic acceptance remains separate. Not a paired efficiency benchmark or full-stack certification.",
+    "provenance": {
+      "method": "Independent read-only review of native structured event streams and exact Codex persisted rollout; public fields explicitly extracted, without raw prompts, machine home paths, session UUIDs or account data.",
+      "attempts": {
+        "codex": 1,
+        "claude": 1
+      },
+      "reviewer_new_model_requests": 0
+    },
+    "codex": {
+      "version": "0.155.1",
+      "configured_model": "gpt-6-astra",
+      "actual_inference_model": null,
+      "model_scope": "Configured model from exact persisted turn context; request failed before generation.",
+      "status": "blocked_before_tools",
+      "error_code": "usage_limit_exceeded",
+      "error_summary": "Native account usage limit rejected the attempt before any tool execution.",
+      "tools_executed": 0,
+      "workflows": {
+        "qmd": "not_exercised",
+        "static_graph": "not_exercised",
+        "browser": "not_exercised"
+      },
+      "provider_usage": null,
+      "usage_note": "Native token-count info was null. Unknown is not zero; no output/model result was produced.",
+      "task_duration_ms": 2514,
+      "native_process_exit_code": 1,
+      "retry_count": 0,
+      "remaining_action": "Resume these optional native-host gap checks only after account readiness changes; do not repeat unchanged quota requests.",
+      "process_exit_provenance": "Coordinator observed native exec-handle completion; independently reviewed stream outcome agrees."
+    },
+    "claude": {
+      "version": "2.1.278",
+      "model": "claude-opus-5[1m]",
+      "canonical_model": "claude-opus-5",
+      "status": "runtime_workflows_passed",
+      "native_result_subtype": "success",
+      "native_process_exit_code": 0,
+      "permission_denials": 0,
+      "actual_tool_calls": 9,
+      "tool_call_types": {
+        "Bash": 8,
+        "Skill": 1
+      },
+      "workflows": [
+        {
+          "id": "qmd",
+          "status": "passed",
+          "upstream_command": "qmd --index agent-lab-docs search 'SocratiCode automatic local code RAG' -c agent-lab-docs -n 1 --json",
+          "native_tool_result_is_error": false,
+          "shell_exit_code": null,
+          "exit_scope": "Native Bash result succeeded; separate numeric process exit was not emitted for this command.",
+          "result": {
+            "guide": "docs/native-rag-runtime.md",
+            "title": "Native automatic code RAG and runtime layers",
+            "score": 0.86,
+            "mode": "BM25"
+          }
+        },
+        {
+          "id": "static_graph",
+          "status": "passed",
+          "upstream_commands": [
+            "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory.search_graph --args '{\"project\":\"agent-lab\",\"name_pattern\":\"^collect$\",\"file_pattern\":\"tools/ecosystem/linux-usage-report.cjs\",\"format\":\"json\",\"limit\":1}' --output json --no-oauth",
+            "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory.trace_path --args '{\"project\":\"agent-lab\",\"function_name\":\"agent-lab.tools.ecosystem.linux-usage-report.collect\",\"direction\":\"outbound\",\"depth\":1,\"format\":\"json\",\"limit\":5}' --output json --no-oauth"
+          ],
+          "native_tool_results_is_error": [
+            false,
+            false
+          ],
+          "shell_exit_codes": [
+            null,
+            null
+          ],
+          "result": {
+            "function": "collect",
+            "source_file": "tools/ecosystem/linux-usage-report.cjs",
+            "source_lines": [
+              91,
+              127
+            ],
+            "lookup_matches": 1,
+            "lookup_truncated": false,
+            "trace_depth": 1,
+            "direct_callees": [
+              "installation",
+              "sourcesFor",
+              "runParser",
+              "overlaps"
+            ],
+            "callees_total": 4
+          },
+          "scope": "Codebase-memory static graph via native upstream MCPorter. Static edges do not prove runtime execution. Existing selected source index was used; this was not a fresh public-repo index."
+        },
+        {
+          "id": "browser",
+          "status": "passed",
+          "skill_invoked": "agent-browser",
+          "core_guide_loaded": true,
+          "upstream_commands": [
+            "agent-browser --config \"${PUBLIC_ROOT}/examples/agent-browser.json\" --namespace \"${BROWSER_NAMESPACE}\" --session \"${BROWSER_SESSION}\" open \"file://${PUBLIC_ROOT}/fixtures/greeting.html\"",
+            "agent-browser --config \"${PUBLIC_ROOT}/examples/agent-browser.json\" --namespace \"${BROWSER_NAMESPACE}\" --session \"${BROWSER_SESSION}\" snapshot -i",
+            "agent-browser --config \"${PUBLIC_ROOT}/examples/agent-browser.json\" --namespace \"${BROWSER_NAMESPACE}\" --session \"${BROWSER_SESSION}\" fill @e2 \"Publication Claude\"",
+            "agent-browser --config \"${PUBLIC_ROOT}/examples/agent-browser.json\" --namespace \"${BROWSER_NAMESPACE}\" --session \"${BROWSER_SESSION}\" click @e3",
+            "agent-browser --config \"${PUBLIC_ROOT}/examples/agent-browser.json\" --namespace \"${BROWSER_NAMESPACE}\" --session \"${BROWSER_SESSION}\" get text '#status'",
+            "agent-browser --config \"${PUBLIC_ROOT}/examples/agent-browser.json\" --namespace \"${BROWSER_NAMESPACE}\" --session \"${BROWSER_SESSION}\" close"
+          ],
+          "fixture": "fixtures/greeting.html",
+          "snapshot": {
+            "input_reference": "@e2",
+            "input_name": "Name",
+            "button_reference": "@e3",
+            "button_name": "Greet"
+          },
+          "expected_text": "Hello, Publication Claude!",
+          "actual_text": "Hello, Publication Claude!",
+          "recorded_exit_codes": {
+            "open": 0,
+            "snapshot": 0,
+            "fill": 0,
+            "click": 0,
+            "get_text": 0,
+            "close": 0
+          },
+          "session_closed": true,
+          "scope": "Owned local HTML file in a unique temporary namespace/session. References are from the actual snapshot; future runs must use their returned references."
+        }
+      ],
+      "provider_usage": {
+        "input_tokens": 16,
+        "cache_creation_input_tokens": 28493,
+        "cache_read_input_tokens": 282294,
+        "output_tokens": 2123,
+        "output_tokens_details": {
+          "thinking_tokens": 220
+        }
+      },
+      "usage_semantics": "Ordinary input, cache creation and cache read are separate counters. Thinking220 is included in output2123. No subscription billing, comparative savings or API-price inference.",
+      "turns": 11,
+      "duration_ms": 21133,
+      "duration_api_ms": 11831,
+      "retry_count": 0,
+      "successful_hook_responses": {
+        "count": 51,
+        "events": {
+          "SessionStart": 4,
+          "UserPromptSubmit": 1,
+          "PreToolUse": 25,
+          "PostToolUse": 18,
+          "Stop": 3
+        },
+        "all_exit_zero": true,
+        "scope": "Native emitted hook-response events; counts alone do not assign each event to a specific plugin."
+      },
+      "handoff": {
+        "evidence_accurate": true,
+        "word_limit_requested": 120,
+        "whitespace_word_count": 126,
+        "word_limit_met": false
+      },
+      "full_instruction_adherence": false,
+      "minor_deviations": [
+        "Final handoff was126 whitespace-separated words, exceeding the requested120-word bound; runtime outcomes remain accepted."
+      ],
+      "process_exit_provenance": "Coordinator observed native exec-handle completion; independently reviewed stream outcome agrees."
+    },
+    "public_replay_prerequisites": [
+      "Configured selected QMD and codebase-memory indexes plus pinned installed native CLIs. The public repository alone does not contain those private local indexes.",
+      "Set PUBLIC_ROOT,MCPORTER_CONFIG,BROWSER_NAMESPACE,BROWSER_SESSION to owned paths/names; use the included harmless HTML/config files.",
+      "Do not reuse private account stores or claim a CLI bridge equals direct current Desktop catalog activation."
+    ],
+    "conclusion": "Claude document, static-graph and browser native-host gaps are closed. The attempted additional Codex lanes remain quota-blocked and unverified in this attempt; earlier successful core Codex evidence is unchanged."
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "worktrunk-list",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "worktrunk"
+  ],
+  "claim": "Native wt list enumerated the actual publication worktree set.",
+  "limitations": [
+    "Model-free repository inventory, not multi-agent correctness."
+  ],
+  "data": {
+    "command": "wt list --format json",
+    "exit_code": 0,
+    "worktree_count": 3,
+    "expected_branches": [
+      "main",
+      "codex/publication-validation",
+      "codex/publication-recipes"
+    ],
+    "private_paths_omitted": true
+  }
+}

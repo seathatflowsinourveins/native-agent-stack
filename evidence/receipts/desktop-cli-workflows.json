@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "id": "desktop-cli-workflows",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "codex",
+    "qmd",
+    "codebase-memory-mcp",
+    "agent-browser"
+  ],
+  "claim": "The active Codex Desktop task used native QMD search/get, static graph search/trace and isolated browser interaction successfully.",
+  "limitations": [
+    "Desktop execution is distinct from the separate quota-blocked native Codex CLI follow-up.",
+    "No isolated provider usage or savings is attributed to these individual calls."
+  ],
+  "data": {
+    "host": "Codex Desktop active task",
+    "qmd": {
+      "search_exit": 0,
+      "get_exit": 0,
+      "returned_document": "native-rag-runtime.md",
+      "score": 0.86,
+      "retrieved_scope": "Local automatic code RAG; explicit scoped projects and separate Markdown lane"
+    },
+    "static_graph": {
+      "search_exit": 0,
+      "trace_exit": 0,
+      "function": "collect",
+      "file": "tools/ecosystem/linux-usage-report.cjs",
+      "lines": [
+        91,
+        127
+      ],
+      "callees": [
+        "installation",
+        "sourcesFor",
+        "runParser",
+        "overlaps"
+      ],
+      "runtime_execution_trace": false
+    },
+    "browser": {
+      "fixture": "fixtures/greeting.html",
+      "snapshot_refs": {
+        "input": "@e2",
+        "button": "@e3"
+      },
+      "operations": [
+        "open",
+        "snapshot -i",
+        "fill",
+        "click",
+        "get text #status",
+        "screenshot",
+        "close"
+      ],
+      "all_exit_codes": 0,
+      "observed_status": "Hello, Publication Codex Desktop!",
+      "screenshot_visually_inspected": true,
+      "closed_owned_session": true
+    }
+  },
+  "provenance": [
+    {
+      "name": "desktop-qmd-search.json",
+      "sha256": "ff115002dbb5dc16bad17bdb73fc956a7c79a42182b0c3896d1048bbbea57455",
+      "disclosure": "Selected factual result exported; private process paths omitted."
+    },
+    {
+      "name": "desktop-qmd-get.txt",
+      "sha256": "2b20afa0b639dd43bf9d93af7d49e82c5eb1aed82e8545a9dd5a74943f56dac3",
+      "disclosure": "Selected factual result exported; private process paths omitted."
+    },
+    {
+      "name": "desktop-graph-search.json",
+      "sha256": "d1742e725e1d72e248cbee88f44bb7cb870a1d5b0623c69b44481996411d4dc6",
+      "disclosure": "Selected factual result exported; private process paths omitted."
+    },
+    {
+      "name": "desktop-graph-trace.json",
+      "sha256": "f79ec5d9f95b65dbed2a9bed9f8332ff0ef21a26e9bffa37d43793742d1a5915",
+      "disclosure": "Selected factual result exported; private process paths omitted."
+    },
+    {
+      "name": "desktop-browser-actions.json",
+      "sha256": "1dd77a01ef729776066862e9e6a09e21efab84832bb14af1775d8d22bb878443",
+      "disclosure": "Selected factual result exported; private process paths omitted."
+    }
+  ]
+}

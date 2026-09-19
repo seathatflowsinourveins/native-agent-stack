@@ -1,0 +1,150 @@
+'use strict';
+// Offline ccusage adapter. Scope only parser children; never change agent homes.
+const fs = require('node:fs');
+const path = require('node:path');
+const os = require('node:os');
+const crypto = require('node:crypto');
+const {spawnSync} = require('node:child_process');
+const bundle = path.resolve(__dirname, '..');
+const fields = ['inputTokens','cacheReadTokens','cacheCreationTokens','outputTokens','reasoningOutputTokens','totalTokens'];
+function counters(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Missing upstream totals.');
+  const row = Object.fromEntries(fields.map(field => {
+    const n = value[field];
+    if (n === undefined || n === null) return [field, null];
+    if (!Number.isSafeInteger(n) || n < 0) throw new Error('Invalid upstream counter.');
+    return [field, n];
+  }));
+  if (Object.values(row).every(n => n === null)) throw new Error('Unavailable counters.');
+  return row;
+}
+function installation(bundleRoot = bundle) {
+  if (process.platform !== 'linux') throw new Error('Run in the native Linux environment.');
+  const record = JSON.parse(fs.readFileSync(path.join(bundleRoot,'state/linux-efficiency-installation.json'),'utf8'));
+  if (record.platform !== 'Linux') throw new Error('Expected the Linux installation manifest.');
+  return record;
+}
+function nativeEnvironment(original = process.env) {
+  // Desktop intentionally uses a shared Windows home. Only these explicitly
+  // Linux-native child processes select the separate Linux accounts and logs.
+  const env = {...original, CODEX_HOME:path.join(os.homedir(), '.codex')};
+  // Claude's unset default also uses ~/.claude.json; setting the equivalent
+  // directory explicitly changes where that account/project file is resolved.
+  delete env.CLAUDE_CONFIG_DIR;
+  return env;
+}
+function directoryExists(p) {
+  try { return fs.statSync(p).isDirectory(); } catch { return false; }
+}
+function sourcesFor(scope, options = {}) {
+  if (!['native','desktop','all'].includes(scope)) throw new Error('Scope must be native, desktop, or all.');
+  const home = options.nativeHome || os.homedir();
+  const sources = [];
+  if (scope !== 'desktop') sources.push({id:'native-codex',agent:'codex',roots:[path.join(home,'.codex')]});
+  if (scope !== 'native') sources.push({id:'desktop-codex',agent:'codex',roots:[options.desktopHome || '/mnt/c/Users/example/.codex']});
+  if (scope !== 'desktop') sources.push({id:'native-claude',agent:'claude',roots:[path.join(options.xdgConfigHome || process.env.XDG_CONFIG_HOME || path.join(home,'.config'),'claude'),path.join(home,'.claude')]});
+  for (const source of sources) {
+    // ccusage uses commas as separators. Reject an ambiguous path rather than
+    // silently broadening a requested scope. Canonicalize aliases before parsing.
+    source.roots = [...new Set(source.roots.map(root => {
+      if (!path.isAbsolute(root) || root.includes(',')) throw new Error('Usage roots must be absolute paths without commas.');
+      return directoryExists(root) ? fs.realpathSync(root) : root;
+    }))];
+    source.usage_directories = source.roots.flatMap(root => {
+      if (source.agent === 'claude') return [path.join(root,'projects')].filter(directoryExists);
+      const dirs = ['sessions','archived_sessions'].map(name => path.join(root,name)).filter(directoryExists);
+      return dirs.length ? dirs : [root].filter(directoryExists);
+    });
+  }
+  return sources;
+}
+function runParser(installed, source, view, run = spawnSync) {
+  const parser = installed.npm.find(item => item.name === 'ccusage');
+  if (!parser || parser.version !== '20.0.23') throw new Error('Validate scope and deduplication behavior before using a different ccusage version.');
+  const started_at = new Date().toISOString();
+  const variable = source.agent === 'codex' ? 'CODEX_HOME' : 'CLAUDE_CONFIG_DIR';
+  const args = [path.join(parser.prefix,parser.entry),source.agent,view,'--offline','--no-cost','--json','--timezone','UTC','--config','/dev/null'];
+  const result = run(installed.node,args,{shell:false,encoding:'utf8',timeout:20000,maxBuffer:16*1024*1024,env:{...nativeEnvironment(),[variable]:source.roots.join(','),NO_COLOR:'1'}});
+  const timing = {started_at,finished_at:new Date().toISOString()};
+  if (result.error || result.status !== 0) return {...timing,available:false,exit_code:result.status ?? null,error:'The upstream local parser did not complete; this scope may have no readable sessions.'};
+  try {
+    const data = JSON.parse(result.stdout);
+    const rows = data[view === 'session' ? 'sessions' : 'daily'];
+    if (!Array.isArray(rows)) throw new Error('Missing upstream rows.');
+    return {...timing,available:true,totals:counters(data.totals),[view === 'session' ? 'sessions' : 'daily']:rows.map(row => {
+      const identity = view === 'session' ? row.sessionId : row.date;
+      if (typeof identity !== 'string' || !identity) throw new Error('Missing upstream row identity.');
+      return view === 'session' ? {sessionId:identity,lastActivity:row.lastActivity ?? null,models:Object.keys(row.models || {}).concat(row.modelsUsed || []),...counters(row)} : {date:identity,...counters(row)};
+    })};
+  } catch { return {...timing,available:false,error:'Upstream counters are unavailable or invalid.'}; }
+}
+function overlaps(coverage) {
+  const rows = [];
+  for (let i=0;i<coverage.length;i++) for (let j=i+1;j<coverage.length;j++) {
+    const a=coverage[i],b=coverage[j];
+    if (a.agent !== b.agent) continue;
+    const ids = new Set((a.sessions || []).map(row => row.sessionId));
+    rows.push({sources:[a.id,b.id],same_session_ids:a.available && b.available ? b.sessions.filter(row => ids.has(row.sessionId)).map(row => row.sessionId) : null});
+  }
+  return rows;
+}
+function collect(options = {}) {
+  const started_at = new Date().toISOString();
+  const scope = options.scope || 'native';
+  const bundleRoot = options.bundleRoot || bundle;
+  const installed = options.installed || installation(bundleRoot);
+  const sources = sourcesFor(scope,options);
+  const coverage = sources.map(source => {
+    const {totals,...result} = source.usage_directories.length ? runParser(installed,source,'session',options.run) : {available:false,error:'No usage directory exists for this source.'};
+    return {...source,...result,...(totals ? {session_view_totals:totals} : {})};
+  });
+  const reports = [...new Set(sources.map(source => source.agent))].map(agent => {
+    const roots = [...new Set(sources.filter(source => source.agent === agent).flatMap(source => source.roots))];
+    // Pass all roots in one upstream invocation. Summing separate reports loses
+    // upstream request/event deduplication (including renamed/copied rollouts).
+    return {agent,roots,...runParser(installed,{agent,roots},'daily',options.run)};
+  });
+  const report = {
+    schema_version:2,started_at,checked_at:new Date().toISOString(),platform:'Linux',scope,
+    source:'ccusage 20.0.23; offline, no cost, UTC; explicit empty configuration prevents user filters',
+    complete:reports.every(row => row.available) && coverage.every(row => row.available),
+    source_roots:Object.fromEntries([...new Set(sources.map(row => row.agent))].map(agent => [agent,[...new Set(sources.filter(row => row.agent === agent).flatMap(row => row.roots))]])),
+    snapshot_notes:'Cumulative local-log snapshot, not a receipt or atomic cutoff. Sources and daily/session views are read at separate recorded times; active tasks continue appending. Replace earlier snapshots; never sum them or combine with a request ledger. Missing, deleted, unflushed, malformed, or unlogged requests are not recovered.',
+    automatic_capture_scope:'Native launchers refresh native scope on normal return; forced termination may skip it. Desktop/all scope requires an explicit refresh. Worker and reviewer rollouts are included when persisted in the selected homes.',
+    coverage_notes:'Session rows and session_view_totals diagnose discovery only. The upstream Codex session view deduplicates within each relative session path; renamed copied events can appear in multiple sessions. Use reports[].totals from the combined daily view for aggregate usage.',
+    deduplication:{method:'Upstream union of roots per agent. Codex prefers active files over same-relative-path archives, handles replayed parent prefixes, then deduplicates timestamp/model/token-counter tuples across files. Claude uses message/request IDs (or message/session IDs when request ID is absent), plus sidechain replay rules.',overlap:overlaps(coverage),limitations:'Session IDs identify overlap but are not a complete duplicate-request inventory. Codex IDs are relative rollout paths; renamed copies can differ. Separate coverage totals are diagnostic and must not be added. Upstream tuple matching may collapse indistinguishable independent Codex events.'},
+    gateway_coverage:'Optional Claude gateway runs are included only if their client logs persist in selected Claude project roots. Usage counters do not establish route or upstream provider identity; no extra gateway total is added.',
+    billed_cost_usd:null,api_equivalent_cost_usd:null,model_duration_seconds:null,retries:null,acceptance:null,
+    counter_notes:'These are upstream-normalized local provider counters, not RTK estimates, verified bills, or measured savings. Codex inputTokens excludes cacheReadTokens; reasoningOutputTokens is part of outputTokens and is never added again. Missing fields remain null; upstream zeros can be parser defaults. Cache writes are not cache hits.',
+    coverage,reports,
+  };
+  const destination=options.output || path.join(bundleRoot,'state',scope === 'native' ? 'linux-native-usage-latest.json' : `linux-${scope}-usage-latest.json`);
+  fs.mkdirSync(path.dirname(destination),{recursive:true});
+  const temporary=destination+'.'+crypto.randomUUID()+'.tmp';
+  fs.writeFileSync(temporary,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
+  try {fs.renameSync(temporary,destination);} catch(error) {fs.unlinkSync(temporary);throw error;}
+  return report;
+}
+if (require.main === module) {
+  try {
+    const options = {};
+    const args=process.argv.slice(2);
+    for(let i=0;i<args.length;i++) {
+      const key={'--scope':'scope','--desktop-home':'desktopHome','--bundle':'bundleRoot','--output':'output'}[args[i]];
+      if(key) {if(!args[i+1] || args[i+1].startsWith('--')) throw new Error(args[i]+' requires a value.');options[key]=args[++i];}
+      else if(!['--check','--json','--help'].includes(args[i])) throw new Error('Unknown option: '+args[i]);
+    }
+    if(args.includes('--help')) {
+      console.log('Usage: ecosystem-usage [--scope native|desktop|all] [--desktop-home /absolute/home] [--output /path/report.json] [--json] [--check]\nDefault scope is native. --bundle /path/ecosystem resolves the installation manifest when running this source copy. No model calls or cost estimates.');
+    } else if (args.includes('--check')) {
+      sourcesFor(options.scope || 'native',options);
+      const installed=installation(options.bundleRoot); const parser=installed.npm.find(x=>x.name==='ccusage');
+      if (!fs.statSync(path.join(parser.prefix,parser.entry)).isFile()) throw new Error('Missing usage parser.');
+      console.log('Linux usage parser is available; no model call or log collection performed.');
+    } else {
+      const r=collect(options); console.log(args.includes('--json') ? JSON.stringify(r,null,2) : 'Updated '+r.scope+' usage snapshot. Available parsers: '+r.reports.filter(x=>x.available).map(x=>x.agent).join(', '));
+      if(!r.complete) process.exitCode=1;
+    }
+  } catch(error) {console.error(error.message);process.exitCode=1;}
+}
+module.exports={collect,counters,installation,nativeEnvironment,sourcesFor,runParser,overlaps};

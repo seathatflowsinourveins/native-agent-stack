@@ -1,0 +1,42 @@
+Search results for "collect agent usage totals separately for native Linux and Desktop configuration homes" (1 matches):
+
+--- tools/ecosystem/linux-usage-report.cjs (lines 2-39) [javascript] score: 0.6429 ---
+// Offline ccusage adapter. Scope only parser children; never change agent homes.
+const fs = require('node:fs');
+const path = require('node:path');
+const os = require('node:os');
+const crypto = require('node:crypto');
+const {spawnSync} = require('node:child_process');
+const bundle = path.resolve(__dirname, '..');
+const fields = ['inputTokens','cacheReadTokens','cacheCreationTokens','outputTokens','reasoningOutputTokens','totalTokens'];
+function counters(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Missing upstream totals.');
+  const row = Object.fromEntries(fields.map(field => {
+    const n = value[field];
+    if (n === undefined || n === null) return [field, null];
+    if (!Number.isSafeInteger(n) || n < 0) throw new Error('Invalid upstream counter.');
+    return [field, n];
+  }));
+  if (Object.values(row).every(n => n === null)) throw new Error('Unavailable counters.');
+  return row;
+}
+function installation(bundleRoot = bundle) {
+  if (process.platform !== 'linux') throw new Error('Run in the native Linux environment.');
+  const record = JSON.parse(fs.readFileSync(path.join(bundleRoot,'state/linux-efficiency-installation.json'),'utf8'));
+  if (record.platform !== 'Linux') throw new Error('Expected the Linux installation manifest.');
+  return record;
+}
+function nativeEnvironment(original = process.env) {
+  // Desktop intentionally uses a shared Windows home. Only these explicitly
+  // Linux-native child processes select the separate Linux accounts and logs.
+  const env = {...original, CODEX_HOME:path.join(os.homedir(), '.codex')};
+  // Claude's unset default also uses ~/.claude.json; setting the equivalent
+  // directory explicitly changes where that account/project file is resolved.
+  delete env.CLAUDE_CONFIG_DIR;
+  return env;
+}
+function directoryExists(p) {
+  try { return fs.statSync(p).isDirectory(); } catch { return false; }
+}
+function sourcesFor(scope, options = {}) {
+
