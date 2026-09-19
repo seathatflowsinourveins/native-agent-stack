@@ -5,9 +5,9 @@ A current, evidence-backed reference for native **Codex + Claude Code**, with sc
 **Snapshot: September 19, 2026.** This repository records a tested selection and its limits. It is not a claim that every available framework is installed or that an independent universal SOTA benchmark has been won.
 
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
-**144 unique repositories in 149 layer decision cards**, **20 model entries**,
+**146 unique repositories in 151 layer decision cards**, **20 model entries**,
 and an auditable **337-star coverage ledger**. Its combined index includes
-**451 repository identities** across all 337 public stars and 114 beyond them,
+**453 repository identities** across all 337 public stars and 116 beyond them,
 with explicit review depth and adoption decisions.
 Start with the [north-star architecture](blueprints/us-equities/north-star.md)
 and [native commands with direct results](catalogs/us-equities/native-workflows.md).
@@ -42,10 +42,14 @@ telemetry to retained metrics/logs, dashboards and local notifications.
 | Native browser/document/static-graph integration | Claude and this Codex Desktop task passed; the separate native Codex CLI follow-up was account-limit blocked |
 | Source-history scan and command isolation | Recorded 22-commit source scan: zero secret findings; permitted/protected filesystem behavior exercised |
 | Native Codex/Claude → local observability | Real native tasks exported logs/metrics; seven scrape targets up, six backend persistence checks, one firing and one resolved local notification |
+| Host resource visibility | Eight native metric families and 23 series for CPU, memory, load and the WSL root filesystem; not the Windows physical backing disk |
+| Fresh native Astra SDK telemetry | One completed Context Mode call; 40,369 input (26,240 cached subset), 149 output; all six native histogram categories reconciled and the atomic receipt reached Loki |
 | Selected observability artifact | 188,769 → 500 tokens with `gpt-tokenizer 3.4.0` / `o200k_base`; task-specific selection, not provider savings |
 | Native catalog retrieval | 6,398 → 490 tokens for the selected TimesFM evidence: 5,908 fewer, 92.34% less retrieved text; not provider savings |
 | Native Astra SDK / LEAN / deterministic data path | Actual worker inference; 3,943 backtest points and 3 simulated orders; JSON→Parquet→SQL accepted, with explicit remaining trading gaps |
 | Exact original retrieved-text comparison | 2,731 → 491 tokens: 2,240 fewer, 82.02% smaller; **not overall provider savings** |
+
+The [current-session follow-up](observability/session-e2e.md) distinguishes fresh native children from the existing Desktop parent: direct memory/RAG and the Context Mode CLI bridge work, while direct Context Mode tool discovery and correlated exporter records remain unproved for that already-running parent. The retained bridge statistics report zero estimated savings; artifact selection measurements are separate.
 
 The public source fixture removes personal path literals and independently recounts to **2,730 → 491 tokens**. Historical original numbers are retained separately, avoiding a false byte-for-byte reproduction claim.
 
@@ -77,6 +81,6 @@ The actual provider/GPU runs are opt-in native workflows requiring your own acco
 - A smaller selected artifact, local embedding tokens, cache reuse and provider usage are different measurements. No paired whole-provider savings claim is established.
 - Memory pages are untrusted historical evidence. Keep project scope, bounded capture and canonical instructions authoritative.
 - A working CLI bridge does not prove an already-running Desktop task hot-reloaded its tool catalog. Future native launches have exporter configuration; this already-running Desktop process was not restarted or hot-reloaded and needs its own fresh exporter proof.
-- The observability profile retains local metrics/logs and local notifications. It does not add a trace database, external alert destination, paid cloud host or connected broker. The SDK native histogram remained unobserved; its separate metadata-receipt path and exact validation limits are documented.
+- The observability profile retains local metrics/logs and local notifications. It does not add a trace database, external alert destination, paid cloud host or connected broker. A [fresh SDK follow-up](observability/session-e2e.md) resolved the earlier missing native histogram; its receipt and metrics represent the same usage and must not be added together. Explicit loopback OTLP settings are not a claim that all native client telemetry is local.
 
 See the [evidence manifest](manifests/evidence.json), [complete component manifest](manifests/stack.json), and [native replay guide](docs/evidence.md). Original project glue and publication files use the MIT license; upstream products, dependencies, models and any attributed material retain their own licenses. See [licensing](licenses/README.md).

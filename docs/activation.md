@@ -8,6 +8,7 @@ Configuration on disk and tools callable by a running client are separate facts.
 | Active Codex Desktop task | Direct ai-memory retrieval and SocratiCode search worked; native QMD, graph and browser workflows also completed | Check the new task's actual tool catalog; do not infer direct availability from a successful CLI bridge |
 | Context Mode in this Desktop task | Installed skill plus successful upstream MCPorter bridge; no direct Context Mode tools exposed in this task | A newly started task may load registered tools; verify discovery before claiming direct activation |
 | Automatic code RAG | The explicitly selected project's watcher persisted add/change/delete changes in Qdrant | Keep the native MCP watcher and local embedding/vector services running; adopt another project explicitly |
+| Host capacity | Native Collector exported eight metric families and 23 series for CPU, memory, load and root-filesystem usage | Keep the selected receiver and metrics pipeline active; this observes the WSL environment, not the Windows physical backing disk |
 | Document retrieval | An explicit QMD collection provided BM25 search and source retrieval | Refresh the chosen collection when documents change; this is separate from the code watcher |
 | Shared memory | Project scope, native capture hooks and cross-client retrieval exercised | Use the matching project scope and installed routing skills; do not treat another project's state as global |
 | Windows and Linux configuration | Separate native configuration roots | Configure each host deliberately; a Linux registration does not prove a Windows client loaded it |
@@ -20,12 +21,37 @@ See the [evidence boundaries](evidence.md) and individual receipts for the exact
 
 ## Native observation profile
 
-The [local observation guide](../observability/README.md) records six enabled native
-user services and real Codex/Claude child-process telemetry from this Desktop task.
-User-level native configurations are saved; the existing Desktop process was not
-restarted or hot-reloaded. Fresh native launchers and SDK/ACP examples assign unique
-process identities. Future native SDK launches can publish atomic bounded result
-metadata through `ECOSYSTEM_SDK_OBSERVATION_DIR`; missing usage remains unknown.
-The SDK native histogram was not observed, so its separately labeled file-receiver
-receipt panel is used for reported usage. Other hosts/client homes need explicit
-configuration and observed acceptance. No global MCP hot-reload claim is made.
+The [local observation guide](../observability/README.md) records native user
+services and real Codex/Claude child-process telemetry launched from Desktop.
+The [current-session follow-up](../observability/session-e2e.md) resolves the
+prior SDK histogram gap: one fresh Astra task completed in **12,493 ms**, and all
+six native Prometheus token categories matched its final native usage. The
+current atomic receipt writer also produced an observation that reached Loki.
+[Exact follow-up receipt](../observability/followup-receipt.json).
+
+The native AppServer analytics gate needed `analytics.enabled=true`. The
+follow-up added this once to each selected native-user/Desktop configuration
+only where the setting was unset, retaining explicit false values and the
+already configured loopback OTLP endpoints. It added no helper-specific metric
+flag or exporter override. This enables the accepted native pipeline for fresh
+processes; it does **not** establish that all first-party telemetry stays local.
+
+Fresh native launchers and SDK/ACP examples assign unique process identities.
+SDK runs can additionally publish atomic bounded result metadata through
+`ECOSYSTEM_SDK_OBSERVATION_DIR`; unavailable usage stays unknown. Native usage,
+OTLP histograms and file observations are alternative views of the same turn,
+not amounts to add. Two earlier SDK observations were imported summaries; the
+new third observation was automatically written by the current helper.
+
+The already-running Desktop parent was not restarted or hot-reloaded. The
+follow-up found **zero correlated exporter records for that parent** and **zero
+direct Context Mode tools** in its live catalog. Those are evidence gaps, not
+zero usage. Its Context Mode bridge works; direct memory and code-RAG retrieval
+were verified, with the code watcher active. A future Desktop process needs its
+own discovery/export check. Other hosts and client homes need explicit adoption;
+there is no global MCP hot-reload claim.
+
+A saved Context Mode snapshot covered **9h55m of the retained bridge connection**:
+**50 calls, 208 KB entered context and zero estimated tokens saved**. It is not
+usage for the whole Desktop task, every client or the provider account. The
+separate 188,769 → 500-token artifact selection does not change that counter.

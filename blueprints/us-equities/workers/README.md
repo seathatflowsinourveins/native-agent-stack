@@ -77,8 +77,8 @@ but the file call then required approval as a new MCP registration and the
 worker's `deny_all` policy correctly blocked it. **The override is not a completed
 file-tool acceptance.** It needs normal native MCP approval before use. No trust
 rule, path containment or approval requirement was bypassed, and no further
-model trial was launched. Default trusted `ctx_execute` remains the demonstrated
-working path; do not treat it as permission to read an unrequested file.
+file-tool acceptance trial was launched at that checkpoint. Default trusted
+`ctx_execute` remains the demonstrated working path; do not treat it as permission to read an unrequested file.
 
 | Native SDK aggregate counter | Observed tokens |
 | --- | ---: |
@@ -111,14 +111,33 @@ separate catalog-research agents; they are not a whole-task cost measurement.
 
 ## Local observation and native usage
 
-The later [observability acceptance](../../../observability/README.md) ran two
-additional native SDK tasks. They completed with **40,187 and 40,583 total
-input-plus-output tokens**, or **80,770 combined**. These are separate from the
-three earlier research/file-scope turns above. Their native receipts and
-correlated logs remain the evidence anchors: the SDK's native turn histogram
-was **not observed**, including after a bounded flush attempt. Missing telemetry
-is not zero usage, and a completed task does not establish delivery of every
-metric family. [Exact monitoring receipt](../../../observability/receipt.json).
+The earlier [observability acceptance](../../../observability/README.md) ran two
+additional native SDK tasks with **40,187 and 40,583 total input-plus-output
+tokens**, or **80,770 combined**. Their native turn histogram was not observed,
+including after a bounded flush attempt. That historical checkpoint remains in
+[the original monitoring receipt](../../../observability/receipt.json); missing
+telemetry did not mean zero usage.
+
+A [fresh follow-up](../../../observability/session-e2e.md) through the current
+helper completed in **12,493 ms** with `gpt-6-astra` / `openai`. Its one
+`context-mode.ctx_execute` call completed, and the handoff returned the requested
+JSON values `sum: 42` and `service_count: 4`. Native usage was **40,369 input,
+including 26,240 cached input, plus 149 output = 40,518 total tokens**. All six
+native Prometheus token categories matched that turn, and its automatically
+written atomic observation reached Loki as the third unique SDK observation.
+[Exact evidence](../../../observability/followup-receipt.json).
+
+The correction was native configuration: add `analytics.enabled=true` once to
+each selected native-user/Desktop home only when unset, preserve explicit false
+values, and retain the explicit loopback OTLP endpoints. No helper-specific
+metric flag or exporter override was introduced. This resolves the fresh SDK
+histogram gap; it is not proof that all native first-party telemetry is local.
+
+The three observability tasks total **121,288 tokens = 80,770 prior + 40,518
+fresh**. They are separate from the three earlier research/file-scope turns
+above. Native receipts, native histograms and ingested observation summaries
+represent the same task usage: do not sum those views or call this a whole-task
+or subscription-billing total.
 
 The helper now assigns a fresh opaque telemetry instance identity for each
 readiness/execution process, preserving the inherited native exporter settings.
@@ -140,13 +159,12 @@ identity or native thread identifier. Unavailable usage remains JSON `null`.
 Its identifier is a local ingestion/deduplication key, not a public session ID.
 The detailed `--receipt` remains private and is a different artifact.
 
-The helper change has offline validation. The monitoring acceptance imported
-bounded summaries from the already-completed SDK receipts to exercise the
-separate file-ingestion route; **it did not run new inference through the changed
-helper**. Consult the monitoring receipt for that route's final delivery status.
-Do not add imported observations, OTLP counters and native receipts together as
-independent usage. The file route does not repair or prove the missing native
-histogram, and there is no automatic model retry to obtain a metric.
+The helper change has offline validation and now also the fresh inference proof
+above. The first two monitoring observations were imported bounded summaries
+of already-completed SDK receipts; the third was written by the current helper
+and ingested automatically. Historical missing-histogram evidence remains
+unchanged. File ingestion is an additional observation route, not a second
+usage charge or a substitute for reconciling the fresh native histogram.
 
 These exporter/identity settings apply to fresh native children. They do not
 hot-reload the current Desktop process, instrument every third-party SDK, or

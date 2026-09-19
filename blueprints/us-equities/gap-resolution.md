@@ -17,7 +17,8 @@ paper execution.
 | Native client telemetry | Codex: 40,745 input including 14,080 cached; 95 output. Claude: 4 ordinary input, 24,283 cache creation, 43,726 cache read, 519 output | [Local monitoring and reconciliation](../../observability/README.md), [receipt](../../observability/receipt.json) |
 | Local observation services | Collector 0.161.0 → Prometheus 3.14.0 / Loki 3.7.8 → Grafana 13.2.2; seven scrape targets up and six backend persistence checks passed | [Native backend commands and evidence](../../observability/backends/README.md) |
 | Local alert delivery | Alertmanager 0.34.1 → ntfy 2.28.0: one firing and one resolved notification from an owned failure fixture | [Notification scope and receipt](../../observability/receipt.json); no external destination |
-| SDK observation | Two actual native SDK tasks completed, totaling 40,187 + 40,583 = 80,770 input-plus-output tokens; native histogram remained unobserved, including a bounded flush attempt | [Worker observation boundary](workers/README.md#local-observation-and-native-usage) |
+| Host capacity | Eight native metric families and 23 series expose CPU, memory, load and the WSL root filesystem; no Windows physical-disk coverage claimed | [Current-session evidence](../../observability/session-e2e.md) |
+| SDK observation | Fresh Astra task completed in 12.493 seconds with 40,369 input (26,240 cached subset) + 149 output = 40,518 tokens; all six native histogram categories matched and its atomic observation reached Loki | [Follow-up receipt](../../observability/followup-receipt.json), [worker history and reconciliation](workers/README.md#local-observation-and-native-usage) |
 | Optional OmniRoute Astra | HTTP 200, response.completed, exact Astra route; completed request reported 81 input +55 output =136 tokens; earlier failed-attempt usage remains unknown | [Native SDK command and all attempts](routing/astra-receipt.json) |
 
 The recorded upstream operations include `dagu start/history/stop`, `dotnet
@@ -36,8 +37,7 @@ later proofs do not retroactively turn discovery checks into inference.
 | ACP permission fidelity | ACP 1.12.0 calls its preset `read-only`, but native events show `workspaceWrite` with on-request approvals | Use the existing native SDK's strict read-only setting when that enforcement is required; do not infer safety from the ACP label |
 | Full research application hosting | The DeerFlow proof invokes its embedded native tool; it does not run a durable planner, browser UI or scheduler | Select persistent storage, auth, sandbox/tool scope and operational requirements only when the full application is needed |
 | Context Mode file-tool scope | Trusted native Context Mode calls work; one ephemeral SDK file-tool transport override still requires normal MCP approval | Use the accepted scoped native lane; reload/approve a new client registration through its normal flow |
-| SDK native metric delivery | Completed task receipts and correlated logs exist, but the native SDK turn histogram was not observed | Use the separately scoped metadata-only receipt ingestion described in the monitoring receipt; the later helper change has offline checks, not a fresh inference run |
-| Existing Desktop exporter activation | The accepted native tasks were fresh child processes; the already-running Desktop process was not restarted or hot-reloaded | Observe export from an intended fresh Desktop process/session before claiming that host is covered |
+| Existing Desktop exporter activation | Fresh native children exported successfully; the unchanged Desktop parent still has zero correlated exporter records and zero direct Context Mode tools, although its bridge and direct memory/RAG work | Observe export and tool discovery from the intended fresh Desktop process/session; absence of records is not zero usage |
 | Off-host operations | Local services, retained samples and notifications do not provide always-on hosting, replication, an off-host backup or external paging | Add only the required hosting/notification destination with separate authorization and acceptance |
 | Provider-level token savings | Cached-input counters and smaller retrieved artifacts are different measurements | A paired, same-task/quality usage comparison including coordinator, failed calls and retries before asserting net savings |
 
@@ -51,8 +51,15 @@ The observability selection is separately **188,769 → 500 tokens** with the sa
 `gpt-tokenizer 3.4.0` / `o200k_base` encoding. It selects native token-category
 information from a large retained metric artifact for one question; it is not
 lossless telemetry compression, a provider-token comparison or maximum savings.
-The two later SDK observation tasks are separate from the earlier three-turn
-research aggregate and from the DeerFlow task; no whole-session total is implied.
+The three SDK observability tasks total **121,288 tokens**: 80,770 from the two
+prior runs plus 40,518 from the fresh accepted run. They are separate from the
+earlier three-turn research aggregate and the DeerFlow task. Imported summaries,
+automatically written observations and native histograms must not be summed as
+independent usage; no whole-session total is implied. The retained Context Mode
+bridge snapshot reports **zero estimated savings**, with 50 calls and 208 KB
+entered context over a retained 9h55m connection. This is not whole-Desktop or
+provider usage. Its counters are separate from the task-specific selected-artifact
+measurement above.
 
 ## Persistence and future sessions
 
@@ -67,9 +74,17 @@ tool catalogs; newly registered tools use normal client discovery/reload. Other
 projects require explicit scoped adoption, and future model tasks still need
 fresh account-readiness checks.
 
-The unchanged 337-public-star snapshot and the 144-repository core catalog are
-complementary. The combined index has 451 identities, including 114 beyond stars:
+The unchanged 337-public-star snapshot and the 146-repository core catalog are
+complementary. The combined index has 453 identities, including 116 beyond stars:
 an individual source disposition is not an installation decision. Candidates
 such as Vibe-Trading, ai-trader and provider-free OCR delegation now have specific
 source findings and prospective workflows, with runtime acceptance left visible.
 No fixed list can establish permanent or universal state-of-the-art superiority.
+
+The [source follow-up](../../catalogs/us-equities/source-followup.md) adds
+node_exporter and OpenLIT as unadopted alternatives; the 42-component baseline
+is unchanged. Both overlap the existing Collector/native OTLP path for the
+current need. The fresh SDK metric correction used native `analytics.enabled`
+configuration only when unset and preserved explicit false values; it did not
+change the worker's model, account, sandbox or inherited OTLP endpoint. Current
+runtime detail is in the [session follow-up](../../observability/session-e2e.md).
