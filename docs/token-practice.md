@@ -199,6 +199,12 @@ MCP status passed. Existing hooks, client configuration and project scope were
 preserved. Earlier model-task and 52-component study receipts remain unchanged;
 these additions did not repeat provider trials or rewrite historical baselines.
 
+The selected zizmor 1.30.1 analyzer also gained a [native Linux follow-up](../evidence/receipts/native-linux-zizmor-20260920.json):
+official isolated `uv tool install`, zero findings on the current workflows,
+expected exit 14 and three findings on an inert unsafe fixture, and two native
+acceptance tests with no skips. Its earlier Mac/CI receipts remain dated. This
+closes local command availability without adding a component or savings claim.
+
 The [coverage receipt](../evidence/receipts/token-practice-coverage-20260920.json)
 preserves all 52 classifications and 70 captured operations: 66 expected process
 checks passed and four failed attempts remain. This is not 52 full-stack passes.

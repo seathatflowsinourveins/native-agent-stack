@@ -54,7 +54,8 @@
     "current_engineering_convergence": "docs/convergence-architecture.md",
     "current_native_child_acceptance": "blueprints/convergence-practice/native-worker/receipt.json",
     "current_supplemental_native_tools": "evidence/receipts/upstream-native-tools-20260920.json",
-    "current_memory_maintenance": "evidence/receipts/native-ai-memory-maintenance-20260920.json"
+    "current_memory_maintenance": "evidence/receipts/native-ai-memory-maintenance-20260920.json",
+    "current_native_workflow_analyzer": "evidence/receipts/native-linux-zizmor-20260920.json"
   },
   "recipe_map": {
     "affaan-m/ECC": "recipes/README.md",

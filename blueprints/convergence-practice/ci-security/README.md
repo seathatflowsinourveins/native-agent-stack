@@ -16,6 +16,28 @@ unsafe fixture returns exit 14 with `template-injection`, `unpinned-uses` and
 
 Replay with the selected native executable available:
 
+The later [native Linux receipt](../../../evidence/receipts/native-linux-zizmor-20260920.json)
+closes the local executable gap with upstream `uv tool install zizmor==1.30.1`
+in an isolated tool environment. The workflow-directory scan returned exit 0
+and no findings; the unchanged inert fixture returned exit 14 with all three
+diagnostics above. Both exact native acceptance tests passed with no skips.
+The installed binary was independently hashed; this follow-up did not repeat
+the CI wheel archive verification or execute any workflow.
+
+Run the direct upstream command from either client's native shell, choosing an
+owned cache directory:
+
+```sh
+uv tool install zizmor==1.30.1
+env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN \
+  zizmor --offline --no-config --no-ignores --no-progress \
+  --persona regular --strict-collection --format json \
+  --cache-dir "$OWNED_CACHE" "$PROJECT_ROOT/.github/workflows"
+```
+
+Install once; subsequent workflow edits need only the relevant scan. Acceptance
+can be replayed with the repository's native fixture tests:
+
 ```sh
 python3 -m unittest -v tests.test_workflow_security
 python3 scripts/validate_convergence.py blueprints/convergence-practice/ci-security/experiment.json --root . --json

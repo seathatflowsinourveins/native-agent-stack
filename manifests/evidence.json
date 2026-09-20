@@ -1152,6 +1152,21 @@
         "This maintenance update does not demonstrate token savings; exact causal lifetime provider savings remain null.",
         "Forward-only migrations may require restoring the retained private backup to downgrade."
       ]
+    },
+    {
+      "id": "native-linux-zizmor-20260920",
+      "path": "evidence/receipts/native-linux-zizmor-20260920.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "zizmor"
+      ],
+      "claim": "zizmor 1.30.1 installed in an isolated native Linux tool environment; offline repository workflow scan returned zero findings, while an inert unsafe fixture returned the expected diagnostics and exit code.",
+      "limitations": [
+        "Offline regular-persona static analysis only; no online credential-backed checks or workflow execution.",
+        "The official uv package-index installation was used. The installed binary was separately hashed; no independent downloaded wheel archive verification was performed in this host follow-up.",
+        "Earlier Mac and disposable GitHub CI acceptance receipts retain their original host scope.",
+        "No provider task was run and zizmor supplies no verified lifetime token-savings counter."
+      ]
     }
   ],
   "files": [
@@ -1207,8 +1222,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "283136411c01b04fa9e0325f59725b538d13b0df4d347cd5d241997a92eaf98d",
-      "bytes": 11476
+      "sha256": "83527c9925c504a7988f681099610a369fc67424d157e10881171483f25c6702",
+      "bytes": 11571
     },
     {
       "path": "adoption/paired/README.md",
@@ -2762,8 +2777,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "8f8d5f46d7da3ed08516d83a76e99c2ee0550c2ee76bc08a27da30fe4c5b0471",
-      "bytes": 1586960
+      "sha256": "f672ac719f27b55b09a952f4294c27822349e4a2a0ada11ef245d9038ec54e5f",
+      "bytes": 1588108
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -2812,8 +2827,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "4b9534cb9ed520af0cc82446ed127ebd2591502b80538811c1eb13d0fb785aca",
-      "bytes": 16259
+      "sha256": "714262f010864373d47e8708bd312efe55e1b9e196842beb30fdd573d9a813fb",
+      "bytes": 16706
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -3072,8 +3087,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "59b032429d8d0c2bbdb873d2a3dacf97ff1bc25773790868e4e685445ab2e3df",
-      "bytes": 56636
+      "sha256": "13f16e0d9a390b2053d338431e7fe89b19c9fd027e40c9f161af5e75eff565e7",
+      "bytes": 56920
     },
     {
       "path": "observability/README.md",
@@ -3417,8 +3432,8 @@
     },
     {
       "path": "blueprints/convergence-practice/ci-security/README.md",
-      "sha256": "e30226b3e8715d64a5010762eb6bcef78aa5c37e6d5765a39d115801e6908a02",
-      "bytes": 2042
+      "sha256": "982b8d46dbc8981cdcfb85721314478869c4aa75190660f96343a3718e6c444c",
+      "bytes": 3105
     },
     {
       "path": "blueprints/convergence-practice/ci-security/ci-acceptance.json",
@@ -3774,6 +3789,11 @@
       "path": "evidence/receipts/native-ai-memory-maintenance-20260920.json",
       "sha256": "513095e6062ddd06fb285aecaf2ee73be6529d25c57709f09afcdfb144960a14",
       "bytes": 3210
+    },
+    {
+      "path": "evidence/receipts/native-linux-zizmor-20260920.json",
+      "sha256": "88842d67b82948374f7e1fc2296be741c03aa38d986a2ae0421498d2751ba1a1",
+      "bytes": 2465
     }
   ]
 }
