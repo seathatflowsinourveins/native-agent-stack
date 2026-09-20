@@ -944,6 +944,179 @@
         "Local supervision completed without timeout; provider cancellation, crash recovery and full-host backup were not tested."
       ],
       "path": "blueprints/convergence-practice/native-worker/receipt.json"
+    },
+    {
+      "id": "token-practice-artifacts-20260920",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "agent-browser",
+        "ast-grep",
+        "edgartools",
+        "markitdown",
+        "qmd",
+        "repomix",
+        "rtk",
+        "socraticode",
+        "syft",
+        "toon"
+      ],
+      "claim": "Ten retained native input/output artifact pairs were counted exactly with gpt-tokenizer 3.4.0 / o200k_base; selection and conversion boundaries remain explicit.",
+      "limitations": [
+        "Counts describe retained original host artifacts. This public aggregate omits the private originals; CI validates aggregate integrity, not an independent recount of those private bytes.",
+        "Most pairs select or transform information lossily. Shorter output does not establish equivalent answer quality or lower complete task usage.",
+        "Pairs overlap, including shared HTML sources and retrieval services. Do not sum them or attribute the same difference independently to dependencies.",
+        "Exact provider savings remain null. Tokenizer counts are not provider billing, subscription savings or causal per-repository effects.",
+        "The Syft table preserves checked package name/version/type columns while omitting other SBOM metadata; this is a view selection, not equivalent full SBOM content."
+      ],
+      "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+    },
+    {
+      "id": "token-practice-native-pairs-20260920",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "context-mode"
+      ],
+      "claim": "Four native coding trials passed shared visible, hidden and file-scope acceptance gates; one fixed-order Context Mode non-use/explicit-use pair per client produced mixed observed task-usage differences.",
+      "limitations": [
+        "One baseline-first pair per client is not randomized, repeated or cache-matched. Native cache warmth and plugin tool availability were not fully controlled.",
+        "Observed differences are not causal per-repository savings, a whole-stack saving rate or evidence that either model is generally better.",
+        "Codex cached input and reasoning output are subsets. Claude ordinary input, cache creation, cache reads and output are separate categories; thinking is included in output.",
+        "Final cumulative session counters are used once. Coordinator, reviewers, audit tooling and report production are outside these four task totals.",
+        "Billed cost is unknown. Token counts and cached reads do not establish subscription charges or money saved.",
+        "Private transcripts, session identifiers and commands are not published. Hashes bind retained evidence, not independent attestation of provider execution."
+      ],
+      "path": "evidence/receipts/token-practice-native-pairs-20260920.json"
+    },
+    {
+      "id": "token-practice-coverage-20260920",
+      "kind": "historical_inventory",
+      "component_ids": [
+        "affaan-m/ECC",
+        "agent-browser",
+        "agentsview",
+        "ai-memory",
+        "ast-grep",
+        "ccusage",
+        "claude-code",
+        "claude-hud",
+        "codebase-memory-mcp",
+        "codex",
+        "codex-for-claude",
+        "context-hub",
+        "context-mode",
+        "davila7/claude-code-templates",
+        "difftastic",
+        "gitleaks",
+        "headroom",
+        "huggingface-hub-native",
+        "markitdown",
+        "mcp-inspector",
+        "mcporter",
+        "openresearch",
+        "playwright-cli",
+        "promptfoo",
+        "qdrant",
+        "qmd",
+        "repomix",
+        "rtk",
+        "sandbox-runtime",
+        "serena",
+        "shanraisshan/claude-code-best-practice",
+        "shellcheck",
+        "socraticode",
+        "toon",
+        "vllm",
+        "worktrunk",
+        "opentelemetry-collector-contrib",
+        "prometheus",
+        "loki",
+        "grafana",
+        "alertmanager",
+        "ntfy",
+        "duckdb",
+        "restic",
+        "dagu",
+        "lean",
+        "syft",
+        "alpaca-py",
+        "systemd",
+        "pandas",
+        "skfolio",
+        "edgartools"
+      ],
+      "claim": "A dated 52-component audit distinguishes native artifact/task pairs, bounded functionality, current queries, configuration validation, historical-only evidence, host failures and non-executable guidance.",
+      "limitations": [
+        "This historical coverage inventory records the dated audit only; it is not 52 fresh end-to-end passes or new-host acceptance.",
+        "Seventy captured operations include four retained failed attempts; successful corrections do not erase the initial OTel environment and Dagu environment-filter failures.",
+        "Two Linux Playwright invocations failed with ENOENT; the Windows installation does not establish Linux availability.",
+        "Guidance repositories are not executable tools. Current state, backup and cache queries or configuration validation do not prove complete lifecycle behavior.",
+        "Native RTK, TOON, Context Mode and Headroom counters have different scopes and estimators. They cannot be summed with artifact differences or provider usage.",
+        "Exact causal per-component provider saving values remain unknown rather than zero."
+      ],
+      "path": "evidence/receipts/token-practice-coverage-20260920.json"
+    },
+    {
+      "id": "token-practice-catalog-toon-20260920",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "toon"
+      ],
+      "claim": "A reversible full-catalog TOON conversion had a smaller native heuristic estimate but a larger exact token count than compact JSON; the guard retained compact JSON.",
+      "limitations": [
+        "This is one later artifact comparison, separate from the ten original token-practice pairs. Do not sum it with cumulative native counters or provider usage.",
+        "Native tokenx estimates and exact o200k_base counts use different estimators and JSON representations; they are not interchangeable savings metrics.",
+        "The public aggregate omits the private captured output files. Published hashes establish identity, not independent CI recount of the private bytes.",
+        "Exact provider savings remain unknown. The successful strict round trip establishes data equivalence for this conversion only.",
+        "Command templates replace host-specific source and output locations with portable placeholders."
+      ],
+      "path": "evidence/receipts/token-practice-catalog-toon-20260920.json"
+    },
+    {
+      "id": "token-practice-native-counters-20260920",
+      "kind": "historical_inventory",
+      "component_ids": [
+        "context-mode",
+        "headroom",
+        "rtk",
+        "toon"
+      ],
+      "claim": "Dated native counter snapshots retain RTK output, the capped Headroom ledger result, per-conversion TOON estimates and three separate Context Mode runtime scopes without treating them as exact provider savings.",
+      "limitations": [
+        "This historical snapshot is a dated report only, not a live dashboard or new-host execution acceptance.",
+        "RTK counters estimate retained command history and default to 90-day retention; selected-project values are a subset of the global result. Do not add snapshots or assume a forever ledger.",
+        "Headroom 0.37.0 caps the report at 30 days despite naming a field lifetime; zero ledger calls do not establish zero offline guard use or provider usage.",
+        "Context Mode uses byte/event heuristics and separate runtime state. Illustrative cost estimates are not bills, and persisted files must not be added to a direct MCP connection snapshot.",
+        "TOON statistics are tokenx heuristics for one conversion, not a native cumulative ledger. The compact-JSON exact counterexample is represented by the separate catalog receipt and must not be counted twice.",
+        "Raw private files, host paths, full command outputs and session identifiers are omitted. Sanitized fields and aggregate hashes do not independently attest provider activity."
+      ],
+      "path": "evidence/receipts/token-practice-native-counters-20260920.json"
+    },
+    {
+      "id": "token-practice-gap-followup-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "playwright-cli",
+        "agentsview",
+        "ccusage",
+        "claude-hud",
+        "openresearch",
+        "codex-for-claude",
+        "codex"
+      ],
+      "claim": "Six separately scoped follow-ups exercised a pinned Linux browser fixture, a single-session archive query, offline usage parsing, a synthetic HUD renderer, public-paper retrieval and one read-only native bridge backend task.",
+      "limitations": [
+        "These later bounded results do not turn the earlier dated 52-component audit into 52 full end-to-end passes. Individual scopes below remain authoritative.",
+        "Three failed attempts remain: file-protocol navigation rejection, implicit archive auto-start message failure and archive restart-lock failure. Successful recovery does not erase them.",
+        "Playwright used an existing Chrome installation and a fixture-only loopback HTTP endpoint. Its Playwright dependencies are alpha builds; no default browser download or arbitrary-site acceptance was tested.",
+        "The archive was restricted to one explicit project session. Full private transcripts, authentication material and session identifiers are omitted; automatic archive discovery did not pass.",
+        "HUD acceptance is a synthetic renderer fixture, not a live interactive account display. OpenResearch acceptance is public-paper retrieval, not an agent research workflow or research-quality assessment.",
+        "The ccusage reports overlap and must not be added. Upstream parser categories and totals are not bills or a matched provider savings comparison. The first date-only query returned an empty window.",
+        "The bridge trial is additional observed provider usage, not savings. It used one backend task without an outer Claude interaction or matched baseline; cached input is a subset of native input.",
+        "Tracked source remained unchanged; native MCP startup created untracked metadata. All owned temporary services were stopped. Public aggregate hashes bind retained evidence but do not independently reproduce private logs."
+      ],
+      "path": "evidence/receipts/token-practice-gap-followup-20260920.json"
     }
   ],
   "files": [
@@ -974,8 +1147,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "7aa89a4049f2db683002e47f2d1e967aaf4e43977ebef6423b8910739b6343d4",
-      "bytes": 6209
+      "sha256": "10523a601aac0bbd01180a73ab2b7650f289b25b78f2f07034bcbd8172ed634f",
+      "bytes": 6482
     },
     {
       "path": "CLAUDE.md",
@@ -989,8 +1162,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "fd32db3711b19d4f01974af193a7e5e8fb89372c437f1cf644dc7f8dd63af20f",
-      "bytes": 14695
+      "sha256": "46668bce04caa806c9a49c11ebb46068a32ade5bea659476dcc2088d9719ad53",
+      "bytes": 15099
     },
     {
       "path": "adoption/README.md",
@@ -1004,8 +1177,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "42ceea1048fd2b86b30e0b79d32b4fc1e4e7d03ddd11fae8699649c7d2c7fdcf",
-      "bytes": 10623
+      "sha256": "acb93920c5ced960de09a5420d0f10a803ac38b74352941a2866b8ec6a6d9633",
+      "bytes": 11170
     },
     {
       "path": "adoption/paired/README.md",
@@ -1074,8 +1247,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "d0dad446d490c4c081686d0714bcde154ec7d29297d5a49f848f5201ebbbcfc5",
-      "bytes": 8229
+      "sha256": "3ae1a89cc8c3fa5034216d69ce100c1efed4a63e9e13f97ce18b0fa6e3dcac20",
+      "bytes": 8547
     },
     {
       "path": "blueprints/convergence-practice/README.md",
@@ -2559,8 +2732,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "bcc80c7b4eb6bf56238db7cbc92b834942b3d3582bd31bf63b1ef13738c9bdb7",
-      "bytes": 12611
+      "sha256": "5a373ba1ad52f0dee96557490d2051a4fa3a2981f888474d8048252070c829bf",
+      "bytes": 12889
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -2774,8 +2947,8 @@
     },
     {
       "path": "catalogs/us-equities/native-workflows.md",
-      "sha256": "303fa345fcb4c1be64e33a247ac1bfcf02d0c6c41951b7607f0716e722c4c804",
-      "bytes": 11309
+      "sha256": "aae8aa3cf0232052cb4573df9ba553ef05523c5c0ed0180d98cea0fccd89c583",
+      "bytes": 11678
     },
     {
       "path": "catalogs/us-equities/repository-index.md",
@@ -2864,8 +3037,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "c3b8d616d5deaedb4809db184e6b7a04f4ae9f63d6283f0dc54e5996ebe4da48",
-      "bytes": 1470410
+      "sha256": "f0e1cb7c819580012ececbda069d570f1e60cf2c3da1f51b5fd80371ee2dc89c",
+      "bytes": 1579600
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -2899,8 +3072,8 @@
     },
     {
       "path": "docs/evidence.md",
-      "sha256": "a5d81d728d58571ac7c88e6aafb26fcb8707717541a92e55eb39d58d8ad55353",
-      "bytes": 9129
+      "sha256": "de6f9567f36adedb9f5c0c9ca32017c0fc1e98e0a99d608eb8c52cffb0d8b867",
+      "bytes": 9435
     },
     {
       "path": "docs/landscape.md",
@@ -3139,8 +3312,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "c4447759ccec63f68399c24b2967add627356cca97145698da18ddf99d130efe",
-      "bytes": 49993
+      "sha256": "8e50ee09f4002c5f811e0bd001faace38b3c2d3c4b33135a64175290c9f56e8f",
+      "bytes": 53615
     },
     {
       "path": "observability/README.md",
@@ -3319,8 +3492,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "21f393cc918c23d733c360762d6c8fe99d9f075d2c3e0eef3a58920e0baa3d74",
-      "bytes": 44049
+      "sha256": "f675d3b4726b1ab6dbebeb61fda90150934499b78b4ee5afc554c423fcccfee4",
+      "bytes": 44747
     },
     {
       "path": "scripts/adoption_status.py",
@@ -3521,6 +3694,41 @@
       "path": "tests/test_workflow_security.py",
       "sha256": "2c260c8d7fd58e747819037177ec9e077ee1cac7dc1e8ebd1ff7ddd1c405266b",
       "bytes": 2582
+    },
+    {
+      "path": "docs/token-practice.md",
+      "sha256": "dd0aa8faed8b99d19713cc05467a28523d335e987f783ce704e09696d4c41228",
+      "bytes": 14368
+    },
+    {
+      "path": "evidence/receipts/token-practice-artifacts-20260920.json",
+      "sha256": "511b012f4ce55d2c4880d249ce9865b54596d117c343fc3de7e4971e3ccaac92",
+      "bytes": 9047
+    },
+    {
+      "path": "evidence/receipts/token-practice-catalog-toon-20260920.json",
+      "sha256": "5cdf0a38880ba537dbfd207e2c77533f58eade027ab008d3327fc571a0e8c803",
+      "bytes": 3204
+    },
+    {
+      "path": "evidence/receipts/token-practice-coverage-20260920.json",
+      "sha256": "cf89425ac0a40c08ee29d3992668d1d1a5b2f48d521821711fc73a3ff88dfc10",
+      "bytes": 15348
+    },
+    {
+      "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
+      "sha256": "41d9a659477e1751c1cba609ddc60ad8dbea635ea30334a7e453938f5c11f9f4",
+      "bytes": 26722
+    },
+    {
+      "path": "evidence/receipts/token-practice-native-counters-20260920.json",
+      "sha256": "8ca3c149a609600a8f6f6830a85d897fb140b6c5b9924853f49b4de4d58d63fa",
+      "bytes": 7597
+    },
+    {
+      "path": "evidence/receipts/token-practice-native-pairs-20260920.json",
+      "sha256": "6c6edfde2da2c1292d36222372b62b2614b980337b72b399984a3a4b368cd37c",
+      "bytes": 6386
     }
   ]
 }

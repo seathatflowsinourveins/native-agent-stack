@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "token-practice-catalog-toon-20260920",
+  "kind": "artifact_measurement",
+  "recorded_at_utc": "2026-09-20T03:13:29.750967+00:00",
+  "component_ids": [
+    "toon"
+  ],
+  "claim": "A reversible full-catalog TOON conversion had a smaller native heuristic estimate but a larger exact token count than compact JSON; the guard retained compact JSON.",
+  "limitations": [
+    "This is one later artifact comparison, separate from the ten original token-practice pairs. Do not sum it with cumulative native counters or provider usage.",
+    "Native tokenx estimates and exact o200k_base counts use different estimators and JSON representations; they are not interchangeable savings metrics.",
+    "The public aggregate omits the private captured output files. Published hashes establish identity, not independent CI recount of the private bytes.",
+    "Exact provider savings remain unknown. The successful strict round trip establishes data equivalence for this conversion only.",
+    "Command templates replace host-specific source and output locations with portable placeholders."
+  ],
+  "data": {
+    "tool": {
+      "package": "@toon-format/cli",
+      "version": "4.1.1",
+      "native_estimator": "tokenx",
+      "native_estimator_version": "1.3.0"
+    },
+    "catalog_scope": {
+      "repositories": 502,
+      "public_star_repositories": 342,
+      "beyond_public_stars": 160,
+      "references": 1030
+    },
+    "source_catalog": {
+      "bytes": 376207,
+      "sha256": "21733b37d9841c1cb71ed7592a52b6b3071ed68a537260ca8fd7fc6c268c15d7"
+    },
+    "native_encode": {
+      "command_template": "toon <decision-index.json> --stats --output <catalog.toon>",
+      "exit_code": 0,
+      "returned_stats_lines": [
+        "Token estimates: ~84907 (JSON) \u2192 ~71770 (TOON)",
+        "Saved ~13137 tokens (-15.5%)"
+      ],
+      "scope": "One conversion; tokenx heuristic against the formatted source JSON"
+    },
+    "native_decode": {
+      "command_template": "toon <catalog.toon> --decode --strict --output <catalog.recovered.json>",
+      "exit_code": 0,
+      "strict_roundtrip_equal": true
+    },
+    "exact_comparison": {
+      "tokenizer": "gpt-tokenizer",
+      "version": "3.4.0",
+      "encoding": "o200k_base",
+      "baseline_representation": "compact JSON",
+      "candidate_representation": "TOON",
+      "baseline": {
+        "bytes": 252612,
+        "sha256": "9354a892cd3644d111b75d55c3724ff117fd7a8e73235508523de30961f279e3",
+        "tokens": 59792
+      },
+      "candidate": {
+        "bytes": 275936,
+        "sha256": "fd1ae82fb3c2413165bbceec83b45ec285912f2f76ff8fa03b27c511ba98319b",
+        "tokens": 66815
+      },
+      "tokens_removed": -7023,
+      "exact_provider_savings": null
+    },
+    "guard_selection": "compact JSON",
+    "selected_tokens": 59792,
+    "native_cross_run_savings_ledger": false
+  },
+  "provenance": {
+    "source_label": "retained_private_native_counter_aggregate",
+    "sha256": "53701b2e9f3db072cfa0a5937a2703f4a88f5eac44fbdb8a157bfd9668039aaf",
+    "publication_method": "Explicit allowlist of aggregate metrics, safe tool metadata and sanitized output lines; host paths and full private records omitted."
+  }
+}

@@ -46,7 +46,13 @@
     "current_frozen_catalyst_protocol": "blueprints/us-equities/catalyst-experiment/protocol.json",
     "current_native_efficiency": "blueprints/us-equities/research-efficiency/native-receipt.json",
     "current_engineering_convergence": "docs/convergence-architecture.md",
-    "current_native_child_acceptance": "blueprints/convergence-practice/native-worker/receipt.json"
+    "current_native_child_acceptance": "blueprints/convergence-practice/native-worker/receipt.json",
+    "current_token_practice": "docs/token-practice.md",
+    "current_token_artifacts": "evidence/receipts/token-practice-artifacts-20260920.json",
+    "current_token_native_pairs": "evidence/receipts/token-practice-native-pairs-20260920.json",
+    "current_token_catalog_conversion": "evidence/receipts/token-practice-catalog-toon-20260920.json",
+    "current_token_native_counters": "evidence/receipts/token-practice-native-counters-20260920.json",
+    "current_token_gap_followup": "evidence/receipts/token-practice-gap-followup-20260920.json"
   },
   "recipe_map": {
     "affaan-m/ECC": "recipes/README.md",

@@ -5,6 +5,12 @@ The catalog's candidate commands are upstream entry points; unversioned examples
 can move and must be locked before a reproducible deployment. They do not claim
 every catalogued framework was installed or executed.
 
+See [current token practice and measured results](../../docs/token-practice.md)
+for exact artifact counts, mixed paired-task observations and native counter limits.
+Shared dependencies do not each earn the same saving. RTK retained-history estimates,
+TOON conversion statistics, Context Mode heuristics and Headroom ledger reports
+remain separate accounting surfaces.
+
 ## Use the catalog without loading all of it
 
 The native QMD CLI has a dedicated local index. These two catalog/foundation

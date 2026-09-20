@@ -1,0 +1,536 @@
+{
+  "schema_version": 1,
+  "id": "token-practice-coverage-20260920",
+  "kind": "historical_inventory",
+  "recorded_at_utc": "2026-09-20T02:28:47.397Z",
+  "component_ids": [
+    "affaan-m/ECC",
+    "agent-browser",
+    "agentsview",
+    "ai-memory",
+    "ast-grep",
+    "ccusage",
+    "claude-code",
+    "claude-hud",
+    "codebase-memory-mcp",
+    "codex",
+    "codex-for-claude",
+    "context-hub",
+    "context-mode",
+    "davila7/claude-code-templates",
+    "difftastic",
+    "gitleaks",
+    "headroom",
+    "huggingface-hub-native",
+    "markitdown",
+    "mcp-inspector",
+    "mcporter",
+    "openresearch",
+    "playwright-cli",
+    "promptfoo",
+    "qdrant",
+    "qmd",
+    "repomix",
+    "rtk",
+    "sandbox-runtime",
+    "serena",
+    "shanraisshan/claude-code-best-practice",
+    "shellcheck",
+    "socraticode",
+    "toon",
+    "vllm",
+    "worktrunk",
+    "opentelemetry-collector-contrib",
+    "prometheus",
+    "loki",
+    "grafana",
+    "alertmanager",
+    "ntfy",
+    "duckdb",
+    "restic",
+    "dagu",
+    "lean",
+    "syft",
+    "alpaca-py",
+    "systemd",
+    "pandas",
+    "skfolio",
+    "edgartools"
+  ],
+  "claim": "A dated 52-component audit distinguishes native artifact/task pairs, bounded functionality, current queries, configuration validation, historical-only evidence, host failures and non-executable guidance.",
+  "limitations": [
+    "This historical coverage inventory records the dated audit only; it is not 52 fresh end-to-end passes or new-host acceptance.",
+    "Seventy captured operations include four retained failed attempts; successful corrections do not erase the initial OTel environment and Dagu environment-filter failures.",
+    "Two Linux Playwright invocations failed with ENOENT; the Windows installation does not establish Linux availability.",
+    "Guidance repositories are not executable tools. Current state, backup and cache queries or configuration validation do not prove complete lifecycle behavior.",
+    "Native RTK, TOON, Context Mode and Headroom counters have different scopes and estimators. They cannot be summed with artifact differences or provider usage.",
+    "Exact causal per-component provider saving values remain unknown rather than zero."
+  ],
+  "data": {
+    "scope_counts": {
+      "components": 52,
+      "repository_identities": 502,
+      "public_stars": 342,
+      "beyond_public_stars": 160,
+      "typed_references": 1030,
+      "scope": "Dated component selection and catalog union; supporting runtimes, archived alternatives and candidates are not additional accepted executions."
+    },
+    "audit_counts": {
+      "components": 52,
+      "captured_operations": 70,
+      "expected_process_checks_passed": 66,
+      "failed_attempts": 4,
+      "artifact_pairs": 10,
+      "provider_sessions": 4,
+      "provider_pairs": 2,
+      "coverage": {
+        "Guidance / source": 3,
+        "Artifact pair": 10,
+        "Historical only": 5,
+        "Current query": 10,
+        "Native task pair": 3,
+        "Functional operation": 19,
+        "Host blocked": 1,
+        "Configuration check": 1
+      }
+    },
+    "coverage": [
+      {
+        "component_id": "affaan-m/ECC",
+        "status": "Guidance / source",
+        "operation_ids": [],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "agent-browser",
+        "status": "Artifact pair",
+        "operation_ids": [
+          "browser-open",
+          "browser-full-snapshot",
+          "browser-interactive-snapshot",
+          "browser-fill",
+          "browser-click",
+          "browser-result",
+          "browser-close"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "agentsview",
+        "status": "Historical only",
+        "operation_ids": [],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "ai-memory",
+        "status": "Current query",
+        "operation_ids": [
+          "memory-query"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "ast-grep",
+        "status": "Artifact pair",
+        "operation_ids": [
+          "ast-grep-subprocess"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "ccusage",
+        "status": "Historical only",
+        "operation_ids": [],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "claude-code",
+        "status": "Native task pair",
+        "operation_ids": [],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "claude-hud",
+        "status": "Historical only",
+        "operation_ids": [],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "codebase-memory-mcp",
+        "status": "Functional operation",
+        "operation_ids": [
+          "static-graph",
+          "static-callees"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "codex",
+        "status": "Native task pair",
+        "operation_ids": [],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "codex-for-claude",
+        "status": "Historical only",
+        "operation_ids": [],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "context-hub",
+        "status": "Functional operation",
+        "operation_ids": [
+          "chub-search",
+          "chub-get"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "context-mode",
+        "status": "Native task pair",
+        "operation_ids": [
+          "inspector-context-call"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "davila7/claude-code-templates",
+        "status": "Guidance / source",
+        "operation_ids": [],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "difftastic",
+        "status": "Functional operation",
+        "operation_ids": [
+          "difftastic"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "gitleaks",
+        "status": "Functional operation",
+        "operation_ids": [
+          "gitleaks"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "headroom",
+        "status": "Functional operation",
+        "operation_ids": [
+          "headroom-guard"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "huggingface-hub-native",
+        "status": "Current query",
+        "operation_ids": [
+          "hf-cache"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "markitdown",
+        "status": "Artifact pair",
+        "operation_ids": [
+          "markitdown-html"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "mcp-inspector",
+        "status": "Functional operation",
+        "operation_ids": [
+          "inspector-context-call"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "mcporter",
+        "status": "Functional operation",
+        "operation_ids": [
+          "socraticode-query",
+          "static-graph",
+          "static-callees",
+          "memory-query"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "openresearch",
+        "status": "Historical only",
+        "operation_ids": [],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "playwright-cli",
+        "status": "Host blocked",
+        "operation_ids": [
+          "playwright-open",
+          "playwright-snapshot"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "promptfoo",
+        "status": "Functional operation",
+        "operation_ids": [
+          "promptfoo-local"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "qdrant",
+        "status": "Functional operation",
+        "operation_ids": [
+          "socraticode-query",
+          "qdrant-collections"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "qmd",
+        "status": "Artifact pair",
+        "operation_ids": [
+          "qmd-search",
+          "qmd-full",
+          "qmd-window"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "repomix",
+        "status": "Artifact pair",
+        "operation_ids": [
+          "repomix-full",
+          "repomix-compressed"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "rtk",
+        "status": "Artifact pair",
+        "operation_ids": [
+          "git-log-rtk"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "sandbox-runtime",
+        "status": "Functional operation",
+        "operation_ids": [
+          "sandbox-denied-read",
+          "sandbox-allowed-write"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "serena",
+        "status": "Functional operation",
+        "operation_ids": [
+          "serena-retained-content"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "shanraisshan/claude-code-best-practice",
+        "status": "Guidance / source",
+        "operation_ids": [],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "shellcheck",
+        "status": "Functional operation",
+        "operation_ids": [
+          "shellcheck"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "socraticode",
+        "status": "Artifact pair",
+        "operation_ids": [
+          "socraticode-query"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "toon",
+        "status": "Artifact pair",
+        "operation_ids": [
+          "components-toon",
+          "components-roundtrip"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "vllm",
+        "status": "Functional operation",
+        "operation_ids": [
+          "socraticode-query",
+          "vllm-embedding"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "worktrunk",
+        "status": "Current query",
+        "operation_ids": [
+          "worktrunk"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "opentelemetry-collector-contrib",
+        "status": "Configuration check",
+        "operation_ids": [
+          "otel-config",
+          "otel-config-unit-env"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "prometheus",
+        "status": "Current query",
+        "operation_ids": [
+          "prometheus-metrics"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "loki",
+        "status": "Current query",
+        "operation_ids": [
+          "loki-receipts"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "grafana",
+        "status": "Current query",
+        "operation_ids": [
+          "grafana-dashboard"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "alertmanager",
+        "status": "Current query",
+        "operation_ids": [
+          "alertmanager-state"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "ntfy",
+        "status": "Current query",
+        "operation_ids": [
+          "ntfy-retained"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "duckdb",
+        "status": "Functional operation",
+        "operation_ids": [
+          "duckdb-parquet"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "restic",
+        "status": "Current query",
+        "operation_ids": [
+          "restic-snapshots"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "dagu",
+        "status": "Functional operation",
+        "operation_ids": [
+          "dagu-history",
+          "dagu-fresh",
+          "dagu-env-forwarded"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "lean",
+        "status": "Functional operation",
+        "operation_ids": [
+          "lean-adaptive_stress",
+          "lean-compile",
+          "lean-one_stress",
+          "lean-one_zero",
+          "lean-over_limit",
+          "lean-two_stress",
+          "lean-two_zero"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "syft",
+        "status": "Artifact pair",
+        "operation_ids": [
+          "syft-sdk",
+          "syft-table"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "alpaca-py",
+        "status": "Functional operation",
+        "operation_ids": [
+          "alpaca-offline-contract"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "systemd",
+        "status": "Current query",
+        "operation_ids": [
+          "systemd-services"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "pandas",
+        "status": "Functional operation",
+        "operation_ids": [
+          "pandas-nanosecond"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "skfolio",
+        "status": "Functional operation",
+        "operation_ids": [
+          "skfolio-walkforward"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      },
+      {
+        "component_id": "edgartools",
+        "status": "Artifact pair",
+        "operation_ids": [
+          "edgar-markdown"
+        ],
+        "exact_causal_provider_tokens_saved": null
+      }
+    ],
+    "accounting": {
+      "native_task_totals": "Use final cumulative session counters once, preserving cached/thinking subset semantics.",
+      "non_additive": "Do not sum repeated snapshots, overlapping artifact pairs or dependency-level effects.",
+      "future_sessions": "Select one suitable lane for the current artifact; do not rerun the full audit or model trials automatically."
+    }
+  },
+  "provenance": {
+    "source_label": "retained_private_native_audit_aggregate",
+    "sha256": "9d5da2aa8868289933569def8b14458e1a0cc97a3f91a671d9030479b60a28a0",
+    "generated_at_utc": "2026-09-20T02:28:47.397Z",
+    "publication_method": "Explicit allowlist of aggregate counts, public component identities, outcomes and artifact hashes; private paths, transcripts, session identifiers and environment values omitted."
+  }
+}

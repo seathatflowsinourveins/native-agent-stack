@@ -1,0 +1,762 @@
+{
+  "schema_version": 1,
+  "id": "token-practice-gap-followup-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20T03:25:59.631Z",
+  "component_ids": [
+    "playwright-cli",
+    "agentsview",
+    "ccusage",
+    "claude-hud",
+    "openresearch",
+    "codex-for-claude",
+    "codex"
+  ],
+  "claim": "Six separately scoped follow-ups exercised a pinned Linux browser fixture, a single-session archive query, offline usage parsing, a synthetic HUD renderer, public-paper retrieval and one read-only native bridge backend task.",
+  "limitations": [
+    "These later bounded results do not turn the earlier dated 52-component audit into 52 full end-to-end passes. Individual scopes below remain authoritative.",
+    "Three failed attempts remain: file-protocol navigation rejection, implicit archive auto-start message failure and archive restart-lock failure. Successful recovery does not erase them.",
+    "Playwright used an existing Chrome installation and a fixture-only loopback HTTP endpoint. Its Playwright dependencies are alpha builds; no default browser download or arbitrary-site acceptance was tested.",
+    "The archive was restricted to one explicit project session. Full private transcripts, authentication material and session identifiers are omitted; automatic archive discovery did not pass.",
+    "HUD acceptance is a synthetic renderer fixture, not a live interactive account display. OpenResearch acceptance is public-paper retrieval, not an agent research workflow or research-quality assessment.",
+    "The ccusage reports overlap and must not be added. Upstream parser categories and totals are not bills or a matched provider savings comparison. The first date-only query returned an empty window.",
+    "The bridge trial is additional observed provider usage, not savings. It used one backend task without an outer Claude interaction or matched baseline; cached input is a subset of native input.",
+    "Tracked source remained unchanged; native MCP startup created untracked metadata. All owned temporary services were stopped. Public aggregate hashes bind retained evidence but do not independently reproduce private logs."
+  ],
+  "data": {
+    "components": [
+      {
+        "component_id": "playwright-cli",
+        "status": "functional fixture passed after retained file-protocol rejection",
+        "scope": "Pinned Linux CLI using existing Chrome: launch, HTTP navigation, accessibility snapshots, fill, click, exact greeting and scoped close; no browser download.",
+        "operation_ids": [
+          "npm-published-pin",
+          "playwright-install",
+          "playwright-version",
+          "playwright-package-tree",
+          "browser-open",
+          "browser-http-goto",
+          "browser-http-before",
+          "browser-http-fill",
+          "browser-http-click",
+          "browser-http-result",
+          "browser-http-after",
+          "browser-http-close"
+        ]
+      },
+      {
+        "component_id": "ccusage",
+        "status": "native offline usage aggregation passed",
+        "scope": "Explicit native Codex/Claude log homes, UTC 2026-09-19 through 2026-09-20, offline and no cost lookup; overlapping combined and Codex reports must not be added.",
+        "operation_ids": [
+          "ccusage-native-offline",
+          "ccusage-native-utc",
+          "ccusage-codex-utc"
+        ]
+      },
+      {
+        "component_id": "claude-hud",
+        "status": "synthetic renderer passed; live interactive UI untested",
+        "scope": "Installed upstream renderer consumed representative synthetic stdin and produced expected HUD fixture label and 25% context bar; these are not live account values.",
+        "operation_ids": [
+          "claude-hud-synthetic"
+        ]
+      },
+      {
+        "component_id": "openresearch",
+        "status": "native full-paper retrieval passed",
+        "scope": "orx --no-telemetry paper 2608.02583 --full returned UEmbed paper text; no models, agents, remote compute, or research-quality evaluation.",
+        "operation_ids": [
+          "openresearch-paper-full"
+        ]
+      },
+      {
+        "component_id": "agentsview",
+        "status": "single-session ingest, search and explicit-endpoint message query passed; daemon-discovery failure retained",
+        "scope": "One exact selected-project session segment in a private isolated archive. Subsequent implicit auto-start attempted initial sync but failed; final metadata audit proves exactly the selected session. All owned services stopped.",
+        "operation_ids": [
+          "archive-serve",
+          "archive-single-session",
+          "archive-search",
+          "archive-message",
+          "archive-scope-audit",
+          "archive-stop",
+          "archive-explicit-message",
+          "archive-final-scope-audit",
+          "archive-owned-stop",
+          "archive-recovery-server-lock-failure"
+        ]
+      },
+      {
+        "component_id": "codex-for-claude",
+        "status": "fresh read-only backend task passed",
+        "scope": "One read-only native backend task through the installed upstream bridge on the existing signed-in plan; not an outer Claude interaction or matched savings trial.",
+        "operation_ids": [
+          "codex-native-readiness",
+          "bridge-task-launch",
+          "bridge-task-status",
+          "bridge-task-result"
+        ]
+      }
+    ],
+    "verification": {
+      "retained_stream_and_artifact_hashes_and_tokens_checked": 62,
+      "operation_count": 31,
+      "passed_process_and_content_checks": 28,
+      "failed_attempts_retained": [
+        "browser-open",
+        "archive-message",
+        "archive-recovery-server-lock-failure"
+      ],
+      "tracked_source_unchanged": true,
+      "bridge_fixed_file_gate": true,
+      "archive_single_session_gate": true
+    },
+    "owned_temporary_services_stopped": true,
+    "playwright": {
+      "package": "@playwright/cli",
+      "version": "0.1.21",
+      "license": "Apache-2.0",
+      "registry_tarball": "https://registry.npmjs.org/@playwright/cli/-/cli-0.1.21.tgz",
+      "integrity": "sha512-FfxmVJj2wJlsxPksUO+4N7gqimPEQPajpocl2Mk97ENIGfAVZ4aElzPb5sDdGXHI9J/3Y8EtUiUTas0VsTm/sg==",
+      "registry_matches_lock": true,
+      "dependencies": {
+        "playwright": "1.64.0-alpha-1789764292000",
+        "playwright-core": "1.64.0-alpha-1789764292000"
+      },
+      "entry_sha256": "fda252270793401d2856530a5f503adf7fc326fc07bed97e413138f67c50662b",
+      "package_lock_sha256": "e9ae326b72234d82848c88013456cb430a4f1f80c487c95812f9c231c5a90b9a",
+      "install_policy": "exact pin, ignore-scripts, skip browser download, no audit/fund",
+      "host": "Linux",
+      "existing_chrome_version": "153.0.8010.52",
+      "browser_downloaded": false,
+      "fixture_path": "fixtures/greeting.html",
+      "fixture_sha256": "f0654d8d0af3a2db6adc9fc3c35c24438faef9ab49680d08ea071e3a1a8dcbc2",
+      "served_fixture_same_bytes": true,
+      "successful_http_steps": 7,
+      "returned_result": "\"Hello, Playwright!\"\n",
+      "command_templates": [
+        "playwright-cli --config <config.json> -s=<session> open <file-url>",
+        "playwright-cli -s=<session> goto <loopback-fixture-url>",
+        "playwright-cli -s=<session> snapshot --filename=<before.yml>",
+        "playwright-cli -s=<session> fill #name Playwright",
+        "playwright-cli -s=<session> click #greet",
+        "playwright-cli -s=<session> --raw eval \"document.querySelector('#status').textContent\"",
+        "playwright-cli -s=<session> snapshot --filename=<after.yml>",
+        "playwright-cli -s=<session> close"
+      ],
+      "initial_file_navigation_exit_code": 1,
+      "initial_failure_reason": "Access to file protocol is blocked; existing Chrome had launched successfully.",
+      "recovery": "Serve the same fixture bytes over loopback HTTP; no security bypass."
+    },
+    "archive": {
+      "version": "0.43.0",
+      "session_count": 1,
+      "vectors": false,
+      "archive_mode": "0700",
+      "generated_keys_private": true,
+      "ephemeral_token_file_deleted": true,
+      "service_stopped": true,
+      "scope": "One explicit project session in an isolated private archive; exact message retrieval through the explicit endpoint.",
+      "retrieval_provider_token_savings": null
+    },
+    "offline_usage": {
+      "ccusage_version": "20.0.23",
+      "combined_totals": {
+        "cacheCreationTokens": 275370,
+        "cacheReadTokens": 2044233,
+        "inputTokens": 213173,
+        "outputTokens": 40609,
+        "totalTokens": 2573385
+      },
+      "codex_subset_totals": {
+        "cacheCreationTokens": 0,
+        "cacheReadTokens": 600960,
+        "inputTokens": 213067,
+        "outputTokens": 5503,
+        "reasoningOutputTokens": 134,
+        "totalTokens": 819530
+      },
+      "scope": "Native homes, selected UTC two-date window; overlapping observations, not savings or a provider bill.",
+      "window_utc": [
+        "2026-09-19",
+        "2026-09-20"
+      ],
+      "native_commands": [
+        "ccusage daily --offline --no-cost --by-agent --since 20260919 --until 20260920 --timezone UTC --json",
+        "ccusage codex daily --offline --no-cost --since 2026-09-19 --until 2026-09-20 --timezone UTC --json"
+      ],
+      "subset_rule": "Codex subset is already included in the combined result; do not add the reports."
+    },
+    "hud": {
+      "acceptance": "Installed renderer consumed synthetic stdin and returned fixture label with 25% context bar.",
+      "live_interactive_acceptance": false
+    },
+    "openresearch": {
+      "native_command": "orx --no-telemetry paper 2608.02583 --full",
+      "paper_id": "2608.02583",
+      "returned_bytes": 63560,
+      "returned_exact_o200k_tokens": 18533,
+      "scope": "Full public-paper retrieval only; no model, research-agent or compute job."
+    },
+    "bridge": {
+      "status": "completed",
+      "write": false,
+      "touched_files": [],
+      "elapsed_ms": 11225,
+      "requested_model": null,
+      "observed_models": [
+        "gpt-6-astra"
+      ],
+      "task_count": 1,
+      "outer_claude_requests": 0,
+      "observed_tool_calls": 1,
+      "result_matches_fixed_file": true,
+      "native_usage": {
+        "input_tokens": 44908,
+        "cached_input_tokens": 22016,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 124,
+        "reasoning_output_tokens": 0,
+        "total_tokens": 45032
+      },
+      "usage_method": "Last cumulative native token_count event, not the sum of cumulative events; cached input is a subset of input and reasoning output is a subset of output.",
+      "native_scope": "One read-only backend task through the installed upstream bridge.",
+      "exact_causal_provider_tokens_saved": null
+    },
+    "operations": [
+      {
+        "id": "npm-published-pin",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 367,
+          "sha256": "f12a003049741679ad3de2410b07b120c9e9ac6008bbcdd96bbbd648d0f1f2d7",
+          "tokens": 164,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "playwright-install",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 27,
+          "sha256": "048192312952fe335b69538f2f4413711856760ad7a45b48bc828a9dc2d32be2",
+          "tokens": 10,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "playwright-version",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 7,
+          "sha256": "b436859fb641d04afbc4796b5df155639d6685280c4a0e8fe8791363d977f222",
+          "tokens": 6,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "playwright-package-tree",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 863,
+          "sha256": "c927c401ebe3356dd63e9522e2612f06a11dba1e916f7722a9e1b8826c8a8507",
+          "tokens": 259,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "codex-native-readiness",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 24,
+          "sha256": "16118df3eb3595e44a4721878cef0f79910e6564e10ff0e78e451e7c4e478947",
+          "tokens": 6,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "ccusage-native-offline",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 159,
+          "sha256": "754fa5c4ae58ddbbcfef17c0efddfc9f4e1821f583cac2576d5638072c2be78e",
+          "tokens": 57,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "claude-hud-synthetic",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 306,
+          "sha256": "9ea5edf9186b3ec509a986ddc64b2046dfcd0f6c634fa5cec49a1af7134460c6",
+          "tokens": 178,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "openresearch-paper-full",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 63560,
+          "sha256": "ecd04a32f24af2a624058d5ded8ba61d3cfe5c901acd7ff511f045db57065a00",
+          "tokens": 18533,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "ccusage-native-utc",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 4110,
+          "sha256": "4fe14b05dc0b3feaa92766d7a4444267dfb5023dc0b3e4056b95f4800bc15c59",
+          "tokens": 1109,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "ccusage-codex-utc",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 1269,
+          "sha256": "0c3462797a3a352911c3526be8a8d4035d51d77744bc4e2d62056a3b0d020235",
+          "tokens": 381,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "browser-open",
+        "exit_code": 1,
+        "passed": false,
+        "stdout": {
+          "bytes": 210,
+          "sha256": "45f5f4ff4e272076d9bbbead9f31312b081420b822b4cb86629b10ffbdcdedd7",
+          "tokens": 53,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "browser-http-goto",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 268,
+          "sha256": "b4ce42b69fe35b2e096b76a37fa3086961162da29397e3fea89bbe7cdda27ef2",
+          "tokens": 93,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "browser-http-before",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 273,
+          "sha256": "9672120e19387b61183177b0fa644fea33b5901cfa96406b664c8ab3a8976216",
+          "tokens": 91,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "browser-http-fill",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 82,
+          "sha256": "a843e599f6c325337e47832f2b9248c4d40809f2ec84e2e5b639cebaee50ce00",
+          "tokens": 23,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "browser-http-click",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 281,
+          "sha256": "873436cf26ca933df8f69d49c0b228fb1b3c4cfc928188274a60ffe25e24f796",
+          "tokens": 94,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "browser-http-result",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 21,
+          "sha256": "86f876a39b24102278ae65076871ef3e0f484733301ef1c2f60bc891095160dd",
+          "tokens": 6,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "browser-http-after",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 182,
+          "sha256": "68100706411d09a7cd604256f83237cf3ea11d098c357cfd60295a876f673357",
+          "tokens": 56,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "browser-http-close",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 38,
+          "sha256": "33fcc41b33b51ffc95ac5b20326770f5ca86ee8295b81b6867c3460144b36582",
+          "tokens": 10,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "archive-serve",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 192,
+          "sha256": "369ce17805024a759202a2b4dd9fccbd73e349ab342a4463b7215786622f54b6",
+          "tokens": 60,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "archive-single-session",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 1610,
+          "sha256": "575a519e2d456e9d9fa717de128225d36658881a694276e62d58a1eb9142a9d3",
+          "tokens": 463,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "archive-search",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 319,
+          "sha256": "d9d2f5d04b06a854d6effebbd350ba3a32b49ee83266476811895ab508dc083b",
+          "tokens": 104,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "archive-message",
+        "exit_code": 1,
+        "passed": false,
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 293,
+          "sha256": "58417fe7cacf821058f269da69f2346174c54bbba91cf3c8b26c06f3648fa7cf",
+          "tokens": 85,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "archive-scope-audit",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 203,
+          "sha256": "1937ac457ce28efdc676bd8c083178c33cd6fafd831f792c4695ebab2a756f04",
+          "tokens": 59,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "archive-stop",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 34,
+          "sha256": "8a67b9b5a4ae32207f12e985b80e3ce1ce905e86d601e500c46eb7b86fa1f8f9",
+          "tokens": 7,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "archive-explicit-message",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 852,
+          "sha256": "acf97d7a65a602641ab35583af89011f55b5547e33bd7f0113d7751257487976",
+          "tokens": 226,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "archive-final-scope-audit",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 203,
+          "sha256": "1937ac457ce28efdc676bd8c083178c33cd6fafd831f792c4695ebab2a756f04",
+          "tokens": 59,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "archive-owned-stop",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 58,
+          "sha256": "59f1b1e95f1ffd86bf3e831874ae1d2110d794fd845dd78434e92f6e56be30e5",
+          "tokens": 13,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "bridge-task-launch",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 329,
+          "sha256": "3588ace08262fde29b84dfabc602c7d740267b9cbe1f33bb170797b1fdadb269",
+          "tokens": 114,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "bridge-task-status",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 1569,
+          "sha256": "88407cecc1479c69d94fa26ac90b68efca6d0e5e7bb9eeb3c23ab9719cee67d8",
+          "tokens": 531,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "bridge-task-result",
+        "exit_code": 0,
+        "passed": true,
+        "stdout": {
+          "bytes": 3519,
+          "sha256": "44dcd8c7579cc822182d397a9c113c32ea564c335ba57c3d43d0449d12283ecb",
+          "tokens": 1210,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tokens": 0,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "archive-recovery-server-lock-failure",
+        "exit_code": 1,
+        "passed": false,
+        "stdout": {
+          "bytes": 35,
+          "sha256": "f0c5f7d4d461aefa624d2ada638b1b326052be8a94c3a0bf08682298f63f734f",
+          "tokens": 7,
+          "encoding": "o200k_base"
+        },
+        "stderr": {
+          "bytes": 279,
+          "sha256": "f36b113f7e52a3621d4d81a7d42cc722edf98d36dc7e4e4cd54a707725cba99e",
+          "tokens": 63,
+          "encoding": "o200k_base"
+        }
+      }
+    ]
+  },
+  "provenance": {
+    "source_label": "retained_private_gap_followup_aggregate",
+    "sha256": "722f665f2b5eec8e196f6f655dbd566d36d60fd3a3d811231a86a08848eda6b4",
+    "publication_method": "Explicit allowlist of scope labels, numeric outcomes, package integrity, safe command templates and hashes. No transcript excerpts, host paths, keys, session identifiers or complete native logs."
+  }
+}
