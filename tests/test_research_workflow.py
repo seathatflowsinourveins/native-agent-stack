@@ -138,10 +138,20 @@ class ResearchWorkflowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             p = Path(directory)
             env = m.child_environment(p, os.environ['PATH'], p)
-            _, timed_out = m.command_run([sys.executable, '-c', code], '', p, 'test', env, 0.5)
+            returncode, timed_out = m.command_run([sys.executable, '-c', code], '', p, 'test', env, 0.5)
             self.assertTrue(timed_out)
+            self.assertEqual(returncode, -signal.SIGTERM)
             pid = int((p / 'test.stdout').read_text().strip())
             self.assert_retired(pid)
+
+    def test_completed_command_preserves_exit_status(self):
+        m = self.implementation()
+        with tempfile.TemporaryDirectory() as directory:
+            p = Path(directory)
+            env = m.child_environment(p, os.environ['PATH'], p)
+            result = m.command_run([sys.executable, '-c', 'raise SystemExit(7)'],
+                                   '', p, 'completed', env, 5)
+            self.assertEqual(result, (7, False))
 
     def test_supervisor_signal_retires_child_group(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -173,8 +183,11 @@ class ResearchWorkflowTests(unittest.TestCase):
 
     def assert_retired(self, pid):
         for _ in range(30):
-            stat = Path(f'/proc/{pid}/stat')
-            if not stat.exists() or stat.read_text().split()[2] == 'Z':
+            result = subprocess.run(['ps', '-o', 'stat=', '-p', str(pid)],
+                                    capture_output=True, text=True)
+            self.assertIn(result.returncode, (0, 1), result.stderr)
+            state = result.stdout.strip()
+            if not state or state.startswith('Z'):
                 return
             time.sleep(0.05)
         self.fail(f'Test descendant {pid} survived cleanup')

@@ -1808,8 +1808,8 @@
     },
     {
       "path": "blueprints/us-equities/research-runtime/run_worker.py",
-      "sha256": "6ea4f5c6f6a62405bf21310b712f8b5759c439996ffecd68fdb0a6bf0b6d047f",
-      "bytes": 18161
+      "sha256": "2fa3497dd6212181205676acd0ca719e66160cc6586c6a3e34e11331601e9cc8",
+      "bytes": 18138
     },
     {
       "path": "blueprints/us-equities/retrieval-evaluation/README.md",
@@ -2838,8 +2838,8 @@
     },
     {
       "path": "tests/test_research_workflow.py",
-      "sha256": "15b2d7472cdb33ac6410b428370fe952741de74bd53116c68cbb97b3302d466a",
-      "bytes": 9161
+      "sha256": "a14b3159757516ffd7d8b795a7f3217acf808e186ec5f3e17f2b4b639504a0b7",
+      "bytes": 9857
     },
     {
       "path": "tests/test_validate.py",
