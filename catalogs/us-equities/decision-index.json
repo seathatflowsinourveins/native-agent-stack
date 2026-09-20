@@ -164,10 +164,10 @@
     "repositories": 512,
     "public_star_repositories": 342,
     "beyond_public_stars": 170,
-    "references": 1064,
+    "references": 1065,
     "repositories_by_record_type": {
       "catalog_card": 147,
-      "component_record": 65,
+      "component_record": 66,
       "legacy_candidate": 20,
       "public_star": 342,
       "research_supplement": 103,
@@ -3586,6 +3586,7 @@
       "public_star": true,
       "record_types": [
         "catalog_card",
+        "component_record",
         "public_star",
         "research_supplement",
         "star_review"
@@ -3619,6 +3620,12 @@
           "decision": "already_covered",
           "review_level": "prior_catalog",
           "review_depth": "prior_evidence_link"
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/65",
+          "id": "omniroute"
         }
       ]
     },

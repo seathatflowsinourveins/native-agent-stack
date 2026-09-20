@@ -74,6 +74,7 @@
     "current_token_clean_prefix": "evidence/receipts/native-token-clean-prefix-20260920.json"
   },
   "recipe_map": {
+    "omniroute": "docs/foundation-stack.md",
     "affaan-m/ECC": "recipes/README.md",
     "agent-browser": "recipes/README.md",
     "agentsview": "recipes/README.md",

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-20",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "ff299948c52dcc5ee83e29121f1f299f10ad9635",
+  "source_revision": "6b9578f09a5cad48e0fb256a993f3037da355bb5",
   "layers": [
     {
       "id": "agents",
@@ -290,6 +290,12 @@
     }
   ],
   "guides": [
+    {
+      "title": "Memory, RAG and token-efficiency foundation",
+      "body": "Fresh native client results, repaired Python/JavaScript retrieval, clean OmniRoute installation and explicit preview, quota and observation limits.",
+      "path": "docs/foundation-stack.md",
+      "category": "evaluation"
+    },
     {
       "title": "Final token-efficiency repositories and native client results",
       "body": "Fourteen core tools with upstream commands, returned results, scoped counters and baseline comparisons; native Codex and Claude acceptance plus independently correlated observation.",

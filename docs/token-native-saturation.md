@@ -9,7 +9,7 @@ and retained artifacts remained intact. This closes those scoped installation,
 restart and cleanup stages; it does not certify a new operating system or every
 optional lifecycle across the catalog.
 
-This dated matrix covers all 65 selected component records and distinguishes them from the 512-repository research catalog. Every selected component has an installation assessment, integration mode, native recipe, functional and lifecycle boundaries, and baseline status in the [machine-readable matrix](../blueprints/token-native-focus/saturation-audit.json). The other 447 identities are reviewed choices or alternatives; catalog inclusion is not installed adoption.
+This dated matrix covers all 66 selected component records and distinguishes them from the 512-repository research catalog. Every selected component has an installation assessment, integration mode, native recipe, functional and lifecycle boundaries, and baseline status in the [machine-readable matrix](../blueprints/token-native-focus/saturation-audit.json). The other 446 identities are reviewed choices or alternatives; catalog inclusion is not installed adoption.
 
 The audit reuses retained acceptance whose inputs still match. This aggregation launches no provider model tasks; the later focus wave separately records one bounded task in each native client. It does not manufacture a counter or require every specialist to run at startup. Exact per-artifact reductions, native historical estimates and provider usage remain separate. No evidence establishes a universal SOTA ranking or exact causal lifetime provider savings.
 
@@ -81,6 +81,7 @@ pairs, including losing comparisons; they are not provider lifetime savings.
 | `ntfy` | observability | use | supporting workflow / 0 |
 | `openresearch` | supporting | use | supporting workflow / 0 |
 | `opentelemetry-collector-contrib` | observability | use | supporting workflow / 0 |
+| `omniroute` | optional | install, persistence, restart, cleanup (isolated Linux fixture only) | optional gateway; use/recovery partial; preview comparisons retained separately |
 | `otel-tui` | supporting | use, cleanup | supporting workflow / 0 |
 | `pandas` | supporting | use | supporting workflow / 0 |
 | `playwright-cli` | optional | use, cleanup | supporting workflow / 0 |
