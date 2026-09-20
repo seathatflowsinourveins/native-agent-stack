@@ -7,13 +7,44 @@ external font. Source links navigate only when selected. GitHub shows HTML sourc
 download the file to view it locally. The same file can be served by an existing
 static host, but this change does not configure GitHub Pages or paid hosting.
 
-The four views connect a layered ecosystem map, the canonical repository explorer,
-token-efficiency policy, and evidence with dated source provenance. All 505 public
-index identities and the existing 342-star snapshot are retained. The separate
+The five views connect a layered ecosystem map, the canonical repository explorer,
+selected-stack setup, token-efficiency evidence, and dated source provenance. Every
+current public index identity and the existing 342-star snapshot are retained. The separate
 current-integrations lane makes newly observed Tavily setup searchable without
 silently enlarging the canonical index or accepted component manifest. Stars and
 awesome lists remain discovery signals. Layer tags are navigation heuristics,
 not adoption decisions or quality scores.
+
+## Use the setup and efficiency views
+
+**Selected stack & setup** includes every component in `manifests/stack.json`,
+with layer and adoption-profile filters, the selected version, native command
+examples and a button that opens its complete recipe inside the HTML. Recipe
+Markdown is embedded once per document and displayed as escaped text in expandable
+sections, so its commands and surrounding conditions remain available offline.
+The setup, update and portable token-report guides are also embedded. When present,
+`adoption/lifecycle.md` supplies the lifecycle continuation guide.
+
+The selected manifest joins `adoption/manifest.json` to the dated
+`blueprints/token-native-focus/saturation-audit.json` by component identity.
+Every component needs a recipe and exactly one canonical catalog repository;
+unknown profile components or receipt references fail the build. A missing audit
+row or a different audited version remains visible and never becomes accepted.
+Lifecycle stages, client integration, functional scope and artifact baselines
+retain their source qualifications. Current acceptance on a new PC is unknown.
+
+**Token efficiency** displays the recorded artifact comparisons, including
+negative differences, and the public receipts' sanitized upstream returned fields.
+The optional `selection_policy` in the presentation manifest records each task's
+chosen representation and quality check. A choice can keep a larger original when
+the task needs all of its content. The page never optimizes by token count alone,
+sums overlapping savings, runs commands or imports private client state.
+
+For fresh complete upstream stdout/stderr and cumulative observations on another
+PC, use the embedded portable token-report guide. That private per-host report is
+separate from this deterministic public catalog and from Grafana's live monitoring
+dashboard. The optional `token-practice-confirmation-20260920` receipt is embedded
+when registered in `manifests/evidence.json`; its absence is not a zero counter.
 
 ## Rebuild and check
 
@@ -51,7 +82,8 @@ update the existing publication hash manifest after regeneration.
 
 Existing source-record links use the recorded immutable public base commit.
 New files in `docs/ecosystem/` did not exist at that base; their links use public
-`main` after publication, while their exact bytes are embedded or hash-listed.
+`main` after publication, as do the new lifecycle guide and confirmation receipt,
+while their exact bytes are embedded or hash-listed.
 The page makes this distinction explicit. This does not turn a moving branch
 link into an immutable source pin; upstream review records retain exact commits.
 
