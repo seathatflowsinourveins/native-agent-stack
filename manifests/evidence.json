@@ -543,7 +543,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1525,7 +1525,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -2003,8 +2003,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "56a48bc10a8f67b99b926961551e1b040b2ccbb239081dd388af3d6eac6b7ad1",
-      "bytes": 1719
+      "sha256": "dc0405f71df254ca0b0af91f52f763492e495ca4a2291629e315c328ca9a4c7a",
+      "bytes": 2603
     },
     {
       "path": ".gitignore",
@@ -5084,8 +5084,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "56c03e8b3d2caddb30d9a724d39408455faad59217f9b709b21652fb71a1e6f3",
-      "bytes": 3719994
+      "sha256": "0e2809e38d0612c7a193231332eb93c4f5582931cabbdd169c56c1b6b290f9ac",
+      "bytes": 3720316
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5094,8 +5094,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "7e9fe612e6dd928c1b482a804c7fbe54484ea6de08a1fe993452b92a64b55b40",
-      "bytes": 31617
+      "sha256": "70b83089de6b986178d99df44d9969e8f5df9712dc2121607cf7e967188cd409",
+      "bytes": 31611
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6079,8 +6079,8 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "7404e514011d172c6a00ffad970b11c0c1b334d7489ed7aa3b5ff6dff6da64f3",
-      "bytes": 1582
+      "sha256": "42f49b071a9252bc62dea3fb223c32844a7687d4b5c51aeadfa27d2760f9fb32",
+      "bytes": 1814
     },
     {
       "path": "catalogs/foundation/README.md",
@@ -6094,8 +6094,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "239010ccc9abc258c3eb0344f482cd6afc3e46e21226cdfdc8b1867986c0731f",
-      "bytes": 17112
+      "sha256": "480988f1500bf01224ad767b104c62f9cffbcd6099ed149c77cded095ea4bd67",
+      "bytes": 17203
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -6449,8 +6449,8 @@
     },
     {
       "path": ".github/workflows/native-offhost-restore.yml",
-      "sha256": "a9c7c95034206b338a7a4a5dd5f8731d51a24c9e3a75f0faad46fc787a4e8eca",
-      "bytes": 6296
+      "sha256": "4525ef97b6827eccd02bb8effad79f15d10e436149ecdf6d33160ec82ba34efe",
+      "bytes": 6306
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/README.md",
@@ -6534,8 +6534,8 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/README.md",
-      "sha256": "af1ed044e58e6ff69ff18e40dd8e764f5216db827a093449a352c488dc302e11",
-      "bytes": 5852
+      "sha256": "93c411197a21bba2708a940a407fda9ce57e927ee0a9d2c8cbc21ed9ab69668d",
+      "bytes": 6975
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/guest.py",
@@ -6549,7 +6549,7 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/native-reboot-observer.service",
-      "sha256": "e296c8f589626e9624f128281f08edd7fdbb612259a3785cc84ae4c361a42827",
+      "sha256": "9627403934945a860ebe9a025239fa43e5da3764a7f724dc0cc0bc103c24c463",
       "bytes": 372
     },
     {
@@ -6579,8 +6579,8 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/run.py",
-      "sha256": "c12a6726fe4b02b76ef9406b2386295237f6f9ff58b03bf9c104b2c9a6eb5094",
-      "bytes": 23185
+      "sha256": "48a22bb48ec067f92e60e1b3d96dfb2678eba83f4d4e2517d214fb34087bd875",
+      "bytes": 23469
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/setup.sh",
@@ -6589,8 +6589,8 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/source-review.md",
-      "sha256": "c8b49ffecb8182793468440fdc229bb227608cd7a92bdb7ec6ab1552bed24bd7",
-      "bytes": 7554
+      "sha256": "9a606e714c853edba024788f0cfb306446ba8ed1077abe5f35597912427b5aa4",
+      "bytes": 9441
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/upstream-tests.sh",
@@ -6599,8 +6599,8 @@
     },
     {
       "path": "tests/test_service_reboot.py",
-      "sha256": "a8151f6d5b1ce0a228bb391df24afae05f3fec7b627abbf86f6cada4dfc61864",
-      "bytes": 11295
+      "sha256": "68e80146c781865c5250c881c2956e84d58daaed4b594411b9a19a051b62923f",
+      "bytes": 12901
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/attempt-1/hosted-plan.json",
@@ -6689,8 +6689,8 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/prior-attempts.json",
-      "sha256": "0bfcdc42253469864bb414f5c7d93b755e90384a3d2f99dc8766fd076f4311af",
-      "bytes": 3024
+      "sha256": "dc8b74b48c06059d049295d7f9e6795084475316fdfe23d39ee112a0db9c63b3",
+      "bytes": 4295
     },
     {
       "path": "evidence/artifacts/native-dagu-retry-20260920/archive-verification.txt",
@@ -6873,14 +6873,189 @@
       "bytes": 4041
     },
     {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/cleanup.json",
+      "sha256": "6aadee9cb7005d261df5f0337cc289190378cb5f3d2f49a264428452acd17b75",
+      "bytes": 111
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/failure.json",
+      "sha256": "abef2c46976afac2ef8cf939ce248462effaa0462c802e7a655d7e8127037b50",
+      "bytes": 213
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/freeze.json",
+      "sha256": "59957fe97e8cd0dab4aba37ef525a824b0c592cc7c1ebbb92c012890aa06d85c",
+      "bytes": 4501
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-after.json",
+      "sha256": "9d9fd30177758cffdb77724e0117a2df0ff9877d801cb65967976e584ec61a8d",
+      "bytes": 678
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-before.json",
+      "sha256": "2f9eaae80a94f93b8728ae73845bffc608b8025d4712b75ee8cb6e10aa22b696",
+      "bytes": 551
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-checkpoint-started.json",
+      "sha256": "b2845c6042555a2d116bbea41631666e3eed78a03a8b94615d1fe00c5f70a837",
+      "bytes": 27
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-checkpoint-tests.log",
+      "sha256": "56ffa2bbe16ecc9157c5dc3cfb62741fb5f273144373e7ba37af2ddf723ed30c",
+      "bytes": 1177
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-checkpoint.json",
+      "sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+      "bytes": 238
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-completed.json",
+      "sha256": "382717ea740e3d3dbb68f704b2581baa6f8d4b6292c83328a06d2ec44a435376",
+      "bytes": 133
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-final-tests.log",
+      "sha256": "fc39e4548221ddd93f7a604ce0b30a1d6965894288a2789279d11886a87f8b8a",
+      "bytes": 1177
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-history-after.stdout",
+      "sha256": "d5039dac489f949e42bca76566fdef93db1b90a292a999d180693f5e9fe0d7ca",
+      "bytes": 239
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-history-before.stdout",
+      "sha256": "175ac4f655416abc8582af180d18289651ddf47dfb8cb14054106107c4d4c84a",
+      "bytes": 195
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-history-interrupted.stdout",
+      "sha256": "c04a007d383db672b46b842a50c4e889d895635ce947d155589f660e94a4f481",
+      "bytes": 238
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-reboot.command.json",
+      "sha256": "0feae9daa84e778eeabebc5a079a50d65922ac9c3840b70fd3f7321580a8a8d5",
+      "bytes": 664
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-reboot.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-reboot.stderr",
+      "sha256": "3918242f46234201fcfa14926336234fc4c93ca7fda523b3295b2e575dccb6af",
+      "bytes": 85
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-retry.command.json",
+      "sha256": "9e94b94cf80390f16a7211943f8950a90ae08bba7f88003e1d8b11b35af1cb4b",
+      "bytes": 487
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-retry.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-retry.stderr",
+      "sha256": "60467ce07b32e1137a5b6c0d6d4d60063612522c4107821ebe68f6883ce05271",
+      "bytes": 846
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/guest-retry.stdout",
+      "sha256": "f0970ad0d47c4d5c5a4b92f4f85a5fa711f56e290581524e351755089765f679",
+      "bytes": 507
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/journal-excerpts.json",
+      "sha256": "682a30d1ddcb9366fefcce2d22e8fb2249204219e84bbd14b9f893e1caac27d6",
+      "bytes": 28771
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/plan.json",
+      "sha256": "f535beb53ef4046a02b39cd85a146d9f3136ad2e9b2e1b57390352133f2871f3",
+      "bytes": 4467
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/publication.json",
+      "sha256": "83e71fea7295d6c6fcc7a86922132c0f4026c995460f4f68c22d2e2d9ba8f951",
+      "bytes": 8885
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/qemu-block-device-help.stdout",
+      "sha256": "e61701bf289d8fc9755dad2bdfaa2317b9a86f5e6cf0a3cb18674d370f3c380e",
+      "bytes": 3823
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/qemu-version.stdout",
+      "sha256": "8f79ffd97970d85d6833a0ccc87f5d6e7182f8f52101c741dfa2fb6374670b18",
+      "bytes": 132
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/qemu.command.json",
+      "sha256": "e05360034b574fd101f8aeeebeb67847eb807f4bc0a1e4dce907786411862a46",
+      "bytes": 1020
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-2/serial-records.json",
+      "sha256": "1c74c53257067f672ddc594efd34e31cfaf5e9d4315c02a795595f2205fb3ab1",
+      "bytes": 408
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/observer-repair.json",
+      "sha256": "fec43c4bcc017fddb079c07ed77c6aa3e16638aa1bd87f10edcbddf2af2fe391",
+      "bytes": 2199
+    },
+    {
       "path": ".github/dependabot.yml",
       "sha256": "d2f1900108fff96b1d677f0c5fb62a9513e89a122aac08d3eb50350bc372aa05",
       "bytes": 350
     },
     {
+      "path": ".github/main-ruleset.json",
+      "sha256": "e466d3a4f52f6c4b2e0dcb6e73b10875b9a9a3c2bd65a2651db4ef458d47e1cd",
+      "bytes": 594
+    },
+    {
+      "path": "docs/github-automation-evidence.json",
+      "sha256": "0ba607adbe2cca73708bd727a3458be94a46ee3c83f91361366761cc88bc7518",
+      "bytes": 4770
+    },
+    {
       "path": "docs/github-automation.md",
-      "sha256": "6a31aa647d4289f4266bc3d3012f0249ed0298342a4983d81e8e21afe5f11f96",
-      "bytes": 8113
+      "sha256": "a1176511800c6b0a8a288392f29dd67a951920b18b0afd0496ca905766c2e903",
+      "bytes": 11240
+    },
+    {
+      "path": "docs/research-task-acceptance.md",
+      "sha256": "82669589d53b1dda2e6fb779343d5d892ef940562648da06a9c9c54028234351",
+      "bytes": 5928
+    },
+    {
+      "path": "docs/tasks/2026-09-20-github-automation.md",
+      "sha256": "2644001cf9d53d993e74ce47245fac0bb4cefad34c6007823d97ff840bf1b0b8",
+      "bytes": 6869
+    },
+    {
+      "path": "docs/upstream-maintenance-pilot.md",
+      "sha256": "4b3410eed8701056b412c65938aac3a453e4d72a2fb70ee59313170433c970de",
+      "bytes": 7856
+    },
+    {
+      "path": ".github/workflows/publish-catalog.yml",
+      "sha256": "94a3a78e8e4db96198cd51e551485bd4347ab0937457f8c2f83144cc00f1ed4b",
+      "bytes": 6585
+    },
+    {
+      "path": "docs/catalog-provenance.md",
+      "sha256": "cfdbdebda42c9b9113f407e07a1304b51af186a856e687dc4eb148d32f3ee2c1",
+      "bytes": 13873
     }
   ],
   "convergence_records": [

@@ -1,0 +1,9 @@
+{
+  "detail": "Automatic serial observation deadline exceeded",
+  "error_type": "TimeoutError",
+  "events": {
+    "before_observed": 229.70771321,
+    "reboot_requested": 229.707715104
+  },
+  "status": "failed"
+}

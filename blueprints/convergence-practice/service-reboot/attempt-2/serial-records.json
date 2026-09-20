@@ -1,0 +1,10 @@
+{
+  "raw_sha256": "48ffdbe04d96366e2f4361d48cfcdae6b8b49be4198538dd62fcc8debfe12397",
+  "raw_bytes": 141978,
+  "lines": [
+    {
+      "line": 1052,
+      "text": "NATIVE_REBOOT_OBSERVER {\"boot_id\": \"synthetic-id-758baf1bfb15051f\", \"linger\": true, \"phase\": \"before\", \"record_sha256\": \"0f74b13406f016d0acd6d251be05badec0111107fd8cbd605317f4c2e8851b5a\", \"user_manager\": \"active\"}"
+    }
+  ]
+}

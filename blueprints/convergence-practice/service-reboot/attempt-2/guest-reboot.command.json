@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "ssh",
+    "-i",
+    "$RUNNER_HOME/work/_temp/native-service-reboot/private/ssh-key",
+    "-p",
+    "47293",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "IdentitiesOnly=yes",
+    "-o",
+    "StrictHostKeyChecking=accept-new",
+    "-o",
+    "UserKnownHostsFile=$RUNNER_HOME/work/_temp/native-service-reboot/private/known_hosts",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "ConnectTimeout=10",
+    "example@127.0.0.1",
+    "sudo /usr/bin/systemctl reboot"
+  ],
+  "ended_utc": "2026-09-20T21:31:07.493719+00:00",
+  "exit_code": 0,
+  "started_utc": "2026-09-20T21:31:01.571733+00:00",
+  "timeout_seconds": 30
+}

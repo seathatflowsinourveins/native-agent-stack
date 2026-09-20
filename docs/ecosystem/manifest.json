@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-20",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "73ba196cf685a6a67e0d66576e06ded50fd4f554",
+  "source_revision": "61ff66a038e4594858477f4f24af5424bc4af899",
   "layers": [
     {
       "id": "agents",
@@ -330,7 +330,7 @@
     },
     {
       "title": "GitHub automation and upstream maintenance",
-      "body": "Focused PR checks, grouped upstream Action updates, native workflow validators and a bounded GitHub Agentic Workflows adoption path.",
+      "body": "Required PR checks, grouped Action updates, one native maintenance owner, catalog provenance and measured research acceptance.",
       "path": "docs/github-automation.md",
       "category": "setup"
     },

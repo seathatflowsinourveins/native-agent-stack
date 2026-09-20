@@ -4,6 +4,14 @@ Use GitHub to maintain reproducible recipes and qualify selected changes. The
 useful result is a working research task, current instructions or a recoverable
 artifact. A green PR alone establishes only the checks that actually ran.
 
+Start with [current verification and limitations](tasks/2026-09-20-github-automation.md),
+[publication provenance](catalog-provenance.md),
+[research-task acceptance](research-task-acceptance.md), and the
+[bounded upstream pilot](upstream-maintenance-pilot.md).
+The [PR #26 qualification record](https://github.com/seathatflowsinourveins/native-agent-stack/pull/26)
+links the final hosted revision, integration and publication outcomes; local
+implementation records below remain dated observations.
+
 ## Event and execution policy
 
 The four ordinary workflows run on pull requests, relevant pushes to `main`,
@@ -76,6 +84,14 @@ zizmor --offline --no-config --no-ignores --no-progress --persona regular --stri
 python3 scripts/validate.py
 ```
 
+The `validate` job now downloads that same pinned release, verifies the recorded
+archive SHA-256 and runs actionlint across all workflows before integrity checks.
+This closes the gap between an optional local check and routine PR acceptance.
+The existing checksum-locked zizmor 1.30.1 lane remains independent. Actionlint's
+embedded shellcheck found two existing sudo/redirection warnings when expanding
+from four to all workflows; `tee` now retains the same apt logs under Bash pipefail.
+No analyzer suppression or integrity exemption was added.
+
 Record exact returned results and the revision. Installation/version output alone
 does not prove the workflows passed. The optional analyzer is not a new required
 runtime component for ordinary Codex/Claude tasks.
@@ -105,8 +121,11 @@ by this guide. A useful initial pilot is one source-cited report on a material
 upstream change affecting an accepted component, with the relevant acceptance
 commands and explicit missing evidence. Start manually with read-only access and
 a bounded model allowance, then assess useful findings, false positives and cost.
-Assign this maintenance responsibility either to the existing Codex task or the
-GitHub workflow before scheduling it; avoid duplicate catalog maintenance.
+The existing ACTIVE daily 09:00 America/New_York Codex task, **Maintain native
+foundation and trading catalogs**, already owns this responsibility. Its saved
+scope covers source changes, retained acceptance, both catalogs and quiet operation
+unless actionable. Keep that owner; no second schedule or competing writer was
+created. The [pilot](upstream-maintenance-pilot.md) evaluates one concrete change.
 
 Keep deterministic checks in supported Actions and native commands. Agent-written
 summaries do not substitute for returned test output or separate observation.
@@ -115,18 +134,45 @@ do not transfer a native client's credential store.
 
 ## Publication and practical acceptance
 
-A future repository ruleset can require the always-running `validate` and
-`token-report` jobs. Do not require a workflow that path filtering can prevent
-from starting. Require native acceptance when its capability changes. Configure
-review requirements to match the actual maintainers; this guide changes no remote
-rules, approval counts or branch permissions.
+The active [main ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774)
+requires the always-running `validate` and `token-report` jobs from GitHub Actions
+(app ID 15368). Its reviewed configuration is [main-ruleset.json](../.github/main-ruleset.json).
+It adds no human approval count, strict up-to-date requirement or bypass actor.
+Native path-filtered and manually dispatched checks are not global requirements.
+Require native acceptance separately when its capability changes. No merge queue
+is enabled; add `merge_group` support before adopting one.
 
-[Artifact attestations](https://docs.github.com/en/actions/concepts/security/artifact-attestations)
-can later identify the producing workflow and revision for a published catalog or
-evidence bundle. They prove provenance, not the truth or adequacy of its claims.
+The prior state had no rulesets and returned `Branch not protected` for main.
+After applying the configuration, a separate `GET /repos/OWNER/REPO/rules/branches/main`
+confirmed both required contexts and their expected app. This verifies settings,
+not an experimentally attempted blocked merge. GitHub's [rules REST interface](https://docs.github.com/en/rest/repos/rules)
+and [status-check behavior](https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks)
+define these controls.
 
-For ecosystem usefulness, exercise a representative native Codex/Claude research
-task and inspect its result, retrieval sources, continuity and complete available
-usage. Preserve its baseline and quality criteria. GitHub fixture results do not
-establish current-session activation or causal token savings. Apply the
+Maintenance commands, from a reviewed checkout with native `gh` sign-in:
+
+```sh
+gh api repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774
+gh api --method PUT repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774 --input .github/main-ruleset.json
+gh api repos/seathatflowsinourveins/native-agent-stack/rules/branches/main
+```
+
+Update the existing ID instead of creating duplicates. To roll back only this
+ruleset, use `gh api --method DELETE repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774`;
+leave unrelated settings intact. Reverting the workflow/dependency commit restores
+prior scheduling. Dependabot has no auto-merge; its version PRs still need reviewed
+source/hash updates. The automation maintainer owns the actionlint release/checksum,
+CI lock and ruleset; Dependabot owns only GitHub Actions references.
+
+[Native artifact attestations](catalog-provenance.md) identify the producing
+workflow and revision for a manually published catalog/evidence archive. The
+workflow is prepared for trusted-main execution; issuance, download verification
+and tamper rejection must be recorded from that hosted event in the qualification
+record. Local checks alone do not establish them. Attestations prove
+provenance, not the truth or adequacy of the archive's claims.
+
+For ecosystem usefulness, use the [native research acceptance guide](research-task-acceptance.md).
+It preserves an existing declared baseline, source/quality rubric, elapsed time,
+available native usage and failures. Hosted fixtures, local runtime activation,
+provider consumption and artifact/token estimates remain distinct. Apply the
 [acceptance evidence policy](acceptance-evidence-policy.md) throughout.
