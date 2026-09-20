@@ -290,6 +290,12 @@
     }
   },
   "verification": {
+    "ci_environment": {
+      "initial_run": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35481061701",
+      "initial_result": "292 discovered; one SDK-dependent test errored because Requests was present but Alpaca-py absent;33 other dependency cases skipped.",
+      "correction": "Check Alpaca distribution presence before native imports. Missing distribution skips only the optional SDK seam; incompatible installed SDK still fails.",
+      "focused_recheck": "23 cases passed with3 skips in the lightweight local interpreter;23 passed without skips in the adopted SDK. Final exact-commit result is recorded by GitHub Actions."
+    },
     "local_tests": {
       "command": "\"$SDK_PYTHON\" -m unittest",
       "exit_code": 0,

@@ -1068,8 +1068,8 @@
     },
     {
       "path": "blueprints/us-equities/authenticated-data/native-receipt.json",
-      "sha256": "f3e75950cb5499d4b74cc7a808b04905aad85d913128b2dad565940b38f2e410",
-      "bytes": 11587
+      "sha256": "ad49cf581b4add46de77bb717d3e2d9dcae0c5b44a08cc7b831a2922361ca657",
+      "bytes": 12256
     },
     {
       "path": "blueprints/us-equities/authenticated-data/plan.json",
@@ -2753,8 +2753,8 @@
     },
     {
       "path": "tests/test_alpaca_historical.py",
-      "sha256": "f0b31bf55f7dc543603061ea14603d5d5aced09cadf61b988effbaee4ac33c00",
-      "bytes": 18630
+      "sha256": "4ec30086b77d6a75081be8ffdae1a7aa5fe516229573aa71eec818c2f5f58ac0",
+      "bytes": 18678
     },
     {
       "path": "tests/test_catalog_decisions.py",

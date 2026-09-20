@@ -232,9 +232,10 @@ class AlpacaHistoricalTests(unittest.TestCase):
         except ImportError:
             self.skipTest("requests dependency is not installed in this interpreter")
         try:
-            self.m.native_identity()
+            importlib.metadata.version("alpaca-py")
         except importlib.metadata.PackageNotFoundError:
             self.skipTest("alpaca-py is not installed in this interpreter")
+        self.m.native_identity()
         captures = []
         raw = b'{"bars":{"AAPL":[]},"next_page_token":null,"exact":1.1234567890123456789}'
 
