@@ -1,9 +1,16 @@
 """Reject overclaims and evidence drift without rerunning native work."""
 
 import copy
+import importlib.util
+from pathlib import Path
 import unittest
 
-from audit import audit, load
+SPEC = importlib.util.spec_from_file_location(
+    "wsl_transport_audit", Path(__file__).resolve().parent / "audit.py"
+)
+MODULE = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(MODULE)
+audit, load = MODULE.audit, MODULE.load
 
 
 class TransportEvidenceTests(unittest.TestCase):

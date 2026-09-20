@@ -3024,8 +3024,8 @@
     },
     {
       "path": "blueprints/convergence-practice/wsl-transport-recovery/test_transport_evidence.py",
-      "sha256": "eaa63e30db04ae5a67fdee18c87400ae6fd8795d89471f45927cd7d4e03e24b3",
-      "bytes": 2546
+      "sha256": "d9118347a368b2877055eb648e650e875156609b0cd0a435b6cc3b5b874e8a6e",
+      "bytes": 2803
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
@@ -4624,7 +4624,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "2d9a08bb2d3b07658ef55cea66a4fff44b99e55bd19c9ff47064671f071580ea",
+      "sha256": "52a34bc1dea8058df8fe0d8d7722e29c3f9740fabb4832a32cfd3c68b49db6d3",
       "bytes": 1658768
     },
     {
@@ -4634,7 +4634,7 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "ace2943e5dc66e220f357b806fc6c5ff6a928431346cf8a351fb5ff630ad25b9",
+      "sha256": "1175af546be7ff7bdd441cd3a7087ca9125322d00f83b6b49133fc2caaef7aa5",
       "bytes": 21285
     },
     {
