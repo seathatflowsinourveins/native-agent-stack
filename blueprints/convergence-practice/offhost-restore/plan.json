@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "id": "synthetic-independent-host-restic-20260920",
+  "frozen_before_preparation": true,
+  "native_version": "0.19.1",
+  "binary_sha256": "20d4142678d0d95ec11a4759def1b73fd9190abc9ca19e4b62d067c0b387e639",
+  "source_parent": "/tmp/native-foundation-offhost-20260920/preparation",
+  "frozen_sources": [
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/run.py",
+      "sha256": "aa6a18135141b937f700b162afd40200aadc7ec9a2b1829e223deace8c689b76"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/plan.json",
+      "sha256": "51713da3bf2be0902e059067d9a287ce2870a93d5a4fd2a4747d4fb702d5c0b3"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/fixture.py",
+      "sha256": "153b0a13d80ab0c0eecb623942237664988c35cb586394f64e70e83106583bf1"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/corruption.py",
+      "sha256": "8f9220e40a8fb550d77b7ef7afec4dd81b591134c190a904d9abc018c2f1b96e"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/install.py",
+      "sha256": "243d7174ab90d3cac7667a6af74bb2062c9f0fc3275aa2b447b25afa870f3c07"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/attempt-2/expected-1.json",
+      "sha256": "72bba97f54f1baefb1f3179e4823976d2074a653987e52c200052e64d98ddfb6"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/attempt-2/expected-2.json",
+      "sha256": "252b94638ee49bded6de21d11dc6cf8b7689548041ad2416dfb26aeb6ae78c56"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/prepare.py",
+      "sha256": "ab6341195c9b1f5e2ed1545387de4e4cc3dd91e7044d486aacdc1850153bb4b5"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/verify.py",
+      "sha256": "fd51bb5c2ccdea21134b03848e53130bb0cf7dcf53840f988424533fa4bc772f"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/run.py",
+      "sha256": "6e684a911a72efa9df9dd58ae335496fc46060aa177eaf534e01f4eb4bdece93"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/probe.py",
+      "sha256": "910e07c81969109d55a34b07a568e2afdb2edd22fe1a3f51eb68690327242115"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/contract_probe.py",
+      "sha256": "a537cfcf9eb017343fd9163375517aa6f665077c3d43a1f492bb29b9a294c8b7"
+    },
+    {
+      "path": "tests/test_offhost_restore.py",
+      "sha256": "77ac24a0d2094856b2d5dfcccafbef49ff7e7f0d5ee90628293e64b076c030a8"
+    },
+    {
+      "path": ".github/workflows/native-offhost-restore.yml",
+      "sha256": "24a495d0d66e50f30b3a87d8b18efe2d6db282811637af6aba97a5ca2b3dd569"
+    }
+  ],
+  "sequence": [
+    "Verify frozen sources and installed binary; create only the absent owned neutral task root.",
+    "Execute unchanged corrected wsl-restore/run.py prepare once. It creates two synthetic snapshots, full read-data check, wrong-password exit12/no files, isolated copied-pack corruption refusal and immutable original manifest.",
+    "Record the original encrypted manifest privately; native key add creates a neutral user/host record using the same fixture password; verify both exact IDs with the new key hint before native removal of the sole original automatically named key.",
+    "Full native check; require unchanged snapshot/data/index/config ciphertext; freeze exact exported manifest, Base64 ciphertext envelope, two IDs and public sanitized source receipt.",
+    "Coordinator alone provisions the non-overwriting repository Actions secret, integrates and dispatches a fresh hosted runner. No local hosted-acceptance substitution.",
+    "Hosted runner verifies release signatures/checksums/version, tests deterministic namespace/read-only/private-mode contract, refuses a missing secret, and copies exact ciphertext into a new owned runtime.",
+    "Wrong-password restore exits12 and creates no files; correct key check --read-data and both exact snapshot-parent restores --verify exit0 in fresh network/mount namespaces.",
+    "Independent complete path/type/byte/hash/POSIX-mode oracle equals the original frozen expected manifests; repository ciphertext is unchanged after each command.",
+    "Remove only invocation-created native runtime and separately supplied password; upload sanitized reports only."
+  ],
+  "command_timeout_seconds": 120,
+  "aggregate_unchanged_prepare_timeout_seconds": 600,
+  "hosted_job_timeout_minutes": 15,
+  "snapshot_selection": "Two full64-hex IDs frozen in input.json after preparation; never latest or dispatch-supplied IDs.",
+  "secret_name": "FOUNDATION_RESTORE_FIXTURE_20260920",
+  "limits": {
+    "new_synthetic_preparations": 1,
+    "model_calls": 0,
+    "provider_calls": 0,
+    "existing_backup_access": false,
+    "global_settings_changes": false
+  },
+  "limitations": [
+    "Local synthetic preparation is not independent-host acceptance; hosted success must be recorded separately.",
+    "Same GitHub account stores public ciphertext and separately protected Actions secret; not independent administrative trust domains or GitHub-account-loss recovery.",
+    "No reboot, power-loss, production disaster recovery, credential recovery, lost-password recovery, or long-term storage availability claim.",
+    "Only complete fixture path/type/length/SHA256/POSIX-mode equality is qualified; not UID/GID, timestamps, ACL/xattrs, sparse files, links or Windows filesystems.",
+    "No token, performance, or storage-efficiency savings claim."
+  ]
+}

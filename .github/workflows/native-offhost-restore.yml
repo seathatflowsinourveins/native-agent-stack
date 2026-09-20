@@ -1,0 +1,103 @@
+name: Native synthetic independent-host restore
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-restore:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out frozen synthetic inputs
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Create new owned runtime and separate report and secret directories
+        run: |
+          umask 022
+          fixture_root=$(mktemp --directory /tmp/native-foundation-offhost-ci.XXXXXXXX)
+          chmod 0755 -- "$fixture_root"
+          mkdir --mode=0755 -- "$fixture_root/reports"
+          mkdir --mode=0700 -- "$fixture_root/private"
+          printf 'FOUNDATION_RESTORE_ROOT=%s\n' "$fixture_root" >> "$GITHUB_ENV"
+      - name: Verify the oracle and ciphertext decoder refusal cases
+        run: python3 -m unittest tests.test_wsl_restore tests.test_offhost_restore -v
+      - name: Install required native namespace tool and verified restic release
+        run: |
+          output="$FOUNDATION_RESTORE_ROOT/reports"
+          sudo apt-get update >"$output/apt-update.txt" 2>&1
+          sudo apt-get install --yes --no-install-recommends bubblewrap >"$output/apt-install.txt" 2>&1
+          install_status=0
+          python3 blueprints/convergence-practice/wsl-restore/install.py \
+            --destination "$FOUNDATION_RESTORE_ROOT/tool" >"$output/install-summary.json" \
+            2>"$output/install.stderr" || install_status=$?
+          if [ -f "$FOUNDATION_RESTORE_ROOT/tool/installation.json" ]; then
+            cp "$FOUNDATION_RESTORE_ROOT/tool/installation.json" "$output/installation.json"
+          fi
+          if [ "$install_status" -ne 0 ]; then
+            exit "$install_status"
+          fi
+          bwrap --version >"$output/bubblewrap-version.txt"
+      - name: Verify required native namespace and private-file mapping before secret delivery
+        run: |
+          sudo --non-interactive /usr/bin/env -i PATH=/usr/bin:/bin LANG=C.UTF-8 PYTHONDONTWRITEBYTECODE=1 \
+            /usr/bin/python3 "$GITHUB_WORKSPACE/blueprints/convergence-practice/offhost-restore/contract_probe.py" \
+            --output "$FOUNDATION_RESTORE_ROOT/reports/namespace-contract.json"
+      - name: Restore only the frozen synthetic snapshots using the separately delivered secret
+        env:
+          FIXTURE_PASSWORD: ${{ secrets.FOUNDATION_RESTORE_FIXTURE_20260920 }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          value = os.environ.pop('FIXTURE_PASSWORD', '')
+          if not value or len(value) > 256 or '\n' in value.rstrip('\n'):
+              raise SystemExit('Required synthetic fixture Actions secret is missing or malformed')
+          path = Path(os.environ['FOUNDATION_RESTORE_ROOT']) / 'private/password'
+          fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+          with os.fdopen(fd, 'w') as stream:
+              stream.write(value.rstrip('\n') + '\n')
+          PY
+          unset FIXTURE_PASSWORD
+          sudo --non-interactive /usr/bin/env -i PATH=/usr/bin:/bin LANG=C.UTF-8 PYTHONDONTWRITEBYTECODE=1 \
+            /usr/bin/python3 "$GITHUB_WORKSPACE/blueprints/convergence-practice/offhost-restore/run.py" \
+            --root "$FOUNDATION_RESTORE_ROOT/run" \
+            --reports "$FOUNDATION_RESTORE_ROOT/reports" \
+            --password-file "$FOUNDATION_RESTORE_ROOT/private/password" \
+            --restic "$FOUNDATION_RESTORE_ROOT/tool/restic" \
+            --run-id "$GITHUB_RUN_ID" --source-sha "$GITHUB_SHA" \
+            --runner-environment "$RUNNER_ENVIRONMENT"
+      - name: Remove the separately supplied private password
+        if: ${{ always() && env.FOUNDATION_RESTORE_ROOT != '' }}
+        run: |
+          sudo --non-interactive /usr/bin/env -i PATH=/usr/bin:/bin /usr/bin/python3 - "$FOUNDATION_RESTORE_ROOT" <<'PY'
+          import json, re, stat, sys
+          from pathlib import Path
+          root = Path(sys.argv[1])
+          if root.parent != Path('/tmp') or not re.fullmatch(r'native-foundation-offhost-ci\.[A-Za-z0-9]+', root.name) or root.resolve() != root:
+              raise SystemExit('Unexpected owned cleanup root')
+          key = root / 'private/password'
+          existed = key.exists()
+          if existed:
+              if not stat.S_ISREG(key.lstat().st_mode):
+                  raise SystemExit('Unexpected secret file type')
+              key.unlink()
+          report = {'private_password_file_existed': existed, 'private_password_file_removed': not key.exists(),
+                    'scope': 'This job-created secret file only; runner VM disposal remains GitHub managed.'}
+          (root / 'reports/secret-cleanup.json').write_text(json.dumps(report, indent=2) + '\n')
+          PY
+      - name: Retain only sanitized reports
+        if: ${{ !cancelled() && env.FOUNDATION_RESTORE_ROOT != '' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: native-offhost-restore-results
+          path: ${{ env.FOUNDATION_RESTORE_ROOT }}/reports/
+          if-no-files-found: error
+          include-hidden-files: false
+          retention-days: 14
