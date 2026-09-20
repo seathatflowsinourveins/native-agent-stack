@@ -188,6 +188,7 @@ def command_run(command: list[str], prompt: str, directory: Path, role: str,
     stderr_fd = os.open(directory / f'{role}.stderr', os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     with os.fdopen(stdout_fd, 'w') as out, os.fdopen(stderr_fd, 'w') as err:
         process = None
+        timed_out = False
         previous = {}
         def interrupted(signum, frame):
             raise WorkerInterrupted(f'Worker interrupted by signal {signum}')
@@ -200,8 +201,7 @@ def command_run(command: list[str], prompt: str, directory: Path, role: str,
             try:
                 process.communicate(prompt, timeout=timeout)
             except subprocess.TimeoutExpired:
-                retire_group(process)
-                return process.returncode, True
+                timed_out = True
         finally:
             # Repeated cancellation cannot interrupt cleanup halfway through.
             for signum in previous:
@@ -212,7 +212,7 @@ def command_run(command: list[str], prompt: str, directory: Path, role: str,
             finally:
                 for signum, handler in previous.items():
                     signal.signal(signum, handler)
-    return process.returncode, False
+    return process.returncode, timed_out
 
 
 def native_prompt(packet: dict, prior: dict | None) -> str:
