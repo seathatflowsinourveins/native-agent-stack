@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "memory": {
+    "version": "2.3.2",
+    "source_commit": "353841d91618d20b110b208de284a74d0b960379",
+    "repository": "https://github.com/akitaonrails/ai-memory.git",
+    "archive_url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.3.2/ai-memory-linux-x86_64.tar.gz",
+    "archive_sha256": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc",
+    "archive_member": "ai-memory",
+    "binary_name": "ai-memory",
+    "binary_sha256": "93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0",
+    "source_files": [
+      {
+        "path": "Cargo.toml",
+        "sha256": "a40bb66a59ed9a36a5cd601d3f41503d69c59bb0d2e4f5f30e138aa8fee683e3",
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/353841d91618d20b110b208de284a74d0b960379/Cargo.toml"
+      },
+      {
+        "path": "Cargo.lock",
+        "sha256": "b87defce7a96c32547b20a80bb44aa13d629c7f270c534d9a34518c2774fb2ad",
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/353841d91618d20b110b208de284a74d0b960379/Cargo.lock"
+      },
+      {
+        "path": "rust-toolchain.toml",
+        "sha256": "0abe45038b7a3234eb7d050ac4df8c0683ca44396daeadd9a61cf12dbd5d5df3",
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/353841d91618d20b110b208de284a74d0b960379/rust-toolchain.toml"
+      },
+      {
+        "path": ".github/workflows/ci.yml",
+        "sha256": "d5f6bbd68ab8655f0f23d0b2dca03910fbaf5ce620ba8957abf68fc7091962de",
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/353841d91618d20b110b208de284a74d0b960379/.github/workflows/ci.yml"
+      },
+      {
+        "path": "docker/Dockerfile",
+        "sha256": "0d9a379406250a108cfff3f80fc5a3c8f696785a35c1fa3531399a0bcc145100",
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/353841d91618d20b110b208de284a74d0b960379/docker/Dockerfile"
+      },
+      {
+        "path": "crates/ai-memory-cli/Cargo.toml",
+        "sha256": "b35090f4fdc51ef215d1a9364927b087d862618824ed5a6844eef16be7d371d1",
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/353841d91618d20b110b208de284a74d0b960379/crates/ai-memory-cli/Cargo.toml"
+      },
+      {
+        "path": "crates/ai-memory-mcp/Cargo.toml",
+        "sha256": "fc18ea3d92e7a6b57d24a2a36356a41d64df783e7f740c421ce7b1d1de85e3ba",
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/353841d91618d20b110b208de284a74d0b960379/crates/ai-memory-mcp/Cargo.toml"
+      },
+      {
+        "path": "crates/ai-memory-cli/src/lib.rs",
+        "sha256": "0281bdc1a6e67cd0b8eaa1f345b02d5bb63a93fd039daf8f3de9b203c78d2ff6",
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/353841d91618d20b110b208de284a74d0b960379/crates/ai-memory-cli/src/lib.rs"
+      },
+      {
+        "path": "crates/ai-memory-mcp/src/lib.rs",
+        "sha256": "0685a90f1283acb5a153b392e07dc07d33023eb5092a07701ad0aa1fe3be2aba",
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/353841d91618d20b110b208de284a74d0b960379/crates/ai-memory-mcp/src/lib.rs"
+      },
+      {
+        "path": "crates/ai-memory-mcp/tests/suite/mod.rs",
+        "sha256": "e2693e704bf4881da30a73537cb2fb894bcf929e6d5768fb15e10becffdde497",
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/353841d91618d20b110b208de284a74d0b960379/crates/ai-memory-mcp/tests/suite/mod.rs"
+      },
+      {
+        "path": "crates/ai-memory-mcp/tests/suite/admin_backup.rs",
+        "sha256": "a4a750e76ae29121b4caebbad9140248143f0de5c36a571cf94be03ad35ddabd",
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/353841d91618d20b110b208de284a74d0b960379/crates/ai-memory-mcp/tests/suite/admin_backup.rs"
+      },
+      {
+        "path": "crates/ai-memory-cli/src/commands/restore.rs",
+        "sha256": "d113ab0c0305c7703fcf1c274a91bf06866c0dc47f09444b064dd31630ea08fe",
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/353841d91618d20b110b208de284a74d0b960379/crates/ai-memory-cli/src/commands/restore.rs"
+      }
+    ],
+    "test_selections": [
+      {
+        "id": "memory-upstream-backup",
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "-p",
+          "ai-memory-mcp",
+          "--lib",
+          "integration::admin_backup::",
+          "--",
+          "--nocapture"
+        ],
+        "expected_tests": [
+          "integration::admin_backup::backup_returns_application_gzip_content_type",
+          "integration::admin_backup::backup_body_is_valid_gzip_and_contains_seeded_page",
+          "integration::admin_backup::backup_empty_store_still_succeeds",
+          "integration::admin_backup::backup_does_not_dereference_wiki_symlinks"
+        ]
+      },
+      {
+        "id": "memory-upstream-restore",
+        "command": [
+          "cargo",
+          "test",
+          "--locked",
+          "-p",
+          "ai-memory-cli",
+          "--lib",
+          "commands::restore::tests::",
+          "--",
+          "--nocapture"
+        ],
+        "expected_tests": [
+          "commands::restore::tests::restore_accepts_expected_backup_paths",
+          "commands::restore::tests::restore_rejects_link_entries",
+          "commands::restore::tests::validate_restore_entry_accepts_gnu_sparse_for_the_sqlite_path",
+          "commands::restore::tests::validate_restore_entry_still_rejects_gnu_sparse_at_an_unexpected_path",
+          "commands::restore::tests::restore_rejects_unexpected_or_unsafe_paths",
+          "commands::restore::tests::restore_round_trips_a_real_gnu_sparse_sqlite_snapshot"
+        ]
+      }
+    ]
+  },
+  "qdrant": {
+    "version": "1.19.1",
+    "source_commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+    "repository": "https://github.com/qdrant/qdrant.git",
+    "archive_url": "https://github.com/qdrant/qdrant/releases/download/v1.19.1/qdrant-x86_64-unknown-linux-gnu.tar.gz",
+    "archive_sha256": "eef986e769d4d3e806dd2d546e1b4ecdd416211e54d34b4ed764fac7c58e1085",
+    "archive_member": "qdrant",
+    "binary_name": "qdrant",
+    "binary_sha256": "f1823c24376c4a5f2f665d42dc2f52fe4e537e7c2b070b8ae7da575d83327e3a",
+    "source_files": [
+      {
+        "path": "Cargo.toml",
+        "sha256": "400b52abe55c22c7c59c8fb44ff2434b89fdbb06a5c307fcdfed102167d76d50",
+        "url": "https://raw.githubusercontent.com/qdrant/qdrant/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/Cargo.toml"
+      },
+      {
+        "path": "LICENSE",
+        "sha256": "210b508429e913d9de5301f90508bc2cbf5b2281de5b45e607c04d58f0f3bd8f",
+        "url": "https://raw.githubusercontent.com/qdrant/qdrant/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/LICENSE"
+      },
+      {
+        "path": ".github/workflows/integration-tests.yml",
+        "sha256": "26d1079b74ded7f103b659f3ec56cf40f1219662adf10007fbe08610688cfec5",
+        "url": "https://raw.githubusercontent.com/qdrant/qdrant/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/.github/workflows/integration-tests.yml"
+      },
+      {
+        "path": "tests/pyproject.toml",
+        "sha256": "cf6c99c5f6f64d0432e1b95852165e8a0b7ae1b02dcabc68a3d6d07807f59653",
+        "url": "https://raw.githubusercontent.com/qdrant/qdrant/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/tests/pyproject.toml"
+      },
+      {
+        "path": "tests/uv.lock",
+        "sha256": "9f28b4a5ce77abfcc104341e60223c17caa498f6fcb713d0cf5c16137d7b982d",
+        "url": "https://raw.githubusercontent.com/qdrant/qdrant/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/tests/uv.lock"
+      },
+      {
+        "path": "tests/integration-tests.sh",
+        "sha256": "6383d044b3d30a04d41f3fa15cce2b03c09dccb1b226f6f570bb83e8afa12612",
+        "url": "https://raw.githubusercontent.com/qdrant/qdrant/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/tests/integration-tests.sh"
+      },
+      {
+        "path": "tests/openapi/test_snapshot.py",
+        "sha256": "091bf44e4f4d276ec5b1e151d098444bb9a700fa3577b9982ae6d9bf65f3e9be",
+        "url": "https://raw.githubusercontent.com/qdrant/qdrant/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/tests/openapi/test_snapshot.py"
+      },
+      {
+        "path": "tests/openapi/conftest.py",
+        "sha256": "a3ca7c6541e7a467ff209ee8dba42ddab7b958d513df09f5038258128d84e240",
+        "url": "https://raw.githubusercontent.com/qdrant/qdrant/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/tests/openapi/conftest.py"
+      },
+      {
+        "path": "tests/openapi/helpers/collection_setup.py",
+        "sha256": "727fa005b4bafdc64790cb6c64952f94d3dc8bdb703f91157f82818b34f7b7df",
+        "url": "https://raw.githubusercontent.com/qdrant/qdrant/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/tests/openapi/helpers/collection_setup.py"
+      },
+      {
+        "path": "tests/openapi/helpers/helpers.py",
+        "sha256": "43690ec74be8a018bcc37e8e8e9cb22c64c3e7150fda99b983399b0e38d35659",
+        "url": "https://raw.githubusercontent.com/qdrant/qdrant/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/tests/openapi/helpers/helpers.py"
+      },
+      {
+        "path": "docs/redoc/master/openapi.json",
+        "sha256": "eb3e5d71ba74e1d99124ca1a77d563bbfa47084f04a13ef9b197e339f5a4ce0a",
+        "url": "https://raw.githubusercontent.com/qdrant/qdrant/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/docs/redoc/master/openapi.json"
+      },
+      {
+        "path": "src/main.rs",
+        "sha256": "eeeee539b3dcffae7c93a2599c6bf02dc267d132a3a4ee5953ea20b2b578b40e",
+        "url": "https://raw.githubusercontent.com/qdrant/qdrant/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/src/main.rs"
+      },
+      {
+        "path": "src/snapshots.rs",
+        "sha256": "0ab9b6568cd2246dc8325254d0684abb0718b38a481fb972ebf06488b247ea1a",
+        "url": "https://raw.githubusercontent.com/qdrant/qdrant/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/src/snapshots.rs"
+      }
+    ]
+  },
+  "restic_binary_sha256": "20d4142678d0d95ec11a4759def1b73fd9190abc9ca19e4b62d067c0b387e639",
+  "toolchains": {
+    "rust": "1.95.0",
+    "python": "3.13",
+    "uv": "0.9.17"
+  }
+}
