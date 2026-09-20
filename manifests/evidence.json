@@ -1364,9 +1364,14 @@
       "bytes": 283
     },
     {
+      "path": ".github/workflows/token-report.yml",
+      "sha256": "17a3f226fd2e91e398f9e634679d509029b65d3d4f2d1441be9bf41a079b5097",
+      "bytes": 509
+    },
+    {
       "path": ".github/workflows/validate.yml",
-      "sha256": "50379b3cae415fd3f7d460111a1c83489fd4b94394a1063d62d15c88fbd11cca",
-      "bytes": 1635
+      "sha256": "7f1657842cd563b64474a3c44bd0a24ce4aa2df81ad6cf977e193d9af11d13d9",
+      "bytes": 1494
     },
     {
       "path": ".gitignore",
