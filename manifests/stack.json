@@ -102,7 +102,8 @@
         "mac-memory-patch-20260920",
         "wsl-memory-maintenance-20260920",
         "current-session-observation-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-offhost-app-state-20260920"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory",
@@ -633,7 +634,8 @@
         "component-history",
         "qdrant-native-state-recovery-20260919",
         "token-practice-coverage-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-offhost-app-state-20260920"
       ],
       "upstream_sources": [
         "https://github.com/qdrant/qdrant"
@@ -1130,7 +1132,8 @@
         "qdrant-native-state-recovery-20260919",
         "token-practice-coverage-20260920",
         "native-wsl-restic-synthetic-20260920",
-        "native-offhost-restic-20260920"
+        "native-offhost-restic-20260920",
+        "native-offhost-app-state-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [

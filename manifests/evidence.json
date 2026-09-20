@@ -1997,6 +1997,26 @@
         "No model was called and no provider or lifetime token-saving measurement was made."
       ],
       "path": "evidence/receipts/native-service-reboot-20260920.json"
+    },
+    {
+      "id": "native-offhost-app-state-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory",
+        "qdrant",
+        "restic"
+      ],
+      "claim": "Accepted within scope: freshly created synthetic ai-memory 2.3.2 and Qdrant 1.19.1 application state was natively backed up, transferred in an exact Restic 0.19.1 snapshot to a distinct GitHub-hosted job, restored into empty native targets, and queried through native MCP and Qdrant APIs. Ten unchanged ai-memory tests and four unchanged Qdrant snapshot cases passed first.",
+      "limitations": [
+        "Newly generated public synthetic application state only; no private user database, old backup recovery or production disaster recovery.",
+        "Sequential native application snapshots do not establish an atomic cross-application transaction.",
+        "Separate runner jobs/boot identities share the GitHub administrative domain; no independent provider/account-loss acceptance.",
+        "The local integration composes native upstream commands and public fixtures; it is not an official upstream end-to-end scenario or the entire upstream test suite.",
+        "Qdrant release-target adaptation ran selected unchanged tests, not its full source-build CI.",
+        "No native client rebinding, whole-stack recovery, reboot/guest boot, external alert or unattended production hosting acceptance.",
+        "No model/provider/broker calls or causal token/cost savings measurement."
+      ],
+      "path": "evidence/receipts/native-offhost-app-state-20260920.json"
     }
   ],
   "files": [
@@ -2067,13 +2087,13 @@
     },
     {
       "path": "adoption/lifecycle.md",
-      "sha256": "bb5e00a86aa25a414728c6f5a505492dc1a201b00c00045dd1f55b6670bced93",
-      "bytes": 15462
+      "sha256": "e131798c7ed4d8b1d488e21d00b68ca9a987eec8370849455745ee2105e5d61b",
+      "bytes": 16102
     },
     {
       "path": "adoption/manifest.json",
-      "bytes": 14868,
-      "sha256": "ba6087d3d6dbe6d6f34a9c7f0de2b3cea00d87fba8bcd25b0fda2954067cf69f"
+      "bytes": 14823,
+      "sha256": "55d2fb168a56cde20cf20b26dd8e70af8dd0a0b265229497b30f209db7bf454c"
     },
     {
       "path": "adoption/paired/README.md",
@@ -3503,8 +3523,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "1c8700f5f58f374f73bb0862036b01f16d60b0e8d7f7d6a3d6a2ddefdd2c0b02",
-      "bytes": 403168
+      "sha256": "ee8284a2919b276fc9093503df515a489d73352d50c43b4ce2ba563fe67be2ff",
+      "bytes": 409000
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -5103,8 +5123,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "48905afe24c23fa67bd6e6f8b035ee0cd010b69c021a51d002430821e4a950fe",
-      "bytes": 3739708
+      "sha256": "c6feee653fc8dc1ea8866a82804e4994aa2db679a7f63462946315a98e5ed056",
+      "bytes": 3761944
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5618,8 +5638,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 74989,
-      "sha256": "c7cde925e38877b8e1563318594d5e2b9de4d4257148886f590430c1c7101fbe"
+      "bytes": 75124,
+      "sha256": "813bd9df11708f8faadf85ee4cd4060a53272991212a8e815d87992476c906a5"
     },
     {
       "path": "observability/README.md",
@@ -6103,18 +6123,18 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "09c3530774b97e64f67a240e7f0b84cd5255a6a0edaac6894adb834214186517",
-      "bytes": 7234
+      "sha256": "580bd3e3c2df61683adeb93bbcda36eb56ac365752071e1a78c838d40c323914",
+      "bytes": 7511
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "fc44557f5e01d037db58515af9a843cc154484724cd1f9842cc11a9801fc080d",
-      "bytes": 104074
+      "sha256": "c63b2357cba6f5ac8e21c2e4b6e60a30541a098ed38a367e356fc901d89128d9",
+      "bytes": 109907
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "b4d5aba28c95003166414cb392b687a8cada091fe5a64479bae7f7bbe2d06e9f",
-      "bytes": 17287
+      "sha256": "f7b02946bb7d7193e3e83c5a90bdd3b0f8b6927a84a674bbe830c40dbcbc79b2",
+      "bytes": 17554
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -7038,8 +7058,8 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/README.md",
-      "sha256": "11782066b26c31ce20e1ab355d28f1b7da6536a75741bf06b19658d8909a81a7",
-      "bytes": 7331
+      "sha256": "05f9922e969adc880a3e5f26d704c49d282be12ebe548d9e975a427a7c86b9bf",
+      "bytes": 8218
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/memory-oracle.json",
@@ -7395,6 +7415,391 @@
       "path": "docs/catalog-provenance.md",
       "sha256": "cfdbdebda42c9b9113f407e07a1304b51af186a856e687dc4eb148d32f3ee2c1",
       "bytes": 13873
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/README.md",
+      "sha256": "45dad03bde9ec39c8dea1c454825d03ef83f2fdb8cb02663b7db313b969abda4",
+      "bytes": 7181
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/cleanup.json",
+      "sha256": "37f1e64c699b0d7b390b7be6432edeae2a58139cb539031455a6ea011dcede2c",
+      "bytes": 1455
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-aliases.response",
+      "sha256": "99fa4349d2563de4b727a04bf729bd29c64a29d7fbcba258250477597e1e190d",
+      "bytes": 133
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-berlin-alias.response",
+      "sha256": "1236cd26442da49b5ce1f9c487ce6391fd2e1e6c92bc75587e47de6eed7eb5da",
+      "bytes": 395
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-berlin.response",
+      "sha256": "c1fabdacab45fa7fc623b3c2416b149dbe94fee8c21bc3f0a2606c44468a4d3a",
+      "bytes": 395
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-collection.response",
+      "sha256": "757c916e21cd165a08dac8b01c7b0cc53616a4cb6d668ad4f45811ecc14b14c2",
+      "bytes": 964
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-collections.response",
+      "sha256": "828e466664b571c5b8d1e0a8fdd4fb6bcb9b2a93e942f8ce53b0d3e6d9195b37",
+      "bytes": 87
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-dense-alias.response",
+      "sha256": "e614410331e290ee9b71a5381487b980bb81974e3d16c076f44942e898f5cff3",
+      "bytes": 873
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-dense.response",
+      "sha256": "8bc2ac79ae3130a439f0c7f3cde082563bee3839a5170d359b23dfb2062434ad",
+      "bytes": 873
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-scroll-0.response",
+      "sha256": "bda3dc3c2d30773585bab3a3b7a0050e320902097f24e317972ca2e6e191f90b",
+      "bytes": 429
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-scroll-1.response",
+      "sha256": "3b761673ce1b70ef9ed591947eb5666f6078cefbbdd9aa6eb60b291d9dc61a8c",
+      "bytes": 341
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-scroll-2.response",
+      "sha256": "5e8dcdf8c35bb451133808f80d5c397e3c2dd53c587a8021c294016f33dff123",
+      "bytes": 277
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-sparse-alias.response",
+      "sha256": "e310b58a929b973a1ff3ee25d83cf8f6bf97b6a3da2cdc7eb9d2e69310738830",
+      "bytes": 166
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-sparse.response",
+      "sha256": "079a86d93e201a0b2ebc4a3e814f5d4f4b0a8ecf28d49de9c2f2ebf6572c8402",
+      "bytes": 166
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination.json",
+      "sha256": "80827035553f700f064609e5e126a00e27631976da1fe81c59f2c54090f45269",
+      "bytes": 24070
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/exact-snapshot-restore.stdout",
+      "sha256": "f1ed7520d197b8e674aaaea30321a52ac475d1d7277de115bae39a80bcca36db",
+      "bytes": 354
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/install.json",
+      "sha256": "b5e8627f06c0fd9ad2407a441e647d3f1111c6998e45b22505b5984a18c11880",
+      "bytes": 10340
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/memory-query-facts.json",
+      "sha256": "db753997796c6d3edc01c79230213a5f1a235be4c743a0c81dd6069956be0c5a",
+      "bytes": 9159
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/memory-version.stdout",
+      "sha256": "233cf1641a43da34100fc56a0d1a90c2c086cccb53425efdf8a6247ca1c689a4",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/native-memory-restore.stderr",
+      "sha256": "7042237da9aea260eda84a0a520dc6542e3454abf581dc1c2b553266a6a6b57c",
+      "bytes": 1039
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/native-memory-restore.stdout",
+      "sha256": "f67facff84cedb82d903852ae302a2fd49ec6c0c9d966679f1257905d3d3f6d1",
+      "bytes": 94
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/qdrant-version.stdout",
+      "sha256": "214295b22d2d525fae20e55f19eb6c016fe20ec4863a531f204e6e849124071e",
+      "bytes": 14
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/received-repository-check.stdout",
+      "sha256": "519b580db41d7223cc5c81b17ffc8b4f36d9e8260b5e391afe97cef15bcdbb14",
+      "bytes": 157
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/restic-installation.json",
+      "sha256": "e5942494dbec8639ef6179472dbd177dc30267c8904c3319e8b1608b153fc74e",
+      "bytes": 6936
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/seal.json",
+      "sha256": "edac5343c3f714387c724e09d07261d55e21574fe14027c40967bb2dc5434f0d",
+      "bytes": 11445
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/wrong-password-restore.stderr",
+      "sha256": "5350d639b7c6932a5cb55c8d6efee0eee512cf3ba361449e550be42e98fee4da",
+      "bytes": 38
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/projection-manifest.json",
+      "sha256": "bccc180d120c8eddab3e567477c278c35dca23d9d5e8703b5af08fc1e1cf5af3",
+      "bytes": 40060
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/selected-commands.json",
+      "sha256": "1c9e43d61aadbabcf7a1ab629b2fe41b4c2bc2c21d7a9ef5281810b88f93ae94",
+      "bytes": 8641
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/cleanup.json",
+      "sha256": "f8b58f2452e4e9cc38902d6fa89bd6ea5b77609f524ae38ac14b504c1efba8f9",
+      "bytes": 1455
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/install.json",
+      "sha256": "f099911b6fb45518d689d276b5ea010278ce1e7c270c2b7ad3e1a980ebf68206",
+      "bytes": 10340
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/memory-upstream-backup.stdout",
+      "sha256": "f355a556eacb8fb4f5052dbf1e21cdb097c577ca83b79cececbee4085ea260f6",
+      "bytes": 443
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/memory-upstream-restore.stdout",
+      "sha256": "a08bdc7dec44f8ff3582dbb551f99ac67994540b4ce313166cffd51611d85dc7",
+      "bytes": 639
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/memory-version.stdout",
+      "sha256": "233cf1641a43da34100fc56a0d1a90c2c086cccb53425efdf8a6247ca1c689a4",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/native-app-backup.stdout",
+      "sha256": "7686bbbe95d6c52a6a625a0124a3c37315ed4fa99ec5c06532081a96310004e0",
+      "bytes": 467
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/native-app-full-check.stdout",
+      "sha256": "519b580db41d7223cc5c81b17ffc8b4f36d9e8260b5e391afe97cef15bcdbb14",
+      "bytes": 157
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/qdrant-native-snapshot-create.response",
+      "sha256": "48122d38679f24086e55048c87b848275187eafffd3d40ea56871c09366afd85",
+      "bytes": 227
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/qdrant-tests.json",
+      "sha256": "f3e68b693ce2b9093984a008728720b34be3cfb8dd182713244fda7912c88d96",
+      "bytes": 6279
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/qdrant-upstream-tests.stdout",
+      "sha256": "f6f8013375e4392898c7e2446809c70c06b9001f3aed59c8d865dff268426663",
+      "bytes": 998
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/qdrant-upstream.xml",
+      "sha256": "fb6371c7c69da9c0830c9644eea18f4a2947be320cdf7616237a82eaea04b253",
+      "bytes": 670
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/qdrant-version.stdout",
+      "sha256": "214295b22d2d525fae20e55f19eb6c016fe20ec4863a531f204e6e849124071e",
+      "bytes": 14
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/restic-installation.json",
+      "sha256": "7d7bba4751a87fc17ab8f7caafea6af8f80b413253baaf0f6ec0f75d5fd06e2b",
+      "bytes": 6937
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/rust-version.stdout",
+      "sha256": "f4d034f5660bb49f22bfcba3f3445be67e25b704c193ff421b53863b4faee148",
+      "bytes": 36
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/seal.json",
+      "sha256": "7a681b1a53898965d04a47759ef1d24125980c7c984952b250df551a787a8f0d",
+      "bytes": 11443
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-aliases.response",
+      "sha256": "bc20c37e3e1e351f6d71aad1d86572f6573853f897b31631cbadb1dcd76cec5b",
+      "bytes": 133
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-berlin-alias.response",
+      "sha256": "7914b7806bd24ee65a493654091d7c0a91a1626b2e12c23a106b79b9dbeab312",
+      "bytes": 395
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-berlin.response",
+      "sha256": "a0f3c256db75559ef5bbc3b48516602d5f3f4b82952564c84181337d2c9338a1",
+      "bytes": 395
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-collection.response",
+      "sha256": "84aca11311b4e94432f91d79c56c4643607842ae629eb8226d16e39c223eb9f3",
+      "bytes": 964
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-collections.response",
+      "sha256": "62636107652d8b2b2a53623e58574e09bee4e39734b6a03ef6593cd334524288",
+      "bytes": 87
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-dense-alias.response",
+      "sha256": "b9b1e9c43bb3b4689ed477443d5d0590c3ba493c8151cfc6d5c6ad3f9489d0a9",
+      "bytes": 873
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-dense.response",
+      "sha256": "b4ebf2ae5cd320c6652a4a5daf7bfc3a6bd9188d243ac47b68afa1ef42f63310",
+      "bytes": 873
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-scroll-0.response",
+      "sha256": "57a34666ae27d24146fed2649b5653d6fd19259a200535598ac66d39b36eddc1",
+      "bytes": 429
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-scroll-1.response",
+      "sha256": "102b6b0b21dfe57ecc40f9570d1a26cd95b692005aec70266e1575e724a5f928",
+      "bytes": 342
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-scroll-2.response",
+      "sha256": "a51ea66dbdb1390547a5eda67722df9cd657a10b0c05dbaa0feb51536b778e51",
+      "bytes": 277
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-sparse-alias.response",
+      "sha256": "34b7889331c73ee5b105649bd846bc93babcee5dc0eed3cc8aaa3c806d1513c1",
+      "bytes": 166
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-sparse.response",
+      "sha256": "24c59be870f08988c0bf60e9f64e684d8d54d573f9929e32e8e0f0a9e7495d4d",
+      "bytes": 166
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-alias-create.response",
+      "sha256": "50966c84fa052ab0f510119d3f676bca5a8488d30b74e02c2aa2019d75c2467f",
+      "bytes": 48
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-aliases.response",
+      "sha256": "75315d0aca6e635a096555a667bc93de731b8d401e849c2b43df2acefd223b99",
+      "bytes": 133
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-berlin-alias.response",
+      "sha256": "c47a3dc7208fb260fbdcc8256ad5729e282d6ebe940ce068274448de885d7e96",
+      "bytes": 394
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-berlin.response",
+      "sha256": "f3a548a59ed434de3ba22aac92dca02500006ef20ba077df26e03522d0c82694",
+      "bytes": 395
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-collection.response",
+      "sha256": "3b47ba5fd41ff809e2effb81e3051a61a79fcf1d37dee549688778f1e4d6619d",
+      "bytes": 964
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-collections.response",
+      "sha256": "0470b5d0e574589e9b84cff680718c042c765473b6a7a85734370bdd4f40847d",
+      "bytes": 87
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-dense-alias.response",
+      "sha256": "904625cb004cd2891fbae5c83e57e86f0ec5a601df3a126dfed675d1e9393c98",
+      "bytes": 873
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-dense.response",
+      "sha256": "07fdeec496963f51cc5e8c2c60978af5634f4cd4904b173090e419b15002bfb2",
+      "bytes": 873
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-index-city.response",
+      "sha256": "0dac4f96db76bf1ecd7f35be11a43198a490a88785e3fd8c641db142341d8244",
+      "bytes": 83
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-index-price.response",
+      "sha256": "c8f3157ae150368998b8e2a6d9944827207cf914bed99bb0dc7dd68d7b5be8df",
+      "bytes": 83
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-scroll-0.response",
+      "sha256": "ab7de2ca5325a301c53202be8e3b3272f6af50d5bdc3a7288c5e8f6fead0c64b",
+      "bytes": 429
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-scroll-1.response",
+      "sha256": "8732896e40c1c0c971ced3bee674577ed35b2f5fd965b60506350f57c55ae092",
+      "bytes": 342
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-scroll-2.response",
+      "sha256": "0a54e7e04acbf81e697b1f408ad0db508d00d27d5b7c27b6eef36eb0c23509d5",
+      "bytes": 277
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-sparse-alias.response",
+      "sha256": "1463d077c204fd52a52f269c46b993b105ffc076d150fe1d6307c522306a7329",
+      "bytes": 166
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-sparse.response",
+      "sha256": "0fdbfe5c1b3d93f9b3cd9b4dc6bd0fa01f1ee9cba2de7f09a92ee2b1a5ab6464",
+      "bytes": 166
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source.json",
+      "sha256": "08e0f0e19f08bfbdec1463c206e5421929b04a2b5413689be89ceb75cc5b85ef",
+      "bytes": 47003
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/upstream-private-network-interfaces.stdout",
+      "sha256": "f9684fc248a6a175c6a7370f407cb4acf85fe5ed6558c1204260656b8860584a",
+      "bytes": 257
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/upstream.json",
+      "sha256": "fc40f64bae4b00cc8e9715cc47deedeeccfb56598d7c1251e7be2fe06704fec0",
+      "bytes": 32163
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/uv-version.stdout",
+      "sha256": "2f2df388eb4b5b1646471309defdcd48e0b340eff2b49f3bfb014590e9365162",
+      "bytes": 10
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/transfer/manifest.json",
+      "sha256": "80dc7b8af5cb01df8f7159ef6ec1ee09d7b0f9c61b8ed9f2f7d5cc245ba5490f",
+      "bytes": 1113
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/transfer/source.json",
+      "sha256": "f4bf08003d7d1ee2e39fc13b1defa624c85e6449f71d4cc0fc9de591d84512ee",
+      "bytes": 8947
+    },
+    {
+      "path": "evidence/receipts/native-offhost-app-state-20260920.json",
+      "sha256": "7bdebe374142fd65dd02960a028c86b0d376f066194412467d9e452cf8ed355c",
+      "bytes": 12548
     }
   ],
   "convergence_records": [

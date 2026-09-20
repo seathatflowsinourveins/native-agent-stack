@@ -1,8 +1,20 @@
 # Synthetic application-state recovery across hosted jobs
 
-This prepared, manual-only workflow composes existing native ai-memory, Qdrant
-and Restic operations. **Hosted execution is pending.** Local checks validate
-the guards; they do not establish application recovery.
+This manual-only workflow composes native ai-memory, Qdrant and Restic operations.
+[Hosted run35541091430](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35541091430)
+passed on source revision `2e7b4624b85a828be11752238e2806efa420ba3c`.
+Independent review reconciled the original artifacts, 144 command-stream hash
+bindings, native application responses and cleanup. The
+[accepted receipt](../../../evidence/receipts/native-offhost-app-state-20260920.json)
+retains exact upstream commands and results: ten unchanged ai-memory tests and
+four unchanged Qdrant tests passed, with no failed or skipped cases.
+
+The fresh destination returned exact scoped memory bodies and refusal/search
+results, plus all ten Qdrant points, vectors, payloads, configuration, indexes,
+alias and three ranked queries. This is synthetic application recovery across
+two hosted boot identities. Production data, client rebinding, cross-application
+atomicity, lost-account/key recovery and physical-host disaster recovery remain
+outside this acceptance. Local guard tests remain separately labelled.
 
 [plan.json](plan.json) freezes the scope, source inputs, independent query
 expectations, key flow, finite deadlines and failure conditions. The workflow is

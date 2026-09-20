@@ -269,6 +269,15 @@ application. Do not use a moving `latest` snapshot when reproducing a dated
 acceptance, and do not overwrite an existing working directory to simulate
 recovery.
 
+Selected recovery now has two separately accepted hosted recipes:
+[native application-state transfer](../blueprints/convergence-practice/offhost-app-state/README.md)
+retains unchanged upstream tests and actual ai-memory/Qdrant destination queries;
+[scheduled guest reboot](../blueprints/convergence-practice/service-reboot/README.md)
+retains native Dagu retry, unchanged checkpoint, one effect and independent
+pre-login observations. Each links exact commands, returned results, original
+digests and cleanup. Reuse their matching scopes; neither certifies production
+data, physical-host disaster recovery or lost-account/key availability.
+
 ## Baseline acceptance and the next session
 
 Choose the cheapest adequate native path for each artifact. Compare the full
