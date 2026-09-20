@@ -4,10 +4,17 @@ A current, evidence-backed reference for native **Codex + Claude Code**, with sc
 
 **Snapshot: September 20, 2026.** This repository records a tested selection and its limits. It is not a claim that every available framework is installed or that an independent universal SOTA benchmark has been won.
 
+The new **[evidence-led convergence practice](blueprints/convergence-practice/README.md)**
+connects public own repositories, stars and curated-list discovery to pinned
+source review, frozen experiments and explicit adoption decisions. It adds an
+executed external retrieval comparison and a reusable acceptance protocol for
+native agent work, recovery and local inference. Research findings remain
+separate from a new host's runtime acceptance.
+
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
 and an auditable **342-star coverage ledger**. Its combined index includes
-**501 repository identities** across all 342 public stars and 159 beyond them,
+**503 repository identities** across all 342 public stars and 161 beyond them,
 with typed, validated pointers to decisions and evidence. The latest
 [architecture research wave](catalogs/us-equities/architecture/README.md) adds
 source reviews, awesome-list coverage and official Alpaca constraints.

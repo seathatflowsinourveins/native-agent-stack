@@ -1,0 +1,295 @@
+{
+  "files": [
+    {
+      "bytes": 1404,
+      "path": "DATA_LICENSE.md",
+      "sha256": "c503889e22cb019a92ddc8c51e704e89c2e85f1797d5f97cc3c022dd49f1a19e"
+    },
+    {
+      "bytes": 1091,
+      "path": "LICENSE",
+      "sha256": "f821747bf0011218a8d18a6030b3343384a2c68478e643e26e057732fc89aa31"
+    },
+    {
+      "bytes": 9985,
+      "path": "README.md",
+      "sha256": "494b73638318f3e8958422e6ac49e6c62d13973c0e4d947c186ed3b305c3dbc4"
+    },
+    {
+      "bytes": 729,
+      "path": "pyproject.toml",
+      "sha256": "05889ec96609b4d5b557ac21b9894a3d308930dbe7d8d11deb130abdc9d2e317"
+    },
+    {
+      "bytes": 107,
+      "path": "src/agent_retrieval_bench/__init__.py",
+      "sha256": "910ff4aa7e090babb5f4d1f45447bf2cfdc9be4c9b493bcd449d1fcae486694c"
+    },
+    {
+      "bytes": 157707,
+      "path": "src/agent_retrieval_bench/abstention.py",
+      "sha256": "810ae98aa22472ce3d5254e0c7b4dea5e322a29167e8c390f89d781d5a28f1c3"
+    },
+    {
+      "bytes": 8189,
+      "path": "src/agent_retrieval_bench/agentic_eval.py",
+      "sha256": "1e15bba4ede3d4597505bfbf2b65c6034e3d82a0f7351f02449edcbcd2e7d24c"
+    },
+    {
+      "bytes": 22486,
+      "path": "src/agent_retrieval_bench/agentic_relevance.py",
+      "sha256": "5afe3add3039adfa4c2141bc65d90a68c8093c70dff5e9f267b99ffa87c36766"
+    },
+    {
+      "bytes": 9811,
+      "path": "src/agent_retrieval_bench/audit.py",
+      "sha256": "29fadae6688f616429d92e0e3c21703a1d0a978417969b165108e161e95a3b1e"
+    },
+    {
+      "bytes": 41557,
+      "path": "src/agent_retrieval_bench/baseline.py",
+      "sha256": "5a82f9a087eb90f9ada2ad6b6047fe8b9781b013749f3d176b1cbdbe7b7f05d1"
+    },
+    {
+      "bytes": 16854,
+      "path": "src/agent_retrieval_bench/bcy_curve.py",
+      "sha256": "83aa1fd4729d2ce9f452ed41ed442213d7078e0ea3535438408c509f84d482c3"
+    },
+    {
+      "bytes": 21226,
+      "path": "src/agent_retrieval_bench/cae_validity.py",
+      "sha256": "190ba5e42cf919bcbe06d0807821554dafac261fe9c58f9a3e49880d142025c6"
+    },
+    {
+      "bytes": 244331,
+      "path": "src/agent_retrieval_bench/cli.py",
+      "sha256": "6214b053c7799e7f654c39e871207624748588eaecc9379e57333c27b95ab58a"
+    },
+    {
+      "bytes": 2070,
+      "path": "src/agent_retrieval_bench/clone.py",
+      "sha256": "fa7e418ee0e9ca658ac8e67d9d56fe9d07545c975cdb96939d3636cb50800a2c"
+    },
+    {
+      "bytes": 81477,
+      "path": "src/agent_retrieval_bench/closed_tool_eval.py",
+      "sha256": "8809ed8e6808839ce5bd5ae9b4c8017ce1e2e69b9c4173bfca4744c10253e72c"
+    },
+    {
+      "bytes": 20893,
+      "path": "src/agent_retrieval_bench/code2test_pr.py",
+      "sha256": "4227aa4c1cc835ec34498d74b60dfc11280d0427a1af47f256ee44fc02e3d0d8"
+    },
+    {
+      "bytes": 18844,
+      "path": "src/agent_retrieval_bench/context_cost.py",
+      "sha256": "beb48b109d706457b283d8590cb74e14e353a79a1b5054f92964522b691f6d97"
+    },
+    {
+      "bytes": 12621,
+      "path": "src/agent_retrieval_bench/corpus.py",
+      "sha256": "6ddde17c0654a9f9086f6054c1ffaadbed00fc3a0a4af8c71dbce57820c69f52"
+    },
+    {
+      "bytes": 43218,
+      "path": "src/agent_retrieval_bench/crawler.py",
+      "sha256": "620a1b3aa021f20a3e5e2b4e367722608be62edc77aced5a29917741d24fa3b4"
+    },
+    {
+      "bytes": 3550,
+      "path": "src/agent_retrieval_bench/curate.py",
+      "sha256": "d23643dcf6e61ba71f82971de70c4fbbc802f139b0e72a34a7f77468269344f1"
+    },
+    {
+      "bytes": 53411,
+      "path": "src/agent_retrieval_bench/dataset_validity.py",
+      "sha256": "9e2cf99ebef0f2616af8d66fe5be751660bfae5ef42f8aa843ff471e4554816a"
+    },
+    {
+      "bytes": 43868,
+      "path": "src/agent_retrieval_bench/derive.py",
+      "sha256": "9c5a541e087d2491431a016db00f18a716197126b41ebb272b9c49caa6101f9c"
+    },
+    {
+      "bytes": 17826,
+      "path": "src/agent_retrieval_bench/diagnostics.py",
+      "sha256": "e3866133f65266e4f8cd9def6c661bd5a00799bd2395b833e56f845c894cb2dc"
+    },
+    {
+      "bytes": 58628,
+      "path": "src/agent_retrieval_bench/edit2ripple.py",
+      "sha256": "a7028cd50ce5fe2a7fb8757e94415a0155e5ef0ffff91120e16adfb824eb90f0"
+    },
+    {
+      "bytes": 45255,
+      "path": "src/agent_retrieval_bench/embedding_eval.py",
+      "sha256": "14bb46a90a9ffc4461d7f4e61cb32a6223983cfbd7dd6af8f7c3338279c940d8"
+    },
+    {
+      "bytes": 7620,
+      "path": "src/agent_retrieval_bench/filters.py",
+      "sha256": "0f71e3de8887805202c3ef9703bc548f3c26c6d4feab58a3dd9237e389a0d2a7"
+    },
+    {
+      "bytes": 14057,
+      "path": "src/agent_retrieval_bench/git_raw.py",
+      "sha256": "d5098f3dc0af809fbac95f6c64147c357ad43b9238bb6327eb1e7672c97aa5aa"
+    },
+    {
+      "bytes": 11301,
+      "path": "src/agent_retrieval_bench/github_api.py",
+      "sha256": "4721a8f023b49c717072372ddf4a945437da36c7c732b0341f32a575d22bc62e"
+    },
+    {
+      "bytes": 18842,
+      "path": "src/agent_retrieval_bench/granularity.py",
+      "sha256": "8049b95e3df237f0cca9cf93e3737de3c3abd263539eff9bced0213dc6b15661"
+    },
+    {
+      "bytes": 13266,
+      "path": "src/agent_retrieval_bench/grep_eval.py",
+      "sha256": "5e7c13b20fae343be23ae8702161f895f7605c921cdfbb2329d2cbe2533d2d8a"
+    },
+    {
+      "bytes": 6509,
+      "path": "src/agent_retrieval_bench/hardmine.py",
+      "sha256": "0be145c68eadde670b18b9c2336a6fb15e52a6f25e2b22439f4da3a18483e750"
+    },
+    {
+      "bytes": 42926,
+      "path": "src/agent_retrieval_bench/hardness.py",
+      "sha256": "638a71acf84bc199a2d9dcdaef512e43db6660163a9ea9928411fb583726006b"
+    },
+    {
+      "bytes": 2362,
+      "path": "src/agent_retrieval_bench/io.py",
+      "sha256": "e009c326e0329b6df8da8e48ff25d563f9681a2b6a71641605fea11ccdcee2d8"
+    },
+    {
+      "bytes": 12895,
+      "path": "src/agent_retrieval_bench/layered_leaderboard.py",
+      "sha256": "f0724cca1592d7794007d99e7a06fd11919c4a8386d29f99f677cb8023d51bb8"
+    },
+    {
+      "bytes": 8340,
+      "path": "src/agent_retrieval_bench/logs.py",
+      "sha256": "bf3eeacc758ba07773c881b8b5fd4b916eca2eac38209ebeec9f567986f90e9c"
+    },
+    {
+      "bytes": 7884,
+      "path": "src/agent_retrieval_bench/model_report.py",
+      "sha256": "a89657411f0bca657403765ff166bb530798252f1db8f660b1928ee665555eb6"
+    },
+    {
+      "bytes": 31246,
+      "path": "src/agent_retrieval_bench/openai_context_agent.py",
+      "sha256": "322efc67beb2611a772677b41dcb851a39a9f1dfd2cee4204f54c1bbd0727ee7"
+    },
+    {
+      "bytes": 16097,
+      "path": "src/agent_retrieval_bench/pes_calibration.py",
+      "sha256": "ef2189e7a8ada936a0ab13719776314dd6e39369cdf07e7232f1ef328447b267"
+    },
+    {
+      "bytes": 2163,
+      "path": "src/agent_retrieval_bench/progress.py",
+      "sha256": "4ed5b3736c7f6dd5bf03b466d4d15a03319e528f25e4d852ef4a3adf741baaa6"
+    },
+    {
+      "bytes": 4561,
+      "path": "src/agent_retrieval_bench/quality.py",
+      "sha256": "ffffee008e340556a37e8bc4b78fd80689d78257af5db802113d79d64aac8728"
+    },
+    {
+      "bytes": 18113,
+      "path": "src/agent_retrieval_bench/rank_analysis.py",
+      "sha256": "55c7b74e45df29b973a08ac44b21039f06d93cad506b164f5b1f4ad616d0cc19"
+    },
+    {
+      "bytes": 17344,
+      "path": "src/agent_retrieval_bench/rank_fusion.py",
+      "sha256": "0c22e72db288f2f6ca109fb0ffc7815e2fb89391fb405a4d12665d9baf98f576"
+    },
+    {
+      "bytes": 8980,
+      "path": "src/agent_retrieval_bench/release.py",
+      "sha256": "28487fc70742a9210b0b6cea5dbe53980453500594f5130c9c06a9dd8704927b"
+    },
+    {
+      "bytes": 27741,
+      "path": "src/agent_retrieval_bench/repomap_eval.py",
+      "sha256": "8ee7477493cb273c1aae3a850d7eeff408be9abb08ee5cf105e28a092cd0a613"
+    },
+    {
+      "bytes": 5644,
+      "path": "src/agent_retrieval_bench/seed_report.py",
+      "sha256": "cc3043617674bf7c55417473fec9000ca8dd242ecc1a8a45c2f2f08f6368421e"
+    },
+    {
+      "bytes": 22051,
+      "path": "src/agent_retrieval_bench/selective_cv.py",
+      "sha256": "d2d1f09f5866d673afc669450a0f8890189db3bb487ae632ecf5dd3319208524"
+    },
+    {
+      "bytes": 14659,
+      "path": "src/agent_retrieval_bench/selective_embedding_eval.py",
+      "sha256": "f4d74375e9819eef41061b4d576d1b215d1ee811f89e392b02df000067d9523c"
+    },
+    {
+      "bytes": 19148,
+      "path": "src/agent_retrieval_bench/selective_eval.py",
+      "sha256": "e58fe00013eed4c08fbaa4c074504d2b1dae8dfcd2bc9d83cd4fd8b43258fdd5"
+    },
+    {
+      "bytes": 57305,
+      "path": "src/agent_retrieval_bench/trace_preflight.py",
+      "sha256": "ee2031d4d2e0472e12c366847e71d820d2bebb7976d5fa72f40cc90bb0bed899"
+    },
+    {
+      "bytes": 44748,
+      "path": "src/agent_retrieval_bench/trace_repro.py",
+      "sha256": "0e5d0d5768ed11948b3dd3849bf5ed24e9aaa60d8ff9dbd78e922d557d3e1555"
+    },
+    {
+      "bytes": 13017,
+      "path": "src/agent_retrieval_bench/trajectory.py",
+      "sha256": "c5995d461df0e3c3f9ea9b8cc51768101be6545b7fe9c4c91275dec06d8bb413"
+    },
+    {
+      "bytes": 9203,
+      "path": "src/agent_retrieval_bench/trajectory_collect.py",
+      "sha256": "603e37e087e0ce38ad488e119f8ef2f36055cea4508ee7c51e3bd744cc967d54"
+    },
+    {
+      "bytes": 3292,
+      "path": "src/agent_retrieval_bench/trajectory_compare.py",
+      "sha256": "652cfc0a770f8c5ff98861cdc7f22a0822d052866220136a2701d6bdd24a94e6"
+    },
+    {
+      "bytes": 16491,
+      "path": "src/agent_retrieval_bench/trajectory_release.py",
+      "sha256": "fd0beda09d3a31471928e6c6431f67d71ccadbceb97f6f76c2eb2d65c9f3e3c9"
+    },
+    {
+      "bytes": 420538,
+      "path": "src/agent_retrieval_bench/v1_1.py",
+      "sha256": "5f98a6b72e366aa0567c994e6611cbd971837ac9d24d6ec40cd8063b3bfd1823"
+    },
+    {
+      "bytes": 27608,
+      "path": "src/agent_retrieval_bench/v1_2.py",
+      "sha256": "84fb40b5d9acb8a3aecf124242b232c1d0e3583683dee2a2be280bae357a0986"
+    },
+    {
+      "bytes": 29887,
+      "path": "src/agent_retrieval_bench/v1_3.py",
+      "sha256": "93cdfe8f6ecf7da87d5a461961330ea26d398ae90c98389afa2572fc94d51078"
+    },
+    {
+      "bytes": 13629,
+      "path": "src/agent_retrieval_bench/v2_positive_report.py",
+      "sha256": "0b76a68b323c478668ba0bd7055bcb5614ae250cf809f4b145b759051336dcf6"
+    }
+  ],
+  "source_commit": "b487f3866cc13dd971819cb902517a6a50282404"
+}

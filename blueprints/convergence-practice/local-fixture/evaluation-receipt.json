@@ -1,0 +1,127 @@
+{
+  "artifact_hashes": {
+    "evaluation.md": "695e61ebe524d0559280a7f3c9247c6e613355215387678ce76fd88411d76b9a",
+    "rankings.json": "35fc05c3483fa5f4a674ee190c543748c1f72d589d9b8f0ed83c2c667f8cd36e"
+  },
+  "checks": {
+    "all_15_git_source_blobs_hash_and_byte_length_match": true,
+    "changed_fixture_and_corpus_bytes_rejected": true,
+    "check_kind": "Ad hoc invariant and arithmetic checks for this bounded documented recipe; no new general-purpose adapter test suite.",
+    "complete_normalized_file_bodies_preserved": true,
+    "each_ranking_has_all_15_unique_source_paths": true,
+    "fixture_and_manifest_exact_hashes": true,
+    "independent_recomputation_from_ranked_paths_matches_all_cases_and_macro_means": true,
+    "known_metric_examples_passed": true,
+    "unsafe_paths_rejected": true,
+    "upstream_corpus_baseline_tests": "15 passed at exact release; see ../arb-trace2code/receipt.json#/checks/upstream_tests"
+  },
+  "configuration": {
+    "bm25": {
+      "b": 0.75,
+      "k1": 1.5
+    },
+    "candidate_documents_per_query": 15,
+    "chunk_parameter_selection": "Maximum raw frozen document character length, approved before scoring; same for both rankers.",
+    "chunks": 15,
+    "cutoffs_predeclared": [
+      1,
+      3,
+      5
+    ],
+    "full_body_normalization": "Native CRLF/CR to LF and surrounding whitespace strip only.",
+    "max_chunk_chars": 9777,
+    "models_called": 0,
+    "mrr": "Full ranking, not truncated at any k.",
+    "native_apis": [
+      "corpus.chunks_for_file",
+      "baseline.rank_chunks_for_ranker",
+      "baseline.unique_ranked_paths",
+      "baseline.recall_at",
+      "baseline.sample_metrics"
+    ],
+    "native_indexes_changed": 0,
+    "negative_policy": "Four no-gold cases ranked and retained, excluded from positive metrics; no threshold, abstention policy or accuracy.",
+    "positive_aggregation": "Macro mean over 20 one-gold-file positive queries.",
+    "provider_calls": 0,
+    "query_transform": "None",
+    "ranker_order": "sequential lexical then bm25",
+    "rankers": [
+      "lexical",
+      "bm25"
+    ]
+  },
+  "inputs": {
+    "base_commit": "bf99d340f798bf72cc3104619edc482882eb423d",
+    "corpus_documents": 15,
+    "corpus_hashes": "corpus-manifest.json#/files",
+    "corpus_manifest_sha256": "7bb986160b332e205208b6767b95b6f019423ffed1f50843534ff7e4272fdded",
+    "expected_abstention_queries": 4,
+    "fixture_sha256": "aea5e9616fb19eb1d2fd58ecfadf88ff087d7d2e79b4a70bc9f88207af9d0402",
+    "frozen_before_first_rank": true,
+    "positive_queries": 20,
+    "queries": 24,
+    "queries_verbatim": true,
+    "source_authored_not_external_holdout": true,
+    "source_repository": "https://github.com/seathatflowsinourveins/native-agent-stack"
+  },
+  "kind": "executed_frozen_public_document_retrieval_fixture",
+  "limits": [
+    "Source-authored 24-question integration fixture over only 15 selected public docs; not an external held-out benchmark.",
+    "Four negative cases have rankings only, no abstention or answer-quality metric.",
+    "Single warm process ranker-loop observations exclude source loading and are not a latency benchmark.",
+    "No claim about rg, QMD, SocratiCode, a native memory service or production tool acceptance.",
+    "No inference, tokenizer cost, provider usage, scientific significance or default-promotion claim."
+  ],
+  "observed_date_utc": "2026-09-20",
+  "replay": {
+    "command_template": "PYTHONPATH=upstream/src FIXTURE_DIRECTORY=${FIXTURE_DIRECTORY} STACK_REPOSITORY=${STACK_REPOSITORY} REPLAY_OUTPUT=${REPLAY_OUTPUT} runtime/bin/python local_doc_replay.py",
+    "document": "evaluation.md",
+    "environment": "Isolated stdlib-only virtual environment, no installed packages.",
+    "execution_exit_code": 0,
+    "python": "3.14.7",
+    "recipe_source_sha256": "557b8cf4b3123d3e0c3dfc9d688950d75cc446f3bc162825eff24708fa78ab4d"
+  },
+  "results": {
+    "bm25": {
+      "abstention_accuracy": null,
+      "abstention_policy": null,
+      "macro_metrics": {
+        "MRR": 0.9666666666666666,
+        "Recall@1": 0.95,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "negative_rankings_returned": 4,
+      "negative_samples_excluded_from_positive_metrics": 4,
+      "positive_samples": 20,
+      "wall_seconds": 0.07384333299705759
+    },
+    "lexical": {
+      "abstention_accuracy": null,
+      "abstention_policy": null,
+      "macro_metrics": {
+        "MRR": 0.9,
+        "Recall@1": 0.8,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "negative_rankings_returned": 4,
+      "negative_samples_excluded_from_positive_metrics": 4,
+      "positive_samples": 20,
+      "wall_seconds": 0.06728295799985062
+    }
+  },
+  "schema_version": 1,
+  "source": {
+    "commit": "b487f3866cc13dd971819cb902517a6a50282404",
+    "files": {
+      "src/agent_retrieval_bench/baseline.py": "5a82f9a087eb90f9ada2ad6b6047fe8b9781b013749f3d176b1cbdbe7b7f05d1",
+      "src/agent_retrieval_bench/corpus.py": "6ddde17c0654a9f9086f6054c1ffaadbed00fc3a0a4af8c71dbce57820c69f52"
+    },
+    "git_source_tree": "0fd0466fb3e24c40c0bdf9468872bea9c9a61fa1",
+    "release": "v0.2.1",
+    "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+    "runtime_dependencies": [],
+    "unmodified": true
+  }
+}

@@ -1,0 +1,1699 @@
+{
+  "samples": [
+    {
+      "base_commit": "aed1af59763d54520a9c72f1fd0222d43904ebfd",
+      "gold_files": [
+        "listeners.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "listeners.go": 3
+        },
+        "lexical": {
+          "listeners.go": 1
+        }
+      },
+      "repo": "caddyserver/caddy",
+      "sample_id": "42f8d46378b0c049f2eb66a8"
+    },
+    {
+      "base_commit": "ca0ca67fbdb831c026d334dfd77ecc653f321876",
+      "gold_files": [
+        "caddyconfig/caddyfile/formatter.go",
+        "caddyconfig/caddyfile/parse.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "caddyconfig/caddyfile/formatter.go": 28,
+          "caddyconfig/caddyfile/parse.go": 15
+        },
+        "lexical": {
+          "caddyconfig/caddyfile/formatter.go": 34,
+          "caddyconfig/caddyfile/parse.go": 11
+        }
+      },
+      "repo": "caddyserver/caddy",
+      "sample_id": "5bdeecc5409069d28e667e6d"
+    },
+    {
+      "base_commit": "18ab0f955fc1075d7727c7658dbfb734c673a5c9",
+      "gold_files": [
+        "modules/caddytls/acmeissuer.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "modules/caddytls/acmeissuer.go": 4
+        },
+        "lexical": {
+          "modules/caddytls/acmeissuer.go": 5
+        }
+      },
+      "repo": "caddyserver/caddy",
+      "sample_id": "9d7b952a6132256cd66c9612"
+    },
+    {
+      "base_commit": "ef496e58ef9e7844cf8f1831030713ee5e9b354b",
+      "gold_files": [
+        "modules/caddyhttp/caddyauth/caddyauth.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "modules/caddyhttp/caddyauth/caddyauth.go": 117
+        },
+        "lexical": {
+          "modules/caddyhttp/caddyauth/caddyauth.go": 69
+        }
+      },
+      "repo": "caddyserver/caddy",
+      "sample_id": "d4149b3f568dfe275250b62e"
+    },
+    {
+      "base_commit": "4f504588669e28373f455b694539475ffe4d2926",
+      "gold_files": [
+        "caddyconfig/httpcaddyfile/builtins.go",
+        "caddyconfig/httpcaddyfile/tlsapp.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "caddyconfig/httpcaddyfile/builtins.go": 49,
+          "caddyconfig/httpcaddyfile/tlsapp.go": 78
+        },
+        "lexical": {
+          "caddyconfig/httpcaddyfile/builtins.go": 70,
+          "caddyconfig/httpcaddyfile/tlsapp.go": 60
+        }
+      },
+      "repo": "caddyserver/caddy",
+      "sample_id": "de059c1c2e3ffc63820ce0e4"
+    },
+    {
+      "base_commit": "7586e68e273fbe84b588e73c014d15d815413648",
+      "gold_files": [
+        "caddyconfig/caddyfile/parse.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "caddyconfig/caddyfile/parse.go": 5
+        },
+        "lexical": {
+          "caddyconfig/caddyfile/parse.go": 15
+        }
+      },
+      "repo": "caddyserver/caddy",
+      "sample_id": "eb750774632943e952f09d40"
+    },
+    {
+      "base_commit": "95941a71e87d6ccd6318bfd95c56929b01edfafd",
+      "gold_files": [
+        "modules/caddyhttp/metrics.go",
+        "modules/caddyhttp/routes.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "modules/caddyhttp/metrics.go": 4,
+          "modules/caddyhttp/routes.go": 16
+        },
+        "lexical": {
+          "modules/caddyhttp/metrics.go": 7,
+          "modules/caddyhttp/routes.go": 15
+        }
+      },
+      "repo": "caddyserver/caddy",
+      "sample_id": "f7d79ec3fd20e651c379facb"
+    },
+    {
+      "base_commit": "e82e1edf76bcbddf5fe53428d297520d76a6a300",
+      "gold_files": [
+        "clap_builder/src/builder/arg.rs",
+        "clap_builder/src/parser/parser.rs"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "clap_builder/src/builder/arg.rs": 55,
+          "clap_builder/src/parser/parser.rs": 50
+        },
+        "lexical": {
+          "clap_builder/src/builder/arg.rs": 57,
+          "clap_builder/src/parser/parser.rs": 110
+        }
+      },
+      "repo": "clap-rs/clap",
+      "sample_id": "2d65eeb2c97d07f557b1ddb2"
+    },
+    {
+      "base_commit": "be3acf4ed017efb7008beb08585d890e5364ce93",
+      "gold_files": [
+        "cache/cache.go",
+        "cache/config.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "cache/cache.go": 5,
+          "cache/config.go": 28
+        },
+        "lexical": {
+          "cache/cache.go": 5,
+          "cache/config.go": 4
+        }
+      },
+      "repo": "etcd-io/etcd",
+      "sample_id": "19c290f5b37ff6d5a93db942"
+    },
+    {
+      "base_commit": "c64f8fd68c2e75cc65b88bc0d956547a5f77cab1",
+      "gold_files": [
+        "cache/cache.go",
+        "cache/demux.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "cache/cache.go": 27,
+          "cache/demux.go": 14
+        },
+        "lexical": {
+          "cache/cache.go": 29,
+          "cache/demux.go": 14
+        }
+      },
+      "repo": "etcd-io/etcd",
+      "sample_id": "a9432b3d44a06f48f40060bb"
+    },
+    {
+      "base_commit": "b83b67e483936a94e59a61198934e88bf0ef95b1",
+      "gold_files": [
+        "server/etcdserver/util.go",
+        "server/etcdserver/v3_server.go",
+        "server/features/etcd_features.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "server/etcdserver/util.go": 366,
+          "server/etcdserver/v3_server.go": 191,
+          "server/features/etcd_features.go": 42
+        },
+        "lexical": {
+          "server/etcdserver/util.go": 285,
+          "server/etcdserver/v3_server.go": 84,
+          "server/features/etcd_features.go": 647
+        }
+      },
+      "repo": "etcd-io/etcd",
+      "sample_id": "b389823a6435d1ada9d7d2b9"
+    },
+    {
+      "base_commit": "8687c97fa5fc7814bf2deaf4b13e666a1b9a0dda",
+      "gold_files": [
+        "server/proxy/grpcproxy/adapter/chan_stream.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "server/proxy/grpcproxy/adapter/chan_stream.go": 22
+        },
+        "lexical": {
+          "server/proxy/grpcproxy/adapter/chan_stream.go": 11
+        }
+      },
+      "repo": "etcd-io/etcd",
+      "sample_id": "d63c68165982a7371fcff2e0"
+    },
+    {
+      "base_commit": "688a429d19d8c804447bb889d3635e2c31a5564d",
+      "gold_files": [
+        "logger.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "logger.go": 1
+        },
+        "lexical": {
+          "logger.go": 3
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "035c3b77d35f10df09605eff"
+    },
+    {
+      "base_commit": "fc1c43298de675e5252d0b44f97dc5e204bd4e1e",
+      "gold_files": [
+        "gin.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "gin.go": 16
+        },
+        "lexical": {
+          "gin.go": 7
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "05041faae6e19b6882e3074a"
+    },
+    {
+      "base_commit": "28e57f58b184b2305ace192e02496bb89f6fd8cb",
+      "gold_files": [
+        "binding/form_mapping.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/form_mapping.go": 26
+        },
+        "lexical": {
+          "binding/form_mapping.go": 5
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "0765b7d2a08dd5736ac91857"
+    },
+    {
+      "base_commit": "5e5ff3ace496a31b138b0820136a146bfb5de0ef",
+      "gold_files": [
+        "context.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 48
+        },
+        "lexical": {
+          "context.go": 27
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "0f4d4723a06149a5172fed0a"
+    },
+    {
+      "base_commit": "2a794cd0b0faa7d829291375b27a3467ea972b0d",
+      "gold_files": [
+        "debug.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "debug.go": 17
+        },
+        "lexical": {
+          "debug.go": 20
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "0f88458fc1fe4acce078ce3f"
+    },
+    {
+      "base_commit": "9f598a31aafb92d675f38f1c8371e4ac76f858bf",
+      "gold_files": [
+        "binding/form_mapping.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/form_mapping.go": 50
+        },
+        "lexical": {
+          "binding/form_mapping.go": 6
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "12951fd6d477e49ce706a14b"
+    },
+    {
+      "base_commit": "db309081bc5c137b2aa15701ef53f7f19788da25",
+      "gold_files": [
+        "render/data.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "render/data.go": 46
+        },
+        "lexical": {
+          "render/data.go": 8
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "13dc98681c5ab25210a04f43"
+    },
+    {
+      "base_commit": "dab5944a7bca8ae37d947dda02ac591afc1177d3",
+      "gold_files": [
+        "recovery.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "recovery.go": 28
+        },
+        "lexical": {
+          "recovery.go": 13
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "1e7cac8cfdead734e7e51ad6"
+    },
+    {
+      "base_commit": "ecb3f7b5e2f3915bf1db240ed5eee572f8dbea36",
+      "gold_files": [
+        "gin.go",
+        "path.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "gin.go": 10,
+          "path.go": 42
+        },
+        "lexical": {
+          "gin.go": 14,
+          "path.go": 76
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "2097c0a5e982d33870da7ffa"
+    },
+    {
+      "base_commit": "16cd8cdd4ef9257b1e86b5119df1536de71c6a87",
+      "gold_files": [
+        "binding/form_mapping.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/form_mapping.go": 46
+        },
+        "lexical": {
+          "binding/form_mapping.go": 8
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "24b8f50a23a0e2ebcf4b7067"
+    },
+    {
+      "base_commit": "a481ee2897af1e368de5c919fbeb21b89aa26fc7",
+      "gold_files": [
+        "gin.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "gin.go": 6
+        },
+        "lexical": {
+          "gin.go": 6
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "2a108bc05f87154f903de451"
+    },
+    {
+      "base_commit": "bdc1ad7987b6931801af9d50e2df25667fdfaaf4",
+      "gold_files": [
+        "response_writer.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "response_writer.go": 10
+        },
+        "lexical": {
+          "response_writer.go": 18
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "30fb9ae30b972db986c4365d"
+    },
+    {
+      "base_commit": "334160bab772f6f93767b870f9d07c176cd4aa2b",
+      "gold_files": [
+        "gin.go",
+        "tree.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "gin.go": 9,
+          "tree.go": 12
+        },
+        "lexical": {
+          "gin.go": 10,
+          "tree.go": 17
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "34b3f2f207dc4ebd77268875"
+    },
+    {
+      "base_commit": "b2b489dbf4826c2c630717a77fd5e42774625410",
+      "gold_files": [
+        "binding/form_mapping.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/form_mapping.go": 16
+        },
+        "lexical": {
+          "binding/form_mapping.go": 3
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "3bd1eecf0ebcd9c6b334fa92"
+    },
+    {
+      "base_commit": "38534e2bf98a06e1f62d6b24384e90b5f78699bf",
+      "gold_files": [
+        "debug.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "debug.go": 2
+        },
+        "lexical": {
+          "debug.go": 2
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "4480edb6cb7cbebd6c6f7126"
+    },
+    {
+      "base_commit": "a64286a7760be2031209686ce4d36e99d42dd419",
+      "gold_files": [
+        "logger.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "logger.go": 59
+        },
+        "lexical": {
+          "logger.go": 19
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "4543cc1c282d6fe603fdc317"
+    },
+    {
+      "base_commit": "fb2583442c4d9bccb75e6d26f1aa6e7c01950db6",
+      "gold_files": [
+        "tree.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "tree.go": 1
+        },
+        "lexical": {
+          "tree.go": 1
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "4882164fe246221e92af0952"
+    },
+    {
+      "base_commit": "c358d5656d0feb8b310d4ec379bccde46ccc8cc7",
+      "gold_files": [
+        "recovery.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "recovery.go": 1
+        },
+        "lexical": {
+          "recovery.go": 1
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "4ac3545de34d4974f16f5838"
+    },
+    {
+      "base_commit": "ac95fa6bbcf5ec102bc81fbbb70e8fccba90f0b1",
+      "gold_files": [
+        "context.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 30
+        },
+        "lexical": {
+          "context.go": 11
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "4af738a83e9f45b8aec78341"
+    },
+    {
+      "base_commit": "d4a64265f21993368c90602c18e778bf04ef36db",
+      "gold_files": [
+        "context.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 11
+        },
+        "lexical": {
+          "context.go": 7
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "4c232faf5b66c5e8febbe45d"
+    },
+    {
+      "base_commit": "3f5b0afa2ac85ea79638ca08f4140ce64b8246e5",
+      "gold_files": [
+        "context.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 30
+        },
+        "lexical": {
+          "context.go": 6
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "589abc5542483246a640f904"
+    },
+    {
+      "base_commit": "19b877fa50cbbb9282763099fb177a1e5cc5c850",
+      "gold_files": [
+        "recovery.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "recovery.go": 2
+        },
+        "lexical": {
+          "recovery.go": 7
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "5bc1aa35cdd32914d7ba6958"
+    },
+    {
+      "base_commit": "2e2bd1f408fdaa5e522bc56972e3f109fd7502fd",
+      "gold_files": [
+        "context.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 3
+        },
+        "lexical": {
+          "context.go": 4
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "5eeea2e7090c74efe2defcdc"
+    },
+    {
+      "base_commit": "ed150e72544949a96e7eb0b7d1151cf1907068fb",
+      "gold_files": [
+        "binding/form_mapping.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/form_mapping.go": 20
+        },
+        "lexical": {
+          "binding/form_mapping.go": 2
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "5fe7a88d29444ad19bb646f6"
+    },
+    {
+      "base_commit": "ba093d19477b896ac89a7fc3246af23d290b8e26",
+      "gold_files": [
+        "logger.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "logger.go": 40
+        },
+        "lexical": {
+          "logger.go": 6
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "6c6d138c6c8afd2d8b73687b"
+    },
+    {
+      "base_commit": "3cb30679b5e3021db16c776ed7e70d380586e9ce",
+      "gold_files": [
+        "binding/form_mapping.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/form_mapping.go": 43
+        },
+        "lexical": {
+          "binding/form_mapping.go": 4
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "73e85c15eb230b9bb3333088"
+    },
+    {
+      "base_commit": "28e57f58b184b2305ace192e02496bb89f6fd8cb",
+      "gold_files": [
+        "gin.go",
+        "ginS/gins.go",
+        "render/html.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "gin.go": 5,
+          "ginS/gins.go": 1,
+          "render/html.go": 32
+        },
+        "lexical": {
+          "gin.go": 2,
+          "ginS/gins.go": 3,
+          "render/html.go": 37
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "7db765ce2d8ea9b3f68029fd"
+    },
+    {
+      "base_commit": "2e22e5085960205fbb11c25776f6ea76b8053253",
+      "gold_files": [
+        "gin.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "gin.go": 3
+        },
+        "lexical": {
+          "gin.go": 2
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "81012a1000bf705dfb9e03a7"
+    },
+    {
+      "base_commit": "4f339e6a35b163d31b30916b37f4176d385f41bd",
+      "gold_files": [
+        "context.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 3
+        },
+        "lexical": {
+          "context.go": 2
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "82a5db6d32bae53d6f85a5a3"
+    },
+    {
+      "base_commit": "76dd08d512504b80ef76a76c9e6bd1831e121b71",
+      "gold_files": [
+        "context.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 14
+        },
+        "lexical": {
+          "context.go": 12
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "85a691c247e4c1686ce67107"
+    },
+    {
+      "base_commit": "c221133ee80c46e3a6c50717ca6f1b41d4ab7711",
+      "gold_files": [
+        "context.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 56
+        },
+        "lexical": {
+          "context.go": 53
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "899589599e1f682b606c97af"
+    },
+    {
+      "base_commit": "e46bd521859fdfc83c508f1d42c92cb7f91e9fcb",
+      "gold_files": [
+        "binding/form_mapping.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/form_mapping.go": 31
+        },
+        "lexical": {
+          "binding/form_mapping.go": 4
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "8c235537a265c9b4acb1c0e8"
+    },
+    {
+      "base_commit": "0cbb30aa940a643e31874f8ad8e355219d306756",
+      "gold_files": [
+        "context.go",
+        "gin.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 58,
+          "gin.go": 42
+        },
+        "lexical": {
+          "context.go": 37,
+          "gin.go": 19
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "9151d23c9630aed754b3355b"
+    },
+    {
+      "base_commit": "9c081de9cdd1948f521d47d170d18cbc2981c33a",
+      "gold_files": [
+        "gin.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "gin.go": 10
+        },
+        "lexical": {
+          "gin.go": 2
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "94882daee852885df4f04f6e"
+    },
+    {
+      "base_commit": "44d0dd70924dd154e3b98bc340accc53484efa9c",
+      "gold_files": [
+        "tree.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "tree.go": 11
+        },
+        "lexical": {
+          "tree.go": 4
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "95131f4a1d5c1094e4b4a013"
+    },
+    {
+      "base_commit": "61c2b1c28f0c5a754330545e31f02cd6d6f7944e",
+      "gold_files": [
+        "recovery.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "recovery.go": 9
+        },
+        "lexical": {
+          "recovery.go": 11
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "98ca5fc67c8dd81a8f9ab021"
+    },
+    {
+      "base_commit": "67c9d4ee110e9adfe33063ef847dba56717c148a",
+      "gold_files": [
+        "errors.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "errors.go": 22
+        },
+        "lexical": {
+          "errors.go": 17
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "9e63d7a07d201c84d7d18546"
+    },
+    {
+      "base_commit": "3ab698dc5110af1977d57226e4995c57dd34c233",
+      "gold_files": [
+        "context.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 31
+        },
+        "lexical": {
+          "context.go": 3
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "a69837e52fea4b05cbedcb9f"
+    },
+    {
+      "base_commit": "915e4c90d28ec4cffc6eb146e208ab5a65eac772",
+      "gold_files": [
+        "context.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 38
+        },
+        "lexical": {
+          "context.go": 3
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "a72e294e63bff7a51eb84669"
+    },
+    {
+      "base_commit": "472d086af2acd924cb4b9d7be0525f7d790f69bc",
+      "gold_files": [
+        "context.go",
+        "render/render.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 41,
+          "render/render.go": 116
+        },
+        "lexical": {
+          "context.go": 24,
+          "render/render.go": 117
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "a9c4956e69fe0ab051fc39a7"
+    },
+    {
+      "base_commit": "ecdbbbe9483dd12222f2085f717a2c7cb5ac55fe",
+      "gold_files": [
+        "binding/binding.go",
+        "binding/binding_nomsgpack.go",
+        "render/yaml.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/binding.go": 53,
+          "binding/binding_nomsgpack.go": 52,
+          "render/yaml.go": 12
+        },
+        "lexical": {
+          "binding/binding.go": 58,
+          "binding/binding_nomsgpack.go": 52,
+          "render/yaml.go": 3
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "a9f6b8adbd0f71a58c99835e"
+    },
+    {
+      "base_commit": "b4f66e965ba9d60257e0de4c25d4ad4bd6115927",
+      "gold_files": [
+        "binding/form_mapping.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/form_mapping.go": 74
+        },
+        "lexical": {
+          "binding/form_mapping.go": 42
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "aac6e0174bcf8f6defe4c774"
+    },
+    {
+      "base_commit": "e0d46ded6cb6974d55a255ab122d1aa6ca0cd60e",
+      "gold_files": [
+        "binding/form_mapping.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/form_mapping.go": 48
+        },
+        "lexical": {
+          "binding/form_mapping.go": 4
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "b8c820bb7d5f8b2e19f4e7f6"
+    },
+    {
+      "base_commit": "c4287b1300363cb3dc2c8408299d3ba6deded485",
+      "gold_files": [
+        "context.go",
+        "logger.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 4,
+          "logger.go": 20
+        },
+        "lexical": {
+          "context.go": 3,
+          "logger.go": 48
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "c06816923c65bcd86bfd1c2a"
+    },
+    {
+      "base_commit": "05caa5c00e552a27c3bfb659b99c0d79b81fafe4",
+      "gold_files": [
+        "binding/default_validator.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/default_validator.go": 2
+        },
+        "lexical": {
+          "binding/default_validator.go": 2
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "c4a057d97f889140494823d0"
+    },
+    {
+      "base_commit": "64ead9e6bd924d431f4dd612349bc5e13300e6fc",
+      "gold_files": [
+        "binding/form_mapping.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/form_mapping.go": 35
+        },
+        "lexical": {
+          "binding/form_mapping.go": 5
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "c7ce74f40b6308a8504688cc"
+    },
+    {
+      "base_commit": "c2ba8f19ec19914b73290c53a32de479cd463555",
+      "gold_files": [
+        "logger.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "logger.go": 30
+        },
+        "lexical": {
+          "logger.go": 6
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "cc9de6b29530ddfb3135f0ea"
+    },
+    {
+      "base_commit": "fad706f1216e6d12bdd51d28d5a40ec27e6c6453",
+      "gold_files": [
+        "binding/form_mapping.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/form_mapping.go": 15
+        },
+        "lexical": {
+          "binding/form_mapping.go": 2
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "cd5fdafbfa862ca7662667c4"
+    },
+    {
+      "base_commit": "90cf4602698dcbce18df3165b2d24e2940670a41",
+      "gold_files": [
+        "binding/form_mapping.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/form_mapping.go": 49
+        },
+        "lexical": {
+          "binding/form_mapping.go": 24
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "d0551ed5a2d63c99e3bbfcd5"
+    },
+    {
+      "base_commit": "79a61b90324586d3c3a5859f8755cae2d1c46f2d",
+      "gold_files": [
+        "tree.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "tree.go": 11
+        },
+        "lexical": {
+          "tree.go": 3
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "d3fe4d1559febe2ac282cced"
+    },
+    {
+      "base_commit": "7a865dcf1dbe6ec52e074b1ddce830d278eb72cf",
+      "gold_files": [
+        "binding/binding.go",
+        "binding/binding_nomsgpack.go",
+        "context.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/binding.go": 8,
+          "binding/binding_nomsgpack.go": 7,
+          "context.go": 2
+        },
+        "lexical": {
+          "binding/binding.go": 24,
+          "binding/binding_nomsgpack.go": 14,
+          "context.go": 2
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "d5a6bc19ef154663f7e591ad"
+    },
+    {
+      "base_commit": "d4a64265f21993368c90602c18e778bf04ef36db",
+      "gold_files": [
+        "binding/form_mapping.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "binding/form_mapping.go": 25
+        },
+        "lexical": {
+          "binding/form_mapping.go": 6
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "d65a03b1febee94c93435793"
+    },
+    {
+      "base_commit": "b1c1e7b572f76071fb0e0e7884a0697e0458aa7c",
+      "gold_files": [
+        "fs.go",
+        "routergroup.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "fs.go": 1,
+          "routergroup.go": 6
+        },
+        "lexical": {
+          "fs.go": 1,
+          "routergroup.go": 17
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "ddc4c4966436317b69c8484b"
+    },
+    {
+      "base_commit": "a4ac275e079d46d493965491d686bfe72d121e85",
+      "gold_files": [
+        "context.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 54
+        },
+        "lexical": {
+          "context.go": 51
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "e843a55e790138194506b76a"
+    },
+    {
+      "base_commit": "f75144a356e57c95bd21a048f0a40492dcdb33c5",
+      "gold_files": [
+        "context.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "context.go": 39
+        },
+        "lexical": {
+          "context.go": 2
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "e8f3298d52397c17e0fa1bc9"
+    },
+    {
+      "base_commit": "86ff4a64c7efe1a1c875529835eeef9e15de1e86",
+      "gold_files": [
+        "gin.go"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "gin.go": 8
+        },
+        "lexical": {
+          "gin.go": 9
+        }
+      },
+      "repo": "gin-gonic/gin",
+      "sample_id": "fa19b2ec3770df1f1285f072"
+    },
+    {
+      "base_commit": "011b9f9d190c71310264e6c54bae6259f5e38a9f",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 23
+        },
+        "lexical": {
+          "src/click/core.py": 18
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "08d24e63e480c9447082ccfb"
+    },
+    {
+      "base_commit": "82a83fda1fafd4a43c67755140555bfd5afbd592",
+      "gold_files": [
+        "src/click/core.py",
+        "src/click/types.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 8,
+          "src/click/types.py": 22
+        },
+        "lexical": {
+          "src/click/core.py": 2,
+          "src/click/types.py": 21
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "27801f382096eabc8e450072"
+    },
+    {
+      "base_commit": "422cb2064eed146dbe03ba3aed5be35daeb70414",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 49
+        },
+        "lexical": {
+          "src/click/core.py": 42
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "2bf38b97ba88b8246c44e306"
+    },
+    {
+      "base_commit": "2ed395b0b5ac4d56553ff715335f456f812cdc78",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 10
+        },
+        "lexical": {
+          "src/click/core.py": 37
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "2c98330b6efb89289f963c2e"
+    },
+    {
+      "base_commit": "fcd85032cff78aa536a6d2b455fb83bfcc02b228",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 36
+        },
+        "lexical": {
+          "src/click/core.py": 8
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "399f735b329d5c11913ac4ab"
+    },
+    {
+      "base_commit": "b625b9f39082f366dd85ad13024e43c8f5e78b87",
+      "gold_files": [
+        "src/click/termui.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/termui.py": 13
+        },
+        "lexical": {
+          "src/click/termui.py": 5
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "461a1aafd27445f29ef24020"
+    },
+    {
+      "base_commit": "7f7bbe4569ea68e8dabee232eade069ef3310aea",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 5
+        },
+        "lexical": {
+          "src/click/core.py": 19
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "49589b875553b5fd2bdb1687"
+    },
+    {
+      "base_commit": "a8c05427602d12842c53ce48b03b5d6b5c0c6693",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 26
+        },
+        "lexical": {
+          "src/click/core.py": 23
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "4dfab03e69e4615b806dbab1"
+    },
+    {
+      "base_commit": "380008389b32ca2b7de7c73f670a9eee1562004e",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 46
+        },
+        "lexical": {
+          "src/click/core.py": 55
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "51fc5202e13c950295302355"
+    },
+    {
+      "base_commit": "08ecfd0e7c238a2444886d239de6d0e9d83530ec",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 25
+        },
+        "lexical": {
+          "src/click/core.py": 19
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "6d3773a91bd26a4977aa45af"
+    },
+    {
+      "base_commit": "a1235aacb1be55dc66ddcfefbf64dec44b6ab54d",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 23
+        },
+        "lexical": {
+          "src/click/core.py": 23
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "8882930f15d1cd0966e4ff81"
+    },
+    {
+      "base_commit": "0bf333e1b77b4ae0e85d387531b38930fc657f12",
+      "gold_files": [
+        "src/click/__init__.py",
+        "src/click/core.py",
+        "src/click/decorators.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/__init__.py": 57,
+          "src/click/core.py": 8,
+          "src/click/decorators.py": 34
+        },
+        "lexical": {
+          "src/click/__init__.py": 78,
+          "src/click/core.py": 5,
+          "src/click/decorators.py": 18
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "8fbcfd329087a4fe16649d69"
+    },
+    {
+      "base_commit": "c88f333de440c5066ff563f784a6561f4713cf78",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 43
+        },
+        "lexical": {
+          "src/click/core.py": 37
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "9372208a6dfa7075afb3f423"
+    },
+    {
+      "base_commit": "ddede2147c9370ab8275f81db4826b6895d2e7dc",
+      "gold_files": [
+        "src/click/termui.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/termui.py": 4
+        },
+        "lexical": {
+          "src/click/termui.py": 4
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "9f0d0d1bb836481d62b838aa"
+    },
+    {
+      "base_commit": "60cad4ad6583bf885c62d6f4597f3555d1ee1a0f",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 5
+        },
+        "lexical": {
+          "src/click/core.py": 13
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "a4218c7e484b796962f32982"
+    },
+    {
+      "base_commit": "fa7f035ab58dc4d9b8818b92fbc6a8f3c3234af6",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 11
+        },
+        "lexical": {
+          "src/click/core.py": 12
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "a94f5208796568631ef01c1e"
+    },
+    {
+      "base_commit": "02046e7a19480f85fff7e4577486518abe47e401",
+      "gold_files": [
+        "src/click/types.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/types.py": 1
+        },
+        "lexical": {
+          "src/click/types.py": 18
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "af8170e7fe43a980be55e40d"
+    },
+    {
+      "base_commit": "4271fe283dc9365563aebb369ada8d20eee015a8",
+      "gold_files": [
+        "src/click/core.py",
+        "src/click/exceptions.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 43,
+          "src/click/exceptions.py": 34
+        },
+        "lexical": {
+          "src/click/core.py": 34,
+          "src/click/exceptions.py": 53
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "bed9a23bf8a662f0e6251a42"
+    },
+    {
+      "base_commit": "c7e1ba8448cbcb2cdd9c1c7f4a592e863dcc3995",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 7
+        },
+        "lexical": {
+          "src/click/core.py": 11
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "bf9f481e5c9e9150f3f773b6"
+    },
+    {
+      "base_commit": "bf3a945b3a220589c67d55dcb73cc1c9a9a175b3",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 28
+        },
+        "lexical": {
+          "src/click/core.py": 21
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "cdca9bf2d9c3acf91f505d3a"
+    },
+    {
+      "base_commit": "6c7624491911f0b18f869e5d0a989506e7b416f8",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 34
+        },
+        "lexical": {
+          "src/click/core.py": 27
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "d9073750309233ee1f19776d"
+    },
+    {
+      "base_commit": "bf9da4838986af3bc09a1b16974d154c61dcbe3f",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 34
+        },
+        "lexical": {
+          "src/click/core.py": 25
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "dfa7089d7bf0b3dad96e2bb8"
+    },
+    {
+      "base_commit": "1a4d8c1bb1e8f8e214ede7223bd2c05dc2ce006a",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 33
+        },
+        "lexical": {
+          "src/click/core.py": 43
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "e50d9d504a467c632442042e"
+    },
+    {
+      "base_commit": "1458800409ed12076f18451889b0857db36aa522",
+      "gold_files": [
+        "src/click/_termui_impl.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/_termui_impl.py": 2
+        },
+        "lexical": {
+          "src/click/_termui_impl.py": 2
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "e7f9f3fc7342903c89bfb775"
+    },
+    {
+      "base_commit": "7d7183604158f064390539d83d4a19a978c6b08a",
+      "gold_files": [
+        "src/click/core.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/core.py": 14
+        },
+        "lexical": {
+          "src/click/core.py": 22
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "ed5f5fce7ddb0be735cf98c7"
+    },
+    {
+      "base_commit": "8d3449517a97b6fd457a025bd9c3d2acfd301fa4",
+      "gold_files": [
+        "src/click/exceptions.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/click/exceptions.py": 11
+        },
+        "lexical": {
+          "src/click/exceptions.py": 5
+        }
+      },
+      "repo": "pallets/click",
+      "sample_id": "f4fccd0dc58a48c09a195d6b"
+    },
+    {
+      "base_commit": "c26c145e0fcef51426d64a184d0faa651777f86f",
+      "gold_files": [
+        "src/_pytest/fixtures.py"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "src/_pytest/fixtures.py": 2
+        },
+        "lexical": {
+          "src/_pytest/fixtures.py": 2
+        }
+      },
+      "repo": "pytest-dev/pytest",
+      "sample_id": "c727abdbfcdfc9879df581d2"
+    },
+    {
+      "base_commit": "873cb8ae2fc291eaffbd71e3c83d17b2f0ed7abf",
+      "gold_files": [
+        "tokio/src/sync/mpsc/block.rs"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "tokio/src/sync/mpsc/block.rs": 322
+        },
+        "lexical": {
+          "tokio/src/sync/mpsc/block.rs": 178
+        }
+      },
+      "repo": "tokio-rs/tokio",
+      "sample_id": "1132f037ebb462f13652adff"
+    },
+    {
+      "base_commit": "670a907c55c7f7b27da203208e65da60de6598b2",
+      "gold_files": [
+        "tokio/src/sync/mpsc/chan.rs"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "tokio/src/sync/mpsc/chan.rs": 96
+        },
+        "lexical": {
+          "tokio/src/sync/mpsc/chan.rs": 33
+        }
+      },
+      "repo": "tokio-rs/tokio",
+      "sample_id": "118b720b3e60d4c6679b9ec0"
+    },
+    {
+      "base_commit": "670a907c55c7f7b27da203208e65da60de6598b2",
+      "gold_files": [
+        "tokio/src/sync/mpsc/bounded.rs"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "tokio/src/sync/mpsc/bounded.rs": 5
+        },
+        "lexical": {
+          "tokio/src/sync/mpsc/bounded.rs": 2
+        }
+      },
+      "repo": "tokio-rs/tokio",
+      "sample_id": "30a18c73cca02d3672705be7"
+    },
+    {
+      "base_commit": "de6ef21a81fc451f904bcad8ba85dd8c96b17d76",
+      "gold_files": [
+        "tokio/src/sync/mpsc/chan.rs",
+        "tokio/src/sync/mpsc/list.rs"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "tokio/src/sync/mpsc/chan.rs": 11,
+          "tokio/src/sync/mpsc/list.rs": 88
+        },
+        "lexical": {
+          "tokio/src/sync/mpsc/chan.rs": 11,
+          "tokio/src/sync/mpsc/list.rs": 36
+        }
+      },
+      "repo": "tokio-rs/tokio",
+      "sample_id": "34b14301c5676ca5e49d6c22"
+    },
+    {
+      "base_commit": "c79121391db8f8d36d4213feeb25381caee110c7",
+      "gold_files": [
+        "tokio/src/sync/batch_semaphore.rs"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "tokio/src/sync/batch_semaphore.rs": 20
+        },
+        "lexical": {
+          "tokio/src/sync/batch_semaphore.rs": 65
+        }
+      },
+      "repo": "tokio-rs/tokio",
+      "sample_id": "954f4ea51031f7c08c603b53"
+    },
+    {
+      "base_commit": "911ab21d7012a50e53971ad1292a9f18de22d4c8",
+      "gold_files": [
+        "tokio/src/sync/mod.rs",
+        "tokio/src/sync/notify.rs"
+      ],
+      "gold_ranks": {
+        "bm25": {
+          "tokio/src/sync/mod.rs": 250,
+          "tokio/src/sync/notify.rs": 3
+        },
+        "lexical": {
+          "tokio/src/sync/mod.rs": 403,
+          "tokio/src/sync/notify.rs": 4
+        }
+      },
+      "repo": "tokio-rs/tokio",
+      "sample_id": "b872b8ef648b8cad2d959a36"
+    }
+  ],
+  "schema_version": 1
+}

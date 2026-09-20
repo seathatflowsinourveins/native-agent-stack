@@ -1,0 +1,810 @@
+{
+  "schema_version": 1,
+  "kind": "bounded_public_convergence_source_review",
+  "retrieved_at": "2026-09-20T02:07:12.602467+00:00",
+  "scope": "One bounded source-review wave spanning evaluation, recovery, local inference and context. This is not a universal SOTA ranking or an installation/runtime acceptance.",
+  "public_base": {
+    "repository": "seathatflowsinourveins/native-agent-stack",
+    "commit": "bf99d340f798bf72cc3104619edc482882eb423d",
+    "decision_index_url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/bf99d340f798bf72cc3104619edc482882eb423d/catalogs/us-equities/decision-index.json",
+    "decision_index_sha256": "7c6b0bb779cdbc46077e63d545f68219521a661343e48fdc3dd19a8c2534f593",
+    "repository_count": 501
+  },
+  "public_inventory": {
+    "owned_count": 1,
+    "starred_count": 342,
+    "starred_pagination_pages": 4,
+    "owned_endpoint": "https://api.github.com/users/seathatflowsinourveins/repos?type=owner&per_page=100",
+    "starred_endpoint": "https://api.github.com/users/seathatflowsinourveins/starred?per_page=100",
+    "retrieved_at": "2026-09-20T02:00:50.538618+00:00",
+    "inventory_files": [
+      "public-owned.json",
+      "public-starred.json"
+    ],
+    "missing_public_stars_from_index": [],
+    "nonpublic_records_retained": 0,
+    "fields_allowlisted": true,
+    "star_count_used_as_quality_rank": false
+  },
+  "awesome_sources": [
+    {
+      "repository": "awesome-foss/awesome-sysadmin",
+      "source_commit": "a0f64294fa6c672767f4dffc978023194bf99550",
+      "retrieved_at": "2026-09-20T02:01:19.828227+00:00",
+      "readme_url": "https://github.com/awesome-foss/awesome-sysadmin/blob/a0f64294fa6c672767f4dffc978023194bf99550/README.md",
+      "readme_blob_sha": "bbd268f26f3284d47d07461430a7185d86e085bd",
+      "discovery_only": true,
+      "license_sources": [
+        {
+          "path": "LICENSE.txt",
+          "url": "https://github.com/awesome-foss/awesome-sysadmin/blob/a0f64294fa6c672767f4dffc978023194bf99550/LICENSE.txt",
+          "blob_sha": "92de3a9259139719271fbcebd47e775b7309c900",
+          "sha256": "2ee4926edd20442e2237f93f90bcb519f97b4200f0334426e76f273be6a764d4",
+          "bytes": 14494
+        }
+      ],
+      "bytes": 76102,
+      "sha256": "c86e591abee4eed1f47675c81f2cfc1b07fa3f568bb2e54f280b508e8784849b",
+      "license_at_pin": "CC-BY-SA-4.0",
+      "actual_outbound_links": [
+        {
+          "repository": "restic/restic",
+          "target_url": "https://github.com/restic/restic",
+          "source_url": "https://github.com/awesome-foss/awesome-sysadmin/blob/a0f64294fa6c672767f4dffc978023194bf99550/README.md#L111",
+          "disposition": "selected primary review"
+        },
+        {
+          "repository": "borgbackup/borg",
+          "target_url": "https://github.com/borgbackup/borg",
+          "source_url": "https://github.com/awesome-foss/awesome-sysadmin/blob/a0f64294fa6c672767f4dffc978023194bf99550/README.md#L99",
+          "disposition": "discovery only; alternate backup engine overlaps retained restic"
+        },
+        {
+          "repository": "garethgeorge/backrest",
+          "target_url": "https://github.com/garethgeorge/backrest",
+          "source_url": "https://github.com/awesome-foss/awesome-sysadmin/blob/a0f64294fa6c672767f4dffc978023194bf99550/README.md#L95",
+          "disposition": "discovery only; GUI/orchestrator adds another service before recovery acceptance"
+        }
+      ],
+      "scope": "Selected matching entries reviewed; the full list is not audited and does not establish tool quality or compatibility."
+    },
+    {
+      "repository": "punkpeye/awesome-mcp-servers",
+      "source_commit": "393b4e9fafb0348e5a1c2a4ef5a8719b0d85e061",
+      "retrieved_at": "2026-09-20T02:01:19.693991+00:00",
+      "readme_url": "https://github.com/punkpeye/awesome-mcp-servers/blob/393b4e9fafb0348e5a1c2a4ef5a8719b0d85e061/README.md",
+      "readme_blob_sha": "45f85250febd3da224f78340c775ff50d72842fb",
+      "discovery_only": true,
+      "bytes": 1756337,
+      "sha256": "9b6a1ee410fde8132c92444f15cc153c2d6c4866dd74c4ac8b428981d49f777c",
+      "license_sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/punkpeye/awesome-mcp-servers/blob/393b4e9fafb0348e5a1c2a4ef5a8719b0d85e061/LICENSE",
+          "blob_sha": "7f5a6e30ea24860b1528cfb7a54cf777650fd46a",
+          "sha256": "8cb2c0a4c6590502ffb793005c0f1b440ca4db34dcc209bbe9cf34d3b52a7e07",
+          "bytes": 1125
+        }
+      ],
+      "license_at_pin": "MIT",
+      "actual_outbound_links": [
+        {
+          "repository": "oraios/serena",
+          "target_url": "https://github.com/oraios/serena",
+          "source_url": "https://github.com/punkpeye/awesome-mcp-servers/blob/393b4e9fafb0348e5a1c2a4ef5a8719b0d85e061/README.md#L807",
+          "disposition": "discovery only; already cataloged symbolic-edit option, require concrete gap"
+        },
+        {
+          "repository": "jagoff/memo",
+          "target_url": "https://github.com/jagoff/memo",
+          "source_url": "https://github.com/punkpeye/awesome-mcp-servers/blob/393b4e9fafb0348e5a1c2a4ef5a8719b0d85e061/README.md#L2785",
+          "disposition": "discovery only; memory/MLX feature list overlaps scoped memory and retrieval; no adoption"
+        }
+      ],
+      "scope": "Selected matching entries reviewed; the full list is not audited and does not establish tool quality or compatibility."
+    },
+    {
+      "repository": "e2b-dev/awesome-ai-agents",
+      "source_commit": "9596ab1e69fbbb6c95291141c8dab5c181083216",
+      "retrieved_at": "2026-09-20T02:01:19.855817+00:00",
+      "readme_url": "https://github.com/e2b-dev/awesome-ai-agents/blob/9596ab1e69fbbb6c95291141c8dab5c181083216/README.md",
+      "readme_blob_sha": "b701937e2c389d3e9fe3830617e4c177e37c06fe",
+      "discovery_only": true,
+      "license_sources": [
+        {
+          "path": "LICENSE.md",
+          "url": "https://github.com/e2b-dev/awesome-ai-agents/blob/9596ab1e69fbbb6c95291141c8dab5c181083216/LICENSE.md",
+          "blob_sha": "d0e1a6978bcaf61741acd6f3295bdd5aa348cc29",
+          "sha256": "7a31126d7adf334ccdcbefd35c2fe98254db746113c6b80e9943b1800d36fc39",
+          "bytes": 19089
+        }
+      ],
+      "bytes": 212139,
+      "sha256": "db062c798654c5f6dec1ddedf7ab823c70d11d2f66ccf2a7036171f1e5b6eaa8",
+      "license_at_pin": "CC-BY-NC-SA-4.0",
+      "actual_outbound_links": [
+        {
+          "repository": "princeton-nlp/SWE-agent",
+          "target_url": "https://github.com/princeton-nlp/SWE-agent",
+          "source_url": "https://github.com/e2b-dev/awesome-ai-agents/blob/9596ab1e69fbbb6c95291141c8dab5c181083216/README.md#L2577",
+          "disposition": "discovery only; another coding-agent runtime; historical score claims were not accepted as evaluation evidence"
+        }
+      ],
+      "scope": "Selected matching entries reviewed; the full list is not audited and does not establish tool quality or compatibility."
+    }
+  ],
+  "candidates": [
+    {
+      "repository": "eyuansu62/agent-retrieval-bench",
+      "repository_key": "eyuansu62/agent-retrieval-bench",
+      "version": "v0.2.1",
+      "published_package_version": null,
+      "source_commit": "b487f3866cc13dd971819cb902517a6a50282404",
+      "retrieved_at": "2026-09-20T02:02:08.467015+00:00",
+      "release_url": "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1",
+      "published_at": "2026-07-26T01:08:48Z",
+      "source_depth": "pinned_readme_license_and_selected_supporting_source",
+      "license_at_pin": {
+        "spdx": "MIT",
+        "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/LICENSE",
+        "sha256": "f821747bf0011218a8d18a6030b3343384a2c68478e643e26e057732fc89aa31"
+      },
+      "catalog_coverage": {
+        "repository": "eyuansu62/agent-retrieval-bench",
+        "in_public_decision_index": true,
+        "public_references": [
+          {
+            "kind": "catalog_card",
+            "path": "catalogs/us-equities/foundation-memory.json",
+            "pointer": "/entries/33",
+            "id": "foundation-agent-retrieval-bench",
+            "decision": "conditional",
+            "evidence_level": "source_review"
+          }
+        ],
+        "public_star": false,
+        "in_maintained_registry": true,
+        "maintained_selection": "trial",
+        "maintained_pin": "v0.2.1"
+      },
+      "discovery_provenance": [
+        {
+          "kind": "public_owned_repository_catalog",
+          "source_url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/bf99d340f798bf72cc3104619edc482882eb423d/catalogs/us-equities/decision-index.json"
+        }
+      ],
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/LICENSE",
+          "blob_sha": "8d60c0515b80b0e50dc5877f209aa84425106b82",
+          "sha256": "f821747bf0011218a8d18a6030b3343384a2c68478e643e26e057732fc89aa31",
+          "bytes": 1091
+        },
+        {
+          "path": "README.md",
+          "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md",
+          "blob_sha": "d5be7aaea6e17ace0a36b319c03e71199aa84ef6",
+          "sha256": "494b73638318f3e8958422e6ac49e6c62d13973c0e4d947c186ed3b305c3dbc4",
+          "bytes": 9985
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/pyproject.toml",
+          "blob_sha": "a5ec148c61f2449edb85e415d4218d2cbbba35d7",
+          "sha256": "05889ec96609b4d5b557ac21b9894a3d308930dbe7d8d11deb130abdc9d2e317",
+          "bytes": 729
+        },
+        {
+          "path": "DATA_LICENSE.md",
+          "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/DATA_LICENSE.md",
+          "blob_sha": "ec257b002b58516a673e747c7fe4be69bf49ee17",
+          "sha256": "c503889e22cb019a92ddc8c51e704e89c2e85f1797d5f97cc3c022dd49f1a19e",
+          "bytes": 1404
+        }
+      ],
+      "runtime_executed": false,
+      "lane": "evaluation/context",
+      "decision": "investigate",
+      "why": "Adds frozen pre-change file-retrieval tasks, token-budgeted context yield and abstention cases to the existing small repository-specific evaluation.",
+      "overlap": "Evaluates retrieval rather than adding a runtime. Complement existing rg, ast-grep, SocratiCode and selected document retrieval.",
+      "compatibility": "Python >=3.10. Corpus snapshots retain each upstream project license; evaluator/metadata/documentation are MIT.",
+      "acceptance": "Freeze a stratified public subset and hashes before runs. Compare lexical, existing semantic and selective-abstention lanes under the same all_files candidates and 4k/8k token budgets. Report Recall@k, MRR, BCY, no-gold errors, time and actual provider usage separately. Add independent edit/test tasks before claiming patch improvement.",
+      "limits": [
+        "File hits do not prove correct spans or test-passing edits.",
+        "Published method rankings are workload-specific; no universal best embedding claim.",
+        "No corpus download, model call or benchmark execution in this audit."
+      ],
+      "review_level": "source_review",
+      "evidence_level": "pinned_source_review",
+      "source_pin_distinction": {
+        "reviewed_release_tag": "v0.2.1",
+        "reviewed_release_commit": "b487f3866cc13dd971819cb902517a6a50282404",
+        "maintained_prior_source_commit": "07014c986f3deadb1548c62b32c0ffbe6a81465d",
+        "maintained_source_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/07014c986f3deadb1548c62b32c0ffbe6a81465d/README.md",
+        "comparison_url": "https://github.com/eyuansu62/agent-retrieval-bench/compare/b487f3866cc13dd971819cb902517a6a50282404...07014c986f3deadb1548c62b32c0ffbe6a81465d",
+        "comparison_retrieved_at": "2026-09-20T02:09:07.328339+00:00",
+        "status": "maintained snapshot is two commits ahead of release tag",
+        "changed_files": [
+          "CITATION.cff",
+          "README.md",
+          "docs/blog.html",
+          "docs/index.html",
+          "paper/README.md"
+        ],
+        "limit": "GitHub compare reports documentation/citation differences only; keep exact source revisions distinct even though both declare version 0.2.1. No evaluator runtime equivalence test was executed."
+      },
+      "subsequent_execution": {
+        "receipt": "blueprints/convergence-practice/arb-trace2code/receipt.json",
+        "source_commit": "b487f3866cc13dd971819cb902517a6a50282404",
+        "scope": "Separately recorded native CLI replay of the complete 101-case trace2code release; no installed retriever, agent repair or model acceptance. runtime_executed above refers only to this source-review wave."
+      }
+    },
+    {
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "repository_key": "ukgovernmentbeis/inspect_ai",
+      "version": null,
+      "published_package_version": "0.3.266",
+      "source_commit": "ec4dfc6953784dc45b79de3147530c89868c6e26",
+      "retrieved_at": "2026-09-20T02:02:08.113262+00:00",
+      "release_url": null,
+      "published_at": null,
+      "source_depth": "pinned_readme_license_and_selected_supporting_source",
+      "license_at_pin": {
+        "spdx": "MIT",
+        "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/LICENSE",
+        "sha256": "c593c2afc81388521eaeb03f0d1a4b01bc3e5147ed9cb16c1f129e5be353b6af"
+      },
+      "catalog_coverage": {
+        "repository": "ukgovernmentbeis/inspect_ai",
+        "in_public_decision_index": true,
+        "public_references": [
+          {
+            "kind": "catalog_card",
+            "path": "catalogs/us-equities/agents-operations.json",
+            "pointer": "/entries/30",
+            "id": "inspect-ai",
+            "decision": "default",
+            "evidence_level": "source_review"
+          }
+        ],
+        "public_star": false,
+        "in_maintained_registry": true,
+        "maintained_selection": "trial",
+        "maintained_pin": "inspect-ai0.3.266; source ec4dfc6953784dc45b79de3147530c89868c6e26"
+      },
+      "discovery_provenance": [
+        {
+          "kind": "public_owned_repository_catalog",
+          "source_url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/bf99d340f798bf72cc3104619edc482882eb423d/catalogs/us-equities/decision-index.json"
+        }
+      ],
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/LICENSE",
+          "blob_sha": "72fc87742ef8a944fab4f28fe6231696c62f2fa4",
+          "sha256": "c593c2afc81388521eaeb03f0d1a4b01bc3e5147ed9cb16c1f129e5be353b6af",
+          "bytes": 1081
+        },
+        {
+          "path": "README.md",
+          "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/README.md",
+          "blob_sha": "1e58c142b2e05faf2e3dba9a487450c0845c4576",
+          "sha256": "a9a1e07b955d869137d8ad109f1c238268f361dcdfac30cfcc94983a51a99b17",
+          "bytes": 3099
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/pyproject.toml",
+          "blob_sha": "ee90d00ac8edbeda0caf7ab56798e1b901dd47d5",
+          "sha256": "ce5713f4a354c3d2fd3b01f08e247a06b240a21eda481581b3cd270c867c1d2b",
+          "bytes": 5660
+        },
+        {
+          "path": "docs/eval-sets.qmd",
+          "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/docs/eval-sets.qmd",
+          "blob_sha": "d09b2b9e05e5c4fc91e35990d7176f2ad1ac112c",
+          "sha256": "1f12dea4705f63125dd127700cdb10c8d11eb0aaf1f468ff3a5ccb92c505d951",
+          "bytes": 14758
+        },
+        {
+          "path": "docs/eval-logs.qmd",
+          "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/docs/eval-logs.qmd",
+          "blob_sha": "c1a81f66e3ac5ba14728233c9f29ef0c811377c1",
+          "sha256": "09b38f97b74f36ef753db9fdfaeb2245a804347dcbc01d6525e69ff2dcc0a9df",
+          "bytes": 34291
+        },
+        {
+          "path": "src/inspect_ai/model/_providers/mockllm.py",
+          "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/src/inspect_ai/model/_providers/mockllm.py",
+          "blob_sha": "7fb658b227093dbd1a1b735b91cc6a3bd8469ba6",
+          "sha256": "7b4038e930b8669389f51bc40b2353ba18ca561fc1c79ac6bf7d88f250dbdb2c",
+          "bytes": 5562
+        }
+      ],
+      "runtime_executed": false,
+      "lane": "evaluation/recovery",
+      "decision": "investigate",
+      "why": "Provides reusable scoring, logs and resume/retry semantics for a small deterministic evaluation suite.",
+      "overlap": "Use it as an evaluation runner only; keep production workflow ownership and native client authentication unchanged.",
+      "compatibility": "Python >=3.10. Source reviewed at exact commit; PyPI latest 0.3.266 is separate package metadata, not a reproduced wheel/source equivalence check.",
+      "acceptance": "Run a tiny public synthetic suite through mockllm with deterministic scoring, max_tasks=1, bounded retry attempts and failure-log retention. Interrupt then resume; verify completed samples are reused, failure provenance remains and no provider traffic occurs. Only then consider an explicitly authorized provider lane.",
+      "limits": [
+        "Default eval-set concurrency and ten retry attempts are broader than the proposed smoke test.",
+        "Eval logs can contain prompts/tool data; only sanitized summaries belong in public evidence.",
+        "Head source review is not installed-runtime qualification."
+      ],
+      "package_metadata": {
+        "url": "https://pypi.org/pypi/inspect_ai/0.3.266/json",
+        "retrieved_at": "2026-09-20T02:08:06.220557+00:00",
+        "version": "0.3.266",
+        "requires_python": ">=3.10",
+        "license": "MIT License",
+        "scope": "Package metadata only; artifact not downloaded or executed; source equivalence not independently reproduced."
+      },
+      "review_level": "source_review",
+      "evidence_level": "pinned_source_review"
+    },
+    {
+      "repository": "harbor-framework/harbor",
+      "repository_key": "harbor-framework/harbor",
+      "version": "v0.23.0",
+      "published_package_version": null,
+      "source_commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "retrieved_at": "2026-09-20T02:02:08.179873+00:00",
+      "release_url": "https://github.com/harbor-framework/harbor/releases/tag/v0.23.0",
+      "published_at": "2026-09-12T04:55:17Z",
+      "source_depth": "pinned_readme_license_and_selected_supporting_source",
+      "license_at_pin": {
+        "spdx": "Apache-2.0",
+        "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/LICENSE",
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      },
+      "catalog_coverage": {
+        "repository": "harbor-framework/harbor",
+        "in_public_decision_index": false,
+        "public_references": [],
+        "public_star": false,
+        "in_maintained_registry": false,
+        "maintained_selection": null,
+        "maintained_pin": null
+      },
+      "discovery_provenance": [
+        {
+          "kind": "primary_search",
+          "source_url": "https://github.com/harbor-framework/harbor/releases/tag/v0.23.0"
+        }
+      ],
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/LICENSE",
+          "blob_sha": "261eeb9e9f8b2b4b0d119366dda99c6fd7d35c64",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "bytes": 11357
+        },
+        {
+          "path": "README.md",
+          "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md",
+          "blob_sha": "4ae345184f65e2c0ff8cce8e496a8fdcc439f9bc",
+          "sha256": "687e4f416b43e1ab28afb3cd48f556d7a9f4d664ac78ac1a2a07a7ab9b95b1b7",
+          "bytes": 2984
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/pyproject.toml",
+          "blob_sha": "f37c92e1b2de2dec7a042bad8db0f6483f9a76f3",
+          "sha256": "00290ec17fb5f4f44ebd1a251dd07fe4f1b6dabb9fed61497cd303a4679e104d",
+          "bytes": 5829
+        },
+        {
+          "path": "src/harbor/agents/oracle.py",
+          "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/oracle.py",
+          "blob_sha": "70d7ef719198e00b89378d95cf468124f494200e",
+          "sha256": "9bebb320fd3909aea0fe7da174b4cb7c9b761591224d9db8010d73d1a002915c",
+          "bytes": 5867
+        }
+      ],
+      "runtime_executed": false,
+      "lane": "evaluation/isolation",
+      "decision": "investigate",
+      "why": "Adds standardized agent task environments and verifiers when evaluating real terminal work, beyond file-retrieval scores.",
+      "overlap": "A genuinely new catalog identity, but overlaps existing native workers if used as another everyday orchestration runtime. Evaluate only as an optional benchmark harness.",
+      "compatibility": "Python >=3.12; local README example requires Docker. Provider examples use API keys; native subscription sign-in reuse was not verified.",
+      "acceptance": "First qualify one self-authored public task with the built-in oracle agent and deterministic verifier, concurrency=1 and explicit timeout; record container cleanup and preserved trial artifacts. This proves task packaging only. Defer model-agent benchmarking until a task requires it and credentials/budget are separately authorized.",
+      "limits": [
+        "Container/oracle success is not agent or model success.",
+        "Do not infer equivalent credential access inside containers.",
+        "No Docker installation, benchmark environment or provider run occurred."
+      ],
+      "qualification_gate": "defer_pending_specific_benchmark",
+      "review_level": "source_review",
+      "evidence_level": "pinned_source_review"
+    },
+    {
+      "repository": "ml-explore/mlx-lm",
+      "repository_key": "ml-explore/mlx-lm",
+      "version": "v0.31.3",
+      "published_package_version": null,
+      "source_commit": "ed1fca4cef15a824c5f1702c80f70b4cffc8e4dd",
+      "retrieved_at": "2026-09-20T02:02:08.096710+00:00",
+      "release_url": "https://github.com/ml-explore/mlx-lm/releases/tag/v0.31.3",
+      "published_at": "2026-04-22T07:43:57Z",
+      "source_depth": "pinned_readme_license_and_selected_supporting_source",
+      "license_at_pin": {
+        "spdx": "MIT",
+        "url": "https://github.com/ml-explore/mlx-lm/blob/ed1fca4cef15a824c5f1702c80f70b4cffc8e4dd/LICENSE",
+        "sha256": "ccfab7ccb2ea306f71531c8ca77bb55507606cd90768b1e32b8b52ab5b48cf01"
+      },
+      "catalog_coverage": {
+        "repository": "ml-explore/mlx-lm",
+        "in_public_decision_index": true,
+        "public_references": [
+          {
+            "kind": "research_supplement",
+            "path": "catalogs/us-equities/architecture/foundation.json",
+            "pointer": "/repositories/12",
+            "decision": "investigate",
+            "evidence_depth": "pinned_primary_source_review"
+          }
+        ],
+        "public_star": false,
+        "in_maintained_registry": true,
+        "maintained_selection": "discovery",
+        "maintained_pin": null
+      },
+      "discovery_provenance": [
+        {
+          "kind": "public_owned_repository_catalog",
+          "source_url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/bf99d340f798bf72cc3104619edc482882eb423d/catalogs/us-equities/decision-index.json"
+        }
+      ],
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/ml-explore/mlx-lm/blob/ed1fca4cef15a824c5f1702c80f70b4cffc8e4dd/LICENSE",
+          "blob_sha": "98ff47b9ef9d4ac9f1a4bde3db13dd27456c5ea1",
+          "sha256": "ccfab7ccb2ea306f71531c8ca77bb55507606cd90768b1e32b8b52ab5b48cf01",
+          "bytes": 1066
+        },
+        {
+          "path": "README.md",
+          "url": "https://github.com/ml-explore/mlx-lm/blob/ed1fca4cef15a824c5f1702c80f70b4cffc8e4dd/README.md",
+          "blob_sha": "ce71596b3cf0a879f1c7cbd9ab29632e08b1af16",
+          "sha256": "d7bfcf00a0a2e0a6d4a5da48eb523bbf0ad248b3f7c5511a20a72175e2958084",
+          "bytes": 8193
+        },
+        {
+          "path": "setup.py",
+          "url": "https://github.com/ml-explore/mlx-lm/blob/ed1fca4cef15a824c5f1702c80f70b4cffc8e4dd/setup.py",
+          "blob_sha": "dd769a706d7d7ea388a540aacb3599afd858f938",
+          "sha256": "d8049945cbe187386dab23122a2aa3c2a035aecc5a004033dd22f26064bca729",
+          "bytes": 2368
+        }
+      ],
+      "runtime_executed": false,
+      "lane": "local-inference",
+      "decision": "investigate",
+      "why": "Apple-native generation/fine-tuning and prompt-cache controls may help a measured local workload.",
+      "overlap": "Existing Ollama covers local embeddings; MLX uses a separate model format/cache and is not a drop-in QMD GGUF backend.",
+      "compatibility": "Apple Silicon MLX; package setup declares Python >=3.8 but dependency wheels govern effective support. Wired-memory optimization requires macOS >=15.",
+      "acceptance": "Pick one extraction or bounded code-review workload with held-out answers. Compare locked model revisions/quantizations to the current route; measure accuracy, cold/warm time, tokens/sec and peak memory without changing system memory limits. Adopt only if a predefined quality/resource threshold is met.",
+      "limits": [
+        "Runtime MIT license does not establish model-weight license.",
+        "Matching parameter count is not matching model/quantization.",
+        "No local model download or inference performed."
+      ],
+      "qualification_gate": "investigate_only_for_named_workload",
+      "review_level": "source_review",
+      "evidence_level": "pinned_source_review"
+    },
+    {
+      "repository": "ggml-org/llama.cpp",
+      "repository_key": "ggml-org/llama.cpp",
+      "version": "v0.4.1",
+      "published_package_version": null,
+      "source_commit": "b29c606e28a01b1bc8c1351026a0fa6e616bf6c4",
+      "retrieved_at": "2026-09-20T02:02:08.108295+00:00",
+      "release_url": "https://github.com/ggml-org/llama.cpp/releases/tag/v0.4.1",
+      "published_at": "2026-09-14T18:27:29Z",
+      "source_depth": "pinned_readme_license_and_selected_supporting_source",
+      "license_at_pin": {
+        "spdx": "MIT",
+        "url": "https://github.com/ggml-org/llama.cpp/blob/b29c606e28a01b1bc8c1351026a0fa6e616bf6c4/LICENSE",
+        "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d"
+      },
+      "catalog_coverage": {
+        "repository": "ggml-org/llama.cpp",
+        "in_public_decision_index": false,
+        "public_references": [],
+        "public_star": false,
+        "in_maintained_registry": true,
+        "maintained_selection": "trial",
+        "maintained_pin": "v0.4.1"
+      },
+      "discovery_provenance": [
+        {
+          "kind": "maintained_registry",
+          "source_url": "https://github.com/ggml-org/llama.cpp/releases/tag/v0.4.1"
+        }
+      ],
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/ggml-org/llama.cpp/blob/b29c606e28a01b1bc8c1351026a0fa6e616bf6c4/LICENSE",
+          "blob_sha": "e7dca554bcb802f98408383a864404e3aa4eacca",
+          "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+          "bytes": 1078
+        },
+        {
+          "path": "README.md",
+          "url": "https://github.com/ggml-org/llama.cpp/blob/b29c606e28a01b1bc8c1351026a0fa6e616bf6c4/README.md",
+          "blob_sha": "aae3bcd35ad9c2ba3e914750a36e125fec0b5355",
+          "sha256": "e58520857253729851cc02313883c9d2a8b2ae86abe212aaf1bcbd7db8bfefb4",
+          "bytes": 7351
+        },
+        {
+          "path": "pyproject.toml",
+          "url": "https://github.com/ggml-org/llama.cpp/blob/b29c606e28a01b1bc8c1351026a0fa6e616bf6c4/pyproject.toml",
+          "blob_sha": "0383fbc5e6d409f14c13096cf666b1dd1f65d9b6",
+          "sha256": "03c52669f756ba7084659fd55467ec5f4990866d1c12f5a01833c4d56430df32",
+          "bytes": 1907
+        }
+      ],
+      "runtime_executed": false,
+      "lane": "local-inference",
+      "decision": "investigate",
+      "why": "Direct GGUF/Metal execution and serving controls provide a transparent comparison lane for local generation.",
+      "overlap": "New to this public decision index but already a trial in the maintained registry; existing Ollama overlaps general local serving.",
+      "compatibility": "Apple Silicon is supported via NEON, Accelerate and Metal; stable v0.4.1 source reviewed. Python conversion scripts have their own runtime dependencies and are not the inference binary.",
+      "acceptance": "Use one exact GGUF artifact and prompt set, bounded context and concurrency=1. Compare quality, prompt processing/generation speed and resident memory with the existing route; verify cancellation releases the process/model. Do not add a persistent server until useful.",
+      "limits": [
+        "Model artifact license/architecture must be checked separately.",
+        "Newer b-series prereleases are not this stable source pin.",
+        "No binary installation, server or model run performed."
+      ],
+      "qualification_gate": "investigate_only_for_named_workload",
+      "review_level": "source_review",
+      "evidence_level": "pinned_source_review"
+    },
+    {
+      "repository": "restic/restic",
+      "repository_key": "restic/restic",
+      "version": "v0.19.1",
+      "published_package_version": null,
+      "source_commit": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+      "retrieved_at": "2026-09-20T02:02:08.159288+00:00",
+      "release_url": "https://github.com/restic/restic/releases/tag/v0.19.1",
+      "published_at": "2026-07-05T08:13:33Z",
+      "source_depth": "pinned_readme_license_and_selected_supporting_source",
+      "license_at_pin": {
+        "spdx": "BSD-2-Clause",
+        "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/LICENSE",
+        "sha256": "6f08a01a9fab5b24e139a09f15cc24a73087c7bc09e3bacf099fdf2d767bf897"
+      },
+      "catalog_coverage": {
+        "repository": "restic/restic",
+        "in_public_decision_index": true,
+        "public_references": [
+          {
+            "kind": "catalog_card",
+            "path": "catalogs/us-equities/agents-operations.json",
+            "pointer": "/entries/41",
+            "id": "restic",
+            "decision": "default",
+            "evidence_level": "native_proven"
+          },
+          {
+            "kind": "research_supplement",
+            "path": "catalogs/us-equities/convergence-program/hosting.json",
+            "pointer": "/candidates/9",
+            "decision": "retain",
+            "evidence_depth": "selected_primary_source_review"
+          },
+          {
+            "kind": "public_star",
+            "path": "catalogs/us-equities/coverage.json",
+            "pointer": "/stars/245",
+            "disposition": "catalog_reviewed"
+          },
+          {
+            "kind": "star_review",
+            "path": "catalogs/us-equities/star-audit.json",
+            "pointer": "/entries/175",
+            "decision": "targeted_candidate",
+            "review_level": "source_review",
+            "review_depth": "selected_primary_files"
+          },
+          {
+            "kind": "component_record",
+            "path": "manifests/stack.json",
+            "pointer": "/components/43",
+            "id": "restic"
+          }
+        ],
+        "public_star": true,
+        "in_maintained_registry": true,
+        "maintained_selection": "selected",
+        "maintained_pin": "0.19.1"
+      },
+      "discovery_provenance": [
+        {
+          "kind": "public_owned_repository_catalog",
+          "source_url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/bf99d340f798bf72cc3104619edc482882eb423d/catalogs/us-equities/decision-index.json"
+        },
+        {
+          "kind": "public_star",
+          "source_url": "https://api.github.com/users/seathatflowsinourveins/starred?per_page=100",
+          "retrieved_at": "2026-09-20T02:00:50.538618+00:00"
+        },
+        {
+          "kind": "awesome_list",
+          "source_url": "https://github.com/awesome-foss/awesome-sysadmin/blob/a0f64294fa6c672767f4dffc978023194bf99550/README.md#L111"
+        }
+      ],
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/LICENSE",
+          "blob_sha": "29b2ee55a92ff2c5516d7b916224c85fa7e9139a",
+          "sha256": "6f08a01a9fab5b24e139a09f15cc24a73087c7bc09e3bacf099fdf2d767bf897",
+          "bytes": 1345
+        },
+        {
+          "path": "README.md",
+          "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/README.md",
+          "blob_sha": "ef12f3e1b2a2992c1b2d5d183c57c828891f4f79",
+          "sha256": "8180046c28e55384c37588607b64a160b3e359a044d6ac59fddb94d659eab75d",
+          "bytes": 5706
+        },
+        {
+          "path": "go.mod",
+          "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/go.mod",
+          "blob_sha": "00e1171de5d2a17f21d2d13f9024ef2956e6afaa",
+          "sha256": "d166913ed4897cf69069ef5be090b2d79a857fc28328bb950e12655b5a54f176",
+          "bytes": 4894
+        }
+      ],
+      "runtime_executed": false,
+      "lane": "recovery",
+      "decision": "retain",
+      "why": "The unresolved capability is independent recovery, not another backup engine.",
+      "overlap": "Already selected and source-host-proven for narrower restore scopes; avoid another orchestrator before off-host restore is demonstrated.",
+      "compatibility": "Upstream supports Linux, macOS and Windows; credentials and repository keys stay in native/private stores.",
+      "acceptance": "Using an explicitly selected independent destination and separately recoverable key, back up a non-sensitive fixture, restore into a clean target, compare content hashes and permissions, then simulate loss of original working files. Record recovery time and missing-key failure without publishing secrets. Never delete real originals for the drill.",
+      "limits": [
+        "Same-host backup/restore does not prove disaster recovery.",
+        "README makes lost repository passwords unrecoverable; key recovery is a separate acceptance dependency.",
+        "No backup destination, account or service changed."
+      ],
+      "qualification_gate": "retain_and_qualify_independent_restore",
+      "review_level": "source_review",
+      "evidence_level": "pinned_source_review"
+    },
+    {
+      "repository": "tobi/qmd",
+      "repository_key": "tobi/qmd",
+      "version": "v2.8.3",
+      "published_package_version": null,
+      "source_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "retrieved_at": "2026-09-20T02:02:10.030799+00:00",
+      "release_url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+      "published_at": "2026-08-16T22:30:34Z",
+      "source_depth": "pinned_readme_license_and_selected_supporting_source",
+      "license_at_pin": {
+        "spdx": "MIT",
+        "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/LICENSE",
+        "sha256": "24c446836e7e2cdea13a914de10c88c553e6297366061ba24013b8ce73c8f7fa"
+      },
+      "catalog_coverage": {
+        "repository": "tobi/qmd",
+        "in_public_decision_index": true,
+        "public_references": [
+          {
+            "kind": "research_supplement",
+            "path": "catalogs/us-equities/architecture/foundation.json",
+            "pointer": "/repositories/2",
+            "decision": "retain",
+            "evidence_depth": "pinned_primary_source_review"
+          },
+          {
+            "kind": "research_supplement",
+            "path": "catalogs/us-equities/convergence-program/foundation.json",
+            "pointer": "/repositories/3",
+            "decision": "retain",
+            "evidence_level": "pinned_primary_source_reuse"
+          },
+          {
+            "kind": "catalog_card",
+            "path": "catalogs/us-equities/foundation-memory.json",
+            "pointer": "/entries/3",
+            "id": "foundation-qmd",
+            "decision": "default",
+            "evidence_level": "native_proven"
+          },
+          {
+            "kind": "legacy_candidate",
+            "path": "manifests/candidates.json",
+            "pointer": "/candidates/7",
+            "decision": "First evaluate semantic mode of existing install"
+          },
+          {
+            "kind": "component_record",
+            "path": "manifests/stack.json",
+            "pointer": "/components/25",
+            "id": "qmd"
+          }
+        ],
+        "public_star": false,
+        "in_maintained_registry": true,
+        "maintained_selection": "selected",
+        "maintained_pin": "2.8.3"
+      },
+      "discovery_provenance": [
+        {
+          "kind": "public_owned_repository_catalog",
+          "source_url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/bf99d340f798bf72cc3104619edc482882eb423d/catalogs/us-equities/decision-index.json"
+        }
+      ],
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/LICENSE",
+          "blob_sha": "81652d05896680c9c78e5f4a3bf69cf719f5818c",
+          "sha256": "24c446836e7e2cdea13a914de10c88c553e6297366061ba24013b8ce73c8f7fa",
+          "bytes": 1072
+        },
+        {
+          "path": "README.md",
+          "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md",
+          "blob_sha": "2c697f3ee9cdb7f53aea1b41342563a88887f7d4",
+          "sha256": "24c049f59408d3d021fbee70d4cd5dd744cdb51f5caea956b417f4dfe7e26880",
+          "bytes": 50056
+        },
+        {
+          "path": "package.json",
+          "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/package.json",
+          "blob_sha": "1c6082ab9783d0d76042f102d517b04b30e2be88",
+          "sha256": "14462e2764e9d140afbeb3c924e6dd81c0448177e97785822e763d901d70f20b",
+          "bytes": 3415
+        }
+      ],
+      "runtime_executed": false,
+      "lane": "context/retrieval",
+      "decision": "retain",
+      "why": "Existing selected document search already has lexical/vector/hybrid/full benchmark modes; measure the unqualified lane before adding another document engine.",
+      "overlap": "Keep document collections explicit; SocratiCode remains code-context retrieval and ai-memory remains explicit durable decisions.",
+      "compatibility": "Node >=22. Semantic/reranking/query expansion use specific GGUF contracts via node-llama-cpp and may download models on first use; no model switch is implied.",
+      "acceptance": "Confirm the named collection is populated, freeze unseen lexical/semantic/alias/no-answer queries and expected files, then compare BM25, vector, hybrid and full pipelines. Measure relevance and latency with exact model artifacts. Preserve the old lexical baseline and rollback index.",
+      "limits": [
+        "Upstream bench can report all zeros without warning for an absent collection, so setup must be checked.",
+        "Upstream example scores do not establish the user corpus result.",
+        "No index refresh, broad directory scan or model download occurred."
+      ],
+      "qualification_gate": "retain_and_measure_existing_semantic_lane",
+      "review_level": "source_review",
+      "evidence_level": "pinned_source_review"
+    }
+  ],
+  "summary": {
+    "candidates_reviewed": 7,
+    "already_in_public_index": 5,
+    "new_to_public_index": [
+      "ggml-org/llama.cpp",
+      "harbor-framework/harbor"
+    ],
+    "genuinely_new_to_maintained_registry": [
+      "harbor-framework/harbor"
+    ],
+    "proposed_adoptions": 0
+  },
+  "limits": [
+    "GET-only public source acquisition; no installation, configuration, model call, benchmark execution, publication or repository mutation.",
+    "Public inventory counts reflect endpoint visibility at retrieval time; private repository identities and account stores were not inspected.",
+    "Awesome lists supplied specific discovery links only; no entire-list audit, popularity ranking or copied quality claim.",
+    "Exact source and license review does not prove dependency resolution, binary equivalence, hardware performance or account entitlement.",
+    "Historical source-host receipts remain separate from current target-host execution.",
+    "The maintained registry comparison records only public candidate identities, status and pins; no private repository identity or location is included."
+  ]
+}

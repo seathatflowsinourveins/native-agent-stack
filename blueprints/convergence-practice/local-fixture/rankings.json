@@ -1,0 +1,1475 @@
+{
+  "base_commit": "bf99d340f798bf72cc3104619edc482882eb423d",
+  "chunks": 15,
+  "corpus_manifest_sha256": "7bb986160b332e205208b6767b95b6f019423ffed1f50843534ff7e4272fdded",
+  "documents": 15,
+  "fixture_sha256": "aea5e9616fb19eb1d2fd58ecfadf88ff087d7d2e79b4a70bc9f88207af9d0402",
+  "full_body_normalization": "Native CRLF/CR to LF and surrounding whitespace strip only.",
+  "max_chunk_chars": 9777,
+  "query_transform": "None: original fixture query string passed verbatim to native ranker.",
+  "results": [
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "adoption/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "adoption/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "adoption/update.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/data-readiness/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "credentials-01"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "adoption/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "adoption/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "adoption/update.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/research-evaluation/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "credentials-02"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "docs/evidence.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "docs/evidence.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "adoption/README.md",
+        "adoption/update.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "evidence-03"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "adoption/update.md",
+        "adoption/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "observability/session-e2e.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "memory-04"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "adoption/update.md",
+        "docs/evidence.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/research-evaluation/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "memory-05"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "docs/evidence.md",
+        "observability/desktop-restart.md",
+        "adoption/update.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/research-runtime/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "memory-06"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "observability/desktop-restart.md"
+      ],
+      "metrics": {
+        "MRR": 0.5,
+        "Recall@1": 0.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "adoption/README.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "adoption/update.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "context-07"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "observability/session-e2e.md"
+      ],
+      "metrics": {
+        "MRR": 0.5,
+        "Recall@1": 0.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "adoption/update.md",
+        "observability/session-e2e.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "context-08"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "observability/desktop-restart.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "observability/desktop-restart.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "observability/session-e2e.md",
+        "adoption/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "context-09"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/worker-supervision/README.md"
+      ],
+      "metrics": {
+        "MRR": 0.5,
+        "Recall@1": 0.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "docs/evidence.md",
+        "adoption/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/memory-lifecycle/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "worker-10"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/worker-supervision/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/worker-supervision/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "adoption/README.md",
+        "docs/evidence.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/data-readiness/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "worker-11"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/worker-supervision/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "observability/session-e2e.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "observability/desktop-restart.md",
+        "adoption/update.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/research-evaluation/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "worker-12"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/research-runtime/README.md"
+      ],
+      "metrics": {
+        "MRR": 0.5,
+        "Recall@1": 0.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "adoption/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "adoption/update.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "execution-13"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/research-runtime/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/research-runtime/README.md",
+        "adoption/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "observability/desktop-restart.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "execution-14"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "docs/evidence.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "research-15"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "adoption/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "research-16"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/research-evaluation/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "adoption/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "observability/desktop-restart.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "research-17"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/state-recovery/memory/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "adoption/README.md",
+        "docs/evidence.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "observability/desktop-restart.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "backup-18"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/state-recovery/qdrant/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "adoption/update.md",
+        "observability/desktop-restart.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "backup-19"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/authenticated-data/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "observability/desktop-restart.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/worker-supervision/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "execution-20"
+    },
+    {
+      "expected_abstention": true,
+      "gold_files": [],
+      "metrics": null,
+      "ranked_files": [
+        "blueprints/us-equities/authenticated-data/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "observability/desktop-restart.md",
+        "adoption/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/state-recovery/memory/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "abstain-21"
+    },
+    {
+      "expected_abstention": true,
+      "gold_files": [],
+      "metrics": null,
+      "ranked_files": [
+        "docs/evidence.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "adoption/update.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/data-readiness/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "abstain-22"
+    },
+    {
+      "expected_abstention": true,
+      "gold_files": [],
+      "metrics": null,
+      "ranked_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "adoption/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "abstain-23"
+    },
+    {
+      "expected_abstention": true,
+      "gold_files": [],
+      "metrics": null,
+      "ranked_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "observability/desktop-restart.md",
+        "adoption/README.md",
+        "observability/session-e2e.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "lexical",
+      "sample_id": "abstain-24"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "adoption/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "adoption/README.md",
+        "docs/evidence.md",
+        "adoption/update.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "observability/desktop-restart.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/data-readiness/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "credentials-01"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "adoption/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "adoption/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "adoption/update.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "observability/desktop-restart.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "credentials-02"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "docs/evidence.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "docs/evidence.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "evidence-03"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "adoption/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "adoption/update.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "memory-04"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "docs/evidence.md",
+        "observability/session-e2e.md",
+        "adoption/update.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/research-evaluation/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "memory-05"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "docs/evidence.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "memory-06"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "observability/desktop-restart.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "observability/desktop-restart.md",
+        "adoption/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "docs/evidence.md",
+        "adoption/update.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "context-07"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "observability/session-e2e.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "observability/session-e2e.md",
+        "adoption/update.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "adoption/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "context-08"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "observability/desktop-restart.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "observability/desktop-restart.md",
+        "docs/evidence.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "context-09"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/worker-supervision/README.md"
+      ],
+      "metrics": {
+        "MRR": 0.3333333333333333,
+        "Recall@1": 0.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "docs/evidence.md",
+        "adoption/README.md",
+        "adoption/update.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "worker-10"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/worker-supervision/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/worker-supervision/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/data-readiness/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "worker-11"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/worker-supervision/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/worker-supervision/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "observability/session-e2e.md",
+        "adoption/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "adoption/update.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "worker-12"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/research-runtime/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/research-runtime/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "docs/evidence.md",
+        "adoption/update.md",
+        "observability/session-e2e.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "execution-13"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/research-runtime/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/research-runtime/README.md",
+        "adoption/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "execution-14"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "research-15"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "observability/desktop-restart.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "observability/session-e2e.md",
+        "adoption/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "research-16"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/research-evaluation/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "adoption/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "observability/desktop-restart.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "research-17"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/state-recovery/memory/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "docs/evidence.md",
+        "adoption/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "observability/desktop-restart.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "backup-18"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/state-recovery/qdrant/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "observability/desktop-restart.md",
+        "adoption/update.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "backup-19"
+    },
+    {
+      "expected_abstention": false,
+      "gold_files": [
+        "blueprints/us-equities/authenticated-data/README.md"
+      ],
+      "metrics": {
+        "MRR": 1.0,
+        "Recall@1": 1.0,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "ranked_files": [
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "adoption/README.md",
+        "observability/desktop-restart.md",
+        "observability/session-e2e.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "blueprints/us-equities/worker-supervision/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "execution-20"
+    },
+    {
+      "expected_abstention": true,
+      "gold_files": [],
+      "metrics": null,
+      "ranked_files": [
+        "blueprints/us-equities/authenticated-data/README.md",
+        "observability/session-e2e.md",
+        "adoption/update.md",
+        "adoption/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "observability/desktop-restart.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "abstain-21"
+    },
+    {
+      "expected_abstention": true,
+      "gold_files": [],
+      "metrics": null,
+      "ranked_files": [
+        "docs/evidence.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "observability/desktop-restart.md",
+        "adoption/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "abstain-22"
+    },
+    {
+      "expected_abstention": true,
+      "gold_files": [],
+      "metrics": null,
+      "ranked_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "adoption/update.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/state-recovery/README.md",
+        "observability/desktop-restart.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "adoption/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "abstain-23"
+    },
+    {
+      "expected_abstention": true,
+      "gold_files": [],
+      "metrics": null,
+      "ranked_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md",
+        "blueprints/us-equities/authenticated-data/README.md",
+        "blueprints/us-equities/state-recovery/memory/README.md",
+        "blueprints/us-equities/research-evaluation/README.md",
+        "adoption/update.md",
+        "adoption/README.md",
+        "blueprints/us-equities/state-recovery/qdrant/README.md",
+        "observability/desktop-restart.md",
+        "docs/evidence.md",
+        "blueprints/us-equities/data-readiness/README.md",
+        "observability/session-e2e.md",
+        "blueprints/us-equities/memory-lifecycle/README.md",
+        "blueprints/us-equities/research-runtime/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/us-equities/state-recovery/README.md"
+      ],
+      "ranker": "bm25",
+      "sample_id": "abstain-24"
+    }
+  ],
+  "schema_version": 1,
+  "summaries": {
+    "bm25": {
+      "abstention_accuracy": null,
+      "abstention_policy": null,
+      "macro_metrics": {
+        "MRR": 0.9666666666666666,
+        "Recall@1": 0.95,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "negative_rankings_returned": 4,
+      "negative_samples_excluded_from_positive_metrics": 4,
+      "positive_samples": 20,
+      "wall_seconds": 0.07384333299705759
+    },
+    "lexical": {
+      "abstention_accuracy": null,
+      "abstention_policy": null,
+      "macro_metrics": {
+        "MRR": 0.9,
+        "Recall@1": 0.8,
+        "Recall@3": 1.0,
+        "Recall@5": 1.0
+      },
+      "negative_rankings_returned": 4,
+      "negative_samples_excluded_from_positive_metrics": 4,
+      "positive_samples": 20,
+      "wall_seconds": 0.06728295799985062
+    }
+  }
+}

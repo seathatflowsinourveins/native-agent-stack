@@ -44,7 +44,7 @@
   "harness_contract": "blueprints/us-equities/harness-contract.json",
   "broader_reference_union": 171,
   "star_audit_file": "catalogs/us-equities/star-audit.json",
-  "grand_index_repositories": 501,
-  "grand_index_beyond_stars": 159,
+  "grand_index_repositories": 503,
+  "grand_index_beyond_stars": 161,
   "decision_index_file": "catalogs/us-equities/decision-index.json"
 }
