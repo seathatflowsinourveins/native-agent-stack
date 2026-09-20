@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "id": "codex-session-environment-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20T16:50:16.005Z",
+  "component_ids": [
+    "codex",
+    "context-mode",
+    "jcodemunch-mcp",
+    "serena",
+    "ai-memory",
+    "socraticode"
+  ],
+  "claim": "A trusted Linux project now passes its resolved native executable PATH to Codex shell commands and its four local MCP servers. A fresh native Codex app-server loaded all five selected MCP servers, resolved all fourteen checked context-tool commands and completed five read-only MCP calls without starting a model turn.",
+  "limitations": [
+    "The already-running Desktop connection was not restarted or modified through private IPC. Fresh native acceptance does not prove it reloaded; use the supported MCP Restart control or a fresh task.",
+    "The fourteen command checks establish executable discovery, not fourteen new install/use/lifecycle tests. Other functional acceptance remains dated and separately scoped.",
+    "The same-process jCodeMunch increment is a bytes/4 estimate including this validation call; it is not provider-token savings. Do not add session and retained values.",
+    "No fake global session identifier was introduced. Shared Context Mode parent-PID statistics and unscoped Desktop Prometheus series remain unattributed.",
+    "OmniRoute stays optional with compression off. Account quotas, rejected compression fidelity and unsupported encrypted restore are unaffected.",
+    "Local private account/configuration files, command search paths and raw MCP inventories are not portable artifacts. Resolve the target host's paths and use its own native sign-in.",
+    "Zero provider turns refers to this isolated configuration/MCP acceptance harness, not the surrounding authoring conversation."
+  ],
+  "execution": {
+    "client": "Codex CLI 0.155.1",
+    "started_at_utc": "2026-09-20T16:50:13.805Z",
+    "completed_at_utc": "2026-09-20T16:50:16.005Z",
+    "command_template": "codex --ask-for-approval never --sandbox danger-full-access --cd \"$PROJECT_ROOT\" app-server --listen stdio:// --strict-config",
+    "command_note": "Recorded authoring-host invocation with the already-selected local permission policy; not a recommended permission default. PROJECT_ROOT substitutes the private resolved path.",
+    "protocol_methods": [
+      "initialize",
+      "initialized",
+      "config/read",
+      "thread/start",
+      "mcpServerStatus/list",
+      "mcpServer/tool/call"
+    ],
+    "mcp_calls_completed": 5,
+    "provider_turns_started": 0,
+    "exit_code": 0,
+    "remaining_owned_processes": 0,
+    "project_config_unchanged_by_test": true
+  },
+  "configuration": {
+    "surface": "Trusted project .codex/config.toml",
+    "added_leaves": [
+      "shell_environment_policy.set.PATH",
+      "shell_environment_policy.set.RTK_TELEMETRY_DISABLED",
+      "mcp_servers.context-mode.env.PATH",
+      "mcp_servers.jcodemunch.env.PATH",
+      "mcp_servers.serena.env.PATH",
+      "mcp_servers.socraticode.env.PATH"
+    ],
+    "all_other_settings_preserved": true,
+    "native_bin_first": true,
+    "transient_codex_argument_and_wsl_runtime_entries_excluded": true,
+    "auth_stores_copied": false
+  },
+  "returned_results": {
+    "mcp_tool_counts": {
+      "ai-memory": 23,
+      "context-mode": 11,
+      "jcodemunch": 6,
+      "serena": 23,
+      "socraticode": 26
+    },
+    "native_commands_resolved": [
+      "rtk",
+      "context-mode",
+      "headroom",
+      "jcodemunch-mcp",
+      "qmd",
+      "serena-context",
+      "socraticode",
+      "ai-memory",
+      "repomix",
+      "toon",
+      "ast-grep",
+      "codebase-memory-mcp",
+      "chub",
+      "markitdown"
+    ],
+    "jcodemunch": {
+      "upstream_actions": [
+        "get_session_stats",
+        "get_symbol_source",
+        "get_session_stats"
+      ],
+      "same_process": true,
+      "session_tokens_saved_before": 0,
+      "session_tokens_saved_after": 4970,
+      "session_calls_before": 0,
+      "session_calls_after": 1,
+      "retained_tokens_saved_before": 49700,
+      "retained_tokens_saved_after": 54670,
+      "source_symbol": "parse_codex",
+      "source_matches_ast_exactly": true,
+      "source_sha256": "da3277537bf59cb63bc0b7bd2b25f86422d8f79679d382147d72863f9dc1dfd5"
+    },
+    "ai_memory": {
+      "upstream_tool": "memory_status",
+      "explicit_workspace_and_project": true,
+      "is_error": false
+    }
+  },
+  "private_evidence": {
+    "receipt_sha256": "eedfd96c1e7e13d5bd369cd59b3ae4e2b154264fdcf265e93542d431b5138098",
+    "stdout_sha256": "483b0ade567842bc73b7a09324b8f206ffa080ccee25290ecbdb1028053c2fb3",
+    "stderr_sha256": "584e7079179eaec9bc9640cca1cc7221b5480c84c0e2deaa9460c58cc69749e2",
+    "publication_policy": "Raw config, inventory, tool responses and native execution remain private; hashes bind retained authoring-host bytes without exposing account or path data."
+  },
+  "guide": "docs/token-session-handbook.md"
+}

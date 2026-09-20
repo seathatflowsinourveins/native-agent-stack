@@ -248,7 +248,7 @@ def build_data(root):
         require(set(profile["component_ids"]).issubset(component_ids),
                 "adoption profile references an unknown component")
     guide_paths = list(SETUP_GUIDES)
-    for path in ("adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md", "docs/foundation-stack.md"):
+    for path in ("adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md", "docs/foundation-stack.md", "docs/token-session-handbook.md"):
         if (root / path).exists():
             guide_paths.append(path)
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))
