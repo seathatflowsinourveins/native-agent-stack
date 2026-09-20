@@ -5084,7 +5084,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "5f90444fb4f48546cf822911ce6635cb1cfd2532ab6a6f9aba31d8734ca37edf",
+      "sha256": "7db9b2ef45ef9bfdc903e12673ec337d81c4af78bfcd6d112e1f091a8d368bad",
       "bytes": 3720076
     },
     {
@@ -5094,7 +5094,7 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "29f4c329e4bbc4135842e7859501dc0b301fe4cea118a48c367a2c1e76f356cd",
+      "sha256": "b188bffd22ab9250afc7437075f8a7472b78666131b347c92bd3fe2711323424",
       "bytes": 31324
     },
     {
