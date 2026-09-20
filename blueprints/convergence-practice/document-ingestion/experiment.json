@@ -33,7 +33,7 @@
     "sources": [
       {
         "path": "blueprints/convergence-practice/document-ingestion/ingest.py",
-        "sha256": "a24ac06a0555c3644161bfdf636e375cfef2ab4c98107788bba8cb7ed8e6823c"
+        "sha256": "b62eb4a974fe6385d30e2243cdd4358c5153d1da2acbbfadb4f37942d066eaa9"
       },
       {
         "path": "blueprints/convergence-practice/document-ingestion/corpus/authored-source.json",
@@ -65,7 +65,7 @@
       },
       {
         "path": "blueprints/convergence-practice/document-ingestion/freeze.json",
-        "sha256": "f0ec8e8059123c7f3131c206b2eef84ec771688d307410308e7f05c6c9b71536"
+        "sha256": "5816ea363d0203f5140646d36f9cb67322aae17d50090f65bcafe44871b5f6ea"
       }
     ]
   },
@@ -92,15 +92,15 @@
     "isolation": "Owned prefix outside Documents with copied pinned libraries; no global settings, dependency mutation or service registration."
   },
   "commands": [
-    "python3 fixture/ingest.py --pdftotext prefix/bin/pdftotext --output attempt-1"
+    "python3 fixture/ingest.py --pdftotext prefix/bin/pdftotext --output attempt-2 --attempt 2"
   ],
   "observations": [
     {
-      "id": "mac-document-ingestion-1",
+      "id": "mac-document-ingestion-2",
       "task": "document-to-evidence",
       "role": "deterministic-pipeline",
       "condition": "candidate",
-      "attempt": 1,
+      "attempt": 2,
       "command_index": 0,
       "evidence_class": "native_cli_execution",
       "scope": "Three-page explicitly permitted born-digital corpus on one Mac; native text/page geometry, declared table templates and bounded exact-phrase retrieval",
@@ -113,7 +113,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/document-ingestion/accepted/receipt.json",
-          "sha256": "1896a91376b242a5ad24cf652fdddc408aacbce406f0a7b9fd27a4bcfc125e79"
+          "sha256": "0562425838ff2a2a881e71ebac05563b9a0c32cad18e15f61c3199454795cf41"
         },
         {
           "path": "blueprints/convergence-practice/document-ingestion/accepted/extraction.json",
@@ -153,19 +153,20 @@
   ],
   "failures_and_skips": [],
   "limitations": [
-    "Only one small designed corpus and one native extraction attempt; no held-out task or matched baseline.",
+    "Only one small designed corpus; original passed attempt retained under history/attempt-1, followed by one passing rerun after source-list guard hardening. No held-out task or matched baseline.",
     "Table geometry is predeclared; no automatic table detection, OCR, multilingual CMaps or semantic retrieval.",
     "Build/preflight failures are retained separately; neither blocked version command constituted a native corpus extraction attempt.",
     "Full upstream parser test suite was not run. Copied libraries are exact compatible pins, not claims every transitive library is latest.",
     "Source checksums identify retained source bytes; detached Poppler signature was not verified.",
     "The same-binary location workaround is observed on one Mac, not a general OS permission diagnosis.",
-    "No model calls within runner; research/coordinator costs unknown. No token or cost saving is claimed."
+    "No model calls within runner; research/coordinator costs unknown. No token or cost saving is claimed.",
+    "The earlier source list relied on reviewed fixture content; the current runner additionally refuses unlisted, absolute, traversal, duplicate and symlink sources before any process launch. Historical attempt bytes are retained; current freeze was set before rerun."
   ],
   "decision_and_scope": {
     "decision": "adopt_within_scope",
     "scope": "Three-page explicitly permitted born-digital corpus on one Mac; native text/page geometry, declared table templates and bounded exact-phrase retrieval",
     "qualification_run_ids": [
-      "mac-document-ingestion-1"
+      "mac-document-ingestion-2"
     ]
   },
   "rollback": "Keep bundled parser intact; retain receipts and remove only the owned private candidate prefix when unused.",

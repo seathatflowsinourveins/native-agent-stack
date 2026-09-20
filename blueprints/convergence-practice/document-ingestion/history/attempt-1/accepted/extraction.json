@@ -1,0 +1,384 @@
+[
+  {
+    "document": "lumen",
+    "height": 792.0,
+    "lines": [
+      {
+        "bbox": [
+          48.0,
+          31.794,
+          359.814,
+          47.519
+        ],
+        "text": "Lumen systems | Release qualification"
+      },
+      {
+        "bbox": [
+          48.0,
+          75.102,
+          379.98,
+          85.277
+        ],
+        "text": "This fictional packet defines release checks for a document pipeline."
+      },
+      {
+        "bbox": [
+          48.0,
+          96.102,
+          401.364,
+          106.277
+        ],
+        "text": "Release owner: Mira Chen. Approval window: 2026-09-24 at 14:30 UTC."
+      },
+      {
+        "bbox": [
+          48.0,
+          117.102,
+          372.027,
+          127.277
+        ],
+        "text": "The release checkpoint is CP-417; its restore target is 2026-09-23."
+      },
+      {
+        "bbox": [
+          48.0,
+          163.102,
+          216.113,
+          173.277
+        ],
+        "text": "Service readiness - release values"
+      },
+      {
+        "bbox": [
+          55.0,
+          199.82,
+          458.56,
+          209.07
+        ],
+        "text": "Service Timeout (s) Archive (MB) Status"
+      },
+      {
+        "bbox": [
+          55.0,
+          227.82,
+          462.45,
+          237.07
+        ],
+        "text": "Aster 30 128.5 READY"
+      },
+      {
+        "bbox": [
+          55.0,
+          255.82,
+          455.78,
+          265.07
+        ],
+        "text": "Birch 45 256.0 HOLD"
+      },
+      {
+        "bbox": [
+          55.0,
+          283.82,
+          462.45,
+          293.07
+        ],
+        "text": "Cedar 60 1024.0 READY"
+      },
+      {
+        "bbox": [
+          48.0,
+          342.102,
+          403.168,
+          352.277
+        ],
+        "text": "Timeout values are seconds. Archive sizes are decimal megabytes (MB)."
+      },
+      {
+        "bbox": [
+          48.0,
+          363.102,
+          394.643,
+          373.277
+        ],
+        "text": "Aster requires checksum verification before the checkpoint is accepted."
+      },
+      {
+        "bbox": [
+          48.0,
+          384.102,
+          334.132,
+          394.277
+        ],
+        "text": "The recovery checkpoint is specified separately on page 2."
+      },
+      {
+        "bbox": [
+          48.0,
+          439.102,
+          417.314,
+          449.277
+        ],
+        "text": "Scope: born-digital text and positioned tables; scanned pages are excluded."
+      },
+      {
+        "bbox": [
+          48.0,
+          460.102,
+          402.585,
+          470.277
+        ],
+        "text": "No production passwords, purchase limits or access tokens appear here."
+      },
+      {
+        "bbox": [
+          48.0,
+          753.538,
+          273.774,
+          761.863
+        ],
+        "text": "Synthetic fixture | Revision LUM-2026-09-A | Page 1 of 2"
+      }
+    ],
+    "page": 1,
+    "source_sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5",
+    "tables": [
+      {
+        "bbox": [
+          48,
+          189,
+          564,
+          312
+        ],
+        "headers": [
+          "Service",
+          "Timeout (s)",
+          "Archive (MB)",
+          "Status"
+        ],
+        "rows": [
+          [
+            "Aster",
+            "30",
+            "128.5",
+            "READY"
+          ],
+          [
+            "Birch",
+            "45",
+            "256.0",
+            "HOLD"
+          ],
+          [
+            "Cedar",
+            "60",
+            "1024.0",
+            "READY"
+          ]
+        ]
+      }
+    ],
+    "width": 612.0,
+    "word_count": 116
+  },
+  {
+    "document": "lumen",
+    "height": 792.0,
+    "lines": [
+      {
+        "bbox": [
+          48.0,
+          31.794,
+          372.088,
+          47.519
+        ],
+        "text": "Lumen systems | Recovery qualification"
+      },
+      {
+        "bbox": [
+          48.0,
+          75.102,
+          382.983,
+          85.277
+        ],
+        "text": "Recovery owner: Omar Ellis. Drill window: 2026-09-25 at 09:00 UTC."
+      },
+      {
+        "bbox": [
+          48.0,
+          96.102,
+          378.132,
+          106.277
+        ],
+        "text": "The recovery checkpoint is CP-902; its restore target is 2026-09-24."
+      },
+      {
+        "bbox": [
+          48.0,
+          117.102,
+          400.143,
+          127.277
+        ],
+        "text": "The release checkpoint CP-417 is historical context, not the recovery ID."
+      },
+      {
+        "bbox": [
+          48.0,
+          163.102,
+          222.218,
+          173.277
+        ],
+        "text": "Service readiness - recovery values"
+      },
+      {
+        "bbox": [
+          55.0,
+          199.82,
+          458.56,
+          209.07
+        ],
+        "text": "Service Timeout (s) Archive (MB) Status"
+      },
+      {
+        "bbox": [
+          55.0,
+          227.82,
+          462.45,
+          237.07
+        ],
+        "text": "Aster 90 129.0 READY"
+      },
+      {
+        "bbox": [
+          55.0,
+          255.82,
+          462.45,
+          265.07
+        ],
+        "text": "Birch 120 258.0 READY"
+      },
+      {
+        "bbox": [
+          55.0,
+          283.82,
+          455.78,
+          293.07
+        ],
+        "text": "Cedar 180 1028.0 HOLD"
+      },
+      {
+        "bbox": [
+          48.0,
+          342.102,
+          389.099,
+          352.277
+        ],
+        "text": "Recovery values override release values only within this recovery drill."
+      },
+      {
+        "bbox": [
+          48.0,
+          363.102,
+          408.096,
+          373.277
+        ],
+        "text": "Aster requires one verified restore before the recovery checkpoint passes."
+      },
+      {
+        "bbox": [
+          48.0,
+          384.102,
+          399.505,
+          394.277
+        ],
+        "text": "Archive sizes are decimal megabytes (MB); timeout values are seconds."
+      },
+      {
+        "bbox": [
+          48.0,
+          439.102,
+          412.419,
+          449.277
+        ],
+        "text": "An absent field must be reported as no evidence in the selected document."
+      },
+      {
+        "bbox": [
+          48.0,
+          460.102,
+          391.618,
+          470.277
+        ],
+        "text": "This synthetic packet grants no authority to run a production operation."
+      },
+      {
+        "bbox": [
+          48.0,
+          753.538,
+          273.774,
+          761.863
+        ],
+        "text": "Synthetic fixture | Revision LUM-2026-09-A | Page 2 of 2"
+      }
+    ],
+    "page": 2,
+    "source_sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5",
+    "tables": [
+      {
+        "bbox": [
+          48,
+          189,
+          564,
+          312
+        ],
+        "headers": [
+          "Service",
+          "Timeout (s)",
+          "Archive (MB)",
+          "Status"
+        ],
+        "rows": [
+          [
+            "Aster",
+            "90",
+            "129.0",
+            "READY"
+          ],
+          [
+            "Birch",
+            "120",
+            "258.0",
+            "READY"
+          ],
+          [
+            "Cedar",
+            "180",
+            "1028.0",
+            "HOLD"
+          ]
+        ]
+      }
+    ],
+    "width": 612.0,
+    "word_count": 123
+  },
+  {
+    "document": "w3c",
+    "height": 842.0,
+    "lines": [
+      {
+        "bbox": [
+          56.8,
+          69.3295,
+          180.2113,
+          87.2971
+        ],
+        "text": "Dummy PDF file"
+      }
+    ],
+    "page": 1,
+    "source_sha256": "3df79d34abbca99308e79cb94461c1893582604d68329a41fd4bec1885e6adb4",
+    "tables": [],
+    "width": 595.0,
+    "word_count": 3
+  }
+]

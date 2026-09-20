@@ -68,6 +68,41 @@ class DocumentIngestionTests(unittest.TestCase):
                 with self.assertRaises(ValueError):m.run(Path('unavailable'),root/'out',root)
                 process.assert_not_called()
 
+    def test_unselected_and_unsafe_sources_refuse_before_process(self):
+        import shutil
+        mutations = [
+            {'id': 'lumen', 'path': '/tmp/unselected.pdf'},
+            {'id': 'lumen', 'path': '../unselected.pdf'},
+            {'id': 'lumen', 'path': 'corpus/unlisted.pdf'},
+            {'id': '../escape', 'path': 'corpus/lumen-qualification.pdf'},
+            {'id': 'lumen', 'path': 'oracle.json'},
+        ]
+        for source in mutations:
+            with self.subTest(source=source), tempfile.TemporaryDirectory() as temporary:
+                root=Path(temporary)/'fixture';shutil.copytree(FIXTURE,root)
+                freeze=m.read(root/'freeze.json');freeze['sources']=[source]
+                m.write(root/'freeze.json',freeze)
+                with patch.object(m.subprocess,'run') as process:
+                    with self.assertRaises(ValueError):m.run(Path('unused'),root/'out',root)
+                    process.assert_not_called()
+                    self.assertFalse((root/'out').exists())
+
+    def test_duplicate_and_symlink_sources_refused(self):
+        import shutil
+        for case in ('id','path','symlink'):
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as temporary:
+                root=Path(temporary)/'fixture';shutil.copytree(FIXTURE,root)
+                freeze=m.read(root/'freeze.json')
+                if case == 'id':freeze['sources'][1]['id']=freeze['sources'][0]['id']
+                elif case == 'path':freeze['sources'][1]['path']=freeze['sources'][0]['path']
+                else:
+                    source=root/freeze['sources'][0]['path'];copy=root/'copy.pdf'
+                    shutil.copy2(source,copy);source.unlink();source.symlink_to(copy)
+                m.write(root/'freeze.json',freeze)
+                with patch.object(m.subprocess,'run') as process:
+                    with self.assertRaises(ValueError):m.run(Path('unused'),root/'out',root)
+                    process.assert_not_called()
+
     def test_invalid_geometry_and_missing_cells_rejected(self):
         raw=(FIXTURE/'accepted/lumen.xhtml').read_bytes()
         tree=m.ET.fromstring(raw);tree.find('.//x:word',m.NS).set('xMin','-1')

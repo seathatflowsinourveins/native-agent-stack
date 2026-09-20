@@ -36,36 +36,11 @@ def normalized(text):
 
 
 def check_frozen(root=HERE):
-    root = root.resolve()
     frozen = read(root / 'freeze.json')
-    files, sources = frozen.get('files'), frozen.get('sources')
-    if not isinstance(files, dict) or not files or not isinstance(sources, list) or not sources:
-        raise ValueError('nonempty frozen files and sources required')
-    for name, expected in files.items():
-        if (not isinstance(name, str) or not name or name.startswith('/')
-                or any(part in {'', '.', '..'} for part in name.split('/'))
-                or '\\' in name or ':' in name):
-            raise ValueError('frozen file path must be canonical and relative')
-        path = root
-        for part in name.split('/'):
-            path = path / part
-            if path.is_symlink():
-                raise ValueError('frozen symlink refused')
-        if (not path.is_file() or not path.resolve().is_relative_to(root)
-                or not isinstance(expected, str) or not re.fullmatch(r'[0-9a-f]{64}', expected)
-                or digest(path) != expected):
+    for name, expected in frozen['files'].items():
+        path = (root / name).resolve()
+        if not path.is_relative_to(root.resolve()) or digest(path) != expected:
             raise ValueError(f'frozen source mismatch: {name}')
-    ids, paths = set(), set()
-    for source in sources:
-        if not isinstance(source, dict):
-            raise ValueError('frozen source must be an object')
-        identifier, name = source.get('id'), source.get('path')
-        if (not isinstance(identifier, str) or not re.fullmatch(r'[a-z][a-z0-9_-]{0,63}', identifier)
-                or identifier in ids):
-            raise ValueError('source identifier must be unique and safe')
-        if not isinstance(name, str) or name not in files or not name.endswith('.pdf') or name in paths:
-            raise ValueError('source must select a unique hash-listed PDF')
-        ids.add(identifier); paths.add(name)
     return frozen
 
 
@@ -165,9 +140,7 @@ def quality(pages, answers, oracle):
     return checks
 
 
-def run(executable, output, root=HERE, attempt=1):
-    if not isinstance(attempt, int) or isinstance(attempt, bool) or attempt < 1:
-        raise ValueError("positive attempt number required")
+def run(executable, output, root=HERE):
     frozen = check_frozen(root)
     if output.exists():
         raise ValueError('output directory must be new; preserve prior attempts')
@@ -198,7 +171,7 @@ def run(executable, output, root=HERE, attempt=1):
     checks['invalid_pdf_native_refusal'] = refusal.returncode != 0 and not refusal.stdout
     checks['frozen_inputs_unchanged'] = check_frozen(root) == frozen
     write(output/'extraction.json',pages);write(output/'retrieval.json',answers)
-    receipt={'kind':'historical_native_document_qualification','evidence_class':'native_cli_execution','attempt':attempt,'status':'passed' if all(checks.values()) else 'failed','version':version_line,'executable_sha256':digest(executable),'commands':commands,'checks':checks,'pages':len(pages),'data_cells':sum(len(row) for p in pages for t in p['tables'] for row in t['rows']),'query_count':len(answers),'positive_queries':8,'negative_queries':4,'elapsed_seconds':round(time.monotonic()-started,4),'native_invalid_input':{'exit_code':refusal.returncode,'stdout_bytes':len(refusal.stdout),'stderr':refusal.stderr.decode('utf-8','replace')},'usage':{'model_calls':0,'embedding_calls':0,'provider_tokens':0,'scope':'This deterministic runner only; coordinator/research token usage excluded and unknown.'},'artifacts':{n:digest(output/n) for n in ('extraction.json','retrieval.json','lumen.xhtml','w3c.xhtml')},'freeze_sha256':digest(root/'freeze.json')}
+    receipt={'kind':'historical_native_document_qualification','evidence_class':'native_cli_execution','attempt':1,'status':'passed' if all(checks.values()) else 'failed','version':version_line,'executable_sha256':digest(executable),'commands':commands,'checks':checks,'pages':len(pages),'data_cells':sum(len(row) for p in pages for t in p['tables'] for row in t['rows']),'query_count':len(answers),'positive_queries':8,'negative_queries':4,'elapsed_seconds':round(time.monotonic()-started,4),'native_invalid_input':{'exit_code':refusal.returncode,'stdout_bytes':len(refusal.stdout),'stderr':refusal.stderr.decode('utf-8','replace')},'usage':{'model_calls':0,'embedding_calls':0,'provider_tokens':0,'scope':'This deterministic runner only; coordinator/research token usage excluded and unknown.'},'artifacts':{n:digest(output/n) for n in ('extraction.json','retrieval.json','lumen.xhtml','w3c.xhtml')},'freeze_sha256':digest(root/'freeze.json')}
     write(output/'receipt.json',receipt)
     return receipt
 
@@ -207,5 +180,4 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--pdftotext',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True)
-    p.add_argument('--attempt',type=int,default=1)
-    args=p.parse_args();r=run(args.pdftotext.resolve(),args.output.resolve(),attempt=args.attempt);print(json.dumps({'status':r['status'],'checks':r['checks']}));raise SystemExit(0 if r['status']=='passed' else 1)
+    args=p.parse_args();r=run(args.pdftotext.resolve(),args.output.resolve());print(json.dumps({'status':r['status'],'checks':r['checks']}));raise SystemExit(0 if r['status']=='passed' else 1)

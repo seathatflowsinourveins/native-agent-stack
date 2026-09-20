@@ -1,11 +1,13 @@
 # Qualified document ingestion and bounded retrieval
 
 The Mac qualification uses **Poppler 26.09.0**, the current upstream release
-checked on September 20, 2026. One native extraction attempt passed a frozen
+checked on September 20, 2026. Two native extraction attempts passed the same frozen
 three-page corpus: exact text on each page, two tables containing 24 data cells,
 eight positive retrieval queries with source/page/coordinate references, and four
 queries that must return no evidence. Invalid PDF input was also refused.
-The retained [receipt](accepted/receipt.json) records the execution; running the
+The retained [receipt](accepted/receipt.json) records the second execution after
+source-list hardening. The [first attempt](history/attempt-1/README.md) is preserved;
+the corpus, layout and oracle did not change. Running the
 [audit](audit.py) verifies its artifacts without pretending to repeat that run.
 
 This closes the small born-digital document ingestion gate on the observed Mac.
@@ -19,7 +21,9 @@ specific unmet needs, without adding their dependencies or services here.
 1. Select documents explicitly and establish copying rights. The original
    [Lumen qualification packet](corpus/lumen-qualification.pdf) is synthetic MIT
    material; the unchanged W3C one-page dummy PDF is a format smoke check with
-   its [source and notice](corpus/NOTICE.md). No user directories are scanned.
+   its [source and notice](corpus/NOTICE.md). No user directories are scanned. The runner refuses source IDs with path syntax,
+   unlisted or noncanonical paths, duplicate sources and symlinks before launching
+   any native process.
 2. Freeze source bytes, revision, layout and expected answers before extraction.
    [freeze.json](freeze.json), [oracle.json](oracle.json) and [plan.json](plan.json)
    were recorded first. The authored PDF was visually checked with the existing

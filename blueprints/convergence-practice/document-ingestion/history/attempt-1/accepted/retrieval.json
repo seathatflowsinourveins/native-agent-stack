@@ -1,0 +1,162 @@
+[
+  {
+    "hits": [
+      {
+        "bbox": [
+          48.0,
+          96.102,
+          401.364,
+          106.277
+        ],
+        "document": "lumen",
+        "kind": "line",
+        "page": 1,
+        "source_sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5",
+        "text": "Release owner: Mira Chen. Approval window: 2026-09-24 at 14:30 UTC."
+      }
+    ],
+    "id": "release-owner"
+  },
+  {
+    "hits": [
+      {
+        "bbox": [
+          48.0,
+          117.102,
+          372.027,
+          127.277
+        ],
+        "document": "lumen",
+        "kind": "line",
+        "page": 1,
+        "source_sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5",
+        "text": "The release checkpoint is CP-417; its restore target is 2026-09-23."
+      }
+    ],
+    "id": "release-checkpoint"
+  },
+  {
+    "hits": [
+      {
+        "bbox": [
+          48.0,
+          96.102,
+          378.132,
+          106.277
+        ],
+        "document": "lumen",
+        "kind": "line",
+        "page": 2,
+        "source_sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5",
+        "text": "The recovery checkpoint is CP-902; its restore target is 2026-09-24."
+      }
+    ],
+    "id": "recovery-checkpoint"
+  },
+  {
+    "hits": [
+      {
+        "bbox": [
+          48,
+          189,
+          564,
+          312
+        ],
+        "document": "lumen",
+        "kind": "table_row",
+        "page": 1,
+        "source_sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5",
+        "text": "Service=Aster; Timeout (s)=30; Archive (MB)=128.5; Status=READY"
+      }
+    ],
+    "id": "release-aster-table"
+  },
+  {
+    "hits": [
+      {
+        "bbox": [
+          48,
+          189,
+          564,
+          312
+        ],
+        "document": "lumen",
+        "kind": "table_row",
+        "page": 2,
+        "source_sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5",
+        "text": "Service=Aster; Timeout (s)=90; Archive (MB)=129.0; Status=READY"
+      }
+    ],
+    "id": "recovery-aster-table"
+  },
+  {
+    "hits": [
+      {
+        "bbox": [
+          48,
+          189,
+          564,
+          312
+        ],
+        "document": "lumen",
+        "kind": "table_row",
+        "page": 1,
+        "source_sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5",
+        "text": "Service=Cedar; Timeout (s)=60; Archive (MB)=1024.0; Status=READY"
+      }
+    ],
+    "id": "release-cedar-table"
+  },
+  {
+    "hits": [
+      {
+        "bbox": [
+          48,
+          189,
+          564,
+          312
+        ],
+        "document": "lumen",
+        "kind": "table_row",
+        "page": 2,
+        "source_sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5",
+        "text": "Service=Birch; Timeout (s)=120; Archive (MB)=258.0; Status=READY"
+      }
+    ],
+    "id": "recovery-birch-table"
+  },
+  {
+    "hits": [
+      {
+        "bbox": [
+          56.8,
+          69.3295,
+          180.2113,
+          87.2971
+        ],
+        "document": "w3c",
+        "kind": "line",
+        "page": 1,
+        "source_sha256": "3df79d34abbca99308e79cb94461c1893582604d68329a41fd4bec1885e6adb4",
+        "text": "Dummy PDF file"
+      }
+    ],
+    "id": "public-source"
+  },
+  {
+    "hits": [],
+    "id": "absent-field"
+  },
+  {
+    "hits": [],
+    "id": "wrong-source"
+  },
+  {
+    "hits": [],
+    "id": "absent-service"
+  },
+  {
+    "hits": [],
+    "id": "wrong-page"
+  }
+]

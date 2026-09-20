@@ -5,7 +5,7 @@
     "retrieval.json": "315980dd5fe7dc2134f763a1bc4dd9d74e0ab8ffe86cff7372fd5fd7a0308298",
     "w3c.xhtml": "17a9352313657c7be7f7afd56563bbaca8a5545c25243dd122c22e96032fddef"
   },
-  "attempt": 2,
+  "attempt": 1,
   "checks": {
     "bounded_output": true,
     "exact_page_text": true,
@@ -44,11 +44,12 @@
       "stderr": ""
     }
   ],
+  "component_id": "poppler",
   "data_cells": 24,
-  "elapsed_seconds": 0.0238,
+  "elapsed_seconds": 0.0199,
   "evidence_class": "native_cli_execution",
   "executable_sha256": "f8ec16db1b1bc976807a4a2a58b6d6f0a9c449a1917aec259f8e98adcb6a3aa1",
-  "freeze_sha256": "5816ea363d0203f5140646d36f9cb67322aae17d50090f65bcafe44871b5f6ea",
+  "freeze_sha256": "f0ec8e8059123c7f3131c206b2eef84ec771688d307410308e7f05c6c9b71536",
   "kind": "historical_native_document_qualification",
   "native_invalid_input": {
     "exit_code": 1,
