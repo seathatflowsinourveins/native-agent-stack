@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Convergence experiment v1",
+  "description": "Structural schema; validate_convergence.py also enforces evidence integrity and conditional claim requirements.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "kind", "status", "lane", "task_and_failure", "primary_sources_and_pins", "discovery_provenance", "license_and_compatibility", "baseline_and_candidate", "frozen_inputs", "predeclared_metrics", "runtime_and_platform", "commands", "observations", "failures_and_skips", "limitations", "decision_and_scope", "rollback", "next_decision_changing_test", "usage_assessment"],
+  "properties": {
+    "schema_version": {"type": "integer", "enum": [1]},
+    "kind": {"type": "string", "enum": ["convergence_experiment"]},
+    "status": {"type": "string", "enum": ["planned", "observed"]},
+    "lane": {"type": "string", "enum": ["retrieval", "native-agent-engineering", "memory", "access-recovery", "local-inference", "research-application"]},
+    "task_and_failure": {"$ref": "#/$defs/text"},
+    "primary_sources_and_pins": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["url", "revision"], "properties": {"url": {"type": "string", "pattern": "^https://[^\\s]+$"}, "revision": {"$ref": "#/$defs/revision"}}}},
+    "discovery_provenance": {"$ref": "#/$defs/texts"},
+    "license_and_compatibility": {"$ref": "#/$defs/text"},
+    "baseline_and_candidate": {"type": "object", "additionalProperties": false, "required": ["baseline", "candidate"], "properties": {"baseline": {"$ref": "#/$defs/text"}, "candidate": {"$ref": "#/$defs/text"}}},
+    "frozen_inputs": {
+      "type": "object", "additionalProperties": false,
+      "required": ["base_revision", "tasks", "roles", "sources", "inputs", "evaluation"],
+      "properties": {
+        "base_revision": {"$ref": "#/$defs/revision"},
+        "tasks": {"$ref": "#/$defs/ids"}, "roles": {"$ref": "#/$defs/ids"},
+        "sources": {"$ref": "#/$defs/artifacts"}, "inputs": {"$ref": "#/$defs/artifacts"}, "evaluation": {"$ref": "#/$defs/artifacts"}
+      }
+    },
+    "predeclared_metrics": {"type": "object", "additionalProperties": false, "required": ["quality_rule", "usage_rule"], "properties": {"quality_rule": {"$ref": "#/$defs/text"}, "usage_rule": {"$ref": "#/$defs/text"}}},
+    "runtime_and_platform": {
+      "type": "object", "additionalProperties": false, "required": ["platform", "tools", "isolation"],
+      "properties": {
+        "platform": {"$ref": "#/$defs/text"}, "isolation": {"$ref": "#/$defs/text"},
+        "tools": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["name", "version"], "properties": {"name": {"$ref": "#/$defs/text"}, "version": {"$ref": "#/$defs/text"}}}}
+      }
+    },
+    "commands": {"$ref": "#/$defs/texts"},
+    "observations": {"type": "array", "items": {"$ref": "#/$defs/run"}},
+    "failures_and_skips": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["run_id", "reason"], "properties": {"run_id": {"$ref": "#/$defs/id"}, "reason": {"$ref": "#/$defs/text"}}}},
+    "limitations": {"$ref": "#/$defs/texts"},
+    "decision_and_scope": {"type": "object", "additionalProperties": false, "required": ["decision", "scope", "qualification_run_ids"], "properties": {"decision": {"type": "string", "enum": ["retain", "trial", "adopt_within_scope", "defer", "reject"]}, "scope": {"$ref": "#/$defs/text"}, "qualification_run_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}}}},
+    "rollback": {"$ref": "#/$defs/text"},
+    "next_decision_changing_test": {"$ref": "#/$defs/text"},
+    "usage_assessment": {
+      "type": "object", "additionalProperties": false, "required": ["claim", "coverage", "expected_run_ids", "coverage_artifact"],
+      "properties": {
+        "claim": {"type": "string", "enum": ["none", "whole_task_token_savings"]},
+        "coverage": {"type": "string", "enum": ["partial", "complete"]},
+        "expected_run_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "coverage_artifact": {"$ref": "#/$defs/optional_artifact"}
+      }
+    }
+  },
+  "$defs": {
+    "text": {"type": "string", "minLength": 1, "pattern": "[\\s\\S]*\\S[\\s\\S]*"},
+    "texts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/text"}},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,79}$"},
+    "ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+    "revision": {"type": "string", "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"},
+    "artifact": {"type": "object", "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"$ref": "#/$defs/text"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+    "optional_artifact": {"type": ["object", "null"], "additionalProperties": false, "required": ["path", "sha256"], "properties": {"path": {"$ref": "#/$defs/text"}, "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}},
+    "artifacts": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/artifact"}},
+    "count": {"type": ["integer", "null"], "minimum": 0},
+    "usage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["uncached_input", "cache_creation", "cache_read", "output", "reasoning_in_output", "total", "native_retries"],
+      "properties": {
+        "uncached_input": {"$ref": "#/$defs/count"}, "cache_creation": {"$ref": "#/$defs/count"}, "cache_read": {"$ref": "#/$defs/count"},
+        "output": {"$ref": "#/$defs/count"}, "reasoning_in_output": {"$ref": "#/$defs/count"}, "total": {"$ref": "#/$defs/count"}, "native_retries": {"$ref": "#/$defs/count"}
+      }
+    },
+    "run": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "task", "role", "condition", "attempt", "command_index", "evidence_class", "scope", "status", "exit_code", "quality", "artifacts", "usage"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"}, "task": {"$ref": "#/$defs/id"}, "role": {"$ref": "#/$defs/id"},
+        "condition": {"type": "string", "enum": ["baseline", "candidate"]},
+        "attempt": {"type": "integer", "minimum": 1}, "command_index": {"type": "integer", "minimum": 0},
+        "evidence_class": {"type": "string", "enum": ["discovery", "pinned_source_review", "offline_artifact_check", "native_cli_execution", "model_task_execution", "recovery_execution"]},
+        "scope": {"$ref": "#/$defs/text"}, "status": {"type": "string", "enum": ["passed", "failed", "skipped"]},
+        "exit_code": {"type": ["integer", "null"]},
+        "quality": {"type": "object", "additionalProperties": false, "required": ["semantic", "contract"], "properties": {"semantic": {"type": ["boolean", "null"]}, "contract": {"type": ["boolean", "null"]}}},
+        "artifacts": {"$ref": "#/$defs/artifacts"}, "usage": {"$ref": "#/$defs/usage"}
+      }
+    }
+  }
+}

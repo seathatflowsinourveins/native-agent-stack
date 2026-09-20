@@ -1,0 +1,11 @@
+# Deliberately unsafe input for static analysis only. Never run this workflow.
+name: Unsafe analysis fixture
+on: pull_request
+permissions:
+  contents: read
+jobs:
+  unsafe:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@main
+      - run: echo '${{ github.event.pull_request.title }}'
