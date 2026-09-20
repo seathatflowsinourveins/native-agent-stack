@@ -1,0 +1,30 @@
+{
+  "checkpoint_sha256": "93f75c4a0a3dec080b19bdfc4fe30f4fd404776bdcfd6bbc86cb003133595f2b",
+  "final_native_total": {
+    "cacheWriteInputTokens": 0,
+    "cachedInputTokens": 18176,
+    "inputTokens": 55233,
+    "outputTokens": 143,
+    "reasoningOutputTokens": 0,
+    "totalTokens": 55376
+  },
+  "limits": "Independent deterministic inspection of retained native protocol and fixture bytes; no new provider call, no independent-host recovery, and no arbitrary descendant cleanup claim.",
+  "native_builtin_command_items": 0,
+  "native_resume_requests": 1,
+  "native_thread_start_requests": 1,
+  "native_tool_actions": [
+    "checkpoint",
+    "wait",
+    "finalize"
+  ],
+  "native_usage_snapshots": 5,
+  "new_connection_initialize_requests": 2,
+  "private_configuration_response_allowlist_passed": true,
+  "same_thread_and_session_identity": true,
+  "status": "passed",
+  "turn_statuses": [
+    "interrupted",
+    "completed"
+  ],
+  "unfinished_wait_received_no_tool_response": true
+}
