@@ -59,7 +59,9 @@
     "current_claude_session_recovery": "blueprints/convergence-practice/native-recovery/claude/README.md",
     "current_supplemental_native_tools": "evidence/receipts/upstream-native-tools-20260920.json",
     "current_memory_maintenance": "evidence/receipts/native-ai-memory-maintenance-20260920.json",
-    "current_native_workflow_analyzer": "evidence/receipts/native-linux-zizmor-20260920.json"
+    "current_native_workflow_analyzer": "evidence/receipts/native-linux-zizmor-20260920.json",
+    "current_cross_layer_acceptance": "blueprints/convergence-practice/layer-acceptance.md",
+    "wsl_native_quality": "blueprints/convergence-practice/wsl-native-tools/README.md"
   },
   "recipe_map": {
     "affaan-m/ECC": "recipes/README.md",
@@ -118,7 +120,13 @@
     "llama-cpp": "blueprints/convergence-practice/gpu-inference/README.md",
     "beads": "recipes/README.md",
     "skills-ref": "recipes/README.md",
-    "otel-tui": "recipes/README.md"
+    "otel-tui": "recipes/README.md",
+    "react": "blueprints/convergence-practice/application-delivery/README.md",
+    "nextjs": "blueprints/convergence-practice/application-delivery/README.md",
+    "fastapi": "blueprints/convergence-practice/application-delivery/README.md",
+    "postgresql": "blueprints/convergence-practice/application-delivery/README.md",
+    "poppler": "blueprints/convergence-practice/document-ingestion/README.md",
+    "apple-container": "blueprints/convergence-practice/container-storage/README.md"
   },
   "profiles": [
     {

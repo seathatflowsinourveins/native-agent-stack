@@ -115,9 +115,14 @@ The lexical baseline retrieved the intended source in the top three for **8/12
 questions**; its misses remain visible. This is a bounded selection review with
 explicit open gates, not a claim of universal completeness.
 
+The [cross-layer acceptance wave](blueprints/convergence-practice/layer-acceptance.md)
+adds a typed application through real PostgreSQL, bounded native PDF extraction,
+Mac container-volume persistence and independent WSL synthetic recovery.
+Each receipt records its host, upstream commands, failures and remaining scope.
+
 ## What is here
 
-- **57 component records** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup, dependency inventory and local observability; adoption scope remains receipt-specific. The original token study retains its 52-component scope.
+- **63 component records** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup, dependency inventory and local observability; adoption scope remains receipt-specific. The original token study retains its 52-component scope.
 - **19 researched alternatives** with adoption decisions, model requirements and prospective commands.
 - A [six-candidate portability comparison](adoption/research.md), with 41 selected primary source files and a native uv adoption decision.
 - **Four extended catalog layers** covering foundations/memory/RAG, agents/hosting/operations, data, and strategy/engine research; source review remains distinct from native execution.

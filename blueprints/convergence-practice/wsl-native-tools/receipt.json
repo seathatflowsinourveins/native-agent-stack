@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "velanext-native-quality-tools-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20T06:32:29.837131+00:00",
+  "component_ids": [
+    "gitleaks",
+    "worktrunk"
+  ],
+  "claim": "On VelaNext, exact gitleaks8.30.1 detected one inert test credential and accepted the clean control with redacted reports. Worktrunk0.78.0 created/listed/removed owned worktrees while refusing dirty removal without loss.",
+  "data": {
+    "current_native_receipt": "receipt-wsl-hardened.json",
+    "native_attempts": 2,
+    "versions": {
+      "git": "git version 2.55.0",
+      "gitleaks": "8.30.1",
+      "worktrunk": "wt v0.78.0"
+    },
+    "gitleaks": {
+      "fully_redacted": true,
+      "negative_findings": 0,
+      "negative_report_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "positive_findings": 1,
+      "positive_report_sha256": "a953f93e58cf17fe3d675bbcc68a886c24f054d32c9b5ad3233f572b8df46a57",
+      "rule": "github-pat"
+    },
+    "worktrunk": {
+      "created": 2,
+      "dirty_removal_refused": true,
+      "frozen_commit": "a6c3ba5985390c3a220f832314d9efed03673a3a",
+      "project_hooks_suppressed": true,
+      "removed_without_force": 2
+    },
+    "dirty_refusal": {
+      "modified_sha256": "c37af475ffe2027b59a4dc8a2fbb3440141e7ebf0b85085d05bf756ac83d60a3",
+      "registration_preserved": true,
+      "untracked_sha256": "6984b46b6abb43fb7ea12da9d50dccc1b6f583d6f39e830b0195c50152d98086"
+    },
+    "cleanup": {
+      "owned_clean_path_absent": true,
+      "owned_dirty_path_absent": true,
+      "primary_fixture_and_logs_retained": true,
+      "remaining_branches": [
+        "main"
+      ],
+      "remaining_worktrees": [
+        "repo"
+      ],
+      "services_or_models_started": false
+    },
+    "source_review": "source-review.json",
+    "installation": "installation-wsl.json",
+    "convergence": "experiment-wsl.json"
+  },
+  "limitations": [
+    "Isolated synthetic Linux/WSL fixtures; no arbitrary repository safety/security certification or Mac acceptance inferred.",
+    "Original executed runner and attempt retained. Second attempt follows exact-pin/archive/binary/version binding and timeout-evidence hardening;20 offline guards passed on Mac and WSL.",
+    "GitHub attestation endpoints returned404. Publisher checksum, GitHub archive digest and exact pinned license checks passed; no attestation claim.",
+    "No accounts, shared services, project hooks or model calls changed by qualification. Global promotion, when performed, is separate host deployment evidence.",
+    "Whole coordinator/worker provider usage is unknown; no token or monetary savings claim."
+  ]
+}

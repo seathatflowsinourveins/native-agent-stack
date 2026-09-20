@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "mac-native-document-ingestion-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20",
+  "component_ids": [
+    "poppler"
+  ],
+  "claim": "Mac native Poppler26.09.0 preserved exact text across3 permitted PDF pages,24 table data cells,8 source/page-grounded positive queries and4 absent answers. A stricter source-list guard passed a second native extraction with the same frozen corpus and oracle.",
+  "limitations": [
+    "Three-page designed born-digital corpus; no general PDF/OCR/semantic-search quality, held-out evaluation or WSL acceptance.",
+    "Table geometry is explicit, not automatic detection; latest source build uses verified compatible existing libraries, not an all-dependency upgrade.",
+    "Historical attempt1 and both frozen implementations are retained. Current accepted attempt2 followed source-boundary hardening; corpus, layout and oracle unchanged.",
+    "Poppler source checksum matched independent metadata; detached signature was not verified. No parser binary redistributed.",
+    "Deterministic runner made no model calls; coordinator/research usage is unknown, no provider savings claimed."
+  ],
+  "data": {
+    "current_native_receipt": "accepted/receipt.json",
+    "attempt": 2,
+    "checks": {
+      "bounded_output": true,
+      "exact_page_text": true,
+      "exact_table_cells": true,
+      "frozen_inputs_unchanged": true,
+      "invalid_pdf_native_refusal": true,
+      "negative_retrieval": true,
+      "positive_provenance": true,
+      "positive_retrieval": true
+    },
+    "pages": 3,
+    "query_count": 12,
+    "executable_sha256": "f8ec16db1b1bc976807a4a2a58b6d6f0a9c449a1917aec259f8e98adcb6a3aa1",
+    "freeze_sha256": "5816ea363d0203f5140646d36f9cb67322aae17d50090f65bcafe44871b5f6ea",
+    "history": "history/attempt-1/README.md",
+    "source_review": "source-review.json",
+    "artifact_audit": "audit.py"
+  }
+}

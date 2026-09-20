@@ -116,3 +116,12 @@ token-saving claim is made. Keep future real data out of this acceptance databas
 Rollback is to stop the owned application and native database first, preserve
 needed records/evidence, then remove only this task-owned runtime installation
 and data after review. Reverting the code commit alone does not remove data.
+
+## Separate migration reversal check
+
+The coordinator additionally qualified upgrade → downgrade-to-base → upgrade in
+a new empty synthetic database, then removed that database and stopped the owned
+cluster. The [separate receipt](migration-rollback.json) records all10 command
+exits and exact schema names. The original application databases were unchanged.
+Downgrade drops both application tables; this proves schema reversal, not user-data
+recovery or production-safe rollback.

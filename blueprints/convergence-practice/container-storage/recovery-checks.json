@@ -1,0 +1,59 @@
+[
+  {
+    "command": [
+      "container",
+      "stop",
+      "--time",
+      "5",
+      "ledger-volume-db-20260920"
+    ],
+    "exit": 0,
+    "seconds": 0.142,
+    "stdout": "ledger-volume-db-20260920"
+  },
+  {
+    "command": [
+      "container",
+      "start",
+      "ledger-volume-db-20260920"
+    ],
+    "exit": 0,
+    "seconds": 0.462,
+    "stdout": "ledger-volume-db-20260920"
+  },
+  {
+    "command": [
+      "container",
+      "exec",
+      "ledger-volume-db-20260920",
+      "pg_isready",
+      "-U",
+      "postgres",
+      "-d",
+      "ledger"
+    ],
+    "exit": 0,
+    "seconds": 0.071,
+    "stdout": "/var/run/postgresql:5432 - accepting connections"
+  },
+  {
+    "command": [
+      "container",
+      "exec",
+      "ledger-volume-db-20260920",
+      "psql",
+      "-U",
+      "postgres",
+      "-d",
+      "ledger",
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-At",
+      "-c",
+      "SELECT value FROM recovery_probe WHERE id=1;"
+    ],
+    "exit": 0,
+    "seconds": 0.06,
+    "stdout": "native-volume-retained"
+  }
+]

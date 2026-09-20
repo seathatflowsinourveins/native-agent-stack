@@ -161,13 +161,13 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 505,
+    "repositories": 511,
     "public_star_repositories": 342,
-    "beyond_public_stars": 163,
-    "references": 1055,
+    "beyond_public_stars": 169,
+    "references": 1061,
     "repositories_by_record_type": {
       "catalog_card": 147,
-      "component_record": 57,
+      "component_record": 63,
       "legacy_candidate": 19,
       "public_star": 342,
       "research_supplement": 103,
@@ -1502,6 +1502,22 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/apple/container",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "component_record"
+      ],
+      "references": [
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/62",
+          "id": "apple-container"
         }
       ]
     },
@@ -4172,6 +4188,22 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/fastapi/fastapi",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "component_record"
+      ],
+      "references": [
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/59",
+          "id": "fastapi"
         }
       ]
     },
@@ -9110,6 +9142,22 @@
       ]
     },
     {
+      "repository": "https://github.com/postgres/postgres",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "component_record"
+      ],
+      "references": [
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/60",
+          "id": "postgresql"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/posthog/posthog",
       "aliases": [],
       "public_star": true,
@@ -9695,6 +9743,22 @@
           "id": "ray-serve",
           "decision": "conditional",
           "evidence_level": "source_review"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/react/react",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "component_record"
+      ],
+      "references": [
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/58",
+          "id": "react"
         }
       ]
     },
@@ -11559,6 +11623,22 @@
       ]
     },
     {
+      "repository": "https://github.com/tsdgeos/poppler_mirror",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "component_record"
+      ],
+      "references": [
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/61",
+          "id": "poppler"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/tt-a1i/archify",
       "aliases": [],
       "public_star": true,
@@ -12114,6 +12194,22 @@
           "decision": "outside_north_star",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/vercel/next.js",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "component_record"
+      ],
+      "references": [
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/57",
+          "id": "nextjs"
         }
       ]
     },
