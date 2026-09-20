@@ -7,7 +7,8 @@
     "Hosted runner verifies this explicit updated source manifest while preserving the original preparation plan and private14-source freeze.",
     "Probe asserts the whole /home mount is absent, avoiding a personal-looking runner path in public source.",
     "Preserve failed hosted run35536387838. Separate negative-key file from commands/<label> directories; regression uses actual initialization and exact unchanged ciphertext.",
-    "Run seven selected unchanged pinned upstream restic tests with upstream-selected Go1.25.10, separately typed source-built upstream evidence; private-key transfer fixture remains local acceptance."
+    "Run seven selected unchanged pinned upstream restic tests with upstream-selected Go1.25.10, separately typed source-built upstream evidence; private-key transfer fixture remains local acceptance.",
+    "Record attempted command, scoped cwd, timestamps, duration and launch errors before propagating missing/denied executable failures; correct official CI line reference to149-153."
   ],
   "changed_sources_since_preparation": [
     {
@@ -23,7 +24,7 @@
     {
       "path": "tests/test_offhost_restore.py",
       "preparation_sha256": "77ac24a0d2094856b2d5dfcccafbef49ff7e7f0d5ee90628293e64b076c030a8",
-      "hosted_sha256": "d4e6f65cda5efffadd72a4b347e4938d1b4bfee4c154628637032de22f9d3703"
+      "hosted_sha256": "fd2d27a7cc03077d6f68b5118db557c2f896014ee0b535647049d2f2eceb7e6e"
     },
     {
       "path": ".github/workflows/native-offhost-restore.yml",
@@ -82,7 +83,7 @@
     },
     {
       "path": "tests/test_offhost_restore.py",
-      "sha256": "d4e6f65cda5efffadd72a4b347e4938d1b4bfee4c154628637032de22f9d3703"
+      "sha256": "fd2d27a7cc03077d6f68b5118db557c2f896014ee0b535647049d2f2eceb7e6e"
     },
     {
       "path": ".github/workflows/native-offhost-restore.yml",
@@ -90,11 +91,11 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/upstream_tests.py",
-      "sha256": "f6299664b52fae1b3c7666b0f35521146ee10a038d7047a58569ae4b7035ebf1"
+      "sha256": "2a27ea638d96f583b24af2518afbaceab49fe548e70c5d2fa4a6c01eafc98574"
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/upstream-source.json",
-      "sha256": "8559d6a05d1542ba565207b3f0fbf6bb22d074afb367f340f87d4dedb35813f8"
+      "sha256": "926a5de880f31b40053f92e7f8252c89f8738259d2b3943105df30275f8dd325"
     }
   ],
   "previous_hosted_plan": {

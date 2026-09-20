@@ -1,6 +1,8 @@
 """Offline refusal cases; no native services, password reads or provider calls."""
 import base64
 import copy
+from datetime import datetime
+import errno
 import hashlib
 import importlib.util
 import json
@@ -146,6 +148,31 @@ class UpstreamResultGuardTests(unittest.TestCase):
                 self.module().check_test_events(json.dumps(dict(event,Action=action)),selected)
         with self.assertRaises(ValueError):self.module().check_test_events('',selected)
         with self.assertRaises(ValueError):self.module().check_test_events(json.dumps(event)+'\n'+json.dumps(event),selected)
+
+    def test_launch_failures_retain_attempted_command_and_empty_streams(self):
+        for error in [FileNotFoundError(errno.ENOENT,'missing executable'),
+                      PermissionError(errno.EACCES,'executable permission denied')]:
+            with self.subTest(error=type(error).__name__), tempfile.TemporaryDirectory() as directory:
+                root=Path(directory);source=root/'source';source.mkdir();reports=root/'reports';reports.mkdir()
+                module=self.module()
+                argv=['upstream_tests.py','--source',str(source),'--reports',str(reports)]
+                with patch.object(sys,'argv',argv), patch.object(module.subprocess,'run',side_effect=error), patch('builtins.print'):
+                    self.assertTrue(module.main())
+                report=json.loads((reports/'upstream-tests.json').read_text())
+                self.assertEqual(report['status'],'failed')
+                self.assertEqual(len(report['commands']),1)
+                command=report['commands'][0]
+                self.assertEqual(command['argv'],['git','rev-parse','HEAD'])
+                self.assertEqual(command['cwd'],'$UPSTREAM_SOURCE')
+                self.assertFalse(command['launched']);self.assertFalse(command['timeout'])
+                self.assertIsNone(command['exit_code'])
+                self.assertEqual(command['launch_error']['type'],type(error).__name__)
+                self.assertEqual(command['launch_error']['errno'],error.errno)
+                self.assertGreaterEqual(datetime.fromisoformat(command['finished_at_utc']),datetime.fromisoformat(command['started_at_utc']))
+                self.assertGreaterEqual(command['seconds'],0)
+                for name in ['stdout','stderr']:
+                    self.assertEqual((reports/command[name]['path']).read_bytes(),b'')
+                    self.assertEqual(command[name]['sha256'],hashlib.sha256(b'').hexdigest())
 
 
 if __name__ == '__main__': unittest.main()

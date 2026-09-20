@@ -9,7 +9,7 @@
   "toolchain": "go1.25.10",
   "toolchain_basis": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/go.mod#L1-L5",
   "upstream_ci": {
-    "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/.github/workflows/tests.yml#L137-L141",
+    "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/.github/workflows/tests.yml#L149-L153",
     "command": "go test -cover ${{matrix.test_opts}} ./...",
     "relationship": "This lane runs selected original tests using the same native Go test driver; -count=1, -json, exact -run selection and finite timeout are local invocation controls. Test code and bundled fixtures are unchanged."
   },

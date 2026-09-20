@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import time
 from verify import HERE, digest, load
 
 
@@ -41,7 +42,10 @@ def main():
     def save():
         (reports/'upstream-tests.json').write_text(json.dumps(report,indent=2)+'\n')
     def call(label, command, timeout=30, env=None):
-        record={'id':label,'argv':[v.replace(str(source),'$UPSTREAM_SOURCE') for v in command]}
+        record={'id':label,'argv':[v.replace(str(source),'$UPSTREAM_SOURCE') for v in command],
+                'cwd':'$UPSTREAM_SOURCE','started_at_utc':datetime.now(timezone.utc).isoformat(),
+                'timeout_seconds':timeout,'launched':True}
+        started=time.monotonic()
         try:
             result=subprocess.run(command,cwd=source,env=env,stdin=subprocess.DEVNULL,capture_output=True,timeout=timeout)
             out,err,code=result.stdout,result.stderr,result.returncode
@@ -49,6 +53,13 @@ def main():
         except subprocess.TimeoutExpired as error:
             out,err,code=error.stdout or b'',error.stderr or b'',None
             record.update(exit_code=None,timeout=True)
+        except OSError as error:
+            out,err,code=b'',b'',None
+            record.update(exit_code=None,timeout=False,launched=False,
+                          launch_error={'type':type(error).__name__,'errno':error.errno,
+                                        'message':str(error).replace(str(source),'$UPSTREAM_SOURCE')})
+        record['finished_at_utc']=datetime.now(timezone.utc).isoformat()
+        record['seconds']=round(time.monotonic()-started,6)
         for name,raw in [('stdout',out),('stderr',err)]:
             path=reports/(label+'.'+name);path.write_bytes(raw)
             record[name]={'path':path.name,'sha256':digest(path),'bytes':len(raw)}
