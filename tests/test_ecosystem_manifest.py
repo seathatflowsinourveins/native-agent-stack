@@ -526,6 +526,30 @@ class EcosystemManifestTests(unittest.TestCase):
         self.save_grand_catalogs()
         self.assertNotEqual(self.run_generator("--write").returncode, 0)
 
+    def test_catalog_structured_supersession_preserves_scope_and_reason(self):
+        self.grand_catalog_fixture()
+        current = self.decisions["decisions"][0]
+        current.update(capability_key="scoped-search", checked_at="2026-09-20", candidate=None)
+        previous = dict(current, id="search-use-previous", checked_at="2026-09-19")
+        self.decisions["decisions"].append(previous)
+        supersession = {"decision_id": previous["id"], "scope": "The same retained search fixture",
+                        "reason": "A later bounded acceptance replaces the earlier decision"}
+        current["supersedes"] = [supersession]
+        self.save_grand_catalogs()
+        page, _ = self.build()
+        decision = json.loads(page.data)["grand_catalogs"]["foundation"]["decisions"][0]
+        self.assertEqual(decision["supersedes"], [supersession])
+        self.assertEqual(decision["components"][0]["id"], "search")
+
+    def test_catalog_structured_supersession_rejects_unknown_decision(self):
+        self.grand_catalog_fixture()
+        self.decisions["decisions"][0]["supersedes"] = [{
+            "decision_id": "unknown", "scope": "Same capability", "reason": "Later acceptance"}]
+        self.save_grand_catalogs()
+        result = self.run_generator("--write")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("supersedes an unknown decision", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

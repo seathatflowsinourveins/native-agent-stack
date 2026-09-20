@@ -128,7 +128,14 @@ def build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url):
         require(set(row["layer_ids"]).issubset(layer_ids), "unknown foundation layer")
         require(set(row["component_ids"]).issubset(components), "catalog references an unknown component")
         require(set(row["evidence_ids"]).issubset(receipts_by_id), "catalog references an unknown receipt")
-        require(set(row.get("supersedes", [])).issubset(decision_ids), "catalog supersedes an unknown decision")
+        supersessions = row.get("supersedes", [])
+        require(isinstance(supersessions, list), "catalog supersedes must be a list")
+        for supersession in supersessions:
+            require(isinstance(supersession, dict)
+                    and set(supersession) == {"decision_id", "scope", "reason"}
+                    and all(isinstance(value, str) and value.strip() for value in supersession.values()),
+                    "catalog supersession needs decision_id, scope and reason text")
+            require(supersession["decision_id"] in decision_ids, "catalog supersedes an unknown decision")
         item = {**row, "sources": sources(row.get("source_paths", [])), "components": [], "receipts": []}
         item.pop("source_paths", None)
         for identifier in row["component_ids"]:
