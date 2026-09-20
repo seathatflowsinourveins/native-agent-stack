@@ -1,0 +1,657 @@
+{
+  "schema_version": 1,
+  "id": "native-token-clean-prefix-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20T13:54:55.597239+00:00",
+  "component_ids": [
+    "headroom",
+    "jcodemunch-mcp"
+  ],
+  "claim": "Fresh isolated upstream uv installations of Headroom0.37.0 and jCodeMunch1.108.319 passed exact native MCP retrieval before/after real server restart, then native uninstall with all created entrypoints absent and zero owned tool processes remaining.",
+  "scope": "Two disposable tool environments on the existing Linux/WSL host. Public fixtures only; no provider model tasks, client registration, authentication migration or production index replacement.",
+  "source_revision": "eb5c5c14ed2c62f1a85aa1f5eb2711bc64601140",
+  "source_inputs": [
+    {
+      "path": "fixtures/records.json",
+      "derivation": "Repeat each of the two public records for fixture_id0..149 (300rows), serialize as an items object with indent2 and trailing newline. This synthetic repetition fixture is not production traffic.",
+      "derived_sha256": "bde8dcfaff1237a6c36d56fdca6bd99b6cbf6d2be93cb1d2a5da505c06aedb98"
+    },
+    {
+      "path": "scripts/adoption_status.py",
+      "derivation": "Copy this one complete public file into an explicit disposable source folder; retrieve unique_json by symbol search.",
+      "source_sha256": "24d943c6fbc047491ff743c6717cc3bad4b8cebed5c2970e78dee69e952565eb",
+      "expected_symbol_sha256": "07d1042891649081b2a5450c5f9137feb7fbdce407265601c331f77f73407e8e"
+    }
+  ],
+  "native_commands": [
+    {
+      "argv": [
+        "uv",
+        "tool",
+        "install",
+        "--python",
+        "3.13",
+        "headroom-ai[mcp]==0.37.0"
+      ],
+      "cwd": "${RUN_DIR}",
+      "env_overrides": {
+        "UV_TOOL_DIR": "${RUN_DIR}/uv-tools",
+        "UV_TOOL_BIN_DIR": "${RUN_DIR}/uv-bin"
+      },
+      "started_utc": "2026-09-20T13:48:16.936190+00:00",
+      "elapsed_seconds": 0.49,
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ca1645141d7df4422d54baf643147dfad94a37eef6f026d440d61e427174d5c1",
+      "name": "install-headroom"
+    },
+    {
+      "argv": [
+        "uv",
+        "tool",
+        "install",
+        "--python",
+        "3.13",
+        "jcodemunch-mcp==1.108.319"
+      ],
+      "cwd": "${RUN_DIR}",
+      "env_overrides": {
+        "UV_TOOL_DIR": "${RUN_DIR}/uv-tools",
+        "UV_TOOL_BIN_DIR": "${RUN_DIR}/uv-bin"
+      },
+      "started_utc": "2026-09-20T13:48:17.426053+00:00",
+      "elapsed_seconds": 0.151,
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "1835b5d72511d5c722754b97b7286362d9d93fc83cda7d5d66af546e78d752f0",
+      "name": "install-jcodemunch"
+    },
+    {
+      "argv": [
+        "uv",
+        "tool",
+        "list"
+      ],
+      "cwd": "${RUN_DIR}",
+      "env_overrides": {
+        "UV_TOOL_DIR": "${RUN_DIR}/uv-tools",
+        "UV_TOOL_BIN_DIR": "${RUN_DIR}/uv-bin"
+      },
+      "started_utc": "2026-09-20T13:48:17.577052+00:00",
+      "elapsed_seconds": 0.058,
+      "exit_code": 0,
+      "stdout_sha256": "e8bba5f88730de07db90bbec172a7e7130798c6a6abf709503709b6a2b4a060f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "name": "installed-tools"
+    },
+    {
+      "argv": [
+        "${RUN_DIR}/uv-tools/headroom-ai/bin/python",
+        "${RUN_DIR}/mcp-e2e.py"
+      ],
+      "cwd": "${RUN_DIR}",
+      "env_overrides": {
+        "UV_TOOL_DIR": "${RUN_DIR}/uv-tools",
+        "UV_TOOL_BIN_DIR": "${RUN_DIR}/uv-bin"
+      },
+      "started_utc": "2026-09-20T13:50:40.268469+00:00",
+      "elapsed_seconds": 48.896,
+      "exit_code": 0,
+      "stdout_sha256": "53db6524ff069698fc9a95f35663929a83ece1d881ea07ce2e33aa792542c653",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "name": "native-mcp-e2e"
+    },
+    {
+      "argv": [
+        "uv",
+        "tool",
+        "uninstall",
+        "headroom-ai"
+      ],
+      "cwd": "${RUN_DIR}",
+      "env_overrides": {
+        "UV_TOOL_DIR": "${RUN_DIR}/uv-tools",
+        "UV_TOOL_BIN_DIR": "${RUN_DIR}/uv-bin"
+      },
+      "started_utc": "2026-09-20T13:52:48.793944+00:00",
+      "elapsed_seconds": 0.379,
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "4a77ed904e2848b9b86e796db8ef5516d75324c32ffa1e4e89070eae9d27f231",
+      "name": "uninstall-headroom-ai"
+    },
+    {
+      "argv": [
+        "uv",
+        "tool",
+        "uninstall",
+        "jcodemunch-mcp"
+      ],
+      "cwd": "${RUN_DIR}",
+      "env_overrides": {
+        "UV_TOOL_DIR": "${RUN_DIR}/uv-tools",
+        "UV_TOOL_BIN_DIR": "${RUN_DIR}/uv-bin"
+      },
+      "started_utc": "2026-09-20T13:52:49.172832+00:00",
+      "elapsed_seconds": 0.057,
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "5bfd35fb14d6918e89de4975f188173f4a0f8841b51732345be072faa2e3d760",
+      "name": "uninstall-jcodemunch-mcp"
+    },
+    {
+      "argv": [
+        "uv",
+        "tool",
+        "list"
+      ],
+      "cwd": "${RUN_DIR}",
+      "env_overrides": {
+        "UV_TOOL_DIR": "${RUN_DIR}/uv-tools",
+        "UV_TOOL_BIN_DIR": "${RUN_DIR}/uv-bin"
+      },
+      "started_utc": "2026-09-20T13:52:49.229675+00:00",
+      "elapsed_seconds": 0.005,
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "20cda567b969b8f9b92282deca5987031983f1e1e0e44c4e80b7dc740111324d",
+      "name": "tools-after-uninstall"
+    }
+  ],
+  "native_mcp_processes": [
+    {
+      "name": "headroom-first",
+      "argv": [
+        "${RUN_DIR}/uv-bin/headroom",
+        "mcp",
+        "serve",
+        "--proxy-url",
+        "http://127.0.0.1:1"
+      ],
+      "environment": {
+        "HEADROOM_WORKSPACE_DIR": "${RUN_DIR}/headroom-state",
+        "HEADROOM_OFFLINE": "1",
+        "HEADROOM_TELEMETRY": "off",
+        "HEADROOM_DISABLE_KOMPRESS": "1",
+        "HEADROOM_DETECT_BACKEND": "python",
+        "HEADROOM_BINARIES_OFFLINE": "1",
+        "HF_HUB_OFFLINE": "1",
+        "TRANSFORMERS_OFFLINE": "1",
+        "LITELLM_LOCAL_MODEL_COST_MAP": "True",
+        "TIKTOKEN_CACHE_DIR": "${EXISTING_PUBLIC_TOKENIZER_CACHE}",
+        "HEADROOM_MCP_CLIENT": "clean-prefix-offline-acceptance"
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 26.093,
+      "stdio_transport_closed": true
+    },
+    {
+      "name": "headroom-restart",
+      "argv": [
+        "${RUN_DIR}/uv-bin/headroom",
+        "mcp",
+        "serve",
+        "--proxy-url",
+        "http://127.0.0.1:1"
+      ],
+      "environment": {
+        "HEADROOM_WORKSPACE_DIR": "${RUN_DIR}/headroom-state",
+        "HEADROOM_OFFLINE": "1",
+        "HEADROOM_TELEMETRY": "off",
+        "HEADROOM_DISABLE_KOMPRESS": "1",
+        "HEADROOM_DETECT_BACKEND": "python",
+        "HEADROOM_BINARIES_OFFLINE": "1",
+        "HF_HUB_OFFLINE": "1",
+        "TRANSFORMERS_OFFLINE": "1",
+        "LITELLM_LOCAL_MODEL_COST_MAP": "True",
+        "TIKTOKEN_CACHE_DIR": "${EXISTING_PUBLIC_TOKENIZER_CACHE}",
+        "HEADROOM_MCP_CLIENT": "clean-prefix-offline-acceptance"
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 20.425,
+      "stdio_transport_closed": true
+    },
+    {
+      "name": "jcode-first",
+      "argv": [
+        "${RUN_DIR}/uv-bin/jcodemunch-mcp"
+      ],
+      "environment": {
+        "CODE_INDEX_PATH": "${RUN_DIR}/jcode-index",
+        "JCODEMUNCH_SHARE_SAVINGS": "0",
+        "JCODEMUNCH_USE_AI_SUMMARIES": "false",
+        "JCODEMUNCH_ALLOW_PAID_SUMMARIES": "false",
+        "JCODEMUNCH_ALLOW_REMOTE_SUMMARIZER": "false",
+        "JCODEMUNCH_CONTEXT_PROVIDERS": "false",
+        "JCODEMUNCH_WATCH": "false",
+        "JCODEMUNCH_GIT_BLAME_ENABLED": "false",
+        "JCODEMUNCH_PERF_TELEMETRY": "false",
+        "JCODEMUNCH_RUNTIME_INGEST_ENABLED": "false",
+        "JCODEMUNCH_ORG_INGEST_ENABLED": "false",
+        "JCODEMUNCH_GIT_ROOT_IDENTITY": "false"
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 1.043,
+      "stdio_transport_closed": true
+    },
+    {
+      "name": "jcode-restart",
+      "argv": [
+        "${RUN_DIR}/uv-bin/jcodemunch-mcp"
+      ],
+      "environment": {
+        "CODE_INDEX_PATH": "${RUN_DIR}/jcode-index",
+        "JCODEMUNCH_SHARE_SAVINGS": "0",
+        "JCODEMUNCH_USE_AI_SUMMARIES": "false",
+        "JCODEMUNCH_ALLOW_PAID_SUMMARIES": "false",
+        "JCODEMUNCH_ALLOW_REMOTE_SUMMARIZER": "false",
+        "JCODEMUNCH_CONTEXT_PROVIDERS": "false",
+        "JCODEMUNCH_WATCH": "false",
+        "JCODEMUNCH_GIT_BLAME_ENABLED": "false",
+        "JCODEMUNCH_PERF_TELEMETRY": "false",
+        "JCODEMUNCH_RUNTIME_INGEST_ENABLED": "false",
+        "JCODEMUNCH_ORG_INGEST_ENABLED": "false",
+        "JCODEMUNCH_GIT_ROOT_IDENTITY": "false"
+      },
+      "exit_code": 0,
+      "elapsed_seconds": 0.382,
+      "stdio_transport_closed": true
+    }
+  ],
+  "native_tool_calls": [
+    {
+      "label": "headroom-compress",
+      "method": "tools/call",
+      "name": "headroom_compress",
+      "arguments": {
+        "content_artifact": "headroom-input.json",
+        "content_sha256": "bde8dcfaff1237a6c36d56fdca6bd99b6cbf6d2be93cb1d2a5da505c06aedb98"
+      },
+      "is_error": false,
+      "response_sha256": "8a21ff13def04f61e1cd085aca6c0e8925250a38c3d3a308f1ca16187f53bc16"
+    },
+    {
+      "label": "headroom-retrieve-restart",
+      "method": "tools/call",
+      "name": "headroom_retrieve",
+      "arguments": {
+        "hash": "${RETURNED_COMPRESSION_HASH}"
+      },
+      "is_error": false,
+      "response_sha256": "7271c35c63b419f935700d5939b6e66c5fd49a88fb621be30206a50f614a2764"
+    },
+    {
+      "label": "headroom-retrieve",
+      "method": "tools/call",
+      "name": "headroom_retrieve",
+      "arguments": {
+        "hash": "${RETURNED_COMPRESSION_HASH}"
+      },
+      "is_error": false,
+      "response_sha256": "63bc1bda6736203ef6336b171befd44b1a84df133f6050832d610df6c0d682d6"
+    },
+    {
+      "label": "headroom-stats-restart",
+      "method": "tools/call",
+      "name": "headroom_stats",
+      "arguments": {},
+      "is_error": false,
+      "response_sha256": "cd347637ba53b93e931c69568855693b043a6fb241ab697d4d676de1a4d230ff"
+    },
+    {
+      "label": "headroom-stats",
+      "method": "tools/call",
+      "name": "headroom_stats",
+      "arguments": {},
+      "is_error": false,
+      "response_sha256": "8c52d98a7f76f683fee35a143dc69b70edcb63abf3638afd4348903436556b61"
+    },
+    {
+      "label": "jcode-index",
+      "method": "tools/call",
+      "name": "order",
+      "arguments": {
+        "action": "index_folder",
+        "args": {
+          "path": "${RUN_DIR}/public-source",
+          "use_ai_summaries": false,
+          "follow_symlinks": false
+        },
+        "allow_state_change": true
+      },
+      "is_error": false,
+      "response_sha256": "bf00d1429f56eb394202c9a526ccc6a086582f0e9b989117bbc8f1d5ba64ddba"
+    },
+    {
+      "label": "jcode-search-restart",
+      "method": "tools/call",
+      "name": "order",
+      "arguments": {
+        "action": "search_symbols",
+        "args": {
+          "repo": "${RETURNED_REPOSITORY_ID}",
+          "query": "unique_json",
+          "kind": "function",
+          "max_results": 1
+        }
+      },
+      "is_error": false,
+      "response_sha256": "5427c7b6a846ad189d6a5a1daa6decc9bc751d962f3df3395c1701b7a95c5b39"
+    },
+    {
+      "label": "jcode-search",
+      "method": "tools/call",
+      "name": "order",
+      "arguments": {
+        "action": "search_symbols",
+        "args": {
+          "repo": "${RETURNED_REPOSITORY_ID}",
+          "query": "unique_json",
+          "kind": "function",
+          "max_results": 1
+        }
+      },
+      "is_error": false,
+      "response_sha256": "5427c7b6a846ad189d6a5a1daa6decc9bc751d962f3df3395c1701b7a95c5b39"
+    },
+    {
+      "label": "jcode-source-restart",
+      "method": "tools/call",
+      "name": "order",
+      "arguments": {
+        "action": "get_symbol_source",
+        "args": {
+          "repo": "${RETURNED_REPOSITORY_ID}",
+          "symbol_id": "${RETURNED_SYMBOL_ID}"
+        }
+      },
+      "is_error": false,
+      "response_sha256": "bd68911a91b12ca1eaa746af3023411f1af39c1ce2379c8ecc8689bcae6181c5"
+    },
+    {
+      "label": "jcode-source",
+      "method": "tools/call",
+      "name": "order",
+      "arguments": {
+        "action": "get_symbol_source",
+        "args": {
+          "repo": "${RETURNED_REPOSITORY_ID}",
+          "symbol_id": "${RETURNED_SYMBOL_ID}"
+        }
+      },
+      "is_error": false,
+      "response_sha256": "bd68911a91b12ca1eaa746af3023411f1af39c1ce2379c8ecc8689bcae6181c5"
+    },
+    {
+      "label": "jcode-stats-after",
+      "method": "tools/call",
+      "name": "order",
+      "arguments": {
+        "action": "get_session_stats",
+        "args": {}
+      },
+      "is_error": false,
+      "response_sha256": "fcc7a0da0705a95e64ebe4c20f45d3cba8b13ba8691d080bbb62ada61997d890"
+    },
+    {
+      "label": "jcode-stats-before",
+      "method": "tools/call",
+      "name": "order",
+      "arguments": {
+        "action": "get_session_stats",
+        "args": {}
+      },
+      "is_error": false,
+      "response_sha256": "a3131e9a0c97c5df2f3f4dae761e6ee70fc4fd2b81ee087d3ccf8478c0e4ed40"
+    },
+    {
+      "label": "jcode-stats-final",
+      "method": "tools/call",
+      "name": "order",
+      "arguments": {
+        "action": "get_session_stats",
+        "args": {}
+      },
+      "is_error": false,
+      "response_sha256": "1dada61863be24c8e7b423cd0cbd9b31e89e86a79c557ad3fded9d6f87df0a6c"
+    },
+    {
+      "label": "jcode-stats-restart-before",
+      "method": "tools/call",
+      "name": "order",
+      "arguments": {
+        "action": "get_session_stats",
+        "args": {}
+      },
+      "is_error": false,
+      "response_sha256": "ad3afe78e7cd9cc225abafb8beb9bb2ea11141eafba9932dd6feef5f1daf1972"
+    }
+  ],
+  "installation": {
+    "empty_tool_and_bin_directories_asserted_before_install": true,
+    "package_manager": "upstream uv tool install --python3.13 with explicit UV_TOOL_DIR and UV_TOOL_BIN_DIR",
+    "existing_package_cache_reused": true,
+    "fresh_virtual_environments": true,
+    "installed_upstream_list_stdout": "headroom-ai v0.37.0\n- headroom\njcodemunch-mcp v1.108.319\n- gcm\n- jcodemunch-mcp\n- munch-bench\n",
+    "prior_working_installations_replaced": false,
+    "uninstall_scope": "Only the newly created explicit UV_TOOL_DIR/UV_TOOL_BIN_DIR."
+  },
+  "headroom": {
+    "version": "0.37.0",
+    "same_process_original_recovery_exact": true,
+    "after_server_restart_original_recovery_exact": true,
+    "input_sha256": "bde8dcfaff1237a6c36d56fdca6bd99b6cbf6d2be93cb1d2a5da505c06aedb98",
+    "recovered_sha256": "bde8dcfaff1237a6c36d56fdca6bd99b6cbf6d2be93cb1d2a5da505c06aedb98",
+    "upstream_compress_returned": {
+      "original_tokens": 9616,
+      "compressed_tokens": 2128,
+      "tokens_saved": 7488
+    },
+    "upstream_savings_lifetime_returned": {
+      "tokens_saved": 7488,
+      "tokens_before": 9616,
+      "cost_usd": 0.022464,
+      "calls": 1,
+      "savings_percent": 77.9
+    },
+    "counter_scope": "Explicit disposable HEADROOM_WORKSPACE_DIR and one native offline compression call. Upstream lifetime is a bounded native report, not this PC's global provider savings. Illustrative cost is not billed savings.",
+    "proxy_url": "http://127.0.0.1:1",
+    "provider_proxy_started": false,
+    "offline_environment": true
+  },
+  "jcodemunch": {
+    "version": "1.108.319",
+    "indexed_files": 1,
+    "indexed_symbols": 12,
+    "selected_symbol": "unique_json",
+    "source_exact_before_restart": true,
+    "source_exact_after_restart": true,
+    "scoped_native_total_tokens_saved": {
+      "before": 0,
+      "after_first_source_read": 2781,
+      "after_server_restart_before_second_read": 2781,
+      "after_second_source_read": 5562
+    },
+    "verification_source_reads": 2,
+    "default_ledger_before": 29820,
+    "default_ledger_after": 29820,
+    "default_ledger_delta": 0,
+    "default_ledger_bytes_unchanged": true,
+    "counter_scope": "Repeated-use upstream bytes/4 estimate in the disposable index. Both increments are verification reads, not unique production or provider savings.",
+    "custom_root_accounting": "In this observed sequence, each fresh native MCP process called get_session_stats with the explicit CODE_INDEX_PATH before retrieval, and the default ledger stayed byte-for-byte unchanged. Installed upstream source also loads the savings root once per process. This is not a new causal A/B test and does not establish that arbitrary independent get_symbol_source calls honor a custom ledger root; the earlier mismatch remains valid dated evidence.",
+    "ai_summaries_watch_context_providers_and_savings_sharing_enabled": false
+  },
+  "exact_artifact_measurement": {
+    "tokenizer": "gpt-tokenizer3.4.0/o200k_base",
+    "counts": {
+      "headroom_pretty_input": 9609,
+      "headroom_compact_input": 5105,
+      "headroom_candidate_content": 2121,
+      "headroom_full_compress_envelope": 2732,
+      "headroom_full_retrieve_envelope": 16045,
+      "jcode_whole_file": 2484,
+      "jcode_known_function": 40,
+      "jcode_index_response": 269,
+      "jcode_search_response": 125,
+      "jcode_source_response": 199,
+      "jcode_complete_search_source": 324,
+      "jcode_index_search_source": 593,
+      "headroom_compress_retrieve": 18777
+    },
+    "jcode_whole_file_delta": 2160,
+    "jcode_known_function_delta": -284,
+    "headroom_compact_to_candidate_delta": 2984,
+    "headroom_compact_to_full_compress_envelope_delta": 2373,
+    "headroom_compact_to_compress_retrieve_delta": -13672,
+    "measurement_boundary": "Exact retained input/candidate and complete returned MCP-envelope serialization; not raw stdio transport framing, prompts, schemas, model reasoning, API usage or billed cost. Search/source figures exclude cold indexing and stats commands; the index-plus-retrieval figure includes indexing but still excludes stats. Stats-before-source was part of this custom-root isolation procedure, so these retrieval-only figures are not the whole lifecycle cost. The full request/response lifecycle and recovery can exceed the original context."
+  },
+  "cleanup": {
+    "all_four_owned_mcp_exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "upstream_uninstall_exit_codes": [
+      0,
+      0,
+      0
+    ],
+    "absent_created_entrypoints": [
+      "headroom",
+      "jcodemunch-mcp",
+      "gcm",
+      "munch-bench"
+    ],
+    "all_created_entrypoints_absent": true,
+    "owned_tool_processes_remaining": 0,
+    "retained_artifact_count": 82,
+    "input_and_recovered_sha256_equal_after_uninstall": true,
+    "expected_and_twice_retrieved_source_equal_after_uninstall": true,
+    "data_and_receipts_preserved": true
+  },
+  "retained_native_failures": [],
+  "limitations": [
+    "Clean prefix means new isolated tool environments using the existing host and package cache, not a newly provisioned operating system or an independent-PC restore.",
+    "The Python MCP SDK transported real upstream tool calls. Retained JSON envelopes preserve returned fields but are serialized artifacts, not a byte-for-byte dump of stdio transport framing.",
+    "Headroom used the selected offline Python detector; its native detector warning is retained in stderr. No model/provider keys were supplied, and no account configuration was copied.",
+    "Headroom upstream9616/2128 counts include message overhead; exact retained content counts are9609/2121, and the cheaper compact original is5105. Comparisons use their stated baseline.",
+    "Headroom full compression+recovery responses cost18777 tokens versus5105 compact original. Exact recoverability is not a net saving when the original is also fetched.",
+    "jCodeMunch complete returned search/source responses cost324 tokens versus2484 for the whole file, but a known focused function is only40 tokens. Retain that cheaper path when its location is already known.",
+    "Native isolated lifetime estimates are verification-ledger values. Do not add them to production counters, existing artifact totals, provider usage or other snapshots.",
+    "Process exits, uninstall and retained-byte checks establish this bounded local lifecycle only; provider-mediated client workflows, every optional feature and OS reboot were not replayed."
+  ],
+  "model_calls": 0,
+  "exact_causal_lifetime_provider_tokens_saved": null,
+  "result": "passed_with_explicit_measurement_boundaries",
+  "private_artifact_hashes": {
+    "artifacts/default-ledger-after.json": "10f25c3bbe43c1880adbaff43bf26b7bef7108939c297da6cf8e059cd3049e7d",
+    "artifacts/default-ledger-before.json": "10f25c3bbe43c1880adbaff43bf26b7bef7108939c297da6cf8e059cd3049e7d",
+    "artifacts/exact-token-counts.command.json": "cad4cf014da58ad5c565db129001ff67e6f80ee89da0b914a388659ff346cde9",
+    "artifacts/exact-token-counts.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/exact-token-counts.stdout": "27c6956e2e7e04ba590e61a6a13dcf8554ad1e3916570db7b32fea49b8fcd49c",
+    "artifacts/expected-symbol.py": "07d1042891649081b2a5450c5f9137feb7fbdce407265601c331f77f73407e8e",
+    "artifacts/headroom-ai-uv-receipt.toml": "0298e99e480e226fdd024de3997fed221966e8b3714567a596c70416c989b355",
+    "artifacts/headroom-candidate.txt": "d4dfa1da64bd04e961a05507ddd373ad7398ed050b7b78a7db054e5b0dd0620f",
+    "artifacts/headroom-compress.call.json": "82e276d4ff34e9d0252c69c2c71241f09af55bf6f372176da590ae9886efd633",
+    "artifacts/headroom-compress.request.json": "e2d17c9ebef625a51a5c004824d306f91aa1091907f9a18bda7dd2206828b0d4",
+    "artifacts/headroom-compress.response.json": "8a21ff13def04f61e1cd085aca6c0e8925250a38c3d3a308f1ca16187f53bc16",
+    "artifacts/headroom-first.command.json": "fe82c002cec5488504c0648c56a5a34f859febd1f5efe4f95da1754f9f8e2b01",
+    "artifacts/headroom-first.initialize.json": "26bf8f5a3992f979557ae822f204391d4da5d27c2bb26f661873573d9107a1f0",
+    "artifacts/headroom-first.process.json": "de531ddb5eaa2045f7e403df1cda7745dc23b0fd5000154680c823bd45c5da02",
+    "artifacts/headroom-first.stderr": "c874f49ba1ac78965c2e330aef9d656da47efca662833d5f811ca94139eb4683",
+    "artifacts/headroom-first.tools.json": "01c167ee55e8e90099529d23de3a816b7f6d2b321fe13dcce18ecc628ca7c6d1",
+    "artifacts/headroom-input.compact.json": "cfdb01702028d29ef71e9d8048b808f8856139d1fcc4e94e07e57e3567b49b10",
+    "artifacts/headroom-input.json": "bde8dcfaff1237a6c36d56fdca6bd99b6cbf6d2be93cb1d2a5da505c06aedb98",
+    "artifacts/headroom-recovered.json": "bde8dcfaff1237a6c36d56fdca6bd99b6cbf6d2be93cb1d2a5da505c06aedb98",
+    "artifacts/headroom-restart.command.json": "fe82c002cec5488504c0648c56a5a34f859febd1f5efe4f95da1754f9f8e2b01",
+    "artifacts/headroom-restart.initialize.json": "26bf8f5a3992f979557ae822f204391d4da5d27c2bb26f661873573d9107a1f0",
+    "artifacts/headroom-restart.process.json": "08205a3c11a3bd1e3c03064af8d62295aadffc341a96e4056a0a043d37f47124",
+    "artifacts/headroom-restart.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/headroom-restart.tools.json": "01c167ee55e8e90099529d23de3a816b7f6d2b321fe13dcce18ecc628ca7c6d1",
+    "artifacts/headroom-retrieve-restart.call.json": "f228a9476b05872e87f9fd86f21f42aa281516b489997aa600718a22dc144f7d",
+    "artifacts/headroom-retrieve-restart.request.json": "16b8386c75ee5a59957f7b04de22c5bf9d730eec83ef5c37645a4213dee0412f",
+    "artifacts/headroom-retrieve-restart.response.json": "7271c35c63b419f935700d5939b6e66c5fd49a88fb621be30206a50f614a2764",
+    "artifacts/headroom-retrieve.call.json": "9256f4703ff48a38fb7b6e63ec024822140be0d61926fefedfe6ae8786df46f5",
+    "artifacts/headroom-retrieve.request.json": "16b8386c75ee5a59957f7b04de22c5bf9d730eec83ef5c37645a4213dee0412f",
+    "artifacts/headroom-retrieve.response.json": "63bc1bda6736203ef6336b171befd44b1a84df133f6050832d610df6c0d682d6",
+    "artifacts/headroom-savings.command.json": "6dffa9f3872230bb5830f6fde6750d4a51c20467c5131b2ed6b8d19c3ad52896",
+    "artifacts/headroom-savings.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "artifacts/headroom-savings.stdout": "6506cfda64556590c02c01e847040a82d337e12f6f836386142781bb68d86ff6",
+    "artifacts/headroom-stats-restart.call.json": "464d14f8dfb1080d16b17d984e38e69726ea4dde05c3278e60c5f8e22d4ebccd",
+    "artifacts/headroom-stats-restart.request.json": "47c09a311a7d0c7f00478597220fafe27f6824721ddf7b0b569befb194c2332d",
+    "artifacts/headroom-stats-restart.response.json": "cd347637ba53b93e931c69568855693b043a6fb241ab697d4d676de1a4d230ff",
+    "artifacts/headroom-stats.call.json": "c8a09a137aa20896875939c97aa1941cef9eb625ac1d1366b05541a9e36213f8",
+    "artifacts/headroom-stats.request.json": "47c09a311a7d0c7f00478597220fafe27f6824721ddf7b0b569befb194c2332d",
+    "artifacts/headroom-stats.response.json": "8c52d98a7f76f683fee35a143dc69b70edcb63abf3638afd4348903436556b61",
+    "artifacts/jcode-first.command.json": "ce9879ab239d46d4ee1412ba2874d508bd265d12691f46d184468195c33e948f",
+    "artifacts/jcode-first.initialize.json": "d7b7550a93cc989fd4ad48938b682f3cd3238c906721d5e846c9dcb1ee0a56e2",
+    "artifacts/jcode-first.process.json": "e389aa3bea84f2d31f915ec76fc5cd15e75b5b85dc5ecd5f6cac346d85bf8671",
+    "artifacts/jcode-first.stderr": "eb5c78d97f455abe013f56db546b561dcc0e2f45242c3e94c3dcb9308d1fdd7c",
+    "artifacts/jcode-first.tools.json": "b719efc1b6cdc6e3d57a897f0e375f4eb2ceb339c68ac1d97de25b9b24bc3d3e",
+    "artifacts/jcode-index.call.json": "123c22aeef3d770a88fa3432a05f240dca45f82c1d6c9780cfb3ccd1732f5149",
+    "artifacts/jcode-index.request.json": "9319b41b34625765347553228bf0a6382b3c37177748f12efb1b2d3e8a8d1066",
+    "artifacts/jcode-index.response.json": "bf00d1429f56eb394202c9a526ccc6a086582f0e9b989117bbc8f1d5ba64ddba",
+    "artifacts/jcode-restart.command.json": "ce9879ab239d46d4ee1412ba2874d508bd265d12691f46d184468195c33e948f",
+    "artifacts/jcode-restart.initialize.json": "d7b7550a93cc989fd4ad48938b682f3cd3238c906721d5e846c9dcb1ee0a56e2",
+    "artifacts/jcode-restart.process.json": "6380349e4e90826abc27ccfe33dd1cb3e5447a955060e4774c5626d5a459ed3e",
+    "artifacts/jcode-restart.stderr": "eb5c78d97f455abe013f56db546b561dcc0e2f45242c3e94c3dcb9308d1fdd7c",
+    "artifacts/jcode-restart.tools.json": "b719efc1b6cdc6e3d57a897f0e375f4eb2ceb339c68ac1d97de25b9b24bc3d3e",
+    "artifacts/jcode-search-restart.call.json": "8ca651579654f5497f719d1984cde3164409354f13d9dc4045643d92a0992634",
+    "artifacts/jcode-search-restart.request.json": "24ae208ac2cf8c0fa7d2aea89b5b4057b6383401f36f2b140e81f05913a865a0",
+    "artifacts/jcode-search-restart.response.json": "5427c7b6a846ad189d6a5a1daa6decc9bc751d962f3df3395c1701b7a95c5b39",
+    "artifacts/jcode-search.call.json": "23e38c9d2994c296df4773e9bdc8b96741d3bc64f36798c2cf684b8ee3a9d0ba",
+    "artifacts/jcode-search.request.json": "24ae208ac2cf8c0fa7d2aea89b5b4057b6383401f36f2b140e81f05913a865a0",
+    "artifacts/jcode-search.response.json": "5427c7b6a846ad189d6a5a1daa6decc9bc751d962f3df3395c1701b7a95c5b39",
+    "artifacts/jcode-source-restart.call.json": "210e192759945c3c092db35dc0b8e079144de6c1f4a268c1a9970fcca13cd4fa",
+    "artifacts/jcode-source-restart.py": "07d1042891649081b2a5450c5f9137feb7fbdce407265601c331f77f73407e8e",
+    "artifacts/jcode-source-restart.request.json": "11c4cbc6e6da2e89e7f0a209805dbe7d32a8d5458c6f0ac06a150a3876d866aa",
+    "artifacts/jcode-source-restart.response.json": "bd68911a91b12ca1eaa746af3023411f1af39c1ce2379c8ecc8689bcae6181c5",
+    "artifacts/jcode-source.call.json": "5d6f78ad03e07a0db09c9e376ddf57858d9811598aa84d1c825f4c0ed8142e47",
+    "artifacts/jcode-source.py": "07d1042891649081b2a5450c5f9137feb7fbdce407265601c331f77f73407e8e",
+    "artifacts/jcode-source.request.json": "11c4cbc6e6da2e89e7f0a209805dbe7d32a8d5458c6f0ac06a150a3876d866aa",
+    "artifacts/jcode-source.response.json": "bd68911a91b12ca1eaa746af3023411f1af39c1ce2379c8ecc8689bcae6181c5",
+    "artifacts/jcode-stats-after.call.json": "a61766e9257d5ff3035a44bbf026c671da6e0b47c76983dcdff5ce90569ea590",
+    "artifacts/jcode-stats-after.request.json": "4598ed875427e57ec7e19c792928874f1559b48aea11a9586a32c3411d1661df",
+    "artifacts/jcode-stats-after.response.json": "fcc7a0da0705a95e64ebe4c20f45d3cba8b13ba8691d080bbb62ada61997d890",
+    "artifacts/jcode-stats-before.call.json": "2fbe74fd59453b3212a2c98d5426d50b8c85babe3521b8c429f00e3abe15c1f0",
+    "artifacts/jcode-stats-before.request.json": "4598ed875427e57ec7e19c792928874f1559b48aea11a9586a32c3411d1661df",
+    "artifacts/jcode-stats-before.response.json": "a3131e9a0c97c5df2f3f4dae761e6ee70fc4fd2b81ee087d3ccf8478c0e4ed40",
+    "artifacts/jcode-stats-final.call.json": "067709f83168cd083dd6a9a6f1de3654ab4f7004e7c8963aadaa87c9ad65cd86",
+    "artifacts/jcode-stats-final.request.json": "4598ed875427e57ec7e19c792928874f1559b48aea11a9586a32c3411d1661df",
+    "artifacts/jcode-stats-final.response.json": "1dada61863be24c8e7b423cd0cbd9b31e89e86a79c557ad3fded9d6f87df0a6c",
+    "artifacts/jcode-stats-restart-before.call.json": "53c305a87f6c49317d814e46955ac9bdccac4147e7223d6d1c2c9f87ba0b5576",
+    "artifacts/jcode-stats-restart-before.request.json": "4598ed875427e57ec7e19c792928874f1559b48aea11a9586a32c3411d1661df",
+    "artifacts/jcode-stats-restart-before.response.json": "ad3afe78e7cd9cc225abafb8beb9bb2ea11141eafba9932dd6feef5f1daf1972",
+    "artifacts/jcodemunch-mcp-uv-receipt.toml": "e75393bdd51439fa9abef2e487bc97a6edd8e3343b9466d883ae234f2541712d",
+    "artifacts/measurements.json": "1514702ba058b9afc5f653b99c5e86928fb16042cbc66ac65d1ad83bc37d0fa9",
+    "artifacts/public-source.py": "24d943c6fbc047491ff743c6717cc3bad4b8cebed5c2970e78dee69e952565eb",
+    "artifacts/result.json": "2be1107472a17759c9c7e368e26ecd7e038829b9488153a4ec7dd2aca59c26d0",
+    "cleanup.json": "389206be15affea18ffc9d61365705ba8c23472276ca94ef87bf97879f8337e7",
+    "install-headroom.command.json": "815af2cb3e1d271b560824313aa71b038b4d2dbe58c0230c3f79990f7cf92dda",
+    "install-headroom.stderr": "ca1645141d7df4422d54baf643147dfad94a37eef6f026d440d61e427174d5c1",
+    "install-headroom.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "install-jcodemunch.command.json": "39af571783ef954deab0bbda33c0a52d61196bed41608956e37703cb25917f57",
+    "install-jcodemunch.stderr": "1835b5d72511d5c722754b97b7286362d9d93fc83cda7d5d66af546e78d752f0",
+    "install-jcodemunch.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "installed-tools.command.json": "c66b041b6d8c896138948be25011ed1a293e91233a6aa8e342d231ec839ef5d2",
+    "installed-tools.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "installed-tools.stdout": "e8bba5f88730de07db90bbec172a7e7130798c6a6abf709503709b6a2b4a060f",
+    "mcp-e2e.py": "d36d8227e6e985f5a191e2c12842316c8e936654a9c646eef5012c20872181fb",
+    "measure.py": "e3324df416452cb2e95b0347ddd094f9ca3b9f1dd25f2789cdbd26bf847e7576",
+    "native-mcp-e2e.command.json": "8a9114a6111c05f1562663d15ff52046989c7d1d46b2b216cbd2456d3c8e72b9",
+    "native-mcp-e2e.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native-mcp-e2e.stdout": "53db6524ff069698fc9a95f35663929a83ece1d881ea07ce2e33aa792542c653",
+    "public-source/adoption_status.py": "24d943c6fbc047491ff743c6717cc3bad4b8cebed5c2970e78dee69e952565eb",
+    "run.py": "f5481057f9b6c2972c0bfe860f2c9c4980f4422b589e2289caf2296915455147",
+    "tools-after-uninstall.command.json": "f256f1df58bf2ede0b7e7e56b4205b2300803a0582800cc7aa0bf313c4bfed1c",
+    "tools-after-uninstall.stderr": "20cda567b969b8f9b92282deca5987031983f1e1e0e44c4e80b7dc740111324d",
+    "tools-after-uninstall.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "uninstall-headroom-ai.command.json": "ae5ee072b6b2557ad4c0b492005924cec4feb6b489e2233e5477901facb661c5",
+    "uninstall-headroom-ai.stderr": "4a77ed904e2848b9b86e796db8ef5516d75324c32ffa1e4e89070eae9d27f231",
+    "uninstall-headroom-ai.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "uninstall-jcodemunch-mcp.command.json": "3c7705e5b472c023dad816e5c5badf2f513cb215a92447b20b424035a4bf0110",
+    "uninstall-jcodemunch-mcp.stderr": "5bfd35fb14d6918e89de4975f188173f4a0f8841b51732345be072faa2e3d760",
+    "uninstall-jcodemunch-mcp.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}
