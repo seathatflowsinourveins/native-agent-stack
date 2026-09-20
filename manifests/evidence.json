@@ -4774,8 +4774,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "f73ba11a7af538f4402f0e8bd73d29e8a4ab8be3ec7b128b2d5def8efc8143d3",
-      "bytes": 3276948
+      "sha256": "ef762f299da7ef60108f74b2ab4898cef7bdcb2d0a8255223875a4eaa5a3dafb",
+      "bytes": 3298230
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -4784,7 +4784,7 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "9fdc8758e9887aaaee5607c1a84068e6698a44cd96a1d51c5713da2193e8edfd",
+      "sha256": "df51cb1a1adcd0f055a00833216663aabd8dfc4407576bdf86b1fddcaa384e92",
       "bytes": 28251
     },
     {
@@ -4829,8 +4829,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "e49f38fd515490aa58147822dc2187f00df30366aa90c98d123abfc61fd57703",
-      "bytes": 133374
+      "sha256": "47f0f8c2957a7b7906210766e7ce5eced81c019202ccb24f85249ea33bfb4539",
+      "bytes": 157126
     },
     {
       "path": "docs/token-efficiency-stack.md",
