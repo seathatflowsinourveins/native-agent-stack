@@ -74,6 +74,9 @@ Planned records have no runs, failures, qualifications or usage claim.
 both quality checks true, matching decision scope, and an execution evidence
 class (`offline_artifact_check`, `native_cli_execution`, `model_task_execution`
 or `recovery_execution`). Discovery and source review cannot qualify adoption.
+Each qualification must be the latest numbered candidate attempt for its
+task/role/scope. A later failed or skipped attempt prevents reuse of an earlier
+success; an earlier failure followed by a qualifying success remains recorded.
 This is a necessary evidence check, not authority to install or promote globally.
 
 ## Usage and matched comparisons
@@ -93,9 +96,13 @@ and a hashed JSON `coverage_artifact` containing exactly
 `{"run_ids": ["…"], "complete": true}`. This is an explicit audit assertion;
 software cannot discover omitted external calls. `whole_task_token_savings`
 additionally requires every declared task/role in both conditions, consecutive
-attempt numbers from one, execution evidence in the declared scope, complete
-known usage/retry categories, passed quality for every attempt, and strictly
-lower summed candidate tokens. All coordinator,
+attempt numbers from one, equal passing attempt counts for each task/role pair,
+execution evidence in the declared scope, complete known usage/retry categories,
+passed quality for every attempt, and strictly lower summed candidate tokens.
+Unequal outer resubmission counts remain reportable observations, but this v1
+contract conservatively refuses their savings claim. Extra baseline attempts
+must not manufacture a saving. Failed attempts remain retained and also prevent
+accepted efficiency. All coordinator,
 preparation, review and other roles in the actual task boundary must be declared;
 excluded roles or attempts make coverage partial; any unknown usage prevents
 this claim even when the attempt inventory is complete.

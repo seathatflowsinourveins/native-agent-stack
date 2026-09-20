@@ -140,6 +140,10 @@ def consistency(record, validator):
         if (run is None or not accepted(run) or run["condition"] != "candidate"
                 or run["scope"] != decision["scope"] or run["evidence_class"] not in EXECUTION):
             error("qualification_run_ids: successful candidate execution in exact scope required")
+        elif any(other["condition"] == "candidate" and other["task"] == run["task"]
+                 and other["role"] == run["role"] and other["scope"] == run["scope"]
+                 and other["attempt"] > run["attempt"] for other in runs):
+            error("qualification_run_ids: latest candidate attempt in task/role/scope required")
     expected = assessment["expected_run_ids"]
     if not set(expected) <= by_id.keys():
         error("usage_assessment: expected run IDs include absent observations")
@@ -165,6 +169,9 @@ def consistency(record, validator):
             error("savings claim: complete matched task/role/condition coverage required")
         if any(sorted(values) != list(range(1, len(values) + 1)) for values in attempts.values()):
             error("savings claim: consecutive attempt coverage required")
+        if any(len(attempts.get((task, role, "baseline"), [])) != len(attempts.get((task, role, "candidate"), []))
+               for task in record["frozen_inputs"]["tasks"] for role in record["frozen_inputs"]["roles"]):
+            error("savings claim: equal passing attempt counts required per task and role")
         if not runs or not known or not all(accepted(run) for run in runs):
             error("savings claim: every attempt needs passing quality and complete known usage")
         elif any(run["evidence_class"] not in EXECUTION or run["scope"] != decision["scope"] for run in runs):

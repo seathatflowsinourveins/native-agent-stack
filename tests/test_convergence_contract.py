@@ -156,6 +156,29 @@ class ConvergenceContractTests(unittest.TestCase):
                 self.record["observations"][0] = original | change
                 self.assert_invalid("successful candidate execution in exact scope required")
 
+    def test_later_failed_or_skipped_candidate_invalidates_earlier_qualification(self):
+        self.observed()
+        self.record["decision_and_scope"].update(decision="adopt_within_scope", qualification_run_ids=["candidate-1"])
+        later = self.run_record("candidate-2")
+        later.update(attempt=2, status="failed", exit_code=1, quality={"semantic": False, "contract": False})
+        self.record["observations"].append(later)
+        self.record["failures_and_skips"] = [{"run_id": "candidate-2", "reason": "Later attempt failed."}]
+        self.assert_invalid("latest candidate attempt in task/role/scope required")
+        later.update(status="skipped", exit_code=None, quality={"semantic": None, "contract": None})
+        self.record["failures_and_skips"][0]["reason"] = "Later attempt skipped."
+        self.assert_invalid("latest candidate attempt in task/role/scope required")
+
+    def test_later_success_can_qualify_with_earlier_failure_retained(self):
+        self.observed()
+        earlier = self.record["observations"][0]
+        earlier.update(status="failed", exit_code=1, quality={"semantic": False, "contract": False})
+        later = self.run_record("candidate-2")
+        later["attempt"] = 2
+        self.record["observations"].append(later)
+        self.record["failures_and_skips"] = [{"run_id": "candidate-1", "reason": "Earlier attempt failed."}]
+        self.record["decision_and_scope"].update(decision="adopt_within_scope", qualification_run_ids=["candidate-2"])
+        self.assertTrue(self.result()["valid"])
+
     def test_failed_and_skipped_runs_are_preserved_exactly_once(self):
         self.observed()
         run = self.record["observations"][0]
@@ -261,6 +284,28 @@ class ConvergenceContractTests(unittest.TestCase):
         self.savings()
         self.record["observations"][1]["usage"] = copy.deepcopy(self.record["observations"][0]["usage"])
         self.assert_invalid("candidate total must be lower")
+
+    def test_extra_passing_baseline_attempt_cannot_manufacture_savings(self):
+        self.savings()
+        baseline = copy.deepcopy(self.record["observations"][0])
+        baseline.update(id="baseline-2", attempt=2)
+        self.record["observations"].append(baseline)
+        # Each baseline costs85; the sole candidate costs105. Summing the two
+        # baseline attempts would incorrectly make the worse candidate look cheaper.
+        self.record["observations"][1]["usage"].update(uncached_input=70, total=105)
+        self.coverage()
+        self.assert_invalid("equal passing attempt counts required per task and role")
+
+    def test_matching_passing_attempt_counts_use_known_aggregate_sums(self):
+        self.savings()
+        second = copy.deepcopy(self.record["observations"])
+        for run in second:
+            run.update(id=f'{run["condition"]}-2', attempt=2)
+        self.record["observations"].extend(second)
+        self.coverage()
+        self.assertEqual(sum(run["usage"]["total"] for run in self.record["observations"] if run["condition"] == "baseline"), 170)
+        self.assertEqual(sum(run["usage"]["total"] for run in self.record["observations"] if run["condition"] == "candidate"), 90)
+        self.assertTrue(self.result()["valid"])
 
     def test_cli_json_and_exit_status(self):
         self.result()
