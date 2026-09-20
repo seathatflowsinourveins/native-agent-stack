@@ -1,6 +1,6 @@
 # Owned guest user-service reboot acceptance
 
-This is a **protocol and executable trial**, with no native reboot receipt yet.
+This is a **protocol and executable trial**, with no accepted native reboot receipt yet.
 The [first hosted attempt](prior-attempts.json) passed the unchanged upstream
 Dagu tests but failed before guest boot because QEMU8.2.2 rejected `serial` on
 the qcow2 backend. Its original freeze, launcher, error, cleanup and plan remain
@@ -8,6 +8,15 @@ retained in [attempt-1](attempt-1/). The launcher correction places the serial
 on an explicit `virtio-blk-pci` device connected to the same named disk backend;
 mandatory native device-help validation runs before the next guest launch.
 Local regression tests do not establish that the guest can reboot or recover.
+The [second hosted attempt](attempt-2/publication.json) performed a real reboot
+and automatically completed the native Dagu retry, but the observer's serial
+write failed with `EIO`. The required live postboot observation and final host
+audit were missing, so that attempt remains failed. Its journal places the
+observer before serial-getty on the second boot; systemd's getty can hang up
+other users of the same terminal. The correction assigns the observer a dedicated
+`ttyS1` serial port and retains the `ttyS0` boot console separately. It does not
+change the workload, acceptance criteria or deadline. Retrospective diagnostic
+success cannot substitute for the required pre-login observation.
 The manual-only `Native owned guest service reboot` workflow is the execution
 entry point; the coordinator dispatches it after reviewing the frozen patch.
 Its first job runs unchanged upstream Dagu native retry tests from the pinned
@@ -42,7 +51,8 @@ checks the changed boot ID, persistent guest identity and frozen source hashes,
 then invokes Dagu's selected-step retry with the original native run ID. It
 requires native success, unchanged checkpoint/claim bytes, all original 12
 tests passing again, and exactly one exclusive local `completed.json` effect.
-The observer reports completion and active user-manager/linger state on serial.
+The observer reports completion and active user-manager/linger state on the
+dedicated `ttyS1` serial channel; `boot-serial.log` retains the `ttyS0` console.
 **No post-reboot SSH probe or login occurs until that observation.** SSH then
 collects the original before/after native histories, task logs and journal.
 The guest explicitly enables persistent journaling before workload startup and
@@ -59,7 +69,12 @@ Failure is terminal for that attempt. A failed-only, bounded diagnostic SSH path
 may collect available task logs after writing `failure.json`; it can never turn
 that attempt into a pass. Failed SSH output and timeouts are preserved. Cleanup
 retires only the owned QEMU process and removes its staged disks and private key.
-The workflow retains reports on both success and failure. Its 30-minute bound
+The workflow retains reports on both success and failure. Both archive paths
+exclude Dagu's generated authentication directory; native histories and task
+artifacts remain included. The second attempt's original diagnostic archive is
+kept private because it included a generated fixture key; the public projection
+records the original artifact identity, hashes, explicit selection and substitutions.
+Its 30-minute bound
 includes installation and the driver's 1,200-second deadline; failure diagnostics
 and cleanup have an additional bound of 80 seconds.
 

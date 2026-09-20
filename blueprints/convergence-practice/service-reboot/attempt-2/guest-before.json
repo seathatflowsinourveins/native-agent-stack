@@ -1,0 +1,11 @@
+{
+  "boot_id": "synthetic-id-758baf1bfb15051f",
+  "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+  "claim_sha256": "b2845c6042555a2d116bbea41631666e3eed78a03a8b94615d1fe00c5f70a837",
+  "disk_token": "9dd8be9a1cdedac44958e1ceef223fe6f95f265a06a51a482a0b9ff249cc9ef1",
+  "effect_count": 0,
+  "filesystem_uuid": "synthetic-id-b1cde6acdb113a29",
+  "machine_id_sha256": "bfa9d1f31f4fc6174886aacc46325c3840d507d32d31faaec675c2eecc5283a7",
+  "native_status": "running",
+  "run_id": "native-service-reboot-fixture"
+}

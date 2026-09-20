@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "qemu-system-x86_64",
+    "-machine",
+    "accel=tcg",
+    "-m",
+    "2048",
+    "-smp",
+    "2",
+    "-display",
+    "none",
+    "-monitor",
+    "none",
+    "-serial",
+    "file:$RUNNER_HOME/work/_temp/native-service-reboot/reports/serial.log",
+    "-drive",
+    "file=$RUNNER_HOME/work/_temp/native-service-reboot/private/persistent.qcow2,format=qcow2,if=none,id=service-reboot-disk",
+    "-device",
+    "virtio-blk-pci,drive=service-reboot-disk,serial=native-reboot-disk",
+    "-drive",
+    "file=$RUNNER_HOME/work/_temp/native-service-reboot/private/seed.iso,format=raw,media=cdrom,readonly=on",
+    "-drive",
+    "file=$RUNNER_HOME/work/_temp/native-service-reboot/private/payload.iso,format=raw,media=cdrom,readonly=on",
+    "-netdev",
+    "user,id=net0,restrict=on,hostfwd=tcp:127.0.0.1:47293-:22",
+    "-device",
+    "virtio-net-pci,netdev=net0",
+    "-no-shutdown"
+  ],
+  "ended_utc": "2026-09-20T21:48:19.484065+00:00",
+  "exit_code": 0,
+  "started_utc": "2026-09-20T21:28:17.218064+00:00"
+}
