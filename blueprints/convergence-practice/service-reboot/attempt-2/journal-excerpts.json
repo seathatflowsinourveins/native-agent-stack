@@ -1,0 +1,655 @@
+{
+  "source": "failed-guest-journal.stdout",
+  "raw_sha256": "23c6b2a665b981b61fe926bd4525bcf83eaa2cce3094bfd67a4c43e147a7bc64",
+  "raw_bytes": 251580,
+  "selection": "Every matching line; original line positions retained.",
+  "patterns": [
+    "native-reboot-observer.service",
+    "observer.py",
+    "Input/output error",
+    "code=exited, status=120",
+    "serial-getty@ttyS0.service",
+    "user@1001.service",
+    "native-reboot.service",
+    "native-reboot.timer",
+    "Accepted publickey"
+  ],
+  "lines": [
+    {
+      "line": 904,
+      "text": "[   85.822293] owned-reboot systemd[1]: Started serial-getty@ttyS0.service - Serial Getty on ttyS0."
+    },
+    {
+      "line": 1004,
+      "text": "[  140.684785] owned-reboot cloud-init[1024]: Created symlink /etc/systemd/system/multi-user.target.wants/native-reboot-observer.service \u2192 /etc/systemd/system/native-reboot-observer.service."
+    },
+    {
+      "line": 1008,
+      "text": "[  144.511778] owned-reboot systemd[1]: Starting native-reboot-observer.service - Read-only serial observer; never starts or retries the workload..."
+    },
+    {
+      "line": 1012,
+      "text": "[  145.184365] owned-reboot systemd[1]: Starting user@1001.service - User Manager for UID 1001..."
+    },
+    {
+      "line": 1027,
+      "text": "[  147.664951] owned-reboot systemd[1134]: Started native-reboot.timer - Owned user-manager boot and retry timer."
+    },
+    {
+      "line": 1044,
+      "text": "[  148.120244] owned-reboot systemd[1]: Started user@1001.service - User Manager for UID 1001."
+    },
+    {
+      "line": 1045,
+      "text": "[  148.142706] owned-reboot systemd[1134]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 1050,
+      "text": "[  159.303464] owned-reboot sshd[1197]: Accepted publickey for example from 10.0.2.2 port 50768 ssh2: ED25519 SHA256:aIW9siVfbWWb3CRQLum8N8nCYdHk/JtdALe50ubMsr0"
+    },
+    {
+      "line": 1128,
+      "text": "[  164.813722] owned-reboot systemd[1]: Stopping serial-getty@ttyS0.service - Serial Getty on ttyS0..."
+    },
+    {
+      "line": 1145,
+      "text": "[  165.020674] owned-reboot systemd[1]: serial-getty@ttyS0.service: Deactivated successfully."
+    },
+    {
+      "line": 1146,
+      "text": "[  165.036503] owned-reboot systemd[1]: Stopped serial-getty@ttyS0.service - Serial Getty on ttyS0."
+    },
+    {
+      "line": 1149,
+      "text": "[  165.049863] owned-reboot systemd[1]: native-reboot-observer.service: Main process exited, code=killed, status=15/TERM"
+    },
+    {
+      "line": 1150,
+      "text": "[  165.068746] owned-reboot systemd[1]: native-reboot-observer.service: Failed with result 'signal'."
+    },
+    {
+      "line": 1151,
+      "text": "[  165.090188] owned-reboot systemd[1]: Stopped native-reboot-observer.service - Read-only serial observer; never starts or retries the workload."
+    },
+    {
+      "line": 1166,
+      "text": "[  165.277449] owned-reboot systemd[1]: Stopping user@1001.service - User Manager for UID 1001..."
+    },
+    {
+      "line": 1176,
+      "text": "[  165.336463] owned-reboot systemd[1134]: native-reboot.service: Main process exited, code=killed, status=15/TERM"
+    },
+    {
+      "line": 1184,
+      "text": "[  165.763676] owned-reboot systemd[1134]: native-reboot.service: Failed with result 'signal'."
+    },
+    {
+      "line": 1185,
+      "text": "[  165.787294] owned-reboot systemd[1134]: Stopped native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 1186,
+      "text": "[  165.788289] owned-reboot systemd[1134]: native-reboot.service: Consumed 10.671s CPU time."
+    },
+    {
+      "line": 1193,
+      "text": "[  165.841302] owned-reboot systemd[1134]: Stopped native-reboot.timer - Owned user-manager boot and retry timer."
+    },
+    {
+      "line": 1214,
+      "text": "[  166.606266] owned-reboot systemd[1]: user@1001.service: Deactivated successfully."
+    },
+    {
+      "line": 1215,
+      "text": "[  166.614235] owned-reboot systemd[1]: Stopped user@1001.service - User Manager for UID 1001."
+    },
+    {
+      "line": 1216,
+      "text": "[  166.619205] owned-reboot systemd[1]: user@1001.service: Consumed 14.353s CPU time, 168.2M memory peak, 0B memory swap peak."
+    },
+    {
+      "line": 2143,
+      "text": "[   59.023621] owned-reboot systemd[1]: Starting native-reboot-observer.service - Read-only serial observer; never starts or retries the workload..."
+    },
+    {
+      "line": 2184,
+      "text": "[   67.168948] owned-reboot systemd[1]: Started serial-getty@ttyS0.service - Serial Getty on ttyS0."
+    },
+    {
+      "line": 2207,
+      "text": "[   70.088645] owned-reboot systemd[1]: Starting user@1001.service - User Manager for UID 1001..."
+    },
+    {
+      "line": 2223,
+      "text": "[   73.607341] owned-reboot systemd[799]: Started native-reboot.timer - Owned user-manager boot and retry timer."
+    },
+    {
+      "line": 2241,
+      "text": "[   73.981245] owned-reboot systemd[1]: Started user@1001.service - User Manager for UID 1001."
+    },
+    {
+      "line": 2242,
+      "text": "[   74.007291] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2272,
+      "text": "[   85.651239] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2274,
+      "text": "[   85.661560] owned-reboot systemd[799]: native-reboot.service: Consumed 10.295s CPU time."
+    },
+    {
+      "line": 2276,
+      "text": "[   88.057254] owned-reboot python3[672]:   File \"/opt/service-reboot/observer.py\", line 40, in <module>"
+    },
+    {
+      "line": 2278,
+      "text": "[   88.061859] owned-reboot python3[672]:   File \"/opt/service-reboot/observer.py\", line 31, in observe"
+    },
+    {
+      "line": 2280,
+      "text": "[   88.064858] owned-reboot python3[672]: OSError: [Errno 5] Input/output error"
+    },
+    {
+      "line": 2289,
+      "text": "[   88.077018] owned-reboot python3[672]: OSError: [Errno 30] Read-only file system: '/var/crash/_opt_service-reboot_observer.py.0.crash'"
+    },
+    {
+      "line": 2292,
+      "text": "[   88.077018] owned-reboot python3[672]:   File \"/opt/service-reboot/observer.py\", line 40, in <module>"
+    },
+    {
+      "line": 2294,
+      "text": "[   88.077018] owned-reboot python3[672]:   File \"/opt/service-reboot/observer.py\", line 31, in observe"
+    },
+    {
+      "line": 2296,
+      "text": "[   88.084400] owned-reboot python3[672]: OSError: [Errno 5] Input/output error"
+    },
+    {
+      "line": 2298,
+      "text": "[   88.084400] owned-reboot python3[672]: OSError: [Errno 5] Input/output error"
+    },
+    {
+      "line": 2299,
+      "text": "[   88.203388] owned-reboot systemd[1]: native-reboot-observer.service: Main process exited, code=exited, status=120/n/a"
+    },
+    {
+      "line": 2300,
+      "text": "[   88.207456] owned-reboot systemd[1]: native-reboot-observer.service: Failed with result 'exit-code'."
+    },
+    {
+      "line": 2301,
+      "text": "[   88.210877] owned-reboot systemd[1]: Failed to start native-reboot-observer.service - Read-only serial observer; never starts or retries the workload."
+    },
+    {
+      "line": 2302,
+      "text": "[   88.216191] owned-reboot systemd[1]: native-reboot-observer.service: Consumed 3.282s CPU time."
+    },
+    {
+      "line": 2314,
+      "text": "[  101.031392] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2315,
+      "text": "[  101.713817] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2317,
+      "text": "[  117.009378] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2322,
+      "text": "[  117.717763] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2332,
+      "text": "[  133.008883] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2333,
+      "text": "[  133.680595] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2334,
+      "text": "[  149.006893] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2335,
+      "text": "[  149.661432] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2336,
+      "text": "[  165.009364] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2337,
+      "text": "[  165.679583] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2338,
+      "text": "[  181.006828] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2339,
+      "text": "[  181.681278] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2340,
+      "text": "[  197.010449] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2341,
+      "text": "[  197.662419] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2345,
+      "text": "[  213.008224] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2346,
+      "text": "[  213.656338] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2347,
+      "text": "[  229.006836] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2348,
+      "text": "[  229.701480] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2349,
+      "text": "[  245.006961] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2350,
+      "text": "[  245.652767] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2351,
+      "text": "[  261.006845] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2352,
+      "text": "[  261.686985] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2353,
+      "text": "[  277.008919] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2354,
+      "text": "[  277.678505] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2355,
+      "text": "[  293.007833] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2356,
+      "text": "[  293.685361] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2357,
+      "text": "[  309.009847] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2358,
+      "text": "[  309.684947] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2359,
+      "text": "[  325.004831] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2361,
+      "text": "[  325.724443] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2365,
+      "text": "[  341.007350] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2366,
+      "text": "[  341.703800] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2367,
+      "text": "[  357.008880] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2368,
+      "text": "[  357.672516] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2370,
+      "text": "[  373.015245] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2371,
+      "text": "[  373.687717] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2372,
+      "text": "[  389.010614] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2373,
+      "text": "[  389.668939] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2374,
+      "text": "[  405.006855] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2375,
+      "text": "[  405.687822] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2376,
+      "text": "[  421.009409] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2377,
+      "text": "[  421.668424] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2378,
+      "text": "[  437.009413] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2379,
+      "text": "[  437.680342] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2380,
+      "text": "[  453.006879] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2381,
+      "text": "[  453.676451] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2382,
+      "text": "[  469.008842] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2383,
+      "text": "[  469.664739] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2384,
+      "text": "[  485.007400] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2385,
+      "text": "[  485.706623] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2386,
+      "text": "[  501.008388] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2390,
+      "text": "[  501.687740] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2391,
+      "text": "[  517.006252] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2392,
+      "text": "[  517.681508] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2393,
+      "text": "[  533.006907] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2394,
+      "text": "[  533.699282] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2395,
+      "text": "[  549.006273] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2396,
+      "text": "[  549.687787] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2397,
+      "text": "[  565.009729] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2398,
+      "text": "[  565.678347] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2399,
+      "text": "[  581.006863] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2400,
+      "text": "[  581.666436] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2401,
+      "text": "[  597.009342] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2402,
+      "text": "[  597.680450] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2403,
+      "text": "[  613.006883] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2404,
+      "text": "[  613.708893] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2405,
+      "text": "[  629.005783] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2406,
+      "text": "[  629.703808] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2407,
+      "text": "[  645.007949] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2408,
+      "text": "[  645.674422] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2409,
+      "text": "[  661.006643] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2410,
+      "text": "[  661.669434] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2411,
+      "text": "[  677.006282] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2412,
+      "text": "[  677.684640] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2413,
+      "text": "[  693.010369] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2414,
+      "text": "[  693.699224] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2415,
+      "text": "[  709.008280] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2416,
+      "text": "[  709.694338] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2417,
+      "text": "[  725.006859] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2418,
+      "text": "[  725.671594] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2419,
+      "text": "[  741.006952] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2420,
+      "text": "[  741.684257] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2421,
+      "text": "[  757.006881] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2422,
+      "text": "[  757.655821] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2423,
+      "text": "[  773.010251] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2424,
+      "text": "[  773.653838] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2425,
+      "text": "[  789.006246] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2426,
+      "text": "[  789.672031] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2430,
+      "text": "[  805.006424] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2431,
+      "text": "[  805.644921] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2432,
+      "text": "[  821.007556] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2433,
+      "text": "[  821.680488] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2434,
+      "text": "[  837.009908] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2435,
+      "text": "[  837.691648] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2436,
+      "text": "[  853.006874] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2437,
+      "text": "[  853.655289] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2438,
+      "text": "[  869.008398] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2439,
+      "text": "[  869.677985] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2440,
+      "text": "[  885.010379] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2441,
+      "text": "[  885.655737] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2445,
+      "text": "[  901.006293] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2446,
+      "text": "[  901.652287] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2447,
+      "text": "[  917.007857] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2448,
+      "text": "[  917.694669] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2449,
+      "text": "[  933.008734] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2450,
+      "text": "[  933.659820] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2451,
+      "text": "[  949.006903] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2452,
+      "text": "[  949.671754] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2453,
+      "text": "[  965.008192] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2454,
+      "text": "[  965.702710] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2455,
+      "text": "[  981.006891] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2456,
+      "text": "[  981.667563] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2461,
+      "text": "[  988.275442] owned-reboot sshd[1083]: Accepted publickey for example from 10.0.2.2 port 39310 ssh2: ED25519 SHA256:aIW9siVfbWWb3CRQLum8N8nCYdHk/JtdALe50ubMsr0"
+    },
+    {
+      "line": 2475,
+      "text": "[  996.778424] owned-reboot sshd[1188]: Accepted publickey for example from 10.0.2.2 port 49406 ssh2: ED25519 SHA256:aIW9siVfbWWb3CRQLum8N8nCYdHk/JtdALe50ubMsr0"
+    },
+    {
+      "line": 2479,
+      "text": "[  997.067603] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2480,
+      "text": "[  997.878676] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    }
+  ]
+}

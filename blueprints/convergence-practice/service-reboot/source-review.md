@@ -88,5 +88,36 @@ The named qcow2 backend is connected by `drive=service-reboot-disk` to an explic
 `virtio-blk-pci` device, which carries `serial=native-reboot-disk`.
 Native `qemu-system-x86_64 -device virtio-blk-pci,help` must expose both `drive`
 and `serial` before launching the guest. This help command does not boot a guest.
+
+## Observed serial failure and dedicated observation port
+
+Run `35538569253` passed the native retry after reboot, but the required observer
+write failed with `EIO`. The original journal places the observer at second-boot
+59.024 seconds, serial-getty at 67.169 seconds and the failed write at 88.065
+seconds. On the first boot the getty started before the observer and its write
+succeeded. This ordering supports a terminal-hangup explanation; no syscall
+trace was collected, so the exact hangup syscall is not independently proven.
+
+The correction composes documented interfaces:
+
+- [QEMU v8.2.2 serial options](https://github.com/qemu/qemu/blob/v8.2.2/qemu-options.hx#L4111)
+  support repeated `-serial` arguments and file output. The first remains the
+  boot console; the second receives only observer records.
+- [systemd v255 execution settings](https://github.com/systemd/systemd/blob/v255/man/systemd.exec.xml#L3277)
+  define `TTYPath` for terminal output. The observer now selects `/dev/ttyS1`.
+- [systemd v255 serial-getty](https://github.com/systemd/systemd/blob/v255/units/serial-getty@.service.in#L40)
+  uses `TTYVHangup=yes` on its own terminal. Sharing its `ttyS0` descriptor was
+  unnecessary for observing application recovery.
+
+Reviewed source SHA-256 values respectively:
+`a5f306558007e5889536f582dc14c95b5c5550bd865b301af2657c1c9d761462`,
+`a0cba490c60152ca042beeab42183c2f63e209113be18afee89c6e5cdf50478c`,
+`1f4dbb3fffd7ddea89dea86d0cad34bf0717b61b176b9aa00c054428d21772e2`.
+
+The parser, read-only observer, no-postboot-login requirement, workload, original
+oracle and deadline remain unchanged. A new native run is required for acceptance.
+The archive exclusion uses GNU tar's native `--exclude` behavior; its local
+regression runs the real archive command against synthetic authentication,
+history and checkpoint files. That check qualifies artifact selection only.
 The local argument regression is supplementary synthetic integration coverage;
 actual boot/reboot/recovery remains the unchanged native acceptance requirement.

@@ -1,0 +1,35 @@
+{
+  "checked_at": "2026-09-20",
+  "failed_run": 35538569253,
+  "evidence_class": "local-integration-correction-with-upstream-interface-references",
+  "status": "reviewed-correction-native-execution-pending",
+  "cause": "The second-boot observer opened ttyS0 before serial-getty; its later serial write failed with EIO. The retained ordering and upstream TTYVHangup setting support a terminal-hangup explanation; no syscall trace was collected.",
+  "changes": [
+    "Retain ttyS0 boot console and use the second QEMU serial device ttyS1 exclusively for observer output.",
+    "Exclude the generated native Dagu authentication directory from both guest archive collection paths."
+  ],
+  "unchanged": [
+    "Read-only observer record creation and parser",
+    "Live completion observation before any postboot SSH",
+    "Source pins, native workload, retry command and original 12-test oracle",
+    "Guest disk identity, original run ID, checkpoint and exclusive effect requirements",
+    "1,200-second trial deadline and owned cleanup"
+  ],
+  "checks": [
+    {
+      "command": "python3 -m unittest discover -s tests -p test_service_reboot.py",
+      "exit_code": 0,
+      "result": "23 tests: 22 passed, 1 skipped because local QEMU is unavailable",
+      "scope": "Authored synthetic integration regressions, including actual GNU tar exclusion behavior; no native guest acceptance."
+    },
+    {
+      "command": "systemd-analyze --man=no verify blueprints/convergence-practice/service-reboot/native-reboot.service blueprints/convergence-practice/service-reboot/native-reboot.timer blueprints/convergence-practice/service-reboot/native-reboot-observer.service",
+      "exit_code": 0,
+      "result": "Native unit verifier accepted the changed settings; no units installed or started."
+    }
+  ],
+  "independent_review": "No actionable findings in serial-channel separation, preserved acceptance or shared native archive exclusion. Original failed artifact independently retrieved and matched before any projection.",
+  "failure_retention": "attempt-2/publication.json",
+  "upstream_sources": "source-review.md#observed-serial-failure-and-dedicated-observation-port",
+  "token_savings_claim": false
+}

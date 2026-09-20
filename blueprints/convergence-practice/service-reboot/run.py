@@ -19,13 +19,19 @@ import urllib.request
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 MARKER = 'NATIVE_REBOOT_OBSERVER '
+GUEST_ARCHIVE = ('sudo /usr/bin/tar --exclude=./dagu-home/data/auth '
+                 '-C /var/lib/service-reboot -czf - .')
 
 
 def qemu_arguments(disk, private, serial, port):
     # QEMU8.2.2's virtio-blk device owns `serial`; the qcow2 backend does not.
     # Keep a separately named backend, matching upstream virtio-blk qtests.
     return ['qemu-system-x86_64', '-machine', 'accel=tcg', '-m', '2048', '-smp', '2',
-            '-display', 'none', '-monitor', 'none', '-serial', 'file:' + str(serial),
+            '-display', 'none', '-monitor', 'none',
+            # ttyS0 remains the boot console. Its getty may hang up open clients;
+            # the observer writes to the separate ttyS1 channel instead.
+            '-serial', 'file:' + str(serial.with_name('boot-serial.log')),
+            '-serial', 'file:' + str(serial),
             '-drive', 'file=' + str(disk) + ',format=qcow2,if=none,id=service-reboot-disk',
             '-device', 'virtio-blk-pci,drive=service-reboot-disk,serial=native-reboot-disk',
             '-drive', 'file=' + str(private / 'seed.iso') + ',format=raw,media=cdrom,readonly=on',
@@ -285,7 +291,7 @@ def run(work):
         # Deliberately no SSH reachability probes, logins, retries or commands here.
         wait_observation('after')
         events['postboot_ssh_started'] = time.monotonic()
-        collected = command('guest-archive', ssh + ['sudo /usr/bin/tar -C /var/lib/service-reboot -czf - .'], timeout=90)
+        collected = command('guest-archive', ssh + [GUEST_ARCHIVE], timeout=90)
         (reports / 'guest.tar.gz').write_bytes(collected.stdout)
         (reports / 'guest-archive.stdout').unlink()  # Binary retained under its named archive.
         command('guest-journal', ssh + ['sudo /usr/bin/journalctl --no-pager -o short-monotonic'], timeout=60)
@@ -312,7 +318,7 @@ def run(work):
         # These commands only collect evidence and can never produce acceptance.
         if qemu is not None and qemu.poll() is None and ssh is not None:
             for label, remote in (
-                ('failed-guest-archive', 'sudo /usr/bin/tar -C /var/lib/service-reboot -czf - .'),
+                ('failed-guest-archive', GUEST_ARCHIVE),
                 ('failed-guest-journal', 'sudo /usr/bin/journalctl --no-pager -o short-monotonic'),
             ):
                 metadata = {'argv': ssh + [remote], 'started_utc': datetime.now(timezone.utc).isoformat(),

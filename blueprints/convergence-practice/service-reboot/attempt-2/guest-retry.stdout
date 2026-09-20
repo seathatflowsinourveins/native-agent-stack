@@ -1,0 +1,15 @@
+Succeeded - 2026-09-20T21:33:01Z
+
+dag: reboot (2.0s)
+├─log: /var/lib/service-reboot/dagu-home/logs/reboot/dag-run_20260920_213057Z_native-service-reboot-fixture/dag-run_20260920.213057.851.native-s.log
+│
+├─checkpoint (1.0s) [succeeded]
+│ └─/usr/bin/python3 -B /opt/service-reboot/fixture.py checkpoint
+│     /var/lib/service-reboot
+│ 
+└─finalize (2.0s) [succeeded]
+  └─/usr/bin/python3 -B /opt/service-reboot/fixture.py finalize
+      /var/lib/service-reboot
+
+Result: Succeeded
+

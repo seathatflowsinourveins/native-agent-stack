@@ -53,6 +53,23 @@
       "recovery": "Move serial to the native virtio-blk-pci device while preserving the same qcow2 disk and disk identifier. No Dagu, guest, oracle, timer, isolation or acceptance change.",
       "fixture_origin_commit": "e22839253a19b3bfd5dabba39ac7f9a8d3695bb0",
       "workflow_head_commit": "3745f0ad5519a34c5ca095bd4389485943ab5a1c"
+    },
+    {
+      "workflow_run_id": 35538569253,
+      "workflow_head_commit": "473b5838c78d3e370af0867344bbe578ec4072d4",
+      "status": "failed-required-live-observation-missing",
+      "failure": "Post-reboot observer serial write raised EIO; the host deadline expired without the required after observation.",
+      "upstream_retry_tests": "passed in the separate prerequisite job; guest failure is independent",
+      "retrospective_native_observation": "Same-run native Dagu retry and both original 12-test oracle phases succeeded after a real guest reboot, before diagnostic login; this cannot substitute for the missing live serial observation or unfinished host identity audit.",
+      "retained_artifacts": "attempt-2/publication.json",
+      "independent_original_artifact_zip_sha256": "01a1f3ae9dca584008cd39be5f1bbd802978f58a680e46099cd8b8f4ca7beafd",
+      "cleanup": {
+        "errors": [],
+        "owned_disks_removed": true,
+        "owned_qemu_retired": true,
+        "private_key_removed": true
+      },
+      "recovery": "Use a dedicated second serial port for the observer, retaining the ttyS0 console separately. Exclude generated native authentication state from both diagnostic collection paths. Acceptance and timing deadline are unchanged."
     }
   ]
 }

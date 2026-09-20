@@ -230,8 +230,8 @@
       "id": "offhost-keys-and-service-reboot",
       "priority": 3,
       "status": "partial",
-      "scope": "Synthetic independent-host Restic recovery passed with separately supplied fixture credentials. Actual application-state queries and scheduled-service continuity after reboot remain unqualified; the first guest launch failed before boot and is retained.",
-      "next_action": "Run the reviewed correction for the owned guest launcher, then qualify real application-state off-host queries at the selected adoption boundary.",
+      "scope": "Synthetic independent-host Restic recovery passed with separately supplied fixture credentials. The second guest attempt automatically completed the native workload after reboot, but its required live serial observation failed; full scheduled-service acceptance and off-host application queries remain unqualified. Both failed attempts are retained.",
+      "next_action": "Qualify the reviewed dedicated-serial observer correction, then native memory and Qdrant off-host queries at the selected adoption boundary.",
       "source_paths": [
         "adoption/lifecycle.md",
         "blueprints/convergence-practice/wsl-restore/README.md",

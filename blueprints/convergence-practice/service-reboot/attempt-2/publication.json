@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "workflow_run_id": 35538569253,
+  "workflow_head": "473b5838c78d3e370af0867344bbe578ec4072d4",
+  "artifact_id": 10614152576,
+  "original_artifact_zip_sha256": "01a1f3ae9dca584008cd39be5f1bbd802978f58a680e46099cd8b8f4ca7beafd",
+  "status": "failed-required-live-observation-missing",
+  "original_diagnostic_tar_sha256": "e4a1dab4b942fc71924abdb9758698ee243ea1fcca8a8606366212411b8e29a9",
+  "original_diagnostic_tar_published": false,
+  "excluded_member": "./dagu-home/data/auth/encryption_key",
+  "excluded_member_reason": "Generated isolated native fixture credential; value was not inspected. Future archives exclude the entire native auth directory.",
+  "projection_rules": [
+    "Replace owned runner and synthetic guest home prefixes.",
+    "Replace synthetic UUID values with stable SHA-256-derived display identities.",
+    "Select explicit credential-free diagnostic members and journal lines; preserve original hashes and line positions.",
+    "Normalize CRLF to LF in the public SSH stderr projection."
+  ],
+  "files": {
+    "failure.json": {
+      "raw_sha256": "abef2c46976afac2ef8cf939ce248462effaa0462c802e7a655d7e8127037b50",
+      "public_sha256": "abef2c46976afac2ef8cf939ce248462effaa0462c802e7a655d7e8127037b50",
+      "raw_bytes": 213,
+      "public_bytes": 213,
+      "changed": false
+    },
+    "cleanup.json": {
+      "raw_sha256": "6aadee9cb7005d261df5f0337cc289190378cb5f3d2f49a264428452acd17b75",
+      "public_sha256": "6aadee9cb7005d261df5f0337cc289190378cb5f3d2f49a264428452acd17b75",
+      "raw_bytes": 111,
+      "public_bytes": 111,
+      "changed": false
+    },
+    "freeze.json": {
+      "raw_sha256": "59957fe97e8cd0dab4aba37ef525a824b0c592cc7c1ebbb92c012890aa06d85c",
+      "public_sha256": "59957fe97e8cd0dab4aba37ef525a824b0c592cc7c1ebbb92c012890aa06d85c",
+      "raw_bytes": 4501,
+      "public_bytes": 4501,
+      "changed": false
+    },
+    "qemu.command.json": {
+      "raw_sha256": "7bf5451832622d08f036fef4ab455ec75eceb9e1a5b9f04b145e077697c1a2c4",
+      "public_sha256": "e05360034b574fd101f8aeeebeb67847eb807f4bc0a1e4dce907786411862a46",
+      "raw_bytes": 1020,
+      "public_bytes": 1020,
+      "changed": true
+    },
+    "qemu-version.stdout": {
+      "raw_sha256": "8f79ffd97970d85d6833a0ccc87f5d6e7182f8f52101c741dfa2fb6374670b18",
+      "public_sha256": "8f79ffd97970d85d6833a0ccc87f5d6e7182f8f52101c741dfa2fb6374670b18",
+      "raw_bytes": 132,
+      "public_bytes": 132,
+      "changed": false
+    },
+    "guest-reboot.command.json": {
+      "raw_sha256": "756aaa56e83676fa1a859b1259abf63d87313bf34fe9963518e29f8b97efd129",
+      "public_sha256": "0feae9daa84e778eeabebc5a079a50d65922ac9c3840b70fd3f7321580a8a8d5",
+      "raw_bytes": 664,
+      "public_bytes": 664,
+      "changed": true
+    },
+    "guest-reboot.exit": {
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "public_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "raw_bytes": 2,
+      "public_bytes": 2,
+      "changed": false
+    },
+    "guest-reboot.stderr": {
+      "raw_sha256": "8633f0adfc21280b84c77dd87cf6e1ee2cacdafcceff3f595a0b2510081d9664",
+      "public_sha256": "3918242f46234201fcfa14926336234fc4c93ca7fda523b3295b2e575dccb6af",
+      "raw_bytes": 86,
+      "public_bytes": 85,
+      "changed": true
+    },
+    "qemu-block-device-help.stdout": {
+      "raw_sha256": "e61701bf289d8fc9755dad2bdfaa2317b9a86f5e6cf0a3cb18674d370f3c380e",
+      "public_sha256": "e61701bf289d8fc9755dad2bdfaa2317b9a86f5e6cf0a3cb18674d370f3c380e",
+      "raw_bytes": 3823,
+      "public_bytes": 3823,
+      "changed": false
+    },
+    "plan.json": {
+      "raw_sha256": "f535beb53ef4046a02b39cd85a146d9f3136ad2e9b2e1b57390352133f2871f3",
+      "public_sha256": "f535beb53ef4046a02b39cd85a146d9f3136ad2e9b2e1b57390352133f2871f3",
+      "raw_bytes": 4467,
+      "public_bytes": 4467,
+      "changed": false
+    },
+    "guest-before.json": {
+      "raw_sha256": "0f74b13406f016d0acd6d251be05badec0111107fd8cbd605317f4c2e8851b5a",
+      "public_sha256": "2f9eaae80a94f93b8728ae73845bffc608b8025d4712b75ee8cb6e10aa22b696",
+      "raw_bytes": 565,
+      "public_bytes": 551,
+      "changed": true
+    },
+    "guest-after.json": {
+      "raw_sha256": "9fb2af918df5d51e36282d4661e46d28db0e072fe896c7000c7dbc75a03d5748",
+      "public_sha256": "9d9fd30177758cffdb77724e0117a2df0ff9877d801cb65967976e584ec61a8d",
+      "raw_bytes": 692,
+      "public_bytes": 678,
+      "changed": true
+    },
+    "guest-history-before.stdout": {
+      "raw_sha256": "175ac4f655416abc8582af180d18289651ddf47dfb8cb14054106107c4d4c84a",
+      "public_sha256": "175ac4f655416abc8582af180d18289651ddf47dfb8cb14054106107c4d4c84a",
+      "raw_bytes": 195,
+      "public_bytes": 195,
+      "changed": false
+    },
+    "guest-history-interrupted.stdout": {
+      "raw_sha256": "c04a007d383db672b46b842a50c4e889d895635ce947d155589f660e94a4f481",
+      "public_sha256": "c04a007d383db672b46b842a50c4e889d895635ce947d155589f660e94a4f481",
+      "raw_bytes": 238,
+      "public_bytes": 238,
+      "changed": false
+    },
+    "guest-history-after.stdout": {
+      "raw_sha256": "d5039dac489f949e42bca76566fdef93db1b90a292a999d180693f5e9fe0d7ca",
+      "public_sha256": "d5039dac489f949e42bca76566fdef93db1b90a292a999d180693f5e9fe0d7ca",
+      "raw_bytes": 239,
+      "public_bytes": 239,
+      "changed": false
+    },
+    "guest-retry.command.json": {
+      "raw_sha256": "9e94b94cf80390f16a7211943f8950a90ae08bba7f88003e1d8b11b35af1cb4b",
+      "public_sha256": "9e94b94cf80390f16a7211943f8950a90ae08bba7f88003e1d8b11b35af1cb4b",
+      "raw_bytes": 487,
+      "public_bytes": 487,
+      "changed": false
+    },
+    "guest-retry.exit": {
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "public_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "raw_bytes": 2,
+      "public_bytes": 2,
+      "changed": false
+    },
+    "guest-retry.stdout": {
+      "raw_sha256": "f0970ad0d47c4d5c5a4b92f4f85a5fa711f56e290581524e351755089765f679",
+      "public_sha256": "f0970ad0d47c4d5c5a4b92f4f85a5fa711f56e290581524e351755089765f679",
+      "raw_bytes": 507,
+      "public_bytes": 507,
+      "changed": false
+    },
+    "guest-retry.stderr": {
+      "raw_sha256": "60467ce07b32e1137a5b6c0d6d4d60063612522c4107821ebe68f6883ce05271",
+      "public_sha256": "60467ce07b32e1137a5b6c0d6d4d60063612522c4107821ebe68f6883ce05271",
+      "raw_bytes": 846,
+      "public_bytes": 846,
+      "changed": false
+    },
+    "guest-checkpoint-tests.log": {
+      "raw_sha256": "56ffa2bbe16ecc9157c5dc3cfb62741fb5f273144373e7ba37af2ddf723ed30c",
+      "public_sha256": "56ffa2bbe16ecc9157c5dc3cfb62741fb5f273144373e7ba37af2ddf723ed30c",
+      "raw_bytes": 1177,
+      "public_bytes": 1177,
+      "changed": false
+    },
+    "guest-final-tests.log": {
+      "raw_sha256": "fc39e4548221ddd93f7a604ce0b30a1d6965894288a2789279d11886a87f8b8a",
+      "public_sha256": "fc39e4548221ddd93f7a604ce0b30a1d6965894288a2789279d11886a87f8b8a",
+      "raw_bytes": 1177,
+      "public_bytes": 1177,
+      "changed": false
+    },
+    "guest-checkpoint.json": {
+      "raw_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+      "public_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+      "raw_bytes": 238,
+      "public_bytes": 238,
+      "changed": false
+    },
+    "guest-checkpoint-started.json": {
+      "raw_sha256": "b2845c6042555a2d116bbea41631666e3eed78a03a8b94615d1fe00c5f70a837",
+      "public_sha256": "b2845c6042555a2d116bbea41631666e3eed78a03a8b94615d1fe00c5f70a837",
+      "raw_bytes": 27,
+      "public_bytes": 27,
+      "changed": false
+    },
+    "guest-completed.json": {
+      "raw_sha256": "382717ea740e3d3dbb68f704b2581baa6f8d4b6292c83328a06d2ec44a435376",
+      "public_sha256": "382717ea740e3d3dbb68f704b2581baa6f8d4b6292c83328a06d2ec44a435376",
+      "raw_bytes": 133,
+      "public_bytes": 133,
+      "changed": false
+    },
+    "journal-excerpts.json": {
+      "raw_sha256": "682a30d1ddcb9366fefcce2d22e8fb2249204219e84bbd14b9f893e1caac27d6",
+      "public_sha256": "682a30d1ddcb9366fefcce2d22e8fb2249204219e84bbd14b9f893e1caac27d6",
+      "raw_bytes": 28771,
+      "public_bytes": 28771,
+      "changed": false
+    },
+    "serial-records.json": {
+      "raw_sha256": "0bd9eea40764fc236c4db196409cca6bb495d49a10b9bd32fd2d9986054de49b",
+      "public_sha256": "1c74c53257067f672ddc594efd34e31cfaf5e9d4315c02a795595f2205fb3ab1",
+      "raw_bytes": 415,
+      "public_bytes": 408,
+      "changed": true
+    }
+  },
+  "original_artifact_retention": "The original credential-bearing artifact is retained privately with its exact ZIP hash. After the sanitized replacement was published in PR27, the hosted original was removed successfully at 2026-09-20T22:00Z; its metadata and digest remain above."
+}

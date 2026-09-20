@@ -1,10 +1,13 @@
 """Contract/failure tests only: no guest, installation, reboot or native Dagu."""
 import copy
 import importlib.util
+import io
 import json
 from pathlib import Path
 import shutil
+import shlex
 import subprocess
+import tarfile
 import tempfile
 import unittest
 from unittest import mock
@@ -40,6 +43,32 @@ class LauncherArgumentsTests(unittest.TestCase):
         self.assertIn('user,id=net0,restrict=on,hostfwd=tcp:127.0.0.1:2222-:22', args)
         self.assertEqual(sum('readonly=on' in value for value in drives), 2)
         self.assertNotIn('-snapshot', args)
+
+    def test_observer_channel_is_separate_from_console_getty(self):
+        args = DRIVER.qemu_arguments(Path('/disk'), Path('/private'), Path('/reports/serial.log'), 2222)
+        serial = [args[i + 1] for i, value in enumerate(args) if value == '-serial']
+        self.assertEqual(serial, ['file:/reports/boot-serial.log', 'file:/reports/serial.log'])
+        unit = (HERE / 'native-reboot-observer.service').read_text()
+        self.assertIn('TTYPath=/dev/ttyS1\n', unit)
+
+    def test_native_archive_excludes_generated_auth_but_retains_history(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            auth = root / 'dagu-home/data/auth'
+            auth.mkdir(parents=True)
+            (auth / 'encryption_key').write_text('synthetic-exclusion-test')
+            history = root / 'dagu-home/data/dag-runs'
+            history.mkdir()
+            (history / 'history.json').write_text('{"status":"succeeded"}')
+            (root / 'checkpoint.json').write_text('{"execution_count":1}')
+            argv = shlex.split(DRIVER.GUEST_ARCHIVE)[1:]
+            argv[argv.index('-C') + 1] = str(root)
+            result = subprocess.run(argv, capture_output=True, check=True, timeout=10)
+            with tarfile.open(fileobj=io.BytesIO(result.stdout), mode='r:gz') as bundle:
+                names = bundle.getnames()
+            self.assertFalse(any('/auth' in name for name in names))
+            self.assertIn('./dagu-home/data/dag-runs/history.json', names)
+            self.assertIn('./checkpoint.json', names)
 
     def test_missing_native_device_property_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'serial'):
