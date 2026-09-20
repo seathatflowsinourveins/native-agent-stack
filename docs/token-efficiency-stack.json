@@ -4,7 +4,7 @@
   "source_repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
   "source_revision": "3ddeabd81e2f1b268f547cc06555b3278870e4d3",
   "synthesized_date_utc": "2026-09-20",
-  "scope": "Dated source-host evidence for 14 core token-efficiency tools and 9 separate observation/support tools. Commands, returned results, scoped counters and baseline/lifecycle limits are recorded per row. The full Setup view contains 65 selected components. Each new PC collects its own acceptance.",
+  "scope": "Dated source-host evidence for 14 core token-efficiency tools, 9 observation/support tools and 1 optional gateway. The full Setup view contains 66 selected components. Older exact-Desktop observations, later native foundation tasks and the separate zero-tool Claude readiness run retain distinct session and time scopes. Each new PC and live session collects its own acceptance; provider usage is not token savings.",
   "counts": {
     "core": 14,
     "observation": 9,
@@ -38,7 +38,7 @@
       "total_output_estimate": 16332,
       "total_saved_estimate": 1722,
       "exact_parent_hook_decision_rows": 0,
-      "independent_match": "Matches coordinator's direct native gain54→55 commands and1708→1722 saved estimate. This confirms RTK's retained accounting increment, not independent provider avoided-token savings."
+      "independent_match": "Matches coordinator's direct native gain54\u219255 commands and1708\u21921722 saved estimate. This confirms RTK's retained accounting increment, not independent provider avoided-token savings."
     },
     "exact_parent_tool_correlations": [
       {
@@ -91,7 +91,8 @@
       "status": "not_established",
       "reason": "Current retained Prometheus token series lack the exact task/client scope needed to join the parent Loki response.completed events. Specific sdk-worker6h query has no matching series; other unscoped codex-app-server series exist.",
       "session_total_tokens": null,
-      "avoided_tokens": null
+      "avoided_tokens": null,
+      "scope": "The exact Desktop parent in the dated current-session-observation receipt, not the later native Codex/Claude foundation sessions."
     },
     "limits": [
       "A configured export route and healthy backend cannot alone attribute current Desktop task usage; use the independent exact-task monitor evidence.",
@@ -104,7 +105,8 @@
       "SDK spool ingestion is configured for processes that publish those receipts; the current Desktop cannot be assumed to have inherited a later launcher environment or SDK writer identity.",
       "RTK's matched native accounting increment confirms its own estimate. No full-PC causal lifetime provider-token saving is established."
     ],
-    "backend_roles": "OpenTelemetry Collector transports native telemetry; Prometheus stores metrics; Loki stores events; Grafana presents them. These supporting services do not add token savings to RTK/Context Mode or artifact counts."
+    "backend_roles": "OpenTelemetry Collector transports native telemetry; Prometheus stores metrics; Loki stores events; Grafana presents them. These supporting services do not add token savings to RTK/Context Mode or artifact counts.",
+    "scope": "Retained 2026-09-20 14:17\u201314:28 exact-Desktop observation only. Later native foundation and readiness evidence is recorded separately in foundation_native_acceptance; this object is not a new live session probe."
   },
   "clean_prefix_reference": {
     "source_path": "evidence/receipts/native-token-clean-prefix-20260920.json",
@@ -206,10 +208,11 @@
     }
   },
   "source_notes": [
-    "Saturation matrix has no SocratiCode artifact_baselines row, but separate native token-practice artifact receipt records 2731→491; both retained without altering the audit.",
-    "Ast-grep original 1818→674 and later 1818→686 are different retained responses; do not silently substitute or sum them.",
+    "Saturation matrix has no SocratiCode artifact_baselines row, but separate native token-practice artifact receipt records 2731\u2192491; both retained without altering the audit.",
+    "Ast-grep original 1818\u2192674 and later 1818\u2192686 are different retained responses; do not silently substitute or sum them.",
     "Current-session RTK 1722 supersedes earlier dated 1708 without adding snapshots.",
-    "Archive commands use explicit portable placeholders. Verify publisher checksum and selected OS/architecture before extracting; file removal/rollback is limited to owned prefixes and retained private data."
+    "Archive commands use explicit portable placeholders. Verify publisher checksum and selected OS/architecture before extracting; file removal/rollback is limited to owned prefixes and retained private data.",
+    "Foundation receipt adds native Codex 219,725 with full backend matches; original native Claude 254,111 has a retained 77,317 Prometheus gap. A separate ready-before-request Claude run matches 35,537 in all usage categories with zero tools or agents; it does not repair the original gap or recertify this Desktop task."
   ],
   "synthesis_observed_current_state": false,
   "provider_calls": 0,
@@ -333,8 +336,16 @@
         "evidence/receipts/token-practice-coverage-20260920.json",
         "evidence/receipts/token-practice-native-counters-20260920.json",
         "evidence/receipts/token-practice-confirmation-20260920.json",
-        "evidence/receipts/native-token-stack-final-20260920.json"
-      ]
+        "evidence/receipts/native-token-stack-final-20260920.json",
+        "evidence/receipts/foundation-native-20260920.json"
+      ],
+      "foundation_counter_confirmation": {
+        "observed_at": "2026-09-20T15:50:45.673231+00:00",
+        "source_path": "evidence/receipts/foundation-native-20260920.json",
+        "source_pointer": "/native_counter_snapshot/rtk",
+        "value": 1722,
+        "scope": "Same retained value reconfirmed by foundation reporter; older detailed per-command stdout metadata keeps its own capture time."
+      }
     },
     {
       "component_id": "context-mode",
@@ -362,7 +373,7 @@
         "install_note": "Native plugin source pinned to `6f0cc6841c687e754059f36714a11233fda1a02b`; [client setup](#native-context-mode-and-hooks). The npm `context-mode@1.0.169` release is a different source revision and is not a substitute for full plugin evidence.",
         "statistics_note": "Upstream savings estimate; keep its own scope."
       },
-      "returned_result_summary": "2026-09-20 14:55:58–59 UTC retained-file refresh read Desktop WSL 2,143,488 lifetime / 0 session, native Claude 54,016 / 0, and native Codex 71,424 / 1,070,038 upstream estimates. These latest persisted process files are not matched to the fresh acceptance sessions and are not additive. Earlier direct Desktop ctx_execute returned 42 and ctx_stats separately quoted a rounded 1.1M estimate. The loaded Desktop ctx_execute_file retained an old plugin-root restriction; the explicit project-root native MCPorter bridge returned matching file length and hash. Dated native Codex and Claude project-file and symbol tasks passed.",
+      "returned_result_summary": "Foundation reporter at 15:50:45 UTC retained separate Context Mode event estimates: Desktop WSL 2,264,064, native Claude 57,856 and native Codex 79,616. They are not matched process-session deltas. 2026-09-20 14:55:58\u201359 UTC retained-file refresh read Desktop WSL 2,143,488 lifetime / 0 session, native Claude 54,016 / 0, and native Codex 71,424 / 1,070,038 upstream estimates. These latest persisted process files are not matched to the fresh acceptance sessions and are not additive. Earlier direct Desktop ctx_execute returned 42 and ctx_stats separately quoted a rounded 1.1M estimate. The loaded Desktop ctx_execute_file retained an old plugin-root restriction; the explicit project-root native MCPorter bridge returned matching file length and hash. Dated native Codex and Claude project-file and symbol tasks passed.",
       "session_statistics": {
         "availability": "upstream_estimate",
         "value": null,
@@ -370,7 +381,7 @@
         "observed_at": "2026-09-20T14:56:03.739753+00:00",
         "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
         "scope": "Separate latest persisted upstream process files under Desktop WSL, Native Claude and Native Codex runtime roots. These files are not linked to the newly accepted client tasks. Do not sum them or equate them with the directly loaded Desktop connection.",
-        "summary": "Latest persisted session estimates: Desktop WSL 0; native Claude 0; native Codex 1,070,038. Captured around 2026-09-20 14:55:59 UTC from separate runtime-root files, not fresh acceptance-session statistics. An earlier direct Desktop connection separately reported a rounded 1.1M estimate.",
+        "summary": "Earlier 14:56 persisted session estimates: Desktop WSL 0; native Claude 0; native Codex 1,070,038. Captured around 2026-09-20 14:55:59 UTC from separate runtime-root files, not fresh acceptance-session statistics. An earlier direct Desktop connection separately reported a rounded 1.1M estimate. The later foundation receipt does not establish a trustworthy exact fresh-session Context Mode delta.",
         "scoped_values": [
           {
             "scope": "Desktop WSL",
@@ -407,41 +418,75 @@
         "availability": "upstream_estimate",
         "value": null,
         "unit": "retained event/byte estimate",
-        "scope": "Separate latest persisted runtime-root estimates: retained event count × 256. No unique exact whole-PC lifetime number. Do not sum roots, direct connection output or other tools' estimates.",
-        "summary": "Latest persisted retained-event estimates: Desktop WSL 2,143,488; native Claude 54,016; native Codex 71,424. Captured around 2026-09-20 14:55:59 UTC. Each is a separate event heuristic, not a combined lifetime, an exact token count or avoided provider usage.",
-        "observed_at": "2026-09-20T14:56:03.739753+00:00",
-        "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
+        "scope": "Separate latest persisted runtime-root estimates: retained event count \u00d7 256. No unique exact whole-PC lifetime number. Do not sum roots, direct connection output or other tools' estimates.",
+        "summary": "Foundation retained-event estimates at 2026-09-20 15:50:45 UTC: Desktop WSL 2,264,064; native Claude 57,856; native Codex 79,616. These separate latest persisted runtime-root heuristics are not exact session deltas, a combined lifetime or measured provider savings.",
+        "observed_at": "2026-09-20T15:50:45.673231+00:00",
+        "source_path": "evidence/receipts/foundation-native-20260920.json",
         "scoped_values": [
           {
             "scope": "Desktop WSL",
-            "value": 2143488,
-            "observed_at": "2026-09-20T14:55:59.016011+00:00",
-            "source_sha256": "bc26ba004a648fcb9e0cb502c33b8a0fd7ebf6f4acfde38a70ee18211b398791",
-            "method": "Retained event count multiplied by 256; latest persisted process file in this runtime root."
+            "value": 2264064,
+            "observed_at": "2026-09-20T15:50:45.673231+00:00",
+            "source_path": "evidence/receipts/foundation-native-20260920.json",
+            "method": "Latest persisted runtime-root retained event count multiplied by 256; not a newly queried client-session counter."
           },
           {
             "scope": "Native Claude",
-            "value": 54016,
-            "observed_at": "2026-09-20T14:55:59.002621+00:00",
-            "source_sha256": "bac5e4520491116981c4c7c1a607c40dbc8206ed7d368b206444fd9256850ae5",
-            "method": "Retained event count multiplied by 256; latest persisted process file in this runtime root."
+            "value": 57856,
+            "observed_at": "2026-09-20T15:50:45.673231+00:00",
+            "source_path": "evidence/receipts/foundation-native-20260920.json",
+            "method": "Latest persisted runtime-root retained event count multiplied by 256; not a newly queried client-session counter."
           },
           {
             "scope": "Native Codex",
-            "value": 71424,
-            "observed_at": "2026-09-20T14:55:58.997781+00:00",
-            "source_sha256": "1ae818883ab98b221260fe54eb651a7e62e4240afe1fcbec2310fb2c8377d709",
-            "method": "Retained event count multiplied by 256; latest persisted process file in this runtime root."
+            "value": 79616,
+            "observed_at": "2026-09-20T15:50:45.673231+00:00",
+            "source_path": "evidence/receipts/foundation-native-20260920.json",
+            "method": "Latest persisted runtime-root retained event count multiplied by 256; not a newly queried client-session counter."
+          }
+        ],
+        "earlier_observations": [
+          {
+            "availability": "upstream_estimate",
+            "value": null,
+            "unit": "retained event/byte estimate",
+            "scope": "Separate latest persisted runtime-root estimates: retained event count \u00d7 256. No unique exact whole-PC lifetime number. Do not sum roots, direct connection output or other tools' estimates.",
+            "summary": "Latest persisted retained-event estimates: Desktop WSL 2,143,488; native Claude 54,016; native Codex 71,424. Captured around 2026-09-20 14:55:59 UTC. Each is a separate event heuristic, not a combined lifetime, an exact token count or avoided provider usage.",
+            "observed_at": "2026-09-20T14:56:03.739753+00:00",
+            "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
+            "scoped_values": [
+              {
+                "scope": "Desktop WSL",
+                "value": 2143488,
+                "observed_at": "2026-09-20T14:55:59.016011+00:00",
+                "source_sha256": "bc26ba004a648fcb9e0cb502c33b8a0fd7ebf6f4acfde38a70ee18211b398791",
+                "method": "Retained event count multiplied by 256; latest persisted process file in this runtime root."
+              },
+              {
+                "scope": "Native Claude",
+                "value": 54016,
+                "observed_at": "2026-09-20T14:55:59.002621+00:00",
+                "source_sha256": "bac5e4520491116981c4c7c1a607c40dbc8206ed7d368b206444fd9256850ae5",
+                "method": "Retained event count multiplied by 256; latest persisted process file in this runtime root."
+              },
+              {
+                "scope": "Native Codex",
+                "value": 71424,
+                "observed_at": "2026-09-20T14:55:58.997781+00:00",
+                "source_sha256": "1ae818883ab98b221260fe54eb651a7e62e4240afe1fcbec2310fb2c8377d709",
+                "method": "Retained event count multiplied by 256; latest persisted process file in this runtime root."
+              }
+            ]
           }
         ]
       },
-      "baseline_summary": "2026-09-20 Desktop: ctx_execute returned 42; ctx_stats returned '1.1M tokens saved ·98.9% reduction' rounded heuristic. Loaded ctx_execute_file still rejected project path due old plugin-root connection; explicit native MCPorter project bridge returned matching file length/hash. 2026-09-20 fresh native Codex and Claude each passed project-file and symbol task.",
+      "baseline_summary": "2026-09-20 Desktop: ctx_execute returned 42; ctx_stats returned '1.1M tokens saved \u00b798.9% reduction' rounded heuristic. Loaded ctx_execute_file still rejected project path due old plugin-root connection; explicit native MCPorter project bridge returned matching file length/hash. 2026-09-20 fresh native Codex and Claude each passed project-file and symbol task.",
       "artifact_baselines": [],
       "additional_dated_artifact_pairs": [],
       "native_client_evidence": {
         "desktop": "Loaded execute/stats pass; old directly loaded file-read root fails; explicit project-scoped CLI bridge passes.",
-        "codex": "Fresh native project-file task passed; old Desktop hot reload not claimed.",
-        "claude": "Fresh native project-file task passed; historical native lifecycle hooks succeeded."
+        "codex": "Fresh native project-file task passed; old Desktop hot reload not claimed. Foundation 15:46 seven-call native task also passed exact source fidelity, with 219,725 returned tokens matched by Loki and Prometheus; no Desktop reconnect/resume.",
+        "claude": "Fresh native project-file task passed; historical native lifecycle hooks succeeded. Foundation 15:49 seven-call native task passed source/content but not strict final JSON; 254,111 tokens matched Loki and had 77,317 missing in Prometheus. The later zero-tool readiness run is only observation evidence."
       },
       "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: accepted_within_scope; cleanup: not_established; recovery: not_established. Fresh both-native-client file operations passed. Old Desktop connection retains prior loaded scope; fresh native PreCompact not forced.",
       "source_paths": [
@@ -459,7 +504,8 @@
         "evidence/receipts/token-practice-native-counters-20260920.json",
         "evidence/receipts/native-token-focus-clients-20260920.json",
         "evidence/receipts/token-practice-confirmation-20260920.json",
-        "evidence/receipts/native-token-stack-final-20260920.json"
+        "evidence/receipts/native-token-stack-final-20260920.json",
+        "evidence/receipts/foundation-native-20260920.json"
       ]
     },
     {
@@ -509,7 +555,7 @@
         "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
         "stdout_sha256": "eafe48c7c8b730861b0d3fa6ddfc0889b3bf8eeed54622936665902e17d6ee46"
       },
-      "baseline_summary": "Clean-prefix exact artifact: compact original 5,105 → complete compression envelope 2,732, saving 2,373. When the task requires full recovery, compression plus recovery is 18,777, an expansion of 13,672 over the same 5,105 baseline; use the direct original. The upstream isolated estimate 9,616 → 2,128 (7,488 saved) uses a different native counting boundary and is not added to this artifact comparison.",
+      "baseline_summary": "Clean-prefix exact artifact: compact original 5,105 \u2192 complete compression envelope 2,732, saving 2,373. When the task requires full recovery, compression plus recovery is 18,777, an expansion of 13,672 over the same 5,105 baseline; use the direct original. The upstream isolated estimate 9,616 \u2192 2,128 (7,488 saved) uses a different native counting boundary and is not added to this artifact comparison.",
       "artifact_baselines": [
         {
           "id": "fresh-headroom-e1641a5b959bb3334f9020d9",
@@ -650,8 +696,16 @@
         "evidence/receipts/native-headroom-mcp-20260920.json",
         "evidence/receipts/token-practice-confirmation-20260920.json",
         "evidence/receipts/native-token-clean-prefix-20260920.json",
-        "evidence/receipts/native-token-stack-final-20260920.json"
-      ]
+        "evidence/receipts/native-token-stack-final-20260920.json",
+        "evidence/receipts/foundation-native-20260920.json"
+      ],
+      "foundation_counter_confirmation": {
+        "observed_at": "2026-09-20T15:50:45.673231+00:00",
+        "source_path": "evidence/receipts/foundation-native-20260920.json",
+        "source_pointer": "/native_counter_snapshot/headroom",
+        "value": 0,
+        "scope": "Same retained value reconfirmed by foundation reporter; older detailed per-command stdout metadata keeps its own capture time."
+      }
     },
     {
       "component_id": "jcodemunch-mcp",
@@ -672,7 +726,7 @@
         "install_note": "Dedicated workflow section in the linked recipe; install only the selected scope.",
         "statistics_note": "Upstream savings estimate; keep its own scope."
       },
-      "returned_result_summary": "2026-09-20 14:55:58.940776 UTC upstream get_session_stats returned session_calls 0, session_tokens_saved 0 and total_tokens_saved 39,760 in the default index, generation 2. The earlier 14:18:33.801 UTC total was 29,820; both snapshots include verification retrievals. Native Codex and Claude retrieved the requested exact function. An isolated clean-prefix one-file, 12-symbol index returned exact unique_json before and after server restart; its separate estimate moved 0 → 2,781 → 5,562.",
+      "returned_result_summary": "Foundation 15:50:40 UTC default-index snapshot returned 49,700 retained estimated saved tokens. The two fresh native foundation MCP processes each reported 0\u21924,970; those subsets are already represented in the shared ledger and are not provider savings. 2026-09-20 14:55:58.940776 UTC upstream get_session_stats returned session_calls 0, session_tokens_saved 0 and total_tokens_saved 39,760 in the default index, generation 2. The earlier 14:18:33.801 UTC total was 29,820; both snapshots include verification retrievals. Native Codex and Claude retrieved the requested exact function. An isolated clean-prefix one-file, 12-symbol index returned exact unique_json before and after server restart; its separate estimate moved 0 \u2192 2,781 \u2192 5,562.",
       "session_statistics": {
         "availability": "same_process_upstream_estimate",
         "value": {
@@ -680,7 +734,7 @@
           "claude": 4970
         },
         "scope": "Two distinct fresh native MCP processes; before0,after4970 each.",
-        "summary": "Foundation runs: Codex and Claude each returned0→4970 in the same jCodeMunch process; neither value is provider savings."
+        "summary": "Foundation runs: Codex and Claude each returned0\u21924970 in the same jCodeMunch process; neither value is provider savings."
       },
       "lifetime_statistics": {
         "availability": "upstream_estimate",
@@ -688,7 +742,7 @@
         "unit": "estimated tokens saved",
         "observed_at": "2026-09-20T15:50:40.270638+00:00",
         "scope": "Default index-root bytes/4 ledger, generation 2; includes repeated verification retrievals. The isolated clean-prefix ledger is excluded. This is a whole-file counterfactual estimate, not measured provider savings.",
-        "summary": "Foundation snapshot:49,700 retained upstream whole-file bytes/4 estimate (earlier39,760); includes validation and both fresh native reads. Shared ledger, not additive with session subsets.",
+        "summary": "Foundation snapshot:49,700 retained upstream whole-file bytes/4 estimate (earlier 39,760); includes validation and both fresh native reads. Shared ledger, not additive with session subsets.",
         "earlier_observations": [
           {
             "observed_at": "2026-09-20T14:18:33.801Z",
@@ -707,7 +761,7 @@
         "source_path": "evidence/receipts/foundation-native-20260920.json",
         "stdout_sha256": "d2d1df1909c5cac9217f16ce93215f5907df4729c04bbf5b52c28984d98436f8"
       },
-      "baseline_summary": "Whole-file retrieval: 5,476 → 861 tokens. Known focused source: 601 → 861, an expansion of 260, so keep the focused read. Clean-prefix indexed retrieval: 2,484 → 324; known exact function: 40 → 324, an expansion of 284. Exact function fidelity passed; these selected artifacts are separate from the retained 39,760 upstream estimate.",
+      "baseline_summary": "Whole-file retrieval: 5,476 \u2192 861 tokens. Known focused source: 601 \u2192 861, an expansion of 260, so keep the focused read. Clean-prefix indexed retrieval: 2,484 \u2192 324; known exact function: 40 \u2192 324, an expansion of 284. Exact function fidelity passed; these selected artifacts are separate from the earlier 39,760 and later 49,700 retained upstream estimates.",
       "artifact_baselines": [
         {
           "id": "jcodemunch-whole-file-20260920",
@@ -755,8 +809,8 @@
       "additional_dated_artifact_pairs": [],
       "native_client_evidence": {
         "desktop": "Not directly loaded in inspected Desktop catalog; native MCPorter statistics bridge passes.",
-        "codex": "One native task:search_symbols/get_symbol_source pass, source correct.",
-        "claude": "One native task:search_symbols/get_symbol_source pass, source correct."
+        "codex": "One native task:search_symbols/get_symbol_source pass, source correct. Foundation 15:46 seven-call native task also passed exact source fidelity, with 219,725 returned tokens matched by Loki and Prometheus; no Desktop reconnect/resume.",
+        "claude": "One native task:search_symbols/get_symbol_source pass, source correct. Foundation 15:49 seven-call native task passed source/content but not strict final JSON; 254,111 tokens matched Loki and had 77,317 missing in Prometheus. The later zero-tool readiness run is only observation evidence."
       },
       "lifecycle_summary": "install: accepted_within_scope; use: accepted_within_scope; persistence: accepted_within_scope; restart: accepted_within_scope; cleanup: accepted_within_scope; recovery: not_established. Selected local index persisted across direct/native-client retrieval. No watcher, cross-repository auto-index or paid summaries.",
       "source_paths": [
@@ -931,7 +985,7 @@
         "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.14.0\" --ignore-scripts socraticode@1.14.0`",
         "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
       },
-      "returned_result_summary": "2026-09-20 loaded Desktop health showed Qdrant reachable, local embedding endpoint reachable, Nemotron 1B loaded; status 196 chunks/26 graphfiles/3 edges, watcher active; search returned evaluate-native.py lines 171–195 parse_codex. Earlier native Codex and Claude both returned linux-usage-report.cjs lines 2–39, score 0.6429. Add/update/delete watcher fixture passed with probe removed.",
+      "returned_result_summary": "2026-09-20 loaded Desktop health showed Qdrant reachable, local embedding endpoint reachable, Nemotron 1B loaded; status 196 chunks/26 graphfiles/3 edges, watcher active; search returned evaluate-native.py lines 171\u2013195 parse_codex. Earlier native Codex and Claude both returned linux-usage-report.cjs lines 2\u201339, score 0.6429. Add/update/delete watcher fixture passed with probe removed.",
       "session_statistics": {
         "availability": "none",
         "value": null,
@@ -944,7 +998,7 @@
         "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
         "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
       },
-      "baseline_summary": "2026-09-20 loaded Desktop health showed Qdrant reachable, local embedding endpoint reachable, Nemotron 1B loaded; status 196 chunks/26 graphfiles/3 edges, watcher active; search returned evaluate-native.py lines 171–195 parse_codex. Earlier native Codex and Claude both returned linux-usage-report.cjs lines 2–39, score 0.6429. Add/update/delete watcher fixture passed with probe removed.",
+      "baseline_summary": "2026-09-20 loaded Desktop health showed Qdrant reachable, local embedding endpoint reachable, Nemotron 1B loaded; status 196 chunks/26 graphfiles/3 edges, watcher active; search returned evaluate-native.py lines 171\u2013195 parse_codex. Earlier native Codex and Claude both returned linux-usage-report.cjs lines 2\u201339, score 0.6429. Add/update/delete watcher fixture passed with probe removed.",
       "artifact_baselines": [],
       "additional_dated_artifact_pairs": [
         {
@@ -1053,7 +1107,7 @@
         "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/repomix-1.18.0\" repomix@1.18.0`",
         "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
       },
-      "returned_result_summary": "Retained native command exited 0 and output contained the explicitly selected paths. Exact outline comparison 3697→663 tokens is lossy; restore/read original implementation before editing or correctness decisions.",
+      "returned_result_summary": "Retained native command exited 0 and output contained the explicitly selected paths. Exact outline comparison 3697\u2192663 tokens is lossy; restore/read original implementation before editing or correctness decisions.",
       "session_statistics": {
         "availability": "none",
         "value": null,
@@ -1066,7 +1120,7 @@
         "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
         "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
       },
-      "baseline_summary": "Retained native command exited 0 and output contained the explicitly selected paths. Exact outline comparison 3697→663 tokens is lossy; restore/read original implementation before editing or correctness decisions.",
+      "baseline_summary": "Retained native command exited 0 and output contained the explicitly selected paths. Exact outline comparison 3697\u2192663 tokens is lossy; restore/read original implementation before editing or correctness decisions.",
       "artifact_baselines": [
         {
           "id": "fresh-repomix-c4b1dc83abcb97ba615d5019",
@@ -1124,7 +1178,7 @@
         "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/toon-4.1.1\" @toon-format/cli@4.1.1`",
         "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
       },
-      "returned_result_summary": "Retained native encode/decode exited 0 and strict recovered JSON equaled source. Small component fixture 1664→1307 tokens; separate 502-repository catalog 59792 compactJSON→66815TOON expanded 7023, despite upstream tokenx heuristic 84907→71770. Compact JSON selected.",
+      "returned_result_summary": "Retained native encode/decode exited 0 and strict recovered JSON equaled source. Small component fixture 1664\u21921307 tokens; separate 502-repository catalog 59792 compactJSON\u219266815TOON expanded 7023, despite upstream tokenx heuristic 84907\u219271770. Compact JSON selected.",
       "session_statistics": {
         "availability": "none",
         "value": null,
@@ -1137,7 +1191,7 @@
         "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
         "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
       },
-      "baseline_summary": "Retained native encode/decode exited 0 and strict recovered JSON equaled source. Small component fixture 1664→1307 tokens; separate 502-repository catalog 59792 compactJSON→66815TOON expanded 7023, despite upstream tokenx heuristic 84907→71770. Compact JSON selected.",
+      "baseline_summary": "Retained native encode/decode exited 0 and strict recovered JSON equaled source. Small component fixture 1664\u21921307 tokens; separate 502-repository catalog 59792 compactJSON\u219266815TOON expanded 7023, despite upstream tokenx heuristic 84907\u219271770. Compact JSON selected.",
       "artifact_baselines": [
         {
           "id": "fresh-toon-ea4c555ad3d459cc4dbef61e",
@@ -1194,7 +1248,7 @@
         "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/ast-grep-0.45.3\" @ast-grep/cli@0.45.3`",
         "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
       },
-      "returned_result_summary": "Retained direct file request against .txt initially returned no matches. Correct upstream --stdin plus --lang javascript returned 8 matches, exit 0. Original artifact 1818→674 tokens; later retained native-output variant 1818→686. These are different captured representations, not interchangeable counts.",
+      "returned_result_summary": "Retained direct file request against .txt initially returned no matches. Correct upstream --stdin plus --lang javascript returned 8 matches, exit 0. Original artifact 1818\u2192674 tokens; later retained native-output variant 1818\u2192686. These are different captured representations, not interchangeable counts.",
       "session_statistics": {
         "availability": "none",
         "value": null,
@@ -1207,7 +1261,7 @@
         "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
         "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
       },
-      "baseline_summary": "Retained direct file request against .txt initially returned no matches. Correct upstream --stdin plus --lang javascript returned 8 matches, exit 0. Original artifact 1818→674 tokens; later retained native-output variant 1818→686. These are different captured representations, not interchangeable counts.",
+      "baseline_summary": "Retained direct file request against .txt initially returned no matches. Correct upstream --stdin plus --lang javascript returned 8 matches, exit 0. Original artifact 1818\u2192674 tokens; later retained native-output variant 1818\u2192686. These are different captured representations, not interchangeable counts.",
       "artifact_baselines": [
         {
           "id": "fresh-ast-grep-0c3b77534fdd4c0875aafa7f",
@@ -1264,7 +1318,7 @@
         "install_note": "Official [DeusData/codebase-memory-mcp v0.11.0](https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0), asset `codebase-memory-mcp-linux-amd64.tar.gz`; recorded SHA-256 `032b33c1833919a2d1de67ff6367fa6ea46aee8689c86ef223c88fae3b6e4536`",
         "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
       },
-      "returned_result_summary": "2026-09-19 native Claude and Desktop searched collect in tools/ecosystem/linux-usage-report.cjs lines 91–127 and traced four static callees:installation, sourcesFor, runParser, overlaps. Native Codex additional lane was quota-blocked before tools. Static edges do not attest runtime execution.",
+      "returned_result_summary": "2026-09-19 native Claude and Desktop searched collect in tools/ecosystem/linux-usage-report.cjs lines 91\u2013127 and traced four static callees:installation, sourcesFor, runParser, overlaps. Native Codex additional lane was quota-blocked before tools. Static edges do not attest runtime execution.",
       "session_statistics": {
         "availability": "none",
         "value": null,
@@ -1277,7 +1331,7 @@
         "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
         "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
       },
-      "baseline_summary": "2026-09-19 native Claude and Desktop searched collect in tools/ecosystem/linux-usage-report.cjs lines 91–127 and traced four static callees:installation, sourcesFor, runParser, overlaps. Native Codex additional lane was quota-blocked before tools. Static edges do not attest runtime execution.",
+      "baseline_summary": "2026-09-19 native Claude and Desktop searched collect in tools/ecosystem/linux-usage-report.cjs lines 91\u2013127 and traced four static callees:installation, sourcesFor, runParser, overlaps. Native Codex additional lane was quota-blocked before tools. Static edges do not attest runtime execution.",
       "artifact_baselines": [
         {
           "id": "fresh-codebase-memory-mcp-619fcd356f69e790656fa06f",
@@ -1324,7 +1378,7 @@
         "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/context-hub-0.1.4\" @aisuite/chub@0.1.4`",
         "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
       },
-      "returned_result_summary": "2026-09-20 retained upstream chub search, get and full-document operations all exited 0. Selected same-entry formatter documentation was present; selected document response 2070→2155 tokens grew 85. Retrieval usefulness is separate from a guaranteed saving.",
+      "returned_result_summary": "2026-09-20 retained upstream chub search, get and full-document operations all exited 0. Selected same-entry formatter documentation was present; selected document response 2070\u21922155 tokens grew 85. Retrieval usefulness is separate from a guaranteed saving.",
       "session_statistics": {
         "availability": "none",
         "value": null,
@@ -1337,7 +1391,7 @@
         "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
         "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
       },
-      "baseline_summary": "2026-09-20 retained upstream chub search, get and full-document operations all exited 0. Selected same-entry formatter documentation was present; selected document response 2070→2155 tokens grew 85. Retrieval usefulness is separate from a guaranteed saving.",
+      "baseline_summary": "2026-09-20 retained upstream chub search, get and full-document operations all exited 0. Selected same-entry formatter documentation was present; selected document response 2070\u21922155 tokens grew 85. Retrieval usefulness is separate from a guaranteed saving.",
       "artifact_baselines": [
         {
           "id": "fresh-context-hub-d6e54188fc269b6fad9d1804",
@@ -1382,7 +1436,7 @@
         "install_note": "`uv tool install markitdown==0.1.7`",
         "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
       },
-      "returned_result_summary": "Retained upstream CLI exited 0 and output contained the expected greeting heading. Stored HTML conversion 10322→1360 o 200 k tokens; base HTML converter only, PDF/Office extras absent from this installation.",
+      "returned_result_summary": "Retained upstream CLI exited 0 and output contained the expected greeting heading. Stored HTML conversion 10322\u21921360 o 200 k tokens; base HTML converter only, PDF/Office extras absent from this installation.",
       "session_statistics": {
         "availability": "none",
         "value": null,
@@ -1395,7 +1449,7 @@
         "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
         "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
       },
-      "baseline_summary": "Retained upstream CLI exited 0 and output contained the expected greeting heading. Stored HTML conversion 10322→1360 o 200 k tokens; base HTML converter only, PDF/Office extras absent from this installation.",
+      "baseline_summary": "Retained upstream CLI exited 0 and output contained the expected greeting heading. Stored HTML conversion 10322\u21921360 o 200 k tokens; base HTML converter only, PDF/Office extras absent from this installation.",
       "artifact_baselines": [
         {
           "id": "fresh-markitdown-47190dd82f1c34d362a22b58",
@@ -1660,7 +1714,7 @@
         "statistics": [],
         "command_kind": "Read-only upstream validation, health and query commands from the retained exact-session evidence. No installer or service mutation is run by this row."
       },
-      "returned_result_summary": "2026-09-20 14:17 UTC: Collector health returned HTTP 200 and status 'Server available'; the native user service was active in the follow-up. Existing configuration routes native client telemetry to local backends. Health and configured routing alone do not prove exact task attribution.",
+      "returned_result_summary": "2026-09-20 14:17 UTC: Collector health returned HTTP 200 and status 'Server available'; the native user service was active in the follow-up. Existing configuration routes native client telemetry to local backends. Health and configured routing alone do not prove exact task attribution. Later foundation evidence: native Codex returned 219,725 total tokens, matched by 9 Loki responses and Prometheus. The original seven-tool Claude returned 254,111, matched by 6 Loki responses, while Prometheus lacks 77,317; strict final JSON failed although required content passed. A separate Claude run waited for writer readiness and returned 35,537, with all four usage categories matched in Loki/Prometheus, zero tools and zero agents. These are separate native processes, not this Desktop task or measured savings.",
       "session_statistics": {
         "availability": "none",
         "value": null,
@@ -1675,18 +1729,19 @@
       },
       "baseline_summary": "No matched token-reduction baseline applies to this observation role. Preserve actual query outcomes and measurement boundaries.",
       "native_client_evidence": {
-        "desktop": "Current Desktop exporter delivery is corroborated by exact-parent Loki events. Native Claude uses a separate configured route whose metrics omit session/account identifiers; do not infer its task identity from unscoped series.",
-        "codex": "The current receipt concerns the Desktop parent task; historical SDK/native CLI receipts retain their own labels and scope.",
-        "claude": "A configured export route is distinct from an independently attributed native Claude task; current metrics omit session/account identifiers."
+        "desktop": "Dated 14:17\u201314:28 UTC exact-parent Loki delivery corroborates the retained Desktop exporter route. The later native foundation and readiness runs use separate writers and do not qualify this Desktop task total.",
+        "codex": "Foundation native run 15:46:10\u201315:46:43 UTC: seven requested MCP calls and exact source passed; returned 219,725 usage matches9 Loki responses and Prometheus. Separate from retained Desktop evidence; no resume or causal savings claim.",
+        "claude": "Foundation seven-tool run 15:49:15\u201315:49:29 UTC: required source/content passed but strict final JSON failed; 254,111 returned tokens match6 Loki responses while Prometheus misses 77,317. Separate readiness run 16:01:38 UTC: 35,537 matches native/Loki/Prometheus in all four categories, with 0 tools / 0 agents. Original gap remains; no live Desktop acceptance."
       },
-      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration.",
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration. Foundation observation reused the configured route without reinstall, restart or collector configuration change; the separate readiness run explicitly waited for its new writer before sending a user request.",
       "source_paths": [
         "evidence/receipts/current-session-observation-20260920.json",
         "docs/current-session-observation.md",
         "observability/README.md",
         "observability/backends/README.md",
         "adoption/lifecycle.md",
-        "blueprints/token-native-focus/saturation-audit.json"
+        "blueprints/token-native-focus/saturation-audit.json",
+        "evidence/receipts/foundation-native-20260920.json"
       ],
       "retained_observations": [
         {
@@ -1695,6 +1750,38 @@
           "exit_code": 0,
           "http_status": 200,
           "returned_body": "{\"status\":\"Server available\",\"upSince\":\"2026-09-19T11:28:52.529351607-04:00\",\"uptime\":\"21h55m12.872514984s\"}"
+        }
+      ],
+      "earlier_native_client_evidence": {
+        "source_path": "evidence/receipts/current-session-observation-20260920.json",
+        "recorded_at_utc": "2026-09-20T14:28:53.815791+00:00",
+        "value": {
+          "desktop": "Current Desktop exporter delivery is corroborated by exact-parent Loki events. Native Claude uses a separate configured route whose metrics omit session/account identifiers; do not infer its task identity from unscoped series.",
+          "codex": "The current receipt concerns the Desktop parent task; historical SDK/native CLI receipts retain their own labels and scope.",
+          "claude": "A configured export route is distinct from an independently attributed native Claude task; current metrics omit session/account identifiers."
+        }
+      },
+      "foundation_native_observations": [
+        {
+          "name": "foundation_native_codex_seven_tool_acceptance",
+          "source_path": "evidence/receipts/foundation-native-20260920.json",
+          "source_pointer": "/native_client_acceptance/codex",
+          "native_total_tokens": 219725,
+          "scope": "One fresh native codex process with seven requested MCP calls; no resume, Desktop reconnect or whole-session savings baseline."
+        },
+        {
+          "name": "foundation_native_claude_seven_tool_acceptance",
+          "source_path": "evidence/receipts/foundation-native-20260920.json",
+          "source_pointer": "/native_client_acceptance/claude",
+          "native_total_tokens": 254111,
+          "scope": "One fresh native claude process with seven requested MCP calls; no resume, Desktop reconnect or whole-session savings baseline."
+        },
+        {
+          "name": "foundation_native_claude_observation_after_readiness",
+          "source_path": "evidence/receipts/foundation-native-20260920.json",
+          "source_pointer": "/observation_resolution",
+          "native_total_tokens": 35537,
+          "scope": "One fresh native Claude process, initialized and observed before its one short user prompt; zero tools or agents. Does not erase the original seven-tool run observation gap."
         }
       ]
     },
@@ -1717,7 +1804,7 @@
         ],
         "command_kind": "Read-only upstream validation, health and query commands from the retained exact-session evidence. No installer or service mutation is run by this row."
       },
-      "returned_result_summary": "2026-09-20 14:17–14:18 UTC: readiness returned HTTP 200, 'Prometheus Server is Ready.' All seven selected up series returned 1. The sdk-worker six-hour usage query returned an empty successful result; 12 unscoped codex-app-server token series existed. Those series lacked the exact task/client scope needed to reconcile current-parent usage with Loki.",
+      "returned_result_summary": "2026-09-20 14:17\u201314:18 UTC: readiness returned HTTP 200, 'Prometheus Server is Ready.' All seven selected up series returned 1. The sdk-worker six-hour usage query returned an empty successful result; 12 unscoped codex-app-server token series existed. Those series lacked the exact task/client scope needed to reconcile current-parent usage with Loki. Later foundation evidence: native Codex returned 219,725 total tokens, matched by 9 Loki responses and Prometheus. The original seven-tool Claude returned 254,111, matched by 6 Loki responses, while Prometheus lacks 77,317; strict final JSON failed although required content passed. A separate Claude run waited for writer readiness and returned 35,537, with all four usage categories matched in Loki/Prometheus, zero tools and zero agents. These are separate native processes, not this Desktop task or measured savings.",
       "session_statistics": {
         "availability": "none",
         "value": null,
@@ -1732,18 +1819,19 @@
       },
       "baseline_summary": "No matched token-reduction baseline applies to this observation role. Preserve actual query outcomes and measurement boundaries.",
       "native_client_evidence": {
-        "desktop": "Desktop app-server metrics exist, but this receipt cannot assign their totals to the exact parent task. Native Claude metrics omit session/account identifiers by configuration. Empty SDK-scoped results do not mean zero provider consumption.",
-        "codex": "The current receipt concerns the Desktop parent task; historical SDK/native CLI receipts retain their own labels and scope.",
-        "claude": "A configured export route is distinct from an independently attributed native Claude task; current metrics omit session/account identifiers."
+        "desktop": "The dated 14:17\u201314:28 UTC receipt found Desktop app-server metrics but could not attribute a total to its exact parent task. Empty SDK-scoped results were not zero consumption. Later native matches do not fill that Desktop observation gap.",
+        "codex": "Foundation native run 15:46:10\u201315:46:43 UTC: seven requested MCP calls and exact source passed; returned 219,725 usage matches9 Loki responses and Prometheus. Separate from retained Desktop evidence; no resume or causal savings claim.",
+        "claude": "Foundation seven-tool run 15:49:15\u201315:49:29 UTC: required source/content passed but strict final JSON failed; 254,111 returned tokens match6 Loki responses while Prometheus misses 77,317. Separate readiness run 16:01:38 UTC: 35,537 matches native/Loki/Prometheus in all four categories, with 0 tools / 0 agents. Original gap remains; no live Desktop acceptance."
       },
-      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration.",
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration. Foundation observation reused the configured route without reinstall, restart or collector configuration change; the separate readiness run explicitly waited for its new writer before sending a user request.",
       "source_paths": [
         "evidence/receipts/current-session-observation-20260920.json",
         "docs/current-session-observation.md",
         "observability/README.md",
         "observability/backends/README.md",
         "adoption/lifecycle.md",
-        "blueprints/token-native-focus/saturation-audit.json"
+        "blueprints/token-native-focus/saturation-audit.json",
+        "evidence/receipts/foundation-native-20260920.json"
       ],
       "retained_observations": [
         {
@@ -1862,6 +1950,38 @@
             }
           ]
         }
+      ],
+      "earlier_native_client_evidence": {
+        "source_path": "evidence/receipts/current-session-observation-20260920.json",
+        "recorded_at_utc": "2026-09-20T14:28:53.815791+00:00",
+        "value": {
+          "desktop": "Desktop app-server metrics exist, but this receipt cannot assign their totals to the exact parent task. Native Claude metrics omit session/account identifiers by configuration. Empty SDK-scoped results do not mean zero provider consumption.",
+          "codex": "The current receipt concerns the Desktop parent task; historical SDK/native CLI receipts retain their own labels and scope.",
+          "claude": "A configured export route is distinct from an independently attributed native Claude task; current metrics omit session/account identifiers."
+        }
+      },
+      "foundation_native_observations": [
+        {
+          "name": "foundation_native_codex_seven_tool_acceptance",
+          "source_path": "evidence/receipts/foundation-native-20260920.json",
+          "source_pointer": "/native_client_acceptance/codex",
+          "native_total_tokens": 219725,
+          "scope": "One fresh native codex process with seven requested MCP calls; no resume, Desktop reconnect or whole-session savings baseline."
+        },
+        {
+          "name": "foundation_native_claude_seven_tool_acceptance",
+          "source_path": "evidence/receipts/foundation-native-20260920.json",
+          "source_pointer": "/native_client_acceptance/claude",
+          "native_total_tokens": 254111,
+          "scope": "One fresh native claude process with seven requested MCP calls; no resume, Desktop reconnect or whole-session savings baseline."
+        },
+        {
+          "name": "foundation_native_claude_observation_after_readiness",
+          "source_path": "evidence/receipts/foundation-native-20260920.json",
+          "source_pointer": "/observation_resolution",
+          "native_total_tokens": 35537,
+          "scope": "One fresh native Claude process, initialized and observed before its one short user prompt; zero tools or agents. Does not erase the original seven-tool run observation gap."
+        }
       ]
     },
     {
@@ -1882,7 +2002,7 @@
         ],
         "command_kind": "Read-only upstream validation, health and query commands from the retained exact-session evidence. No installer or service mutation is run by this row."
       },
-      "returned_result_summary": "2026-09-20 14:17 UTC: initial readiness returned HTTP 503 during the ingester ready delay; a 14:18:31 UTC follow-up returned 'ready' and HTTP 200. The exact-parent 24-hour query returned 2, 778 codex-app-server records; the recent 15-minute provider query returned 391. Four retained event correlations matched SocratiCode search, ai-memory observations and both Serena pattern attempts, including the initial empty result and later source match.",
+      "returned_result_summary": "2026-09-20 14:17 UTC: initial readiness returned HTTP 503 during the ingester ready delay; a 14:18:31 UTC follow-up returned 'ready' and HTTP 200. The exact-parent 24-hour query returned 2, 778 codex-app-server records; the recent 15-minute provider query returned 391. Four retained event correlations matched SocratiCode search, ai-memory observations and both Serena pattern attempts, including the initial empty result and later source match. Later foundation evidence: native Codex returned 219,725 total tokens, matched by 9 Loki responses and Prometheus. The original seven-tool Claude returned 254,111, matched by 6 Loki responses, while Prometheus lacks 77,317; strict final JSON failed although required content passed. A separate Claude run waited for writer readiness and returned 35,537, with all four usage categories matched in Loki/Prometheus, zero tools and zero agents. These are separate native processes, not this Desktop task or measured savings.",
       "session_statistics": {
         "availability": "none",
         "value": null,
@@ -1897,18 +2017,19 @@
       },
       "baseline_summary": "No matched token-reduction baseline applies to this observation role. Preserve actual query outcomes and measurement boundaries.",
       "native_client_evidence": {
-        "desktop": "Exact-parent Desktop tool completion events are corroborated. Event transport success alone does not prove useful content; returned tool evidence supplies that check. No unique whole-session provider-token total or native Claude task-level metric match was established.",
-        "codex": "The current receipt concerns the Desktop parent task; historical SDK/native CLI receipts retain their own labels and scope.",
-        "claude": "A configured export route is distinct from an independently attributed native Claude task; current metrics omit session/account identifiers."
+        "desktop": "Dated 14:17\u201314:28 UTC exact-parent Desktop tool events matched retained direct results, including the initial empty Serena result. That evidence did not establish a unique whole-Desktop-session provider total. Later native client matches are separate.",
+        "codex": "Foundation native run 15:46:10\u201315:46:43 UTC: seven requested MCP calls and exact source passed; returned 219,725 usage matches9 Loki responses and Prometheus. Separate from retained Desktop evidence; no resume or causal savings claim.",
+        "claude": "Foundation seven-tool run 15:49:15\u201315:49:29 UTC: required source/content passed but strict final JSON failed; 254,111 returned tokens match6 Loki responses while Prometheus misses 77,317. Separate readiness run 16:01:38 UTC: 35,537 matches native/Loki/Prometheus in all four categories, with 0 tools / 0 agents. Original gap remains; no live Desktop acceptance."
       },
-      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration.",
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration. Foundation observation reused the configured route without reinstall, restart or collector configuration change; the separate readiness run explicitly waited for its new writer before sending a user request.",
       "source_paths": [
         "evidence/receipts/current-session-observation-20260920.json",
         "docs/current-session-observation.md",
         "observability/README.md",
         "observability/backends/README.md",
         "adoption/lifecycle.md",
-        "blueprints/token-native-focus/saturation-audit.json"
+        "blueprints/token-native-focus/saturation-audit.json",
+        "evidence/receipts/foundation-native-20260920.json"
       ],
       "retained_observations": [
         {
@@ -1969,6 +2090,38 @@
           "exit_code": 0,
           "stdout": "ready\n\n200",
           "stderr": ""
+        }
+      ],
+      "earlier_native_client_evidence": {
+        "source_path": "evidence/receipts/current-session-observation-20260920.json",
+        "recorded_at_utc": "2026-09-20T14:28:53.815791+00:00",
+        "value": {
+          "desktop": "Exact-parent Desktop tool completion events are corroborated. Event transport success alone does not prove useful content; returned tool evidence supplies that check. No unique whole-session provider-token total or native Claude task-level metric match was established.",
+          "codex": "The current receipt concerns the Desktop parent task; historical SDK/native CLI receipts retain their own labels and scope.",
+          "claude": "A configured export route is distinct from an independently attributed native Claude task; current metrics omit session/account identifiers."
+        }
+      },
+      "foundation_native_observations": [
+        {
+          "name": "foundation_native_codex_seven_tool_acceptance",
+          "source_path": "evidence/receipts/foundation-native-20260920.json",
+          "source_pointer": "/native_client_acceptance/codex",
+          "native_total_tokens": 219725,
+          "scope": "One fresh native codex process with seven requested MCP calls; no resume, Desktop reconnect or whole-session savings baseline."
+        },
+        {
+          "name": "foundation_native_claude_seven_tool_acceptance",
+          "source_path": "evidence/receipts/foundation-native-20260920.json",
+          "source_pointer": "/native_client_acceptance/claude",
+          "native_total_tokens": 254111,
+          "scope": "One fresh native claude process with seven requested MCP calls; no resume, Desktop reconnect or whole-session savings baseline."
+        },
+        {
+          "name": "foundation_native_claude_observation_after_readiness",
+          "source_path": "evidence/receipts/foundation-native-20260920.json",
+          "source_pointer": "/observation_resolution",
+          "native_total_tokens": 35537,
+          "scope": "One fresh native Claude process, initialized and observed before its one short user prompt; zero tools or agents. Does not erase the original seven-tool run observation gap."
         }
       ]
     },
@@ -2051,7 +2204,7 @@
         "availability": "not_established",
         "value": null,
         "scope": "No accepted current gateway inference savings comparison.",
-        "summary": "Exact-dedup preview894→470 preserves both facts; single447→447 is unchanged. This is a preview, not session/provider savings."
+        "summary": "Exact-dedup preview894\u2192470 preserves both facts; single447\u2192447 is unchanged. This is a preview, not session/provider savings."
       },
       "lifetime_statistics": {
         "availability": "upstream_retained_counters",
@@ -2059,7 +2212,7 @@
         "scope": "Existing Windows gateway retained history at2026-09-20T15:46:53Z, separate from clean Linux fixture.",
         "summary": "Compression saved0; semantic-cache saved0; historical provider-prefix cache field tokensSaved41903, unchanged. Retained consumed57720 is separate; new causal savings unavailable."
       },
-      "baseline_summary": "RTK447→14 and lite447→444 both lost a required value and failed validation. Only exact session-dedup accepted the repeated-history preview. Global compression remainsoff.",
+      "baseline_summary": "RTK447\u219214 and lite447\u2192444 both lost a required value and failed validation. Only exact session-dedup accepted the repeated-history preview. Global compression remainsoff.",
       "native_client_evidence": {
         "desktop": "The Linux CLI is now on native PATH. This Desktop task is not automatically rerouted.",
         "codex": "Stored exact-model alias readback passed; corrected native routing remains pending connected-account quota. Native default GPT-6 Astra independently passed foundation retrieval.",
@@ -2074,11 +2227,176 @@
     }
   ],
   "latest_counter_capture": {
-    "capture_id": "20260920T145557-577415c6",
-    "generated_at": "2026-09-20T14:56:03.739753+00:00",
-    "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
-    "boundary": "Read-only retained snapshots. Context Mode process-file session values are not linked to fresh client acceptance sessions; no cumulative snapshots or runtime scopes are summed."
+    "generated_at": "2026-09-20T15:50:45.673231+00:00",
+    "source_path": "evidence/receipts/foundation-native-20260920.json",
+    "source_pointer": "/native_counter_snapshot",
+    "scope": "Latest retained foundation reporter snapshot, with no collection performed by this document update. Per-row observed_at and source_path identify the actual reading used in that row.",
+    "boundary": "The foundation jCodeMunch reading is 15:50:40 UTC; the reporter completed at 15:50:45 UTC. Earlier 14:56 snapshots and process-session estimates remain dated history. Runtime counters, shared-ledger/session subsets and provider usage are not summed."
   },
-  "native_client_acceptance_source": "evidence/receipts/native-token-stack-final-20260920.json",
-  "foundation_acceptance_source": "evidence/receipts/foundation-native-20260920.json"
+  "native_client_acceptance_source": "evidence/receipts/foundation-native-20260920.json",
+  "foundation_acceptance_source": "evidence/receipts/foundation-native-20260920.json",
+  "foundation_reconciliation": {
+    "source_revision": "a677c7506bc12c0e426fcc5224d3fcec4a245f19",
+    "source_path": "evidence/receipts/foundation-native-20260920.json",
+    "source_recorded_at_utc": "2026-09-20T16:03:22.849491+00:00",
+    "scope": "Documentation reconciliation of published receipts only; no tool execution, inference, service probe or live Desktop recertification."
+  },
+  "earlier_counter_captures": [
+    {
+      "capture_id": "20260920T145557-577415c6",
+      "generated_at": "2026-09-20T14:56:03.739753+00:00",
+      "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
+      "boundary": "Read-only retained snapshots. Context Mode process-file session values are not linked to fresh client acceptance sessions; no cumulative snapshots or runtime scopes are summed."
+    }
+  ],
+  "earlier_native_client_acceptance_sources": [
+    "evidence/receipts/native-token-stack-final-20260920.json"
+  ],
+  "foundation_native_acceptance": {
+    "source_path": "evidence/receipts/foundation-native-20260920.json",
+    "recorded_at_utc": "2026-09-20T16:03:22.849491+00:00",
+    "scope": "Three separate native runs. Observer copies confirm the specified returned usage; they are not invoices, measured avoided tokens or this Desktop task total.",
+    "observations": [
+      {
+        "name": "foundation_native_codex_seven_tool_acceptance",
+        "source_path": "evidence/receipts/foundation-native-20260920.json",
+        "source_pointer": "/native_client_acceptance/codex",
+        "started_at_utc": "2026-09-20T15:46:10.031Z",
+        "completed_at_utc": "2026-09-20T15:46:43.151Z",
+        "scope": "One fresh native codex process with seven requested MCP calls; no resume, Desktop reconnect or whole-session savings baseline.",
+        "requested_model": "gpt-6-astra",
+        "returned_models": [
+          "gpt-6-astra"
+        ],
+        "requested_mcp_calls": 7,
+        "content_pass": true,
+        "strict_final_JSON": true,
+        "native_usage": {
+          "input_tokens": 219267,
+          "cached_input_tokens": 190336,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 458,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 219725
+        },
+        "loki_matches_direct": true,
+        "loki_matched_requests": 9,
+        "prometheus_matches_direct": true,
+        "prometheus_missing": {
+          "input_tokens": 0,
+          "cached_input_tokens": 0,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 0,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 0
+        },
+        "same_process_jcode_delta_estimate": 4970,
+        "exit_code": 0,
+        "limits": [
+          "One fresh native invocation; no resume, Desktop reconnect or PC reboot.",
+          "Provider usage and observer copies are not billing or a measured savings baseline; cached fields are subsets/categories.",
+          "Direct MCP source fidelity is established separately; raw observer bodies remain private.",
+          "Unmatched startup response usage remains separate with unknown billing treatment."
+        ],
+        "exact_function_body_matches_source": true,
+        "source_files_unchanged": true
+      },
+      {
+        "name": "foundation_native_claude_seven_tool_acceptance",
+        "source_path": "evidence/receipts/foundation-native-20260920.json",
+        "source_pointer": "/native_client_acceptance/claude",
+        "started_at_utc": "2026-09-20T15:49:15.562Z",
+        "completed_at_utc": "2026-09-20T15:49:29.154Z",
+        "scope": "One fresh native claude process with seven requested MCP calls; no resume, Desktop reconnect or whole-session savings baseline.",
+        "requested_model": "claude-opus-5[1m]",
+        "returned_models": [
+          "claude-opus-5"
+        ],
+        "requested_mcp_calls": 7,
+        "content_pass": true,
+        "strict_final_JSON": false,
+        "native_usage": {
+          "input_tokens": 12,
+          "cache_creation_input_tokens": 34270,
+          "cache_read_input_tokens": 218267,
+          "output_tokens": 1562,
+          "total_tokens": 254111
+        },
+        "loki_matches_direct": true,
+        "loki_matched_requests": 6,
+        "prometheus_matches_direct": false,
+        "prometheus_missing": {
+          "input_tokens": 4,
+          "cache_creation_input_tokens": 26668,
+          "cache_read_input_tokens": 50222,
+          "output_tokens": 423,
+          "total_tokens": 77317
+        },
+        "same_process_jcode_delta_estimate": 4970,
+        "exit_code": 0,
+        "limits": [
+          "One fresh native invocation; no resume, Desktop reconnect or PC reboot.",
+          "Provider usage and observer copies are not billing or a measured savings baseline; cached fields are subsets/categories.",
+          "Direct MCP source fidelity is established separately; raw observer bodies remain private."
+        ],
+        "exact_function_body_matches_source": true,
+        "source_files_unchanged": true
+      },
+      {
+        "name": "foundation_native_claude_observation_after_readiness",
+        "source_path": "evidence/receipts/foundation-native-20260920.json",
+        "source_pointer": "/observation_resolution",
+        "captured_at_utc": "2026-09-20T16:03:22.849491+00:00",
+        "first_user_message_sent_at_utc": "2026-09-20T16:01:38.045Z",
+        "scope": "One fresh native Claude process, initialized and observed before its one short user prompt; zero tools or agents. Does not erase the original seven-tool run observation gap.",
+        "requested_model": "claude-opus-5[1m]",
+        "canonical_model": "claude-opus-5",
+        "native_usage": {
+          "input_tokens": 2,
+          "cache_creation_input_tokens": 22728,
+          "cache_read_input_tokens": 12792,
+          "output_tokens": 15,
+          "total_tokens": 35537
+        },
+        "loki_usage": {
+          "input_tokens": 2,
+          "cache_creation_input_tokens": 22728,
+          "cache_read_input_tokens": 12792,
+          "output_tokens": 15,
+          "total_tokens": 35537
+        },
+        "prometheus_usage": {
+          "cache_creation_input_tokens": 22728,
+          "cache_read_input_tokens": 12792,
+          "input_tokens": 2,
+          "output_tokens": 15,
+          "total_tokens": 35537
+        },
+        "all_four_categories_match": true,
+        "tool_calls": 0,
+        "subagents": 0,
+        "loki_matched_requests": 1,
+        "initialize_acknowledged": true,
+        "no_user_model_request_before_readiness": true,
+        "readiness_elapsed_ms": 11138,
+        "result": "READY_OBSERVATION_OK",
+        "exit_code": 0,
+        "recipe": [
+          "Launch the configured native client with --input-format stream-json and --output-format stream-json, preserving account and native settings; assign one fresh service.instance.id and ecosystem.task.id before launch.",
+          "Send the upstream initialize control request, keep stdin open, and withhold user messages.",
+          "Poll the loopback collector exporter for that exact writer\u2019s claude_code.session.count counter, with a 45-second ceiling. Counter creation precedes the native session increment in installed source. Stop cleanly without model calls if unavailable.",
+          "After the counter is observed, send one user message in the same stdin stream, close stdin, retain native result, then query Loki and Prometheus using the fresh identities and bounded times."
+        ],
+        "collector_configuration_changed": false,
+        "default_native_workflow_changed": false,
+        "original_seven_tool_Prometheus_gap_preserved": true,
+        "limits": [
+          "Explicit observed-run recipe, not a global wrapper or default workflow change.",
+          "Only one short request was measured after readiness; no tool-heavy replay or fresh Desktop acceptance.",
+          "Provider consumption is native reported usage confirmed in two backends, not a token-savings baseline or invoice.",
+          "Original earlier two-request metric loss is retained. This successful readiness run supports the asynchronous-startup hypothesis but does not retrospectively recover missing raw metric points."
+        ]
+      }
+    ]
+  }
 }
