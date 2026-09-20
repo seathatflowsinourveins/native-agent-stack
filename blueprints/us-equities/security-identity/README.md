@@ -160,3 +160,86 @@ path without external access. Dependency availability is checked before importin
 the optional SDK, so the lightweight CI environment can skip that native check.
 Native authenticated counts belong in a separately reviewed execution receipt;
 these tests do not establish provider acceptance.
+
+## Retained zero-activity observation and bounded continuation
+
+The original native capture returned HTTP 200 for every attempted request, but
+the META-unmapped case failed the original positive-VWAP guard. Its first page
+contained a positive-OHLC row reporting numeric `v=0`, `n=0`, `vw=0`, followed by
+a row with positive activity fields. That page also had a non-null continuation
+token. The failure stopped pagination; reparsing the page alone cannot establish
+a complete query.
+
+The [official stock aggregation FAQ](https://docs.alpaca.markets/us/docs/market-data-faq)
+states that emitted stock bars require nonzero volume and OHLC. The retained
+zero-volume observation conflicts with that documented rule. The cause remains
+unknown. The FAQ's separate crypto midpoint explanation is not applied to this
+stock observation. The installed native `Bar` model accepts zero numeric fields;
+SDK schema acceptance neither explains the source discrepancy nor qualifies a
+price for trading.
+
+The new [quality adapter](quality.py) leaves the original probe and acquisition
+receipt unchanged. It first verifies the original external receipt anchor, copies
+all original artifacts to a new private directory and reproduces the original
+failed status. It then reparses exact source numbers under a separately frozen
+quality policy. All zero values remain zero; no replacement, imputation or
+synthetic VWAP is introduced.
+
+`reported_zero_activity=true` means exactly that volume, count and VWAP in this
+source row are all numeric zeros. Its local quality is
+`quarantined_reported_zero_activity` and `price_observation_qualified=false`.
+Other zero combinations are also quarantined. Positive activity fields can qualify
+an observation under this local numeric policy; this never establishes trade,
+fill, halt, security identity or market-wide activity claims. Documentation
+discrepancy counts remain separate and visible. Unknown historical validity and
+original-availability fields remain NULL.
+
+```bash
+# Offline reparse of retained pages; an unfinished query remains partial.
+"$SDK_PYTHON" blueprints/us-equities/security-identity/quality.py derive \
+  --source "$IDENTITY_RUN" --receipt-sha256 "$IDENTITY_RECEIPT_SHA256" \
+  --out "$QUALITY_DERIVATION"
+
+# Explicitly authorized continuation in a different new directory.
+"$SDK_PYTHON" blueprints/us-equities/security-identity/quality.py resume \
+  --source "$IDENTITY_RUN" --receipt-sha256 "$IDENTITY_RECEIPT_SHA256" \
+  --out "$QUALITY_RESUMED_RUN"
+
+"$SDK_PYTHON" blueprints/us-equities/security-identity/quality.py verify \
+  --run "$QUALITY_RESUMED_RUN" --receipt-sha256 "$QUALITY_RECEIPT_SHA256"
+"$SDK_PYTHON" blueprints/us-equities/security-identity/ledger.py materialize \
+  --derived --source "$QUALITY_RESUMED_RUN" \
+  --receipt-sha256 "$QUALITY_RECEIPT_SHA256" --out "$QUALITY_LEDGER"
+```
+
+Only `resume` can issue new requests. It keeps all original pages, case results
+and the current asset snapshot, then uses the saved META-unmapped token with
+the original query parameters. It never re-fetches page 1 or another case/asset.
+At most two additional one-attempt requests fit inside the original three-page
+case limit and 13-attempt overall ceiling. Every new response has its own raw
+bytes, status and observation instant. A refusal, malformed response or capped
+nonterminal chain remains failed/partial and retains the already validated
+prefix. No unchanged failure is retried. Offline derive/verify/materialize/select
+perform no requests and never construct an authenticated client.
+
+The new receipt binds original source/code hashes, the new quality policy and
+adapter, and any continuation raw pages and metadata. Its public summary keeps
+`original_probe_exit`, original case status and current normalization/query
+completion separate. Mapped alias comparisons and every unmapped observation's
+raw-field comparison remain separate; overlapping dates with conflicting values
+are counted without merging or discarding either query observation.
+Before a real continuation client is constructed, its current SDK version and
+source fingerprints are frozen separately from the original capture's runtime.
+Offline verification checks that retained identity without importing the SDK;
+injected test transports are labeled explicitly and claim no native identity.
+
+The derived ledger retains both original and derivation receipt anchors, source
+phase and quality flags. Eligibility still means that an observation was received
+by the cutoff. Results partition their count into `qualified_count` and
+`quarantined_count`; quarantined records remain visible as observations and are
+never silently promoted into prices for a trading or fill model. Original event
+and observation nanoseconds are unchanged; only new continuation pages receive
+new observation times. Ledger verification also binds the quality adapter bytes
+and replays its anchored derivation before checking Parquet and SQL results.
+Pages observed at different times do not establish an atomic provider snapshot
+or provider revision ordering.

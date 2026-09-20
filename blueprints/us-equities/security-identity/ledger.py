@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Immutable native DuckDB/Parquet ledger for verified query-scoped observations."""
 import argparse
+from decimal import Decimal
 import importlib.metadata
 import importlib.util
 import json
@@ -12,10 +13,10 @@ SPEC = importlib.util.spec_from_file_location("identity_probe", HERE / "probe.py
 P = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(P)
 B = P.B
-BAR_FIELDS = [*P.FIELDS, "case_id", "requested_symbol", "returned_symbol", "request_asof", "event_at", "event_ns", "session_date", "observed_ns", "available_ns", "valid_from", "valid_to", "original_publication_at", "provider_revision_at", "permanent_security_id", "source_sha256", "source_bytes", "first_observed_at", "acquisition_receipt_sha256"]
-ASSET_FIELDS = ["provider_asset_id", "symbol", "status", "exchange", "asset_class", "tradable", "valid_from", "valid_to", "original_publication_at", "provider_revision_at", "historical_universe_eligible", "observed_ns", "source_sha256", "source_bytes", "first_observed_at", "acquisition_receipt_sha256"]
+BAR_FIELDS = [*P.FIELDS, "case_id", "requested_symbol", "returned_symbol", "request_asof", "event_at", "event_ns", "session_date", "observed_ns", "available_ns", "valid_from", "valid_to", "original_publication_at", "provider_revision_at", "permanent_security_id", "source_sha256", "source_bytes", "first_observed_at", "acquisition_receipt_sha256", "derivation_receipt_sha256", "quality", "reported_zero_activity", "price_observation_qualified", "source_phase"]
+ASSET_FIELDS = ["provider_asset_id", "symbol", "status", "exchange", "asset_class", "tradable", "valid_from", "valid_to", "original_publication_at", "provider_revision_at", "historical_universe_eligible", "observed_ns", "source_sha256", "source_bytes", "first_observed_at", "acquisition_receipt_sha256", "derivation_receipt_sha256"]
 INTEGER = {"event_ns", "observed_ns", "available_ns", "source_bytes"}
-BOOLEAN = {"tradable", "historical_universe_eligible"}
+BOOLEAN = {"tradable", "historical_universe_eligible", "reported_zero_activity", "price_observation_qualified"}
 SCHEMAS = {"bars": BAR_FIELDS, "assets": ASSET_FIELDS}
 
 
@@ -27,7 +28,29 @@ def connection():
 
 
 def bar_records(acquisition, anchor):
-    return [dict(row, acquisition_receipt_sha256=anchor) for case in acquisition["cases"].values() for row in case["rows"]]
+    rows = []
+    for case in acquisition["cases"].values():
+        for row in case["rows"]:
+            qualified = all(Decimal(row[f]) > 0 for f in ["v", "n", "vw"])
+            zero = all(Decimal(row[f]) == 0 for f in ["v", "n", "vw"])
+            defaults = {"quality": "qualified_observation" if qualified else "quarantined_reported_zero_activity" if zero else "quarantined_inconsistent_activity", "reported_zero_activity": zero, "price_observation_qualified": qualified, "source_phase": "original_capture"}
+            rows.append(defaults | row | anchors(acquisition, anchor))
+    return rows
+
+
+def anchors(acquisition, anchor):
+    return {"acquisition_receipt_sha256": acquisition.get("original_receipt_sha256", anchor),
+            "derivation_receipt_sha256": anchor if "original_receipt_sha256" in acquisition else None}
+
+
+def quality_module():
+    spec = importlib.util.spec_from_file_location("ledger_quality", HERE / "quality.py")
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
+
+
+def source_verify(source, anchor, derived):
+    return quality_module().verify(source, anchor) if derived else P.verify(source, anchor)
 
 
 def source_statuses(acquisition):
@@ -46,6 +69,11 @@ def validate_rows(rows):
             raise ValueError("invalid_observation_availability")
         if any(row[k] is not None for k in ["valid_from", "valid_to", "original_publication_at", "provider_revision_at", "permanent_security_id"]):
             raise ValueError("unsupported_historical_identity_claim")
+        qualified = all(Decimal(row[f]) > 0 for f in ["v", "n", "vw"])
+        zero = all(Decimal(row[f]) == 0 for f in ["v", "n", "vw"])
+        expected_quality = "qualified_observation" if qualified else "quarantined_reported_zero_activity" if zero else "quarantined_inconsistent_activity"
+        if row["price_observation_qualified"] is not qualified or row["reported_zero_activity"] is not zero or row["quality"] != expected_quality or row["source_phase"] not in {"original_capture", "continuation"}:
+            raise ValueError("quality_flag_mismatch")
         key = (row["case_id"], row["event_ns"], row["observed_ns"])
         if key in seen:
             raise ValueError("ambiguous_semantic_revision")
@@ -67,6 +95,8 @@ def selection(con, sql, cutoff_ns, case_id=None):
     names = [c[0] for c in cursor.description]
     rows = [dict(zip(names, row)) for row in cursor.fetchall()]
     return {"case_id": case_id, "cutoff_ns": str(cutoff_ns), "count": len(rows),
+            "qualified_count": sum(r["price_observation_qualified"] for r in rows),
+            "quarantined_count": sum(not r["price_observation_qualified"] for r in rows),
             "selected_rows_sha256": B.sha(B.encode(rows)), "historical_universe_eligible": False}
 
 
@@ -81,25 +111,32 @@ def proof(con, sql, rows):
     return result
 
 
-def materialize(source, expected_receipt_sha256, out):
+def materialize(source, expected_receipt_sha256, out, *, derived=False):
     out = B.safe_path(out)
     if out.exists():
         raise FileExistsError("output_directory_exists")
     source = B.safe_path(source)
-    P.verify(source, expected_receipt_sha256)
+    source_verify(source, expected_receipt_sha256, derived)
     out = P.new_directory(out)
     frozen_source = out / "source"
     frozen_source.mkdir(mode=0o700)
-    for path in sorted(source.iterdir()):
-        B.write_new(frozen_source / path.name, B.read(path))
+    for path in sorted(source.rglob("*")):
+        B.safe_path(path)
+        target = frozen_source / path.relative_to(source)
+        if path.is_dir():
+            target.mkdir(mode=0o700)
+        else:
+            B.write_new(target, B.read(path))
     # Reparse exactly the copied bytes under the external anchor, not mutable paths.
-    acquisition = P.verify(frozen_source, expected_receipt_sha256)
+    acquisition = source_verify(frozen_source, expected_receipt_sha256, derived)
     rows = bar_records(acquisition, expected_receipt_sha256)
     validate_rows(rows)
-    assets = [dict(row, acquisition_receipt_sha256=expected_receipt_sha256) for row in acquisition["asset"]["rows"]]
+    assets = [row | anchors(acquisition, expected_receipt_sha256) for row in acquisition["asset"]["rows"]]
     sql_raw = B.read(HERE / "select.sql")
     for name, raw in [("select.sql", sql_raw), ("ledger.py", B.read(Path(__file__))), ("probe.py", B.read(HERE / "probe.py")), ("base-collector.py", B.read(P.BASE_PATH))]:
         B.write_new(out / name, raw)
+    if derived:
+        B.write_new(out / "quality.py", B.read(HERE / "quality.py"))
     with connection() as con:
         for table, records in [("bars", rows), ("assets", assets)]:
             fields = SCHEMAS[table]
@@ -114,7 +151,8 @@ def materialize(source, expected_receipt_sha256, out):
     B.write_new(out / "eligibility.json", B.encode(eligibility))
     files = [B.digest(str(p.relative_to(out)), B.read(p)) for p in sorted(out.rglob("*")) if p.is_file()]
     manifest = {"schema_version": 1, "contract": "query-scoped-identity-ledger-v1", "synthetic": False,
-                "duckdb_version": "1.5.5", "acquisition_receipt_sha256": expected_receipt_sha256,
+                "duckdb_version": "1.5.5", "source_receipt_sha256": expected_receipt_sha256,
+                "source_kind": "quality_derivation" if derived else "original_capture",
                 "files": files, "counts": counts, "eligibility": eligibility,
                 "source_statuses": source_statuses(acquisition),
                 "provider_revision_availability_established": False, "historical_identity_established": False}
@@ -132,6 +170,9 @@ def verified(root, expected_manifest_sha256):
     manifest = B.strict_json(raw)
     if manifest["contract"] != "query-scoped-identity-ledger-v1" or manifest["synthetic"] is not False:
         raise ValueError("unsupported_ledger_contract")
+    if manifest["source_kind"] not in {"quality_derivation", "original_capture"}:
+        raise ValueError("unsupported_source_kind")
+    derived = manifest["source_kind"] == "quality_derivation"
     files = {}
     for entry in manifest["files"]:
         name = entry["path"]
@@ -142,11 +183,14 @@ def verified(root, expected_manifest_sha256):
             raise ValueError("artifact_hash_mismatch")
         files[name] = content
     actual = {str(p.relative_to(root)) for p in root.rglob("*") if p.is_file()}
-    if any(p.is_symlink() or (p.is_dir() and p != root / "source") for p in root.rglob("*")):
+    allowed_dirs = {root / "source", *[root / Path(n).parent for n in files if str(Path(n).parent) != "."]}
+    if any(p.is_symlink() or (p.is_dir() and p not in allowed_dirs) for p in root.rglob("*")):
         raise ValueError("unexpected_ledger_directory_or_symlink")
     if actual != {"manifest.json", *files}:
         raise ValueError("unexpected_ledger_artifact")
     required = {"bars.parquet", "assets.parquet", "select.sql", "ledger.py", "probe.py", "base-collector.py", "eligibility.json"}
+    if derived:
+        required.add("quality.py")
     if {n for n in files if not n.startswith("source/")} != required:
         raise ValueError("unexpected_ledger_payload_set")
     if files["select.sql"] != B.read(HERE / "select.sql"):
@@ -154,18 +198,21 @@ def verified(root, expected_manifest_sha256):
     for name, path in [("ledger.py", Path(__file__)), ("probe.py", HERE / "probe.py"), ("base-collector.py", P.BASE_PATH)]:
         if files[name] != B.read(path):
             raise ValueError("ledger_bridge_version_mismatch")
+    if derived and files["quality.py"] != B.read(HERE / "quality.py"):
+        raise ValueError("quality_bridge_version_mismatch")
     # All native queries operate only on the verified frozen bytes in this temp copy.
     with tempfile.TemporaryDirectory(prefix="identity-verified-") as temp:
         staged = Path(temp)
         (staged / "source").mkdir(mode=0o700)
         for name, content in files.items():
+            (staged / name).parent.mkdir(mode=0o700, parents=True, exist_ok=True)
             B.write_new(staged / name, content)
-        acquisition = P.verify(staged / "source", manifest["acquisition_receipt_sha256"])
+        acquisition = source_verify(staged / "source", manifest["source_receipt_sha256"], derived)
         if manifest["source_statuses"] != source_statuses(acquisition):
             raise ValueError("source_status_mismatch")
-        rows = bar_records(acquisition, manifest["acquisition_receipt_sha256"])
+        rows = bar_records(acquisition, manifest["source_receipt_sha256"])
         validate_rows(rows)
-        assets = [dict(row, acquisition_receipt_sha256=manifest["acquisition_receipt_sha256"]) for row in acquisition["asset"]["rows"]]
+        assets = [row | anchors(acquisition, manifest["source_receipt_sha256"]) for row in acquisition["asset"]["rows"]]
         with connection() as con:
             for table, expected in [("bars", rows), ("assets", assets)]:
                 con.read_parquet(str(staged / (table + ".parquet"))).create_view(table)
@@ -196,12 +243,13 @@ def main():
     sub = parser.add_subparsers(dest="command", required=True)
     make = sub.add_parser("materialize")
     make.add_argument("--source", type=Path, required=True); make.add_argument("--receipt-sha256", required=True); make.add_argument("--out", type=Path, required=True)
+    make.add_argument("--derived", action="store_true", help="Source is an anchored quality derivation, not an original probe capture")
     query = sub.add_parser("select")
     query.add_argument("--ledger", type=Path, required=True)
     for key in ["manifest-sha256", "cutoff", "case-id"]:
         query.add_argument("--" + key, required=True)
     args = parser.parse_args()
-    result = materialize(args.source, args.receipt_sha256, args.out) if args.command == "materialize" else select(args.ledger, args.manifest_sha256, args.cutoff, args.case_id)
+    result = materialize(args.source, args.receipt_sha256, args.out, derived=args.derived) if args.command == "materialize" else select(args.ledger, args.manifest_sha256, args.cutoff, args.case_id)
     print(json.dumps(result, sort_keys=True))
 
 
