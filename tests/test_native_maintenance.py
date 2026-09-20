@@ -12,6 +12,7 @@ def load_tests(loader, tests, pattern):
     for name, path in (
         ("memory_patch_evidence_tests", ROOT / "mac-memory-patch/test_evidence.py"),
         ("application_portability_tests", ROOT / "application-delivery/test_portability.py"),
+        ("wsl_transport_evidence_tests", ROOT / "wsl-transport-recovery/test_transport_evidence.py"),
     ):
         spec = importlib.util.spec_from_file_location(name, path)
         module = importlib.util.module_from_spec(spec)

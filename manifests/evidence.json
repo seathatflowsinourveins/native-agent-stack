@@ -1491,6 +1491,48 @@
         "Historical application inputs remain frozen; Makelevel/TIME_WAIT recipe fixes were qualified separately with five real make/socket tests on Mac and WSL.",
         "No model calls by application commands; whole-task usage remains unknown."
       ]
+    },
+    {
+      "id": "wsl-transport-recovery-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "dagu"
+      ],
+      "claim": "An owned nonmultiplexed SSH client was terminated; fresh reconnect observed the same native Dagu job running with one unchanged checkpoint, then native completion without stop or retry.",
+      "limitations": [
+        "Controlled client termination and a deliberately detached deterministic job; not a real network outage, host restart, model-session recovery or distributed exactly-once guarantee.",
+        "First harness attempt misclassified native SSH exit255 and stopped the job; its narrower same-run finalizer retry is retained separately from corrected survival acceptance.",
+        "Original12-test oracle passed before and after; observed owned processes/listener retired; whole-task provider usage remains unknown."
+      ],
+      "path": "evidence/receipts/wsl-transport-recovery-20260920.json"
+    },
+    {
+      "id": "wsl-document-ingestion-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "poppler"
+      ],
+      "claim": "Native Poppler26.09.0 built in a clean WSL prefix and passed the frozen3-page,24-cell,8-positive/4-absent document protocol; four extraction/retrieval artifacts exactly match Mac output.",
+      "limitations": [
+        "Designed born-digital Latin fixture with explicit table geometry; no OCR, inferred layout, general semantic retrieval or broad upstream corpus qualification.",
+        "Exact source signature, signed package extraction and native dependency checks preceded execution; failed first public-key lookup remains recorded.",
+        "No global package/service/client change or model/GPU invocation; whole-task provider usage unknown."
+      ],
+      "path": "evidence/receipts/wsl-document-ingestion-20260920.json"
+    },
+    {
+      "id": "wsl-memory-maintenance-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory"
+      ],
+      "claim": "Official Linux ai-memory2.3.2 passed65 synthetic native checks across exact scope, Unicode/reserved paths, restart, upstream HTTP backup and native restore; four owned processes exited0.",
+      "limitations": [
+        "Isolated fresh synthetic store and39 MCP tool calls; not production activation, native-client integration or prior-version migration.",
+        "Automatic capture, embeddings, generation, watcher and autowire disabled; no OS-confinement claim.",
+        "Native backup/restore both exit0; complete private logs retained, fixture model calls0 and whole-task provider usage unknown."
+      ],
+      "path": "evidence/receipts/wsl-memory-maintenance-20260920.json"
     }
   ],
   "files": [
@@ -2262,8 +2304,8 @@
     },
     {
       "path": "blueprints/convergence-practice/layer-acceptance.md",
-      "sha256": "ad7e6f84ba8d959e33b4a3e2b9e53fc4d7b1b0f0dfa322986151e2abf364ed91",
-      "bytes": 4010
+      "sha256": "0c630a8bce5202fe21986e5d1eed30654a07bfc28ec9fdb475b568d2f1ff9d76",
+      "bytes": 4949
     },
     {
       "path": "blueprints/convergence-practice/local-fixture/corpus-manifest.json",
@@ -2636,6 +2678,76 @@
       "bytes": 5419
     },
     {
+      "path": "blueprints/convergence-practice/wsl-document-ingestion/README.md",
+      "sha256": "e84dce25fc7ae33044c5ac3965ad65fc4ac04c7f8aa3932ab5452c38dc111aac",
+      "bytes": 6364
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-document-ingestion/freeze.json",
+      "sha256": "cd95e754562df20005d7b4d97585b4d6a7f3332c8eedbc54e4bfea46dc8c161c",
+      "bytes": 2455
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-document-ingestion/receipt.json",
+      "sha256": "8421f68f49ebb89717aee28198dc17bbdbe47cdccab5071ec0c5837bae22c3dd",
+      "bytes": 6752
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-document-ingestion/sources.json",
+      "sha256": "280fe43c7876ba8fa670fdde521305c5cbd6b999b22e636def7ea99aca7e9e87",
+      "bytes": 13918
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-memory-maintenance/README.md",
+      "sha256": "62f5403c6438727cbc69875d6d455c05fa03a38393601019206fcba51c235507",
+      "bytes": 7048
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-memory-maintenance/audit.py",
+      "sha256": "56d71b653a77f84a64a383859252625bb08693a8502863e3dca51e81c7de4d10",
+      "bytes": 7342
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-memory-maintenance/config.toml",
+      "sha256": "5ee5fb3ddcb790c9a234143fdfa2f99b80ecf752a45c9e8cad625d75e9311331",
+      "bytes": 290
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-memory-maintenance/experiment.json",
+      "sha256": "99b5d55587bac22be2b36483d2fe6758ad66f214c2a585f52a7731edca088977",
+      "bytes": 6425
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-memory-maintenance/native-facts.json",
+      "sha256": "ee1d0a348588a876bd437e85bad0df3b79a7784446c4dc639830e99ab01b0d59",
+      "bytes": 13614
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-memory-maintenance/oracle.json",
+      "sha256": "20c0a8d4c5a19e4257b9c59e88a8abbd963529d63c35baa13095b403e91043c0",
+      "bytes": 2594
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-memory-maintenance/pins.json",
+      "sha256": "a8919332b6910adb2e3b6e8ff8153f24d258fbdae056d025c19cc7549996b1d7",
+      "bytes": 835
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-memory-maintenance/receipt.json",
+      "sha256": "3280210ba0001628d8dd8d3a7f5b7476db6c81d1abbde9831a427c9183ed5f27",
+      "bytes": 10762
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-memory-maintenance/run.py",
+      "sha256": "5abefd6083f2ac6057cd6ca6f64cf2fc77a68e6213b35f64bddfa5d18b169a3e",
+      "bytes": 22528
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-memory-maintenance/verification.json",
+      "sha256": "7c8e1a41ddebb72187169bfba4bb3447f7ef607815f609e56dd81860ceb7fdfe",
+      "bytes": 2530
+    },
+    {
       "path": "blueprints/convergence-practice/wsl-native-tools/README.md",
       "sha256": "9fd96134064c39a685a132dcae08252640ebd9f4e1ffc861cd91766bbe4ee40c",
       "bytes": 4950
@@ -2839,6 +2951,81 @@
       "path": "blueprints/convergence-practice/wsl-restore/validation.json",
       "sha256": "558b43769f30e3e7924d7a7ed789670fb063b330feed207e4dfba39d093e1438",
       "bytes": 2429
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/README.md",
+      "sha256": "aeff50d1e1ca29825c8a6b09cbc43dea9fc094de4e666cbad4bf66f92df3cecb",
+      "bytes": 5203
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/audit.py",
+      "sha256": "21cc19ea5106ef94202a6f46a2cf708fb10dc11e308b11784b5097c76b4aa750",
+      "bytes": 4829
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/driver-corrected.py",
+      "sha256": "46d5145cd2adb5ae5f19cf4a37f0fadec1b180cb46a730d43e916eb89ed0d0ef",
+      "bytes": 7773
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/driver.py",
+      "sha256": "edd7c10e35098991982ba2994983ef906bd9a4ef62a0333135390c78a34f1328",
+      "bytes": 7507
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/experiment.json",
+      "sha256": "4218880880f1effe7ebf94008ab6303984253794ac361f81af4555e364c57969",
+      "bytes": 11970
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/frozen-evidence.json",
+      "sha256": "35596f10eb295fc18c161825ee01a050c02b7315369b4d1644ecd57274d0b11a",
+      "bytes": 4462
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/plan-corrected.json",
+      "sha256": "ff5f63c7cc085670f544d162f77173915136fdce5829224e3012d11fb19575df",
+      "bytes": 3959
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/plan.json",
+      "sha256": "b98fc4fda6fd7a5b9d8e651c81a68ff1b64df52741dc6eb107dcb6cf82e9ce04",
+      "bytes": 3666
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/prior-attempts.json",
+      "sha256": "05710ce081007eff442c212e49f05cd0e6649f1c8f0c735f9a3c965d856d6689",
+      "bytes": 1954
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/receipt-attempt-1.json",
+      "sha256": "1958281cf1d4935b9eb1fe4321150932cf2b00771839b6c90c48e3a2ee7312d1",
+      "bytes": 7806
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/receipt.json",
+      "sha256": "856c8a2f58f204d62daddeb02b2670f138e9666b2f5c72d68246b6c1750e0082",
+      "bytes": 8508
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/remote.py",
+      "sha256": "aabbd72e4bfd4c8e1b6bff8370ad2dd10d0cd677e82234ea73a5ec81dcde484e",
+      "bytes": 12776
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/repair-plan.json",
+      "sha256": "4b1fc4fa92b552b67c8af203a87ed9e5e86dafb70ac47661f3ec07162fc46ffa",
+      "bytes": 1507
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/repair.py",
+      "sha256": "e939ffa29e11c8340ded22fc25a6699cc195f2d43957e460d778d34bc0702da5",
+      "bytes": 5767
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/test_transport_evidence.py",
+      "sha256": "eaa63e30db04ae5a67fdee18c87400ae6fd8795d89471f45927cd7d4e03e24b3",
+      "bytes": 2546
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
@@ -4437,8 +4624,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "d932c3c088ec4f34864d04afe47665f5f69e45cdfe881ada25bf759c6c59a393",
-      "bytes": 1652967
+      "sha256": "2d9a08bb2d3b07658ef55cea66a4fff44b99e55bd19c9ff47064671f071580ea",
+      "bytes": 1658768
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -4447,8 +4634,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "b5e2e45526e993616807863980cd834072fc208cd984370c5084245e9e55d025",
-      "bytes": 19475
+      "sha256": "ace2943e5dc66e220f357b806fc6c5ff6a928431346cf8a351fb5ff630ad25b9",
+      "bytes": 21285
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -4716,6 +4903,21 @@
       "bytes": 1205
     },
     {
+      "path": "evidence/receipts/wsl-document-ingestion-20260920.json",
+      "sha256": "b6052b6ce83a5318db657bf385eca54d478ed1d8b787d80b7d78d52d6e9098a7",
+      "bytes": 936
+    },
+    {
+      "path": "evidence/receipts/wsl-memory-maintenance-20260920.json",
+      "sha256": "11443ae6cef72ef8388a817c8e7546d5f2c40e4333f1faeb4dc99167ab7194f1",
+      "bytes": 891
+    },
+    {
+      "path": "evidence/receipts/wsl-transport-recovery-20260920.json",
+      "sha256": "150c1d59848e227df6886863473838a032cd17b9e28303dedf8dcb2e4f1112d4",
+      "bytes": 1013
+    },
+    {
       "path": "examples/agent-browser.json",
       "sha256": "36a05e4bfe7bbca6f673892b60bf6b109ea1f773a02796966fa8a95a2b1e0aea",
       "bytes": 25
@@ -4827,8 +5029,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "67670c777c5cdef5ea13b1e972f770e304a5e61aef6f130cada173f9bfc2ff50",
-      "bytes": 68224
+      "sha256": "52e72c2f505363054e01f073bd076b3003249e4c16f7863af5e8cbc5f13912fd",
+      "bytes": 68353
     },
     {
       "path": "observability/README.md",
@@ -5182,8 +5384,8 @@
     },
     {
       "path": "tests/test_native_maintenance.py",
-      "sha256": "2ab5eda2f2dc79139087091ba02cec082615b62b7414533d06beb88bff3a3e7f",
-      "bytes": 750
+      "sha256": "04b6a74168157db1fb72fafbf1942efc66b2b5f8c6d6a655ffb2914321ca6826",
+      "bytes": 852
     },
     {
       "path": "tests/test_native_recovery.py",
@@ -5241,6 +5443,11 @@
       "bytes": 2582
     },
     {
+      "path": "tests/test_wsl_memory_maintenance.py",
+      "sha256": "b66309e74fcd3b5e25cc1ffca585eaf12e0d4094db4efa4313a880e423212871",
+      "bytes": 4729
+    },
+    {
       "path": "tests/test_wsl_native_tools.py",
       "sha256": "020530918ede07f057d28a8c4234d3ed1e0c0f4cb886f5fee1f772beaed7787f",
       "bytes": 12555
@@ -5287,6 +5494,8 @@
     "blueprints/convergence-practice/native-recovery/claude/experiment.json",
     "blueprints/convergence-practice/native-recovery/experiment.json",
     "blueprints/convergence-practice/native-worker/experiment.json",
-    "blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json"
+    "blueprints/convergence-practice/wsl-memory-maintenance/experiment.json",
+    "blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json",
+    "blueprints/convergence-practice/wsl-transport-recovery/experiment.json"
   ]
 }

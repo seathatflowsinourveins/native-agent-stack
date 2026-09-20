@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "wsl-document-ingestion-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "poppler"
+  ],
+  "recorded_at_utc": "2026-09-20T07:53:49.603757+00:00",
+  "claim": "Native Poppler26.09.0 built in a clean WSL prefix and passed the frozen3-page,24-cell,8-positive/4-absent document protocol; four extraction/retrieval artifacts exactly match Mac output.",
+  "limitations": [
+    "Designed born-digital Latin fixture with explicit table geometry; no OCR, inferred layout, general semantic retrieval or broad upstream corpus qualification.",
+    "Exact source signature, signed package extraction and native dependency checks preceded execution; failed first public-key lookup remains recorded.",
+    "No global package/service/client change or model/GPU invocation; whole-task provider usage unknown."
+  ],
+  "native_receipt": "blueprints/convergence-practice/wsl-document-ingestion/receipt.json"
+}

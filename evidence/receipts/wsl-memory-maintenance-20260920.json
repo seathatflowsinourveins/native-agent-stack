@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "wsl-memory-maintenance-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "ai-memory"
+  ],
+  "recorded_at_utc": "2026-09-20T07:54:27.164931+00:00",
+  "claim": "Official Linux ai-memory2.3.2 passed65 synthetic native checks across exact scope, Unicode/reserved paths, restart, upstream HTTP backup and native restore; four owned processes exited0.",
+  "limitations": [
+    "Isolated fresh synthetic store and39 MCP tool calls; not production activation, native-client integration or prior-version migration.",
+    "Automatic capture, embeddings, generation, watcher and autowire disabled; no OS-confinement claim.",
+    "Native backup/restore both exit0; complete private logs retained, fixture model calls0 and whole-task provider usage unknown."
+  ],
+  "native_receipt": "blueprints/convergence-practice/wsl-memory-maintenance/receipt.json"
+}
