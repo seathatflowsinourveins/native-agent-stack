@@ -79,10 +79,12 @@ jobs:
             | sha256sum --check >"$output/source-check.txt"
       - name: Run the original quickstart twice without network or host credentials
         run: |
+          umask 022
           output="$RUNNER_TEMP/native-foundation-e2e"
           for run in run-1 run-2; do
             run_output="$output/$run"
-            mkdir -p "$run_output"
+            # Refuse existing paths: ownership changes apply only to this new run directory.
+            mkdir --mode=0755 -- "$run_output"
             # Mandatory namespaces: failure is a failed acceptance, never a host-network fallback.
             command=(timeout --signal=TERM --kill-after=5 120 sudo --non-interactive bwrap
               --unshare-all --unshare-net --die-with-parent --new-session --clearenv
@@ -99,6 +101,10 @@ jobs:
               /venv/bin/python -I /input/observe_quickstart.py)
             printf '%q ' "${command[@]}" >"$run_output/command.txt"
             date --utc --iso-8601=seconds >"$run_output/started.txt"
+            touch "$run_output/stdout" "$run_output/stderr" "$run_output/exit-code.txt" "$run_output/finished.txt"
+            # sudo+bwrap maps the inside UID to outside root. Only /out needs that owner;
+            # the existing command logs stay runner-owned, and native reports remain readable.
+            sudo --non-interactive chown --no-dereference 0:0 -- "$run_output"
             status=0
             "${command[@]}" >"$run_output/stdout" 2>"$run_output/stderr" || status=$?
             printf '%s\n' "$status" >"$run_output/exit-code.txt"
