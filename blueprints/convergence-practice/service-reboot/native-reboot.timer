@@ -1,0 +1,11 @@
+[Unit]
+Description=Owned user-manager boot and retry timer
+
+[Timer]
+OnStartupSec=2s
+OnUnitInactiveSec=15s
+AccuracySec=1s
+Unit=native-reboot.service
+
+[Install]
+WantedBy=timers.target

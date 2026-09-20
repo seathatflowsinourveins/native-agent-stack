@@ -1,0 +1,13 @@
+[Unit]
+Description=Owned finite native Dagu checkpoint reboot qualification
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 -B /opt/service-reboot/guest.py
+WorkingDirectory=/var/lib/service-reboot
+Environment=PYTHONDONTWRITEBYTECODE=1
+UMask=0077
+TimeoutStartSec=180
+TimeoutStopSec=20
+KillMode=control-group
+NoNewPrivileges=yes

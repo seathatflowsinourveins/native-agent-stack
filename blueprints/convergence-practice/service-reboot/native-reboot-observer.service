@@ -1,0 +1,17 @@
+[Unit]
+Description=Read-only serial observer; never starts or retries the workload
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 -B /opt/service-reboot/observer.py
+TimeoutStartSec=650
+StandardOutput=tty
+StandardError=journal
+TTYPath=/dev/ttyS0
+ProtectSystem=strict
+ProtectHome=read-only
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target

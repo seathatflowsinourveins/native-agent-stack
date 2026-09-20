@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "experiment": "owned-ubuntu-guest-native-user-service-reboot",
+  "status": "protocol-only-until-a-native-receipt-is-reviewed",
+  "base_commit": "4f892e53f9d9f458d345c668cffe13ef176d1896",
+  "scope": "One orderly guest kernel reboot on the same writable disk; automatic lingering user-manager timer retries only the unfinished native Dagu finalizer under the existing run ID.",
+  "deadline_seconds": 1200,
+  "dagu": {
+    "version": "2.16.6",
+    "source_revision": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+    "url": "https://github.com/dagucloud/dagu/releases/download/v2.16.6/dagu_2.16.6_linux_amd64.tar.gz",
+    "archive_sha256": "06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717",
+    "binary_sha256": "20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7"
+  },
+  "ubuntu": {
+    "url": "https://cloud-images.ubuntu.com/noble/20260911/noble-server-cloudimg-amd64.img",
+    "sha256": "612b2c0cc1bc413a6cb8c38fd611794caf0f2b436c50013d8b3794db12ad7354",
+    "signer_fingerprint": "D2EB44626FDDC30B513D5BB71A5D6C4C7DB87C81",
+    "signature_required": true
+  },
+  "scheduler": "systemd user native-reboot.timer: OnStartupSec=2s, OnUnitInactiveSec=15s, explicit loginctl enable-linger; native-reboot.service invokes supported Dagu CLI execution",
+  "frozen_before_trial": ["this plan", "driver and guest sources", "systemd units", "cloud-init seed", "accepted planner", "unchanged 12-test oracle", "unchanged job-recovery fixture", "Dagu archive and binary", "signed cloud image", "QEMU executable and version", "guest Python executable and version before native start"],
+  "acceptance": [
+    "Preboot native run is running; finalizer has published its wait marker and no completed effect exists.",
+    "Durable checkpoint and exclusive execution claim both record execution count one; original oracle passes all 12 tests.",
+    "Guest kernel boot ID changes; machine ID, filesystem UUID, disk token, QEMU process and host disk inode remain the same.",
+    "Read-only boot observer emits completed recovery on serial while the user manager is active and linger is enabled, before any post-reboot SSH connection.",
+    "Native Dagu selected-step retry uses the original run ID and reports succeeded; checkpoint and exclusive claim bytes remain unchanged.",
+    "Original final 12-test oracle passes and exactly one exclusive completed.json effect exists.",
+    "Input hashes remain unchanged; before/after native histories, full task logs and journals remain available in the artifact.",
+    "Guest QEMU process is retired and its private SSH key is removed in finally cleanup."
+  ],
+  "excluded": ["existing-host shutdown", "power loss", "physical PC qualification", "cloud provider availability", "broker or model operations", "distributed exactly-once effects", "provider token savings", "production installation"],
+  "primary_sources_reviewed_2026_09_20": [
+    "https://www.qemu.org/docs/master/system/invocation.html",
+    "https://docs.cloud-init.io/en/latest/reference/datasources/nocloud.html",
+    "https://github.com/canonical/cloud-utils/blob/main/bin/cloud-localds",
+    "https://ubuntu.com/docs/public-images/public-images-how-to/verify-image-checksum/",
+    "https://ubuntu.com/docs/public-images/public-images-reference/artifacts/",
+    "https://github.com/systemd/systemd/blob/main/man/loginctl.xml",
+    "https://github.com/systemd/systemd/blob/main/man/systemd.timer.xml",
+    "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go"
+  ]
+}
