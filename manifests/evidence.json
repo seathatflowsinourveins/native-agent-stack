@@ -511,7 +511,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1493,7 +1493,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -1725,6 +1725,48 @@
         "No fresh Prometheus turn sample in the selected window; no three-way observation join."
       ],
       "path": "evidence/receipts/codex-desktop-live-20260920.json"
+    },
+    {
+      "id": "native-session-defaults-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "ai-memory",
+        "context-mode",
+        "rtk",
+        "qmd"
+      ],
+      "claim": "Persistent Linux/WSL defaults reach actual Codex command and MCP processes and the native Claude MCP child; reviewed hooks remain trusted, with four observed successful Claude startup completions.",
+      "limitations": [
+        "This is authoring-host setup and zero-model-turn acceptance, not a new-PC or provider-savings comparison.",
+        "Both Codex homes were tested with the installed native app-server; the active Desktop transport was not restarted or privately controlled.",
+        "Codex hooks/list proves trust and enablement, not hook execution. Neither initialization-only client path exposed SessionEnd completion.",
+        "The selected-project launch parents already had native defaults. The separate unadopted-directory Codex command/exec checks used a system-only parent PATH and no parent RTK flag.",
+        "Claude startup events join four starts to four completions but do not identify individual configured commands.",
+        "Global CLI defaults do not automatically adopt another repository into project-specific indexes, memory scope or MCP servers.",
+        "Exact current-task or provider tokens avoided are not established; retained counters and local fixture estimates are separate."
+      ],
+      "path": "evidence/receipts/native-session-defaults-20260920.json"
+    },
+    {
+      "id": "native-token-ci-local-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "rtk",
+        "qmd",
+        "repomix",
+        "toon"
+      ],
+      "claim": "Fresh upstream installs passed41commands and14scoped fidelity/recovery checks, with six acceptance failure tests and owned temporary-state cleanup.",
+      "limitations": [
+        "Not a new-PC, native Codex/Claude, GPU or provider acceptance",
+        "Top-level package pins; npm transitive ranges resolve at installation",
+        "RTK counters are fixture-local estimates, not provider savings",
+        "No token-saving requirement: fidelity may need the larger representation",
+        "Retained text replaces local paths; raw byte hashes precede sanitization"
+      ],
+      "path": "evidence/receipts/native-token-ci-local-20260920.json"
     }
   ],
   "files": [
@@ -1737,6 +1779,11 @@
       "path": ".github/requirements-ci.lock",
       "sha256": "e475964596b4439d069891ef3f194efe7f8eea9fe1c9478d944001644fcab083",
       "bytes": 283
+    },
+    {
+      "path": ".github/workflows/native-token-e2e.yml",
+      "sha256": "cb4e0dfdc19345ea56b2ee7e1d13926cdd095c3f3a550d330fae2c08881ba9b6",
+      "bytes": 1665
     },
     {
       "path": ".github/workflows/token-report.yml",
@@ -4875,6 +4922,11 @@
       "bytes": 9038
     },
     {
+      "path": "docs/native-token-ci.md",
+      "sha256": "0697e77c25399b2053cef9637b9a2541629fc4adae1f216b9a937efdc714b9dd",
+      "bytes": 5504
+    },
+    {
       "path": "docs/stack.md",
       "sha256": "58728a1f807256257e7848da15401221eeef0f63d36d0630b4e7cfb195bd35de",
       "bytes": 7667
@@ -4901,8 +4953,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "f8dfbb8238a0e6b6ac701ffcf98a8703c67e46f6acf98341042a612f56bf956e",
-      "bytes": 27010
+      "sha256": "fe50d13c9fbca994ff8d58552f4b06b38251c9cd217e31b85f362387be12c6e6",
+      "bytes": 33574
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -5073,6 +5125,16 @@
       "path": "evidence/receipts/native-sandbox-network-20260920.json",
       "sha256": "e934457a442f01bcf564fa1e37777f35e6a64eff0455c572efb382a6c652dd4b",
       "bytes": 2504
+    },
+    {
+      "path": "evidence/receipts/native-session-defaults-20260920.json",
+      "sha256": "0da307248aa3809c09519dd64020e8744d2edd5f565f052a1a8c0af7489b819f",
+      "bytes": 29978
+    },
+    {
+      "path": "evidence/receipts/native-token-ci-local-20260920.json",
+      "sha256": "fc8b64ac9e5e6510ba680b696fc056501511f5b5668fbbe060250ac37832e6d1",
+      "bytes": 38136
     },
     {
       "path": "evidence/receipts/native-token-clean-prefix-20260920.json",
@@ -5485,6 +5547,11 @@
       "bytes": 13435
     },
     {
+      "path": "scripts/native_token_ci.py",
+      "sha256": "f1bb054a244160a4c8fc1674ff658aa67d6a3f9dc9e79b86b30e32794c5d0983",
+      "bytes": 20201
+    },
+    {
       "path": "scripts/recount-tokens.cjs",
       "sha256": "8f5749fb447e508e0a9a6b52ce61fad195a4f9cdcc6407726a677622cb9f5837",
       "bytes": 1634
@@ -5648,6 +5715,11 @@
       "path": "tests/test_native_recovery.py",
       "sha256": "99eee9a81f549b3c4e432ba686f0676cbc8a5691399413f8a437b7cff281bd4d",
       "bytes": 3345
+    },
+    {
+      "path": "tests/test_native_token_ci.py",
+      "sha256": "71cded5b7795100aef1a94cc531a1dfb0030e9f9139e8d3013059fa7768c832a",
+      "bytes": 6077
     },
     {
       "path": "tests/test_native_worker_fixture.py",

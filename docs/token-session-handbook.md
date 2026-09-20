@@ -2,6 +2,52 @@
 
 Use the installed tools for the current task; setup is a one-time operation per selected client/project. This handbook covers all **24 topic repositories**: 14 context tools, nine observation tools and one optional gateway. The wider catalog has 66 selected components and 512 recorded repository identities; those are different scopes, and catalog inclusion does not mean installed or active. Pins, exact commands and dated results remain in the [topic manifest](token-efficiency-stack.json), [component manifest](../manifests/stack.json) and [foundation receipt](../evidence/receipts/foundation-native-20260920.json).
 
+## Persistent defaults for future sessions
+
+On the authoring Linux/WSL host, the native workflow is now saved in client settings, shell startup files and short global instructions. A copied startup prompt is optional. The [persistent-default receipt](../evidence/receipts/native-session-defaults-20260920.json) records the actual changes and acceptance; another PC must resolve its own paths and collect its own evidence.
+
+| Scope | Persistent setting or behavior | Boundary |
+| --- | --- | --- |
+| Desktop agent and integrated terminal | Agent environment already WSL; terminal already `wsl`; both settings retained | These are independent settings. Changing the agent environment requires an app restart; this host already uses WSL |
+| Desktop WSL and native Codex | Each existing home has `shell_environment_policy.set.PATH` with the native bin first and `RTK_TELEMETRY_DISABLED="1"` | Homes and native sign-ins remain separate |
+| Native Claude | User `settings.json` has the same resolved PATH and RTK environment value | Existing model, permission mode, telemetry and other hooks remain intact |
+| Linux shells | A small sourced defaults fragment applies before Bash's noninteractive return and after login PATH additions | No model route, credential store, index or service is selected by this fragment |
+| Agent instructions | Short global AGENTS/CLAUDE pointers select installed tools when useful | The complete catalog and long prompt are not loaded at every start |
+| Project context | The adopted project retains its five configured MCP servers and explicit memory/index scope | Another repository receives the global CLI/plugin defaults; it needs its own project adoption for scoped MCP indexes |
+| ai-memory hooks | Upstream 2.3.2 installer refreshed eight Claude entries and seven entries in each Codex home | Capture remains allowlisted by project marker; existing Claude prompt opt-out preserved |
+
+The two Codex homes passed a fresh upstream app-server `config/read` and actual `command/exec` from a directory with **no project configuration**. The parent PATH contained only system directories and the parent RTK flag was absent; the executed child still returned the configured native PATH first and flag `1`. No model turn was started. Login, interactive and noninteractive Bash checks also passed.
+
+The updated hook scripts were compared against all 34 staged upstream assets. The native Codex `/hooks` review controls accepted the seven changed commands in each home; a fresh `hooks/list` returned **13/13 trusted and enabled** in both homes, with no errors. No trust-bypass flag or manual trust-store edit was used. Trust readiness is separate from observing each lifecycle event.
+
+Fresh selected-project launches also returned the native PATH first and RTK flag `1` from an actual Context Mode subprocess in each Codex home and a diagnostic MCP child of native Claude. Claude's native stream joined **four startup hooks to four successful completions**, all exit 0. All three clients exited cleanly, with no remaining owned processes and no model turns. These initialization-only Codex streams did not expose hook completion events; neither client exposed SessionEnd completion. Those lifecycle events remain unverified by this check.
+
+### Continuous upstream checks on GitHub
+
+The [native token CI workflow](../.github/workflows/native-token-e2e.yml) installs pinned RTK, QMD, Repomix and TOON from their upstream release/package channels on a fresh Linux runner. It exercises selected inputs, exact recovery, expected failures, retained fixture state and cleanup. It runs automatically for changes to its tools, pins or fixtures and can also be dispatched manually. Existing catalog and evidence checks continue alongside it.
+
+The [local clean-install receipt](../evidence/receipts/native-token-ci-local-20260920.json) retains actual arguments, returned outputs, exits and hashes for **41 commands and 14 acceptance checks**. Six focused tests cover rejection and failure handling. RTK's isolated fixture ledger returned `total_commands: 3`, `total_input: 124`, `total_output: 118`, `total_saved: 6`; this small fixture estimate is separate from the host's retained history. QMD has no downloaded model in this lane. The [CI guide](native-token-ci.md) gives the commands and boundaries; each run uploads sanitized evidence for 14 days.
+
+### Applying the defaults on another host
+
+First install the selected profile with the pinned upstream recipes. Then resolve that host's native executable directory and stable inherited PATH. Set the following in each intended Codex home's `config.toml`, merging with existing settings:
+
+```toml
+[shell_environment_policy.set]
+PATH = "/absolute/native/bin:/the/host/resolved/inherited/paths"
+RTK_TELEMETRY_DISABLED = "1"
+```
+
+For Claude, merge the same two string values into user `settings.json` under `env`. For adopted local-process MCP servers, supply their required PATH and RTK flag through supported `env` fields. These are literal JSON/TOML values; `$PATH` and `~` do not expand there. A Linux PATH is appropriate only for Linux/WSL clients: regenerate it if switching the Desktop agent to native Windows or moving to another PC. Preserve the existing account home, provider route, model and permissions.
+
+Use the normal Linux shell profile for terminal defaults and make its PATH prefix idempotent. Keep generated secrets out of these portable examples. Retain only a short task-routing instruction globally; project markers, collections, indexes and service URLs belong to their adopted scope.
+
+When upgrading ai-memory, use its installed upstream `install-hooks --apply --agent AGENT --config-file TARGET --server-url URL` command with explicit native targets and existing capture choices. Review changed Codex hook commands through `/hooks`. The installer preserves unrelated hooks and writes a backup; command success does not replace trust or runtime acceptance.
+
+No environment recreation is needed for these defaults. New sessions/processes inherit them automatically. A running stdio MCP process keeps its old environment until reconnect; use the supported MCP Restart control only when that process must inherit a changed setting immediately. Keep the current working task if its selected tools already work.
+
+Official guidance: [Codex Windows/WSL agent and terminal settings](https://learn.chatgpt.com/docs/windows/windows-app), [Codex environment settings](https://learn.chatgpt.com/docs/config-file/config-advanced), [Claude settings](https://code.claude.com/docs/en/settings).
+
 ## Start or resume work
 
 The [authoring-host environment receipt](../evidence/receipts/codex-session-environment-20260920.json) records a fresh native Codex app-server connecting five selected MCP servers, resolving fourteen native commands and completing five read-only calls with no model turn. It verifies the project PATH setup, not a reload of an already-running Desktop task or acceptance on a new PC.
