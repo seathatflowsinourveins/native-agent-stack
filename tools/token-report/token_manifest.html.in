@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Native token practice · Retained evidence</title>
+<style>
+:root{--ink:#173c3d;--muted:#5f7475;--paper:#f3f6f3;--line:#d8e3db;--green:#006d5f;--red:#a13e32}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.6 system-ui,sans-serif}main{max-width:1250px;margin:auto;padding:38px 22px 60px}h1{font-size:clamp(32px,5vw,54px);line-height:1.1;letter-spacing:-1px}h2{margin-top:35px}a{color:var(--green);overflow-wrap:anywhere}p{max-width:1000px}.muted{color:var(--muted)}.small{font-size:12px}.eyebrow{font:12px monospace;letter-spacing:1.4px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px}.card,.box,details{background:white;border:1px solid var(--line);border-radius:10px;padding:18px;margin:12px 0}.metric{display:block;font-size:32px;font-weight:700;margin:10px 0}.note{padding:15px 19px;background:#e3eee8;border-left:3px solid var(--green)}.bad{color:var(--red)}.table{overflow:auto;background:white;border:1px solid var(--line);border-radius:9px}table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;vertical-align:top;padding:12px 16px;border-bottom:1px solid var(--line)}th{background:#e9f0eb;font-size:12px}td{max-width:500px;overflow-wrap:anywhere}pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:400px;overflow:auto;background:#edf3ee;padding:13px;font:12px/1.5 ui-monospace,monospace}code{font:12px ui-monospace,monospace}summary,button{cursor:pointer}button,input{font:inherit;padding:9px 13px;border:1px solid var(--line);border-radius:6px;background:white;color:var(--ink)}input{width:100%;max-width:550px;margin-bottom:15px}header{display:flex;align-items:center;justify-content:space-between;gap:15px}footer{margin-top:40px;color:var(--muted);font-size:12px}nav{display:flex;gap:18px;flex-wrap:wrap;margin:25px 0}@media(max-width:600px){main{padding:25px 15px}header{align-items:start}th,td{padding:10px}}@media print{button,input,nav{display:none}pre{max-height:none}}
+</style>
+</head>
+<body><main>
+<header><span class="eyebrow">NATIVE STACK / RETAINED EVIDENCE</span><button id="export">Export JSON</button></header>
+<h1>Token practice.<br>Results with boundaries.</h1>
+<p>Upstream counters, exact artifact comparisons and provider studies remain separate. This report does not calculate a combined lifetime saving.</p>
+<p id="stamp" class="muted small"></p>
+<nav><a href="#counters">Counters</a><a href="#comparisons">Comparisons</a><a href="#commands">Upstream output</a><a href="#catalog">Catalog</a><a href="#practice">Refresh</a></nav>
+<div id="issues"></div>
+<section id="counters"><h2>Native counters</h2><div id="native-cards" class="cards"></div>
+<p class="note">Project and session views can overlap cumulative totals. Refreshes append observations; they do not add previous snapshots together. A failed refresh keeps the last successful value visibly separate.</p>
+<details><summary>Counter history and exact evidence</summary><div id="native-history"></div></details>
+<details><summary>Optional retained event history</summary><div id="event-history"></div></details></section>
+<section id="comparisons"><h2>Exact artifact comparisons</h2><p>These count retained UTF-8 text with a named tokenizer. A reduction is relative to its stated task and baseline. It is not measured provider usage, and text size alone does not establish equivalent answer quality.</p><div id="comparison-table"></div>
+<details><summary>Optional TOON conversion</summary><div id="toon"></div></details>
+<details><summary>Explicitly imported task, provider and quality evidence</summary><div id="imported"></div></details></section>
+<section id="commands"><h2>Complete upstream output</h2><p>Arguments, exits, timestamps and raw responses are retained. Failed and unavailable commands stay visible.</p><div id="command-results"></div></section>
+<section id="catalog"><h2>Repository catalog</h2><p id="catalog-summary"></p><p>Repository records are reference material. Inclusion does not establish that a tool is installed, accepted or saving tokens on this machine.</p>
+<input id="catalog-search" type="search" placeholder="Find a repository or component" aria-label="Find a repository or component"><div id="catalog-table"></div>
+<details><summary>Selected components and counter availability</summary><div id="components"></div></details></section>
+<section id="practice"><h2>Refresh this report</h2><div id="refresh" class="box"></div>
+<p>Only selected sources are read. By default, there is no client configuration, transcript, hook database or historical project scan. Optional Context Mode roots read the latest upstream stats file in each named root.</p>
+<p>Keep this report, configuration and local state private. Complete upstream output can contain project paths or other local details. Publish a reviewed, sanitized receipt separately.</p>
+<details><summary>Configuration and retained boundaries</summary><div id="configuration"></div></details></section>
+<footer>Native estimates, exact output counts and actual provider usage answer different questions. Unmeasured does not mean zero.</footer>
+</main>
+<script id="report-data" type="application/json">__DATA__</script>
+<script>
+const D=JSON.parse(document.getElementById('report-data').textContent);
+const $=id=>document.getElementById(id),e=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const n=v=>typeof v==='number'?v.toLocaleString():'Unavailable';
+const pre=v=>'<pre>'+e(typeof v==='string'?v:JSON.stringify(v,null,2))+'</pre>';
+const link=(p,label)=>p?'<a href="'+e(p)+'">'+e(label)+'</a>':'';
+const table=(headers,body)=>'<div class="table"><table><thead><tr>'+headers.map(x=>'<th>'+e(x)+'</th>').join('')+'</tr></thead><tbody>'+body+'</tbody></table></div>';
+const native=D.native||[],comparisons=D.comparisons||[],repos=D.repository_coverage||[];
+$('stamp').textContent='Captured '+D.generated_at+' · '+native.length+' native scopes · '+comparisons.length+' unique artifact comparisons';
+$('issues').innerHTML=D.issues?.length?'<div class="note bad"><strong>Refresh needs attention</strong>'+pre(D.issues)+'</div>':'';
+$('native-cards').innerHTML=native.map(r=>{const good=r.latest_success;return '<article class="card"><span class="eyebrow">'+e(r.tool)+'</span><strong class="metric">'+n(good?.metrics.saved)+'</strong><p>'+e(r.scope)+'</p><p class="small">'+e(good?.metrics.kind||'No successful measurement')+'</p>'+(!r.latest.success?'<p class="bad">Latest refresh failed. Value above is the last successful observation.</p>':'')+(r.counter_decreased?'<p class="bad">Counter decreased since the previous successful observation.</p>':'')+'<p class="small muted">'+e(good?.metrics.boundary||r.latest.metrics.boundary)+'</p></article>';}).join('')||'<p class="muted">No counters selected. Add explicit upstream commands to the local configuration.</p>';
+$('native-history').innerHTML=native.map(r=>'<h3>'+e(r.tool)+' · '+e(r.scope)+'</h3>'+pre(r)).join('');
+$('event-history').innerHTML=pre(D.preserved_native_events||[]);
+$('comparison-table').innerHTML=comparisons.length?table(['Tool / task boundary','Baseline','Candidate','Difference','Evidence'],comparisons.map(r=>'<tr><td><strong>'+e(r.tool)+'</strong><p>'+e(r.boundary)+'</p></td><td>'+n(r.baseline.tokens)+'</td><td>'+n(r.candidate.tokens)+'</td><td class="'+(r.tokens_removed<0?'bad':'')+'">'+n(r.tokens_removed)+' tokens removed</td><td>'+link(r.baseline.path,'Baseline')+' · '+link(r.candidate.path,'Candidate')+'<details><summary>Hashes and tokenizer</summary>'+pre(r)+'</details></td></tr>').join('')):'<p class="muted">No exact comparisons imported. Use the compare command on explicit retained inputs.</p>';
+$('toon').innerHTML=pre(D.toon);
+$('imported').innerHTML=pre({audit:D.audit,additional_evidence:D.additional_evidence,hook_inventory:D.hook_inventory,project_counters:D.project_counters});
+$('command-results').innerHTML=(D.commands||[]).map(r=>'<details><summary>'+e(r.argv[0])+' · exit '+e(r.exit_code??'unavailable')+'</summary>'+pre({argv:r.argv,cwd:r.cwd,exit_code:r.exit_code,started_at:r.started_at,completed_at:r.completed_at,error:r.error})+'<h3>stdout</h3>'+pre(r.stdout_text)+'<h3>stderr</h3>'+pre(r.stderr_text)+pre({stdout:r.stdout,stderr:r.stderr})+'</details>').join('')||'<p class="muted">No upstream CLI command was selected.</p>';
+if(D.context_direct)$('command-results').insertAdjacentHTML('beforeend','<details><summary>Explicit direct Context Mode capture</summary>'+pre(D.context_direct)+'</details>');
+$('catalog-summary').textContent=repos.length+' repository identities; '+(D.stack.components||[]).length+' selected component records from the configured checkout.';
+function renderCatalog(){const q=$('catalog-search').value.toLowerCase(),rows=repos.filter(r=>JSON.stringify(r).toLowerCase().includes(q));$('catalog-table').innerHTML=table(['Repository','Catalog classification','Current measurement boundary'],rows.map(r=>'<tr><td>'+link(r.repository,r.repository)+'</td><td>'+e(r.classification)+'</td><td>'+e(r.native_lifetime_kind)+'<p>'+e(r.baseline_status)+'</p></td></tr>').join(''));}
+$('components').innerHTML=table(['Component / version','Role','Counter boundary'],(D.coverage_matrix||[]).map(r=>'<tr><td>'+e(r.id)+'<br>'+e(r.version)+'</td><td>'+e(r.role)+'</td><td>'+e(r.native_lifetime_kind)+'<p>'+e(r.lifetime_boundary)+'</p></td></tr>').join(''));
+$('refresh').innerHTML=pre(D.setup.refresh_command)+'<p>'+e(D.setup.history)+'</p><p>'+e(D.setup.artifact_history)+'</p>'+link(D.configuration.practice_guide,'Portable practice guide');
+$('configuration').innerHTML=pre({configuration:D.configuration,scope:D.scope,database:D.database,boundaries:D.dollar_explanation});
+$('catalog-search').oninput=renderCatalog;renderCatalog();
+$('export').onclick=()=>{const u=URL.createObjectURL(new Blob([JSON.stringify(D,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download='native-token-manifest.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);};
+</script>
+</body></html>
