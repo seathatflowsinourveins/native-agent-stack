@@ -1,0 +1,1398 @@
+{
+  "schema_version": 1,
+  "kind": "public_star_identity_refresh",
+  "checked_at_utc": "2026-09-20T03:11:37.905398+00:00",
+  "baseline": "blueprints/us-equities/authenticated-data/public-stars-refresh.json",
+  "prior_count": 342,
+  "current_count": 342,
+  "duplicate_ids": 0,
+  "added": [],
+  "removed": [],
+  "renamed": [],
+  "native_command": [
+    "gh",
+    "api",
+    "--paginate",
+    "--slurp",
+    "users/seathatflowsinourveins/starred?per_page=100"
+  ],
+  "exit_code": 0,
+  "raw_response": {
+    "bytes": 1940110,
+    "sha256": "ace8edc05ed2a73dd2c95e45a5e09908db4e3f21d516ac45bd73f83cc1962d40",
+    "pages": 4
+  },
+  "identity_sha256": "292de090a2e665892b31d914d1e1e2192cb74a80d4100e679e7c8bdf0488809d",
+  "identity_encoding": "SHA256 of UTF-8 json.dumps(sorted((id, full_name) pairs), separators=(',', ':'))",
+  "scope": "Complete public-star identity comparison at the recorded time. No delta; does not rerun earlier source reviews or native acceptances. Private response body retained outside Git.",
+  "repositories": [
+    {
+      "id": 1062572,
+      "full_name": "catchorg/Catch2"
+    },
+    {
+      "id": 7056202,
+      "full_name": "fmtlib/fmt"
+    },
+    {
+      "id": 7270538,
+      "full_name": "ankitects/anki"
+    },
+    {
+      "id": 18708860,
+      "full_name": "tiimgreen/github-cheat-sheet"
+    },
+    {
+      "id": 19205896,
+      "full_name": "restic/restic"
+    },
+    {
+      "id": 21289110,
+      "full_name": "vinta/awesome-python"
+    },
+    {
+      "id": 21540759,
+      "full_name": "avelino/awesome-go"
+    },
+    {
+      "id": 21552971,
+      "full_name": "alebcay/awesome-shell"
+    },
+    {
+      "id": 21737266,
+      "full_name": "sindresorhus/awesome-nodejs"
+    },
+    {
+      "id": 21737465,
+      "full_name": "sindresorhus/awesome"
+    },
+    {
+      "id": 21935031,
+      "full_name": "fffaraz/awesome-cpp"
+    },
+    {
+      "id": 22670857,
+      "full_name": "enaqx/awesome-react"
+    },
+    {
+      "id": 24297122,
+      "full_name": "veggiemonk/awesome-docker"
+    },
+    {
+      "id": 28387406,
+      "full_name": "awesome-foss/awesome-sysadmin"
+    },
+    {
+      "id": 32484381,
+      "full_name": "ripienaar/free-for-dev"
+    },
+    {
+      "id": 36633370,
+      "full_name": "awesome-selfhosted/awesome-selfhosted"
+    },
+    {
+      "id": 37489525,
+      "full_name": "pytest-dev/pytest"
+    },
+    {
+      "id": 39840932,
+      "full_name": "google/googletest"
+    },
+    {
+      "id": 43425480,
+      "full_name": "wilsonfreitas/awesome-quant"
+    },
+    {
+      "id": 53548867,
+      "full_name": "dbt-labs/dbt"
+    },
+    {
+      "id": 54346799,
+      "full_name": "public-apis/public-apis"
+    },
+    {
+      "id": 55355650,
+      "full_name": "fmzquant/strategies"
+    },
+    {
+      "id": 56899284,
+      "full_name": "Kong/insomnia"
+    },
+    {
+      "id": 60246359,
+      "full_name": "ClickHouse/ClickHouse"
+    },
+    {
+      "id": 63539055,
+      "full_name": "jaywcjlove/awesome-mac"
+    },
+    {
+      "id": 68619379,
+      "full_name": "bbfamily/abu"
+    },
+    {
+      "id": 83222441,
+      "full_name": "donnemartin/system-design-primer"
+    },
+    {
+      "id": 90194616,
+      "full_name": "pydantic/pydantic"
+    },
+    {
+      "id": 93163073,
+      "full_name": "dependabot/dependabot-core"
+    },
+    {
+      "id": 119190187,
+      "full_name": "gitleaks/gitleaks"
+    },
+    {
+      "id": 136062240,
+      "full_name": "DovAmir/awesome-design-patterns"
+    },
+    {
+      "id": 136202695,
+      "full_name": "mlflow/mlflow"
+    },
+    {
+      "id": 138552196,
+      "full_name": "nautechsystems/nautilus_trader"
+    },
+    {
+      "id": 139199684,
+      "full_name": "PrefectHQ/prefect"
+    },
+    {
+      "id": 153500249,
+      "full_name": "sdras/awesome-actions"
+    },
+    {
+      "id": 163788469,
+      "full_name": "kernc/backtesting.py"
+    },
+    {
+      "id": 170326929,
+      "full_name": "goabstract/Awesome-Design-Tools"
+    },
+    {
+      "id": 180687624,
+      "full_name": "aquasecurity/trivy"
+    },
+    {
+      "id": 184456251,
+      "full_name": "microsoft/PowerToys"
+    },
+    {
+      "id": 193215554,
+      "full_name": "n8n-io/n8n"
+    },
+    {
+      "id": 197814629,
+      "full_name": "actions/checkout"
+    },
+    {
+      "id": 200722670,
+      "full_name": "NVIDIA-NeMo/Speech"
+    },
+    {
+      "id": 212037775,
+      "full_name": "akfamily/akshare"
+    },
+    {
+      "id": 212613049,
+      "full_name": "cli/cli"
+    },
+    {
+      "id": 216628419,
+      "full_name": "flyteorg/flyte"
+    },
+    {
+      "id": 235901813,
+      "full_name": "PostHog/posthog"
+    },
+    {
+      "id": 240215314,
+      "full_name": "docker/awesome-compose"
+    },
+    {
+      "id": 255378816,
+      "full_name": "bigskysoftware/htmx"
+    },
+    {
+      "id": 263727855,
+      "full_name": "pola-rs/polars"
+    },
+    {
+      "id": 279064706,
+      "full_name": "abhisheknaiidu/awesome-github-profile-readme"
+    },
+    {
+      "id": 294371636,
+      "full_name": "Lumiwealth/lumibot"
+    },
+    {
+      "id": 326404870,
+      "full_name": "SigNoz/signoz"
+    },
+    {
+      "id": 357241735,
+      "full_name": "searxng/searxng"
+    },
+    {
+      "id": 357728969,
+      "full_name": "oven-sh/bun"
+    },
+    {
+      "id": 384219990,
+      "full_name": "warpdotdev/warp"
+    },
+    {
+      "id": 396569538,
+      "full_name": "khoj-ai/khoj"
+    },
+    {
+      "id": 420628968,
+      "full_name": "asavinov/intelligent-trading-bot"
+    },
+    {
+      "id": 434085185,
+      "full_name": "VeejaLiu/ScienceFictionCollection"
+    },
+    {
+      "id": 437352558,
+      "full_name": "wangzhe3224/awesome-systematic-trading"
+    },
+    {
+      "id": 455229168,
+      "full_name": "immich-app/immich"
+    },
+    {
+      "id": 455878073,
+      "full_name": "warp-tech/warpgate"
+    },
+    {
+      "id": 455982203,
+      "full_name": "paperswithbacktest/awesome-systematic-trading"
+    },
+    {
+      "id": 458648791,
+      "full_name": "paperless-ngx/paperless-ngx"
+    },
+    {
+      "id": 493376588,
+      "full_name": "cordiverse/cordis"
+    },
+    {
+      "id": 569959091,
+      "full_name": "modelscope/FunASR"
+    },
+    {
+      "id": 574523116,
+      "full_name": "f/prompts.chat"
+    },
+    {
+      "id": 581872397,
+      "full_name": "dgunning/edgartools"
+    },
+    {
+      "id": 582432706,
+      "full_name": "brianpetro/obsidian-smart-connections"
+    },
+    {
+      "id": 586920414,
+      "full_name": "jdx/mise"
+    },
+    {
+      "id": 598667202,
+      "full_name": "lightpanda-io/browser"
+    },
+    {
+      "id": 610217037,
+      "full_name": "di-sukharev/opencommit"
+    },
+    {
+      "id": 618351200,
+      "full_name": "likec4/likec4"
+    },
+    {
+      "id": 626805178,
+      "full_name": "langgenius/dify"
+    },
+    {
+      "id": 633262635,
+      "full_name": "onyx-dot-app/onyx"
+    },
+    {
+      "id": 633927609,
+      "full_name": "promptfoo/promptfoo"
+    },
+    {
+      "id": 638951438,
+      "full_name": "comet-ml/opik"
+    },
+    {
+      "id": 639835356,
+      "full_name": "assafelovic/gpt-researcher"
+    },
+    {
+      "id": 654124617,
+      "full_name": "open-compass/opencompass"
+    },
+    {
+      "id": 655459367,
+      "full_name": "e2b-dev/awesome-ai-agents"
+    },
+    {
+      "id": 656099147,
+      "full_name": "mem0ai/mem0"
+    },
+    {
+      "id": 656227652,
+      "full_name": "OtterMind/Chat2DB"
+    },
+    {
+      "id": 658928958,
+      "full_name": "ollama/ollama"
+    },
+    {
+      "id": 678973052,
+      "full_name": "anthropics/claude-cookbooks"
+    },
+    {
+      "id": 679343504,
+      "full_name": "topoteretes/cognee"
+    },
+    {
+      "id": 683347556,
+      "full_name": "tursodatabase/turso"
+    },
+    {
+      "id": 707441527,
+      "full_name": "livekit/agents"
+    },
+    {
+      "id": 718741813,
+      "full_name": "abi/screenshot-to-code"
+    },
+    {
+      "id": 721767116,
+      "full_name": "clash-verge-rev/clash-verge-rev"
+    },
+    {
+      "id": 722844356,
+      "full_name": "Open-LLM-VTuber/Open-LLM-VTuber"
+    },
+    {
+      "id": 725205304,
+      "full_name": "unslothai/unsloth"
+    },
+    {
+      "id": 725956246,
+      "full_name": "open-compass/VLMEvalKit"
+    },
+    {
+      "id": 730534580,
+      "full_name": "infiniflow/ragflow"
+    },
+    {
+      "id": 762304524,
+      "full_name": "ComposioHQ/composio"
+    },
+    {
+      "id": 764287615,
+      "full_name": "supermemoryai/supermemory"
+    },
+    {
+      "id": 771302083,
+      "full_name": "OpenHands/OpenHands"
+    },
+    {
+      "id": 774468912,
+      "full_name": "yorukot/superfile"
+    },
+    {
+      "id": 793375104,
+      "full_name": "Shubhamsaboo/awesome-llm-apps"
+    },
+    {
+      "id": 793784055,
+      "full_name": "google-research/timesfm"
+    },
+    {
+      "id": 798201435,
+      "full_name": "unclecode/crawl4ai"
+    },
+    {
+      "id": 807305060,
+      "full_name": "LMCache/LMCache"
+    },
+    {
+      "id": 816848129,
+      "full_name": "whchien/ai-trader"
+    },
+    {
+      "id": 817326197,
+      "full_name": "screenpipe/screenpipe"
+    },
+    {
+      "id": 824874689,
+      "full_name": "cline/cline"
+    },
+    {
+      "id": 828119367,
+      "full_name": "yamadashy/repomix"
+    },
+    {
+      "id": 833984877,
+      "full_name": "kvcache-ai/ktransformers"
+    },
+    {
+      "id": 838542536,
+      "full_name": "humanlayer/humanlayer"
+    },
+    {
+      "id": 846698999,
+      "full_name": "aaif-goose/goose"
+    },
+    {
+      "id": 849406496,
+      "full_name": "Fincept-Corporation/FinceptTerminal"
+    },
+    {
+      "id": 849553306,
+      "full_name": "anthropics/claude-quickstarts"
+    },
+    {
+      "id": 862570523,
+      "full_name": "modelcontextprotocol/modelcontextprotocol"
+    },
+    {
+      "id": 870554327,
+      "full_name": "NirDiamant/Prompt_Engineering"
+    },
+    {
+      "id": 872119017,
+      "full_name": "D4Vinci/Scrapling"
+    },
+    {
+      "id": 876286167,
+      "full_name": "lfnovo/open-notebook"
+    },
+    {
+      "id": 881458615,
+      "full_name": "browser-use/browser-use"
+    },
+    {
+      "id": 888092115,
+      "full_name": "microsoft/markitdown"
+    },
+    {
+      "id": 890668799,
+      "full_name": "modelcontextprotocol/servers"
+    },
+    {
+      "id": 896144595,
+      "full_name": "virattt/ai-hedge-fund"
+    },
+    {
+      "id": 896335270,
+      "full_name": "punkpeye/awesome-mcp-servers"
+    },
+    {
+      "id": 898345892,
+      "full_name": "wonderwhy-er/DesktopCommanderMCP"
+    },
+    {
+      "id": 899407931,
+      "full_name": "firecrawl/firecrawl-mcp-server"
+    },
+    {
+      "id": 908589694,
+      "full_name": "Zackriya-Solutions/meetily"
+    },
+    {
+      "id": 909213664,
+      "full_name": "TauricResearch/TradingAgents"
+    },
+    {
+      "id": 910422636,
+      "full_name": "usekaneo/kaneo"
+    },
+    {
+      "id": 916009087,
+      "full_name": "rowboatlabs/rowboat"
+    },
+    {
+      "id": 929121414,
+      "full_name": "coleam00/Archon"
+    },
+    {
+      "id": 929868765,
+      "full_name": "LearningCircuit/local-deep-research"
+    },
+    {
+      "id": 937253475,
+      "full_name": "anthropics/claude-code"
+    },
+    {
+      "id": 938468965,
+      "full_name": "musistudio/claude-code-router"
+    },
+    {
+      "id": 943398999,
+      "full_name": "x1xhlol/system-prompts-and-models-of-ai-tools"
+    },
+    {
+      "id": 945530209,
+      "full_name": "bytebase/dbhub"
+    },
+    {
+      "id": 945605057,
+      "full_name": "smtg-ai/claude-squad"
+    },
+    {
+      "id": 946380199,
+      "full_name": "openai/openai-agents-python"
+    },
+    {
+      "id": 953683578,
+      "full_name": "oraios/serena"
+    },
+    {
+      "id": 956472076,
+      "full_name": "mcp-use/mcp-use"
+    },
+    {
+      "id": 958136139,
+      "full_name": "google-ai-edge/gallery"
+    },
+    {
+      "id": 958531089,
+      "full_name": "VectifyAI/PageIndex"
+    },
+    {
+      "id": 966386486,
+      "full_name": "google-ai-edge/LiteRT-LM"
+    },
+    {
+      "id": 969302809,
+      "full_name": "hesreallyhim/awesome-claude-code"
+    },
+    {
+      "id": 975070903,
+      "full_name": "llm-d/llm-d"
+    },
+    {
+      "id": 975318071,
+      "full_name": "AsyncFuncAI/deepwiki-open"
+    },
+    {
+      "id": 979115477,
+      "full_name": "bytedance/deer-flow"
+    },
+    {
+      "id": 979560403,
+      "full_name": "superplanehq/superplane"
+    },
+    {
+      "id": 987975584,
+      "full_name": "langchain-ai/open-swe"
+    },
+    {
+      "id": 994093166,
+      "full_name": "omacom/omarchy"
+    },
+    {
+      "id": 995029641,
+      "full_name": "ruvnet/ruflo"
+    },
+    {
+      "id": 997125912,
+      "full_name": "zilliztech/claude-context"
+    },
+    {
+      "id": 997220241,
+      "full_name": "HKUDS/RAG-Anything"
+    },
+    {
+      "id": 1000362065,
+      "full_name": "github/awesome-copilot"
+    },
+    {
+      "id": 1000486904,
+      "full_name": "anthropics/claude-agent-sdk-python"
+    },
+    {
+      "id": 1003043071,
+      "full_name": "vitali87/code-graph-rag"
+    },
+    {
+      "id": 1004631442,
+      "full_name": "Maciek-roboblog/Claude-Code-Usage-Monitor"
+    },
+    {
+      "id": 1006251566,
+      "full_name": "zebbern/claude-code-guide"
+    },
+    {
+      "id": 1006496207,
+      "full_name": "SuperClaude-Org/SuperClaude_Framework"
+    },
+    {
+      "id": 1007827531,
+      "full_name": "Crosstalk-Solutions/project-nomad"
+    },
+    {
+      "id": 1010681419,
+      "full_name": "shareAI-lab/learn-claude-code"
+    },
+    {
+      "id": 1011567289,
+      "full_name": "shiyu-coder/Kronos"
+    },
+    {
+      "id": 1012087571,
+      "full_name": "router-for-me/CLIProxyAPI"
+    },
+    {
+      "id": 1013480284,
+      "full_name": "davila7/claude-code-templates"
+    },
+    {
+      "id": 1024118326,
+      "full_name": "Tencent/WeKnora"
+    },
+    {
+      "id": 1024554267,
+      "full_name": "NousResearch/hermes-agent"
+    },
+    {
+      "id": 1025856648,
+      "full_name": "wshobson/agents"
+    },
+    {
+      "id": 1027384981,
+      "full_name": "langchain-ai/deepagents"
+    },
+    {
+      "id": 1028832403,
+      "full_name": "UfoMiao/zcf"
+    },
+    {
+      "id": 1029036679,
+      "full_name": "VoltAgent/awesome-claude-code-subagents"
+    },
+    {
+      "id": 1031059905,
+      "full_name": "abhigyanpatwari/GitNexus"
+    },
+    {
+      "id": 1031912724,
+      "full_name": "farion1231/cc-switch"
+    },
+    {
+      "id": 1033873680,
+      "full_name": "MiroMindAI/MiroThinker"
+    },
+    {
+      "id": 1034425196,
+      "full_name": "sirmalloc/ccstatusline"
+    },
+    {
+      "id": 1034736943,
+      "full_name": "atilaahmettaner/tradingview-mcp"
+    },
+    {
+      "id": 1035029907,
+      "full_name": "earendil-works/pi"
+    },
+    {
+      "id": 1045721921,
+      "full_name": "frankbria/ralph-claude-code"
+    },
+    {
+      "id": 1048065319,
+      "full_name": "thedotmack/claude-mem"
+    },
+    {
+      "id": 1053598893,
+      "full_name": "looplj/axonhub"
+    },
+    {
+      "id": 1062356571,
+      "full_name": "tw93/Mole"
+    },
+    {
+      "id": 1065936302,
+      "full_name": "Open-Dev-Society/OpenStock"
+    },
+    {
+      "id": 1073224021,
+      "full_name": "EveryInc/compound-engineering-plugin"
+    },
+    {
+      "id": 1073224795,
+      "full_name": "obra/superpowers"
+    },
+    {
+      "id": 1074561042,
+      "full_name": "gastownhall/beads"
+    },
+    {
+      "id": 1075372545,
+      "full_name": "msitarzewski/agency-agents"
+    },
+    {
+      "id": 1076426995,
+      "full_name": "virattt/dexter"
+    },
+    {
+      "id": 1078079172,
+      "full_name": "ComposioHQ/awesome-claude-skills"
+    },
+    {
+      "id": 1078319457,
+      "full_name": "yusufkaraaslan/Skill_Seekers"
+    },
+    {
+      "id": 1078528927,
+      "full_name": "max-sixty/worktrunk"
+    },
+    {
+      "id": 1079084637,
+      "full_name": "alirezarezvani/claude-skills"
+    },
+    {
+      "id": 1079356098,
+      "full_name": "tradermonty/claude-trading-skills"
+    },
+    {
+      "id": 1079456184,
+      "full_name": "K-Dense-AI/scientific-agent-skills"
+    },
+    {
+      "id": 1079906817,
+      "full_name": "deta/surf"
+    },
+    {
+      "id": 1080989149,
+      "full_name": "composio-community/awesome-claude-plugins"
+    },
+    {
+      "id": 1081397957,
+      "full_name": "toon-format/toon"
+    },
+    {
+      "id": 1081891045,
+      "full_name": "HKUDS/AI-Trader"
+    },
+    {
+      "id": 1083162948,
+      "full_name": "SeemSeam/claude_codex_bridge"
+    },
+    {
+      "id": 1084853233,
+      "full_name": "VoltAgent/awesome-agent-skills"
+    },
+    {
+      "id": 1085086903,
+      "full_name": "EverMind-AI/EverOS"
+    },
+    {
+      "id": 1086419061,
+      "full_name": "vectorize-io/hindsight"
+    },
+    {
+      "id": 1086436947,
+      "full_name": "andrewyng/context-hub"
+    },
+    {
+      "id": 1086692156,
+      "full_name": "quemsah/awesome-claude-plugins"
+    },
+    {
+      "id": 1087192965,
+      "full_name": "shanraisshan/claude-code-best-practice"
+    },
+    {
+      "id": 1088558237,
+      "full_name": "Orchestra-Research/AI-Research-SKILLs"
+    },
+    {
+      "id": 1092047360,
+      "full_name": "luongnv89/claude-howto"
+    },
+    {
+      "id": 1097346685,
+      "full_name": "pbakaus/impeccable"
+    },
+    {
+      "id": 1099328966,
+      "full_name": "Piebald-AI/claude-code-system-prompts"
+    },
+    {
+      "id": 1100776768,
+      "full_name": "anthropics/claude-plugins-official"
+    },
+    {
+      "id": 1103108740,
+      "full_name": "JetBrains/go-modern-guidelines"
+    },
+    {
+      "id": 1103643573,
+      "full_name": "openai/skills"
+    },
+    {
+      "id": 1104120047,
+      "full_name": "eugr/spark-vllm-docker"
+    },
+    {
+      "id": 1104332987,
+      "full_name": "666ghj/MiroFish"
+    },
+    {
+      "id": 1105657641,
+      "full_name": "ykdojo/claude-code-tips"
+    },
+    {
+      "id": 1106996539,
+      "full_name": "nextlevelbuilder/ui-ux-pro-max-skill"
+    },
+    {
+      "id": 1108837393,
+      "full_name": "code-yeongyu/oh-my-openagent"
+    },
+    {
+      "id": 1110782890,
+      "full_name": "YishenTu/claudian"
+    },
+    {
+      "id": 1112540808,
+      "full_name": "vercel-labs/agent-skills"
+    },
+    {
+      "id": 1114903449,
+      "full_name": "Chachamaru127/claude-code-harness"
+    },
+    {
+      "id": 1117639997,
+      "full_name": "agentskills/agentskills"
+    },
+    {
+      "id": 1124219907,
+      "full_name": "HKUDS/DeepTutor"
+    },
+    {
+      "id": 1125856365,
+      "full_name": "can1357/oh-my-pi"
+    },
+    {
+      "id": 1126473386,
+      "full_name": "jarrodwatts/claude-hud"
+    },
+    {
+      "id": 1126947080,
+      "full_name": "kepano/obsidian-skills"
+    },
+    {
+      "id": 1127110039,
+      "full_name": "OthmanAdi/planning-with-files"
+    },
+    {
+      "id": 1128123594,
+      "full_name": "volcengine/OpenViking"
+    },
+    {
+      "id": 1128204614,
+      "full_name": "1jehuang/jcode"
+    },
+    {
+      "id": 1129786550,
+      "full_name": "teng-lin/notebooklm-py"
+    },
+    {
+      "id": 1129940957,
+      "full_name": "headroomlabs-ai/headroom"
+    },
+    {
+      "id": 1130564872,
+      "full_name": "koala73/worldmonitor"
+    },
+    {
+      "id": 1130809465,
+      "full_name": "Yeachan-Heo/oh-my-claudecode"
+    },
+    {
+      "id": 1131107802,
+      "full_name": "FlorianBruniaux/claude-code-ultimate-guide"
+    },
+    {
+      "id": 1131513930,
+      "full_name": "ZhuLinsen/daily_stock_analysis"
+    },
+    {
+      "id": 1132750706,
+      "full_name": "composio-community/awesome-codex-skills"
+    },
+    {
+      "id": 1133141258,
+      "full_name": "Tracer-Cloud/opensre"
+    },
+    {
+      "id": 1133707766,
+      "full_name": "multica-ai/multica"
+    },
+    {
+      "id": 1134426800,
+      "full_name": "sickn33/agentic-awesome-skills"
+    },
+    {
+      "id": 1134447175,
+      "full_name": "trailofbits/skills"
+    },
+    {
+      "id": 1134819911,
+      "full_name": "nyldn/claude-octopus"
+    },
+    {
+      "id": 1135791677,
+      "full_name": "lsdefine/GenericAgent"
+    },
+    {
+      "id": 1135847870,
+      "full_name": "google-labs-code/stitch-skills"
+    },
+    {
+      "id": 1136590548,
+      "full_name": "affaan-m/ECC"
+    },
+    {
+      "id": 1136666433,
+      "full_name": "blader/humanizer"
+    },
+    {
+      "id": 1137078255,
+      "full_name": "colbymchenry/codegraph"
+    },
+    {
+      "id": 1137515077,
+      "full_name": "tech-leads-club/agent-skills"
+    },
+    {
+      "id": 1139971460,
+      "full_name": "rtk-ai/rtk"
+    },
+    {
+      "id": 1140229822,
+      "full_name": "cursor/plugins"
+    },
+    {
+      "id": 1140828898,
+      "full_name": "anthropics/knowledge-work-plugins"
+    },
+    {
+      "id": 1140843380,
+      "full_name": "mvanhorn/last30days-skill"
+    },
+    {
+      "id": 1141704318,
+      "full_name": "VoltAgent/awesome-openclaw-skills"
+    },
+    {
+      "id": 1141974122,
+      "full_name": "ColeMurray/background-agents"
+    },
+    {
+      "id": 1142423471,
+      "full_name": "mindfold-ai/Trellis"
+    },
+    {
+      "id": 1142983825,
+      "full_name": "multica-ai/andrej-karpathy-skills"
+    },
+    {
+      "id": 1148052330,
+      "full_name": "Yeachan-Heo/oh-my-codex"
+    },
+    {
+      "id": 1148788086,
+      "full_name": "mattpocock/skills"
+    },
+    {
+      "id": 1153178500,
+      "full_name": "jgravelle/jcodemunch-mcp"
+    },
+    {
+      "id": 1153579168,
+      "full_name": "Osmantic/ODS"
+    },
+    {
+      "id": 1156994049,
+      "full_name": "Untrivial-ai/agent-orchestrator"
+    },
+    {
+      "id": 1157102282,
+      "full_name": "diegosouzapw/OmniRoute"
+    },
+    {
+      "id": 1158096951,
+      "full_name": "refactoringhq/tolaria"
+    },
+    {
+      "id": 1158588224,
+      "full_name": "AlexsJones/llmfit"
+    },
+    {
+      "id": 1158722119,
+      "full_name": "addyosmani/agent-skills"
+    },
+    {
+      "id": 1159938129,
+      "full_name": "ZSeven-W/openpencil"
+    },
+    {
+      "id": 1161163182,
+      "full_name": "tinyhumansai/openhuman"
+    },
+    {
+      "id": 1162021647,
+      "full_name": "kenn-io/agentsview"
+    },
+    {
+      "id": 1162099055,
+      "full_name": "Leonxlnx/taste-skill"
+    },
+    {
+      "id": 1163834030,
+      "full_name": "CloakHQ/CloakBrowser"
+    },
+    {
+      "id": 1164477708,
+      "full_name": "mksglu/context-mode"
+    },
+    {
+      "id": 1165277268,
+      "full_name": "Panniantong/Agent-Reach"
+    },
+    {
+      "id": 1166102148,
+      "full_name": "DeusData/codebase-memory-mcp"
+    },
+    {
+      "id": 1166408297,
+      "full_name": "rohitg00/agentmemory"
+    },
+    {
+      "id": 1167300963,
+      "full_name": "Imbad0202/academic-research-skills"
+    },
+    {
+      "id": 1167732163,
+      "full_name": "giancarloerra/SocratiCode"
+    },
+    {
+      "id": 1167788341,
+      "full_name": "tirth8205/code-review-graph"
+    },
+    {
+      "id": 1168270795,
+      "full_name": "shanraisshan/codex-cli-best-practice"
+    },
+    {
+      "id": 1169560166,
+      "full_name": "breferrari/obsidian-mind"
+    },
+    {
+      "id": 1170266927,
+      "full_name": "phuryn/pm-skills"
+    },
+    {
+      "id": 1170291083,
+      "full_name": "xingkongliang/skills-manager"
+    },
+    {
+      "id": 1170548091,
+      "full_name": "0xNyk/council-of-high-intelligence"
+    },
+    {
+      "id": 1170821064,
+      "full_name": "paperclipai/paperclip"
+    },
+    {
+      "id": 1172574522,
+      "full_name": "Andyyyy64/whichllm"
+    },
+    {
+      "id": 1172963839,
+      "full_name": "openai/plugins"
+    },
+    {
+      "id": 1174820787,
+      "full_name": "karpathy/autoresearch"
+    },
+    {
+      "id": 1175748759,
+      "full_name": "awarexone/Agentic-Bug-Hunter"
+    },
+    {
+      "id": 1176011916,
+      "full_name": "HKUDS/CLI-Anything"
+    },
+    {
+      "id": 1176753219,
+      "full_name": "NousResearch/hermes-agent-self-evolution"
+    },
+    {
+      "id": 1177608268,
+      "full_name": "wanshuiyin/Auto-claude-code-research-in-sleep"
+    },
+    {
+      "id": 1177640089,
+      "full_name": "Nexting-ai/nexting"
+    },
+    {
+      "id": 1178737655,
+      "full_name": "THU-MAIC/OpenMAIC"
+    },
+    {
+      "id": 1179363570,
+      "full_name": "tw93/Waza"
+    },
+    {
+      "id": 1179959183,
+      "full_name": "BuilderIO/agent-native"
+    },
+    {
+      "id": 1180917769,
+      "full_name": "uditgoenka/autoresearch"
+    },
+    {
+      "id": 1182081931,
+      "full_name": "Egonex-AI/Understand-Anything"
+    },
+    {
+      "id": 1183888342,
+      "full_name": "stablyai/orca"
+    },
+    {
+      "id": 1184268220,
+      "full_name": "VoltAgent/awesome-codex-subagents"
+    },
+    {
+      "id": 1185590488,
+      "full_name": "rohitg00/ai-engineering-from-scratch"
+    },
+    {
+      "id": 1189234446,
+      "full_name": "0xNyk/awesome-hermes-agent"
+    },
+    {
+      "id": 1190557545,
+      "full_name": "eugeniughelbur/obsidian-second-brain"
+    },
+    {
+      "id": 1193082155,
+      "full_name": "revfactory/harness"
+    },
+    {
+      "id": 1195165448,
+      "full_name": "graykode/abtop"
+    },
+    {
+      "id": 1195243030,
+      "full_name": "walkinglabs/learn-harness-engineering"
+    },
+    {
+      "id": 1195329660,
+      "full_name": "tradesdontlie/tradingview-mcp"
+    },
+    {
+      "id": 1196181411,
+      "full_name": "drona23/claude-token-efficient"
+    },
+    {
+      "id": 1196321162,
+      "full_name": "openai/codex-plugin-cc"
+    },
+    {
+      "id": 1197656406,
+      "full_name": "open-multi-agent/open-multi-agent"
+    },
+    {
+      "id": 1198306812,
+      "full_name": "HKUDS/Vibe-Trading"
+    },
+    {
+      "id": 1198616956,
+      "full_name": "HKUDS/OpenHarness"
+    },
+    {
+      "id": 1200597263,
+      "full_name": "Graphify-Labs/graphify"
+    },
+    {
+      "id": 1201173969,
+      "full_name": "JuliusBrussee/caveman"
+    },
+    {
+      "id": 1201656210,
+      "full_name": "MemPalace/mempalace"
+    },
+    {
+      "id": 1202057891,
+      "full_name": "garrytan/gbrain"
+    },
+    {
+      "id": 1203558071,
+      "full_name": "TencentCloud/TencentDB-Agent-Memory"
+    },
+    {
+      "id": 1203670949,
+      "full_name": "AgriciDaniel/claude-obsidian"
+    },
+    {
+      "id": 1203777920,
+      "full_name": "xbtlin/ai-berkshire"
+    },
+    {
+      "id": 1204828304,
+      "full_name": "nashsu/llm_wiki"
+    },
+    {
+      "id": 1208642537,
+      "full_name": "KnockOutEZ/wigolo"
+    },
+    {
+      "id": 1209343409,
+      "full_name": "h4ckf0r0day/obscura"
+    },
+    {
+      "id": 1209889782,
+      "full_name": "getagentseal/codeburn"
+    },
+    {
+      "id": 1211139949,
+      "full_name": "tt-a1i/archify"
+    },
+    {
+      "id": 1211537500,
+      "full_name": "codejunkie99/agentic-stack"
+    },
+    {
+      "id": 1212503250,
+      "full_name": "citrolabs/ego-lite"
+    },
+    {
+      "id": 1212769188,
+      "full_name": "cathrynlavery/diagram-design"
+    },
+    {
+      "id": 1213015951,
+      "full_name": "Storybloq/storybloq"
+    },
+    {
+      "id": 1213616615,
+      "full_name": "unclebob/swarm-forge"
+    },
+    {
+      "id": 1214125715,
+      "full_name": "VoltAgent/awesome-claude-design"
+    },
+    {
+      "id": 1219644159,
+      "full_name": "bradautomates/claude-video"
+    },
+    {
+      "id": 1222789989,
+      "full_name": "weave-os/router"
+    },
+    {
+      "id": 1226123343,
+      "full_name": "virgiliojr94/book-to-skill"
+    },
+    {
+      "id": 1230751102,
+      "full_name": "BigPizzaV3/CodexPlusPlus"
+    },
+    {
+      "id": 1232493406,
+      "full_name": "PrimeIntellect-ai/prime-agent"
+    },
+    {
+      "id": 1232669890,
+      "full_name": "microsoft/SkillOpt"
+    },
+    {
+      "id": 1235403234,
+      "full_name": "nexu-io/html-anything"
+    },
+    {
+      "id": 1238120057,
+      "full_name": "ayghri/i-have-adhd"
+    },
+    {
+      "id": 1240191065,
+      "full_name": "DenisSergeevitch/agents-best-practices"
+    },
+    {
+      "id": 1241960226,
+      "full_name": "alibaba/open-code-review"
+    },
+    {
+      "id": 1243889840,
+      "full_name": "NVIDIA-NeMo/Switchyard"
+    },
+    {
+      "id": 1246148135,
+      "full_name": "akitaonrails/ai-memory"
+    },
+    {
+      "id": 1251460378,
+      "full_name": "apache/maka"
+    },
+    {
+      "id": 1251648409,
+      "full_name": "opengeos/GeoLibre"
+    },
+    {
+      "id": 1255180606,
+      "full_name": "odysseus-dev/odysseus"
+    },
+    {
+      "id": 1255217938,
+      "full_name": "loopx-project/loopx"
+    },
+    {
+      "id": 1255237198,
+      "full_name": "chaitanyagiri/munder-difflin"
+    },
+    {
+      "id": 1261663145,
+      "full_name": "alphaXiv/OpenResearch"
+    },
+    {
+      "id": 1263648864,
+      "full_name": "cobusgreyling/loop-engineering"
+    },
+    {
+      "id": 1266212515,
+      "full_name": "omnigent-ai/omnigent"
+    },
+    {
+      "id": 1266797999,
+      "full_name": "DietrichGebert/ponytail"
+    },
+    {
+      "id": 1267145484,
+      "full_name": "magnitudedev/magnitude"
+    },
+    {
+      "id": 1277471539,
+      "full_name": "bilawalsidhu/gods-eye-view"
+    },
+    {
+      "id": 1277477208,
+      "full_name": "langchain-ai/openwiki"
+    }
+  ]
+}

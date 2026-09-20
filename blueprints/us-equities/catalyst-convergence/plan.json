@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "catalyst-convergence-20260920",
+  "base_commit": "cb79080cf5d9510818c67ac51c521b1d2a1b80fe",
+  "status": "bounded_native_wave_accepted",
+  "objective": "Advance historical lifecycle qualification, freeze a catalyst experiment and measure bounded native research-task efficiency without upgrading incomplete evidence into strategy or whole-stack acceptance.",
+  "waves": [
+    {
+      "id": "lifecycle_sources",
+      "state": "six captured sources and three claims / offline native proof accepted",
+      "owner": "data worker",
+      "artifact": "blueprints/us-equities/lifecycle-sample/README.md"
+    },
+    {
+      "id": "catalyst_protocol",
+      "state": "frozen daily and intraday protocol / synthetic mechanics accepted",
+      "owner": "experiment worker",
+      "artifact": "blueprints/us-equities/catalyst-experiment/README.md"
+    },
+    {
+      "id": "native_efficiency",
+      "state": "eight native invocations / semantic pass / two word-contract failures",
+      "owner": "efficiency worker",
+      "artifact": "blueprints/us-equities/research-efficiency/README.md"
+    },
+    {
+      "id": "review_publication",
+      "state": "independent review accepted / publication integrity and CI recorded separately",
+      "owner": "coordinator and independent reviewers",
+      "artifact": "blueprints/us-equities/catalyst-convergence/README.md"
+    }
+  ],
+  "constraints": {
+    "workers": 3,
+    "writing_workers_use_separate_worktrees": true,
+    "default_runtime": "Existing accepted native SDKs and client routes; no dependency or model upgrade by default",
+    "initial_model_comparison_ceiling": 8,
+    "inference_requires_frozen_reviewed_design": true,
+    "unchanged_provider_failure_retries": 0,
+    "provider_data_acquisition": "Only a reviewed fixed read-only plan; coordinator executes authenticated requests",
+    "raw_private_artifacts_published": false,
+    "orders": false,
+    "account_resets": false,
+    "paid_resources": false,
+    "live_promotion": false
+  },
+  "acceptance": [
+    "Lifecycle cases distinguish security identity, company identity, query symbol, claimed effective time, original publication/revision and local observation. Unknown or unsupported fields remain explicit.",
+    "Reuse immutable prior rename acquisition. Any new provider request must have a concrete unmet question, fixed scope and finite request cap; no broad price/outcome scan.",
+    "Daily and intraday hypotheses specify candidate selection, source availability, event age, latency, labels, exits, costs, controls, chronological partitions and research-only promotion criteria before outcome inspection.",
+    "The inspected 2021 control segment and any other inspected sample cannot be represented as untouched holdout. Missing, losing and rejected cases remain in experiment accounting.",
+    "Native offline exercises establish protocol mechanics only. They cannot establish empirical strategy quality or fill realism.",
+    "Efficiency conditions use the same frozen research task/corpus/model settings within each provider, preserve answer quality and report complete available usage. Unknown categories and uncontrolled cache/retry effects remain explicit.",
+    "Independent review precedes publication. Exact native commands, failures, artifact hashes, dashboard scope and GitHub commit validation are recorded."
+  ],
+  "next_dependent_gates": [
+    "Permitted historical universe and original availability/revision policy before broad as-known catalyst strategy evaluation",
+    "Realistic fill, liquidity, financing and latency calibration before interpreting leveraged simulation merit",
+    "Numeric risk, journal, idempotency, reconciliation and recovery acceptance before dedicated paper execution",
+    "Operational off-host recovery, second-machine/macOS and provider cancellation acceptance"
+  ],
+  "current_catalog": {
+    "repository_identities": 504,
+    "public_stars": 342,
+    "beyond_stars": 162,
+    "typed_references": 1040,
+    "new_installs_this_wave": 0
+  }
+}

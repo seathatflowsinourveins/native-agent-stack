@@ -1,0 +1,220 @@
+{
+  "schema_version": 1,
+  "id": "native-lifecycle-sample-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "edgartools",
+    "duckdb"
+  ],
+  "status": "accepted_bounded_documentary_and_observation_mechanics",
+  "claim": "Six HTTP200 public documents support three distinct lifecycle claims. Native offline EdgarTools parsing and DuckDB preserve source anchors and exact observation cutoffs:0 historical,0 before first observation,1 at first and3 at last; historical replay remains0. Original availability, permanent identity and historical universe eligibility remain unestablished.",
+  "limitations": [
+    "Three hand-selected cases and six source documents only; not complete historical coverage or an outcome-selected mover dataset.",
+    "Retrospective publisher claims are distinct from when this runtime observed the document. Local available_ns equals observed_ns; original provider revisions and historical as-known eligibility remain unknown.",
+    "Distinct company-stock and ETF documentary scopes support ordered META ticker reuse; no permanent identity crosswalk, continuous ownership intervals or cause of the prior quarantined zero-activity bar.",
+    "Twitter suspension and a Form25 notification do not establish a precise legal delisting instant. Native SEC acceptance text is timezone-naive; its timezone and UTC instant remain unknown.",
+    "Custom bounded transport/qualification adapters call installed upstream APIs. This receipt is not an upstream project benchmark or general filing parser acceptance.",
+    "No new Alpaca requests, broker orders, account resets, paid resources, price/outcome scan or empirical strategy result. Native provider comparison is a separate receipt."
+  ],
+  "implementation_boundary": "Fixed reviewed source plan, native Requests transport; local witness qualification through EdgarTools5.58.0 and DuckDB1.5.5. Source bytes remain private; source URLs and cryptographic anchors are public.",
+  "runtime": {
+    "python": "3.13.15",
+    "requests": "2.34.2",
+    "edgartools": "5.58.0",
+    "duckdb": "1.5.5",
+    "offline_processing": "bwrap --unshare-net; separate existing Edgar and SDK environments"
+  },
+  "source_plan": {
+    "path": "blueprints/us-equities/lifecycle-sample/plan.json",
+    "sha256": "1324845825796e32b46d502884bf036e6b9211ca9976b7e9684dfda5b9b7f72b"
+  },
+  "source_review": "catalogs/us-equities/lifecycle-source-review.json",
+  "capture": {
+    "http_attempts": 6,
+    "manifest_sha256": "aafe9311ada95294c3fb1fe11de9e291e24039f155d3f446c9f10170b991ddb7",
+    "sources": [
+      {
+        "body": {
+          "bytes": 53379,
+          "path": "meta_release.body",
+          "sha256": "2c948e315202559544b25c4f673ef6db125e464594c9a883948e349b8fa9c486"
+        },
+        "body_complete": true,
+        "source_id": "meta_release",
+        "status": 200,
+        "transport_error": null
+      },
+      {
+        "body": {
+          "bytes": 207018,
+          "path": "roundhill_release.body",
+          "sha256": "d52ce74cbf7d266991b80f51452776e4d7696570f60b0928927b9a9135995b5d"
+        },
+        "body_complete": true,
+        "source_id": "roundhill_release",
+        "status": 200,
+        "transport_error": null
+      },
+      {
+        "body": {
+          "bytes": 441380,
+          "path": "twtr_8k_sgml.body",
+          "sha256": "2f115ca07c0e88ca7814c42de3c9c0dc6855644d18da72cc884dc224581eefd2"
+        },
+        "body_complete": true,
+        "source_id": "twtr_8k_sgml",
+        "status": 200,
+        "transport_error": null
+      },
+      {
+        "body": {
+          "bytes": 12186,
+          "path": "twtr_8k_index.body",
+          "sha256": "b581e05fecd3097b7e03c6b491077b5b5d9c2fe10aa7a2bde80de73942a4d11d"
+        },
+        "body_complete": true,
+        "source_id": "twtr_8k_index",
+        "status": 200,
+        "transport_error": null
+      },
+      {
+        "body": {
+          "bytes": 4160,
+          "path": "twtr_25_sgml.body",
+          "sha256": "d9d9e7719a52f31ce8b5e44efaad2bad3e275da4be5daffe998373f0e91f3aae"
+        },
+        "body_complete": true,
+        "source_id": "twtr_25_sgml",
+        "status": 200,
+        "transport_error": null
+      },
+      {
+        "body": {
+          "bytes": 8673,
+          "path": "twtr_25_index.body",
+          "sha256": "f11083497e32f4ec7f23ac417a8d6c489853e3a9d6f4ddff25246b6c7b2afcb3"
+        },
+        "body_complete": true,
+        "source_id": "twtr_25_index",
+        "status": 200,
+        "transport_error": null
+      }
+    ]
+  },
+  "qualification": {
+    "capture_sha256": "aafe9311ada95294c3fb1fe11de9e291e24039f155d3f446c9f10170b991ddb7",
+    "claim_count": 3,
+    "historical_universe_eligible": false,
+    "kind": "lifecycle-qualified-v1",
+    "provider_revision_availability_established": false,
+    "receipt_sha256": "1e0bec06fe3810dc3a9525469e2419da66996f8eab70c3142e5491c7aa0c3af4",
+    "relationships": {
+      "continuous_symbol_ownership_intervals_established": false,
+      "distinct_documentary_scopes": 3,
+      "documented_meta_ticker_reuse": true,
+      "permanent_identity_crosswalk_established": false,
+      "quarantined_bar_origin_established": false,
+      "reconstructed_order": "Roundhill META-to-METV claim precedes Meta FB-to-META claim"
+    },
+    "source_statuses": {
+      "meta_release": "parsed",
+      "roundhill_release": "parsed",
+      "twtr_25_index": "parsed",
+      "twtr_25_sgml": "parsed",
+      "twtr_8k_index": "parsed",
+      "twtr_8k_sgml": "parsed"
+    },
+    "supported_claims": 3,
+    "synthetic": false
+  },
+  "temporal_ledger": {
+    "duckdb": "1.5.5",
+    "historical_universe_eligible": false,
+    "kind": "lifecycle-ledger-v1",
+    "proof": {
+      "at_first_observation": {
+        "cutoff_ns": "1789873986868691122",
+        "eligible_documentary_claims": 1,
+        "historical_universe_eligible": false,
+        "selection_sha256": "21d8a7d6cd6a403fb9bab4a3ac83811e349dc02fc052553f82448d912bfc63a4"
+      },
+      "at_last_observation": {
+        "cutoff_ns": "1789873987063890294",
+        "eligible_documentary_claims": 3,
+        "historical_universe_eligible": false,
+        "selection_sha256": "2ac4928fa4141e1e2b1d89a9afb184270fddddec949d66007f5f9ff089baabcd"
+      },
+      "before_first_observation": {
+        "cutoff_ns": "1789873986868691121",
+        "eligible_documentary_claims": 0,
+        "historical_universe_eligible": false,
+        "selection_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      },
+      "historical": {
+        "cutoff_ns": "1672531199999999999",
+        "eligible_documentary_claims": 0,
+        "historical_universe_eligible": false,
+        "selection_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      },
+      "historical_replay": {
+        "cutoff_ns": "1672531199999999999",
+        "eligible_documentary_claims": 0,
+        "historical_universe_eligible": false,
+        "selection_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      }
+    },
+    "qualified_receipt_sha256": "1e0bec06fe3810dc3a9525469e2419da66996f8eab70c3142e5491c7aa0c3af4",
+    "receipt_sha256": "b66796b68f63918285b943d37229c448511a9a8f9b705fb087537948be9bb036",
+    "source_statuses": {
+      "meta_release": "parsed",
+      "roundhill_release": "parsed",
+      "twtr_25_index": "parsed",
+      "twtr_25_sgml": "parsed",
+      "twtr_8k_index": "parsed",
+      "twtr_8k_sgml": "parsed"
+    },
+    "supported_claims": 3,
+    "synthetic": false
+  },
+  "native_commands": [
+    {
+      "command": ". \"$PRIVATE_ENV_FILE\"\n\"$SDK_PYTHON\" blueprints/us-equities/catalyst-convergence/capture_sources.py --plan \"$STACK_REPO\"/blueprints/us-equities/lifecycle-sample/plan.json --out \"$PRIVATE_WAVE\"/lifecycle-capture-1",
+      "exit_code": 0,
+      "result": "6 attempts,6 HTTP200,6 complete bodies; no transport errors"
+    },
+    {
+      "command": "bwrap --unshare-net --ro-bind / / --bind \"$PRIVATE_WAVE\" \"$PRIVATE_WAVE\" --tmpfs /tmp --proc /proc --dev /dev --die-with-parent \"$EDGAR_PYTHON\" \"$STACK_REPO\"/blueprints/us-equities/lifecycle-sample/sample.py qualify --source \"$PRIVATE_WAVE\"/lifecycle-capture-1 --receipt-sha256 aafe9311ada95294c3fb1fe11de9e291e24039f155d3f446c9f10170b991ddb7 --out \"$PRIVATE_WAVE\"/lifecycle-qualified-1",
+      "exit_code": 0,
+      "result": "6 parsed sources;3 supported nonsynthetic claims"
+    },
+    {
+      "command": "bwrap --unshare-net --ro-bind / / --tmpfs /tmp --proc /proc --dev /dev --die-with-parent \"$EDGAR_PYTHON\" \"$STACK_REPO/blueprints/us-equities/lifecycle-sample/sample.py\" verify --source \"$PRIVATE_WAVE/lifecycle-qualified-1\" --receipt-sha256 1e0bec06fe3810dc3a9525469e2419da66996f8eab70c3142e5491c7aa0c3af4 --reparse",
+      "exit_code": 0,
+      "result": "Anchored source bytes reparsed identically"
+    },
+    {
+      "command": "bwrap --unshare-net --ro-bind / / --bind \"$PRIVATE_WAVE\" \"$PRIVATE_WAVE\" --tmpfs /tmp --proc /proc --dev /dev --die-with-parent \"$SDK_PYTHON\" \"$STACK_REPO\"/blueprints/us-equities/lifecycle-sample/sample.py materialize --source \"$PRIVATE_WAVE\"/lifecycle-qualified-1 --receipt-sha256 1e0bec06fe3810dc3a9525469e2419da66996f8eab70c3142e5491c7aa0c3af4 --out \"$PRIVATE_WAVE\"/lifecycle-ledger-1",
+      "exit_code": 0,
+      "result": "DuckDBParquet preserves three source-derived claims and exact BIGINT observation proof"
+    },
+    {
+      "command": "bwrap --unshare-net --ro-bind / / --tmpfs /tmp --proc /proc --dev /dev --die-with-parent \"$SDK_PYTHON\" \"$STACK_REPO\"/blueprints/us-equities/lifecycle-sample/sample.py verify-ledger --source \"$PRIVATE_WAVE\"/lifecycle-ledger-1 --receipt-sha256 b66796b68f63918285b943d37229c448511a9a8f9b705fb087537948be9bb036",
+      "exit_code": 0,
+      "result": "Artifact hashes, source-derived rows and all five cutoff queries verified"
+    }
+  ],
+  "command_path_convention": "Commands executed on the authoring WSL host. Only private absolute prefixes are replaced by variables. STACK_REPO is the selected checkout; PRIVATE_WAVE is a fresh private directory outside Git; SDK_PYTHON and EDGAR_PYTHON are separate adopted environments. PRIVATE_ENV_FILE holds the configured SEC contact identity and is never published. Relative capture command ran from the publication checkout. Read the plan before new acquisition.",
+  "verification": {
+    "capture_tests": 7,
+    "lifecycle_tests_per_environment": 12,
+    "passed_per_environment": 11,
+    "optional_dependency_skips_per_environment": 1,
+    "both_native_paths_exercised": true,
+    "semantic_tamper_rejection": [
+      "available_ns",
+      "documentary_scope",
+      "source_id"
+    ],
+    "independent_review": "Accepted. Independent network-disabled Edgar reparse and DuckDB verification reproduced all outcomes;22 qualified and28 ledger referenced file size/hash entries matched the externally supplied receipt anchors."
+  }
+}

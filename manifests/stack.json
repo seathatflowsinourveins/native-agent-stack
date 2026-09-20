@@ -159,7 +159,8 @@
         "native-claude-convergence-review-20260919",
         "native-paired-adoption-20260919",
         "native-architecture-review-20260919",
-        "native-convergence-review-20260919"
+        "native-convergence-review-20260919",
+        "native-research-efficiency-20260920"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -235,7 +236,8 @@
         "portable-sdk-adoption-20260919",
         "native-paired-adoption-20260919",
         "native-architecture-review-20260919",
-        "native-convergence-review-20260919"
+        "native-convergence-review-20260919",
+        "native-research-efficiency-20260920"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -573,7 +575,8 @@
         "native-cli-gaps",
         "component-history",
         "desktop-cli-workflows",
-        "qmd-bm25-retrieval-20260919"
+        "qmd-bm25-retrieval-20260919",
+        "native-research-efficiency-20260920"
       ],
       "upstream_sources": [
         "https://github.com/tobi/qmd/releases/tag/v2.8.3"
@@ -965,7 +968,9 @@
         "native-point-in-time-contract-20260919",
         "native-exact-nanosecond-replay-20260919",
         "sec-catalyst-dataset-native-20260920",
-        "native-security-identity-20260920"
+        "native-security-identity-20260920",
+        "native-lifecycle-sample-20260920",
+        "synthetic-catalyst-contract-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1163,7 +1168,8 @@
       "evidence_ids": [
         "native-edgartools-catalyst-20260919",
         "native-sec-access-resolution-20260919",
-        "sec-catalyst-dataset-native-20260920"
+        "sec-catalyst-dataset-native-20260920",
+        "native-lifecycle-sample-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [

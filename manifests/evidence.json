@@ -858,6 +858,63 @@
         "No new model-inference task or causal whole-task token-savings experiment. Existing Codex/Claude/context/memory receipts retain their own dates and scope."
       ],
       "path": "blueprints/us-equities/identity-readiness/native-receipt.json"
+    },
+    {
+      "id": "native-lifecycle-sample-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "edgartools",
+        "duckdb"
+      ],
+      "claim": "Six HTTP200 public documents support three distinct lifecycle claims. Native offline EdgarTools parsing and DuckDB preserve source anchors and exact observation cutoffs:0 historical,0 before first observation,1 at first and3 at last; historical replay remains0. Original availability, permanent identity and historical universe eligibility remain unestablished.",
+      "limitations": [
+        "Three hand-selected cases and six source documents only; not complete historical coverage or an outcome-selected mover dataset.",
+        "Retrospective publisher claims are distinct from when this runtime observed the document. Local available_ns equals observed_ns; original provider revisions and historical as-known eligibility remain unknown.",
+        "Distinct company-stock and ETF documentary scopes support ordered META ticker reuse; no permanent identity crosswalk, continuous ownership intervals or cause of the prior quarantined zero-activity bar.",
+        "Twitter suspension and a Form25 notification do not establish a precise legal delisting instant. Native SEC acceptance text is timezone-naive; its timezone and UTC instant remain unknown.",
+        "Custom bounded transport/qualification adapters call installed upstream APIs. This receipt is not an upstream project benchmark or general filing parser acceptance.",
+        "No new Alpaca requests, broker orders, account resets, paid resources, price/outcome scan or empirical strategy result. Native provider comparison is a separate receipt."
+      ],
+      "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json"
+    },
+    {
+      "id": "synthetic-catalyst-contract-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "duckdb"
+      ],
+      "claim": "Native DuckDB1.5.5 executed an exact BIGINT availability query on five synthetic observations in a network-disabled process. Thirteen focused standard-library tests exercise threshold, label, timing, units, interval and inspection-registry failures. No empirical trading experiment or new LEAN/skfolio run.",
+      "limitations": [
+        "Protocol thresholds are exploratory choices, not fitted or proven optimal.",
+        "Full feature construction, historical universe/availability, matched controls, fills, cash/corporate-action/margin accounting, statistical inference and promotion are future work.",
+        "The chronological2025reserved calendar requires a complete case-specific inspection registry and is not asserted globally unseen.",
+        "Synthetic labels are independent arithmetic fixtures, not market outcomes or simulated P&L.",
+        "No provider calls, broker orders, new model turn or net token-savings measurement."
+      ],
+      "path": "blueprints/us-equities/catalyst-experiment/receipt.json"
+    },
+    {
+      "id": "native-research-efficiency-20260920",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "qmd"
+      ],
+      "claim": "Eight fresh native answer invocations yielded four within-provider task comparisons. All eight semantic grades pass; six answers meet the shared structural and word protocol. Numeric differences are observed sample differences only.",
+      "limitations": [
+        "Only two fixed tasks per provider; no confidence intervals, provider ranking, causal attribution or general savings claim.",
+        "Full corpus is eight selected public project documents, not a comprehensive repository or autonomous research workload.",
+        "Prompts use identical questions/instructions and verbatim common source IDs; different document context lengths are the intended treatment.",
+        "QMD lexical selection was fixed before answers; task B focused omits the separate retrieval-evaluation document, and rubric deductions remain recorded.",
+        "Native default context, system policy, hooks and provider caches are uncontrolled; fresh sessions do not imply cold caches.",
+        "The two Claude full-context answers fail the word protocol, so their numeric differences are not clean protocol-passing matched comparisons.",
+        "Codex task B focused score is 9.5 versus full 10 despite both clearing the predeclared threshold.",
+        "Codex zero-tools enforcement is requested/audited with read-only and deny-all settings, weaker than hard prevention of every MCP call.",
+        "Local supervision does not prove provider-side cancellation; no run timed out.",
+        "This session uses these hosted research worker invocations; it does not establish token savings for the enclosing Desktop conversation or whole ecosystem."
+      ],
+      "path": "blueprints/us-equities/research-efficiency/native-receipt.json"
     }
   ],
   "files": [
@@ -883,8 +940,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "41ad6496859b54c8ae7206ce276b128b1ebf58297baf770aa7d83002b98b12a4",
-      "bytes": 5516
+      "sha256": "0fbc2500fbd7e391c375c62ddfc327ae41d9847340459e72c00b83cc92730305",
+      "bytes": 5922
     },
     {
       "path": "CLAUDE.md",
@@ -898,8 +955,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "53656ef088abd5a81b3fcbdb2c1e0e7078691773f54482264b8b8bf00321d31a",
-      "bytes": 13757
+      "sha256": "3d972f00791ab729f92bbbfed9635fa3722806606c69476b18247220790948c9",
+      "bytes": 14244
     },
     {
       "path": "adoption/README.md",
@@ -913,8 +970,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "e3a48289cd9d56214294f6a312020a3a1b3d1641bbe80eab6fce3207dac6f530",
-      "bytes": 10034
+      "sha256": "ed2bf9bcf66a5261313cc5a4ece2bc258572b4726eebbcd9bd9447a2e7b02a27",
+      "bytes": 10376
     },
     {
       "path": "adoption/paired/README.md",
@@ -983,8 +1040,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "22c6b2a8b39bde0ff2acdd300d4f17df9b3be71a08821d292d7066df47669af1",
-      "bytes": 8234
+      "sha256": "d0dad446d490c4c081686d0714bcde154ec7d29297d5a49f848f5201ebbbcfc5",
+      "bytes": 8229
     },
     {
       "path": "blueprints/convergence-practice/README.md",
@@ -1187,6 +1244,31 @@
       "bytes": 28718
     },
     {
+      "path": "blueprints/us-equities/catalyst-convergence/README.md",
+      "sha256": "92572baab1e6084e8b3cbc2e828c14a583106c464fb329758e6dbb4877fd463e",
+      "bytes": 7012
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-convergence/capture_sources.py",
+      "sha256": "1a8157ce0e851265e4df4323699c2a9dd6fa384595f5aafbf962f1b9d0d0712f",
+      "bytes": 6766
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-convergence/plan.json",
+      "sha256": "eda7afc29d4007bb0af201593fda482a6117aee7ac73af6791756225ba2df12c",
+      "bytes": 4040
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-convergence/public-stars-refresh.json",
+      "sha256": "e20b4ba4ec3006ce5efe48812f04e06b80401e048b78e6277b83c88069357620",
+      "bytes": 28768
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-convergence/verification.json",
+      "sha256": "0c2bb2a772e616bea642c78cf535f269a275a1e4904cad74de16c26c4c5f82b4",
+      "bytes": 3178
+    },
+    {
       "path": "blueprints/us-equities/catalyst-dataset/README.md",
       "sha256": "0933fa810e52f2e9f002fae0a1bae65e67070b3d2125f00b97c7ea1d2b39b85d",
       "bytes": 10582
@@ -1200,6 +1282,36 @@
       "path": "blueprints/us-equities/catalyst-dataset/native-receipt.json",
       "sha256": "ff9578bff25c7303a9b6820521ed8173285df8027079a5152ae5eb5874a25c43",
       "bytes": 10671
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-experiment/README.md",
+      "sha256": "c5841ca17e1e2ddb5b35982590755813a294db64b2605a727eff90a2d3aca8e0",
+      "bytes": 9405
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-experiment/availability.sql",
+      "sha256": "7af124ee0368b61bf81c832d83163c8b75fd35da5a3c4d2e8127b23107bf99cc",
+      "bytes": 385
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-experiment/contract.py",
+      "sha256": "3bbbd9c7321e14c56d95f3e027702082339e1d3719e37d5410bdcf7cc91d2968",
+      "bytes": 7918
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-experiment/exercise.py",
+      "sha256": "182b86e2aff96e4e782350a56e7eb78d30e502babc8fddb5b14f1ddd80575fd1",
+      "bytes": 5421
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-experiment/protocol.json",
+      "sha256": "f2aa3e4944ba2bd7cfb1fa41155e304075fff791f10b8c60996e3257dcbfe1e4",
+      "bytes": 16935
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-experiment/receipt.json",
+      "sha256": "0033848f3bdcbb9baabfd405380bffaeb50cff6e86c78063c9da7f0d3bb649df",
+      "bytes": 9962
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/README.md",
@@ -1737,6 +1849,31 @@
       "bytes": 5193
     },
     {
+      "path": "blueprints/us-equities/lifecycle-sample/README.md",
+      "sha256": "66647b5c8a2428415f830d17fd30c130d5a49e25b575918101fda8393d782525",
+      "bytes": 6259
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json",
+      "sha256": "6ae8b6dd8c0222ee3c078b59a738277a61b6f4a2d14bae647f7365c989a7ea81",
+      "bytes": 10895
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/plan.json",
+      "sha256": "1324845825796e32b46d502884bf036e6b9211ca9976b7e9684dfda5b9b7f72b",
+      "bytes": 2286
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/sample.py",
+      "sha256": "9a4fb73f84cf77634ffd4796c612b8f965a4386545691a5d412b90a9383eca87",
+      "bytes": 22275
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/select.sql",
+      "sha256": "006b5f4f9f99b4ad6bc3c7e9a80fc3b0c11d283886255428d83c4a08ae8a39c8",
+      "bytes": 532
+    },
+    {
       "path": "blueprints/us-equities/manifest.json",
       "sha256": "3660237d92c99c90d09464315288b8cffd78c4a1c501ca41b8100ef1e74260b7",
       "bytes": 7982
@@ -1855,6 +1992,36 @@
       "path": "blueprints/us-equities/point-in-time/temporal_snapshot.py",
       "sha256": "43f209840427124e6f447427ae00261b3360e2dc76826f4fede48093a8c55d26",
       "bytes": 11998
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/README.md",
+      "sha256": "c769eba0628851a76f6c66197eb6e7a179f687bb2151f270c6e7b230083d10f5",
+      "bytes": 11145
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/experiment.py",
+      "sha256": "cb307c4f6b80a2fa8eee66c3dc0f88fb72b71dddaaada99acac18d1192b26865",
+      "bytes": 27330
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/native-receipt.json",
+      "sha256": "18969aa21eabad2b5a5cc23fcc6baa527f76ff68f664f2645cb57334e7571451",
+      "bytes": 42248
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/plan.json",
+      "sha256": "2cc26b312bb40cd92657da4d6ae38ff49a462f8f987b6180b2ef1ced7ea4897e",
+      "bytes": 7770
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/review.py",
+      "sha256": "ce2706608b9dad9cdcaea955affd9542dd073e4a6e13d4cbcb4a901e4cc1b0e2",
+      "bytes": 6012
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/run_codex.py",
+      "sha256": "18b2e5f0bdcbd78eccef69d1070ea226027a99331d1ab01dfd658b7bbf09d4ea",
+      "bytes": 2465
     },
     {
       "path": "blueprints/us-equities/research-evaluation/README.md",
@@ -2283,8 +2450,8 @@
     },
     {
       "path": "catalogs/us-equities/convergence-review.json",
-      "sha256": "d5cecca1bcabb01131932b2470e7d6f5651fcf337896845409aa84be722a1758",
-      "bytes": 13035
+      "sha256": "59f8c3da89fd1a20f9bf4516c029cbd87f34dab9d334657d31ba8170ae8d7ed0",
+      "bytes": 14149
     },
     {
       "path": "catalogs/us-equities/convergence-review.md",
@@ -2323,8 +2490,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "cdfae5f79f31a0c79baf3ea09d7f4b47b16a9d509a2d5355bba8e22e19e710b3",
-      "bytes": 378992
+      "sha256": "1bf6ae0cee5ca96bd26429d31243eee36a54224933b7620d72568f242d0b11c4",
+      "bytes": 380072
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -2357,9 +2524,19 @@
       "bytes": 13801
     },
     {
+      "path": "catalogs/us-equities/lifecycle-source-review.json",
+      "sha256": "830c6629579c8ef0164df0c260ef71fd1561c38046c8c31e22752539023543bb",
+      "bytes": 8812
+    },
+    {
+      "path": "catalogs/us-equities/lifecycle-source-review.md",
+      "sha256": "c84c656f51d0f10003a9563b0730f47073a781ddb93facf891ef45a1e9cfc89a",
+      "bytes": 4752
+    },
+    {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "80bda6a63665bab4a8fa6ea7383d1d9c89f87de2987e9f5c43605e514ea34681",
-      "bytes": 2376
+      "sha256": "daa0187e8726f9745bad3892402edeaaa1e30745ecdc44eb83363d26257c61d5",
+      "bytes": 2633
     },
     {
       "path": "catalogs/us-equities/model-followup.json",
@@ -2383,8 +2560,8 @@
     },
     {
       "path": "catalogs/us-equities/native-workflows.md",
-      "sha256": "3b8868012a0b12209b3623d2647b52ad71a496d9178dad4a852e47e7a1942d7b",
-      "bytes": 9952
+      "sha256": "303fa345fcb4c1be64e33a247ac1bfcf02d0c6c41951b7607f0716e722c4c804",
+      "bytes": 11309
     },
     {
       "path": "catalogs/us-equities/repository-index.md",
@@ -2468,8 +2645,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "1ef3154cbd95c7203f1880001069e0dc65051e220d2c9a37755ae5f56086adaa",
-      "bytes": 1445198
+      "sha256": "6d4b8cbd13020e77075aaf3b7a6516b1096c0a6e4b7fb63946db5439200bed86",
+      "bytes": 1458467
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -2743,8 +2920,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "b4c8aa88ac6173001fecbd83dea24e27506e879bf6e6481cf56c134ae223255c",
-      "bytes": 48895
+      "sha256": "c7bad49183f8930563b746e61c1043d77d1435700d0bbb8048027f4a001d829a",
+      "bytes": 49172
     },
     {
       "path": "observability/README.md",
@@ -2903,8 +3080,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "cf86a2b71bc05c7dbdf86bc084034bb4b16b847ef3f628315b74a24e3c9ac377",
-      "bytes": 5062
+      "sha256": "bbef5201f609bbd6f2e9f8a5c8c1aab74fa20c11d35108da66502c6ad8fe8dd3",
+      "bytes": 5409
     },
     {
       "path": "observability/receipt.json",
@@ -2997,6 +3174,11 @@
       "bytes": 12856
     },
     {
+      "path": "tests/test_catalyst_experiment.py",
+      "sha256": "0767c544693c249e1649fc77c7578fb924deadba6f7f2b5aba6f1fd88a22f644",
+      "bytes": 6407
+    },
+    {
       "path": "tests/test_catalyst_provenance.py",
       "sha256": "d97ef06024b15d92c7447ee889c708a2975ec583d947c1e3590471373872164d",
       "bytes": 12522
@@ -3037,6 +3219,16 @@
       "bytes": 5155
     },
     {
+      "path": "tests/test_lifecycle_capture.py",
+      "sha256": "ab76bdda7d8df777ed5efbf740a0456f18358a3e2cd19603e2e59a80c68757b2",
+      "bytes": 6656
+    },
+    {
+      "path": "tests/test_lifecycle_sample.py",
+      "sha256": "36fe3e887d2866da583a70dc4461dfe1f42033921e63b99f442f44a8530acdc6",
+      "bytes": 11123
+    },
+    {
       "path": "tests/test_memory_lifecycle.py",
       "sha256": "d61a864ed272d9f8c796751c2d78ce27ec1ae18645ffeea455ce83bd212600c0",
       "bytes": 2188
@@ -3060,6 +3252,11 @@
       "path": "tests/test_point_in_time.py",
       "sha256": "1f92eb8fb3f6abb1f6da24c89570900b1944816e691c5a77cc92c60e32579382",
       "bytes": 7481
+    },
+    {
+      "path": "tests/test_research_efficiency.py",
+      "sha256": "fbfe73f3001b369c1814e78cd8cd91bb38d4f77274cd2b221f554a4a2a9c609c",
+      "bytes": 10386
     },
     {
       "path": "tests/test_research_evaluation.py",

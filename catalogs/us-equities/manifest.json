@@ -39,7 +39,11 @@
     "catalogs/us-equities/data-readiness-review.json",
     "blueprints/us-equities/catalyst-dataset/native-receipt.json",
     "blueprints/us-equities/corporate-action-readiness/receipt.json",
-    "blueprints/us-equities/identity-readiness/native-receipt.json"
+    "blueprints/us-equities/identity-readiness/native-receipt.json",
+    "catalogs/us-equities/lifecycle-source-review.json",
+    "blueprints/us-equities/lifecycle-sample/native-receipt.json",
+    "blueprints/us-equities/catalyst-experiment/receipt.json",
+    "blueprints/us-equities/research-efficiency/native-receipt.json"
   ],
   "north_star": "blueprints/us-equities/north-star.md",
   "harness_contract": "blueprints/us-equities/harness-contract.json",

@@ -60,6 +60,13 @@ remains zero. Six selected engine/data-contract reviews accompany the proof.
 WRDS is a conditional access reference
 for licensed historical research data; it is not installed or entitled by inclusion.
 
+The latest [catalyst-convergence wave](blueprints/us-equities/catalyst-convergence/README.md)
+adds six captured public documents supporting three lifecycle claims, a frozen
+daily/intraday experiment and eight native Codex/Claude research invocations.
+Documentary claims, original historical availability, output quality and observed
+provider usage have separate acceptance records. The protocol's native synthetic
+checks establish mechanics; empirical trading merit remains unmeasured.
+
 The earlier [native acceptance wave](blueprints/us-equities/acceptance-wave/README.md)
 adds LEAN cost sensitivity, synthetic DuckDB temporal selection and an offline
 Alpaca order guard. The selected [research direction](blueprints/us-equities/acceptance-wave/research-protocol.md)

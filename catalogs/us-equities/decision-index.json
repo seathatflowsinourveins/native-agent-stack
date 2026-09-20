@@ -105,6 +105,12 @@
       "kind": "catalog_card"
     },
     {
+      "path": "catalogs/us-equities/lifecycle-source-review.json",
+      "collection": "/decisions",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/security-identity-review.json",
       "collection": "/decisions",
       "repository_field": "repository",
@@ -152,7 +158,7 @@
     "repositories": 504,
     "public_star_repositories": 342,
     "beyond_public_stars": 162,
-    "references": 1037,
+    "references": 1040,
     "repositories_by_record_type": {
       "catalog_card": 147,
       "component_record": 52,
@@ -879,6 +885,13 @@
           "id": "alpaca-py",
           "decision": "default",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/lifecycle-source-review.json",
+          "pointer": "/decisions/2",
+          "decision": "retain_prior_alias_evidence_without_refetch",
+          "evidence_level": "prior_native_receipt_reuse"
         },
         {
           "kind": "research_supplement",
@@ -3475,6 +3488,13 @@
         },
         {
           "kind": "research_supplement",
+          "path": "catalogs/us-equities/lifecycle-source-review.json",
+          "pointer": "/decisions/0",
+          "decision": "retain_native_lifecycle_parser",
+          "evidence_level": "installed_source_sections_and_native_offline_artifacts"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/simulation-data-review.json",
           "pointer": "/decisions/0",
           "decision": "adopt_native_parser_bounded",
@@ -3748,6 +3768,13 @@
           "id": "data-duckdb",
           "decision": "default",
           "evidence_level": "native_proven"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/lifecycle-source-review.json",
+          "pointer": "/decisions/1",
+          "decision": "retain_native_observation_ledger",
+          "evidence_level": "native_offline_artifacts"
         },
         {
           "kind": "component_record",

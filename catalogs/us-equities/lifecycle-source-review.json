@@ -161,5 +161,37 @@
       "result": "Internal error; rendered filing page and index available",
       "effect": "No inferred absence; coordinator fixed native capture is separate evidence"
     }
+  ],
+  "decisions": [
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "decision": "retain_native_lifecycle_parser",
+      "evidence_level": "installed_source_sections_and_native_offline_artifacts",
+      "review_date": "2026-09-20",
+      "version": "5.58.0",
+      "role": "Retained SGML primary-document and HTML parsing",
+      "evidence": "blueprints/us-equities/lifecycle-sample/native-receipt.json",
+      "limitations": "Three documentary cases only; naive acceptance text does not establish a timezone or original availability."
+    },
+    {
+      "repository": "https://github.com/duckdb/duckdb",
+      "decision": "retain_native_observation_ledger",
+      "evidence_level": "native_offline_artifacts",
+      "review_date": "2026-09-20",
+      "version": "1.5.5",
+      "role": "Exact BIGINT observation eligibility and Parquet source reconciliation",
+      "evidence": "blueprints/us-equities/lifecycle-sample/native-receipt.json",
+      "limitations": "Local received time, not original provider availability; historical universe unknown."
+    },
+    {
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "decision": "retain_prior_alias_evidence_without_refetch",
+      "evidence_level": "prior_native_receipt_reuse",
+      "review_date": "2026-09-20",
+      "version": "0.44.0",
+      "role": "Retrospective alias observation reference only",
+      "evidence": "blueprints/us-equities/identity-readiness/native-receipt.json",
+      "limitations": "No new Alpaca calls; current assets cannot fill historical identity or delisting gaps."
+    }
   ]
 }

@@ -87,3 +87,14 @@ Focused checks are `python -m unittest tests.test_lifecycle_sample -v`. The
 lightweight runtime skips the two optional native checks; each existing native
 environment exercises its own integration without installing the other's
 dependency. Fixtures are explicitly synthetic and contain no provider payloads.
+
+## Recorded native result
+
+The [September20 receipt](native-receipt.json) records six complete HTTP200 bodies,
+three supported nonsynthetic documentary claims and native offline acceptance in
+the adopted EdgarTools and DuckDB environments. Historical/before-first/first/last
+observation selections are0/0/1/3; historical replay remains0. Independent reparse
+and ledger verification reproduced the results and checked50 referenced file
+hashes/sizes. Exact commands and all three external bundle anchors are in the receipt.
+Historical universe eligibility, original revisions, permanent identity and legal
+delisting instants remain unestablished.

@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "kind": "catalyst_wave_publication_checks",
+  "date": "2026-09-20",
+  "scope": "Integration and local observation; does not repeat native inference or establish a new host's acceptance.",
+  "checks": [
+    {
+      "command": "\"$SDK_PYTHON\" -m unittest discover -s tests",
+      "exit_code": 0,
+      "discovered": 369,
+      "passed": 368,
+      "skipped": 1,
+      "skip": "EdgarTools absent from general SDK; exercised separately in adopted Edgar runtime."
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "components": 52,
+      "registered_receipts": 46
+    },
+    {
+      "command": "python3 scripts/validate_catalogs.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/catalog_decisions.py --check",
+      "exit_code": 0,
+      "repository_identities": 504,
+      "public_stars": 342,
+      "beyond_stars": 162,
+      "typed_references": 1040
+    },
+    {
+      "command": "gitleaks dir . --redact --no-banner",
+      "exit_code": 0,
+      "leaks": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "independent_review": {
+    "lifecycle": "50 referenced hash/size entries and both native offline verifier outcomes reproduced.",
+    "protocol": "Frozen protocol,13 focused checks and exact threshold correction accepted; initial native run retained.",
+    "research_efficiency": "112 private artifact entries,8 native raw replay records, frozen inputs and blinded grades independently reconciled; two Claude word failures retained."
+  },
+  "dashboard": {
+    "command": "python3 observability/grand-dashboard/progress.py --repo \"$STACK_REPO\" --cache \"$PRIVATE_WAVE/dashboard-cache.json\" --dagu-bin \"$DAGU_BIN\" --dagu-home \"$DAGU_HOME\"",
+    "exit_code": 0,
+    "result": {
+      "status": "published",
+      "records": 72,
+      "sha256": "cc12cb0f0b9a682041c681d8aef3152126dd5fd81de81929be337cc3c62551c0"
+    },
+    "native_browser": "agent-browser --session convergence-viewer open LOOPBACK_GRAFANA_DASHBOARD",
+    "visible": [
+      "Frozen daily and intraday catalyst protocol",
+      "3 documentary lifecycle claims / historical universe pending",
+      "Native research usage and quality",
+      "Codex2 pairs accepted / Claude2 protocol-confounded",
+      "8 native invocations / blinded grading complete"
+    ],
+    "private_screenshot_sha256": "b5a4f81028b15735909bbfd34138543e7c228627485531ff7fc37db1745701f1",
+    "boundary": "Checkpoint ingestion and visible browser text/image inspected. Not live worker liveness or per-run token telemetry reconciliation."
+  },
+  "local_token_report": {
+    "command": "ecosystem-token-report refresh",
+    "exit_code": 0,
+    "issues": [],
+    "native_scopes": 6,
+    "unique_comparisons": 12,
+    "boundary": "Existing local cumulative collector outputs; these counts are not the new study and do not automatically add its provider totals."
+  },
+  "publication": {
+    "method": "Authorized direct fast-forward of main, preserving reviewed concurrent commits.",
+    "ci": "Exact final commit's Actions result is checked after push and recorded in local continuation/GitHub Actions."
+  }
+}
