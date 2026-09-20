@@ -1,0 +1,1178 @@
+{
+  "blind_review": {
+    "export_hardening": "After execution and grading, two negative checks were added: exact frozen citation-scope derivation and refusal of a fabricated report when raw stdout is malformed. All 8 actual receipts replayed unchanged; the original graded packet and inference helpers were not replaced.",
+    "grades_sealed_before_unblinding": true,
+    "grades_sha256": "a73f22a4de2ace1a31970ea4f5b967fae30cdd031413665b74bf6c613969e96a",
+    "output_word_count": "Whitespace words across answer, claim strings and unknown strings, excluding citation IDs; maximum 250.",
+    "packet_sha256": "8cb7aef1a1422de51c9bb36442b4cafc14f6c6af57e8f7e51935709201ae3559",
+    "protocol_passes": 6,
+    "reviewers": 2,
+    "rubric": "Frozen 10-point content rubric; >=8 overall and >=3/4 required facts, no fabricated citation/value or false eligibility/net-savings claim. Word/citation/tool/usage checks remain separate.",
+    "semantic_passes": 8
+  },
+  "claim": "Eight fresh native answer invocations yielded four within-provider task comparisons. All eight semantic grades pass; six answers meet the shared structural and word protocol. Numeric differences are observed sample differences only.",
+  "command_path_convention": "Arguments containing host paths are replaced with the documented variables. Private command hashes refer to original actual argument vectors, not these portable substitutions. Prompts were passed by stdin.",
+  "comparisons": [
+    {
+      "both_protocol_pass": true,
+      "both_semantic_pass": true,
+      "focused_semantic_score": 10,
+      "focused_total": 22691,
+      "full_minus_focused_percent": 40.4467,
+      "full_minus_focused_tokens": 15411,
+      "full_semantic_score": 10,
+      "full_total": 38102,
+      "interpretation": "observed_difference_with_both_answers_above_frozen_quality_threshold",
+      "provider": "codex",
+      "task": "A"
+    },
+    {
+      "both_protocol_pass": true,
+      "both_semantic_pass": true,
+      "focused_semantic_score": 9.5,
+      "focused_total": 25069,
+      "full_minus_focused_percent": 34.2539,
+      "full_minus_focused_tokens": 13061,
+      "full_semantic_score": 10,
+      "full_total": 38130,
+      "interpretation": "observed_difference_with_both_answers_above_frozen_quality_threshold",
+      "provider": "codex",
+      "task": "B"
+    },
+    {
+      "both_protocol_pass": false,
+      "both_semantic_pass": true,
+      "focused_semantic_score": 10,
+      "focused_total": 20136,
+      "full_minus_focused_percent": 54.847,
+      "full_minus_focused_tokens": 24459,
+      "full_semantic_score": 9.5,
+      "full_total": 44595,
+      "interpretation": "observed_difference_with_full_answer_word_protocol_failure",
+      "provider": "claude",
+      "task": "A"
+    },
+    {
+      "both_protocol_pass": false,
+      "both_semantic_pass": true,
+      "focused_semantic_score": 9.5,
+      "focused_total": 24562,
+      "full_minus_focused_percent": 46.1973,
+      "full_minus_focused_tokens": 21090,
+      "full_semantic_score": 9.5,
+      "full_total": 45652,
+      "interpretation": "observed_difference_with_full_answer_word_protocol_failure",
+      "provider": "claude",
+      "task": "B"
+    }
+  ],
+  "component_ids": [
+    "codex",
+    "claude-code",
+    "qmd"
+  ],
+  "frozen_plan": {
+    "base_commit": "cb79080cf5d9510818c67ac51c521b1d2a1b80fe",
+    "execution_seal_sha256": "80a097515d206a85a2a81c43ede44651a583bd50203dcbb32b10478b73ed22dd",
+    "path": "blueprints/us-equities/research-efficiency/plan.json",
+    "private_freeze_sha256": "572c62ba86fc690034cfd15d1fd1ee3382c440e8d9f91275376996541bac00c6",
+    "selected": {
+      "A": [
+        "S01"
+      ],
+      "B": [
+        "S08",
+        "S07"
+      ]
+    },
+    "source_bytes": 71223,
+    "source_documents": 8
+  },
+  "id": "native-research-efficiency-20260920",
+  "implementation_boundary": "Project-owned freezing, native command orchestration, usage normalization and blind export around upstream QMD CLI, official OpenAI Codex SDK and Claude CLI. No upstream whole-stack efficiency feature is claimed.",
+  "kind": "native_model_e2e",
+  "limitations": [
+    "Only two fixed tasks per provider; no confidence intervals, provider ranking, causal attribution or general savings claim.",
+    "Full corpus is eight selected public project documents, not a comprehensive repository or autonomous research workload.",
+    "Prompts use identical questions/instructions and verbatim common source IDs; different document context lengths are the intended treatment.",
+    "QMD lexical selection was fixed before answers; task B focused omits the separate retrieval-evaluation document, and rubric deductions remain recorded.",
+    "Native default context, system policy, hooks and provider caches are uncontrolled; fresh sessions do not imply cold caches.",
+    "The two Claude full-context answers fail the word protocol, so their numeric differences are not clean protocol-passing matched comparisons.",
+    "Codex task B focused score is 9.5 versus full 10 despite both clearing the predeclared threshold.",
+    "Codex zero-tools enforcement is requested/audited with read-only and deny-all settings, weaker than hard prevention of every MCP call.",
+    "Local supervision does not prove provider-side cancellation; no run timed out.",
+    "This session uses these hosted research worker invocations; it does not establish token savings for the enclosing Desktop conversation or whole ecosystem."
+  ],
+  "native_commands": {
+    "claude": {
+      "actual_private_argv_sha256": "6f2b6821fb1e172364e1c2d8a80ccb2e98f487f9a4699f5ab32b8e9ff64e057d",
+      "argv": [
+        "$NATIVE_CLAUDE_BIN",
+        "-p",
+        "--model",
+        "claude-opus-5",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--include-hook-events",
+        "--max-turns",
+        "1",
+        "--tools",
+        "",
+        "--disallowedTools",
+        "*",
+        "--permission-mode",
+        "dontAsk",
+        "--permission-prompts",
+        "none"
+      ]
+    },
+    "codex": {
+      "actual_private_argv_sha256": "de7ace77dbadc1b398b12004daa486f3fb6566653c5ecc413665402ad2e1b68c",
+      "argv": [
+        "$SDK_PYTHON",
+        "$RESEARCH_EFFICIENCY/run_codex.py",
+        "--codex-bin",
+        "$NATIVE_CODEX_BIN",
+        "--codex-home",
+        "$NATIVE_CODEX_HOME",
+        "--workspace",
+        "$ADOPTED_WORKSPACE",
+        "--policy",
+        "$EFFICIENCY_RUN/worker-policy.md"
+      ]
+    }
+  },
+  "observed_utc": "2026-09-20",
+  "primary_references": [
+    "https://learn.chatgpt.com/docs/non-interactive-mode",
+    "https://code.claude.com/docs/en/cli-reference",
+    "https://github.com/tobi/qmd"
+  ],
+  "private_artifact_root": "$RESEARCH_EFFICIENCY_STATE",
+  "private_artifacts": {
+    "blind-review/answer-01.json": {
+      "bytes": 2235,
+      "sha256": "6f6b6f3c36c3430bd6ad357556c4d71950b5aa89d946587120c43f1acb06203d"
+    },
+    "blind-review/answer-02.json": {
+      "bytes": 2288,
+      "sha256": "073187ee5c77aed91b7be524c413dd251efa443c9b0df96847ff6e3576394494"
+    },
+    "blind-review/answer-03.json": {
+      "bytes": 2950,
+      "sha256": "11c4c1aaca8a79c6e85120bd388ea81aa4be5461cdd80245abb3cbe8f3010062"
+    },
+    "blind-review/answer-04.json": {
+      "bytes": 2453,
+      "sha256": "a0a28fa8e9b7e2d07ac45b3e808dfae7595736969902004cf7ce5e1d7b325b10"
+    },
+    "blind-review/answer-05.json": {
+      "bytes": 2614,
+      "sha256": "bace0752c1c8f17f0509bdbef4d8f49ec5347453def5a11792ec793916a5212e"
+    },
+    "blind-review/answer-06.json": {
+      "bytes": 2191,
+      "sha256": "897fa2d13cc5d69c785c4bb9b73f522687e9580cd9259a5884f55524007e78f5"
+    },
+    "blind-review/answer-07.json": {
+      "bytes": 2052,
+      "sha256": "4ad143fbf005f7d23942dde52338039913247905654b56507f7093c013e417c1"
+    },
+    "blind-review/answer-08.json": {
+      "bytes": 2327,
+      "sha256": "189cea2431c20683279fc08a28a7448d844e62f52d0d219afbf4c53d93e7d202"
+    },
+    "blind-review/grades.json": {
+      "bytes": 3769,
+      "sha256": "a73f22a4de2ace1a31970ea4f5b967fae30cdd031413665b74bf6c613969e96a"
+    },
+    "blind-review/manifest.json": {
+      "bytes": 2965,
+      "sha256": "8cb7aef1a1422de51c9bb36442b4cafc14f6c6af57e8f7e51935709201ae3559"
+    },
+    "blind-review/questions.json": {
+      "bytes": 758,
+      "sha256": "a85ea731592db8267483cec9d83184f5c3bd671709431aa2469cae4cc0531b47"
+    },
+    "blind-review/rubric.json": {
+      "bytes": 1965,
+      "sha256": "0d84fa6eba2469c6d43c39364fb4a46b7ff27b1f6ceef84359b67b172530c2f2"
+    },
+    "blind-review/source-manifest.json": {
+      "bytes": 1404,
+      "sha256": "d87dc31f9630286826d516374621044aa9d898f8ca8156dd1473119f6a07de34"
+    },
+    "blind-review/sources/S01.md": {
+      "bytes": 7708,
+      "sha256": "2452c1c1b3639e490cae7c4b97177637f56d133116d2da1aedfc30ed9b0e7600"
+    },
+    "blind-review/sources/S02.md": {
+      "bytes": 8763,
+      "sha256": "76d2439e456aacca301013d1993bde75e42fd6ffa0f77990eb2e60686a961666"
+    },
+    "blind-review/sources/S03.md": {
+      "bytes": 10582,
+      "sha256": "0933fa810e52f2e9f002fae0a1bae65e67070b3d2125f00b97c7ea1d2b39b85d"
+    },
+    "blind-review/sources/S04.md": {
+      "bytes": 8339,
+      "sha256": "752c3bd98424fcaa09fa44abf122bad2af499a9c2da22610363562b7b113ecef"
+    },
+    "blind-review/sources/S05.md": {
+      "bytes": 9140,
+      "sha256": "0da2a95d70b254795d93cca9b854b2b806b2a7ac6b15559b7a845db919a1443c"
+    },
+    "blind-review/sources/S06.md": {
+      "bytes": 9587,
+      "sha256": "26941ae2c64ec137c3a9dc97e8d766d93cf6bdcb103ee290f871fd0a181f2757"
+    },
+    "blind-review/sources/S07.md": {
+      "bytes": 11279,
+      "sha256": "081b85f97ab174d86201b42675ea18f429642e4f77f038e0e9af661a226e4b8a"
+    },
+    "blind-review/sources/S08.md": {
+      "bytes": 5825,
+      "sha256": "b187875b97595cd975ddb161464c995cda6690399f0bd0b488b0019394016cf3"
+    },
+    "claude-readiness.json": {
+      "bytes": 262,
+      "sha256": "c65285e22091d35584280d54f3f14f224779d9becd249269b6d73d06f0bd4c27"
+    },
+    "codex-readiness.json": {
+      "bytes": 426,
+      "sha256": "1a33abe7200df42b93c8ec6f2d799cd581f09844f0cbf95f49559b04dcdbfe59"
+    },
+    "experiment-2/blind-mapping.json": {
+      "bytes": 1915,
+      "sha256": "1101027a1e28d5b6fdc72e5aa4e218fcdf8e51df3f94dbf267333736cde61b45"
+    },
+    "experiment-2/corpus/s01.md": {
+      "bytes": 7708,
+      "sha256": "2452c1c1b3639e490cae7c4b97177637f56d133116d2da1aedfc30ed9b0e7600"
+    },
+    "experiment-2/corpus/s02.md": {
+      "bytes": 8763,
+      "sha256": "76d2439e456aacca301013d1993bde75e42fd6ffa0f77990eb2e60686a961666"
+    },
+    "experiment-2/corpus/s03.md": {
+      "bytes": 10582,
+      "sha256": "0933fa810e52f2e9f002fae0a1bae65e67070b3d2125f00b97c7ea1d2b39b85d"
+    },
+    "experiment-2/corpus/s04.md": {
+      "bytes": 8339,
+      "sha256": "752c3bd98424fcaa09fa44abf122bad2af499a9c2da22610363562b7b113ecef"
+    },
+    "experiment-2/corpus/s05.md": {
+      "bytes": 9140,
+      "sha256": "0da2a95d70b254795d93cca9b854b2b806b2a7ac6b15559b7a845db919a1443c"
+    },
+    "experiment-2/corpus/s06.md": {
+      "bytes": 9587,
+      "sha256": "26941ae2c64ec137c3a9dc97e8d766d93cf6bdcb103ee290f871fd0a181f2757"
+    },
+    "experiment-2/corpus/s07.md": {
+      "bytes": 11279,
+      "sha256": "081b85f97ab174d86201b42675ea18f429642e4f77f038e0e9af661a226e4b8a"
+    },
+    "experiment-2/corpus/s08.md": {
+      "bytes": 5825,
+      "sha256": "b187875b97595cd975ddb161464c995cda6690399f0bd0b488b0019394016cf3"
+    },
+    "experiment-2/execution-seal.json": {
+      "bytes": 9467,
+      "sha256": "80a097515d206a85a2a81c43ede44651a583bd50203dcbb32b10478b73ed22dd"
+    },
+    "experiment-2/experiment.py": {
+      "bytes": 27330,
+      "sha256": "cb307c4f6b80a2fa8eee66c3dc0f88fb72b71dddaaada99acac18d1192b26865"
+    },
+    "experiment-2/freeze.json": {
+      "bytes": 5005,
+      "sha256": "572c62ba86fc690034cfd15d1fd1ee3382c440e8d9f91275376996541bac00c6"
+    },
+    "experiment-2/plan.json": {
+      "bytes": 11284,
+      "sha256": "2bee0b03508708647ee6812936abe8ab7c8608d6da653518644ff7144bf7c36a"
+    },
+    "experiment-2/prompts/A-focused.txt": {
+      "bytes": 8944,
+      "sha256": "73a22f0be29924535d5cb21cbe3489099ab1eb7ee29e9efafbde5059b8874468"
+    },
+    "experiment-2/prompts/A-full.txt": {
+      "bytes": 74081,
+      "sha256": "a109c20c2c9846d010118654d3f1265879897643a7341730b51c434549c39ac4"
+    },
+    "experiment-2/prompts/B-focused.txt": {
+      "bytes": 18696,
+      "sha256": "27c60fce559bcc0a96054018057391be70d7e2ca8c725294b50bd02c120e0ec0"
+    },
+    "experiment-2/prompts/B-full.txt": {
+      "bytes": 74150,
+      "sha256": "6c18759259b0abf59ef0689f5219e2bb805f03f606de10521d061d566a5def3f"
+    },
+    "experiment-2/qmd-cache/qmd/research-efficiency.sqlite": {
+      "bytes": 364544,
+      "sha256": "841f2662a55fcfae6711d7dfffaff3ee246e5324f398249b97b341a21c7ab984"
+    },
+    "experiment-2/qmd-config/research-efficiency.yml": {
+      "bytes": 399,
+      "sha256": "caf45b9f23bdb4c7e18e42e998863d69ae87ec2c5ff7403b5941a499f06509fd"
+    },
+    "experiment-2/retrieval/get-A-1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/retrieval/get-A-1.stdout": {
+      "bytes": 7752,
+      "sha256": "5cf36a7848910530cae20fcb898082dc053990246c0e2b5cd69c776a72dbf5f9"
+    },
+    "experiment-2/retrieval/get-B-1.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/retrieval/get-B-1.stdout": {
+      "bytes": 5869,
+      "sha256": "1c94aadeb2071f4da8d667a685662e817f159ddf3987cfa5ec08541a9d7f0bee"
+    },
+    "experiment-2/retrieval/get-B-2.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/retrieval/get-B-2.stdout": {
+      "bytes": 11323,
+      "sha256": "97997d6fb144cafa84e824bd603aa511b1d5b8cf006d630b95aeeccfc6f9cddf"
+    },
+    "experiment-2/retrieval/index.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/retrieval/index.stdout": {
+      "bytes": 317,
+      "sha256": "205c7b5b174d11dcb955d5322f2fc56dce093431246414d7e17a978fa92647d0"
+    },
+    "experiment-2/retrieval/search-A.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/retrieval/search-A.stdout": {
+      "bytes": 521,
+      "sha256": "c8ca031eefd9c806cadea10139cfc833d3619acc1351e9dcdfb2d9118dc66341"
+    },
+    "experiment-2/retrieval/search-B.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/retrieval/search-B.stdout": {
+      "bytes": 1008,
+      "sha256": "83c346471d364cdeec28cc1236f55e093ee2e4fb887e4c319ec525b953da6e84"
+    },
+    "experiment-2/run_codex.py": {
+      "bytes": 2465,
+      "sha256": "18b2e5f0bdcbd78eccef69d1070ea226027a99331d1ab01dfd658b7bbf09d4ea"
+    },
+    "experiment-2/runs/claude-A-focused/command.json": {
+      "bytes": 601,
+      "sha256": "c4f58baa8b9ffca0710d83d620a68e458a1879898469a8e15abfac2300d3f7bd"
+    },
+    "experiment-2/runs/claude-A-focused/native.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/claude-A-focused/native.stdout": {
+      "bytes": 49626,
+      "sha256": "2a5d4545adc9853558702b7516c01223ef86c47176093ec0904b7e8cb10dd77b"
+    },
+    "experiment-2/runs/claude-A-focused/receipt.json": {
+      "bytes": 2971,
+      "sha256": "b31231a6b9c4f53e03f03ff5208c161d74f27e9c9842ec75dca534cbf29aaa10"
+    },
+    "experiment-2/runs/claude-A-focused/reservation.json": {
+      "bytes": 121,
+      "sha256": "7ab03756af21a12c9846177c3b4aa7895c47b7c5bcb39777fb5fe254d0688279"
+    },
+    "experiment-2/runs/claude-A-focused/supervisor.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/claude-A-focused/supervisor.stdout": {
+      "bytes": 389,
+      "sha256": "af68cdcc688571510fdd46e46da7141f345cd43c00be31829692b88ef3e378c2"
+    },
+    "experiment-2/runs/claude-A-full/command.json": {
+      "bytes": 602,
+      "sha256": "0f13f2efb3f1ebfc26a9ec2df28d51ecfd0fae08879a270310c34121065fa395"
+    },
+    "experiment-2/runs/claude-A-full/native.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/claude-A-full/native.stdout": {
+      "bytes": 42219,
+      "sha256": "fd4ec33f08c0934851dd2e45b0fa8b499a577269ea408cf37acfc42e423e4ae2"
+    },
+    "experiment-2/runs/claude-A-full/receipt.json": {
+      "bytes": 3796,
+      "sha256": "f9038f4e9232a27e156a5b8753efd232de238061abe24752640e02519404cd31"
+    },
+    "experiment-2/runs/claude-A-full/reservation.json": {
+      "bytes": 118,
+      "sha256": "28e3db1366d69dfc936a5491a82f0eff1460f9f6ab692775580ca1f2ad73232d"
+    },
+    "experiment-2/runs/claude-A-full/supervisor.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/claude-A-full/supervisor.stdout": {
+      "bytes": 386,
+      "sha256": "e149394b950483180e3395e21afda7a312b42f7a12468f8aa1bcfbde4581178e"
+    },
+    "experiment-2/runs/claude-B-focused/command.json": {
+      "bytes": 602,
+      "sha256": "b418e35230e0cf1f712df3fe855b9f5e4b4e5d3055980b909d2b76231891577b"
+    },
+    "experiment-2/runs/claude-B-focused/native.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/claude-B-focused/native.stdout": {
+      "bytes": 49401,
+      "sha256": "24e14960ec9d4d56b3b746799bd855c070803d8af8d8a73a660e9936b47e4efb"
+    },
+    "experiment-2/runs/claude-B-focused/receipt.json": {
+      "bytes": 3075,
+      "sha256": "5986dbdd83991e8e77fd906f5b2865a34c3ed2cbfe8ad8ebed6415c067752a0c"
+    },
+    "experiment-2/runs/claude-B-focused/reservation.json": {
+      "bytes": 121,
+      "sha256": "15ebdef3dc6c4c1d7b6095f842062b011d8c3676ee25f895b979999f310706a2"
+    },
+    "experiment-2/runs/claude-B-focused/supervisor.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/claude-B-focused/supervisor.stdout": {
+      "bytes": 389,
+      "sha256": "601285e025f0fd57c228183fb325ddfc78f995c524efb62a1f9df04434adfbdf"
+    },
+    "experiment-2/runs/claude-B-full/command.json": {
+      "bytes": 602,
+      "sha256": "a80af5b1d263683d365180242cbb783dc56021ff9ceca439cf0523fb28b6b81f"
+    },
+    "experiment-2/runs/claude-B-full/native.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/claude-B-full/native.stdout": {
+      "bytes": 44323,
+      "sha256": "299c88ddbeb841d257b6954097f13acb8fd1b802ed600d43bc644c6839a5d8ce"
+    },
+    "experiment-2/runs/claude-B-full/receipt.json": {
+      "bytes": 3461,
+      "sha256": "b1ab289efb5e5ab71a07481205ffa470385aedaa83980b04d6eebf337cf3c249"
+    },
+    "experiment-2/runs/claude-B-full/reservation.json": {
+      "bytes": 118,
+      "sha256": "4c2e31069d57628b180da22546aeae94edb1328b61cfcfb49ff3e21c7df47ab6"
+    },
+    "experiment-2/runs/claude-B-full/supervisor.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/claude-B-full/supervisor.stdout": {
+      "bytes": 387,
+      "sha256": "486c0983e19437ccd36638c2dfcd7c7e80d8b6dd0d0f4d33f495a86d16ef81ce"
+    },
+    "experiment-2/runs/codex-A-focused/command.json": {
+      "bytes": 741,
+      "sha256": "ad88996ab748973698c243f230cdddd107c4e845f16a9b40f4b4896eabfca22e"
+    },
+    "experiment-2/runs/codex-A-focused/native.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/codex-A-focused/native.stdout": {
+      "bytes": 14391,
+      "sha256": "e671dadeaeac757186387d43d32249e7ff9b89a70a024f989986754c80447a0d"
+    },
+    "experiment-2/runs/codex-A-focused/receipt.json": {
+      "bytes": 3025,
+      "sha256": "1a641a252264cd3f89d89521769f9f79d8f0393f2fe808b78592f3027c17e037"
+    },
+    "experiment-2/runs/codex-A-focused/reservation.json": {
+      "bytes": 120,
+      "sha256": "52e2b51525bdc706ba74efe6c77b51075c089a2de3cbd398ea32548e7020dce1"
+    },
+    "experiment-2/runs/codex-A-focused/supervisor.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/codex-A-focused/supervisor.stdout": {
+      "bytes": 390,
+      "sha256": "a895d7166c6d9b5ef4787e0df6a01a7ebaf1acadc93257e221d9f923f0506a29"
+    },
+    "experiment-2/runs/codex-A-full/command.json": {
+      "bytes": 742,
+      "sha256": "ee71776d7885d400b581bd6483f62fb79b5bff0b960757c5cc75ff07bc30476f"
+    },
+    "experiment-2/runs/codex-A-full/native.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/codex-A-full/native.stdout": {
+      "bytes": 81740,
+      "sha256": "311b30dde884ba698e957751c1101e5aa685dcedc8b30fbb90ab8de6b929c245"
+    },
+    "experiment-2/runs/codex-A-full/receipt.json": {
+      "bytes": 3265,
+      "sha256": "34f0cfa12fa4b5e64f9e766f5716368298bbe6fd70f9f9c1d2bf7193864b39fa"
+    },
+    "experiment-2/runs/codex-A-full/reservation.json": {
+      "bytes": 117,
+      "sha256": "0a3093ecc6872cdc130e20c64e6a3c26fa4d0e6d5e3da385e52e16e342b73a7c"
+    },
+    "experiment-2/runs/codex-B-focused/command.json": {
+      "bytes": 742,
+      "sha256": "782f3bf19c5539eecfe966a5e7a4d8cdb92ef09156b421096aef5fd492dbb306"
+    },
+    "experiment-2/runs/codex-B-focused/native.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/codex-B-focused/native.stdout": {
+      "bytes": 23964,
+      "sha256": "7699d0dcf701293496806bb576c34ee093204e0332816100ec7c117b6543a697"
+    },
+    "experiment-2/runs/codex-B-focused/receipt.json": {
+      "bytes": 2800,
+      "sha256": "08495a786683e7ad783583984acf35b68dcf533a9e5906b72b5e950f1fb4bcd0"
+    },
+    "experiment-2/runs/codex-B-focused/reservation.json": {
+      "bytes": 120,
+      "sha256": "58cb6f75d8916bf1ff3efc9713a642caef5e109959cd54804b34edcde488094b"
+    },
+    "experiment-2/runs/codex-B-focused/supervisor.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/codex-B-focused/supervisor.stdout": {
+      "bytes": 389,
+      "sha256": "bfbc7ca16987c1279373276c31cec06dd62935bf1a9a5855b704a9d3ddca2069"
+    },
+    "experiment-2/runs/codex-B-full/command.json": {
+      "bytes": 742,
+      "sha256": "bafb9d4c8c826a0542983dcffb02beeea18f9c5efdec2a1fa50b3520e63e9e92"
+    },
+    "experiment-2/runs/codex-B-full/native.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/codex-B-full/native.stdout": {
+      "bytes": 81269,
+      "sha256": "774336f4bf32c6a39d1e73365b535ced058d8d459ff165edbc310d07621d78cb"
+    },
+    "experiment-2/runs/codex-B-full/receipt.json": {
+      "bytes": 3003,
+      "sha256": "06e418e3ebd985bf593db5f3ce5d3c8c9f36c18be5fd1f77d0c1fc0dc9cbedea"
+    },
+    "experiment-2/runs/codex-B-full/reservation.json": {
+      "bytes": 117,
+      "sha256": "3b912ff908ddc3166fdedd8490fed4618d3e300a737b557990cba4c863a968ea"
+    },
+    "experiment-2/runs/codex-B-full/supervisor.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "experiment-2/runs/codex-B-full/supervisor.stdout": {
+      "bytes": 387,
+      "sha256": "2e01a2a837b65d641d0daa564ae1a6f103771663ea0f78b72907d6389d29c16d"
+    },
+    "experiment-2/supervisor.py": {
+      "bytes": 18161,
+      "sha256": "6ea4f5c6f6a62405bf21310b712f8b5759c439996ffecd68fdb0a6bf0b6d047f"
+    },
+    "experiment-2/tasks-rubric.json": {
+      "bytes": 2965,
+      "sha256": "e4c2fcaaadee72efc27d271f4c412fd097984a5d6d7d7117d8125a565c8bcdff"
+    },
+    "experiment-2/worker-policy.md": {
+      "bytes": 2353,
+      "sha256": "c59ef6d88cf5c60bac7971364b75643fd05018e2414b7868f82d1a7bc11d1c31"
+    }
+  },
+  "readiness": {
+    "auth_stores_read_or_copied": false,
+    "claude_allowance_observable": false,
+    "claude_logged_in": true,
+    "claude_native_auth_method": "claude.ai",
+    "codex_ordinary_usage_allowed": true,
+    "codex_selected_model_available": true
+  },
+  "results": [
+    {
+      "accepted_answer": true,
+      "blind_answer": "answer-04",
+      "condition": "full",
+      "confirmed_model_submission": true,
+      "duration_ms": 19780,
+      "hook_event_count": null,
+      "invocation_attempt_count": 1,
+      "native_completed": true,
+      "process_exit_code": 0,
+      "process_timeout": false,
+      "prompt_bytes": 74081,
+      "prompt_sha256": "a109c20c2c9846d010118654d3f1265879897643a7341730b51c434549c39ac4",
+      "prose_words": 227,
+      "protocol_pass": true,
+      "provider": "codex",
+      "receipt_sha256": "34f0cfa12fa4b5e64f9e766f5716368298bbe6fd70f9f9c1d2bf7193864b39fa",
+      "run": "codex-A-full",
+      "semantic_grade": {
+        "dimensions": {
+          "citation_support": 2,
+          "no_unsupported_claims": 1,
+          "question_completion": 1,
+          "required_facts": 4,
+          "unknown_and_limit_preservation": 2
+        },
+        "id": "answer-04",
+        "notes": "Required reconciliation, citations and limits preserved.",
+        "semantic_pass": true,
+        "total": 10
+      },
+      "source_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08"
+      ],
+      "task": "A",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": 6400,
+        "input_including_cache": 37611,
+        "output": 491,
+        "reasoning_in_output": 30,
+        "retries": null,
+        "total": 38102,
+        "uncached_input": 31211
+      },
+      "validation_error": null
+    },
+    {
+      "accepted_answer": true,
+      "blind_answer": "answer-02",
+      "condition": "focused",
+      "confirmed_model_submission": true,
+      "duration_ms": 18854,
+      "hook_event_count": null,
+      "invocation_attempt_count": 1,
+      "native_completed": true,
+      "process_exit_code": 0,
+      "process_timeout": false,
+      "prompt_bytes": 8944,
+      "prompt_sha256": "73a22f0be29924535d5cb21cbe3489099ab1eb7ee29e9efafbde5059b8874468",
+      "prose_words": 223,
+      "protocol_pass": true,
+      "provider": "codex",
+      "receipt_sha256": "1a641a252264cd3f89d89521769f9f79d8f0393f2fe808b78592f3027c17e037",
+      "run": "codex-A-focused",
+      "semantic_grade": {
+        "dimensions": {
+          "citation_support": 2,
+          "no_unsupported_claims": 1,
+          "question_completion": 1,
+          "required_facts": 4,
+          "unknown_and_limit_preservation": 2
+        },
+        "id": "answer-02",
+        "notes": "Required reconciliation, citations and limits preserved.",
+        "semantic_pass": true,
+        "total": 10
+      },
+      "source_ids": [
+        "S01"
+      ],
+      "task": "A",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": 6400,
+        "input_including_cache": 22227,
+        "output": 464,
+        "reasoning_in_output": 33,
+        "retries": null,
+        "total": 22691,
+        "uncached_input": 15827
+      },
+      "validation_error": null
+    },
+    {
+      "accepted_answer": true,
+      "blind_answer": "answer-07",
+      "condition": "focused",
+      "confirmed_model_submission": true,
+      "duration_ms": 17751,
+      "hook_event_count": null,
+      "invocation_attempt_count": 1,
+      "native_completed": true,
+      "process_exit_code": 0,
+      "process_timeout": false,
+      "prompt_bytes": 18696,
+      "prompt_sha256": "27c60fce559bcc0a96054018057391be70d7e2ca8c725294b50bd02c120e0ec0",
+      "prose_words": 206,
+      "protocol_pass": true,
+      "provider": "codex",
+      "receipt_sha256": "08495a786683e7ad783583984acf35b68dcf533a9e5906b72b5e950f1fb4bcd0",
+      "run": "codex-B-focused",
+      "semantic_grade": {
+        "dimensions": {
+          "citation_support": 2,
+          "no_unsupported_claims": 1,
+          "question_completion": 1,
+          "required_facts": 3.5,
+          "unknown_and_limit_preservation": 2
+        },
+        "id": "answer-07",
+        "notes": "Qualitative retrieval limits preserved; measured retrieval misses omitted.",
+        "semantic_pass": true,
+        "total": 9.5
+      },
+      "source_ids": [
+        "S08",
+        "S07"
+      ],
+      "task": "B",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": 6400,
+        "input_including_cache": 24617,
+        "output": 452,
+        "reasoning_in_output": 0,
+        "retries": null,
+        "total": 25069,
+        "uncached_input": 18217
+      },
+      "validation_error": null
+    },
+    {
+      "accepted_answer": true,
+      "blind_answer": "answer-06",
+      "condition": "full",
+      "confirmed_model_submission": true,
+      "duration_ms": 20950,
+      "hook_event_count": null,
+      "invocation_attempt_count": 1,
+      "native_completed": true,
+      "process_exit_code": 0,
+      "process_timeout": false,
+      "prompt_bytes": 74150,
+      "prompt_sha256": "6c18759259b0abf59ef0689f5219e2bb805f03f606de10521d061d566a5def3f",
+      "prose_words": 202,
+      "protocol_pass": true,
+      "provider": "codex",
+      "receipt_sha256": "06e418e3ebd985bf593db5f3ce5d3c8c9f36c18be5fd1f77d0c1fc0dc9cbedea",
+      "run": "codex-B-full",
+      "semantic_grade": {
+        "dimensions": {
+          "citation_support": 2,
+          "no_unsupported_claims": 1,
+          "question_completion": 1,
+          "required_facts": 4,
+          "unknown_and_limit_preservation": 2
+        },
+        "id": "answer-06",
+        "notes": "Required reconciliation, citations and limits preserved.",
+        "semantic_pass": true,
+        "total": 10
+      },
+      "source_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08"
+      ],
+      "task": "B",
+      "usage": {
+        "cache_creation": null,
+        "cache_read": 6400,
+        "input_including_cache": 37600,
+        "output": 530,
+        "reasoning_in_output": 45,
+        "retries": null,
+        "total": 38130,
+        "uncached_input": 31200
+      },
+      "validation_error": null
+    },
+    {
+      "accepted_answer": false,
+      "blind_answer": "answer-03",
+      "condition": "full",
+      "confirmed_model_submission": true,
+      "duration_ms": 10578,
+      "hook_event_count": 16,
+      "invocation_attempt_count": 1,
+      "native_completed": true,
+      "process_exit_code": 0,
+      "process_timeout": false,
+      "prompt_bytes": 74081,
+      "prompt_sha256": "a109c20c2c9846d010118654d3f1265879897643a7341730b51c434549c39ac4",
+      "prose_words": 327,
+      "protocol_pass": false,
+      "provider": "claude",
+      "receipt_sha256": "f9038f4e9232a27e156a5b8753efd232de238061abe24752640e02519404cd31",
+      "run": "claude-A-full",
+      "semantic_grade": {
+        "dimensions": {
+          "citation_support": 2,
+          "no_unsupported_claims": 1,
+          "question_completion": 1,
+          "required_facts": 3.5,
+          "unknown_and_limit_preservation": 2
+        },
+        "id": "answer-03",
+        "notes": "Boundary counts correct but cutoff association omitted.",
+        "semantic_pass": true,
+        "total": 9.5
+      },
+      "source_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08"
+      ],
+      "task": "A",
+      "usage": {
+        "cache_creation": 42019,
+        "cache_read": 531,
+        "input_including_cache": 42552,
+        "output": 2043,
+        "reasoning_in_output": 1127,
+        "retries": null,
+        "total": 44595,
+        "uncached_input": 2
+      },
+      "validation_error": "ValueError: prose word bound exceeded"
+    },
+    {
+      "accepted_answer": true,
+      "blind_answer": "answer-01",
+      "condition": "focused",
+      "confirmed_model_submission": true,
+      "duration_ms": 14893,
+      "hook_event_count": 16,
+      "invocation_attempt_count": 1,
+      "native_completed": true,
+      "process_exit_code": 0,
+      "process_timeout": false,
+      "prompt_bytes": 8944,
+      "prompt_sha256": "73a22f0be29924535d5cb21cbe3489099ab1eb7ee29e9efafbde5059b8874468",
+      "prose_words": 228,
+      "protocol_pass": true,
+      "provider": "claude",
+      "receipt_sha256": "b31231a6b9c4f53e03f03ff5208c161d74f27e9c9842ec75dca534cbf29aaa10",
+      "run": "claude-A-focused",
+      "semantic_grade": {
+        "dimensions": {
+          "citation_support": 2,
+          "no_unsupported_claims": 1,
+          "question_completion": 1,
+          "required_facts": 4,
+          "unknown_and_limit_preservation": 2
+        },
+        "id": "answer-01",
+        "notes": "Required reconciliation, citations and limits preserved.",
+        "semantic_pass": true,
+        "total": 10
+      },
+      "source_ids": [
+        "S01"
+      ],
+      "task": "A",
+      "usage": {
+        "cache_creation": 12998,
+        "cache_read": 3156,
+        "input_including_cache": 16156,
+        "output": 3980,
+        "reasoning_in_output": 3241,
+        "retries": null,
+        "total": 20136,
+        "uncached_input": 2
+      },
+      "validation_error": null
+    },
+    {
+      "accepted_answer": true,
+      "blind_answer": "answer-08",
+      "condition": "focused",
+      "confirmed_model_submission": true,
+      "duration_ms": 16558,
+      "hook_event_count": 16,
+      "invocation_attempt_count": 1,
+      "native_completed": true,
+      "process_exit_code": 0,
+      "process_timeout": false,
+      "prompt_bytes": 18696,
+      "prompt_sha256": "27c60fce559bcc0a96054018057391be70d7e2ca8c725294b50bd02c120e0ec0",
+      "prose_words": 244,
+      "protocol_pass": true,
+      "provider": "claude",
+      "receipt_sha256": "5986dbdd83991e8e77fd906f5b2865a34c3ed2cbfe8ad8ebed6415c067752a0c",
+      "run": "claude-B-focused",
+      "semantic_grade": {
+        "dimensions": {
+          "citation_support": 2,
+          "no_unsupported_claims": 1,
+          "question_completion": 1,
+          "required_facts": 3.5,
+          "unknown_and_limit_preservation": 2
+        },
+        "id": "answer-08",
+        "notes": "Astra289 output omitted; other categories and limits preserved.",
+        "semantic_pass": true,
+        "total": 9.5
+      },
+      "source_ids": [
+        "S08",
+        "S07"
+      ],
+      "task": "B",
+      "usage": {
+        "cache_creation": 17114,
+        "cache_read": 3156,
+        "input_including_cache": 20272,
+        "output": 4290,
+        "reasoning_in_output": 3454,
+        "retries": null,
+        "total": 24562,
+        "uncached_input": 2
+      },
+      "validation_error": null
+    },
+    {
+      "accepted_answer": false,
+      "blind_answer": "answer-05",
+      "condition": "full",
+      "confirmed_model_submission": true,
+      "duration_ms": 12846,
+      "hook_event_count": 16,
+      "invocation_attempt_count": 1,
+      "native_completed": true,
+      "process_exit_code": 0,
+      "process_timeout": false,
+      "prompt_bytes": 74150,
+      "prompt_sha256": "6c18759259b0abf59ef0689f5219e2bb805f03f606de10521d061d566a5def3f",
+      "prose_words": 260,
+      "protocol_pass": false,
+      "provider": "claude",
+      "receipt_sha256": "b1ab289efb5e5ab71a07481205ffa470385aedaa83980b04d6eebf337cf3c249",
+      "run": "claude-B-full",
+      "semantic_grade": {
+        "dimensions": {
+          "citation_support": 2,
+          "no_unsupported_claims": 1,
+          "question_completion": 1,
+          "required_facts": 3.5,
+          "unknown_and_limit_preservation": 2
+        },
+        "id": "answer-05",
+        "notes": "Explicit289 output and2 ordinary input omitted; generalized cache subset wording weaker than main accounting explanation.",
+        "semantic_pass": true,
+        "total": 9.5
+      },
+      "source_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08"
+      ],
+      "task": "B",
+      "usage": {
+        "cache_creation": 39597,
+        "cache_read": 3156,
+        "input_including_cache": 42755,
+        "output": 2897,
+        "reasoning_in_output": 1976,
+        "retries": null,
+        "total": 45652,
+        "uncached_input": 2
+      },
+      "validation_error": "ValueError: prose word bound exceeded"
+    }
+  ],
+  "retained_failures": [
+    {
+      "directory": "experiment-1",
+      "model_submissions": 0,
+      "phase": "preparation",
+      "reason": "Initial adapter rejected native named-index query suffix; fixed strict URI handling before successful freeze, original queries unchanged. Index/search outputs retained; traceback was not separately captured as a private artifact."
+    },
+    {
+      "reason": "327 prose words exceed 250; native process and model completed; usage and answer retained.",
+      "run": "claude-A-full"
+    },
+    {
+      "reason": "260 prose words exceed 250; native process and model completed; usage and answer retained.",
+      "run": "claude-B-full"
+    }
+  ],
+  "retrieval": {
+    "elapsed_ms_sum": 607,
+    "model_calls": 0,
+    "native_commands": [
+      {
+        "argv": [
+          "$QMD_BIN",
+          "--index",
+          "research-efficiency",
+          "collection",
+          "add",
+          "$EFFICIENCY_RUN/corpus",
+          "--name",
+          "research-corpus",
+          "--mask",
+          "*.md"
+        ],
+        "duration_ms": 136,
+        "exit_code": 0
+      },
+      {
+        "argv": [
+          "$QMD_BIN",
+          "--index",
+          "research-efficiency",
+          "search",
+          "META unmapped quarantine historical universe",
+          "-c",
+          "research-corpus",
+          "-n",
+          "2",
+          "--format",
+          "json"
+        ],
+        "duration_ms": 90,
+        "exit_code": 0
+      },
+      {
+        "argv": [
+          "$QMD_BIN",
+          "--index",
+          "research-efficiency",
+          "get",
+          "qmd://research-corpus/s01.md?index=research-efficiency",
+          "--no-line-numbers"
+        ],
+        "duration_ms": 102,
+        "exit_code": 0
+      },
+      {
+        "argv": [
+          "$QMD_BIN",
+          "--index",
+          "research-efficiency",
+          "search",
+          "native usage cache reduction",
+          "-c",
+          "research-corpus",
+          "-n",
+          "2",
+          "--format",
+          "json"
+        ],
+        "duration_ms": 93,
+        "exit_code": 0
+      },
+      {
+        "argv": [
+          "$QMD_BIN",
+          "--index",
+          "research-efficiency",
+          "get",
+          "qmd://research-corpus/s08.md?index=research-efficiency",
+          "--no-line-numbers"
+        ],
+        "duration_ms": 92,
+        "exit_code": 0
+      },
+      {
+        "argv": [
+          "$QMD_BIN",
+          "--index",
+          "research-efficiency",
+          "get",
+          "qmd://research-corpus/s07.md?index=research-efficiency",
+          "--no-line-numbers"
+        ],
+        "duration_ms": 94,
+        "exit_code": 0
+      }
+    ],
+    "native_commands_exit_zero": 6,
+    "scope": "isolated BM25 index; native full-document get; retained exact original queries and selected IDs; no shared index mutation"
+  },
+  "runtime": {
+    "controller_resubmissions": 0,
+    "effort": "inherited native defaults, not overridden",
+    "fingerprint_scope": "Selected Codex binary, Python executable, Codex SDK sources and existing Claude launcher were rechecked before each invocation. The launcher targets Claude 2.1.278 and disables auto-update; the underlying Claude executable was not separately frozen. No claim covers all runtime dependencies or changing account/hook settings.",
+    "maximum_seconds_each": 120,
+    "model_submissions": 8,
+    "models": {
+      "claude": "claude-opus-5",
+      "codex": "gpt-6-astra"
+    },
+    "native_model_actions_observed": 0,
+    "native_process_exit_zero": 8,
+    "native_process_invocations": 8,
+    "reported_models": {
+      "claude": "claude-opus-5",
+      "codex": "gpt-6-astra"
+    },
+    "tool_boundary": {
+      "claude": "native --tools empty and --disallowedTools wildcard; hooks still run",
+      "codex": "read-only/deny-all plus requested and audited zero tools; not hard MCP prevention"
+    }
+  },
+  "schema_version": 1,
+  "status": "bounded_comparison_completed_with_two_word_protocol_failures",
+  "usage_accounting": {
+    "billing": "Subscription dollar cost and monetary savings not measured.",
+    "claude": "Single terminal usage: ordinary input + cache creation + cache reads + output. Thinking is inside output. No per-message/modelUsage summation. Provider retry count unavailable, not zero.",
+    "codex": "Single returned thread total. cache_read is already inside input_including_cache; reasoning_in_output is inside output. Cache creation and provider retry count unavailable, not zero.",
+    "exclusions": [
+      "coordinator",
+      "fixture construction",
+      "local retrieval",
+      "independent reviewers",
+      "other workers"
+    ],
+    "hook_observability": "Each Claude invocation exposed 16 hook events, not separately measured hook tokens. SDK hook-event count is unavailable."
+  },
+  "verification": {
+    "actual_raw_receipt_replays_matching_frozen_source_scope": 8,
+    "focused_skips": 0,
+    "focused_tests": 16,
+    "full_sdk_suite_before_final_two_export_checks": {
+      "skips": 0,
+      "status": "passed",
+      "tests": 324
+    },
+    "independent_code_review": "Two early exporter integrity findings reproduced then fixed with red-to-green negative checks; independent reviewer accepted all 16 focused tests.",
+    "inference_helpers_unchanged_after_first_submission": true
+  }
+}
