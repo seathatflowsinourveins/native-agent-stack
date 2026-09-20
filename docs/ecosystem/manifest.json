@@ -194,8 +194,14 @@
   ],
   "guides": [
     {
+      "title": "Capture this PC's lifetime evidence",
+      "body": "Upstream counter commands, private cumulative snapshots, exact artifact comparisons and a portable JSON/HTML manifest.",
+      "path": "tools/token-report/README.md",
+      "category": "adoption"
+    },
+    {
       "title": "Start on a new host",
-      "body": "Profiles, native sign-in and acceptance gates.",
+      "body": "Selected profiles, native sign-in and useful acceptance checks.",
       "path": "adoption/README.md",
       "category": "adoption"
     },

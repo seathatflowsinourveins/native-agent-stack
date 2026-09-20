@@ -43,6 +43,7 @@
     "ecosystem_explorer": "docs/ecosystem/index.html",
     "ecosystem_explorer_guide": "docs/ecosystem/README.md",
     "current_token_practice": "docs/token-practice.md",
+    "current_portable_token_report": "tools/token-report/README.md",
     "current_token_artifacts": "evidence/receipts/token-practice-artifacts-20260920.json",
     "current_token_native_pairs": "evidence/receipts/token-practice-native-pairs-20260920.json",
     "current_token_catalog_conversion": "evidence/receipts/token-practice-catalog-toon-20260920.json",

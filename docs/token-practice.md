@@ -1,5 +1,7 @@
 # Token practice and measured native results
 
+For a new PC or a separate local ledger, use the [portable upstream counter collector](../tools/token-report/README.md). It produces local JSON/HTML reports, retains failed refreshes and never adds overlapping lifetime snapshots.
+
 Recorded September 20, 2026. Read this guide on demand when selecting a context
 lane, interpreting native counters, or designing a measured comparison.
 
