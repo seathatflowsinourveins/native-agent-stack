@@ -14,6 +14,10 @@
 @media(prefers-reduced-motion:no-preference){button,a{transition:background .15s,color .15s,border-color .15s}.layer{transition:border-color .15s}}@media print{header,.controls,.filter-row,.pagination,.dialog-close,.button,.arrow{display:none!important}[role=tabpanel][hidden]{display:block!important}body{background:white}.shell{padding:0}.repo-grid{grid-template-columns:repeat(2,1fr)}.layer,.repo,.policy,.proof{break-inside:avoid}.hero{padding-top:10px}dialog{display:none}}
 header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{scroll-margin-top:155px}.integration-heading{margin:18px 0 15px}.integration-card{background:#e9efe2;border:1px solid #cad7bf;border-radius:12px;padding:22px;margin-bottom:24px;display:grid;grid-template-columns:1.6fr 1fr;gap:25px}.integration-card .eyebrow{color:var(--green);font-size:9px;margin-bottom:9px}.integration-card p{font-size:12px;color:#50604f;margin:9px 0}.integration-card code{font-size:10px;overflow-wrap:anywhere;display:block}.integration-card a{font-size:12px}.integration-card .boundary{border-left:1px solid #c2ceba;padding-left:24px}.integration-card .boundary strong{font-size:12px}.integration-card .boundary p{font-size:11px}@media(max-width:670px){.integration-card{grid-template-columns:1fr;gap:8px}.integration-card .boundary{border-left:0;border-top:1px solid #c2ceba;padding:13px 0 0}}
 .setup-summary{margin-bottom:24px}.setup-guides{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0 28px}.stack-list{margin:20px 0 40px}.stack-entry{border:1px solid var(--line);border-radius:12px;background:var(--white);padding:18px 20px;margin-bottom:12px}.stack-entry>summary{display:flex;justify-content:space-between;gap:18px;align-items:center;font-size:15px;overflow-wrap:anywhere}.stack-entry .stack-role{margin:15px 0;color:var(--muted);font-size:13px}.stack-meta{font-size:11px;font-weight:400;color:var(--muted);text-align:right;overflow-wrap:anywhere}.stack-detail{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}.stack-detail>div{min-width:0}.stack-detail h3{font-size:14px;margin:15px 0 8px}.stack-detail p{font-size:12px;margin:9px 0;overflow-wrap:anywhere}.stack-detail ul{font-size:12px;padding-left:18px}.native-code{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf1e7;padding:14px;border-radius:7px;font:11px/1.6 ui-monospace,monospace;max-height:400px;overflow:auto}.recipe-section{border-top:1px solid var(--line);padding:14px 0}.recipe-section summary{font-size:14px}.recipe-section pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.7 ui-monospace,monospace;background:var(--paper);padding:14px;margin-top:12px}.token-table{font-size:12px}.token-table td{overflow-wrap:anywhere;min-width:80px}.negative{color:var(--copper);font-weight:600}.token-section{margin:30px 0}.token-section>p{font-size:13px;color:var(--muted);margin:13px 0}.token-receipt{border:1px solid var(--line);border-radius:10px;background:var(--white);padding:18px;margin:12px 0}.token-receipt>p{font-size:12px;margin:12px 0}.token-receipt li{font-size:12px;margin:8px 0}.stack-notice{font-size:12px;margin-top:10px;color:var(--copper)}.lifecycle-table td:first-child{text-transform:capitalize}.lifecycle-table td{max-width:260px}.setup-profile{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:20px}.setup-profile h3{font-size:15px;margin-bottom:12px}.setup-profile p{font-size:12px;margin:10px 0}.setup-profile button{margin-top:12px}.selection-card{margin:12px 0;border-left:3px solid var(--green);padding:16px 20px;background:var(--white)}.selection-card h3{font-size:15px}.selection-card p{font-size:12px;margin-top:10px}.selection-card a{font-size:11px;overflow-wrap:anywhere}.setup-head-actions{display:flex;gap:10px;flex-wrap:wrap}.navigation{gap:22px}.stack-heading{display:block;min-width:0}.stack-actions{display:flex;gap:15px;flex-wrap:wrap;margin:16px 0}.stack-actions a{font-size:12px}@media(max-width:670px){.stack-detail{grid-template-columns:1fr}.stack-entry>summary{display:block}.stack-meta{text-align:left;display:block;margin-top:7px}.navigation{gap:16px}.stack-entry{padding:16px}.token-table{min-width:590px}}
+#token-topic .token-table{table-layout:fixed;min-width:960px}
+#token-topic th:nth-child(1){width:15%}#token-topic th:nth-child(2){width:25%}#token-topic th:nth-child(3){width:32%}#token-topic th:nth-child(4){width:28%}
+#token-topic .topic-detail td{padding-top:0;padding-bottom:20px}#token-topic .topic-detail pre{max-width:100%}
+#token-topic-section{scroll-margin-top:160px}
 </style>
 </head>
 <body>
@@ -56,6 +60,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <section id="efficiency" role="tabpanel" aria-labelledby="tab-efficiency" hidden>
 <div class="page-heading"><div><div class="eyebrow">A core policy, not an extra tool</div><h2>Make every context choice count.</h2><p>The same discipline applies to Codex, Claude Code, native subagents and research workers. Keep quality and source recovery intact.</p></div></div>
 <div class="policy-intro"><div><h2>Less to carry.<br>Enough to decide.</h2><p>Find the smallest useful source set, do the work in its native runtime, and return a compact result with evidence and unresolved gates.</p></div><div class="measure"><b>Net provider savings: unmeasured</b><span>Artifact reductions and native cache counters exist. They are not a matched whole-task quality, token or billing comparison.</span></div></div>
+<div class="token-section" id="token-topic-section"><h3>The token-efficiency stack: upstream commands and results</h3><p id="token-topic-scope"></p><div id="token-topic"></div></div>
 <div class="token-section"><h3>Choose the smaller complete path for the task</h3><p>A correct upstream installation does not guarantee a reduction on every input. These choices retain the stated quality checks and include comparisons that grew.</p><div id="selection-policy"></div></div>
 <div class="token-section"><h3>Retained artifact baselines</h3><p>These are individual dated text comparisons, not amounts to add together. Positive differences mean fewer retained tokens; negative differences mean the candidate grew. Whole-task provider costs and equal answer quality require separate evidence.</p><div id="artifact-baselines"></div></div>
 <div class="token-section"><h3>Upstream returned fields and client observations</h3><p>These public receipts retain sanitized upstream results, commands and scope. They are historical observations from the source host. Complete private stdout and stderr belong in that PC's token report; this offline page reads no current counters.</p><div id="token-receipts"></div></div>
@@ -160,6 +165,7 @@ if(setup.missing_audit_count) add($("setup-summary"), make("p", "stack-notice", 
 [["adoption/README.md", "New-PC setup"], ["adoption/update.md", "Resume and update"], ["tools/token-report/README.md", "Capture this PC's lifetime results"]].forEach(([path, label]) => add($("setup-guides"), recipeButton(path, label)));
 if(recipeMap.has("adoption/lifecycle.md")) add($("setup-guides"), recipeButton("adoption/lifecycle.md", "Lifecycle checks and recovery"));
 if(recipeMap.has("docs/current-session-observation.md")) add($("setup-guides"), recipeButton("docs/current-session-observation.md", "Recorded session: live tools and observation"));
+if(recipeMap.has("docs/token-efficiency-stack.md")) add($("setup-guides"), recipeButton("docs/token-efficiency-stack.md", "Final token-efficiency list and client results"));
 data.layers.forEach(layer => { const option = make("option", "", layer.name); option.value = layer.id; add($("stack-layer"), option); });
 setup.profiles.forEach(profile => {
   const option = make("option", "", profile.label); option.value = profile.id; add($("stack-profile"), option);
@@ -234,6 +240,27 @@ $("stack-layer").addEventListener("change", renderStack);
 $("stack-profile").addEventListener("change", renderStack);
 $("stack-reset").addEventListener("click", () => { $("stack-search").value = ""; $("stack-layer").value = ""; $("stack-profile").value = ""; renderStack(); });
 renderStack();
+const topic = data.efficiency.topic;
+$("token-topic-scope").textContent = topic.scope;
+if(!topic.rows.length) $("token-topic-section").hidden = true;
+[["core", "Core token-efficiency paths"], ["observation", "Observation and accounting"], ["runtime", "Native clients and supporting runtimes"]].forEach(([group, title]) => {
+  const rows = topic.rows.filter(row => row.group === group);
+  if(!rows.length) return;
+  const table = make("table", "token-table"), body = make("tbody");
+  add(table, add(make("thead"), add(make("tr"), ...["Repository / version", "Upstream use", "Returned result", "Session / lifetime"].map(label => make("th", "", label)))));
+  rows.forEach(row => {
+    const detail = add(make("details", "record-detail"), make("summary", "", "Commands, baseline and lifecycle"), make("p", "", row.purpose), codeBlock(row.upstream_commands), make("p", "", "Baseline: " + row.baseline_summary), make("p", "", "Lifecycle: " + row.lifecycle_summary));
+    add(detail, recipeButton(row.recipe_path, "Read complete native recipe", row.component_id));
+    row.sources.forEach(source => add(detail, add(make("p"), link(source.path + " ↗", source.url))));
+    const identity = add(make("td"), link(row.component_id, row.repository), make("p", "small mono", row.version));
+    const meters = add(make("td"), make("p", "", "Session: " + row.session_statistics.summary), make("p", "", "Lifetime: " + row.lifetime_statistics.summary));
+    const record = add(make("tr"), identity, add(make("td"), codeBlock(row.upstream_commands.use)), make("td", "", row.returned_result_summary), meters);
+    record.dataset.component = row.component_id;
+    const detailCell = add(make("td"), detail); detailCell.colSpan = 4;
+    add(body, record, add(make("tr", "topic-detail"), detailCell));
+  });
+  add(table, body); add($("token-topic"), make("h3", "", title), add(make("div", "table-wrap"), table));
+});
 data.efficiency.selection_policy.forEach(row => {
   const measured = [row.baseline_tokens, row.candidate_tokens, row.chosen_tokens].every(value => typeof value === "number");
   const numbers = measured ? "Baseline " + row.baseline_tokens + " → candidate " + row.candidate_tokens + "; chosen " + row.chosen_tokens + " " + row.unit : "Numeric comparison: not measured here. " + row.unit;

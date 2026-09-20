@@ -2,6 +2,33 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "native-token-stack-final-20260920",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "context-mode",
+        "jcodemunch-mcp",
+        "headroom",
+        "rtk",
+        "opentelemetry-collector-contrib",
+        "loki",
+        "prometheus"
+      ],
+      "claim": "Both native clients retrieved verified project source and resumed their sessions; writer-scoped observer records independently match bounded native outcomes and consumption. Final retained upstream estimates are separate from usage and artifact baselines.",
+      "limitations": [
+        "Dated source-host acceptance with existing native accounts and configured models, not another PC or all selected components.",
+        "Codex initial launch refused two MCP calls; corrected native launch passed. Claude initial strict JSON format and tool-count narration failed while source/continuity checks passed.",
+        "Codex returned session-cumulative 161720 consumed tokens includes the initial 64820. Claude three invocations consumed 247211. These are not paired savings trials.",
+        "Codex seven task response events and two writer histograms match 161720, but two additional zero-output startup events contain 25772 input tokens outside those turn totals; billing/attribution unknown.",
+        "Claude final continuation matches 46011 across CLI, Loki and Prometheus. Earlier unlabelled invocations only have numerical/time correspondence and are not retroactively assigned the new writer.",
+        "Per-process compressor savings were not collected for the initial client task. Native counters use their own retained history, heuristic and process scopes; no exact causal lifetime provider saving is established.",
+        "Private prompts, account metadata and raw task/writer IDs are withheld; portable command paths and query identifiers are parameterized. Original captures and hashes are retained privately.",
+        "The prior Desktop Context Mode file-root limitation and unestablished lifecycle stages remain. No claim that every installed tool is active for every turn."
+      ],
+      "path": "evidence/receipts/native-token-stack-final-20260920.json"
+    },
+    {
       "id": "native-rag",
       "path": "evidence/receipts/native-rag.json",
       "kind": "native_model_e2e",
@@ -3110,8 +3137,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "e57a9ee3497ea0b92cb7f4b5432e91d7a37c94812c0b1d84676aae204de4312b",
-      "bytes": 374249
+      "sha256": "a4915f4065011f6c5dea37086f7368ff18b72ba0438f4e3a37dda37aab038033",
+      "bytes": 376040
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -4710,8 +4737,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "c99a6156648b782be16820c83a237153771cf7e8b7480d2fc9b2f5ef6f1767f5",
-      "bytes": 2852209
+      "sha256": "efd79dfffcaedd26cb5d5c3145323c1439ecf8f185aef21d3b0d304fbc0803fd",
+      "bytes": 3127002
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -4720,8 +4747,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "663bf2ba72fdd3109ac80031b9cde922ffeed68ae639088a5894afc53a8f1bf7",
-      "bytes": 27567
+      "sha256": "e59e5a1fe8bfcd16a8bd6e3a66b547856b267a028451f8ed6f3cc1f9a27a44bf",
+      "bytes": 27938
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -4740,8 +4767,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "1c1116cc83b47bdd14ab5ea2499510afb5ec6385ca1de7aca07cc941803abcf5",
-      "bytes": 55582
+      "sha256": "2406778d802b7c67497502e06c6bf092fb1cae2ca55ec6ff6e4ffd48b52dc8c0",
+      "bytes": 58211
     },
     {
       "path": "docs/evidence.md",
@@ -4757,6 +4784,16 @@
       "path": "docs/stack.md",
       "sha256": "58728a1f807256257e7848da15401221eeef0f63d36d0630b4e7cfb195bd35de",
       "bytes": 7667
+    },
+    {
+      "path": "docs/token-efficiency-stack.json",
+      "sha256": "d3aa773299a1b9ff62348d53f95f9a0baaf7d7a589184a16be799aa81f2f77f9",
+      "bytes": 128972
+    },
+    {
+      "path": "docs/token-efficiency-stack.md",
+      "sha256": "e0bc45a476f3c385fb312f40d4544a507a5c2868e1a2f55159ae8422eb174662",
+      "bytes": 11635
     },
     {
       "path": "docs/token-native-saturation.md",
@@ -4932,6 +4969,11 @@
       "path": "evidence/receipts/native-token-focus-clients-20260920.json",
       "sha256": "bd101c71255fcee84fb2181604c101f3c2ade4e64a9801959071feaca89c2ee4",
       "bytes": 3004
+    },
+    {
+      "path": "evidence/receipts/native-token-stack-final-20260920.json",
+      "sha256": "4223674dbaaeecc2bfefcc477a36610cc3e3b1a14716f93fe4572a5252bb2fc8",
+      "bytes": 115131
     },
     {
       "path": "evidence/receipts/portable-cli-artifacts.json",
@@ -5130,13 +5172,13 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "e05249744633f1436839ac6b19f65ad3e24712e74b36a90e996328692b461d9d",
-      "bytes": 69501
+      "sha256": "2ccf38ffd1cc853717120c3fdb990560b4720d9812c83829033e6ebf4f4d7be9",
+      "bytes": 69906
     },
     {
       "path": "observability/README.md",
-      "sha256": "685bf9adc109e0e478f3c0e675399046bc182948294154e83cf5619863e6df4c",
-      "bytes": 13227
+      "sha256": "ac57328e88dd7ee63afc497b7b453bcaf00ebefd95f63907cfee9c830d271554",
+      "bytes": 14522
     },
     {
       "path": "observability/backends/README.md",
@@ -5310,8 +5352,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "2474ed161f1de3f64cf73b77f8de49f65603394e37ffc6d98b4b4eed8dcb259d",
-      "bytes": 55773
+      "sha256": "d0fd6bb27026ded23a756482ab4dc1d0c479b6ff90e08fd67ef3c04dfd222115",
+      "bytes": 55764
     },
     {
       "path": "scripts/adoption_status.py",
@@ -5320,8 +5362,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "2f90a85c883f93960111507722b94d26d5d3f57e6c6f11dd2b0d6cb8aa4126cf",
-      "bytes": 20998
+      "sha256": "a913b5af85f00ef6e5e427f98f0a757e5340a3bc944f294b9811b9331fd45564",
+      "bytes": 23407
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -5425,8 +5467,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "7216c1b3ac21b859212e54d4e559711cca0d0f36495575fee570bc976153fffb",
-      "bytes": 20276
+      "sha256": "ce5652039cd045e4b802e5956fc5d68e43f6d0ff8cd8a20d9a79fa67c5267183",
+      "bytes": 22198
     },
     {
       "path": "tests/test_execution_realism.py",

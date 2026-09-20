@@ -1,0 +1,2026 @@
+{
+  "schema_version": 1,
+  "kind": "focused_native_token_efficiency_reference",
+  "source_repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+  "source_revision": "3ddeabd81e2f1b268f547cc06555b3278870e4d3",
+  "synthesized_date_utc": "2026-09-20",
+  "scope": "Dated source-host evidence for 14 core token-efficiency tools and 9 separate observation/support tools. Commands, returned results, scoped counters and baseline/lifecycle limits are recorded per row. The full Setup view contains 65 selected components. Each new PC collects its own acceptance.",
+  "counts": {
+    "core": 14,
+    "observation": 9,
+    "total_rows": 23,
+    "native_savings_counter_tools": 4,
+    "core_without_native_savings_counter": 10
+  },
+  "method": [
+    "Exact artifact counts, upstream byte/event estimates and provider consumption are separate.",
+    "A larger complete original is preferred when the task needs all content; no universal positive delta is inferred from installation.",
+    "A current Desktop direct MCP call, native CLI bridge, historical native model task and future recipe are distinct evidence classes.",
+    "Dates and scopes remain attached; historical counters are not the latest live values unless captured by coordinator anew."
+  ],
+  "monitoring_confirmation": {
+    "source_path": "evidence/receipts/current-session-observation-20260920.json",
+    "recorded_at_utc": "2026-09-20T14:28:53.815791+00:00",
+    "rtk_accounting": {
+      "sqlite_open_mode": "read_only",
+      "newest_row_id": 55,
+      "newest_timestamp_utc": "2026-09-20T14:19:03.026948393Z",
+      "newest_command": "rtk git log -3",
+      "input_tokens_estimate": 118,
+      "output_tokens_estimate": 104,
+      "saved_tokens_estimate": 14,
+      "execution_ms": 9,
+      "project_scope": "Canonical public stack checkout",
+      "total_commands": 55,
+      "total_input_estimate": 18054,
+      "total_output_estimate": 16332,
+      "total_saved_estimate": 1722,
+      "exact_parent_hook_decision_rows": 0,
+      "independent_match": "Matches coordinator's direct native gain54→55 commands and1708→1722 saved estimate. This confirms RTK's retained accounting increment, not independent provider avoided-token savings."
+    },
+    "exact_parent_tool_correlations": [
+      {
+        "tool_namespace": "mcp__socraticode",
+        "tool_name": "codebase_search",
+        "root_probe_capture_utc": "2026-09-20T14:18:00.239Z",
+        "loki_event_utc": "2026-09-20T14:17:59.634735+00:00",
+        "loki_success": true,
+        "root_result_is_error": false,
+        "capture_minus_event_seconds": 0.604265,
+        "canonical_root_result_sha256": "f2e8d33530ca4f3e37c1b0b9e8ac4ae9d755dd427f036bb7d1cb5155614c298b",
+        "semantic_boundary": "Root returned content supports the requested native retrieval."
+      },
+      {
+        "tool_namespace": "mcp__ai_memory",
+        "tool_name": "memory_read_session_observations",
+        "root_probe_capture_utc": "2026-09-20T14:18:00.239Z",
+        "loki_event_utc": "2026-09-20T14:17:58.774973+00:00",
+        "loki_success": true,
+        "root_result_is_error": false,
+        "capture_minus_event_seconds": 1.464027,
+        "canonical_root_result_sha256": "15741ff7112def41fcf775fdab880c8464a7a5f7936b95a49b284cd2100aeeb1",
+        "semantic_boundary": "Root returned content supports the requested native retrieval."
+      },
+      {
+        "tool_namespace": "mcp__serena",
+        "tool_name": "search_for_pattern",
+        "root_probe_capture_utc": "2026-09-20T14:19:02.856Z",
+        "loki_event_utc": "2026-09-20T14:19:02.659207+00:00",
+        "loki_success": true,
+        "root_result_is_error": false,
+        "capture_minus_event_seconds": 0.196793,
+        "canonical_root_result_sha256": "3693513c56e6af8efba1c952d17941a0958a3f8ddd8289b4936d0d4f39a6f8f1",
+        "semantic_boundary": "First pattern call returned an empty result object; later native retry is separate and outside this retained Loki sample."
+      },
+      {
+        "tool_namespace": "mcp__serena",
+        "tool_name": "search_for_pattern",
+        "root_probe_capture_utc": "2026-09-20T14:19:39.418Z",
+        "loki_event_utc": "2026-09-20T14:19:39.213505+00:00",
+        "loki_success": true,
+        "root_result_is_error": false,
+        "capture_minus_event_seconds": 0.204495,
+        "canonical_root_result_sha256": "3c84cced3063f349b0c503ed12ea6d29db098302779871daa216f0952d5099c5",
+        "semantic_boundary": "Later retry returned the requested parse_codex source-pattern match in tools/ecosystem/evaluate-native.py; one successful exact-parent Loki event matches the retained root completion window.",
+        "followup_evidence": "serena-retry-correlation.json"
+      }
+    ],
+    "current_provider_metric_reconciliation": {
+      "status": "not_established",
+      "reason": "Current retained Prometheus token series lack the exact task/client scope needed to join the parent Loki response.completed events. Specific sdk-worker6h query has no matching series; other unscoped codex-app-server series exist.",
+      "session_total_tokens": null,
+      "avoided_tokens": null
+    },
+    "limits": [
+      "A configured export route and healthy backend cannot alone attribute current Desktop task usage; use the independent exact-task monitor evidence.",
+      "Current native Claude metrics omit session/account identifiers by configuration; multiwriter and task attribution need the separately established metadata route.",
+      "This running Desktop Context Mode connection still has its old project-file scope. Corrected project configuration and the successful native bridge are distinct routes.",
+      "Retained Context Mode event rows, session_meta counters, direct tool statistics and ai-memory observations are different accounting populations; never sum them as tokens or complete tool counts.",
+      "The observed event timestamps bound freshness; configured hooks do not prove every later nested operation, provider call or lifecycle event has been captured.",
+      "AgentsView's selected archive server is stopped and requires explicit scoped refresh for newer historical sessions.",
+      "ccusage and otel-tui are available commands, not continuously loaded MCP observers for this task; Claude HUD is outside the Codex Desktop UI.",
+      "SDK spool ingestion is configured for processes that publish those receipts; the current Desktop cannot be assumed to have inherited a later launcher environment or SDK writer identity.",
+      "RTK's matched native accounting increment confirms its own estimate. No full-PC causal lifetime provider-token saving is established."
+    ],
+    "backend_roles": "OpenTelemetry Collector transports native telemetry; Prometheus stores metrics; Loki stores events; Grafana presents them. These supporting services do not add token savings to RTK/Context Mode or artifact counts."
+  },
+  "clean_prefix_reference": {
+    "source_path": "evidence/receipts/native-token-clean-prefix-20260920.json",
+    "recorded_at_utc": "2026-09-20T13:54:55.597239+00:00",
+    "scope": "Two disposable tool environments on the existing Linux/WSL host. Public fixtures only; no provider model tasks, client registration, authentication migration or production index replacement.",
+    "headroom": {
+      "version": "0.37.0",
+      "same_process_original_recovery_exact": true,
+      "after_server_restart_original_recovery_exact": true,
+      "input_sha256": "bde8dcfaff1237a6c36d56fdca6bd99b6cbf6d2be93cb1d2a5da505c06aedb98",
+      "recovered_sha256": "bde8dcfaff1237a6c36d56fdca6bd99b6cbf6d2be93cb1d2a5da505c06aedb98",
+      "upstream_compress_returned": {
+        "original_tokens": 9616,
+        "compressed_tokens": 2128,
+        "tokens_saved": 7488
+      },
+      "upstream_savings_lifetime_returned": {
+        "tokens_saved": 7488,
+        "tokens_before": 9616,
+        "cost_usd": 0.022464,
+        "calls": 1,
+        "savings_percent": 77.9
+      },
+      "counter_scope": "Explicit disposable HEADROOM_WORKSPACE_DIR and one native offline compression call. Upstream lifetime is a bounded native report, not this PC's global provider savings. Illustrative cost is not billed savings.",
+      "proxy_url": "http://127.0.0.1:1",
+      "provider_proxy_started": false,
+      "offline_environment": true
+    },
+    "jcodemunch": {
+      "version": "1.108.319",
+      "indexed_files": 1,
+      "indexed_symbols": 12,
+      "selected_symbol": "unique_json",
+      "source_exact_before_restart": true,
+      "source_exact_after_restart": true,
+      "scoped_native_total_tokens_saved": {
+        "before": 0,
+        "after_first_source_read": 2781,
+        "after_server_restart_before_second_read": 2781,
+        "after_second_source_read": 5562
+      },
+      "verification_source_reads": 2,
+      "default_ledger_before": 29820,
+      "default_ledger_after": 29820,
+      "default_ledger_delta": 0,
+      "default_ledger_bytes_unchanged": true,
+      "counter_scope": "Repeated-use upstream bytes/4 estimate in the disposable index. Both increments are verification reads, not unique production or provider savings.",
+      "custom_root_accounting": "In this observed sequence, each fresh native MCP process called get_session_stats with the explicit CODE_INDEX_PATH before retrieval, and the default ledger stayed byte-for-byte unchanged. Installed upstream source also loads the savings root once per process. This is not a new causal A/B test and does not establish that arbitrary independent get_symbol_source calls honor a custom ledger root; the earlier mismatch remains valid dated evidence.",
+      "ai_summaries_watch_context_providers_and_savings_sharing_enabled": false
+    },
+    "exact_artifact_measurement": {
+      "tokenizer": "gpt-tokenizer3.4.0/o200k_base",
+      "counts": {
+        "headroom_pretty_input": 9609,
+        "headroom_compact_input": 5105,
+        "headroom_candidate_content": 2121,
+        "headroom_full_compress_envelope": 2732,
+        "headroom_full_retrieve_envelope": 16045,
+        "jcode_whole_file": 2484,
+        "jcode_known_function": 40,
+        "jcode_index_response": 269,
+        "jcode_search_response": 125,
+        "jcode_source_response": 199,
+        "jcode_complete_search_source": 324,
+        "jcode_index_search_source": 593,
+        "headroom_compress_retrieve": 18777
+      },
+      "jcode_whole_file_delta": 2160,
+      "jcode_known_function_delta": -284,
+      "headroom_compact_to_candidate_delta": 2984,
+      "headroom_compact_to_full_compress_envelope_delta": 2373,
+      "headroom_compact_to_compress_retrieve_delta": -13672,
+      "measurement_boundary": "Exact retained input/candidate and complete returned MCP-envelope serialization; not raw stdio transport framing, prompts, schemas, model reasoning, API usage or billed cost. Search/source figures exclude cold indexing and stats commands; the index-plus-retrieval figure includes indexing but still excludes stats. Stats-before-source was part of this custom-root isolation procedure, so these retrieval-only figures are not the whole lifecycle cost. The full request/response lifecycle and recovery can exceed the original context."
+    },
+    "cleanup": {
+      "all_four_owned_mcp_exit_codes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "upstream_uninstall_exit_codes": [
+        0,
+        0
+      ],
+      "absent_created_entrypoints": [
+        "headroom",
+        "jcodemunch-mcp",
+        "gcm",
+        "munch-bench"
+      ],
+      "all_created_entrypoints_absent": true,
+      "owned_tool_processes_remaining": 0,
+      "retained_artifact_count": 82,
+      "input_and_recovered_sha256_equal_after_uninstall": true,
+      "expected_and_twice_retrieved_source_equal_after_uninstall": true,
+      "data_and_receipts_preserved": true,
+      "tools_after_uninstall_exit_code": 0
+    }
+  },
+  "source_notes": [
+    "Saturation matrix has no SocratiCode artifact_baselines row, but separate native token-practice artifact receipt records 2731→491; both retained without altering the audit.",
+    "Ast-grep original 1818→674 and later 1818→686 are different retained responses; do not silently substitute or sum them.",
+    "Current-session RTK 1722 supersedes earlier dated 1708 without adding snapshots.",
+    "Archive commands use explicit portable placeholders. Verify publisher checksum and selected OS/architecture before extracting; file removal/rollback is limited to owned prefixes and retained private data."
+  ],
+  "synthesis_observed_current_state": false,
+  "provider_calls": 0,
+  "public_repository_edits": 0,
+  "rows": [
+    {
+      "component_id": "rtk",
+      "group": "core",
+      "purpose": "Compact supported command outputs, retain failure/raw recovery",
+      "upstream_commands": {
+        "install": [
+          "gh release download v0.49.0 --repo rtk-ai/rtk --pattern rtk-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt --dir \"$STACK_HOME/downloads/rtk-0.49.0\"",
+          "(cd \"$STACK_HOME/downloads/rtk-0.49.0\" && sha256sum --check --ignore-missing checksums.txt && tar -xf rtk-x86_64-unknown-linux-musl.tar.gz -C \"$PREFIX\")"
+        ],
+        "use": [
+          "rtk git log -3",
+          "rtk proxy git log -3"
+        ],
+        "statistics": [
+          "rtk gain --format json",
+          "rtk gain --project --format json"
+        ],
+        "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
+        "install_note": "Official [rtk-ai/rtk v0.49.0](https://github.com/rtk-ai/rtk/releases/tag/v0.49.0), asset `rtk-x86_64-unknown-linux-musl.tar.gz`, `checksums.txt`; exact archive procedure above The guarded subshell checks and extracts inside the owned download directory; PREFIX must be the absolute owned installation prefix.",
+        "statistics_note": "Upstream savings estimate; keep its own scope."
+      },
+      "returned_result_summary": "2026-09-20 14:55:57 UTC upstream refresh returned 1,722 estimated saved tokens across 55 retained commands; the selected project's 234 across 18 commands are included. Earlier same-day Desktop acceptance: native rtk git log -3 returned successfully; meter moved from 54 commands / 1,708 saved to 55 commands / 1,722 saved. An independent SQLite row matched 118 input, 104 output, 14 saved and 9 ms. These are estimates over retained history, not measured provider savings.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No separate native session-token-savings counter established; global and project retained-history views overlap.",
+        "summary": "No native session token-savings counter. No separate native session-token-savings counter established; global and project retained-history views overlap."
+      },
+      "lifetime_statistics": {
+        "availability": "upstream_estimate",
+        "value": 1722,
+        "unit": "estimated tokens saved",
+        "observed_at": "2026-09-20T14:55:57.834524+00:00",
+        "scope": "All retained native projects: 55 commands; configured 90-day retention. The selected project subset is included in the global total.",
+        "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
+        "summary": "1,722 estimated tokens saved across 55 retained commands at 2026-09-20 14:55:57 UTC. Selected project: 234 estimated tokens across 18 commands, already included in the global total. This is retained history under a 90-day policy, not an infinite lifetime or provider savings.",
+        "earlier_observations": [
+          {
+            "observed_at": "2026-09-20T14:28:53.815791+00:00",
+            "value": 1722,
+            "scope": "55 retained commands across projects; default 90-day retention; meter is not infinite lifetime.",
+            "source_path": "evidence/receipts/current-session-observation-20260920.json"
+          }
+        ],
+        "scoped_values": [
+          {
+            "scope": "All retained native projects",
+            "value": 1722,
+            "observed_at": "2026-09-20T14:55:57.834524+00:00",
+            "returned_fields": {
+              "total_commands": 55,
+              "total_input": 18054,
+              "total_output": 16332,
+              "total_saved": 1722,
+              "avg_savings_pct": 9.538052509139249,
+              "total_time_ms": 1624,
+              "avg_time_ms": 29
+            },
+            "stdout_sha256": "b8fb4c1c322613a794a015f8e1e0b103ec4974576addcf10a850e92e3b176bd5"
+          },
+          {
+            "scope": "Selected project (included in global)",
+            "value": 234,
+            "observed_at": "2026-09-20T14:55:57.842351+00:00",
+            "returned_fields": {
+              "total_commands": 18,
+              "total_input": 10199,
+              "total_output": 9965,
+              "total_saved": 234,
+              "avg_savings_pct": 2.294342582606138,
+              "total_time_ms": 346,
+              "avg_time_ms": 19
+            },
+            "stdout_sha256": "dff02a975fa9f37898a6a86b8635029ced362e68bda789c5e7bc3da2ace682d3"
+          }
+        ]
+      },
+      "baseline_summary": "2026-09-20 Desktop task: native rtk git log -3 returned successfully; meter moved from 54 commands / 1708 saved to 55 commands / 1722 saved. Independent SQLite row matched 118 input, 104 output, 14 saved, 9 ms. Estimates over retained history, not tokenizer/provider savings.",
+      "artifact_baselines": [
+        {
+          "id": "fresh-rtk-81acf6b27117a5da282a3b33",
+          "baseline_tokens": 537,
+          "candidate_tokens": 178,
+          "tokens_removed": 359,
+          "quality_passed": true,
+          "limitations": [
+            "Metadata is omitted/reformatted and relative timestamps vary. No provider comparison."
+          ]
+        }
+      ],
+      "additional_dated_artifact_pairs": [
+        {
+          "id": "rtk-git-log",
+          "baseline_tokens": 537,
+          "candidate_tokens": 178,
+          "tokens_removed": 359,
+          "type": "lossy command formatting",
+          "source_path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        }
+      ],
+      "native_client_evidence": {
+        "desktop": "Executed explicitly; latest SQLite corroboration 1722 total/14 probe delta.",
+        "codex": "Historical native command rtk git log -6 passed; stable Codex profile uses explicit commands.",
+        "claude": "Upstream Bash-rewriting installation recipe is supported; current Desktop receipt does not establish this task's automatic Claude rewriting."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery in the linked matrix. An unestablished stage is not inferred from runtime availability.",
+      "source_paths": [
+        "recipes/README.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "adoption/lifecycle.md",
+        "evidence/receipts/current-session-observation-20260920.json",
+        "evidence/receipts/native-context-memory.json",
+        "evidence/receipts/artifact-reductions.json",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/token-practice-artifacts-20260920.json",
+        "evidence/receipts/token-practice-coverage-20260920.json",
+        "evidence/receipts/token-practice-native-counters-20260920.json",
+        "evidence/receipts/token-practice-confirmation-20260920.json",
+        "evidence/receipts/native-token-stack-final-20260920.json"
+      ]
+    },
+    {
+      "component_id": "context-mode",
+      "group": "core",
+      "purpose": "Local execution, file processing, indexed retrieval, native context hooks",
+      "upstream_commands": {
+        "install": [
+          "codex plugin marketplace add mksglu/context-mode --ref 6f0cc6841c687e754059f36714a11233fda1a02b --json",
+          "codex plugin add context-mode@context-mode --json",
+          "codex features enable hooks",
+          "codex features enable plugin_hooks",
+          "claude plugin marketplace add mksglu/context-mode@6f0cc6841c687e754059f36714a11233fda1a02b --scope user",
+          "claude plugin install context-mode@context-mode --scope user --json"
+        ],
+        "use": [
+          "ctx_execute({\"language\":\"python\",\"code\":\"print(6 * 7)\"})",
+          "ctx_execute_file({\"path\":\"/absolute/project/file\",\"language\":\"python\",\"code\":\"print(FILE_CONTENT)\"})",
+          "mcporter --config \"$MCPORTER_CONFIG\" call context-mode.ctx_execute_file --args \"$FILE_ARGS\" --output text --no-oauth"
+        ],
+        "statistics": [
+          "ctx_stats({})",
+          "mcporter --config \"$MCPORTER_CONFIG\" call context-mode.ctx_stats --args '{}' --output text --no-oauth"
+        ],
+        "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
+        "install_note": "Native plugin source pinned to `6f0cc6841c687e754059f36714a11233fda1a02b`; [client setup](#native-context-mode-and-hooks). The npm `context-mode@1.0.169` release is a different source revision and is not a substitute for full plugin evidence.",
+        "statistics_note": "Upstream savings estimate; keep its own scope."
+      },
+      "returned_result_summary": "2026-09-20 14:55:58–59 UTC retained-file refresh read Desktop WSL 2,143,488 lifetime / 0 session, native Claude 54,016 / 0, and native Codex 71,424 / 1,070,038 upstream estimates. These latest persisted process files are not matched to the fresh acceptance sessions and are not additive. Earlier direct Desktop ctx_execute returned 42 and ctx_stats separately quoted a rounded 1.1M estimate. The loaded Desktop ctx_execute_file retained an old plugin-root restriction; the explicit project-root native MCPorter bridge returned matching file length and hash. Dated native Codex and Claude project-file and symbol tasks passed.",
+      "session_statistics": {
+        "availability": "upstream_estimate",
+        "value": null,
+        "unit": "persisted process-session byte estimate",
+        "observed_at": "2026-09-20T14:56:03.739753+00:00",
+        "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
+        "scope": "Separate latest persisted upstream process files under Desktop WSL, Native Claude and Native Codex runtime roots. These files are not linked to the newly accepted client tasks. Do not sum them or equate them with the directly loaded Desktop connection.",
+        "summary": "Latest persisted session estimates: Desktop WSL 0; native Claude 0; native Codex 1,070,038. Captured around 2026-09-20 14:55:59 UTC from separate runtime-root files, not fresh acceptance-session statistics. An earlier direct Desktop connection separately reported a rounded 1.1M estimate.",
+        "scoped_values": [
+          {
+            "scope": "Desktop WSL",
+            "value": 0,
+            "observed_at": "2026-09-20T14:55:59.016011+00:00",
+            "source_sha256": "bc26ba004a648fcb9e0cb502c33b8a0fd7ebf6f4acfde38a70ee18211b398791",
+            "method": "Kept-out bytes divided by 4; latest persisted process file, not a newly invoked MCP result."
+          },
+          {
+            "scope": "Native Claude",
+            "value": 0,
+            "observed_at": "2026-09-20T14:55:59.002621+00:00",
+            "source_sha256": "bac5e4520491116981c4c7c1a607c40dbc8206ed7d368b206444fd9256850ae5",
+            "method": "Kept-out bytes divided by 4; latest persisted process file, not a newly invoked MCP result."
+          },
+          {
+            "scope": "Native Codex",
+            "value": 1070038,
+            "observed_at": "2026-09-20T14:55:58.997781+00:00",
+            "source_sha256": "1ae818883ab98b221260fe54eb651a7e62e4240afe1fcbec2310fb2c8377d709",
+            "method": "Kept-out bytes divided by 4; latest persisted process file, not a newly invoked MCP result."
+          }
+        ],
+        "earlier_direct_connection": {
+          "availability": "upstream_estimate",
+          "value": "1.1M (rounded)",
+          "unit": "estimated tokens saved",
+          "observed_at": "2026-09-20T14:28:53.815791+00:00",
+          "scope": "Existing Desktop connection: 98.9% quoted reduction. This is a byte/event heuristic, not an exact token count or a reading of the separate native-client roots. Snapshot timestamp is the retained observation receipt timestamp; direct tool output remains quoted and rounded.",
+          "summary": "1.1M (rounded) estimated tokens saved. Existing Desktop connection: 98.9% quoted reduction. This is a byte/event heuristic, not an exact token count or a reading of the separate native-client roots."
+        }
+      },
+      "lifetime_statistics": {
+        "availability": "upstream_estimate",
+        "value": null,
+        "unit": "retained event/byte estimate",
+        "scope": "Separate latest persisted runtime-root estimates: retained event count × 256. No unique exact whole-PC lifetime number. Do not sum roots, direct connection output or other tools' estimates.",
+        "summary": "Latest persisted retained-event estimates: Desktop WSL 2,143,488; native Claude 54,016; native Codex 71,424. Captured around 2026-09-20 14:55:59 UTC. Each is a separate event heuristic, not a combined lifetime, an exact token count or avoided provider usage.",
+        "observed_at": "2026-09-20T14:56:03.739753+00:00",
+        "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
+        "scoped_values": [
+          {
+            "scope": "Desktop WSL",
+            "value": 2143488,
+            "observed_at": "2026-09-20T14:55:59.016011+00:00",
+            "source_sha256": "bc26ba004a648fcb9e0cb502c33b8a0fd7ebf6f4acfde38a70ee18211b398791",
+            "method": "Retained event count multiplied by 256; latest persisted process file in this runtime root."
+          },
+          {
+            "scope": "Native Claude",
+            "value": 54016,
+            "observed_at": "2026-09-20T14:55:59.002621+00:00",
+            "source_sha256": "bac5e4520491116981c4c7c1a607c40dbc8206ed7d368b206444fd9256850ae5",
+            "method": "Retained event count multiplied by 256; latest persisted process file in this runtime root."
+          },
+          {
+            "scope": "Native Codex",
+            "value": 71424,
+            "observed_at": "2026-09-20T14:55:58.997781+00:00",
+            "source_sha256": "1ae818883ab98b221260fe54eb651a7e62e4240afe1fcbec2310fb2c8377d709",
+            "method": "Retained event count multiplied by 256; latest persisted process file in this runtime root."
+          }
+        ]
+      },
+      "baseline_summary": "2026-09-20 Desktop: ctx_execute returned 42; ctx_stats returned '1.1M tokens saved ·98.9% reduction' rounded heuristic. Loaded ctx_execute_file still rejected project path due old plugin-root connection; explicit native MCPorter project bridge returned matching file length/hash. 2026-09-20 fresh native Codex and Claude each passed project-file and symbol task.",
+      "artifact_baselines": [],
+      "additional_dated_artifact_pairs": [],
+      "native_client_evidence": {
+        "desktop": "Loaded execute/stats pass; old directly loaded file-read root fails; explicit project-scoped CLI bridge passes.",
+        "codex": "Fresh native project-file task passed; old Desktop hot reload not claimed.",
+        "claude": "Fresh native project-file task passed; historical native lifecycle hooks succeeded."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: accepted_within_scope; cleanup: not_established; recovery: not_established. Fresh both-native-client file operations passed. Old Desktop connection retains prior loaded scope; fresh native PreCompact not forced.",
+      "source_paths": [
+        "recipes/README.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "adoption/lifecycle.md",
+        "evidence/receipts/current-session-observation-20260920.json",
+        "evidence/receipts/native-context-memory.json",
+        "evidence/receipts/artifact-reductions.json",
+        "evidence/receipts/component-history.json",
+        "observability/followup-receipt.json",
+        "observability/restart-receipt.json",
+        "evidence/receipts/token-practice-native-pairs-20260920.json",
+        "evidence/receipts/token-practice-coverage-20260920.json",
+        "evidence/receipts/token-practice-native-counters-20260920.json",
+        "evidence/receipts/native-token-focus-clients-20260920.json",
+        "evidence/receipts/token-practice-confirmation-20260920.json",
+        "evidence/receipts/native-token-stack-final-20260920.json"
+      ]
+    },
+    {
+      "component_id": "headroom",
+      "group": "core",
+      "purpose": "On-demand upstream MCP compression/retrieval and separately guarded offline artifact compression",
+      "upstream_commands": {
+        "install": [
+          "uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'"
+        ],
+        "use": [
+          "headroom mcp serve --proxy-url http://127.0.0.1:1",
+          "headroom_compress({\"content\":\"selected content\"})",
+          "headroom_retrieve({\"hash\":\"RETURNED_HASH\"})"
+        ],
+        "statistics": [
+          "headroom savings --json",
+          "headroom_stats({})"
+        ],
+        "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
+        "install_note": "`uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'`",
+        "statistics_note": "Upstream savings estimate; keep its own scope."
+      },
+      "returned_result_summary": "2026-09-20 14:55:58.113162 UTC global headroom savings JSON still returned 0 estimated saved tokens. Separate earlier fixture ledger: 1 call and 36,719 estimated saved. Later clean-prefix fixture: 9,616 original, 2,128 compressed and 7,488 saved upstream tokens. Exact original recovery passed across server restart; uninstall removed created entrypoints while retaining source artifacts.",
+      "session_statistics": {
+        "availability": "upstream_estimate",
+        "value": 7488,
+        "unit": "estimated tokens saved",
+        "observed_at": "2026-09-20T13:54:55.597239+00:00",
+        "scope": "One isolated offline clean-prefix acceptance compression; not the global ledger or provider traffic.",
+        "summary": "7488 estimated tokens saved. One isolated offline clean-prefix acceptance compression; not the global ledger or provider traffic."
+      },
+      "lifetime_statistics": {
+        "availability": "upstream_estimate",
+        "value": 0,
+        "unit": "estimated tokens saved",
+        "observed_at": "2026-09-20T14:55:58.113162+00:00",
+        "scope": "Global native ledger: 0 calls. The upstream lifetime field covers at most 30 days. Isolated fixture totals of 36,719 and 7,488 remain separate.",
+        "summary": "0 estimated tokens saved in the global native ledger at 2026-09-20 14:55:58 UTC. The upstream lifetime field covers at most 30 days. Isolated fixture totals of 36,719 and 7,488 remain separate.",
+        "earlier_observations": [
+          {
+            "observed_at": "2026-09-20T14:18:33.322Z",
+            "value": 0,
+            "scope": "Global native ledger: 0 calls. The upstream lifetime field covers at most 30 days. Isolated fixture totals of 36,719 and 7,488 remain separate."
+          }
+        ],
+        "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
+        "stdout_sha256": "eafe48c7c8b730861b0d3fa6ddfc0889b3bf8eeed54622936665902e17d6ee46"
+      },
+      "baseline_summary": "Clean-prefix exact artifact: compact original 5,105 → complete compression envelope 2,732, saving 2,373. When the task requires full recovery, compression plus recovery is 18,777, an expansion of 13,672 over the same 5,105 baseline; use the direct original. The upstream isolated estimate 9,616 → 2,128 (7,488 saved) uses a different native counting boundary and is not added to this artifact comparison.",
+      "artifact_baselines": [
+        {
+          "id": "fresh-headroom-e1641a5b959bb3334f9020d9",
+          "baseline_tokens": 4044,
+          "candidate_tokens": 300,
+          "tokens_removed": 3744,
+          "quality_passed": true,
+          "limitations": [
+            "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+            "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+          ]
+        },
+        {
+          "id": "fresh-headroom-62321a612f2e09d18927fcce",
+          "baseline_tokens": 2360,
+          "candidate_tokens": 1298,
+          "tokens_removed": 1062,
+          "quality_passed": true,
+          "limitations": [
+            "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+            "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+          ]
+        },
+        {
+          "id": "fresh-headroom-43861024062687e0826ce5ab",
+          "baseline_tokens": 3032,
+          "candidate_tokens": 3032,
+          "tokens_removed": 0,
+          "quality_passed": true,
+          "limitations": [
+            "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+            "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+          ]
+        },
+        {
+          "id": "fresh-headroom-5a0ccf43a8a9a20cbb8b95d5",
+          "baseline_tokens": 235,
+          "candidate_tokens": 235,
+          "tokens_removed": 0,
+          "quality_passed": true,
+          "limitations": [
+            "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+            "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+          ]
+        },
+        {
+          "id": "fresh-headroom-4c309b573fdf934e1c1ca51a",
+          "baseline_tokens": 504,
+          "candidate_tokens": 246,
+          "tokens_removed": 258,
+          "quality_passed": true,
+          "limitations": [
+            "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+            "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+          ]
+        },
+        {
+          "id": "fresh-headroom-c8905930063d7fcc47127d2e",
+          "baseline_tokens": 1770,
+          "candidate_tokens": 1770,
+          "tokens_removed": 0,
+          "quality_passed": true,
+          "limitations": [
+            "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+            "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+          ]
+        },
+        {
+          "id": "fresh-headroom-7f9a4d938277a9293291cc56",
+          "baseline_tokens": 1744,
+          "candidate_tokens": 1744,
+          "tokens_removed": 0,
+          "quality_passed": true,
+          "limitations": [
+            "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+            "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+          ]
+        },
+        {
+          "id": "headroom-direct-mcp-20260920",
+          "baseline_tokens": 36625,
+          "candidate_tokens": 19714,
+          "tokens_removed": 16911,
+          "quality_passed": true,
+          "limitations": [
+            "Summary retains selected failure; exact retrieval is available but consumes original content. Owned synthetic fixture, no provider task."
+          ]
+        },
+        {
+          "id": "headroom-guard-positive-20260920",
+          "baseline_tokens": 26529,
+          "candidate_tokens": 191,
+          "tokens_removed": 26338,
+          "quality_passed": true,
+          "limitations": [
+            "Exact run-expansion recovery verified for selected synthetic logs; local guarded adapter around upstream APIs."
+          ]
+        },
+        {
+          "id": "headroom-clean-compression-20260920",
+          "baseline_tokens": 5105,
+          "candidate_tokens": 2732,
+          "tokens_removed": 2373,
+          "quality_passed": true,
+          "limitations": [
+            "Complete SDK-serialized compression response versus compact original; exact original recovery separately verified. No provider-token claim.",
+            "Native clean-prefix receipt: evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        },
+        {
+          "id": "headroom-clean-full-recovery-20260920",
+          "baseline_tokens": 5105,
+          "candidate_tokens": 18777,
+          "tokens_removed": -13672,
+          "quality_passed": true,
+          "limitations": [
+            "Complete compression plus full-retrieval response serialization; exact original recovered. Read original directly when all content is required.",
+            "Native clean-prefix receipt: evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        }
+      ],
+      "additional_dated_artifact_pairs": [],
+      "native_client_evidence": {
+        "desktop": "Explicit upstream statistics responding; offline MCP/guard fixture accepted.",
+        "codex": "No automatic request interception or native model-task use established by retained Headroom receipts.",
+        "claude": "No automatic request interception or native model-task use established by retained Headroom receipts."
+      },
+      "lifecycle_summary": "install: accepted_within_scope; use: accepted_within_scope; persistence: accepted_within_scope; restart: accepted_within_scope; cleanup: accepted_within_scope; recovery: accepted_within_scope. Direct same-session compress/retrieve/stats with exact recovery; local global and isolated fixture ledgers kept separate. No automatic provider interception.",
+      "source_paths": [
+        "recipes/README.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "adoption/lifecycle.md",
+        "evidence/receipts/current-session-observation-20260920.json",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/token-practice-coverage-20260920.json",
+        "evidence/receipts/token-practice-native-counters-20260920.json",
+        "evidence/receipts/token-native-retained-functional-20260920.json",
+        "evidence/receipts/native-headroom-mcp-20260920.json",
+        "evidence/receipts/token-practice-confirmation-20260920.json",
+        "evidence/receipts/native-token-clean-prefix-20260920.json",
+        "evidence/receipts/native-token-stack-final-20260920.json"
+      ]
+    },
+    {
+      "component_id": "jcodemunch-mcp",
+      "group": "core",
+      "purpose": "Explicitly scoped code index and exact symbol retrieval through a six-tool MCP surface",
+      "upstream_commands": {
+        "install": [
+          "uv tool install jcodemunch-mcp==1.108.319"
+        ],
+        "use": [
+          "order({\"action\":\"search_symbols\",\"args\":{\"repo\":\"RETURNED_REPOSITORY_ID\",\"query\":\"requested_function\",\"kind\":\"function\",\"max_results\":1}})",
+          "order({\"action\":\"get_symbol_source\",\"args\":{\"repo\":\"RETURNED_REPOSITORY_ID\",\"symbol_id\":\"RETURNED_SYMBOL_ID\"}})"
+        ],
+        "statistics": [
+          "mcporter call --stdio jcodemunch-mcp --env \"CODE_INDEX_PATH=$HOME/.code-index\" --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth"
+        ],
+        "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
+        "install_note": "Dedicated workflow section in the linked recipe; install only the selected scope.",
+        "statistics_note": "Upstream savings estimate; keep its own scope."
+      },
+      "returned_result_summary": "2026-09-20 14:55:58.940776 UTC upstream get_session_stats returned session_calls 0, session_tokens_saved 0 and total_tokens_saved 39,760 in the default index, generation 2. The earlier 14:18:33.801 UTC total was 29,820; both snapshots include verification retrievals. Native Codex and Claude retrieved the requested exact function. An isolated clean-prefix one-file, 12-symbol index returned exact unique_json before and after server restart; its separate estimate moved 0 → 2,781 → 5,562.",
+      "session_statistics": {
+        "availability": "upstream_estimate",
+        "value": 0,
+        "unit": "estimated tokens saved",
+        "observed_at": "2026-09-20T14:55:58.940776+00:00",
+        "scope": "New statistics reporting process, session_calls 0; does not erase previous indexed retrieval.",
+        "summary": "0 estimated tokens saved and 0 calls in the fresh statistics reporting process at 2026-09-20 14:55:58 UTC. This does not erase previous indexed retrievals or describe another client session.",
+        "session_calls": 0,
+        "source_path": "evidence/receipts/native-token-stack-final-20260920.json"
+      },
+      "lifetime_statistics": {
+        "availability": "upstream_estimate",
+        "value": 39760,
+        "unit": "estimated tokens saved",
+        "observed_at": "2026-09-20T14:55:58.940776+00:00",
+        "scope": "Default index-root bytes/4 ledger, generation 2; includes repeated verification retrievals. The isolated clean-prefix ledger is excluded. This is a whole-file counterfactual estimate, not measured provider savings.",
+        "summary": "39,760 estimated tokens saved at 2026-09-20 14:55:58 UTC in the persistent default index ledger, including validation retrievals. Earlier dated snapshot: 29,820. Isolated clean-prefix totals remain separate; schema-size estimates are never added.",
+        "earlier_observations": [
+          {
+            "observed_at": "2026-09-20T14:18:33.801Z",
+            "value": 29820,
+            "scope": "Default index-root bytes/4 ledger, generation 2, includes repeated verification reads. Isolated clean-prefix 5562 is excluded.",
+            "source_path": "evidence/receipts/current-session-observation-20260920.json"
+          }
+        ],
+        "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
+        "stdout_sha256": "586e1b1f3cdca3ebb2f8df72ef7d76721631652609a04ce166aff72cc3009539"
+      },
+      "baseline_summary": "Whole-file retrieval: 5,476 → 861 tokens. Known focused source: 601 → 861, an expansion of 260, so keep the focused read. Clean-prefix indexed retrieval: 2,484 → 324; known exact function: 40 → 324, an expansion of 284. Exact function fidelity passed; these selected artifacts are separate from the retained 39,760 upstream estimate.",
+      "artifact_baselines": [
+        {
+          "id": "jcodemunch-whole-file-20260920",
+          "baseline_tokens": 5476,
+          "candidate_tokens": 861,
+          "tokens_removed": 4615,
+          "quality_passed": true,
+          "limitations": [
+            "Complete search-plus-source envelopes, excluding initial index1332total and model prompts/usage."
+          ]
+        },
+        {
+          "id": "jcodemunch-known-focused-source-20260920",
+          "baseline_tokens": 601,
+          "candidate_tokens": 861,
+          "tokens_removed": -260,
+          "quality_passed": true,
+          "limitations": [
+            "Known exact source extraction is cheaper; do not replace it automatically."
+          ]
+        },
+        {
+          "id": "jcodemunch-clean-indexed-retrieval-20260920",
+          "baseline_tokens": 2484,
+          "candidate_tokens": 324,
+          "tokens_removed": 2160,
+          "quality_passed": true,
+          "limitations": [
+            "Complete search/source SDK response serialization with exact function fidelity; existing scoped index. Cold index plus retrieval is 593; stats/setup outputs are excluded.",
+            "Native clean-prefix receipt: evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        },
+        {
+          "id": "jcodemunch-clean-known-source-20260920",
+          "baseline_tokens": 40,
+          "candidate_tokens": 324,
+          "tokens_removed": -284,
+          "quality_passed": true,
+          "limitations": [
+            "Known exact function read is cheaper than search/source responses; do not replace the focused read.",
+            "Native clean-prefix receipt: evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        }
+      ],
+      "additional_dated_artifact_pairs": [],
+      "native_client_evidence": {
+        "desktop": "Not directly loaded in inspected Desktop catalog; native MCPorter statistics bridge passes.",
+        "codex": "One native task:search_symbols/get_symbol_source pass, source correct.",
+        "claude": "One native task:search_symbols/get_symbol_source pass, source correct."
+      },
+      "lifecycle_summary": "install: accepted_within_scope; use: accepted_within_scope; persistence: accepted_within_scope; restart: accepted_within_scope; cleanup: accepted_within_scope; recovery: not_established. Selected local index persisted across direct/native-client retrieval. No watcher, cross-repository auto-index or paid summaries.",
+      "source_paths": [
+        "recipes/README.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "adoption/lifecycle.md",
+        "evidence/receipts/current-session-observation-20260920.json",
+        "evidence/receipts/native-jcodemunch-20260920.json",
+        "evidence/receipts/native-token-focus-clients-20260920.json",
+        "evidence/receipts/token-practice-confirmation-20260920.json",
+        "evidence/receipts/native-token-clean-prefix-20260920.json",
+        "evidence/receipts/native-token-stack-final-20260920.json"
+      ]
+    },
+    {
+      "component_id": "qmd",
+      "group": "core",
+      "purpose": "Local lexical retrieval over selected documentation",
+      "upstream_commands": {
+        "install": [
+          "npm install --global --prefix \"$STACK_HOME/tools/qmd-2.8.3\" @tobilu/qmd@2.8.3"
+        ],
+        "use": [
+          "qmd --index \"$QMD_INDEX\" search \"local code\" -c \"$QMD_COLLECTION\" -n 2 --json",
+          "qmd --index \"$QMD_INDEX\" get \"$QMD_DOCUMENT_ID\"",
+          "qmd --index \"$QMD_INDEX\" update"
+        ],
+        "statistics": [
+          "qmd --index \"$QMD_INDEX\" status"
+        ],
+        "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/qmd-2.8.3\" @tobilu/qmd@2.8.3`",
+        "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
+      },
+      "returned_result_summary": "2026-09-19 native Claude and Desktop QMD BM 25 search returned native-rag-runtime.md, score 0.86; scoped get returned the recorded section. Same dated additional native Codex attempt was quota-blocked before tools, so it did not establish that CLI lane.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "baseline_summary": "2026-09-19 native Claude and Desktop QMD BM 25 search returned native-rag-runtime.md, score 0.86; scoped get returned the recorded section. Same dated additional native Codex attempt was quota-blocked before tools, so it did not establish that CLI lane.",
+      "artifact_baselines": [
+        {
+          "id": "fresh-qmd-9d2d88745e48e8f07ad34b46",
+          "baseline_tokens": 2672,
+          "candidate_tokens": 815,
+          "tokens_removed": 1857,
+          "quality_passed": true,
+          "limitations": [
+            "Retrieves a dated historical source, not new provider evidence. Other sections are omitted."
+          ]
+        }
+      ],
+      "additional_dated_artifact_pairs": [
+        {
+          "id": "qmd-window",
+          "baseline_tokens": 2672,
+          "candidate_tokens": 815,
+          "tokens_removed": 1857,
+          "type": "lossy indexed source selection",
+          "source_path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        }
+      ],
+      "native_client_evidence": {
+        "desktop": "Native explicit search/get passed.",
+        "codex": "Additional native CLI attempt 2026-09-19 quota-blocked before tools; retain unknown for that attempt.",
+        "claude": "Native explicit search/get passed, BM 25 score 0.86."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery in the linked matrix. An unestablished stage is not inferred from runtime availability.",
+      "source_paths": [
+        "recipes/README.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "adoption/lifecycle.md",
+        "evidence/receipts/native-cli-gaps.json",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/desktop-cli-workflows.json",
+        "blueprints/us-equities/retrieval-evaluation/receipt.json",
+        "evidence/receipts/token-practice-artifacts-20260920.json",
+        "evidence/receipts/token-practice-coverage-20260920.json",
+        "blueprints/us-equities/research-efficiency/native-receipt.json"
+      ]
+    },
+    {
+      "component_id": "serena",
+      "group": "core",
+      "purpose": "Language-server symbol and reference retrieval",
+      "upstream_commands": {
+        "install": [
+          "uvx --from git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143 serena start-mcp-server --context codex --project-from-cwd"
+        ],
+        "use": [
+          "search_for_pattern({\"relative_path\":\"tools/ecosystem/evaluate-native.py\",\"substring_pattern\":\"def parse_codex\",\"multiline\":false,\"skip_ignored_files\":false,\"max_answer_chars\":700})",
+          "mcp-inspector --cli --config \"$PROJECT_ROOT/.mcp.json\" --server serena --method tools/call --tool-name get_symbols_overview --tool-args-json '{\"relative_path\":\"fixtures/before.py\",\"depth\":1}' --format json --stored-auth-only --cwd \"$PROJECT_ROOT\""
+        ],
+        "statistics": [
+          "get_current_config({})"
+        ],
+        "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
+        "install_note": "Native pinned execution: `uvx --from git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143 serena start-mcp-server --context codex --project-from-cwd`",
+        "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
+      },
+      "returned_result_summary": "2026-09-20 loaded Desktop get_current_config: active agent-lab project, language server ready, Bash. Initial pattern query returned empty; corrected explicit source request returned '172:def parse_codex(stream, env):'. Earlier native Codex find_symbol/find_referencing_symbols calls succeeded. Bash readiness is not proof of Python semantic support.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "baseline_summary": "2026-09-20 loaded Desktop get_current_config: active agent-lab project, language server ready, Bash. Initial pattern query returned empty; corrected explicit source request returned '172:def parse_codex(stream, env):'. Earlier native Codex find_symbol/find_referencing_symbols calls succeeded. Bash readiness is not proof of Python semantic support.",
+      "artifact_baselines": [
+        {
+          "id": "fresh-serena-d36fcddddbad3e9f1de3d640",
+          "baseline_tokens": 3129,
+          "candidate_tokens": 214,
+          "tokens_removed": 2915,
+          "quality_passed": true,
+          "limitations": [
+            "Retains only the requested function and metadata; not the whole file or measured provider savings.",
+            "The exact count covers the returned MCP text-content field, not a wire envelope or prompt overhead."
+          ]
+        }
+      ],
+      "additional_dated_artifact_pairs": [],
+      "native_client_evidence": {
+        "desktop": "Loaded project config/pattern retrieval pass; active Bash LS limits preserved.",
+        "codex": "Historical find_symbol/find_referencing_symbols passed.",
+        "claude": "Supported context=claude-code recipe; selected evidence does not establish a separate current Claude semantic result."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery in the linked matrix. An unestablished stage is not inferred from runtime availability.",
+      "source_paths": [
+        "recipes/README.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "adoption/lifecycle.md",
+        "evidence/receipts/current-session-observation-20260920.json",
+        "evidence/receipts/native-context-memory.json",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/token-practice-coverage-20260920.json"
+      ]
+    },
+    {
+      "component_id": "socraticode",
+      "group": "core",
+      "purpose": "Automatically refreshed semantic code retrieval and native code graph",
+      "upstream_commands": {
+        "install": [
+          "npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.14.0\" --ignore-scripts socraticode@1.14.0"
+        ],
+        "use": [
+          "codebase_search({\"projectPath\":\"/absolute/project\",\"query\":\"parse native Codex usage counters\",\"limit\":1,\"includeLinked\":false})",
+          "mcporter --config \"$MCPORTER_CONFIG\" call socraticode.codebase_search --args \"$SEARCH_ARGS\" --output text --no-oauth"
+        ],
+        "statistics": [
+          "codebase_health({})",
+          "codebase_status({\"projectPath\":\"/absolute/project\"})"
+        ],
+        "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.14.0\" --ignore-scripts socraticode@1.14.0`",
+        "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
+      },
+      "returned_result_summary": "2026-09-20 loaded Desktop health showed Qdrant reachable, local embedding endpoint reachable, Nemotron 1B loaded; status 196 chunks/26 graphfiles/3 edges, watcher active; search returned evaluate-native.py lines 171–195 parse_codex. Earlier native Codex and Claude both returned linux-usage-report.cjs lines 2–39, score 0.6429. Add/update/delete watcher fixture passed with probe removed.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "baseline_summary": "2026-09-20 loaded Desktop health showed Qdrant reachable, local embedding endpoint reachable, Nemotron 1B loaded; status 196 chunks/26 graphfiles/3 edges, watcher active; search returned evaluate-native.py lines 171–195 parse_codex. Earlier native Codex and Claude both returned linux-usage-report.cjs lines 2–39, score 0.6429. Add/update/delete watcher fixture passed with probe removed.",
+      "artifact_baselines": [],
+      "additional_dated_artifact_pairs": [
+        {
+          "id": "socraticode-selection",
+          "baseline_tokens": 2731,
+          "candidate_tokens": 491,
+          "tokens_removed": 2240,
+          "type": "lossy semantic retrieval",
+          "source_path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        }
+      ],
+      "native_client_evidence": {
+        "desktop": "Loaded health/status/search pass on explicit scope.",
+        "codex": "Historical actual codebase_search passed.",
+        "claude": "Historical actual codebase_search passed."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: accepted_within_scope; restart: not_established; cleanup: not_established; recovery: not_established. Selected-project add/change/delete watcher and persistent retrieval passed in dated native evidence.",
+      "source_paths": [
+        "recipes/README.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "adoption/lifecycle.md",
+        "evidence/receipts/current-session-observation-20260920.json",
+        "evidence/receipts/native-rag.json",
+        "evidence/receipts/desktop-direct-rag.json",
+        "evidence/receipts/artifact-reductions.json",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/vllm-compatibility.json",
+        "observability/followup-receipt.json",
+        "evidence/receipts/token-practice-artifacts-20260920.json",
+        "evidence/receipts/token-practice-coverage-20260920.json"
+      ]
+    },
+    {
+      "component_id": "ai-memory",
+      "group": "core",
+      "purpose": "Shared scoped Markdown decisions and automatic heuristic cross-client handoffs",
+      "upstream_commands": {
+        "install": [
+          "gh release download v2.3.2 --repo akitaonrails/ai-memory --pattern ai-memory-linux-x86_64.tar.gz --dir \"$DOWNLOAD_DIR\"",
+          "tar -xf \"$DOWNLOAD_DIR/ai-memory-linux-x86_64.tar.gz\" -C \"$PREFIX\""
+        ],
+        "use": [
+          "ai-memory --data-dir \"$MEMORY_DATA_DIR\" search native --workspace \"$WORKSPACE\" --project \"$PROJECT\" --limit 3 --json",
+          "memory_read_page({\"workspace\":\"EXPLICIT_WORKSPACE\",\"project\":\"EXPLICIT_PROJECT\",\"path\":\"SELECTED_PAGE\"})"
+        ],
+        "statistics": [
+          "ai-memory --data-dir \"$MEMORY_DATA_DIR\" status --json",
+          "memory_status({})"
+        ],
+        "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
+        "install_note": "Official [akitaonrails/ai-memory v2.3.2](https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2) archive; `gh release view v2.3.2 --repo akitaonrails/ai-memory --json assets`; retain its native hooks and packaging files",
+        "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
+      },
+      "returned_result_summary": "2026-09-20 official 2.3.2 maintenance: publisher checksum, active service executable, native status, 3-hit scoped search and direct MCP status passed after private backup. Current Desktop loaded MCP returned active exact session and bounded observations. Earlier native Claude/Codex page reads returned correct heading and disabled-feature facts; those dated model receipts retain 2.3.1 scope.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "baseline_summary": "2026-09-20 official 2.3.2 maintenance: publisher checksum, active service executable, native status, 3-hit scoped search and direct MCP status passed after private backup. Current Desktop loaded MCP returned active exact session and bounded observations. Earlier native Claude/Codex page reads returned correct heading and disabled-feature facts; those dated model receipts retain 2.3.1 scope.",
+      "artifact_baselines": [],
+      "additional_dated_artifact_pairs": [],
+      "native_client_evidence": {
+        "desktop": "Loaded memory_status and exact-session observations pass at current service; unknown outer-tool fields remain.",
+        "codex": "Historical native scoped page result passed; 2.3.2 update itself made no new model call.",
+        "claude": "Historical native scoped page result/handoff passed; 2.3.2 update itself made no new model call."
+      },
+      "lifecycle_summary": "install: accepted_within_scope; use: accepted_within_scope; persistence: accepted_within_scope; restart: accepted_within_scope; cleanup: accepted_within_scope; recovery: accepted_within_scope. Scoped memory/client lifecycle and private backup/update/status/search accepted; earlier restoration evidence retains its dated scope.",
+      "source_paths": [
+        "recipes/README.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "adoption/lifecycle.md",
+        "evidence/receipts/current-session-observation-20260920.json",
+        "evidence/receipts/native-memory.json",
+        "evidence/receipts/desktop-direct-rag.json",
+        "evidence/receipts/component-history.json",
+        "observability/followup-receipt.json",
+        "blueprints/us-equities/state-recovery/memory/receipt.json",
+        "blueprints/us-equities/memory-lifecycle/receipt.json",
+        "evidence/receipts/token-practice-coverage-20260920.json",
+        "evidence/receipts/native-ai-memory-maintenance-20260920.json",
+        "evidence/receipts/mac-memory-patch-20260920.json",
+        "evidence/receipts/wsl-memory-maintenance-20260920.json"
+      ]
+    },
+    {
+      "component_id": "repomix",
+      "group": "core",
+      "purpose": "Explicit repository packing and structural compression",
+      "upstream_commands": {
+        "install": [
+          "npm install --global --prefix \"$STACK_HOME/tools/repomix-1.18.0\" repomix@1.18.0"
+        ],
+        "use": [
+          "repomix \"$PROJECT_ROOT\" --include \"fixtures/before.py,fixtures/after.py\" --style xml --parsable-style --compress --token-count-encoding o200k_base --output \"$STACK_HOME/output/selected-code.xml\""
+        ],
+        "statistics": [],
+        "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/repomix-1.18.0\" repomix@1.18.0`",
+        "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
+      },
+      "returned_result_summary": "Retained native command exited 0 and output contained the explicitly selected paths. Exact outline comparison 3697→663 tokens is lossy; restore/read original implementation before editing or correctness decisions.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "baseline_summary": "Retained native command exited 0 and output contained the explicitly selected paths. Exact outline comparison 3697→663 tokens is lossy; restore/read original implementation before editing or correctness decisions.",
+      "artifact_baselines": [
+        {
+          "id": "fresh-repomix-c4b1dc83abcb97ba615d5019",
+          "baseline_tokens": 3697,
+          "candidate_tokens": 663,
+          "tokens_removed": 3034,
+          "quality_passed": true,
+          "limitations": [
+            "Function names are retained; omitted implementation must be read before correctness decisions."
+          ]
+        }
+      ],
+      "additional_dated_artifact_pairs": [
+        {
+          "id": "repomix-compress",
+          "baseline_tokens": 3697,
+          "candidate_tokens": 663,
+          "tokens_removed": 3034,
+          "type": "lossy source packing",
+          "source_path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        }
+      ],
+      "native_client_evidence": {
+        "desktop": "Explicit native CLI acceptance retained; not a claim of automatic loaded MCP use.",
+        "codex": "No separate current native model-task result established for this component by these receipts.",
+        "claude": "No separate current native model-task result established for this component by these receipts."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_applicable; restart: not_applicable; cleanup: documented_not_replayed; recovery: not_applicable. Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery in the linked matrix. An unestablished stage is not inferred from runtime availability.",
+      "source_paths": [
+        "recipes/README.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "adoption/lifecycle.md",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/portable-cli-artifacts.json",
+        "evidence/receipts/token-practice-artifacts-20260920.json",
+        "evidence/receipts/token-practice-coverage-20260920.json"
+      ]
+    },
+    {
+      "component_id": "toon",
+      "group": "core",
+      "purpose": "Compact suitable structured data with explicit decode",
+      "upstream_commands": {
+        "install": [
+          "npm install --global --prefix \"$STACK_HOME/tools/toon-4.1.1\" @toon-format/cli@4.1.1"
+        ],
+        "use": [
+          "toon fixtures/records.json --stats -o \"$STACK_HOME/output/records.toon\"",
+          "toon \"$STACK_HOME/output/records.toon\" --decode --strict -o \"$STACK_HOME/output/records.recovered.json\""
+        ],
+        "statistics": [
+          "toon \"$INPUT_JSON\" --stats --output \"$OUTPUT_TOON\""
+        ],
+        "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/toon-4.1.1\" @toon-format/cli@4.1.1`",
+        "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
+      },
+      "returned_result_summary": "Retained native encode/decode exited 0 and strict recovered JSON equaled source. Small component fixture 1664→1307 tokens; separate 502-repository catalog 59792 compactJSON→66815TOON expanded 7023, despite upstream tokenx heuristic 84907→71770. Compact JSON selected.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "baseline_summary": "Retained native encode/decode exited 0 and strict recovered JSON equaled source. Small component fixture 1664→1307 tokens; separate 502-repository catalog 59792 compactJSON→66815TOON expanded 7023, despite upstream tokenx heuristic 84907→71770. Compact JSON selected.",
+      "artifact_baselines": [
+        {
+          "id": "fresh-toon-ea4c555ad3d459cc4dbef61e",
+          "baseline_tokens": 1664,
+          "candidate_tokens": 1307,
+          "tokens_removed": 357,
+          "quality_passed": true,
+          "limitations": [
+            "Exact retained-artifact counts; native --stats uses a different heuristic. No model request."
+          ]
+        }
+      ],
+      "additional_dated_artifact_pairs": [
+        {
+          "id": "toon-components",
+          "baseline_tokens": 1664,
+          "candidate_tokens": 1307,
+          "tokens_removed": 357,
+          "type": "reversible serialization",
+          "source_path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        }
+      ],
+      "native_client_evidence": {
+        "desktop": "Explicit native CLI acceptance retained; not a claim of automatic loaded MCP use.",
+        "codex": "No separate current native model-task result established for this component by these receipts.",
+        "claude": "No separate current native model-task result established for this component by these receipts."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_applicable; restart: not_applicable; cleanup: documented_not_replayed; recovery: not_applicable. Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery in the linked matrix. An unestablished stage is not inferred from runtime availability.",
+      "source_paths": [
+        "recipes/README.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "adoption/lifecycle.md",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/portable-cli-artifacts.json",
+        "evidence/receipts/token-practice-artifacts-20260920.json",
+        "evidence/receipts/token-practice-coverage-20260920.json",
+        "evidence/receipts/token-practice-catalog-toon-20260920.json",
+        "evidence/receipts/token-practice-native-counters-20260920.json"
+      ]
+    },
+    {
+      "component_id": "ast-grep",
+      "group": "core",
+      "purpose": "Structural source search",
+      "upstream_commands": {
+        "install": [
+          "npm install --global --prefix \"$STACK_HOME/tools/ast-grep-0.45.3\" @ast-grep/cli@0.45.3"
+        ],
+        "use": [
+          "ast-grep run --lang javascript --pattern 'function $NAME($$$ARGS) { $$$BODY }' --json=compact --stdin < evidence/artifacts/usage-report.source.txt"
+        ],
+        "statistics": [],
+        "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/ast-grep-0.45.3\" @ast-grep/cli@0.45.3`",
+        "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
+      },
+      "returned_result_summary": "Retained direct file request against .txt initially returned no matches. Correct upstream --stdin plus --lang javascript returned 8 matches, exit 0. Original artifact 1818→674 tokens; later retained native-output variant 1818→686. These are different captured representations, not interchangeable counts.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "baseline_summary": "Retained direct file request against .txt initially returned no matches. Correct upstream --stdin plus --lang javascript returned 8 matches, exit 0. Original artifact 1818→674 tokens; later retained native-output variant 1818→686. These are different captured representations, not interchangeable counts.",
+      "artifact_baselines": [
+        {
+          "id": "fresh-ast-grep-0c3b77534fdd4c0875aafa7f",
+          "baseline_tokens": 1818,
+          "candidate_tokens": 686,
+          "tokens_removed": 1132,
+          "quality_passed": true,
+          "limitations": [
+            "Only the selected call set is complete; surrounding code is omitted."
+          ]
+        }
+      ],
+      "additional_dated_artifact_pairs": [
+        {
+          "id": "ast-grep-selection",
+          "baseline_tokens": 1818,
+          "candidate_tokens": 674,
+          "tokens_removed": 1144,
+          "type": "lossy structural retrieval",
+          "source_path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        }
+      ],
+      "native_client_evidence": {
+        "desktop": "Explicit native CLI acceptance retained; not a claim of automatic loaded MCP use.",
+        "codex": "No separate current native model-task result established for this component by these receipts.",
+        "claude": "No separate current native model-task result established for this component by these receipts."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_applicable; restart: not_applicable; cleanup: documented_not_replayed; recovery: not_applicable. Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery in the linked matrix. An unestablished stage is not inferred from runtime availability.",
+      "source_paths": [
+        "recipes/README.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "adoption/lifecycle.md",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/portable-cli-artifacts.json",
+        "evidence/receipts/token-practice-artifacts-20260920.json",
+        "evidence/receipts/token-practice-coverage-20260920.json"
+      ]
+    },
+    {
+      "component_id": "codebase-memory-mcp",
+      "group": "core",
+      "purpose": "Persistent static code graph and call tracing",
+      "upstream_commands": {
+        "install": [
+          "gh release download v0.11.0 --repo DeusData/codebase-memory-mcp --pattern codebase-memory-mcp-linux-amd64.tar.gz --dir \"$DOWNLOAD_DIR\"",
+          "tar -xf \"$DOWNLOAD_DIR/codebase-memory-mcp-linux-amd64.tar.gz\" -C \"$PREFIX\""
+        ],
+        "use": [
+          "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory.search_graph --args '{\"project\":\"agent-lab\",\"name_pattern\":\"^collect$\",\"file_pattern\":\"tools/ecosystem/linux-usage-report.cjs\",\"format\":\"json\",\"limit\":1}' --output json --no-oauth",
+          "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory.trace_path --args '{\"project\":\"agent-lab\",\"function_name\":\"agent-lab.tools.ecosystem.linux-usage-report.collect\",\"direction\":\"outbound\",\"depth\":1,\"format\":\"json\",\"limit\":5}' --output json --no-oauth"
+        ],
+        "statistics": [],
+        "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
+        "install_note": "Official [DeusData/codebase-memory-mcp v0.11.0](https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0), asset `codebase-memory-mcp-linux-amd64.tar.gz`; recorded SHA-256 `032b33c1833919a2d1de67ff6367fa6ea46aee8689c86ef223c88fae3b6e4536`",
+        "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
+      },
+      "returned_result_summary": "2026-09-19 native Claude and Desktop searched collect in tools/ecosystem/linux-usage-report.cjs lines 91–127 and traced four static callees:installation, sourcesFor, runParser, overlaps. Native Codex additional lane was quota-blocked before tools. Static edges do not attest runtime execution.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "baseline_summary": "2026-09-19 native Claude and Desktop searched collect in tools/ecosystem/linux-usage-report.cjs lines 91–127 and traced four static callees:installation, sourcesFor, runParser, overlaps. Native Codex additional lane was quota-blocked before tools. Static edges do not attest runtime execution.",
+      "artifact_baselines": [
+        {
+          "id": "fresh-codebase-memory-mcp-619fcd356f69e790656fa06f",
+          "baseline_tokens": 2731,
+          "candidate_tokens": 186,
+          "tokens_removed": 2545,
+          "quality_passed": true,
+          "limitations": [
+            "Static local helper calls only; the full implementation and dynamic behavior are not represented. MCPorter is a shared transport, not another independent saving."
+          ]
+        }
+      ],
+      "additional_dated_artifact_pairs": [],
+      "native_client_evidence": {
+        "desktop": "Explicit native MCPorter graph search/trace passed.",
+        "codex": "Additional 2026-09-19 native CLI lane quota-blocked before tools.",
+        "claude": "Explicit native MCPorter graph search/trace passed."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery in the linked matrix. An unestablished stage is not inferred from runtime availability.",
+      "source_paths": [
+        "recipes/README.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "adoption/lifecycle.md",
+        "evidence/receipts/native-cli-gaps.json",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/desktop-cli-workflows.json",
+        "evidence/receipts/token-practice-coverage-20260920.json"
+      ]
+    },
+    {
+      "component_id": "context-hub",
+      "group": "core",
+      "purpose": "Retrieve selected curated developer documentation",
+      "upstream_commands": {
+        "install": [
+          "npm install --global --prefix \"$STACK_HOME/tools/context-hub-0.1.4\" @aisuite/chub@0.1.4"
+        ],
+        "use": [
+          "chub search \"python pytest\" --json",
+          "chub get \"$DOC_ID\" --lang py -o \"$STACK_HOME/output/api-doc.md\""
+        ],
+        "statistics": [],
+        "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/context-hub-0.1.4\" @aisuite/chub@0.1.4`",
+        "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
+      },
+      "returned_result_summary": "2026-09-20 retained upstream chub search, get and full-document operations all exited 0. Selected same-entry formatter documentation was present; selected document response 2070→2155 tokens grew 85. Retrieval usefulness is separate from a guaranteed saving.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "baseline_summary": "2026-09-20 retained upstream chub search, get and full-document operations all exited 0. Selected same-entry formatter documentation was present; selected document response 2070→2155 tokens grew 85. Retrieval usefulness is separate from a guaranteed saving.",
+      "artifact_baselines": [
+        {
+          "id": "fresh-context-hub-d6e54188fc269b6fad9d1804",
+          "baseline_tokens": 2070,
+          "candidate_tokens": 2155,
+          "tokens_removed": -85,
+          "quality_passed": true,
+          "limitations": [
+            "The selected call includes upstream feedback text and is larger than --full for this one-file entry. No feedback was sent. Retain the smaller applicable representation."
+          ]
+        }
+      ],
+      "additional_dated_artifact_pairs": [],
+      "native_client_evidence": {
+        "desktop": "Explicit native CLI acceptance retained; not a claim of automatic loaded MCP use.",
+        "codex": "No separate current native model-task result established for this component by these receipts.",
+        "claude": "No separate current native model-task result established for this component by these receipts."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery in the linked matrix. An unestablished stage is not inferred from runtime availability.",
+      "source_paths": [
+        "recipes/README.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "adoption/lifecycle.md",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/token-practice-coverage-20260920.json",
+        "evidence/receipts/token-native-retained-functional-20260920.json"
+      ]
+    },
+    {
+      "component_id": "markitdown",
+      "group": "core",
+      "purpose": "Convert supported source documents to readable Markdown",
+      "upstream_commands": {
+        "install": [
+          "uv tool install markitdown==0.1.7"
+        ],
+        "use": [
+          "markitdown fixtures/greeting.html -o \"$STACK_HOME/output/greeting.md\""
+        ],
+        "statistics": [],
+        "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
+        "install_note": "`uv tool install markitdown==0.1.7`",
+        "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
+      },
+      "returned_result_summary": "Retained upstream CLI exited 0 and output contained the expected greeting heading. Stored HTML conversion 10322→1360 o 200 k tokens; base HTML converter only, PDF/Office extras absent from this installation.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Status, indexing counts, token-size reports or provider consumption do not establish cumulative avoided tokens."
+      },
+      "baseline_summary": "Retained upstream CLI exited 0 and output contained the expected greeting heading. Stored HTML conversion 10322→1360 o 200 k tokens; base HTML converter only, PDF/Office extras absent from this installation.",
+      "artifact_baselines": [
+        {
+          "id": "fresh-markitdown-47190dd82f1c34d362a22b58",
+          "baseline_tokens": 10322,
+          "candidate_tokens": 1360,
+          "tokens_removed": 8962,
+          "quality_passed": true,
+          "limitations": [
+            "Selected identity facts are retained; original HTML formatting and markup are not. The two conversions share the same baseline and must not be summed."
+          ]
+        }
+      ],
+      "additional_dated_artifact_pairs": [
+        {
+          "id": "markitdown-exact-stored-input",
+          "baseline_tokens": 10322,
+          "candidate_tokens": 1360,
+          "tokens_removed": 8962,
+          "type": "lossy HTML-to-Markdown conversion",
+          "source_path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        }
+      ],
+      "native_client_evidence": {
+        "desktop": "Explicit native CLI acceptance retained; not a claim of automatic loaded MCP use.",
+        "codex": "No separate current native model-task result established for this component by these receipts.",
+        "claude": "No separate current native model-task result established for this component by these receipts."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_applicable; restart: not_applicable; cleanup: documented_not_replayed; recovery: not_applicable. Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery in the linked matrix. An unestablished stage is not inferred from runtime availability.",
+      "source_paths": [
+        "recipes/README.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "adoption/lifecycle.md",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/portable-cli-artifacts.json",
+        "evidence/receipts/token-practice-artifacts-20260920.json",
+        "evidence/receipts/token-practice-coverage-20260920.json"
+      ]
+    },
+    {
+      "component_id": "mcporter",
+      "group": "observation",
+      "purpose": "Native CLI bridge with persistent MCP daemon connection",
+      "upstream_commands": {
+        "install": [
+          "npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.13.13\" mcporter@0.13.13"
+        ],
+        "use": [
+          "mcporter --config \"$MCPORTER_CONFIG\" list socraticode --brief --no-oauth",
+          "mcporter call --stdio jcodemunch-mcp --env \"CODE_INDEX_PATH=$HOME/.code-index\" --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth"
+        ],
+        "statistics": [],
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.13.13\" mcporter@0.13.13`",
+        "command_kind": "Upstream documented commands; only the retained receipt establishes execution."
+      },
+      "returned_result_summary": "2026-09-20 native CLI bridge returned jCodeMunch's 29, 820 estimated retained total and Context Mode's actual project-file hash/length. This is a transport bridge, not an additional savings source; do not credit the same payload reduction again.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements."
+      },
+      "baseline_summary": "No matched causal saved-token baseline; observe tool execution/consumption without double-crediting underlying retrieval.",
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery in the linked matrix. An unestablished stage is not inferred from runtime availability.",
+      "source_paths": [
+        "recipes/README.md",
+        "adoption/lifecycle.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "evidence/receipts/component-history.json",
+        "observability/restart-receipt.json",
+        "evidence/receipts/token-practice-coverage-20260920.json",
+        "evidence/receipts/current-session-observation-20260920.json"
+      ],
+      "observation_role": "selected_cli_or_client_display"
+    },
+    {
+      "component_id": "ccusage",
+      "group": "observation",
+      "purpose": "Read existing native provider usage logs",
+      "upstream_commands": {
+        "install": [
+          "npm install --global --prefix \"$STACK_HOME/tools/ccusage-20.0.23\" ccusage@20.0.23"
+        ],
+        "use": [
+          "ccusage daily --offline --no-cost --by-agent --since 20260919 --until 20260920 --timezone UTC --json",
+          "ccusage codex daily --offline --no-cost --since 2026-09-19 --until 2026-09-20 --timezone UTC --json"
+        ],
+        "statistics": [
+          "ccusage daily --offline --no-cost --by-agent --since 20260919 --until 20260920 --timezone UTC --json",
+          "ccusage codex daily --offline --no-cost --since 2026-09-19 --until 2026-09-20 --timezone UTC --json"
+        ],
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/ccusage-20.0.23\" ccusage@20.0.23`",
+        "command_kind": "Upstream documented commands; only the retained receipt establishes execution."
+      },
+      "returned_result_summary": "2026-09-20 scoped offline two-date report returned 2, 573, 385 total usage tokens across selected native homes; Codex subset 819, 530 already included. These are native parser consumption categories, not saved tokens or an invoice. CLI available on demand; no continuous observer established.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements."
+      },
+      "baseline_summary": "No matched causal saved-token baseline; observe tool execution/consumption without double-crediting underlying retrieval.",
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_applicable; restart: not_applicable; cleanup: documented_not_replayed; recovery: not_applicable. Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery in the linked matrix. An unestablished stage is not inferred from runtime availability.",
+      "source_paths": [
+        "recipes/README.md",
+        "adoption/lifecycle.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/token-practice-coverage-20260920.json",
+        "evidence/receipts/token-practice-gap-followup-20260920.json",
+        "evidence/receipts/current-session-observation-20260920.json"
+      ],
+      "observation_role": "selected_cli_or_client_display"
+    },
+    {
+      "component_id": "agentsview",
+      "group": "observation",
+      "purpose": "Scoped historical Codex/Claude transcript lexical search",
+      "upstream_commands": {
+        "install": [
+          "gh release view v0.43.0 --repo kenn-io/agentsview --json assets"
+        ],
+        "use": [
+          "AGENTSVIEW_DATA_DIR=\"$STACK_HOME/state/selected-history\" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 AGENTSVIEW_NO_DAEMON=1 agentsview sync",
+          "AGENTSVIEW_DATA_DIR=\"$STACK_HOME/state/selected-history\" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview session search \"selected task\" --fts --project \"$HISTORY_PROJECT_ID\" --limit 3 --json",
+          "AGENTSVIEW_DATA_DIR=\"$STACK_HOME/state/selected-history\" AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview daemon stop"
+        ],
+        "statistics": [],
+        "install_note": "Official [kenn-io/agentsview v0.43.0](https://github.com/kenn-io/agentsview/releases/tag/v0.43.0) archive; select the host asset through `gh release view v0.43.0 --repo kenn-io/agentsview --json assets`, then the archive procedure",
+        "command_kind": "Upstream documented commands; only the retained receipt establishes execution."
+      },
+      "returned_result_summary": "2026-09-20 one explicitly scoped historical session was indexed and exact message retrieval passed through the explicit endpoint. Archive vectors false; server stopped and ephemeral token file deleted. New sessions require an explicit scoped refresh; no token saving counter.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements."
+      },
+      "baseline_summary": "No matched causal saved-token baseline; observe tool execution/consumption without double-crediting underlying retrieval.",
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery in the linked matrix. An unestablished stage is not inferred from runtime availability.",
+      "source_paths": [
+        "recipes/README.md",
+        "adoption/lifecycle.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/token-practice-coverage-20260920.json",
+        "evidence/receipts/token-practice-gap-followup-20260920.json",
+        "evidence/receipts/current-session-observation-20260920.json"
+      ],
+      "observation_role": "selected_cli_or_client_display"
+    },
+    {
+      "component_id": "claude-hud",
+      "group": "observation",
+      "purpose": "Claude statusline rendering",
+      "upstream_commands": {
+        "install": [
+          "claude plugin marketplace add jarrodwatts/claude-hud@v0.8.0 --scope user",
+          "claude plugin install claude-hud@claude-hud --scope user --json"
+        ],
+        "use": [
+          "/claude-hud:setup"
+        ],
+        "statistics": [],
+        "install_note": "`claude plugin marketplace add jarrodwatts/claude-hud@v0.8.0 --scope user`; `claude plugin install claude-hud@claude-hud --scope user --json`",
+        "command_kind": "Upstream documented commands; only the retained receipt establishes execution."
+      },
+      "returned_result_summary": "Installed 0.8.0 renderer returned the synthetic fixture label and 25% context bar. Actual interactive attempt reached onboarding before live HUD appeared. Native Claude-only display, not a Codex Desktop observer or cumulative saved-token counter.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements."
+      },
+      "baseline_summary": "No matched causal saved-token baseline; observe tool execution/consumption without double-crediting underlying retrieval.",
+      "lifecycle_summary": "install: observed_installed; use: partial_acceptance; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Synthetic renderer passed. Actual interactive attempt stopped at onboarding before HUD display; native authenticated state was already reported.",
+      "source_paths": [
+        "recipes/README.md",
+        "adoption/lifecycle.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "evidence/receipts/component-history.json",
+        "evidence/receipts/token-practice-coverage-20260920.json",
+        "evidence/receipts/token-practice-gap-followup-20260920.json",
+        "evidence/receipts/native-claude-hud-interactive-20260920.json",
+        "evidence/receipts/current-session-observation-20260920.json"
+      ],
+      "observation_role": "selected_cli_or_client_display"
+    },
+    {
+      "component_id": "otel-tui",
+      "group": "observation",
+      "purpose": "On-demand local OTLP receiver and terminal trace inspection",
+      "upstream_commands": {
+        "install": [
+          "gh release download v0.7.5 --repo ymtdzzz/otel-tui -p otel-tui_Linux_x86_64.tar.gz -p otel-tui_0.7.5_checksums.txt --dir \"$STACK_HOME/downloads/otel-tui-0.7.5\""
+        ],
+        "use": [
+          "otel-tui --host 127.0.0.1 --grpc 24317 --http 24318"
+        ],
+        "statistics": [],
+        "install_note": "Dedicated workflow section in the linked recipe; install only the selected scope.",
+        "command_kind": "Upstream documented commands; only the retained receipt establishes execution."
+      },
+      "returned_result_summary": "2026-09-20 native loopback receiver accepted OTLP HTTP 200 and rendered one synthetic trace for service native-upstream-acceptance, 1 span/10 ms; owned process exit 0. This does not demonstrate live provider usage or savings.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements.",
+        "summary": "No native session token-savings counter. No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements.",
+        "summary": "No native lifetime token-savings counter. No verified native token-savings counter. Observations, provider consumption or UI percentages are not avoided-token measurements."
+      },
+      "baseline_summary": "No matched causal saved-token baseline; observe tool execution/consumption without double-crediting underlying retrieval.",
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: accepted_within_scope; recovery: not_established. Owned synthetic trace received/displayed; native process shutdown exit 0 recorded.",
+      "source_paths": [
+        "recipes/README.md",
+        "adoption/lifecycle.md",
+        "blueprints/token-native-focus/saturation-audit.json",
+        "evidence/receipts/upstream-native-tools-20260920.json",
+        "evidence/receipts/current-session-observation-20260920.json"
+      ],
+      "observation_role": "selected_cli_or_client_display"
+    },
+    {
+      "component_id": "opentelemetry-collector-contrib",
+      "group": "observation",
+      "observation_role": "telemetry_backend",
+      "purpose": "Receive and route native client telemetry to local metrics and log stores.",
+      "upstream_commands": {
+        "install": [],
+        "use": [
+          "otelcol-contrib validate --config=\"$OTEL_CONFIG\"",
+          "curl --silent --show-error --fail-with-body --max-time 10 --write-out '\n%{http_code}' http://127.0.0.1:14333/"
+        ],
+        "statistics": [],
+        "command_kind": "Read-only upstream validation, health and query commands from the retained exact-session evidence. No installer or service mutation is run by this row."
+      },
+      "returned_result_summary": "2026-09-20 14:17 UTC: Collector health returned HTTP 200 and status 'Server available'; the native user service was active in the follow-up. Existing configuration routes native client telemetry to local backends. Health and configured routing alone do not prove exact task attribution.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No native session token-savings counter. Provider usage, service metrics and event counts have separate meanings.",
+        "summary": "No native session token-savings counter. No native session token-savings counter. Provider usage, service metrics and event counts have separate meanings."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No native cumulative avoided-token counter. Do not credit transport or presentation with another tool's savings.",
+        "summary": "No native lifetime token-savings counter. No native cumulative avoided-token counter. Do not credit transport or presentation with another tool's savings."
+      },
+      "baseline_summary": "No matched token-reduction baseline applies to this observation role. Preserve actual query outcomes and measurement boundaries.",
+      "native_client_evidence": {
+        "desktop": "Current Desktop exporter delivery is corroborated by exact-parent Loki events. Native Claude uses a separate configured route whose metrics omit session/account identifiers; do not infer its task identity from unscoped series.",
+        "codex": "The current receipt concerns the Desktop parent task; historical SDK/native CLI receipts retain their own labels and scope.",
+        "claude": "A configured export route is distinct from an independently attributed native Claude task; current metrics omit session/account identifiers."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration.",
+      "source_paths": [
+        "evidence/receipts/current-session-observation-20260920.json",
+        "docs/current-session-observation.md",
+        "observability/README.md",
+        "observability/backends/README.md",
+        "adoption/lifecycle.md",
+        "blueprints/token-native-focus/saturation-audit.json"
+      ],
+      "retained_observations": [
+        {
+          "name": "collector_health",
+          "observed_at_utc": "2026-09-20T14:17:13.228733+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "returned_body": "{\"status\":\"Server available\",\"upSince\":\"2026-09-19T11:28:52.529351607-04:00\",\"uptime\":\"21h55m12.872514984s\"}"
+        }
+      ]
+    },
+    {
+      "component_id": "prometheus",
+      "group": "observation",
+      "observation_role": "telemetry_backend",
+      "purpose": "Observe backend readiness and native token-usage metrics without adding them to savings counters.",
+      "upstream_commands": {
+        "install": [],
+        "use": [
+          "promtool check config \"$PROMETHEUS_CONFIG\"",
+          "promtool query instant http://127.0.0.1:19090 up",
+          "curl --silent --show-error --fail-with-body --max-time 10 --write-out '\n%{http_code}' http://127.0.0.1:19090/-/ready"
+        ],
+        "statistics": [
+          "curl --silent --show-error --fail-with-body --max-time 10 --get http://127.0.0.1:19090/api/v1/query --data-urlencode query=up --write-out '\n%{http_code}'",
+          "curl --silent --show-error --fail-with-body --max-time 10 --get http://127.0.0.1:19090/api/v1/query --data-urlencode 'query=last_over_time(ecosystem_codex_turn_token_usage_sum{client_scope=\"sdk-worker\"}[6h])' --write-out '\n%{http_code}'",
+          "curl --silent --show-error --fail-with-body --max-time 10 --get http://127.0.0.1:19090/api/v1/query --data-urlencode 'query=count by (client_scope,job) (last_over_time(ecosystem_codex_turn_token_usage_sum[6h]))' --write-out '\n%{http_code}'"
+        ],
+        "command_kind": "Read-only upstream validation, health and query commands from the retained exact-session evidence. No installer or service mutation is run by this row."
+      },
+      "returned_result_summary": "2026-09-20 14:17–14:18 UTC: readiness returned HTTP 200, 'Prometheus Server is Ready.' All seven selected up series returned 1. The sdk-worker six-hour usage query returned an empty successful result; 12 unscoped codex-app-server token series existed. Those series lacked the exact task/client scope needed to reconcile current-parent usage with Loki.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No native session token-savings counter. Provider usage, service metrics and event counts have separate meanings.",
+        "summary": "No native session token-savings counter. No native session token-savings counter. Provider usage, service metrics and event counts have separate meanings."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No native cumulative avoided-token counter. Do not credit transport or presentation with another tool's savings.",
+        "summary": "No native lifetime token-savings counter. No native cumulative avoided-token counter. Do not credit transport or presentation with another tool's savings."
+      },
+      "baseline_summary": "No matched token-reduction baseline applies to this observation role. Preserve actual query outcomes and measurement boundaries.",
+      "native_client_evidence": {
+        "desktop": "Desktop app-server metrics exist, but this receipt cannot assign their totals to the exact parent task. Native Claude metrics omit session/account identifiers by configuration. Empty SDK-scoped results do not mean zero provider consumption.",
+        "codex": "The current receipt concerns the Desktop parent task; historical SDK/native CLI receipts retain their own labels and scope.",
+        "claude": "A configured export route is distinct from an independently attributed native Claude task; current metrics omit session/account identifiers."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration.",
+      "source_paths": [
+        "evidence/receipts/current-session-observation-20260920.json",
+        "docs/current-session-observation.md",
+        "observability/README.md",
+        "observability/backends/README.md",
+        "adoption/lifecycle.md",
+        "blueprints/token-native-focus/saturation-audit.json"
+      ],
+      "retained_observations": [
+        {
+          "name": "prometheus_ready",
+          "observed_at_utc": "2026-09-20T14:17:13.228939+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "returned_body": "Prometheus Server is Ready.\n"
+        },
+        {
+          "name": "prometheus_targets",
+          "observed_at_utc": "2026-09-20T14:18:02.188109+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "returned_results": [
+            {
+              "metric": {
+                "__name__": "up",
+                "instance": "127.0.0.1:16333",
+                "job": "qdrant"
+              },
+              "value": [
+                1789913882.193,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "up",
+                "instance": "127.0.0.1:18888",
+                "job": "collector-health"
+              },
+              "value": [
+                1789913882.193,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "up",
+                "instance": "127.0.0.1:19090",
+                "job": "prometheus"
+              },
+              "value": [
+                1789913882.193,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "up",
+                "instance": "127.0.0.1:13100",
+                "job": "loki"
+              },
+              "value": [
+                1789913882.193,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "up",
+                "instance": "127.0.0.1:19093",
+                "job": "alertmanager"
+              },
+              "value": [
+                1789913882.193,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "up",
+                "instance": "127.0.0.1:8231",
+                "job": "vllm"
+              },
+              "value": [
+                1789913882.193,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "up",
+                "instance": "127.0.0.1:18889",
+                "job": "collector-native"
+              },
+              "value": [
+                1789913882.193,
+                "1"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "sdk_usage_6h",
+          "observed_at_utc": "2026-09-20T14:18:02.188442+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "returned_results": []
+        },
+        {
+          "name": "provider_metric_writer_scopes_6h",
+          "observed_at_utc": "2026-09-20T14:18:02.188719+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "returned_results": [
+            {
+              "metric": {
+                "job": "codex-app-server"
+              },
+              "value": [
+                1789913882.192,
+                "12"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "component_id": "loki",
+      "group": "observation",
+      "observation_role": "telemetry_backend",
+      "purpose": "Independently correlate native tool events with the exact Desktop task and retain provider-response observations.",
+      "upstream_commands": {
+        "install": [],
+        "use": [
+          "loki -config.file=\"$LOKI_CONFIG\" -verify-config=true",
+          "curl --silent --show-error --fail-with-body --max-time 10 --write-out '\n%{http_code}' http://127.0.0.1:13100/ready",
+          "curl --silent --show-error --fail-with-body --max-time 10 --write-out '\n%{http_code}' http://127.0.0.1:13100/ready"
+        ],
+        "statistics": [
+          "curl --silent --show-error --fail-with-body --max-time 10 --get http://127.0.0.1:13100/loki/api/v1/query --data-urlencode \"query=sum by (service_name) (count_over_time({service_name=~\\\".+\\\"} | conversation_id = \\\"${DESKTOP_THREAD_ID}\\\" or thread_id = \\\"${DESKTOP_THREAD_ID}\\\" or session_id = \\\"${DESKTOP_THREAD_ID}\\\" or ecosystem_task_id = \\\"${DESKTOP_THREAD_ID}\\\" [24h]))\" --write-out '\\n%{http_code}'",
+          "curl --silent --show-error --fail-with-body --max-time 10 --get http://127.0.0.1:13100/loki/api/v1/query --data-urlencode 'query=sum by (service_name) (count_over_time({service_name=~\"codex.*|Codex.*|claude.*\"}[15m]))' --write-out '\n%{http_code}'"
+        ],
+        "command_kind": "Read-only upstream validation, health and query commands from the retained exact-session evidence. No installer or service mutation is run by this row."
+      },
+      "returned_result_summary": "2026-09-20 14:17 UTC: initial readiness returned HTTP 503 during the ingester ready delay; a 14:18:31 UTC follow-up returned 'ready' and HTTP 200. The exact-parent 24-hour query returned 2, 778 codex-app-server records; the recent 15-minute provider query returned 391. Four retained event correlations matched SocratiCode search, ai-memory observations and both Serena pattern attempts, including the initial empty result and later source match.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No native session token-savings counter. Provider usage, service metrics and event counts have separate meanings.",
+        "summary": "No native session token-savings counter. No native session token-savings counter. Provider usage, service metrics and event counts have separate meanings."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No native cumulative avoided-token counter. Do not credit transport or presentation with another tool's savings.",
+        "summary": "No native lifetime token-savings counter. No native cumulative avoided-token counter. Do not credit transport or presentation with another tool's savings."
+      },
+      "baseline_summary": "No matched token-reduction baseline applies to this observation role. Preserve actual query outcomes and measurement boundaries.",
+      "native_client_evidence": {
+        "desktop": "Exact-parent Desktop tool completion events are corroborated. Event transport success alone does not prove useful content; returned tool evidence supplies that check. No unique whole-session provider-token total or native Claude task-level metric match was established.",
+        "codex": "The current receipt concerns the Desktop parent task; historical SDK/native CLI receipts retain their own labels and scope.",
+        "claude": "A configured export route is distinct from an independently attributed native Claude task; current metrics omit session/account identifiers."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration.",
+      "source_paths": [
+        "evidence/receipts/current-session-observation-20260920.json",
+        "docs/current-session-observation.md",
+        "observability/README.md",
+        "observability/backends/README.md",
+        "adoption/lifecycle.md",
+        "blueprints/token-native-focus/saturation-audit.json"
+      ],
+      "retained_observations": [
+        {
+          "name": "loki_ready",
+          "observed_at_utc": "2026-09-20T14:17:13.229242+00:00",
+          "exit_code": 22,
+          "http_status": 503,
+          "returned_body": "Ingester not ready: waiting for 15s after being ready\n"
+        },
+        {
+          "name": "current_parent_records_24h",
+          "observed_at_utc": "2026-09-20T14:18:02.188991+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "returned_results": [
+            {
+              "metric": {
+                "service_name": "codex-app-server"
+              },
+              "value": [
+                1789913882.193,
+                "2778"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "recent_provider_records_15m",
+          "observed_at_utc": "2026-09-20T14:18:02.189241+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "returned_results": [
+            {
+              "metric": {
+                "service_name": "codex-app-server"
+              },
+              "value": [
+                1789913882.193,
+                "391"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "loki_ready_followup",
+          "argv": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "10",
+            "--write-out",
+            "\n%{http_code}",
+            "http://127.0.0.1:13100/ready"
+          ],
+          "observed_at_utc": "2026-09-20T14:18:31.942375+00:00",
+          "exit_code": 0,
+          "stdout": "ready\n\n200",
+          "stderr": ""
+        }
+      ]
+    },
+    {
+      "component_id": "grafana",
+      "group": "observation",
+      "observation_role": "telemetry_backend",
+      "purpose": "Present local telemetry and evidence dashboards using the existing observation service.",
+      "upstream_commands": {
+        "install": [],
+        "use": [
+          "grafana --version",
+          "curl --fail --silent http://127.0.0.1:13000/api/health",
+          "curl --silent --show-error --fail-with-body --max-time 10 --write-out '\n%{http_code}' http://127.0.0.1:13000/api/health"
+        ],
+        "statistics": [],
+        "command_kind": "Read-only upstream validation, health and query commands from the retained exact-session evidence. No installer or service mutation is run by this row."
+      },
+      "returned_result_summary": "2026-09-20 14:17 UTC: /api/health returned HTTP 200 with database 'ok', version '13.2.2', and the retained commit identity. The native user service was active in the follow-up. This current health check does not constitute a new visual dashboard acceptance or a token-savings measurement.",
+      "session_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No native session token-savings counter. Provider usage, service metrics and event counts have separate meanings.",
+        "summary": "No native session token-savings counter. No native session token-savings counter. Provider usage, service metrics and event counts have separate meanings."
+      },
+      "lifetime_statistics": {
+        "availability": "none",
+        "value": null,
+        "scope": "No native cumulative avoided-token counter. Do not credit transport or presentation with another tool's savings.",
+        "summary": "No native lifetime token-savings counter. No native cumulative avoided-token counter. Do not credit transport or presentation with another tool's savings."
+      },
+      "baseline_summary": "No matched token-reduction baseline applies to this observation role. Preserve actual query outcomes and measurement boundaries.",
+      "native_client_evidence": {
+        "desktop": "Grafana presents the configured backend data; it does not independently execute native Claude/Codex tasks or resolve missing task labels in the underlying metrics.",
+        "codex": "The current receipt concerns the Desktop parent task; historical SDK/native CLI receipts retain their own labels and scope.",
+        "claude": "A configured export route is distinct from an independently attributed native Claude task; current metrics omit session/account identifiers."
+      },
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration.",
+      "source_paths": [
+        "evidence/receipts/current-session-observation-20260920.json",
+        "docs/current-session-observation.md",
+        "observability/README.md",
+        "observability/backends/README.md",
+        "adoption/lifecycle.md",
+        "blueprints/token-native-focus/saturation-audit.json"
+      ],
+      "retained_observations": [
+        {
+          "name": "grafana_health",
+          "observed_at_utc": "2026-09-20T14:17:13.229410+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "returned_body": "{\n  \"database\": \"ok\",\n  \"version\": \"13.2.2\",\n  \"commit\": \"1bea008f7e4e858b6824c9e364d608bd4d10b13a\"\n}"
+        }
+      ]
+    }
+  ],
+  "latest_counter_capture": {
+    "capture_id": "20260920T145557-577415c6",
+    "generated_at": "2026-09-20T14:56:03.739753+00:00",
+    "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
+    "boundary": "Read-only retained snapshots. Context Mode process-file session values are not linked to fresh client acceptance sessions; no cumulative snapshots or runtime scopes are summed."
+  },
+  "native_client_acceptance_source": "evidence/receipts/native-token-stack-final-20260920.json"
+}

@@ -1,0 +1,2719 @@
+{
+  "schema_version": 1,
+  "id": "native-token-stack-final-20260920",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "claude-code",
+    "codex",
+    "context-mode",
+    "jcodemunch-mcp",
+    "headroom",
+    "rtk",
+    "opentelemetry-collector-contrib",
+    "loki",
+    "prometheus"
+  ],
+  "claim": "Both native clients retrieved verified project source and resumed their sessions; writer-scoped observer records independently match bounded native outcomes and consumption. Final retained upstream estimates are separate from usage and artifact baselines.",
+  "limitations": [
+    "Dated source-host acceptance with existing native accounts and configured models, not another PC or all selected components.",
+    "Codex initial launch refused two MCP calls; corrected native launch passed. Claude initial strict JSON format and tool-count narration failed while source/continuity checks passed.",
+    "Codex returned session-cumulative 161720 consumed tokens includes the initial 64820. Claude three invocations consumed 247211. These are not paired savings trials.",
+    "Codex seven task response events and two writer histograms match 161720, but two additional zero-output startup events contain 25772 input tokens outside those turn totals; billing/attribution unknown.",
+    "Claude final continuation matches 46011 across CLI, Loki and Prometheus. Earlier unlabelled invocations only have numerical/time correspondence and are not retroactively assigned the new writer.",
+    "Per-process compressor savings were not collected for the initial client task. Native counters use their own retained history, heuristic and process scopes; no exact causal lifetime provider saving is established.",
+    "Private prompts, account metadata and raw task/writer IDs are withheld; portable command paths and query identifiers are parameterized. Original captures and hashes are retained privately.",
+    "The prior Desktop Context Mode file-root limitation and unestablished lifecycle stages remain. No claim that every installed tool is active for every turn."
+  ],
+  "recorded_at_utc": "2026-09-20T14:59:39.465636+00:00",
+  "data": {
+    "codex": {
+      "schema_version": 1,
+      "captured_at_utc": "2026-09-20T14:50:53.762131+00:00",
+      "acceptance": "native_codex_readonly_context_source_same_session_resume",
+      "status": "passed_after_corrected_launch_with_initial_failure_retained",
+      "client": {
+        "version": "codex-cli 0.155.1",
+        "model_observed": "gpt-6-astra",
+        "account_ready": true,
+        "account_method": "native existing sign-in",
+        "profile": "native Linux Codex",
+        "model_override_supplied": false,
+        "provider_or_account_or_persisted_configuration_changed": false
+      },
+      "session_identity_sha256": "7770d9adf224cd991966359c0fbecf957aad4e598246271b536f6b78520b4d96",
+      "lifecycle": {
+        "initial_turn": "completed_with_two_MCP_refusals",
+        "resume_turn": "completed_with_three_successful_MCP_calls",
+        "same_native_session": true,
+        "continuity_marker_recalled_without_repetition": true,
+        "owned_processes_remaining_after_each_invocation": 0
+      },
+      "launch_correction": {
+        "initial_sandbox": "read-only",
+        "resume_sandbox": "danger-full-access",
+        "approval_policy_both": "never",
+        "basis": "One corrected resume matches the existing authorized native launcher policy; task behavior remains read-only."
+      },
+      "attempts": [
+        {
+          "stage": "initial",
+          "started_at_utc": "2026-09-20T14:43:45.451Z",
+          "completed_at_utc": "2026-09-20T14:44:11.833Z",
+          "exit_code": 0,
+          "native_turn_completed": true,
+          "functional_pass": false,
+          "mcp_calls": [
+            {
+              "server": "context-mode",
+              "tool": "ctx_execute_file",
+              "action": null,
+              "status": "failed",
+              "error": {
+                "message": "MCP tool call requires approval, but approval policy is never"
+              }
+            },
+            {
+              "server": "jcodemunch",
+              "tool": "order",
+              "action": "search_symbols",
+              "status": "failed",
+              "error": {
+                "message": "MCP tool call requires approval, but approval policy is never"
+              }
+            }
+          ],
+          "returned_usage_scope": "session_cumulative",
+          "returned_usage": {
+            "input_tokens": 64517,
+            "cached_input_tokens": 49152,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 303,
+            "reasoning_output_tokens": 18,
+            "total_tokens": 64820
+          },
+          "attributed_turn_usage": {
+            "input_tokens": 64517,
+            "cached_input_tokens": 49152,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 303,
+            "reasoning_output_tokens": 18,
+            "total_tokens": 64820
+          },
+          "stream_sha256": "aeb5dbe6965846ddbfa43d4d038523a8a7dcf0411664d72f48837c2d358fe8f5",
+          "stderr_sha256": "b49331c8c0347d361858e5aaf850c936dca6c243216c7eea55f60563bfea5167"
+        },
+        {
+          "stage": "resume",
+          "started_at_utc": "2026-09-20T14:45:55.849Z",
+          "completed_at_utc": "2026-09-20T14:46:20.419Z",
+          "exit_code": 0,
+          "native_turn_completed": true,
+          "functional_pass": true,
+          "mcp_calls": [
+            {
+              "server": "context-mode",
+              "tool": "ctx_execute_file",
+              "action": null,
+              "status": "completed",
+              "error": null
+            },
+            {
+              "server": "jcodemunch",
+              "tool": "order",
+              "action": "search_symbols",
+              "status": "completed",
+              "error": null
+            },
+            {
+              "server": "jcodemunch",
+              "tool": "order",
+              "action": "get_symbol_source",
+              "status": "completed",
+              "error": null
+            }
+          ],
+          "returned_usage_scope": "session_cumulative",
+          "returned_usage": {
+            "input_tokens": 161025,
+            "cached_input_tokens": 142208,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 695,
+            "reasoning_output_tokens": 60,
+            "total_tokens": 161720
+          },
+          "attributed_turn_usage": {
+            "input_tokens": 96508,
+            "cached_input_tokens": 93056,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 392,
+            "reasoning_output_tokens": 42,
+            "total_tokens": 96900
+          },
+          "stream_sha256": "5875de844cfe4a83468320765346580767690e054235ab4d0738d5a3197b8aac",
+          "stderr_sha256": "62258d042be156b251d29c974de6e459d9548338f2cef1690089d6f8f81f8ca9"
+        }
+      ],
+      "functional_assertions": {
+        "context_mode_project_heading_exact": true,
+        "returned_heading": "# Native upstream additions — 2026-09-20",
+        "jcodemunch_search_single_expected_symbol": true,
+        "returned_symbol": "tools/ecosystem/evaluate-native.py::parse_codex#function",
+        "jcodemunch_source_byte_exact_against_current_AST": true,
+        "source_bytes": 2255,
+        "source_sha256": "da3277537bf59cb63bc0b7bd2b25f86422d8f79679d382147d72863f9dc1dfd5",
+        "usage_field_mapping_exact": true,
+        "completion_event_exact": true,
+        "unrequested_shell_or_other_tool_calls": 0
+      },
+      "provider_usage": {
+        "scope": "Both turns in this one native session, including the failed first attempt",
+        "total": {
+          "input_tokens": 161025,
+          "cached_input_tokens": 142208,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 695,
+          "reasoning_output_tokens": 60,
+          "total_tokens": 161720
+        },
+        "first_failed_turn": {
+          "input_tokens": 64517,
+          "cached_input_tokens": 49152,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 303,
+          "reasoning_output_tokens": 18,
+          "total_tokens": 64820
+        },
+        "corrected_resume_delta": {
+          "input_tokens": 96508,
+          "cached_input_tokens": 93056,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 392,
+          "reasoning_output_tokens": 42,
+          "total_tokens": 96900
+        },
+        "independent_native_session_log_matches_returned_usage": true,
+        "last_request_usage_sum_matches_cumulative_total": true,
+        "cumulative_snapshots_must_not_be_summed": true,
+        "cached_input_is_subset_of_input": true,
+        "reasoning_output_is_subset_of_output": true
+      },
+      "tool_savings": {
+        "context_mode_session_or_lifetime_counter_returned": null,
+        "jcodemunch_session_or_lifetime_counter_returned": null,
+        "status": "not_collected_by_this_native_process",
+        "reason": "Bounded task requested three retrieval calls; no ctx_stats/get_session_stats call. No additional model run was launched for counters.",
+        "provider_cached_input_is_not_a_tool_savings_measurement": true,
+        "matched_baseline": "not_part_of_this_lifecycle_acceptance",
+        "universal_or_net_savings_claim": false
+      },
+      "limitations": [
+        "Initial CLI exit zero and turn.completed did not establish functional success: both requested MCP calls were refused.",
+        "Full native transcripts and session identifiers are retained privately; public data uses hashed identity.",
+        "Successful source retrieval naturally updates tool accounting; no claim that telemetry or index metadata were untouched.",
+        "Scope is one configured project, two native turns, and two selected MCP servers.",
+        "Monitoring correlation is delegated to the coordinator using the private exact session and service-instance identities."
+      ]
+    },
+    "codex_observation": {
+      "schema_version": 1,
+      "captured_at_utc": "2026-09-20T14:57:14.881180+00:00",
+      "scope": "One native Codex session and its two exact process writer identities; no new model run.",
+      "status": "CLI_and_Prometheus_turn_usage_reconciled; seven_Loki_task_responses_matched; two_extra_startup_responses_unattributed",
+      "session_identity_sha256": "7770d9adf224cd991966359c0fbecf957aad4e598246271b536f6b78520b4d96",
+      "writer_identity_sha256": {
+        "initial": "a47d65289489f819ade71e5adc14a6f703f5e35faf363308abff5de7cb77e5a5",
+        "resume": "990fabba3c255942f8b78ea520ed9905ff1eb84cbd4c8700be5ad9aad6ba82d2"
+      },
+      "native_service_name": "Codex Desktop",
+      "native_client_scope": "native-codex",
+      "query_window_utc": {
+        "start": "2026-09-20T14:43:40Z",
+        "end": "2026-09-20T14:47:00Z"
+      },
+      "loki_record_count": 52,
+      "loki_record_count_by_stage": {
+        "initial": 26,
+        "resume": 26
+      },
+      "loki_event_counts": {
+        "codex.conversation_starts": 2,
+        "codex.startup_phase": 14,
+        "codex.user_prompt": 2,
+        "codex.websocket_connect": 2,
+        "codex.websocket_request": 9,
+        "codex.sse_event": 9,
+        "codex.turn_ttft": 2,
+        "codex.tool_result": 10,
+        "codex.tool_decision": 2
+      },
+      "all_log_bodies_omitted": true,
+      "mcp_outcome_matches": [
+        {
+          "stage": "initial",
+          "server": "context-mode",
+          "tool": "ctx_execute_file",
+          "action_from_CLI_arguments": null,
+          "observed_tool_result_sequence": 2,
+          "observed_at_utc": "2026-09-20T14:44:05.339Z",
+          "cli_status": "failed",
+          "observer_success": false,
+          "match_basis": "Exact private session and writer, bounded time, MCP namespace/name and ordered call sequence; bodies omitted."
+        },
+        {
+          "stage": "initial",
+          "server": "jcodemunch",
+          "tool": "order",
+          "action_from_CLI_arguments": "search_symbols",
+          "observed_tool_result_sequence": 3,
+          "observed_at_utc": "2026-09-20T14:44:05.357Z",
+          "cli_status": "failed",
+          "observer_success": false,
+          "match_basis": "Exact private session and writer, bounded time, MCP namespace/name and ordered call sequence; bodies omitted."
+        },
+        {
+          "stage": "resume",
+          "server": "context-mode",
+          "tool": "ctx_execute_file",
+          "action_from_CLI_arguments": null,
+          "observed_tool_result_sequence": 1,
+          "observed_at_utc": "2026-09-20T14:46:03.487Z",
+          "cli_status": "completed",
+          "observer_success": true,
+          "match_basis": "Exact private session and writer, bounded time, MCP namespace/name and ordered call sequence; bodies omitted."
+        },
+        {
+          "stage": "resume",
+          "server": "jcodemunch",
+          "tool": "order",
+          "action_from_CLI_arguments": "search_symbols",
+          "observed_tool_result_sequence": 3,
+          "observed_at_utc": "2026-09-20T14:46:07.219Z",
+          "cli_status": "completed",
+          "observer_success": true,
+          "match_basis": "Exact private session and writer, bounded time, MCP namespace/name and ordered call sequence; bodies omitted."
+        },
+        {
+          "stage": "resume",
+          "server": "jcodemunch",
+          "tool": "order",
+          "action_from_CLI_arguments": "get_symbol_source",
+          "observed_tool_result_sequence": 5,
+          "observed_at_utc": "2026-09-20T14:46:11.435Z",
+          "cli_status": "completed",
+          "observer_success": true,
+          "match_basis": "Exact private session and writer, bounded time, MCP namespace/name and ordered call sequence; bodies omitted."
+        }
+      ],
+      "successful_MCP_outcomes_matched": 3,
+      "failed_MCP_outcomes_matched": 2,
+      "initial_denied_decisions_matched": 2,
+      "additional_codex_code_mode_exec_wrapper_results": 5,
+      "prometheus": {
+        "metric_sum": "ecosystem_codex_turn_token_usage_sum",
+        "metric_count": "ecosystem_codex_turn_token_usage_count",
+        "six_categories_match_each_exact_writer": true,
+        "histogram_observation_count_each_category_each_writer": 1,
+        "observed_usage_by_stage": {
+          "initial": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 49152,
+            "input_tokens": 64517,
+            "output_tokens": 303,
+            "reasoning_output_tokens": 18,
+            "total_tokens": 64820
+          },
+          "resume": {
+            "cache_write_input_tokens": 0,
+            "cached_input_tokens": 93056,
+            "input_tokens": 96508,
+            "output_tokens": 392,
+            "reasoning_output_tokens": 42,
+            "total_tokens": 96900
+          }
+        },
+        "combined_turn_usage_matches_CLI_cumulative": {
+          "input_tokens": 161025,
+          "cached_input_tokens": 142208,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 695,
+          "reasoning_output_tokens": 60,
+          "total_tokens": 161720
+        }
+      },
+      "loki_provider_events": {
+        "response_completed_event_count": 9,
+        "matched_native_task_request_count": 7,
+        "matched_requests": [
+          {
+            "stage": "initial",
+            "event_timestamp_utc": "2026-09-20T14:43:59.225Z",
+            "usage": {
+              "input_tokens": 20599,
+              "cached_input_tokens": 7040,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 74,
+              "reasoning_output_tokens": 0,
+              "total_tokens": 20673
+            },
+            "native_snapshot_after_observer_event_seconds": 0.036
+          },
+          {
+            "stage": "initial",
+            "event_timestamp_utc": "2026-09-20T14:44:05.332Z",
+            "usage": {
+              "input_tokens": 21860,
+              "cached_input_tokens": 20480,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 117,
+              "reasoning_output_tokens": 0,
+              "total_tokens": 21977
+            },
+            "native_snapshot_after_observer_event_seconds": 0.027
+          },
+          {
+            "stage": "initial",
+            "event_timestamp_utc": "2026-09-20T14:44:10.911Z",
+            "usage": {
+              "input_tokens": 22058,
+              "cached_input_tokens": 21632,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 112,
+              "reasoning_output_tokens": 18,
+              "total_tokens": 22170
+            },
+            "native_snapshot_after_observer_event_seconds": 0.002
+          },
+          {
+            "stage": "resume",
+            "event_timestamp_utc": "2026-09-20T14:46:03.441Z",
+            "usage": {
+              "input_tokens": 23670,
+              "cached_input_tokens": 21888,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 100,
+              "reasoning_output_tokens": 0,
+              "total_tokens": 23770
+            },
+            "native_snapshot_after_observer_event_seconds": 0.106
+          },
+          {
+            "stage": "resume",
+            "event_timestamp_utc": "2026-09-20T14:46:07.202Z",
+            "usage": {
+              "input_tokens": 23871,
+              "cached_input_tokens": 23552,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 55,
+              "reasoning_output_tokens": 0,
+              "total_tokens": 23926
+            },
+            "native_snapshot_after_observer_event_seconds": 0.088
+          },
+          {
+            "stage": "resume",
+            "event_timestamp_utc": "2026-09-20T14:46:11.447Z",
+            "usage": {
+              "input_tokens": 24051,
+              "cached_input_tokens": 23680,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 58,
+              "reasoning_output_tokens": 0,
+              "total_tokens": 24109
+            },
+            "native_snapshot_after_observer_event_seconds": 0.053
+          },
+          {
+            "stage": "resume",
+            "event_timestamp_utc": "2026-09-20T14:46:19.597Z",
+            "usage": {
+              "input_tokens": 24916,
+              "cached_input_tokens": 23936,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 179,
+              "reasoning_output_tokens": 42,
+              "total_tokens": 25095
+            },
+            "native_snapshot_after_observer_event_seconds": 0.003
+          }
+        ],
+        "matched_requests_usage": {
+          "input_tokens": 161025,
+          "cached_input_tokens": 142208,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 695,
+          "reasoning_output_tokens": 60,
+          "total_tokens": 161720
+        },
+        "all_nine_responses_raw_usage": {
+          "input_tokens": 186797,
+          "cached_input_tokens": 142208,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 695,
+          "reasoning_output_tokens": 60,
+          "total_tokens": 187492
+        },
+        "unattributed_responses": [
+          {
+            "stage": "initial",
+            "event_timestamp_utc": "2026-09-20T14:43:48.058Z",
+            "usage": {
+              "input_tokens": 12886,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 0,
+              "reasoning_output_tokens": 0,
+              "total_tokens": 12886
+            },
+            "classification": "unattributed_zero_output_response_near_process_start",
+            "billing_treatment": "unknown"
+          },
+          {
+            "stage": "resume",
+            "event_timestamp_utc": "2026-09-20T14:45:57.822Z",
+            "usage": {
+              "input_tokens": 12886,
+              "cached_input_tokens": 0,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 0,
+              "reasoning_output_tokens": 0,
+              "total_tokens": 12886
+            },
+            "classification": "unattributed_zero_output_response_near_process_start",
+            "billing_treatment": "unknown"
+          }
+        ],
+        "unattributed_input_tokens": 25772,
+        "all_response_usage_equals_CLI_turn_usage": false
+      },
+      "queries": [
+        {
+          "name": "loki-session",
+          "argv_template": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "15",
+            "--get",
+            "http://127.0.0.1:13100/loki/api/v1/query_range",
+            "--data-urlencode",
+            "query={service_name=~\"codex.*\"} | conversation_id = \"${NATIVE_SESSION_ID}\" or session_id = \"${NATIVE_SESSION_ID}\" or thread_id = \"${NATIVE_SESSION_ID}\"",
+            "--data-urlencode",
+            "start=2026-09-20T14:43:40Z",
+            "--data-urlencode",
+            "end=2026-09-20T14:47:00Z",
+            "--data-urlencode",
+            "limit=1000",
+            "--data-urlencode",
+            "direction=forward",
+            "--write-out",
+            "\n%{http_code}"
+          ],
+          "captured_at_utc": "2026-09-20T14:54:02.285094+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "response_sha256": "fd7adf02cfba0fa7e75944c8a2d6ece18de6302646bfb567d1fffeec1269710e"
+        },
+        {
+          "name": "loki-native-session",
+          "argv_template": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "15",
+            "--get",
+            "http://127.0.0.1:13100/loki/api/v1/query_range",
+            "--data-urlencode",
+            "query={service_name=\"Codex Desktop\"} | conversation_id = \"${NATIVE_SESSION_ID}\" or session_id = \"${NATIVE_SESSION_ID}\" or thread_id = \"${NATIVE_SESSION_ID}\"",
+            "--data-urlencode",
+            "start=2026-09-20T14:43:40Z",
+            "--data-urlencode",
+            "end=2026-09-20T14:47:00Z",
+            "--data-urlencode",
+            "limit=1000",
+            "--data-urlencode",
+            "direction=forward",
+            "--write-out",
+            "\n%{http_code}"
+          ],
+          "captured_at_utc": "2026-09-20T14:54:31.149483+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "response_sha256": "dacd1c0dd7810878710ef959c5c501fd8a77a0f34b6b10e9d3bf6940a984762b"
+        },
+        {
+          "name": "prometheus-usage",
+          "argv_template": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "15",
+            "--get",
+            "http://127.0.0.1:19090/api/v1/query",
+            "--data-urlencode",
+            "query=last_over_time(ecosystem_codex_turn_token_usage_sum{instance=~\"${INITIAL_WRITER_ID}|${RESUME_WRITER_ID}\"}[10m])",
+            "--data-urlencode",
+            "time=2026-09-20T14:47:00Z",
+            "--write-out",
+            "\n%{http_code}"
+          ],
+          "captured_at_utc": "2026-09-20T14:54:02.285384+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "response_sha256": "aef6a2616831870cccf8ebc39441e68ee81f0a20bec21a994a446dce99774502"
+        },
+        {
+          "name": "prometheus-count",
+          "argv_template": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "15",
+            "--get",
+            "http://127.0.0.1:19090/api/v1/query",
+            "--data-urlencode",
+            "query=last_over_time(ecosystem_codex_turn_token_usage_count{instance=~\"${INITIAL_WRITER_ID}|${RESUME_WRITER_ID}\"}[10m])",
+            "--data-urlencode",
+            "time=2026-09-20T14:47:00Z",
+            "--write-out",
+            "\n%{http_code}"
+          ],
+          "captured_at_utc": "2026-09-20T14:54:02.285565+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "response_sha256": "d7a61d33832d5a5b1405d5cf544c29d4806e642a276db0b71954ccc73c1d39a4"
+        }
+      ],
+      "limitations": [
+        "The first case-sensitive service_name=~codex.* query returned zero because this native CLI advertises service.name=Codex Desktop. The corrected exact service and session query returned 52 records; the empty query is retained.",
+        "Two startup response.completed events each report 12886 input and zero output; they are absent from native task token snapshots and turn histograms. Their purpose and billing treatment were not established. They are not silently discarded or added to the CLI turn total.",
+        "Loki omits tool argument/result bodies; tool outcomes match names, exact identities, order and time. Source byte fidelity remains a separate direct-result verification.",
+        "Five internal functions.exec wrapper results are present in observer telemetry. CLI JSONL exposes the five underlying MCP calls; these wrapper events do not represent five extra MCP operations.",
+        "Prometheus retains writer identity but no task identifier; the join uses the privately recorded fresh process writers and bounded run times.",
+        "Cached input and reasoning output are subsets. Histogram samples and CLI cumulative snapshots must not be summed repeatedly.",
+        "These are observer copies of native reported usage, not an independent invoice or token-savings baseline."
+      ],
+      "artifacts": {
+        "direct_acceptance_sha256": "c2350d245015601bbf747a87657f65bb1440af565784946f6233d768d4727705",
+        "initial_CLI_stream_sha256": "aeb5dbe6965846ddbfa43d4d038523a8a7dcf0411664d72f48837c2d358fe8f5",
+        "resume_CLI_stream_sha256": "5875de844cfe4a83468320765346580767690e054235ab4d0738d5a3197b8aac",
+        "verifier_sha256": "f3139cba74e56ed8b97328c10bfda237c7142866ad570b477e5720194679a173"
+      }
+    },
+    "claude": {
+      "schema_version": 1,
+      "kind": "real_native_claude_functional_and_resume_acceptance",
+      "recorded_at_utc": "2026-09-20T14:47:08.220998+00:00",
+      "session_id_sha256": "38024bf1b2c90fef74702f932f20c8970ef75156ac7d5dc07edd26486c6e239c",
+      "account_readiness": {
+        "command": [
+          "claude",
+          "auth",
+          "status",
+          "--json"
+        ],
+        "exit_code": 0,
+        "checked_once": true,
+        "loggedIn": true,
+        "authMethod": "claude.ai",
+        "apiProvider": "firstParty"
+      },
+      "version_pin": {
+        "version": "2.1.278",
+        "executable": "$NATIVE_TOOL_HOME/tools/claude-2.1.278/claude",
+        "sha256": "5c4735937844e84f8a93306e841a5b0e12252909b07870f789b190468da147ab"
+      },
+      "phases": {
+        "initial": {
+          "argv": [
+            "$NATIVE_TOOL_HOME/bin/claude",
+            "-p",
+            "--output-format",
+            "stream-json",
+            "--verbose",
+            "--include-hook-events",
+            "--max-turns",
+            "8",
+            "--permission-prompts",
+            "none",
+            "--session-id",
+            "${NATIVE_CLAUDE_SESSION_ID}"
+          ],
+          "cwd": "$PROJECT",
+          "started_at_utc": "2026-09-20T14:43:44.031996+00:00",
+          "finished_at_utc": "2026-09-20T14:43:55.117115+00:00",
+          "exit_code": 0,
+          "timed_out": false,
+          "native_result_subtype": "success",
+          "native_result_is_error": false,
+          "observed_model": "claude-opus-5[1m]",
+          "observed_cli_version": "2.1.278",
+          "native_session_id_matches": true,
+          "connected_mcp_servers": [
+            {
+              "name": "plugin:context-mode:context-mode",
+              "status": "connected",
+              "source": "plugin"
+            },
+            {
+              "name": "serena",
+              "status": "connected",
+              "source": "project"
+            },
+            {
+              "name": "ai-memory",
+              "status": "connected",
+              "source": "local"
+            },
+            {
+              "name": "socraticode",
+              "status": "connected",
+              "source": "project"
+            },
+            {
+              "name": "jcodemunch",
+              "status": "connected",
+              "source": "local"
+            },
+            {
+              "name": "claude.ai Claude Docs",
+              "status": "connected",
+              "source": "claudeai"
+            }
+          ],
+          "tool_calls": [
+            {
+              "name": "ToolSearch",
+              "action": null,
+              "response_present": true,
+              "is_error": false
+            },
+            {
+              "name": "mcp__plugin_context-mode_context-mode__ctx_execute_file",
+              "action": null,
+              "response_present": true,
+              "is_error": false
+            },
+            {
+              "name": "mcp__jcodemunch__order",
+              "action": "search_symbols",
+              "response_present": true,
+              "is_error": false
+            },
+            {
+              "name": "mcp__jcodemunch__order",
+              "action": "get_symbol_source",
+              "response_present": true,
+              "is_error": false
+            }
+          ],
+          "native_usage": {
+            "input_tokens": 8,
+            "cache_creation_input_tokens": 30746,
+            "cache_read_input_tokens": 125393,
+            "output_tokens": 1242,
+            "output_tokens_details": {
+              "thinking_tokens": 200
+            },
+            "server_tool_use": {
+              "web_search_requests": 0,
+              "web_fetch_requests": 0
+            },
+            "service_tier": "standard",
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 30746,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "inference_geo": "not_available",
+            "iterations": [
+              {
+                "input_tokens": 2,
+                "output_tokens": 610,
+                "cache_read_input_tokens": 39589,
+                "cache_creation_input_tokens": 1275,
+                "cache_creation": {
+                  "ephemeral_5m_input_tokens": 0,
+                  "ephemeral_1h_input_tokens": 1275
+                },
+                "type": "message"
+              }
+            ],
+            "speed": "standard"
+          },
+          "native_model_usage": {
+            "claude-opus-5[1m]": {
+              "inputTokens": 8,
+              "outputTokens": 1242,
+              "cacheReadInputTokens": 125393,
+              "cacheCreationInputTokens": 30746,
+              "webSearchRequests": 0,
+              "costUSD": 0.40124650000000006,
+              "contextWindow": 1000000,
+              "maxOutputTokens": 64000,
+              "thinkingTokens": 200,
+              "canonicalModel": "claude-opus-5",
+              "provider": "firstParty",
+              "costBasis": "list"
+            }
+          },
+          "derived_input_plus_cache_plus_output": 157389,
+          "strict_json_output_passed": false,
+          "parsed_answer": {
+            "heading": "# Native upstream additions — 2026-09-20",
+            "symbol_path": "tools/ecosystem/evaluate-native.py::parse_codex#function",
+            "usage_fields": [
+              "input_tokens",
+              "cached_input_tokens",
+              "cache_write_input_tokens",
+              "output_tokens",
+              "reasoning_output_tokens"
+            ],
+            "completion_event": "turn.completed",
+            "failed_tool_calls": 0,
+            "continuity_marker": "native-upstream-20260920"
+          },
+          "final_text": "```json\n{\n  \"heading\": \"# Native upstream additions — 2026-09-20\",\n  \"symbol_path\": \"tools/ecosystem/evaluate-native.py::parse_codex#function\",\n  \"usage_fields\": [\n    \"input_tokens\",\n    \"cached_input_tokens\",\n    \"cache_write_input_tokens\",\n    \"output_tokens\",\n    \"reasoning_output_tokens\"\n  ],\n  \"completion_event\": \"turn.completed\",\n  \"failed_tool_calls\": 0,\n  \"continuity_marker\": \"native-upstream-20260920\"\n}\n```\n\nNotes on the facts, retained for a later same-session check:\n- `parse_codex` (`tools/ecosystem/evaluate-native.py:173-199`) pulls the usage fields out of the last `token_count` payload's `info.total_token_usage`, remapping `cached_input_tokens` → `cache_read_tokens` and `cache_write_input_tokens` → `cache_write_tokens` in its returned `usage` dict, and also keeps the raw dict as `native_usage`.\n- Completion is recognized via `agent_success = any(r.get('type') == 'turn.completed' ...)`. A separate `item.completed` type is used for handoff/agent-message and item extraction, not for overall completion.\n- Both tool calls succeeded on the first attempt; the jcodemunch menu was not needed.",
+          "observed_hooks": [
+            "PostToolUse",
+            "PreToolUse",
+            "SessionStart",
+            "Stop",
+            "UserPromptSubmit"
+          ],
+          "permission_denials": [],
+          "cleanup": {
+            "owned_process_group_remaining_before_cleanup": [],
+            "cleanup_actions": [],
+            "owned_process_group_remaining_after_cleanup": []
+          }
+        },
+        "resume": {
+          "argv": [
+            "$NATIVE_TOOL_HOME/bin/claude",
+            "-p",
+            "--output-format",
+            "stream-json",
+            "--verbose",
+            "--include-hook-events",
+            "--max-turns",
+            "8",
+            "--permission-prompts",
+            "none",
+            "--resume",
+            "${NATIVE_CLAUDE_SESSION_ID}"
+          ],
+          "cwd": "$PROJECT",
+          "started_at_utc": "2026-09-20T14:44:25.641337+00:00",
+          "finished_at_utc": "2026-09-20T14:44:30.273988+00:00",
+          "exit_code": 0,
+          "timed_out": false,
+          "native_result_subtype": "success",
+          "native_result_is_error": false,
+          "observed_model": "claude-opus-5[1m]",
+          "observed_cli_version": "2.1.278",
+          "native_session_id_matches": true,
+          "connected_mcp_servers": [
+            {
+              "name": "plugin:context-mode:context-mode",
+              "status": "connected",
+              "source": "plugin"
+            },
+            {
+              "name": "serena",
+              "status": "connected",
+              "source": "project"
+            },
+            {
+              "name": "ai-memory",
+              "status": "connected",
+              "source": "local"
+            },
+            {
+              "name": "socraticode",
+              "status": "connected",
+              "source": "project"
+            },
+            {
+              "name": "jcodemunch",
+              "status": "connected",
+              "source": "local"
+            },
+            {
+              "name": "claude.ai Claude Docs",
+              "status": "connected",
+              "source": "claudeai"
+            }
+          ],
+          "tool_calls": [],
+          "native_usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 2834,
+            "cache_read_input_tokens": 40864,
+            "output_tokens": 111,
+            "output_tokens_details": {
+              "thinking_tokens": 0
+            },
+            "server_tool_use": {
+              "web_search_requests": 0,
+              "web_fetch_requests": 0
+            },
+            "service_tier": "standard",
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 2834,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "inference_geo": "not_available",
+            "iterations": [
+              {
+                "input_tokens": 2,
+                "output_tokens": 111,
+                "cache_read_input_tokens": 40864,
+                "cache_creation_input_tokens": 2834,
+                "cache_creation": {
+                  "ephemeral_5m_input_tokens": 0,
+                  "ephemeral_1h_input_tokens": 2834
+                },
+                "type": "message"
+              }
+            ],
+            "speed": "standard"
+          },
+          "native_model_usage": {
+            "claude-opus-5[1m]": {
+              "inputTokens": 10,
+              "outputTokens": 1353,
+              "thinkingTokens": 200,
+              "cacheReadInputTokens": 166257,
+              "cacheCreationInputTokens": 33580,
+              "webSearchRequests": 0,
+              "costUSD": 0.4528035000000001,
+              "contextWindow": 1000000,
+              "maxOutputTokens": 64000,
+              "canonicalModel": "claude-opus-5",
+              "provider": "firstParty",
+              "costBasis": "list"
+            }
+          },
+          "derived_input_plus_cache_plus_output": 43811,
+          "strict_json_output_passed": true,
+          "parsed_answer": {
+            "continuity_marker": "native-upstream-20260920",
+            "completion_event": "turn.completed",
+            "cached_input_source_field": "cached_input_tokens",
+            "cached_input_returned_field": "cache_read_tokens",
+            "symbol_path": "tools/ecosystem/evaluate-native.py::parse_codex#function"
+          },
+          "final_text": "{\"continuity_marker\": \"native-upstream-20260920\", \"completion_event\": \"turn.completed\", \"cached_input_source_field\": \"cached_input_tokens\", \"cached_input_returned_field\": \"cache_read_tokens\", \"symbol_path\": \"tools/ecosystem/evaluate-native.py::parse_codex#function\"}",
+          "observed_hooks": [
+            "SessionStart",
+            "Stop",
+            "UserPromptSubmit"
+          ],
+          "permission_denials": [],
+          "cleanup": {
+            "owned_process_group_remaining_before_cleanup": [],
+            "cleanup_actions": [],
+            "owned_process_group_remaining_after_cleanup": []
+          }
+        }
+      },
+      "independent_source_validation": {
+        "source_path": "tools/ecosystem/evaluate-native.py",
+        "source_lines": [
+          173,
+          199
+        ],
+        "source_sha256": "da3277537bf59cb63bc0b7bd2b25f86422d8f79679d382147d72863f9dc1dfd5",
+        "retrieved_source_sha256": "da3277537bf59cb63bc0b7bd2b25f86422d8f79679d382147d72863f9dc1dfd5",
+        "checks": {
+          "initial_native_tools_passed": true,
+          "initial_source_facts_passed": true,
+          "retrieved_source_byte_exact": true,
+          "source_unchanged_since_preflight": true,
+          "same_session_both_phases": true,
+          "resume_continuity_without_tool_use_passed": true,
+          "both_normal_exits": true,
+          "both_owned_process_groups_empty": true
+        }
+      },
+      "functional_lifecycle_acceptance_passed": true,
+      "strict_output_format_acceptance_passed": false,
+      "retained_defects": [
+        "Initial answer added fenced JSON plus prose despite an exact-JSON request.",
+        "Initial narrative said both tool calls; the stream records three successful MCP calls plus ToolSearch."
+      ],
+      "usage_boundary": "Native Claude invocation-reported consumed usage, not a controlled baseline or causal savings. Anthropic input_tokens excludes separate cache reads and cache creation; thinking_tokens is a subset of output. Cache lifetime details and iterations are not extra totals. Native model cost is list-price equivalent, not a subscription bill.",
+      "total_consumed_tokens_two_invocations": 201200,
+      "exact_causal_tokens_saved": null,
+      "telemetry": {
+        "observed_at_utc": "2026-09-20T14:45:26.667316+00:00",
+        "argv": [
+          "curl",
+          "--silent",
+          "--show-error",
+          "--fail-with-body",
+          "--max-time",
+          "10",
+          "--get",
+          "http://127.0.0.1:13100/loki/api/v1/query_range",
+          "--data-urlencode",
+          "query={service_name=~\".+\"} | session_id = \"${NATIVE_CLAUDE_SESSION_ID}\" or conversation_id = \"${NATIVE_CLAUDE_SESSION_ID}\" or thread_id = \"${NATIVE_CLAUDE_SESSION_ID}\"",
+          "--data-urlencode",
+          "start=1789915394031995904",
+          "--data-urlencode",
+          "end=1789915500273988096",
+          "--data-urlencode",
+          "limit=100",
+          "--data-urlencode",
+          "direction=backward",
+          "--write-out",
+          "\n%{http_code}"
+        ],
+        "parent_session_sha256": "38024bf1b2c90fef74702f932f20c8970ef75156ac7d5dc07edd26486c6e239c",
+        "http_status": "200",
+        "exit_code": 0,
+        "native_result_status": "success",
+        "query_start_utc": "2026-09-20T14:43:14.031996+00:00",
+        "query_end_utc": "2026-09-20T14:45:00.273988+00:00",
+        "matching_streams": 0,
+        "matching_events": 0,
+        "scope": "One exact native Claude session, bounded initial/resume window plus 30 seconds; no aggregate fallback or telemetry injection.",
+        "exact_session_correlation_established": false,
+        "limitation": "The bounded exact-session-ID label query returned no Loki matches. This does not establish absence of all Claude telemetry or current Prometheus/Loki consumption equality."
+      },
+      "limits": [
+        "One initial read-only native Claude task and one same-session resume only; no E2E benchmark sweep.",
+        "No model, route, account, source, shared configuration, or permission-mode override.",
+        "Normal native hooks and session persistence may write their own operational state; no user-source edits requested.",
+        "No additional model retries or synthetic telemetry injection.",
+        "Compaction, interactive HUD and all-catalog lifecycle coverage were not exercised.",
+        "Global savings meters are shared and were not used to attribute this trial; older baselines remain separate."
+      ],
+      "private_artifacts": [
+        {
+          "path": "auth.json",
+          "bytes": 300,
+          "sha256": "6c88b8ba357364e5fec860ffd983be3ec45bf418d3283e08c38783bef4a4b77b"
+        },
+        {
+          "path": "auth.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "auth.stdout.txt",
+          "bytes": 383,
+          "sha256": "0bd8b2153189518c04720b783fe06fbb1f6a92943e126680c4c327a52817c338"
+        },
+        {
+          "path": "expected-source.json",
+          "bytes": 2610,
+          "sha256": "198206f5e8adebe56744dbf171331dca641ff7316273972b34acd2295ba4ff85"
+        },
+        {
+          "path": "help.json",
+          "bytes": 274,
+          "sha256": "43a6820d2ee116fbb74868d131e18afc0506eebf3721cf40147a522fcc88e46c"
+        },
+        {
+          "path": "help.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "help.stdout.txt",
+          "bytes": 21401,
+          "sha256": "ae85d661e9c086f05637ebcd868f5702b477ff6e55e2e65b8ada7807cd51a4b6"
+        },
+        {
+          "path": "initial-execution.json",
+          "bytes": 1103,
+          "sha256": "1689a4d29fc379ab63ba9bbfb4435ada10c6855a971ab9504ce2e2a7b4d0a496"
+        },
+        {
+          "path": "initial-stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "initial-stream.jsonl",
+          "bytes": 61485,
+          "sha256": "4cd570cfe0dd2ff6095b432b69ee865a7aa7cbe49ae961cc6e657d6447541d8f"
+        },
+        {
+          "path": "prompt-initial.txt",
+          "bytes": 1161,
+          "sha256": "1d653dea5296d9f5da500effa1fe536bac61f1b34db9d45865f9a61d63e52154"
+        },
+        {
+          "path": "prompt-resume.txt",
+          "bytes": 462,
+          "sha256": "39ee0a1a995952fa5d1ad1e76b3866f8f89b97e9d204e4ae65eb78fa31687c58"
+        },
+        {
+          "path": "resume-execution.json",
+          "bytes": 1098,
+          "sha256": "64c06132518577680e9d14f6e50e2e34a82838708e3321b9f952c399edca35fd"
+        },
+        {
+          "path": "resume-stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "resume-stream.jsonl",
+          "bytes": 28391,
+          "sha256": "e36683b59842648dd140a8fd15739e5729f95d23edc84763d9d5a595326eb76a"
+        },
+        {
+          "path": "run-native.py",
+          "bytes": 3381,
+          "sha256": "949de9724d9bba32a9646d22d6452dc0a025d583755b9bc23edbad3c10b2447a"
+        },
+        {
+          "path": "session.json",
+          "bytes": 150,
+          "sha256": "341a0ef4e42f9561d4c059ae833dbfdb75c577390279a232a00008f0e76d3b39"
+        },
+        {
+          "path": "telemetry-loki-body.json",
+          "bytes": 3623,
+          "sha256": "63c73fb9fa52fb5ce7c1a882eb4f9564258e5301c702349719642ce062e3733c"
+        },
+        {
+          "path": "telemetry-loki-execution.json",
+          "bytes": 1196,
+          "sha256": "2f66458458a1598d7ba9f9b6a755df87f4ce4abb14b0f5dc7f9dd0b3e8cee1e4"
+        },
+        {
+          "path": "telemetry-loki-stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "version.json",
+          "bytes": 277,
+          "sha256": "d94c6e378318e32a8dd31f1bca2465fd3832ab105af1f26ba5ed5f561ca28f9d"
+        },
+        {
+          "path": "version.stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "version.stdout.txt",
+          "bytes": 22,
+          "sha256": "f0d384f3abe85e8cb2f0366465826cc8232426881854235d3ad1150e4a76f689"
+        }
+      ]
+    },
+    "claude_observation_diagnosis": {
+      "schema_version": 1,
+      "kind": "native_claude_observation_gap_analysis",
+      "recorded_at_utc": "2026-09-20T14:52:32.910696+00:00",
+      "native_session_sha256": "38024bf1b2c90fef74702f932f20c8970ef75156ac7d5dc07edd26486c6e239c",
+      "finding": "Telemetry delivery is active. Native session IDs are suppressed by the existing include-session flag, which the installed Claude binary applies to both metric and log attributes. The direct upstream CLI launch also omitted the ecosystem launcher writer/client scope, preventing an exact identity join.",
+      "launch_harness_safe_inherited_environment_snapshot": {
+        "CLAUDE_CODE_ENABLE_TELEMETRY": null,
+        "OTEL_LOGS_EXPORTER": null,
+        "OTEL_METRICS_EXPORTER": null,
+        "OTEL_TRACES_EXPORTER": null,
+        "OTEL_EXPORTER_OTLP_ENDPOINT": null,
+        "OTEL_EXPORTER_OTLP_PROTOCOL": null,
+        "OTEL_LOGS_EXPORT_INTERVAL": null,
+        "OTEL_METRIC_EXPORT_INTERVAL": null,
+        "OTEL_METRICS_INCLUDE_SESSION_ID": null,
+        "OTEL_METRICS_INCLUDE_ACCOUNT_UUID": null,
+        "OTEL_METRICS_INCLUDE_VERSION": null,
+        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": null,
+        "DISABLE_TELEMETRY": null,
+        "DO_NOT_TRACK": null
+      },
+      "launch_harness_resource_attributes_present": false,
+      "native_user_settings_safe_environment": {
+        "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+        "OTEL_LOGS_EXPORTER": "otlp",
+        "OTEL_METRICS_EXPORTER": "otlp",
+        "OTEL_TRACES_EXPORTER": "none",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "http://127.0.0.1:14318",
+        "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+        "OTEL_LOGS_EXPORT_INTERVAL": "1000",
+        "OTEL_METRIC_EXPORT_INTERVAL": "10000",
+        "OTEL_METRICS_INCLUDE_SESSION_ID": "false",
+        "OTEL_METRICS_INCLUDE_ACCOUNT_UUID": "false",
+        "OTEL_METRICS_INCLUDE_VERSION": "true"
+      },
+      "effective_setting_boundary": "The child has exited: this is the harness environment snapshot plus configured native settings, not a post-exit child environment read. Observed native export proves telemetry was enabled; installed flag handling and missing output attributes explain the attribution gap.",
+      "installed_binary_flag_and_call_path": {
+        "path": "$NATIVE_TOOL_HOME/tools/claude-2.1.278/claude",
+        "sha256": "5c4735937844e84f8a93306e841a5b0e12252909b07870f789b190468da147ab",
+        "snippets": [
+          {
+            "offset": 195001284,
+            "text": "if(r[\"user.id\"]=e,m(\"OTEL_METRICS_INCLUDE_SESSION_ID\")){if(r[\"session.id\"]=n,a.CLAUDE_CODE_REMOTE_SESSION_ID)r[\"ccr.session.id\"]=a.CLAUDE_CODE_REMOTE_SESSION_ID}if(m(\"OTEL_METRICS_INCLUDE_VERSION\"))r[\"app.versi"
+          },
+          {
+            "offset": 195005486,
+            "text": "async function xo(e,n={},o){let i=ie.of(W().host),r={...IYe(),\"event.name\":e,\"event.timestamp\":new Date().toISOString(),\"event.sequence\":i.nextSequence++},c=jue();if(c)r[\"prompt.id\"]=c;let s=a.CLAUDE_CODE_WORKSPACE_HOST_PATHS"
+          },
+          {
+            "offset": 207264756,
+            "text": "hr(e,(u,o)=>{let c=e?.createCounter(u,o);return{add(_,p={}){let r={...IYe(),...p};c?.add(_,r)}}},{omitUnits:T(s)}),await yqr(),Thr()?.add(1,{start_typ"
+          }
+        ]
+      },
+      "configured_collector_privacy": {
+        "path": "$NATIVE_USER_HOME/.config/ecosystem-observability/collector.yaml",
+        "sha256": "c6aa902c52bd61677c5b964cc7d7db8e16e25bbca4e34671efa8a7a70977a0d8",
+        "relevant_lines": [
+          {
+            "line": 74,
+            "text": "          - keep_keys(attributes, [\"service.name\", \"service.version\", \"service.instance.id\", \"deployment.environment\", \"ecosystem.task.id\", \"ecosystem.client.scope\"])"
+          },
+          {
+            "line": 77,
+            "text": "          - keep_keys(attributes, [])"
+          },
+          {
+            "line": 87,
+            "text": "          - keep_keys(attributes, [\"receipt_id\", \"observation_id\", \"usage_status\", \"event.name\", \"event.kind\", \"event.timestamp\", \"event.sequence\", \"session.id\", \"conversation.id\", \"thread.id\", \"turn.id\", \"model\", \"model_name\", \"provider_name\", \"tool_name\", \"success\", \"decision\", \"duration_ms\", \"duration\", \"status_code\", \"http.response.status_code\", \"error.type\", \"input_tokens\", \"output_tokens\", \"cached_input_tokens\", \"cache_read_tokens\", \"cache_creation_tokens\", \"input_token_count\", \"output_token_count\", \"cached_input_token_count\", \"cached_token_count\", \"cache_write_token_count\", \"reasoning_token_count\", \"tool_token_count\", \"tool_result_seq\", \"tool_namespace\", \"status\", \"reasoning_effort\", \"model_reasoning_effort\", \"service_tier\", \"app.version\", \"query_source\", \"effort\", \"error_type\", \"reasoning_output_token_count\", \"total_token_count\", \"cache_read_input_tokens\", \"cache_creation_input_tokens\", \"attempt\", \"ecosystem.task.id\", \"ecosystem.client.scope\"])"
+          },
+          {
+            "line": 91,
+            "text": "          - keep_keys(attributes, [\"service.name\", \"service.version\", \"service.instance.id\", \"deployment.environment\", \"ecosystem.client.scope\"])"
+          },
+          {
+            "line": 94,
+            "text": "          - keep_keys(attributes, [])"
+          },
+          {
+            "line": 104,
+            "text": "          - keep_keys(attributes, [\"kind\", \"tool\", \"query_source\", \"effort\", \"app.version\", \"type\", \"token_type\", \"token.type\", \"model\", \"model_name\", \"tool_name\", \"status\", \"success\", \"error.type\", \"http.response.status_code\"])"
+          },
+          {
+            "line": 155,
+            "text": "      processors: [memory_limiter, transform/privacy, batch]"
+          },
+          {
+            "line": 159,
+            "text": "      processors: [memory_limiter, transform/privacy, deltatocumulative, batch]"
+          },
+          {
+            "line": 167,
+            "text": "      processors: [memory_limiter, transform/sdk_receipt, transform/privacy, batch]"
+          }
+        ],
+        "interpretation": "Logs allow session.id and ecosystem.task.id and retain writer/client resource scope; metrics intentionally omit session/task IDs but retain writer/client scope resources."
+      },
+      "native_launcher_intended_scope": {
+        "path": "$STACK_HOME/bin/launch-linux-agent.cjs",
+        "sha256": "bb6ffa8911b2ffa0897d9720a37b6d025fe10a845e319c3639f62c510e0deda7",
+        "relevant_lines": [
+          {
+            "line": 25,
+            "text": "    const childEnv={...nativeEnvironment(),RTK_TELEMETRY_DISABLED:'1'};"
+          },
+          {
+            "line": 26,
+            "text": "    const retained=(childEnv.OTEL_RESOURCE_ATTRIBUTES||'').split(',').filter(x=>x.trim()&&!/^(service\\.instance\\.id|ecosystem\\.client\\.scope)=/.test(x.trim()));"
+          },
+          {
+            "line": 27,
+            "text": "    childEnv.OTEL_RESOURCE_ATTRIBUTES=[...retained,'service.instance.id='+randomUUID(),'ecosystem.client.scope=native-'+agent].join(',');"
+          },
+          {
+            "line": 28,
+            "text": "    const result=spawnSync(executable,nativeArgs,{cwd:project,stdio:'inherit',shell:false,env:childEnv});"
+          }
+        ],
+        "direct_acceptance_launcher_additions_missing": [
+          "service.instance.id",
+          "ecosystem.client.scope"
+        ]
+      },
+      "native_query_results": [
+        {
+          "name": "loki_claude_20m",
+          "observed_at_utc": "2026-09-20T14:48:29.182977+00:00",
+          "http_status": "200",
+          "exit_code": 0,
+          "results": [
+            {
+              "metric": {
+                "service_name": "claude-code"
+              },
+              "value": [
+                1789915709.213,
+                "134"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "prometheus_claude_series_20m",
+          "observed_at_utc": "2026-09-20T14:48:29.220365+00:00",
+          "http_status": "200",
+          "exit_code": 0,
+          "results": [
+            {
+              "metric": {
+                "__name__": "ecosystem_claude_code_active_time_seconds_total",
+                "job": "claude-code"
+              },
+              "value": [
+                1789915709.224,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "ecosystem_claude_code_cost_usage_USD_total",
+                "job": "claude-code"
+              },
+              "value": [
+                1789915709.224,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "ecosystem_claude_code_session_count_total",
+                "job": "claude-code"
+              },
+              "value": [
+                1789915709.224,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "ecosystem_claude_code_token_usage_tokens_total",
+                "job": "claude-code"
+              },
+              "value": [
+                1789915709.224,
+                "4"
+              ]
+            }
+          ]
+        }
+      ],
+      "bounded_metadata_sample": {
+        "http_status": "200",
+        "events": 20,
+        "unique_stream_keys": [
+          "app_version",
+          "cache_creation_tokens",
+          "cache_read_tokens",
+          "detected_level",
+          "duration_ms",
+          "effort",
+          "event_name",
+          "event_sequence",
+          "event_timestamp",
+          "input_tokens",
+          "model",
+          "observed_timestamp",
+          "output_tokens",
+          "query_source",
+          "scope_name",
+          "service_name",
+          "service_version",
+          "status"
+        ]
+      },
+      "native_api_usage_numerical_correspondence": {
+        "initial": {
+          "events": 4,
+          "loki_sums": {
+            "input_tokens": 8,
+            "cache_creation_tokens": 30746,
+            "cache_read_tokens": 125393,
+            "output_tokens": 1242
+          },
+          "native_sums": {
+            "input_tokens": 8,
+            "cache_creation_tokens": 30746,
+            "cache_read_tokens": 125393,
+            "output_tokens": 1242
+          },
+          "numerical_window_match": true,
+          "identity_join_established": false
+        },
+        "resume": {
+          "events": 1,
+          "loki_sums": {
+            "input_tokens": 2,
+            "cache_creation_tokens": 2834,
+            "cache_read_tokens": 40864,
+            "output_tokens": 111
+          },
+          "native_sums": {
+            "input_tokens": 2,
+            "cache_creation_tokens": 2834,
+            "cache_read_tokens": 40864,
+            "output_tokens": 111
+          },
+          "numerical_window_match": true,
+          "identity_join_established": false
+        }
+      },
+      "correlation_boundary": "All five Loki API events match the four native initial usage categories and the one resume usage record in their execution windows. No exact task/writer identity join is established; equal counters and timing are corroboration, not unique attribution.",
+      "proposed_correction": {
+        "status": "proposed_not_applied",
+        "scope": "Process-local upstream OpenTelemetry metadata on a future authorized acceptance; retain native model/login/privacy settings.",
+        "upstream_argv_prefix": [
+          "env",
+          "OTEL_RESOURCE_ATTRIBUTES=service.instance.id=${FRESH_INVOCATION_UUID},ecosystem.client.scope=native-claude,ecosystem.task.id=38024bf1b2c90fef74702f932f20c8970ef75156ac7d5dc07edd26486c6e239c",
+          "$NATIVE_TOOL_HOME/bin/claude"
+        ],
+        "alternative": "The installed ecosystem-claude launcher already adds a fresh service.instance.id and native-claude scope. Retain an explicit ecosystem.task.id equal to the native session SHA256.",
+        "preserve": [
+          "OTEL_METRICS_INCLUDE_SESSION_ID=false",
+          "OTEL_METRICS_INCLUDE_ACCOUNT_UUID=false",
+          "local endpoint/protocol",
+          "Collector privacy transforms",
+          "native model/authentication"
+        ],
+        "verification_next": [
+          "One bounded authorized native invocation with unique writer/task metadata.",
+          "Exact hashed task or writer Loki query and corresponding Prometheus writer series.",
+          "Keep unmatched categories explicit."
+        ]
+      },
+      "new_provider_requests": 0,
+      "synthetic_events": 0,
+      "configuration_mutations": 0,
+      "evidence_files": [
+        {
+          "path": "telemetry-gap-queries.json",
+          "sha256": "e474d877ac9f0279b55b7eff9b2214112b99a3bc35c99e4713b3cab01d46ae0f",
+          "bytes": 9115
+        },
+        {
+          "path": "telemetry-gap-claude-metadata.json",
+          "sha256": "387f92ea9f3be4329ca812f5f0137968a3cbfe9a811862dd112bcf62c2ecdf53",
+          "bytes": 31261
+        },
+        {
+          "path": "telemetry-gap-api-usage.json",
+          "sha256": "4cbe17016f790439662f080e028af7a6dcc9a3a5df0914316026a9670382b9a0",
+          "bytes": 13974
+        },
+        {
+          "path": "telemetry-loki-execution.json",
+          "sha256": "2f66458458a1598d7ba9f9b6a755df87f4ce4abb14b0f5dc7f9dd0b3e8cee1e4",
+          "bytes": 1196
+        },
+        {
+          "path": "receipt.json",
+          "sha256": "ffea3d4dc0e397670b441c2ef7c9ec49632e470392fd9c042b8989904d003430",
+          "bytes": 17926
+        }
+      ]
+    },
+    "claude_observed_continuation": {
+      "schema_version": 1,
+      "kind": "native_claude_corrected_observation_acceptance",
+      "recorded_at_utc": "2026-09-20T14:55:20.481686+00:00",
+      "claim": "One same-session native Claude continuation has exact writer/task attribution in Loki and matching writer-scoped Prometheus categories, all equal to the native returned usage.",
+      "session_id_sha256": "38024bf1b2c90fef74702f932f20c8970ef75156ac7d5dc07edd26486c6e239c",
+      "writer_id_sha256": "58e9fe247bcf7c4d62f678fd8a2f597f7394c53533c532799ecd82c7ed500441",
+      "upstream_command": [
+        "$NATIVE_TOOL_HOME/bin/claude",
+        "-p",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--include-hook-events",
+        "--max-turns",
+        "2",
+        "--permission-prompts",
+        "none",
+        "--resume",
+        "${NATIVE_CLAUDE_SESSION_ID}"
+      ],
+      "working_directory": "<PROJECT>",
+      "process_environment_overrides": {
+        "CODEX_HOME": "$NATIVE_USER_HOME/.codex",
+        "CLAUDE_CONFIG_DIR": "unset",
+        "OTEL_RESOURCE_ATTRIBUTES": "service.instance.id=${WRITER_INSTANCE_ID},ecosystem.client.scope=native-claude,ecosystem.task.id=38024bf1b2c90fef74702f932f20c8970ef75156ac7d5dc07edd26486c6e239c"
+      },
+      "correction_scope": "Process-local upstream OTEL_RESOURCE_ATTRIBUTES only, using the native launcher label conventions; no shared configuration, account, model, permission mode, collector/privacy or endpoint changes.",
+      "native_execution": {
+        "started_at_utc": "2026-09-20T14:53:06.629522+00:00",
+        "finished_at_utc": "2026-09-20T14:53:11.270889+00:00",
+        "exit_code": 0,
+        "timed_out": false,
+        "timeout_seconds": 180,
+        "cleanup_actions": [],
+        "owned_process_group_remaining_before_cleanup": [],
+        "owned_process_group_remaining_after_cleanup": []
+      },
+      "native_result": {
+        "subtype": "success",
+        "is_error": false,
+        "result": "native-upstream-20260920",
+        "usage": {
+          "input_tokens": 2,
+          "cache_creation_input_tokens": 2300,
+          "cache_read_input_tokens": 43698,
+          "output_tokens": 11,
+          "output_tokens_details": {
+            "thinking_tokens": 0
+          },
+          "server_tool_use": {
+            "web_search_requests": 0,
+            "web_fetch_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 2300,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "inference_geo": "not_available",
+          "iterations": [
+            {
+              "input_tokens": 2,
+              "output_tokens": 11,
+              "cache_read_input_tokens": 43698,
+              "cache_creation_input_tokens": 2300,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 0,
+                "ephemeral_1h_input_tokens": 2300
+              },
+              "type": "message"
+            }
+          ],
+          "speed": "standard"
+        },
+        "model_usage": {
+          "claude-opus-5[1m]": {
+            "inputTokens": 12,
+            "outputTokens": 1364,
+            "thinkingTokens": 200,
+            "cacheReadInputTokens": 209955,
+            "cacheCreationInputTokens": 35880,
+            "webSearchRequests": 0,
+            "costUSD": 0.4979375000000001,
+            "contextWindow": 1000000,
+            "maxOutputTokens": 64000,
+            "canonicalModel": "claude-opus-5",
+            "provider": "firstParty",
+            "costBasis": "list"
+          }
+        },
+        "model": "claude-opus-5[1m]",
+        "cli_version": "2.1.278",
+        "provider_call_count": 1,
+        "tool_calls": 0,
+        "observed_hooks": [
+          "SessionStart",
+          "Stop",
+          "UserPromptSubmit"
+        ]
+      },
+      "monitor_queries": [
+        {
+          "name": "loki_task_api",
+          "observed_at_utc": "2026-09-20T14:53:55.858939+00:00",
+          "argv": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "10",
+            "--get",
+            "http://127.0.0.1:13100/loki/api/v1/query_range",
+            "--data-urlencode",
+            "query={service_name=\"claude-code\"} | ecosystem_task_id = \"38024bf1b2c90fef74702f932f20c8970ef75156ac7d5dc07edd26486c6e239c\" | event_name = \"api_request\"",
+            "--data-urlencode",
+            "start=1789915976629522176",
+            "--data-urlencode",
+            "end=1789916011270888960",
+            "--data-urlencode",
+            "limit=20",
+            "--data-urlencode",
+            "direction=forward",
+            "--write-out",
+            "\n%{http_code}"
+          ],
+          "http_status": "200",
+          "exit_code": 0,
+          "native_response": {
+            "status": "success",
+            "data": {
+              "resultType": "streams",
+              "result": [
+                {
+                  "stream": {
+                    "app_version": "2.1.278",
+                    "cache_creation_tokens": "2300",
+                    "cache_read_tokens": "43698",
+                    "detected_level": "unknown",
+                    "duration_ms": "1037",
+                    "ecosystem_client_scope": "native-claude",
+                    "ecosystem_task_id": "38024bf1b2c90fef74702f932f20c8970ef75156ac7d5dc07edd26486c6e239c",
+                    "effort": "high",
+                    "event_name": "api_request",
+                    "event_sequence": "43",
+                    "event_timestamp": "2026-09-20T14:53:09.494Z",
+                    "input_tokens": "2",
+                    "model": "claude-opus-5",
+                    "observed_timestamp": "1789915989494000000",
+                    "output_tokens": "11",
+                    "query_source": "sdk",
+                    "scope_name": "native-agent-telemetry",
+                    "service_instance_id": "${WRITER_INSTANCE_ID}",
+                    "service_name": "claude-code",
+                    "service_version": "2.1.278"
+                  },
+                  "values": [
+                    [
+                      "1789915989494000000",
+                      "[content omitted]"
+                    ]
+                  ]
+                }
+              ],
+              "stats": {
+                "summary": {
+                  "bytesProcessedPerSecond": 2529631,
+                  "linesProcessedPerSecond": 20055,
+                  "totalBytesProcessed": 6685,
+                  "totalLinesProcessed": 53,
+                  "execTime": 0.002643,
+                  "queueTime": 6.3e-05,
+                  "subqueries": 0,
+                  "totalEntriesReturned": 1,
+                  "splits": 0,
+                  "shards": 1,
+                  "totalPostFilterLines": 1,
+                  "totalStructuredMetadataBytesProcessed": 5784
+                },
+                "querier": {
+                  "store": {
+                    "totalChunksRef": 0,
+                    "totalChunksDownloaded": 0,
+                    "chunksDownloadTime": 0,
+                    "queryReferencedStructuredMetadata": false,
+                    "queryUsedV2Engine": false,
+                    "chunk": {
+                      "headChunkBytes": 0,
+                      "headChunkLines": 0,
+                      "decompressedBytes": 0,
+                      "decompressedLines": 0,
+                      "compressedBytes": 0,
+                      "totalDuplicates": 0,
+                      "postFilterLines": 0,
+                      "headChunkStructuredMetadataBytes": 0,
+                      "decompressedStructuredMetadataBytes": 0
+                    },
+                    "chunkRefsFetchTime": 0,
+                    "congestionControlLatency": 0,
+                    "pipelineWrapperFilteredLines": 0,
+                    "dataobj": {
+                      "prePredicateDecompressedRows": 0,
+                      "prePredicateDecompressedBytes": 0,
+                      "prePredicateDecompressedStructuredMetadataBytes": 0,
+                      "postPredicateRows": 0,
+                      "postPredicateDecompressedBytes": 0,
+                      "postPredicateStructuredMetadataBytes": 0,
+                      "postFilterRows": 0,
+                      "pagesScanned": 0,
+                      "pagesDownloaded": 0,
+                      "pagesDownloadedBytes": 0,
+                      "pageBatches": 0,
+                      "totalRowsAvailable": 0,
+                      "totalPageDownloadTime": 0
+                    }
+                  },
+                  "querierExecTime": 0.001976
+                },
+                "ingester": {
+                  "totalReached": 1,
+                  "totalChunksMatched": 1,
+                  "totalBatches": 2,
+                  "totalLinesSent": 1,
+                  "store": {
+                    "totalChunksRef": 0,
+                    "totalChunksDownloaded": 0,
+                    "chunksDownloadTime": 0,
+                    "queryReferencedStructuredMetadata": true,
+                    "queryUsedV2Engine": false,
+                    "chunk": {
+                      "headChunkBytes": 6685,
+                      "headChunkLines": 53,
+                      "decompressedBytes": 0,
+                      "decompressedLines": 0,
+                      "compressedBytes": 0,
+                      "totalDuplicates": 0,
+                      "postFilterLines": 1,
+                      "headChunkStructuredMetadataBytes": 5784,
+                      "decompressedStructuredMetadataBytes": 0
+                    },
+                    "chunkRefsFetchTime": 56759,
+                    "congestionControlLatency": 0,
+                    "pipelineWrapperFilteredLines": 0,
+                    "dataobj": {
+                      "prePredicateDecompressedRows": 0,
+                      "prePredicateDecompressedBytes": 0,
+                      "prePredicateDecompressedStructuredMetadataBytes": 0,
+                      "postPredicateRows": 0,
+                      "postPredicateDecompressedBytes": 0,
+                      "postPredicateStructuredMetadataBytes": 0,
+                      "postFilterRows": 0,
+                      "pagesScanned": 0,
+                      "pagesDownloaded": 0,
+                      "pagesDownloadedBytes": 0,
+                      "pageBatches": 0,
+                      "totalRowsAvailable": 0,
+                      "totalPageDownloadTime": 0
+                    }
+                  },
+                  "recvWaitTime": 0.000507
+                },
+                "cache": {
+                  "chunk": {
+                    "entriesFound": 0,
+                    "entriesRequested": 0,
+                    "entriesStored": 0,
+                    "bytesReceived": 0,
+                    "bytesSent": 0,
+                    "requests": 0,
+                    "downloadTime": 0,
+                    "queryLengthServed": 0
+                  },
+                  "index": {
+                    "entriesFound": 0,
+                    "entriesRequested": 0,
+                    "entriesStored": 0,
+                    "bytesReceived": 0,
+                    "bytesSent": 0,
+                    "requests": 0,
+                    "downloadTime": 0,
+                    "queryLengthServed": 0
+                  },
+                  "result": {
+                    "entriesFound": 0,
+                    "entriesRequested": 0,
+                    "entriesStored": 0,
+                    "bytesReceived": 0,
+                    "bytesSent": 0,
+                    "requests": 0,
+                    "downloadTime": 0,
+                    "queryLengthServed": 0
+                  },
+                  "statsResult": {
+                    "entriesFound": 0,
+                    "entriesRequested": 0,
+                    "entriesStored": 0,
+                    "bytesReceived": 0,
+                    "bytesSent": 0,
+                    "requests": 0,
+                    "downloadTime": 0,
+                    "queryLengthServed": 0
+                  },
+                  "volumeResult": {
+                    "entriesFound": 0,
+                    "entriesRequested": 0,
+                    "entriesStored": 0,
+                    "bytesReceived": 0,
+                    "bytesSent": 0,
+                    "requests": 0,
+                    "downloadTime": 0,
+                    "queryLengthServed": 0
+                  },
+                  "seriesResult": {
+                    "entriesFound": 0,
+                    "entriesRequested": 0,
+                    "entriesStored": 0,
+                    "bytesReceived": 0,
+                    "bytesSent": 0,
+                    "requests": 0,
+                    "downloadTime": 0,
+                    "queryLengthServed": 0
+                  },
+                  "labelResult": {
+                    "entriesFound": 0,
+                    "entriesRequested": 0,
+                    "entriesStored": 0,
+                    "bytesReceived": 0,
+                    "bytesSent": 0,
+                    "requests": 0,
+                    "downloadTime": 0,
+                    "queryLengthServed": 0
+                  },
+                  "instantMetricResult": {
+                    "entriesFound": 0,
+                    "entriesRequested": 0,
+                    "entriesStored": 0,
+                    "bytesReceived": 0,
+                    "bytesSent": 0,
+                    "requests": 0,
+                    "downloadTime": 0,
+                    "queryLengthServed": 0
+                  }
+                },
+                "index": {
+                  "totalChunks": 0,
+                  "postFilterChunks": 0,
+                  "shardsDuration": 0,
+                  "usedBloomFilters": false,
+                  "totalStreams": 0,
+                  "chunkRefsLookupTime": 0,
+                  "bloomFilterTime": 0
+                }
+              }
+            }
+          },
+          "stderr": ""
+        },
+        {
+          "name": "prometheus_writer_tokens",
+          "observed_at_utc": "2026-09-20T14:53:55.867368+00:00",
+          "argv": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "10",
+            "--get",
+            "http://127.0.0.1:19090/api/v1/query",
+            "--data-urlencode",
+            "query=ecosystem_claude_code_token_usage_tokens_total{job=\"claude-code\",instance=\"${WRITER_INSTANCE_ID}\"}",
+            "--write-out",
+            "\n%{http_code}"
+          ],
+          "http_status": "200",
+          "exit_code": 0,
+          "native_response": {
+            "status": "success",
+            "data": {
+              "resultType": "vector",
+              "result": [
+                {
+                  "metric": {
+                    "__name__": "ecosystem_claude_code_token_usage_tokens_total",
+                    "app_version": "2.1.278",
+                    "client_scope": "native-claude",
+                    "effort": "high",
+                    "instance": "${WRITER_INSTANCE_ID}",
+                    "job": "claude-code",
+                    "model": "claude-opus-5[1m]",
+                    "otel_scope_name": "native-agent-telemetry",
+                    "query_source": "main",
+                    "type": "cacheCreation"
+                  },
+                  "value": [
+                    1789916035.871,
+                    "2300"
+                  ]
+                },
+                {
+                  "metric": {
+                    "__name__": "ecosystem_claude_code_token_usage_tokens_total",
+                    "app_version": "2.1.278",
+                    "client_scope": "native-claude",
+                    "effort": "high",
+                    "instance": "${WRITER_INSTANCE_ID}",
+                    "job": "claude-code",
+                    "model": "claude-opus-5[1m]",
+                    "otel_scope_name": "native-agent-telemetry",
+                    "query_source": "main",
+                    "type": "cacheRead"
+                  },
+                  "value": [
+                    1789916035.871,
+                    "43698"
+                  ]
+                },
+                {
+                  "metric": {
+                    "__name__": "ecosystem_claude_code_token_usage_tokens_total",
+                    "app_version": "2.1.278",
+                    "client_scope": "native-claude",
+                    "effort": "high",
+                    "instance": "${WRITER_INSTANCE_ID}",
+                    "job": "claude-code",
+                    "model": "claude-opus-5[1m]",
+                    "otel_scope_name": "native-agent-telemetry",
+                    "query_source": "main",
+                    "type": "input"
+                  },
+                  "value": [
+                    1789916035.871,
+                    "2"
+                  ]
+                },
+                {
+                  "metric": {
+                    "__name__": "ecosystem_claude_code_token_usage_tokens_total",
+                    "app_version": "2.1.278",
+                    "client_scope": "native-claude",
+                    "effort": "high",
+                    "instance": "${WRITER_INSTANCE_ID}",
+                    "job": "claude-code",
+                    "model": "claude-opus-5[1m]",
+                    "otel_scope_name": "native-agent-telemetry",
+                    "query_source": "main",
+                    "type": "output"
+                  },
+                  "value": [
+                    1789916035.871,
+                    "11"
+                  ]
+                }
+              ]
+            }
+          },
+          "stderr": ""
+        }
+      ],
+      "three_way_usage_comparison": {
+        "native": {
+          "input": 2,
+          "cacheCreation": 2300,
+          "cacheRead": 43698,
+          "output": 11
+        },
+        "loki": {
+          "input": 2,
+          "cacheCreation": 2300,
+          "cacheRead": 43698,
+          "output": 11
+        },
+        "prometheus": {
+          "cacheCreation": 2300,
+          "cacheRead": 43698,
+          "input": 2,
+          "output": 11
+        },
+        "total_consumed_tokens": 46011,
+        "all_equal": true,
+        "scope": "One API request, one freshly generated service.instance.id. Prometheus values are cumulative for this writer; this acceptance produced exactly one API request, so the writer totals equal this request. Earlier invocations are excluded."
+      },
+      "checks": {
+        "normal_exit": true,
+        "native_result_success": true,
+        "same_session_identity": true,
+        "same_configured_model": true,
+        "exact_continuity_marker": true,
+        "no_tool_use": true,
+        "loki_exact_task_and_writer": true,
+        "prometheus_exact_writer": true,
+        "both_upstream_queries_success": true,
+        "four_usage_categories_equal_native_loki_prometheus": true,
+        "owned_process_group_empty": true,
+        "original_23_artifact_hashes_still_valid": true
+      },
+      "acceptance_passed": true,
+      "whole_claude_acceptance_consumption": {
+        "initial": 157389,
+        "first_resume": 43811,
+        "observation_corrected_resume": 46011,
+        "total": 247211,
+        "measured_causal_tokens_saved": null,
+        "boundary": "Three distinct native invocation usage totals; cache creation/read are separate Anthropic input categories and thinking is an output subset. This is consumed usage, not avoided tokens or subscription billing."
+      },
+      "preserved_earlier_limits": [
+        "Initial exact-session Loki query returned zero because raw session IDs were suppressed and the direct launch omitted writer/task metadata.",
+        "Earlier initial/resume API categories match their native values by time window, but are not retroactively assigned the new writer identity.",
+        "Initial strict-JSON formatting failed and the both-tools narrative disagreed with the three successful MCP calls.",
+        "No whole-stack lifecycle, interactive HUD, PreCompact or causal token-saving claim is established."
+      ],
+      "evidence_files": [
+        {
+          "path": "auth.json",
+          "sha256": "6c88b8ba357364e5fec860ffd983be3ec45bf418d3283e08c38783bef4a4b77b",
+          "bytes": 300
+        },
+        {
+          "path": "auth.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        {
+          "path": "auth.stdout.txt",
+          "sha256": "0bd8b2153189518c04720b783fe06fbb1f6a92943e126680c4c327a52817c338",
+          "bytes": 383
+        },
+        {
+          "path": "expected-source.json",
+          "sha256": "198206f5e8adebe56744dbf171331dca641ff7316273972b34acd2295ba4ff85",
+          "bytes": 2610
+        },
+        {
+          "path": "help.json",
+          "sha256": "43a6820d2ee116fbb74868d131e18afc0506eebf3721cf40147a522fcc88e46c",
+          "bytes": 274
+        },
+        {
+          "path": "help.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        {
+          "path": "help.stdout.txt",
+          "sha256": "ae85d661e9c086f05637ebcd868f5702b477ff6e55e2e65b8ada7807cd51a4b6",
+          "bytes": 21401
+        },
+        {
+          "path": "initial-execution.json",
+          "sha256": "1689a4d29fc379ab63ba9bbfb4435ada10c6855a971ab9504ce2e2a7b4d0a496",
+          "bytes": 1103
+        },
+        {
+          "path": "initial-stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        {
+          "path": "initial-stream.jsonl",
+          "sha256": "4cd570cfe0dd2ff6095b432b69ee865a7aa7cbe49ae961cc6e657d6447541d8f",
+          "bytes": 61485
+        },
+        {
+          "path": "observed-monitor-queries.json",
+          "sha256": "f7638b7d87144c48e13076fdd93bc8c259826d9ec4f5a9234d1159bcc61df75f",
+          "bytes": 11845
+        },
+        {
+          "path": "observed-resume-execution.json",
+          "sha256": "431f8dd19a3749ad16f5fef489ef686b8a657aefb4300699821f51aa0f7f102c",
+          "bytes": 1371
+        },
+        {
+          "path": "observed-resume-stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        {
+          "path": "observed-resume-stream.jsonl",
+          "sha256": "abb33e3c5ea3cf4ab3e27c8d9bb595fa32fc0a72bc84851b31ea5b0682309351",
+          "bytes": 28219
+        },
+        {
+          "path": "observed-scope.json",
+          "sha256": "bf87e8a3c294adfd18d4f274dc69f7ce9f26f787a39f33a450ef72b7ce2ba3f0",
+          "bytes": 509
+        },
+        {
+          "path": "prompt-initial.txt",
+          "sha256": "1d653dea5296d9f5da500effa1fe536bac61f1b34db9d45865f9a61d63e52154",
+          "bytes": 1161
+        },
+        {
+          "path": "prompt-observed-resume.txt",
+          "sha256": "918ae81e625984e0a33ef4ae433b6bd6a0d5d51ab21f9a52c564d71730a87239",
+          "bytes": 181
+        },
+        {
+          "path": "prompt-resume.txt",
+          "sha256": "39ee0a1a995952fa5d1ad1e76b3866f8f89b97e9d204e4ae65eb78fa31687c58",
+          "bytes": 462
+        },
+        {
+          "path": "receipt.json",
+          "sha256": "ffea3d4dc0e397670b441c2ef7c9ec49632e470392fd9c042b8989904d003430",
+          "bytes": 17926
+        },
+        {
+          "path": "resume-execution.json",
+          "sha256": "64c06132518577680e9d14f6e50e2e34a82838708e3321b9f952c399edca35fd",
+          "bytes": 1098
+        },
+        {
+          "path": "resume-stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        {
+          "path": "resume-stream.jsonl",
+          "sha256": "e36683b59842648dd140a8fd15739e5729f95d23edc84763d9d5a595326eb76a",
+          "bytes": 28391
+        },
+        {
+          "path": "run-native.py",
+          "sha256": "949de9724d9bba32a9646d22d6452dc0a025d583755b9bc23edbad3c10b2447a",
+          "bytes": 3381
+        },
+        {
+          "path": "run-observed-resume.py",
+          "sha256": "eadd9c7e8ba23e7f2241d8b39528fb46fb60ad17e8a570bfac844f901c853b63",
+          "bytes": 3561
+        },
+        {
+          "path": "session.json",
+          "sha256": "341a0ef4e42f9561d4c059ae833dbfdb75c577390279a232a00008f0e76d3b39",
+          "bytes": 150
+        },
+        {
+          "path": "telemetry-gap-api-usage.json",
+          "sha256": "4cbe17016f790439662f080e028af7a6dcc9a3a5df0914316026a9670382b9a0",
+          "bytes": 13974
+        },
+        {
+          "path": "telemetry-gap-claude-metadata.json",
+          "sha256": "387f92ea9f3be4329ca812f5f0137968a3cbfe9a811862dd112bcf62c2ecdf53",
+          "bytes": 31261
+        },
+        {
+          "path": "telemetry-gap-queries.json",
+          "sha256": "e474d877ac9f0279b55b7eff9b2214112b99a3bc35c99e4713b3cab01d46ae0f",
+          "bytes": 9115
+        },
+        {
+          "path": "telemetry-gap-receipt.json",
+          "sha256": "a31a58bf6df02df1756143a77db5a52feacd569d397ca8e1456f13ac21f5cf83",
+          "bytes": 12434
+        },
+        {
+          "path": "telemetry-loki-body.json",
+          "sha256": "63c73fb9fa52fb5ce7c1a882eb4f9564258e5301c702349719642ce062e3733c",
+          "bytes": 3623
+        },
+        {
+          "path": "telemetry-loki-execution.json",
+          "sha256": "2f66458458a1598d7ba9f9b6a755df87f4ce4abb14b0f5dc7f9dd0b3e8cee1e4",
+          "bytes": 1196
+        },
+        {
+          "path": "telemetry-loki-stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        {
+          "path": "version.json",
+          "sha256": "d94c6e378318e32a8dd31f1bca2465fd3832ab105af1f26ba5ed5f561ca28f9d",
+          "bytes": 277
+        },
+        {
+          "path": "version.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        },
+        {
+          "path": "version.stdout.txt",
+          "sha256": "f0d384f3abe85e8cb2f0366465826cc8232426881854235d3ad1150e4a76f689",
+          "bytes": 22
+        }
+      ]
+    },
+    "native_counter_capture": {
+      "generated_at": "2026-09-20T14:56:03.739753+00:00",
+      "scope": "Latest successful upstream command returns and persisted runtime statistics; no refresh-time rewrite of older direct captures.",
+      "native": [
+        {
+          "tool": "context-mode",
+          "scope": "Desktop WSL",
+          "latest": {
+            "observed_at": "2026-09-20T14:55:59.016011+00:00",
+            "success": true,
+            "metrics": {
+              "saved": 2143488,
+              "session_estimated_saved": 0,
+              "kind": "upstream event/byte estimate",
+              "boundary": "Latest persisted upstream file in this runtime root, not a sum of sessions. Lifetime = retained event count × 256; session = kept-out bytes ÷ 4. Not avoided provider usage.",
+              "raw": {
+                "schemaVersion": 2,
+                "version": "1.0.169",
+                "updated_at": 1789916118167,
+                "session_start": 1789832293000,
+                "uptime_ms": 83825167,
+                "total_calls": 1,
+                "bytes_returned": 58,
+                "bytes_indexed": 0,
+                "bytes_sandboxed": 0,
+                "cache_hits": 0,
+                "cache_bytes_saved": 0,
+                "kept_out": 0,
+                "total_processed": 58,
+                "reduction_pct": 0,
+                "tokens_saved": 0,
+                "dollars_saved_session": 0,
+                "tokens_saved_lifetime": 2143488,
+                "dollars_saved_lifetime": 10.72,
+                "by_tool": {
+                  "ctx_execute": {
+                    "calls": 1,
+                    "bytes": 58
+                  }
+                }
+              }
+            },
+            "evidence": {
+              "source": {
+                "path": "$DESKTOP_USER_DIR/.codex/context-mode/sessions/stats-pid-26553.json",
+                "bytes": 435,
+                "sha256": "bc26ba004a648fcb9e0cb502c33b8a0fd7ebf6f4acfde38a70ee18211b398791"
+              },
+              "captured_source": {
+                "path": "$STACK_HOME/state/token-evidence/captures/20260920T145557-577415c6/context-Desktop-WSL.json",
+                "bytes": 435,
+                "sha256": "bc26ba004a648fcb9e0cb502c33b8a0fd7ebf6f4acfde38a70ee18211b398791",
+                "tokens": null
+              },
+              "session_start": 1789832293000,
+              "source_updated_at": 1789916118167,
+              "schema": 2,
+              "version": "1.0.169",
+              "access": "Read upstream-generated stats JSON; no fresh MCP invocation implied."
+            }
+          }
+        },
+        {
+          "tool": "context-mode",
+          "scope": "Native Claude",
+          "latest": {
+            "observed_at": "2026-09-20T14:55:59.002621+00:00",
+            "success": true,
+            "metrics": {
+              "saved": 54016,
+              "session_estimated_saved": 0,
+              "kind": "upstream event/byte estimate",
+              "boundary": "Latest persisted upstream file in this runtime root, not a sum of sessions. Lifetime = retained event count × 256; session = kept-out bytes ÷ 4. Not avoided provider usage.",
+              "raw": {
+                "schemaVersion": 2,
+                "version": "1.0.169",
+                "updated_at": 1789915989553,
+                "session_start": 1789915424000,
+                "uptime_ms": 565553,
+                "total_calls": 1,
+                "bytes_returned": 240,
+                "bytes_indexed": 0,
+                "bytes_sandboxed": 0,
+                "cache_hits": 0,
+                "cache_bytes_saved": 0,
+                "kept_out": 0,
+                "total_processed": 240,
+                "reduction_pct": 0,
+                "tokens_saved": 0,
+                "dollars_saved_session": 0,
+                "tokens_saved_lifetime": 54016,
+                "dollars_saved_lifetime": 0.27,
+                "by_tool": {
+                  "ctx_execute_file": {
+                    "calls": 1,
+                    "bytes": 240
+                  }
+                }
+              }
+            },
+            "evidence": {
+              "source": {
+                "path": "$NATIVE_USER_HOME/.claude/context-mode/sessions/stats-pid-1899070.json",
+                "bytes": 438,
+                "sha256": "bac5e4520491116981c4c7c1a607c40dbc8206ed7d368b206444fd9256850ae5"
+              },
+              "captured_source": {
+                "path": "$STACK_HOME/state/token-evidence/captures/20260920T145557-577415c6/context-Native-Claude.json",
+                "bytes": 438,
+                "sha256": "bac5e4520491116981c4c7c1a607c40dbc8206ed7d368b206444fd9256850ae5",
+                "tokens": null
+              },
+              "session_start": 1789915424000,
+              "source_updated_at": 1789915989553,
+              "schema": 2,
+              "version": "1.0.169",
+              "access": "Read upstream-generated stats JSON; no fresh MCP invocation implied."
+            }
+          }
+        },
+        {
+          "tool": "context-mode",
+          "scope": "Native Codex",
+          "latest": {
+            "observed_at": "2026-09-20T14:55:58.997781+00:00",
+            "success": true,
+            "metrics": {
+              "saved": 71424,
+              "session_estimated_saved": 1070038,
+              "kind": "upstream event/byte estimate",
+              "boundary": "Latest persisted upstream file in this runtime root, not a sum of sessions. Lifetime = retained event count × 256; session = kept-out bytes ÷ 4. Not avoided provider usage.",
+              "raw": {
+                "schemaVersion": 2,
+                "version": "1.0.169",
+                "updated_at": 1789916158983,
+                "session_start": 1789880572917,
+                "uptime_ms": 35586066,
+                "total_calls": 26,
+                "bytes_returned": 73429,
+                "bytes_indexed": 69789,
+                "bytes_sandboxed": 4210363,
+                "cache_hits": 0,
+                "cache_bytes_saved": 0,
+                "kept_out": 4280152,
+                "total_processed": 4353581,
+                "reduction_pct": 98,
+                "tokens_saved": 1070038,
+                "dollars_saved_session": 5.35,
+                "tokens_saved_lifetime": 71424,
+                "dollars_saved_lifetime": 0.36,
+                "by_tool": {
+                  "ctx_search": {
+                    "calls": 6,
+                    "bytes": 9711
+                  },
+                  "ctx_execute": {
+                    "calls": 13,
+                    "bytes": 31440
+                  },
+                  "ctx_batch_execute": {
+                    "calls": 1,
+                    "bytes": 18320
+                  },
+                  "ctx_stats": {
+                    "calls": 4,
+                    "bytes": 12832
+                  },
+                  "ctx_execute_file": {
+                    "calls": 2,
+                    "bytes": 1126
+                  }
+                }
+              }
+            },
+            "evidence": {
+              "source": {
+                "path": "$NATIVE_USER_HOME/.codex/context-mode/sessions/stats-pid-837.json",
+                "bytes": 637,
+                "sha256": "1ae818883ab98b221260fe54eb651a7e62e4240afe1fcbec2310fb2c8377d709"
+              },
+              "captured_source": {
+                "path": "$STACK_HOME/state/token-evidence/captures/20260920T145557-577415c6/context-Native-Codex.json",
+                "bytes": 637,
+                "sha256": "1ae818883ab98b221260fe54eb651a7e62e4240afe1fcbec2310fb2c8377d709",
+                "tokens": null
+              },
+              "session_start": 1789880572917,
+              "source_updated_at": 1789916158983,
+              "schema": 2,
+              "version": "1.0.169",
+              "access": "Read upstream-generated stats JSON; no fresh MCP invocation implied."
+            }
+          }
+        },
+        {
+          "tool": "headroom",
+          "scope": "Linux / native last 30 days",
+          "latest": {
+            "observed_at": "2026-09-20T14:55:58.113162+00:00",
+            "success": true,
+            "metrics": {
+              "saved": 0,
+              "boundary": "Upstream field named lifetime is capped at 30 days in version 0.37.0; local offline guards do not append native events.",
+              "raw": {
+                "schema_version": 1,
+                "path": "$NATIVE_USER_HOME/.headroom/savings_events.jsonl",
+                "top_model": "unknown",
+                "lifetime": {
+                  "tokens_saved": 0,
+                  "tokens_before": 0,
+                  "cost_usd": 0.0,
+                  "calls": 0,
+                  "savings_percent": 0.0
+                },
+                "windows": {
+                  "today": {
+                    "tokens_saved": 0,
+                    "tokens_before": 0,
+                    "cost_usd": 0.0,
+                    "calls": 0,
+                    "savings_percent": 0.0
+                  },
+                  "last_7_days": {
+                    "tokens_saved": 0,
+                    "tokens_before": 0,
+                    "cost_usd": 0.0,
+                    "calls": 0,
+                    "savings_percent": 0.0
+                  },
+                  "last_30_days": {
+                    "tokens_saved": 0,
+                    "tokens_before": 0,
+                    "cost_usd": 0.0,
+                    "calls": 0,
+                    "savings_percent": 0.0
+                  }
+                },
+                "by_model": [],
+                "by_client": []
+              },
+              "kind": "upstream estimate"
+            },
+            "evidence": {
+              "argv": [
+                "$NATIVE_TOOL_HOME/bin/headroom",
+                "savings",
+                "--json"
+              ],
+              "cwd": "$PROJECT",
+              "started_at": "2026-09-20T14:55:57.846383+00:00",
+              "completed_at": "2026-09-20T14:55:58.113162+00:00",
+              "exit_code": 0,
+              "error": null,
+              "stdout": {
+                "path": "$STACK_HOME/state/token-evidence/captures/20260920T145557-577415c6/headroom/stdout.txt",
+                "bytes": 738,
+                "sha256": "eafe48c7c8b730861b0d3fa6ddfc0889b3bf8eeed54622936665902e17d6ee46",
+                "tokens": null
+              },
+              "stderr": {
+                "path": "$STACK_HOME/state/token-evidence/captures/20260920T145557-577415c6/headroom/stderr.txt",
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "tokens": null
+              },
+              "stdout_text": "{\n  \"schema_version\": 1,\n  \"path\": \"$NATIVE_USER_HOME/.headroom/savings_events.jsonl\",\n  \"top_model\": \"unknown\",\n  \"lifetime\": {\n    \"tokens_saved\": 0,\n    \"tokens_before\": 0,\n    \"cost_usd\": 0.0,\n    \"calls\": 0,\n    \"savings_percent\": 0.0\n  },\n  \"windows\": {\n    \"today\": {\n      \"tokens_saved\": 0,\n      \"tokens_before\": 0,\n      \"cost_usd\": 0.0,\n      \"calls\": 0,\n      \"savings_percent\": 0.0\n    },\n    \"last_7_days\": {\n      \"tokens_saved\": 0,\n      \"tokens_before\": 0,\n      \"cost_usd\": 0.0,\n      \"calls\": 0,\n      \"savings_percent\": 0.0\n    },\n    \"last_30_days\": {\n      \"tokens_saved\": 0,\n      \"tokens_before\": 0,\n      \"cost_usd\": 0.0,\n      \"calls\": 0,\n      \"savings_percent\": 0.0\n    }\n  },\n  \"by_model\": [],\n  \"by_client\": []\n}\n",
+              "stderr_text": ""
+            }
+          }
+        },
+        {
+          "tool": "jcodemunch",
+          "scope": "Linux / upstream default index",
+          "latest": {
+            "observed_at": "2026-09-20T14:55:58.940776+00:00",
+            "success": true,
+            "metrics": {
+              "saved": 39760,
+              "kind": "upstream bytes/4 estimate",
+              "boundary": "Persistent upstream retrieval estimate, including validation calls. Whole-file counterfactual; not measured provider savings. Custom index-root accounting has an upstream gap in 1.108.319; the default root is used. Schema-size estimates are separate and never added.",
+              "basis": {
+                "generation": 2,
+                "first_generation": 2,
+                "mixed_basis": false
+              },
+              "by_tool": {
+                "get_symbol_source": 39760,
+                "search_symbols": 0
+              },
+              "since": "2026-09-20",
+              "session_calls": 0,
+              "raw": {
+                "session_tokens_saved": 0,
+                "session_calls": 0,
+                "session_duration_s": 0.1,
+                "session_response_tokens": 0,
+                "total_tokens_saved": 39760,
+                "total_tokens_saved_basis": {
+                  "generation": 2,
+                  "first_generation": 2,
+                  "mixed_basis": false
+                },
+                "lifetime_by_tool": {
+                  "get_symbol_source": 39760,
+                  "search_symbols": 0
+                },
+                "lifetime_by_tool_since": "2026-09-20",
+                "lifetime_unattributed": 0,
+                "tool_breakdown": {},
+                "tool_calls": {},
+                "savings_per_call": 0,
+                "result_cache": {
+                  "total_hits": 0,
+                  "total_misses": 0,
+                  "hit_rate": 0,
+                  "cached_entries": 0
+                },
+                "latency_per_tool": {},
+                "session_cost_avoided": {
+                  "claude_opus_4_6": 0,
+                  "claude_sonnet_4_6": 0,
+                  "claude_haiku_4_5": 0,
+                  "gpt5_latest": 0
+                },
+                "total_cost_avoided": {
+                  "claude_opus_4_6": 0.1988,
+                  "claude_sonnet_4_6": 0.1193,
+                  "claude_haiku_4_5": 0.0398,
+                  "gpt5_latest": 0.3976
+                },
+                "runtime_signal": {
+                  "rows": 0,
+                  "by_source": {}
+                },
+                "savings_provenance": {
+                  "token_reduction": {
+                    "average_pct": 99.6,
+                    "task_runs": 15,
+                    "tokenizer": "cl100k_base",
+                    "basis": "measured",
+                    "source": "benchmarks/provenance/measured.json",
+                    "methodology": "benchmarks/METHODOLOGY.md"
+                  },
+                  "replay_retrieval_quality": {
+                    "fixture": "self_v1_75_0",
+                    "k": 10,
+                    "ndcg": 1,
+                    "mrr": 1,
+                    "recall": 1,
+                    "basis": "measured",
+                    "source": "benchmarks/provenance/measured.json",
+                    "ci_gated": true
+                  },
+                  "implementation_channel_accuracy": {
+                    "corpus": "authored-scenarios-v2",
+                    "languages": [
+                      "python",
+                      "typescript",
+                      "go"
+                    ],
+                    "channels": {
+                      "ast": {
+                        "precision": 0.818,
+                        "recall": 1
+                      },
+                      "duck": {
+                        "precision": 0.5,
+                        "recall": 1
+                      },
+                      "decorator": {
+                        "precision": 0.556,
+                        "recall": 1
+                      }
+                    },
+                    "basis": "measured",
+                    "source": "benchmarks/provenance/channel_accuracy.json",
+                    "ci_gated": true,
+                    "scope_note": "authored gold corpus — channel discrimination on known patterns and traps, not in-the-wild base rates; n small and disclosed in the artifact"
+                  },
+                  "contract": "declared = engineering prior; measured = committed benchmark artifact (benchmarks/provenance/measured.json)"
+                },
+                "processes": {
+                  "live": 2,
+                  "others": 1,
+                  "this_pid": 1904741,
+                  "oldest_age_seconds": 6292.2,
+                  "processes": [
+                    {
+                      "pid": 1727107,
+                      "client_id": "jcodemunch-mcp",
+                      "version": "1.108.319",
+                      "transport": "stdio",
+                      "started_at": "2026-09-20T13:11:06.535665+00:00",
+                      "age_seconds": 6292.2,
+                      "create_time": 75084.75
+                    }
+                  ]
+                },
+                "tool_surface": {
+                  "surface": "counter",
+                  "profile": "full",
+                  "visible_tools": 6,
+                  "catalog_tools": 94,
+                  "schema_tokens_visible": 1050,
+                  "schema_tokens_catalog": 27782,
+                  "schema_tokens_avoided": 26732,
+                  "schema_tokens_basis": "one_time_at_full_rate_then_cache_read",
+                  "schema_tokens_basis_note": "The tool-schema block is stable across requests, so it is paid at full rate approximately once per cache lifetime and at cache-read rates (~0.1x) thereafter. This count is payload size, NOT a per-request saving; reading it as one overstates the cost impact by roughly an order of magnitude. Measured: benchmarks/codex_surface/.",
+                  "heaviest_tools": {
+                    "order": 260,
+                    "route": 229,
+                    "announce_model": 161,
+                    "jcodemunch_guide": 147,
+                    "menu": 128,
+                    "set_tool_tier": 125
+                  },
+                  "estimator": "bytes/4"
+                }
+              }
+            },
+            "evidence": {
+              "argv": [
+                "$NATIVE_TOOL_HOME/bin/mcporter",
+                "call",
+                "--stdio",
+                "$NATIVE_TOOL_HOME/bin/jcodemunch-mcp",
+                "--env",
+                "CODE_INDEX_PATH=$NATIVE_USER_HOME/.code-index",
+                "--env",
+                "JCODEMUNCH_SHARE_SAVINGS=0",
+                "--name",
+                "jcodemunch",
+                "--tool",
+                "order",
+                "--args",
+                "{\"action\":\"get_session_stats\",\"args\":{}}",
+                "--output",
+                "json",
+                "--no-oauth"
+              ],
+              "cwd": "$PROJECT",
+              "started_at": "2026-09-20T14:55:58.116765+00:00",
+              "completed_at": "2026-09-20T14:55:58.940776+00:00",
+              "exit_code": 0,
+              "error": null,
+              "stdout": {
+                "path": "$STACK_HOME/state/token-evidence/captures/20260920T145557-577415c6/jcodemunch/stdout.txt",
+                "bytes": 3609,
+                "sha256": "586e1b1f3cdca3ebb2f8df72ef7d76721631652609a04ce166aff72cc3009539",
+                "tokens": null
+              },
+              "stderr": {
+                "path": "$STACK_HOME/state/token-evidence/captures/20260920T145557-577415c6/jcodemunch/stderr.txt",
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "tokens": null
+              },
+              "stdout_text": "{\n  \"session_tokens_saved\": 0,\n  \"session_calls\": 0,\n  \"session_duration_s\": 0.1,\n  \"session_response_tokens\": 0,\n  \"total_tokens_saved\": 39760,\n  \"total_tokens_saved_basis\": {\n    \"generation\": 2,\n    \"first_generation\": 2,\n    \"mixed_basis\": false\n  },\n  \"lifetime_by_tool\": {\n    \"get_symbol_source\": 39760,\n    \"search_symbols\": 0\n  },\n  \"lifetime_by_tool_since\": \"2026-09-20\",\n  \"lifetime_unattributed\": 0,\n  \"tool_breakdown\": {},\n  \"tool_calls\": {},\n  \"savings_per_call\": 0,\n  \"result_cache\": {\n    \"total_hits\": 0,\n    \"total_misses\": 0,\n    \"hit_rate\": 0,\n    \"cached_entries\": 0\n  },\n  \"latency_per_tool\": {},\n  \"session_cost_avoided\": {\n    \"claude_opus_4_6\": 0,\n    \"claude_sonnet_4_6\": 0,\n    \"claude_haiku_4_5\": 0,\n    \"gpt5_latest\": 0\n  },\n  \"total_cost_avoided\": {\n    \"claude_opus_4_6\": 0.1988,\n    \"claude_sonnet_4_6\": 0.1193,\n    \"claude_haiku_4_5\": 0.0398,\n    \"gpt5_latest\": 0.3976\n  },\n  \"runtime_signal\": {\n    \"rows\": 0,\n    \"by_source\": {}\n  },\n  \"savings_provenance\": {\n    \"token_reduction\": {\n      \"average_pct\": 99.6,\n      \"task_runs\": 15,\n      \"tokenizer\": \"cl100k_base\",\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/measured.json\",\n      \"methodology\": \"benchmarks/METHODOLOGY.md\"\n    },\n    \"replay_retrieval_quality\": {\n      \"fixture\": \"self_v1_75_0\",\n      \"k\": 10,\n      \"ndcg\": 1,\n      \"mrr\": 1,\n      \"recall\": 1,\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/measured.json\",\n      \"ci_gated\": true\n    },\n    \"implementation_channel_accuracy\": {\n      \"corpus\": \"authored-scenarios-v2\",\n      \"languages\": [\n        \"python\",\n        \"typescript\",\n        \"go\"\n      ],\n      \"channels\": {\n        \"ast\": {\n          \"precision\": 0.818,\n          \"recall\": 1\n        },\n        \"duck\": {\n          \"precision\": 0.5,\n          \"recall\": 1\n        },\n        \"decorator\": {\n          \"precision\": 0.556,\n          \"recall\": 1\n        }\n      },\n      \"basis\": \"measured\",\n      \"source\": \"benchmarks/provenance/channel_accuracy.json\",\n      \"ci_gated\": true,\n      \"scope_note\": \"authored gold corpus — channel discrimination on known patterns and traps, not in-the-wild base rates; n small and disclosed in the artifact\"\n    },\n    \"contract\": \"declared = engineering prior; measured = committed benchmark artifact (benchmarks/provenance/measured.json)\"\n  },\n  \"processes\": {\n    \"live\": 2,\n    \"others\": 1,\n    \"this_pid\": 1904741,\n    \"oldest_age_seconds\": 6292.2,\n    \"processes\": [\n      {\n        \"pid\": 1727107,\n        \"client_id\": \"jcodemunch-mcp\",\n        \"version\": \"1.108.319\",\n        \"transport\": \"stdio\",\n        \"started_at\": \"2026-09-20T13:11:06.535665+00:00\",\n        \"age_seconds\": 6292.2,\n        \"create_time\": 75084.75\n      }\n    ]\n  },\n  \"tool_surface\": {\n    \"surface\": \"counter\",\n    \"profile\": \"full\",\n    \"visible_tools\": 6,\n    \"catalog_tools\": 94,\n    \"schema_tokens_visible\": 1050,\n    \"schema_tokens_catalog\": 27782,\n    \"schema_tokens_avoided\": 26732,\n    \"schema_tokens_basis\": \"one_time_at_full_rate_then_cache_read\",\n    \"schema_tokens_basis_note\": \"The tool-schema block is stable across requests, so it is paid at full rate approximately once per cache lifetime and at cache-read rates (~0.1x) thereafter. This count is payload size, NOT a per-request saving; reading it as one overstates the cost impact by roughly an order of magnitude. Measured: benchmarks/codex_surface/.\",\n    \"heaviest_tools\": {\n      \"order\": 260,\n      \"route\": 229,\n      \"announce_model\": 161,\n      \"jcodemunch_guide\": 147,\n      \"menu\": 128,\n      \"set_tool_tier\": 125\n    },\n    \"estimator\": \"bytes/4\"\n  }\n}\n",
+              "stderr_text": ""
+            }
+          }
+        },
+        {
+          "tool": "rtk",
+          "scope": "Linux / all retained projects",
+          "latest": {
+            "observed_at": "2026-09-20T14:55:57.834524+00:00",
+            "success": true,
+            "metrics": {
+              "saved": 1722,
+              "boundary": "Native estimates; configured history retention 90 days. Global includes project counters.",
+              "raw": {
+                "summary": {
+                  "total_commands": 55,
+                  "total_input": 18054,
+                  "total_output": 16332,
+                  "total_saved": 1722,
+                  "avg_savings_pct": 9.538052509139249,
+                  "total_time_ms": 1624,
+                  "avg_time_ms": 29
+                }
+              },
+              "kind": "upstream estimate"
+            },
+            "evidence": {
+              "argv": [
+                "$NATIVE_TOOL_HOME/bin/rtk",
+                "gain",
+                "--format",
+                "json"
+              ],
+              "cwd": "$PROJECT",
+              "started_at": "2026-09-20T14:55:57.822036+00:00",
+              "completed_at": "2026-09-20T14:55:57.834524+00:00",
+              "exit_code": 0,
+              "error": null,
+              "stdout": {
+                "path": "$STACK_HOME/state/token-evidence/captures/20260920T145557-577415c6/rtk-global/stdout.txt",
+                "bytes": 218,
+                "sha256": "b8fb4c1c322613a794a015f8e1e0b103ec4974576addcf10a850e92e3b176bd5",
+                "tokens": null
+              },
+              "stderr": {
+                "path": "$STACK_HOME/state/token-evidence/captures/20260920T145557-577415c6/rtk-global/stderr.txt",
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "tokens": null
+              },
+              "stdout_text": "{\n  \"summary\": {\n    \"total_commands\": 55,\n    \"total_input\": 18054,\n    \"total_output\": 16332,\n    \"total_saved\": 1722,\n    \"avg_savings_pct\": 9.538052509139249,\n    \"total_time_ms\": 1624,\n    \"avg_time_ms\": 29\n  }\n}\n",
+              "stderr_text": ""
+            }
+          }
+        },
+        {
+          "tool": "rtk",
+          "scope": "Linux / project $PROJECT",
+          "latest": {
+            "observed_at": "2026-09-20T14:55:57.842351+00:00",
+            "success": true,
+            "metrics": {
+              "saved": 234,
+              "boundary": "Native estimates for this working directory only; already included in global.",
+              "raw": {
+                "summary": {
+                  "total_commands": 18,
+                  "total_input": 10199,
+                  "total_output": 9965,
+                  "total_saved": 234,
+                  "avg_savings_pct": 2.294342582606138,
+                  "total_time_ms": 346,
+                  "avg_time_ms": 19
+                }
+              },
+              "kind": "upstream estimate"
+            },
+            "evidence": {
+              "argv": [
+                "$NATIVE_TOOL_HOME/bin/rtk",
+                "gain",
+                "--project",
+                "--format",
+                "json"
+              ],
+              "cwd": "$PROJECT",
+              "started_at": "2026-09-20T14:55:57.839771+00:00",
+              "completed_at": "2026-09-20T14:55:57.842351+00:00",
+              "exit_code": 0,
+              "error": null,
+              "stdout": {
+                "path": "$STACK_HOME/state/token-evidence/captures/20260920T145557-577415c6/rtk-project/stdout.txt",
+                "bytes": 215,
+                "sha256": "dff02a975fa9f37898a6a86b8635029ced362e68bda789c5e7bc3da2ace682d3",
+                "tokens": null
+              },
+              "stderr": {
+                "path": "$STACK_HOME/state/token-evidence/captures/20260920T145557-577415c6/rtk-project/stderr.txt",
+                "bytes": 0,
+                "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                "tokens": null
+              },
+              "stdout_text": "{\n  \"summary\": {\n    \"total_commands\": 18,\n    \"total_input\": 10199,\n    \"total_output\": 9965,\n    \"total_saved\": 234,\n    \"avg_savings_pct\": 2.294342582606138,\n    \"total_time_ms\": 346,\n    \"avg_time_ms\": 19\n  }\n}\n",
+              "stderr_text": ""
+            }
+          }
+        }
+      ],
+      "unique_artifact_comparisons": 42,
+      "issues": []
+    },
+    "private_artifacts": [
+      {
+        "path": "codex/acceptance.public.json",
+        "sha256": "c2350d245015601bbf747a87657f65bb1440af565784946f6233d768d4727705",
+        "bytes": 7081
+      },
+      {
+        "path": "codex/acceptance.private.json",
+        "sha256": "4cd2aba6035aeea67fb43d246e663f2045d215a0a0fc97417327c21fbb7d6081",
+        "bytes": 13299
+      },
+      {
+        "path": "codex/observation.public.json",
+        "sha256": "a1ba6a131203284b8a4194ca696a89eecfe785b8dd0076fa055b7b22d29ec1aa",
+        "bytes": 14394
+      },
+      {
+        "path": "codex/observation.private.json",
+        "sha256": "89544cce7bab43980339bd29be2897c2484f6791db79ee08a00e69def6f15e17",
+        "bytes": 21564
+      },
+      {
+        "path": "claude/receipt.json",
+        "sha256": "ffea3d4dc0e397670b441c2ef7c9ec49632e470392fd9c042b8989904d003430",
+        "bytes": 17926
+      },
+      {
+        "path": "claude/telemetry-gap-receipt.json",
+        "sha256": "a31a58bf6df02df1756143a77db5a52feacd569d397ca8e1456f13ac21f5cf83",
+        "bytes": 12434
+      },
+      {
+        "path": "claude/observed-resume-receipt.json",
+        "sha256": "de3859e156412643ab27896cb2e36002098b0ac231fedae331bf7f9a61db100a",
+        "bytes": 23581
+      }
+    ]
+  }
+}

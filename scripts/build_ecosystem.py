@@ -28,6 +28,7 @@ STARS = "catalogs/convergence-practice/public-starred.json"
 REVIEW = "catalogs/convergence-practice/source-review.json"
 ADOPTION = "adoption/manifest.json"
 SATURATION = "blueprints/token-native-focus/saturation-audit.json"
+TOKEN_TOPIC = "docs/token-efficiency-stack.json"
 SETUP_GUIDES = ("adoption/README.md", "adoption/update.md", "tools/token-report/README.md")
 TOKEN_RECEIPTS = (
     "token-practice-native-counters-20260920", "native-jcodemunch-20260920",
@@ -247,7 +248,7 @@ def build_data(root):
         require(set(profile["component_ids"]).issubset(component_ids),
                 "adoption profile references an unknown component")
     guide_paths = list(SETUP_GUIDES)
-    for path in ("adoption/lifecycle.md", "docs/current-session-observation.md"):
+    for path in ("adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md"):
         if (root / path).exists():
             guide_paths.append(path)
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))
@@ -295,7 +296,7 @@ def build_data(root):
                          "current_host_acceptance": "Unknown on this browser's host"})
     token_receipts = []
     receipt_ids = list(TOKEN_RECEIPTS)
-    for receipt_id in ("token-practice-confirmation-20260920", "native-token-clean-prefix-20260920", "current-session-observation-20260920"):
+    for receipt_id in ("token-practice-confirmation-20260920", "native-token-clean-prefix-20260920", "current-session-observation-20260920", "native-token-stack-final-20260920"):
         if receipt_id in receipts_by_id:
             receipt_ids.append(receipt_id)
     for receipt_id in receipt_ids:
@@ -312,6 +313,41 @@ def build_data(root):
             track(path)
             item["sources"].append({"path": path, "url": file_url(path)})
         selection_policy.append(item)
+    token_topic = {"rows": [], "scope": "No topic-specific evidence packet is present."}
+    if (root / TOKEN_TOPIC).exists():
+        topic_source = read(TOKEN_TOPIC)
+        require(topic_source.get("schema_version") == 1, "unsupported token topic schema")
+        require(isinstance(topic_source.get("rows"), list), "token topic rows must be a list")
+        selected_by_id = {row["id"]: row for row in selected}
+        topic_ids = set()
+        topic_rows = []
+        for row in topic_source["rows"]:
+            identifier = row.get("component_id")
+            require(identifier in selected_by_id and identifier not in topic_ids,
+                    "token topic component must be selected and unique")
+            require(row.get("group") in {"core", "observation", "runtime"},
+                    "unknown token topic group")
+            require(isinstance(row.get("source_paths"), list) and row["source_paths"],
+                    "token topic row needs evidence paths")
+            for field in ("purpose", "returned_result_summary", "baseline_summary", "lifecycle_summary"):
+                require(isinstance(row.get(field), str) and row[field].strip(),
+                        "token topic row needs an explicit " + field)
+            for field in ("session_statistics", "lifetime_statistics"):
+                meter = row.get(field)
+                require(isinstance(meter, dict) and isinstance(meter.get("summary"), str)
+                        and meter["summary"].strip(), "token topic needs scoped " + field)
+            require(isinstance(row.get("upstream_commands"), dict) and row["upstream_commands"].get("use"),
+                    "token topic needs an upstream use command")
+            topic_ids.add(identifier)
+            component = selected_by_id[identifier]
+            item = dict(row)
+            item.update(repository=component["repository"], version=component["version"],
+                        recipe_path=component["recipe_path"], sources=[])
+            for path in item.pop("source_paths"):
+                track(path)
+                item["sources"].append({"path": path, "url": file_url(path)})
+            topic_rows.append(item)
+        token_topic = {**topic_source, "rows": topic_rows, "url": file_url(TOKEN_TOPIC)}
     return {"schema_version": 1, "snapshot_date": config["snapshot_date"],
             "repository_url": config["repository_url"], "source_revision": config["source_revision"],
             "stars_observed_at": stars["retrieved_at"], "component_snapshot_at": stamp(stack),
@@ -329,7 +365,7 @@ def build_data(root):
                       "missing_audit_count": sum(row["audit_status"] == "missing" for row in selected)},
             "efficiency": {"comparisons": comparisons, "receipts": token_receipts,
                            "counter_policy": saturation.get("counter_policy", {}),
-                           "selection_policy": selection_policy},
+                           "selection_policy": selection_policy, "topic": token_topic},
             "inputs": sorted(inputs.values(), key=lambda row: row["path"]), **curated}
 
 
