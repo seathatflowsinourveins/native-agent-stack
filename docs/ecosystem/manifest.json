@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-20",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "1d42918df85d9c3dd3795da6bf7660e8be58e820",
+  "source_revision": "1c9b1dc3d6857463409b117fa1e83fe675f7ed42",
   "layers": [
     {
       "id": "agents",
@@ -368,6 +368,27 @@
       "status": "Mac synthetic acceptance",
       "body": "56 checks across migration, exact scope, FTS, reserved and Unicode paths, and restart. No capture or model calls. Failed OS-confinement attempt remains explicit.",
       "path": "blueprints/convergence-practice/mac-memory-patch/README.md"
+    },
+    {
+      "id": "wsl-transport-recovery-20260920",
+      "title": "Owned SSH disconnect with one durable job",
+      "status": "Isolated WSL acceptance",
+      "body": "An owned nonmultiplexed SSH client was terminated; fresh reconnect observed the same native Dagu job running with one unchanged checkpoint, then native completion without stop or retry. Controlled client termination and a deliberately detached deterministic job; not a real network outage, host restart, model-session recovery or distributed exactly-once guarantee.",
+      "path": "blueprints/convergence-practice/wsl-transport-recovery/README.md"
+    },
+    {
+      "id": "wsl-document-ingestion-20260920",
+      "title": "Matching document evidence on Mac and WSL",
+      "status": "Isolated WSL acceptance",
+      "body": "Native Poppler26.09.0 built in a clean WSL prefix and passed the frozen3-page,24-cell,8-positive/4-absent document protocol; four extraction/retrieval artifacts exactly match Mac output. Designed born-digital Latin fixture with explicit table geometry; no OCR, inferred layout, general semantic retrieval or broad upstream corpus qualification.",
+      "path": "blueprints/convergence-practice/wsl-document-ingestion/README.md"
+    },
+    {
+      "id": "wsl-memory-maintenance-20260920",
+      "title": "Native WSL memory backup and restore",
+      "status": "Isolated WSL acceptance",
+      "body": "Official Linux ai-memory2.3.2 passed65 synthetic native checks across exact scope, Unicode/reserved paths, restart, upstream HTTP backup and native restore; four owned processes exited0. Isolated fresh synthetic store and39 MCP tool calls; not production activation, native-client integration or prior-version migration.",
+      "path": "blueprints/convergence-practice/wsl-memory-maintenance/README.md"
     }
   ],
   "annotations": [

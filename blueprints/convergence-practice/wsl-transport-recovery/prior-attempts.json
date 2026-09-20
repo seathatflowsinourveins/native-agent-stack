@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "original_attempt": {
+    "status": "failed",
+    "failure": {
+      "type": "ValueError",
+      "message": "expected owned SSH client SIGTERM exit"
+    },
+    "local_ssh_exit_code": 255,
+    "stderr_empty": true,
+    "fresh_running_snapshot_before_stop": false,
+    "native_stop_was_explicit_cleanup": true,
+    "local_owned_ssh_remaining": false,
+    "public_receipt_sha256": "1958281cf1d4935b9eb1fe4321150932cf2b00771839b6c90c48e3a2ee7312d1",
+    "private_original_result_sha256": "609a458b345b82de315cbf59491761fb5833ebc297ccc2191d7358d56329870a"
+  },
+  "diagnostic_repair": {
+    "status": "passed",
+    "scope": "Same native run recovery after explicit native stop using finalize-only retry; transport survival unqualified.",
+    "native_retries": 1,
+    "checkpoint_count": 1,
+    "oracle_tests_before": 12,
+    "oracle_tests_after": 12
+  },
+  "correction": {
+    "new_attempt": 2,
+    "separately_frozen": true,
+    "change": "Accept the owned SSH client SIGTERM result -15 or 255; immediately require fresh same-run native running status before cleanup or finalizer release. Do not retry in the successful survival condition.",
+    "fixture_and_oracle_unchanged": true
+  },
+  "sequence": [
+    "Attempt 1: native running and durable checkpoint count 1.",
+    "Signal only the active owned local SSH client; it returns 255 with empty stderr.",
+    "Frozen harness incorrectly requires -15 and fails before fresh reconnect.",
+    "Its finally block explicitly stops the owned native run.",
+    "Fresh independent reconnect sees the same run aborted with the checkpoint unchanged.",
+    "One separately frozen diagnostic repair retries only finalize under that same run; all 12 tests pass and owned processes/listeners retire.",
+    "Attempt 2: separately frozen corrected protocol in a new prefix; running before disconnect, running immediately after fresh reconnect, then succeeded without native stop or retry."
+  ]
+}

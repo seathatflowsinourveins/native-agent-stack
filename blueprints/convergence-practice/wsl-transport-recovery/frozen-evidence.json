@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "base_revision": "76f839249f78482ead10ad700a268009d091aad5",
+  "attempts": {
+    "attempt-1": {
+      "frozen_at_utc": "2026-09-20T07:45:02.595479+00:00",
+      "private_freeze_sha256": "d4f3c4371e29c77caeee2f166e81cf1a798009d7079a532b7f8bd6762fcc536c",
+      "files": [
+        {
+          "staged_name": "plan.json",
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/plan.json",
+          "sha256": "b98fc4fda6fd7a5b9d8e651c81a68ff1b64df52741dc6eb107dcb6cf82e9ce04"
+        },
+        {
+          "staged_name": "remote.py",
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/remote.py",
+          "sha256": "aabbd72e4bfd4c8e1b6bff8370ad2dd10d0cd677e82234ea73a5ec81dcde484e"
+        },
+        {
+          "staged_name": "driver.py",
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/driver.py",
+          "sha256": "edd7c10e35098991982ba2994983ef906bd9a4ef62a0333135390c78a34f1328"
+        },
+        {
+          "staged_name": "source/planner.py",
+          "path": "blueprints/convergence-practice/native-worker/accepted/planner.py",
+          "sha256": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef"
+        },
+        {
+          "staged_name": "source/test_planner.py",
+          "path": "blueprints/convergence-practice/native-worker/seed/test_planner.py",
+          "sha256": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+        },
+        {
+          "staged_name": "fixture.py",
+          "path": "blueprints/convergence-practice/job-recovery/fixture.py",
+          "sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+        }
+      ]
+    },
+    "attempt-2": {
+      "frozen_at_utc": "2026-09-20T07:52:35.227997+00:00",
+      "private_freeze_sha256": "18f4f59a42305d5637c1af0069ab84d7a2f117b1f7698c625001259be35b55ec",
+      "files": [
+        {
+          "staged_name": "plan.json",
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/plan-corrected.json",
+          "sha256": "ff5f63c7cc085670f544d162f77173915136fdce5829224e3012d11fb19575df"
+        },
+        {
+          "staged_name": "remote.py",
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/remote.py",
+          "sha256": "aabbd72e4bfd4c8e1b6bff8370ad2dd10d0cd677e82234ea73a5ec81dcde484e"
+        },
+        {
+          "staged_name": "driver.py",
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/driver-corrected.py",
+          "sha256": "46d5145cd2adb5ae5f19cf4a37f0fadec1b180cb46a730d43e916eb89ed0d0ef"
+        },
+        {
+          "staged_name": "source/planner.py",
+          "path": "blueprints/convergence-practice/native-worker/accepted/planner.py",
+          "sha256": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef"
+        },
+        {
+          "staged_name": "source/test_planner.py",
+          "path": "blueprints/convergence-practice/native-worker/seed/test_planner.py",
+          "sha256": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+        },
+        {
+          "staged_name": "fixture.py",
+          "path": "blueprints/convergence-practice/job-recovery/fixture.py",
+          "sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+        }
+      ]
+    },
+    "diagnostic-repair": {
+      "frozen_at_utc": "2026-09-20T07:48:21.141497+00:00",
+      "private_freeze_sha256": "2cca56aa013887efbafa96e4ddb2230cbcdaccbdd5a0a167419b450601c18948",
+      "files": [
+        {
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/repair.py",
+          "sha256": "e939ffa29e11c8340ded22fc25a6699cc195f2d43957e460d778d34bc0702da5"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/repair-plan.json",
+          "sha256": "4b1fc4fa92b552b67c8af203a87ed9e5e86dafb70ac47661f3ec07162fc46ffa"
+        }
+      ]
+    }
+  },
+  "private_artifacts": {
+    "attempt-1-original-result": "609a458b345b82de315cbf59491761fb5833ebc297ccc2191d7358d56329870a",
+    "attempt-1-repair-result": "07ec75926b807bcb08b2a304cf9b355c38d1e3366409b2c80c759d3f8899c360",
+    "attempt-2-result": "d78044b09f9d3ea47e5ff2ad8d852b242b9339d6372322706f1996a9f35b4ab2"
+  },
+  "note": "Hashes identify retained bytes; private native IDs and host paths are not published. Stage-name mappings preserve both original and corrected source bytes."
+}

@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "started_utc": "2026-09-20T07:48:21.142332+00:00",
+  "initial_attempt_passed": false,
+  "transport_survival_qualified": false,
+  "controlled_transport_interruptions": 1,
+  "diagnostic_repairs": 1,
+  "passed": true,
+  "same_run_recovery_qualified": true,
+  "native": {
+    "passed": true,
+    "checks": {
+      "same_native_run_id": true,
+      "native_running_before_disconnect": true,
+      "checkpoint_durable_before_disconnect": true,
+      "native_succeeded": true,
+      "checkpoint_unchanged": true,
+      "exact_completed_result": true,
+      "checkpoint_executed_once": true,
+      "frozen_inputs_unchanged": true,
+      "checkpoint_oracle_12": true,
+      "final_oracle_12": true,
+      "owned_processes_exited": true,
+      "owned_listeners_retired": true
+    },
+    "before_status": "running",
+    "reconnected_status": "aborted",
+    "final_status": "succeeded",
+    "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+    "checkpoint_execution_count": 1,
+    "oracle_tests_before": 12,
+    "oracle_tests_after": 12,
+    "native_selected_step_retry": true,
+    "native_start_exit": {
+      "exit_code": 0,
+      "timeout": false
+    },
+    "observed_owned_processes_remaining": 0,
+    "observed_owned_listeners_remaining": 0,
+    "owned_processes_observed": 5,
+    "owned_listeners_observed": 1,
+    "model_calls": 0,
+    "python_version": "3.12.3",
+    "frozen_files": {
+      "config.yaml": "a2651229d74dd660c8f98f884292ecb8e405ea6ab3bc363ad4985d4d1eb4a087",
+      "driver.py": "edd7c10e35098991982ba2994983ef906bd9a4ef62a0333135390c78a34f1328",
+      "expected.json": "b71639f796b744d6d3bf2897e34f64e9646b808e0136f6dd5222a0c6c47b1893",
+      "fixture.py": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+      "plan.json": "b98fc4fda6fd7a5b9d8e651c81a68ff1b64df52741dc6eb107dcb6cf82e9ce04",
+      "recovery.yaml": "271e3c1e8b665c7f251f664743f22c7320f8076041c513f3d4dcb97dfb85efaa",
+      "remote.py": "aabbd72e4bfd4c8e1b6bff8370ad2dd10d0cd677e82234ea73a5ec81dcde484e",
+      "run.private.json": "8043d75bc22dba3f6a00c368f3f4f649455142a207869d780ea4a5fe26adcddd",
+      "source/planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+      "source/test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+    },
+    "home_preserved": true,
+    "environment_keys": [
+      "DAGU_HOME",
+      "DO_NOT_TRACK",
+      "HOME",
+      "PATH",
+      "PYTHONDONTWRITEBYTECODE",
+      "TMPDIR",
+      "XDG_CACHE_HOME",
+      "XDG_CONFIG_HOME"
+    ],
+    "private_evidence_hashes": {
+      "checkpoint-started.json": "b2845c6042555a2d116bbea41631666e3eed78a03a8b94615d1fe00c5f70a837",
+      "checkpoint-tests.log": "9896d8ab33fe7dabf8c6d21517a86c830aff3502817eee8110cbb3bdf45635df",
+      "checkpoint.json": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+      "completed.json": "382717ea740e3d3dbb68f704b2581baa6f8d4b6292c83328a06d2ec44a435376",
+      "expected.json": "b71639f796b744d6d3bf2897e34f64e9646b808e0136f6dd5222a0c6c47b1893",
+      "failure-cleanup-stop.command.private.json": "31f4f2881bf76b549050765360950515a8efa260a97e491b8d3f5b99d3f96cf9",
+      "final-tests.log": "9896d8ab33fe7dabf8c6d21517a86c830aff3502817eee8110cbb3bdf45635df",
+      "finalize-ready.json": "1aad14198877f5ca5a0a01047f1ad2f8c1391d251d9a4b75ed90656777a86581",
+      "freeze.private.json": "c6c6071b674c3c28bda6675fa1339c23122165107c1aaab9fcb2bb6f61da4ae6",
+      "help-history.command.private.json": "999414d1580953b64640c6d7678dc666d352b20970f3d3279a7bfbc809857d84",
+      "help-retry.command.private.json": "4688ade3141135123783c8535f52ee344f5fd8f0b588da54a58b05ce498515a5",
+      "help-start.command.private.json": "088b99fad535f2050baced16201d444cca54d41cf6590556acd9b84f5349336b",
+      "help-stop.command.private.json": "1c6d9de273b052bee7490f7154b96fb5e07c6faa6d2472514eafd1d69640dfa8",
+      "help-validate.command.private.json": "64a8b4acf9859a2447057353a7fa646c08ca63070190bd35aa062a01892405ba",
+      "history-after.command.private.json": "9602e6015c1933b24e9e0bcd2ab596de7805bad6b36d8956c161f7d49b0594a1",
+      "history-before.command.private.json": "27b58ad56dcbdf43573d81cfbd049d9d42c07ffbbe9f5f63d0a641512ff0ecc3",
+      "history-final.command.private.json": "6c5cc0143aa183008c70d6b9e2de9e97f50f4534b17c24f803b864ae6bad6332",
+      "plan.json": "b98fc4fda6fd7a5b9d8e651c81a68ff1b64df52741dc6eb107dcb6cf82e9ce04",
+      "process.private.json": "a2178c0746743fe7b55adb0b02d4cc82d5c81b301051b1cc5d81a15f15596548",
+      "release.private.json": "589eb554380076df08d7ebd5c74acc1a40038ac5d4b51711ba8ea6a6de3bb4e9",
+      "retry-finalize.command.private.json": "735546934fab368880e3b2dc78de87e0be849223ed1abc65b254ee4ba36272f7",
+      "retry-ready.json": "3172f99eedd5794041055f0d1de237edca3516215acce6fe818afc80581667b1",
+      "run.private.json": "8043d75bc22dba3f6a00c368f3f4f649455142a207869d780ea4a5fe26adcddd",
+      "snapshot-after.private.json": "d2863b2dab9255a42600d425fc4e2e62caba06e229b2b1b8a42fc4c0df28fa85",
+      "snapshot-before.private.json": "05068f3ca1f3344cbbe40a0939472302f3a3b940fabb3cc7e53e575e12ff3deb",
+      "start-exit.private.json": "303a5251d83d50e1c7a479f39ea2c59e79c83ab3a20333f08536f9591f934a81",
+      "start.stderr": "2b3fafdf1d615402e5e9fa05f00be6a5c913bd9da6f444637a10ca593d315e3b",
+      "start.stdout": "b6c37affd5d7ad710b093997f5fbb03902deca33428b569690cbe7e4c030d8fe",
+      "supervisor.private.json": "c73e3479822a5ea995e9e596e89e0ee2162d5941303b3c12e95ede11e288e9c0",
+      "validate.command.private.json": "52dc2aabdd171876822a7ba3d79b51d4edac45bedea53d7fc04a91c22af84b11",
+      "version.command.private.json": "8418451ca65cedb0b662fc1c4d38e156c25901a405e14b6a0fbb1285a3b706ab"
+    }
+  },
+  "cleanup": {
+    "retry_finalizer_absent": true,
+    "owned_prefix_unix_listeners": 0
+  },
+  "transport": {
+    "client_active_before_signal": true,
+    "controlled_signal": "SIGTERM",
+    "local_client_exit_code": 255,
+    "fresh_independent_reconnect": true,
+    "explicit_native_stop_after_harness_failure": true,
+    "same_run_reconciled": true,
+    "checkpoint_effect_count_after_reconnect": 1,
+    "same_native_run_id": true,
+    "initial_native_status": "running",
+    "reconnected_native_status": "aborted",
+    "final_native_status": "succeeded"
+  },
+  "ssh_command_exit_codes": {
+    "native-selected-finalizer-retry": 0,
+    "same-run-finish": 0,
+    "retry-finalizer-cleanup": 0
+  },
+  "finished_utc": "2026-09-20T07:48:22.685840+00:00",
+  "private_evidence_hashes": {
+    "freeze.json": "2cca56aa013887efbafa96e4ddb2230cbcdaccbdd5a0a167419b450601c18948",
+    "native-selected-finalizer-retry.private.json": "9a1688aca279e349edac0f61f3f69fd7c40b97bed44f038b26cc5f5e813b5f4f",
+    "retry-finalizer-cleanup.private.json": "bfb3bdda4a940c9467cf3dd6800beeaafbc122e31b829fe8a276bed93f0968e6",
+    "same-run-finish.private.json": "4947e83ede11b4e7fe07b79dc89d5347b2f16a06917da948e310786c5fd9c643"
+  },
+  "id": "wsl-transport-recovery-attempt-1",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "dagu"
+  ],
+  "original_failure": {
+    "type": "ValueError",
+    "message": "expected owned SSH client SIGTERM exit"
+  },
+  "original_ssh_command_exit_codes": {
+    "stage": 0,
+    "prepare": 0,
+    "ready-1": 0,
+    "ready-2": 0,
+    "failure-cleanup": 0
+  },
+  "original_local_client_cleanup": {
+    "remaining": false
+  },
+  "limits": [
+    "Original transport-survival attempt failed on a harness exit-code assertion. The repair establishes same-run native stop/retry recovery only.",
+    "The checkpoint and original12-test oracle were unchanged; no second interruption occurred during repair.",
+    "Controlled local SSH-client termination is not an actual network/power outage or host restart."
+  ]
+}

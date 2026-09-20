@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "access-recovery",
+  "task_and_failure": "An owned Mac SSH client disconnect must not duplicate the durable synthetic checkpoint or lose the identity/result of a WSL native Dagu job. The first attempt also exposed an incorrect local SSH exit-code assertion.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/dagucloud/dagu/tree/58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "revision": "58fed633d58c1dd1319091fdb2c2f6158ecfa053"
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/tree/76f839249f78482ead10ad700a268009d091aad5",
+      "revision": "76f839249f78482ead10ad700a268009d091aad5"
+    }
+  ],
+  "discovery_provenance": [
+    "Existing accepted job-recovery recipe and retained native WSL receipt; unchanged planner/fixture/oracle. No new discovery-list adoption."
+  ],
+  "license_and_compatibility": "Existing Dagu 2.16.6 GPL-3.0 binary and license hashes verified before both runs. Mac native OpenSSH controls Linux WSL2 native Dagu; remote Python standard library 3.12.3.",
+  "baseline_and_candidate": {
+    "baseline": "Previously accepted native local checkpoint cancellation and selected-step retry; it did not establish SSH transport survival.",
+    "candidate": "Terminate only the owned nonmultiplexed Mac SSH client after a durable checkpoint, freshly reconcile the same running WSL native run, then complete without stop or retry."
+  },
+  "frozen_inputs": {
+    "base_revision": "76f839249f78482ead10ad700a268009d091aad5",
+    "tasks": [
+      "transport-survival",
+      "same-run-repair"
+    ],
+    "roles": [
+      "deterministic-runner"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/wsl-transport-recovery/driver.py",
+        "sha256": "edd7c10e35098991982ba2994983ef906bd9a4ef62a0333135390c78a34f1328"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-transport-recovery/remote.py",
+        "sha256": "aabbd72e4bfd4c8e1b6bff8370ad2dd10d0cd677e82234ea73a5ec81dcde484e"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-transport-recovery/repair.py",
+        "sha256": "e939ffa29e11c8340ded22fc25a6699cc195f2d43957e460d778d34bc0702da5"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-transport-recovery/driver-corrected.py",
+        "sha256": "46d5145cd2adb5ae5f19cf4a37f0fadec1b180cb46a730d43e916eb89ed0d0ef"
+      },
+      {
+        "path": "blueprints/convergence-practice/native-worker/accepted/planner.py",
+        "sha256": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef"
+      },
+      {
+        "path": "blueprints/convergence-practice/job-recovery/fixture.py",
+        "sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/wsl-transport-recovery/plan.json",
+        "sha256": "b98fc4fda6fd7a5b9d8e651c81a68ff1b64df52741dc6eb107dcb6cf82e9ce04"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-transport-recovery/repair-plan.json",
+        "sha256": "4b1fc4fa92b552b67c8af203a87ed9e5e86dafb70ac47661f3ec07162fc46ffa"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-transport-recovery/plan-corrected.json",
+        "sha256": "ff5f63c7cc085670f544d162f77173915136fdce5829224e3012d11fb19575df"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/native-worker/seed/test_planner.py",
+        "sha256": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-transport-recovery/plan-corrected.json",
+        "sha256": "ff5f63c7cc085670f544d162f77173915136fdce5829224e3012d11fb19575df"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Same native run running before and immediately after client disconnect, native succeeded without stop/retry, byte-identical durable checkpoint count 1, all 12 original tests before/after, frozen inputs unchanged, owned client/controller/processes/listeners retired. Preserve the prior failed attempt and narrower repair.",
+    "usage_rule": "Deterministic fixture model calls and local model token categories zero. Enclosing coordinator/agent usage unknown; no savings claim."
+  },
+  "runtime_and_platform": {
+    "platform": "Mac native SSH client to Linux WSL2 x86_64, isolated task prefixes",
+    "tools": [
+      {
+        "name": "dagu",
+        "version": "2.16.6"
+      },
+      {
+        "name": "remote-python",
+        "version": "3.12.3"
+      }
+    ],
+    "isolation": "New task-owned prefixes, DAGU_HOME and minimal child environment preserving real HOME. Native Dagu starts in a separate process session with file-backed logs. Nonmultiplexed independent SSH sessions; only the owned local client is signalled. No global service, account, package or host-network mutation."
+  },
+  "commands": [
+    "python3 blueprints/convergence-practice/wsl-transport-recovery/driver.py --host \"$AUTHORIZED_HOST\" --remote-prefix \"$NEW_REMOTE_PREFIX_1\" --private-output \"$NEW_LOCAL_PREFIX_1\"",
+    "python3 blueprints/convergence-practice/wsl-transport-recovery/repair.py --host \"$AUTHORIZED_HOST\" --remote-prefix \"$REMOTE_PREFIX_1\" --original-private-output \"$LOCAL_PREFIX_1\"",
+    "python3 blueprints/convergence-practice/wsl-transport-recovery/driver-corrected.py --host \"$AUTHORIZED_HOST\" --remote-prefix \"$NEW_REMOTE_PREFIX_2\" --private-output \"$NEW_LOCAL_PREFIX_2\""
+  ],
+  "observations": [
+    {
+      "id": "transport-attempt-1",
+      "task": "transport-survival",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "recovery_execution",
+      "scope": "Mac-owned SSH client termination and fresh-connection reconciliation of the same detached WSL Dagu run, without native stop or retry",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/receipt-attempt-1.json",
+          "sha256": "1958281cf1d4935b9eb1fe4321150932cf2b00771839b6c90c48e3a2ee7312d1"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/frozen-evidence.json",
+          "sha256": "35596f10eb295fc18c161825ee01a050c02b7315369b4d1644ecd57274d0b11a"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/prior-attempts.json",
+          "sha256": "05710ce081007eff442c212e49f05cd0e6649f1c8f0c735f9a3c965d856d6689"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "transport-attempt-1-repair",
+      "task": "same-run-repair",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "recovery_execution",
+      "scope": "Same-run native stop and selected-finalizer retry recovery after the preserved harness failure; transport survival unqualified",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/receipt-attempt-1.json",
+          "sha256": "1958281cf1d4935b9eb1fe4321150932cf2b00771839b6c90c48e3a2ee7312d1"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/frozen-evidence.json",
+          "sha256": "35596f10eb295fc18c161825ee01a050c02b7315369b4d1644ecd57274d0b11a"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/prior-attempts.json",
+          "sha256": "05710ce081007eff442c212e49f05cd0e6649f1c8f0c735f9a3c965d856d6689"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 1
+      }
+    },
+    {
+      "id": "transport-attempt-2",
+      "task": "transport-survival",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 2,
+      "evidence_class": "recovery_execution",
+      "scope": "Mac-owned SSH client termination and fresh-connection reconciliation of the same detached WSL Dagu run, without native stop or retry",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/receipt.json",
+          "sha256": "856c8a2f58f204d62daddeb02b2670f138e9666b2f5c72d68246b6c1750e0082"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/frozen-evidence.json",
+          "sha256": "35596f10eb295fc18c161825ee01a050c02b7315369b4d1644ecd57274d0b11a"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-transport-recovery/prior-attempts.json",
+          "sha256": "05710ce081007eff442c212e49f05cd0e6649f1c8f0c735f9a3c965d856d6689"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "transport-attempt-1",
+      "reason": "Native SSH handled the owned SIGTERM by exiting 255 with empty stderr; frozen harness required -15 and failed before reconnect. Explicit failure cleanup then stopped the job. Diagnostic same-run finalizer retry is a separate narrower observation."
+    }
+  ],
+  "limitations": [
+    "Controlled local SSH-client termination is not evidence of a real network outage, power loss, host restart or credential recovery.",
+    "Separate remote process session and file-backed logs deliberately remove SSH-pipe dependence; this does not qualify arbitrary foreground processes.",
+    "Exclusive checkpoint claim is a local synthetic effect, not distributed exactly-once external side effects.",
+    "No model, provider, broker, GPU, global service, authentication or package changes.",
+    "Enclosing agent usage remains unknown; no token-savings claim.",
+    "Raw native IDs, process identities, generated host paths and command logs remain private. Published hashes establish byte identity, not independent observation truth.",
+    "Process retirement covers observed owned identities and listeners; no exhaustive host audit.",
+    "The fixed synthetic oracle was already accepted; no application/model session, external effect or hidden-test benchmark was run."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "Mac-owned SSH client termination and fresh-connection reconciliation of the same detached WSL Dagu run, without native stop or retry",
+    "qualification_run_ids": [
+      "transport-attempt-2"
+    ]
+  },
+  "rollback": "Owned clients, observed remote processes and listeners exited. Preserve evidence, then retire only task-owned prefixes. No global service/account/configuration change to roll back.",
+  "next_decision_changing_test": "A separately frozen, authorized stronger failure mode or real native-agent session recovery experiment; controlled SSH client termination does not qualify power loss or arbitrary network partitions.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

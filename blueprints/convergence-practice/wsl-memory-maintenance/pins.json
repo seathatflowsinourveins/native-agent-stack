@@ -1,0 +1,15 @@
+{
+  "component_id": "ai-memory",
+  "base_revision": "76f839249f78482ead10ad700a268009d091aad5",
+  "version": "2.3.2",
+  "verified_date": "2026-09-20",
+  "release_published_at": "2026-09-20T02:34:33Z",
+  "source_commit": "353841d91618d20b110b208de284a74d0b960379",
+  "release_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2",
+  "archive_url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.3.2/ai-memory-linux-x86_64.tar.gz",
+  "archive_sha256": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc",
+  "sidecar_sha256": "3692479f0082cb303bbe259e58fe10f6b044740fdbe66df53cd541b114eeb941",
+  "binary_sha256": "93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0",
+  "license": "MIT",
+  "license_sha256": "18332c61780ce8e694d4fa330770cd4d8c85e33f47ac13a80d72d70bb032ae72"
+}

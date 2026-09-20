@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Qualify the official Linux memory patch on isolated synthetic scoped decisions, detecting lost restart/restore state, cross-scope leakage, wrong native errors, Unicode handling failures and accidental capture.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2",
+      "revision": "353841d91618d20b110b208de284a74d0b960379"
+    }
+  ],
+  "discovery_provenance": [
+    "Existing selected ai-memory component and prior Mac maintenance protocol; exact current official Linux release verified independently. Mac acceptance does not qualify WSL."
+  ],
+  "license_and_compatibility": "MIT, exact tagged/bundled license hash. Official Linux x86_64 archive, sidecar, executable SHA256 and native 2.3.2 version verified. WSL2 Linux x86_64 execution observed.",
+  "baseline_and_candidate": {
+    "baseline": "Fresh isolated empty store, no existing production or older-version store opened.",
+    "candidate": "Official pinned Linux ai-memory2.3.2; scoped writes, restart, native HTTP backup, cold native restore and repeated scoped retrieval."
+  },
+  "frozen_inputs": {
+    "base_revision": "76f839249f78482ead10ad700a268009d091aad5",
+    "tasks": [
+      "wsl-memory-maintenance"
+    ],
+    "roles": [
+      "deterministic-runner"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/wsl-memory-maintenance/run.py",
+        "sha256": "5abefd6083f2ac6057cd6ca6f64cf2fc77a68e6213b35f64bddfa5d18b169a3e"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/wsl-memory-maintenance/pins.json",
+        "sha256": "a8919332b6910adb2e3b6e8ff8153f24d258fbdae056d025c19cc7549996b1d7"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-memory-maintenance/config.toml",
+        "sha256": "5ee5fb3ddcb790c9a234143fdfa2f99b80ecf752a45c9e8cad625d75e9311331"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/wsl-memory-maintenance/oracle.json",
+        "sha256": "20c0a8d4c5a19e4257b9c59e88a8abbd963529d63c35baa13095b403e91043c0"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "All frozen scoped body/FTS/negative/Unicode/capture-off requirements pass; restore guard refusal is recorded as blocked rather than successful restoration. No guard bypass or unrelated process signals.",
+    "usage_rule": "No model/provider work invoked by this fixture; enclosing task usage unknown. No token-saving claim."
+  },
+  "runtime_and_platform": {
+    "platform": "WSL2 Linux x86_64 kernel 6.18.33.2-microsoft-standard-WSL2",
+    "tools": [
+      {
+        "name": "python",
+        "version": "3.12.3"
+      },
+      {
+        "name": "ai-memory",
+        "version": "2.3.2"
+      }
+    ],
+    "isolation": "Task-owned synthetic stores, explicit config, filtered child environment with real HOME unchanged; one owned authenticated loopback listener. No production/global changes. No OS confinement claim."
+  },
+  "commands": [
+    "python3 blueprints/convergence-practice/wsl-memory-maintenance/run.py --run-dir \"$NEW_PRIVATE_RUN_DIRECTORY\" --archive \"$REVIEWED_LINUX_ARCHIVE\" --sidecar \"$REVIEWED_LINUX_CHECKSUM_SIDECAR\""
+  ],
+  "observations": [
+    {
+      "id": "wsl-memory-maintenance-attempt-1",
+      "task": "wsl-memory-maintenance",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "WSL2 Linux x86_64 isolated synthetic ai-memory2.3.2 restart, native backup and restore",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/wsl-memory-maintenance/receipt.json",
+          "sha256": "3280210ba0001628d8dd8d3a7f5b7476db6c81d1abbde9831a427c9183ed5f27"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-memory-maintenance/native-facts.json",
+          "sha256": "ee1d0a348588a876bd437e85bad0df3b79a7784446c4dc639830e99ab01b0d59"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-memory-maintenance/audit.py",
+          "sha256": "56d71b653a77f84a64a383859252625bb08693a8502863e3dca51e81c7de4d10"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    }
+  ],
+  "failures_and_skips": [],
+  "limitations": [
+    "One native attempt; no failed execution or sibling-process refusal occurred. Conditional refusal handling exists but was not observed here.",
+    "Fresh synthetic2.3.2 stores only, not an older-version migration, production backup, existing embeddings, user service or active Codex/Claude MCP route.",
+    "Workspace/project routing is not tenant authorization. No models or automatic history capture. Explicit no-provider config and empty tables are not an independent network-traffic audit.",
+    "Four directly owned server processes exited0; stdio EOF and HTTP SIGINT. No broad signals or arbitrary descendant cleanup guarantee.",
+    "Full logs, native archive and stores retained privately; sanitized selected facts and hashes do not independently certify historical execution.",
+    "Fixture model usage0; enclosing parent/child provider usage unknown. No token-saving claim."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "WSL2 Linux x86_64 isolated synthetic ai-memory2.3.2 restart, native backup and restore",
+    "qualification_run_ids": [
+      "wsl-memory-maintenance-attempt-1"
+    ]
+  },
+  "rollback": "No production change. Retire only the owned private trial prefix after retaining required evidence; do not stop unrelated processes.",
+  "next_decision_changing_test": "Coordinator-owned first WSL user-service creation and actual native Codex/Claude route readiness, with explicit durable-decision scope and capture-off policy. Synthetic acceptance is not live availability.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

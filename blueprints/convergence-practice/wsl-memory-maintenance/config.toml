@@ -1,0 +1,16 @@
+embedding_provider = "none"
+backfill_on_start = false
+capture_assistant = false
+consolidate_on_session_end = false
+run_autowire = false
+
+[maintenance]
+enabled = false
+
+[auto_improve]
+require_approval = true
+on_session_end = false
+
+[auto_improve.scheduler]
+enabled = false
+interval_secs = 0

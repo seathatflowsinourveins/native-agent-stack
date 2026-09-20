@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "wsl-transport-recovery-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "dagu"
+  ],
+  "recorded_at_utc": "2026-09-20T07:52:39.144877+00:00",
+  "claim": "An owned nonmultiplexed SSH client was terminated; fresh reconnect observed the same native Dagu job running with one unchanged checkpoint, then native completion without stop or retry.",
+  "limitations": [
+    "Controlled client termination and a deliberately detached deterministic job; not a real network outage, host restart, model-session recovery or distributed exactly-once guarantee.",
+    "First harness attempt misclassified native SSH exit255 and stopped the job; its narrower same-run finalizer retry is retained separately from corrected survival acceptance.",
+    "Original12-test oracle passed before and after; observed owned processes/listener retired; whole-task provider usage remains unknown."
+  ],
+  "native_receipt": "blueprints/convergence-practice/wsl-transport-recovery/receipt.json"
+}

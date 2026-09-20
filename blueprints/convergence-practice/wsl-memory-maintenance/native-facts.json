@@ -1,0 +1,570 @@
+{
+  "facts": [
+    {
+      "phase": "fresh",
+      "tool": "memory_write_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "path": "notes/alpha.md",
+        "body": "# Synthetic alpha decision\nWslpatchcobalt belongs only to alpha.\n"
+      },
+      "value": {
+        "acknowledged": true
+      }
+    },
+    {
+      "phase": "fresh",
+      "tool": "memory_write_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "beta",
+        "path": "notes/beta.md",
+        "body": "# Synthetic beta decision\nWslpatchamber belongs only to beta.\n"
+      },
+      "value": {
+        "acknowledged": true
+      }
+    },
+    {
+      "phase": "fresh",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "path": "notes/alpha.md"
+      },
+      "value": {
+        "body": "# Synthetic alpha decision\nWslpatchcobalt belongs only to alpha.\n"
+      }
+    },
+    {
+      "phase": "fresh",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "query": "Wslpatchcobalt",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/alpha.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "fresh",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "beta",
+        "query": "Wslpatchcobalt"
+      },
+      "value": {
+        "hits": []
+      }
+    },
+    {
+      "phase": "fresh",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "beta",
+        "path": "notes/alpha.md"
+      },
+      "error": {
+        "code": -32603,
+        "message": "page notes/alpha.md not found in resolved scope wsl-maintenance-synthetic/beta"
+      }
+    },
+    {
+      "phase": "fresh",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "beta",
+        "path": "notes/beta.md"
+      },
+      "value": {
+        "body": "# Synthetic beta decision\nWslpatchamber belongs only to beta.\n"
+      }
+    },
+    {
+      "phase": "fresh",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "beta",
+        "query": "Wslpatchamber",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/beta.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "fresh",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "query": "Wslpatchamber"
+      },
+      "value": {
+        "hits": []
+      }
+    },
+    {
+      "phase": "fresh",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "path": "notes/beta.md"
+      },
+      "error": {
+        "code": -32603,
+        "message": "page notes/beta.md not found in resolved scope wsl-maintenance-synthetic/alpha"
+      }
+    },
+    {
+      "phase": "fresh",
+      "tool": "memory_status",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha"
+      },
+      "value": {
+        "counts": {
+          "sessions": 0,
+          "observations": 0
+        }
+      }
+    },
+    {
+      "phase": "fresh",
+      "tool": "memory_write_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "path": ".git/config",
+        "body": "Synthetic rejected page.\n"
+      },
+      "error": {
+        "code": -32603,
+        "message": "invalid path: invalid page path: page path \".git/config\": component \".git\" is reserved by Git for repository metadata and refused in tree entries"
+      }
+    },
+    {
+      "phase": "fresh",
+      "tool": "memory_write_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "path": "notes/aéé/decision.md",
+        "body": "# Unicode fixture\nWslpatchunicode survives a five-byte Unicode directory component.\n"
+      },
+      "value": {
+        "acknowledged": true
+      }
+    },
+    {
+      "phase": "fresh",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "path": "notes/aéé/decision.md"
+      },
+      "value": {
+        "body": "# Unicode fixture\nWslpatchunicode survives a five-byte Unicode directory component.\n"
+      }
+    },
+    {
+      "phase": "fresh",
+      "tool": "memory_write_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "path": "notes/alpha.md",
+        "body": "# Updated synthetic alpha decision\nWslpatchwillow replaces the original alpha decision.\n"
+      },
+      "value": {
+        "acknowledged": true
+      }
+    },
+    {
+      "phase": "restart",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "path": "notes/alpha.md"
+      },
+      "value": {
+        "body": "# Updated synthetic alpha decision\nWslpatchwillow replaces the original alpha decision.\n"
+      }
+    },
+    {
+      "phase": "restart",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "query": "Wslpatchwillow",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/alpha.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "restart",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "beta",
+        "query": "Wslpatchwillow"
+      },
+      "value": {
+        "hits": []
+      }
+    },
+    {
+      "phase": "restart",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "beta",
+        "path": "notes/alpha.md"
+      },
+      "error": {
+        "code": -32603,
+        "message": "page notes/alpha.md not found in resolved scope wsl-maintenance-synthetic/beta"
+      }
+    },
+    {
+      "phase": "restart",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "beta",
+        "path": "notes/beta.md"
+      },
+      "value": {
+        "body": "# Synthetic beta decision\nWslpatchamber belongs only to beta.\n"
+      }
+    },
+    {
+      "phase": "restart",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "beta",
+        "query": "Wslpatchamber",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/beta.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "restart",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "query": "Wslpatchamber"
+      },
+      "value": {
+        "hits": []
+      }
+    },
+    {
+      "phase": "restart",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "path": "notes/beta.md"
+      },
+      "error": {
+        "code": -32603,
+        "message": "page notes/beta.md not found in resolved scope wsl-maintenance-synthetic/alpha"
+      }
+    },
+    {
+      "phase": "restart",
+      "tool": "memory_status",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha"
+      },
+      "value": {
+        "counts": {
+          "sessions": 0,
+          "observations": 0
+        }
+      }
+    },
+    {
+      "phase": "restart",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "path": "notes/aéé/decision.md"
+      },
+      "value": {
+        "body": "# Unicode fixture\nWslpatchunicode survives a five-byte Unicode directory component.\n"
+      }
+    },
+    {
+      "phase": "restart",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "query": "Wslpatchunicode",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/aéé/decision.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "restart",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "query": "Wslpatchcobalt"
+      },
+      "value": {
+        "hits": []
+      }
+    },
+    {
+      "phase": "restored",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "path": "notes/alpha.md"
+      },
+      "value": {
+        "body": "# Updated synthetic alpha decision\nWslpatchwillow replaces the original alpha decision.\n"
+      }
+    },
+    {
+      "phase": "restored",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "query": "Wslpatchwillow",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/alpha.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "restored",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "beta",
+        "query": "Wslpatchwillow"
+      },
+      "value": {
+        "hits": []
+      }
+    },
+    {
+      "phase": "restored",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "beta",
+        "path": "notes/alpha.md"
+      },
+      "error": {
+        "code": -32603,
+        "message": "page notes/alpha.md not found in resolved scope wsl-maintenance-synthetic/beta"
+      }
+    },
+    {
+      "phase": "restored",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "beta",
+        "path": "notes/beta.md"
+      },
+      "value": {
+        "body": "# Synthetic beta decision\nWslpatchamber belongs only to beta.\n"
+      }
+    },
+    {
+      "phase": "restored",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "beta",
+        "query": "Wslpatchamber",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/beta.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "restored",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "query": "Wslpatchamber"
+      },
+      "value": {
+        "hits": []
+      }
+    },
+    {
+      "phase": "restored",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "path": "notes/beta.md"
+      },
+      "error": {
+        "code": -32603,
+        "message": "page notes/beta.md not found in resolved scope wsl-maintenance-synthetic/alpha"
+      }
+    },
+    {
+      "phase": "restored",
+      "tool": "memory_status",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha"
+      },
+      "value": {
+        "counts": {
+          "sessions": 0,
+          "observations": 0
+        }
+      }
+    },
+    {
+      "phase": "restored",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "path": "notes/aéé/decision.md"
+      },
+      "value": {
+        "body": "# Unicode fixture\nWslpatchunicode survives a five-byte Unicode directory component.\n"
+      }
+    },
+    {
+      "phase": "restored",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "query": "Wslpatchunicode",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/aéé/decision.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "restored",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "wsl-maintenance-synthetic",
+        "project": "alpha",
+        "query": "Wslpatchcobalt"
+      },
+      "value": {
+        "hits": []
+      }
+    }
+  ]
+}

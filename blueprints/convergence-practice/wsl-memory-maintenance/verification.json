@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "scope": "Offline retained-evidence checks; no second native attempt or model invocation",
+  "checks": [
+    {
+      "command": "python3 blueprints/convergence-practice/wsl-memory-maintenance/audit.py",
+      "exit_code": 0,
+      "result": "65 native checks and 39 selected native calls consistent; production/client availability not established"
+    },
+    {
+      "command": "python3 -m unittest tests.test_wsl_memory_maintenance tests.test_native_maintenance tests.test_convergence_contract -q",
+      "exit_code": 0,
+      "tests": 68,
+      "new_focused_tests": 15
+    },
+    {
+      "command": "python3 scripts/validate_convergence.py blueprints/convergence-practice/wsl-memory-maintenance/experiment.json --root . --json",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/validate_catalogs.py",
+      "exit_code": 0
+    },
+    {
+      "command": "ruff check blueprints/convergence-practice/wsl-memory-maintenance/audit.py tests/test_wsl_memory_maintenance.py",
+      "exit_code": 0
+    },
+    {
+      "command": "ty check blueprints/convergence-practice/wsl-memory-maintenance/audit.py tests/test_wsl_memory_maintenance.py",
+      "exit_code": 0
+    },
+    {
+      "command": "ruff check --isolated --select E9,F blueprints/convergence-practice/wsl-memory-maintenance/run.py",
+      "exit_code": 0
+    },
+    {
+      "command": "gitleaks dir blueprints/convergence-practice/wsl-memory-maintenance --redact --no-banner",
+      "exit_code": 0
+    },
+    {
+      "command": "gitleaks dir tests --redact --no-banner",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "retained_diagnostics": [
+    {
+      "check": "Full configured Ruff on historical executed runner",
+      "status": "not clean",
+      "codes": [
+        "I001",
+        "TRY004",
+        "BLE001",
+        "PLW1510"
+      ],
+      "decision": "Preserve frozen executed bytes. Syntax/name diagnostics E9,F pass. Generic exception catches retain boundary failure/cleanup receipts. No claim that historical runner passes every configured style rule."
+    },
+    {
+      "check": "Initial offline test import-loader type check",
+      "status": "corrected",
+      "decision": "Added explicit spec/loader non-null assertion; current audit/tests type check passes."
+    }
+  ],
+  "native_execution_attempts": 1,
+  "native_failed_attempts": 0,
+  "whole_task_provider_usage": null
+}

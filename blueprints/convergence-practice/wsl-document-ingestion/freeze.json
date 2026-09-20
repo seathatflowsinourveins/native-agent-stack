@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "source_revision": "76f839249f78482ead10ad700a268009d091aad5",
+  "protocol": "../document-ingestion/freeze.json",
+  "original_protocol_sha256": "5816ea363d0203f5140646d36f9cb67322aae17d50090f65bcafe44871b5f6ea",
+  "files": [
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/build_corpus.py",
+      "sha256": "2c84de93409ffacc33b20b7797683d81e530595c85c46381ec0bab46fd47dffe"
+    },
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/corpus/authored-source.json",
+      "sha256": "9b294753d91abcbd8ebdd87460513014f179068796febfa9500ed25a5051ed34"
+    },
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/corpus/lumen-qualification.pdf",
+      "sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5"
+    },
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/corpus/w3c-dummy.pdf",
+      "sha256": "3df79d34abbca99308e79cb94461c1893582604d68329a41fd4bec1885e6adb4"
+    },
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/corpus/NOTICE.md",
+      "sha256": "292f6558c6a2a77050613d085d324053aa1fbb919edd89f6f4f6d22308aeb80a"
+    },
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/layout.json",
+      "sha256": "644ab52d3f24f087119590b9840ad4f501630e11450186a6232f6dbf756e8aa4"
+    },
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/oracle.json",
+      "sha256": "5298f2943c528819efa8901c47532924ae8ea5cf4ddee8af80378eb72495d17a"
+    },
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/plan.json",
+      "sha256": "864244dd87e5fcae16acb06b687fa7935f036847e8d10602b2dab8b7c8b9384c"
+    },
+    {
+      "path": "blueprints/convergence-practice/document-ingestion/ingest.py",
+      "sha256": "b62eb4a974fe6385d30e2243cdd4358c5153d1da2acbbfadb4f37942d066eaa9"
+    }
+  ],
+  "runner_unchanged": true,
+  "oracle_unchanged": true,
+  "private_complete_freeze": {
+    "stage": "Before native configuration, compilation and candidate extraction",
+    "sha256": "1cdbf7d1479466988e930e6f47437f97102071de95b74ce5be91890743f2444b",
+    "selected_file_hashes": 972,
+    "runtime_dependency_hashes": 12,
+    "scope": "Complete retained fixture and Poppler source files, extracted development headers, downloaded source/build/header archives, native build-tool binaries and all selected runtime shared libraries; exact configure command hash."
+  }
+}
