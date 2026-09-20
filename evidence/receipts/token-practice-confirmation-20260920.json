@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "id": "token-practice-confirmation-20260920",
+  "kind": "historical_inventory",
+  "recorded_at_utc": "2026-09-20T13:32:58Z",
+  "component_ids": [
+    "rtk",
+    "context-mode",
+    "headroom",
+    "jcodemunch-mcp"
+  ],
+  "claim": "Dated direct upstream counter outputs, current release metadata, independent artifact rechecks and reconciled recorded monitoring support explicit baseline selection without claiming causal lifetime provider savings.",
+  "limitations": [
+    "Historical source-host observations only; not live acceptance on the reader's PC.",
+    "Upstream retained-history estimates, exact artifact counts and provider consumption are different quantities and must not be summed.",
+    "Artifact and client rechecks inspected existing retained inputs and streams; no new model task or reinstall was performed in this confirmation.",
+    "Public native fields are allowlisted unchanged from private outputs; host paths, process identifiers and account details are omitted.",
+    "Latest monitoring queries returned no matching observations in their six-hour window; this does not mean zero usage or newly confirmed savings.",
+    "Latest-release equality was checked only for the four selected token tools; accepted specialist compatibility pins are separate."
+  ],
+  "data": {
+    "native_snapshots": [
+      {
+        "tool": "rtk",
+        "observed_at_utc": "2026-09-20T13:21:46.094424+00:00",
+        "command": "rtk gain --format json",
+        "exit_code": 0,
+        "snapshot_success": true,
+        "scope": "All retained projects; estimated command-output savings; default 90-day retention",
+        "measurement": "upstream estimate",
+        "native_returned_fields": {
+          "summary": {
+            "total_commands": 54,
+            "total_input": 17936,
+            "total_output": 16228,
+            "total_saved": 1708,
+            "avg_savings_pct": 9.522747546833186,
+            "total_time_ms": 1615,
+            "avg_time_ms": 29
+          }
+        },
+        "private_stdout_sha256": "60a8dc4bedffc1a29484387433bc4977b3a0448b5ffb3f8184cb6e0ad793ccb0"
+      },
+      {
+        "tool": "headroom",
+        "observed_at_utc": "2026-09-20T13:21:47.424573+00:00",
+        "command": "headroom savings --json",
+        "exit_code": 0,
+        "snapshot_success": true,
+        "scope": "Global native ledger; maximum 30-day lookback; isolated offline fixture is separate",
+        "measurement": "upstream estimate",
+        "native_returned_fields": {
+          "schema_version": 1,
+          "lifetime": {
+            "tokens_saved": 0,
+            "tokens_before": 0,
+            "cost_usd": 0,
+            "calls": 0,
+            "savings_percent": 0
+          },
+          "windows": {
+            "today": {
+              "tokens_saved": 0,
+              "tokens_before": 0,
+              "cost_usd": 0,
+              "calls": 0,
+              "savings_percent": 0
+            },
+            "last_7_days": {
+              "tokens_saved": 0,
+              "tokens_before": 0,
+              "cost_usd": 0,
+              "calls": 0,
+              "savings_percent": 0
+            },
+            "last_30_days": {
+              "tokens_saved": 0,
+              "tokens_before": 0,
+              "cost_usd": 0,
+              "calls": 0,
+              "savings_percent": 0
+            }
+          }
+        },
+        "private_stdout_sha256": "eafe48c7c8b730861b0d3fa6ddfc0889b3bf8eeed54622936665902e17d6ee46"
+      },
+      {
+        "tool": "jcodemunch",
+        "observed_at_utc": "2026-09-20T13:21:48.126855+00:00",
+        "command": "mcporter call --stdio jcodemunch-mcp --env \"CODE_INDEX_PATH=$HOME/.code-index\" --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth",
+        "exit_code": 0,
+        "snapshot_success": true,
+        "scope": "Default index ledger; bytes/4 estimate including repeated validation reads",
+        "measurement": "upstream estimate",
+        "native_returned_fields": {
+          "session_tokens_saved": 0,
+          "session_calls": 0,
+          "total_tokens_saved": 29820,
+          "total_tokens_saved_basis": {
+            "generation": 2,
+            "first_generation": 2,
+            "mixed_basis": false
+          },
+          "lifetime_by_tool": {
+            "get_symbol_source": 29820,
+            "search_symbols": 0
+          },
+          "lifetime_by_tool_since": "2026-09-20",
+          "lifetime_unattributed": 0
+        },
+        "private_stdout_sha256": "d460af36829b785fc56ae0f0786994a1159d25bdd52a5878e66da83ab3dba035"
+      }
+    ],
+    "direct_context_mode": {
+      "native_tool": "ctx_stats",
+      "version": "1.0.169",
+      "returned_excerpt": "1.1M tokens saved  ·  99.1% reduction  ·  8h 18m  ·  ~$5.33 saved (Opus)",
+      "scope": "Existing Desktop MCP connection; not a sum of native-client runtime roots",
+      "method": "byte/event heuristics and illustrative pricing",
+      "exact_causal_provider_tokens_saved": null
+    },
+    "release_checks": [
+      {
+        "published_at": "2026-09-11T08:52:38Z",
+        "repository": "rtk-ai/rtk",
+        "tag": "v0.49.0",
+        "url": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
+        "command": "gh api repos/rtk-ai/rtk/releases/latest",
+        "exit_code": 0,
+        "decision": "Retain matching accepted installed version"
+      },
+      {
+        "published_at": "2026-09-16T14:04:32Z",
+        "repository": "jgravelle/jcodemunch-mcp",
+        "tag": "v1.108.319",
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "command": "gh api repos/jgravelle/jcodemunch-mcp/releases/latest",
+        "exit_code": 0,
+        "decision": "Retain matching accepted installed version"
+      },
+      {
+        "published_at": "2026-08-27T21:18:26Z",
+        "repository": "headroomlabs-ai/headroom",
+        "tag": "v0.37.0",
+        "url": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0",
+        "command": "gh api repos/headroomlabs-ai/headroom/releases/latest",
+        "exit_code": 0,
+        "decision": "Retain matching accepted installed version"
+      },
+      {
+        "published_at": "2026-06-29T18:18:53Z",
+        "repository": "mksglu/context-mode",
+        "tag": "v1.0.169",
+        "url": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169",
+        "command": "gh api repos/mksglu/context-mode/releases/latest",
+        "exit_code": 0,
+        "decision": "Retain matching accepted installed version"
+      }
+    ],
+    "independent_recheck": {
+      "headroom_guard": {
+        "before_tokens": 26529,
+        "after_tokens": 191,
+        "restored_lines": 1202,
+        "all_request_fields_equal": true
+      },
+      "headroom_mcp": {
+        "original_formatted_tokens": 56433,
+        "compact_original_tokens": 36625,
+        "compressed_candidate_tokens": 19714,
+        "original_and_recovered_bytes": 177696,
+        "byte_exact_recovery": true,
+        "tokenizer": "gpt-tokenizer 3.4.0 / o200k_base",
+        "measurement_scope": "Complete retained content, excluding MCP message overhead; full recovery adds original tokens again."
+      },
+      "jcodemunch": {
+        "whole_file_tokens": 5476,
+        "complete_search_and_source_tokens": 861,
+        "known_function_tokens": 601,
+        "source_byte_exact": true
+      },
+      "native_clients": {
+        "claude_successful_mcp_calls": 3,
+        "codex_successful_mcp_calls": 3,
+        "source_and_answers_verified": true
+      },
+      "source_paths": [
+        "evidence/receipts/native-headroom-mcp-20260920.json",
+        "evidence/receipts/native-jcodemunch-20260920.json",
+        "evidence/receipts/native-token-focus-clients-20260920.json"
+      ]
+    },
+    "monitoring": {
+      "recorded_task_date": "2026-09-19",
+      "sdk": {
+        "input": 40369,
+        "cached_input_subset": 26240,
+        "output": 149,
+        "total": 40518
+      },
+      "prometheus": {
+        "input": 40369,
+        "cached_input_subset": 26240,
+        "output": 149,
+        "total": 40518
+      },
+      "loki_receipt_totals": [
+        40187,
+        40583,
+        40518
+      ],
+      "loki_aggregate": 121288,
+      "independently_rechecked": true,
+      "scope": "Native consumption delivered through two observation paths; not avoided tokens or independent billing",
+      "source_path": "observability/followup-receipt.json",
+      "current_query": {
+        "observed_at_utc": "2026-09-20T13:22:02Z",
+        "lookback_hours": 6,
+        "prometheus_http_status": 200,
+        "prometheus_results": [],
+        "loki_http_status": 200,
+        "loki_results": []
+      }
+    },
+    "portable_report_acceptance": {
+      "observed_at_utc": "2026-09-20T13:38:27Z",
+      "scope": "New private report directory on the existing Linux/WSL host; installed native tools reused",
+      "python": "3.13.15",
+      "commands": [
+        "uv run --no-project --python 3.13 python tools/token-report/token_manifest.py init-config --config \"$REPORT_STATE/config.json\" --state-dir \"$REPORT_STATE\" --project \"$REPORT_PROJECT\" --rtk rtk --headroom headroom --jcodemunch jcodemunch-mcp --mcporter mcporter",
+        "uv run --no-project --python 3.13 python tools/token-report/token_manifest.py refresh --config \"$REPORT_STATE/config.json\""
+      ],
+      "exit_codes": [0, 0],
+      "returned_native_scopes": 4,
+      "returned_unique_comparisons": 0,
+      "returned_issues": [],
+      "html_and_json_written": true,
+      "boundary": "This proves clean local report initialization and direct native counter capture, not fresh installation of every dependency or second-machine acceptance. No historical comparisons or other runtime roots were imported implicitly."
+    },
+    "exact_causal_lifetime_provider_tokens_saved": null
+  }
+}

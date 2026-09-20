@@ -30,6 +30,13 @@ component matrix; reuse matching acceptance and run only the missing check.
 The complete repository research catalog is not an instruction to install every
 alternative or start every optional service.
 
+The offline docs/ecosystem/index.html is the consolidated layer/setup guide;
+adoption/lifecycle.md defines owned installation, restart, recovery and cleanup.
+Choose the cheapest measured representation that meets the task's information
+contract. Known-source reads, compact JSON and full-original reads remain valid
+defaults when an extra retrieval or compression step is larger or inadequate.
+Read only the selected recipe during work; do not preload the HTML payload.
+
 Use upstream executables and supported integration formats. Keep client accounts, model routes, native caching and tool discovery intact. Load detailed guides only for the current task. Run the repository validation command before committing changed evidence or manifests. Do not fetch private state or authentication stores.
 
 One coordinator integrates. Writing workers need separate worktrees and bounded file ownership. Evidence belongs in compact sanitized receipts; no raw conversations, tokens, personal paths or machine-specific active client configuration.

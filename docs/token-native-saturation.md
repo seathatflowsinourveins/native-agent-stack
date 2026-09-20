@@ -1,5 +1,14 @@
 # Native token-practice saturation audit
 
+The [clean-prefix follow-up](../evidence/receipts/native-token-clean-prefix-20260920.json)
+executed both pinned upstream uv installs, real MCP use and server restart, then
+native uninstall in disposable prefixes. Headroom restored identical original
+content after restart; jCodeMunch retained its exact selected function. All four
+servers exited zero, all four created entrypoints were absent after uninstall,
+and retained artifacts remained intact. This closes those scoped installation,
+restart and cleanup stages; it does not certify a new operating system or every
+optional lifecycle across the catalog.
+
 This dated matrix covers all 65 selected component records and distinguishes them from the 512-repository research catalog. Every selected component has an installation assessment, integration mode, native recipe, functional and lifecycle boundaries, and baseline status in the [machine-readable matrix](../blueprints/token-native-focus/saturation-audit.json). The other 447 identities are reviewed choices or alternatives; catalog inclusion is not installed adoption.
 
 The audit reuses retained acceptance whose inputs still match. This aggregation launches no provider model tasks; the later focus wave separately records one bounded task in each native client. It does not manufacture a counter or require every specialist to run at startup. Exact per-artifact reductions, native historical estimates and provider usage remain separate. No evidence establishes a universal SOTA ranking or exact causal lifetime provider savings.
@@ -40,7 +49,7 @@ pairs, including losing comparisons; they are not provider lifetime savings.
 | `ai-memory` | core | install, use, persistence, restart, cleanup, recovery | supporting workflow / 0 |
 | `alertmanager` | observability | use | supporting workflow / 0 |
 | `alpaca-py` | supporting | use | supporting workflow / 0 |
-| `apple-container` | supporting | install, use | supporting workflow / 0 |
+| `apple-container` | supporting | install, use, persistence, restart, cleanup | supporting workflow / 0 |
 | `ast-grep` | supporting | use | direct context / 1 |
 | `beads` | supporting | use, persistence, cleanup | supporting workflow / 0 |
 | `ccusage` | supporting | use | supporting workflow / 0 |
@@ -59,9 +68,9 @@ pairs, including losing comparisons; they are not provider lifetime savings.
 | `fastapi` | supporting | install, use, persistence, restart, cleanup | supporting workflow / 0 |
 | `gitleaks` | supporting | use | supporting workflow / 0 |
 | `grafana` | observability | use | supporting workflow / 0 |
-| `headroom` | supporting | use, recovery | direct context / 9 |
+| `headroom` | supporting | install, use, persistence, restart, cleanup, recovery | direct context / 11 |
 | `huggingface-hub-native` | core | use | supporting workflow / 0 |
-| `jcodemunch-mcp` | supporting | use, persistence | direct context / 2 |
+| `jcodemunch-mcp` | supporting | install, use, persistence, restart, cleanup | direct context / 4 |
 | `lean` | supporting | use | supporting workflow / 0 |
 | `llama-cpp` | optional | use, cleanup | supporting workflow / 0 |
 | `loki` | observability | use | supporting workflow / 0 |

@@ -68,7 +68,10 @@
     "current_native_token_clients": "evidence/receipts/native-token-focus-clients-20260920.json",
     "current_native_sandbox_network": "evidence/receipts/native-sandbox-network-20260920.json",
     "current_cross_layer_acceptance": "blueprints/convergence-practice/layer-acceptance.md",
-    "wsl_native_quality": "blueprints/convergence-practice/wsl-native-tools/README.md"
+    "wsl_native_quality": "blueprints/convergence-practice/wsl-native-tools/README.md",
+    "current_selected_lifecycle": "adoption/lifecycle.md",
+    "current_token_confirmation": "evidence/receipts/token-practice-confirmation-20260920.json",
+    "current_token_clean_prefix": "evidence/receipts/native-token-clean-prefix-20260920.json"
   },
   "recipe_map": {
     "affaan-m/ECC": "recipes/README.md",

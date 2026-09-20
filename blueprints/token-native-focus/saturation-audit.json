@@ -599,9 +599,9 @@
       "lifecycle_stages": {
         "install": {"status": "accepted_within_scope", "scope": "Dated macOS installation/native operation only; Linux/WSL is not a supported target for Apple Container.", "evidence_refs": ["blueprints/convergence-practice/container-storage/receipt.json"]},
         "use": {"status": "accepted_within_scope", "scope": "Dated native role acceptance in the linked receipts; no provider/model run was launched by this reconciliation.", "evidence_refs": ["blueprints/convergence-practice/container-storage/receipt.json"]},
-        "persistence": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
-        "restart": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
-        "cleanup": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
+        "persistence": {"status": "accepted_within_scope", "scope": "Dated macOS fixture: one PostgreSQL row remained unchanged on the owned ext4 volume after container stop/start; no host-reboot or whole-stack recovery claim.", "evidence_refs": ["blueprints/convergence-practice/container-storage/receipt.json"]},
+        "restart": {"status": "accepted_within_scope", "scope": "Dated macOS fixture: native container stop/start, database readiness and selected-row query exited successfully; no host reboot was exercised.", "evidence_refs": ["blueprints/convergence-practice/container-storage/receipt.json"]},
+        "cleanup": {"status": "accepted_within_scope", "scope": "Dated macOS fixture: owned containers and volume were removed successfully, with zero owned containers remaining. Other installations and user state were outside scope.", "evidence_refs": ["blueprints/convergence-practice/container-storage/receipt.json"]},
         "recovery": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []}
       },
       "baseline_applicability": {
@@ -1476,6 +1476,11 @@
             "id": "native-token-focus-clients-20260920",
             "path": "evidence/receipts/native-token-focus-clients-20260920.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-practice-confirmation-20260920",
+            "path": "evidence/receipts/token-practice-confirmation-20260920.json",
+            "kind": "historical_inventory"
           }
         ],
         "retained_operation_ids": [
@@ -2173,7 +2178,7 @@
       "version": "0.37.0",
       "profile": "supporting",
       "role": "On-demand upstream MCP compression/retrieval and separately guarded offline artifact compression",
-      "installation_assessment": "runtime present at retained native operation date",
+      "installation_assessment": "Clean isolated upstream uv installation and native uninstall passed on the existing Linux/WSL host; the working installation was preserved.",
       "current_host_recertified_by_this_audit": false,
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/headroom",
@@ -2210,6 +2215,16 @@
           {
             "id": "native-headroom-mcp-20260920",
             "path": "evidence/receipts/native-headroom-mcp-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-confirmation-20260920",
+            "path": "evidence/receipts/token-practice-confirmation-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "native-token-clean-prefix-20260920",
+            "path": "evidence/receipts/native-token-clean-prefix-20260920.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -2316,6 +2331,28 @@
           "limitations": [
             "Exact run-expansion recovery verified for selected synthetic logs; local guarded adapter around upstream APIs."
           ]
+        },
+        {
+          "id": "headroom-clean-compression-20260920",
+          "baseline_tokens": 5105,
+          "candidate_tokens": 2732,
+          "tokens_removed": 2373,
+          "acceptance_passed": true,
+          "limitations": [
+            "Complete SDK-serialized compression response versus compact original; exact original recovery separately verified. No provider-token claim.",
+            "Native clean-prefix receipt: evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        },
+        {
+          "id": "headroom-clean-full-recovery-20260920",
+          "baseline_tokens": 5105,
+          "candidate_tokens": 18777,
+          "tokens_removed": -13672,
+          "acceptance_passed": true,
+          "limitations": [
+            "Complete compression plus full-retrieval response serialization; exact original recovered. Read original directly when all content is required.",
+            "Native clean-prefix receipt: evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
         }
       ],
       "exact_causal_lifetime_provider_tokens_saved": null,
@@ -2330,17 +2367,53 @@
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
       "source_pin": null,
       "lifecycle_stages": {
-        "install": {"status": "observed_installed", "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.", "evidence_refs": ["evidence/receipts/component-history.json", "evidence/receipts/token-practice-coverage-20260920.json", "evidence/receipts/token-practice-native-counters-20260920.json", "evidence/receipts/token-native-retained-functional-20260920.json", "evidence/receipts/native-headroom-mcp-20260920.json"]},
-        "use": {"status": "accepted_within_scope", "scope": "Direct upstream MCP compress/retrieve returned the retained original; a separate local SDK guard also reconstructed exact repeated-log input. Fetching the original consumes it again; this does not establish net provider savings for the roundtrip.", "evidence_refs": ["evidence/receipts/native-headroom-mcp-20260920.json", "evidence/receipts/token-native-retained-functional-20260920.json"]},
-        "persistence": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
-        "restart": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
-        "cleanup": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
-        "recovery": {"status": "accepted_within_scope", "scope": "Direct upstream MCP compress/retrieve returned the retained original; a separate local SDK guard also reconstructed exact repeated-log input. Fetching the original consumes it again; this does not establish net provider savings for the roundtrip.", "evidence_refs": ["evidence/receipts/native-headroom-mcp-20260920.json", "evidence/receipts/token-native-retained-functional-20260920.json"]}
+        "install": {
+          "status": "accepted_within_scope",
+          "scope": "New isolated upstream uv tool environment with the accepted pin installed successfully; existing host and package cache reused.",
+          "evidence_refs": [
+            "evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        },
+        "use": {
+          "status": "accepted_within_scope",
+          "scope": "Real upstream MCP calls returned exact original content from the selected public fixture; not a new provider-mediated client task.",
+          "evidence_refs": [
+            "evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        },
+        "persistence": {
+          "status": "accepted_within_scope",
+          "scope": "The scoped artifact/index was readable through a new server process after the first server exited; no OS reboot or corruption recovery.",
+          "evidence_refs": [
+            "evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        },
+        "restart": {
+          "status": "accepted_within_scope",
+          "scope": "Two real server processes per tool completed; all four owned MCP servers exited zero.",
+          "evidence_refs": [
+            "evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        },
+        "cleanup": {
+          "status": "accepted_within_scope",
+          "scope": "Native uv tool uninstall passed; all created entrypoints absent and zero owned tool processes remained; 82 input/output artifacts retained.",
+          "evidence_refs": [
+            "evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        },
+        "recovery": {
+          "status": "accepted_within_scope",
+          "scope": "The original Headroom content was recovered exactly in the same process and after a real server restart; full retrieval is not net token savings.",
+          "evidence_refs": [
+            "evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        }
       },
       "baseline_applicability": {
         "category": "direct_context",
         "scope": "Compare complete required input/output context with the cheapest adequate native read, preserve quality/recovery and include query overhead; a new installation does not imply a win.",
-        "retained_artifact_comparisons": 9,
+        "retained_artifact_comparisons": 11,
         "matched_lifetime_provider_baseline": "not_established",
         "regression_policy": "Keep the cheaper adequate native path when a candidate expands tokens or fails required information/quality checks."
       }
@@ -2420,7 +2493,7 @@
       "version": "1.108.319",
       "profile": "supporting",
       "role": "Explicitly scoped code index and exact symbol retrieval through a six-tool MCP surface",
-      "installation_assessment": "Official native installation and direct/both-client acceptance recorded in scoped public receipts",
+      "installation_assessment": "Clean isolated upstream uv installation and native uninstall passed on the existing Linux/WSL host; the working installation was preserved.",
       "current_host_recertified_by_this_audit": false,
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/jcodemunch-mcp",
@@ -2449,6 +2522,16 @@
             "id": "native-token-focus-clients-20260920",
             "path": "evidence/receipts/native-token-focus-clients-20260920.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-practice-confirmation-20260920",
+            "path": "evidence/receipts/token-practice-confirmation-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "native-token-clean-prefix-20260920",
+            "path": "evidence/receipts/native-token-clean-prefix-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "new_native_client_scope": "One bounded task in each native client passed project-file Context Mode reading and exact jCodeMunch symbol retrieval; six MCP calls, no failures. Consumption is separate from savings.",
@@ -2474,6 +2557,28 @@
           "limitations": [
             "Known exact source extraction is cheaper; do not replace it automatically."
           ]
+        },
+        {
+          "id": "jcodemunch-clean-indexed-retrieval-20260920",
+          "baseline_tokens": 2484,
+          "candidate_tokens": 324,
+          "tokens_removed": 2160,
+          "acceptance_passed": true,
+          "limitations": [
+            "Complete search/source SDK response serialization with exact function fidelity; existing scoped index. Cold index plus retrieval is 593; stats/setup outputs are excluded.",
+            "Native clean-prefix receipt: evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        },
+        {
+          "id": "jcodemunch-clean-known-source-20260920",
+          "baseline_tokens": 40,
+          "candidate_tokens": 324,
+          "tokens_removed": -284,
+          "acceptance_passed": true,
+          "limitations": [
+            "Known exact function read is cheaper than search/source responses; do not replace the focused read.",
+            "Native clean-prefix receipt: evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
         }
       ],
       "exact_causal_lifetime_provider_tokens_saved": null,
@@ -2488,17 +2593,51 @@
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
       "source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
       "lifecycle_stages": {
-        "install": {"status": "observed_installed", "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.", "evidence_refs": ["evidence/receipts/native-jcodemunch-20260920.json", "evidence/receipts/native-token-focus-clients-20260920.json"]},
-        "use": {"status": "accepted_within_scope", "scope": "Selected local index survived separate native calls and both-client symbol retrieval. Default-root accounting applies; no watcher, cross-repository automatic indexing or paid summaries were enabled.", "evidence_refs": ["evidence/receipts/native-jcodemunch-20260920.json", "evidence/receipts/native-token-focus-clients-20260920.json"]},
-        "persistence": {"status": "accepted_within_scope", "scope": "Selected local index survived separate native calls and both-client symbol retrieval. Default-root accounting applies; no watcher, cross-repository automatic indexing or paid summaries were enabled.", "evidence_refs": ["evidence/receipts/native-jcodemunch-20260920.json", "evidence/receipts/native-token-focus-clients-20260920.json"]},
-        "restart": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
-        "cleanup": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
-        "recovery": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []}
+        "install": {
+          "status": "accepted_within_scope",
+          "scope": "New isolated upstream uv tool environment with the accepted pin installed successfully; existing host and package cache reused.",
+          "evidence_refs": [
+            "evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        },
+        "use": {
+          "status": "accepted_within_scope",
+          "scope": "Real upstream MCP calls returned exact original content from the selected public fixture; not a new provider-mediated client task.",
+          "evidence_refs": [
+            "evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        },
+        "persistence": {
+          "status": "accepted_within_scope",
+          "scope": "The scoped artifact/index was readable through a new server process after the first server exited; no OS reboot or corruption recovery.",
+          "evidence_refs": [
+            "evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        },
+        "restart": {
+          "status": "accepted_within_scope",
+          "scope": "Two real server processes per tool completed; all four owned MCP servers exited zero.",
+          "evidence_refs": [
+            "evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        },
+        "cleanup": {
+          "status": "accepted_within_scope",
+          "scope": "Native uv tool uninstall passed; all created entrypoints absent and zero owned tool processes remained; 82 input/output artifacts retained.",
+          "evidence_refs": [
+            "evidence/receipts/native-token-clean-prefix-20260920.json"
+          ]
+        },
+        "recovery": {
+          "status": "not_established",
+          "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.",
+          "evidence_refs": []
+        }
       },
       "baseline_applicability": {
         "category": "direct_context",
         "scope": "Compare complete required input/output context with the cheapest adequate native read, preserve quality/recovery and include query overhead; a new installation does not imply a win.",
-        "retained_artifact_comparisons": 2,
+        "retained_artifact_comparisons": 4,
         "matched_lifetime_provider_baseline": "not_established",
         "regression_policy": "Keep the cheaper adequate native path when a candidate expands tokens or fails required information/quality checks."
       }
@@ -4297,6 +4436,11 @@
           {
             "id": "token-practice-native-counters-20260920",
             "path": "evidence/receipts/token-practice-native-counters-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-confirmation-20260920",
+            "path": "evidence/receipts/token-practice-confirmation-20260920.json",
             "kind": "historical_inventory"
           }
         ],

@@ -15,6 +15,13 @@ is unknown, and `not_applicable` means the selected role has no such lifecycle.
 This guide supplies future-host commands; reading or validating it does not run
 those commands or turn historical evidence into that PC's acceptance.
 
+The [two-tool clean-prefix receipt](../evidence/receipts/native-token-clean-prefix-20260920.json)
+records actual execution of isolated upstream Headroom and jCodeMunch installs,
+exact MCP results before/after process restart, and native uninstall. All owned
+entrypoints and processes were gone afterward; retained inputs and outputs
+survived. Its scoped verification counters and negative full-recovery comparison
+are retained separately from the working installation and provider usage.
+
 ## Choose the host and retain the inputs
 
 Start with `python3 scripts/adoption_status.py --help` and the selected profile

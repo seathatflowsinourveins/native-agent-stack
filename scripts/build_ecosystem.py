@@ -294,8 +294,9 @@ def build_data(root):
                          "current_host_acceptance": "Unknown on this browser's host"})
     token_receipts = []
     receipt_ids = list(TOKEN_RECEIPTS)
-    if "token-practice-confirmation-20260920" in receipts_by_id:
-        receipt_ids.append("token-practice-confirmation-20260920")
+    for receipt_id in ("token-practice-confirmation-20260920", "native-token-clean-prefix-20260920"):
+        if receipt_id in receipts_by_id:
+            receipt_ids.append(receipt_id)
     for receipt_id in receipt_ids:
         require(receipt_id in receipts_by_id, "required token receipt is unregistered")
         receipt = receipts_by_id[receipt_id]

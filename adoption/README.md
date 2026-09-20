@@ -16,7 +16,7 @@ These adoption profiles select from the existing component catalog; they do not 
 | `semantic-rag` | HF, vLLM, Qdrant, SocratiCode | Hardware-compatible model serving, explicit project index and real retrieval/watcher behavior |
 | `recovery` | Restic plus selected ai-memory/Qdrant application state | Isolated restore, logical comparison, independent key/destination, then explicit consumer cutover |
 
-The [reference manifest](manifest.json) maps **all 52 component IDs** to native guides, including optional components outside these starting profiles. It points to current versions and evidence rather than duplicating them. The [portability comparison](research.md) explains why native uv is the required dependency tool and other environment managers remain optional.
+The [reference manifest](manifest.json) maps **all 65 selected component IDs** to native guides, including optional components outside these starting profiles. The [offline HTML setup guide](../docs/ecosystem/index.html) embeds these recipes alongside layer/profile selection, scoped acceptance and measured baseline choices. The [lifecycle guide](lifecycle.md) covers ownership, restart, recovery and rollback. The [portability comparison](research.md) explains why native uv is the required dependency tool and other environment managers remain optional.
 
 The [latest acceptance recipes](../blueprints/us-equities/acceptance-wave/README.md)
 reuse that SDK for synthetic temporal data and offline Alpaca request models, plus
@@ -39,6 +39,8 @@ From the checkout root:
 python3 scripts/validate.py
 python3 scripts/validate_catalogs.py
 "$PYTHON_BIN" scripts/adoption_status.py --profile foundation-cpu --json
+# Or select the supported interpreter through native uv:
+uv run --no-project --python 3.13 python scripts/adoption_status.py --profile foundation-cpu --json
 # After the SDK recipe, use that environment to check research prerequisites:
 "$SDK_ENV/bin/python" scripts/adoption_status.py --profile research-runtime --json
 ```

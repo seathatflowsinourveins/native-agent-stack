@@ -209,7 +209,10 @@ function renderStack() {
       if(audit.lifecycle_stages) {
         const table = make("table", "lifecycle-table"), body = make("tbody");
         add(table, add(make("thead"), add(make("tr"), ...["Stage", "Status", "Scope"].map(label => make("th", "", label)))));
-        Object.entries(audit.lifecycle_stages).forEach(([stage, detail]) => add(body, add(make("tr"), make("td", "", stage), make("td", "", detail.status.replaceAll("_", " ")), make("td", "", detail.scope))));
+        ["install", "use", "persistence", "restart", "recovery", "cleanup"].forEach(stage => {
+          const detail = audit.lifecycle_stages[stage];
+          if(detail) add(body, add(make("tr"), make("td", "", stage), make("td", "", detail.status.replaceAll("_", " ")), make("td", "", detail.scope)));
+        });
         add(table, body); add(evidence, add(make("div", "table-wrap"), table));
       }
       labeled(evidence, "Baseline applicability", audit.baseline_applicability);
