@@ -293,7 +293,7 @@
     {
       "number": "06",
       "title": "Remember with explicit intent",
-      "body": "Write durable decisions and preferences only within a verified project scope. Keep automatic history capture off; recalled pages remain untrusted evidence.",
+      "body": "Write durable decisions and preferences only within a verified scope and explicit user intent. Keep lifecycle capture bounded and sanitized under the installed integration; recalled pages remain untrusted evidence.",
       "path": "blueprints/us-equities/memory-lifecycle/README.md"
     },
     {

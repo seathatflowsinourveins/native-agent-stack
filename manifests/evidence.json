@@ -5052,8 +5052,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "37fe361b2cef32710ad3a2c0fd21cbf4ddc5251d83dcdcf4205b2b71bd79a4e3",
-      "bytes": 3703388
+      "sha256": "6db6df9b6bc8f2a6272b54279f2fa960daa066a766cf935065df7c91fec014bd",
+      "bytes": 3703447
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5062,8 +5062,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "16b0cc7a23899691fa405119f1eba62d672fbd44479921ab3b6535b1ddd92ae8",
-      "bytes": 30500
+      "sha256": "b7c7d24dfff2d742dea53f3451fa96214b3d50015f4d73498d1e627ee192661d",
+      "bytes": 30559
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6494,6 +6494,81 @@
       "path": "docs/acceptance-evidence-policy.md",
       "sha256": "cff82f8a59a57f9c51d6d9d18a4d02bdde978f8c4fe928e7a4af219894bed964",
       "bytes": 4916
+    },
+    {
+      "path": ".github/workflows/native-service-reboot.yml",
+      "sha256": "33fc35a62c1d8932b1931673bac7341175d74aa09d97ba087922b73e31146620",
+      "bytes": 2832
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/README.md",
+      "sha256": "d1cb0dc51a5ba32d478287ac2f10d1edf3011cceb1848cf54d0562495990c26d",
+      "bytes": 5379
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/guest.py",
+      "sha256": "609186c1a5651166c8654d0f8d9c2b57a1caabefffacd3bb4efe719bb8c17d93",
+      "bytes": 10168
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/local-verification.json",
+      "sha256": "36357dee51c90409106d3e13b8667dbfb0b4c8c55f9bd40d7cde3b1375e54bad",
+      "bytes": 2210
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/native-reboot-observer.service",
+      "sha256": "e296c8f589626e9624f128281f08edd7fdbb612259a3785cc84ae4c361a42827",
+      "bytes": 372
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/native-reboot.service",
+      "sha256": "3f79504f7812dc2fbc38cbc29dd862fcb245a1eb48097d9eb614f22f43a6620f",
+      "bytes": 330
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/native-reboot.timer",
+      "sha256": "3deb371b58abed60210f673405f3f56b34f349ee0fc7dd0d08abb91a0a11379c",
+      "bytes": 182
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/observer.py",
+      "sha256": "02a2fb86741c7739046e42626d2b47eda63eb5fabf2b8db31d5f8f0a83e1d65c",
+      "bytes": 1496
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/plan-initial.json",
+      "sha256": "f9056bd2b04c6d72ac9d329c3821cc8b93c1f1e1b706f99fb4942de8adab1f47",
+      "bytes": 3562
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/plan.json",
+      "sha256": "f535beb53ef4046a02b39cd85a146d9f3136ad2e9b2e1b57390352133f2871f3",
+      "bytes": 4467
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/run.py",
+      "sha256": "1f14f31bbbecda1a955c2988c5e2e9591ab825a881d67cfcf97c8596cce6338d",
+      "bytes": 22396
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/setup.sh",
+      "sha256": "662da3b254f3cfdf93cce61c96dadfbd0885661cf0e1fc50c408785f60f1e893",
+      "bytes": 1436
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/source-review.md",
+      "sha256": "158c982983449487d8a502157e47d0ab27331cb907d187fb2b4ba39244304f76",
+      "bytes": 6311
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/upstream-tests.sh",
+      "sha256": "8143d570f8f321db56b5deefc718c9e7aa7e4e00676c7f146f196b55272d0e7c",
+      "bytes": 2816
+    },
+    {
+      "path": "tests/test_service_reboot.py",
+      "sha256": "07c57ed8e5d229b45253de079944d1d4a79e64c58ee398263a1e7c5c3c8e144a",
+      "bytes": 9464
     }
   ],
   "convergence_records": [
