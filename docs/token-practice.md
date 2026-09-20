@@ -5,13 +5,19 @@ For a new PC or a separate local ledger, use the [portable upstream counter coll
 Recorded September 20, 2026. Read this guide on demand when selecting a context
 lane, interpreting native counters, or designing a measured comparison.
 
-The current selection has **58 component records**. The broader catalog has
-**505 repository identities: 342 public stars and 163 beyond stars, with 1,057
+The current selection has **65 component records**. The broader catalog has
+**512 repository identities: 342 public stars and 170 beyond stars, with 1,064
 typed references**. The earlier audit retains its 52-component scope, and the
 full-catalog TOON receipt retains the 502-repository input actually measured.
-These are bounded catalog counts, not a universal ranking, 58 successful full
+These are bounded catalog counts, not a universal ranking, 65 successful full
 E2E runs, or savings from every repository. Supporting runtimes and historical
 alternative installations retain separate scope.
+
+The [offline HTML setup guide](ecosystem/index.html) brings the selected stack,
+layer/profile filters, native recipes, lifecycle stages and baseline choices
+together. Its historical results do not become a new PC's acceptance. Use the
+[lifecycle guide](../adoption/lifecycle.md) for installation ownership, restart,
+recovery and rollback; collect that PC's counters with the portable reporter.
 
 ## Default practice
 
@@ -46,6 +52,15 @@ hook acceptance is not authorization to enable capture on every runtime.
 5. Count once at the proper boundary. Missing measurements are unknown.
    Never add cumulative snapshots, cache subsets, provider usage and artifact
    differences, or multiply a measured difference by repository count.
+
+Before adopting a transformation, compare it with the cheapest adequate native
+baseline for that task and verify required information. The HTML's structured
+selection table keeps these decisions visible: focused known-source reads beat
+an extra search; code discovery may benefit from an index; compact JSON wins
+when TOON expands it; full-original tasks bypass compression followed by full
+recovery. A rejected representation remains recorded but is not the default.
+Supporting runtimes, security checks and recovery tools are evaluated for their
+own role, not assigned invented token savings.
 
 ## Four accepted native coding trials
 
@@ -179,8 +194,22 @@ when importing new matched-task or retrieval evaluations.
 
 ## Coverage and future acceptance
 
-The [58-component saturation matrix](token-native-saturation.md) links each
+The [current component lifecycle matrix](token-native-saturation.md) links each
 selected role to installation, integration, functional and lifecycle evidence.
+
+The later [clean-prefix acceptance](../evidence/receipts/native-token-clean-prefix-20260920.json)
+also proves fresh isolated upstream Headroom/jCodeMunch installation, exact use
+before and after server restart, and native removal with retained evidence.
+Complete Headroom compression responses used 2,732 tokens versus a 5,105-token
+compact original; fetching the full original as well raised the responses to
+18,777. jCodeMunch search/source responses used 324 versus a 2,484-token whole
+file, while the already-known function required only 40. Indexing plus retrieval
+was 593; setup/statistics outputs remain outside those retrieval-only figures.
+The isolated native meters returned Headroom 7,488 and jCodeMunch 5,562 estimated
+tokens for their verification calls. These are separate test ledgers; the
+existing jCodeMunch ledger remained unchanged at 29,820. Keep the cheaper adequate
+path and retain these growth cases alongside the reductions.
+
 The focus wave added exact jCodeMunch retrieval, direct upstream Headroom MCP,
 both-native-client project-file/symbol acceptance and explicit sandbox network
 allow/deny fixtures. The [native client receipt](../evidence/receipts/native-token-focus-clients-20260920.json)

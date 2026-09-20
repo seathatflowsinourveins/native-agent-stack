@@ -1533,6 +1533,46 @@
         "Native backup/restore both exit0; complete private logs retained, fixture model calls0 and whole-task provider usage unknown."
       ],
       "path": "evidence/receipts/wsl-memory-maintenance-20260920.json"
+    },
+    {
+      "id": "token-practice-confirmation-20260920",
+      "kind": "historical_inventory",
+      "component_ids": [
+        "rtk",
+        "context-mode",
+        "headroom",
+        "jcodemunch-mcp"
+      ],
+      "claim": "Dated direct upstream counter outputs, current release metadata, independent artifact rechecks and reconciled recorded monitoring support explicit baseline selection without claiming causal lifetime provider savings.",
+      "limitations": [
+        "Historical source-host observations only; not live acceptance on the reader's PC.",
+        "Upstream retained-history estimates, exact artifact counts and provider consumption are different quantities and must not be summed.",
+        "Artifact and client rechecks inspected existing retained inputs and streams; no new model task or reinstall was performed in this confirmation.",
+        "Public native fields are allowlisted unchanged from private outputs; host paths, process identifiers and account details are omitted.",
+        "Latest monitoring queries returned no matching observations in their six-hour window; this does not mean zero usage or newly confirmed savings.",
+        "Latest-release equality was checked only for the four selected token tools; accepted specialist compatibility pins are separate."
+      ],
+      "path": "evidence/receipts/token-practice-confirmation-20260920.json"
+    },
+    {
+      "id": "native-token-clean-prefix-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "headroom",
+        "jcodemunch-mcp"
+      ],
+      "claim": "Fresh isolated upstream uv installations of Headroom0.37.0 and jCodeMunch1.108.319 passed exact native MCP retrieval before/after real server restart, then native uninstall with all created entrypoints absent and zero owned tool processes remaining.",
+      "limitations": [
+        "Clean prefix means new isolated tool environments using the existing host and package cache, not a newly provisioned operating system or an independent-PC restore.",
+        "The Python MCP SDK transported real upstream tool calls. Retained JSON envelopes preserve returned fields but are serialized artifacts, not a byte-for-byte dump of stdio transport framing.",
+        "Headroom used the selected offline Python detector; its native detector warning is retained in stderr. No model/provider keys were supplied, and no account configuration was copied.",
+        "Headroom upstream9616/2128 counts include message overhead; exact retained content counts are9609/2121, and the cheaper compact original is5105. Comparisons use their stated baseline.",
+        "Headroom full compression+recovery responses cost18777 tokens versus5105 compact original. Exact recoverability is not a net saving when the original is also fetched.",
+        "jCodeMunch complete returned search/source responses cost324 tokens versus2484 for the whole file, but a known focused function is only40 tokens. Retain that cheaper path when its location is already known.",
+        "Native isolated lifetime estimates are verification-ledger values. Do not add them to production counters, existing artifact totals, provider usage or other snapshots.",
+        "Process exits, uninstall and retained-byte checks establish this bounded local lifecycle only; provider-mediated client workflows, every optional feature and OS reboot were not replayed."
+      ],
+      "path": "evidence/receipts/native-token-clean-prefix-20260920.json"
     }
   ],
   "files": [
@@ -1568,8 +1608,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "f4d8a40d0031a2f0bdf3d860174cb8f8e491c3a13780aa942a8c60a5f6bd99bf",
-      "bytes": 7483
+      "sha256": "db048c3999722d81e2c746b1cfefac620552f034debee1d9ec6eb0afd72d9997",
+      "bytes": 7954
     },
     {
       "path": "CLAUDE.md",
@@ -1588,8 +1628,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "5e554f816905070b474aaa8e177fbc7b4ed81e017019fb3067ec08ca67b6c568",
-      "bytes": 9783
+      "sha256": "9dda51b5accec2174996aba789ede62829836f371c7cfa3ec00e8e9b2c8602a6",
+      "bytes": 10128
     },
     {
       "path": "adoption/host-state.example.json",
@@ -1597,9 +1637,14 @@
       "bytes": 1066
     },
     {
+      "path": "adoption/lifecycle.md",
+      "sha256": "bef87bce2a1107d7d4ed1a22b45af334d980f4f653d3b94bdc1f0179f79ecef2",
+      "bytes": 15345
+    },
+    {
       "path": "adoption/manifest.json",
-      "sha256": "25cdc4638a02f6641c6c531ae1f71414e0f564deaa10362ba9c5711a6e9baab5",
-      "bytes": 13406
+      "sha256": "d0f785fe66f896a8362f48afda44fb483eb56138b33e1e3970af92b1c7de37ea",
+      "bytes": 13657
     },
     {
       "path": "adoption/paired/README.md",
@@ -3029,8 +3074,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "bd8ee6a6d86b6adef89964ca10e63f93ae00d4f9265eff45acab4547ad871ce8",
-      "bytes": 180593
+      "sha256": "36d856af431951b2ee736675c8cd954170977f37b953d3f116680c5595eb051d",
+      "bytes": 370595
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -4619,13 +4664,13 @@
     },
     {
       "path": "docs/ecosystem/README.md",
-      "sha256": "2f4307fe69cd1338ac9eaa70b06652971b8a4378b684cf0ad6d6b994e64463b2",
-      "bytes": 6706
+      "sha256": "a5eec2448805f3bf30ed59c798f5e5fa03366ae8dfbb7b89cf1e5bf39453a822",
+      "bytes": 8789
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "b28ebbde764a385ef08683de283c8af0f22fa32b3a6fdc0cfb9c19c690acd225",
-      "bytes": 1658768
+      "sha256": "fca3bd5790df32fea9eaa451a14fe60545458dd672e4a6149097345f2cdb663e",
+      "bytes": 2726963
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -4634,8 +4679,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "1c5c081d1dcbb43b88513de9e072b1c22a56f6af499fe43c74978a2c3d644dc5",
-      "bytes": 21285
+      "sha256": "d411c3e473cd2fc0e69dcdbdb51dfe0bce608d7d795937a64d7d41105f2213e4",
+      "bytes": 27230
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -4654,8 +4699,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "9685076d5d8f7d62a3c7385b26c2a389e65e4b1eaa23959a95000f1b74017f30",
-      "bytes": 37984
+      "sha256": "003096be53d2bf94ff23884ec557f1e964a7546b2dddb5d28cfc9d5f31ca9e55",
+      "bytes": 55400
     },
     {
       "path": "docs/evidence.md",
@@ -4674,13 +4719,13 @@
     },
     {
       "path": "docs/token-native-saturation.md",
-      "sha256": "81f3ea585b30c047c7166db174d555c912e71f13d85cd63ba28c1bfe1071d1bb",
-      "bytes": 10225
+      "sha256": "b0c44fffb87af0bba8ab197aa238d0c75a606fc1f5e9ab9abc0502ecdab2ad83",
+      "bytes": 10776
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "ee7d55ebc9ce08855110ae7be923ae08d1c20b3643d4c2120a71cc6ed35112e3",
-      "bytes": 18446
+      "sha256": "3801b1cc41d65ae54f9c2bc1048a8bc4acb105f95135a47ed05e0ac845ef1996",
+      "bytes": 20392
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -4833,6 +4878,11 @@
       "bytes": 2504
     },
     {
+      "path": "evidence/receipts/native-token-clean-prefix-20260920.json",
+      "sha256": "31866f3e767733b0e20fa9d380828c589ae366f183f3c36f8a83f170b6279d63",
+      "bytes": 36736
+    },
+    {
       "path": "evidence/receipts/native-token-focus-clients-20260920.json",
       "sha256": "bd101c71255fcee84fb2181604c101f3c2ade4e64a9801959071feaca89c2ee4",
       "bytes": 3004
@@ -4861,6 +4911,11 @@
       "path": "evidence/receipts/token-practice-catalog-toon-20260920.json",
       "sha256": "5cdf0a38880ba537dbfd207e2c77533f58eade027ab008d3327fc571a0e8c803",
       "bytes": 3204
+    },
+    {
+      "path": "evidence/receipts/token-practice-confirmation-20260920.json",
+      "sha256": "322b7b1e9e37bf52cbfbb59e432d2c1e3610a8c9355732bd74ed35828e4f91d9",
+      "bytes": 9890
     },
     {
       "path": "evidence/receipts/token-practice-coverage-20260920.json",
@@ -5029,8 +5084,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "52e72c2f505363054e01f073bd076b3003249e4c16f7863af5e8cbc5f13912fd",
-      "bytes": 68353
+      "sha256": "40ab333f81eaf8933576f3f60a5ebe714eca2717106558feb2627666ae1351e0",
+      "bytes": 68637
     },
     {
       "path": "observability/README.md",
@@ -5219,8 +5274,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "4a5443cfb92f60ffa5119f249e94b88d85fcbbc45f7fb7c65aaf151b96612723",
-      "bytes": 14165
+      "sha256": "cabceabcf409ad2a54bb688a4b599ce4c5f8cacc63ae66e127efb3b92742d7ca",
+      "bytes": 20906
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -5324,8 +5379,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "16d3cb7774f0f8ceb2c8569dbc326965fbc8bb762a5fdb148a53e1f1acc49f92",
-      "bytes": 12250
+      "sha256": "7216c1b3ac21b859212e54d4e559711cca0d0f36495575fee570bc976153fffb",
+      "bytes": 20276
     },
     {
       "path": "tests/test_execution_realism.py",
@@ -5431,6 +5486,11 @@
       "path": "tests/test_security_identity.py",
       "sha256": "cdd357d5cc1521959509ce41b519787790d046b51f91a2c29275f3842b667fee",
       "bytes": 22857
+    },
+    {
+      "path": "tests/test_stack_lifecycle.py",
+      "sha256": "36c665dd6fe85bf1150236116238336ddd4769629b68e64737ada800c9af6edf",
+      "bytes": 4470
     },
     {
       "path": "tests/test_validate.py",

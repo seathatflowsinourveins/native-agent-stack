@@ -26,6 +26,15 @@ STACK = "manifests/stack.json"
 EVIDENCE = "manifests/evidence.json"
 STARS = "catalogs/convergence-practice/public-starred.json"
 REVIEW = "catalogs/convergence-practice/source-review.json"
+ADOPTION = "adoption/manifest.json"
+SATURATION = "blueprints/token-native-focus/saturation-audit.json"
+SETUP_GUIDES = ("adoption/README.md", "adoption/update.md", "tools/token-report/README.md")
+TOKEN_RECEIPTS = (
+    "token-practice-native-counters-20260920", "native-jcodemunch-20260920",
+    "native-headroom-mcp-20260920", "token-practice-catalog-toon-20260920",
+    "native-token-focus-clients-20260920",
+)
+NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json"}
 EXECUTION_KINDS = {"native_cli_e2e", "native_model_e2e"}
 
 
@@ -66,7 +75,7 @@ def repository_key(value):
 
 def stamp(value):
     for key in ("retrieved_at", "checked_at", "recorded_at_utc", "recorded_at",
-                "observed_at_utc", "observed_at", "executed_at", "date"):
+                "observed_at_utc", "observed_at", "executed_at", "recorded_date_utc", "date"):
         if isinstance(value.get(key), str):
             return value[key]
     return "Date not recorded in this source"
@@ -117,7 +126,7 @@ def build_data(root):
         safe_file(root, path)
         # This packet is newer than the immutable base; its own new pages resolve
         # at the public branch after publication, with exact input hashes retained.
-        revision = "main" if path.startswith("docs/ecosystem/") else config["source_revision"]
+        revision = "main" if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES else config["source_revision"]
         return f'{config["repository_url"]}/blob/{revision}/{quote(path, safe="/")}'
 
     index, stack, evidence, stars, review = (read(path) for path in (INDEX, STACK, EVIDENCE, STARS, REVIEW))
@@ -220,6 +229,88 @@ def build_data(root):
     awesome = [{"name": item["repository"], "pin": item["source_commit"],
                 "date": item["retrieved_at"], "url": public_url(item["readme_url"]),
                 "license": item["license_at_pin"]} for item in review["awesome_sources"]]
+
+    # The selected stack drives coverage. A dated audit may lag an added component
+    # or version; absence must remain visible instead of becoming acceptance.
+    adoption, saturation = read(ADOPTION), read(SATURATION)
+    component_ids = [component["id"] for component in stack["components"]]
+    require(len(set(component_ids)) == len(component_ids), "duplicate selected component identity")
+    require(set(adoption["recipe_map"]) == set(component_ids),
+            "recipe map must cover exactly the selected stack")
+    audited = {row["component_id"]: row for row in saturation["components"]}
+    require(len(audited) == len(saturation["components"]), "duplicate saturation component identity")
+    require(set(audited).issubset(component_ids), "saturation references an unknown component")
+    profiles = adoption["profiles"]
+    profile_ids = [profile["id"] for profile in profiles]
+    require(len(set(profile_ids)) == len(profile_ids), "duplicate adoption profile identity")
+    for profile in profiles:
+        require(set(profile["component_ids"]).issubset(component_ids),
+                "adoption profile references an unknown component")
+    guide_paths = list(SETUP_GUIDES)
+    if (root / "adoption/lifecycle.md").exists():
+        guide_paths.append("adoption/lifecycle.md")
+    documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))
+    recipes = []
+    for path in documents_to_embed:
+        require(isinstance(path, str) and path.endswith(".md"), "recipe must be repository Markdown")
+        track(path)
+        recipes.append({"path": path, "url": file_url(path),
+                        "text": safe_file(root, path).read_text(encoding="utf-8")})
+    selected, comparisons = [], []
+    comparison_ids = set()
+    for component in stack["components"]:
+        identifier = component["id"]
+        repositories = [row for row in output if identifier in row["component_ids"]]
+        require(len(repositories) == 1, "selected component must join exactly one catalog repository")
+        repository = repositories[0]
+        audit = audited.get(identifier)
+        status = "missing" if audit is None else (
+            "matched_version" if audit.get("version") == component.get("version") else "different_version")
+        if audit:
+            for receipt_ref in audit.get("functional_evidence", {}).get("public_receipts", []):
+                registered = receipts_by_id.get(receipt_ref["id"])
+                require(registered is not None and registered["path"] == receipt_ref["path"],
+                        "saturation receipt must match registered evidence")
+            for row in audit.get("artifact_baselines", []):
+                require(row["id"] not in comparison_ids, "duplicate artifact comparison identity")
+                comparison_ids.add(row["id"])
+                before, after, removed = (row.get(key) for key in (
+                    "baseline_tokens", "candidate_tokens", "tokens_removed"))
+                require(all(type(value) is int for value in (before, after, removed))
+                        and before >= 0 and after >= 0 and before - after == removed,
+                        "artifact comparison counts are inconsistent")
+                comparisons.append({**row, "component_id": identifier, "audit_status": status,
+                                    "recorded_at": stamp(saturation), "source_url": file_url(SATURATION)})
+        selected.append({"id": identifier, "repository": repository["url"],
+                         "version": component.get("version", "Not recorded"),
+                         "license": component.get("license", "Not recorded"),
+                         "role": component.get("role", ""), "tier": component.get("profile", ""),
+                         "commands": component.get("commands", []),
+                         "command_scope": component.get("command_scope", "See the full native recipe and its recorded boundaries."),
+                         "layers": repository["layers"],
+                         "profiles": [p["id"] for p in profiles if identifier in p["component_ids"]],
+                         "recipe_path": adoption["recipe_map"][identifier],
+                         "audit_status": status, "audit": audit, "receipts": repository["receipts"],
+                         "current_host_acceptance": "Unknown on this browser's host"})
+    token_receipts = []
+    receipt_ids = list(TOKEN_RECEIPTS)
+    for receipt_id in ("token-practice-confirmation-20260920", "native-token-clean-prefix-20260920"):
+        if receipt_id in receipts_by_id:
+            receipt_ids.append(receipt_id)
+    for receipt_id in receipt_ids:
+        require(receipt_id in receipts_by_id, "required token receipt is unregistered")
+        receipt = receipts_by_id[receipt_id]
+        detail = read(receipt["path"])
+        require(detail.get("id") == receipt_id, "token receipt identity differs from registration")
+        token_receipts.append({"id": receipt_id, "url": file_url(receipt["path"]), "record": detail})
+    selection_policy = []
+    for entry in config.get("selection_policy", []):
+        item = dict(entry)
+        item["sources"] = []
+        for path in item.pop("source_paths", []):
+            track(path)
+            item["sources"].append({"path": path, "url": file_url(path)})
+        selection_policy.append(item)
     return {"schema_version": 1, "snapshot_date": config["snapshot_date"],
             "repository_url": config["repository_url"], "source_revision": config["source_revision"],
             "stars_observed_at": stars["retrieved_at"], "component_snapshot_at": stamp(stack),
@@ -228,6 +319,16 @@ def build_data(root):
                        "source_reviewed": sum(row["source_reviewed"] for row in output),
                        "executed": sum(row["executed"] for row in output)},
             "layers": layers, "repositories": output, "integrations": integrations, "awesome": awesome,
+            "setup": {"components": selected, "profiles": profiles, "recipes": recipes,
+                      "default_profile": adoption["default_profile"],
+                      "supported_platforms": adoption.get("supported_platforms", []),
+                      "acceptance_target": adoption.get("acceptance_target", {}),
+                      "stack_scope": stack.get("scope", ""), "audit_scope": saturation.get("scope", ""),
+                      "audit_date": stamp(saturation),
+                      "missing_audit_count": sum(row["audit_status"] == "missing" for row in selected)},
+            "efficiency": {"comparisons": comparisons, "receipts": token_receipts,
+                           "counter_policy": saturation.get("counter_policy", {}),
+                           "selection_policy": selection_policy},
             "inputs": sorted(inputs.values(), key=lambda row: row["path"]), **curated}
 
 

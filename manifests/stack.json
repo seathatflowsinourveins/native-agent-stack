@@ -340,7 +340,8 @@
         "token-practice-native-pairs-20260920",
         "token-practice-coverage-20260920",
         "token-practice-native-counters-20260920",
-        "native-token-focus-clients-20260920"
+        "native-token-focus-clients-20260920",
+        "token-practice-confirmation-20260920"
       ],
       "upstream_sources": [
         "https://github.com/mksglu/context-mode"
@@ -433,7 +434,9 @@
         "token-practice-coverage-20260920",
         "token-practice-native-counters-20260920",
         "token-native-retained-functional-20260920",
-        "native-headroom-mcp-20260920"
+        "native-headroom-mcp-20260920",
+        "token-practice-confirmation-20260920",
+        "native-token-clean-prefix-20260920"
       ],
       "upstream_sources": [
         "https://github.com/chopratejas/headroom"
@@ -683,7 +686,8 @@
         "component-history",
         "token-practice-artifacts-20260920",
         "token-practice-coverage-20260920",
-        "token-practice-native-counters-20260920"
+        "token-practice-native-counters-20260920",
+        "token-practice-confirmation-20260920"
       ],
       "upstream_sources": [
         "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0"
@@ -1404,7 +1408,9 @@
       "source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
       "evidence_ids": [
         "native-jcodemunch-20260920",
-        "native-token-focus-clients-20260920"
+        "native-token-focus-clients-20260920",
+        "token-practice-confirmation-20260920",
+        "native-token-clean-prefix-20260920"
       ],
       "upstream_sources": [
         "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",

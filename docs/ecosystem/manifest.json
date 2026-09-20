@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-20",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "1c9b1dc3d6857463409b117fa1e83fe675f7ed42",
+  "source_revision": "d44472cd5f652908725726956e82e0dbb4b096bb",
   "layers": [
     {
       "id": "agents",
@@ -160,6 +160,85 @@
       "repositories": []
     }
   ],
+  "selection_policy": [
+    {
+      "task": "Read a function whose source location is already known",
+      "preferred": "Focused native source read",
+      "baseline_tokens": 601,
+      "candidate_tokens": 861,
+      "chosen_tokens": 601,
+      "unit": "o200k_base retained-text tokens",
+      "quality_check": "Returned function equals the original source bytes.",
+      "boundary": "The jCodeMunch search and source envelopes add 260 tokens for this known location; retain the focused read. These are artifact counts, not model-task usage.",
+      "source_paths": ["evidence/receipts/native-jcodemunch-20260920.json"]
+    },
+    {
+      "task": "Discover a function inside an explicitly indexed code scope",
+      "preferred": "jCodeMunch search_symbols then get_symbol_source",
+      "baseline_tokens": 5476,
+      "candidate_tokens": 861,
+      "chosen_tokens": 861,
+      "unit": "o200k_base retained-text tokens",
+      "quality_check": "Search identifies the requested symbol; complete returned source equals disk.",
+      "boundary": "Whole-file baseline versus complete search and source responses. If an index must be created, the recorded indexing-plus-retrieval sequence is 1332 tokens. Refresh stale indexes before relying on their contents.",
+      "source_paths": ["evidence/receipts/native-jcodemunch-20260920.json", "recipes/README.md"]
+    },
+    {
+      "task": "Serialize the recorded repository catalog",
+      "preferred": "Compact JSON",
+      "baseline_tokens": 59792,
+      "candidate_tokens": 66815,
+      "chosen_tokens": 59792,
+      "unit": "o200k_base retained-text tokens",
+      "quality_check": "Strict TOON decode preserves JSON values; both complete representations use the same tokenizer.",
+      "boundary": "TOON expands this recorded compact-JSON baseline by 7023 tokens. Its native tokenx estimate uses a different baseline. Counts refer to the retained catalog fixture, not every later catalog revision.",
+      "source_paths": ["evidence/receipts/token-practice-catalog-toon-20260920.json"]
+    },
+    {
+      "task": "Inspect repetitive logs while preserving the required error and summary",
+      "preferred": "Guarded Headroom artifact with retained original",
+      "baseline_tokens": 26529,
+      "candidate_tokens": 191,
+      "chosen_tokens": 191,
+      "unit": "o200k_base retained-text tokens",
+      "quality_check": "All 1202 original lines and request fields reconstruct exactly; error and summary remain available.",
+      "boundary": "This is the accepted local guard around the upstream SDK, not a native CLI lifetime value or automatic interception of agent traffic. Select the original if the quality check fails.",
+      "source_paths": ["evidence/receipts/native-headroom-mcp-20260920.json", "evidence/receipts/token-practice-confirmation-20260920.json"]
+    },
+    {
+      "task": "Read the complete original JSON artifact immediately",
+      "preferred": "Read compact original directly",
+      "baseline_tokens": 36625,
+      "candidate_tokens": 19714,
+      "chosen_tokens": 36625,
+      "unit": "o200k_base retained-text tokens",
+      "quality_check": "The task requires the complete original, so a compressed summary alone does not meet its contract.",
+      "boundary": "The 19714-token candidate is compression-only. Full retrieval then returns the original text again (56433 tokens in its original formatting). Do not label the compress-and-recover round trip a net saving.",
+      "source_paths": ["evidence/receipts/native-headroom-mcp-20260920.json", "evidence/receipts/token-practice-confirmation-20260920.json"]
+    },
+    {
+      "task": "Compare native model workflows",
+      "preferred": "Accept a comparison only when both answers meet semantic and output requirements",
+      "baseline_tokens": null,
+      "candidate_tokens": null,
+      "chosen_tokens": null,
+      "unit": "complete provider usage with client-specific cache accounting",
+      "quality_check": "Both tasks pass required facts, citations and output protocol; retain every failed attempt.",
+      "boundary": "The recorded Claude full-context answers exceed the word limit, so their observed differences remain protocol-confounded. Valid artifact reductions do not repair a failed model comparison or establish causal lifetime savings.",
+      "source_paths": ["blueprints/us-equities/research-efficiency/native-receipt.json", "docs/token-practice.md"]
+    },
+    {
+      "task": "Report cumulative token-efficiency evidence",
+      "preferred": "Latest successful upstream snapshot for each explicit scope, alongside exact comparisons",
+      "baseline_tokens": null,
+      "candidate_tokens": null,
+      "chosen_tokens": null,
+      "unit": "separate upstream estimates, artifact counts and provider consumption",
+      "quality_check": "Retain command, exit, complete private output, timestamp and hash; preserve missing observations and resets.",
+      "boundary": "RTK defaults to 90-day retention; Headroom's lifetime field covers at most 30 days; Context Mode retention is bounded. jCodeMunch includes repeated reads. Never sum overlapping scopes, successive snapshots, cache subsets or monitoring replicas.",
+      "source_paths": ["tools/token-report/README.md", "evidence/receipts/token-practice-native-counters-20260920.json", "observability/followup-receipt.json"]
+    }
+  ],
   "policies": [
     {
       "number": "01",
@@ -211,6 +290,18 @@
     }
   ],
   "guides": [
+    {
+      "title": "Install, recover and clean up selected tools",
+      "body": "Native lifecycle commands, owned prefixes, preservation of state and per-stage acceptance boundaries.",
+      "path": "adoption/lifecycle.md",
+      "category": "adoption"
+    },
+    {
+      "title": "Direct counters and independent confirmation",
+      "body": "Returned upstream fields, four current-release checks, artifact rechecks and actual usage reconciliation. Savings estimates remain separate.",
+      "path": "evidence/receipts/token-practice-confirmation-20260920.json",
+      "category": "evaluation"
+    },
     {
       "title": "Capture this PC's lifetime evidence",
       "body": "Upstream counter commands, private cumulative snapshots, exact artifact comparisons and a portable JSON/HTML manifest.",
