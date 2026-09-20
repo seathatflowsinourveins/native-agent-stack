@@ -120,6 +120,43 @@ reporting window. Its separate local guard passed seven fixtures. A zero ledger
 does not establish zero guard activity, zero provider usage or zero possible
 benefit. Heuristic counters and illustrative API prices are not subscription bills.
 
+### Why the Context Mode lifetime dollar line can be small
+
+In installed Context Mode 1.0.169, the text footer estimates session tokens as
+`round((kept-out bytes + cache bytes saved) / 4)`. Its lifetime dollar line prices
+`retained events × 256 + current session estimated tokens`. The persisted status
+JSON instead reports `retained events × 256` without the session term. The
+renderer's fallback is $5 per million input tokens, with an environment override;
+this is an illustrative value, not avoided provider billing or subscription cost.
+
+The native database caps 1,000 events per session. Startup removes sessions older
+than seven days. Consequently, "lifetime" means retained runtime history and can
+decrease. Native Codex, native Claude and Desktop data stores have separate scope.
+A small dollar quote without its runtime and capture date cannot establish whole-PC
+or per-repository savings. Inspect the installed `src/session/analytics.ts`
+(`renderBottomLine`, session token estimate and price fallback), `src/server.ts`
+(persisted status), `src/session/db.ts` and both SessionStart hooks when upgrading.
+
+The local report preserves metadata-only event identities, timestamps and project
+attribution, plus immutable upstream reports. It excludes prompts and event
+content, deduplicates observed events, and never adds these archived event
+estimates to overlapping native counters. Missing historical events cannot be
+reconstructed. A command output comparison is not an actual-use lifetime total.
+
+Adoption must distinguish enabled hook configuration, observed retained source
+labels and completed task acceptance. Native Claude's RTK Bash rewrite is
+configured; current Codex practice uses explicit RTK commands. A stale trust entry
+for an absent hook file does not activate it. Per-client hook inventories should
+respect disabled-hook flags and retain unobserved lifecycle paths.
+
+Only RTK, Context Mode and Headroom expose verified native savings-history
+reports in the selected stack. TOON has per-conversion statistics; usage and
+telemetry tools report consumption or state. Keep every catalog repository's
+adoption and baseline availability explicit, with unknown values left null.
+Run role-specific acceptance where applicable; guidance and research catalog
+entries are not implied executable deployments. Preserve failed quality gates
+when importing new matched-task or retrieval evaluations.
+
 ## Coverage and future acceptance
 
 The [coverage receipt](../evidence/receipts/token-practice-coverage-20260920.json)
