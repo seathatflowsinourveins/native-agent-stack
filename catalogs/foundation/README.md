@@ -6,7 +6,7 @@ Start with the layer needed for the task in [manifest.json](manifest.json), then
 read its scoped capability decision in [decisions.json](decisions.json). A default
 is a selected way to do a task, not permission to install or activate every tool.
 
-The catalog references 61 selected components through 40 capability decisions. It cites 65 relevant registered
+The catalog references 61 selected components through 41 capability decisions. It cites 66 relevant registered
 receipts from the current 88-receipt inventory. These are coverage counts, not a
 score of complete installation, execution or lifecycle acceptance.
 
@@ -65,9 +65,9 @@ The three current priorities are:
 1. Keep general capabilities and financial-domain decisions separate, with
    explicit claim scope. This catalog addresses that structure; maintain the
    references when evidence changes rather than migrating the broad inventory.
-2. Qualify cancellation, abrupt crash and resume of an owned writing worker.
-   Existing local termination, individual session resume and checkpointed jobs
-   remain useful narrower results.
+2. Complete crash descendant containment after the recorded same-child cancellation
+   and crash continuation. The new fixture retained one checkpoint and final effect,
+   but needed explicit supervisor cleanup for a surviving wait.
 3. Qualify independent off-host restore with separately available key recovery,
    and scheduled-service acceptance after reboot. Same-host restore and ordinary
    stop/start do not close these gaps.

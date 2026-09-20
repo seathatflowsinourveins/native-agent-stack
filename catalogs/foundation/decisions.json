@@ -2184,6 +2184,54 @@
         ]
       },
       "supersedes": []
+    },
+    {
+      "id": "native-child-interruption-recovery",
+      "capability": "Resume the same native child and reconcile a local effect after interruption",
+      "capability_key": "native-child-interruption-recovery",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "workers",
+        "scheduling-supervision",
+        "recovery-portability"
+      ],
+      "selection": "conditional",
+      "review_status": "partial_acceptance",
+      "activation": "Use bounded native TaskStop/SendMessage and same-parent continuation; explicitly own and reconcile descendant processes and local effects.",
+      "component_ids": [
+        "claude-code"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-worker-recovery-20260920"
+      ],
+      "evidence_scope": "One native background child retained its identity through TaskStop/SendMessage cancellation and same-parent continuation after abrupt runtime failure, producing one final local effect from an unchanged checkpoint after explicit supervisor cleanup.",
+      "limitations": [
+        "One synthetic local fixture and one physical WSL host, not arbitrary application state.",
+        "Actual native child identities and paths remain private; hashes bind retained streams.",
+        "Native original runtime SIGKILL is a shared-process failure; task identity and effect continuation are distinct from process containment.",
+        "The updated runner parser is regression-tested offline; the one native attempt executed the separately retained source.",
+        "Automatic native crash descendant containment: the crash wait survived and needed supervisor SIGKILL.",
+        "Exact requested tool-only behavior: the child attempted an extra read-only ls/git-status command, which was refused.",
+        "Remote provider cancellation, billing cessation, independent child-process isolation, off-host recovery, power-loss durability and distributed exactly-once effects."
+      ],
+      "source_paths": [
+        "blueprints/convergence-practice/worker-recovery/README.md"
+      ],
+      "next_gap": "Contain abrupt-runtime descendants through supported supervision; independent-host and provider-side effects remain separate.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Existing native-use stage is retained; this new child-continuation receipt explicitly needs supervisor cleanup.",
+        "unknown": "Native automatic crash containment failed in this attempt; provider cancellation and complete usage unknown.",
+        "stage_refs": [
+          {
+            "component_id": "claude-code",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
     }
   ]
 }

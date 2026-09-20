@@ -40,8 +40,8 @@
       "purpose": "Delegate bounded independent work with an actual base, owned paths and independent acceptance.",
       "selection": "Native workers first; Beads only when a dependency-aware queue helps.",
       "activation": "One coordinator integrates; each writing worker uses its own worktree and concise task contract.",
-      "lifecycle_scope": "One native child repair and scoped companion backend passed; cancellation/crash/resume remains broader than a successful child task.",
-      "next_gap": "Exercise cancellation, abrupt failure and resume of an owned writing worker with external-effect reconciliation."
+      "lifecycle_scope": "Native child repair and same-child interruption/crash continuation passed within their fixtures; crash descendant containment required explicit supervisor cleanup.",
+      "next_gap": "Qualify supported process containment for the observed survivor; independent-host and provider effects remain separate."
     },
     {
       "id": "isolation",
@@ -215,12 +215,13 @@
       "id": "worker-cancellation-crash-resume",
       "priority": 2,
       "status": "partial",
-      "scope": "Native child repair, local process-tree termination and individual session/job resume are accepted only for their fixtures; combined worker crash and external-effect recovery remains open.",
-      "next_action": "Freeze one owned writing-worker fixture and test cancellation, abrupt crash and same-task resume with single-effect assertions.",
+      "scope": "One same-child cancellation/crash/resume with an unchanged checkpoint and one local effect passed after explicit supervisor cleanup. The pending wait survived the native runtime crash; automatic descendant containment remains open.",
+      "next_action": "Qualify supported native cgroup/service containment for the actual survivor case; retain explicit effect reconciliation and original failed recorder.",
       "source_paths": [
         "blueprints/convergence-practice/native-worker/README.md",
         "blueprints/convergence-practice/native-recovery/README.md",
-        "blueprints/us-equities/worker-supervision/README.md"
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/convergence-practice/worker-recovery/README.md"
       ]
     },
     {

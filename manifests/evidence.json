@@ -1838,6 +1838,38 @@
         "The daily maintenance automation is scheduled; no scheduled execution or reboot recovery is claimed by its creation."
       ],
       "path": "evidence/receipts/native-harness-defaults-20260920.json"
+    },
+    {
+      "id": "native-worker-recovery-20260920",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "One native background child retained its identity through TaskStop/SendMessage cancellation and same-parent continuation after abrupt runtime failure, producing one final local effect from an unchanged checkpoint after explicit supervisor cleanup.",
+      "limitations": [
+        "One synthetic local fixture and one physical WSL host, not arbitrary application state.",
+        "Actual native child identities and paths remain private; hashes bind retained streams.",
+        "Native original runtime SIGKILL is a shared-process failure; task identity and effect continuation are distinct from process containment.",
+        "The updated runner parser is regression-tested offline; the one native attempt executed the separately retained source.",
+        "Automatic native crash descendant containment: the crash wait survived and needed supervisor SIGKILL.",
+        "Exact requested tool-only behavior: the child attempted an extra read-only ls/git-status command, which was refused.",
+        "Remote provider cancellation, billing cessation, independent child-process isolation, off-host recovery, power-loss durability and distributed exactly-once effects."
+      ],
+      "path": "evidence/receipts/native-worker-recovery-20260920.json"
+    },
+    {
+      "id": "foundation-catalog-ui-20260920",
+      "kind": "artifact_measurement",
+      "component_ids": [
+        "agent-browser"
+      ],
+      "claim": "Independent native-browser inspection of the Foundation/Trading catalog passed capability filtering, source navigation, keyboard interaction, scoped evidence rendering and desktop/mobile layout with no page errors.",
+      "limitations": [
+        "Source pin/publication URLs pending parent final source commit and regeneration.",
+        "No provider/broker execution or broad regression rerun performed.",
+        "Previously reported101 focused tests are coordinator evidence, not rerun during UI review."
+      ],
+      "path": "evidence/receipts/foundation-catalog-ui-20260920.json"
     }
   ],
   "files": [
@@ -4944,8 +4976,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "eefb2d6c20178045b4fe7e5794c6beea20bab5778441ecb5afa09bdc5b494bf1",
-      "bytes": 3669281
+      "sha256": "e3d9b75f5e9a5ca9663d4da76af2720b4548e959438eeb86533bffcb6b5a1e66",
+      "bytes": 3674501
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5944,18 +5976,18 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "61b7c7874e98ac669403c32f81687845365e2227f82f4ad4d20ab604a4987555",
-      "bytes": 6096
+      "sha256": "dedf89d8fcc08f3799dffbf2ec1f897444bc53e613342dd2f61bb69b842d88f1",
+      "bytes": 6138
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "75f9ebde76ed75f7c0a89f829ed74ab75e2fdda014d4f2c5a738b7c46eba0a02",
-      "bytes": 91924
+      "sha256": "783749d8731da4d224b5b06ae9b6b0cfaca6bd377fa2a948d4860496671645b0",
+      "bytes": 94711
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "f3e17d25240d481f7c9245f4cfbee42b9a0bb520bacabe081455d2f124326f76",
-      "bytes": 16274
+      "sha256": "aa50f172f3e43a19f37c1a5d3992d70e23892c4cc73f68744351532417741ae3",
+      "bytes": 16446
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -5986,6 +6018,111 @@
       "path": "tests/test_foundation_catalog.py",
       "sha256": "db733637abda822a8ec846794ec18b333abe20e03a1866b4b0565f8528a9ff0b",
       "bytes": 11296
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/README.md",
+      "sha256": "99f260cae8012236e3fb4cc6f2ba8e4e3c34515e95d1366770fb96511a3937a9",
+      "bytes": 5717
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/accepted/actions.jsonl",
+      "sha256": "498d1d6b788c82fa4bfb28bb96a56a1af6b906355d416b75220db2ddfe3e4e37",
+      "bytes": 99
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/accepted/checkpoint.json",
+      "sha256": "55bff20c10c5625554ca7b553ecc8ffe0557592135463d331469c208d855167c",
+      "bytes": 29
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/accepted/final.json",
+      "sha256": "b00398342db51dd3aa75cff5dd9f7768418af09b9b3b03f799d21093cb0dc238",
+      "bytes": 134
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/audit.py",
+      "sha256": "3707d85848807c45bd5ebeffdecf96c6f4f381f54b85280f16e9c6c487c19cad",
+      "bytes": 8930
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/control.py",
+      "sha256": "e25f7758b5d374fea206b3b7936baa99e4ac5abeb9fd8aed2e83f1cae21006a7",
+      "bytes": 1692
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/executed-runner.py.txt",
+      "sha256": "7e3f40af6bd4be3996ffbee200e0c9ade2ce4eb142cde8ad8d0636ae28796a35",
+      "bytes": 11265
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/executed-test-oracle.py.txt",
+      "sha256": "2761382a6b638eaa880463c94205404ef92920940868fbb33c5a9641af3176c6",
+      "bytes": 2720
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/freeze.json",
+      "sha256": "7eb5ab107fa770251481e2434ff3b7866ae812eba8b408ce495e0bd326b92979",
+      "bytes": 665
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/independent-audit.json",
+      "sha256": "8304b737fc79fa447d61ecbfcc298de6acb844e0903c114856055db588161cf0",
+      "bytes": 3653
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/input.json",
+      "sha256": "69741926414949ad09864359cb41523db6a94d093d5c44dc822982c8aab3ef2d",
+      "bytes": 56
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/plan.json",
+      "sha256": "37dd427636fe5d9eef1dfbd5c9932d0343f2c8729962e9971a716f38bafb0b2e",
+      "bytes": 2081
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/prompt.txt",
+      "sha256": "a68ee7b3ce1bc73b4393b348d8e267ce34bee1337d2bc43c8b046df8f0e1811c",
+      "bytes": 1821
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/receipt.json",
+      "sha256": "20b5a15ffd1f2e77020faab94b3c48f2d86f6d5fee402241417a1c147c7c3e36",
+      "bytes": 4525
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/recorder-outcome.json",
+      "sha256": "69e1d2fe530a5a8caf5422bf49abd8c3acbce3ed16cd44e68433ec61cfa4070c",
+      "bytes": 5153
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/run.py",
+      "sha256": "8287b3eb6bd184938aa22855da8a939ea4c92d9ec73c41cfc5d37ea18aa1e1b0",
+      "bytes": 11813
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/source-review.json",
+      "sha256": "0430297902452a7a8f3dc3cdf3a8ccafbd1eeefbe6fea9b6748f031e92aebc95",
+      "bytes": 1429
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/stage.py",
+      "sha256": "fdadd66e4b137940ee638c8e89747cfbf882241084cccb0a4e09b9c00d927214",
+      "bytes": 2543
+    },
+    {
+      "path": "evidence/receipts/foundation-catalog-ui-20260920.json",
+      "sha256": "c3d6aad4800dd2f08d6c8ea3f66ac9c174eca7e8fd5d3d11fadbee3e7974f1d9",
+      "bytes": 4603
+    },
+    {
+      "path": "evidence/receipts/native-worker-recovery-20260920.json",
+      "sha256": "8ff6f59ad6b7fc3dc8f28aa041ef44a1bed4c641456420ea1ddc59e48da3f430",
+      "bytes": 2669
+    },
+    {
+      "path": "tests/test_worker_recovery.py",
+      "sha256": "0bad9d361a0ae33b1783d48505206f328c290ed5616a0cebf96a1ee8d55fffc4",
+      "bytes": 5206
     }
   ],
   "convergence_records": [
