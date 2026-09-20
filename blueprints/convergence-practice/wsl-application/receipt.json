@@ -1,0 +1,269 @@
+{
+  "schema_version": 1,
+  "kind": "native_cli_e2e",
+  "status": "passed_with_explicit_platform_adaptations",
+  "completed_at_utc": "2026-09-20T07:14:00.254217+00:00",
+  "host_role": "velanext",
+  "platform": {
+    "os": "Ubuntu 24.04.5 LTS",
+    "architecture": "x86_64",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "qualification_scope": "New isolated prefix on existing WSL host; no canonical project or system package changes."
+  },
+  "source_revision": "cabbe2c96e39096b510f739f07a6e4132da082de",
+  "source_repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+  "frozen_inputs": "freeze.json",
+  "frozen_inputs_unchanged": true,
+  "runtimes": {
+    "node": "24.21.0",
+    "pnpm": "12.4.2",
+    "python": "3.13.15",
+    "uv": "0.12.17",
+    "postgresql": "18.6",
+    "next": "16.3.5",
+    "react": "19.3.0",
+    "fastapi": "0.141.1",
+    "playwright": "1.63.0",
+    "chrome_for_testing": "153.0.8010.52"
+  },
+  "acceptance": [
+    {
+      "check": "Locked dependency restore",
+      "command": "make setup",
+      "exit": 0,
+      "python": "Frozen uv.lock, no builds, no Python downloads",
+      "javascript": "Frozen pnpm-lock.yaml, ignore-scripts, isolated store"
+    },
+    {
+      "check": "Native PostgreSQL source build/install",
+      "commands": [
+        "taskset -c 0-3 make -C .runtime/postgresql-build -j 4",
+        "taskset -c 0-3 make -C .runtime/postgresql-build install"
+      ],
+      "exit": 0,
+      "archive_publisher_sha256_matched": true,
+      "actual_server_version": "18.6",
+      "source_changed": false
+    },
+    {
+      "check": "Empty application/test database migrations and idempotent repeat",
+      "commands": [
+        "make postgres-init postgres-start postgres-databases",
+        "make migrate migrate-test",
+        "make migrate migrate-test"
+      ],
+      "exit": 0
+    },
+    {
+      "check": "Separate empty-database upgrade/downgrade/re-upgrade",
+      "commands": [
+        "createdb <owned-empty-reversal-database>",
+        "DATABASE_URL=<owned-empty-reversal-database> uv run --frozen alembic upgrade head",
+        "DATABASE_URL=<owned-empty-reversal-database> uv run --frozen alembic downgrade base",
+        "DATABASE_URL=<owned-empty-reversal-database> uv run --frozen alembic upgrade head",
+        "dropdb <owned-empty-reversal-database>"
+      ],
+      "all_command_exits": 0,
+      "empty_tables": [],
+      "upgraded_tables": [
+        "alembic_version",
+        "run_events",
+        "runs"
+      ],
+      "downgraded_tables": [
+        "alembic_version"
+      ],
+      "reupgraded_tables": [
+        "alembic_version",
+        "run_events",
+        "runs"
+      ],
+      "original_application_databases_unchanged": true,
+      "temporary_database_removed": true
+    },
+    {
+      "check": "Dependency peer compatibility",
+      "command": "pnpm peers check",
+      "exit": 0
+    },
+    {
+      "check": "OpenAPI and generated TypeScript drift",
+      "command": "uv run --frozen python verify_schema.py",
+      "exit": 0
+    },
+    {
+      "check": "Type checking",
+      "command": "pnpm typecheck",
+      "exit": 0
+    },
+    {
+      "check": "Production Next build",
+      "command": "NEXT_TELEMETRY_DISABLED=1 taskset -c 0-3 pnpm build",
+      "exit": 0
+    },
+    {
+      "check": "Frozen API/database guards",
+      "command": "make test",
+      "exit": 0,
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "warnings": 1,
+      "warning": "Existing Starlette TestClient AnyIO BlockingPortal alias deprecation."
+    },
+    {
+      "check": "Frozen real browser create/update/reload",
+      "command": "taskset -c 0-3 pnpm exec playwright test --config ../wsl-application/playwright.config.ts",
+      "exit": 0,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "retries": 0,
+      "workers": 1,
+      "headless": true,
+      "browser_assertions_changed": false,
+      "page_errors": 0
+    },
+    {
+      "check": "Native application/database restart and exact persistence",
+      "exit": 0,
+      "api_exact_equal": true,
+      "database_rows_and_history_exact_equal": true,
+      "record_count": 1,
+      "event_count": 2,
+      "postgres_restart": true,
+      "api_next_restart": true,
+      "fresh_browser_reopened_row": true,
+      "database_before_sha256": "2102521d349981af655720ef1e27d262e93ca2208e8ba557ed38819e8a94eb97",
+      "database_after_sha256": "2102521d349981af655720ef1e27d262e93ca2208e8ba557ed38819e8a94eb97",
+      "response_payload": {
+        "before_sha256": "c5cd616bf94018dd86f5f2a2b8b5b26a6d60472057d58ac52cbb2ca5aa5d8fcd",
+        "after_sha256": "c5cd616bf94018dd86f5f2a2b8b5b26a6d60472057d58ac52cbb2ca5aa5d8fcd"
+      }
+    },
+    {
+      "check": "Fresh browser reopens retained record after restart",
+      "exit": 0,
+      "passed": 1,
+      "status": "passed",
+      "revision": 2,
+      "history_count": 2,
+      "page_errors": 0
+    },
+    {
+      "check": "External Make boundary correction fixture",
+      "command": "env MAKELEVEL=0 $(MAKE) -f Child",
+      "exit": 0,
+      "external_project_makelevel": 0,
+      "internal_recursive_makelevel": 1
+    }
+  ],
+  "retained_failures": [
+    {
+      "stage": "Initial setup",
+      "exit": 2,
+      "cause": "Task-local pnpm symlink assumed obsolete package/bin/pnpm.cjs; make exited127 for pnpm. Frozen Python restore had succeeded.",
+      "resolution": "Verified pnpm12.4.2 wrapper/native metadata, extracted exact @pnpm/exe.linux-x64 artifact, then reran setup successfully."
+    },
+    {
+      "stage": "Initial native PostgreSQL configuration",
+      "exit": 2,
+      "cause": "configure: error: bison not found",
+      "resolution": "Exact authenticated Ubuntu M4/Bison/Flex payloads extracted only into task sysroot."
+    },
+    {
+      "stage": "Recursive PostgreSQL make",
+      "exit": 2,
+      "cause": "Missing utils/errcodes.h because original wrapper invoked external project at MAKELEVEL1; upstream header generation requires0.",
+      "resolution": "Unmodified upstream standalone make build/install succeeded; original application Makefile retained byte-for-byte."
+    },
+    {
+      "stage": "Mac browser version metadata lookup",
+      "exit": 1,
+      "http_status": 404,
+      "cause": "No official Chrome for Testing153.0.8010.53 metadata.",
+      "resolution": "Explicit verified Linux153.0.8010.52 adaptation; no claim of identical Mac/Linux browser artifact."
+    },
+    {
+      "stage": "Immediate application restart",
+      "exit": 1,
+      "cause": "Original serve.py bind preflight rejected local18081 TIME-WAIT despite no listener or owned process.",
+      "resolution": "Waited for normal native TCP expiry, resumed using exact retained before snapshots, verified full equality and fresh browser read."
+    },
+    {
+      "stage": "Initial cleanup bind probe",
+      "exit": 1,
+      "cause": "Same TIME-WAIT bind restriction.",
+      "resolution": "Final cleanup separately verified no listeners via socket connection probes/ss and no owned browser/application/database processes."
+    },
+    {
+      "stage": "Browser evidence copy",
+      "exit": 1,
+      "cause": "Reporter output followed alternate config directory instead of original app directory.",
+      "resolution": "Located and retained exact sibling wsl-application/.runtime/browser-results.json; test result unaffected."
+    }
+  ],
+  "command_exit_records": {
+    "01-setup": 2,
+    "02-setup": 0,
+    "03-postgres-install": 2,
+    "04-peers": 0,
+    "05-schema": 0,
+    "06-typecheck": 0,
+    "07-build": 0,
+    "08-postgres-install": 2,
+    "09-postgres-build": 0,
+    "10-postgres-install": 0,
+    "11-postgres-init": 0,
+    "12-postgres-start": 0,
+    "13-postgres-databases": 0,
+    "14-migrations": 0,
+    "15-migrations-repeat": 0,
+    "16-api-tests": 0,
+    "17-browser": 0,
+    "18-migration-createdb": 0,
+    "18-migration-downgrade": 0,
+    "18-migration-dropdb": 0,
+    "18-migration-reupgrade": 0,
+    "18-migration-upgrade": 0,
+    "19-postgres-start": 0,
+    "19-postgres-stop": 0,
+    "20-postgres-stop-final": 0,
+    "22-makelevel-boundary": 0,
+    "23-browser-after-restart": 0,
+    "23-postgres-resume": 0,
+    "23-supervisor-stop": 0,
+    "24-postgres-stop-final": 0
+  },
+  "cleanup": {
+    "ports_not_listening": [
+      15432,
+      18080,
+      18081
+    ],
+    "owned_servers_or_browsers_remaining": 0,
+    "temporary_reversal_database_removed": true,
+    "retained": "Synthetic ledger databases, task-only runtimes/artifacts, complete build/test/server logs and exact before/after rows in private qualification prefix.",
+    "system_packages_installed": false,
+    "package_maintainer_scripts_executed": false,
+    "global_path_or_loader_changed": false,
+    "shared_services_changed": false,
+    "native_client_accounts_or_models_used": false
+  },
+  "private_evidence": {
+    "files_indexed": 107,
+    "indexed_bytes": 7534904,
+    "index_sha256": "0e980c0b9d96959127201c105b645ccd5773c5fed8e2955c23925773f3ab784a",
+    "location": "Task-owned qualification prefix; native paths and raw identifiers intentionally omitted.",
+    "full_failed_attempts_retained": true
+  },
+  "rollback": "Stop only owned API/Next/browser/PostgreSQL processes; preserve needed synthetic data/evidence; remove only the newly created qualification prefix after review. No canonical project or system package rollback is required.",
+  "limits": [
+    "Native single-host WSL application acceptance, not source-only replay.",
+    "No production database hardening, authentication, external ingestion, hosted deployment, load test, backup or independent-host restore.",
+    "The original wrapper needs its separately recorded clean-build correction; this receipt uses supported standalone upstream make.",
+    "Immediate restart can wait for TCP TIME-WAIT because the frozen supervisor uses exclusive bind preflight.",
+    "No provider/model, GPU workload, broker or trading execution.",
+    "Whole-task model usage unknown; no token-saving claim."
+  ]
+}
