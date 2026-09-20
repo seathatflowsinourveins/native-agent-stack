@@ -1,0 +1,201 @@
+{
+  "artifact_hashes": {
+    "README.md": "214f2f09a151792c6e83b6705eb1973d5efeb3c3b16be563ff7cd4cca0342e16",
+    "input-files.json": "2203d0f03d0ccb5e863e61df5c47d09023204fbbbf8cf51b1699a82e76cc1e25",
+    "metrics.json": "e2329e35dcd3ebe9fb831814264aa71bbd9edfc4172a487c79cb38971c03197a",
+    "paired-samples.json": "b44b3547e8db13f5acfc48ba828153f4833bd04e6afbbd9ce38e11c67dcd8286",
+    "source-files.json": "d87ac16f0e85d6ebdcba5adb519d3bf556253e2674c2a972258df4efa75657d2",
+    "upstream-bm25-summary.json": "1b2451800f0b81060486659a71dc40b447097c903299dbf9ea841019128789e9",
+    "upstream-lexical-summary.json": "6fe6c2746c3bc0a855ee452b2de59707730d199b6f3128c1f7dee4f0b928132b",
+    "upstream-validation.json": "2fdff3fa025e8d82e77ee23756d490a4579cd9d5f5796bf57ced2306dcb2d922"
+  },
+  "checks": {
+    "archive_path_safety": "Every member inspected before extraction: only regular files/directories, no absolute/traversal paths; extracted with Python tarfile data filter.",
+    "independent_arithmetic": "All four headline per-sample metrics and macro means recomputed from exact gold ranks and agree with upstream within1e-14.",
+    "manifest_path_safety": "All98 chunks_path values checked relative under data/corpus and present before evaluator invocation.",
+    "source_git_worktree_clean": true,
+    "upstream_schema_validation": {
+      "exit_code": 0,
+      "invalid": 0,
+      "report": "upstream-validation.json",
+      "samples": 101
+    },
+    "upstream_tests": {
+      "command_template": "PYTHONPATH=src ${PYTEST_PYTHON} -m pytest -q tests/test_corpus_baseline.py",
+      "exit_code": 0,
+      "failed": 0,
+      "passed": 15,
+      "pytest_version": "9.1.1",
+      "result_text": "15 passed in 0.15s",
+      "scope": "Pinned upstream corpus/lexical/BM25 tests; no full-suite/model execution claimed.",
+      "skipped": 0,
+      "source_commit": "b487f3866cc13dd971819cb902517a6a50282404"
+    }
+  },
+  "dataset": {
+    "archive_bytes": 39295446,
+    "archive_entries": 120,
+    "archive_hash_matches_publisher_checksum_and_hub_lfs_oid": true,
+    "archive_sha256": "19b252e8cfff42107fedc74005dbb6972f2970af33651ce0c1571546819e41c4",
+    "archive_url": "https://huggingface.co/datasets/eyuansu71/agent_retrieval_bench/resolve/5901e1ee3aff048290db72edf9c63bc498b79ea3/releases/v2_trace2code/agent_retrieval_bench_v2_trace2code.tar.zst",
+    "checksum_file_sha256": "d844cc6f1fb9f345f97a687f140d12740e96cc16d533958581a9e77621f7eb04",
+    "corpus_snapshots": 98,
+    "extracted_bytes": 300175960,
+    "extracted_files": 104,
+    "gold_file_count_distribution": {
+      "1": 80,
+      "2": 16,
+      "3": 5
+    },
+    "input_file_hashes": "input-files.json",
+    "license": "Benchmark metadata/reports MIT; corpus source retains each original project license. No corpus or query text is republished in this evidence.",
+    "release": "v2_trace2code",
+    "repo_sample_counts": {
+      "caddyserver/caddy": 7,
+      "clap-rs/clap": 1,
+      "etcd-io/etcd": 4,
+      "gin-gonic/gin": 56,
+      "pallets/click": 26,
+      "pytest-dev/pytest": 1,
+      "tokio-rs/tokio": 6
+    },
+    "repositories": 7,
+    "repository": "https://huggingface.co/datasets/eyuansu71/agent_retrieval_bench",
+    "revision": "5901e1ee3aff048290db72edf9c63bc498b79ea3",
+    "samples": 101,
+    "selection_reason": "Smallest complete positive release by reviewed compressed size; all101 rows selected before evaluating results.",
+    "snapshot_chunk_records": 356074,
+    "snapshot_file_records": 24883
+  },
+  "environment": {
+    "architecture": "arm64",
+    "environment": "Isolated stdlib-only virtual environment; no pip packages installed.",
+    "os": "Darwin",
+    "python": "3.14.7",
+    "runtime_dependencies": []
+  },
+  "initial_source_snapshot_execution": {
+    "commit": "07014c986f3deadb1548c62b32c0ffbe6a81465d",
+    "declared_version": "0.2.1",
+    "differences_to_release": "README, CITATION and documentation only; no evaluator or pyproject changes.",
+    "is_exact_release_tag_commit": false,
+    "metrics_identical_after_rerun": true,
+    "per_sample_details_byte_identical_after_rerun": true,
+    "rerun_reason": "Source metadata snapshot and release tag are distinct identities; primary receipt was rerun at verified release tag commit.",
+    "runs": {
+      "bm25": {
+        "command_wall_seconds": 10.487976332999096,
+        "concurrent_with": "lexical; elapsed time is not an isolated latency benchmark",
+        "evaluated": 101,
+        "exit_code": 0,
+        "native_details_sha256": "3c5e53999c89b48a5df55ef870484a85786e8939b91d6c9ee3a0f29e08c40b87",
+        "native_wall_seconds": 10.383530625000276,
+        "skipped": {},
+        "summary_sha256": "010707ed9fa84b112b6ac3e9674c7f7acb26a2c362b17f6415bea13863ce1780"
+      },
+      "lexical": {
+        "command_wall_seconds": 10.16499712500081,
+        "concurrent_with": "bm25; elapsed time is not an isolated latency benchmark",
+        "evaluated": 101,
+        "exit_code": 0,
+        "native_details_sha256": "2eb08ad2e7f35549ec823f6911bf4150c7ccddb5a037998c3a357a03d2c22cd4",
+        "native_wall_seconds": 10.042018500000268,
+        "skipped": {},
+        "summary_sha256": "dcf9265d0efbbd9655eab094909a893b6cb6af6c71f5c0486036ae4ce2a91f35"
+      }
+    },
+    "source_tree": "0fd0466fb3e24c40c0bdf9468872bea9c9a61fa1",
+    "source_tree_identical_to_exact_release": true
+  },
+  "kind": "actual_upstream_offline_retrieval_evaluation",
+  "limits": [
+    "Positive-only failure-trace subset; no abstention/no-gold test and no whole-benchmark generalization.",
+    "Repository imbalance: gin56 and click26 together account for82/101 samples.",
+    "These are ARB lexical/BM25 algorithms, not rg, QMD, SocratiCode or an embedding baseline.",
+    "No model/provider calls, active-index modifications, native client changes or retrieval default promotion.",
+    "Exact file-level relevance does not prove function/span correctness, repair success or task completion.",
+    "Native summaries retain legacy @8k fields whose baseline implementation packs len(text) characters and may include an oversized first chunk; those are not tokenizer-measured BCY, context tokens or provider savings.",
+    "One complete released task with no tuned parameters; no significance test or universal quality claim.",
+    "Primary exact-release runs are single sequential warm observations after source-identical earlier runs; no controlled latency or cold-cache comparison."
+  ],
+  "parameters": {
+    "bm25": {
+      "b": 0.75,
+      "chunk_text_fields": [
+        "path",
+        "symbol",
+        "kind",
+        "text"
+      ],
+      "k1": 1.5,
+      "query_frequency_weight": true,
+      "tie_break": "path then chunk_id ascending"
+    },
+    "candidate_filter": "all_files",
+    "dry_run": false,
+    "keep_list": null,
+    "lexical": {
+      "basename_substring_bonus": 8.0,
+      "chunk_text_fields": [
+        "path",
+        "symbol",
+        "kind",
+        "text"
+      ],
+      "full_path_substring_bonus": 25.0,
+      "native_tool_equivalence": false,
+      "normalization": "Divide combined score by max(1,sqrt(number of unique chunk tokens)).",
+      "query_tokenizer": "Camel-case split then lowercase ASCII alphanumeric tokens.",
+      "symbol_substring_bonus": 5.0,
+      "term_weight": "(1+log(query_count))*log((N+1)/(1+df)+1) for each matching token",
+      "tie_break": "path then chunk_id ascending"
+    },
+    "limit_samples": null,
+    "rankers": [
+      "lexical",
+      "bm25"
+    ],
+    "samples_argument": "data/benchmark/v2_trace2code/samples.jsonl"
+  },
+  "receipt_created_at": "2026-09-20T02:12:40+00:00",
+  "runs": {
+    "bm25": {
+      "command_wall_seconds": 10.085556417001499,
+      "concurrent_with": null,
+      "evaluated": 101,
+      "exit_code": 0,
+      "native_details_sha256": "3c5e53999c89b48a5df55ef870484a85786e8939b91d6c9ee3a0f29e08c40b87",
+      "native_wall_seconds": 9.94414224999855,
+      "skipped": {},
+      "started_at": "2026-09-20T02:09:16+00:00",
+      "summary": "upstream-bm25-summary.json",
+      "timing_limit": "Single sequential replay after earlier source-identical warmup; not a performance benchmark."
+    },
+    "lexical": {
+      "command_wall_seconds": 10.265198290999251,
+      "concurrent_with": null,
+      "evaluated": 101,
+      "exit_code": 0,
+      "native_details_sha256": "2eb08ad2e7f35549ec823f6911bf4150c7ccddb5a037998c3a357a03d2c22cd4",
+      "native_wall_seconds": 10.135793833000207,
+      "skipped": {},
+      "started_at": "2026-09-20T02:09:06+00:00",
+      "summary": "upstream-lexical-summary.json",
+      "timing_limit": "Single sequential replay after earlier source-identical warmup; not a performance benchmark."
+    }
+  },
+  "schema_version": 1,
+  "source": {
+    "code_license": "MIT",
+    "commit": "b487f3866cc13dd971819cb902517a6a50282404",
+    "data_license_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/DATA_LICENSE.md",
+    "license_url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/LICENSE",
+    "modified": false,
+    "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+    "source_hashes": "source-files.json",
+    "source_tree": "0fd0466fb3e24c40c0bdf9468872bea9c9a61fa1",
+    "tag": "v0.2.1",
+    "version": "0.2.1"
+  },
+  "status": "completed"
+}

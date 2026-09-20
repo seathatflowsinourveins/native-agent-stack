@@ -1,0 +1,14 @@
+{
+  "created_at": "2026-09-20T02:06:03.632262+00:00",
+  "base_commit": "bf99d340f798bf72cc3104619edc482882eb423d",
+  "fixture_sha256": "aea5e9616fb19eb1d2fd58ecfadf88ff087d7d2e79b4a70bc9f88207af9d0402",
+  "corpus_manifest_sha256": "7bb986160b332e205208b6767b95b6f019423ffed1f50843534ff7e4272fdded",
+  "fixture_payload_sha256": "206b14cbc6ecbbafce4d5afad9d249fb767d3f4e49142d3e4020599e17808454",
+  "corpus_payload_sha256": "f104af0112d6c6307a5bc7e08e3f9e65835e9efef35b4e69c098f948058bae83",
+  "question_count": 24,
+  "answerable_count": 20,
+  "abstention_count": 4,
+  "corpus_document_count": 15,
+  "source_byte_total": 105003,
+  "no_search_or_ranking_executed": true
+}

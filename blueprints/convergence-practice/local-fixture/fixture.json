@@ -1,0 +1,649 @@
+{
+  "schema_version": 1,
+  "fixture_id": "public-convergence-questions-2026-09-20-v1",
+  "created_at": "2026-09-20T02:06:03.632262+00:00",
+  "base_commit": "bf99d340f798bf72cc3104619edc482882eb423d",
+  "corpus_manifest": "corpus-manifest.json",
+  "corpus_manifest_sha256": "7bb986160b332e205208b6767b95b6f019423ffed1f50843534ff7e4272fdded",
+  "question_count": 24,
+  "answerable_count": 20,
+  "expected_abstention_count": 4,
+  "authorship": {
+    "method": "One agent authored natural user questions, relevance judgments and exact support quotations by directly reading public source documents. No model API calls or search/ranking runs were performed during authoring.",
+    "queries_authored_before_first_evaluation": true,
+    "search_or_ranking_executed_by_author": false,
+    "independent_of_evaluation_outputs": true,
+    "external_real_user_benchmark": false,
+    "blinded_external_relevance_judgments": false,
+    "prior_fixture_reviewed": "blueprints/us-equities/retrieval-evaluation/fixture.json",
+    "prior_fixture_question_count": 12,
+    "prior_fixture_status": "Previously scored historical evidence; not reused or relabeled as a fresh held-out benchmark."
+  },
+  "evaluation_contract": {
+    "query_text": "Use query verbatim; it is the full natural question, without post-score lexical rewrites.",
+    "document_id": "Exact case-sensitive repository-relative path; no basename or suffix matching.",
+    "answerable_retrieval": "Score expected_files only. Report recall at fixed cutoffs and rank separately from answer correctness.",
+    "abstention_retrieval": "expected_files is intentionally empty for abstentions; boundary_files are explanatory sources, not positive answer targets. Do not count a retrieved boundary as an answerable-document hit.",
+    "answer_judgment": "Assess support, source citation and adherence to reference_answer boundaries separately; do not infer answer quality from source retrieval alone.",
+    "corpus_scope": "Index only the exact fifteen source files in corpus-manifest.json. Do not index this question file, manifests, reports, old evaluation fixtures or other repository files.",
+    "failure_policy": "Keep backend errors distinct from empty results and misses. Retain every original question/result; document any new fixture version separately."
+  },
+  "limitations": [
+    "Small source-authored repository integration fixture, not an independent real-user external benchmark or general retrieval-quality estimate.",
+    "Questions and labels were derived with source documents visible; topic overlap with earlier repository guidance is unavoidable and does not create a fresh external holdout.",
+    "One author selected relevance labels; positive gold paths are reviewed intended sources, not exhaustive judgments of every relevant passage.",
+    "No search/ranking performance, answer accuracy, embedding quality, latency, model cost, token savings, platform portability or live runtime acceptance has been measured by authoring this fixture.",
+    "The abstention labels apply to the requested specifics in this frozen public corpus, not universal unanswerability.",
+    "Source updates must not silently alter the corpus; preserve this base commit and hashes for comparisons."
+  ],
+  "queries": [
+    {
+      "id": "credentials-01",
+      "category": "native_credentials_host_evidence",
+      "query": "After cloning the stack onto another machine, how should native sign-in and tool activation be checked across Linux clients and Desktop?",
+      "question": "After cloning the stack onto another machine, how should native sign-in and tool activation be checked across Linux clients and Desktop?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "adoption/README.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The ordered adoption instructions state both the required native account action and the separate client activation scopes.",
+      "reference_answer": "Sign in natively on the destination, then verify discovery and a useful scoped call for each relevant client separately; do not copy account stores.",
+      "source_evidence": [
+        {
+          "path": "adoption/README.md",
+          "source_sha256": "5e554f816905070b474aaa8e177fbc7b4ed81e017019fb3067ec08ca67b6c568",
+          "utf8_bytes": 9783,
+          "line_start": 33,
+          "line_end": 33,
+          "snippet": "Use native sign-in on the target host. Then verify the actual client's tool discovery and one bounded useful call. Treat Linux Codex, Linux Claude and Desktop as separate client scopes. No authentication store is copied.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "credentials-02",
+      "category": "native_credentials_host_evidence",
+      "query": "The prerequisite report returned zero. Does that tell me my provider account and running services are ready?",
+      "question": "The prerequisite report returned zero. Does that tell me my provider account and running services are ready?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "adoption/README.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "This paragraph defines the exact exit-code contract and the probes it excludes.",
+      "reference_answer": "No. Zero confirms selected prerequisites only; account and live-service readiness need separate checks.",
+      "source_evidence": [
+        {
+          "path": "adoption/README.md",
+          "source_sha256": "5e554f816905070b474aaa8e177fbc7b4ed81e017019fb3067ec08ca67b6c568",
+          "utf8_bytes": 9783,
+          "line_start": 46,
+          "line_end": 46,
+          "snippet": "A prerequisite report exits 0 when the selected prerequisites are present, 2 when they are missing, unsupported or malformed. It does not probe accounts or services.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "evidence-03",
+      "category": "native_credentials_host_evidence",
+      "query": "What do the published receipt checksums establish about an earlier model run, and what do they leave unverified?",
+      "question": "What do the published receipt checksums establish about an earlier model run, and what do they leave unverified?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "docs/evidence.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The evidence guide explicitly distinguishes artifact integrity from independent provider attestation or replay.",
+      "reference_answer": "They verify the published artifact bytes. They do not independently attest provider execution or constitute a newly executed model task.",
+      "source_evidence": [
+        {
+          "path": "docs/evidence.md",
+          "source_sha256": "a5d81d728d58571ac7c88e6aafb26fcb8707717541a92e55eb39d58d8ad55353",
+          "utf8_bytes": 9129,
+          "line_start": 3,
+          "line_end": 3,
+          "snippet": "These hashes establish integrity of the published bytes; they do not independently authenticate a provider or turn a recorded result into a new run.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "memory-04",
+      "category": "memory",
+      "query": "If a pinned memory page has expired, can an exact-path read still return it before maintenance runs?",
+      "question": "If a pinned memory page has expired, can an exact-path read still return it before maintenance runs?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The native lifecycle result directly covers expired-page search and exact-path access before a sweep.",
+      "reference_answer": "Yes in the recorded fixture. Expiry hid it from ordinary search but exact-path and include_expired reads still returned it before the explicit sweep.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/memory-lifecycle/README.md",
+          "source_sha256": "309fc735617e7b939a91866301614707a713bd9e38d1b4f241722ecd5925a6cf",
+          "utf8_bytes": 4321,
+          "line_start": 7,
+          "line_end": 7,
+          "snippet": "**Expiry is not immediate access revocation.** An already expired pinned page was hidden from ordinary search, but `include_expired` and an exact-path read returned it before the sweep.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "memory-05",
+      "category": "memory",
+      "query": "How did the disposable memory exercise distinguish two projects that used the same page path?",
+      "question": "How did the disposable memory exercise distinguish two projects that used the same page path?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The reported project-routing check uses identical page paths and cross-project unique terms.",
+      "reference_answer": "Each scope returned its own page body, and searching for the other project's unique term returned no hits; this tests routing rather than tenant authorization.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/memory-lifecycle/README.md",
+          "source_sha256": "309fc735617e7b939a91866301614707a713bd9e38d1b4f241722ecd5925a6cf",
+          "utf8_bytes": 4321,
+          "line_start": 5,
+          "line_end": 5,
+          "snippet": "The same page path returned each project's own body; searches for the other project's unique term returned zero hits.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "memory-06",
+      "category": "memory",
+      "query": "Can the memory lifecycle acceptance be used as proof of market valid-time retrieval or secure erasure from backups?",
+      "question": "Can the memory lifecycle acceptance be used as proof of market valid-time retrieval or secure erasure from backups?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "blueprints/us-equities/memory-lifecycle/README.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "This explicit boundary separates memory ingestion-time behavior and query deletion from stronger temporal and erasure claims.",
+      "reference_answer": "No. It demonstrates ingestion-time retrieval and removal from query results, not market valid-time semantics or secure erasure of checkpoints and backups.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/memory-lifecycle/README.md",
+          "source_sha256": "309fc735617e7b939a91866301614707a713bd9e38d1b4f241722ecd5925a6cf",
+          "utf8_bytes": 4321,
+          "line_start": 28,
+          "line_end": 28,
+          "snippet": "The acceptance covers project routing, not tenant authorization; ingestion-time retrieval, not market valid-time data or historical ranking; search deletion, not secure erasure of Git checkpoints/backups.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "context-07",
+      "category": "context_usage",
+      "query": "If the Context Mode doctor lists registered hooks, does the restart acceptance prove every lifecycle hook actually fired?",
+      "question": "If the Context Mode doctor lists registered hooks, does the restart acceptance prove every lifecycle hook actually fired?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "observability/desktop-restart.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The restart acceptance retains this exact distinction between registration and executed lifecycle evidence.",
+      "reference_answer": "No. Registration alone does not prove that every hook executed; relevant lifecycle behavior requires its own evidence.",
+      "source_evidence": [
+        {
+          "path": "observability/desktop-restart.md",
+          "source_sha256": "39e4ee70ea568d8f30182715566c287abc0b6b06c6176634c93fdae2e7dbc711",
+          "utf8_bytes": 6238,
+          "line_start": 105,
+          "line_end": 105,
+          "snippet": "Registered hooks are not proof that every lifecycle hook was exercised.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "context-08",
+      "category": "context_usage",
+      "query": "How should an empty SDK receipt panel be interpreted when there are no records in the selected time range?",
+      "question": "How should an empty SDK receipt panel be interpreted when there are no records in the selected time range?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "observability/session-e2e.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The observation guide states the missing-data semantics and its blind spot for non-emitting tasks.",
+      "reference_answer": "Treat it as no matching data, not zero usage. The panel also cannot account for tasks that never emitted a receipt.",
+      "source_evidence": [
+        {
+          "path": "observability/session-e2e.md",
+          "source_sha256": "843e8f4dff03e7f81d260b060ed3f140c2f6574555680beb84f3f7c0b2888712",
+          "utf8_bytes": 7704,
+          "line_start": 106,
+          "line_end": 107,
+          "snippet": "Empty data remains “No matching data,” not zero usage. It cannot identify tasks\nthat never emitted a receipt.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "context-09",
+      "category": "context_usage",
+      "query": "What local condition caused Context Mode to work in an interactive shell but fail to start from Desktop in the recorded restart investigation?",
+      "question": "What local condition caused Context Mode to work in an interactive shell but fail to start from Desktop in the recorded restart investigation?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "observability/desktop-restart.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The root-cause section records a process-environment executable-resolution mismatch rather than missing credentials or a plugin rewrite.",
+      "reference_answer": "Desktop could not resolve the installed Linux node executable on its process path, although interactive shells could. This is a historical host-specific diagnosis.",
+      "source_evidence": [
+        {
+          "path": "observability/desktop-restart.md",
+          "source_sha256": "39e4ee70ea568d8f30182715566c287abc0b6b06c6176634c93fdae2e7dbc711",
+          "utf8_bytes": 6238,
+          "line_start": 29,
+          "line_end": 31,
+          "snippet": "Desktop's process environment could not resolve\nLinux `node`, and its native startup log reported `No such file or directory`.\nThe already installed Node 24.21.0 worked in interactive shells.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "worker-10",
+      "category": "worker_recovery",
+      "query": "After a local supervisor terminates a research process, what still needs checking about its remote provider request and usage?",
+      "question": "After a local supervisor terminates a research process, what still needs checking about its remote provider request and usage?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "blueprints/us-equities/worker-supervision/README.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The supervision adoption gate names the unresolved remote-request and usage boundary after local termination.",
+      "reference_answer": "Preserve partial receipts, propagate cancellation through the native client, and reconcile provider usage. A local kill alone does not establish that remote work or billing stopped.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/worker-supervision/README.md",
+          "source_sha256": "a0b55860e727e2bd7e631f7070e50bf5aa6c98974fd94dea7ac72362d1aca695",
+          "utf8_bytes": 5670,
+          "line_start": 114,
+          "line_end": 117,
+          "snippet": "Before wrapping a real research worker, select limits from actual workload\nmeasurements, propagate cancellation to the native client, preserve partial\nreceipts, and reconcile provider usage after interruption. A local kill cannot\nguarantee that a remote request stopped or that billing stopped.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "worker-11",
+      "category": "worker_recovery",
+      "query": "What did the successful fresh transient service establish after the timeout exercise, and did it restore unfinished application state?",
+      "question": "What did the successful fresh transient service establish after the timeout exercise, and did it restore unfinished application state?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "blueprints/us-equities/worker-supervision/README.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The direct-result interpretation distinguishes a fresh launch from application recovery.",
+      "reference_answer": "It established that a new unit could start successfully. It did not resume the interrupted application state.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/worker-supervision/README.md",
+          "source_sha256": "a0b55860e727e2bd7e631f7070e50bf5aa6c98974fd94dea7ac72362d1aca695",
+          "utf8_bytes": 5670,
+          "line_start": 99,
+          "line_end": 100,
+          "snippet": "The fresh run proves that another unit\ncan start successfully; unfinished application state was not resumed.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "worker-12",
+      "category": "worker_recovery",
+      "query": "Do the recorded cgroup limits demonstrate that the worker was tested under memory exhaustion, CPU saturation and a process explosion?",
+      "question": "Do the recorded cgroup limits demonstrate that the worker was tested under memory exhaustion, CPU saturation and a process explosion?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "blueprints/us-equities/worker-supervision/README.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The supervision receipt interpretation directly limits what the observed resource settings establish.",
+      "reference_answer": "No. The values establish configured limits; saturation, excessive process creation and memory-exhaustion behavior were not demonstrated.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/worker-supervision/README.md",
+          "source_sha256": "a0b55860e727e2bd7e631f7070e50bf5aa6c98974fd94dea7ac72362d1aca695",
+          "utf8_bytes": 5670,
+          "line_start": 97,
+          "line_end": 99,
+          "snippet": "The observed resource\nvalues prove limit configuration, not behavior under CPU saturation, excessive\nprocess creation or memory exhaustion.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "execution-13",
+      "category": "deterministic_execution",
+      "query": "Can a missing paired Astra report silently turn the Claude step into an independent review, or must that be selected explicitly?",
+      "question": "Can a missing paired Astra report silently turn the Claude step into an independent review, or must that be selected explicitly?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "blueprints/us-equities/research-runtime/README.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The native workflow binds paired execution to the previous result and reserves independent mode for an explicit invocation.",
+      "reference_answer": "Independent mode must be selected explicitly. The paired workflow requires the preceding receipt and report to match the packet and report hashes.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/research-runtime/README.md",
+          "source_sha256": "26941ae2c64ec137c3a9dc97e8d766d93cf6bdcb103ee290f871fd0a181f2757",
+          "utf8_bytes": 9587,
+          "line_start": 127,
+          "line_end": 128,
+          "snippet": "Independent mode is never a silent fallback. The paired DAG omits it and requires\nthe preceding Astra receipt/report to match the packet and report hashes.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "execution-14",
+      "category": "deterministic_execution",
+      "query": "Which parts of a research report does the deterministic checker validate, and does passing it prove the prose conclusions?",
+      "question": "Which parts of a research report does the deterministic checker validate, and does passing it prove the prose conclusions?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "blueprints/us-equities/research-runtime/README.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The checker boundary identifies both deterministic fields and unsupported semantic or trading conclusions.",
+      "reference_answer": "It validates exact values, units, citation identifiers, cutoff and scope. Passing does not prove every prose inference, profitability, diligence or trading authority.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/research-runtime/README.md",
+          "source_sha256": "26941ae2c64ec137c3a9dc97e8d766d93cf6bdcb103ee290f871fd0a181f2757",
+          "utf8_bytes": 9587,
+          "line_start": 161,
+          "line_end": 163,
+          "snippet": "The report checker validates exact numerical values, units, citation IDs, cutoff\nand scope. It does not establish that every prose claim follows from its citations,\nprove profitability, perform investment diligence or authorize trading.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "research-15",
+      "category": "research_data",
+      "query": "When may a strategy act on a daily close-derived signal versus an intraday catalyst according to the research protocol?",
+      "question": "When may a strategy act on a daily close-derived signal versus an intraday catalyst according to the research protocol?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The timing protocol explicitly separates close-derived daily decisions from intraday information receipt and latency.",
+      "reference_answer": "A close-derived daily signal cannot execute at the same close. Intraday entry follows actual receipt plus declared processing/order latency when the market state is tradable.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/acceptance-wave/research-protocol.md",
+          "source_sha256": "a4bbb4b1682e84c7324b903f90ececce3a3f7c547b445517089607794ded4f92",
+          "utf8_bytes": 6449,
+          "line_start": 17,
+          "line_end": 19,
+          "snippet": "A close-derived daily signal\ncannot execute at that same close. Intraday entry follows actual information\nreceipt and declared processing/order latency at a tradable market state.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "research-16",
+      "category": "research_data",
+      "query": "For the extreme-mover discovery cohort, what price ratio corresponds to a 200 percent increase, and can different return horizons be pooled?",
+      "question": "For the extreme-mover discovery cohort, what price ratio corresponds to a 200 percent increase, and can different return horizons be pooled?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The cohort definition supplies the exact numerical interpretation and prevents horizon substitution.",
+      "reference_answer": "A return of at least 2.0 corresponds to a price ratio of at least 3.0. Freeze the anchor and horizon; those different measures must not be pooled as one return.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/acceptance-wave/research-protocol.md",
+          "source_sha256": "a4bbb4b1682e84c7324b903f90ececce3a3f7c547b445517089607794ded4f92",
+          "utf8_bytes": 6449,
+          "line_start": 24,
+          "line_end": 28,
+          "snippet": "Create a discovery cohort for observed price increases of at least 200%:\nreturn `>= 2.0`, equivalent to a price ratio `>= 3.0`. Freeze the anchor and\nhorizon before extraction. Prior regular close to intraday high, first executable\npost-signal quote to exit, and multiday close-to-close are different measures;\nnever mix them in one claimed return.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "research-17",
+      "category": "research_data",
+      "query": "After the reserved 2021 control segment has been scored, may a later experiment describe it as untouched held-out evidence?",
+      "question": "After the reserved 2021 control segment has been scored, may a later experiment describe it as untouched held-out evidence?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "blueprints/us-equities/research-evaluation/README.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The chronological control guide directly states the changed evidence status after inspection.",
+      "reference_answer": "No. Once scored, the segment is inspected evidence for future work and must not be described as a fresh untouched holdout.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/research-evaluation/README.md",
+          "source_sha256": "5f6e4b5cc7338e9f5fc3edeb0d2d5092f1c2ba779d0243ed3ba29da76a80edde",
+          "utf8_bytes": 8589,
+          "line_start": 34,
+          "line_end": 35,
+          "snippet": "Once scored, these results are inspected evidence\nfor future work and cannot be presented as a fresh untouched holdout.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "backup-18",
+      "category": "backup",
+      "query": "Does the native memory backup include model caches, external session transcripts and the raw archive as well as the application store?",
+      "question": "Does the native memory backup include model caches, external session transcripts and the raw archive as well as the application store?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "blueprints/us-equities/state-recovery/memory/README.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The recovery limits enumerate the backup contents and specifically excluded data classes.",
+      "reference_answer": "No. It includes wiki, SQLite and service configuration, but excludes raw data, model caches, logs and external native transcripts; it is not complete ledger or account recovery.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/state-recovery/memory/README.md",
+          "source_sha256": "c58fd2a181feb488281c5a0a57fe7b6227f085ad44c41c53f539632d26a34965",
+          "utf8_bytes": 8477,
+          "line_start": 141,
+          "line_end": 143,
+          "snippet": "- Native backup includes wiki, SQLite and service configuration. It excludes\n  `raw/`, model caches, logs and external native session transcripts. Do not\n  describe it as complete portable-ledger or account recovery.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "backup-19",
+      "category": "backup",
+      "query": "When verifying a recovered vector database, are matching collection and point counts enough?",
+      "question": "When verifying a recovered vector database, are matching collection and point counts enough?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "blueprints/us-equities/state-recovery/qdrant/README.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The vector-state restore workflow requires full logical-record and configuration comparison beyond aggregate counts.",
+      "reference_answer": "No. Compare canonical complete point IDs, payloads and vectors, plus full collection configuration, payload schema and aliases; counts alone are insufficient.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/state-recovery/qdrant/README.md",
+          "source_sha256": "13f5ce8292fcec69e3daa85859c800aecb4e529bf1f94391dc883129623febe0",
+          "utf8_bytes": 5252,
+          "line_start": 66,
+          "line_end": 69,
+          "snippet": "Use native `GET /collections`, `GET /collections/{name}` and\n`POST /collections/{name}/points/scroll` with payloads and vectors to compare\nlogical state; canonicalize complete point records, not just counts. Also compare\nthe complete `config`, `payload_schema` and `GET /aliases` responses.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "execution-20",
+      "category": "deterministic_execution",
+      "query": "If the corporate-action amount matches the reference but the provider omits the currency, should the comparison fill in USD or declare the amount inconsistent?",
+      "question": "If the corporate-action amount matches the reference but the provider omits the currency, should the comparison fill in USD or declare the amount inconsistent?",
+      "expected_behavior": "answer_with_sources",
+      "expected_abstention": false,
+      "expected_files": [
+        "blueprints/us-equities/authenticated-data/README.md"
+      ],
+      "boundary_files": [],
+      "relevance_rationale": "The authenticated-data comparison explicitly preserves an unknown unit instead of inventing or contradicting it.",
+      "reference_answer": "Neither. Preserve currency as unknown and leave cash-unit reconciliation open; do not infer USD or treat the matching amount as a conflict.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/authenticated-data/README.md",
+          "source_sha256": "76d2439e456aacca301013d1993bde75e42fd6ffa0f77990eb2e60686a961666",
+          "utf8_bytes": 8763,
+          "line_start": 27,
+          "line_end": 29,
+          "snippet": "The corporate-action\ncomparison treats missing currency as unknown, rather than a conflicting amount\nor an inferred USD label.",
+          "support_role": "answer_support"
+        }
+      ]
+    },
+    {
+      "id": "abstain-21",
+      "category": "native_credentials_host_evidence",
+      "query": "Which provider account is signed in on the next workstation we will onboard right now?",
+      "question": "Which provider account is signed in on the next workstation we will onboard right now?",
+      "expected_behavior": "abstain_from_requested_specifics",
+      "expected_abstention": true,
+      "expected_files": [],
+      "boundary_files": [
+        "adoption/README.md"
+      ],
+      "relevance_rationale": "The public adoption guide explains why historical source-host receipts cannot reveal current authentication on an unspecified new host.",
+      "reference_answer": "Abstain from naming an account or asserting sign-in. The public corpus does not contain current account state for that future destination.",
+      "source_evidence": [
+        {
+          "path": "adoption/README.md",
+          "source_sha256": "5e554f816905070b474aaa8e177fbc7b4ed81e017019fb3067ec08ca67b6c568",
+          "utf8_bytes": 9783,
+          "line_start": 3,
+          "line_end": 3,
+          "snippet": "Historical receipts describe the authoring host; a clone does not inherit its logins, service state, tool discovery or acceptance.",
+          "support_role": "abstention_boundary"
+        }
+      ]
+    },
+    {
+      "id": "abstain-22",
+      "category": "context_usage",
+      "query": "What is the exact net billed token reduction for a complete comparable task after enabling this stack?",
+      "question": "What is the exact net billed token reduction for a complete comparable task after enabling this stack?",
+      "expected_behavior": "abstain_from_requested_specifics",
+      "expected_abstention": true,
+      "expected_files": [],
+      "boundary_files": [
+        "blueprints/us-equities/authenticated-data/README.md"
+      ],
+      "relevance_rationale": "The current convergence guide explicitly leaves provider savings unmeasured; no exact billed reduction can be supplied.",
+      "reference_answer": "Abstain from giving a numeric savings figure. The corpus has no matched whole-task billed-token comparison supporting one.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/authenticated-data/README.md",
+          "source_sha256": "76d2439e456aacca301013d1993bde75e42fd6ffa0f77990eb2e60686a961666",
+          "utf8_bytes": 8763,
+          "line_start": 132,
+          "line_end": 132,
+          "snippet": "Provider tokens saved and strategy profitability are not measured.",
+          "support_role": "abstention_boundary"
+        }
+      ]
+    },
+    {
+      "id": "abstain-23",
+      "category": "research_data",
+      "query": "Give the final numerical capital allocation, risk limits and promotion thresholds approved for deploying the catalyst strategy.",
+      "question": "Give the final numerical capital allocation, risk limits and promotion thresholds approved for deploying the catalyst strategy.",
+      "expected_behavior": "abstain_from_requested_specifics",
+      "expected_abstention": true,
+      "expected_files": [],
+      "boundary_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md"
+      ],
+      "relevance_rationale": "The selected research protocol expressly leaves these choices unset and provides no deployment authorization.",
+      "reference_answer": "Abstain from inventing allocations, risk thresholds or authorization. Those parameters are unset and the document is a research design.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/acceptance-wave/research-protocol.md",
+          "source_sha256": "a4bbb4b1682e84c7324b903f90ececce3a3f7c547b445517089607794ded4f92",
+          "utf8_bytes": 6449,
+          "line_start": 7,
+          "line_end": 8,
+          "snippet": "leaving capital, risk, source entitlements, evaluation intervals and promotion\nthresholds unset. This is a research design, with no accepted strategy or broker authority.",
+          "support_role": "abstention_boundary"
+        }
+      ]
+    },
+    {
+      "id": "abstain-24",
+      "category": "research_data",
+      "query": "Provide the complete historical census of all securities that rose at least 200 percent in the target research universe.",
+      "question": "Provide the complete historical census of all securities that rose at least 200 percent in the target research universe.",
+      "expected_behavior": "abstain_from_requested_specifics",
+      "expected_abstention": true,
+      "expected_files": [],
+      "boundary_files": [
+        "blueprints/us-equities/acceptance-wave/research-protocol.md"
+      ],
+      "relevance_rationale": "The protocol identifies the requested census as data not acquired by this research wave; a complete answer is unavailable in the frozen corpus.",
+      "reference_answer": "Abstain from fabricating a list or claiming completeness. The frozen protocol supplies a cohort design, not an acquired complete mover census.",
+      "source_evidence": [
+        {
+          "path": "blueprints/us-equities/acceptance-wave/research-protocol.md",
+          "source_sha256": "a4bbb4b1682e84c7324b903f90ececce3a3f7c547b445517089607794ded4f92",
+          "utf8_bytes": 6449,
+          "line_start": 100,
+          "line_end": 100,
+          "snippet": "No historical vendor dataset or +200% case census was acquired in this wave.",
+          "support_role": "abstention_boundary"
+        }
+      ]
+    }
+  ],
+  "hashfreeze": {
+    "algorithm": "sha256",
+    "canonicalization": "UTF-8 JSON, sorted keys, compact separators, ensure_ascii=false",
+    "payload_scope": "entire top-level object excluding hashfreeze",
+    "payload_sha256": "206b14cbc6ecbbafce4d5afad9d249fb767d3f4e49142d3e4020599e17808454",
+    "frozen_before_first_search_or_ranking_run": true,
+    "change_policy": "Never edit scored questions or labels in place; create a new version and retain prior results."
+  }
+}

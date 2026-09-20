@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "corpus_id": "public-convergence-docs-2026-09-20-v1",
+  "created_at": "2026-09-20T02:06:03.632262+00:00",
+  "source_repository_label": "native-agent-stack public reference",
+  "base_commit": "bf99d340f798bf72cc3104619edc482882eb423d",
+  "selection": "Fifteen directly read public documentation files selected before evaluation, with source bytes fixed by the base commit. No retrieval or ranking selected these files.",
+  "document_count": 15,
+  "path_order": "case-sensitive canonical repository-relative paths in ascending order",
+  "files": [
+    {
+      "path": "adoption/README.md",
+      "source_sha256": "5e554f816905070b474aaa8e177fbc7b4ed81e017019fb3067ec08ca67b6c568",
+      "utf8_bytes": 9783,
+      "media_type": "text/markdown"
+    },
+    {
+      "path": "adoption/update.md",
+      "source_sha256": "4aedc083e4665bec7131263e36b81390e4011c660b3c78df183ddc988021aadd",
+      "utf8_bytes": 8234,
+      "media_type": "text/markdown"
+    },
+    {
+      "path": "blueprints/us-equities/acceptance-wave/research-protocol.md",
+      "source_sha256": "a4bbb4b1682e84c7324b903f90ececce3a3f7c547b445517089607794ded4f92",
+      "utf8_bytes": 6449,
+      "media_type": "text/markdown"
+    },
+    {
+      "path": "blueprints/us-equities/authenticated-data/README.md",
+      "source_sha256": "76d2439e456aacca301013d1993bde75e42fd6ffa0f77990eb2e60686a961666",
+      "utf8_bytes": 8763,
+      "media_type": "text/markdown"
+    },
+    {
+      "path": "blueprints/us-equities/data-readiness/README.md",
+      "source_sha256": "77ac8fa53c3fca2ede3824a80a17d448a37f28d36e872c4d619af2c4be55642a",
+      "utf8_bytes": 5426,
+      "media_type": "text/markdown"
+    },
+    {
+      "path": "blueprints/us-equities/memory-lifecycle/README.md",
+      "source_sha256": "309fc735617e7b939a91866301614707a713bd9e38d1b4f241722ecd5925a6cf",
+      "utf8_bytes": 4321,
+      "media_type": "text/markdown"
+    },
+    {
+      "path": "blueprints/us-equities/research-evaluation/README.md",
+      "source_sha256": "5f6e4b5cc7338e9f5fc3edeb0d2d5092f1c2ba779d0243ed3ba29da76a80edde",
+      "utf8_bytes": 8589,
+      "media_type": "text/markdown"
+    },
+    {
+      "path": "blueprints/us-equities/research-runtime/README.md",
+      "source_sha256": "26941ae2c64ec137c3a9dc97e8d766d93cf6bdcb103ee290f871fd0a181f2757",
+      "utf8_bytes": 9587,
+      "media_type": "text/markdown"
+    },
+    {
+      "path": "blueprints/us-equities/state-recovery/README.md",
+      "source_sha256": "bc48a54ba5bc9a0f7c8128cfba5386531b26c12bbe51cc97002ce2148d50e8c7",
+      "utf8_bytes": 1381,
+      "media_type": "text/markdown"
+    },
+    {
+      "path": "blueprints/us-equities/state-recovery/memory/README.md",
+      "source_sha256": "c58fd2a181feb488281c5a0a57fe7b6227f085ad44c41c53f539632d26a34965",
+      "utf8_bytes": 8477,
+      "media_type": "text/markdown"
+    },
+    {
+      "path": "blueprints/us-equities/state-recovery/qdrant/README.md",
+      "source_sha256": "13f5ce8292fcec69e3daa85859c800aecb4e529bf1f94391dc883129623febe0",
+      "utf8_bytes": 5252,
+      "media_type": "text/markdown"
+    },
+    {
+      "path": "blueprints/us-equities/worker-supervision/README.md",
+      "source_sha256": "a0b55860e727e2bd7e631f7070e50bf5aa6c98974fd94dea7ac72362d1aca695",
+      "utf8_bytes": 5670,
+      "media_type": "text/markdown"
+    },
+    {
+      "path": "docs/evidence.md",
+      "source_sha256": "a5d81d728d58571ac7c88e6aafb26fcb8707717541a92e55eb39d58d8ad55353",
+      "utf8_bytes": 9129,
+      "media_type": "text/markdown"
+    },
+    {
+      "path": "observability/desktop-restart.md",
+      "source_sha256": "39e4ee70ea568d8f30182715566c287abc0b6b06c6176634c93fdae2e7dbc711",
+      "utf8_bytes": 6238,
+      "media_type": "text/markdown"
+    },
+    {
+      "path": "observability/session-e2e.md",
+      "source_sha256": "843e8f4dff03e7f81d260b060ed3f140c2f6574555680beb84f3f7c0b2888712",
+      "utf8_bytes": 7704,
+      "media_type": "text/markdown"
+    }
+  ],
+  "hashfreeze": {
+    "algorithm": "sha256",
+    "canonicalization": "UTF-8 JSON, sorted keys, compact separators, ensure_ascii=false",
+    "payload_scope": "entire top-level object excluding hashfreeze",
+    "payload_sha256": "f104af0112d6c6307a5bc7e08e3f9e65835e9efef35b4e69c098f948058bae83",
+    "frozen_before_first_search_or_ranking_run": true,
+    "change_policy": "Never edit scored questions or labels in place; create a new version and retain prior results."
+  }
+}

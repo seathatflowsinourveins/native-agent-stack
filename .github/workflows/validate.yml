@@ -21,5 +21,7 @@ jobs:
         run: python3 scripts/validate.py
       - name: Validate catalog evidence and coverage joins
         run: python3 scripts/validate_catalogs.py
+      - name: Check offline ecosystem explorer rebuild
+        run: python3 scripts/build_ecosystem.py --check
       - name: Test validation failure modes
         run: python3 -m unittest
