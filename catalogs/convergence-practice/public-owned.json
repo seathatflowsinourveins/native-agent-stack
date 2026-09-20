@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "kind": "public_owned",
+  "endpoint": "https://api.github.com/users/seathatflowsinourveins/repos?type=owner&per_page=100",
+  "retrieved_at": "2026-09-20T02:00:50.538618+00:00",
+  "count": 1,
+  "filtered_nonpublic_count": 0,
+  "fields_allowlisted": true,
+  "repositories": [
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "description": "Evidence-backed native Codex and Claude stack: scoped memory, automatic local code RAG, context efficiency, upstream recipes and reproducible receipts.",
+      "default_branch": "main",
+      "archived": false,
+      "fork": false,
+      "pushed_at": "2026-09-20T01:20:58Z",
+      "license_metadata": "MIT",
+      "topics": []
+    }
+  ]
+}

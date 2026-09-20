@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment_contract",
+  "scope": "Reusable research-to-acceptance practice; no installation, host qualification, model run or trading authority follows from inclusion.",
+  "evidence_classes": ["discovery", "pinned_source_review", "offline_artifact_check", "native_cli_execution", "model_task_execution", "recovery_execution"],
+  "adoption_decisions": ["retain", "trial", "adopt_within_scope", "defer", "reject"],
+  "required_experiment_fields": [
+    "task_and_failure", "primary_sources_and_pins", "discovery_provenance",
+    "license_and_compatibility", "baseline_and_candidate", "frozen_inputs",
+    "predeclared_metrics", "runtime_and_platform", "commands", "observations",
+    "failures_and_skips", "limitations", "decision_and_scope", "rollback",
+    "next_decision_changing_test"
+  ],
+  "lanes": [
+    {"id": "retrieval", "acceptance": "Exact-source coverage plus explicit no-answer cases; task outcomes measured separately.", "next_gate": "Held-out task evaluation on a substantial real project."},
+    {"id": "native-agent-engineering", "acceptance": "A real issue produces a tested independently reviewed patch in an isolated workspace.", "next_gate": "Matched correctness, elapsed time and complete usage comparison."},
+    {"id": "memory", "acceptance": "An explicit durable decision is retrievable in its intended scope with cross-scope negatives.", "next_gate": "Recovery without importing unrelated histories or another host's credential store."},
+    {"id": "access-recovery", "acceptance": "Interruption, reconnect, cancellation and selected-state restoration have observed results.", "next_gate": "Independent-host restore and controlled startup/network-change qualification."},
+    {"id": "local-inference", "acceptance": "A pinned model/runtime meets task quality and measured resource limits against the existing baseline.", "next_gate": "Useful native client integration; inference speed alone does not pass."},
+    {"id": "research-application", "acceptance": "A reproducible source-to-result packet preserves time, provenance and deterministic calculations.", "next_gate": "Application-specific data and execution gates remain independently enforced."}
+  ],
+  "publication_policy": {
+    "public_sources_only": true,
+    "private_repository_export": false,
+    "credential_export": false,
+    "automatic_transcript_capture": false,
+    "automatic_install_or_promotion": false,
+    "historical_host_acceptance_transfers": false,
+    "provider_savings_from_artifact_reduction": false,
+    "universal_sota_claim": false
+  }
+}
