@@ -1,0 +1,118 @@
+{
+  "id": "sec-catalyst-dataset-native-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": ["edgartools", "duckdb"],
+  "claim": "Pinned EdgarTools parsed five verified retained SEC headers through complementary native views; pinned DuckDB materialized the full 371-identity cohort and nine item links to deterministic Parquet, preserving 366 unfetched rows and rejecting historical availability before local observation.",
+  "limitations": [
+    "Offline conversion of previously accepted sources; no new SEC request, model call or dependency installation.",
+    "This is metadata dataset acceptance, not historical point-in-time strategy data or profitability evidence.",
+    "First observation is completion in the retained acquisition run; 2020 acceptance does not prove historical dissemination or receipt.",
+    "Five headers are the deterministic acquisition cap, not a representative or outcome-selected trading universe; 366 remain unfetched.",
+    "Header item declarations and native taxonomy labels do not establish catalysts, economic incentives, sentiment or trading signals.",
+    "All tickers and amendment-parent accessions remain unknown; no price, adjustment, corporate-action or return join is performed.",
+    "Parquet determinism is scoped to the pinned runtime and these inputs; no provider token-saving claim is made.",
+    "The repository CLI is a custom integrity/temporal bridge around native SDK APIs; synthetic contract tests are separate from actual native header parsing.",
+    "Public hashes are local integrity anchors, not signed SEC attestations; private source bytes and contact identity are not published."
+  ],
+  "recorded_at": "2026-09-20T00:22:52Z",
+  "scope": "offline_native_sdk_metadata_and_typed_parquet",
+  "worker_base": "85bdaa5eedf5a40aa9fa65acba69292c54c51581",
+  "source_refs": [
+    "blueprints/us-equities/catalyst-provenance/access-resolution.md",
+    "blueprints/us-equities/catalyst-provenance/catalyst.py",
+    "blueprints/us-equities/catalyst-dataset/dataset.py",
+    "blueprints/us-equities/catalyst-dataset/README.md",
+    "tests/test_catalyst_dataset.py"
+  ],
+  "upstream": {
+    "edgartools": {
+      "version": "5.58.0",
+      "license": "MIT",
+      "release_commit": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+      "release_url": "https://github.com/dgunning/edgartools/releases/tag/v5.58.0",
+      "entrypoints": [
+        "edgar.sgml.FilingHeader.parse_from_sgml_text(verified_header_text)",
+        "edgar.sgml.FilingSGML.from_text(verified_header_text).header",
+        "edgar.company_reports.current_report.EightK.structure.get_item('ITEM ' + code)"
+      ],
+      "observed_native_source_files": [
+        {"path":"edgar/company_reports/current_report.py","bytes":41609,"sha256":"63f4d187ea7d939cc73d83db46fe908615d00f1a7bd8af3cbb68152a1ea912f9"},
+        {"path":"edgar/sgml/sgml_common.py","bytes":24124,"sha256":"6ae05089cc974820ee119a0caa15cecf89dcebbba74b7321ea9a0be5d5fb4484"},
+        {"path":"edgar/sgml/sgml_header.py","bytes":48662,"sha256":"b54fff3ab146a0fec7fc58ad8360ceccfe017983e97b91f68860bb88452343c0"},
+        {"path":"edgar/sgml/sgml_parser.py","bytes":23773,"sha256":"6e0c7e7f2f3e91c1709f31a4f0a68a8ebf180eb1e08825b0a2a4a300c525ac63"}
+      ]
+    },
+    "duckdb": {
+      "version": "1.5.5",
+      "license": "MIT",
+      "entrypoints": ["duckdb.connect(':memory:', config={'threads':'1'})", "DuckDBPyConnection.execute", "DuckDBPyConnection.executemany", "COPY ... TO ... (FORMAT PARQUET, COMPRESSION ZSTD, ROW_GROUP_SIZE 2048)", "read_parquet"],
+      "documentation": ["https://duckdb.org/docs/stable/data/parquet/overview.html", "https://duckdb.org/docs/stable/sql/data_types/timestamp.html"]
+    },
+    "sec": {
+      "index_url": "https://www.sec.gov/Archives/edgar/daily-index/2020/QTR1/master.20200302.idx",
+      "form_definition": "https://www.sec.gov/about/forms/form8-k.pdf",
+      "availability_reference": "https://www.sec.gov/about/webmaster-frequently-asked-questions"
+    }
+  },
+  "input": {
+    "run_id": "native-format-confirmed-20260919",
+    "source_day": "2020-03-02",
+    "receipt_sha256": "9d73682848321accbe95bac0f0fda50ebdef9851a693bfb8bdc6e8229a610e10",
+    "index_bytes": 630238,
+    "index_sha256": "5865f91e3d68590389b08760ea256fbaa1693fbc1b0e1350142fc3634a9c3383",
+    "index_observed_at": "2026-09-19T23:48:26.011418Z",
+    "latest_header_observed_at": "2026-09-19T23:48:29.649862Z",
+    "headers": [
+      {"cik":2186,"accession":"0001654954-20-002156","bytes":1099,"sha256":"73170bbcc48df9289f2721f0000f6bf7504a775372b337b507046e820fdf6813","observed_at":"2026-09-19T23:48:26.727717Z","item_codes":["8.01","9.01"]},
+      {"cik":12208,"accession":"0001193125-20-059087","bytes":896,"sha256":"0d222c4b4a4f77538b323fc8d27b34be9449d72a604252f37fe80d11ceac82be","observed_at":"2026-09-19T23:48:27.407928Z","item_codes":["5.02"]},
+      {"cik":13239,"accession":"0000013239-20-000002","bytes":1141,"sha256":"df57a064db2839e0885144347365b5b17f9a65200ec9f9f6d4d323039990232f","observed_at":"2026-09-19T23:48:28.124228Z","item_codes":["5.02"]},
+      {"cik":16918,"accession":"0000016918-20-000035","bytes":1165,"sha256":"1dcebb5b57b9b8aea1d680cdab20ff7fd13d285a9d7a42283858ef2ea85ba0d3","observed_at":"2026-09-19T23:48:28.857258Z","item_codes":["7.01","8.01","9.01"]},
+      {"cik":18349,"accession":"0000018349-20-000014","bytes":917,"sha256":"1ec80b1966ccd1c5a46d8598d4f80f110594a58d2ba4d8f8f126d3b2a4a80add","observed_at":"2026-09-19T23:48:29.649862Z","item_codes":["7.01","9.01"]}
+    ],
+    "bridge_sha256": "d4ad517451b37e418a4b9a522952e9188c29e4b2cb260a7f27a041fd5a030d1b",
+    "strict_parser_sha256": "26a85df727df99a67c800be1c1ed792eec05ec488f65186ac179acb9b1acd13e"
+  },
+  "commands": [
+    {"command":"\"$CATALYST_PY\" blueprints/us-equities/catalyst-dataset/dataset.py extract --run \"$ACCEPTED_SEC_RUN\" --out \"$DATASET_STATE/extraction\" --receipt-sha256 9d73682848321accbe95bac0f0fda50ebdef9851a693bfb8bdc6e8229a610e10","exit_code":0,"stdout_artifact":"extract.stdout.json"},
+    {"command":"\"$DUCKDB_PY\" blueprints/us-equities/catalyst-dataset/dataset.py materialize --extraction \"$DATASET_STATE/extraction\" --out \"$DATASET_STATE/parquet\" --manifest-sha256 080b93378dc7dd866579efc3878be95b9a682f89013701465afa269d740b688c","exit_code":0,"stdout_artifact":"parquet.stdout.json"},
+    {"command":"\"$DUCKDB_PY\" blueprints/us-equities/catalyst-dataset/dataset.py materialize --extraction \"$DATASET_STATE/extraction\" --out \"$DATASET_STATE/parquet-repeat\" --manifest-sha256 080b93378dc7dd866579efc3878be95b9a682f89013701465afa269d740b688c","exit_code":0,"stdout_artifact":"parquet-repeat.stdout.json"},
+    {"command":"\"$DUCKDB_PY\" blueprints/us-equities/catalyst-dataset/dataset.py query --dataset \"$DATASET_STATE/parquet\" --manifest-sha256 1447ea484822dd178084236e581a15e4c5659c84b25912c54281ca5029d9a792 --as-of \"$AS_OF\"","as_of_values":["2020-03-03T00:00:00Z","2026-09-19T23:48:25.727717Z","2026-09-19T23:48:26.727717Z","2026-09-19T23:48:29.649861Z","2026-09-19T23:48:29.649862Z"],"exit_codes":[0,0,0,0,0],"eligible_counts":[0,0,1,4,5]}
+  ],
+  "native_results": {
+    "members":371,"unique_accessions":360,"cofiling_groups":9,"qualified_headers":5,"not_fetched":366,"item_links":9,
+    "forms":{"8-K":362,"8-K/A":9},"items":{"5.02":2,"7.01":2,"8.01":2,"9.01":3},
+    "unfetched_left_join_null_header_rows":366,"unknown_ticker_and_amendment_parent_rows":371,
+    "timestamp_type":"TIMESTAMP WITH TIME ZONE",
+    "historical":{"as_of":"2020-03-03T00:00:00Z","eligible_headers":0,"eligible_items":0},
+    "observation":{"as_of":"2026-09-19T23:48:29.649862Z","eligible_headers":5,"eligible_items":9},
+    "repeat_parquet_bytes_identical":true,"repeat_complete_manifest_identical":true
+  },
+  "artifacts": [
+    {"path":"extract.stdout.json","bytes":258,"sha256":"5f80c3891c568b5c495c8e0808b22e775797be6b270ee9ce25665a6f09dec39e"},
+    {"path":"parquet.stdout.json","bytes":255,"sha256":"8125d08ed9bd0eb2fc59028cb1258f4b61617acefd92f020b90af7562a6b5185"},
+    {"path":"parquet-repeat.stdout.json","bytes":255,"sha256":"8125d08ed9bd0eb2fc59028cb1258f4b61617acefd92f020b90af7562a6b5185"},
+    {"path":"historical.stdout.json","bytes":70,"sha256":"8bbf47bf0bc6dc2e77e2b3f4d06f7392d4c652c3820de22f1006bf83a2fc3aeb"},
+    {"path":"before_first.stdout.json","bytes":77,"sha256":"4e07acb5c4eda55c26055821539a248e00ff5bd7030740be5cb2feb6655bbcb0"},
+    {"path":"first_boundary.stdout.json","bytes":297,"sha256":"c9ede33e52ccdd3071791a2eadce1bdbe7ac9acb69fcc26a4b7e161d5e3d43b9"},
+    {"path":"before_last.stdout.json","bytes":966,"sha256":"3a7b7d31f6a59ba0b6242ba3d23619a72e7d747ae90ca9c86f86443beacf2dc2"},
+    {"path":"latest_boundary.stdout.json","bytes":1189,"sha256":"5278a265cdfca31bb27ec34a0721046b9993086c3ed0c5505cf982c2332121a3"},
+    {"path":"native-sql.json","bytes":2629,"sha256":"498bb40783343e983e8134abd5110e5f989efdd0829426df70095c8abd8d7ab5"},
+    {"path":"extraction/manifest.json","bytes":3886,"sha256":"080b93378dc7dd866579efc3878be95b9a682f89013701465afa269d740b688c"},
+    {"path":"extraction/extraction.json","bytes":227115,"sha256":"90840863e0f9a1f03700fbfd6bdedac9c3029f9d183c4d4b30fdf4dbe17fd26e"},
+    {"path":"parquet/manifest.json","bytes":7411,"sha256":"1447ea484822dd178084236e581a15e4c5659c84b25912c54281ca5029d9a792"},
+    {"path":"parquet/members.parquet","bytes":15830,"sha256":"66b6c2cd505f95c8bee1eb4e60f89023c36c414f5b8ddd9c6c2db628dd138463"},
+    {"path":"parquet/headers.parquet","bytes":4140,"sha256":"6939bc75f32a3449043fa712f7f94fc31a1e7550331b8424e887557851291cdd"},
+    {"path":"parquet/items.parquet","bytes":2272,"sha256":"26714e5b6116de5912a825d8153974b37e294923867a14e7fd10041d555e31ed"},
+    {"path":"parquet/as-of.sql","bytes":640,"sha256":"ae06038323facd9afcb64065b77b894bd3899dcf481180133fa2de83c9214dba"},
+    {"path":"parquet/queries.json","bytes":4824,"sha256":"277d6466d6a946b7d58cb70cea5757c8e436bd215c4d2d73fdb968e237543f97"}
+  ],
+  "verification": {
+    "focused_command":"\"$DUCKDB_PY\" -m unittest discover -s tests -p 'test_catalyst_dataset.py' -q",
+    "focused_tests_passed":14,
+    "full_command":"\"$DUCKDB_PY\" -m unittest discover -s tests -q",
+    "full_tests_passed":250,
+    "structural_commands":["python3 scripts/validate.py","python3 scripts/validate_catalogs.py","git diff --check"],
+    "structural_results":"passed at worker base; new central evidence registration is coordinator-owned",
+    "independent_review":"accepted: 14 focused tests independently passed; all 17 receipt artifact hashes and sizes, source/parser anchors, identical repeat outputs, counts, unknown mappings and temporal claim boundaries verified"
+  }
+}
