@@ -99,6 +99,12 @@
       "kind": "catalog_card"
     },
     {
+      "path": "catalogs/us-equities/security-identity-review.json",
+      "collection": "/decisions",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/simulation-data-review.json",
       "collection": "/decisions",
       "repository_field": "repository",
@@ -137,16 +143,16 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 501,
+    "repositories": 502,
     "public_star_repositories": 342,
-    "beyond_public_stars": 159,
-    "references": 1024,
+    "beyond_public_stars": 160,
+    "references": 1030,
     "repositories_by_record_type": {
       "catalog_card": 147,
       "component_record": 52,
       "legacy_candidate": 19,
       "public_star": 342,
-      "research_supplement": 95,
+      "research_supplement": 96,
       "star_review": 342
     }
   },
@@ -867,6 +873,13 @@
           "id": "alpaca-py",
           "decision": "default",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/security-identity-review.json",
+          "pointer": "/decisions/0",
+          "decision": "retain_selected_bounded_identity_probe",
+          "evidence_level": "source_sections_reviewed"
         },
         {
           "kind": "research_supplement",
@@ -6872,6 +6885,13 @@
           "id": "qlib",
           "decision": "conditional",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/security-identity-review.json",
+          "pointer": "/decisions/2",
+          "decision": "retain_conditional_membership_span_reference",
+          "evidence_level": "source_sections_reviewed"
         }
       ]
     },
@@ -7415,6 +7435,13 @@
           "id": "nautilustrader",
           "decision": "alternative",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/security-identity-review.json",
+          "pointer": "/decisions/3",
+          "decision": "retain_conditional_runtime_not_security_master",
+          "evidence_level": "source_sections_reviewed"
         },
         {
           "kind": "star_review",
@@ -9364,6 +9391,13 @@
           "evidence_level": "native_proven"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/security-identity-review.json",
+          "pointer": "/decisions/4",
+          "decision": "retain_selected_map_semantics_with_coverage_guard",
+          "evidence_level": "source_sections_reviewed"
+        },
+        {
           "kind": "component_record",
           "path": "manifests/stack.json",
           "pointer": "/components/45",
@@ -10544,6 +10578,13 @@
           "id": "zipline-reloaded",
           "decision": "alternative",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/security-identity-review.json",
+          "pointer": "/decisions/1",
+          "decision": "retain_conditional_identity_fixture_reference",
+          "evidence_level": "source_sections_reviewed"
         }
       ]
     },
@@ -12371,6 +12412,23 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/wharton/wrds",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/security-identity-review.json",
+          "pointer": "/decisions/5",
+          "decision": "add_conditional_licensed_identity_benchmark",
+          "evidence_level": "source_sections_reviewed"
         }
       ]
     },

@@ -80,7 +80,9 @@
       "id": "accepted-pit-source",
       "state": "native_sec_and_historical_sample_accepted_pit_pending",
       "required": "Native SEC metadata retains371members/5headers/9itemlinks with366headers and historical mappings unknown. Native Alpaca acquired25AAPL SIP/raw daily bars and2actions over5HTTP200pages; all25rawcloses and2numeric action values match LEAN, but dividendcurrency is unknown. Original historical availability, eligible/delisted universe, revisions and issuer-price coverage remain open.",
-      "evidence": "blueprints/us-equities/authenticated-data/native-receipt.json"
+      "evidence": "blueprints/us-equities/authenticated-data/native-receipt.json",
+      "security_identity_receipt": "blueprints/us-equities/identity-readiness/native-receipt.json",
+      "identity_observation_limit": "10 retrospective query observations,9 qualified/1 quarantined; original historical publication/revision and inactive/delisted universe not established."
     },
     {
       "id": "retrieval-quality",
@@ -135,7 +137,7 @@
       "state": "accepted_scoped_native_pair",
       "resolved_at_utc": "2026-09-19T19:41:50Z",
       "evidence": "adoption/paired/receipt.json",
-      "scope": "Fresh LEAN→Dagu→DuckDB→Astra→Claude prepared-packet task; no model tools, broker, unattended hosting or causal token-savings acceptance"
+      "scope": "Fresh LEAN\u2192Dagu\u2192DuckDB\u2192Astra\u2192Claude prepared-packet task; no model tools, broker, unattended hosting or causal token-savings acceptance"
     }
   ],
   "architecture_followup": {
@@ -225,5 +227,15 @@
     "upstream_nunit_status": "unresolved / fixture abort",
     "broker_orders": 0,
     "net_provider_token_savings": null
+  },
+  "security_identity_followup": {
+    "date": "2026-09-20",
+    "plan": "blueprints/us-equities/identity-readiness/plan.json",
+    "source_review": "catalogs/us-equities/security-identity-review.json",
+    "state": "bounded native query/quality/observation acceptance; historical universe and provider revision availability remain unresolved",
+    "historical_universe_complete": false,
+    "provider_revision_availability_established": false,
+    "receipt": "blueprints/us-equities/identity-readiness/native-receipt.json",
+    "grand_identities": 502
   }
 }

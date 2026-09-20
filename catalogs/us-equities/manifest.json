@@ -38,13 +38,14 @@
     "catalogs/us-equities/simulation-data-review.json",
     "catalogs/us-equities/data-readiness-review.json",
     "blueprints/us-equities/catalyst-dataset/native-receipt.json",
-    "blueprints/us-equities/corporate-action-readiness/receipt.json"
+    "blueprints/us-equities/corporate-action-readiness/receipt.json",
+    "blueprints/us-equities/identity-readiness/native-receipt.json"
   ],
   "north_star": "blueprints/us-equities/north-star.md",
   "harness_contract": "blueprints/us-equities/harness-contract.json",
   "broader_reference_union": 171,
   "star_audit_file": "catalogs/us-equities/star-audit.json",
-  "grand_index_repositories": 501,
-  "grand_index_beyond_stars": 159,
+  "grand_index_repositories": 502,
+  "grand_index_beyond_stars": 160,
   "decision_index_file": "catalogs/us-equities/decision-index.json"
 }

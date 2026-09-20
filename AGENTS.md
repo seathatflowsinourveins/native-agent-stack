@@ -53,6 +53,13 @@ native parser behavior, materialized data integrity and actual historical
 availability are separate claims. Read that plan and the matching receipt before
 repeating acquisition or advancing a strategy gate.
 
+The subsequent `blueprints/us-equities/authenticated-data/README.md` records native
+Alpaca AAPL acceptance. Continue with `blueprints/us-equities/identity-readiness/README.md`
+for the symbol-mapping/observation gate. A request's symbol-asof date, current asset
+UUID/status and newly captured historical values are not original availability or
+historical universe membership. Reuse retained anchored runs before refetching;
+new hosts must establish their own permitted observations and acceptance.
+
 For the next research/acceptance work, read `blueprints/us-equities/acceptance-wave/README.md`
 and its research protocol on demand. The selected direction is daily/intraday
 catalyst research, including historical +200% mover discovery. Preserve as-known

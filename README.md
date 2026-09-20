@@ -7,7 +7,7 @@ A current, evidence-backed reference for native **Codex + Claude Code**, with sc
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
 and an auditable **342-star coverage ledger**. Its combined index includes
-**501 repository identities** across all 342 public stars and 159 beyond them,
+**502 repository identities** across all 342 public stars and 160 beyond them,
 with typed, validated pointers to decisions and evidence. The latest
 [architecture research wave](catalogs/us-equities/architecture/README.md) adds
 source reviews, awesome-list coverage and official Alpaca constraints.
@@ -40,6 +40,13 @@ Its current plan and receipt distinguish native responses, precise verification,
 cross-provider differences and unresolved historical coverage. OpenFIGI is the sole
 new reference identity; the immediate data stack remains Alpaca-py, EdgarTools,
 DuckDB and LEAN.
+
+The following [security-identity wave](blueprints/us-equities/identity-readiness/README.md)
+records eight native HTTP200 responses and a DuckDB ledger with ten query
+observations: nine locally qualified and one quarantined. Historical eligibility
+remains zero. Six selected engine/data-contract reviews accompany the proof.
+WRDS is a conditional access reference
+for licensed historical research data; it is not installed or entitled by inclusion.
 
 The earlier [native acceptance wave](blueprints/us-equities/acceptance-wave/README.md)
 adds LEAN cost sensitivity, synthetic DuckDB temporal selection and an offline

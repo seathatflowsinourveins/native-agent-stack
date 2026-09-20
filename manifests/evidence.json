@@ -838,6 +838,26 @@
         "No new model task or whole-task causal token-savings experiment in this wave."
       ],
       "path": "blueprints/us-equities/authenticated-data/native-receipt.json"
+    },
+    {
+      "id": "native-security-identity-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "alpaca-py",
+        "duckdb"
+      ],
+      "claim": "One saved native Alpaca-py continuation completed the four FB/META query chains across three historical sessions. Eight total HTTP200 responses retain10 distinct query observations (9 locally qualified,1 quarantined) plus1 current asset snapshot. Native DuckDB preserves original/derived source anchors and exact nanosecond observation cutoffs; historical2022 and just-before-observation selections return0.",
+      "limitations": [
+        "Three June2022 sessions and four FB/META query namespaces only; no historical or inactive/delisted market-wide universe.",
+        "Equal mapped prices do not establish a permanent security identifier. Current asset metadata cannot define historical validity or tradability.",
+        "The reported-zero-activity row conflicts with documented stock aggregation. Cause unknown; local quarantine preserves exact source zeros without imputation.",
+        "Query completion across separately observed pages does not establish an atomic provider snapshot or provider revision order.",
+        "Conservative availability equals local observation time. Original publication, source revisions and historical security validity remain unknown; this is not a historical strategy decision dataset.",
+        "Positive activity fields only qualify an observation under the stated local numeric policy; they do not establish market coverage, execution eligibility, fills or alpha.",
+        "No account, position, order, reset, paid resource, entitlement upgrade or real-time capability test in this wave.",
+        "No new model-inference task or causal whole-task token-savings experiment. Existing Codex/Claude/context/memory receipts retain their own dates and scope."
+      ],
+      "path": "blueprints/us-equities/identity-readiness/native-receipt.json"
     }
   ],
   "files": [
@@ -863,8 +883,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "de46cca5e14630b3780b61463953061a1a911e42b8b399a17baf94b1454d4578",
-      "bytes": 5018
+      "sha256": "41ad6496859b54c8ae7206ce276b128b1ebf58297baf770aa7d83002b98b12a4",
+      "bytes": 5516
     },
     {
       "path": "CLAUDE.md",
@@ -878,8 +898,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "0796cea2b09898ea503e253ef3cf27f1d3ab5fc3b5faa0fcd328038e783fb768",
-      "bytes": 12533
+      "sha256": "4e83851f41569ab576ab1df1022d472d5d946ffa54321f1be5a62779f707f0f6",
+      "bytes": 12982
     },
     {
       "path": "adoption/README.md",
@@ -893,8 +913,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "0d3a86742b09fa8a274f4fdfaf387e214c85322e461d5bc144826200eb2c52d5",
-      "bytes": 9621
+      "sha256": "14459781e5fa14cd9e20806d9457f55f083727315671fa4938ef0e9af682a84a",
+      "bytes": 9919
     },
     {
       "path": "adoption/paired/README.md",
@@ -963,7 +983,7 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "4aedc083e4665bec7131263e36b81390e4011c660b3c78df183ddc988021aadd",
+      "sha256": "22c6b2a8b39bde0ff2acdd300d4f17df9b3be71a08821d292d7066df47669af1",
       "bytes": 8234
     },
     {
@@ -1617,6 +1637,21 @@
       "bytes": 565
     },
     {
+      "path": "blueprints/us-equities/identity-readiness/README.md",
+      "sha256": "2452c1c1b3639e490cae7c4b97177637f56d133116d2da1aedfc30ed9b0e7600",
+      "bytes": 7708
+    },
+    {
+      "path": "blueprints/us-equities/identity-readiness/native-receipt.json",
+      "sha256": "97cc1a0b03f8d59d56eeb4e1bfdd805f32c047c350208c03fadb5d2f6308abc5",
+      "bytes": 51698
+    },
+    {
+      "path": "blueprints/us-equities/identity-readiness/plan.json",
+      "sha256": "0b0caa375fbc2891fcde65051a8cbd8e44f106a6b0dc1d113bf6495c6f384fb9",
+      "bytes": 5193
+    },
+    {
       "path": "blueprints/us-equities/manifest.json",
       "sha256": "3660237d92c99c90d09464315288b8cffd78c4a1c501ca41b8100ef1e74260b7",
       "bytes": 7982
@@ -1912,6 +1947,36 @@
       "bytes": 273
     },
     {
+      "path": "blueprints/us-equities/security-identity/README.md",
+      "sha256": "a919229e8e563563777c53ae26a189449069a363f4fcb60d15681e19da5c57d5",
+      "bytes": 14391
+    },
+    {
+      "path": "blueprints/us-equities/security-identity/ledger.py",
+      "sha256": "5457a6f43f7d74163db1804d094554705834532f150781fa7ac024896b2c710b",
+      "bytes": 14979
+    },
+    {
+      "path": "blueprints/us-equities/security-identity/plan.json",
+      "sha256": "8180fe9251d3b41fc08a0a7a5ab34bdc84d0c99067f5f8289ef14cb8ed69123d",
+      "bytes": 1627
+    },
+    {
+      "path": "blueprints/us-equities/security-identity/probe.py",
+      "sha256": "8a9365bb919bfac70576c5d81e04b0ab30e9737dc348acee8149d137ea5c46d2",
+      "bytes": 19108
+    },
+    {
+      "path": "blueprints/us-equities/security-identity/quality.py",
+      "sha256": "95b3baef88ce214c8f579dd0ff3f83df1dd6434ef2db7af937c2f6b48d07197d",
+      "bytes": 18496
+    },
+    {
+      "path": "blueprints/us-equities/security-identity/select.sql",
+      "sha256": "a69c00bac3451d39edbbf808041a0b67eea6d231743b53e12681953c2d9e9477",
+      "bytes": 377
+    },
+    {
       "path": "blueprints/us-equities/simulation-research/README.md",
       "sha256": "7cbb07d3cfe5e5785485ede029ed32f82d3ce83e75dbf1adb8911dcf133b2b21",
       "bytes": 5100
@@ -2008,8 +2073,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "d2b8e67219cb50f5cc58fc63631f1d6d191a71248562abe68b85e40cd750e4c4",
-      "bytes": 12116
+      "sha256": "89ba8cbaba3dc3df9de40ad815c6e4b9f6aa6220c0324415ce81e677ce3e718d",
+      "bytes": 12611
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -2113,8 +2178,8 @@
     },
     {
       "path": "catalogs/us-equities/convergence-review.json",
-      "sha256": "747e2824e34aa0b0a1f4f09ec537af2cbd11ce56aced23b45944552e85a34dac",
-      "bytes": 12175
+      "sha256": "d5cecca1bcabb01131932b2470e7d6f5651fcf337896845409aa84be722a1758",
+      "bytes": 13035
     },
     {
       "path": "catalogs/us-equities/convergence-review.md",
@@ -2153,8 +2218,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "7c6b0bb779cdbc46077e63d545f68219521a661343e48fdc3dd19a8c2534f593",
-      "bytes": 374030
+      "sha256": "21733b37d9841c1cb71ed7592a52b6b3071ed68a537260ca8fd7fc6c268c15d7",
+      "bytes": 376207
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -2188,8 +2253,8 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "cd452fe7286a6e8679f1a2ceef3f99745415c0a78e5078d9d4086cc4fb90e46f",
-      "bytes": 2307
+      "sha256": "c24776afe39b02698dc3adb9de0fdb471994cb99546aa8a85897d3a6937d7067",
+      "bytes": 2376
     },
     {
       "path": "catalogs/us-equities/model-followup.json",
@@ -2213,8 +2278,8 @@
     },
     {
       "path": "catalogs/us-equities/native-workflows.md",
-      "sha256": "cf1902bd20418fd65d12c54c04464415ba8186f864b8d15fda7d419b60730c93",
-      "bytes": 8544
+      "sha256": "3b8868012a0b12209b3623d2647b52ad71a496d9178dad4a852e47e7a1942d7b",
+      "bytes": 9952
     },
     {
       "path": "catalogs/us-equities/repository-index.md",
@@ -2230,6 +2295,16 @@
       "path": "catalogs/us-equities/retrieval-receipt.json",
       "sha256": "d42e225d314b077f91768d821f4990932ad76376d421d48295c8cfad5a02de64",
       "bytes": 1995
+    },
+    {
+      "path": "catalogs/us-equities/security-identity-review.json",
+      "sha256": "b1c22f7730d595c442b19077e99150f45298d6afc0b9aa47484f8b958a1aa16d",
+      "bytes": 27451
+    },
+    {
+      "path": "catalogs/us-equities/security-identity-review.md",
+      "sha256": "5c486734a93e5a699c523e404f72560d919321312ffd30a32db5ed6aa41b9bfb",
+      "bytes": 10693
     },
     {
       "path": "catalogs/us-equities/simulation-data-review.json",
@@ -2523,8 +2598,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "af1d60139f9a0422e9da29a005e006080774e4694514154365d2e993ac12fee5",
-      "bytes": 48700
+      "sha256": "b4c8aa88ac6173001fecbd83dea24e27506e879bf6e6481cf56c134ae223255c",
+      "bytes": 48895
     },
     {
       "path": "observability/README.md",
@@ -2683,8 +2758,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "278c8d13a3212de56ef519fd3290d89e728eacf8dc9984f668a7e138c1a1f02c",
-      "bytes": 4961
+      "sha256": "cf86a2b71bc05c7dbdf86bc084034bb4b16b847ef3f628315b74a24e3c9ac377",
+      "bytes": 5062
     },
     {
       "path": "observability/receipt.json",
@@ -2840,6 +2915,11 @@
       "path": "tests/test_research_workflow.py",
       "sha256": "15b2d7472cdb33ac6410b428370fe952741de74bd53116c68cbb97b3302d466a",
       "bytes": 9161
+    },
+    {
+      "path": "tests/test_security_identity.py",
+      "sha256": "cdd357d5cc1521959509ce41b519787790d046b51f91a2c29275f3842b667fee",
+      "bytes": 22857
     },
     {
       "path": "tests/test_validate.py",
