@@ -18,6 +18,11 @@ Use upstream executables and supported integration formats. Keep client accounts
 
 One coordinator integrates. Writing workers need separate worktrees and bounded file ownership. Evidence belongs in compact sanitized receipts; no raw conversations, tokens, personal paths or machine-specific active client configuration.
 
+For general engineering and ecosystem changes, start with
+`docs/convergence-architecture.md`. New convergence claims use
+`scripts/validate_convergence.py` with a scoped experiment record. Preserve failed
+attempts and unknown usage; the checker verifies declared consistency, not truth.
+
 The north star is US-equities research/backtesting followed by Alpaca paper.
 Read `catalogs/us-equities/README.md` for selection and `blueprints/us-equities/north-star.md`
 for boundaries; load only the layer needed for the current task. The native
@@ -65,8 +70,13 @@ UUID/status and newly captured historical values are not original availability o
 historical universe membership. Reuse retained anchored runs before refetching;
 new hosts must establish their own permitted observations and acceptance.
 
-For the next research/acceptance work, read `blueprints/us-equities/acceptance-wave/README.md`
-and its research protocol on demand. The selected direction is daily/intraday
+For the latest bounded wave, read `blueprints/us-equities/catalyst-convergence/README.md`
+and its plan on demand. The frozen daily/intraday protocol is in
+`blueprints/us-equities/catalyst-experiment/protocol.json`; lifecycle evidence is in
+`blueprints/us-equities/lifecycle-sample/native-receipt.json`. Local observation
+availability cannot substitute for original historical publication/revisions.
+Native research efficiency also requires both semantic quality and the frozen
+output contract; preserve failed conditions and their usage. The selected direction is daily/intraday
 catalyst research, including historical +200% mover discovery. Preserve as-known
 candidate universes and source revisions; the current synthetic temporal fixture
 and fixed LEAN schedule are not an accepted historical strategy dataset.

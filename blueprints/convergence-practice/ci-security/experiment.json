@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "discovery_provenance": [
+    "Measured gap in public native workflow acceptance; stars and awesome lists used only for discovery."
+  ],
+  "license_and_compatibility": "See pinned source review; original fixture under repository MIT license. No new native authentication or model default.",
+  "predeclared_metrics": {
+    "quality_rule": "Preserve frozen acceptance oracle and inspect actual exit, changes and intended failure cases.",
+    "usage_rule": "Known native fields retained separately; unknown stays null; no savings claim."
+  },
+  "commands": [
+    "python3 -m unittest -v tests.test_workflow_security"
+  ],
+  "observations": [
+    {
+      "id": "ci-regular-pair",
+      "task": "workflow-analysis",
+      "role": "static-verifier",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Offline regular workflow analysis using native zizmor1.30.1 on macOS arm64",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/ci-security/observation.json",
+          "sha256": "aebb8c8dd1b5d269fbbc1b3a3e66a591d3b7ea9f2caff23891ba6270ab55232f"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    }
+  ],
+  "failures_and_skips": [],
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  },
+  "task_and_failure": "Public CI lacked static workflow security analysis and a known-unsafe regression fixture.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/zizmorcore/zizmor",
+      "revision": "99a054ed9283c90abdd2d5b9fb5101d27dde9783"
+    }
+  ],
+  "baseline_and_candidate": {
+    "baseline": "Existing evidence and catalog validation only",
+    "candidate": "Pinned native offline workflow analysis with positive and negative fixture checks"
+  },
+  "frozen_inputs": {
+    "base_revision": "327d9badff0ad09ec0c1266e70b4ad361743c77f",
+    "tasks": [
+      "workflow-analysis"
+    ],
+    "roles": [
+      "static-verifier"
+    ],
+    "sources": [
+      {
+        "path": "catalogs/convergence-practice/architecture-wave/zizmorcore__zizmor.json",
+        "sha256": "25c5ead3bb9660aeae390f7c0f3076e3db26014c3ac31d9f1686849d803ab679"
+      }
+    ],
+    "inputs": [
+      {
+        "path": ".github/workflows/validate.yml",
+        "sha256": "7f1657842cd563b64474a3c44bd0a24ce4aa2df81ad6cf977e193d9af11d13d9"
+      },
+      {
+        "path": "tests/fixtures/workflow-security/unsafe.yml.txt",
+        "sha256": "9e1c6130a396200387a0b9f1d445a33dbf154370db5460a3b50e086321bb737a"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "tests/test_workflow_security.py",
+        "sha256": "2c260c8d7fd58e747819037177ec9e077ee1cac7dc1e8ebd1ff7ddd1c405266b"
+      }
+    ]
+  },
+  "runtime_and_platform": {
+    "platform": "macOS arm64",
+    "tools": [
+      {
+        "name": "zizmor",
+        "version": "1.30.1"
+      }
+    ],
+    "isolation": "Local offline static analysis; unsafe workflow inert in disposable directory."
+  },
+  "limitations": [
+    "Offline regular analysis is scoped static evidence, not absence of every vulnerability or signature verification.",
+    "Mac binary and the checksum-locked Linux CI wheel are distinct artifacts; new runner execution is established by its own CI result.",
+    "The unsafe fixture was analyzed but never executed. No model calls, broker actions or savings measurement."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "Offline regular workflow analysis using native zizmor1.30.1 on macOS arm64",
+    "qualification_run_ids": [
+      "ci-regular-pair"
+    ]
+  },
+  "rollback": "Remove analyzer step, lock and matching CI tests together; preserve prior validators.",
+  "next_decision_changing_test": "Linux wheel and fixtures now pass in the separately linked CI receipt; broader persona and signature checks require separate scoped qualification."
+}

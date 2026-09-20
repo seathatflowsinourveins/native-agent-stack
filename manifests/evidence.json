@@ -1031,6 +1031,127 @@
         "Tracked source remained unchanged; native MCP startup created untracked metadata. All owned temporary services were stopped. Public aggregate hashes bind retained evidence but do not independently reproduce private logs."
       ],
       "path": "evidence/receipts/token-practice-gap-followup-20260920.json"
+    },
+    {
+      "id": "native-lifecycle-sample-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "edgartools",
+        "duckdb"
+      ],
+      "claim": "Six HTTP200 public documents support three distinct lifecycle claims. Native offline EdgarTools parsing and DuckDB preserve source anchors and exact observation cutoffs:0 historical,0 before first observation,1 at first and3 at last; historical replay remains0. Original availability, permanent identity and historical universe eligibility remain unestablished.",
+      "limitations": [
+        "Three hand-selected cases and six source documents only; not complete historical coverage or an outcome-selected mover dataset.",
+        "Retrospective publisher claims are distinct from when this runtime observed the document. Local available_ns equals observed_ns; original provider revisions and historical as-known eligibility remain unknown.",
+        "Distinct company-stock and ETF documentary scopes support ordered META ticker reuse; no permanent identity crosswalk, continuous ownership intervals or cause of the prior quarantined zero-activity bar.",
+        "Twitter suspension and a Form25 notification do not establish a precise legal delisting instant. Native SEC acceptance text is timezone-naive; its timezone and UTC instant remain unknown.",
+        "Custom bounded transport/qualification adapters call installed upstream APIs. This receipt is not an upstream project benchmark or general filing parser acceptance.",
+        "No new Alpaca requests, broker orders, account resets, paid resources, price/outcome scan or empirical strategy result. Native provider comparison is a separate receipt."
+      ],
+      "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json"
+    },
+    {
+      "id": "synthetic-catalyst-contract-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "duckdb"
+      ],
+      "claim": "Native DuckDB1.5.5 executed an exact BIGINT availability query on five synthetic observations in a network-disabled process. Thirteen focused standard-library tests exercise threshold, label, timing, units, interval and inspection-registry failures. No empirical trading experiment or new LEAN/skfolio run.",
+      "limitations": [
+        "Protocol thresholds are exploratory choices, not fitted or proven optimal.",
+        "Full feature construction, historical universe/availability, matched controls, fills, cash/corporate-action/margin accounting, statistical inference and promotion are future work.",
+        "The chronological2025reserved calendar requires a complete case-specific inspection registry and is not asserted globally unseen.",
+        "Synthetic labels are independent arithmetic fixtures, not market outcomes or simulated P&L.",
+        "No provider calls, broker orders, new model turn or net token-savings measurement."
+      ],
+      "path": "blueprints/us-equities/catalyst-experiment/receipt.json"
+    },
+    {
+      "id": "native-research-efficiency-20260920",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "qmd"
+      ],
+      "claim": "Eight fresh native answer invocations yielded four within-provider task comparisons. All eight semantic grades pass; six answers meet the shared structural and word protocol. Numeric differences are observed sample differences only.",
+      "limitations": [
+        "Only two fixed tasks per provider; no confidence intervals, provider ranking, causal attribution or general savings claim.",
+        "Full corpus is eight selected public project documents, not a comprehensive repository or autonomous research workload.",
+        "Prompts use identical questions/instructions and verbatim common source IDs; different document context lengths are the intended treatment.",
+        "QMD lexical selection was fixed before answers; task B focused omits the separate retrieval-evaluation document, and rubric deductions remain recorded.",
+        "Native default context, system policy, hooks and provider caches are uncontrolled; fresh sessions do not imply cold caches.",
+        "The two Claude full-context answers fail the word protocol, so their numeric differences are not clean protocol-passing matched comparisons.",
+        "Codex task B focused score is 9.5 versus full 10 despite both clearing the predeclared threshold.",
+        "Codex zero-tools enforcement is requested/audited with read-only and deny-all settings, weaker than hard prevention of every MCP call.",
+        "Local supervision does not prove provider-side cancellation; no run timed out.",
+        "This session uses these hosted research worker invocations; it does not establish token savings for the enclosing Desktop conversation or whole ecosystem."
+      ],
+      "path": "blueprints/us-equities/research-efficiency/native-receipt.json"
+    },
+    {
+      "id": "native-ci-security-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "zizmor"
+      ],
+      "claim": "Native zizmor1.30.1 on macOS accepts the published workflow under offline regular analysis and rejects an inert unsafe fixture with three findings; two executable regression checks pass.",
+      "limitations": [
+        "Offline regular analysis is scoped static evidence, not absence of every vulnerability or signature verification.",
+        "Mac binary and the checksum-locked Linux CI wheel are distinct artifacts; new runner execution is established by its own CI result.",
+        "The unsafe fixture was analyzed but never executed. No model calls, broker actions or savings measurement."
+      ],
+      "path": "blueprints/convergence-practice/ci-security/receipt.json"
+    },
+    {
+      "id": "native-claude-child-patch-20260920",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "Native Claude Code2.1.278 on Ubuntu24.04 WSL2 used Opus5 through Max for one foreground isolated child repair. Only planner.py changed; all12 frozen visible tests pass independently after8 seed failures.",
+      "limitations": [
+        "One synthetic visible-oracle fixture, not a held-out benchmark, real application or GPU acceptance.",
+        "Ultracode was requested; observed native delegation does not establish dynamic-workflow selection or an OS sandbox.",
+        "Three native usage views retain different scopes; native retries and whole Desktop usage are unknown. No matched model baseline or savings claim.",
+        "Local supervision completed without timeout; provider cancellation, crash recovery and full-host backup were not tested."
+      ],
+      "path": "blueprints/convergence-practice/native-worker/receipt.json"
+    },
+    {
+      "id": "upstream-native-tools-20260920",
+      "path": "evidence/receipts/upstream-native-tools-20260920.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "beads",
+        "skills-ref",
+        "otel-tui"
+      ],
+      "claim": "Three supplemental upstream tools installed natively: Beads persisted task claims and dependency transitions, skills-ref validated and rendered a selected skill, and otel-tui ingested and displayed one synthetic loopback trace.",
+      "limitations": [
+        "Bounded native CLI/TUI acceptance on Linux/WSL; no new native Codex or Claude provider task was run for these additions.",
+        "Beads used one owned Git fixture with embedded Dolt, explicit task scope, skipped agent-instruction generation and skipped hooks. It does not replace ai-memory.",
+        "skills-ref is upstream's reference/demo implementation; successful portable-format validation does not certify production client extensions or tool semantics.",
+        "otel-tui received one synthetic local trace; no production or native-provider telemetry session was evaluated and no persistent exporter was installed.",
+        "None of these three tools exposes a verified cumulative token-savings counter. Exact causal lifetime provider savings remain null.",
+        "Public command forms substitute portable variables for private host paths; private raw operation logs are not published."
+      ]
+    },
+    {
+      "id": "native-ai-memory-maintenance-20260920",
+      "path": "evidence/receipts/native-ai-memory-maintenance-20260920.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory"
+      ],
+      "claim": "Official ai-memory 2.3.2 release installed over 2.3.1 after a private upstream backup; active service executable, native status, scoped search and configured direct MCP status verified.",
+      "limitations": [
+        "No new provider/model task was run. Existing dated client acceptance remains tied to its original version and scope.",
+        "Private memory contents, counts, backup, paths and raw native/MCP responses are excluded from this publication.",
+        "Native client configuration, service unit, lifecycle hooks, managed routing/skills, project scope and provider settings were preserved.",
+        "This maintenance update does not demonstrate token savings; exact causal lifetime provider savings remain null.",
+        "Forward-only migrations may require restoring the retained private backup to downgrade."
+      ]
     }
   ],
   "files": [
@@ -1041,8 +1162,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "03209e2a5501975de1994576f99ce09a8f928bd7098cfa70500c224f383a9b53",
-      "bytes": 755
+      "sha256": "7f1657842cd563b64474a3c44bd0a24ce4aa2df81ad6cf977e193d9af11d13d9",
+      "bytes": 1494
     },
     {
       "path": ".gitignore",
@@ -1056,8 +1177,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "5bbccf29fc8b739d956291472e455721e5349f2137e717654fef84a1961ce1fa",
-      "bytes": 5789
+      "sha256": "10523a601aac0bbd01180a73ab2b7650f289b25b78f2f07034bcbd8172ed634f",
+      "bytes": 6482
     },
     {
       "path": "CLAUDE.md",
@@ -1071,8 +1192,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "dd34a7bbbf982f769c489d409316f74ad629437f8285a9e3d60f4bdcd10396f7",
-      "bytes": 14161
+      "sha256": "54e1d4aeb234185222eed8dff3caa0958c14b3ba6259271a9b6b5d854d4c9381",
+      "bytes": 15156
     },
     {
       "path": "adoption/README.md",
@@ -1086,8 +1207,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "4f53606d3a75341cddc40e3a6005eea026f1535229616ca21d71e10cf899b8f5",
-      "bytes": 10581
+      "sha256": "283136411c01b04fa9e0325f59725b538d13b0df4d347cd5d241997a92eaf98d",
+      "bytes": 11476
     },
     {
       "path": "adoption/paired/README.md",
@@ -1156,13 +1277,13 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "d6c3498068e40ca501cb8bacdfa7e9a582ee822af127ec67fdba3e71c11659af",
-      "bytes": 8552
+      "sha256": "3ae1a89cc8c3fa5034216d69ce100c1efed4a63e9e13f97ce18b0fa6e3dcac20",
+      "bytes": 8547
     },
     {
       "path": "blueprints/convergence-practice/README.md",
-      "sha256": "c2fe9c4d70e5df43f5ea537ab9355c4afe2c3cafbad21a5dd40b46c1ac2fe429",
-      "bytes": 9616
+      "sha256": "ea29ca04da80e3503fe814f1220b02dc438b7d16fa7ff415ececd65b45b51042",
+      "bytes": 10073
     },
     {
       "path": "blueprints/convergence-practice/arb-trace2code/README.md",
@@ -2351,7 +2472,7 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "e05eb51e428cc262f54d19cd826c44d57164f1eb4c09850efb5676fa18393e79",
+      "sha256": "63097f101b52ccae8225e945d7595ecc68ce4a44838765f318a392670b17d3fc",
       "bytes": 12889
     },
     {
@@ -2456,8 +2577,8 @@
     },
     {
       "path": "catalogs/us-equities/convergence-review.json",
-      "sha256": "d5cecca1bcabb01131932b2470e7d6f5651fcf337896845409aa84be722a1758",
-      "bytes": 13035
+      "sha256": "59f8c3da89fd1a20f9bf4516c029cbd87f34dab9d334657d31ba8170ae8d7ed0",
+      "bytes": 14149
     },
     {
       "path": "catalogs/us-equities/convergence-review.md",
@@ -2496,8 +2617,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "cdfae5f79f31a0c79baf3ea09d7f4b47b16a9d509a2d5355bba8e22e19e710b3",
-      "bytes": 378992
+      "sha256": "e8ea080c06968626db396c661c3de23ae6029ca5a2e94439e6a5b1e339127b1b",
+      "bytes": 383265
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -2531,8 +2652,8 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "80bda6a63665bab4a8fa6ea7383d1d9c89f87de2987e9f5c43605e514ea34681",
-      "bytes": 2376
+      "sha256": "eab8b317848ddd9d9e08cf7840d3f7a37fa52c765f69d77ce59d9a59a4bf44ed",
+      "bytes": 2763
     },
     {
       "path": "catalogs/us-equities/model-followup.json",
@@ -2556,8 +2677,8 @@
     },
     {
       "path": "catalogs/us-equities/native-workflows.md",
-      "sha256": "57828db51b98cd9cdaeeef83b705cd5a6e47fa67a9375a2602edd31105bef8a8",
-      "bytes": 10321
+      "sha256": "aae8aa3cf0232052cb4573df9ba553ef05523c5c0ed0180d98cea0fccd89c583",
+      "bytes": 11678
     },
     {
       "path": "catalogs/us-equities/repository-index.md",
@@ -2636,13 +2757,13 @@
     },
     {
       "path": "docs/ecosystem/README.md",
-      "sha256": "0d03ead725224343cec59556c2df21694bf546148702d2a4b37ae880cf53edf5",
+      "sha256": "7f5e5f9844f36fe4ed99935eb3948b9843a9dbce4685ec3f8db0e5512bbd4540",
       "bytes": 6253
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "e75b3863d69dbf0c2adc85e4e40c6b875f4434550365830e023c0442176d09e0",
-      "bytes": 1554388
+      "sha256": "8f8d5f46d7da3ed08516d83a76e99c2ee0550c2ee76bc08a27da30fe4c5b0471",
+      "bytes": 1586960
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -2651,8 +2772,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "72b76e481e2331244d5760565e2ef141dbe0f64124294e33220be127d9b2b9d2",
-      "bytes": 14038
+      "sha256": "a45c6e91b993f583a718059a36f283d7dfd754c049a2882475c7b0310c6e5ad6",
+      "bytes": 15638
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -2681,8 +2802,8 @@
     },
     {
       "path": "docs/landscape.md",
-      "sha256": "f135260141079ffde613b02de895b297e37e78e3eb4c9c9a6c64fbceb1fd252a",
-      "bytes": 6924
+      "sha256": "0c52f493834a4bbd89edfcd95975bd822363c9c0f04c47637f5c7297289c9ff5",
+      "bytes": 8153
     },
     {
       "path": "docs/stack.md",
@@ -2691,8 +2812,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "dd0aa8faed8b99d19713cc05467a28523d335e987f783ce704e09696d4c41228",
-      "bytes": 14368
+      "sha256": "4b9534cb9ed520af0cc82446ed127ebd2591502b80538811c1eb13d0fb785aca",
+      "bytes": 16259
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -2941,18 +3062,18 @@
     },
     {
       "path": "manifests/candidates.json",
-      "sha256": "55512de92e1f9eb0ddd94dbd56e551f4ecf0f1a7b930b68469420385db62a00a",
-      "bytes": 24360
+      "sha256": "9cbbaa0bc6e96f60e530aa3a51019005a028a1a796cecb41eb542dd588008e22",
+      "bytes": 24351
     },
     {
       "path": "manifests/landscape.json",
-      "sha256": "ab17b9674f24cec1a3d46f070b48d76713929ccaff57de9619c9132890d4ae27",
-      "bytes": 21149
+      "sha256": "393f823fe10cd71a0017aa0255f7a8be9fbc2bd88dbbd423245a8363289be6ac",
+      "bytes": 21140
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "70863a50935c0d981aaac2aa6eff203c8ec87d53f36d846ed0d36255ccbad24a",
-      "bytes": 52517
+      "sha256": "59b032429d8d0c2bbdb873d2a3dacf97ff1bc25773790868e4e685445ab2e3df",
+      "bytes": 56636
     },
     {
       "path": "observability/README.md",
@@ -3111,8 +3232,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "cf86a2b71bc05c7dbdf86bc084034bb4b16b847ef3f628315b74a24e3c9ac377",
-      "bytes": 5062
+      "sha256": "1433945181a68d987200eabeefd78c54c82322548b6d7c4954227f5ec0b47a92",
+      "bytes": 5983
     },
     {
       "path": "observability/receipt.json",
@@ -3131,8 +3252,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "f675d3b4726b1ab6dbebeb61fda90150934499b78b4ee5afc554c423fcccfee4",
-      "bytes": 44747
+      "sha256": "67f841e28eff962bb1a5fbaad183c9431d5cfda4cc07cc71f0c7cc4c99a929eb",
+      "bytes": 48783
     },
     {
       "path": "scripts/adoption_status.py",
@@ -3288,6 +3409,371 @@
       "path": "tests/test_validate.py",
       "sha256": "8ffe84e3e14d87a1858033cbb0137eddde8ed4623909961c6d469077ae6716f8",
       "bytes": 10863
+    },
+    {
+      "path": ".github/requirements-ci.lock",
+      "sha256": "e475964596b4439d069891ef3f194efe7f8eea9fe1c9478d944001644fcab083",
+      "bytes": 283
+    },
+    {
+      "path": "blueprints/convergence-practice/ci-security/README.md",
+      "sha256": "e30226b3e8715d64a5010762eb6bcef78aa5c37e6d5765a39d115801e6908a02",
+      "bytes": 2042
+    },
+    {
+      "path": "blueprints/convergence-practice/ci-security/ci-acceptance.json",
+      "sha256": "11d819eee7ecfefcc0fd07987ed273d8a245bbe888145c94d0a47b67c52211df",
+      "bytes": 1109
+    },
+    {
+      "path": "blueprints/convergence-practice/ci-security/experiment.json",
+      "sha256": "394a4cd2f6d74322dc5cf8e8c0e06f372d1c34e6428d6c4680f2c76319872768",
+      "bytes": 4378
+    },
+    {
+      "path": "blueprints/convergence-practice/ci-security/observation.json",
+      "sha256": "aebb8c8dd1b5d269fbbc1b3a3e66a591d3b7ea9f2caff23891ba6270ab55232f",
+      "bytes": 707
+    },
+    {
+      "path": "blueprints/convergence-practice/ci-security/receipt.json",
+      "sha256": "218dca2e923462c85c08cd7ff07edeb20f1e784cd409988f2e201ad2351c8b31",
+      "bytes": 787
+    },
+    {
+      "path": "blueprints/convergence-practice/contract-reference.md",
+      "sha256": "fe2fe90486c16f93daa9ed3b9855b02f8acdcd6737f484015e92436499cef19e",
+      "bytes": 7089
+    },
+    {
+      "path": "blueprints/convergence-practice/contract.schema.json",
+      "sha256": "c544cfe4294316bee825eb3ae976b1321a63e848d326214b3efb065a990daaae",
+      "bytes": 7081
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/README.md",
+      "sha256": "f04976e11b165463e774deb64517d16da33d77331cb995ebeb76e4cd75701095",
+      "bytes": 4363
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/accepted/planner.py",
+      "sha256": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+      "bytes": 1972
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/checks.json",
+      "sha256": "5716e42cbb9b9d31b16defe18a7ab3a91f134c7f71b9883480929e586690b817",
+      "bytes": 571
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/experiment.json",
+      "sha256": "a8bbd1cb0f63bf96f9f82ab604b9ac03c6262671afcc1d845a9a739f915bda13",
+      "bytes": 7570
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/independent-review.json",
+      "sha256": "7751cec857832486f8b460b450d282c5679af061e807351947c118ef3fab0c76",
+      "bytes": 2639
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/independent_review.py",
+      "sha256": "3196a23d66c1f60bcd9e9520d12d6c87bdc4c956d27ea78524534681aa6022a6",
+      "bytes": 7753
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/plan.json",
+      "sha256": "84b46b5b3f996e0ae7dcb80ba4b45d675a3e47150959880d23071f5ce759fcec",
+      "bytes": 1510
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/prompt.txt",
+      "sha256": "643713536c3711d1f7135579eb81fc0e4e942c628da012e0f75aef7d0aefe6f1",
+      "bytes": 1074
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/receipt.json",
+      "sha256": "6c663f07a8738d3df74c38db073c7a6eb1030dd9b84b4c25385f32630ce848d6",
+      "bytes": 955
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/seed/TASK.md",
+      "sha256": "0807600d365213edbbc2a65c4e2833e1b997b66b932adc88b2542fab638a4bd8",
+      "bytes": 1023
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/seed/planner.py",
+      "sha256": "ba9155fd203a5d23e12ea7f842ccc5ac033249db4a64ec525374fa2db9d71082",
+      "bytes": 227
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/seed/test_planner.py",
+      "sha256": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937",
+      "bytes": 2072
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/test-output.txt",
+      "sha256": "9896d8ab33fe7dabf8c6d21517a86c830aff3502817eee8110cbb3bdf45635df",
+      "bytes": 1177
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/usage.json",
+      "sha256": "db253301dc4f69db52c9607878f6d6c72ea11c1d58b86eac0c4858847d6f319d",
+      "bytes": 1807
+    },
+    {
+      "path": "blueprints/convergence-practice/validation.json",
+      "sha256": "2781bc66707fad526ae0798546cc4b6738f03964d6e4702dabd94f9f4172cf9d",
+      "bytes": 2009
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-convergence/README.md",
+      "sha256": "92572baab1e6084e8b3cbc2e828c14a583106c464fb329758e6dbb4877fd463e",
+      "bytes": 7012
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-convergence/capture_sources.py",
+      "sha256": "1a8157ce0e851265e4df4323699c2a9dd6fa384595f5aafbf962f1b9d0d0712f",
+      "bytes": 6766
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-convergence/plan.json",
+      "sha256": "eda7afc29d4007bb0af201593fda482a6117aee7ac73af6791756225ba2df12c",
+      "bytes": 4040
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-convergence/public-stars-refresh.json",
+      "sha256": "e20b4ba4ec3006ce5efe48812f04e06b80401e048b78e6277b83c88069357620",
+      "bytes": 28768
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-convergence/verification.json",
+      "sha256": "0c2bb2a772e616bea642c78cf535f269a275a1e4904cad74de16c26c4c5f82b4",
+      "bytes": 3178
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-experiment/README.md",
+      "sha256": "c5841ca17e1e2ddb5b35982590755813a294db64b2605a727eff90a2d3aca8e0",
+      "bytes": 9405
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-experiment/availability.sql",
+      "sha256": "7af124ee0368b61bf81c832d83163c8b75fd35da5a3c4d2e8127b23107bf99cc",
+      "bytes": 385
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-experiment/contract.py",
+      "sha256": "3bbbd9c7321e14c56d95f3e027702082339e1d3719e37d5410bdcf7cc91d2968",
+      "bytes": 7918
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-experiment/exercise.py",
+      "sha256": "182b86e2aff96e4e782350a56e7eb78d30e502babc8fddb5b14f1ddd80575fd1",
+      "bytes": 5421
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-experiment/protocol.json",
+      "sha256": "f2aa3e4944ba2bd7cfb1fa41155e304075fff791f10b8c60996e3257dcbfe1e4",
+      "bytes": 16935
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-experiment/receipt.json",
+      "sha256": "0033848f3bdcbb9baabfd405380bffaeb50cff6e86c78063c9da7f0d3bb649df",
+      "bytes": 9962
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/README.md",
+      "sha256": "66647b5c8a2428415f830d17fd30c130d5a49e25b575918101fda8393d782525",
+      "bytes": 6259
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json",
+      "sha256": "6ae8b6dd8c0222ee3c078b59a738277a61b6f4a2d14bae647f7365c989a7ea81",
+      "bytes": 10895
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/plan.json",
+      "sha256": "1324845825796e32b46d502884bf036e6b9211ca9976b7e9684dfda5b9b7f72b",
+      "bytes": 2286
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/sample.py",
+      "sha256": "9a4fb73f84cf77634ffd4796c612b8f965a4386545691a5d412b90a9383eca87",
+      "bytes": 22275
+    },
+    {
+      "path": "blueprints/us-equities/lifecycle-sample/select.sql",
+      "sha256": "006b5f4f9f99b4ad6bc3c7e9a80fc3b0c11d283886255428d83c4a08ae8a39c8",
+      "bytes": 532
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/README.md",
+      "sha256": "c769eba0628851a76f6c66197eb6e7a179f687bb2151f270c6e7b230083d10f5",
+      "bytes": 11145
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/experiment.py",
+      "sha256": "cb307c4f6b80a2fa8eee66c3dc0f88fb72b71dddaaada99acac18d1192b26865",
+      "bytes": 27330
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/native-receipt.json",
+      "sha256": "18969aa21eabad2b5a5cc23fcc6baa527f76ff68f664f2645cb57334e7571451",
+      "bytes": 42248
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/plan.json",
+      "sha256": "2cc26b312bb40cd92657da4d6ae38ff49a462f8f987b6180b2ef1ced7ea4897e",
+      "bytes": 7770
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/review.py",
+      "sha256": "ce2706608b9dad9cdcaea955affd9542dd073e4a6e13d4cbcb4a901e4cc1b0e2",
+      "bytes": 6012
+    },
+    {
+      "path": "blueprints/us-equities/research-efficiency/run_codex.py",
+      "sha256": "18b2e5f0bdcbd78eccef69d1070ea226027a99331d1ab01dfd658b7bbf09d4ea",
+      "bytes": 2465
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/README.md",
+      "sha256": "b28bb92eb51da98ab63a3705b45215c344c01394fe6aab0a61160833eeeef38b",
+      "bytes": 3353
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json",
+      "sha256": "aa45ade36e6cc2dc8d0916b466d0858566dabcdc98fdf6aae1c5e4d7c53a2da9",
+      "bytes": 4640
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/astral-sh__uv.json",
+      "sha256": "6ab933f3f6b20832c4f41778ed0bef2fb34c7926a13d8dba8830692f54644a63",
+      "bytes": 5466
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/dagucloud__dagu.json",
+      "sha256": "be902af6d071e0b051ce9c761d3b77dfe0ecdf5fb363a1b34cad8b52383c7721",
+      "bytes": 6558
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/eyuansu62__agent-retrieval-bench.json",
+      "sha256": "47b5e3763b3739f5f438b49a84102158bb3fb4e37f53631e7807c637698083a1",
+      "bytes": 5726
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/harbor-framework__harbor.json",
+      "sha256": "cb5b011dc53ba1868841ea18c503c635b55d61bcc7f6f68f0fea741a3b36461b",
+      "bytes": 4619
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/jaywcjlove__awesome-mac.json",
+      "sha256": "0a77e11938b43bcf93c080236a02e057dd70e662f9f5c309ff878b012493f8e8",
+      "bytes": 6063
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/jgravelle__jcodemunch-mcp.json",
+      "sha256": "4993341d973d229fcb9eec8ca70aa3aafa6601e27e5eb8ea4cb9877a47aceda7",
+      "bytes": 5659
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/own-repository.json",
+      "sha256": "1e88fa73217da209f83239ace7271482bc4f5ee66c610a0b49c488673dc723e1",
+      "bytes": 710
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/public-star-delta.json",
+      "sha256": "afba692a2849361d785e61d90c9eda1cdcf4762b424ab41d33046a6b7ec80cef",
+      "bytes": 11245
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/sigstore__cosign.json",
+      "sha256": "0aba570f5b7256d2b8d97c984839ff145e507b9ba76bc3e26b217aac894ce201",
+      "bytes": 4857
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+      "sha256": "a39ea78a9c8cb9722d3647f11a94771c8f22aa6e92662260d8e7ded94a74d6d0",
+      "bytes": 15471
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/tobi__qmd.json",
+      "sha256": "bd6405abb939342eec8e25da4ec8069de666cff7cff9e05465a8f84c82dc9b0d",
+      "bytes": 6353
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/zizmorcore__zizmor.json",
+      "sha256": "25c5ead3bb9660aeae390f7c0f3076e3db26014c3ac31d9f1686849d803ab679",
+      "bytes": 4679
+    },
+    {
+      "path": "catalogs/us-equities/lifecycle-source-review.json",
+      "sha256": "830c6629579c8ef0164df0c260ef71fd1561c38046c8c31e22752539023543bb",
+      "bytes": 8812
+    },
+    {
+      "path": "catalogs/us-equities/lifecycle-source-review.md",
+      "sha256": "c84c656f51d0f10003a9563b0730f47073a781ddb93facf891ef45a1e9cfc89a",
+      "bytes": 4752
+    },
+    {
+      "path": "docs/convergence-architecture.md",
+      "sha256": "3e40c442b43c1c117cba05c1f8ae90c90a0cddf7d5ff41aa1f28b8a10c42433c",
+      "bytes": 13123
+    },
+    {
+      "path": "scripts/validate_convergence.py",
+      "sha256": "a2ee2dbf280c699b5c6b84be97e449e7ab6533e327446024f9692fc0f8ea1e21",
+      "bytes": 12512
+    },
+    {
+      "path": "tests/fixtures/workflow-security/unsafe.yml.txt",
+      "sha256": "9e1c6130a396200387a0b9f1d445a33dbf154370db5460a3b50e086321bb737a",
+      "bytes": 304
+    },
+    {
+      "path": "tests/test_catalyst_experiment.py",
+      "sha256": "0767c544693c249e1649fc77c7578fb924deadba6f7f2b5aba6f1fd88a22f644",
+      "bytes": 6407
+    },
+    {
+      "path": "tests/test_convergence_contract.py",
+      "sha256": "8b989a25264c16129166496397ba514a3f07037007aad7039f1e75cc566907e8",
+      "bytes": 17133
+    },
+    {
+      "path": "tests/test_lifecycle_capture.py",
+      "sha256": "ab76bdda7d8df777ed5efbf740a0456f18358a3e2cd19603e2e59a80c68757b2",
+      "bytes": 6656
+    },
+    {
+      "path": "tests/test_lifecycle_sample.py",
+      "sha256": "36fe3e887d2866da583a70dc4461dfe1f42033921e63b99f442f44a8530acdc6",
+      "bytes": 11123
+    },
+    {
+      "path": "tests/test_native_worker_fixture.py",
+      "sha256": "e4bd5345e9d23a338602fd0f6f34a67d959af51cb7939f4112dced74bcb01301",
+      "bytes": 1341
+    },
+    {
+      "path": "tests/test_research_efficiency.py",
+      "sha256": "fbfe73f3001b369c1814e78cd8cd91bb38d4f77274cd2b221f554a4a2a9c609c",
+      "bytes": 10386
+    },
+    {
+      "path": "tests/test_workflow_security.py",
+      "sha256": "2c260c8d7fd58e747819037177ec9e077ee1cac7dc1e8ebd1ff7ddd1c405266b",
+      "bytes": 2582
+    },
+    {
+      "path": "evidence/receipts/upstream-native-tools-20260920.json",
+      "sha256": "bca6d58c2dc0e59d96140d4bee2efba4823355f46cb4aaf4b39ccdeeb536fe46",
+      "bytes": 6455
+    },
+    {
+      "path": "evidence/receipts/native-ai-memory-maintenance-20260920.json",
+      "sha256": "513095e6062ddd06fb285aecaf2ee73be6529d25c57709f09afcdfb144960a14",
+      "bytes": 3210
     }
   ]
 }

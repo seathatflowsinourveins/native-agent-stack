@@ -135,3 +135,25 @@ Historical and just-before-observation cutoffs select zero. Its original failed
 normalization is retained. Current metadata and retrospective data do not establish
 historical universe completeness or strategy merit; the exact commands and source
 anchors are in the wave's [receipt](../../blueprints/us-equities/identity-readiness/native-receipt.json).
+
+## Catalyst convergence and native research comparison
+
+The [current wave](../../blueprints/us-equities/catalyst-convergence/README.md)
+records six fixed native Requests acquisitions, offline EdgarTools qualification,
+DuckDBParquet materialization and independent replay. Its
+[exact command receipt](../../blueprints/us-equities/lifecycle-sample/native-receipt.json)
+reports three supported lifecycle claims and historical/before-first/first/last
+selection counts0/0/1/3. These are local observer semantics; historical coverage
+and original revisions remain unknown.
+
+The [frozen protocol receipt](../../blueprints/us-equities/catalyst-experiment/receipt.json)
+records synthetic DuckDB cutoffs0/1/1/3, stable earlier selection under a future
+perturbation, and exact one-nanosecond arithmetic. It is not empirical strategy merit.
+
+The [native comparison](../../blueprints/us-equities/research-efficiency/README.md)
+uses actual AsyncCodex and Claude print-mode calls on eight frozen documents.
+Codex full/focused totals were38,102/22,691 and38,130/25,069, both pairs accepted.
+Claude totals were44,595/20,136 and45,652/24,562; both full answers exceeded the
+frozen word cap. All semantic answers passed blinded grading. Commands, complete
+available usage and failures remain in the receipt; no pooled or causal savings
+claim follows from this bounded study.

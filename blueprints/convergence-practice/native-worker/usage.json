@@ -1,0 +1,66 @@
+{
+  "native_terminal_usage": {
+    "input_tokens": 8,
+    "cache_creation_input_tokens": 27444,
+    "cache_read_input_tokens": 74277,
+    "output_tokens": 3568,
+    "output_tokens_details": {
+      "thinking_tokens": 1592
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 27444,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 647,
+        "cache_read_input_tokens": 26761,
+        "cache_creation_input_tokens": 683,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 683
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "native_model_usage": {
+    "claude-opus-5": {
+      "inputTokens": 22,
+      "outputTokens": 6786,
+      "cacheReadInputTokens": 216553,
+      "cacheCreationInputTokens": 54371,
+      "webSearchRequests": 0,
+      "costUSD": 0.7207702500000002,
+      "contextWindow": 1000000,
+      "maxOutputTokens": 64000,
+      "thinkingTokens": 1895,
+      "canonicalModel": "claude-opus-5",
+      "provider": "firstParty",
+      "costBasis": "list"
+    }
+  },
+  "native_child_task_summary_usage": [
+    {
+      "total_tokens": 27865,
+      "tool_uses": 8,
+      "duration_ms": 35184
+    }
+  ],
+  "native_child_status": [
+    "completed"
+  ],
+  "field_scope": "Terminal usage and modelUsage are retained separately; task summary total is not additive with modelUsage. Stream message blocks repeat usage and must not be summed naively.",
+  "native_retries": null,
+  "outer_attempts": 1,
+  "whole_desktop_task_usage": null,
+  "savings_claim": null
+}

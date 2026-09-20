@@ -13,6 +13,13 @@ It does not replace those receipts or transfer their acceptance to a new host.
 SOTA is the research direction; this publication makes no universal best-stack
 or end-to-end autonomous-system claim.
 
+The subsequent [architecture wave](../../catalogs/convergence-practice/architecture-wave/README.md)
+adds the [general engineering guide](../../docs/convergence-architecture.md), an
+[executable evidence contract](contract-reference.md),
+[native child repair](native-worker/README.md) and
+[workflow security qualification](ci-security/README.md). It retains the earlier
+retrieval results below and does not convert them into patch-success or savings claims.
+
 ## This wave's evidence
 
 The [source review](../../catalogs/convergence-practice/source-review.md) refreshed

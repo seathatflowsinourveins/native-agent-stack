@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-20T02:08:12.691509Z",
+  "recorded_at_utc": "2026-09-20T04:30:41.591503+00:00",
   "meaning": "Recorded checkpoint; freshness of emission is separate from source update. Worker states are coordinator checkpoints, not process heartbeats.",
   "lanes": [
     {
@@ -51,8 +51,8 @@
       "kind": "gate",
       "id": "historical-universe",
       "title": "Historical extreme mover universe",
-      "state": "10 observations / 1 quarantined / historical universe pending",
-      "evidence_ref": "blueprints/us-equities/identity-readiness/native-receipt.json"
+      "state": "3 documentary lifecycle claims / historical universe pending",
+      "evidence_ref": "blueprints/us-equities/lifecycle-sample/native-receipt.json"
     },
     {
       "kind": "gate",
@@ -78,9 +78,9 @@
     {
       "kind": "gate",
       "id": "net-token-savings",
-      "title": "Causal net token savings",
-      "state": "not measured",
-      "evidence_ref": "observability/README.md"
+      "title": "Native research usage and quality",
+      "state": "Codex2 pairs accepted / Claude2 protocol-confounded",
+      "evidence_ref": "blueprints/us-equities/research-efficiency/native-receipt.json"
     },
     {
       "kind": "gate",
@@ -109,31 +109,52 @@
       "title": "Native Alpaca historical data",
       "state": "25 bars / 2 actions / cash currency unknown",
       "evidence_ref": "blueprints/us-equities/authenticated-data/native-receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "catalyst-protocol",
+      "title": "Frozen daily and intraday catalyst protocol",
+      "state": "synthetic mechanics accepted / empirical merit unknown",
+      "evidence_ref": "blueprints/us-equities/catalyst-experiment/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "convergence-evidence-contract",
+      "title": "Convergence claim integrity",
+      "state": "scoped qualification and matched usage checks enforced",
+      "evidence_ref": "blueprints/convergence-practice/ci-security/experiment.json"
     }
   ],
   "workers": [
     {
       "kind": "worker",
       "id": "evaluation-worker",
-      "title": "Identity and universe source worker",
-      "state": "six source reviews accepted / catalog502",
-      "evidence_ref": "blueprints/us-equities/identity-readiness/native-receipt.json"
+      "title": "Catalyst protocol worker",
+      "state": "frozen protocol / synthetic proof reviewed",
+      "evidence_ref": "blueprints/us-equities/catalyst-experiment/receipt.json"
     },
     {
       "kind": "worker",
       "id": "data-worker",
-      "title": "Symbol mapping and observation worker",
-      "state": "native8 HTTP200 / temporal ledger accepted",
-      "evidence_ref": "blueprints/us-equities/identity-readiness/native-receipt.json"
+      "title": "Lifecycle source worker",
+      "state": "6 sources / 3 claims / native proof reviewed",
+      "evidence_ref": "blueprints/us-equities/lifecycle-sample/native-receipt.json"
     },
     {
       "kind": "worker",
       "id": "independent-reviewer",
-      "title": "Independent evidence reviewer",
-      "state": "code and private evidence accepted / 18 focused checks",
-      "evidence_ref": "blueprints/us-equities/identity-readiness/native-receipt.json"
+      "title": "Research efficiency worker and reviewers",
+      "state": "8 native invocations / blinded grading complete",
+      "evidence_ref": "blueprints/us-equities/research-efficiency/native-receipt.json"
+    },
+    {
+      "kind": "worker",
+      "id": "native-engineering-child",
+      "title": "Native Claude engineering child",
+      "state": "one isolated repair accepted / real repository trial next",
+      "evidence_ref": "blueprints/convergence-practice/native-worker/receipt.json"
     }
   ],
-  "plan_ref": "blueprints/us-equities/identity-readiness/plan.json",
-  "stars_ref": "blueprints/us-equities/authenticated-data/public-stars-refresh.json"
+  "plan_ref": "blueprints/us-equities/catalyst-convergence/plan.json",
+  "stars_ref": "blueprints/us-equities/catalyst-convergence/public-stars-refresh.json"
 }

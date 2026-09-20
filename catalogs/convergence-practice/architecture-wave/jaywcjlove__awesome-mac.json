@@ -1,0 +1,162 @@
+{
+  "repository": "jaywcjlove/awesome-mac",
+  "requested_repository": "jaywcjlove/awesome-mac",
+  "checked_at": "2026-09-20T04:10:41.318940+00:00",
+  "source_depth": "pinned_README_license_overview_only",
+  "metadata": {
+    "html_url": "https://github.com/jaywcjlove/awesome-mac",
+    "default_branch": "master",
+    "archived": false,
+    "disabled": false,
+    "pushed_at": "2026-09-17T08:01:12Z",
+    "description": "\uf8ff This project is dedicated to collecting high-quality macOS software and organizing them systematically by different categories for easy search and use.",
+    "license": {
+      "key": "cc0-1.0",
+      "name": "Creative Commons Zero v1.0 Universal",
+      "spdx_id": "CC0-1.0",
+      "url": "https://api.github.com/licenses/cc0-1.0",
+      "node_id": "MDc6TGljZW5zZTY="
+    }
+  },
+  "default_head": "31718871dfbac3cc17139b3958759f5a3e47675c",
+  "release": {
+    "tag_name": "v2.1.0",
+    "published_at": "2026-03-30T16:52:39Z",
+    "html_url": "https://github.com/jaywcjlove/awesome-mac/releases/tag/v2.1.0",
+    "prerelease": false,
+    "draft": false
+  },
+  "source_commit": "31718871dfbac3cc17139b3958759f5a3e47675c",
+  "source_basis": "default branch HEAD for current discovery list; release metadata retained separately",
+  "access": [
+    {
+      "endpoint": "https://api.github.com/repos/jaywcjlove/awesome-mac",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/jaywcjlove/awesome-mac/commits/master",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/jaywcjlove/awesome-mac/releases/latest",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/jaywcjlove/awesome-mac/commits/v2.1.0",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/jaywcjlove/awesome-mac/readme?ref=cf291a7aa96f21f8d2afcf031fca80e867c15751",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/jaywcjlove/awesome-mac/license?ref=cf291a7aa96f21f8d2afcf031fca80e867c15751",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/jaywcjlove/awesome-mac/readme?ref=31718871dfbac3cc17139b3958759f5a3e47675c",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/jaywcjlove/awesome-mac/license?ref=31718871dfbac3cc17139b3958759f5a3e47675c",
+      "exit_code": 0
+    }
+  ],
+  "baseline_index_matches": [
+    {
+      "repository": "https://github.com/jaywcjlove/awesome-mac",
+      "aliases": [],
+      "public_star": true,
+      "record_types": [
+        "public_star",
+        "research_supplement",
+        "star_review"
+      ],
+      "references": [
+        {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/138",
+          "disposition": "no_catalog_card"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/simulation-data-review.json",
+          "pointer": "/decisions/11",
+          "decision": "discovery_only",
+          "evidence_level": "readme_and_license"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/341",
+          "decision": "discovery_only",
+          "review_level": "source_review",
+          "review_depth": "readme_license_overview"
+        }
+      ]
+    }
+  ],
+  "readme": {
+    "path": "README.md",
+    "url": "https://github.com/jaywcjlove/awesome-mac/blob/31718871dfbac3cc17139b3958759f5a3e47675c/README.md",
+    "sha256": "e3929967dd724f29d153f7b0202e7ccfcffaa1cfa40ee5bf9319f3131ff90b35",
+    "git_blob_sha": "2f6b8848ec7eea06afbd0960921cfc7828c2ef3b",
+    "bytes": 262869,
+    "matched_excerpts": [
+      {
+        "term": "Ghostty",
+        "line": 642,
+        "url": "https://github.com/jaywcjlove/awesome-mac/blob/31718871dfbac3cc17139b3958759f5a3e47675c/README.md#L642"
+      },
+      {
+        "term": "Ghostty",
+        "line": 650,
+        "url": "https://github.com/jaywcjlove/awesome-mac/blob/31718871dfbac3cc17139b3958759f5a3e47675c/README.md#L650"
+      },
+      {
+        "term": "OrbStack",
+        "line": 578,
+        "url": "https://github.com/jaywcjlove/awesome-mac/blob/31718871dfbac3cc17139b3958759f5a3e47675c/README.md#L578"
+      },
+      {
+        "term": "Podman",
+        "line": 580,
+        "url": "https://github.com/jaywcjlove/awesome-mac/blob/31718871dfbac3cc17139b3958759f5a3e47675c/README.md#L580"
+      },
+      {
+        "term": "Raycast",
+        "line": 1473,
+        "url": "https://github.com/jaywcjlove/awesome-mac/blob/31718871dfbac3cc17139b3958759f5a3e47675c/README.md#L1473"
+      },
+      {
+        "term": "Raycast",
+        "line": 1474,
+        "url": "https://github.com/jaywcjlove/awesome-mac/blob/31718871dfbac3cc17139b3958759f5a3e47675c/README.md#L1474"
+      }
+    ]
+  },
+  "license_at_source": {
+    "path": "LICENSE",
+    "url": "https://github.com/jaywcjlove/awesome-mac/blob/31718871dfbac3cc17139b3958759f5a3e47675c/LICENSE",
+    "metadata": {
+      "key": "cc0-1.0",
+      "name": "Creative Commons Zero v1.0 Universal",
+      "spdx_id": "CC0-1.0",
+      "url": "https://api.github.com/licenses/cc0-1.0",
+      "node_id": "MDc6TGljZW5zZTY="
+    },
+    "sha256": "36ffd9dc085d529a7e60e1276d73ae5a030b020313e6c5408593a6ae2af39673",
+    "bytes": 6555
+  },
+  "release_source_snapshot": "cf291a7aa96f21f8d2afcf031fca80e867c15751",
+  "decision": {
+    "disposition": "retain-discovery",
+    "license_text_classification": "CC0-1.0",
+    "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+    "concrete_gap_or_overlap": "Current list supplies Mac terminal/container/launcher leads. Existing Mac terminal and Apple container plus remote Linux already cover those roles; no demonstrated gap supports a second app layer.",
+    "next_acceptance": "Read only the selected category and verify each actual publisher before any separate adoption.",
+    "installation_performed": false,
+    "model_calls": 0
+  }
+}

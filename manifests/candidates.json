@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "recorded_at_utc": "2026-09-19T04:44:41.681441+00:00",
-  "scope": "Bounded researched alternatives, not installations or provider-account grants.",
+  "scope": "Bounded researched alternatives and dated adoption decisions; selected native installations link to their component records and receipts.",
   "candidates": [
     {
       "repository": "akitaonrails/ai-memory",
       "url": "https://github.com/akitaonrails/ai-memory",
-      "version": "v2.3.1",
+      "version": "v2.3.2",
       "reviewed_commit": "bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025",
       "license": "MIT",
-      "status": "ADOPTED: native CLI/MCP/service/hooks/skills installed; native Codex and post-login Claude model reads passed",
+      "status": "ADOPTED: official 2.3.2 native maintenance update; active service/native status/scoped search/direct MCP verified; earlier native model reads retained with original scope",
       "decision": "Selected shared durable layer; do not install a competing default capture stack",
       "model_requirements": "Capture/search/handoff work without LLM or API key. As of2.0, best-effort local all-MiniLM-L6-v2 (384-dimensional) embedding is default, ~87MB checksum-pinned background download; hybrid search enables after restart. embedding_provider=\"none\" opts out; no GPU required. LLM-written consolidation and larger/remote embeddings optional.",
       "sources": [
@@ -17,8 +17,10 @@
         "https://github.com/akitaonrails/ai-memory/blob/bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025/docs/install.md",
         "https://github.com/akitaonrails/ai-memory/blob/bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025/docs/support-matrix.md",
         "https://github.com/akitaonrails/ai-memory/blob/bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025/docs/local-embeddings.md",
-        "https://github.com/akitaonrails/ai-memory/blob/bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025/docs/security.md"
-      ]
+        "https://github.com/akitaonrails/ai-memory/blob/bbc96c4a93f5dc0473a993a2dab2ab1ac1c33025/docs/security.md",
+        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2"
+      ],
+      "native_evidence": "evidence/receipts/native-ai-memory-maintenance-20260920.json"
     },
     {
       "repository": "MemPalace/mempalace",
@@ -294,21 +296,16 @@
       "repository": "gastownhall/beads",
       "url": "https://github.com/gastownhall/beads",
       "license": "MIT",
-      "status": "Researched; deferred, not installed",
-      "decision": "conditional backlog tool; defer installation until durable dependency/claimable-task queue is a real requirement",
-      "commands_not_executed": [
-        "BEADS_DIR=/absolute/owned-project-task-state/.beads bd init --quiet --stealth",
-        "BEADS_DIR=/absolute/owned-project-task-state/.beads bd create \"Review memory retrieval acceptance\" -p 1 -t task",
-        "BEADS_DIR=/absolute/owned-project-task-state/.beads bd ready --json",
-        "BEADS_DIR=/absolute/owned-project-task-state/.beads bd update ACTUAL_RETURNED_ID --claim",
-        "BEADS_DIR=/absolute/owned-project-task-state/.beads bd show ACTUAL_RETURNED_ID",
-        "BEADS_DIR=/absolute/owned-project-task-state/.beads bd close ACTUAL_RETURNED_ID \"Acceptance recorded\""
-      ],
+      "status": "ADOPTED supplemental native CLI: 1.3.0 installed and bounded task/dependency lifecycle passed",
+      "decision": "Use for selected-project persistent task dependencies and claims; ai-memory remains durable knowledge. Initialization skips agent instructions and hooks.",
       "sources": [
         "https://github.com/gastownhall/beads/blob/v1.3.0/README.md",
         "https://github.com/gastownhall/beads/blob/v1.3.0/docs/getting-started/installation.md",
         "https://github.com/gastownhall/beads/blob/v1.3.0/docs/getting-started/ide-setup.md"
-      ]
+      ],
+      "version": "1.3.0",
+      "component_id": "beads",
+      "native_evidence": "evidence/receipts/upstream-native-tools-20260920.json"
     },
     {
       "repository": "EverMind-AI/EverOS",
@@ -334,8 +331,11 @@
       "url": "https://github.com/agentskills/agentskills",
       "reviewed_commit": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
       "license": "Apache-2.0",
-      "status": "Reference validator researched; permanent installation deferred",
-      "decision": "Demo-only portable-format linter; native client extensions differ. Existing official Codex quick_validate helper already passed for selected task-checkpoint skills."
+      "status": "ADOPTED supplemental reference tool: skills-ref 0.1.0 installed from locked official source; three native operations passed",
+      "decision": "On-demand reference/demo portable-format linting, properties and prompt metadata; does not certify production native client extensions.",
+      "version": "0.1.0",
+      "component_id": "skills-ref",
+      "native_evidence": "evidence/receipts/upstream-native-tools-20260920.json"
     },
     {
       "repository": "Tencent/WeKnora",
@@ -400,18 +400,16 @@
       "version": "v0.7.5",
       "reviewed_commit": "3b25779a083469b732e3c628b4a412ee05cf9948",
       "license": "Apache-2.0",
-      "status": "researched, not installed",
-      "decision": "Conditional: use a deliberate local instrumented session or deterministic workflow when runtime latency/events are being diagnosed; no persistent exporter proposed.",
-      "commands_not_executed": [
-        "otel-tui --host 127.0.0.1 --grpc 4317 --http 4318",
-        "otel-tui --host 127.0.0.1 --from-json-file /ABS/OWNED/exported-otel.json"
-      ],
+      "status": "ADOPTED supplemental native TUI: 0.7.5 installed; synthetic OTLP ingestion and displayed trace passed",
+      "decision": "Use for explicit local telemetry diagnosis; no persistent exporter or provider-session claim.",
       "sources": [
         "https://github.com/ymtdzzz/otel-tui/releases/tag/v0.7.5",
         "https://github.com/ymtdzzz/otel-tui/blob/3b25779a083469b732e3c628b4a412ee05cf9948/README.md",
         "https://code.claude.com/docs/en/monitoring-usage",
         "https://learn.chatgpt.com/docs/config-file/config-reference"
-      ]
+      ],
+      "component_id": "otel-tui",
+      "native_evidence": "evidence/receipts/upstream-native-tools-20260920.json"
     }
   ]
 }

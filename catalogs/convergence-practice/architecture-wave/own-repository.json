@@ -1,0 +1,14 @@
+{
+  "full_name": "seathatflowsinourveins/native-agent-stack",
+  "html_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+  "private": false,
+  "archived": false,
+  "disabled": false,
+  "pushed_at": "2026-09-20T04:10:21Z",
+  "updated_at": "2026-09-20T03:40:55Z",
+  "default_branch": "main",
+  "description": "Evidence-backed native Codex and Claude stack: scoped memory, automatic local code RAG, context efficiency, upstream recipes and reproducible receipts.",
+  "checked_at": "2026-09-20T04:27:06.523330+00:00",
+  "selected_base": "327d9badff0ad09ec0c1266e70b4ad361743c77f",
+  "review_scope": "Current public branch architecture inspected; private companion repository is not exported."
+}

@@ -21,10 +21,16 @@ executed external retrieval comparison and a reusable acceptance protocol for
 native agent work, recovery and local inference. Research findings remain
 separate from a new host's runtime acceptance.
 
+For general software work, start with the **[convergence architecture](docs/convergence-architecture.md)**.
+It connects compact task contracts, native workers, scoped retrieval, complete
+attempt records and recoverable decisions. The latest wave adds executable
+claim checks, a verified Claude child repair, and pinned workflow-security
+analysis. [Ten-source review and current star delta](catalogs/convergence-practice/architecture-wave/README.md).
+
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
 and an auditable **342-star coverage ledger**. Its combined index includes
-**504 repository identities** across all 342 public stars and 162 beyond them,
+**505 repository identities** across all 342 public stars and 163 beyond them,
 with typed, validated pointers to decisions and evidence. The latest
 [architecture research wave](catalogs/us-equities/architecture/README.md) adds
 source reviews, awesome-list coverage and official Alpaca constraints.
@@ -65,6 +71,13 @@ remains zero. Six selected engine/data-contract reviews accompany the proof.
 WRDS is a conditional access reference
 for licensed historical research data; it is not installed or entitled by inclusion.
 
+The latest [catalyst-convergence wave](blueprints/us-equities/catalyst-convergence/README.md)
+adds six captured public documents supporting three lifecycle claims, a frozen
+daily/intraday experiment and eight native Codex/Claude research invocations.
+Documentary claims, original historical availability, output quality and observed
+provider usage have separate acceptance records. The protocol's native synthetic
+checks establish mechanics; empirical trading merit remains unmeasured.
+
 The earlier [native acceptance wave](blueprints/us-equities/acceptance-wave/README.md)
 adds LEAN cost sensitivity, synthetic DuckDB temporal selection and an offline
 Alpaca order guard. The selected [research direction](blueprints/us-equities/acceptance-wave/research-protocol.md)
@@ -104,7 +117,7 @@ explicit open gates, not a claim of universal completeness.
 
 ## What is here
 
-- **52 component records** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup, dependency inventory and local observability; adoption scope remains receipt-specific.
+- **56 component records** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup, dependency inventory and local observability; adoption scope remains receipt-specific. The original token study retains its 52-component scope.
 - **19 researched alternatives** with adoption decisions, model requirements and prospective commands.
 - A [six-candidate portability comparison](adoption/research.md), with 41 selected primary source files and a native uv adoption decision.
 - **Four extended catalog layers** covering foundations/memory/RAG, agents/hosting/operations, data, and strategy/engine research; source review remains distinct from native execution.

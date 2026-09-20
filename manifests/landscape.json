@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_date_utc": "2026-09-19",
+  "checked_date_utc": "2026-09-20",
   "scope": "Current primary upstream release metadata for core components. Release freshness is not runtime acceptance or benchmark ranking.",
   "current_core_releases": [
     {
@@ -31,13 +31,13 @@
       "source_commit": "589d8214d56740a28b5f7bf63167743d586b0b40"
     },
     {
-      "tag_name": "v2.3.1",
-      "published_at": "2026-09-17T18:26:44Z",
+      "tag_name": "v2.3.2",
+      "published_at": "2026-09-20T02:34:33Z",
       "prerelease": false,
-      "html_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.1",
+      "html_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2",
       "target_commitish": "main",
       "repo": "akitaonrails/ai-memory",
-      "source_commit": "5b2426f73db69ee45a6805dabf74b061ed2c63dd"
+      "source_commit": "353841d91618d20b110b208de284a74d0b960379"
     },
     {
       "tag_name": "v1.14.0",
@@ -253,7 +253,7 @@
         "https://arxiv.org/abs/2607.18152"
       ],
       "architecture": "596.8M parameters; Qwen3-0.6B derived,28layers with hybrid3L2G attention and a separate MLP projection/scoring layer.",
-      "qmd_compatibility_status": "Not a drop-in QMD reranker. Its listwise scoring and MLP projector differ from QMD\u2019s node-llama-cpp createRankingContext contract. Publisher GGUF card requires llama.cpp fork; upstreamPR26286 remains open as checked.",
+      "qmd_compatibility_status": "Not a drop-in QMD reranker. Its listwise scoring and MLP projector differ from QMD’s node-llama-cpp createRankingContext contract. Publisher GGUF card requires llama.cpp fork; upstreamPR26286 remains open as checked.",
       "practical_assessment": "Recent compact reranker worth tracking, but noncommercial license and runtime/scoring incompatibility prevent an immediate native QMD substitution.",
       "status": "Metadata/research only; not installed or inferred"
     },
@@ -281,7 +281,7 @@
         "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16"
       ],
       "architecture": "Ministral3 bidirectional encoder; 1B variant produced by structured pruning/distillation of a3B backbone;8B variant adapts Ministral3-8B.",
-      "qmd_compatibility_status": "No official GGUF in inspected publisher repo. QMD2.8.3 loads local GGUF via node-llama-cpp and formats inputs as Gemma/nomic or Qwen3, whereas this model requires query:/passage: prefixes and mean pooling. A local vLLM endpoint is not automatically used by QMD\u2019s local adapter.",
+      "qmd_compatibility_status": "No official GGUF in inspected publisher repo. QMD2.8.3 loads local GGUF via node-llama-cpp and formats inputs as Gemma/nomic or Qwen3, whereas this model requires query:/passage: prefixes and mean pooling. A local vLLM endpoint is not automatically used by QMD’s local adapter.",
       "practical_assessment": "1B is the strongest practical recent dense-embedding candidate for a separately supported local retrieval service;8B is a heavier quality-oriented option, not a default PC upgrade.",
       "status": "Actual local GPU inference and code retrieval"
     },
@@ -298,7 +298,7 @@
         "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16"
       ],
       "architecture": "Ministral3 bidirectional encoder; 1B variant produced by structured pruning/distillation of a3B backbone;8B variant adapts Ministral3-8B.",
-      "qmd_compatibility_status": "No official GGUF in inspected publisher repo. QMD2.8.3 loads local GGUF via node-llama-cpp and formats inputs as Gemma/nomic or Qwen3, whereas this model requires query:/passage: prefixes and mean pooling. A local vLLM endpoint is not automatically used by QMD\u2019s local adapter.",
+      "qmd_compatibility_status": "No official GGUF in inspected publisher repo. QMD2.8.3 loads local GGUF via node-llama-cpp and formats inputs as Gemma/nomic or Qwen3, whereas this model requires query:/passage: prefixes and mean pooling. A local vLLM endpoint is not automatically used by QMD’s local adapter.",
       "practical_assessment": "1B is the strongest practical recent dense-embedding candidate for a separately supported local retrieval service;8B is a heavier quality-oriented option, not a default PC upgrade.",
       "status": "Metadata/research only; not installed or inferred"
     },

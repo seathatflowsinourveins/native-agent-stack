@@ -9,6 +9,12 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+      "collection": "/reviewed_repositories",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/convergence-practice/source-review.json",
       "collection": "/candidates",
       "repository_field": "repository",
@@ -105,6 +111,12 @@
       "kind": "catalog_card"
     },
     {
+      "path": "catalogs/us-equities/lifecycle-source-review.json",
+      "collection": "/decisions",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/security-identity-review.json",
       "collection": "/decisions",
       "repository_field": "repository",
@@ -149,16 +161,16 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 504,
+    "repositories": 505,
     "public_star_repositories": 342,
-    "beyond_public_stars": 162,
-    "references": 1037,
+    "beyond_public_stars": 163,
+    "references": 1054,
     "repositories_by_record_type": {
       "catalog_card": 147,
-      "component_record": 52,
+      "component_record": 56,
       "legacy_candidate": 19,
       "public_star": 342,
-      "research_supplement": 100,
+      "research_supplement": 103,
       "star_review": 342
     }
   },
@@ -470,6 +482,7 @@
       "aliases": [],
       "public_star": true,
       "record_types": [
+        "component_record",
         "legacy_candidate",
         "public_star",
         "star_review"
@@ -493,7 +506,13 @@
           "kind": "legacy_candidate",
           "path": "manifests/candidates.json",
           "pointer": "/candidates/14",
-          "decision": "Demo-only portable-format linter; native client extensions differ. Existing official Codex quick_validate helper already passed for selected task-checkpoint skills."
+          "decision": "On-demand reference/demo portable-format linting, properties and prompt metadata; does not certify production native client extensions."
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/54",
+          "id": "skills-ref"
         }
       ]
     },
@@ -879,6 +898,13 @@
           "id": "alpaca-py",
           "decision": "default",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/lifecycle-source-review.json",
+          "pointer": "/decisions/2",
+          "decision": "retain_prior_alias_evidence_without_refetch",
+          "evidence_level": "prior_native_receipt_reuse"
         },
         {
           "kind": "research_supplement",
@@ -1644,6 +1670,11 @@
           "path": "adoption/research.json",
           "pointer": "/candidates/1",
           "decision": "required_reuse_existing_native_python_layer"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/1"
         }
       ]
     },
@@ -3035,6 +3066,11 @@
       ],
       "references": [
         {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/2"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
           "pointer": "/entries/6",
@@ -3475,6 +3511,13 @@
         },
         {
           "kind": "research_supplement",
+          "path": "catalogs/us-equities/lifecycle-source-review.json",
+          "pointer": "/decisions/0",
+          "decision": "retain_native_lifecycle_parser",
+          "evidence_level": "installed_source_sections_and_native_offline_artifacts"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/simulation-data-review.json",
           "pointer": "/decisions/0",
           "decision": "adopt_native_parser_bounded",
@@ -3748,6 +3791,13 @@
           "id": "data-duckdb",
           "decision": "default",
           "evidence_level": "native_proven"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/lifecycle-source-review.json",
+          "pointer": "/decisions/1",
+          "decision": "retain_native_observation_ledger",
+          "evidence_level": "native_offline_artifacts"
         },
         {
           "kind": "component_record",
@@ -4035,6 +4085,11 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/3"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/convergence-practice/source-review.json",
@@ -4414,6 +4469,7 @@
       "aliases": [],
       "public_star": true,
       "record_types": [
+        "component_record",
         "legacy_candidate",
         "public_star",
         "star_review"
@@ -4437,7 +4493,13 @@
           "kind": "legacy_candidate",
           "path": "manifests/candidates.json",
           "pointer": "/candidates/12",
-          "decision": "conditional backlog tool; defer installation until durable dependency/claimable-task queue is a real requirement"
+          "decision": "Use for selected-project persistent task dependencies and claims; ai-memory remains durable knowledge. Initialization skips agent instructions and hooks."
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/53",
+          "id": "beads"
         }
       ]
     },
@@ -4980,6 +5042,11 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/4"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/convergence-practice/source-review.json",
           "pointer": "/candidates/2",
           "decision": "investigate",
@@ -5497,6 +5564,11 @@
       ],
       "references": [
         {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/5"
+        },
+        {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
           "pointer": "/stars/138",
@@ -5598,9 +5670,15 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/6"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -10313,9 +10391,15 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/7"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -11192,6 +11276,11 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/8"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/convergence-practice/source-review.json",
           "pointer": "/candidates/6",
           "decision": "retain",
@@ -11663,6 +11752,11 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/0"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/convergence-practice/source-review.json",
@@ -12870,6 +12964,7 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
+        "component_record",
         "legacy_candidate"
       ],
       "references": [
@@ -12877,7 +12972,13 @@
           "kind": "legacy_candidate",
           "path": "manifests/candidates.json",
           "pointer": "/candidates/18",
-          "decision": "Conditional: use a deliberate local instrumented session or deterministic workflow when runtime latency/events are being diagnosed; no persistent exporter proposed."
+          "decision": "Use for explicit local telemetry diagnosis; no persistent exporter or provider-session claim."
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/55",
+          "id": "otel-tui"
         }
       ]
     },
@@ -13036,6 +13137,28 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "component_record",
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/9"
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/52",
+          "id": "zizmor"
         }
       ]
     },

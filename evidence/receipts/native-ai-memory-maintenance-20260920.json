@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "native-ai-memory-maintenance-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20T05:10:15Z",
+  "component_ids": [
+    "ai-memory"
+  ],
+  "claim": "Official ai-memory 2.3.2 release installed over 2.3.1 after a private upstream backup; active service executable, native status, scoped search and configured direct MCP status verified.",
+  "limitations": [
+    "No new provider/model task was run. Existing dated client acceptance remains tied to its original version and scope.",
+    "Private memory contents, counts, backup, paths and raw native/MCP responses are excluded from this publication.",
+    "Native client configuration, service unit, lifecycle hooks, managed routing/skills, project scope and provider settings were preserved.",
+    "This maintenance update does not demonstrate token savings; exact causal lifetime provider savings remain null.",
+    "Forward-only migrations may require restoring the retained private backup to downgrade."
+  ],
+  "data": {
+    "repository": "https://github.com/akitaonrails/ai-memory",
+    "previous_version": "2.3.1",
+    "version": "2.3.2",
+    "source_commit": "353841d91618d20b110b208de284a74d0b960379",
+    "release_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2",
+    "archive": "ai-memory-linux-x86_64.tar.gz",
+    "archive_sha256": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc",
+    "binary_sha256": "93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0",
+    "backup_before_switch": true,
+    "checks": [
+      {
+        "name": "published SHA256 sidecar matches archive",
+        "passed": true
+      },
+      {
+        "name": "binary reports ai-memory 2.3.2",
+        "passed": true
+      },
+      {
+        "name": "active service executable resolves to installed 2.3.2 binary",
+        "passed": true
+      },
+      {
+        "name": "native status reports 2.3.2",
+        "passed": true
+      },
+      {
+        "name": "explicit project-scoped native search",
+        "passed": true,
+        "returned_hits": 3
+      },
+      {
+        "name": "configured direct MCP memory_status",
+        "passed": true,
+        "native_status_agrees": true
+      }
+    ],
+    "portable_native_commands": [
+      "ai-memory --data-dir \"$MEMORY_DATA_DIR\" backup --to \"$PRIVATE_BACKUP\"",
+      "ai-memory --version",
+      "ai-memory --data-dir \"$MEMORY_DATA_DIR\" status --json",
+      "ai-memory --data-dir \"$MEMORY_DATA_DIR\" search native --workspace \"$WORKSPACE\" --project \"$PROJECT\" --limit 3 --json"
+    ],
+    "retained_execution_issues": [
+      "Initial inline download received hook routing guidance without downloading; the same native upstream downloads then completed and passed checksums.",
+      "Context Mode subprocess lacked the existing user bus; native host service operation succeeded.",
+      "The unit's optional environment file was absent; the existing configured native environment was used.",
+      "Guessed unauthenticated HTTP health/status routes returned 404; acceptance instead used supported native status/search and configured direct MCP."
+    ],
+    "exact_causal_lifetime_provider_tokens_saved": null
+  }
+}

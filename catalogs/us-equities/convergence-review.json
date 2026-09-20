@@ -57,7 +57,10 @@
     "blueprints/us-equities/point-in-time/receipt.json",
     "blueprints/us-equities/order-contract/receipt.json",
     "blueprints/us-equities/catalyst-dataset/native-receipt.json",
-    "blueprints/us-equities/corporate-action-readiness/receipt.json"
+    "blueprints/us-equities/corporate-action-readiness/receipt.json",
+    "blueprints/us-equities/lifecycle-sample/native-receipt.json",
+    "blueprints/us-equities/catalyst-experiment/receipt.json",
+    "blueprints/us-equities/research-efficiency/native-receipt.json"
   ],
   "previous_runtime_evidence": [
     "observability/restart-receipt.json",
@@ -72,9 +75,9 @@
   "open_gates": [
     {
       "id": "research-specification",
-      "state": "curated_control_protocol_executed_catalyst_spec_pending",
-      "required": "User selected both daily and intraday, focused on catalyst/incentive-driven potential movers and pre-positioning/early entry. Finalize eligible universe, event hypotheses, intervals, labels, latency/cost and numeric risk/capital/promotion criteria; no strategy is yet accepted. Subsequent frozen curated ETF price-label control executed20folds/21selections;2021Q1 is now inspected. Catalyst/extreme-mover universe and numeric live promotion remain unaccepted.",
-      "evidence": "blueprints/us-equities/acceptance-wave/research-protocol.json"
+      "state": "frozen_catalyst_protocol_synthetic_mechanics_accepted_empirical_pending",
+      "required": "Daily/intraday SEC8-K Item1.01 exploratory protocols freeze eligibility, latency, labels, costs, controls and chronological evaluation. Native synthetic mechanics passed; feature construction, matched controls, portfolio/fills and empirical merit remain unexecuted. Prior2021Q1 remains inspected; reserved samples require an inspection registry.",
+      "evidence": "blueprints/us-equities/catalyst-experiment/receipt.json"
     },
     {
       "id": "accepted-pit-source",
@@ -82,7 +85,9 @@
       "required": "Native SEC metadata retains371members/5headers/9itemlinks with366headers and historical mappings unknown. Native Alpaca acquired25AAPL SIP/raw daily bars and2actions over5HTTP200pages; all25rawcloses and2numeric action values match LEAN, but dividendcurrency is unknown. Original historical availability, eligible/delisted universe, revisions and issuer-price coverage remain open.",
       "evidence": "blueprints/us-equities/authenticated-data/native-receipt.json",
       "security_identity_receipt": "blueprints/us-equities/identity-readiness/native-receipt.json",
-      "identity_observation_limit": "10 retrospective query observations,9 qualified/1 quarantined; original historical publication/revision and inactive/delisted universe not established."
+      "identity_observation_limit": "10 retrospective query observations,9 qualified/1 quarantined; original historical publication/revision and inactive/delisted universe not established.",
+      "lifecycle_receipt": "blueprints/us-equities/lifecycle-sample/native-receipt.json",
+      "lifecycle_limit": "Six documents support three retrospective claims with local observation cutoffs0/0/1/3; no complete universe, permanent identity or original revisions."
     },
     {
       "id": "retrieval-quality",
@@ -114,8 +119,9 @@
     },
     {
       "id": "net-provider-savings",
-      "state": "unmeasured",
-      "required": "Comparable complete tasks and usage accounting. Tool byte estimates and selected-text reductions do not establish causal provider savings."
+      "state": "bounded_native_comparison_completed_quality_gates_applied",
+      "required": "Eight counterbalanced native invocations and blind grading with separate word/citation/native gates. Codex pairs pass and show lower selected-task totals; Claude full conditions violate the output cap, confounding both Claude pairs. No causal or whole-task savings claim.",
+      "evidence": "blueprints/us-equities/research-efficiency/native-receipt.json"
     },
     {
       "id": "execution-realism",
@@ -137,7 +143,7 @@
       "state": "accepted_scoped_native_pair",
       "resolved_at_utc": "2026-09-19T19:41:50Z",
       "evidence": "adoption/paired/receipt.json",
-      "scope": "Fresh LEAN\u2192Dagu\u2192DuckDB\u2192Astra\u2192Claude prepared-packet task; no model tools, broker, unattended hosting or causal token-savings acceptance"
+      "scope": "Fresh LEAN→Dagu→DuckDB→Astra→Claude prepared-packet task; no model tools, broker, unattended hosting or causal token-savings acceptance"
     }
   ],
   "architecture_followup": {
@@ -237,5 +243,17 @@
     "provider_revision_availability_established": false,
     "receipt": "blueprints/us-equities/identity-readiness/native-receipt.json",
     "grand_identities": 502
+  },
+  "catalyst_convergence_followup": {
+    "date": "2026-09-20",
+    "plan": "blueprints/us-equities/catalyst-convergence/plan.json",
+    "summary": "blueprints/us-equities/catalyst-convergence/README.md",
+    "stars": "blueprints/us-equities/catalyst-convergence/public-stars-refresh.json",
+    "public_stars": 342,
+    "new_star_identities": 0,
+    "historical_universe_eligible": false,
+    "empirical_strategy_merit": false,
+    "broker_orders": 0,
+    "causal_net_provider_savings": null
   }
 }

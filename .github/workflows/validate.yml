@@ -17,10 +17,23 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Install checksum-locked CI analyzer
+        run: >-
+          python3 -m pip install --disable-pip-version-check --no-input
+          --only-binary=:all: --require-hashes
+          --index-url https://pypi.org/simple
+          -r .github/requirements-ci.lock
+      - name: Audit GitHub workflows without network or credentials
+        run: zizmor --offline --no-config --no-ignores --persona regular --strict-collection .github/workflows
       - name: Validate manifests and evidence integrity
         run: python3 scripts/validate.py
       - name: Validate catalog evidence and coverage joins
         run: python3 scripts/validate_catalogs.py
+      - name: Validate declared convergence evidence and scope
+        run: >-
+          python3 scripts/validate_convergence.py
+          blueprints/convergence-practice/ci-security/experiment.json
+          blueprints/convergence-practice/native-worker/experiment.json --root . --json
       - name: Check offline ecosystem explorer rebuild
         run: python3 scripts/build_ecosystem.py --check
       - name: Test validation failure modes

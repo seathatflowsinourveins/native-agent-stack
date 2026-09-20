@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "kind": "native_child_patch_acceptance_plan",
+  "frozen_before_model_execution": true,
+  "public_source_base": "327d9badff0ad09ec0c1266e70b4ad361743c77f",
+  "remote_fixture_base": "5699a1c8026796f8350d5549f62aa012ee5c6332",
+  "fixture_hashes": {
+    "planner.py": "ba9155fd203a5d23e12ea7f842ccc5ac033249db4a64ec525374fa2db9d71082",
+    "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937",
+    "TASK.md": "0807600d365213edbbc2a65c4e2833e1b997b66b932adc88b2542fab638a4bd8"
+  },
+  "prompt_sha256": "643713536c3711d1f7135579eb81fc0e4e942c628da012e0f75aef7d0aefe6f1",
+  "task": "dependency-planner",
+  "intended_model": "claude-opus-5",
+  "effort": "ultracode",
+  "account_route": "native claude.ai subscription; no API key or paid fallback",
+  "parent_max_turns": 12,
+  "configured_child_max_turns": 16,
+  "timeout_seconds": 300,
+  "outer_attempts": 1,
+  "quality_rule": "Original12 tests all pass; only planner.py changes; exact base and separate child worktree observed; root independently reruns unchanged oracle and reviews patch.",
+  "usage_rule": "Retain native parent/child categories when available; unknown stays null. No whole-task savings claim.",
+  "limitations": [
+    "Visible author-written fixture, not held-out benchmark.",
+    "No matched baseline model invocation.",
+    "Native process cleanup does not establish remote provider cancellation.",
+    "Model effort requested does not by itself prove dynamic workflow execution."
+  ]
+}

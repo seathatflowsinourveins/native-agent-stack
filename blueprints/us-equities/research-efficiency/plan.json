@@ -1,0 +1,188 @@
+{
+  "base_commit": "cb79080cf5d9510818c67ac51c521b1d2a1b80fe",
+  "cache_control": "native caching retained, no reset or causal/general attribution",
+  "claude_tool_boundary": "native --tools empty and --disallowedTools wildcard; hooks still run",
+  "codex_tool_boundary": "read-only/deny-all plus requested and audited zero tools; not hard MCP prevention",
+  "corpus": [
+    {
+      "id": "S01",
+      "repo_path": "blueprints/us-equities/identity-readiness/README.md",
+      "sha256": "2452c1c1b3639e490cae7c4b97177637f56d133116d2da1aedfc30ed9b0e7600"
+    },
+    {
+      "id": "S02",
+      "repo_path": "blueprints/us-equities/authenticated-data/README.md",
+      "sha256": "76d2439e456aacca301013d1993bde75e42fd6ffa0f77990eb2e60686a961666"
+    },
+    {
+      "id": "S03",
+      "repo_path": "blueprints/us-equities/catalyst-dataset/README.md",
+      "sha256": "0933fa810e52f2e9f002fae0a1bae65e67070b3d2125f00b97c7ea1d2b39b85d"
+    },
+    {
+      "id": "S04",
+      "repo_path": "blueprints/us-equities/corporate-action-readiness/README.md",
+      "sha256": "752c3bd98424fcaa09fa44abf122bad2af499a9c2da22610363562b7b113ecef"
+    },
+    {
+      "id": "S05",
+      "repo_path": "blueprints/us-equities/retrieval-evaluation/README.md",
+      "sha256": "0da2a95d70b254795d93cca9b854b2b806b2a7ac6b15559b7a845db919a1443c"
+    },
+    {
+      "id": "S06",
+      "repo_path": "blueprints/us-equities/research-runtime/README.md",
+      "sha256": "26941ae2c64ec137c3a9dc97e8d766d93cf6bdcb103ee290f871fd0a181f2757"
+    },
+    {
+      "id": "S07",
+      "repo_path": "blueprints/us-equities/workers/README.md",
+      "sha256": "081b85f97ab174d86201b42675ea18f429642e4f77f038e0e9af661a226e4b8a"
+    },
+    {
+      "id": "S08",
+      "repo_path": "adoption/paired/README.md",
+      "sha256": "b187875b97595cd975ddb161464c995cda6690399f0bd0b488b0019394016cf3"
+    }
+  ],
+  "effort": "inherited native defaults, not overridden",
+  "frozen_command_hashes": {
+    "claude": "6f2b6821fb1e172364e1c2d8a80ccb2e98f487f9a4699f5ab32b8e9ff64e057d",
+    "codex": "de7ace77dbadc1b398b12004daa486f3fb6566653c5ecc413665402ad2e1b68c"
+  },
+  "maximum_model_submissions": 8,
+  "model_tool_limit": 0,
+  "models": {
+    "claude": "claude-opus-5",
+    "codex": "gpt-6-astra"
+  },
+  "order_per_provider": [
+    [
+      "A",
+      "full"
+    ],
+    [
+      "A",
+      "focused"
+    ],
+    [
+      "B",
+      "focused"
+    ],
+    [
+      "B",
+      "full"
+    ]
+  ],
+  "prepared_at": "2026-09-20T03:16:54.356611+00:00",
+  "private_freeze_sha256": "572c62ba86fc690034cfd15d1fd1ee3382c440e8d9f91275376996541bac00c6",
+  "provider_usage_scope": "complete narrow prepared-context answer tasks; excludes coordinator, fixture design, independent review and local retrieval; no cross-provider tokenizer pooling",
+  "qmd_native_hashes": [
+    {
+      "bytes": 3415,
+      "path": "package.json",
+      "sha256": "14462e2764e9d140afbeb3c924e6dd81c0448177e97785822e763d901d70f20b"
+    },
+    {
+      "bytes": 203691,
+      "path": "dist/cli/qmd.js",
+      "sha256": "0dd4fd702adb83f27a69e59725478524ee48d00580ab6e9848dcde933000d99a"
+    },
+    {
+      "bytes": 12535,
+      "path": "dist/cli/formatter.js",
+      "sha256": "277e3695e5c765415ff4be0e0e12ddb8435d0fca5d94905962220f889884a185"
+    },
+    {
+      "bytes": 210392,
+      "path": "dist/store.js",
+      "sha256": "affbc9cc67f9bbfeee0bedccd8658195ce89fa8f6bdc9abc6c9c61c50b0a590b"
+    },
+    {
+      "bytes": 12803,
+      "path": "dist/collections.js",
+      "sha256": "60a816b4fa7667a20d911dd29edee2877ccc54922ca670eb0c70e7ef2527c9dd"
+    }
+  ],
+  "rubric": {
+    "A_required_facts": [
+      "Original7 HTTP200 plus1 continuation; original normalization failure is retained.",
+      "Four terminal queries,10 observations,9 qualified and1 quarantined; separate current asset1.",
+      "Mapped3 sessions equal7 fields; unmapped1 overlapping date/conflicting quarantined observation, not a clean partition.",
+      "Historical/before-observation selections0; first boundary2/latest10 are local observed-time eligibility, not historical universe."
+    ],
+    "B_required_facts": [
+      "Paired Astra20,776 and Claude16,293 total37,069 native worker tokens; excludes coordinator and separate workers.",
+      "Selected-text4,823 to640 tokens,4,183 fewer/86.73%; lossy task selection, not net provider savings.",
+      "Astra cached6,400 already in input20,487; output289. Claude2 input+11,142 creation+3,156 reads+1,993 output; thinking852 already in output.",
+      "No matched full-source/provider savings established by prior packet measurement; system/hooks/cache/context and retrieval misses matter."
+    ],
+    "dimensions": {
+      "citation_support": 2,
+      "no_unsupported_claims": 1,
+      "question_completion": 1,
+      "required_facts": 4,
+      "unknown_and_limit_preservation": 2
+    },
+    "efficiency_gate": "Report each within-provider task pair, including degraded/failed outputs and missing usage. A smaller sample cost with failed quality is not accepted efficiency. No inferential confidence, causal attribution, provider ranking or general saving percentage.",
+    "quality_gate": "At least8/10, at least3/4 required facts, no fabricated citation/value or false historical eligibility/net-savings claim. Do not score an explicit unknown as a fabrication; it loses completion/fact credit where full corpus supports the fact.",
+    "scoring": "Independent reviewer sees anonymized answer IDs, question and full frozen corpus, but no provider, condition, order or usage. Citation availability is separately checked against each supplied packet."
+  },
+  "runtime_fingerprints": {
+    "binary_hashes": {
+      "claude_bin": {
+        "bytes": 128,
+        "path": "claude_bin",
+        "sha256": "c4276228a8cdcc3da67e889169830b02f43c0d5d87f9eca1e96e66a38e1ce573"
+      },
+      "codex_bin": {
+        "bytes": 269273536,
+        "path": "codex_bin",
+        "sha256": "0753dfe1d8b87a52436deb13eb1c549661ef4c84fee2c5aa688385eebeccb761"
+      },
+      "sdk_python": {
+        "bytes": 31375608,
+        "path": "sdk_python",
+        "sha256": "93a93f4c8af5ae6f127fb0310f923d5fab89eb7257a0b801eec2e44b3f199840"
+      }
+    },
+    "codex_sdk": {
+      "sources": [
+        {
+          "name": "openai_codex.api",
+          "sha256": "4dbd2e231f3e1c26d5ee205adfa7dff13291b0a1bd201574c15cd901183bab59"
+        },
+        {
+          "name": "openai_codex.client",
+          "sha256": "8452afbd8148ea212c94e8a6727468054b175acb0daf95002c84b66b604d05a6"
+        },
+        {
+          "name": "openai_codex.generated.v2_all",
+          "sha256": "c2e777e85ee770f9303a8a45d807c5e3fdce221cc98c978e102bbed5af0bf2ee"
+        }
+      ],
+      "version": "0.154.0"
+    }
+  },
+  "schema_version": 1,
+  "selected": {
+    "A": [
+      "S01"
+    ],
+    "B": [
+      "S08",
+      "S07"
+    ]
+  },
+  "tasks": {
+    "A": {
+      "query": "META unmapped quarantine historical universe",
+      "question": "What exactly did the native FB/META capture and observation ledger establish? Reconcile mapped and unmapped observations, the original failed capture and the zero-activity quarantine. Explain the remaining historical-universe and information-availability gate. Distinguish query observations from independent securities or sessions."
+    },
+    "B": {
+      "query": "native usage cache reduction",
+      "question": "What do the paired native worker usage and selected-text measurements establish? Report the paired worker totals and selected-text reduction, explain how cache and thinking subsets are counted, and determine whether net provider token savings were demonstrated. Distinguish dated earlier results from the paired acceptance; preserve any retrieval-quality limitations supported by the supplied sources."
+    }
+  },
+  "timeout_seconds": 120
+}

@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "kind": "native_static_analysis_observation",
+  "platform": "macOS arm64",
+  "zizmor_version": "1.30.1",
+  "binary_sha256": "0717f7c8878caf12f3c8bdb99841bd5dff97e26f0481bba98f59169d414edc34",
+  "persona": "regular",
+  "network": "offline analysis; prior installation separate",
+  "published_workflow": {
+    "exit_code": 0,
+    "findings": []
+  },
+  "unsafe_fixture": {
+    "exit_code": 14,
+    "finding_identifiers": [
+      "artipacked",
+      "template-injection",
+      "unpinned-uses"
+    ]
+  },
+  "model_calls": 0,
+  "fixture_execution": false,
+  "scope": "Static analysis of retained workflow and synthetic unsafe fixture; not proof that all vulnerabilities are absent."
+}
