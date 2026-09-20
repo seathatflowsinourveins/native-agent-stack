@@ -1,0 +1,253 @@
+{
+  "provenance_type": "upstream-fixture-with-local-independent-query-oracle",
+  "source_url": "https://raw.githubusercontent.com/qdrant/qdrant/6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de/tests/openapi/helpers/collection_setup.py",
+  "source_sha256": "727fa005b4bafdc64790cb6c64952f94d3dc8bdb703f91157f82818b34f7b7df",
+  "points": [
+    {
+      "id": 1,
+      "vector": [
+        0.05,
+        0.61,
+        0.76,
+        0.74
+      ],
+      "payload": {
+        "city": "Berlin",
+        "price": 10.0
+      }
+    },
+    {
+      "id": 2,
+      "vector": [
+        0.19,
+        0.81,
+        0.75,
+        0.11
+      ],
+      "payload": {
+        "city": [
+          "Berlin",
+          "London"
+        ],
+        "price": 11.0
+      }
+    },
+    {
+      "id": 3,
+      "vector": [
+        0.36,
+        0.55,
+        0.47,
+        0.94
+      ],
+      "payload": {
+        "city": [
+          "Berlin",
+          "Moscow"
+        ],
+        "price": 9.5
+      }
+    },
+    {
+      "id": 4,
+      "vector": [
+        0.18,
+        0.01,
+        0.85,
+        0.8
+      ],
+      "payload": {
+        "city": [
+          "London",
+          "Moscow"
+        ],
+        "price": 9
+      }
+    },
+    {
+      "id": 5,
+      "vector": [
+        0.24,
+        0.18,
+        0.22,
+        0.44
+      ],
+      "payload": {
+        "count": 0
+      }
+    },
+    {
+      "id": 6,
+      "vector": [
+        0.35,
+        0.08,
+        0.11,
+        0.44
+      ]
+    },
+    {
+      "id": 7,
+      "vector": [
+        0.25,
+        0.98,
+        0.14,
+        0.43
+      ],
+      "payload": {
+        "city": null,
+        "price": null
+      }
+    },
+    {
+      "id": 8,
+      "vector": [
+        0.79,
+        0.53,
+        0.72,
+        0.15
+      ],
+      "payload": {
+        "city": [],
+        "price": []
+      }
+    },
+    {
+      "id": 9,
+      "vector": {
+        "sparse-text": {
+          "indices": [
+            66,
+            12
+          ],
+          "values": [
+            0.5,
+            0.5
+          ]
+        }
+      }
+    },
+    {
+      "id": 10,
+      "vector": {
+        "sparse-text": {
+          "indices": [
+            1,
+            2,
+            3
+          ],
+          "values": [
+            0.1,
+            0.2,
+            0.3
+          ]
+        }
+      },
+      "payload": {
+        "city": [],
+        "price": []
+      }
+    }
+  ],
+  "collection": "synthetic_offhost",
+  "alias": "synthetic_offhost_alias",
+  "indexes": {
+    "city": "keyword",
+    "price": "float"
+  },
+  "queries": {
+    "dense": {
+      "body": {
+        "query": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "limit": 8,
+        "params": {
+          "exact": true
+        },
+        "with_payload": true,
+        "with_vector": true
+      },
+      "ids": [
+        8,
+        3,
+        6,
+        7,
+        5,
+        2,
+        4,
+        1
+      ],
+      "scores": [
+        0.79,
+        0.36,
+        0.35,
+        0.25,
+        0.24,
+        0.19,
+        0.18,
+        0.05
+      ]
+    },
+    "berlin": {
+      "body": {
+        "query": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "limit": 8,
+        "params": {
+          "exact": true
+        },
+        "with_payload": true,
+        "with_vector": true,
+        "filter": {
+          "must": [
+            {
+              "key": "city",
+              "match": {
+                "value": "Berlin"
+              }
+            }
+          ]
+        }
+      },
+      "ids": [
+        3,
+        2,
+        1
+      ],
+      "scores": [
+        0.36,
+        0.19,
+        0.05
+      ]
+    },
+    "sparse": {
+      "body": {
+        "query": {
+          "indices": [
+            66
+          ],
+          "values": [
+            1
+          ]
+        },
+        "using": "sparse-text",
+        "limit": 10,
+        "with_payload": true,
+        "with_vector": true
+      },
+      "ids": [
+        9
+      ],
+      "scores": [
+        0.5
+      ]
+    }
+  }
+}

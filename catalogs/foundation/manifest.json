@@ -238,7 +238,8 @@
         "blueprints/convergence-practice/wsl-transport-recovery/README.md",
         "blueprints/convergence-practice/offhost-restore/README.md",
         "evidence/receipts/native-offhost-restic-20260920.json",
-        "blueprints/convergence-practice/service-reboot/README.md"
+        "blueprints/convergence-practice/service-reboot/README.md",
+        "blueprints/convergence-practice/offhost-app-state/README.md"
       ]
     }
   ],
