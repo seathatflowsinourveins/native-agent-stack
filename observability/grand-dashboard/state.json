@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-20T00:30:35Z",
+  "recorded_at_utc": "2026-09-20T01:15:20Z",
   "meaning": "Recorded checkpoint; freshness of emission is separate from source update. Worker states are coordinator checkpoints, not process heartbeats.",
   "lanes": [
     {
@@ -14,8 +14,8 @@
       "kind": "lane",
       "id": "paper",
       "title": "Dedicated Alpaca paper account",
-      "state": "deferred by user / credentials pending",
-      "evidence_ref": "blueprints/us-equities/convergence-program/plan.json"
+      "state": "first profile authenticated / paper execution deferred",
+      "evidence_ref": "blueprints/us-equities/authenticated-data/plan.json"
     },
     {
       "kind": "lane",
@@ -65,8 +65,8 @@
       "kind": "gate",
       "id": "data-entitlements",
       "title": "Alpaca data and margin entitlements",
-      "state": "actual account verification pending",
-      "evidence_ref": "blueprints/us-equities/architecture/README.md"
+      "state": "historical SIP sample accepted / other entitlements unproved",
+      "evidence_ref": "blueprints/us-equities/authenticated-data/native-receipt.json"
     },
     {
       "kind": "gate",
@@ -102,31 +102,38 @@
       "title": "Split and dividend data semantics",
       "state": "25 AAPL sessions / probe accepted / upstream suite unresolved",
       "evidence_ref": "blueprints/us-equities/corporate-action-readiness/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "authenticated-historical-data",
+      "title": "Native Alpaca historical data",
+      "state": "25 bars / 2 actions / cash currency unknown",
+      "evidence_ref": "blueprints/us-equities/authenticated-data/native-receipt.json"
     }
   ],
   "workers": [
     {
       "kind": "worker",
       "id": "evaluation-worker",
-      "title": "Corporate-action data worker",
-      "state": "native probe accepted / upstream NUnit unresolved",
-      "evidence_ref": "blueprints/us-equities/corporate-action-readiness/receipt.json"
+      "title": "Data source challenge worker",
+      "state": "6 source decisions / 501 identities",
+      "evidence_ref": "catalogs/us-equities/authenticated-data-review.json"
     },
     {
       "kind": "worker",
       "id": "data-worker",
-      "title": "Catalyst dataset worker",
-      "state": "native dataset and independent review accepted",
-      "evidence_ref": "blueprints/us-equities/catalyst-dataset/native-receipt.json"
+      "title": "Historical data acquisition worker",
+      "state": "5 HTTP200 pages / verified",
+      "evidence_ref": "blueprints/us-equities/authenticated-data/native-receipt.json"
     },
     {
       "kind": "worker",
       "id": "independent-reviewer",
       "title": "Independent evidence reviewer",
-      "state": "review and 259 integrated tests accepted / publication tracked by GitHub CI",
-      "evidence_ref": "blueprints/us-equities/data-readiness/plan.json"
+      "state": "code and native evidence accepted",
+      "evidence_ref": "blueprints/us-equities/authenticated-data/native-receipt.json"
     }
   ],
-  "plan_ref": "blueprints/us-equities/data-readiness/plan.json",
-  "stars_ref": "blueprints/us-equities/data-readiness/public-stars-refresh.json"
+  "plan_ref": "blueprints/us-equities/authenticated-data/plan.json",
+  "stars_ref": "blueprints/us-equities/authenticated-data/public-stars-refresh.json"
 }

@@ -78,9 +78,9 @@
     },
     {
       "id": "accepted-pit-source",
-      "state": "native_sec_metadata_materialized_historical_pit_pending",
-      "required": "371 issuer/accession memberships materialized with five headers and nine item declarations; 366 headers, ticker and amendment-parent mappings remain unknown. Historical cutoff rejects all five present-day observations. Native AAPL factor/map mechanics accepted for25sessions; original corporate-action availability, historical universe/security mappings, issuer-price coverage and authenticated provider acceptance remain open.",
-      "evidence": "blueprints/us-equities/catalyst-dataset/native-receipt.json"
+      "state": "native_sec_and_historical_sample_accepted_pit_pending",
+      "required": "Native SEC metadata retains371members/5headers/9itemlinks with366headers and historical mappings unknown. Native Alpaca acquired25AAPL SIP/raw daily bars and2actions over5HTTP200pages; all25rawcloses and2numeric action values match LEAN, but dividendcurrency is unknown. Original historical availability, eligible/delisted universe, revisions and issuer-price coverage remain open.",
+      "evidence": "blueprints/us-equities/authenticated-data/native-receipt.json"
     },
     {
       "id": "retrieval-quality",
@@ -106,8 +106,9 @@
     },
     {
       "id": "broker-paper",
-      "state": "dedicated_account_selected_user_deferred_execution",
-      "required": "User selected dedicated research paper account and will configure credentials locally. Current priority is historical simulation/backtests. Actual account/feed, numeric risk, journal, idempotency, reconciliation and recovery remain required; no orders submitted."
+      "state": "first_profile_authenticated_simulation_priority",
+      "required": "First dedicated research paper profile passed native read-only account authentication. Bounded historical SIP/raw acquisition also passed; this does not establish real-time/Elite/margin entitlements. Historical simulation remains current priority. Numeric risk, journal, order idempotency, reconciliation and recovery remain required; no orders submitted.",
+      "evidence": "blueprints/us-equities/authenticated-data/native-receipt.json"
     },
     {
       "id": "net-provider-savings",

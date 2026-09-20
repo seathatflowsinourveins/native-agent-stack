@@ -1035,7 +1035,8 @@
         "native-lean-execution-sensitivity-20260919",
         "native-historical-leverage-stress-20260919",
         "native-chronological-controls-20260919",
-        "native-corporate-actions-20260920"
+        "native-corporate-actions-20260920",
+        "native-alpaca-historical-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1069,20 +1070,22 @@
       "version": "0.44.0",
       "license": "Apache-2.0",
       "profile": "supporting",
-      "role": "Installed official Python SDK; offline basic order request serialization and strict local intent rejection only",
+      "role": "Official Python SDK; offline intent guard and bounded authenticated historical SIP/raw bars and corporate-action acquisition",
       "commands": [
         "python3 blueprints/us-equities/order-contract/order_contract.py < blueprints/us-equities/order-contract/basic-intent.json",
-        "bwrap --unshare-net --ro-bind / / --proc /proc --dev /dev --die-with-parent \"$SDK_PYTHON\" blueprints/us-equities/order-contract/sdk_probe.py"
+        "bwrap --unshare-net --ro-bind / / --proc /proc --dev /dev --die-with-parent \"$SDK_PYTHON\" blueprints/us-equities/order-contract/sdk_probe.py",
+        "\"$SDK_PYTHON\" blueprints/us-equities/alpaca-historical/collect.py collect --out \"$NEW_PRIVATE_RUN\""
       ],
       "evidence_ids": [
-        "alpaca-offline-order-contract-20260919"
+        "alpaca-offline-order-contract-20260919",
+        "native-alpaca-historical-20260920"
       ],
       "upstream_sources": [
         "https://github.com/alpacahq/alpaca-py/tree/v0.44.0",
         "https://pypi.org/project/alpaca-py/0.44.0/"
       ],
       "source_pin": null,
-      "freshness": "Installed 0.44.0 from the accepted 36-package SDK hash lock; dated offline acceptance on 2026-09-19. No broker connection or advanced-order support."
+      "freshness": "Installed0.44.0 from accepted SDK lock; native read-only historical acquisition on2026-09-20. Exact scope and missing currency/PIT limits in receipt; no broker execution."
     },
     {
       "id": "systemd",

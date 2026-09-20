@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "portable_adoption_reference",
-  "updated_at": "2026-09-20",
+  "updated_at": "2026-09-20T01:09:45.784858656Z",
   "source": {
     "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
     "baseline_commit": "8f1da51757e925d319e2a50f080b02742e7e7168",
@@ -36,7 +36,8 @@
     "current_historical_simulation": "blueprints/us-equities/historical-simulation/receipt.json",
     "current_data_readiness": "blueprints/us-equities/data-readiness/plan.json",
     "current_catalyst_dataset": "blueprints/us-equities/catalyst-dataset/native-receipt.json",
-    "current_corporate_action_readiness": "blueprints/us-equities/corporate-action-readiness/receipt.json"
+    "current_corporate_action_readiness": "blueprints/us-equities/corporate-action-readiness/receipt.json",
+    "current_authenticated_data": "blueprints/us-equities/authenticated-data/native-receipt.json"
   },
   "recipe_map": {
     "affaan-m/ECC": "recipes/README.md",
@@ -164,7 +165,9 @@
         "blueprints/us-equities/simulation-research/README.md",
         "blueprints/us-equities/data-readiness/README.md",
         "blueprints/us-equities/catalyst-dataset/README.md",
-        "blueprints/us-equities/corporate-action-readiness/README.md"
+        "blueprints/us-equities/corporate-action-readiness/README.md",
+        "blueprints/us-equities/alpaca-historical/README.md",
+        "blueprints/us-equities/authenticated-data/README.md"
       ]
     },
     {

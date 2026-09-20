@@ -7,7 +7,7 @@ A current, evidence-backed reference for native **Codex + Claude Code**, with sc
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
 and an auditable **342-star coverage ledger**. Its combined index includes
-**500 repository identities** across all 342 public stars and 158 beyond them,
+**501 repository identities** across all 342 public stars and 159 beyond them,
 with typed, validated pointers to decisions and evidence. The latest
 [architecture research wave](catalogs/us-equities/architecture/README.md) adds
 source reviews, awesome-list coverage and official Alpaca constraints.
@@ -34,7 +34,14 @@ semantics on retained local data. Its plan, native results, source review and
 remaining historical-availability gates are kept together. This wave does not
 require a new provider login or duplicate data framework.
 
-The latest [native acceptance wave](blueprints/us-equities/acceptance-wave/README.md)
+The [authenticated historical-data wave](blueprints/us-equities/authenticated-data/README.md)
+adds bounded Alpaca data acquisition and a six-alternative primary-source challenge.
+Its current plan and receipt distinguish native responses, precise verification,
+cross-provider differences and unresolved historical coverage. OpenFIGI is the sole
+new reference identity; the immediate data stack remains Alpaca-py, EdgarTools,
+DuckDB and LEAN.
+
+The earlier [native acceptance wave](blueprints/us-equities/acceptance-wave/README.md)
 adds LEAN cost sensitivity, synthetic DuckDB temporal selection and an offline
 Alpaca order guard. The selected [research direction](blueprints/us-equities/acceptance-wave/research-protocol.md)
 covers daily/intraday catalyst signals and historical +200% mover discovery;

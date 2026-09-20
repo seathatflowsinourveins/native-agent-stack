@@ -1,0 +1,318 @@
+{
+  "schema_version": 1,
+  "id": "native-alpaca-historical-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "alpaca-py",
+    "lean"
+  ],
+  "observed_utc": "2026-09-20T01:09:45.784858656Z",
+  "status": "bounded_acquisition_accepted_reconciliation_partially_open",
+  "claim": "Native Alpaca-py0.44.0 GET transport acquired25 AAPL SIP/raw daily bars and2 corporate actions over5 HTTP200 pages. Terminal pagination and private artifacts verified;25 raw closes and both numeric action values match the frozen LEAN probe. Dividend currency and original historical availability remain unestablished.",
+  "runtime": {
+    "alpaca_py_version": "0.44.0",
+    "requests_version": "2.34.2",
+    "sources": [
+      {
+        "bytes": 16523,
+        "path": "alpaca/common/rest.py",
+        "sha256": "887753b055a4b8e8a07468b4702cfad1fa3aa66ac73427fe0c62971aa3b165c5"
+      },
+      {
+        "bytes": 2906,
+        "path": "alpaca/data/historical/corporate_actions.py",
+        "sha256": "ee8fea66b8d846d2b6e8c76e1b13304f9cf7a6aa96e336abe3c314cce1b1130f"
+      },
+      {
+        "bytes": 7892,
+        "path": "alpaca/data/historical/stock.py",
+        "sha256": "abceca87e5bc6df15885e97a28682edb2444a4f1a51aeb4706aa29ef52950c79"
+      },
+      {
+        "bytes": 25326,
+        "path": "alpaca/data/requests.py",
+        "sha256": "7837528bfc298c2018aac993a9027b7322cafa336ec64967be8462f3c98a246c"
+      }
+    ]
+  },
+  "frozen_plan": {
+    "bytes": 1761,
+    "path": "plan.json",
+    "sha256": "258a3f935ba385105f831f9270db4a14cfccfdfec2feb1046af2f4184a4fa66b"
+  },
+  "collector": {
+    "bytes": 25735,
+    "path": "collector.py",
+    "sha256": "e2a3032167d66a91d2367d76eacf12bf9a45865d11892fbb91ac3b30bc46570f"
+  },
+  "private_receipt_sha256": "a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd",
+  "results": {
+    "receipt_sha256": "a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd",
+    "stages": {
+      "actions": {
+        "status": "complete",
+        "summary": {
+          "pages": 2,
+          "rows": 2,
+          "terminal_page_observed": true,
+          "qualified_rows": 2,
+          "comparison_targets_observed": [
+            true,
+            true
+          ],
+          "historical_coverage_established": false
+        }
+      },
+      "bars": {
+        "status": "complete",
+        "summary": {
+          "pages": 3,
+          "rows": 25,
+          "terminal_page_observed": true,
+          "session_dates": [
+            "2020-08-03",
+            "2020-08-04",
+            "2020-08-05",
+            "2020-08-06",
+            "2020-08-07",
+            "2020-08-10",
+            "2020-08-11",
+            "2020-08-12",
+            "2020-08-13",
+            "2020-08-14",
+            "2020-08-17",
+            "2020-08-18",
+            "2020-08-19",
+            "2020-08-20",
+            "2020-08-21",
+            "2020-08-24",
+            "2020-08-25",
+            "2020-08-26",
+            "2020-08-27",
+            "2020-08-28",
+            "2020-08-31",
+            "2020-09-01",
+            "2020-09-02",
+            "2020-09-03",
+            "2020-09-04"
+          ]
+        }
+      }
+    },
+    "scope": "Retrospective query only; historical availability and complete action coverage remain unestablished."
+  },
+  "comparison": {
+    "reference_sessions": 25,
+    "basis": "raw daily close by New York session date",
+    "original_historical_availability": "not_established",
+    "strategy_or_return_computed": false,
+    "bars": {
+      "status": "equal",
+      "compared": 25,
+      "equal": 25,
+      "different": 0,
+      "missing": 0,
+      "extra": 0,
+      "maximum_absolute_close_difference": "0.00"
+    },
+    "actions": {
+      "status": "reconciliation_incomplete",
+      "reference_events": 2,
+      "provider_records": 2,
+      "compared": 2,
+      "numeric_values_equal": 2,
+      "equal": 1,
+      "different": 0,
+      "missing": 0,
+      "ambiguous": 0,
+      "unknown_currency": 1,
+      "scope": "qualified ex-date/type candidates; cash per raw share and old/new split ratio; process-date window may omit events"
+    },
+    "input_hashes": {
+      "alpaca_receipt": "a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd",
+      "lean_native_results": "b31c282c90367c3baf87232772fc78a7bc36a8c64229faa2ef86a9068e88b25b",
+      "comparison_code": "7a2b258624d0219daf2c3bf8582f974a91ec84c8e190db73ed190e4312b37439"
+    }
+  },
+  "http_pages": [
+    {
+      "stage": "actions",
+      "status": 200,
+      "body_complete": true,
+      "source": {
+        "bytes": 367,
+        "path": "actions-001.json",
+        "sha256": "39a4bc4aa26ce5bd6258c873ac0215fed1be63de0170912fcb083e119a6bd1e9"
+      },
+      "observed_at": "2026-09-20T01:09:45.999868588Z"
+    },
+    {
+      "stage": "actions",
+      "status": 200,
+      "body_complete": true,
+      "source": {
+        "bytes": 319,
+        "path": "actions-002.json",
+        "sha256": "87bbcb58969ee80c3dbb0d29b6cc3216fdaade9d29e4ccf2a4bc7250f5aac9be"
+      },
+      "observed_at": "2026-09-20T01:09:46.026351265Z"
+    },
+    {
+      "stage": "bars",
+      "status": 200,
+      "body_complete": true,
+      "source": {
+        "bytes": 1199,
+        "path": "bars-001.json",
+        "sha256": "43ee7fd35d658629b7e2d5fa64ff5e350c07fab30d0f4736c2c5c309634145be"
+      },
+      "observed_at": "2026-09-20T01:09:45.870760187Z"
+    },
+    {
+      "stage": "bars",
+      "status": 200,
+      "body_complete": true,
+      "source": {
+        "bytes": 1209,
+        "path": "bars-002.json",
+        "sha256": "a56c7fd4aa141eecedbcd33e8b2d3721e27eda083e3775fda582af6f7e8c4984"
+      },
+      "observed_at": "2026-09-20T01:09:45.900779337Z"
+    },
+    {
+      "stage": "bars",
+      "status": 200,
+      "body_complete": true,
+      "source": {
+        "bytes": 602,
+        "path": "bars-003.json",
+        "sha256": "78e7b19b82da8dc4671ff4229ed0077ae6390725bdd95b92e1228055362db057"
+      },
+      "observed_at": "2026-09-20T01:09:45.931329224Z"
+    }
+  ],
+  "native_commands": [
+    {
+      "command": "\"$SDK_PYTHON\" blueprints/us-equities/alpaca-historical/collect.py collect --out \"$NEW_PRIVATE_RUN\"",
+      "exit_code": 0,
+      "upstream_calls": [
+        "StockHistoricalDataClient.get(\"/stocks/bars\", data=explicit_query)",
+        "CorporateActionsClient.get(\"/corporate-actions\", data=explicit_query)"
+      ],
+      "result": "25bars/3pages;2actions/2pages;5HTTP200;terminalboth"
+    },
+    {
+      "command": "\"$SDK_PYTHON\" blueprints/us-equities/alpaca-historical/collect.py verify --run \"$PRIVATE_RUN\" --receipt-sha256 \"$RECEIPT_SHA256\"",
+      "exit_code": 0,
+      "result": "Private plan/collector/freeze/page/meta/receipt integrity and normalized assessment verified;no network request"
+    },
+    {
+      "command": "python3 blueprints/us-equities/authenticated-data/compare.py --run \"$PRIVATE_RUN\" --receipt-sha256 \"$RECEIPT_SHA256\" --lean \"$LEAN_NATIVE_RESULTS\" --lean-sha256 \"$LEAN_RESULTS_SHA256\"",
+      "exit_code": 0,
+      "result": "25/25rawcloses equal;2numeric action values equal;1cashcurrencyunknown;no network request"
+    }
+  ],
+  "implementation_boundary": [
+    "Native supported GET/authentication/URL transport; custom bounded pagination and provenance/validation bridge.",
+    "Pinned private _session and _retry seams capture bounded Requests response bytes and disable native retries; constructor retry_attempts=0 alone is ignored upstream.",
+    "Requests decoded response content is retained, not necessarily compressed on-wire bytes. Headers, credentials and raw market payloads are private."
+  ],
+  "limitations": [
+    "One retrospective AAPL sample only; no all-equities universe, delisting completeness, intraday mover coverage or original point-in-time availability.",
+    "Cash amount and split ratio numerically match; missing dividend currency prevents fully qualified cash-unit reconciliation. No holdings, dividend cash posting, total return, financing or strategy performance modeled.",
+    "Historical SIP response does not establish real-time access, unlimited history, Elite margin/order entitlement or broker execution. No orders or account resets.",
+    "Five bounded authenticated GET requests; no IEX downgrade, retries after access refusal, paid data or SDK upgrade.",
+    "Prior LEAN direct probe passed, but its separate upstream NUnit host aborted before executing tests; this wave does not repair or supersede that failure.",
+    "No new model task or whole-task causal token-savings experiment in this wave."
+  ],
+  "primary_references": [
+    "https://docs.alpaca.markets/us/reference/stockbars",
+    "https://docs.alpaca.markets/us/reference/corporateactions-1",
+    "https://github.com/alpacahq/alpaca-py/tree/v0.44.0",
+    "https://github.com/QuantConnect/Lean/tree/985ef30ad3ac774218c5ac516b4cb0aa2655730f"
+  ],
+  "private_artifacts": {
+    "actions-001.json": {
+      "sha256": "39a4bc4aa26ce5bd6258c873ac0215fed1be63de0170912fcb083e119a6bd1e9",
+      "bytes": 367
+    },
+    "actions-001.json.meta.json": {
+      "sha256": "fcf17780b7176a70f4d796b3b5b8055dd7b60eaee6814d95b147525afe0d1408",
+      "bytes": 778
+    },
+    "actions-002.json": {
+      "sha256": "87bbcb58969ee80c3dbb0d29b6cc3216fdaade9d29e4ccf2a4bc7250f5aac9be",
+      "bytes": 319
+    },
+    "actions-002.json.meta.json": {
+      "sha256": "78d2ec805681508fc83861e47dc5f3f8e70ba6c5db2e13e41b28d1cd64826767",
+      "bytes": 960
+    },
+    "bars-001.json": {
+      "sha256": "43ee7fd35d658629b7e2d5fa64ff5e350c07fab30d0f4736c2c5c309634145be",
+      "bytes": 1199
+    },
+    "bars-001.json.meta.json": {
+      "sha256": "61d9ed0364cd75ac9aeab10f3f8a02cbb3b8fa50e8002eb2ade06acf42a91ff2",
+      "bytes": 872
+    },
+    "bars-002.json": {
+      "sha256": "a56c7fd4aa141eecedbcd33e8b2d3721e27eda083e3775fda582af6f7e8c4984",
+      "bytes": 1209
+    },
+    "bars-002.json.meta.json": {
+      "sha256": "8eb999d6d30fbf29bb1bb236f4d60e75b64ac140481da72b521af58ad199a271",
+      "bytes": 980
+    },
+    "bars-003.json": {
+      "sha256": "78e7b19b82da8dc4671ff4229ed0077ae6390725bdd95b92e1228055362db057",
+      "bytes": 602
+    },
+    "bars-003.json.meta.json": {
+      "sha256": "3e4c4d155744786200080980b682fb43cd590e822cfb99c6b0558ce8138e5609",
+      "bytes": 979
+    },
+    "collector.py": {
+      "sha256": "e2a3032167d66a91d2367d76eacf12bf9a45865d11892fbb91ac3b30bc46570f",
+      "bytes": 25735
+    },
+    "freeze.json": {
+      "sha256": "e8acd002cd1e0f5a2227a16bec833fd6e7a268d04133fe851cd88f32c7b37397",
+      "bytes": 1194
+    },
+    "plan.json": {
+      "sha256": "258a3f935ba385105f831f9270db4a14cfccfdfec2feb1046af2f4184a4fa66b",
+      "bytes": 1761
+    },
+    "receipt.json": {
+      "sha256": "a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd",
+      "bytes": 24829
+    }
+  },
+  "verification": {
+    "local_tests": {
+      "command": "\"$SDK_PYTHON\" -m unittest",
+      "exit_code": 0,
+      "tests": 292,
+      "skipped": 0
+    },
+    "independent_review": {
+      "status": "accepted",
+      "collector_tests": 23,
+      "comparison_tests": 10,
+      "private_artifact_anchors": 14,
+      "sdk_source_hashes": 4,
+      "notes": "Independent reviewer verified private capture and frozen LEAN hash, then reproduced every aggregate comparison without provider calls."
+    },
+    "secret_scan": {
+      "command": "gitleaks dir . --redact --no-banner",
+      "exit_code": 0,
+      "findings": 0
+    },
+    "dashboard": {
+      "service_result": "success",
+      "service_exit_code": 0,
+      "scope": "Recorded dataset acceptance; not streaming broker telemetry."
+    }
+  }
+}

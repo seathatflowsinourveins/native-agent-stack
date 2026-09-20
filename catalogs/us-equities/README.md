@@ -2,7 +2,14 @@
 
 **Dated decision catalog: September 20, 2026.** The north star is native, token-efficient research → reproducible backtesting → Alpaca paper automation. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
 
-The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **500 repository identities**, including all 342 public stars and 158 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 1,018 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
+The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **501 repository identities**, including all 342 public stars and 159 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 1,024 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
+
+The newest [authenticated-data review](authenticated-data-review.md) challenges
+Massive, Databento, OpenFIGI, ArcticDB, Pandera and OpenBB. It records historical
+identity, revision, availability and licensing limits from pinned source files.
+Only OpenFIGI adds a new reference identity; no additional framework is adopted.
+The [native acquisition wave](../../blueprints/us-equities/authenticated-data/README.md)
+links its own commands, results and open gates.
 
 The [September 20 selected review](data-readiness-review.json) records six current
 repository/API decisions. The [data-readiness wave](../../blueprints/us-equities/data-readiness/README.md)
@@ -71,7 +78,7 @@ The later [native observability receipt](../../observability/receipt.json) estab
 
 The September 20 native public-endpoint refresh contained **342 public stars**, with
 zero added, removed or renamed identity pairs since the previous refresh. The
-[refresh receipt](../../blueprints/us-equities/data-readiness/public-stars-refresh.json)
+[refresh receipt](../../blueprints/us-equities/authenticated-data/public-stars-refresh.json)
 preserves the identity hash and scope. The card-membership ledger and 105
 beyond-star baseline card identities remain in [coverage.json](coverage.json);
 the [complete star audit](star-audit.md) and typed union include subsequent

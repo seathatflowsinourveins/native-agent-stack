@@ -69,8 +69,8 @@ Use `qmd get` on the exact returned document URI with a bounded range. [Native c
 
 ## Current next moves
 
-Continue with the [September 20 data-readiness plan](../blueprints/us-equities/data-readiness/plan.json)
-and its [native recipes and source decisions](../blueprints/us-equities/data-readiness/README.md).
+Continue with the [September 20 authenticated-data plan](../blueprints/us-equities/authenticated-data/plan.json)
+and its [native recipes and source decisions](../blueprints/us-equities/authenticated-data/README.md).
 Reuse verified retained sources where available; a new machine must acquire its
 own permitted data and establish its own observations. A historical receipt is
 not that host's first-received evidence or an authenticated provider result.

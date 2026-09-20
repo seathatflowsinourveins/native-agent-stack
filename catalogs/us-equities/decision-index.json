@@ -39,6 +39,12 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/us-equities/authenticated-data-review.json",
+      "collection": "/decisions",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/convergence-program/foundation.json",
       "collection": "/discovery_only_leads",
       "repository_field": "repository",
@@ -131,16 +137,16 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 500,
+    "repositories": 501,
     "public_star_repositories": 342,
-    "beyond_public_stars": 158,
-    "references": 1018,
+    "beyond_public_stars": 159,
+    "references": 1024,
     "repositories_by_record_type": {
       "catalog_card": 147,
       "component_record": 52,
       "legacy_candidate": 19,
       "public_star": 342,
-      "research_supplement": 91,
+      "research_supplement": 95,
       "star_review": 342
     }
   },
@@ -3054,6 +3060,13 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/authenticated-data-review.json",
+          "pointer": "/decisions/1",
+          "decision": "retain_conditional_revision_aware_reference_provider",
+          "evidence_level": "source_sections_reviewed"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/convergence-program/trading.json",
@@ -6483,9 +6496,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/authenticated-data-review.json",
+          "pointer": "/decisions/3",
+          "decision": "retain_conditional_version_store_not_immediate_dependency",
+          "evidence_level": "source_sections_reviewed"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
@@ -6524,6 +6545,13 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/authenticated-data-review.json",
+          "pointer": "/decisions/0",
+          "decision": "retain_conditional_identity_provider",
+          "evidence_level": "source_sections_reviewed"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/data-readiness-review.json",
@@ -8248,9 +8276,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/authenticated-data-review.json",
+          "pointer": "/decisions/5",
+          "decision": "defer_general_connector_aggregator_for_current_lane",
+          "evidence_level": "source_sections_reviewed"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
@@ -8274,6 +8310,23 @@
           "path": "manifests/stack.json",
           "pointer": "/components/20",
           "id": "mcporter"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/openfigi/api-examples",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/authenticated-data-review.json",
+          "pointer": "/decisions/2",
+          "decision": "add_conditional_identifier_crosswalk_reference",
+          "evidence_level": "source_sections_reviewed"
         }
       ]
     },
@@ -11558,9 +11611,17 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/authenticated-data-review.json",
+          "pointer": "/decisions/4",
+          "decision": "retain_selected_optional_validation_boundary",
+          "evidence_level": "source_sections_reviewed"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",

@@ -484,7 +484,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -820,6 +820,24 @@
         "Authenticated Alpaca historical fetch remains deferred; no paid service, broker order, new dataset or SDK upgrade."
       ],
       "path": "blueprints/us-equities/corporate-action-readiness/receipt.json"
+    },
+    {
+      "id": "native-alpaca-historical-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "alpaca-py",
+        "lean"
+      ],
+      "claim": "Native Alpaca-py0.44.0 GET transport acquired25 AAPL SIP/raw daily bars and2 corporate actions over5 HTTP200 pages. Terminal pagination and private artifacts verified;25 raw closes and both numeric action values match the frozen LEAN probe. Dividend currency and original historical availability remain unestablished.",
+      "limitations": [
+        "One retrospective AAPL sample only; no all-equities universe, delisting completeness, intraday mover coverage or original point-in-time availability.",
+        "Cash amount and split ratio numerically match; missing dividend currency prevents fully qualified cash-unit reconciliation. No holdings, dividend cash posting, total return, financing or strategy performance modeled.",
+        "Historical SIP response does not establish real-time access, unlimited history, Elite margin/order entitlement or broker execution. No orders or account resets.",
+        "Five bounded authenticated GET requests; no IEX downgrade, retries after access refusal, paid data or SDK upgrade.",
+        "Prior LEAN direct probe passed, but its separate upstream NUnit host aborted before executing tests; this wave does not repair or supersede that failure.",
+        "No new model task or whole-task causal token-savings experiment in this wave."
+      ],
+      "path": "blueprints/us-equities/authenticated-data/native-receipt.json"
     }
   ],
   "files": [
@@ -860,8 +878,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "de49f6645c1e9722e537fd275319abd3d50b5ea901ca99210e48633799882ffe",
-      "bytes": 12090
+      "sha256": "0796cea2b09898ea503e253ef3cf27f1d3ab5fc3b5faa0fcd328038e783fb768",
+      "bytes": 12533
     },
     {
       "path": "adoption/README.md",
@@ -875,8 +893,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "01ec3920039bcda10e283e8835388a4b42ec5c59cf4779b360332a5790545389",
-      "bytes": 9377
+      "sha256": "0d3a86742b09fa8a274f4fdfaf387e214c85322e461d5bc144826200eb2c52d5",
+      "bytes": 9621
     },
     {
       "path": "adoption/paired/README.md",
@@ -945,8 +963,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "c4a8085e721516a1e8bba07531c86e5efd79b88050d8613a2eedcfb394a83438",
-      "bytes": 8222
+      "sha256": "4aedc083e4665bec7131263e36b81390e4011c660b3c78df183ddc988021aadd",
+      "bytes": 8234
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -972,6 +990,21 @@
       "path": "blueprints/us-equities/acceptance-wave/research-protocol.md",
       "sha256": "a4bbb4b1682e84c7324b903f90ececce3a3f7c547b445517089607794ded4f92",
       "bytes": 6449
+    },
+    {
+      "path": "blueprints/us-equities/alpaca-historical/README.md",
+      "sha256": "09d916f81d869a242e9c6d174f55d651deb7812e2e9d8cd6d108b00c6834576e",
+      "bytes": 9126
+    },
+    {
+      "path": "blueprints/us-equities/alpaca-historical/collect.py",
+      "sha256": "e2a3032167d66a91d2367d76eacf12bf9a45865d11892fbb91ac3b30bc46570f",
+      "bytes": 25735
+    },
+    {
+      "path": "blueprints/us-equities/alpaca-historical/plan.json",
+      "sha256": "258a3f935ba385105f831f9270db4a14cfccfdfec2feb1046af2f4184a4fa66b",
+      "bytes": 1761
     },
     {
       "path": "blueprints/us-equities/architecture/README.md",
@@ -1022,6 +1055,31 @@
       "path": "blueprints/us-equities/architecture/review-prompt.txt",
       "sha256": "ce5ccf53ffb05a79f6cb86d293f9161e4dd97e1b6cfd7312d948cc5dd34cf9a9",
       "bytes": 6997
+    },
+    {
+      "path": "blueprints/us-equities/authenticated-data/README.md",
+      "sha256": "76d2439e456aacca301013d1993bde75e42fd6ffa0f77990eb2e60686a961666",
+      "bytes": 8763
+    },
+    {
+      "path": "blueprints/us-equities/authenticated-data/compare.py",
+      "sha256": "7a2b258624d0219daf2c3bf8582f974a91ec84c8e190db73ed190e4312b37439",
+      "bytes": 6025
+    },
+    {
+      "path": "blueprints/us-equities/authenticated-data/native-receipt.json",
+      "sha256": "f3e75950cb5499d4b74cc7a808b04905aad85d913128b2dad565940b38f2e410",
+      "bytes": 11587
+    },
+    {
+      "path": "blueprints/us-equities/authenticated-data/plan.json",
+      "sha256": "c4eb0ba2ed9e89397e192044ad46d8c87ed7515b783ce2bae00f348def36ba15",
+      "bytes": 4626
+    },
+    {
+      "path": "blueprints/us-equities/authenticated-data/public-stars-refresh.json",
+      "sha256": "103b16846feda464c144a7a71fa813901455a3c4ab9c688bde94e01379a4824d",
+      "bytes": 28718
     },
     {
       "path": "blueprints/us-equities/catalyst-dataset/README.md",
@@ -1950,8 +2008,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "a09dc04f993c77a2369258ebd64189c3ad0707ff73a0e6bddc1206ad7be727e1",
-      "bytes": 11651
+      "sha256": "d2b8e67219cb50f5cc58fc63631f1d6d191a71248562abe68b85e40cd750e4c4",
+      "bytes": 12116
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -2009,6 +2067,16 @@
       "bytes": 69055
     },
     {
+      "path": "catalogs/us-equities/authenticated-data-review.json",
+      "sha256": "93520797a2ec0c46111968c63292da8c1612c0f1aafab275c1a2af5c0df693f8",
+      "bytes": 26113
+    },
+    {
+      "path": "catalogs/us-equities/authenticated-data-review.md",
+      "sha256": "ebe7bdcdbd2173ce25a355f74621aa690398fd641d02ffa69971d991ca62006b",
+      "bytes": 9134
+    },
+    {
       "path": "catalogs/us-equities/convergence-program/foundation.json",
       "sha256": "b4da344b3530f45770011df55fb0dcfcd90e536e32c45b0ddeec4fe6798c78c3",
       "bytes": 68024
@@ -2045,8 +2113,8 @@
     },
     {
       "path": "catalogs/us-equities/convergence-review.json",
-      "sha256": "80af6eadc3773ab4562969f0b15607570f3f132103122cc81888a5cd9fc3a1d3",
-      "bytes": 12048
+      "sha256": "747e2824e34aa0b0a1f4f09ec537af2cbd11ce56aced23b45944552e85a34dac",
+      "bytes": 12175
     },
     {
       "path": "catalogs/us-equities/convergence-review.md",
@@ -2085,8 +2153,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "3200305fed1c7a2e2b7336a0e9aa15e68c98f14fc093d8c5a12848621107466d",
-      "bytes": 371723
+      "sha256": "7c6b0bb779cdbc46077e63d545f68219521a661343e48fdc3dd19a8c2534f593",
+      "bytes": 374030
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -2120,7 +2188,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "9ade5d79507ce7be670a0b15775ce5777724c1de1e50e063571ac9fae555cbce",
+      "sha256": "cd452fe7286a6e8679f1a2ceef3f99745415c0a78e5078d9d4086cc4fb90e46f",
       "bytes": 2307
     },
     {
@@ -2455,8 +2523,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "62a81e4042603a9b5a4241e4f4d6587eead8a27e43f411294e67f6d87a8da712",
-      "bytes": 48461
+      "sha256": "af1d60139f9a0422e9da29a005e006080774e4694514154365d2e993ac12fee5",
+      "bytes": 48700
     },
     {
       "path": "observability/README.md",
@@ -2615,8 +2683,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "0a8bf6444420dc7e0e7c6de853ff4a4454cdf4b5165fc78afc6444f2637ad5db",
-      "bytes": 4681
+      "sha256": "278c8d13a3212de56ef519fd3290d89e728eacf8dc9984f668a7e138c1a1f02c",
+      "bytes": 4961
     },
     {
       "path": "observability/receipt.json",
@@ -2684,6 +2752,11 @@
       "bytes": 1036
     },
     {
+      "path": "tests/test_alpaca_historical.py",
+      "sha256": "f0b31bf55f7dc543603061ea14603d5d5aced09cadf61b988effbaee4ac33c00",
+      "bytes": 18630
+    },
+    {
       "path": "tests/test_catalog_decisions.py",
       "sha256": "e24efa328daf0a3536ee8416bcf5c1ac406e207202f559c3ad5ca11155e4110e",
       "bytes": 9953
@@ -2722,6 +2795,11 @@
       "path": "tests/test_grand_dashboard.py",
       "sha256": "56fde9bf3570c521701928e848c924c2d1cedb982b1c7c4df67589a0d5697079",
       "bytes": 10398
+    },
+    {
+      "path": "tests/test_historical_comparison.py",
+      "sha256": "ea6d395520931585a58928f083b4276919ff9d162a59867292b532f5316c426e",
+      "bytes": 3985
     },
     {
       "path": "tests/test_historical_simulation.py",

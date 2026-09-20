@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "id": "authenticated-historical-data-convergence-20260920",
+  "base_commit": "daa3316c192520989cfeb34390fa1326d71eaa16",
+  "recorded_date": "2026-09-20",
+  "objective": "Acquire and verify a bounded native Alpaca historical sample, challenge relevant catalog choices against primary sources, and publish independently reviewed provenance and readiness evidence.",
+  "scope": {
+    "profile": "First configured dedicated research paper profile; read-only market data. Credential values and account identity stay private.",
+    "symbol": "AAPL",
+    "local_interval": "[2020-08-03T00:00:00Z, 2020-09-05T00:00:00Z)",
+    "wire_start_inclusive": "2020-08-03T00:00:00Z",
+    "wire_end_inclusive": "2020-09-04T23:59:59.999999999Z",
+    "feed": "sip",
+    "adjustment": "raw",
+    "timeframe": "1Day",
+    "currency": "USD",
+    "symbol_asof": "2020-09-04",
+    "page_size": 10,
+    "page_cap": 10,
+    "corporate_actions": "Explicit US region and data_quality=all, cash dividends/forward splits, process-date range matching the requested sample; empty/refused response remains distinct from completeness.",
+    "comparison": "Existing 25-session LEAN AAPL sample and factor/map semantics. Cross-provider values need reconciliation, not forced equality; no SEC issuer-price join is assumed.",
+    "broker_orders": false,
+    "account_resets": false,
+    "paid_resources": false,
+    "automatic_live_promotion": false
+  },
+  "waves": [
+    {
+      "id": "primary_source_challenge",
+      "state": "accepted / 6 source decisions / 501 identities",
+      "purpose": "Refresh public identities and challenge selected data/reference/versioning/validation alternatives with dated primary-source decisions."
+    },
+    {
+      "id": "native_historical_acquisition",
+      "state": "accepted / 25 bars / 2 actions / 5 HTTP200 pages",
+      "purpose": "Use supported native Alpaca API transport with a bounded provenance bridge; retain exact pages, requests, observations and failures privately."
+    },
+    {
+      "id": "integrity_and_semantics",
+      "state": "25 raw closes equal / dividend currency unknown",
+      "purpose": "Prove terminal pagination, precision, source anchoring, missing-data handling and limited reconciliation with prior sample evidence."
+    },
+    {
+      "id": "review_and_publication",
+      "state": "local checks and independent review accepted / exact-commit CI tracked on GitHub",
+      "purpose": "Resolve independent findings, update native recipes/catalog/dashboard and validate the exact published commit."
+    }
+  ],
+  "acceptance": [
+    "Freeze the sample and request contract before fetching or examining price outcomes.",
+    "Keep the API's inclusive bounds distinct from the local half-open interval; preserve exact timestamp and numeric text before normalization.",
+    "Use explicit feed, adjustment, currency, symbol-asof and ordering; retain and validate a terminal pagination chain, not merely the first page or SDK total cap.",
+    "Bind plan, collector, SDK sources, complete response bytes and derived outputs by hashes; refuse overwrite, truncation, cycles, duplicate identities and out-of-range rows.",
+    "No silent IEX downgrade, credential retry loop or access-refusal bypass. A refused corporate-action endpoint does not invalidate a separately accepted bar acquisition.",
+    "Current API observations, symbol-asof mapping and retrospective adjustment do not establish original historical information availability or an all-equities universe.",
+    "Keep native SDK transport and custom provenance/validation behavior identified separately, including pinned private seams needed for response capture and bounded retries.",
+    "Record useful failures and limits. Independently review code/evidence and complete appropriate local checks before GitHub publication."
+  ],
+  "continuation": "After this sample, define an entitled historical universe and source-revision policy before broader mover/catalyst sampling or strategy evaluation. Paper execution remains deferred.",
+  "results": {
+    "native_receipt": "blueprints/us-equities/authenticated-data/native-receipt.json",
+    "catalog_review": "catalogs/us-equities/authenticated-data-review.json",
+    "public_stars": 342,
+    "repository_identities": 501,
+    "beyond_public_stars": 159,
+    "source_pointers": 1024,
+    "native_requests": 5,
+    "raw_close_matches": 25,
+    "action_numeric_matches": 2,
+    "unresolved": "Dividend currency missing; original historical availability/universe, strategy evaluation, macOS/off-host operations and causal whole-task token savings remain gated."
+  }
+}
