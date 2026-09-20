@@ -1,0 +1,383 @@
+{
+  "schema_version": 1,
+  "kind": "authenticated_historical_data_source_review",
+  "checked_at": "2026-09-20T00:58:34Z",
+  "baseline_commit": "daa3316c192520989cfeb34390fa1326d71eaa16",
+  "scope": "Six alternatives challenged against the already selected Alpaca-py, EdgarTools, DuckDB and LEAN path. Five existing catalog identities and one new conditional identity. Pinned selected-source sections and official documentation, not full-repository audits or native acceptance.",
+  "review_boundaries": {
+    "authentication": "Coordinator owns profile authentication and acquisition. This task neither inspects credentials nor asserts account/data entitlement.",
+    "activities": "Public repository metadata, pinned selected source/license files, official documentation and existing public catalog review only.",
+    "excluded": "No market-data/account API requests, broker actions, installs, model calls, purchases, auth-store reads, or star-list pagination.",
+    "metadata_method": "Unauthenticated HTTPS GET https://api.github.com/repos/OWNER/REPO and /commits/DEFAULT_BRANCH; /license?ref=COMMIT. Selected raw.githubusercontent.com files fetched at that commit."
+  },
+  "selected_stack": [
+    {
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "accepted_version": "0.44.0",
+      "retain_for": "Official bounded historical price and action acquisition with explicit feed, raw adjustment, time window and pagination. Previous REST region/data_quality drift must be handled without assuming SDK completeness.",
+      "evidence": "blueprints/us-equities/corporate-action-readiness/receipt.json"
+    },
+    {
+      "repository": "https://github.com/dgunning/edgartools",
+      "accepted_version": "5.58.0",
+      "accepted_source_pin": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+      "retain_for": "SEC filing index/SGML parsing with acceptance, economic event and locally observed times kept distinct; no present-day financial field relabelled as historical knowledge.",
+      "evidence": "blueprints/us-equities/catalyst-dataset/native-receipt.json"
+    },
+    {
+      "repository": "https://github.com/duckdb/duckdb",
+      "accepted_version": "1.5.5",
+      "accepted_source_pin": "d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
+      "retain_for": "Deterministic SQL/Parquet joins and exact decimal metadata over content-hashed raw objects. Append observed revisions; engine constraints and schema checks do not establish source truth.",
+      "evidence": "manifests/stack.json"
+    },
+    {
+      "repository": "https://github.com/QuantConnect/Lean",
+      "accepted_source_pin": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "retain_for": "Pinned corporate-action/map semantics and deterministic simulation. Current direct API proof covers 25 AAPL sessions; broad upstream NUnit fixture remains unresolved.",
+      "evidence": "blueprints/us-equities/corporate-action-readiness/receipt.json"
+    }
+  ],
+  "decisions": [
+    {
+      "repository": "https://github.com/massive-com/client-python",
+      "commit": "481e5c270ea85e8eae5e96f8b9fda34e5e2a674a",
+      "commit_date": "2026-07-09T15:25:36Z",
+      "default_branch": "master",
+      "current_metadata": {
+        "archived": false,
+        "license_spdx": "MIT"
+      },
+      "license_declared": "MIT",
+      "license_source": {
+        "url": "https://github.com/massive-com/client-python/blob/481e5c270ea85e8eae5e96f8b9fda34e5e2a674a/LICENSE",
+        "sha256": "ec423cc5506eea1ffbfc9955c3ec8f86139996963d84ff306a5ee41eda8a4ff1"
+      },
+      "existing_identity": true,
+      "decision": "retain_conditional_identity_provider",
+      "evidence_level": "source_sections_reviewed",
+      "role": "Historical ticker identity and inactive-symbol enumeration; alternative corporate-action and price source",
+      "reviewed_files": [
+        {
+          "path": "massive/rest/reference.py",
+          "sha256": "4d6d6871ae966be1f873bbe15a0ebe8877511b0f433fc42d4cb45662fb4852fb",
+          "total_file_lines": 1208,
+          "reviewed_scope": "list_tickers, get_ticker_details and split/dividend request sections",
+          "url": "https://github.com/massive-com/client-python/blob/481e5c270ea85e8eae5e96f8b9fda34e5e2a674a/massive/rest/reference.py"
+        }
+      ],
+      "strengths": [
+        "list_tickers exposes an explicit date and active flag; inactive symbols can be enumerated instead of assuming a present-day survivor universe.",
+        "Native SDK exposes splits and dividends with distinct execution, declaration, ex-dividend, record and payment dates."
+      ],
+      "limits": [
+        "get_ticker_details(date) says SEC fields are compared with period-of-report date, not filing acceptance time. Historical ticker details are not accepted as as-known fundamental features.",
+        "Endpoint support and a historical-date parameter do not prove original observation, complete delisted coverage, or our account entitlement.",
+        "Market-data access and redistribution rights are separate from the MIT client license. Individual plan use is distinct from business/redistribution licensing."
+      ],
+      "native_api_shapes_not_executed": [
+        "RESTClient.list_tickers(date=AS_OF_DATE, active=False, market='stocks', locale='us', limit=1000)",
+        "RESTClient.get_ticker_details(ticker=SYMBOL, date=AS_OF_DATE)",
+        "RESTClient.list_splits(ticker=SYMBOL, execution_date_gte=START, execution_date_lte=END)"
+      ],
+      "sources": [
+        "https://massive.com/docs/rest/stocks/tickers/all-tickers",
+        "https://massive.com/docs/rest/stocks/overview",
+        "https://massive.com/stocks"
+      ],
+      "next_bounded_acceptance": "Only if the existing Alpaca path cannot supply required historical identity: freeze a small known rename/delisting example, enumerate both active states for an explicit date with complete pagination, retain raw payloads and coverage, and compare stable IDs. Do not use financial fields dated by report period as available-at signals.",
+      "selection_effect": "Conditional identity supplement; no second price runtime added while the coordinator accepts Alpaca history.",
+      "native_execution": "None in this source-review task"
+    },
+    {
+      "repository": "https://github.com/databento/databento-python",
+      "commit": "e675ef30369f5ee9f68b04606080c519adf3be69",
+      "commit_date": "2026-09-01T22:42:48Z",
+      "default_branch": "main",
+      "current_metadata": {
+        "archived": false,
+        "license_spdx": "Apache-2.0"
+      },
+      "license_declared": "Apache-2.0",
+      "license_source": {
+        "url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/LICENSE",
+        "sha256": "d3174ad63e721d4c9dccb8ad4320848992d314369bc46319720b5802c9153fe9"
+      },
+      "existing_identity": true,
+      "decision": "retain_conditional_revision_aware_reference_provider",
+      "evidence_level": "source_sections_reviewed",
+      "role": "Historical security master and corporate-action revisions",
+      "reviewed_files": [
+        {
+          "path": "databento/reference/client.py",
+          "sha256": "e40b4701c7f9a66dd7fd36862bab0d989e61e817830d8a788e00c481dbdca048",
+          "total_file_lines": 84,
+          "reviewed_scope": "selected API definitions and control flow",
+          "url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/databento/reference/client.py"
+        },
+        {
+          "path": "databento/reference/api/security.py",
+          "sha256": "31ad5930fee63d7e2e1f595b5b91fc34af4142184d14c3317b5b9070f1201c91",
+          "total_file_lines": 203,
+          "reviewed_scope": "selected API definitions and control flow",
+          "url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/databento/reference/api/security.py"
+        },
+        {
+          "path": "databento/reference/api/corporate.py",
+          "sha256": "9ec588b95db94297e870faf4a8f31f1392dc0d322c8375de08e9900574d53eb3",
+          "total_file_lines": 214,
+          "reviewed_scope": "get_range signature, pit and flatten parameters, revision-collapse branch",
+          "url": "https://github.com/databento/databento-python/blob/e675ef30369f5ee9f68b04606080c519adf3be69/databento/reference/api/corporate.py"
+        }
+      ],
+      "strengths": [
+        "Official schemas separate issuer, security and listing IDs, listing/delisting dates, ts_effective, ts_record and ts_created.",
+        "Reference exposes security_master and corporate_actions range APIs, with explicit index selection and corporate-action revision retention."
+      ],
+      "limits": [
+        "CorporateActionsHttpAPI.get_range defaults pit=False: sort by ts_record then groupby(event_unique_id).agg('last') performs a latest-style per-column collapse, potentially combining latest non-null values instead of preserving a complete source row.",
+        "pit=True retains returned revisions; it does not impose a decision cutoff. Default corporate-action index=event_date and security-master index=ts_effective track economic/effective time rather than our ingestion chronology.",
+        "Vendor creation/change times differ from our first observed time. Date ranges are start-inclusive/end-exclusive; omitted end can request all future available records.",
+        "Reference datasets require separately established access and data rights. No entitlement or data request was exercised in this review."
+      ],
+      "native_api_shapes_not_executed": [
+        "Reference.corporate_actions.get_range(start=START, end=END_EXCLUSIVE, index='ts_record', symbols=SYMBOLS, pit=True, flatten=False)",
+        "Reference.security_master.get_range(start=START, end=END_EXCLUSIVE, index='ts_record', symbols=SYMBOLS, stype_in=IDENTIFIER_TYPE)"
+      ],
+      "sources": [
+        "https://databento.com/docs/schemas-and-data-formats/corporate-actions",
+        "https://databento.com/docs/schemas-and-data-formats/security-master",
+        "https://databento.com/pricing"
+      ],
+      "next_bounded_acceptance": "If reference-data access is separately available, request one bounded action with multiple revisions using pit=True and index='ts_record'; retain unflattened records, original fields and local observation time. Verify event-ID continuity, strict decision-time cutoffs and listing identity before permitting feature joins.",
+      "selection_effect": "Strongest reviewed conditional replacement for a richer historical reference plane, not a free implicit entitlement or immediate installation.",
+      "native_execution": "None in this source-review task"
+    },
+    {
+      "repository": "https://github.com/OpenFIGI/api-examples",
+      "commit": "f847dce9492a6bac685f9fdf1d9450e57280a9c4",
+      "commit_date": "2025-07-01T18:25:18Z",
+      "default_branch": "main",
+      "current_metadata": {
+        "archived": false,
+        "license_spdx": "Apache-2.0"
+      },
+      "license_declared": "Apache-2.0",
+      "license_source": {
+        "url": "https://github.com/OpenFIGI/api-examples/blob/f847dce9492a6bac685f9fdf1d9450e57280a9c4/LICENSE",
+        "sha256": "32bb5d8014dc9178975b7983e078ff0589d7949bed37cc1d73c1cb6d31f18871"
+      },
+      "existing_identity": false,
+      "decision": "add_conditional_identifier_crosswalk_reference",
+      "evidence_level": "source_sections_reviewed",
+      "role": "Official examples for cross-provider FIGI identity mapping",
+      "reviewed_files": [
+        {
+          "path": "python/example.py",
+          "sha256": "10d3f123698c82a197bebeeff6934a5916ae76aff0d981ad3b02435bd49ded01",
+          "total_file_lines": 96,
+          "reviewed_scope": "selected API definitions and control flow",
+          "url": "https://github.com/OpenFIGI/api-examples/blob/f847dce9492a6bac685f9fdf1d9450e57280a9c4/python/example.py"
+        }
+      ],
+      "strengths": [
+        "Official mapping interface returns exchange/composite/share-class FIGI distinctions; a useful crosswalk when provider-specific symbols or IDs differ.",
+        "The API is publicly accessible with lower unauthenticated rate limits; the official Python example uses the standard library."
+      ],
+      "limits": [
+        "The documented mapping interface has no general historical as-of parameter or original first-observed field. Expiration/maturity date filters are instrument terms, not historical mapping timestamps.",
+        "A ticker mapping can have multiple results. Exchange, security type and identifier level need explicit disambiguation; no default first-row selection.",
+        "Examples license and FIGI metadata terms do not grant rights to unrelated prices, CUSIP feeds or vendor datasets. No mapping API call was made."
+      ],
+      "native_api_shapes_not_executed": [
+        "POST https://api.openfigi.com/v3/mapping with explicit idType, idValue and exchange/security filters; inspect every mapping result",
+        "Official example: python python/example.py (not executed; its example requests are not an accepted historical collector)"
+      ],
+      "sources": [
+        "https://www.openfigi.com/api/documentation",
+        "https://www.openfigi.com/docs/faqs"
+      ],
+      "next_bounded_acceptance": "Only when cross-provider identity is needed, map a few already licensed identifiers, retain all candidates and local observation time, and fail on unresolved ambiguity. Keep the result as a dated crosswalk; do not reconstruct an as-known universe from today's mapping.",
+      "selection_effect": "The single new repository identity in this review; reference-only, no package installation or runtime service.",
+      "native_execution": "None in this source-review task"
+    },
+    {
+      "repository": "https://github.com/man-group/ArcticDB",
+      "commit": "7d30a6eefe709e5379f1dd7f38b03074750cf1be",
+      "commit_date": "2026-09-17T12:04:20Z",
+      "default_branch": "master",
+      "current_metadata": {
+        "archived": false,
+        "license_spdx": "NOASSERTION"
+      },
+      "license_declared": "Business Source License 1.1; per-version change to Apache-2.0 after two years",
+      "license_source": {
+        "url": "https://github.com/man-group/ArcticDB/blob/7d30a6eefe709e5379f1dd7f38b03074750cf1be/LICENSE.txt",
+        "sha256": "b95d83bb7c23a18f11ad8da4dcdb45f7e235253f0c40f9afe593c152b90d26c2"
+      },
+      "existing_identity": true,
+      "decision": "retain_conditional_version_store_not_immediate_dependency",
+      "evidence_level": "source_sections_reviewed",
+      "role": "Versioned local/object-store data revisions and named snapshots",
+      "reviewed_files": [
+        {
+          "path": "python/arcticdb/version_store/library.py",
+          "sha256": "824583e9cb8f10d553fbd55ae498eb9e888dccd2b4d1c619daa592d70cd5c5e7",
+          "total_file_lines": 3687,
+          "reviewed_scope": "read/as_of, snapshot/retention and list_versions sections",
+          "url": "https://github.com/man-group/ArcticDB/blob/7d30a6eefe709e5379f1dd7f38b03074750cf1be/python/arcticdb/version_store/library.py"
+        }
+      ],
+      "strengths": [
+        "Library.read(as_of=version_or_snapshot_or_datetime), snapshot(versions=...) and list_versions expose reproducible stored revisions.",
+        "Named snapshots retain referenced versions; explicit version lists can freeze a research input set."
+      ],
+      "limits": [
+        "Stored-version time is database write history, not the provider's historical availability. A current snapshot cannot recreate missing earlier source revisions.",
+        "Concurrent pruning during snapshot construction is documented as a corruption risk; a future adoption must freeze writers or explicitly manage version retention.",
+        "The Additional Use Grant excludes the defined third-party Database Service offering. This source-available license is not an unconditional permissive license for current versions; internal research use is not automatically prohibited.",
+        "Introduces another storage engine and lifecycle; existing content-hashed files plus DuckDB already cover the bounded current dataset."
+      ],
+      "native_api_shapes_not_executed": [
+        "Library.write(symbol, dataframe, metadata=PROVENANCE, prune_previous_versions=False)",
+        "Library.snapshot(name, versions=EXPLICIT_SYMBOL_VERSIONS)",
+        "Library.read(symbol, as_of=SNAPSHOT_OR_VERSION)"
+      ],
+      "sources": [
+        "https://docs.arcticdb.io/6.12.1/api/library/",
+        "https://arcticdb.io/faqs/"
+      ],
+      "next_bounded_acceptance": "Only after measured revision volume or concurrent readers exceed the existing store's needs: write two explicitly observed revisions, snapshot exact versions, prove byte/row equivalence on replay and safe retention, and document applicable deployment license.",
+      "selection_effect": "Retain as a scaling alternative; preserve DuckDB and immutable source objects now.",
+      "native_execution": "None in this source-review task"
+    },
+    {
+      "repository": "https://github.com/unionai-oss/pandera",
+      "commit": "1c9a139436ae2657dd2cb100655b84138d7da443",
+      "commit_date": "2026-09-14T13:20:29Z",
+      "default_branch": "main",
+      "current_metadata": {
+        "archived": false,
+        "license_spdx": "MIT"
+      },
+      "license_declared": "MIT",
+      "license_source": {
+        "url": "https://github.com/unionai-oss/pandera/blob/1c9a139436ae2657dd2cb100655b84138d7da443/LICENSE.txt",
+        "sha256": "142d0a4e2b2ade63e1d3f85d8289865f729397aafeec9afced01877826c54640"
+      },
+      "existing_identity": true,
+      "decision": "retain_selected_optional_validation_boundary",
+      "evidence_level": "source_sections_reviewed",
+      "role": "Native dataframe schema validation at acquisition and normalized-data boundaries",
+      "reviewed_files": [
+        {
+          "path": "pandera/api/pandas/container.py",
+          "sha256": "3d12c96884bbe6c1f77688671c908671a1ec942be09730a09a15d03cb691fa6e",
+          "total_file_lines": 420,
+          "reviewed_scope": "selected API definitions and control flow",
+          "url": "https://github.com/unionai-oss/pandera/blob/1c9a139436ae2657dd2cb100655b84138d7da443/pandera/api/pandas/container.py"
+        }
+      ],
+      "strengths": [
+        "DataFrameSchema.validate supports aggregate lazy errors, joint uniqueness, strict columns, nullable fields and explicit checks.",
+        "Non-mutating validation can retain all rejection evidence instead of coercing, dropping or silently filling data."
+      ],
+      "limits": [
+        "Schema validity cannot establish data truth, universe completeness, original publication time, or valid economic identifiers.",
+        "Do not use strict='filter', drop_invalid_rows=True, implicit coercion or missing-column filling in the provenance boundary; retain original raw response and failure cases.",
+        "Current commit review is not an installed-version or native-runtime acceptance claim. Existing deterministic Python/DuckDB checks remain sufficient until a repeated schema justifies adoption."
+      ],
+      "native_api_shapes_not_executed": [
+        "pandera.pandas.DataFrameSchema(..., strict=True, coerce=False, unique=REVISION_KEY, add_missing_columns=False, drop_invalid_rows=False).validate(frame, lazy=True, inplace=False)"
+      ],
+      "sources": [
+        "https://pandera.readthedocs.io/en/latest/dataframe_schemas.html"
+      ],
+      "next_bounded_acceptance": "An isolated pinned adoption can validate a frozen acquired batch and deliberate missing-key, duplicate-revision, nonfinite-price, timezone and late-observation fixtures, preserving all failures. Promote only after proving no data mutation and equivalent results to existing checks.",
+      "selection_effect": "Best small optional addition when schema repetition warrants it; a quality gate, not another data feed.",
+      "native_execution": "None in this source-review task"
+    },
+    {
+      "repository": "https://github.com/OpenBB-finance/OpenBB",
+      "commit": "3e071fcc2cd9f891cac6040ae60296dba76dab46",
+      "commit_date": "2026-07-20T17:45:28Z",
+      "default_branch": "develop",
+      "current_metadata": {
+        "archived": false,
+        "license_spdx": "NOASSERTION"
+      },
+      "license_declared": "GNU Affero General Public License v3.0 declared in pinned LICENSE",
+      "license_source": {
+        "url": "https://github.com/OpenBB-finance/OpenBB/blob/3e071fcc2cd9f891cac6040ae60296dba76dab46/LICENSE",
+        "sha256": "442baa7865ddf53ba04808a29e4810ac1fd9c83383d4ac76297cec4569e19222"
+      },
+      "existing_identity": true,
+      "decision": "defer_general_connector_aggregator_for_current_lane",
+      "evidence_level": "source_sections_reviewed",
+      "role": "Provider-neutral extraction/transformation and broader research interfaces",
+      "reviewed_files": [
+        {
+          "path": "openbb_platform/core/openbb_core/provider/abstract/fetcher.py",
+          "sha256": "303a8e5d394e35b7b0b783d52c9d94cbdb329fffdfe125c8cc6052b09c479887",
+          "total_file_lines": 233,
+          "reviewed_scope": "selected API definitions and control flow",
+          "url": "https://github.com/OpenBB-finance/OpenBB/blob/3e071fcc2cd9f891cac6040ae60296dba76dab46/openbb_platform/core/openbb_core/provider/abstract/fetcher.py"
+        }
+      ],
+      "strengths": [
+        "Fetcher exposes query transformation, extraction and output transformation; individual provider extensions can be used without the whole application.",
+        "Provider coverage introspection can reveal installed connector scope."
+      ],
+      "limits": [
+        "OpenBB documentation says it does not host or serve the underlying data; provider endpoints, subscriptions and data rights remain external.",
+        "The generic Fetcher pipeline alone does not enforce our raw-byte retention, source revision chronology or historical availability contract.",
+        "Pinned LICENSE declares AGPLv3 while GitHub metadata reports NOASSERTION; do not inherit a historical MIT assumption. Hosted/distributed use needs the applicable license understood.",
+        "Another normalization layer duplicates the direct Alpaca/EdgarTools path before a concrete missing provider is identified."
+      ],
+      "native_api_shapes_not_executed": [
+        "Fetcher.fetch_data(params=PARAMS, credentials=PROVIDER_SETTINGS) -> transform_query, extract_data, transform_data",
+        "obb.coverage.providers (installed-coverage introspection; not executed)"
+      ],
+      "sources": [
+        "https://docs.openbb.co/odp/python/extensions/providers",
+        "https://docs.openbb.co/odp/python/faqs/license"
+      ],
+      "next_bounded_acceptance": "Only select a specific provider extension for a documented missing source, then compare its raw payload and normalized fields against a direct native request under the same entitlement. No umbrella install solely to increase catalog breadth.",
+      "selection_effect": "Excluded from the immediate path; retain as a researched connector alternative.",
+      "native_execution": "None in this source-review task"
+    }
+  ],
+  "convergence": {
+    "immediate": "Keep the four selected native components and immutable acquisition provenance. Add no alternative price provider, storage service or umbrella connector in this wave.",
+    "optional": "Pandera remains the smallest optional validation boundary once repeated schemas justify a pinned native acceptance. OpenFIGI is a new conditional identity crosswalk reference only.",
+    "conditional": "Use Massive only for a measured identity/coverage gap; prefer revision-preserving Databento reference APIs if richer historical reference access and rights are separately available. ArcticDB remains conditional on measured version-store needs.",
+    "promotion_gate": [
+      "Freeze symbols, windows, feed, adjustment and known limitations before acquisition; retain every HTTP attempt, page boundary, raw payload hash and retrieval time.",
+      "Model issuer/security/listing identity separately from ticker. Keep source effective/publication/revision times distinct from our observation time and record unknown times explicitly.",
+      "Retain all revisions and use a strict decision-time eligibility rule before selecting a revision. Prevent per-column mixing from manufacturing a source row.",
+      "Compare sample coverage and corporate actions to pinned native mechanics before any research return labels; current AAPL sample proves neither full delisted coverage nor strategy merit."
+    ],
+    "stopping_basis": "Each alternative has a distinct evaluated role or explicit exclusion. No unresolved finding requires another framework installation. Further breadth would not prove missing historical source availability or account entitlements."
+  },
+  "independent_review": {
+    "status": "three critical claims independently corroborated before catalog finalization",
+    "claims": [
+      "Massive report-period versus availability-date semantics",
+      "Databento default per-column latest-style revision collapse and need for explicit cutoffs",
+      "OpenFIGI examples license and lack of a general historical-availability contract in its documented mapping interface"
+    ]
+  },
+  "limitations": [
+    "Current upstream default-branch commits are source-review pins, not automatically adopted release versions.",
+    "No provider-native data request or new runtime was executed by this review; coordinator receipts establish separate authenticated acquisition results.",
+    "This selected challenge is not a claim that every starred repository or the entire market was deeply audited.",
+    "Software licenses do not automatically grant dataset entitlement or redistribution rights."
+  ],
+  "primary_context_references": [
+    "catalogs/us-equities/data-readiness-review.json",
+    "catalogs/us-equities/data-research.json",
+    "catalogs/us-equities/decision-index.json",
+    "blueprints/us-equities/corporate-action-readiness/README.md",
+    "https://docs.alpaca.markets/us/reference/corporateactions-1"
+  ]
+}
