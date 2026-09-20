@@ -68,7 +68,8 @@
       "evidence_ids": [
         "component-history",
         "token-practice-coverage-20260920",
-        "token-practice-gap-followup-20260920"
+        "token-practice-gap-followup-20260920",
+        "current-session-observation-20260920"
       ],
       "upstream_sources": [
         "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0"
@@ -99,7 +100,8 @@
         "token-practice-coverage-20260920",
         "native-ai-memory-maintenance-20260920",
         "mac-memory-patch-20260920",
-        "wsl-memory-maintenance-20260920"
+        "wsl-memory-maintenance-20260920",
+        "current-session-observation-20260920"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory",
@@ -143,7 +145,8 @@
       "evidence_ids": [
         "component-history",
         "token-practice-coverage-20260920",
-        "token-practice-gap-followup-20260920"
+        "token-practice-gap-followup-20260920",
+        "current-session-observation-20260920"
       ],
       "upstream_sources": [
         "https://github.com/ccusage/ccusage"
@@ -204,7 +207,8 @@
         "component-history",
         "token-practice-coverage-20260920",
         "token-practice-gap-followup-20260920",
-        "native-claude-hud-interactive-20260920"
+        "native-claude-hud-interactive-20260920",
+        "current-session-observation-20260920"
       ],
       "upstream_sources": [
         "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0"
@@ -341,7 +345,8 @@
         "token-practice-coverage-20260920",
         "token-practice-native-counters-20260920",
         "native-token-focus-clients-20260920",
-        "token-practice-confirmation-20260920"
+        "token-practice-confirmation-20260920",
+        "current-session-observation-20260920"
       ],
       "upstream_sources": [
         "https://github.com/mksglu/context-mode"
@@ -436,7 +441,8 @@
         "token-native-retained-functional-20260920",
         "native-headroom-mcp-20260920",
         "token-practice-confirmation-20260920",
-        "native-token-clean-prefix-20260920"
+        "native-token-clean-prefix-20260920",
+        "current-session-observation-20260920"
       ],
       "upstream_sources": [
         "https://github.com/chopratejas/headroom"
@@ -524,7 +530,8 @@
       "evidence_ids": [
         "component-history",
         "desktop-restart-acceptance",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "current-session-observation-20260920"
       ],
       "upstream_sources": [
         "https://github.com/openclaw/mcporter/tree/v0.13.13"
@@ -687,7 +694,8 @@
         "token-practice-artifacts-20260920",
         "token-practice-coverage-20260920",
         "token-practice-native-counters-20260920",
-        "token-practice-confirmation-20260920"
+        "token-practice-confirmation-20260920",
+        "current-session-observation-20260920"
       ],
       "upstream_sources": [
         "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0"
@@ -737,7 +745,8 @@
       "evidence_ids": [
         "native-context-memory",
         "component-history",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "current-session-observation-20260920"
       ],
       "upstream_sources": [
         "https://github.com/oraios/serena"
@@ -810,7 +819,8 @@
         "vllm-compatibility",
         "native-observability-followup",
         "token-practice-artifacts-20260920",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "current-session-observation-20260920"
       ],
       "upstream_sources": [
         "https://github.com/giancarloerra/SocratiCode"
@@ -908,7 +918,8 @@
         "native-claude-convergence-review-20260919",
         "native-paired-adoption-20260919",
         "native-architecture-review-20260919",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "current-session-observation-20260920"
       ],
       "source_pin": null,
       "upstream_sources": [
@@ -936,7 +947,8 @@
         "native-paired-adoption-20260919",
         "native-architecture-review-20260919",
         "native-grand-dashboard-20260919",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "current-session-observation-20260920"
       ],
       "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
       "upstream_sources": [
@@ -964,7 +976,8 @@
         "native-architecture-review-20260919",
         "native-grand-dashboard-20260919",
         "native-simulation-research-dashboard-20260919",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "current-session-observation-20260920"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [
@@ -989,7 +1002,8 @@
         "desktop-restart-acceptance",
         "native-grand-dashboard-20260919",
         "native-simulation-research-dashboard-20260919",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "current-session-observation-20260920"
       ],
       "source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
       "upstream_sources": [
@@ -1010,7 +1024,8 @@
       "evidence_ids": [
         "native-observability",
         "desktop-restart-acceptance",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "current-session-observation-20260920"
       ],
       "source_pin": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
       "upstream_sources": [
@@ -1032,7 +1047,8 @@
       "evidence_ids": [
         "native-observability",
         "desktop-restart-acceptance",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "current-session-observation-20260920"
       ],
       "source_pin": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
       "upstream_sources": [
@@ -1365,7 +1381,8 @@
       ],
       "command_scope": "Choose unused loopback ports for an owned diagnostic session and close it afterward; synthetic trace acceptance only.",
       "evidence_ids": [
-        "upstream-native-tools-20260920"
+        "upstream-native-tools-20260920",
+        "current-session-observation-20260920"
       ],
       "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import."
     },
@@ -1410,7 +1427,8 @@
         "native-jcodemunch-20260920",
         "native-token-focus-clients-20260920",
         "token-practice-confirmation-20260920",
-        "native-token-clean-prefix-20260920"
+        "native-token-clean-prefix-20260920",
+        "current-session-observation-20260920"
       ],
       "upstream_sources": [
         "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
