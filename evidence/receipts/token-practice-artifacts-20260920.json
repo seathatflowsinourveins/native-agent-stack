@@ -1,0 +1,256 @@
+{
+  "schema_version": 1,
+  "id": "token-practice-artifacts-20260920",
+  "kind": "artifact_measurement",
+  "recorded_at_utc": "2026-09-20T02:28:47.397Z",
+  "component_ids": [
+    "agent-browser",
+    "ast-grep",
+    "edgartools",
+    "markitdown",
+    "qmd",
+    "repomix",
+    "rtk",
+    "socraticode",
+    "syft",
+    "toon"
+  ],
+  "claim": "Ten retained native input/output artifact pairs were counted exactly with gpt-tokenizer 3.4.0 / o200k_base; selection and conversion boundaries remain explicit.",
+  "limitations": [
+    "Counts describe retained original host artifacts. This public aggregate omits the private originals; CI validates aggregate integrity, not an independent recount of those private bytes.",
+    "Most pairs select or transform information lossily. Shorter output does not establish equivalent answer quality or lower complete task usage.",
+    "Pairs overlap, including shared HTML sources and retrieval services. Do not sum them or attribute the same difference independently to dependencies.",
+    "Exact provider savings remain null. Tokenizer counts are not provider billing, subscription savings or causal per-repository effects.",
+    "The Syft table preserves checked package name/version/type columns while omitting other SBOM metadata; this is a view selection, not equivalent full SBOM content."
+  ],
+  "data": {
+    "tokenizer": {
+      "package": "gpt-tokenizer",
+      "version": "3.4.0",
+      "encoding": "o200k_base"
+    },
+    "pairs": [
+      {
+        "id": "rtk-git-log",
+        "component": "rtk",
+        "type": "lossy command formatting",
+        "baseline_tokens": 537,
+        "candidate_tokens": 178,
+        "tokens_removed": 359,
+        "exact_provider_savings": null,
+        "baseline_artifact": {
+          "bytes": 1456,
+          "sha256": "85d55265414d6c3507c1284edb550e27c04fab67ff5e12c21b88af2c7c7bd6d3",
+          "tokens": 537,
+          "encoding": "o200k_base"
+        },
+        "candidate_artifact": {
+          "bytes": 641,
+          "sha256": "9669c4fdc3b6eeddacf522b7ad26bfc65505da3f2bb70f54201daba87de3ff56",
+          "tokens": 178,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "toon-components",
+        "component": "toon",
+        "type": "reversible serialization",
+        "baseline_tokens": 1664,
+        "candidate_tokens": 1307,
+        "tokens_removed": 357,
+        "exact_provider_savings": null,
+        "baseline_artifact": {
+          "bytes": 6877,
+          "sha256": "c3e41e1becfe1faea53c5fc6c4a870e5491faebd44fe725568842e112300182a",
+          "tokens": 1664,
+          "encoding": "o200k_base"
+        },
+        "candidate_artifact": {
+          "bytes": 4832,
+          "sha256": "e24dfa671e841e79395693a98ecd3a5eb7d2c7998e8a6567d4859d67821c6f56",
+          "tokens": 1307,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "ast-grep-selection",
+        "component": "ast-grep",
+        "type": "lossy structural retrieval",
+        "baseline_tokens": 1818,
+        "candidate_tokens": 674,
+        "tokens_removed": 1144,
+        "exact_provider_savings": null,
+        "baseline_artifact": {
+          "bytes": 7704,
+          "sha256": "8ca92584c4b5556fa1859a0c51bd8579fded84b1cd1dd5a56082143fdc1a59f1",
+          "tokens": 1818,
+          "encoding": "o200k_base"
+        },
+        "candidate_artifact": {
+          "bytes": 2232,
+          "sha256": "96d9a7577834fbb9d6d9708e671075c02a5c48f65525297e993c52448905c80b",
+          "tokens": 674,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "qmd-window",
+        "component": "qmd",
+        "type": "lossy indexed source selection",
+        "baseline_tokens": 2672,
+        "candidate_tokens": 815,
+        "tokens_removed": 1857,
+        "exact_provider_savings": null,
+        "baseline_artifact": {
+          "bytes": 10102,
+          "sha256": "d4620e507748ff770e943f36f7423bb785b4e18bb46e7a33168c518b284e1f28",
+          "tokens": 2672,
+          "encoding": "o200k_base"
+        },
+        "candidate_artifact": {
+          "bytes": 2955,
+          "sha256": "6926ef18acdf7266a0e57ea3653705a2df62e36ac8fee0d1a1b987bbf87ee03f",
+          "tokens": 815,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "socraticode-selection",
+        "component": "socraticode",
+        "type": "lossy semantic retrieval",
+        "baseline_tokens": 2731,
+        "candidate_tokens": 491,
+        "tokens_removed": 2240,
+        "exact_provider_savings": null,
+        "baseline_artifact": {
+          "bytes": 11761,
+          "sha256": "d8050a34ace0b4f16a9345ffeca798ca5d8ce897ed614936e530115699e1fdf9",
+          "tokens": 2731,
+          "encoding": "o200k_base"
+        },
+        "candidate_artifact": {
+          "bytes": 2167,
+          "sha256": "88bdf13ffaa0527109945c9042397e9e10cacba53006c30d2ca004719991d523",
+          "tokens": 491,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "repomix-compress",
+        "component": "repomix",
+        "type": "lossy source packing",
+        "baseline_tokens": 3697,
+        "candidate_tokens": 663,
+        "tokens_removed": 3034,
+        "exact_provider_savings": null,
+        "baseline_artifact": {
+          "bytes": 15166,
+          "sha256": "38f127c32fde14c74a799799dfcb89847dca2018e49bf239f154747bd9f6318a",
+          "tokens": 3697,
+          "encoding": "o200k_base"
+        },
+        "candidate_artifact": {
+          "bytes": 3292,
+          "sha256": "6d1c16295e4775a220cf4335e46067d07392fb4d9a67d8e3c1a0ed11c3ed87bb",
+          "tokens": 663,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "edgartools-html",
+        "component": "edgartools",
+        "type": "lossy HTML conversion",
+        "baseline_tokens": 10322,
+        "candidate_tokens": 1249,
+        "tokens_removed": 9073,
+        "exact_provider_savings": null,
+        "baseline_artifact": {
+          "bytes": 32434,
+          "sha256": "6f40108c938a9edc73da7477d92d5c6c705e965210e8e62faf60de81f0af4ab2",
+          "tokens": 10322,
+          "encoding": "o200k_base"
+        },
+        "candidate_artifact": {
+          "bytes": 5325,
+          "sha256": "0c7253e2ffaf1937296fdccf9b297994e86ecae233b13b5a9c4dd438859117f8",
+          "tokens": 1249,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "browser-snapshot",
+        "component": "agent-browser",
+        "type": "lossy view selection",
+        "baseline_tokens": 67,
+        "candidate_tokens": 38,
+        "tokens_removed": 29,
+        "exact_provider_savings": null,
+        "baseline_artifact": {
+          "bytes": 197,
+          "sha256": "54980010f1e45539f9006e3bfacb4754e7c886d0de701227d58bed02fbe4dd41",
+          "tokens": 67,
+          "encoding": "o200k_base"
+        },
+        "candidate_artifact": {
+          "bytes": 110,
+          "sha256": "b5e9e22ffdf9cfec28a3998de6f12b70964b657cfdfaaf41dec75d9be0e1a349",
+          "tokens": 38,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "markitdown-exact-stored-input",
+        "component": "markitdown",
+        "type": "lossy HTML-to-Markdown conversion",
+        "baseline_tokens": 10322,
+        "candidate_tokens": 1360,
+        "tokens_removed": 8962,
+        "exact_provider_savings": null,
+        "baseline_artifact": {
+          "bytes": 32435,
+          "sha256": "a1e7ca4772bca52911631c6ba2626878cb8c5ebdf17c662033e89d04ef4a0b17",
+          "tokens": 10322,
+          "encoding": "o200k_base"
+        },
+        "candidate_artifact": {
+          "bytes": 5611,
+          "sha256": "a27f0f27487e634d2eb2ae8d10720845cbbff3ce3fccc8878ee0283eca3ef28b",
+          "tokens": 1360,
+          "encoding": "o200k_base"
+        }
+      },
+      {
+        "id": "syft-inventory-view",
+        "component": "syft",
+        "type": "lossy native table view",
+        "baseline_tokens": 471760,
+        "candidate_tokens": 465,
+        "tokens_removed": 471295,
+        "exact_provider_savings": null,
+        "baseline_artifact": {
+          "bytes": 1230291,
+          "sha256": "b90f142315ea2fbd894ac805ee836d47b287e2b74bb9bcb2676e2fb5533595ed",
+          "tokens": 471760,
+          "encoding": "o200k_base"
+        },
+        "candidate_artifact": {
+          "bytes": 1700,
+          "sha256": "dd3777ddb7dddbd3a8e5ba31de6f51bdd87b65913e133ae31f93870c3555697c",
+          "tokens": 465,
+          "encoding": "o200k_base"
+        }
+      }
+    ],
+    "syft_required_columns": {
+      "json_packages": 36,
+      "table_packages": 36,
+      "exact_name_version_type_equality": true
+    }
+  },
+  "provenance": {
+    "source_label": "retained_private_native_audit_aggregate",
+    "sha256": "9d5da2aa8868289933569def8b14458e1a0cc97a3f91a671d9030479b60a28a0",
+    "generated_at_utc": "2026-09-20T02:28:47.397Z",
+    "publication_method": "Explicit allowlist of aggregate counts, public component identities, outcomes and artifact hashes; private paths, transcripts, session identifiers and environment values omitted."
+  }
+}

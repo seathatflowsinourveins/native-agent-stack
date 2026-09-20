@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "local-inference",
+  "discovery_provenance": [
+    "Existing catalog trial: ggml-org/llama.cpp and conditional local Qwen3.8 generation. No star-ranking-based adoption."
+  ],
+  "license_and_compatibility": "Pinned MIT native runtime, Apache-2.0 Qwen primary/conversion metadata and private NVIDIA CUDA13.3 license receipt. Exact archive/model hashes and native attestation passed; one target-host partial-offload task tested.",
+  "predeclared_metrics": {
+    "quality_rule": "One reviewed source artifact passes unchanged12-test oracle with3GiB sampled memory reserve and frozen deadlines.",
+    "usage_rule": "Retain native prompt/completion/total and cached-token counters; undefined categories null; no savings claim."
+  },
+  "commands": [
+    "python3 qualify.py --lane <owned-private-lane> --plan plan.json --prompt prompt.txt",
+    "python3 -I <reviewed isolated unittest launcher>; unchanged test_planner oracle,5sCPU/512MiBAS/15sdeadline"
+  ],
+  "observations": [
+    {
+      "id": "gpu-partial-patch",
+      "task": "dependency-planner",
+      "role": "local-gpu-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "model_task_execution",
+      "scope": "One visible dependency-planner repair with Qwen3.8-27B Q4_K_M and b11057 CUDA13.3 in configured partial CPU/GPU offload on RTX4090 WSL2",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/gpu-inference/receipt.json",
+          "sha256": "48a25b9f9192783564bbc3b1fd3b75628efa0f2cddce2663e0cbdd9b577c9e6a"
+        },
+        {
+          "path": "blueprints/convergence-practice/gpu-inference/trial.json",
+          "sha256": "96a2b16b9b1e7741bd473702c073bd66b7da8bc172663e453556e5c6d9d187ed"
+        },
+        {
+          "path": "blueprints/convergence-practice/gpu-inference/checks.json",
+          "sha256": "af70cc9d7bf9e6ab7b2043fc2ceeeff71169afa1dcb4058e3c269fb494e25406"
+        },
+        {
+          "path": "blueprints/convergence-practice/gpu-inference/accepted/planner.py",
+          "sha256": "53a2c5b34dd5265561741bab8fb27330951c39897ade398425aeb20f45d3f413"
+        },
+        {
+          "path": "blueprints/convergence-practice/gpu-inference/test-output.txt",
+          "sha256": "5b7d9978947acc47b15c516090444a9e74ac7fe5439aa56ab46da8f8cd3855fc"
+        },
+        {
+          "path": "blueprints/convergence-practice/gpu-inference/independent-review.json",
+          "sha256": "f4b367b66735f22cfd576385b7841f63dcc33879d8e0c5f7cc59d2f68433cc88"
+        }
+      ],
+      "usage": {
+        "uncached_input": 791,
+        "cache_creation": null,
+        "cache_read": 0,
+        "output": 394,
+        "reasoning_in_output": null,
+        "total": 1185,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [],
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  },
+  "task_and_failure": "Clean VelaNext had CUDA kernel evidence but no installed local generation runtime/model or useful inference quality/latency/VRAM acceptance.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/ggml-org/llama.cpp",
+      "revision": "59657a613ab0fa4ab327d6c790123dff30bfbd67"
+    },
+    {
+      "url": "https://huggingface.co/ggml-org/Qwen3.8-27B-GGUF",
+      "revision": "efbb3b1f70a21d97fd4495240648405f7228554f"
+    },
+    {
+      "url": "https://huggingface.co/Qwen/Qwen3.8-27B",
+      "revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0"
+    }
+  ],
+  "baseline_and_candidate": {
+    "baseline": "Existing broken planner retained; no matched baseline model trial",
+    "candidate": "One source-only loopback native request using a pinned local partial-offload CUDA model, followed by independent review and original oracle"
+  },
+  "frozen_inputs": {
+    "base_revision": "6001677f83c9519bb9ceb8fc5c2e7b3771b94860",
+    "tasks": [
+      "dependency-planner"
+    ],
+    "roles": [
+      "local-gpu-worker"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/native-worker/seed/planner.py",
+        "sha256": "ba9155fd203a5d23e12ea7f842ccc5ac033249db4a64ec525374fa2db9d71082"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/gpu-inference/prompt.txt",
+        "sha256": "ddf87696c150dd92792911d4664341ab6b29996be07dbc2b5fb897a82d8d61f7"
+      },
+      {
+        "path": "blueprints/convergence-practice/gpu-inference/plan.json",
+        "sha256": "0067f2056a1638a6414b21c40b0d39b4828b096f12c49399ea0a423056350fda"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/native-worker/seed/test_planner.py",
+        "sha256": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+      },
+      {
+        "path": "blueprints/convergence-practice/gpu-inference/qualify.py",
+        "sha256": "a64ab593587135d9587365fb5f9a93c84e1ffc62bcbaef32db30f84bc4a70d34"
+      }
+    ]
+  },
+  "runtime_and_platform": {
+    "platform": "Ubuntu24.04.5 WSL2 x86_64; RTX4090; Windowsdriver616.64",
+    "tools": [
+      {
+        "name": "llama.cpp",
+        "version": "0.4.1-dev b11057 CUDA13.3"
+      },
+      {
+        "name": "Qwen3.8-27B-Q4_K_M",
+        "version": "efbb3b1f70a21d97fd4495240648405f7228554f"
+      }
+    ],
+    "isolation": "Versioned user-owned installation; loopback/no-tools foreground process; reviewed source tested separately in resource-limited fresh directory, not an OS sandbox."
+  },
+  "limitations": [
+    "One visible fixture and one sample, no frontier parity or general coding qualification.",
+    "179.191s generation narrowly meets the frozen180s deadline; this partial-offload profile is not an interactive latency default.",
+    "Shared-device memory samples are not process peak allocation or an isolated benchmark.",
+    "ExactGPUlayerplacement count unavailable; partial offload was explicit and GPU allocation observed.",
+    "Generated trial receipt remains unchanged; subsequent review/testing is a separate acceptance.",
+    "No complete-host recovery, concurrent serving or broker/trading qualification."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "One visible dependency-planner repair with Qwen3.8-27B Q4_K_M and b11057 CUDA13.3 in configured partial CPU/GPU offload on RTX4090 WSL2",
+    "qualification_run_ids": [
+      "gpu-partial-patch"
+    ]
+  },
+  "rollback": "Keep compact receipts; retire only owned private foreground lane after exit. No driver/global-service changes to undo.",
+  "next_decision_changing_test": "A separately frozen realistic repository repair and latency/offload budget after this single task; no unapproved second trial in this wave."
+}

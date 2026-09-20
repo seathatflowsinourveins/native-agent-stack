@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "status": "frozen_before_native_attempt",
+  "base_revision": "6001677f83c9519bb9ceb8fc5c2e7b3771b94860",
+  "task": "native-tool-turn-interrupt-resume",
+  "attempt_limit": 1,
+  "native_turns": 2,
+  "model": "gpt-6-astra",
+  "reasoning_effort": "ultra",
+  "model_selection": "Inspect and preserve existing native defaults; fail before turn/start if different",
+  "source": "https://learn.chatgpt.com/docs/app-server#start-or-resume-a-thread",
+  "source_reviewed_at": "2026-09-20",
+  "protocol": ["initialize", "thread/start", "turn/start", "item/tool/call:checkpoint", "item/tool/call:wait pending", "turn/interrupt", "turn/completed:interrupted", "stop owned server", "new server initialize", "thread/resume:same ID", "turn/start", "item/tool/call:finalize", "turn/completed:completed"],
+  "quality_rule": "Every fixture.assess check must be true: native interruption, new connection and same identity; unchanged frozen bytes and checkpoint; exactly checkpoint, wait, finalize; complete result and stopped owned servers",
+  "usage_rule": "Retain native same-thread cumulative categories; count final total once only if monotonic. Never sum cumulative snapshots. Unknown retries, billing and enclosing coordinator usage remain null; no savings claim.",
+  "stop_conditions": ["unexpected tool or approval", "checkpoint repeated", "native protocol error", "stage deadline", "identity mismatch", "changed fixture bytes"],
+  "rollback": "Stop only the two owned app-server processes; retain private native evidence and disposable fixture. Do not edit shared configuration or erase native session history."
+}

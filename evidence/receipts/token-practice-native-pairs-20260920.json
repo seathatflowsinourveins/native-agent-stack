@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "id": "token-practice-native-pairs-20260920",
+  "kind": "native_model_e2e",
+  "recorded_at_utc": "2026-09-20T02:28:47.397Z",
+  "component_ids": [
+    "codex",
+    "claude-code",
+    "context-mode"
+  ],
+  "claim": "Four native coding trials passed shared visible, hidden and file-scope acceptance gates; one fixed-order Context Mode non-use/explicit-use pair per client produced mixed observed task-usage differences.",
+  "limitations": [
+    "One baseline-first pair per client is not randomized, repeated or cache-matched. Native cache warmth and plugin tool availability were not fully controlled.",
+    "Observed differences are not causal per-repository savings, a whole-stack saving rate or evidence that either model is generally better.",
+    "Codex cached input and reasoning output are subsets. Claude ordinary input, cache creation, cache reads and output are separate categories; thinking is included in output.",
+    "Final cumulative session counters are used once. Coordinator, reviewers, audit tooling and report production are outside these four task totals.",
+    "Billed cost is unknown. Token counts and cached reads do not establish subscription charges or money saved.",
+    "Private transcripts, session identifiers and commands are not published. Hashes bind retained evidence, not independent attestation of provider execution."
+  ],
+  "data": {
+    "fixture_revision": "c0bb7561a9c88a98ceaa06d6fcc153f35f55dd69",
+    "cache_conditions": "Fresh isolated task workspaces with retained native provider caches; uncontrolled cache warmth.",
+    "trials": [
+      {
+        "client": "codex",
+        "variant": "baseline",
+        "models_observed": [
+          "gpt-6-astra"
+        ],
+        "started_at_utc": "2026-09-20T02:04:31.169881+00:00",
+        "wall_seconds": 56.129,
+        "exit_code": 0,
+        "usage_categories": {
+          "input_tokens": 133798,
+          "cache_read_tokens": 97024,
+          "cache_write_tokens": 0,
+          "output_tokens": 1419,
+          "reasoning_output_tokens": 11
+        },
+        "total_tokens": 135217,
+        "visible_acceptance": true,
+        "hidden_acceptance": true,
+        "file_scope_passed": true,
+        "full_acceptance": true,
+        "harness_retries": 0,
+        "api_retries_observed": null,
+        "observed_context_mode_calls": 0,
+        "command_sha256": "a52af580e56ac6c60db6bd3bb76b4b182f41d325f0018ae99d38e93bcb8eace1",
+        "billed_cost_usd": null
+      },
+      {
+        "client": "codex",
+        "variant": "candidate",
+        "models_observed": [
+          "gpt-6-astra"
+        ],
+        "started_at_utc": "2026-09-20T02:06:52.974016+00:00",
+        "wall_seconds": 50.207,
+        "exit_code": 0,
+        "usage_categories": {
+          "input_tokens": 118668,
+          "cache_read_tokens": 98688,
+          "cache_write_tokens": 0,
+          "output_tokens": 1330,
+          "reasoning_output_tokens": 8
+        },
+        "total_tokens": 119998,
+        "visible_acceptance": true,
+        "hidden_acceptance": true,
+        "file_scope_passed": true,
+        "full_acceptance": true,
+        "harness_retries": 0,
+        "api_retries_observed": null,
+        "observed_context_mode_calls": 2,
+        "command_sha256": "255bd76bb1f76abbca6b82358daba4d6b2741d1cf2979de1c5f0b088c94e3d7e",
+        "billed_cost_usd": null
+      },
+      {
+        "client": "claude",
+        "variant": "baseline",
+        "models_observed": [
+          "claude-opus-5"
+        ],
+        "started_at_utc": "2026-09-20T02:09:21.466941+00:00",
+        "wall_seconds": 27.465,
+        "exit_code": 0,
+        "usage_categories": {
+          "input_tokens": 20,
+          "cache_read_tokens": 264785,
+          "cache_write_tokens": 22884,
+          "output_tokens": 4872,
+          "reasoning_output_tokens": 1137
+        },
+        "total_tokens": 292561,
+        "visible_acceptance": true,
+        "hidden_acceptance": true,
+        "file_scope_passed": true,
+        "full_acceptance": true,
+        "harness_retries": 0,
+        "api_retries_observed": 0,
+        "observed_context_mode_calls": 0,
+        "command_sha256": "aea88a2f48f2b3e84b242ec821ea9a29edec51566e23f187078fc1ce3da7b82d",
+        "billed_cost_usd": null
+      },
+      {
+        "client": "claude",
+        "variant": "candidate",
+        "models_observed": [
+          "claude-opus-5"
+        ],
+        "started_at_utc": "2026-09-20T02:11:17.440035+00:00",
+        "wall_seconds": 34.056,
+        "exit_code": 0,
+        "usage_categories": {
+          "input_tokens": 22,
+          "cache_read_tokens": 333092,
+          "cache_write_tokens": 28166,
+          "output_tokens": 6841,
+          "reasoning_output_tokens": 1502
+        },
+        "total_tokens": 368121,
+        "visible_acceptance": true,
+        "hidden_acceptance": true,
+        "file_scope_passed": true,
+        "full_acceptance": true,
+        "harness_retries": 0,
+        "api_retries_observed": 0,
+        "observed_context_mode_calls": 3,
+        "command_sha256": "3a3acca725a11f333abd630313623fb2dcf17e24f6d79cd878dbee18e1ef77e3",
+        "billed_cost_usd": null
+      }
+    ],
+    "pairs": [
+      {
+        "client": "codex",
+        "model": "gpt-6-astra",
+        "baseline_total": 135217,
+        "candidate_total": 119998,
+        "observed_tokens_fewer": 15219,
+        "reduction_percent": 11.255241574654075,
+        "baseline_seconds": 56.129,
+        "candidate_seconds": 50.207,
+        "all_acceptance_passed": true,
+        "causal_per_repo_savings": null
+      },
+      {
+        "client": "claude",
+        "model": "claude-opus-5",
+        "baseline_total": 292561,
+        "candidate_total": 368121,
+        "observed_tokens_fewer": -75560,
+        "reduction_percent": -25.82709246960463,
+        "baseline_seconds": 27.465,
+        "candidate_seconds": 34.056,
+        "all_acceptance_passed": true,
+        "causal_per_repo_savings": null
+      }
+    ]
+  },
+  "provenance": {
+    "source_label": "retained_private_native_audit_aggregate",
+    "sha256": "9d5da2aa8868289933569def8b14458e1a0cc97a3f91a671d9030479b60a28a0",
+    "generated_at_utc": "2026-09-20T02:28:47.397Z",
+    "publication_method": "Explicit allowlist of aggregate counts, public component identities, outcomes and artifact hashes; private paths, transcripts, session identifiers and environment values omitted."
+  }
+}

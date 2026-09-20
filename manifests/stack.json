@@ -20,7 +20,8 @@
         }
       ],
       "evidence_ids": [
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/affaan-m/ECC"
@@ -44,7 +45,9 @@
         "component-history",
         "desktop-cli-workflows",
         "native-observability",
-        "native-observability-followup"
+        "native-observability-followup",
+        "token-practice-artifacts-20260920",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1"
@@ -63,7 +66,9 @@
         "agentsview --help"
       ],
       "evidence_ids": [
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920",
+        "token-practice-gap-followup-20260920"
       ],
       "upstream_sources": [
         "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0"
@@ -90,7 +95,8 @@
         "component-history",
         "native-observability-followup",
         "ai-memory-native-state-recovery-20260919",
-        "native-memory-lifecycle-20260919"
+        "native-memory-lifecycle-20260919",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory"
@@ -110,7 +116,9 @@
       ],
       "evidence_ids": [
         "component-history",
-        "portable-cli-artifacts"
+        "portable-cli-artifacts",
+        "token-practice-artifacts-20260920",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3"
@@ -129,7 +137,9 @@
         "ccusage --help"
       ],
       "evidence_ids": [
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920",
+        "token-practice-gap-followup-20260920"
       ],
       "upstream_sources": [
         "https://github.com/ccusage/ccusage"
@@ -161,7 +171,10 @@
         "native-architecture-review-20260919",
         "native-convergence-review-20260919",
         "native-research-efficiency-20260920",
-        "native-claude-child-patch-20260920"
+        "native-claude-child-patch-20260920",
+        "token-practice-native-pairs-20260920",
+        "token-practice-coverage-20260920",
+        "native-claude-session-recovery-20260920"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -183,7 +196,9 @@
         }
       ],
       "evidence_ids": [
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920",
+        "token-practice-gap-followup-20260920"
       ],
       "upstream_sources": [
         "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0"
@@ -206,7 +221,8 @@
       "evidence_ids": [
         "native-cli-gaps",
         "component-history",
-        "desktop-cli-workflows"
+        "desktop-cli-workflows",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0"
@@ -238,7 +254,11 @@
         "native-paired-adoption-20260919",
         "native-architecture-review-20260919",
         "native-convergence-review-20260919",
-        "native-research-efficiency-20260920"
+        "native-research-efficiency-20260920",
+        "token-practice-native-pairs-20260920",
+        "token-practice-coverage-20260920",
+        "token-practice-gap-followup-20260920",
+        "native-codex-session-recovery-20260920"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -262,7 +282,9 @@
         }
       ],
       "evidence_ids": [
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920",
+        "token-practice-gap-followup-20260920"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex-plugin-cc/tree/v1.0.6"
@@ -282,7 +304,8 @@
         "chub search \"python json\" --json"
       ],
       "evidence_ids": [
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/andrewyng/context-hub"
@@ -305,7 +328,10 @@
         "artifact-reductions",
         "component-history",
         "native-observability-followup",
-        "desktop-restart-acceptance"
+        "desktop-restart-acceptance",
+        "token-practice-native-pairs-20260920",
+        "token-practice-coverage-20260920",
+        "token-practice-native-counters-20260920"
       ],
       "upstream_sources": [
         "https://github.com/mksglu/context-mode"
@@ -329,7 +355,8 @@
         }
       ],
       "evidence_ids": [
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/davila7/claude-code-templates"
@@ -350,7 +377,8 @@
       ],
       "evidence_ids": [
         "component-history",
-        "portable-cli-artifacts"
+        "portable-cli-artifacts",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/Wilfred/difftastic/releases/tag/0.71.0"
@@ -370,7 +398,8 @@
       ],
       "evidence_ids": [
         "runtime-tools",
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/gitleaks/gitleaks"
@@ -389,7 +418,9 @@
         "python -m pip show headroom-ai"
       ],
       "evidence_ids": [
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920",
+        "token-practice-native-counters-20260920"
       ],
       "upstream_sources": [
         "https://github.com/chopratejas/headroom"
@@ -411,7 +442,8 @@
       ],
       "evidence_ids": [
         "component-history",
-        "native-rag"
+        "native-rag",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/huggingface/huggingface_hub"
@@ -431,7 +463,9 @@
       ],
       "evidence_ids": [
         "component-history",
-        "portable-cli-artifacts"
+        "portable-cli-artifacts",
+        "token-practice-artifacts-20260920",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/microsoft/markitdown/releases/tag/v0.1.7"
@@ -450,7 +484,8 @@
         "npx @modelcontextprotocol/inspector@2.7.0 --help"
       ],
       "evidence_ids": [
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/modelcontextprotocol/inspector"
@@ -471,7 +506,8 @@
       ],
       "evidence_ids": [
         "component-history",
-        "desktop-restart-acceptance"
+        "desktop-restart-acceptance",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/openclaw/mcporter/tree/v0.13.13"
@@ -492,7 +528,9 @@
       ],
       "evidence_ids": [
         "component-history",
-        "artifact-reductions"
+        "artifact-reductions",
+        "token-practice-coverage-20260920",
+        "token-practice-gap-followup-20260920"
       ],
       "upstream_sources": [
         "https://github.com/alphaXiv/OpenResearch"
@@ -506,18 +544,21 @@
       "version": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
       "license": "Apache-2.0",
       "profile": "optional",
-      "role": "Browser workflow instructions from installed official CLI",
+      "role": "Native browser CLI with bounded Linux fixture acceptance and separately scoped Windows history",
       "commands": [
-        "playwright-cli --help"
+        "playwright-cli --help",
+        "playwright-cli --version"
       ],
       "evidence_ids": [
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920",
+        "token-practice-gap-followup-20260920"
       ],
       "upstream_sources": [
         "https://github.com/microsoft/playwright-cli"
       ],
       "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "freshness": "Exact 0.1.21 package integrity verified against registry and lock; alpha Playwright dependencies and existing-Chrome acceptance are recorded in the dated gap follow-up receipt.",
       "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
     },
     {
@@ -531,7 +572,8 @@
         "promptfoo --help"
       ],
       "evidence_ids": [
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/promptfoo/promptfoo"
@@ -554,7 +596,8 @@
         "native-rag",
         "desktop-direct-rag",
         "component-history",
-        "qdrant-native-state-recovery-20260919"
+        "qdrant-native-state-recovery-20260919",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/qdrant/qdrant"
@@ -577,7 +620,9 @@
         "component-history",
         "desktop-cli-workflows",
         "qmd-bm25-retrieval-20260919",
-        "native-research-efficiency-20260920"
+        "native-research-efficiency-20260920",
+        "token-practice-artifacts-20260920",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/tobi/qmd/releases/tag/v2.8.3"
@@ -597,7 +642,9 @@
       ],
       "evidence_ids": [
         "component-history",
-        "portable-cli-artifacts"
+        "portable-cli-artifacts",
+        "token-practice-artifacts-20260920",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/yamadashy/repomix/releases/tag/v1.18.0"
@@ -618,7 +665,10 @@
       "evidence_ids": [
         "native-context-memory",
         "artifact-reductions",
-        "component-history"
+        "component-history",
+        "token-practice-artifacts-20260920",
+        "token-practice-coverage-20260920",
+        "token-practice-native-counters-20260920"
       ],
       "upstream_sources": [
         "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0"
@@ -638,7 +688,8 @@
       ],
       "evidence_ids": [
         "runtime-tools",
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/sandbox-runtime"
@@ -665,7 +716,8 @@
       ],
       "evidence_ids": [
         "native-context-memory",
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/oraios/serena"
@@ -688,7 +740,8 @@
         }
       ],
       "evidence_ids": [
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/shanraisshan/claude-code-best-practice"
@@ -709,7 +762,8 @@
       ],
       "evidence_ids": [
         "component-history",
-        "portable-cli-artifacts"
+        "portable-cli-artifacts",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0"
@@ -734,7 +788,9 @@
         "artifact-reductions",
         "component-history",
         "vllm-compatibility",
-        "native-observability-followup"
+        "native-observability-followup",
+        "token-practice-artifacts-20260920",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/giancarloerra/SocratiCode"
@@ -755,7 +811,11 @@
       ],
       "evidence_ids": [
         "component-history",
-        "portable-cli-artifacts"
+        "portable-cli-artifacts",
+        "token-practice-artifacts-20260920",
+        "token-practice-coverage-20260920",
+        "token-practice-catalog-toon-20260920",
+        "token-practice-native-counters-20260920"
       ],
       "upstream_sources": [
         "https://github.com/toon-format/toon/releases/tag/v4.1.1"
@@ -777,7 +837,8 @@
         "native-rag",
         "vllm-compatibility",
         "desktop-direct-rag",
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/vllm-project/vllm"
@@ -797,7 +858,8 @@
       ],
       "evidence_ids": [
         "worktrunk-list",
-        "component-history"
+        "component-history",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/max-sixty/worktrunk"
@@ -823,7 +885,8 @@
         "native-research-runtime-20260919",
         "native-claude-convergence-review-20260919",
         "native-paired-adoption-20260919",
-        "native-architecture-review-20260919"
+        "native-architecture-review-20260919",
+        "token-practice-coverage-20260920"
       ],
       "source_pin": null,
       "upstream_sources": [
@@ -850,7 +913,8 @@
         "native-claude-convergence-review-20260919",
         "native-paired-adoption-20260919",
         "native-architecture-review-20260919",
-        "native-grand-dashboard-20260919"
+        "native-grand-dashboard-20260919",
+        "token-practice-coverage-20260920"
       ],
       "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
       "upstream_sources": [
@@ -877,7 +941,8 @@
         "native-paired-adoption-20260919",
         "native-architecture-review-20260919",
         "native-grand-dashboard-20260919",
-        "native-simulation-research-dashboard-20260919"
+        "native-simulation-research-dashboard-20260919",
+        "token-practice-coverage-20260920"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [
@@ -901,7 +966,8 @@
         "native-observability-followup",
         "desktop-restart-acceptance",
         "native-grand-dashboard-20260919",
-        "native-simulation-research-dashboard-20260919"
+        "native-simulation-research-dashboard-20260919",
+        "token-practice-coverage-20260920"
       ],
       "source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
       "upstream_sources": [
@@ -921,7 +987,8 @@
       ],
       "evidence_ids": [
         "native-observability",
-        "desktop-restart-acceptance"
+        "desktop-restart-acceptance",
+        "token-practice-coverage-20260920"
       ],
       "source_pin": "73c6bfe7393929211294c1954f30d8ed78e4d0ad",
       "upstream_sources": [
@@ -942,7 +1009,8 @@
       ],
       "evidence_ids": [
         "native-observability",
-        "desktop-restart-acceptance"
+        "desktop-restart-acceptance",
+        "token-practice-coverage-20260920"
       ],
       "source_pin": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
       "upstream_sources": [
@@ -971,7 +1039,8 @@
         "sec-catalyst-dataset-native-20260920",
         "native-security-identity-20260920",
         "native-lifecycle-sample-20260920",
-        "synthetic-catalyst-contract-20260920"
+        "synthetic-catalyst-contract-20260920",
+        "token-practice-coverage-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -994,7 +1063,8 @@
       "evidence_ids": [
         "restic-local-public-reference-20260919",
         "ai-memory-native-state-recovery-20260919",
-        "qdrant-native-state-recovery-20260919"
+        "qdrant-native-state-recovery-20260919",
+        "token-practice-coverage-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1018,7 +1088,9 @@
         "native-research-runtime-20260919",
         "native-paired-adoption-20260919",
         "native-convergence-review-20260919",
-        "native-grand-dashboard-20260919"
+        "native-grand-dashboard-20260919",
+        "token-practice-coverage-20260920",
+        "native-dagu-job-recovery-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1043,7 +1115,8 @@
         "native-historical-leverage-stress-20260919",
         "native-chronological-controls-20260919",
         "native-corporate-actions-20260920",
-        "native-alpaca-historical-20260920"
+        "native-alpaca-historical-20260920",
+        "token-practice-coverage-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1063,7 +1136,9 @@
         "syft scan dir:/sdk --base-path /sdk --source-name equity-worker-sdk --parallelism 2 -o syft-json=/output/runtime.syft.json -o cyclonedx-json=/output/runtime.cdx.json"
       ],
       "evidence_ids": [
-        "syft-sdk-inventory-20260919"
+        "syft-sdk-inventory-20260919",
+        "token-practice-artifacts-20260920",
+        "token-practice-coverage-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1086,7 +1161,8 @@
       "evidence_ids": [
         "alpaca-offline-order-contract-20260919",
         "native-alpaca-historical-20260920",
-        "native-security-identity-20260920"
+        "native-security-identity-20260920",
+        "token-practice-coverage-20260920"
       ],
       "upstream_sources": [
         "https://github.com/alpacahq/alpaca-py/tree/v0.44.0",
@@ -1106,7 +1182,8 @@
         "systemctl --user show \"$SYNTHETIC_UNIT\""
       ],
       "evidence_ids": [
-        "native-worker-supervision-20260919"
+        "native-worker-supervision-20260919",
+        "token-practice-coverage-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1125,7 +1202,8 @@
       ],
       "evidence_ids": [
         "native-exact-nanosecond-replay-20260919",
-        "native-chronological-controls-20260919"
+        "native-chronological-controls-20260919",
+        "token-practice-coverage-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1145,7 +1223,8 @@
         "\"$WAVE_DIR/venv/bin/python\" blueprints/us-equities/research-evaluation/evaluate.py --lean-source \"$LEAN_SOURCE\" --out \"$WAVE_DIR/run-1\""
       ],
       "evidence_ids": [
-        "native-chronological-controls-20260919"
+        "native-chronological-controls-20260919",
+        "token-practice-coverage-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1170,7 +1249,9 @@
         "native-edgartools-catalyst-20260919",
         "native-sec-access-resolution-20260919",
         "sec-catalyst-dataset-native-20260920",
-        "native-lifecycle-sample-20260920"
+        "native-lifecycle-sample-20260920",
+        "token-practice-artifacts-20260920",
+        "token-practice-coverage-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1198,6 +1279,26 @@
       ],
       "source_pin": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
       "freshness": "Release and wheel reviewed2026-09-20; Mac native acceptance scoped to offline regular persona."
+    },
+    {
+      "id": "llama-cpp",
+      "repository": "https://github.com/ggml-org/llama.cpp",
+      "version": "b11057 (0.4.1-dev)",
+      "license": "MIT; bundled CUDA13.3 libraries retain NVIDIA license",
+      "role": "Trial local text inference with one qualified partial-offload planner repair on WSL RTX4090",
+      "source_pin": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+      "commands": [
+        "python3 blueprints/convergence-practice/gpu-inference/qualify.py --help"
+      ],
+      "evidence_ids": [
+        "native-gpu-patch-20260920"
+      ],
+      "profile": "optional",
+      "upstream_sources": [
+        "https://github.com/ggml-org/llama.cpp/releases/tag/b11057",
+        "https://github.com/ggml-org/llama.cpp/blob/59657a613ab0fa4ab327d6c790123dff30bfbd67/tools/server/README.md"
+      ],
+      "freshness": "Pinned September20 trial after archive digest/attestation/license checks and one actual task. Prerelease chosen for official Linux CUDA artifacts; no native-agent default replacement."
     }
   ],
   "profiles": [
@@ -1263,7 +1364,8 @@
         "playwright-cli",
         "promptfoo",
         "shanraisshan/claude-code-best-practice",
-        "worktrunk"
+        "worktrunk",
+        "llama-cpp"
       ]
     },
     {
@@ -1302,6 +1404,19 @@
       "dimensions": 2048,
       "evidence_ids": [
         "native-rag"
+      ]
+    },
+    {
+      "id": "ggml-org/Qwen3.8-27B-GGUF",
+      "revision": "efbb3b1f70a21d97fd4495240648405f7228554f",
+      "license": "Apache-2.0",
+      "runtime": "llama-cpp",
+      "quantization": "Q4_K_M",
+      "base_model": "Qwen/Qwen3.8-27B",
+      "base_revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+      "file_sha256": "c600de0300ae8a0eb3a6c0b8b5561b8b96f16bd2c863c2a66c42de29d391a747",
+      "evidence_ids": [
+        "native-gpu-patch-20260920"
       ]
     }
   ],

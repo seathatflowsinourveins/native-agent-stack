@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "access-recovery",
+  "task_and_failure": "A local job must reuse its successful immutable planner checkpoint after native cancellation during finalization, without repeating checkpoint execution.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/dagucloud/dagu/tree/58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "revision": "58fed633d58c1dd1319091fdb2c2f6158ecfa053"
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/tree/6001677f83c9519bb9ceb8fc5c2e7b3771b94860",
+      "revision": "6001677f83c9519bb9ceb8fc5c2e7b3771b94860"
+    }
+  ],
+  "discovery_provenance": [
+    "Existing recovery catalog gap and previously reviewed native Dagu lifecycle evidence; no new discovery-list adoption."
+  ],
+  "license_and_compatibility": "Existing Dagu 2.16.6 GPL-3.0 native executable; Python standard library only. Darwin 25.5.0 arm64.",
+  "baseline_and_candidate": {
+    "baseline": "Restart the whole deterministic workflow; not executed in this experiment.",
+    "candidate": "Retry only finalize from the retained successful checkpoint using native Dagu."
+  },
+  "frozen_inputs": {
+    "base_revision": "6001677f83c9519bb9ceb8fc5c2e7b3771b94860",
+    "tasks": [
+      "checkpoint-recovery"
+    ],
+    "roles": [
+      "deterministic-runner"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/job-recovery/run.py",
+        "sha256": "8ed7548112c45a88d57cabf917269ef34a99fbacaa2ce019325d92393a27d1af"
+      },
+      {
+        "path": "blueprints/convergence-practice/job-recovery/fixture.py",
+        "sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+      },
+      {
+        "path": "blueprints/convergence-practice/native-worker/accepted/planner.py",
+        "sha256": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/job-recovery/plan.json",
+        "sha256": "0e6f3dffbc8c87094c660358874382987150bffb6a01b67de7e855d686f12aac"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/native-worker/seed/test_planner.py",
+        "sha256": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+      },
+      {
+        "path": "blueprints/convergence-practice/job-recovery/plan.json",
+        "sha256": "0e6f3dffbc8c87094c660358874382987150bffb6a01b67de7e855d686f12aac"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Native aborted then succeeded under the same run ID; checkpoint count exactly one and hash unchanged; all 12 tests before and after; observed owned processes retired.",
+    "usage_rule": "No model call in this fixture; observed local model categories zero. Total coordinator task usage is outside scope and unknown; no savings claim."
+  },
+  "runtime_and_platform": {
+    "platform": "Darwin 25.5.0 arm64",
+    "tools": [
+      {
+        "name": "dagu",
+        "version": "2.16.6"
+      },
+      {
+        "name": "python",
+        "version": "3.14.7"
+      }
+    ],
+    "isolation": "New private task directory, DAGU_HOME, configuration and minimal child environment. No global services, scheduler, credentials or environment changes."
+  },
+  "commands": [
+    "python3 blueprints/convergence-practice/job-recovery/run.py --dagu \"$REVIEWED_DAGU\" --work \"$NEW_PRIVATE_TASK_DIR\""
+  ],
+  "observations": [
+    {
+      "id": "mac-validation",
+      "task": "checkpoint-recovery",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "recovery_execution",
+      "scope": "Mac local deterministic Dagu checkpoint, cancellation and selected-step retry",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/job-recovery/prior-attempts.json",
+          "sha256": "2a8c5f607f4c95075efa15ffef63c538ba7fb4579fe7bec8b486ee9f84e8c593"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "mac-initial-native",
+      "task": "checkpoint-recovery",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 0,
+      "evidence_class": "recovery_execution",
+      "scope": "Mac local deterministic Dagu checkpoint, cancellation and selected-step retry",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/job-recovery/prior-attempts.json",
+          "sha256": "2a8c5f607f4c95075efa15ffef63c538ba7fb4579fe7bec8b486ee9f84e8c593"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "macos-native-qualified",
+      "task": "checkpoint-recovery",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 0,
+      "evidence_class": "recovery_execution",
+      "scope": "Mac local deterministic Dagu checkpoint, cancellation and selected-step retry",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/job-recovery/receipt-macos.json",
+          "sha256": "3b948ebef539f10d5d226c59e88f503d64cbd4d94b5d76310941932c797abef4"
+        },
+        {
+          "path": "blueprints/convergence-practice/job-recovery/macos-checkpoint-tests.txt",
+          "sha256": "5b7d9978947acc47b15c516090444a9e74ac7fe5439aa56ab46da8f8cd3855fc"
+        },
+        {
+          "path": "blueprints/convergence-practice/job-recovery/macos-final-tests.txt",
+          "sha256": "5b7d9978947acc47b15c516090444a9e74ac7fe5439aa56ab46da8f8cd3855fc"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "mac-validation",
+      "reason": "Native validation rejected the initial explicit entrypoint name before any DAG execution; earlier freeze and failure hashes are retained."
+    }
+  ],
+  "limitations": [
+    "No model calls were made by this deterministic fixture. Agent-session resume, provider cancellation, disconnect and host restart recovery remain unqualified.",
+    "The visible 12-test synthetic planner oracle was already accepted. This is no real-application or hidden-test benchmark and has no external effects.",
+    "Observed process retirement covers sampled owned process identities and the retry finalizer; it is not an exhaustive operating-system process audit.",
+    "Raw native histories and private generated paths remain in the isolated task directory; public hashes prove byte identity, not independent observation truth.",
+    "Native aborted history is preserved even though the cancelled start command returned exit zero. Expected cancellation is part of the successful recovery procedure.",
+    "No matched model baseline, total coordinator usage coverage, savings claim, general worker recovery or cross-host restore acceptance.",
+    "One pre-execution schema failure and the initial native success are retained with earlier runner hashes; the frozen accepted variant is the final source. No quality or efficiency comparison is made between these adapter variants."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "Mac local deterministic Dagu checkpoint, cancellation and selected-step retry",
+    "qualification_run_ids": [
+      "macos-native-qualified"
+    ]
+  },
+  "rollback": "Preserve task evidence, then retire only the task-owned workspace and optional scoped WSL executable; no global configuration or service was installed.",
+  "next_decision_changing_test": "A separately authorized native-agent interruption with explicit session/account boundaries and artifact reconciliation; not implied by deterministic Dagu retry.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

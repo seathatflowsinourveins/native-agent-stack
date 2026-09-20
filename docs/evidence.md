@@ -2,6 +2,11 @@
 
 The public evidence manifest lists each receipt, its claim, limitations and covered components. Its file list records SHA-256 and byte length for every exported receipt and fixture. These hashes establish integrity of the published bytes; they do not independently authenticate a provider or turn a recorded result into a new run.
 
+The [September 20 token-practice audit](token-practice.md) records four accepted
+native coding trials with mixed observed usage differences, ten exact retained-artifact
+comparisons and explicit native counter scopes. Its sanitized aggregate receipts
+supersede older summaries only for their stated scope.
+
 ## Evidence levels
 
 | Kind | Meaning | What validation establishes |

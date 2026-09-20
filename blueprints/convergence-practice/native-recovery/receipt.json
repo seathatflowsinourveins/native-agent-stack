@@ -1,0 +1,95 @@
+{
+  "action_sequence": [
+    "checkpoint",
+    "wait",
+    "finalize"
+  ],
+  "attempt": 1,
+  "checkpoint_expected_sha256": "93f75c4a0a3dec080b19bdfc4fe30f4fd404776bdcfd6bbc86cb003133595f2b",
+  "checks": {
+    "checkpoint_executed_once": true,
+    "checkpoint_unchanged": true,
+    "exact_action_order": true,
+    "final_matches_oracle": true,
+    "frozen_inputs_unchanged": true,
+    "interrupt_acknowledged": true,
+    "interrupted_turn_observed": true,
+    "model_and_effort_preserved": true,
+    "owned_servers_stopped": true,
+    "pending_native_tool_observed": true,
+    "resumed_turn_completed": true,
+    "same_session_id": true,
+    "same_thread_id": true,
+    "second_connection_initialized": true
+  },
+  "executable_sha256": "9280c0754e8f1f6b72f495d30c8c82a006dbc4995bf0492916fa0901f6bfd1f9",
+  "failure": null,
+  "frozen_files": {
+    "blueprints/convergence-practice/native-recovery/executed-runner.py.txt": "428cee7af6aeea4172aeb7e5c61d431c6c5a7692a90785d10a539b6ccfa14222",
+    "blueprints/convergence-practice/native-recovery/fixture.py": "3a9c7c55a84baf66e652d82be5e426a26a912178f4b6dee847c078100efce71d",
+    "blueprints/convergence-practice/native-recovery/plan.json": "ec283b08ec39a1b8d30f46a05540d47435a274337e6b49c417c211b64deaa729",
+    "blueprints/convergence-practice/native-recovery/seed/TASK.md": "03b794a9ac6fe53c4b32e3762d0f12aecb950185c16dd2418b4c75f46af0743a",
+    "blueprints/convergence-practice/native-recovery/seed/input.json": "9a1fd06380f086357597eaa4d7d83a9f97b665f7f32c79c1efb7285a1ec4c3f8",
+    "tests/test_native_recovery.py": "99eee9a81f549b3c4e432ba686f0676cbc8a5691399413f8a437b7cff281bd4d"
+  },
+  "kind": "native_tool_turn_recovery",
+  "limitations": [
+    "One synthetic attempt and two native turns; no matched baseline or savings claim.",
+    "Dynamic tool service is owned by this harness; no arbitrary shell, remote provider cancellation, network outage, host power-loss or independent-host restore was tested.",
+    "The coordinator sends a concise continuation after resume; it does not replay messages or create a replacement native thread.",
+    "The unchanged checkpoint and exact action sequence establish one observed effect, not an exactly-once distributed-system guarantee.",
+    "Existing native authentication, configuration, caches and persisted session stores are used; worktree isolation is not account or service isolation.",
+    "Full native protocol, identifiers and paths remain private. Hashes identify retained logs, not independent provider attestation."
+  ],
+  "model_configurations_observed": [
+    {
+      "effort": "ultra",
+      "model": "gpt-6-astra"
+    },
+    {
+      "effort": "ultra",
+      "model": "gpt-6-astra"
+    }
+  ],
+  "native_version": "codex-cli 0.155.0-alpha.9.2",
+  "owned_server_exit_codes": [
+    0,
+    0
+  ],
+  "platform": "macOS",
+  "post_capture_review": {
+    "arbitrary_mcp_descendants_verified_stopped": null,
+    "configuration_response_redacted": true,
+    "executed_runner_retained_as_inert_text": true,
+    "future_runner_logging_fixed_after_execution": true,
+    "native_background_terminals_queried": false,
+    "new_model_attempts": 0,
+    "original_executed_runner_path": "blueprints/convergence-practice/native-recovery/run.py"
+  },
+  "private_protocol_sha256": {
+    "connection-1": "93861c7c59022bd7278725836b32491436f6337fb3d3a527bf41f9a0f8a55337",
+    "connection-2": "3eb987ea1b1e89912cbcc3d63e37c2b0bb5ee98a802600332da9db3b372f2c78"
+  },
+  "recorded_at_utc": "2026-09-20T05:08:08.750616+00:00",
+  "schema_version": 1,
+  "scope": "One owned synthetic dynamic-tool checkpoint, native turn interruption, new app-server process and same-thread resume on one Mac",
+  "status": "passed",
+  "usage": {
+    "billed_cost": null,
+    "coordinator_and_review_usage": null,
+    "cumulative_total_monotonic": true,
+    "final_native_total": {
+      "cacheWriteInputTokens": 0,
+      "cachedInputTokens": 18176,
+      "inputTokens": 55233,
+      "outputTokens": 143,
+      "reasoningOutputTokens": 0,
+      "totalTokens": 55376
+    },
+    "native_retries": null,
+    "savings_claim": null,
+    "scope": "Native same-thread cumulative snapshots; final total counted once when monotonic",
+    "snapshot_count": 5
+  },
+  "wall_seconds": 17.554
+}

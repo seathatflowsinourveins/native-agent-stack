@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Native same-thread tool-turn interruption and resume had not been qualified by process restart or ordinary worktree tests.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://learn.chatgpt.com/docs/app-server#start-or-resume-a-thread",
+      "revision": "007f26351b4e6293c051a0ea5d48fc491b1affcd91a0f1bc234ba5ed8d8f7c0d"
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "revision": "6001677f83c9519bb9ceb8fc5c2e7b3771b94860"
+    }
+  ],
+  "discovery_provenance": [
+    "Named native-session recovery gap in the accepted engineering architecture."
+  ],
+  "license_and_compatibility": "Original MIT fixture; standard-library harness using experimental native app-server dynamic tools on the installed bundled Mac alpha. Official-source revision is a fetched documentation-section digest, not an upstream release.",
+  "baseline_and_candidate": {
+    "baseline": "Unqualified same-session recovery; no model baseline executed",
+    "candidate": "One checkpoint, interrupted pending tool, second native process resuming identical thread/session, finalization without replay"
+  },
+  "frozen_inputs": {
+    "base_revision": "6001677f83c9519bb9ceb8fc5c2e7b3771b94860",
+    "tasks": [
+      "tool-turn-recovery"
+    ],
+    "roles": [
+      "native-worker"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/native-recovery/fixture.py",
+        "sha256": "3a9c7c55a84baf66e652d82be5e426a26a912178f4b6dee847c078100efce71d"
+      },
+      {
+        "path": "blueprints/convergence-practice/native-recovery/executed-runner.py.txt",
+        "sha256": "428cee7af6aeea4172aeb7e5c61d431c6c5a7692a90785d10a539b6ccfa14222"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/native-recovery/seed/input.json",
+        "sha256": "9a1fd06380f086357597eaa4d7d83a9f97b665f7f32c79c1efb7285a1ec4c3f8"
+      },
+      {
+        "path": "blueprints/convergence-practice/native-recovery/seed/TASK.md",
+        "sha256": "03b794a9ac6fe53c4b32e3762d0f12aecb950185c16dd2418b4c75f46af0743a"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/native-recovery/plan.json",
+        "sha256": "ec283b08ec39a1b8d30f46a05540d47435a274337e6b49c417c211b64deaa729"
+      },
+      {
+        "path": "tests/test_native_recovery.py",
+        "sha256": "99eee9a81f549b3c4e432ba686f0676cbc8a5691399413f8a437b7cff281bd4d"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Every frozen fixture.assess gate is true; verify independently against retained native protocol and exact checkpoint/final bytes.",
+    "usage_rule": "Final native cumulative snapshot once; cache read remains an input subset; missing retries, costs and enclosing coordinator usage remain unknown; no savings claim."
+  },
+  "runtime_and_platform": {
+    "platform": "macOS bundled native Codex",
+    "tools": [
+      {
+        "name": "codex",
+        "version": "0.155.0-alpha.9.2"
+      },
+      {
+        "name": "model configuration",
+        "version": "gpt-6-astra / ultra"
+      }
+    ],
+    "isolation": "Owned synthetic Git fixture and two sequential app-server processes; inherited native account/configuration and integrations."
+  },
+  "commands": [
+    "python3 blueprints/convergence-practice/native-recovery/run.py --codex NATIVE_CODEX --run-dir PRIVATE_NEW_DIRECTORY"
+  ],
+  "observations": [
+    {
+      "id": "mac-codex-native-recovery-1",
+      "task": "tool-turn-recovery",
+      "role": "native-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "recovery_execution",
+      "scope": "One owned synthetic dynamic-tool checkpoint, native turn interruption, new app-server process and same-thread resume on one Mac",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/native-recovery/receipt.json",
+          "sha256": "b0b4a55ca5d74684285087f30599ac2e4557de84a7d4e79b7068b3fbb066b14e"
+        },
+        {
+          "path": "blueprints/convergence-practice/native-recovery/independent-audit.json",
+          "sha256": "4216e74bb578b20cecefcc88bc688ffea0875e8cefbc783bbe092f8e9595a78d"
+        },
+        {
+          "path": "blueprints/convergence-practice/native-recovery/accepted/checkpoint.json",
+          "sha256": "93f75c4a0a3dec080b19bdfc4fe30f4fd404776bdcfd6bbc86cb003133595f2b"
+        },
+        {
+          "path": "blueprints/convergence-practice/native-recovery/accepted/final.json",
+          "sha256": "324cfed55ef7e20818872b5793214c26a6293f28b14d7fab8998a48770496267"
+        }
+      ],
+      "usage": {
+        "uncached_input": 37057,
+        "cache_creation": 0,
+        "cache_read": 18176,
+        "output": 143,
+        "reasoning_in_output": 0,
+        "total": 55376,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [],
+  "limitations": [
+    "One synthetic attempt and two native turns; no matched baseline or savings claim.",
+    "Dynamic tool service is owned by this harness; no arbitrary shell, remote provider cancellation, network outage, host power-loss or independent-host restore was tested.",
+    "The coordinator sends a concise continuation after resume; it does not replay messages or create a replacement native thread.",
+    "The unchanged checkpoint and exact action sequence establish one observed effect, not an exactly-once distributed-system guarantee.",
+    "Existing native authentication, configuration, caches and persisted session stores are used; worktree isolation is not account or service isolation.",
+    "Full native protocol, identifiers and paths remain private. Hashes identify retained logs, not independent provider attestation.",
+    "Current runner minimizes configuration logs after review; the original executed source is separately retained and no new model trial was run for that logging change."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "One owned synthetic dynamic-tool checkpoint, native turn interruption, new app-server process and same-thread resume on one Mac",
+    "qualification_run_ids": [
+      "mac-codex-native-recovery-1"
+    ]
+  },
+  "rollback": "Stop only owned app-server processes; keep existing configuration and native session history. Preserve private evidence and disposable fixture.",
+  "next_decision_changing_test": "A separately frozen Claude-native session recovery check or independent-host restore; neither is implied by this Mac result.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

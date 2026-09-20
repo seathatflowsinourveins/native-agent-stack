@@ -1,0 +1,14 @@
+{
+  "source": "https://learn.chatgpt.com/docs/app-server#start-or-resume-a-thread",
+  "retrieved_at_utc": "2026-09-20T05:12:33.520321+00:00",
+  "retrieved_section_sha256": "007f26351b4e6293c051a0ea5d48fc491b1affcd91a0f1bc234ba5ed8d8f7c0d",
+  "pin_kind": "SHA-256 of official fetched section, not an immutable upstream release",
+  "accepted_semantics": [
+    "initialize each connection",
+    "turn/interrupt ends active turn with interrupted status",
+    "thread/resume uses the existing thread ID",
+    "experimental dynamic tools persist in rollout metadata and are restored on resume"
+  ],
+  "local_protocol": "JSON schema generated from the already-installed bundled executable before the attempt",
+  "native_source_build": "Bundled alpha executable digest is recorded separately; this is not a verified upstream Git commit"
+}

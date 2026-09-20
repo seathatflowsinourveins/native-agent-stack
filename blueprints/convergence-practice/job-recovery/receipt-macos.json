@@ -1,0 +1,61 @@
+{
+  "after_retry_status": "succeeded",
+  "architecture": "arm64",
+  "before_retry_status": "aborted",
+  "checkpoint_execution_count": 1,
+  "checkpoint_sha256_unchanged": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+  "checkpoint_tests": 12,
+  "command_exit_codes": {
+    "history-aborted": 0,
+    "history-succeeded": 0,
+    "retry": 0,
+    "start": 0,
+    "stop": 0,
+    "validate": 0,
+    "version": 0
+  },
+  "completed_at_utc": "2026-09-20T05:06:24.312602+00:00",
+  "dagu_version": "2.16.6",
+  "final_tests": 12,
+  "frozen_inputs": {
+    "dagu_binary_sha256": "325ecbd0662d477146be95de57f36613529ddaad93a63a7447bcd615bf7ad1ce",
+    "frozen_at_utc": "2026-09-20T05:06:23.423263+00:00",
+    "private_inputs": {
+      "config.yaml": "a2651229d74dd660c8f98f884292ecb8e405ea6ab3bc363ad4985d4d1eb4a087",
+      "expected.json": "b71639f796b744d6d3bf2897e34f64e9646b808e0136f6dd5222a0c6c47b1893",
+      "fixture.py": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+      "recovery.yaml": "185ddb0982d5e760cedeb1056a8209207735f5087a30f26f53234402beda1177"
+    },
+    "python_version": "3.14.7",
+    "repository_inputs": {
+      "blueprints/convergence-practice/job-recovery/fixture.py": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+      "blueprints/convergence-practice/job-recovery/plan.json": "0e6f3dffbc8c87094c660358874382987150bffb6a01b67de7e855d686f12aac",
+      "blueprints/convergence-practice/job-recovery/run.py": "8ed7548112c45a88d57cabf917269ef34a99fbacaa2ce019325d92393a27d1af",
+      "blueprints/convergence-practice/native-worker/accepted/planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+      "blueprints/convergence-practice/native-worker/seed/test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+    }
+  },
+  "model_calls": 0,
+  "observed_owned_processes_remaining": 0,
+  "platform": "Darwin 25.5.0",
+  "python_version": "3.14.7",
+  "retained_native_outputs": {
+    "history-aborted.stderr": "7045eb140ba56566d494e53371ced66cf2e63d2f5903aed937565bcd06a0dbdd",
+    "history-aborted.stdout": "81157c9d8c7fe06b8be3434b7fee021d3848d5e9e58fac7287526d947f2967d4",
+    "history-succeeded.stderr": "9e3312f9324b547a3a77c95787c609b0baab682e786bf5f1c2632ba4850b2e55",
+    "history-succeeded.stdout": "b72393de0cf2f0e10355e575789c2d69be2d5a8b1664dc63cbcc9971fa98ad05",
+    "retry.stderr": "af0122edb67868e2d0b06d569dcf5b897328476692ac90e193ec66228198b1b2",
+    "retry.stdout": "6ac0c8c48d07d42ab438ae5db780cf7c6d446de2cd2516489a057bc81e5bcf95",
+    "start.stderr": "20572f586d907ebeeb89aaa62064fff61210e1653503b06e96632300783a3115",
+    "start.stdout": "fb42e3f2a6499deaae0bb493b65108256683f792cb664e91b3eeb77fb4fd95aa",
+    "stop.stderr": "b9a0de16dc66681d48df575df3c115435ec919c941a4000b5c93f60f5ae6f328",
+    "stop.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "validate.stderr": "5a26b8462fba119f85cb947159fdb3e563cfe5019fcac0270ba6cb433965caf8",
+    "validate.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version.stdout": "7ee203ac73fca7d93c699ceefabb5bb5cdea2e02213de22ceea56908ff0945c5"
+  },
+  "retry_finalizer_remaining": false,
+  "same_native_run_id": true,
+  "status": "passed"
+}

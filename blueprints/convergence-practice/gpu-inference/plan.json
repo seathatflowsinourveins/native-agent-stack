@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "kind": "frozen_local_gpu_inference_plan",
+  "frozen_before_inference": true,
+  "source_base": "6001677",
+  "runtime": {
+    "repository": "ggml-org/llama.cpp",
+    "tag": "b11057",
+    "release_channel": "prerelease",
+    "commit": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+    "server_sha256": "7740775d5a9e418340c44b8152eb3481f47407b0eec9306443df528915c67315"
+  },
+  "model": {
+    "repository": "ggml-org/Qwen3.8-27B-GGUF",
+    "revision": "efbb3b1f70a21d97fd4495240648405f7228554f",
+    "filename": "Qwen3.8-27B-Q4_K_M.gguf",
+    "sha256": "c600de0300ae8a0eb3a6c0b8b5561b8b96f16bd2c863c2a66c42de29d391a747",
+    "bytes": 18973870528,
+    "base_repository": "Qwen/Qwen3.8-27B",
+    "base_revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+    "license": "Apache-2.0",
+    "no_draft_or_vision_models": true
+  },
+  "profile": {
+    "kind": "partial-offload",
+    "gpu_layers": 32,
+    "context": 4096,
+    "parallel": 1,
+    "batch": 128,
+    "threads": 8,
+    "output_cap": 1536,
+    "minimum_free_mib": 3072,
+    "admission_free_mib": 16384,
+    "auto_fit": false,
+    "memory_scope": "sampled whole device; preserve existing allocations"
+  },
+  "sampling": {
+    "seed": 0,
+    "temperature": 0.0,
+    "top_p": 1.0,
+    "top_k": 1,
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    }
+  },
+  "sampling_scope": "Explicit deterministic non-thinking fixture settings; not claimed optimal model-publisher benchmarking settings.",
+  "outer_attempts": 1,
+  "deadlines": {
+    "startup_seconds": 120,
+    "generation_seconds": 180,
+    "total_seconds": 300
+  },
+  "prompt_sha256": "ddf87696c150dd92792911d4664341ab6b29996be07dbc2b5fb897a82d8d61f7",
+  "fixture_sha256": {
+    "TASK.md": "0807600d365213edbbc2a65c4e2833e1b997b66b932adc88b2542fab638a4bd8",
+    "planner.py": "ba9155fd203a5d23e12ea7f842ccc5ac033249db4a64ec525374fa2db9d71082",
+    "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+  },
+  "quality_rule": "One source artifact; unchanged specification and 12-test oracle; independent source review before controlled tests; all12 tests pass.",
+  "latency_rule": "Report cold load, first content and generation separately; no comparison or throughput guarantee.",
+  "failure_rule": "Retain failed attempt; no silent retry or changed profile; stop only owned process on memory/deadline failure.",
+  "claims_excluded": [
+    "full-GPU residency",
+    "frontier-model parity",
+    "general coding quality",
+    "held-out quality",
+    "financial accuracy",
+    "token savings"
+  ]
+}

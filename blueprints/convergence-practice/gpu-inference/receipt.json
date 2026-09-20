@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "kind": "scoped_gpu_patch_acceptance",
+  "observed_at": "2026-09-20T05:16:51.821756+00:00",
+  "status": "passed_within_scope",
+  "scope": "One visible dependency-planner repair with Qwen3.8-27B Q4_K_M and b11057 CUDA13.3 in32-layer configured partial-offload mode on RTX4090 WSL2.",
+  "quality": {
+    "independent_source_review": "passed",
+    "original_oracle_tests": 12,
+    "test_exit_code": 0
+  },
+  "evidence": {
+    "plan.json": "0067f2056a1638a6414b21c40b0d39b4828b096f12c49399ea0a423056350fda",
+    "prompt.txt": "ddf87696c150dd92792911d4664341ab6b29996be07dbc2b5fb897a82d8d61f7",
+    "qualify.py": "a64ab593587135d9587365fb5f9a93c84e1ffc62bcbaef32db30f84bc4a70d34",
+    "preflight.json": "4130165de3bff86fcf09ebce1c42254dda9ff004f3a3af7bd72e3646de06d1fa",
+    "trial.json": "96a2b16b9b1e7741bd473702c073bd66b7da8bc172663e453556e5c6d9d187ed",
+    "checks.json": "af70cc9d7bf9e6ab7b2043fc2ceeeff71169afa1dcb4058e3c269fb494e25406",
+    "test-output.txt": "5b7d9978947acc47b15c516090444a9e74ac7fe5439aa56ab46da8f8cd3855fc",
+    "independent-review.json": "f4b367b66735f22cfd576385b7841f63dcc33879d8e0c5f7cc59d2f68433cc88",
+    "accepted/planner.py": "53a2c5b34dd5265561741bab8fb27330951c39897ade398425aeb20f45d3f413"
+  },
+  "offload_evidence": {
+    "requested_gpu_layers": 32,
+    "observed_exact_layer_count": null,
+    "reason": "Native verbosity3 omitted detailed placement logs; no count inferred from requested flag.",
+    "gpu_memory_before_mib": 6170,
+    "maximum_whole_device_used_mib": 16341,
+    "minimum_sampled_free_mib": 8223,
+    "memory_guard_events": []
+  },
+  "performance": {
+    "cold_start_seconds": 4.111,
+    "first_content_seconds": 6.818,
+    "generation_seconds": 179.191,
+    "elapsed_seconds": 183.819,
+    "native_usage": {
+      "completion_tokens": 394,
+      "prompt_tokens": 791,
+      "total_tokens": 1185,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      }
+    }
+  },
+  "native_server_exit": 0,
+  "service_installed": false,
+  "savings_claim": false,
+  "limitations": [
+    "One visible fixture and one sample, no frontier parity or general coding qualification.",
+    "179.191s generation narrowly meets the frozen180s deadline; this partial-offload profile is not an interactive latency default.",
+    "Shared-device memory samples are not process peak allocation or an isolated benchmark.",
+    "ExactGPUlayerplacement count unavailable; partial offload was explicit and GPU allocation observed.",
+    "Generated trial receipt remains unchanged; subsequent review/testing is a separate acceptance.",
+    "No complete-host recovery, concurrent serving or broker/trading qualification."
+  ]
+}

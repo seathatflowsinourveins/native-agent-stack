@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "base_revision": "6001677f83c9519bb9ceb8fc5c2e7b3771b94860",
+  "dagu_version": "2.16.6",
+  "dagu_source_revision": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+  "scope": "Mac local deterministic Dagu checkpoint, cancellation and selected-step retry",
+  "oracle": "Unchanged accepted planner and all 12 existing visible tests",
+  "acceptance": [
+    "Freeze source, oracle, runner and plan hashes before starting the DAG",
+    "Checkpoint runs the complete 12-test oracle once and writes an exclusive checkpoint",
+    "Finalizer becomes observable before native stop; native history reports aborted",
+    "Native retry --step finalize uses the same run ID and succeeds",
+    "Checkpoint bytes and checkpoint execution count remain unchanged at one",
+    "Finalizer reruns all 12 oracle tests; observed owned processes have exited"
+  ],
+  "bounds": {"readiness_seconds": 30, "finalize_wait_seconds": 60, "command_seconds": 30},
+  "excluded": ["model calls", "agent-session resume", "provider cancellation", "restart or disconnect recovery", "exactly-once external effects", "whole-task token savings"]
+}

@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Native Claude interruption and same-session continuation were not established by onboarding, process liveness or a completed native child task.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.278",
+      "revision": "bf7d404e26a5fb6167d21b46c93a2bf6c22ab274"
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "revision": "e51a615f962e2b0502e588cafc8b63b9434d22e3"
+    }
+  ],
+  "discovery_provenance": [
+    "Named Claude-native recovery gap after the separate Mac Codex tool-turn qualification."
+  ],
+  "license_and_compatibility": "Original MIT synthetic fixture; Python standard-library supervision on Linux/WSL2 with existing native Claude2.1.278, native authentication and per-invocation Opus5/Ultracode.",
+  "baseline_and_candidate": {
+    "baseline": "No same-session native recovery qualification; no model baseline run",
+    "candidate": "One durable checkpoint; interrupt owned pending Bash operation; resume exact native session and finalize without replay"
+  },
+  "frozen_inputs": {
+    "base_revision": "e51a615f962e2b0502e588cafc8b63b9434d22e3",
+    "tasks": [
+      "claude-bash-recovery"
+    ],
+    "roles": [
+      "native-worker"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/native-recovery/claude/stage.py",
+        "sha256": "8b1ddd24fd6e53b34515f36afe0d45fba50fa38e2a4ec40d4e0c0b27578502f8"
+      },
+      {
+        "path": "blueprints/convergence-practice/native-recovery/claude/executed-runner.py.txt",
+        "sha256": "42137c0b58ba35907599e70ed6b2e45c7ffdf0f8829dcec248606d022d91fcfc"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/native-recovery/claude/input.json",
+        "sha256": "9a1fd06380f086357597eaa4d7d83a9f97b665f7f32c79c1efb7285a1ec4c3f8"
+      },
+      {
+        "path": "blueprints/convergence-practice/native-recovery/claude/TASK.md",
+        "sha256": "879bcd4b4e1e399ed96ca5fb7e6cc8a3bbdee912fe77ea87d4475981f7df3b43"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/native-recovery/claude/test_fixture.py",
+        "sha256": "8208a35d24a4ffc95f22ee8192aa59237fde26bac2631494892f784187845ce3"
+      },
+      {
+        "path": "blueprints/convergence-practice/native-recovery/claude/plan.json",
+        "sha256": "cd462b5c8eafceaeb18ad02ef7923c0dc6a855a1736a5b35ccad186dfd4a8e7e"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Observe pending native Bash and owned process; SIGINT stops first CLI; same native session resumes; exact checkpoint/wait/finalize action journal and unchanged checkpoint/frozen bytes; final native result and owned cleanup pass.",
+    "usage_rule": "Retain both terminal usage views and reconcile against resumed cumulative model counts without double counting; retries/billing/coordinator and provider cancellation remain unknown."
+  },
+  "runtime_and_platform": {
+    "platform": "Linux WSL2 x86_64",
+    "tools": [
+      {
+        "name": "claude-code",
+        "version": "2.1.278"
+      },
+      {
+        "name": "model",
+        "version": "claude-opus-5"
+      },
+      {
+        "name": "effort requested",
+        "version": "ultracode"
+      }
+    ],
+    "isolation": "Owned synthetic Git fixture; separate native process groups, Bash only with precise allowed commands; no child agents or global/account/service writes."
+  },
+  "commands": [
+    "python3 blueprints/convergence-practice/native-recovery/claude/run.py --run-dir PRIVATE_NEW_DIRECTORY"
+  ],
+  "observations": [
+    {
+      "id": "claude-native-recovery-1",
+      "task": "claude-bash-recovery",
+      "role": "native-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "recovery_execution",
+      "scope": "One frozen native Claude Opus5 Bash checkpoint, SIGINT to owned CLI, and same-session resume on one Linux WSL2 host",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/native-recovery/claude/receipt.json",
+          "sha256": "f0d4bc0f1ec408c51b2297e16365fa59aa8317f6035415e2151d360d17e2b491"
+        },
+        {
+          "path": "blueprints/convergence-practice/native-recovery/claude/independent-audit.json",
+          "sha256": "8614cbe925311eb3337ca9c1b6d76af01a7af4fed99d3d4f05e9afbd2c115572"
+        },
+        {
+          "path": "blueprints/convergence-practice/native-recovery/claude/accepted/checkpoint.json",
+          "sha256": "93f75c4a0a3dec080b19bdfc4fe30f4fd404776bdcfd6bbc86cb003133595f2b"
+        },
+        {
+          "path": "blueprints/convergence-practice/native-recovery/claude/accepted/final.json",
+          "sha256": "324cfed55ef7e20818872b5793214c26a6293f28b14d7fab8998a48770496267"
+        },
+        {
+          "path": "blueprints/convergence-practice/native-recovery/claude/accepted/action-journal.json",
+          "sha256": "47a3d1dfc49b574f52efd1df4e98aa5e192cfdcb9b9e206620a3c0f1ff4fe8d1"
+        }
+      ],
+      "usage": {
+        "uncached_input": 8,
+        "cache_creation": 7871,
+        "cache_read": 21777,
+        "output": 785,
+        "reasoning_in_output": 250,
+        "total": 30441,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [],
+  "limitations": [
+    "One synthetic same-host CLI session recovery attempt; no independent-host, network, power-loss or whole-ecosystem guarantee.",
+    "SIGINT and process observations do not confirm remote provider cancellation or billing cessation.",
+    "The same native session ID is verified privately; no raw transcript replay or --fork-session is used.",
+    "Explicit Opus5 and Ultracode are scoped to this trial; this does not qualify the best alias or another model. No child agent is allowed.",
+    "Cumulative resumed results and per-model counters can have different scopes; interrupted usage can be incomplete. Retain categories separately and do not add them.",
+    "Full streams, process identities and session identifiers remain private. Cleanup targets owned CLI process groups and the identity-verified owned wait, not shared services.",
+    "Observed SIGINT timing and live-process state are supervisor evidence; the independent retained-stream audit verifies session identity, exact native actions, final bytes and accounting.",
+    "Both original terminal results are retained. The original recorder left a combined total unknown; the independent audit subsequently reconciles disjoint categories against cumulative model counts.",
+    "The current supervisor now protects the containing source repository and retains cleanup errors after review; the native trial used the separately preserved executed runner, and no model rerun followed these hardening changes."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "One frozen native Claude Opus5 Bash checkpoint, SIGINT to owned CLI, and same-session resume on one Linux WSL2 host",
+    "qualification_run_ids": [
+      "claude-native-recovery-1"
+    ]
+  },
+  "rollback": "Stop only owned CLI process groups and identity-verified owned wait; retain existing native session history and private fixture evidence.",
+  "next_decision_changing_test": "Independent-host restoration or a real application operation with a frozen external-effect reconciliation rule.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

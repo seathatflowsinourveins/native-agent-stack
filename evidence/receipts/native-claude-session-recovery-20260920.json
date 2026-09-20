@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "id": "native-claude-session-recovery-20260920",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "claude-code"
+  ],
+  "claim": "One native Claude Opus5 session on WSL was interrupted during an owned pending Bash wait and resumed under the same native session ID to finalize one unchanged checkpoint.",
+  "limitations": [
+    "One synthetic task with explicit Opus5/Ultracode; no general model, child-agent or cross-host guarantee.",
+    "Native SIGINT and owned-process retirement do not prove remote provider cancellation or billing cessation.",
+    "The two terminal usage views reconcile to30441tokens; resumed cumulative modelUsage is not an additional total. Native retries, billing and enclosing coordinator/reviewer usage remain unknown.",
+    "The executed runner is frozen separately from later private-log boundary and cleanup hardening; no new model attempt was run for those fixes."
+  ],
+  "evidence_paths": [
+    "blueprints/convergence-practice/native-recovery/claude/receipt.json",
+    "blueprints/convergence-practice/native-recovery/claude/independent-audit.json",
+    "blueprints/convergence-practice/native-recovery/claude/experiment.json"
+  ]
+}

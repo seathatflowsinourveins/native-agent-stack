@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "id": "native-gpu-patch-20260920",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "llama-cpp"
+  ],
+  "claim": "One pinned Qwen3.8-27B Q4_K_M local CUDA partial-offload repair passed independent source review and all12 original planner tests on WSL RTX4090.",
+  "limitations": [
+    "One visible fixture, one trial, configured32GPUlayers; exact layer placement count unavailable at native log verbosity.",
+    "Generation took179.191seconds near the180second cap. This is not an interactive default or frontier-model comparison.",
+    "Minimum whole-device sampled freeVRAM8223MiB includes other allocations; not an isolated process-peak benchmark.",
+    "Native model and archives were downloaded and hash-verified; archive attestations verified. CUDA licensing reviewed for local use, not redistribution.",
+    "No host recovery, concurrent serving, provider billing or whole-task savings qualification."
+  ],
+  "evidence_paths": [
+    "blueprints/convergence-practice/gpu-inference/receipt.json",
+    "blueprints/convergence-practice/gpu-inference/experiment.json",
+    "blueprints/convergence-practice/gpu-inference/preflight.json"
+  ]
+}
