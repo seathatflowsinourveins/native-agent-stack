@@ -868,8 +868,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "8d83b9e3a017fd085aa599a5dfcc51555560755a0582342a63aad5bc6e04cfbf",
-      "bytes": 644
+      "sha256": "03209e2a5501975de1994576f99ce09a8f928bd7098cfa70500c224f383a9b53",
+      "bytes": 755
     },
     {
       "path": ".gitignore",
@@ -898,8 +898,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "bc5427a7054fcddf04b541817ba7d75e2a00b879a2a11f70dcd698300b1df866",
-      "bytes": 13428
+      "sha256": "53656ef088abd5a81b3fcbdb2c1e0e7078691773f54482264b8b8bf00321d31a",
+      "bytes": 13757
     },
     {
       "path": "adoption/README.md",
@@ -913,8 +913,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "14459781e5fa14cd9e20806d9457f55f083727315671fa4938ef0e9af682a84a",
-      "bytes": 9919
+      "sha256": "e3a48289cd9d56214294f6a312020a3a1b3d1641bbe80eab6fce3207dac6f530",
+      "bytes": 10034
     },
     {
       "path": "adoption/paired/README.md",
@@ -2462,6 +2462,46 @@
       "bytes": 4022
     },
     {
+      "path": "docs/ecosystem/README.md",
+      "sha256": "0d03ead725224343cec59556c2df21694bf546148702d2a4b37ae880cf53edf5",
+      "bytes": 6253
+    },
+    {
+      "path": "docs/ecosystem/index.html",
+      "sha256": "1ef3154cbd95c7203f1880001069e0dc65051e220d2c9a37755ae5f56086adaa",
+      "bytes": 1445198
+    },
+    {
+      "path": "docs/ecosystem/legacy-worker-receipt.json",
+      "sha256": "44da9174ce983fa8e5472326dfcd5a0d146bc1849c4d0fe193c6c16d1eb59d73",
+      "bytes": 6877
+    },
+    {
+      "path": "docs/ecosystem/manifest.json",
+      "sha256": "72b76e481e2331244d5760565e2ef141dbe0f64124294e33220be127d9b2b9d2",
+      "bytes": 14038
+    },
+    {
+      "path": "docs/ecosystem/readiness-observation.json",
+      "sha256": "703d9c11d52c6e682cf963b85badc0e489833c95eaf41bd7b98b3df015321e51",
+      "bytes": 1062
+    },
+    {
+      "path": "docs/ecosystem/source-review.json",
+      "sha256": "1483d8d50976b9fe59ecc9213d0d173b87d368dd5bf34287e216d85cc098fecc",
+      "bytes": 16916
+    },
+    {
+      "path": "docs/ecosystem/tavily-receipt.json",
+      "sha256": "c7141021a9164e61ab8f8ac6930660ba27e76fbb13b403023ca01b09ec672430",
+      "bytes": 5590
+    },
+    {
+      "path": "docs/ecosystem/template.html",
+      "sha256": "9685076d5d8f7d62a3c7385b26c2a389e65e4b1eaa23959a95000f1b74017f30",
+      "bytes": 37984
+    },
+    {
       "path": "docs/evidence.md",
       "sha256": "a5d81d728d58571ac7c88e6aafb26fcb8707717541a92e55eb39d58d8ad55353",
       "bytes": 9129
@@ -2892,6 +2932,11 @@
       "bytes": 11297
     },
     {
+      "path": "scripts/build_ecosystem.py",
+      "sha256": "4a5443cfb92f60ffa5119f249e94b88d85fcbbc45f7fb7c65aaf151b96612723",
+      "bytes": 14165
+    },
+    {
       "path": "scripts/catalog_decisions.py",
       "sha256": "af621796e0c11888b7fa90ff13c9266e350416c924a4b6848ed995ca38faa552",
       "bytes": 13435
@@ -2960,6 +3005,11 @@
       "path": "tests/test_corporate_action_readiness.py",
       "sha256": "23146f72baddc05093fe234ced1e74c0a23aa5d23763a6c1138508911842b406",
       "bytes": 4471
+    },
+    {
+      "path": "tests/test_ecosystem_manifest.py",
+      "sha256": "16d3cb7774f0f8ceb2c8569dbc326965fbc8bb762a5fdb148a53e1f1acc49f92",
+      "bytes": 12250
     },
     {
       "path": "tests/test_execution_realism.py",

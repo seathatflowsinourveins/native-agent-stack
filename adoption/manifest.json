@@ -39,7 +39,9 @@
     "current_corporate_action_readiness": "blueprints/us-equities/corporate-action-readiness/receipt.json",
     "current_authenticated_data": "blueprints/us-equities/authenticated-data/native-receipt.json",
     "current_wave": "blueprints/us-equities/identity-readiness/plan.json",
-    "current_identity_observation": "blueprints/us-equities/identity-readiness/native-receipt.json"
+    "current_identity_observation": "blueprints/us-equities/identity-readiness/native-receipt.json",
+    "ecosystem_explorer": "docs/ecosystem/index.html",
+    "ecosystem_explorer_guide": "docs/ecosystem/README.md"
   },
   "recipe_map": {
     "affaan-m/ECC": "recipes/README.md",

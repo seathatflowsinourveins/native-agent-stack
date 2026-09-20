@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "kind": "dated_coordinator_reported_readiness",
+  "observed_date": "2026-09-20",
+  "scope": "A separate existing WSL environment; observations cannot be inherited by another host.",
+  "observations": {
+    "codex_version": "0.155.1",
+    "claude_code_version": "2.1.278",
+    "native_signin": "Both native sign-ins verified without publishing account information.",
+    "existing_offline_worker_checks_passed": 75,
+    "configuration_changes": 0,
+    "model_execution_scope": "This readiness observation alone is not model acceptance; subsequent standalone acceptance is recorded separately in legacy-worker-receipt.json."
+  },
+  "policy_observation": "Existing worker policy covers bounded retrieval, Context Mode and native cache accounting.",
+  "limits": [
+    "Readiness and existing offline harness checks are not a new native model run.",
+    "No claim about cancellation, restart, resumed execution, all integrations or another host.",
+    "Personal paths, project topology and raw host audit are intentionally excluded."
+  ]
+}

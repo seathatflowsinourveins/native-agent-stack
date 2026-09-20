@@ -1,0 +1,296 @@
+{
+  "schema_version": 1,
+  "kind": "dated_primary_source_review",
+  "retrieved_at": "2026-09-20T02:54:02.069531+00:00",
+  "scope": "Bounded primary-source landscape: native Claude, existing retrieval/memory and one existing local inference runtime. No installations, configuration changes, credential reads or model calls.",
+  "components": [
+    {
+      "repository": "anthropics/claude-code",
+      "observed_release": "v2.1.278",
+      "source_commit": "bf7d404e26a5fb6167d21b46c93a2bf6c22ab274",
+      "release_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.278",
+      "published_at": "2026-09-19T03:10:40Z",
+      "retrieved_at": "2026-09-20T02:45:27.024112+00:00",
+      "license_at_pin": "Anthropic proprietary; all rights reserved, Commercial Terms",
+      "compatibility_source_statement": "Native binary on Linux/WSL; Ubuntu 20.04+, Debian 10+, Alpine 3.19+, x64/ARM64. WSL2 sandbox supported; WSL1 sandbox unsupported.",
+      "recommendation": "retain",
+      "why": "Native harness/subagents/skills/worktrees already cover the requested Claude features.",
+      "acceptance_gaps": [
+        "Verify native authentication and renewed session on each target host; no credential copying.",
+        "Qualify bounded worker completion, cancellation, exact-session resume, crash cleanup, and worktree base."
+      ],
+      "evidence_level": "pinned_primary_source_review",
+      "sources": [
+        {
+          "path": "LICENSE.md",
+          "url": "https://github.com/anthropics/claude-code/blob/bf7d404e26a5fb6167d21b46c93a2bf6c22ab274/LICENSE.md",
+          "sha256": "728158fd1037143fad6907e8fa34804177e598b7326519503fe83cafdef849e6",
+          "bytes": 150
+        },
+        {
+          "path": "README.md",
+          "url": "https://github.com/anthropics/claude-code/blob/bf7d404e26a5fb6167d21b46c93a2bf6c22ab274/README.md",
+          "sha256": "aa0d8b80ac083e1591be0789273f447058cc9187b4331634a5614155da27778d",
+          "bytes": 2873
+        }
+      ],
+      "stable_channel": {
+        "url": "https://downloads.claude.ai/claude-code-releases/stable",
+        "version": "2.1.267",
+        "sha256": "02f727b31c47fc2ff6858d98a751f9c373c9c46a697e4ba8f78a98192d98c62a",
+        "bytes": 7,
+        "retrieved_at": "2026-09-20T02:50:44.865866+00:00",
+        "tag_commit": "9cdc2a4d946c586a8472e504fb20b3e79106518c",
+        "sources": [
+          {
+            "path": "README.md",
+            "url": "https://raw.githubusercontent.com/anthropics/claude-code/9cdc2a4d946c586a8472e504fb20b3e79106518c/README.md",
+            "sha256": "aa0d8b80ac083e1591be0789273f447058cc9187b4331634a5614155da27778d",
+            "bytes": 2873
+          },
+          {
+            "path": "LICENSE.md",
+            "url": "https://raw.githubusercontent.com/anthropics/claude-code/9cdc2a4d946c586a8472e504fb20b3e79106518c/LICENSE.md",
+            "sha256": "728158fd1037143fad6907e8fa34804177e598b7326519503fe83cafdef849e6",
+            "bytes": 150
+          }
+        ],
+        "note": "Distribution stable channel is distinct from the latest GitHub non-prerelease and from the existing selected pin; do not silently downgrade."
+      }
+    },
+    {
+      "repository": "tobi/qmd",
+      "observed_release": "v2.8.3",
+      "source_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "release_url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+      "published_at": "2026-08-16T22:30:34Z",
+      "retrieved_at": "2026-09-20T02:45:27.254891+00:00",
+      "license_at_pin": "MIT",
+      "compatibility_source_statement": "Node >=22; local Markdown collection retrieval. Semantic mode has additional model downloads and resource needs.",
+      "recommendation": "retain; trial semantic mode",
+      "why": "Document retrieval complements code retrieval; use an explicit collection rather than every local document.",
+      "acceptance_gaps": [
+        "Run a fixed labeled corpus against lexical and hybrid modes; include missing collection, no-answer, conflicting source and stale-index cases.",
+        "Record citation correctness, recall, latency, peak memory and whole-workflow token use before enabling semantic defaults."
+      ],
+      "evidence_level": "pinned_primary_source_review",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/LICENSE",
+          "sha256": "24c446836e7e2cdea13a914de10c88c553e6297366061ba24013b8ce73c8f7fa",
+          "bytes": 1072
+        },
+        {
+          "path": "README.md",
+          "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md",
+          "sha256": "24c049f59408d3d021fbee70d4cd5dd744cdb51f5caea956b417f4dfe7e26880",
+          "bytes": 50056
+        },
+        {
+          "path": "package.json",
+          "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/package.json",
+          "sha256": "14462e2764e9d140afbeb3c924e6dd81c0448177e97785822e763d901d70f20b",
+          "bytes": 3415
+        }
+      ]
+    },
+    {
+      "repository": "giancarloerra/SocratiCode",
+      "observed_release": "v1.14.0",
+      "source_commit": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+      "release_url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.14.0",
+      "published_at": "2026-09-16T14:26:47Z",
+      "retrieved_at": "2026-09-20T02:45:27.251141+00:00",
+      "license_at_pin": "AGPL-3.0-only; commercial alternative advertised",
+      "compatibility_source_statement": "Node >=18.17; external Qdrant plus native Ollama removes Docker requirement. Hybrid BM25 needs Qdrant >=1.15.2.",
+      "recommendation": "retain",
+      "why": "Conceptual code retrieval/AST chunks/dependency graph complements rg and ast-grep; confirm retrieved claims against actual source.",
+      "acceptance_gaps": [
+        "Index only intended repository and verify revision/worktree scope.",
+        "Compare fixed conceptual queries and cross-file impact tasks with lexical baseline; retain existing native services and avoid managed Docker duplicates."
+      ],
+      "evidence_level": "pinned_primary_source_review",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/giancarloerra/SocratiCode/blob/2218f25153d0f3f4a76ee240a5643dbc873e80be/LICENSE",
+          "sha256": "644937712a0d0e36507a8739c289074625c9953668ba9ccbcfe7e74efb09a86e",
+          "bytes": 35430
+        },
+        {
+          "path": "README.md",
+          "url": "https://github.com/giancarloerra/SocratiCode/blob/2218f25153d0f3f4a76ee240a5643dbc873e80be/README.md",
+          "sha256": "280f3c7b8415953c00885f489cb59bab10d6e3bc8637a32f7196165cc4cb700d",
+          "bytes": 144321
+        },
+        {
+          "path": "package.json",
+          "url": "https://github.com/giancarloerra/SocratiCode/blob/2218f25153d0f3f4a76ee240a5643dbc873e80be/package.json",
+          "sha256": "0834757f6538e4a857c0b9be5357925a5160e49a60cbbb4aaecd90b6c7f23424",
+          "bytes": 3576
+        }
+      ]
+    },
+    {
+      "repository": "akitaonrails/ai-memory",
+      "observed_release": "v2.3.2",
+      "source_commit": "353841d91618d20b110b208de284a74d0b960379",
+      "release_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2",
+      "published_at": "2026-09-20T02:34:33Z",
+      "retrieved_at": "2026-09-20T02:45:26.984389+00:00",
+      "license_at_pin": "MIT",
+      "compatibility_source_statement": "Native Linux/macOS supported; Windows via WSL2 supported; native Windows experimental upstream.",
+      "recommendation": "trial update to 2.3.2",
+      "why": "Explicit scoped durable decisions complement retrieved documents; upstream lifecycle capture is outside the accepted explicit-memory policy.",
+      "acceptance_gaps": [
+        "Test v2.3.2 against isolated copied state with backup/rollback; migration and scope-negative checks before any accepted pin change.",
+        "Keep automatic history capture, scheduler and LLM consolidation off; test only explicit scoped read/write decisions."
+      ],
+      "evidence_level": "pinned_primary_source_review",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/akitaonrails/ai-memory/blob/353841d91618d20b110b208de284a74d0b960379/LICENSE",
+          "sha256": "18332c61780ce8e694d4fa330770cd4d8c85e33f47ac13a80d72d70bb032ae72",
+          "bytes": 1068
+        },
+        {
+          "path": "README.md",
+          "url": "https://github.com/akitaonrails/ai-memory/blob/353841d91618d20b110b208de284a74d0b960379/README.md",
+          "sha256": "1d0a918f3dc0c8234aff97b75e78d6ac4143cac9ad9127e77fb0fca2077b8eda",
+          "bytes": 23159
+        }
+      ],
+      "update_delta": {
+        "url": "https://github.com/akitaonrails/ai-memory/compare/v2.3.1...v2.3.2",
+        "commit_count": 59,
+        "file_count": 51,
+        "observations": [
+          "Page-path portability checks and git-reserved-path rejection",
+          "V62 backfill moved off migration path",
+          "Transient serve-lock retry and import error exit handling",
+          "Dry-run backfill no longer mutates import state"
+        ],
+        "status": "Commit-subject/source overview; not runtime-tested"
+      }
+    },
+    {
+      "repository": "ollama/ollama",
+      "observed_release": "v0.34.2",
+      "source_commit": "dfabde4539e42ba1e1eab50a3a50b88aea7958a0",
+      "release_url": "https://github.com/ollama/ollama/releases/tag/v0.34.2",
+      "published_at": "2026-09-15T21:21:07Z",
+      "retrieved_at": "2026-09-20T02:45:27.046113+00:00",
+      "license_at_pin": "MIT runtime; model licenses are separate",
+      "compatibility_source_statement": "Official Linux x64/ARM64 distribution; Apple Metal acceleration. GPU support depends on hardware/driver; source compatibility is not host acceptance.",
+      "recommendation": "retain; qualify one local model",
+      "why": "Already selected local embedding runtime; qualify one bounded inference workload before adding another serving engine.",
+      "acceptance_gaps": [
+        "Pin exact model digest and model license separately.",
+        "Measure cold/warm load, context fit, task correctness, latency and memory; verify intended GPU after restart/suspend, and no cloud fallback."
+      ],
+      "evidence_level": "pinned_primary_source_review",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "url": "https://github.com/ollama/ollama/blob/dfabde4539e42ba1e1eab50a3a50b88aea7958a0/LICENSE",
+          "sha256": "5934ed2ce0d15154bcdb9c85203210abac0da4314af34081e36df4599f90b226",
+          "bytes": 1058
+        },
+        {
+          "path": "README.md",
+          "url": "https://github.com/ollama/ollama/blob/dfabde4539e42ba1e1eab50a3a50b88aea7958a0/README.md",
+          "sha256": "09c456b8f3e2fca486f6961e07494f424ec6f998cfd0b23ebde099bc028a47de",
+          "bytes": 19225
+        }
+      ]
+    }
+  ],
+  "official_document_review": [
+    {
+      "topic": "install",
+      "url": "https://code.claude.com/docs/en/setup",
+      "retrieved_at": "2026-09-20T02:54:02.069531+00:00",
+      "evidence_level": "current_official_documentation_review",
+      "facts_and_recommendations": "Official native installer supports Linux/WSL and explicit version or stable/latest channel. Use inside WSL. Native runtime does not require Node. Latest is the default channel; stable intentionally lags. Preserve accepted latest pin until a deliberate channel decision."
+    },
+    {
+      "topic": "auth",
+      "url": "https://code.claude.com/docs/en/authentication",
+      "retrieved_at": "2026-09-20T02:54:02.069531+00:00",
+      "evidence_level": "current_official_documentation_review",
+      "facts_and_recommendations": "Use native /login, saved native credentials and /status. macOS uses Keychain; Linux credential file has restricted permissions. Credentials must refresh for unattended sessions. API-key environment settings can override subscription auth, especially -p; check effective route without exposing secrets."
+    },
+    {
+      "topic": "workers",
+      "url": "https://code.claude.com/docs/en/sub-agents",
+      "retrieved_at": "2026-09-20T02:54:02.069531+00:00",
+      "evidence_level": "current_official_documentation_review",
+      "facts_and_recommendations": "Supported fields: model: inherit, tools, disallowedTools, maxTurns, isolation: worktree, optional memory. Omitted effort inherits. Per-call model overrides inheritance. maxTurns returns partial output; custom/general-purpose agents support ID-based continuation. Explore/Plan are one-shot. Worktree starts at default branch; verify intended base. Omit memory to avoid automatic durable memory. Excluding Edit/Write does not constrain Bash/MCP side effects. A newly created agents directory needs a fresh session."
+    },
+    {
+      "topic": "skills",
+      "url": "https://code.claude.com/docs/en/skills",
+      "retrieved_at": "2026-09-20T02:54:02.069531+00:00",
+      "evidence_level": "current_official_documentation_review",
+      "facts_and_recommendations": "Keep task skills concise and loaded only when relevant. context: fork starts an isolated subagent without conversation history; background defaults true, with narrower built-in tools. A user-only skill uses disable-model-invocation: true. Full preloaded skills consume context; skill permissions and instruction lifetimes differ."
+    },
+    {
+      "topic": "headless",
+      "url": "https://code.claude.com/docs/en/headless",
+      "retrieved_at": "2026-09-20T02:54:02.069531+00:00",
+      "evidence_level": "current_official_documentation_review",
+      "facts_and_recommendations": "Noninteractive -p supports structured output. Resume by exact session ID for coordinated work; --continue can select the most recent session. Native resume retains continuity without a separate transcript replay layer."
+    },
+    {
+      "topic": "cost",
+      "url": "https://code.claude.com/docs/en/costs",
+      "retrieved_at": "2026-09-20T02:54:02.069531+00:00",
+      "evidence_level": "current_official_documentation_review",
+      "facts_and_recommendations": "Preserve native prompt caching and compaction. /usage main prompt-cache statistics exclude subagents; whole-workflow savings require worker usage too. /context identifies context overhead. Use focused delegation, small teams, concise skills and bounded tool output. Experimental agent teams add independent contexts and are disabled by default. No vendor percentage is evidence for this workload."
+    },
+    {
+      "topic": "verification",
+      "url": "https://code.claude.com/docs/en/best-practices",
+      "retrieved_at": "2026-09-20T02:54:02.069531+00:00",
+      "evidence_level": "current_official_documentation_review",
+      "facts_and_recommendations": "Give workers an executable acceptance check and require evidence before success. Delegate independent research with concise findings; use a bounded review pass instead of recursive model review."
+    },
+    {
+      "topic": "inference",
+      "url": "https://docs.ollama.com/gpu",
+      "retrieved_at": "2026-09-20T02:54:02.069531+00:00",
+      "evidence_level": "current_official_documentation_review",
+      "facts_and_recommendations": "Metal acceleration is supported; Linux GPU support is driver/hardware dependent. A connected host is not a qualified GPU workload."
+    }
+  ],
+  "measurement_proposal": {
+    "status": "proposal; not executed",
+    "comparison": "Same repository revision, task, model, effort and correctness gates; compare native baseline against one added retrieval or worker feature at a time.",
+    "metrics": [
+      "accepted task correctness",
+      "citation/provenance accuracy",
+      "wall latency",
+      "main and worker input/output/cache-read/cache-write tokens where provided",
+      "tool payload volume",
+      "rework/retry count"
+    ],
+    "limits": [
+      "Do not treat a main-only cache statistic as total workflow savings.",
+      "Record cold and warm cache runs separately.",
+      "Metadata pin/license review does not establish host runtime acceptance.",
+      "Do not switch models down solely to manufacture a token reduction."
+    ]
+  },
+  "limits": [
+    "Source review is distinct from installation and useful host acceptance.",
+    "The selected public component manifest is unchanged by this source review.",
+    "The ai-memory 2.3.2 release is an isolated-trial candidate; retained 2.3.1 state was not upgraded."
+  ],
+  "validator_limit": {
+    "status": "native CLI validator gap observed",
+    "details": "Installed Claude 2.1.278 plugin validate did not reject a malformed agent YAML negative control; contents stayed empty for both agents-directory and standard plugin fixture. Do not treat its exit 0 as agent-file schema or discovery acceptance.",
+    "next": "Use an actual YAML parser, then fresh-client discovery and bounded runtime acceptance."
+  }
+}

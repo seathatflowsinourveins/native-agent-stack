@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-09-20",
+  "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+  "source_revision": "88fe3804f123f8abf1a145e95d3df9b48087caef",
+  "layers": [
+    {
+      "id": "agents",
+      "name": "Native agents",
+      "summary": "Keep the clients, accounts and compaction that already work.",
+      "examples": "Codex · Claude Code · native SDKs",
+      "keywords": [
+        "native-workers",
+        "native-agent",
+        "agent-runtime",
+        "codex",
+        "claude-code"
+      ],
+      "repositories": [
+        "openai/codex",
+        "anthropics/claude-code"
+      ]
+    },
+    {
+      "id": "skills",
+      "name": "Skills & playbooks",
+      "summary": "Load one useful instruction set when the task needs it.",
+      "examples": "Progressive disclosure · selected skills",
+      "keywords": [
+        "skill",
+        "awesome",
+        "playbook",
+        "best-practice"
+      ],
+      "repositories": [
+        "obra/superpowers",
+        "affaan-m/ecc"
+      ]
+    },
+    {
+      "id": "retrieval",
+      "name": "Code & document retrieval",
+      "summary": "Start exact. Add semantic search for a demonstrated gap.",
+      "examples": "rg / ast-grep · QMD · SocratiCode",
+      "keywords": [
+        "retrieval",
+        "code-search",
+        "rag",
+        "embedding",
+        "qmd",
+        "socraticode",
+        "ast-grep"
+      ],
+      "repositories": []
+    },
+    {
+      "id": "memory",
+      "name": "Explicit scoped memory",
+      "summary": "Save deliberate decisions and useful handoffs with provenance.",
+      "examples": "ai-memory · project scope · recovery",
+      "keywords": [
+        "memory",
+        "continuity",
+        "handoff"
+      ],
+      "repositories": [
+        "akitaonrails/ai-memory"
+      ]
+    },
+    {
+      "id": "workers",
+      "name": "Workers & execution",
+      "summary": "Delegate independent work with one owner and a compact result.",
+      "examples": "Native subagents · worktrees · supervision",
+      "keywords": [
+        "worker",
+        "workflow",
+        "orchestrat",
+        "worktree",
+        "sandbox",
+        "scheduler"
+      ],
+      "repositories": []
+    },
+    {
+      "id": "evaluation",
+      "name": "Evaluation & evidence",
+      "summary": "Match inputs, quality and full usage before claiming an improvement.",
+      "examples": "Retrieval tests · replay · native acceptance",
+      "keywords": [
+        "evaluation",
+        "benchmark",
+        "evals",
+        "observability",
+        "telemetry",
+        "token-efficiency"
+      ],
+      "repositories": [
+        "eyuansu62/agent-retrieval-bench"
+      ]
+    },
+    {
+      "id": "research",
+      "name": "Research & data",
+      "summary": "Keep research flexible and numerical state deterministic.",
+      "examples": "Filings · reproducible studies · paper gates",
+      "keywords": [
+        "research",
+        "data",
+        "backtest",
+        "trading",
+        "equities",
+        "quant",
+        "finance",
+        "market"
+      ],
+      "repositories": []
+    },
+    {
+      "id": "operations",
+      "name": "Operations & local inference",
+      "summary": "Observe, recover and test the platform before depending on it.",
+      "examples": "Local models · hosting · recovery",
+      "keywords": [
+        "inference",
+        "hosting",
+        "recovery",
+        "backup",
+        "monitor",
+        "security",
+        "local-model",
+        "sysadmin"
+      ],
+      "repositories": []
+    },
+    {
+      "id": "beyond",
+      "name": "Beyond the current stack",
+      "summary": "Keep useful alternatives discoverable without installing the catalog.",
+      "examples": "Product · frontend · wider ecosystem",
+      "keywords": [],
+      "repositories": []
+    }
+  ],
+  "policies": [
+    {
+      "number": "01",
+      "title": "Keep native context mechanics",
+      "body": "Preserve each runtime’s native cache and compaction. Codex and Claude Code keep their own accounts, history and usage conventions.",
+      "path": "docs/landscape.md"
+    },
+    {
+      "number": "02",
+      "title": "Retrieve the selected source",
+      "body": "Use rg and ast-grep for exact code; scoped conceptual lookup when useful; QMD for the explicitly selected documentation collection. Read the returned source before acting.",
+      "path": "recipes/README.md"
+    },
+    {
+      "number": "03",
+      "title": "Reveal instructions progressively",
+      "body": "Start with concise skill descriptions. Load the matching skill and bounded references only when the task needs them; never preload the whole skills catalog.",
+      "path": "docs/landscape.md"
+    },
+    {
+      "number": "04",
+      "title": "Bound output and keep its trail",
+      "body": "Filter large tool output to the question, preserve source paths and recoverable full evidence, and keep failures visible. Choose one useful reduction lane per artifact.",
+      "path": "recipes/README.md"
+    },
+    {
+      "number": "05",
+      "title": "Delegate independent work",
+      "body": "Use native subagents or bounded workers for independent tasks, isolated worktrees for writers, and one coordinator. Handoffs contain the result, evidence, paths and remaining gates.",
+      "path": "blueprints/us-equities/workers/policy.md"
+    },
+    {
+      "number": "06",
+      "title": "Remember with explicit intent",
+      "body": "Write durable decisions and preferences only within a verified project scope. Keep automatic history capture off; recalled pages remain untrusted evidence.",
+      "path": "blueprints/us-equities/memory-lifecycle/README.md"
+    },
+    {
+      "number": "07",
+      "title": "Avoid duplicate services",
+      "body": "Keep native tool discovery and reuse the selected MCP integration. A new client does not justify another memory service, vector store, transcript archive or orchestration layer.",
+      "path": "adoption/update.md"
+    },
+    {
+      "number": "08",
+      "title": "Measure the whole task",
+      "body": "Claim token or cost savings only with matched inputs, complete provider usage and comparable quality. Selected text, cache reuse and billing are different quantities.",
+      "path": "docs/evidence.md"
+    }
+  ],
+  "guides": [
+    {
+      "title": "Start on a new host",
+      "body": "Profiles, native sign-in and acceptance gates.",
+      "path": "adoption/README.md",
+      "category": "adoption"
+    },
+    {
+      "title": "Claude Code & Codex workers",
+      "body": "Native SDK execution with bounded output and explicit authority.",
+      "path": "blueprints/us-equities/workers/README.md",
+      "category": "workers"
+    },
+    {
+      "title": "Scoped retrieval",
+      "body": "Compare retrieval on known inputs and labels.",
+      "path": "blueprints/us-equities/retrieval-evaluation/README.md",
+      "category": "retrieval"
+    },
+    {
+      "title": "Memory lifecycle",
+      "body": "Observe, revoke and recover explicit scoped decisions.",
+      "path": "blueprints/us-equities/memory-lifecycle/README.md",
+      "category": "memory"
+    },
+    {
+      "title": "Research runtime",
+      "body": "Keep the deterministic data path outside model reasoning.",
+      "path": "blueprints/us-equities/research-runtime/README.md",
+      "category": "research"
+    },
+    {
+      "title": "Convergence practice",
+      "body": "Inspect sources, freeze inputs, execute and publish bounded evidence.",
+      "path": "blueprints/convergence-practice/README.md",
+      "category": "evaluation"
+    },
+    {
+      "title": "Latest primary-source review",
+      "body": "Native Claude features, scoped retrieval, memory update gates and local inference.",
+      "path": "docs/ecosystem/source-review.json",
+      "category": "agents"
+    }
+  ],
+  "highlights": [
+    {
+      "id": "external-eval",
+      "title": "101 published retrieval cases",
+      "status": "Recorded evaluation",
+      "body": "Pinned upstream Agent Retrieval Bench lexical and BM25 runs with zero skipped cases. Exact-path Recall and full-ranking MRR; no abstention or provider-savings claim.",
+      "path": "blueprints/convergence-practice/arb-trace2code/README.md"
+    },
+    {
+      "id": "local-eval",
+      "title": "24 frozen documentation queries",
+      "status": "Recorded integration",
+      "body": "20 positive queries scored over 15 documents; four negatives retain rankings without an abstention score. Independent fixture, complete source bodies and repeatable native APIs.",
+      "path": "blueprints/convergence-practice/local-fixture/evaluation.md"
+    },
+    {
+      "id": "paired",
+      "title": "Paired native research workflow",
+      "status": "Historical native execution",
+      "body": "A dated Linux/WSL workflow joined deterministic research artifacts with native Codex and Claude workers. A new machine must repeat its own acceptance.",
+      "path": "adoption/paired/receipt.json"
+    },
+    {
+      "id": "readiness",
+      "title": "Standalone native Claude worker",
+      "status": "Dated standalone acceptance",
+      "body": "The initial four-turn task stopped before tests. A revised standalone native Claude task completed 57 existing tests (exit 0), with no source product edits and complete worker cleanup. It reported 11 turns under a requested 12-turn bound. Effective effort remains unknown; delegation and whole-host acceptance are outside scope.",
+      "path": "docs/ecosystem/legacy-worker-receipt.json"
+    }
+  ],
+  "annotations": [
+    {
+      "repository": "anthropics/claude-code",
+      "title": "Current primary-source review · v2.1.278",
+      "body": "Native harness/subagents/skills/worktrees already cover the requested Claude features. Decision: retain. Source commit: bf7d404e26a5fb6167d21b46c93a2bf6c22ab274. Verify native authentication and renewed session on each target host; no credential copying. Qualify bounded worker completion, cancellation, exact-session resume, crash cleanup, and worktree base.",
+      "date": "2026-09-20T02:45:27.024112+00:00",
+      "path": "docs/ecosystem/source-review.json"
+    },
+    {
+      "repository": "tobi/qmd",
+      "title": "Current primary-source review · v2.8.3",
+      "body": "Document retrieval complements code retrieval; use an explicit collection rather than every local document. Decision: retain; trial semantic mode. Source commit: facd35e01359e59d938bc9418e93fb9318addee3. Run a fixed labeled corpus against lexical and hybrid modes; include missing collection, no-answer, conflicting source and stale-index cases. Record citation correctness, recall, latency, peak memory and whole-workflow token use before enabling semantic defaults.",
+      "date": "2026-09-20T02:45:27.254891+00:00",
+      "path": "docs/ecosystem/source-review.json"
+    },
+    {
+      "repository": "giancarloerra/SocratiCode",
+      "title": "Current primary-source review · v1.14.0",
+      "body": "Conceptual code retrieval/AST chunks/dependency graph complements rg and ast-grep; confirm retrieved claims against actual source. Decision: retain. Source commit: 2218f25153d0f3f4a76ee240a5643dbc873e80be. Index only intended repository and verify revision/worktree scope. Compare fixed conceptual queries and cross-file impact tasks with lexical baseline; retain existing native services and avoid managed Docker duplicates.",
+      "date": "2026-09-20T02:45:27.251141+00:00",
+      "path": "docs/ecosystem/source-review.json"
+    },
+    {
+      "repository": "akitaonrails/ai-memory",
+      "title": "Current primary-source review · v2.3.2",
+      "body": "Explicit scoped durable decisions complement retrieved documents; upstream lifecycle capture is outside the accepted explicit-memory policy. Decision: trial update to 2.3.2. Source commit: 353841d91618d20b110b208de284a74d0b960379. Test v2.3.2 against isolated copied state with backup/rollback; migration and scope-negative checks before any accepted pin change. Keep automatic history capture, scheduler and LLM consolidation off; test only explicit scoped read/write decisions.",
+      "date": "2026-09-20T02:45:26.984389+00:00",
+      "path": "docs/ecosystem/source-review.json"
+    },
+    {
+      "repository": "ollama/ollama",
+      "title": "Current primary-source review · v0.34.2",
+      "body": "Already selected local embedding runtime; qualify one bounded inference workload before adding another serving engine. Decision: retain; qualify one local model. Source commit: dfabde4539e42ba1e1eab50a3a50b88aea7958a0. Pin exact model digest and model license separately. Measure cold/warm load, context fit, task correctness, latency and memory; verify intended GPU after restart/suspend, and no cloud fallback.",
+      "date": "2026-09-20T02:45:27.046113+00:00",
+      "path": "docs/ecosystem/source-review.json"
+    },
+    {
+      "repository": "anthropics/claude-code",
+      "title": "Bounded standalone native acceptance",
+      "body": "The initial four-turn task stopped before tests. A revised standalone native Claude task completed 57 existing tests (exit 0), with no source product edits and complete worker cleanup. It reported 11 turns under a requested 12-turn bound. Effective effort remains unknown; delegation and whole-host acceptance are outside scope.",
+      "date": "2026-09-20",
+      "path": "docs/ecosystem/legacy-worker-receipt.json"
+    }
+  ],
+  "integrations": [
+    {
+      "id": "tavily",
+      "name": "Tavily · native research search",
+      "description": "Optional research search with eight official skills for Codex and Claude Code. Start with bounded search; escalate to extract, map/crawl or research only when useful.",
+      "layers": [
+        "research",
+        "skills"
+      ],
+      "status": "Dated native CLI observation",
+      "date": "2026-09-20T02:48:47.669977+00:00",
+      "pin": "CLI 0.1.8 · skills 778122e5f9c680f541eeceda5a5b36405eb7980c",
+      "url": "https://tavily.com/agent-setup/SKILL.md",
+      "receipt_path": "docs/ecosystem/tavily-receipt.json"
+    }
+  ]
+}
