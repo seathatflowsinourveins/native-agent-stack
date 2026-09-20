@@ -6414,6 +6414,81 @@
       "path": "evidence/receipts/native-worker-cgroup-20260920.json",
       "sha256": "6f378629b2e631e205bf449c923aa8d1fb20d0010f02e5aa2a1bdbf85104b2a5",
       "bytes": 3600
+    },
+    {
+      "path": ".github/workflows/native-offhost-restore.yml",
+      "sha256": "2eff16eb2a7403f620a6d4df8f431a95fca09bd3edd5a5ce35ee0decdd701d4b",
+      "bytes": 5310
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/README.md",
+      "sha256": "871a667d170dd800fe98f84a2b0a2c42e74ed36d8d4c2d10d01c310eea0924b8",
+      "bytes": 6008
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/contract_probe.py",
+      "sha256": "2b50b486bb29948051165dac9bcf46771f19100d289d46c783724c6e10132dac",
+      "bytes": 3359
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/hosted-plan.json",
+      "sha256": "4ba9e561bd42cebe1f0e4795f06fdeb400f3545f38fb0a62d86bb2821feefeef",
+      "bytes": 3803
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/input.json",
+      "sha256": "1f4b22364d60ee63280afc8734dcd61a996c84e4282384e9a6bb66a93e1dafef",
+      "bytes": 609
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/local-contract.json",
+      "sha256": "2f750004589fd8f66cb1daf9d2f1262fed95740eb14ae104e589651b06260b44",
+      "bytes": 2009
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/plan.json",
+      "sha256": "284939a99b6d1136edc655ceed16c4f423eb926ad2a4618e35821b0c326b79ca",
+      "bytes": 5511
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/prepare.py",
+      "sha256": "ab6341195c9b1f5e2ed1545387de4e4cc3dd91e7044d486aacdc1850153bb4b5",
+      "bytes": 8011
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/probe.py",
+      "sha256": "910e07c81969109d55a34b07a568e2afdb2edd22fe1a3f51eb68690327242115",
+      "bytes": 594
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/repository-manifest.json",
+      "sha256": "a9a58c28e8f52cf5f690abcd35f16be95ce892c8ae7b721c52e0c906707c5231",
+      "bytes": 1896
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/repository.json",
+      "sha256": "d022f5534db0bcb18a7254f1795c7bf33c13f73b64d9d285df6970ea046aec20",
+      "bytes": 16550
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/run.py",
+      "sha256": "897cc019d2f8195d3212ac6ab41ef8eff84f528d85fabdb72c54e1cd60378f17",
+      "bytes": 10876
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/source-receipt.json",
+      "sha256": "1906a5637b9374990cd4523e932f6476f4e23797a4033118473661e735202a31",
+      "bytes": 18028
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/verify.py",
+      "sha256": "fd51bb5c2ccdea21134b03848e53130bb0cf7dcf53840f988424533fa4bc772f",
+      "bytes": 4651
+    },
+    {
+      "path": "tests/test_offhost_restore.py",
+      "sha256": "77ac24a0d2094856b2d5dfcccafbef49ff7e7f0d5ee90628293e64b076c030a8",
+      "bytes": 6340
     }
   ],
   "convergence_records": [

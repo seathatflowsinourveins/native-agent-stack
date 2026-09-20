@@ -1,0 +1,409 @@
+{
+  "schema_version": 1,
+  "status": "prepared-only-awaiting-independent-host-restore",
+  "plan_sha256": "284939a99b6d1136edc655ceed16c4f423eb926ad2a4618e35821b0c326b79ca",
+  "binary_sha256": "20d4142678d0d95ec11a4759def1b73fd9190abc9ca19e4b62d067c0b387e639",
+  "preparation_receipt_sha256": "e1951afd08822711197b6f131a708a3bc82b907edee5740993f480a3a48c454c",
+  "before_neutral_key_manifest_sha256": "7c8f816ef06904e8a4c51dc76f18a86ac85bde90019e5222b9b34b5aa942dedc",
+  "after_neutral_key_manifest_sha256": "a9a58c28e8f52cf5f690abcd35f16be95ce892c8ae7b721c52e0c906707c5231",
+  "preparation_receipt": {
+    "schema_version": 1,
+    "id": "synthetic-wsl-restic-20260920",
+    "started_at_utc": "2026-09-20T20:32:13.985481+00:00",
+    "host_profile": "velanext-linux-wsl2",
+    "scope": "Synthetic task state in one isolated encrypted local repository on the qualified WSL host.",
+    "binary_sha256": "20d4142678d0d95ec11a4759def1b73fd9190abc9ca19e4b62d067c0b387e639",
+    "plan_sha256": "51713da3bf2be0902e059067d9a287ce2870a93d5a4fd2a4747d4fb702d5c0b3",
+    "runner_sha256": "aa6a18135141b937f700b162afd40200aadc7ec9a2b1829e223deace8c689b76",
+    "status": "prepared-awaiting-fresh-channel",
+    "commands": [
+      {
+        "id": "init",
+        "argv": [
+          "$RESTIC",
+          "--no-cache",
+          "--repo",
+          "$RUN_DIR/repository",
+          "--password-file",
+          "$RUN_DIR/password",
+          "init",
+          "--repository-version",
+          "2"
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "expected_failure": false,
+        "seconds": 3.362,
+        "stdout": "created restic repository 324b729ed4 at $RUN_DIR/repository\n\nPlease note that knowledge of your password is required to access\nthe repository. Losing your password means that your data is\nirrecoverably lost.\n",
+        "stderr": ""
+      },
+      {
+        "id": "backup-1",
+        "argv": [
+          "$RESTIC",
+          "--no-cache",
+          "--repo",
+          "$RUN_DIR/repository",
+          "--password-file",
+          "$RUN_DIR/password",
+          "backup",
+          "--json",
+          "--host",
+          "synthetic-wsl-restore",
+          "--tag",
+          "synthetic-1",
+          "$RUN_DIR/fixture"
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "expected_failure": false,
+        "seconds": 0.761,
+        "stdout": "{\"message_type\":\"summary\",\"files_new\":6,\"files_changed\":0,\"files_unmodified\":0,\"dirs_new\":10,\"dirs_changed\":0,\"dirs_unmodified\":0,\"data_blobs\":5,\"tree_blobs\":11,\"data_added\":1054688,\"data_added_packed\":4456,\"total_files_processed\":6,\"total_bytes_processed\":1048747,\"total_duration\":0.746163082,\"backup_start\":\"2026-09-20T16:32:18.923847615-04:00\",\"backup_end\":\"2026-09-20T16:32:19.670010696-04:00\",\"snapshot_id\":\"071e8951efdb088585a3d4c31680bc660276eed9e11ecd562f44e22b6c2ddc80\"}\n",
+        "stderr": ""
+      },
+      {
+        "id": "snapshot-id-1",
+        "argv": [
+          "$RESTIC",
+          "--no-cache",
+          "--repo",
+          "$RUN_DIR/repository",
+          "--password-file",
+          "$RUN_DIR/password",
+          "snapshots",
+          "--json",
+          "--tag",
+          "synthetic-1"
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "expected_failure": false,
+        "seconds": 0.736,
+        "stdout": "[{\"time\":\"2026-09-20T16:32:18.923847615-04:00\",\"tree\":\"1c1292f619ece4769afd5046bad47c6c140bc2ee7f476093fa5eb346a2a7573f\",\"paths\":[\"$RUN_DIR/fixture\"],\"hostname\":\"synthetic-wsl-restore\",\"username\":\"$USER\",\"uid\":1000,\"gid\":1000,\"tags\":[\"synthetic-1\"],\"program_version\":\"restic 0.19.1\",\"summary\":{\"backup_start\":\"2026-09-20T16:32:18.923847615-04:00\",\"backup_end\":\"2026-09-20T16:32:19.670010696-04:00\",\"files_new\":6,\"files_changed\":0,\"files_unmodified\":0,\"dirs_new\":10,\"dirs_changed\":0,\"dirs_unmodified\":0,\"data_blobs\":5,\"tree_blobs\":11,\"data_added\":1054688,\"data_added_packed\":4456,\"total_files_processed\":6,\"total_bytes_processed\":1048747},\"id\":\"071e8951efdb088585a3d4c31680bc660276eed9e11ecd562f44e22b6c2ddc80\",\"short_id\":\"071e8951\"}]\n",
+        "stderr": ""
+      },
+      {
+        "id": "backup-2",
+        "argv": [
+          "$RESTIC",
+          "--no-cache",
+          "--repo",
+          "$RUN_DIR/repository",
+          "--password-file",
+          "$RUN_DIR/password",
+          "backup",
+          "--json",
+          "--host",
+          "synthetic-wsl-restore",
+          "--tag",
+          "synthetic-2",
+          "$RUN_DIR/fixture"
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "expected_failure": false,
+        "seconds": 0.747,
+        "stdout": "{\"message_type\":\"summary\",\"files_new\":1,\"files_changed\":5,\"files_unmodified\":0,\"dirs_new\":0,\"dirs_changed\":10,\"dirs_unmodified\":0,\"data_blobs\":2,\"tree_blobs\":10,\"data_added\":5988,\"data_added_packed\":3659,\"total_files_processed\":6,\"total_bytes_processed\":1048747,\"total_duration\":0.737996363,\"backup_start\":\"2026-09-20T16:32:20.422032941-04:00\",\"backup_end\":\"2026-09-20T16:32:21.160029304-04:00\",\"snapshot_id\":\"584e40a22ffbb39c814b9322daf22b0001e165e37c1518d484f6d5d2464f5a21\"}\n",
+        "stderr": ""
+      },
+      {
+        "id": "snapshot-id-2",
+        "argv": [
+          "$RESTIC",
+          "--no-cache",
+          "--repo",
+          "$RUN_DIR/repository",
+          "--password-file",
+          "$RUN_DIR/password",
+          "snapshots",
+          "--json",
+          "--tag",
+          "synthetic-2"
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "expected_failure": false,
+        "seconds": 0.735,
+        "stdout": "[{\"time\":\"2026-09-20T16:32:20.422032941-04:00\",\"parent\":\"071e8951efdb088585a3d4c31680bc660276eed9e11ecd562f44e22b6c2ddc80\",\"tree\":\"aeeb43fc9c09ae88bf3924139e1574d14d9814586e98dbb86527c74ced07cc60\",\"paths\":[\"$RUN_DIR/fixture\"],\"hostname\":\"synthetic-wsl-restore\",\"username\":\"$USER\",\"uid\":1000,\"gid\":1000,\"tags\":[\"synthetic-2\"],\"program_version\":\"restic 0.19.1\",\"summary\":{\"backup_start\":\"2026-09-20T16:32:20.422032941-04:00\",\"backup_end\":\"2026-09-20T16:32:21.160029304-04:00\",\"files_new\":1,\"files_changed\":5,\"files_unmodified\":0,\"dirs_new\":0,\"dirs_changed\":10,\"dirs_unmodified\":0,\"data_blobs\":2,\"tree_blobs\":10,\"data_added\":5988,\"data_added_packed\":3659,\"total_files_processed\":6,\"total_bytes_processed\":1048747},\"id\":\"584e40a22ffbb39c814b9322daf22b0001e165e37c1518d484f6d5d2464f5a21\",\"short_id\":\"584e40a2\"}]\n",
+        "stderr": ""
+      },
+      {
+        "id": "healthy-read-all-data",
+        "argv": [
+          "$RESTIC",
+          "--no-cache",
+          "--repo",
+          "$RUN_DIR/repository",
+          "--password-file",
+          "$RUN_DIR/password",
+          "check",
+          "--read-data"
+        ],
+        "exit_code": 0,
+        "timeout": false,
+        "expected_failure": false,
+        "seconds": 0.727,
+        "stdout": "create exclusive lock for repository\nload indexes\ncheck all packs\ncheck snapshots, trees and blobs\n[0:00] 100.00%  2 / 2 snapshots\nread all data\n[0:00] 100.00%  4 / 4 packs\nno errors were found\n",
+        "stderr": ""
+      },
+      {
+        "id": "wrong-password-restore",
+        "argv": [
+          "$RESTIC",
+          "--no-cache",
+          "--repo",
+          "$RUN_DIR/repository",
+          "--password-file",
+          "$RUN_DIR/wrong-password",
+          "restore",
+          "584e40a22ffbb39c814b9322daf22b0001e165e37c1518d484f6d5d2464f5a21:$RUN_DIR/fixture",
+          "--target",
+          "$RUN_DIR/wrong-target",
+          "--verify"
+        ],
+        "exit_code": 12,
+        "timeout": false,
+        "expected_failure": true,
+        "seconds": 0.513,
+        "stdout": "",
+        "stderr": "Fatal: wrong password or no key found\n"
+      },
+      {
+        "id": "corrupted-copy-read-all-data",
+        "argv": [
+          "$RESTIC",
+          "--no-cache",
+          "--repo",
+          "$RUN_DIR/corrupted-copy",
+          "--password-file",
+          "$RUN_DIR/password",
+          "check",
+          "--read-data"
+        ],
+        "exit_code": 1,
+        "timeout": false,
+        "expected_failure": true,
+        "seconds": 0.731,
+        "stdout": "create exclusive lock for repository\nload indexes\ncheck all packs\ncheck snapshots, trees and blobs\n[0:00] 100.00%  2 / 2 snapshots\nread all data\n[0:00] 100.00%  4 / 4 packs\n",
+        "stderr": "error for tree cf119811:\n  decrypting blob <tree/cf119811> from pack 10d2860b5e8996c87f5ec80eb8a77d70e5c850ddbe4cacff096a84675c6d10bd failed: ciphertext verification failed\npack 10d2860b5e8996c87f5ec80eb8a77d70e5c850ddbe4cacff096a84675c6d10bd contains 2 errors: [blob cf11981195cd704adeba3462dea3fd55968a862e84e95d2e69c06f5e24e9e78c: decrypting blob <tree/cf119811> from pack 10d2860b5e8996c87f5ec80eb8a77d70e5c850ddbe4cacff096a84675c6d10bd failed: ciphertext verification failed unexpected pack id 14e4420f019b77a320794d61e5dd96511aeb8f0c80e0e28cbb059a9cfbecc21b]\n\nThe repository contains damaged pack files. These damaged files must be removed to repair the repository. This can be done using the following commands. Please read the troubleshooting guide at https://restic.readthedocs.io/en/stable/077_troubleshooting.html first.\n\nrestic repair packs 10d2860b5e8996c87f5ec80eb8a77d70e5c850ddbe4cacff096a84675c6d10bd\nrestic repair snapshots --forget\n\nDamaged pack files can be caused by backend problems, hardware problems or bugs in restic. Please open an issue at https://github.com/restic/restic/issues/new/choose for further troubleshooting!\nFatal: repository contains errors\n"
+      }
+    ],
+    "checks": [
+      {
+        "name": "snapshot-1-matches-independent-frozen-oracle",
+        "passed": true
+      },
+      {
+        "name": "exact-snapshot-1-identity",
+        "passed": true
+      },
+      {
+        "name": "snapshot-2-matches-independent-frozen-oracle",
+        "passed": true
+      },
+      {
+        "name": "exact-snapshot-2-identity",
+        "passed": true
+      },
+      {
+        "name": "wrong-password-native-exit-12",
+        "passed": true
+      },
+      {
+        "name": "wrong-password-produced-no-files",
+        "passed": true
+      },
+      {
+        "name": "corrupted-copy-native-exit-1",
+        "passed": true
+      },
+      {
+        "name": "original-repository-unchanged-by-negative-tests",
+        "passed": true
+      }
+    ],
+    "stages": [
+      {
+        "stage": "prepare",
+        "started_at_utc": "2026-09-20T20:32:13.985679+00:00",
+        "finished_at_utc": "2026-09-20T20:32:23.918067+00:00"
+      }
+    ],
+    "limits": [
+      "No pruning, services, global PATH/configuration changes, credential access, model calls, reboot, or shared SSH transport changes.",
+      "Fresh-SSH recovery after explicit incorrect-input/corruption failures; process-crash and power-loss recovery not qualified.",
+      "Same-host password-file availability is a prerequisite; independent key recovery and offhost disaster recovery remain unknown.",
+      "No ACL/xattr/sparse/hardlink/symlink or cross-filesystem/Windows-NTFS/exFAT claims.",
+      "No token, storage-efficiency or backup performance claim."
+    ],
+    "exact_causal_lifetime_provider_tokens_saved": null,
+    "snapshots": [
+      "071e8951efdb088585a3d4c31680bc660276eed9e11ecd562f44e22b6c2ddc80",
+      "584e40a22ffbb39c814b9322daf22b0001e165e37c1518d484f6d5d2464f5a21"
+    ],
+    "corruption": {
+      "copied_pack_relative_path": "data/10/10d2860b5e8996c87f5ec80eb8a77d70e5c850ddbe4cacff096a84675c6d10bd",
+      "bytes": 3541,
+      "change": "One byte XOR 1 at floor(size/2), on isolated copied repository only; copied pack owner-write bit enabled."
+    }
+  },
+  "commands": [
+    {
+      "id": "unchanged-corrected-prepare",
+      "argv": [
+        "/usr/bin/python3",
+        "$CHECKOUT/blueprints/convergence-practice/wsl-restore/run.py",
+        "prepare",
+        "--run-dir",
+        "/tmp/native-foundation-offhost-20260920/preparation",
+        "--restic",
+        "$RESTIC"
+      ],
+      "started_at_utc": "2026-09-20T20:32:13.937008+00:00",
+      "exit_code": 0,
+      "timeout": false,
+      "stdout": {
+        "text": "{\"status\": \"prepared-awaiting-fresh-channel\", \"commands\": 8, \"checks\": 8}\n",
+        "raw_sha256": "343326f008ace9ecea8e33546d1828f60b6990e2871deae7ad4d1c4f90261927",
+        "raw_bytes": 74
+      },
+      "stderr": {
+        "text": "",
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0
+      }
+    },
+    {
+      "id": "add-neutral-key",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "/tmp/native-foundation-offhost-20260920/preparation/repository",
+        "--password-file",
+        "/tmp/native-foundation-offhost-20260920/preparation/password",
+        "key",
+        "add",
+        "--host",
+        "synthetic-offhost-restore",
+        "--user",
+        "synthetic",
+        "--new-password-file",
+        "/tmp/native-foundation-offhost-20260920/preparation/password"
+      ],
+      "started_at_utc": "2026-09-20T20:32:23.926952+00:00",
+      "exit_code": 0,
+      "timeout": false,
+      "stdout": {
+        "text": "saved new key with ID 6d659225e9aa283d8e0816bd236b436f0bb1cbf429e603ffb72ae0e0fb682845\n",
+        "raw_sha256": "fe0f21790d336bcc183cca110bba0c70ff9c12aed4d70fdd706f61df2e1ea724",
+        "raw_bytes": 87
+      },
+      "stderr": {
+        "text": "",
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0
+      }
+    },
+    {
+      "id": "validate-neutral-key-before-removal",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "/tmp/native-foundation-offhost-20260920/preparation/repository",
+        "--password-file",
+        "/tmp/native-foundation-offhost-20260920/preparation/password",
+        "--key-hint",
+        "6d659225e9aa283d8e0816bd236b436f0bb1cbf429e603ffb72ae0e0fb682845",
+        "snapshots",
+        "--json"
+      ],
+      "started_at_utc": "2026-09-20T20:32:28.452883+00:00",
+      "exit_code": 0,
+      "timeout": false,
+      "stdout": {
+        "text": "[decoded snapshot metadata retained privately; exact two IDs verified]",
+        "raw_sha256": "80e373fb8966fd56757e3d514cbc6226511b250c14af290b7fc8227c6c81035b",
+        "raw_bytes": 1625
+      },
+      "stderr": {
+        "text": "",
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0
+      }
+    },
+    {
+      "id": "remove-only-original-new-fixture-key",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "/tmp/native-foundation-offhost-20260920/preparation/repository",
+        "--password-file",
+        "/tmp/native-foundation-offhost-20260920/preparation/password",
+        "--key-hint",
+        "6d659225e9aa283d8e0816bd236b436f0bb1cbf429e603ffb72ae0e0fb682845",
+        "key",
+        "remove",
+        "d0c1d6d3ca64b84456408fb8c8af51bcb0baf2c4b93ce9b58865debc6acc2e6f"
+      ],
+      "started_at_utc": "2026-09-20T20:32:29.178525+00:00",
+      "exit_code": 0,
+      "timeout": false,
+      "stdout": {
+        "text": "removed key d0c1d6d3ca64b84456408fb8c8af51bcb0baf2c4b93ce9b58865debc6acc2e6f\n",
+        "raw_sha256": "ef1d1bb3e47c3f394b2ae703df8f95002b32b7bda82d3963000e56a69eb62673",
+        "raw_bytes": 77
+      },
+      "stderr": {
+        "text": "",
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0
+      }
+    },
+    {
+      "id": "final-export-read-all-data",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "/tmp/native-foundation-offhost-20260920/preparation/repository",
+        "--password-file",
+        "/tmp/native-foundation-offhost-20260920/preparation/password",
+        "--key-hint",
+        "6d659225e9aa283d8e0816bd236b436f0bb1cbf429e603ffb72ae0e0fb682845",
+        "check",
+        "--read-data"
+      ],
+      "started_at_utc": "2026-09-20T20:32:29.900154+00:00",
+      "exit_code": 0,
+      "timeout": false,
+      "stdout": {
+        "text": "create exclusive lock for repository\nload indexes\ncheck all packs\ncheck snapshots, trees and blobs\n[0:00] 100.00%  2 / 2 snapshots\nread all data\n[0:00] 100.00%  4 / 4 packs\nno errors were found\n",
+        "raw_sha256": "9f8dcae421a1bf9787f88ef04e062a91b2e022dbbc7390d8514d74a6282d896b",
+        "raw_bytes": 194
+      },
+      "stderr": {
+        "text": "",
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0
+      }
+    }
+  ],
+  "checks": {
+    "new_synthetic_state_only": true,
+    "unchanged_corrected_prepare": true,
+    "same_exact_snapshots_after_native_key_metadata_correction": true,
+    "all_non_key_ciphertext_unchanged": true,
+    "private_password_not_exported": true
+  },
+  "sanitization": "Native source username/hostname and checkout/tool paths are replaced in command streams; decoded snapshot JSON is private with exact output hash retained. Ciphertext is byte exact; neutral key labels were created by native key add/remove before export freeze.",
+  "limitations": [
+    "Local synthetic preparation is not independent-host acceptance; hosted success must be recorded separately.",
+    "Same GitHub account stores public ciphertext and separately protected Actions secret; not independent administrative trust domains or GitHub-account-loss recovery.",
+    "No reboot, power-loss, production disaster recovery, credential recovery, lost-password recovery, or long-term storage availability claim.",
+    "Only complete fixture path/type/length/SHA256/POSIX-mode equality is qualified; not UID/GID, timestamps, ACL/xattrs, sparse files, links or Windows filesystems.",
+    "No token, performance, or storage-efficiency savings claim."
+  ]
+}

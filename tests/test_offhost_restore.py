@@ -1,0 +1,116 @@
+"""Offline refusal cases; no native services, password reads or provider calls."""
+import base64
+import copy
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[1]
+HERE = ROOT / 'blueprints/convergence-practice/offhost-restore'
+spec = importlib.util.spec_from_file_location('offhost_verify', HERE / 'verify.py')
+verify = importlib.util.module_from_spec(spec); spec.loader.exec_module(verify)
+
+
+class CiphertextTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory(); self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+        self.expected = [{'path':'config','bytes':3,'sha256':hashlib.sha256(b'abc').hexdigest()}]
+        self.bundle = {'schema_version':1,'files':[{'path':'config','base64':base64.b64encode(b'abc').decode()}]}
+
+    def test_exact_decode(self):
+        verify.decode_repository(self.bundle, self.expected, self.root/'repository')
+        self.assertEqual(verify.repository_manifest(self.root/'repository'), self.expected)
+
+    def test_corrupted_ciphertext_refused_before_write(self):
+        self.bundle['files'][0]['base64'] = base64.b64encode(b'bad').decode()
+        with self.assertRaises(ValueError): verify.decode_repository(self.bundle, self.expected, self.root/'repository')
+        self.assertFalse((self.root/'repository').exists())
+
+    def test_traversal_and_extra_members_refused(self):
+        for name in ['../password','/tmp/escape','config/../password','locks/anything']:
+            bad = copy.deepcopy(self.bundle); bad['files'][0]['path'] = name
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                verify.decode_repository(bad, self.expected, self.root/'repository')
+
+    def test_duplicate_and_missing_members_refused(self):
+        for entries in [[], self.bundle['files'] * 2]:
+            bad = dict(self.bundle, files=entries)
+            with self.assertRaises(ValueError): verify.decode_repository(bad, self.expected, self.root/'repository')
+
+    def test_duplicate_manifest_refused(self):
+        with self.assertRaises(ValueError): verify.decode_repository(self.bundle, self.expected*2, self.root/'repository')
+
+    def test_existing_destination_refused(self):
+        (self.root/'repository').mkdir()
+        with self.assertRaises(FileExistsError): verify.decode_repository(self.bundle, self.expected, self.root/'repository')
+
+    def test_symlink_destination_and_extra_files_refused(self):
+        (self.root/'outside').mkdir(); (self.root/'repository').symlink_to(self.root/'outside',target_is_directory=True)
+        with self.assertRaises(ValueError): verify.decode_repository(self.bundle, self.expected, self.root/'repository')
+        (self.root/'repository').unlink()
+        verify.decode_repository(self.bundle, self.expected, self.root/'repository')
+        (self.root/'repository/secret').write_text('not ciphertext')
+        with self.assertRaises(ValueError): verify.repository_manifest(self.root/'repository')
+
+    def test_duplicate_json_keys_refused(self):
+        p = self.root/'bad.json'; p.write_text('{"files": [], "files": []}')
+        with self.assertRaises(ValueError): verify.load(p)
+
+    def test_checked_in_envelope_if_prepared(self):
+        if not (HERE/'repository.json').exists(): self.skipTest('one authorized preparation not executed yet')
+        data = verify.load(HERE/'input.json')
+        self.assertEqual(verify.digest(HERE/'repository.json'), data['repository_envelope_sha256'])
+        expected = verify.load(HERE/'repository-manifest.json')
+        verify.decode_repository(verify.load(HERE/'repository.json'),expected,self.root/'repository')
+        self.assertEqual(verify.repository_manifest(self.root/'repository'),expected)
+
+
+class RestoreTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory(); self.addCleanup(temporary.cleanup)
+        self.target = Path(temporary.name)
+        verify.fixture_module().materialize(self.target/'fixture',1)
+
+    def test_unchanged_historical_oracle_matches(self):
+        self.assertEqual(verify.verify_restore(self.target,1),verify.load(verify.BASELINE/'attempt-2/expected-1.json'))
+
+    def test_root_mode_and_same_size_byte_change_refused(self):
+        (self.target/'fixture').chmod(0o700)
+        with self.assertRaises(ValueError): verify.verify_restore(self.target,1)
+        (self.target/'fixture').chmod(0o750)
+        p=self.target/'fixture/blobs/data.bin'; raw=bytearray(p.read_bytes());raw[123]^=1;p.write_bytes(raw)
+        with self.assertRaises(ValueError): verify.verify_restore(self.target,1)
+
+    def test_extra_parent_output_refused(self):
+        (self.target/'unexpected').write_text('')
+        with self.assertRaises(ValueError): verify.verify_restore(self.target,1)
+
+    def test_sandbox_keeps_keys_and_repo_read_only_without_network(self):
+        spec = importlib.util.spec_from_file_location('offhost_run', HERE/'run.py')
+        module = importlib.util.module_from_spec(spec)
+        with patch.dict(sys.modules, {'verify':verify}): spec.loader.exec_module(module)
+        command=module.sandbox_command(Path('/binary'),Path('/repo'),Path('/key'),Path('/out'),Path('/probe'),['check','--read-data'])
+        self.assertIn('--unshare-net',command);self.assertIn('--clearenv',command)
+        for source in ['/repo','/key']:
+            self.assertEqual(command[command.index(source)-1],'--ro-bind')
+        self.assertIn('--no-lock',command)
+        self.assertIn('PWD',command)
+        self.assertNotIn(str(HERE), ' '.join(command))
+        self.assertEqual(module.sanitize('snapshot by privateuser@synthetic-wsl-restore'), 'snapshot by $SOURCE_USER@synthetic-wsl-restore')
+
+    def test_workflow_is_manual_only_and_uploads_reports_not_root(self):
+        text=(ROOT/'.github/workflows/native-offhost-restore.yml').read_text()
+        self.assertIn('  workflow_dispatch:',text)
+        self.assertNotIn('  push:',text);self.assertNotIn('pull_request',text)
+        self.assertIn('path: ${{ env.FOUNDATION_RESTORE_ROOT }}/reports/',text)
+        self.assertIn('secrets.FOUNDATION_RESTORE_FIXTURE_20260920',text)
+        self.assertNotIn('bypass',text)
+
+
+if __name__ == '__main__': unittest.main()

@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "preparation_plan_sha256": "284939a99b6d1136edc655ceed16c4f423eb926ad2a4618e35821b0c326b79ca",
+  "frozen_after_preparation_before_hosted_dispatch": true,
+  "corrections": [
+    "Retain installer structured failure report before propagating installer exit status.",
+    "Hosted runner verifies this explicit updated source manifest while preserving the original preparation plan and private14-source freeze.",
+    "Probe asserts the whole /home mount is absent, avoiding a personal-looking runner path in public source."
+  ],
+  "changed_sources_since_preparation": [
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/run.py",
+      "preparation_sha256": "6e684a911a72efa9df9dd58ae335496fc46060aa177eaf534e01f4eb4bdece93",
+      "hosted_sha256": "897cc019d2f8195d3212ac6ab41ef8eff84f528d85fabdb72c54e1cd60378f17"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/contract_probe.py",
+      "preparation_sha256": "a537cfcf9eb017343fd9163375517aa6f665077c3d43a1f492bb29b9a294c8b7",
+      "hosted_sha256": "2b50b486bb29948051165dac9bcf46771f19100d289d46c783724c6e10132dac"
+    },
+    {
+      "path": ".github/workflows/native-offhost-restore.yml",
+      "preparation_sha256": "24a495d0d66e50f30b3a87d8b18efe2d6db282811637af6aba97a5ca2b3dd569",
+      "hosted_sha256": "2eff16eb2a7403f620a6d4df8f431a95fca09bd3edd5a5ce35ee0decdd701d4b"
+    }
+  ],
+  "frozen_sources": [
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/run.py",
+      "sha256": "aa6a18135141b937f700b162afd40200aadc7ec9a2b1829e223deace8c689b76"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/plan.json",
+      "sha256": "51713da3bf2be0902e059067d9a287ce2870a93d5a4fd2a4747d4fb702d5c0b3"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/fixture.py",
+      "sha256": "153b0a13d80ab0c0eecb623942237664988c35cb586394f64e70e83106583bf1"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/corruption.py",
+      "sha256": "8f9220e40a8fb550d77b7ef7afec4dd81b591134c190a904d9abc018c2f1b96e"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/install.py",
+      "sha256": "243d7174ab90d3cac7667a6af74bb2062c9f0fc3275aa2b447b25afa870f3c07"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/attempt-2/expected-1.json",
+      "sha256": "72bba97f54f1baefb1f3179e4823976d2074a653987e52c200052e64d98ddfb6"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/attempt-2/expected-2.json",
+      "sha256": "252b94638ee49bded6de21d11dc6cf8b7689548041ad2416dfb26aeb6ae78c56"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/prepare.py",
+      "sha256": "ab6341195c9b1f5e2ed1545387de4e4cc3dd91e7044d486aacdc1850153bb4b5"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/verify.py",
+      "sha256": "fd51bb5c2ccdea21134b03848e53130bb0cf7dcf53840f988424533fa4bc772f"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/run.py",
+      "sha256": "897cc019d2f8195d3212ac6ab41ef8eff84f528d85fabdb72c54e1cd60378f17"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/probe.py",
+      "sha256": "910e07c81969109d55a34b07a568e2afdb2edd22fe1a3f51eb68690327242115"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/contract_probe.py",
+      "sha256": "2b50b486bb29948051165dac9bcf46771f19100d289d46c783724c6e10132dac"
+    },
+    {
+      "path": "tests/test_offhost_restore.py",
+      "sha256": "77ac24a0d2094856b2d5dfcccafbef49ff7e7f0d5ee90628293e64b076c030a8"
+    },
+    {
+      "path": ".github/workflows/native-offhost-restore.yml",
+      "sha256": "2eff16eb2a7403f620a6d4df8f431a95fca09bd3edd5a5ce35ee0decdd701d4b"
+    }
+  ]
+}
