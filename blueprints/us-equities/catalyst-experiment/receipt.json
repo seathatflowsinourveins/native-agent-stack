@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "id": "synthetic-catalyst-contract-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "duckdb"
+  ],
+  "status": "accepted_synthetic_contract_only",
+  "claim": "Native DuckDB1.5.5 executed an exact BIGINT availability query on five synthetic observations in a network-disabled process. Thirteen focused standard-library tests exercise threshold, label, timing, units, interval and inspection-registry failures. No empirical trading experiment or new LEAN/skfolio run.",
+  "protocol": {
+    "path": "blueprints/us-equities/catalyst-experiment/protocol.json",
+    "sha256": "f2aa3e4944ba2bd7cfb1fa41155e304075fff791f10b8c60996e3257dcbfe1e4",
+    "frozen_at_utc": "2026-09-20T03:12:40.886915+00:00",
+    "before": "Native SQL, synthetic candidate decisions and label calculations."
+  },
+  "source_hashes": {
+    "availability.sql": "7af124ee0368b61bf81c832d83163c8b75fd35da5a3c4d2e8127b23107bf99cc",
+    "contract.py": "3bbbd9c7321e14c56d95f3e027702082339e1d3719e37d5410bdcf7cc91d2968",
+    "exercise.py": "182b86e2aff96e4e782350a56e7eb78d30e502babc8fddb5b14f1ddd80575fd1",
+    "protocol.json": "f2aa3e4944ba2bd7cfb1fa41155e304075fff791f10b8c60996e3257dcbfe1e4"
+  },
+  "synthetic_input_sha256": "9b7799ef49040caaac3205af3e64cba2d4168d0788ff0e49bc465979a643fdc7",
+  "runtime": {
+    "python": "3.13.15",
+    "duckdb": "1.5.5",
+    "installation": "Existing isolated SDK runtime; no dependency install or upgrade.",
+    "isolation": "Bubblewrap --unshare-net, read-only root filesystem, explicit writable private run parent and tmpfs /tmp."
+  },
+  "native_command": "bwrap --unshare-net --ro-bind / / --bind \"$RUN_PARENT\" \"$RUN_PARENT\" --tmpfs /tmp \"$SDK_PYTHON\" blueprints/us-equities/catalyst-experiment/exercise.py --output \"$RUN_PARENT/run-2\"",
+  "native_exit": 0,
+  "native_results": {
+    "broker_orders": 0,
+    "candidate_rejection_reasons": {
+      "daily": [],
+      "intraday": []
+    },
+    "duckdb_version": "1.5.5",
+    "empirical_results": null,
+    "future_perturbation_preserves_earlier_selection": true,
+    "kind": "synthetic_contract_exercise",
+    "limitations": "Supplied synthetic inputs only. No real source availability, feature construction, execution accounting, matching, bootstrap or empirical promotion accepted.",
+    "named_synthetic_labels": {
+      "close_to_close_1d": "0.5",
+      "close_to_close_5d": "2",
+      "entry_to_exit": "0.076923076923076923076923077",
+      "gte_200pct": {
+        "close_to_close_1d": false,
+        "close_to_close_5d": true,
+        "entry_to_exit": false,
+        "open_to_high_1d": true,
+        "prior_close_to_high_1d": true
+      },
+      "open_to_high_1d": "2",
+      "prior_close_to_high_1d": "2.6"
+    },
+    "native_bigint_one_nanosecond_difference": 1,
+    "native_query": "duckdb.connect(':memory:').execute(availability_sql, {'cutoff': integer_ns}).fetchall()",
+    "observation_count": 5,
+    "protocol_id": "catalyst-experiment-v1-20260920",
+    "protocol_sha256": "f2aa3e4944ba2bd7cfb1fa41155e304075fff791f10b8c60996e3257dcbfe1e4",
+    "provider_calls": 0,
+    "python_version": "3.13.15",
+    "selections": {
+      "100": [],
+      "110": [
+        "known"
+      ],
+      "120": [
+        "known"
+      ],
+      "130": [
+        "incomplete_at_120",
+        "known",
+        "late_revision"
+      ]
+    },
+    "source_hashes_unchanged": true
+  },
+  "focused_tests": {
+    "command": "python3 -m unittest discover -s tests -p test_catalyst_experiment.py -v",
+    "python": "3.12.3",
+    "passed": 13,
+    "exit": 0,
+    "scope": "Synthetic supplied contract values only; no real exchange schedule, provider or broker calls.",
+    "source_sha256": "0767c544693c249e1649fc77c7578fb924deadba6f7f2b5aba6f1fd88a22f644"
+  },
+  "private_artifacts": [
+    {
+      "name": "public-receipt-before-precision-fix.json",
+      "sha256": "d3d24ed85a5e0fa431e517e4fef2a45fa13299545ce6299484af82dd7baa2cb2",
+      "bytes": 5440
+    },
+    {
+      "name": "run-1/command.private.json",
+      "sha256": "52043e6a61985022023b53f81b8b74b221cdea9678b49b06b37b0f8973429977",
+      "bytes": 270
+    },
+    {
+      "name": "run-1/freeze.json",
+      "sha256": "638229f8f4e265674adcdc9efed97514a87bdd20c1c7e5fe2f88db7abcd824ed",
+      "bytes": 553
+    },
+    {
+      "name": "run-1/launcher-command.txt",
+      "sha256": "5cf2111b9fc98fcff5eb40a5ff07a3811b7f50334846f9a9ae072b0219004da2",
+      "bytes": 387
+    },
+    {
+      "name": "run-1/result.json",
+      "sha256": "2b5d23bee78c62792b3d038188cfafeec7bdc55d3e4bda492eedb6b8523f620e",
+      "bytes": 1446
+    },
+    {
+      "name": "run-1/synthetic-inputs.json",
+      "sha256": "9b7799ef49040caaac3205af3e64cba2d4168d0788ff0e49bc465979a643fdc7",
+      "bytes": 290
+    },
+    {
+      "name": "run-2/command.private.json",
+      "sha256": "bd16c8f253aa61101a2383e876e236e22b68678ccd80ff5afd9e40f57b3a9b1a",
+      "bytes": 270
+    },
+    {
+      "name": "run-2/freeze.json",
+      "sha256": "4bc4f63c7a7cf3255ada4d036f4253a58c684f55f4ae3036a03ee9ed5d8c6537",
+      "bytes": 553
+    },
+    {
+      "name": "run-2/launcher-command.txt",
+      "sha256": "8688bbf937e1a614906c9e0d9a374ee9280a3ec22a843d72b47bc31a5aaf9710",
+      "bytes": 387
+    },
+    {
+      "name": "run-2/result.json",
+      "sha256": "2b5d23bee78c62792b3d038188cfafeec7bdc55d3e4bda492eedb6b8523f620e",
+      "bytes": 1446
+    },
+    {
+      "name": "run-2/synthetic-inputs.json",
+      "sha256": "9b7799ef49040caaac3205af3e64cba2d4168d0788ff0e49bc465979a643fdc7",
+      "bytes": 290
+    }
+  ],
+  "prior_setup_observations": [
+    "Requested worktree already existed clean at the specified base; reused it after duplicate branch creation was refused.",
+    "Separate chronological-evaluation venv has no DuckDB distribution; selected existing SDK runtime instead.",
+    "Focused tests initially failed because contract.py did not yet exist; all12passed after implementation.",
+    "The added precision regression initially passed one extra positional argument; the test failed before native execution and was corrected. All13focusedtests then passed."
+  ],
+  "limitations": [
+    "Protocol thresholds are exploratory choices, not fitted or proven optimal.",
+    "Full feature construction, historical universe/availability, matched controls, fills, cash/corporate-action/margin accounting, statistical inference and promotion are future work.",
+    "The chronological2025reserved calendar requires a complete case-specific inspection registry and is not asserted globally unseen.",
+    "Synthetic labels are independent arithmetic fixtures, not market outcomes or simulated P&L.",
+    "No provider calls, broker orders, new model turn or net token-savings measurement."
+  ],
+  "initial_native_run": {
+    "source_hashes": {
+      "availability.sql": "7af124ee0368b61bf81c832d83163c8b75fd35da5a3c4d2e8127b23107bf99cc",
+      "contract.py": "c4bfae240f2f2f67ed8185db4e55799050421e3537e883631d0f2652cd048488",
+      "exercise.py": "182b86e2aff96e4e782350a56e7eb78d30e502babc8fddb5b14f1ddd80575fd1",
+      "protocol.json": "f2aa3e4944ba2bd7cfb1fa41155e304075fff791f10b8c60996e3257dcbfe1e4"
+    },
+    "native_results": {
+      "broker_orders": 0,
+      "candidate_rejection_reasons": {
+        "daily": [],
+        "intraday": []
+      },
+      "duckdb_version": "1.5.5",
+      "empirical_results": null,
+      "future_perturbation_preserves_earlier_selection": true,
+      "kind": "synthetic_contract_exercise",
+      "limitations": "Supplied synthetic inputs only. No real source availability, feature construction, execution accounting, matching, bootstrap or empirical promotion accepted.",
+      "named_synthetic_labels": {
+        "close_to_close_1d": "0.5",
+        "close_to_close_5d": "2",
+        "entry_to_exit": "0.076923076923076923076923077",
+        "gte_200pct": {
+          "close_to_close_1d": false,
+          "close_to_close_5d": true,
+          "entry_to_exit": false,
+          "open_to_high_1d": true,
+          "prior_close_to_high_1d": true
+        },
+        "open_to_high_1d": "2",
+        "prior_close_to_high_1d": "2.6"
+      },
+      "native_bigint_one_nanosecond_difference": 1,
+      "native_query": "duckdb.connect(':memory:').execute(availability_sql, {'cutoff': integer_ns}).fetchall()",
+      "observation_count": 5,
+      "protocol_id": "catalyst-experiment-v1-20260920",
+      "protocol_sha256": "f2aa3e4944ba2bd7cfb1fa41155e304075fff791f10b8c60996e3257dcbfe1e4",
+      "provider_calls": 0,
+      "python_version": "3.13.15",
+      "selections": {
+        "100": [],
+        "110": [
+          "known"
+        ],
+        "120": [
+          "known"
+        ],
+        "130": [
+          "incomplete_at_120",
+          "known",
+          "late_revision"
+        ]
+      },
+      "source_hashes_unchanged": true
+    },
+    "native_exit": 0,
+    "private_artifacts": [
+      {
+        "name": "command.private.json",
+        "sha256": "52043e6a61985022023b53f81b8b74b221cdea9678b49b06b37b0f8973429977",
+        "bytes": 270
+      },
+      {
+        "name": "freeze.json",
+        "sha256": "638229f8f4e265674adcdc9efed97514a87bdd20c1c7e5fe2f88db7abcd824ed",
+        "bytes": 553
+      },
+      {
+        "name": "launcher-command.txt",
+        "sha256": "5cf2111b9fc98fcff5eb40a5ff07a3811b7f50334846f9a9ae072b0219004da2",
+        "bytes": 387
+      },
+      {
+        "name": "result.json",
+        "sha256": "2b5d23bee78c62792b3d038188cfafeec7bdc55d3e4bda492eedb6b8523f620e",
+        "bytes": 1446
+      },
+      {
+        "name": "synthetic-inputs.json",
+        "sha256": "9b7799ef49040caaac3205af3e64cba2d4168d0788ff0e49bc465979a643fdc7",
+        "bytes": 290
+      }
+    ]
+  },
+  "correction": "Independent review found Decimal display rounding could classify a >28digit price just below3x as a threshold hit. Final flags use exact Fraction comparisons, with28significant digits for display only. Original run and source hashes retained; updated source exercised once in run-2. Protocol bytes unchanged."
+}

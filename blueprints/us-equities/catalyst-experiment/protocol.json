@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "id": "catalyst-experiment-v1-20260920",
+  "status": "frozen_exploratory_protocol_no_empirical_execution",
+  "base_commit": "cb79080cf5d9510818c67ac51c521b1d2a1b80fe",
+  "intent": "Test daily post-catalyst continuation and intraday early-mover hypotheses without selecting eventual winners. Numeric values are predeclared exploratory choices, not optimized or empirically justified parameters.",
+  "scope": {
+    "market": "US exchange-listed ordinary common shares only, including eligible historical inactive/delisted names",
+    "currencies": [
+      "USD"
+    ],
+    "long_only": true,
+    "regular_session_only": true,
+    "orders": false,
+    "live_promotion": false,
+    "empirical_scoring": false,
+    "synthetic_contract_exercise_only": true
+  },
+  "source_contract": {
+    "universe": "Provider-scoped security ID and historical ordinary-share/listing intervals with evidence valid at each cutoff. Current asset status, ticker equality, missing map or today's reconstructed membership is insufficient. Retain every rejected, missing and eligible candidate.",
+    "availability": "Each input requires its original value/revision, source hash, effective time and separately evidenced available_at_ns. Unknown original publication/availability is not inferred from SEC acceptance or bar event time. For newly captured historical rows, use actual response observation conservatively, which excludes them at historical cutoffs.",
+    "timestamps": "Exact integer UTC nanoseconds; local schedule uses America/New_York and an explicit exchange calendar. Positive source timestamps only; reject bool, float, naive/local ambiguous timestamps and unsupported precision. Strict comparisons must never round availability downward.",
+    "catalyst": "SEC form8-K only (exclude8-K/A), explicit parsed Item1.01, unique accession plus source hash. This category denotes a material definitive agreement, not necessarily favorable news. Parser absence/ambiguous item means unknown; do not infer missing1.01 from silence. Require a complete supported item index to label a non-catalyst control.",
+    "duplicates": "One accession triggers at most one signal per lane/security; multiple share classes keep security identities but group by issuer/event for splitting. Revisions retained by hash/available time; no amendment silently replaces original event. Subsequent corrections can affect later decisions only.",
+    "corporate_actions": "All prior-window prices and share volumes must share a documented cutoff-consistent split basis; dollar volume is matched price times share volume. Never combine adjusted volume with raw prices or apply a future split to an earlier signal without a frozen causal normalization rule. Unknown action, identity, dividend currency/unit, or delisting outcome blocks empirical accounting and remains retained.",
+    "minute_bars": "Timestamp is interval start, not completion. Eligible feature_end_ns is the minute interval end; actual available_at_ns must also be <= decision. Completed bars may arrive late; use only known revision. Missing/zero-activity/invalid bars are quarantined, never filled. Do not infer a halt from missing data.",
+    "quotes": "Require bid>0, ask>=bid, supported quote condition, nonzero displayed sizes and as-known source sequence. At intraday decision and every entry quote age<=1000ms and full quoted spread<=100bps. Daily16:15 formation uses completed bars only; do not demand a regular-session quote then. Missing quote/halt/session evidence blocks fill.",
+    "session": "Use actual venue calendar. Skip half-days and any session not390regular minutes in v1; retain excluded rows. During known halt, unknown status or missing required minute window, no new entry. Never assume continuous tradability."
+  },
+  "eligibility": {
+    "prior_close_min_usd": "1",
+    "prior_close_max_usd": "50",
+    "lookback_sessions": 20,
+    "median_dollar_volume_min_usd": "5000000",
+    "required_complete_prior_sessions": 20,
+    "max_quote_age_ms": 1000,
+    "max_full_spread_bps": "100",
+    "max_candidates_per_lane_per_session": 10,
+    "unknown_policy": "retain_rejected_reason_no_imputation"
+  },
+  "lanes": {
+    "daily": {
+      "id": "daily_agreement_continuation",
+      "hypothesis": "A newly available Item1.01 event plus completed-session positive price/volume reaction is followed by positive five-session continuation relative to controls.",
+      "decision_time_et": "16:15:00",
+      "catalyst_age_sessions_min": 0,
+      "catalyst_age_sessions_max": 0,
+      "catalyst_window": "First availability strictly after the prior regular close and <=current16:15 cutoff; event_session_index denotes that decision-session availability window, not economic event date.",
+      "min_price_return": "0.02",
+      "min_relative_volume": "1.5",
+      "price_return": "completed regular close[t]/prior regular close[t-1]-1, split-consistent",
+      "relative_volume": "completed regular-session volume[t]/median complete regular volume over prior20sessions, common split basis",
+      "rank": "descending relative_volume, then descending price_return, then stable security ID lexicographically",
+      "minimum_latency_seconds": 60,
+      "earliest_entry": "Next full regular session09:35:00ET; first eligible quote >=max(target time,decision+60s); never signal close",
+      "entry_timeout_seconds": 300,
+      "exit": "First eligible quote at/after15:55ET on fifth holding session, counting entry session as1; no earlier price stop or profit target",
+      "holding_sessions": 5,
+      "max_exit_wait_minutes": 5
+    },
+    "intraday": {
+      "id": "intraday_catalyst_early_mover",
+      "hypothesis": "Known Item1.01 plus an early +5% reaction and unusual elapsed-session volume predicts positive next60minute price movement relative to controls.",
+      "decision_window_et": [
+        "09:35:00",
+        "10:30:00"
+      ],
+      "decision_frequency_seconds": 60,
+      "catalyst_age_sessions_min": 0,
+      "catalyst_age_sessions_max": 3,
+      "min_price_return": "0.05",
+      "min_relative_volume": "3",
+      "price_return": "latest fully completed known regular minute close/prior regular close-1, split-consistent",
+      "relative_volume": "cumulative completed volume from09:30 to decision/median same elapsed-minute cumulative volume across prior20fullsessions; all20matchedwindows required",
+      "rank": "first qualifying decision per security/session, then descending relative_volume, descending price_return and security ID for simultaneous competition",
+      "minimum_latency_seconds": 60,
+      "earliest_entry": "First eligible quote >=decision+60s; never at triggering minute open/close",
+      "entry_timeout_seconds": 60,
+      "exit": "First eligible quote at/after min(actual_entry+60minutes,15:55ET); no earlier price stop or profit target",
+      "holding_minutes": 60,
+      "max_exit_wait_minutes": 5
+    }
+  },
+  "portfolio": {
+    "capital_usd": "100000",
+    "baseline_gross_leverage": "1",
+    "stress_gross_leverage": [
+      "2",
+      "4"
+    ],
+    "allocation": "Each accepted fill targets10% start-of-session NAV times leverage; maximum10concurrent positions and gross<=leverage*NAV. No same-security overlap within lane; lanes evaluated as separate portfolios, never silently combined. Cash unallocated.",
+    "sizing": "Whole shares floor(target_notional/entry_ask); max1% cumulative actual eligible traded volume over entry minute and max10% contemporaneous displayed ask size; no future-minute liquidity. Require quote/trade evidence before feasible size is assigned.",
+    "costs": {
+      "fee_per_share_per_side_usd": "0.005",
+      "minimum_fee_per_order_usd": "1",
+      "base_adverse_impact_bps_per_side": "10",
+      "stress_adverse_impact_bps_per_side": "50",
+      "bid_ask": "Buy at supported ask plus impact; sell at supported bid minus impact. Full spread is paid by crossing, not deducted again.",
+      "financing_apr_base": "0.10",
+      "financing_apr_stress": "0.20",
+      "financing_convention": "ACT/365 on positive borrowed cash over actual elapsed UTC time; hypothetical sensitivity, not broker rate.",
+      "cash_interest_apr": "0"
+    },
+    "latency_stress_seconds": [
+      60,
+      300
+    ],
+    "leverage_semantics": "Fixed separate sensitivities, never automatic leverage optimization or Alpaca margin/Elite entitlement. At2x/4x assume initial margin1/leverage and maintenance25% gross marked exposure. Fees may make4x immediately violate maintenance; retain refusal or forced-liquidation loss.",
+    "margin_and_halts": "At every supported event mark, equity/exposure<0.25 requests liquidation at next eligible bid plus stress costs. No fictitious fills through halts. If no eligible exit within5minutes, retain unresolved exposure and block promotion; never mark unknown delisting proceeds zero.",
+    "loss_gates": "Stop new risk for that simulated lane after start-of-dayNAV drawdown>=3% or total peak-to-trough drawdown>=20%; manage existing positions. Resume daily stop next fullsession; total drawdown remains stopped for experiment."
+  },
+  "labels": {
+    "threshold_simple_return": "2",
+    "threshold_price_ratio": "3",
+    "close_to_close_1d": "regular_close[t]/regular_close[t-1]-1",
+    "open_to_high_1d": "regular_high[t]/regular_open[t]-1; ex-post excursion only, never attainable fill or selection feature",
+    "prior_close_to_high_1d": "regular_high[t]/regular_close[t-1]-1; separate from open-to-high",
+    "close_to_close_5d": "regular_close[t+5]/regular_close[t]-1; exactly5fullsessions after anchor t",
+    "entry_to_exit": "supported exit_mid/entry_mid-1 for declared lane horizon; separate from executable bid/ask/cash P&L",
+    "first_crossing": "Earliest valid observed future quote/trade satisfying its named ratio>=3; interval-censored at available resolution, never infer exact crossing from daily high.",
+    "unknowns": "Invalid units, missing prices, unproven action basis or incomplete horizon produce explicit unknown/censored labels, not zero or negative. IPO lacking prior close is excluded from v1 and counted.",
+    "separation": "Each named label has its own +200%boolean. Open-to-high, prior-close-to-high, five-session close and attainable returns must never be collapsed into one mover flag."
+  },
+  "controls": {
+    "arms": [
+      "combined",
+      "event_only",
+      "price_volume_only",
+      "non_catalyst_matched",
+      "cash"
+    ],
+    "event_only": "Same eligible universe and lane timing/catalyst age; remove price/relative-volume thresholds; rank stable security ID.",
+    "price_volume_only": "Same thresholds/timing without catalyst requirement; keep catalyst presence as descriptive flag.",
+    "non_catalyst_matched": "At each treated cutoff choose1 eligible security with confirmed no1.01availability in the same lane event window, same floor(log2(prior_close)) and floor(log10(median_dollar_volume)) bins. Minimize SHA256(protocol_id|date|treated_id|control_id), exclude treated security. Match without replacement within cutoff; missing match remains missing. Same clocks, size and costs.",
+    "non_movers": "Keep ALL eligible signals and outcomes, including eventual non-movers, nonfills, rejected/missing/halts and losses. Future mover status is label-only, never candidate or matching input.",
+    "cash": "Zero market exposure and zero hypothetical interest/fees."
+  },
+  "chronology": {
+    "development": [
+      "2022-01-01",
+      "2023-12-31"
+    ],
+    "validation": [
+      "2024-01-01",
+      "2024-12-31"
+    ],
+    "reserved": [
+      "2025-01-01",
+      "2025-12-31"
+    ],
+    "warmup": "At least20fullprior sessions before first eligible date; no warmup outcomes scored.",
+    "inspection_registry": "Before any empirical read, per-security/event/date registry records prior access, result inspection, purpose and hashes. Any known inspected reserved case is ineligible for reserved evaluation; no substitute dates/symbols selected by results. Missing registry blocks reserved access. These calendar names do not assert globally unseen public data.",
+    "previously_inspected": "2021Q1 ETF control permanently inspected, never a new holdout. Earlier LEAN/AAPL2020 and FB/META2022samples are diagnostics/development only. No existing outcomes were selected to choose these thresholds.",
+    "walk_forward": "If development training is later introduced, native skfolio1.2.9 WalkForward(train_size=252,test_size=63,purged_size=6,reduce_test=True) splits SESSION rows; all securities/events for a session remain grouped. v1 rules have no fitted selector.",
+    "purge": "All training label_end/exit times must be strictly before first evaluation decision; remove any shared issuer-event group from training. Six-session gap is a coarse aid, not sufficient proof. At each segment end censor any horizon crossing that boundary.",
+    "embargo": "Strictly forward training only; never train on future-side rows. No extra future-side embargo is asserted. Cross-segment issuer/event groups stay excluded from earlier training.",
+    "trial_policy": "Exactly2hypotheses x5arms; baseline selected a priori, no grid search or best-lane switch. Preserve each stress combination separately (leverage1/2/4 x impact10/50bps x latency60/300s,12perarm/lane); never choose favorable stress variant.",
+    "freeze": "Protocol/code/input hashes and per-segment candidate selections retained exclusively before future labels/returns load. Reserved pass occurs once after validation gate; failed/inspected runs remain in ledger, never called untouched on rerun."
+  },
+  "promotion": {
+    "scope": "Permission to proceed to a separately reviewed paper-candidate experiment only, never automatic paper/live orders.",
+    "mechanical": "Zero late-source, same-bar, unknown-identity or corporate-action leakage; exact cash/fees/dividend/split reconciliation; all trial records retained; no unresolved exit, funding or delisting outcomes.",
+    "minimum_per_lane_per_evaluation_segment": {
+      "filled_signals": 250,
+      "distinct_issuers": 100,
+      "distinct_entry_sessions": 40,
+      "matched_control_fraction": "0.90"
+    },
+    "quality": "Required historical universe/catalyst/quote/action coverage known for100% of scored candidate sessions; any unknown remains outside qualified sample and its count/selection implications reported. No market-wide completeness claim from selective exclusions.",
+    "performance": "Validation AND reserved baseline must have positive net total return, drawdown<=20%, and mean net return excess over matched controls with simultaneous lower confidence bound>0. Both declared lanes retained even if one fails.",
+    "uncertainty": "2000 fixed-seed20260920 circular moving blocks of5consecutive session-level paired excess-return means; preserve same-date cross-sectional dependence. Two lanes use97.5%two-sided per-lane intervals (Bonferroni family>=95%); no ordinary IID per-trade interval. Missing paired sessions are retained and fail minimum match coverage.",
+    "stress": "At1x gross,50bps impact and300s delay net totalreturn>=0. Other stress paths, including2x/4x margin failure, reported without gating a favorable leverage selection.",
+    "extreme_label_claim": "At least30positive cases and100negative cases per named +200%label per evaluation segment before any recall/precision claim; otherwise descriptive counts only and insufficient_evidence. No threshold relaxation after seeing rarity.",
+    "reject_or_defer": "Any mechanical failure rejects current version. Insufficient sample/coverage or unknown inspection history defers empirical promotion. Negative validation rejects before reserved access. Positive synthetic mechanics never satisfy empirical gates."
+  },
+  "references": [
+    {
+      "url": "https://www.sec.gov/files/form8-k.pdf",
+      "role": "Item1.01 is a material definitive agreement; filing timing and event date do not establish our information availability."
+    },
+    {
+      "url": "https://docs.alpaca.markets/us/docs/market-data-faq",
+      "role": "Stock bar interval starts, condition filtering and zero-volume documentation; historical mapping is retrospective."
+    },
+    {
+      "url": "https://skfolio.org/generated/skfolio.model_selection.WalkForward.html",
+      "role": "Chronological native session splitter; independent interval/group checks still required."
+    },
+    {
+      "url": "https://www.quantconnect.com/docs/v2/writing-algorithms/reality-modeling/slippage/supported-models",
+      "role": "Existing LEAN execution-model integration reference, not calibration or new execution proof."
+    }
+  ],
+  "implementation_scope": "Minimal synthetic availability, candidate threshold, named label, entry timing and split/leakage checks only. Full feature construction, real PIT data, portfolio fills/accounting, matching, bootstrap inference and empirical promotion are NOT implemented by this contract exercise."
+}
