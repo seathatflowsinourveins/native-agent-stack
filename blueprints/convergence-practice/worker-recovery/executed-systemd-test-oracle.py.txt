@@ -80,13 +80,6 @@ class NativeStreamSummaryTests(unittest.TestCase):
     def test_missing_native_init_and_terminals_are_unknown(self):
         self.assertEqual(self.module.native_summary([], 'same'), (False, False, False))
 
-    def test_native_permission_refusal_stops_the_wait_without_a_retry(self):
-        refusal = [{'type':'user','message':{'content':[{'type':'tool_result','is_error':True,
-                    'content':'Permission to use Bash has been denied because dontAsk is active.'}]}}]
-        self.assertTrue(self.module.permission_refused(refusal))
-        refusal[0]['message']['content'][0]['content'] = 'Tool execution cancelled by TaskStop'
-        self.assertFalse(self.module.permission_refused(refusal))
-
 
 class PublishedEffectTests(unittest.TestCase):
     def test_retained_outputs_satisfy_single_effect_oracle(self):

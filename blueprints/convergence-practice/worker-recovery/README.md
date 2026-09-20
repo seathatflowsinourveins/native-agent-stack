@@ -93,3 +93,69 @@ The runner has one outer attempt, bounded native phases, scoped tools and no
 fallback on unchanged failures. Its final `passed_pending_independent_audit`
 status is provisional; inspect actual child identity, effects, source hashes,
 process cleanup and unexpected tool behavior before accepting another run.
+
+## Follow-up: deterministic cgroup containment and refused native trial
+
+The [containment receipt](containment-receipt.json) and
+[independent audit](containment-independent-audit.json) keep three results separate:
+
+- The existing systemd 255 user manager contained an owned TERM-ignoring child
+  which called `setsid`. Only the service MainPID received the deliberate SIGKILL;
+  systemd stopped the descendant, removed the cgroup and recorded zero restarts.
+- A no-model readiness probe under that same transient-service wrapper preserved
+  Claude 2.1.278, the existing first-party account route and exact PATH/HOME.
+- The one changed native child trial was **not accepted**. Its child tried
+  `ls -la && python3 stage.py checkpoint`; unchanged `dontAsk` permissions refused
+  that prefixed command. No checkpoint, action journal or final effect was created.
+  The supervisor aborted only the owned service main process and verified cleanup.
+  It did not retry, widen permissions or substitute a deterministic result for
+  native child acceptance.
+
+An initial deterministic harness attempt also refused the inherited WSL variable
+`PROGRAMFILES(X86)` before starting a service. The corrected wrapper propagates
+valid inherited environment names using upstream `--setenv=NAME`, so values are
+not copied into its argument record. The unsupported Windows variable is omitted;
+no native account/model/permission setting changes. The original process-group
+survivor and earlier accepted continuation with explicit cleanup remain intact.
+
+The frozen [changed-input plan](systemd-plan.json), [source hashes](systemd-freeze.json),
+[executed service wrapper](executed-systemd-service.py.txt),
+[executed runner](executed-systemd-runner.py.txt),
+[executed tests](executed-systemd-test-oracle.py.txt) and
+[failed recorder outcome](systemd-recorder-outcome.json) retain the trial inputs.
+The current runner now recognizes a native permission refusal while waiting and
+ends the attempt; this guard was checked offline without another model call.
+
+For an explicitly authorized future qualification, use the already-running Linux
+user manager and a fresh private directory. The supported option is:
+
+```sh
+python3 blueprints/convergence-practice/worker-recovery/run.py \
+  --supervision systemd --claude /path/to/native/claude \
+  --run-dir /private/new-owned-service-attempt
+```
+
+The wrapper uses an owned, uniquely named transient user service with `Type=exec`,
+`KillMode=control-group`, `TimeoutStopSec=2s`, `SendSIGKILL=yes`, `Restart=no`, and a
+300-second service deadline. `--pipe` preserves native stdin/stdout/stderr;
+`--expand-environment=no` preserves literal native arguments. It creates no
+persistent service/timer and never restarts the user manager. Only its own unit
+is stopped or has its failed state cleared during cleanup. See the pinned
+[systemd-run semantics](https://raw.githubusercontent.com/systemd/systemd/v255/man/systemd-run.xml)
+and [cgroup kill semantics](https://raw.githubusercontent.com/systemd/systemd/v255/man/systemd.kill.xml).
+This wrapper is not a filesystem sandbox or provider-cancellation mechanism.
+
+The deterministic proof and retained-stream audit need no model:
+
+```sh
+python3 blueprints/convergence-practice/worker-recovery/containment_probe.py \
+  --run-dir /private/new-detached-descendant-probe
+python3 blueprints/convergence-practice/worker-recovery/containment_audit.py \
+  /private/retained-worker-recovery-base
+python3 -m unittest tests.test_worker_recovery
+```
+
+The next specific unresolved condition is the native child's command-contract
+mismatch under the existing permissions. The combined native containment/resume
+gate remains open. Neither fixture claims host/user-manager crash recovery,
+remote provider cancellation, billing cessation or independent-host restoration.

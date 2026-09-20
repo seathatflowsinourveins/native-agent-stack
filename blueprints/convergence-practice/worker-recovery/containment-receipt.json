@@ -1,0 +1,127 @@
+{
+  "account_model_permissions": "Same native first-party subscription, claude-opus-5/ultracode, inherited child model, dontAsk permissions. No global settings or manager restart.",
+  "audit": "containment-independent-audit.json",
+  "claim": "The existing native user manager contained an owned TERM-ignoring setsid descendant after only MainPID was killed. One changed native child trial under that wrapper stopped before checkpoint because its extra-prefixed command was refused; combined native child containment/resume remains unaccepted.",
+  "deterministic_model_calls": 0,
+  "failed_attempts_retained": [
+    "Initial deterministic builder rejected unsupported inherited PROGRAMFILES(X86) before service launch; corrected environment-name handling retained all valid native variables.",
+    "The single native child attempted ls -la && python3 stage.py checkpoint; permission denied it before any effect. Supervisor aborted only the owned service main process. No retries or widened permissions."
+  ],
+  "kind": "native_cgroup_containment_followup",
+  "limitations": [
+    "Deterministic cgroup proof is not successful native child crash/resume acceptance.",
+    "Earlier same-child continuation still required explicit direct descendant cleanup.",
+    "No host/user-manager restart, provider cancellation, billing cessation, off-host restoration or distributed exactly-once acceptance."
+  ],
+  "native_child_spawns": 1,
+  "native_cli_invocations": 1,
+  "native_outer_attempts": 1,
+  "native_runtime": "systemd255.4-1ubuntu8.17 and ClaudeCode2.1.278 on Linux/WSL",
+  "next_action": "Keep the combined native gate open. A future explicitly scoped qualification must address the child command-contract mismatch while retaining existing permissions and original failures; do not repeat setup or label deterministic proof as native child acceptance.",
+  "plan": "systemd-plan.json",
+  "prior_partial_receipt": "receipt.json",
+  "private_evidence": {
+    "containment-probe-1/result-private.json": {
+      "bytes": 359,
+      "sha256": "efa565e9cd407e0d3a11d314ec6d8b8f4275dfdf87c8d89c410b578730ca607b"
+    },
+    "containment-probe-2/after-private.json": {
+      "bytes": 361,
+      "sha256": "f81cd30c8c2efed52b2b402d9b279f35c5909d4e13409c65f63df20fa6eab2e1"
+    },
+    "containment-probe-2/before-members-private.json": {
+      "bytes": 25,
+      "sha256": "617a2ebd8a4153333c62d6dc8b242df469531e9113e4cae0e858ca9638241c11"
+    },
+    "containment-probe-2/before-private.json": {
+      "bytes": 471,
+      "sha256": "90f69c51cc5b4d9e473d427f972b377d129e3bfabfa2a62b97bc8532d65f63f8"
+    },
+    "containment-probe-2/command-private.json": {
+      "bytes": 2808,
+      "sha256": "cfd8d4ca9a70e5d0ddc424814fad888ca7136255e531d2b915bec35dad694cbb"
+    },
+    "containment-probe-2/detached-child.json": {
+      "bytes": 277,
+      "sha256": "27a337055b128b881b000fbc57a211a01681919d08b2c6a6c1c962c0ce80d787"
+    },
+    "containment-probe-2/main-kill-private.json": {
+      "bytes": 738,
+      "sha256": "29fc54de3431b1a024a37d137ed2eaf6c0b0c2fae0317fc3ee041d3211063405"
+    },
+    "containment-probe-2/main.json": {
+      "bytes": 267,
+      "sha256": "3b302ffa692a2a21ad6f138d60193eabb5a8fdd4d1f8aa27c3011fec88674084"
+    },
+    "containment-probe-2/result-private.json": {
+      "bytes": 1098,
+      "sha256": "d4daf18ba6733de1cfc3a9fe7010df5c7c6cd0014cbb573b5850aaf8ae8a96c0"
+    },
+    "containment-probe-2/stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "containment-probe-2/stdout.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "systemd-attempt-1/abort-main-kill-private.json": {
+      "bytes": 922,
+      "sha256": "aba15f3f2e5754eaaf906d15ce09eabd0d187a63ed0e35412f2fa827e68bd7ff"
+    },
+    "systemd-attempt-1/attempt.json": {
+      "bytes": 1887,
+      "sha256": "dd3625fbf2dedcb59756fdc93d01118a295d0b5088852d78294725ebe36d1892"
+    },
+    "systemd-attempt-1/commands-private.json": {
+      "bytes": 3976,
+      "sha256": "6794aa1340df62db3764bf32811ea4c0f652ba38d232d301f3c14ecaf55b9ed7"
+    },
+    "systemd-attempt-1/freeze.json": {
+      "bytes": 821,
+      "sha256": "1bfb4dccf256239ff796f612155c460cbce3fbc0dd0ad98597f7edd7efa92f65"
+    },
+    "systemd-attempt-1/initial-service-start-private.json": {
+      "bytes": 475,
+      "sha256": "52961186bd119061763984f575bdcf0c95c372fd59d050f36eb4e84bb1086b04"
+    },
+    "systemd-attempt-1/initial.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "systemd-attempt-1/initial.stream.jsonl": {
+      "bytes": 53368,
+      "sha256": "758b4a3187701a9777b627fbd8f7381b8348f4d16e983222a754974cf285327a"
+    },
+    "systemd-attempt-1/native-identity.json": {
+      "bytes": 66,
+      "sha256": "e984c7d98309ec81b7a30b393c9ad5351124ff2395a488c1ca79e08dc7a0e868"
+    },
+    "systemd-readiness-1/command-private.json": {
+      "bytes": 3143,
+      "sha256": "adae7e713beec45c7b25b320355e949555737d726090abc19bc812682d04f74c"
+    },
+    "systemd-readiness-1/result-private.json": {
+      "bytes": 787,
+      "sha256": "f78a7496b4ddf8972e10e658c957f101707e14b557276ed1f45cc208c958d222"
+    },
+    "systemd-readiness-1/stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "systemd-readiness-1/stdout.json": {
+      "bytes": 311,
+      "sha256": "387ab67e7117b10fcdfbb748077625a599953c5356ce8851c4ff29cea1e4a5ca"
+    }
+  },
+  "recorded_at_utc": "2026-09-20T18:56:47.623853+00:00",
+  "schema_version": 1,
+  "scope": "One deterministic detached-descendant proof; no-model native route readiness; one unsuccessful combined native child trial.",
+  "status": "partial_acceptance",
+  "usage": {
+    "billing": null,
+    "complete_parent_child_retry_total": null,
+    "reason": "Native service aborted after refusal; terminal/task views are not complete enclosing usage.",
+    "savings_claim": null
+  }
+}

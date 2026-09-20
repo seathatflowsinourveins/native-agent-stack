@@ -52,16 +52,6 @@ def native_summary(events, session):
             bool(terminals) and all(e.get('subtype')=='success' and e.get('is_error') is False for e in terminals))
 
 
-def permission_refused(events):
-    for event in list(events):
-        if event.get('type')!='user':continue
-        for block in event.get('message',{}).get('content',[]):
-            if not isinstance(block,dict) or block.get('type')!='tool_result' or block.get('is_error') is not True:continue
-            content=str(block.get('content','')).casefold()
-            if 'permission' in content and 'denied' in content:return True
-    return False
-
-
 def service_ready(unit,client):
     deadline=time.monotonic()+15
     while True:
@@ -120,7 +110,6 @@ def run(args):
         if units:write(root/'initial-service-start-private.json',service_ready(units['initial'],initial))
         deadline=time.monotonic()+args.timeout
         while not (workspace/'crash-wait.json').is_file():
-            if permission_refused(initial.events):raise RuntimeError('native_tool_permission_refused')
             if initial.proc.poll() is not None:raise RuntimeError('initial_native_exit_before_child_crash_wait')
             if time.monotonic()>deadline:raise TimeoutError('child_crash_wait_deadline')
             time.sleep(.05)

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "kind": "native_child_cgroup_containment_plan",
+  "frozen_before_model_execution": true,
+  "base_partial_acceptance_commit": "533c6ee17f414fe7306ee3a64a7b01f9415e3fdf",
+  "concrete_gap": "The prior native crash wait survived process-group SIGKILL and needed direct coordinator cleanup.",
+  "changed_input": "Each native CLI is an owned transient systemd user service: Type=exec, KillMode=control-group, TimeoutStopSec=2s, SendSIGKILL=yes, Restart=no, RuntimeMaxSec=300s, native stdio pipes. Only service MainPID is deliberately killed.",
+  "preserved_inputs": ["same stage/control/input/prompt fixture", "claude-opus-5 and ultracode", "child model inherit", "native account and permission configuration", "all valid inherited environment names including PATH/HOME"],
+  "omitted_unsupported_environment_names": ["PROGRAMFILES(X86)"],
+  "preconditions": ["deterministic native setsid TERM-ignoring descendant proof", "no-model native sign-in/version/PATH/HOME readiness under service"],
+  "outer_native_attempts": 1,
+  "native_cli_invocations": 2,
+  "native_phase_deadline_seconds": 240,
+  "acceptance": ["one actual native child and same parent/child continuation", "native TaskStop cancellation first", "actual pending crash wait observed in owned service cgroup", "kill only owned service MainPID", "systemd removes every cgroup member and original wait without direct PID cleanup", "resume same task with unchanged checkpoint and one final effect", "no native restart or lingering owned unit/process"],
+  "usage": "SIGKILL prevents complete initial terminal accounting. Keep native terminal/model/task views separate; no billing or savings claim.",
+  "limitations": ["one WSL host and synthetic task", "not manager or host crash, remote provider cancellation, power loss, independent-host recovery or distributed exactly-once effects", "original direct-process survivor and recorder failure remain retained"],
+  "sources": ["https://raw.githubusercontent.com/systemd/systemd/v255/man/systemd.kill.xml", "https://raw.githubusercontent.com/systemd/systemd/v255/man/systemd-run.xml"]
+}
