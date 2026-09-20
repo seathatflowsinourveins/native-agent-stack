@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "workspace": "wsl-maintenance-synthetic",
+  "alpha": {
+    "project": "alpha",
+    "path": "notes/alpha.md",
+    "body": "# Synthetic alpha decision\nWslpatchcobalt belongs only to alpha.\n",
+    "marker": "Wslpatchcobalt"
+  },
+  "beta": {
+    "project": "beta",
+    "path": "notes/beta.md",
+    "body": "# Synthetic beta decision\nWslpatchamber belongs only to beta.\n",
+    "marker": "Wslpatchamber"
+  },
+  "updated_alpha": {
+    "body": "# Updated synthetic alpha decision\nWslpatchwillow replaces the original alpha decision.\n",
+    "marker": "Wslpatchwillow"
+  },
+  "unicode": {
+    "project": "alpha",
+    "path": "notes/aéé/decision.md",
+    "body": "# Unicode fixture\nWslpatchunicode survives a five-byte Unicode directory component.\n",
+    "marker": "Wslpatchunicode"
+  },
+  "reserved_path": ".git/config",
+  "required_tools": [
+    "memory_query",
+    "memory_read_page",
+    "memory_write_page",
+    "memory_status"
+  ],
+  "acceptance": [
+    "official archive, sidecar, binary and MIT license hashes match pins",
+    "arm64 Mach-O, valid native code signature verification, retained Gatekeeper assessment, native version 2.3.2",
+    "baseline 2.3.1 writes, scoped exact reads and FTS positives; cross-scope queries empty and exact reads rejected",
+    "frozen cold 2.3.1 state reopens under 2.3.2 with identical scoped bodies and retrieval",
+    "candidate rejects reserved Git path and accepts the five-byte Unicode path component",
+    "candidate update and Unicode page persist through a clean restart; old marker absent",
+    "V62 is present and populated before and after; baseline snapshot remains byte-identical",
+    "no captured history, embeddings or downloaded model files; no forceful termination or owned process left running"
+  ],
+  "stop_conditions": [
+    "hash mismatch",
+    "signature verification failure",
+    "native execution blocked",
+    "unexpected native error",
+    "any failed acceptance assertion"
+  ],
+  "execution_scope": "Original requested scope: separate synthetic data/config and clean environment, without an OS filesystem/network confinement claim. No security override or bypass of an actual native execution denial.",
+  "backup_restore": {
+    "backup_required": true,
+    "restore_outcomes": [
+      "passed",
+      "blocked_by_native_sibling_process_guard"
+    ],
+    "on_refusal": "Retain native exit, no retry, no process enumeration or unrelated signals, empty restore target unchanged.",
+    "on_success": "Exact updated scoped bodies and FTS, Unicode, negatives, capture-off, database integrity."
+  }
+}
