@@ -4269,7 +4269,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "f53e56321fe75a7cc9a851eb6064c3c53fc2fb11f315c409dff80fdcef8ea055",
+      "sha256": "5d82215163baf525c3fc684e558fc6c118a4cf352cf9168480ba644318c804db",
       "bytes": 1644278
     },
     {
@@ -4279,7 +4279,7 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "f1d0138d106dc8a51c0c2a091f55d034e6f8f2711c47536ab3b89dac5d6d47ca",
+      "sha256": "4fb8fe0d984147d3eee4042e4fbf3e1689da127b351743903087154810bd0adc",
       "bytes": 18645
     },
     {
@@ -5079,8 +5079,8 @@
     },
     {
       "path": "tools/token-report/test_token_manifest.py",
-      "sha256": "7efbe16646ebb37ad07674c067fc242f99bdb4011dc1e8b07bfba454864ac07d",
-      "bytes": 24602
+      "sha256": "d96e96ffd60c29419c28eb8c2c93ef37cc9148f3d8c4283f116d42e8d519288f",
+      "bytes": 29827
     },
     {
       "path": "tools/token-report/token_manifest.html.in",
@@ -5089,8 +5089,8 @@
     },
     {
       "path": "tools/token-report/token_manifest.py",
-      "sha256": "d3135c1a37a348e6a9a717ec4074974971e6f634d834efe7f8b28eb863092923",
-      "bytes": 44852
+      "sha256": "8c32a6832b53baddfe895b0e5dd14319d955a4ac4e55b842e0e9fc2e91900b38",
+      "bytes": 45037
     }
   ]
 }
