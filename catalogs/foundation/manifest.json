@@ -130,8 +130,8 @@
       "purpose": "Schedule owned work, bound process lifetime and resume unfinished steps deliberately.",
       "selection": "Dagu for selected workflows and Linux user-manager supervision for owned process trees.",
       "activation": "Use explicit task/service ownership, bounded retries and independent state/effect checks.",
-      "lifecycle_scope": "Local descendant termination, native child cgroup crash cleanup and Dagu cancel/retry/SSH continuation passed. Full service reboot and provider cancellation remain unknown.",
-      "next_gap": "Qualify the selected owned scheduled service after reboot on an available target host."
+      "lifecycle_scope": "Local descendant termination, native child cgroup crash cleanup, Dagu cancel/retry/SSH continuation and one independently observed orderly guest service reboot passed within their retained scopes.",
+      "next_gap": "Qualify changed deployment boundaries and external provider or application effects when needed."
     },
     {
       "id": "hosting-services",
@@ -148,8 +148,8 @@
       "purpose": "Retain pinned inputs and prove usable restore, continuity and cleanup at the intended boundary.",
       "selection": "Owned lifecycle recipes, Restic, native application backups and native session resume.",
       "activation": "Use exact snapshots and empty restore targets; keep keys/account sign-ins private and separate from the checkout.",
-      "lifecycle_scope": "Same-host application restores, synthetic independent-host Restic recovery with a separately supplied password, and individual session/job continuations passed. Whole-stack independent-host disaster recovery has not.",
-      "next_gap": "Qualify affected application-state queries after off-host restore and the selected scheduled service after reboot."
+      "lifecycle_scope": "Same-host application restores, synthetic independent-host Restic recovery, native session/job continuations and one orderly guest service reboot passed. Off-host application queries remain pending.",
+      "next_gap": "Complete native memory and Qdrant post-restore queries on a fresh destination host."
     },
     {
       "id": "observation-inference",
@@ -230,8 +230,8 @@
       "id": "offhost-keys-and-service-reboot",
       "priority": 3,
       "status": "partial",
-      "scope": "Synthetic independent-host Restic recovery passed with separately supplied fixture credentials. The second guest attempt automatically completed the native workload after reboot, but its required live serial observation failed; full scheduled-service acceptance and off-host application queries remain unqualified. Both failed attempts are retained.",
-      "next_action": "Qualify the reviewed dedicated-serial observer correction, then native memory and Qdrant off-host queries at the selected adoption boundary.",
+      "scope": "Synthetic independent-host Restic recovery and an independently observed orderly guest scheduled-service reboot passed. Actual native memory and Qdrant application-state queries on a fresh destination remain unqualified; their reviewed workflow is running. Prior failed guest attempts remain retained.",
+      "next_action": "Finish and independently verify the bounded native off-host application-state trial; preserve any actual failure before proposing a targeted correction.",
       "source_paths": [
         "adoption/lifecycle.md",
         "blueprints/convergence-practice/wsl-restore/README.md",
@@ -239,7 +239,8 @@
         "blueprints/convergence-practice/offhost-restore/README.md",
         "evidence/receipts/native-offhost-restic-20260920.json",
         "blueprints/convergence-practice/service-reboot/README.md",
-        "blueprints/convergence-practice/offhost-app-state/README.md"
+        "blueprints/convergence-practice/offhost-app-state/README.md",
+        "evidence/receipts/native-service-reboot-20260920.json"
       ]
     }
   ],

@@ -1,6 +1,12 @@
 # Owned guest user-service reboot acceptance
 
-This is a **protocol and executable trial**, with no accepted native reboot receipt yet.
+The [third hosted run](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35540304328)
+passed and was independently verified. The [native receipt](../../../evidence/receipts/native-service-reboot-20260920.json)
+links actual upstream test output, native retry/history, serial observations,
+journal timing and cleanup. It qualifies one orderly disposable guest reboot.
+Exactly one checkpoint execution and one completed effect survived; the observer
+finished before the first postboot SSH. This does not qualify a physical PC or
+production workload. The original protocol and both failed attempts remain below.
 The [first hosted attempt](prior-attempts.json) passed the unchanged upstream
 Dagu tests but failed before guest boot because QEMU8.2.2 rejected `serial` on
 the qcow2 backend. Its original freeze, launcher, error, cleanup and plan remain

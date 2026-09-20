@@ -1648,13 +1648,18 @@
             "id": "native-dagu-retry-tests-20260920",
             "path": "evidence/receipts/native-dagu-retry-tests-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-service-reboot-20260920",
+            "path": "evidence/receipts/native-service-reboot-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
           "fresh-dagu-history",
           "fresh-dagu-isolated-native"
         ],
-        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance. Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed."
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,
@@ -1670,12 +1675,60 @@
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
       "source_pin": "v2.16.6",
       "lifecycle_stages": {
-        "install": {"status": "observed_installed", "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.", "evidence_refs": ["blueprints/us-equities/research-runtime/receipt.json", "adoption/paired/receipt.json", "blueprints/us-equities/convergence-program/review-receipt.json", "observability/grand-dashboard/receipt.json", "evidence/receipts/token-practice-coverage-20260920.json", "evidence/receipts/native-dagu-job-recovery-20260920.json", "evidence/receipts/wsl-transport-recovery-20260920.json"]},
-        "use": {"status": "accepted_within_scope", "scope": "Owned nonmultiplexed SSH client termination/reconnect observed the same detached Dagu job/checkpoint and final completion; owned listener/processes retired. This is controlled transport interruption, not host restart or a real network outage.", "evidence_refs": ["blueprints/convergence-practice/wsl-transport-recovery/receipt.json"]},
-        "persistence": {"status": "accepted_within_scope", "scope": "Owned nonmultiplexed SSH client termination/reconnect observed the same detached Dagu job/checkpoint and final completion; owned listener/processes retired. This is controlled transport interruption, not host restart or a real network outage.", "evidence_refs": ["blueprints/convergence-practice/wsl-transport-recovery/receipt.json"]},
-        "restart": {"status": "accepted_within_scope", "scope": "Native same-run stop/retry passed the retained integration fixture and selected unchanged official retry tests passed on a fresh runner. This qualifies job retry, not scheduler/host restart; the later guest launch failed before boot.", "evidence_refs": ["blueprints/convergence-practice/job-recovery/README.md", "evidence/receipts/native-dagu-retry-tests-20260920.json"]},
-        "cleanup": {"status": "accepted_within_scope", "scope": "Owned nonmultiplexed SSH client termination/reconnect observed the same detached Dagu job/checkpoint and final completion; owned listener/processes retired. This is controlled transport interruption, not host restart or a real network outage.", "evidence_refs": ["blueprints/convergence-practice/wsl-transport-recovery/receipt.json"]},
-        "recovery": {"status": "accepted_within_scope", "scope": "Owned nonmultiplexed SSH client termination/reconnect observed the same detached Dagu job/checkpoint and final completion; owned listener/processes retired. This is controlled transport interruption, not host restart or a real network outage.", "evidence_refs": ["blueprints/convergence-practice/wsl-transport-recovery/receipt.json"]}
+        "install": {
+          "status": "observed_installed",
+          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.",
+          "evidence_refs": [
+            "blueprints/us-equities/research-runtime/receipt.json",
+            "adoption/paired/receipt.json",
+            "blueprints/us-equities/convergence-program/review-receipt.json",
+            "observability/grand-dashboard/receipt.json",
+            "evidence/receipts/token-practice-coverage-20260920.json",
+            "evidence/receipts/native-dagu-job-recovery-20260920.json",
+            "evidence/receipts/wsl-transport-recovery-20260920.json"
+          ]
+        },
+        "use": {
+          "status": "accepted_within_scope",
+          "scope": "Owned nonmultiplexed SSH client termination/reconnect observed the same detached Dagu job/checkpoint and final completion; owned listener/processes retired. This is controlled transport interruption, not host restart or a real network outage. Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed.",
+          "evidence_refs": [
+            "blueprints/convergence-practice/wsl-transport-recovery/receipt.json",
+            "evidence/receipts/native-service-reboot-20260920.json"
+          ]
+        },
+        "persistence": {
+          "status": "accepted_within_scope",
+          "scope": "Owned nonmultiplexed SSH client termination/reconnect observed the same detached Dagu job/checkpoint and final completion; owned listener/processes retired. This is controlled transport interruption, not host restart or a real network outage. Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed.",
+          "evidence_refs": [
+            "blueprints/convergence-practice/wsl-transport-recovery/receipt.json",
+            "evidence/receipts/native-service-reboot-20260920.json"
+          ]
+        },
+        "restart": {
+          "status": "accepted_within_scope",
+          "scope": "Native same-run stop/retry passed the retained integration fixture and selected unchanged official retry tests passed on a fresh runner. This qualifies job retry, not scheduler/host restart; the later guest launch failed before boot. Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed.",
+          "evidence_refs": [
+            "blueprints/convergence-practice/job-recovery/README.md",
+            "evidence/receipts/native-dagu-retry-tests-20260920.json",
+            "evidence/receipts/native-service-reboot-20260920.json"
+          ]
+        },
+        "cleanup": {
+          "status": "accepted_within_scope",
+          "scope": "Owned nonmultiplexed SSH client termination/reconnect observed the same detached Dagu job/checkpoint and final completion; owned listener/processes retired. This is controlled transport interruption, not host restart or a real network outage. Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed.",
+          "evidence_refs": [
+            "blueprints/convergence-practice/wsl-transport-recovery/receipt.json",
+            "evidence/receipts/native-service-reboot-20260920.json"
+          ]
+        },
+        "recovery": {
+          "status": "accepted_within_scope",
+          "scope": "Owned nonmultiplexed SSH client termination/reconnect observed the same detached Dagu job/checkpoint and final completion; owned listener/processes retired. This is controlled transport interruption, not host restart or a real network outage. Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed.",
+          "evidence_refs": [
+            "blueprints/convergence-practice/wsl-transport-recovery/receipt.json",
+            "evidence/receipts/native-service-reboot-20260920.json"
+          ]
+        }
       },
       "baseline_applicability": {
         "category": "supporting_workflow",
@@ -5428,12 +5481,17 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "native-service-reboot-20260920",
+            "path": "evidence/receipts/native-service-reboot-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
           "fresh-systemd-services"
         ],
-        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim. Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed."
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,
@@ -5448,12 +5506,51 @@
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
       "source_pin": null,
       "lifecycle_stages": {
-        "install": {"status": "observed_installed", "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.", "evidence_refs": ["blueprints/us-equities/worker-supervision/receipt.json", "evidence/receipts/token-practice-coverage-20260920.json"]},
-        "use": {"status": "accepted_within_scope", "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim. The later inherited-tool native child fixture adds automatic owned-systemd descendant cleanup and same-identity single-effect continuation on the recorded WSL host.", "evidence_refs": ["blueprints/us-equities/worker-supervision/receipt.json", "evidence/receipts/native-worker-cgroup-20260920.json"]},
-        "persistence": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
-        "restart": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
-        "cleanup": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
-        "recovery": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []}
+        "install": {
+          "status": "observed_installed",
+          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.",
+          "evidence_refs": [
+            "blueprints/us-equities/worker-supervision/receipt.json",
+            "evidence/receipts/token-practice-coverage-20260920.json"
+          ]
+        },
+        "use": {
+          "status": "accepted_within_scope",
+          "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim. The later inherited-tool native child fixture adds automatic owned-systemd descendant cleanup and same-identity single-effect continuation on the recorded WSL host. Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed.",
+          "evidence_refs": [
+            "blueprints/us-equities/worker-supervision/receipt.json",
+            "evidence/receipts/native-worker-cgroup-20260920.json",
+            "evidence/receipts/native-service-reboot-20260920.json"
+          ]
+        },
+        "persistence": {
+          "status": "accepted_within_scope",
+          "scope": "Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed.",
+          "evidence_refs": [
+            "evidence/receipts/native-service-reboot-20260920.json"
+          ]
+        },
+        "restart": {
+          "status": "accepted_within_scope",
+          "scope": "Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed.",
+          "evidence_refs": [
+            "evidence/receipts/native-service-reboot-20260920.json"
+          ]
+        },
+        "cleanup": {
+          "status": "accepted_within_scope",
+          "scope": "Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed.",
+          "evidence_refs": [
+            "evidence/receipts/native-service-reboot-20260920.json"
+          ]
+        },
+        "recovery": {
+          "status": "accepted_within_scope",
+          "scope": "Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed.",
+          "evidence_refs": [
+            "evidence/receipts/native-service-reboot-20260920.json"
+          ]
+        }
       },
       "baseline_applicability": {
         "category": "supporting_workflow",

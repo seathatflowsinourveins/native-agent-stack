@@ -1,0 +1,173 @@
+{
+  "source": "guest-journal.stdout",
+  "raw_sha256": "c81a20fe5e5fc739f9bd1e66ec0f5cc0c99bc454b948829bbad6f6b47c51e33c",
+  "raw_bytes": 231116,
+  "selection": "All lines containing a listed marker, with original line positions.",
+  "patterns": [
+    "native-reboot-observer.service",
+    "serial-getty@ttyS0.service",
+    "user@1001.service",
+    "native-reboot.service",
+    "native-reboot.timer",
+    "Accepted publickey",
+    "systemd-shutdown"
+  ],
+  "lines": [
+    {
+      "line": 913,
+      "text": "[  100.994404] owned-reboot systemd[1]: Started serial-getty@ttyS0.service - Serial Getty on ttyS0."
+    },
+    {
+      "line": 1000,
+      "text": "[  126.723864] owned-reboot cloud-init[1014]: Created symlink /etc/systemd/system/multi-user.target.wants/native-reboot-observer.service \u2192 /etc/systemd/system/native-reboot-observer.service."
+    },
+    {
+      "line": 1004,
+      "text": "[  131.031743] owned-reboot systemd[1]: Starting native-reboot-observer.service - Read-only serial observer; never starts or retries the workload..."
+    },
+    {
+      "line": 1008,
+      "text": "[  131.854265] owned-reboot systemd[1]: Starting user@1001.service - User Manager for UID 1001..."
+    },
+    {
+      "line": 1023,
+      "text": "[  134.531603] owned-reboot systemd[1126]: Started native-reboot.timer - Owned user-manager boot and retry timer."
+    },
+    {
+      "line": 1039,
+      "text": "[  135.072521] owned-reboot systemd[1]: Started user@1001.service - User Manager for UID 1001."
+    },
+    {
+      "line": 1041,
+      "text": "[  135.103266] owned-reboot systemd[1126]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 1053,
+      "text": "[  146.874916] owned-reboot sshd[1194]: Accepted publickey for example from 10.0.2.2 port 52198 ssh2: ED25519 SHA256:dNrNegEuyTB0Ld7U5F47jUsv3DN5oR+afc1/XlelfGI"
+    },
+    {
+      "line": 1130,
+      "text": "[  152.818606] owned-reboot systemd[1]: Stopping serial-getty@ttyS0.service - Serial Getty on ttyS0..."
+    },
+    {
+      "line": 1146,
+      "text": "[  152.979931] owned-reboot systemd[1]: serial-getty@ttyS0.service: Deactivated successfully."
+    },
+    {
+      "line": 1147,
+      "text": "[  152.990930] owned-reboot systemd[1]: Stopped serial-getty@ttyS0.service - Serial Getty on ttyS0."
+    },
+    {
+      "line": 1150,
+      "text": "[  153.039233] owned-reboot systemd[1]: native-reboot-observer.service: Main process exited, code=killed, status=15/TERM"
+    },
+    {
+      "line": 1151,
+      "text": "[  153.040873] owned-reboot systemd[1]: native-reboot-observer.service: Failed with result 'signal'."
+    },
+    {
+      "line": 1152,
+      "text": "[  153.053436] owned-reboot systemd[1]: Stopped native-reboot-observer.service - Read-only serial observer; never starts or retries the workload."
+    },
+    {
+      "line": 1154,
+      "text": "[  153.113405] owned-reboot systemd[1]: native-reboot-observer.service: Consumed 1.189s CPU time."
+    },
+    {
+      "line": 1169,
+      "text": "[  153.299804] owned-reboot systemd[1]: Stopping user@1001.service - User Manager for UID 1001..."
+    },
+    {
+      "line": 1179,
+      "text": "[  153.436293] owned-reboot systemd[1126]: native-reboot.service: Main process exited, code=killed, status=15/TERM"
+    },
+    {
+      "line": 1187,
+      "text": "[  153.851611] owned-reboot systemd[1126]: native-reboot.service: Failed with result 'signal'."
+    },
+    {
+      "line": 1188,
+      "text": "[  153.867355] owned-reboot systemd[1126]: Stopped native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 1189,
+      "text": "[  153.882284] owned-reboot systemd[1126]: native-reboot.service: Consumed 11.353s CPU time."
+    },
+    {
+      "line": 1195,
+      "text": "[  153.943832] owned-reboot systemd[1126]: Stopped native-reboot.timer - Owned user-manager boot and retry timer."
+    },
+    {
+      "line": 1214,
+      "text": "[  154.750615] owned-reboot systemd[1]: user@1001.service: Deactivated successfully."
+    },
+    {
+      "line": 1215,
+      "text": "[  154.755482] owned-reboot systemd[1]: Stopped user@1001.service - User Manager for UID 1001."
+    },
+    {
+      "line": 1216,
+      "text": "[  154.756239] owned-reboot systemd[1]: user@1001.service: Consumed 15.396s CPU time, 168.0M memory peak, 0B memory swap peak."
+    },
+    {
+      "line": 1361,
+      "text": "[  173.775163] owned-reboot systemd-shutdown[1]: Syncing filesystems and block devices."
+    },
+    {
+      "line": 1362,
+      "text": "[  173.822785] owned-reboot systemd-shutdown[1]: Sending SIGTERM to remaining processes..."
+    },
+    {
+      "line": 2142,
+      "text": "[   62.777639] owned-reboot systemd[1]: Starting native-reboot-observer.service - Read-only serial observer; never starts or retries the workload..."
+    },
+    {
+      "line": 2182,
+      "text": "[   71.196262] owned-reboot systemd[1]: Started serial-getty@ttyS0.service - Serial Getty on ttyS0."
+    },
+    {
+      "line": 2206,
+      "text": "[   74.320247] owned-reboot systemd[1]: Starting user@1001.service - User Manager for UID 1001..."
+    },
+    {
+      "line": 2221,
+      "text": "[   78.757822] owned-reboot systemd[799]: Started native-reboot.timer - Owned user-manager boot and retry timer."
+    },
+    {
+      "line": 2240,
+      "text": "[   79.042843] owned-reboot systemd[1]: Started user@1001.service - User Manager for UID 1001."
+    },
+    {
+      "line": 2241,
+      "text": "[   79.060767] owned-reboot systemd[799]: Starting native-reboot.service - Owned finite native Dagu checkpoint reboot qualification..."
+    },
+    {
+      "line": 2271,
+      "text": "[   91.150004] owned-reboot systemd[799]: Finished native-reboot.service - Owned finite native Dagu checkpoint reboot qualification."
+    },
+    {
+      "line": 2273,
+      "text": "[   91.173887] owned-reboot systemd[799]: native-reboot.service: Consumed 10.963s CPU time."
+    },
+    {
+      "line": 2274,
+      "text": "[   91.429447] owned-reboot systemd[1]: native-reboot-observer.service: Deactivated successfully."
+    },
+    {
+      "line": 2275,
+      "text": "[   91.432874] owned-reboot systemd[1]: Finished native-reboot-observer.service - Read-only serial observer; never starts or retries the workload."
+    },
+    {
+      "line": 2276,
+      "text": "[   91.442358] owned-reboot systemd[1]: native-reboot-observer.service: Consumed 1.450s CPU time."
+    },
+    {
+      "line": 2287,
+      "text": "[   93.388977] owned-reboot sshd[931]: Accepted publickey for example from 10.0.2.2 port 44052 ssh2: ED25519 SHA256:dNrNegEuyTB0Ld7U5F47jUsv3DN5oR+afc1/XlelfGI"
+    },
+    {
+      "line": 2306,
+      "text": "[   98.530513] owned-reboot sshd[1039]: Accepted publickey for example from 10.0.2.2 port 43316 ssh2: ED25519 SHA256:dNrNegEuyTB0Ld7U5F47jUsv3DN5oR+afc1/XlelfGI"
+    }
+  ]
+}

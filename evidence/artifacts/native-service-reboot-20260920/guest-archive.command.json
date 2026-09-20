@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "ssh",
+    "-i",
+    "$RUNNER_HOME/work/_temp/native-service-reboot/private/ssh-key",
+    "-p",
+    "37501",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "IdentitiesOnly=yes",
+    "-o",
+    "StrictHostKeyChecking=accept-new",
+    "-o",
+    "UserKnownHostsFile=$RUNNER_HOME/work/_temp/native-service-reboot/private/known_hosts",
+    "-o",
+    "ControlMaster=no",
+    "-o",
+    "ControlPath=none",
+    "-o",
+    "ConnectTimeout=10",
+    "example@127.0.0.1",
+    "sudo /usr/bin/tar --exclude=./dagu-home/data/auth -C /var/lib/service-reboot -czf - ."
+  ],
+  "ended_utc": "2026-09-20T22:08:54.333095+00:00",
+  "exit_code": 0,
+  "started_utc": "2026-09-20T22:08:48.032739+00:00",
+  "timeout_seconds": 90
+}

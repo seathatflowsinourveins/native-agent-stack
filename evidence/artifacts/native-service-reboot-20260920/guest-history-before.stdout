@@ -1,0 +1,10 @@
+[
+  {
+    "name": "reboot",
+    "dagRunId": "native-service-reboot-fixture",
+    "status": "running",
+    "startedAt": "2026-09-20T22:06:34Z",
+    "duration": "3s",
+    "workerId": "local"
+  }
+]

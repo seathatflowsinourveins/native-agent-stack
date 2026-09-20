@@ -185,18 +185,22 @@
       "changed": false
     },
     "journal-excerpts.json": {
-      "raw_sha256": "682a30d1ddcb9366fefcce2d22e8fb2249204219e84bbd14b9f893e1caac27d6",
       "public_sha256": "682a30d1ddcb9366fefcce2d22e8fb2249204219e84bbd14b9f893e1caac27d6",
-      "raw_bytes": 28771,
       "public_bytes": 28771,
-      "changed": false
+      "kind": "derived_excerpt",
+      "source_path": "failed-guest-journal.stdout",
+      "source_raw_sha256": "23c6b2a665b981b61fe926bd4525bcf83eaa2cce3094bfd67a4c43e147a7bc64",
+      "source_raw_bytes": 251580,
+      "derivation": "Select the declared source lines with original positions, then apply the listed public text substitutions."
     },
     "serial-records.json": {
-      "raw_sha256": "0bd9eea40764fc236c4db196409cca6bb495d49a10b9bd32fd2d9986054de49b",
       "public_sha256": "1c74c53257067f672ddc594efd34e31cfaf5e9d4315c02a795595f2205fb3ab1",
-      "raw_bytes": 415,
       "public_bytes": 408,
-      "changed": true
+      "kind": "derived_excerpt",
+      "source_path": "serial.log",
+      "source_raw_sha256": "48ffdbe04d96366e2f4361d48cfcdae6b8b49be4198538dd62fcc8debfe12397",
+      "source_raw_bytes": 141978,
+      "derivation": "Select the declared source lines with original positions, then apply the listed public text substitutions."
     }
   },
   "original_artifact_retention": "The original credential-bearing artifact is retained privately with its exact ZIP hash. After the sanitized replacement was published in PR27, the hosted original was removed successfully at 2026-09-20T22:00Z; its metadata and digest remain above."

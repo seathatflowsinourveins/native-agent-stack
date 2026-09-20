@@ -1158,7 +1158,8 @@
         "token-practice-coverage-20260920",
         "native-dagu-job-recovery-20260920",
         "wsl-transport-recovery-20260920",
-        "native-dagu-retry-tests-20260920"
+        "native-dagu-retry-tests-20260920",
+        "native-service-reboot-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1252,7 +1253,8 @@
       "evidence_ids": [
         "native-worker-supervision-20260919",
         "token-practice-coverage-20260920",
-        "native-worker-cgroup-20260920"
+        "native-worker-cgroup-20260920",
+        "native-service-reboot-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [

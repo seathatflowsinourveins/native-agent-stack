@@ -6,7 +6,7 @@ Start with the layer needed for the task in [manifest.json](manifest.json), then
 read its scoped capability decision in [decisions.json](decisions.json). A default
 is a selected way to do a task, not permission to install or activate every tool.
 
-The catalog references 61 selected components through 42 capability decisions. Its
+The catalog references 61 selected components through 43 capability decisions. Its
 registered evidence references are listed per capability. These are coverage counts, not a
 score of complete installation, execution or lifecycle acceptance.
 
@@ -74,13 +74,14 @@ The three tracked foundation priorities are:
    a forced parent-runtime crash, one unchanged checkpoint and one final effect.
    The earlier manual-cleanup and refused-role trials remain recorded failures;
    this WSL fixture does not establish whole-host or remote-provider recovery.
-3. Complete independent off-host application queries and scheduled-service
-   acceptance after reboot. Synthetic Restic byte/mode recovery is accepted;
+3. Complete independent off-host application queries. Synthetic Restic byte/mode
+   recovery and one independently observed orderly guest service reboot are accepted;
    the [native application-state trial](../../blueprints/convergence-practice/offhost-app-state/README.md)
    now defines separate fresh source/destination jobs and unchanged upstream
-   tests, but has not executed yet. The guest observer correction also awaits
-   its actual result. Same-host restore and ordinary stop/start do not qualify
-   these remaining boundaries.
+   tests, and its first native execution is underway. The
+   [guest receipt](../../evidence/receipts/native-service-reboot-20260920.json)
+   retains real retry/history, pre-login observation, checkpoint and cleanup
+   evidence. Actual off-host application usability remains a separate boundary.
 
 Use [the convergence guide](../../docs/convergence-architecture.md) for the work
 sequence and [the lifecycle guide](../../adoption/lifecycle.md) for selected native

@@ -1978,6 +1978,25 @@
         "Native usage views overlap; initial SIGKILL has no terminal record. Complete parent/child/retry usage, billing and savings remain unknown."
       ],
       "path": "evidence/receipts/native-worker-cgroup-20260920.json"
+    },
+    {
+      "id": "native-service-reboot-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "dagu",
+        "systemd"
+      ],
+      "claim": "A signed disposable Ubuntu guest automatically resumed the same native Dagu run after an orderly kernel reboot, preserved its checkpoint and produced one local effect. A dedicated read-only serial observer and independent journal review confirmed completion before postboot SSH; owned cleanup passed.",
+      "limitations": [
+        "One orderly disposable guest reboot with a synthetic workload; not a physical PC, power loss, production disaster recovery, provider recovery or broker acceptance.",
+        "The unchanged official Dagu retry tests are a selected upstream subset. The project planner, its original 12-test oracle and the guest experiment are local synthetic integration coverage.",
+        "Source, disk and process continuity cover this owned guest only; no distributed exactly-once or arbitrary external side-effect guarantee.",
+        "Public text projections replace owned home prefixes and synthetic UUIDs and normalize CRLF. Original artifact/stream hashes and explicit projection rules are retained; projected bytes are not labelled raw-byte-identical.",
+        "The full auth-free guest archive contains three hidden bookkeeping files omitted by loose-file artifact upload. Independent inspection used the intact archive.",
+        "Both prior failed attempts remain failures; retrospective successful workload records did not override their missing acceptance evidence.",
+        "No model was called and no provider or lifetime token-saving measurement was made."
+      ],
+      "path": "evidence/receipts/native-service-reboot-20260920.json"
     }
   ],
   "files": [
@@ -2018,8 +2037,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "0d805ccc085506e8c17913022f21fb66443e1b19cb78ecc9b9d3345e7b7b8015",
-      "bytes": 9506
+      "sha256": "d19bebd6e47f480c19e1324a69a128b28e80f397c0d13106bdb902ef170dfac8",
+      "bytes": 9828
     },
     {
       "path": "CLAUDE.md",
@@ -3484,8 +3503,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "224150d482666eaa03ca17b7a04b10eb0eb321249701e88e97328f74f5404168",
-      "bytes": 398064
+      "sha256": "1c8700f5f58f374f73bb0862036b01f16d60b0e8d7f7d6a3d6a2ddefdd2c0b02",
+      "bytes": 403168
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -3529,8 +3548,8 @@
     },
     {
       "path": "blueprints/us-equities/architecture/README.md",
-      "sha256": "0eef5b253a2753f81eb88b998b887acf42e6cc92de28d863319895d25b4d3f56",
-      "bytes": 16417
+      "sha256": "707a152bd800b87bed9374952e428b5844abfdb1432f0d373dfb96b1d9388db7",
+      "bytes": 17055
     },
     {
       "path": "blueprints/us-equities/architecture/alpaca-probe.json",
@@ -3644,8 +3663,8 @@
     },
     {
       "path": "blueprints/us-equities/catalyst-experiment/README.md",
-      "sha256": "c5841ca17e1e2ddb5b35982590755813a294db64b2605a727eff90a2d3aca8e0",
-      "bytes": 9405
+      "sha256": "f94eaaf3fa4fade1883f668217bd02db3d08e88afc11205f895fad85506c2327",
+      "bytes": 10096
     },
     {
       "path": "blueprints/us-equities/catalyst-experiment/availability.sql",
@@ -4104,8 +4123,8 @@
     },
     {
       "path": "blueprints/us-equities/harness-contract.json",
-      "sha256": "731b37b3e674ec4c6b45bdd59a7c0d6392b4d33d8ef682f15f9826277facd09b",
-      "bytes": 4357
+      "sha256": "fd56edc4738c0f202733d278dd2b4da0403717a9ef90edf8f2ab80f37cf470c4",
+      "bytes": 4636
     },
     {
       "path": "blueprints/us-equities/historical-simulation/HistoricalSimulationAlgorithm.cs",
@@ -4829,8 +4848,8 @@
     },
     {
       "path": "catalogs/us-equities/architecture/trading.json",
-      "sha256": "26dd4e0882823e3537922fa495e46dd518ad2b627a6db41962e7fa09d63ecedf",
-      "bytes": 69055
+      "sha256": "e28cfd404ab8992ae3fd2a785e8978908d1b2b2a86e7292bea4ff51335fa2f0c",
+      "bytes": 69562
     },
     {
       "path": "catalogs/us-equities/authenticated-data-review.json",
@@ -5084,8 +5103,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "7db9b2ef45ef9bfdc903e12673ec337d81c4af78bfcd6d112e1f091a8d368bad",
-      "bytes": 3720076
+      "sha256": "b3c22e3abaf5c5ea42ff049913f4c746b658e259347ecbb45042eb336fdce7ad",
+      "bytes": 3738713
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5599,8 +5618,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 74905,
-      "sha256": "d52b9a5b500170fd25aae1b08a6457131df4d70423e75a9ff6c35a7470584093"
+      "bytes": 74989,
+      "sha256": "c7cde925e38877b8e1563318594d5e2b9de4d4257148886f590430c1c7101fbe"
     },
     {
       "path": "observability/README.md",
@@ -6084,18 +6103,18 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "1a9e7678d331648d310647746638abe564cfc38fcb0147d39be2492075202fb4",
-      "bytes": 7112
+      "sha256": "09c3530774b97e64f67a240e7f0b84cd5255a6a0edaac6894adb834214186517",
+      "bytes": 7234
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "1a0b80c4a9abeac9e3376abfd22a992928c20cb2afbc3ecea74d8ff8cf5f4690",
-      "bytes": 99332
+      "sha256": "fc44557f5e01d037db58515af9a843cc154484724cd1f9842cc11a9801fc080d",
+      "bytes": 104074
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "1e1f916dfb2d176cac7a4cb639d1a9ad40bb07503b2d9a18ea730574a23b0fa9",
-      "bytes": 17274
+      "sha256": "b4d5aba28c95003166414cb392b687a8cada091fe5a64479bae7f7bbe2d06e9f",
+      "bytes": 17287
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -6104,8 +6123,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "43c27b6561c032e6fc6846f7dc225b4b4689d0df3845a412c62e5a630ad896cb",
-      "bytes": 6350
+      "sha256": "51f603954ee5fd26bf600624000a3321e6ba8bd795498420b203345dfa803fdf",
+      "bytes": 6879
     },
     {
       "path": "evidence/receipts/native-harness-defaults-20260920.json",
@@ -6439,8 +6458,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/acceptance-plan.md",
-      "sha256": "311e97e678d10dd7399182a4ed300be473f245a5f9c2b63d3eefb740960587c4",
-      "bytes": 18463
+      "sha256": "7cb12b7cb96cc1dacceb426782297cbf1cbdb95aa2d32e87f42f4a8e4eb0c831",
+      "bytes": 19333
     },
     {
       "path": "evidence/receipts/native-worker-cgroup-20260920.json",
@@ -6534,8 +6553,8 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/README.md",
-      "sha256": "93c411197a21bba2708a940a407fda9ce57e927ee0a9d2c8cbc21ed9ab69668d",
-      "bytes": 6975
+      "sha256": "bd9b9e8963b1f7f8e917e483812194d6905c8e61da34afd43f5019acf9340ad0",
+      "bytes": 7518
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/guest.py",
@@ -6984,8 +7003,8 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/attempt-2/publication.json",
-      "sha256": "83e71fea7295d6c6fcc7a86922132c0f4026c995460f4f68c22d2e2d9ba8f951",
-      "bytes": 8885
+      "sha256": "502d53294cd71c604e9ec1aff4c0e3d274c4fae68913d10487a4ba66e4e0ea1f",
+      "bytes": 9283
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/attempt-2/qemu-block-device-help.stdout",
@@ -7056,6 +7075,281 @@
       "path": "tests/test_offhost_app_state.py",
       "sha256": "a763c8ed4d707bbe447a4af97c7545faabd75866f5ffea320d232285a9a0162c",
       "bytes": 9730
+    },
+    {
+      "path": "docs/paper-lane-policy.md",
+      "sha256": "a9fef28df97bf6318119b0d2e55e502d47301ec07ea217106f3886402a43b77a",
+      "bytes": 3337
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/cleanup.json",
+      "sha256": "6aadee9cb7005d261df5f0337cc289190378cb5f3d2f49a264428452acd17b75",
+      "bytes": 111
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/freeze.json",
+      "sha256": "5a542522c5fdbd1bc6ae493d957475978fadec9be8f267b8a920f47802e8cdae",
+      "bytes": 4645
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-after.json",
+      "sha256": "bb05b2666bf5bb1c6e25db5a88b7db4b7bb30b12caec1ded951936cc8cd19311",
+      "bytes": 678
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-archive.command.json",
+      "sha256": "2b0be0a3401a39477d2d6c4306dd96c02d2de19fade2b57b23cdd3a1a7d113d0",
+      "bytes": 719
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-archive.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-archive.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-before.json",
+      "sha256": "967a56ebdb74875873f524a33514d6d0d1b3f868ff4612b4a0634525f3c35e43",
+      "bytes": 551
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-boots.command.json",
+      "sha256": "fc9c2eb7e1823d30a7ba3e730d01eefb60259a38e21c07177daec230e5c1b733",
+      "bytes": 682
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-boots.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-boots.stdout",
+      "sha256": "480782af78667044a10f43c5f8a4d8a8289451c0c4ce0b7a54fa1b54d7f7806b",
+      "bytes": 262
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-checkpoint-started.json",
+      "sha256": "b2845c6042555a2d116bbea41631666e3eed78a03a8b94615d1fe00c5f70a837",
+      "bytes": 27
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-checkpoint-tests.log",
+      "sha256": "df15cb585b6e1a59d76ff7988b8ea36054ec45b9bd6788349d370ef90ec2ea33",
+      "bytes": 1177
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-checkpoint.json",
+      "sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+      "bytes": 238
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-completed.json",
+      "sha256": "382717ea740e3d3dbb68f704b2581baa6f8d4b6292c83328a06d2ec44a435376",
+      "bytes": 133
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-config.yaml",
+      "sha256": "a2651229d74dd660c8f98f884292ecb8e405ea6ab3bc363ad4985d4d1eb4a087",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-final-tests.log",
+      "sha256": "d753ed2aaee4f758a087b5965887e88756e8052e65aba6294bb4bffcea73a4d4",
+      "bytes": 1177
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-freeze.json",
+      "sha256": "f1dbd54a7a9da58dd33ede0ce99490e5d6eafda4f0af1c73811e3f51039bfb1e",
+      "bytes": 2310
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-after.command.json",
+      "sha256": "86d1b9ba35cf7ddb7dcd6aa269cb8812968176c93f5442dd8ac010b1bcad3707",
+      "bytes": 443
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-after.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-after.stdout",
+      "sha256": "1a197b5688539275a385aeda2b91bf68c7dff911a746c05078c548b81ce63b73",
+      "bytes": 239
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-before.command.json",
+      "sha256": "acb954137aa0fc60bd497f755f00d753a0645fb5143d78c1c4cfa8af0fd00487",
+      "bytes": 443
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-before.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-before.stdout",
+      "sha256": "80fa5bd8b1db5be3e0a22d21faf68c3831e8d658fb9547c03612d156cd76d963",
+      "bytes": 195
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-interrupted.command.json",
+      "sha256": "609db8ca7a518d7ea7863b0c887b6cac2d1995d45ecd0e1f7ed90d8e6da2e63b",
+      "bytes": 443
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-interrupted.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-interrupted.stdout",
+      "sha256": "c1b8f0a70c36e719203ed7d4ad17e438728d50805cd6401f86cd13f9e3af7ea0",
+      "bytes": 238
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-reboot.command.json",
+      "sha256": "797fc8657868a280e2d85a66c456d88c09a43983905b51e877067f5bcf004bba",
+      "bytes": 664
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-reboot.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-reboot.stderr",
+      "sha256": "ac52b274fe282b80412edf14920d068ed97684ba3162ab4b80961024b24ff1c1",
+      "bytes": 85
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-reboot.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-reboot.yaml",
+      "sha256": "60d3c42031c69ee508750a7ccc0e5e3c4ab14504b0edfbbfc287dd3bf26048c4",
+      "bytes": 341
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-retry.command.json",
+      "sha256": "9154cb8be7c68cbc645163387defb18b2a703e9bcbd0a0cc8faf441693636da0",
+      "bytes": 487
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-retry.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-retry.stderr",
+      "sha256": "9e3b89e4190c9deaaf475d50e84b3edbfc7a85a9f799a70b1f68e20f28013ff1",
+      "bytes": 846
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-retry.stdout",
+      "sha256": "a0fd978a879707016fbda983e613aed32e09f71d445f0166367a0894ab935592",
+      "bytes": 507
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-version.stdout",
+      "sha256": "7ee203ac73fca7d93c699ceefabb5bb5cdea2e02213de22ceea56908ff0945c5",
+      "bytes": 7
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/host-observations.json",
+      "sha256": "00ec1d1796c68d734394f4cba65e1d1de31849223979af214dd50d950e23fb9a",
+      "bytes": 360
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/journal-excerpts.json",
+      "sha256": "9b7d23c1e25ccb910fe9ea0877a0ea27fb603ca7a4cbcfd10c500e2e405fc7b4",
+      "bytes": 6907
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/publication.json",
+      "sha256": "4b3fb16befaf2e68a694da096223cb205d2667ee32da1a3afb9a11f04c792101",
+      "bytes": 17110
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/qemu-block-device-help.stdout",
+      "sha256": "e61701bf289d8fc9755dad2bdfaa2317b9a86f5e6cf0a3cb18674d370f3c380e",
+      "bytes": 3823
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/qemu-version.stdout",
+      "sha256": "8f79ffd97970d85d6833a0ccc87f5d6e7182f8f52101c741dfa2fb6374670b18",
+      "bytes": 132
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/qemu.command.json",
+      "sha256": "95046d5ca76fb90db1291570942d7bb3d2fa229134257b9aa2b4dbffbd41aee6",
+      "bytes": 1117
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/result.json",
+      "sha256": "9baa16ea628d1f4844ecbec8f3ded2c87e49d05bbaa256f322074b34a44aaf2f",
+      "bytes": 365
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/serial.log",
+      "sha256": "e97d86327f0b4791596f7e17541e790b1659f735cd93e265d4dd9932127db7c1",
+      "bytes": 427
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/ubuntu-signature.command.json",
+      "sha256": "bf32f92dae935029d3825069b5182a95111c03ac93aa66d3d3b36a79a30ff110",
+      "bytes": 429
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/ubuntu-signature.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/ubuntu-signature.stderr",
+      "sha256": "33e46ef560a389fee1665eb5274962415c84b0f9c1b84ae40e8483ea877b8cae",
+      "bytes": 207
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/ubuntu-signature.stdout",
+      "sha256": "30a2ca1dcd976d0f0a609e19ba34641ee8f231e0c61e7a66a9a9918761c266d7",
+      "bytes": 372
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/upstream-archive-verification.txt",
+      "sha256": "441a83667300a77189ef664a9d0c8a9a2fa7bcb9da51e6a756d1c4ee62bd8835",
+      "bytes": 73
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/upstream-exit-code.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/upstream-go-version.txt",
+      "sha256": "76227025cc0bc2be7067aa45d11e09cacfd49c58f498f4c2e4f6a9872a607bf9",
+      "bytes": 32
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/upstream-native-command.txt",
+      "sha256": "70fe2d9b972da0abd201b3bd0080c522788383be3504192f3f0dae2c94d8c9be",
+      "bytes": 78
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/upstream-upstream-tests.txt",
+      "sha256": "c975dcb643e18efd96e4a34efecf2670f88f03834a1a4e3dd00ee081a5a85f21",
+      "bytes": 110896
+    },
+    {
+      "path": "evidence/receipts/native-service-reboot-20260920.json",
+      "sha256": "7f13f5bfe6072465d09aa725d766fb880eb865f6c0452902a41cf7f5b446a0d0",
+      "bytes": 5495
     }
   ],
   "convergence_records": [

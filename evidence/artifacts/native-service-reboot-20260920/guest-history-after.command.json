@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "/opt/service-reboot/dagu",
+    "--context",
+    "local",
+    "--dagu-home",
+    "/var/lib/service-reboot/dagu-home",
+    "--config",
+    "/var/lib/service-reboot/config.yaml",
+    "history",
+    "--run-id",
+    "native-service-reboot-fixture",
+    "--format",
+    "json"
+  ],
+  "started_utc": "2026-09-20T22:08:46.035580+00:00",
+  "timeout_seconds": 60,
+  "ended_utc": "2026-09-20T22:08:46.810422+00:00",
+  "exit_code": 0
+}

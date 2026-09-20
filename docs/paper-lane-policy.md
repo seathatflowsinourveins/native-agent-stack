@@ -11,9 +11,11 @@ Paper and live are separate configurations. Live credentials have not been
 provided and are not a prerequisite for paper. Verify the selected native paper
 endpoint and account before enabling execution; never substitute a live endpoint.
 Necessary native paper sign-in or unavailable paper configuration is a concrete
-input to resolve, not a request to reauthorize the paper lane. Future live trading
-requires its own explicit user authorization and readiness; no paper result grants
-it. Paid hosting and purchases are also outside this paper authorization.
+input to resolve, not a request to reauthorize the paper lane. The intended later
+transition uses retained paper results and separately configured live execution.
+This paper workflow must not switch itself to a live endpoint, and a paper score
+alone does not establish live readiness. Paid hosting and purchases are outside
+this paper authorization.
 
 The coordinator freezes each bounded paper trial before execution:
 

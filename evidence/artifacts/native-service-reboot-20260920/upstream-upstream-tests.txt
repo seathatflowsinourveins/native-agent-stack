@@ -1,0 +1,830 @@
+go: downloading github.com/goccy/go-yaml v1.19.2
+go: downloading github.com/spf13/cobra v1.10.2
+go: downloading github.com/spf13/viper v1.20.1
+go: downloading golang.org/x/term v0.45.0
+go: downloading google.golang.org/grpc v1.83.2
+go: downloading github.com/google/uuid v1.6.0
+go: downloading github.com/stretchr/testify v1.12.1
+go: downloading github.com/getkin/kin-openapi v0.144.0
+go: downloading github.com/go-chi/chi/v5 v5.3.2
+go: downloading github.com/oapi-codegen/runtime v1.7.0
+go: downloading github.com/samber/slog-multi v1.6.0
+go: downloading github.com/hashicorp/golang-lru/v2 v2.0.7
+go: downloading golang.org/x/text v0.41.0
+go: downloading github.com/adrg/xdg v0.5.3
+go: downloading github.com/go-viper/mapstructure/v2 v2.5.0
+go: downloading gopkg.in/yaml.v3 v3.0.1
+go: downloading github.com/go-git/go-git/v5 v5.19.2
+go: downloading golang.org/x/crypto v0.56.0
+go: downloading golang.org/x/sys v0.47.0
+go: downloading github.com/golang-jwt/jwt/v5 v5.3.1
+go: downloading github.com/robfig/cron/v3 v3.0.1
+go: downloading github.com/fsnotify/fsnotify v1.10.1
+go: downloading github.com/gofrs/flock v0.13.1
+go: downloading mvdan.cc/sh/v3 v3.12.0
+go: downloading github.com/jedib0t/go-pretty/v6 v6.6.9
+go: downloading go.opentelemetry.io/otel v1.44.0
+go: downloading go.opentelemetry.io/otel/trace v1.44.0
+go: downloading github.com/bmatcuk/doublestar/v4 v4.8.1
+go: downloading github.com/joho/godotenv v1.5.1
+go: downloading github.com/go-chi/cors v1.2.2
+go: downloading github.com/go-chi/httplog/v2 v2.1.1
+go: downloading github.com/prometheus/client_golang v1.23.2
+go: downloading github.com/google/jsonschema-go v0.4.3
+go: downloading github.com/shirou/gopsutil/v4 v4.26.7
+go: downloading tailscale.com v1.94.2
+go: downloading github.com/aquaproj/aqua/v2 v2.60.1
+go: downloading github.com/spf13/afero v1.15.0
+go: downloading github.com/Masterminds/semver/v3 v3.5.0
+go: downloading github.com/go-resty/resty/v2 v2.16.5
+go: downloading github.com/mholt/archives v0.1.5
+go: downloading github.com/oapi-codegen/nethttp-middleware v1.1.2
+go: downloading dario.cat/mergo v1.0.2
+go: downloading golang.org/x/sync v0.22.0
+go: downloading github.com/spf13/pflag v1.0.10
+go: downloading github.com/sagikazarmark/locafero v0.7.0
+go: downloading github.com/spf13/cast v1.7.1
+go: downloading google.golang.org/protobuf v1.36.12
+go: downloading golang.org/x/net v0.58.0
+go: downloading github.com/apapsch/go-jsonmerge/v2 v2.0.0
+go: downloading github.com/samber/lo v1.52.0
+go: downloading github.com/samber/slog-common v0.19.0
+go: downloading github.com/go-openapi/jsonpointer v0.22.5
+go: downloading github.com/oasdiff/yaml v0.1.1
+go: downloading github.com/santhosh-tekuri/jsonschema/v6 v6.0.3
+go: downloading github.com/ProtonMail/go-crypto v1.1.6
+go: downloading github.com/go-git/go-billy/v5 v5.9.0
+go: downloading github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3
+go: downloading github.com/emirpasic/gods v1.18.1
+go: downloading github.com/kevinburke/ssh_config v1.2.0
+go: downloading github.com/skeema/knownhosts v1.3.1
+go: downloading github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8
+go: downloading github.com/xanzy/ssh-agent v0.3.3
+go: downloading github.com/itchyny/gojq v0.12.19
+go: downloading golang.org/x/oauth2 v0.36.0
+go: downloading github.com/aws/aws-sdk-go-v2 v1.41.12
+go: downloading github.com/aws/aws-sdk-go-v2/config v1.29.18
+go: downloading github.com/aws/aws-sdk-go-v2/credentials v1.17.71
+go: downloading github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.85
+go: downloading github.com/aws/aws-sdk-go-v2/service/s3 v1.97.3
+go: downloading github.com/pkg/sftp v1.13.11
+go: downloading github.com/containerd/errdefs v1.0.0
+go: downloading github.com/containerd/platforms v1.0.0-rc.5
+go: downloading github.com/moby/moby/api v1.54.2
+go: downloading github.com/moby/moby/client v0.3.0
+go: downloading github.com/opencontainers/image-spec v1.1.1
+go: downloading go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.43.0
+go: downloading go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.43.0
+go: downloading go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.43.0
+go: downloading go.opentelemetry.io/otel/sdk v1.44.0
+go: downloading cloud.google.com/go/secretmanager v1.20.0
+go: downloading github.com/Azure/azure-sdk-for-go/sdk/azcore v1.23.1
+go: downloading github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.14.1
+go: downloading github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/azsecrets v1.5.0
+go: downloading github.com/alibabacloud-go/darabonba-openapi/v2 v2.2.4
+go: downloading github.com/alibabacloud-go/kms-20160120/v4 v4.1.0
+go: downloading github.com/alibabacloud-go/tea v1.5.3
+go: downloading github.com/aliyun/credentials-go v1.4.13
+go: downloading github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.41.9
+go: downloading github.com/hashicorp/vault/api v1.22.0
+go: downloading google.golang.org/api v0.288.0
+go: downloading k8s.io/api v0.35.8
+go: downloading k8s.io/apimachinery v0.35.8
+go: downloading k8s.io/client-go v0.35.8
+go: downloading github.com/coreos/go-oidc v2.3.0+incompatible
+go: downloading github.com/creack/pty v1.1.24
+go: downloading github.com/coder/websocket v1.8.15
+go: downloading github.com/modelcontextprotocol/go-sdk v1.6.1
+go: downloading github.com/beorn7/perks v1.0.1
+go: downloading github.com/cespare/xxhash/v2 v2.3.0
+go: downloading github.com/prometheus/client_model v0.6.2
+go: downloading github.com/prometheus/common v0.66.1
+go: downloading github.com/prometheus/procfs v0.16.1
+go: downloading github.com/tklauser/go-sysconf v0.3.16
+go: downloading google.golang.org/genproto/googleapis/rpc v0.0.0-20260706201446-f0a921348800
+go: downloading google.golang.org/genproto v0.0.0-20260319201613-d00831a3d3e7
+go: downloading github.com/go-logr/logr v1.4.3
+go: downloading go.opentelemetry.io/otel/metric v1.44.0
+go: downloading github.com/suzuki-shunsuke/slog-error v0.2.2
+go: downloading go.yaml.in/yaml/v3 v3.0.5
+go: downloading github.com/invopop/jsonschema v0.14.0
+go: downloading github.com/pb33f/ordered-map/v2 v2.3.1
+go: downloading go.yaml.in/yaml/v2 v2.4.4
+go: downloading github.com/suzuki-shunsuke/go-osenv v0.1.0
+go: downloading github.com/google/go-github/v88 v88.0.0
+go: downloading github.com/suzuki-shunsuke/ghtkn-go-sdk v0.3.0
+go: downloading github.com/suzuki-shunsuke/go-retryablehttp v0.7.8-2
+go: downloading github.com/suzuki-shunsuke/urfave-cli-v3-util v0.2.3
+go: downloading github.com/schollz/progressbar/v3 v3.19.0
+go: downloading github.com/oasdiff/yaml3 v0.0.14
+go: downloading github.com/STARRY-S/zip v0.2.3
+go: downloading github.com/andybalholm/brotli v1.2.0
+go: downloading github.com/bodgit/sevenzip v1.6.1
+go: downloading github.com/dsnet/compress v0.0.2-0.20230904184137-39efe44ab707
+go: downloading github.com/klauspost/compress v1.18.7
+go: downloading github.com/klauspost/pgzip v1.2.6
+go: downloading github.com/mikelolasagasti/xz v1.0.1
+go: downloading github.com/minio/minlz v1.0.1
+go: downloading github.com/nwaples/rardecode/v2 v2.2.0
+go: downloading github.com/pierrec/lz4/v4 v4.1.25
+go: downloading github.com/sorairolake/lzip-go v0.3.8
+go: downloading github.com/ulikunitz/xz v0.5.15
+go: downloading github.com/go-task/slim-sprig/v3 v3.0.0
+go: downloading github.com/sourcegraph/conc v0.3.0
+go: downloading github.com/subosito/gotenv v1.6.0
+go: downloading github.com/pelletier/go-toml/v2 v2.4.3
+go: downloading github.com/stretchr/objx v0.5.3
+go: downloading github.com/go-openapi/swag/jsonname v0.25.5
+go: downloading github.com/cyphar/filepath-securejoin v0.6.1
+go: downloading github.com/go-openapi/swag v0.23.0
+go: downloading github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376
+go: downloading github.com/pjbgf/sha1cd v0.6.0
+go: downloading github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99
+go: downloading github.com/redis/go-redis/v9 v9.7.3
+go: downloading github.com/jackc/pgx/v5 v5.9.2
+go: downloading modernc.org/sqlite v1.43.0
+go: downloading github.com/itchyny/timefmt-go v0.1.8
+go: downloading github.com/aws/smithy-go v1.27.1
+go: downloading github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.33
+go: downloading github.com/aws/aws-sdk-go-v2/internal/ini v1.8.3
+go: downloading github.com/aws/aws-sdk-go-v2/service/sso v1.25.6
+go: downloading github.com/aws/aws-sdk-go-v2/service/ssooidc v1.30.4
+go: downloading github.com/aws/aws-sdk-go-v2/service/sts v1.41.5
+go: downloading github.com/containerd/log v0.1.0
+go: downloading github.com/kr/fs v0.1.0
+go: downloading github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.8
+go: downloading github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.25
+go: downloading github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.22
+go: downloading github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.7
+go: downloading github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.13
+go: downloading github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.21
+go: downloading github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.21
+go: downloading github.com/docker/go-units v0.5.0
+go: downloading github.com/moby/docker-image-spec v1.3.1
+go: downloading go.opentelemetry.io/proto/otlp v1.10.0
+go: downloading github.com/opencontainers/go-digest v1.0.0
+go: downloading cloud.google.com/go/iam v1.7.0
+go: downloading github.com/googleapis/gax-go/v2 v2.23.0
+go: downloading google.golang.org/genproto/googleapis/api v0.0.0-20260630182238-925bb5da69e7
+go: downloading github.com/Azure/azure-sdk-for-go/sdk/security/keyvault/internal v1.2.0
+go: downloading github.com/tjfoc/gmsm v1.4.1
+go: downloading github.com/containerd/errdefs/pkg v0.3.0
+go: downloading github.com/distribution/reference v0.6.0
+go: downloading github.com/docker/go-connections v0.6.0
+go: downloading go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.69.0
+go: downloading github.com/Azure/azure-sdk-for-go/sdk/internal v1.12.0
+go: downloading github.com/AzureAD/microsoft-authentication-library-for-go v1.8.0
+go: downloading github.com/alibabacloud-go/debug v1.0.1
+go: downloading github.com/alibabacloud-go/tea-utils/v2 v2.0.9
+go: downloading github.com/clbanning/mxj/v2 v2.7.0
+go: downloading github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
+go: downloading github.com/json-iterator/go v1.1.12
+go: downloading github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee
+go: downloading gopkg.in/ini.v1 v1.67.0
+go: downloading github.com/cenkalti/backoff/v4 v4.3.0
+go: downloading github.com/go-jose/go-jose/v4 v4.1.4
+go: downloading github.com/hashicorp/errwrap v1.1.0
+go: downloading github.com/hashicorp/go-cleanhttp v0.5.2
+go: downloading github.com/hashicorp/go-multierror v1.1.1
+go: downloading github.com/hashicorp/go-retryablehttp v0.7.8
+go: downloading github.com/hashicorp/go-rootcerts v1.0.2
+go: downloading github.com/hashicorp/go-secure-stdlib/parseutil v0.2.0
+go: downloading github.com/hashicorp/go-secure-stdlib/strutil v0.1.2
+go: downloading github.com/hashicorp/hcl v1.0.1-vault-7
+go: downloading github.com/mitchellh/mapstructure v1.5.0
+go: downloading golang.org/x/time v0.15.0
+go: downloading github.com/alibabacloud-go/alibabacloud-gateway-pop v0.0.8
+go: downloading k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
+go: downloading sigs.k8s.io/randfill v1.0.0
+go: downloading k8s.io/klog/v2 v2.130.1
+go: downloading github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
+go: downloading github.com/mattn/go-runewidth v0.0.24
+go: downloading github.com/pquerna/cachecontrol v0.2.0
+go: downloading gopkg.in/go-jose/go-jose.v2 v2.6.3
+go: downloading github.com/yosida95/uritemplate/v3 v3.0.2
+go: downloading github.com/tklauser/numcpus v0.11.0
+go: downloading github.com/go-logr/stdr v1.2.2
+go: downloading go.opentelemetry.io/auto/sdk v1.2.1
+go: downloading github.com/otiai10/copy v1.14.1
+go: downloading github.com/expr-lang/expr v1.17.8
+go: downloading github.com/hashicorp/go-version v1.9.0
+go: downloading github.com/Masterminds/sprig/v3 v3.3.0
+go: downloading github.com/suzuki-shunsuke/go-findconfig v1.2.0
+go: downloading github.com/suzuki-shunsuke/go-error-with-exit-code v1.0.0
+go: downloading github.com/forPelevin/gomoji v1.4.1
+go: downloading github.com/bahlo/generic-list-go v0.2.0
+go: downloading github.com/buger/jsonparser v1.2.0
+go: downloading go.yaml.in/yaml/v4 v4.0.0-rc.6
+go: downloading github.com/ktr0731/go-fuzzyfinder v0.9.0
+go: downloading github.com/charmbracelet/x/term v0.2.2
+go: downloading github.com/urfave/cli/v3 v3.9.1
+go: downloading github.com/zalando/go-keyring v0.2.8
+go: downloading github.com/google/go-querystring v1.2.0
+go: downloading github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db
+go: downloading github.com/rivo/uniseg v0.4.7
+go: downloading github.com/bodgit/plumbing v1.3.0
+go: downloading github.com/bodgit/windows v1.0.1
+go: downloading go4.org v0.0.0-20230225012048-214862532bf5
+go: downloading github.com/gorilla/mux v1.8.1
+go: downloading gopkg.in/warnings.v0 v0.1.2
+go: downloading github.com/cloudflare/circl v1.6.3
+go: downloading go4.org/mem v0.0.0-20240501181205-ae6ca9944745
+go: downloading github.com/go-json-experiment/json v0.0.0-20260214004413-d219187c3433
+go: downloading github.com/tailscale/peercred v0.0.0-20250107143737-35a0c7bd7edc
+go: downloading github.com/pires/go-proxyproto v0.8.1
+go: downloading go4.org/netipx v0.0.0-20231129151722-fdeea329fbba
+go: downloading gvisor.dev/gvisor v0.0.0-20250205023644-9414b50a5633
+go: downloading golang.org/x/exp v0.0.0-20260410095643-746e56fc9e2f
+go: downloading github.com/creachadair/msync v0.7.1
+go: downloading github.com/jsimonetti/rtnetlink v1.4.0
+go: downloading github.com/mdlayher/netlink v1.7.3-0.20250113171957-fbb4dce95f42
+go: downloading github.com/gaissmai/bart v0.18.0
+go: downloading github.com/tailscale/wireguard-go v0.0.0-20250716170648-1d0488a3d7da
+go: downloading cloud.google.com/go/compute/metadata v0.9.0
+go: downloading gopkg.in/inf.v0 v0.9.1
+go: downloading github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f
+go: downloading github.com/klauspost/cpuid/v2 v2.3.0
+go: downloading github.com/sirupsen/logrus v1.10.1
+go: downloading github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.25
+go: downloading github.com/cenkalti/backoff/v5 v5.0.3
+go: downloading github.com/grpc-ecosystem/grpc-gateway/v2 v2.28.0
+go: downloading cloud.google.com/go/auth v0.21.0
+go: downloading cloud.google.com/go/auth/oauth2adapt v0.2.8
+go: downloading go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.67.0
+go: downloading github.com/felixge/httpsnoop v1.1.0
+go: downloading github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
+go: downloading github.com/kylelemons/godebug v1.1.0
+go: downloading github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd
+go: downloading github.com/hashicorp/go-sockaddr v1.0.7
+go: downloading github.com/ryanuber/go-glob v1.0.0
+go: downloading github.com/alibabacloud-go/alibabacloud-gateway-spi v0.0.5
+go: downloading k8s.io/kube-openapi v0.0.0-20250910181357-589584f1c912
+go: downloading sigs.k8s.io/structured-merge-diff/v6 v6.3.0
+go: downloading sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730
+go: downloading github.com/alibabacloud-go/darabonba-array v0.1.0
+go: downloading github.com/alibabacloud-go/darabonba-encode-util v0.0.2
+go: downloading github.com/alibabacloud-go/darabonba-map v0.0.2
+go: downloading github.com/alibabacloud-go/darabonba-signature-util v0.0.7
+go: downloading github.com/alibabacloud-go/darabonba-string v1.0.2
+go: downloading github.com/alibabacloud-go/endpoint-util v1.1.0
+go: downloading github.com/alibabacloud-go/openapi-util v0.1.1
+go: downloading github.com/google/gnostic-models v0.7.0
+go: downloading github.com/fxamacker/cbor/v2 v2.9.0
+go: downloading github.com/clipperhouse/uax29/v2 v2.7.0
+go: downloading github.com/segmentio/encoding v0.5.4
+go: downloading github.com/Masterminds/goutils v1.1.1
+go: downloading github.com/huandu/xstrings v1.5.0
+go: downloading github.com/mitchellh/copystructure v1.2.0
+go: downloading github.com/shopspring/decimal v1.4.0
+go: downloading github.com/suzuki-shunsuke/go-exec v0.0.1
+go: downloading github.com/gdamore/tcell/v2 v2.9.0
+go: downloading github.com/ktr0731/go-ansisgr v0.1.0
+go: downloading github.com/nsf/termbox-go v1.1.1
+go: downloading github.com/pkg/errors v0.9.1
+go: downloading github.com/godbus/dbus/v5 v5.2.2
+go: downloading github.com/mitchellh/go-ps v1.0.0
+go: downloading github.com/hdevalence/ed25519consensus v0.2.0
+go: downloading github.com/tailscale/web-client-prebuilt v0.0.0-20250124233751-d4cd19a26976
+go: downloading github.com/tailscale/hujson v0.0.0-20221223112325-20486734a56a
+go: downloading github.com/safchain/ethtool v0.3.0
+go: downloading github.com/mdlayher/socket v0.5.0
+go: downloading modernc.org/libc v1.66.10
+go: downloading github.com/google/btree v1.1.3
+go: downloading github.com/jackc/pgpassfile v1.0.0
+go: downloading github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761
+go: downloading github.com/jackc/puddle/v2 v2.2.2
+go: downloading github.com/google/s2a-go v0.1.9
+go: downloading github.com/googleapis/enterprise-certificate-proxy v0.3.18
+go: downloading sigs.k8s.io/yaml v1.6.0
+go: downloading github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
+go: downloading github.com/x448/float16 v0.8.4
+go: downloading github.com/mitchellh/reflectwalk v1.0.2
+go: downloading github.com/gdamore/encoding v1.0.1
+go: downloading github.com/lucasb-eyer/go-colorful v1.4.1
+go: downloading github.com/huin/goupnp v1.3.0
+go: downloading filippo.io/edwards25519 v1.1.1
+go: downloading github.com/segmentio/asm v1.1.3
+go: downloading github.com/go-openapi/jsonreference v0.20.4
+go: downloading gopkg.in/evanphx/json-patch.v4 v4.13.0
+go: downloading github.com/emicklei/go-restful/v3 v3.12.2
+go: downloading github.com/mailru/easyjson v0.9.1
+go: downloading github.com/josharian/intern v1.0.0
+go: downloading modernc.org/mathutil v1.7.1
+go: downloading modernc.org/memory v1.11.0
+go: downloading github.com/dustin/go-humanize v1.0.1
+go: downloading github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
+=== RUN   TestRetryCommand
+=== RUN   TestRetryCommand/RetryDAGWithFilePath
+=== PAUSE TestRetryCommand/RetryDAGWithFilePath
+=== RUN   TestRetryCommand/RetryDAGWithName
+=== PAUSE TestRetryCommand/RetryDAGWithName
+=== RUN   TestRetryCommand/QueuedCatchupRegeneratesLogAndPreservesTriggerType
+=== PAUSE TestRetryCommand/QueuedCatchupRegeneratesLogAndPreservesTriggerType
+=== RUN   TestRetryCommand/QueuedRetryCreatesNewAttempt
+=== PAUSE TestRetryCommand/QueuedRetryCreatesNewAttempt
+=== RUN   TestRetryCommand/QueuedRetryDoesNotWaitForTerminalSourceProc
+time=2026-09-20T22:03:27.405Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-bc615c6be20df09d3254324531/data/dag-runs/queued-retry-live-source-dag/dag-runs/2026/09/20/dag-run_20260920_220227Z_queued-retry-live-source-run/a_20260920_220227_403Z_a8b0ae/status.jsonl
+time=2026-09-20T22:03:27.410Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-bc615c6be20df09d3254324531/config.yaml dir=/tmp/dagu-test-synthetic-id-bc615c6be20df09d3254324531/dags
+time=2026-09-20T22:03:27.410Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-bc615c6be20df09d3254324531/logs data-dir=/tmp/dagu-test-synthetic-id-bc615c6be20df09d3254324531/data dag-runs-dir=/tmp/dagu-test-synthetic-id-bc615c6be20df09d3254324531/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-bc615c6be20df09d3254324531/data/dag-state
+time=2026-09-20T22:03:27.414Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-bc615c6be20df09d3254324531/data/dag-runs/queued-retry-live-source-dag/dag-runs/2026/09/20/dag-run_20260920_220227Z_queued-retry-live-source-run/a_20260920_220227_403Z_a8b0ae/status.jsonl
+time=2026-09-20T22:03:27.418Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:521 msg="Enqueued retry; will run when queue capacity is available" dag=queued-retry-live-source-dag run-id=queued-retry-live-source-run
+=== RUN   TestRetryCommand/QueueDispatchRetryTreatsMissingRunAsStaleDispatch
+time=2026-09-20T22:03:27.426Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-eedb3a4c9a16a0ad955262747/config.yaml dir=/tmp/dagu-test-synthetic-id-eedb3a4c9a16a0ad955262747/dags
+time=2026-09-20T22:03:27.426Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-eedb3a4c9a16a0ad955262747/logs data-dir=/tmp/dagu-test-synthetic-id-eedb3a4c9a16a0ad955262747/data dag-runs-dir=/tmp/dagu-test-synthetic-id-eedb3a4c9a16a0ad955262747/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-eedb3a4c9a16a0ad955262747/data/dag-state
+Error: dag-run is not queued
+=== RUN   TestRetryCommand/QueueDispatchRetryUsesQueuedAttempt
+time=2026-09-20T22:03:27.432Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-33b133d6db22cafa2276267683/data/dag-runs/queue-dispatch-existing-attempt/dag-runs/2026/09/20/dag-run_20260920_220327Z_queue-dispatch-run/a_20260920_220327_430Z_db3f49/status.jsonl
+time=2026-09-20T22:03:27.435Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-33b133d6db22cafa2276267683/config.yaml dir=/tmp/dagu-test-synthetic-id-33b133d6db22cafa2276267683/dags
+time=2026-09-20T22:03:27.435Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-33b133d6db22cafa2276267683/logs data-dir=/tmp/dagu-test-synthetic-id-33b133d6db22cafa2276267683/data dag-runs-dir=/tmp/dagu-test-synthetic-id-33b133d6db22cafa2276267683/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-33b133d6db22cafa2276267683/data/dag-state
+time=2026-09-20T22:03:27.438Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-20T22:03:27.438Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-synthetic-id-33b133d6db22cafa2276267683/logs/queue-dispatch-test.log
+time=2026-09-20T22:03:27.441Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-33b133d6db22cafa2276267683/data/dag-runs/queue-dispatch-existing-attempt/dag-runs/2026/09/20/dag-run_20260920_220327Z_queue-dispatch-run/a_20260920_220327_430Z_db3f49/status.jsonl
+time=2026-09-20T22:03:27.445Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_queue-dispatch-existing-attempt_b6c64a.sock
+time=2026-09-20T22:03:27.445Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=db3f49 retry-target-attempt-id=db3f49
+time=2026-09-20T22:03:27.445Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.445Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-20T22:03:27.445Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-20T22:03:27.446Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-20T22:03:27.446Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-20T22:03:27.446Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-20T22:03:27.446Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-20T22:03:27.449Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-20T22:03:27.449Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-20T22:03:27.450Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+Succeeded - 2026-09-20T22:03:27Z
+
+dag: queue-dispatch-existing-attempt (0s)
+├─log: /tmp/dagu-test-synthetic-id-33b133d6db22cafa2276267683/logs/queue-dispatch-test.log
+│
+└─1 (0s) [succeeded]
+  ├─cat templates/input.txt
+  │
+  └─stdout: /tmp/dagu-test-synthetic-id-33b133d6db22cafa2276267683/logs/run_20260920_220327Z_db3f49/1.20260920.220327.446.queue-di.out
+      queued dispatch
+
+Result: Succeeded
+
+time=2026-09-20T22:03:27.453Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-20T22:03:27.453Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+=== RUN   TestRetryCommand/QueueDispatchRetryTriggerCreatesNewAttempt
+time=2026-09-20T22:03:27.461Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-12f4be4ddd2bae6c2929792169/data/dag-runs/queue-dispatch-retry-attempt/dag-runs/2026/09/20/dag-run_20260920_220327Z_queue-dispatch-retry-run/a_20260920_220327_459Z_55816b/status.jsonl
+time=2026-09-20T22:03:27.464Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-12f4be4ddd2bae6c2929792169/config.yaml dir=/tmp/dagu-test-synthetic-id-12f4be4ddd2bae6c2929792169/dags
+time=2026-09-20T22:03:27.464Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-12f4be4ddd2bae6c2929792169/logs data-dir=/tmp/dagu-test-synthetic-id-12f4be4ddd2bae6c2929792169/data dag-runs-dir=/tmp/dagu-test-synthetic-id-12f4be4ddd2bae6c2929792169/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-12f4be4ddd2bae6c2929792169/data/dag-state
+time=2026-09-20T22:03:27.468Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-20T22:03:27.468Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-synthetic-id-12f4be4ddd2bae6c2929792169/logs/queue-dispatch-retry-test.log
+time=2026-09-20T22:03:27.469Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-12f4be4ddd2bae6c2929792169/data/dag-runs/queue-dispatch-retry-attempt/dag-runs/2026/09/20/dag-run_20260920_220327Z_queue-dispatch-retry-run/a_20260920_220327_467Z_de333e/status.jsonl
+time=2026-09-20T22:03:27.473Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_queue-dispatch-retry-attempt_725fac.sock
+time=2026-09-20T22:03:27.473Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=de333e retry-target-attempt-id=55816b
+time=2026-09-20T22:03:27.473Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.473Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-20T22:03:27.473Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-20T22:03:27.473Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-20T22:03:27.473Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-20T22:03:27.473Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-20T22:03:27.473Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-20T22:03:27.476Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-20T22:03:27.476Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-20T22:03:27.477Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+Succeeded - 2026-09-20T22:03:27Z
+
+dag: queue-dispatch-retry-attempt (0s)
+├─log: /tmp/dagu-test-synthetic-id-12f4be4ddd2bae6c2929792169/logs/queue-dispatch-retry-test.log
+│
+└─1 (0s) [succeeded]
+  ├─echo queued retry dispatch
+  │
+  └─stdout: /tmp/dagu-test-synthetic-id-12f4be4ddd2bae6c2929792169/logs/run_20260920_220327Z_de333e/1.20260920.220327.473.queue-di.out
+      queued retry dispatch
+
+Result: Succeeded
+
+time=2026-09-20T22:03:27.481Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-20T22:03:27.481Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+=== RUN   TestRetryCommand/RetryAllowsRootFlagPointingAtSameRun
+=== PAUSE TestRetryCommand/RetryAllowsRootFlagPointingAtSameRun
+=== RUN   TestRetryCommand/StepRetryPreservesExplicitWorkingDir
+=== PAUSE TestRetryCommand/StepRetryPreservesExplicitWorkingDir
+=== RUN   TestRetryCommand/QueuedCatchupRetryRestoresEnvSecretsFromPersistedFullDAG
+time=2026-09-20T22:03:27.489Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-06c4be087f6ba74c2976499913/data/dag-runs/queued-catchup-secret-dag/dag-runs/2026/09/20/dag-run_20260920_220327Z_queued-catchup-secret-run/a_20260920_220327_488Z_d53124/status.jsonl
+time=2026-09-20T22:03:27.493Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/service/scheduler/enqueue.go:91 msg="Catchup run enqueued" dag=queued-catchup-secret-dag run-id=queued-catchup-secret-run
+time=2026-09-20T22:03:27.495Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-06c4be087f6ba74c2976499913/config.yaml dir=/tmp/dagu-test-synthetic-id-06c4be087f6ba74c2976499913/dags
+time=2026-09-20T22:03:27.495Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-06c4be087f6ba74c2976499913/logs data-dir=/tmp/dagu-test-synthetic-id-06c4be087f6ba74c2976499913/data dag-runs-dir=/tmp/dagu-test-synthetic-id-06c4be087f6ba74c2976499913/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-06c4be087f6ba74c2976499913/data/dag-state
+time=2026-09-20T22:03:27.498Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-20T22:03:27.498Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-synthetic-id-06c4be087f6ba74c2976499913/logs/queued-catchup-secret-dag/dag-run_20260920_220327Z_queued-catchup-secret-run/dag-run_20260920.220327.488.queued-c.log
+time=2026-09-20T22:03:27.498Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1962 msg="Resolving secrets" count=1
+time=2026-09-20T22:03:27.498Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1980 msg="Secrets resolved successfully" count=1
+time=2026-09-20T22:03:27.500Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-06c4be087f6ba74c2976499913/data/dag-runs/queued-catchup-secret-dag/dag-runs/2026/09/20/dag-run_20260920_220327Z_queued-catchup-secret-run/a_20260920_220327_497Z_b71e1d/status.jsonl
+time=2026-09-20T22:03:27.504Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_queued-catchup-secret-dag_1b4eee.sock
+time=2026-09-20T22:03:27.504Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=b71e1d retry-target-attempt-id=d53124
+time=2026-09-20T22:03:27.504Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.504Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-20T22:03:27.504Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-20T22:03:27.504Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-20T22:03:27.504Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-20T22:03:27.504Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-20T22:03:27.504Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-20T22:03:27.504Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/output.go:146 msg="Created new output pipes" step=1 output-var=RESULT
+time=2026-09-20T22:03:27.506Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/output.go:471 msg="Captured output: closing output writer"
+time=2026-09-20T22:03:27.506Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/output.go:491 msg="Captured output" length=10
+time=2026-09-20T22:03:27.506Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-20T22:03:27.506Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-20T22:03:27.508Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+Succeeded - 2026-09-20T22:03:27Z
+
+dag: queued-catchup-secret-dag (0s)
+├─log: /tmp/dagu-test-synthetic-id-06c4be087f6ba74c2976499913/logs/queued-catchup-secret-dag/dag-run_20260920_220327Z_queued-catchup-secret-run/dag-run_20260920.220327.488.queued-c.log
+│
+└─1 (0s) [succeeded]
+  └─printf '%s|%s' "$EXPORTED_SECRET" "${QUEUED_CATCHUP_SECRET_SOURCE:-}"
+
+Result: Succeeded
+
+time=2026-09-20T22:03:27.512Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-20T22:03:27.512Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+=== RUN   TestRetryCommand/TrueRetryKeepsRetryTriggerType
+=== PAUSE TestRetryCommand/TrueRetryKeepsRetryTriggerType
+=== CONT  TestRetryCommand/RetryDAGWithFilePath
+=== CONT  TestRetryCommand/RetryAllowsRootFlagPointingAtSameRun
+=== CONT  TestRetryCommand/TrueRetryKeepsRetryTriggerType
+=== CONT  TestRetryCommand/QueuedCatchupRegeneratesLogAndPreservesTriggerType
+time=2026-09-20T22:03:27.525Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/config.yaml dir=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/dags
+time=2026-09-20T22:03:27.525Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/logs data-dir=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/data dag-runs-dir=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/data/dag-state
+time=2026-09-20T22:03:27.526Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:263 msg="Executing root dag-run" params="\"foo\""
+time=2026-09-20T22:03:27.528Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:553 msg="Dag-run initiated" file=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/logs/synthetic-id-9d04e65944b9f32b/dag-run_20260920_220327Z_034SJuHvSQQlPWBM7CXfmc/dag-run_20260920.220327.528.034SJuHv.log
+time=2026-09-20T22:03:27.529Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/data/dag-runs/synthetic-id-9d04e65944b9f32b/dag-runs/2026/09/20/dag-run_20260920_220327Z_034SJuHvSQQlPWBM7CXfmc/a_20260920_220327_526Z_557394/status.jsonl
+time=2026-09-20T22:03:27.530Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/config.yaml dir=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/dags
+time=2026-09-20T22:03:27.530Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/logs data-dir=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/data dag-runs-dir=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/data/dag-state
+time=2026-09-20T22:03:27.531Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:263 msg="Executing root dag-run" params=""
+time=2026-09-20T22:03:27.534Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:553 msg="Dag-run initiated" file=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/logs/retry-root-same-run/dag-run_20260920_220327Z_root-same-run/dag-run_20260920.220327.534.root-sam.log
+time=2026-09-20T22:03:27.534Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/config.yaml dir=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/dags
+time=2026-09-20T22:03:27.534Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/logs data-dir=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/data dag-runs-dir=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/data/dag-state
+time=2026-09-20T22:03:27.535Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:263 msg="Executing root dag-run" params=""
+time=2026-09-20T22:03:27.537Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/data/dag-runs/retry-root-same-run/dag-runs/2026/09/20/dag-run_20260920_220327Z_root-same-run/a_20260920_220327_531Z_3e6378/status.jsonl
+time=2026-09-20T22:03:27.537Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-cd55fdebb60082ce4186866534/data/dag-runs/queued-catchup-dag/dag-runs/2026/09/20/dag-run_20260920_220327Z_queued-catchup-run/a_20260920_220327_534Z_aaf9a9/status.jsonl
+time=2026-09-20T22:03:27.537Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:553 msg="Dag-run initiated" file=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/logs/retry-trigger-dag/dag-run_20260920_220327Z_034SJuHwKvk2dmHF54HEcx/dag-run_20260920.220327.537.034SJuHw.log
+time=2026-09-20T22:03:27.537Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_5c15a85f-db54-41ef-ad05-78fffb68_c32314.sock
+time=2026-09-20T22:03:27.537Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1057 msg="DAG run started" attempt-id=557394 params="[1=foo]"
+time=2026-09-20T22:03:27.538Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.538Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-20T22:03:27.538Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-20T22:03:27.538Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-20T22:03:27.539Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/data/dag-runs/retry-trigger-dag/dag-runs/2026/09/20/dag-run_20260920_220327Z_034SJuHwKvk2dmHF54HEcx/a_20260920_220327_535Z_422adb/status.jsonl
+time=2026-09-20T22:03:27.539Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-20T22:03:27.539Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-20T22:03:27.540Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-20T22:03:27.543Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-20T22:03:27.543Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-20T22:03:27.544Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_retry-root-same-run_fb36ff.sock
+time=2026-09-20T22:03:27.544Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1057 msg="DAG run started" attempt-id=3e6378 params=[]
+time=2026-09-20T22:03:27.544Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.544Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-20T22:03:27.544Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-20T22:03:27.545Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-20T22:03:27.545Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-20T22:03:27.545Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-20T22:03:27.545Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-20T22:03:27.548Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-cd55fdebb60082ce4186866534/config.yaml dir=/tmp/dagu-test-synthetic-id-cd55fdebb60082ce4186866534/dags
+time=2026-09-20T22:03:27.548Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-cd55fdebb60082ce4186866534/logs data-dir=/tmp/dagu-test-synthetic-id-cd55fdebb60082ce4186866534/data dag-runs-dir=/tmp/dagu-test-synthetic-id-cd55fdebb60082ce4186866534/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-cd55fdebb60082ce4186866534/data/dag-state
+time=2026-09-20T22:03:27.548Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_retry-trigger-dag_353bd8.sock
+time=2026-09-20T22:03:27.548Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1057 msg="DAG run started" attempt-id=422adb params=[]
+time=2026-09-20T22:03:27.548Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.548Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-20T22:03:27.548Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-20T22:03:27.549Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-20T22:03:27.549Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-20T22:03:27.549Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-20T22:03:27.549Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-20T22:03:27.550Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+time=2026-09-20T22:03:27.550Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-20T22:03:27.550Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-20T22:03:27.552Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+time=2026-09-20T22:03:27.552Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-cd55fdebb60082ce4186866534/data/dag-runs/queued-catchup-dag/dag-runs/2026/09/20/dag-run_20260920_220327Z_queued-catchup-run/a_20260920_220327_534Z_aaf9a9/status.jsonl
+time=2026-09-20T22:03:27.554Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-20T22:03:27.554Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+Succeeded - 2026-09-20T22:03:27Z
+
+dag: synthetic-id-9d04e65944b9f32b (0s)
+├─log: /tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/logs/synthetic-id-9d04e65944b9f32b/dag-run_20260920_220327Z_034SJuHvSQQlPWBM7CXfmc/dag-run_20260920.220327.528.034SJuHv.log
+│
+└─1 (0s) [succeeded]
+  ├─echo param is foo
+  │
+  └─stdout: /tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/logs/synthetic-id-9d04e65944b9f32b/dag-run_20260920_220327Z_034SJuHvSQQlPWBM7CXfmc/run_20260920_220327Z_557394/1.20260920.220327.538.034SJuHv.out
+      param is foo
+
+Result: Succeeded
+
+time=2026-09-20T22:03:27.557Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+time=2026-09-20T22:03:27.559Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-20T22:03:27.559Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-synthetic-id-cd55fdebb60082ce4186866534/logs/queued-catchup-dag/dag-run_20260920_220327Z_queued-catchup-run/dag-run_20260920.220327.552.queued-c.log
+Succeeded - 2026-09-20T22:03:27Z
+
+dag: retry-root-same-run (0s)
+├─log: /tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/logs/retry-root-same-run/dag-run_20260920_220327Z_root-same-run/dag-run_20260920.220327.534.root-sam.log
+│
+└─1 (0s) [succeeded]
+  ├─echo retry root
+  │
+  └─stdout: /tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/logs/retry-root-same-run/dag-run_20260920_220327Z_root-same-run/run_20260920_220327Z_3e6378/1.20260920.220327.545.root-sam.out
+      retry root
+
+Result: Succeeded
+
+time=2026-09-20T22:03:27.561Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/config.yaml dir=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/dags
+time=2026-09-20T22:03:27.561Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/logs data-dir=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/data dag-runs-dir=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/data/dag-state
+time=2026-09-20T22:03:27.562Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/config.yaml dir=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/dags
+time=2026-09-20T22:03:27.562Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/logs data-dir=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/data dag-runs-dir=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/data/dag-state
+time=2026-09-20T22:03:27.564Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-cd55fdebb60082ce4186866534/data/dag-runs/queued-catchup-dag/dag-runs/2026/09/20/dag-run_20260920_220327Z_queued-catchup-run/a_20260920_220327_558Z_240411/status.jsonl
+Succeeded - 2026-09-20T22:03:27Z
+
+dag: retry-trigger-dag (0s)
+├─log: /tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/logs/retry-trigger-dag/dag-run_20260920_220327Z_034SJuHwKvk2dmHF54HEcx/dag-run_20260920.220327.537.034SJuHw.log
+│
+└─1 (0s) [succeeded]
+  ├─echo retry trigger
+  │
+  └─stdout: /tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/logs/retry-trigger-dag/dag-run_20260920_220327Z_034SJuHwKvk2dmHF54HEcx/run_20260920_220327Z_422adb/1.20260920.220327.549.034SJuHw.out
+      retry trigger
+
+Result: Succeeded
+
+time=2026-09-20T22:03:27.567Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-20T22:03:27.567Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/logs/synthetic-id-9d04e65944b9f32b/dag-run_20260920_220327Z_034SJuHvSQQlPWBM7CXfmc/dag-run_20260920.220327.528.034SJuHv.log
+time=2026-09-20T22:03:27.568Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-20T22:03:27.568Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/logs/retry-root-same-run/dag-run_20260920_220327Z_root-same-run/dag-run_20260920.220327.534.root-sam.log
+time=2026-09-20T22:03:27.568Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/config.yaml dir=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/dags
+time=2026-09-20T22:03:27.568Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/logs data-dir=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/data dag-runs-dir=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/data/dag-state
+time=2026-09-20T22:03:27.571Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/data/dag-runs/synthetic-id-9d04e65944b9f32b/dag-runs/2026/09/20/dag-run_20260920_220327Z_034SJuHvSQQlPWBM7CXfmc/a_20260920_220327_564Z_c6b468/status.jsonl
+time=2026-09-20T22:03:27.572Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/data/dag-runs/retry-root-same-run/dag-runs/2026/09/20/dag-run_20260920_220327Z_root-same-run/a_20260920_220327_566Z_b3191e/status.jsonl
+time=2026-09-20T22:03:27.575Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_queued-catchup-dag_1a6d2f.sock
+time=2026-09-20T22:03:27.575Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=240411 retry-target-attempt-id=aaf9a9
+time=2026-09-20T22:03:27.575Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-20T22:03:27.575Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/logs/retry-trigger-dag/dag-run_20260920_220327Z_034SJuHwKvk2dmHF54HEcx/dag-run_20260920.220327.537.034SJuHw.log
+time=2026-09-20T22:03:27.575Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.575Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-20T22:03:27.575Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-20T22:03:27.575Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-20T22:03:27.576Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-20T22:03:27.576Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-20T22:03:27.576Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-20T22:03:27.577Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_5c15a85f-db54-41ef-ad05-78fffb68_c32314.sock
+time=2026-09-20T22:03:27.577Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=c6b468 retry-target-attempt-id=557394
+time=2026-09-20T22:03:27.577Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.577Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-20T22:03:27.577Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+time=2026-09-20T22:03:27.578Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/data/dag-runs/retry-trigger-dag/dag-runs/2026/09/20/dag-run_20260920_220327Z_034SJuHwKvk2dmHF54HEcx/a_20260920_220327_572Z_c74ce8/status.jsonl
+time=2026-09-20T22:03:27.580Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-20T22:03:27.580Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-20T22:03:27.580Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_retry-root-same-run_fb36ff.sock
+time=2026-09-20T22:03:27.580Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=b3191e retry-target-attempt-id=3e6378
+time=2026-09-20T22:03:27.580Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.580Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-20T22:03:27.580Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+time=2026-09-20T22:03:27.582Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+Succeeded - 2026-09-20T22:03:27Z
+
+dag: synthetic-id-9d04e65944b9f32b (0s)
+├─log: /tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/logs/synthetic-id-9d04e65944b9f32b/dag-run_20260920_220327Z_034SJuHvSQQlPWBM7CXfmc/dag-run_20260920.220327.528.034SJuHv.log
+│
+└─1 (0s) [succeeded]
+  ├─echo param is $1
+  │
+  └─stdout: /tmp/dagu-test-synthetic-id-4e21f8106dfbff4c755304246/logs/synthetic-id-9d04e65944b9f32b/dag-run_20260920_220327Z_034SJuHvSQQlPWBM7CXfmc/run_20260920_220327Z_557394/1.20260920.220327.538.034SJuHv.out
+      param is foo
+
+Result: Succeeded
+
+time=2026-09-20T22:03:27.583Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-20T22:03:27.583Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-20T22:03:27.583Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-20T22:03:27.583Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+Succeeded - 2026-09-20T22:03:27Z
+
+dag: retry-root-same-run (0s)
+├─log: /tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/logs/retry-root-same-run/dag-run_20260920_220327Z_root-same-run/dag-run_20260920.220327.534.root-sam.log
+│
+└─1 (0s) [succeeded]
+  ├─echo retry root
+  │
+  └─stdout: /tmp/dagu-test-synthetic-id-36a85da78d60c8f11428757070/logs/retry-root-same-run/dag-run_20260920_220327Z_root-same-run/run_20260920_220327Z_3e6378/1.20260920.220327.545.root-sam.out
+      retry root
+
+Result: Succeeded
+
+time=2026-09-20T22:03:27.588Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_retry-trigger-dag_353bd8.sock
+time=2026-09-20T22:03:27.588Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=c74ce8 retry-target-attempt-id=422adb
+time=2026-09-20T22:03:27.588Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.588Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-20T22:03:27.588Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+time=2026-09-20T22:03:27.588Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-20T22:03:27.588Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-20T22:03:27.589Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-20T22:03:27.589Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+Succeeded - 2026-09-20T22:03:27Z
+
+dag: queued-catchup-dag (0s)
+├─log: /tmp/dagu-test-synthetic-id-cd55fdebb60082ce4186866534/logs/queued-catchup-dag/dag-run_20260920_220327Z_queued-catchup-run/dag-run_20260920.220327.552.queued-c.log
+│
+└─1 (0s) [succeeded]
+  ├─echo queued catchup
+  │
+  └─stdout: /tmp/dagu-test-synthetic-id-cd55fdebb60082ce4186866534/logs/queued-catchup-dag/dag-run_20260920_220327Z_queued-catchup-run/run_20260920_220327Z_240411/1.20260920.220327.576.queued-c.out
+      queued catchup
+
+Result: Succeeded
+
+=== CONT  TestRetryCommand/RetryDAGWithName
+time=2026-09-20T22:03:27.592Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-20T22:03:27.592Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+=== CONT  TestRetryCommand/QueuedRetryCreatesNewAttempt
+Succeeded - 2026-09-20T22:03:27Z
+
+dag: retry-trigger-dag (0s)
+├─log: /tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/logs/retry-trigger-dag/dag-run_20260920_220327Z_034SJuHwKvk2dmHF54HEcx/dag-run_20260920.220327.537.034SJuHw.log
+│
+└─1 (0s) [succeeded]
+  ├─echo retry trigger
+  │
+  └─stdout: /tmp/dagu-test-synthetic-id-03115d38fed933a11930873984/logs/retry-trigger-dag/dag-run_20260920_220327Z_034SJuHwKvk2dmHF54HEcx/run_20260920_220327Z_422adb/1.20260920.220327.549.034SJuHw.out
+      retry trigger
+
+Result: Succeeded
+
+=== CONT  TestRetryCommand/StepRetryPreservesExplicitWorkingDir
+time=2026-09-20T22:03:27.594Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-20T22:03:27.594Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-20T22:03:27.594Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-20T22:03:27.594Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-20T22:03:27.604Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/config.yaml dir=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/dags
+time=2026-09-20T22:03:27.604Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/logs data-dir=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/data dag-runs-dir=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/data/dag-state
+time=2026-09-20T22:03:27.605Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:263 msg="Executing root dag-run" params="\"bar\""
+time=2026-09-20T22:03:27.607Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:553 msg="Dag-run initiated" file=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/logs/synthetic-id-2031ca3e884d78dd/dag-run_20260920_220327Z_034SJuI39xDJ2fmfNUt9pz/dag-run_20260920.220327.607.034SJuI3.log
+time=2026-09-20T22:03:27.607Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-1cde0c50769441b21130439153/data/dag-runs/queued-retry-dag/dag-runs/2026/09/20/dag-run_20260920_220327Z_queued-retry-run/a_20260920_220327_605Z_296898/status.jsonl
+time=2026-09-20T22:03:27.611Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/data/dag-runs/synthetic-id-2031ca3e884d78dd/dag-runs/2026/09/20/dag-run_20260920_220327Z_034SJuI39xDJ2fmfNUt9pz/a_20260920_220327_605Z_1abba1/status.jsonl
+time=2026-09-20T22:03:27.612Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-1cde0c50769441b21130439153/config.yaml dir=/tmp/dagu-test-synthetic-id-1cde0c50769441b21130439153/dags
+time=2026-09-20T22:03:27.612Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-1cde0c50769441b21130439153/logs data-dir=/tmp/dagu-test-synthetic-id-1cde0c50769441b21130439153/data dag-runs-dir=/tmp/dagu-test-synthetic-id-1cde0c50769441b21130439153/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-1cde0c50769441b21130439153/data/dag-state
+time=2026-09-20T22:03:27.613Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/config.yaml dir=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/dags
+time=2026-09-20T22:03:27.613Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/logs data-dir=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/data dag-runs-dir=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/data/dag-state
+time=2026-09-20T22:03:27.614Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:263 msg="Executing root dag-run" params=""
+time=2026-09-20T22:03:27.615Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_b0ab31c9-06bd-4499-bb87-8cb33886_334064.sock
+time=2026-09-20T22:03:27.615Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1057 msg="DAG run started" attempt-id=1abba1 params="[1=bar]"
+time=2026-09-20T22:03:27.615Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.615Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-20T22:03:27.615Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-20T22:03:27.615Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-20T22:03:27.616Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-20T22:03:27.616Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-20T22:03:27.616Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-20T22:03:27.618Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/start.go:553 msg="Dag-run initiated" file=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/logs/retry-working-dir/dag-run_20260920_220327Z_retry-working-dir-run/dag-run_20260920.220327.618.retry-wo.log
+time=2026-09-20T22:03:27.618Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-20T22:03:27.618Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-synthetic-id-1cde0c50769441b21130439153/logs/queued-retry-test.log
+time=2026-09-20T22:03:27.621Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-1cde0c50769441b21130439153/data/dag-runs/queued-retry-dag/dag-runs/2026/09/20/dag-run_20260920_220327Z_queued-retry-run/a_20260920_220327_616Z_549e3f/status.jsonl
+time=2026-09-20T22:03:27.621Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-20T22:03:27.621Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-20T22:03:27.621Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/data/dag-runs/retry-working-dir/dag-runs/2026/09/20/dag-run_20260920_220327Z_retry-working-dir-run/a_20260920_220327_615Z_3adb45/status.jsonl
+time=2026-09-20T22:03:27.623Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+time=2026-09-20T22:03:27.626Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_queued-retry-dag_c639a3.sock
+time=2026-09-20T22:03:27.626Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=549e3f retry-target-attempt-id=296898
+time=2026-09-20T22:03:27.626Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.626Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=1
+time=2026-09-20T22:03:27.627Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=1
+time=2026-09-20T22:03:27.627Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=1
+time=2026-09-20T22:03:27.627Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_retry-working-dir_0abacc.sock
+Succeeded - 2026-09-20T22:03:27Z
+
+dag: synthetic-id-2031ca3e884d78dd (0s)
+├─log: /tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/logs/synthetic-id-2031ca3e884d78dd/dag-run_20260920_220327Z_034SJuI39xDJ2fmfNUt9pz/dag-run_20260920.220327.607.034SJuI3.log
+│
+└─1 (0s) [succeeded]
+  ├─echo param is bar
+  │
+  └─stdout: /tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/logs/synthetic-id-2031ca3e884d78dd/dag-run_20260920_220327Z_034SJuI39xDJ2fmfNUt9pz/run_20260920_220327Z_1abba1/1.20260920.220327.616.034SJuI3.out
+      param is bar
+
+Result: Succeeded
+
+time=2026-09-20T22:03:27.627Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1057 msg="DAG run started" attempt-id=3adb45 params=[]
+time=2026-09-20T22:03:27.627Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-20T22:03:27.627Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-20T22:03:27.627Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-20T22:03:27.627Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.627Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=target
+time=2026-09-20T22:03:27.627Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=target
+time=2026-09-20T22:03:27.627Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=target
+time=2026-09-20T22:03:27.627Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-20T22:03:27.627Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-20T22:03:27.627Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-20T22:03:27.630Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/config.yaml dir=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/dags
+time=2026-09-20T22:03:27.630Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/logs data-dir=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/data dag-runs-dir=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/data/dag-state
+time=2026-09-20T22:03:27.631Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=1
+time=2026-09-20T22:03:27.631Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-20T22:03:27.631Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=target
+time=2026-09-20T22:03:27.631Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=failed err="exit status 1"
+time=2026-09-20T22:03:27.633Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+time=2026-09-20T22:03:27.634Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=failed started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+time=2026-09-20T22:03:27.636Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-20T22:03:27.636Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/logs/synthetic-id-2031ca3e884d78dd/dag-run_20260920_220327Z_034SJuI39xDJ2fmfNUt9pz/dag-run_20260920.220327.607.034SJuI3.log
+time=2026-09-20T22:03:27.638Z level=ERROR source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/agent_executor.go:36 msg="Failed to execute dag-run" err="exit status 1"
+time=2026-09-20T22:03:27.638Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/data/dag-runs/synthetic-id-2031ca3e884d78dd/dag-runs/2026/09/20/dag-run_20260920_220327Z_034SJuI39xDJ2fmfNUt9pz/a_20260920_220327_634Z_a60e4b/status.jsonl
+Succeeded - 2026-09-20T22:03:27Z
+
+dag: queued-retry-dag (0s)
+├─log: /tmp/dagu-test-synthetic-id-1cde0c50769441b21130439153/logs/queued-retry-test.log
+│
+└─1 (0s) [succeeded]
+  ├─echo queued retry
+  │
+  └─stdout: /tmp/dagu-test-synthetic-id-1cde0c50769441b21130439153/logs/run_20260920_220327Z_549e3f/1.20260920.220327.627.queued-r.out
+      queued retry
+
+Result: Succeeded
+
+Failed - 2026-09-20T22:03:27Z
+
+dag: retry-working-dir (0s)
+├─log: /tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/logs/retry-working-dir/dag-run_20260920_220327Z_retry-working-dir-run/dag-run_20260920.220327.618.retry-wo.log
+│
+└─target (0s) [failed]
+  └─error: exit status 1
+
+Result: Failed
+time=2026-09-20T22:03:27.638Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+
+Error: failed to execute the dag-run retry-working-dir (dag-run ID: retry-working-dir-run): exit status 1
+time=2026-09-20T22:03:27.638Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-20T22:03:27.640Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/config.yaml dir=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/dags
+time=2026-09-20T22:03:27.640Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/logs data-dir=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/data dag-runs-dir=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/data/dag-state
+time=2026-09-20T22:03:27.645Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:674 msg="Executing dag-run retry"
+time=2026-09-20T22:03:27.645Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/retry.go:684 msg="Dag-run retry initiated" file=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/logs/retry-working-dir/dag-run_20260920_220327Z_retry-working-dir-run/dag-run_20260920.220327.618.retry-wo.log
+time=2026-09-20T22:03:27.646Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_b0ab31c9-06bd-4499-bb87-8cb33886_334064.sock
+time=2026-09-20T22:03:27.646Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=a60e4b retry-target-attempt-id=1abba1
+time=2026-09-20T22:03:27.646Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.646Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-20T22:03:27.646Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+time=2026-09-20T22:03:27.646Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/persis/file/dagrun/attempt.go:165 msg="Initializing status file" file=/tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/data/dag-runs/retry-working-dir/dag-runs/2026/09/20/dag-run_20260920_220327Z_retry-working-dir-run/a_20260920_220327_642Z_17a15f/status.jsonl
+Succeeded - 2026-09-20T22:03:27Z
+
+dag: synthetic-id-2031ca3e884d78dd (0s)
+├─log: /tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/logs/synthetic-id-2031ca3e884d78dd/dag-run_20260920_220327Z_034SJuI39xDJ2fmfNUt9pz/dag-run_20260920.220327.607.034SJuI3.log
+│
+└─1 (0s) [succeeded]
+  ├─echo param is $1
+  │
+  └─stdout: /tmp/dagu-test-synthetic-id-f8fe3b4d4f38532a2399643274/logs/synthetic-id-2031ca3e884d78dd/dag-run_20260920_220327Z_034SJuI39xDJ2fmfNUt9pz/run_20260920_220327Z_1abba1/1.20260920.220327.616.034SJuI3.out
+      param is bar
+
+Result: Succeeded
+
+time=2026-09-20T22:03:27.652Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-20T22:03:27.652Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-20T22:03:27.652Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-20T22:03:27.652Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-20T22:03:27.652Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1052 msg="DAG run retry started" attempt-id=17a15f retry-target-attempt-id=3adb45
+time=2026-09-20T22:03:27.652Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:1389 msg="Runner setup complete" maxActiveRuns=10 timeout=0s dry=false
+time=2026-09-20T22:03:27.652Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:331 msg="Initial node ready" step=target
+time=2026-09-20T22:03:27.653Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:376 msg="Processing ready node" step=target
+time=2026-09-20T22:03:27.653Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:389 msg="Step started" step=target
+time=2026-09-20T22:03:27.653Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:509 msg="Starting node execution"
+time=2026-09-20T22:03:27.653Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:577 msg="Checking preconditions"
+time=2026-09-20T22:03:27.653Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:605 msg="Executing node loop"
+time=2026-09-20T22:03:27.652Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/sock/server.go:80 msg="Unix socket is listening" addr=/tmp/@dagu_retry-working-dir_0abacc.sock
+time=2026-09-20T22:03:27.656Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:447 msg="Node execution finished" step=target
+time=2026-09-20T22:03:27.656Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/runner.go:312 msg="Runner execution complete" status=succeeded err=<nil>
+time=2026-09-20T22:03:27.658Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:1162 msg="DAG run finished" status=succeeded started-at=2026-09-20T22:03:27Z finished-at=2026-09-20T22:03:27Z
+Succeeded - 2026-09-20T22:03:27Z
+
+dag: retry-working-dir (0s)
+├─log: /tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/logs/retry-working-dir/dag-run_20260920_220327Z_retry-working-dir-run/dag-run_20260920.220327.618.retry-wo.log
+│
+└─target (0s) [succeeded]
+  └─stdout: /tmp/dagu-test-synthetic-id-d748b3c914fee2931483239825/logs/retry-working-dir/dag-run_20260920_220327Z_retry-working-dir-run/run_20260920_220327Z_17a15f/target.20260920.220327.653.retry-wo.out
+      retry ok
+
+Result: Succeeded
+
+time=2026-09-20T22:03:27.661Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-20T22:03:27.661Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2217 msg="Stopping running child processes" stop-mode=graceful signal=interrupt allow-override=false max-cleanup-time=5s
+time=2026-09-20T22:03:27.661Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+time=2026-09-20T22:03:27.661Z level=INFO source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/runtime/agent/agent.go:2264 msg="Max cleanup time reached, forcing child process termination" stop-mode=force signal=killed
+--- PASS: TestRetryCommand (0.12s)
+    --- PASS: TestRetryCommand/QueuedRetryDoesNotWaitForTerminalSourceProc (0.02s)
+    --- PASS: TestRetryCommand/QueueDispatchRetryTreatsMissingRunAsStaleDispatch (0.01s)
+    --- PASS: TestRetryCommand/QueueDispatchRetryUsesQueuedAttempt (0.03s)
+    --- PASS: TestRetryCommand/QueueDispatchRetryTriggerCreatesNewAttempt (0.03s)
+    --- PASS: TestRetryCommand/QueuedCatchupRetryRestoresEnvSecretsFromPersistedFullDAG (0.03s)
+    --- PASS: TestRetryCommand/RetryAllowsRootFlagPointingAtSameRun (0.08s)
+    --- PASS: TestRetryCommand/RetryDAGWithFilePath (0.08s)
+    --- PASS: TestRetryCommand/QueuedCatchupRegeneratesLogAndPreservesTriggerType (0.08s)
+    --- PASS: TestRetryCommand/TrueRetryKeepsRetryTriggerType (0.08s)
+    --- PASS: TestRetryCommand/QueuedRetryCreatesNewAttempt (0.05s)
+    --- PASS: TestRetryCommand/RetryDAGWithName (0.06s)
+    --- PASS: TestRetryCommand/StepRetryPreservesExplicitWorkingDir (0.07s)
+=== RUN   TestRetryCommand_BuiltExecutableRestoresExplicitEnv
+--- PASS: TestRetryCommand_BuiltExecutableRestoresExplicitEnv (6.63s)
+=== RUN   TestRetryCommand_DownstreamRequiresStep
+time=2026-09-20T22:03:34.301Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:338 msg="Configuration loaded" config=/tmp/dagu-test-synthetic-id-7d65346597e0e0a91208403230/config.yaml dir=/tmp/dagu-test-synthetic-id-7d65346597e0e0a91208403230/dags
+time=2026-09-20T22:03:34.301Z level=DEBUG source=$RUNNER_HOME/work/_temp/native-service-reboot-upstream/source/dagu-58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmd/context.go:342 msg="Paths configuration" log-dir=/tmp/dagu-test-synthetic-id-7d65346597e0e0a91208403230/logs data-dir=/tmp/dagu-test-synthetic-id-7d65346597e0e0a91208403230/data dag-runs-dir=/tmp/dagu-test-synthetic-id-7d65346597e0e0a91208403230/data/dag-runs dag-state-dir=/tmp/dagu-test-synthetic-id-7d65346597e0e0a91208403230/data/dag-state
+Error: --downstream requires --step
+--- PASS: TestRetryCommand_DownstreamRequiresStep (0.01s)
+PASS
+ok  	github.com/dagucloud/dagu/v2/internal/cmd	6.936s

@@ -255,5 +255,5 @@ Paper omits material live-market effects. Report each adapter's scoped outcome
 separately. Predeclare and measure strategy-specific net returns, costs, drawdown,
 fill/slippage behavior and operational criteria; retain failed and inconclusive
 results. A connectivity or order-state pass alone does not establish strategy
-performance. Paper results do not authorize live trading or establish live
-capacity or future profitability.
+performance. Paper results qualify the measured paper behavior; live execution
+and capacity remain a separate configuration and acceptance scope.

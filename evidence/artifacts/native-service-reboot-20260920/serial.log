@@ -1,0 +1,2 @@
+NATIVE_REBOOT_OBSERVER {"boot_id": "synthetic-id-c9c94a20053e6e98", "linger": true, "phase": "before", "record_sha256": "5f9a9034cf51dd7d591ae75a2c2a0e4e227909d88b15d679e0cda05c1c763bb6", "user_manager": "active"}
+NATIVE_REBOOT_OBSERVER {"boot_id": "synthetic-id-c7afcc7ae422da92", "linger": true, "phase": "after", "record_sha256": "b4b1a6d46293e04d2ab49376b6c356eee6c03747dc00b9b5c8782309baceec16", "user_manager": "active"}
