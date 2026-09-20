@@ -19,11 +19,14 @@ Do not turn a bounded fix or setup into repeated intake, planning approvals,
 catalog audits or restarts. An optional component is activated when the task needs
 it. Repair a failed connection individually while continuing independent work.
 
-RTK global awareness belongs in each actual native client home. Use the
+For profiles that select RTK global awareness, use the
 [upstream installation recipe](../recipes/README.md#native-context-mode-and-hooks)
 once per profile, then prove use through returned native task results. Stable
 Codex uses explicit RTK commands; native Claude supports Bash rewriting. An
-installed executable without its instruction reference is incomplete awareness.
+explicit-command profile can instead carry the relevant RTK instruction in its
+task envelope. An installed executable alone does not prove either behavior.
+Preserve canonical generated instructions and the host's hook policy; historical
+hook acceptance is not authorization to enable capture on every runtime.
 
 1. Retrieve what the current decision needs: exact code with rg/Serena,
    structural patterns with ast-grep, conceptual code with SocratiCode, selected

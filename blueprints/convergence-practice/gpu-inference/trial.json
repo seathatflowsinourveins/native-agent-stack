@@ -1,0 +1,39 @@
+{
+  "status": "generated-awaiting-review",
+  "scope": "one-local-partial-offload-patch",
+  "plan_sha256": "0067f2056a1638a6414b21c40b0d39b4828b096f12c49399ea0a423056350fda",
+  "model_sha256": "c600de0300ae8a0eb3a6c0b8b5561b8b96f16bd2c863c2a66c42de29d391a747",
+  "quality": "awaiting-independent-source-review",
+  "savings_claim": false,
+  "memory_before": {
+    "total_mib": 24564,
+    "used_mib": 6170,
+    "free_mib": 18394
+  },
+  "cold_start_seconds": 4.111,
+  "first_content_seconds": 6.818,
+  "finish_reason": "stop",
+  "native_usage": {
+    "completion_tokens": 394,
+    "prompt_tokens": 791,
+    "total_tokens": 1185,
+    "prompt_tokens_details": {
+      "cached_tokens": 0
+    }
+  },
+  "generation_seconds": 179.191,
+  "candidate_sha256": "53a2c5b34dd5265561741bab8fb27330951c39897ade398425aeb20f45d3f413",
+  "server_exit": 0,
+  "elapsed_seconds": 183.819,
+  "memory_samples": 622,
+  "minimum_free_mib_observed": 8223,
+  "maximum_device_used_mib_observed": 16341,
+  "memory_guard_events": [],
+  "cleanup_errors": [],
+  "memory_after": {
+    "total_mib": 24564,
+    "used_mib": 6073,
+    "free_mib": 18491
+  },
+  "observed_layer_placement": []
+}

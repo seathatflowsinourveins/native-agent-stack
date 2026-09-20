@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "observed_date": "2026-09-20",
+  "host_role": "velanext-gpu-worker",
+  "runtime_release_channel": "prerelease",
+  "archive_downloads": [
+    {
+      "asset": "llama-b11057-bin-ubuntu-cuda-13.3-x64.tar.gz",
+      "exit": 0,
+      "seconds": 1.256,
+      "bytes": 149142938,
+      "sha256": "7f8d89f2dcdf110265ef1cde8e67065d089d9bea727832d526cd2e00027f3141",
+      "hash_matches": true
+    },
+    {
+      "asset": "cudart-llama-b11057-bin-ubuntu-cuda-13.3-x64.tar.gz",
+      "exit": 0,
+      "seconds": 2.815,
+      "bytes": 410248824,
+      "sha256": "7a6ea3a0971055b41195ae92e6098842b5369995d360069fc06e392f64ea18f2",
+      "hash_matches": true
+    }
+  ],
+  "archive_inspection_and_attestation": [
+    {
+      "asset": "cudart-llama-b11057-bin-ubuntu-cuda-13.3-x64.tar.gz",
+      "attestation_exit": 0,
+      "verification": [
+        {
+          "certificate": {
+            "certificateIssuer": "CN=sigstore-intermediate,O=sigstore.dev",
+            "subjectAlternativeName": "https://github.com/ggml-org/llama.cpp/.github/workflows/release.yml@refs/heads/master",
+            "issuer": "https://token.actions.githubusercontent.com",
+            "githubWorkflowTrigger": "push",
+            "githubWorkflowSHA": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+            "githubWorkflowName": "Release",
+            "githubWorkflowRepository": "ggml-org/llama.cpp",
+            "githubWorkflowRef": "refs/heads/master",
+            "buildSignerURI": "https://github.com/ggml-org/llama.cpp/.github/workflows/release.yml@refs/heads/master",
+            "buildSignerDigest": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+            "runnerEnvironment": "github-hosted",
+            "sourceRepositoryURI": "https://github.com/ggml-org/llama.cpp",
+            "sourceRepositoryDigest": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+            "sourceRepositoryRef": "refs/heads/master",
+            "sourceRepositoryIdentifier": "612354784",
+            "sourceRepositoryOwnerURI": "https://github.com/ggml-org",
+            "sourceRepositoryOwnerIdentifier": "134263123",
+            "buildConfigURI": "https://github.com/ggml-org/llama.cpp/.github/workflows/release.yml@refs/heads/master",
+            "buildConfigDigest": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+            "buildTrigger": "push",
+            "runInvocationURI": "https://github.com/ggml-org/llama.cpp/actions/runs/35476551131/attempts/1",
+            "sourceRepositoryVisibilityAtSigning": "public"
+          },
+          "verifiedTimestamps": [
+            {
+              "type": "Tlog",
+              "uri": "https://rekor.sigstore.dev",
+              "timestamp": "2026-09-19T19:58:50-04:00"
+            }
+          ]
+        }
+      ],
+      "archive_members": 4,
+      "unpacked_bytes": 572734360,
+      "roots": [
+        "cudart-llama-b11057-bin-ubuntu-cuda-13.3-x64"
+      ],
+      "licenses": [],
+      "unsafe": []
+    },
+    {
+      "asset": "llama-b11057-bin-ubuntu-cuda-13.3-x64.tar.gz",
+      "attestation_exit": 0,
+      "verification": [
+        {
+          "certificate": {
+            "certificateIssuer": "CN=sigstore-intermediate,O=sigstore.dev",
+            "subjectAlternativeName": "https://github.com/ggml-org/llama.cpp/.github/workflows/release.yml@refs/heads/master",
+            "issuer": "https://token.actions.githubusercontent.com",
+            "githubWorkflowTrigger": "push",
+            "githubWorkflowSHA": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+            "githubWorkflowName": "Release",
+            "githubWorkflowRepository": "ggml-org/llama.cpp",
+            "githubWorkflowRef": "refs/heads/master",
+            "buildSignerURI": "https://github.com/ggml-org/llama.cpp/.github/workflows/release.yml@refs/heads/master",
+            "buildSignerDigest": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+            "runnerEnvironment": "github-hosted",
+            "sourceRepositoryURI": "https://github.com/ggml-org/llama.cpp",
+            "sourceRepositoryDigest": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+            "sourceRepositoryRef": "refs/heads/master",
+            "sourceRepositoryIdentifier": "612354784",
+            "sourceRepositoryOwnerURI": "https://github.com/ggml-org",
+            "sourceRepositoryOwnerIdentifier": "134263123",
+            "buildConfigURI": "https://github.com/ggml-org/llama.cpp/.github/workflows/release.yml@refs/heads/master",
+            "buildConfigDigest": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+            "buildTrigger": "push",
+            "runInvocationURI": "https://github.com/ggml-org/llama.cpp/actions/runs/35476551131/attempts/1",
+            "sourceRepositoryVisibilityAtSigning": "public"
+          },
+          "verifiedTimestamps": [
+            {
+              "type": "Tlog",
+              "uri": "https://rekor.sigstore.dev",
+              "timestamp": "2026-09-19T19:58:50-04:00"
+            }
+          ]
+        }
+      ],
+      "archive_members": 62,
+      "unpacked_bytes": 201601046,
+      "roots": [
+        "llama-b11057"
+      ],
+      "licenses": [
+        {
+          "path": "llama-b11057/LICENSE",
+          "sha256": "94f29bbed6a22c35b992c5c6ebf0e7c92f13b836b90f36f461c9cf2f0f1d010d",
+          "prefix": "MIT License\n\nCopyright (c) 2023-2026 The ggml authors\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation fi"
+        }
+      ],
+      "unsafe": []
+    }
+  ],
+  "licenses": [
+    {
+      "name": "NVIDIA-CUDA-13.3-EULA.html",
+      "url": "https://docs.nvidia.com/cuda/archive/13.3.0/eula/index.html",
+      "sha256": "91aea454a943a3394d04eba13aef09dc1546bd9d2cd9cb04ae9ea808ddfff9a3"
+    },
+    {
+      "name": "Qwen-LICENSE",
+      "url": "https://huggingface.co/Qwen/Qwen3.8-27B/raw/1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0/LICENSE",
+      "sha256": "bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a"
+    },
+    {
+      "name": "Qwen-GGUF-README.md",
+      "url": "https://huggingface.co/ggml-org/Qwen3.8-27B-GGUF/raw/efbb3b1f70a21d97fd4495240648405f7228554f/README.md",
+      "sha256": "8e73fa58675415e431f4f1016df397750907829827fc23c0245808642cecedb9"
+    },
+    {
+      "name": "Qwen-GGUF-src_sha",
+      "url": "https://huggingface.co/ggml-org/Qwen3.8-27B-GGUF/raw/efbb3b1f70a21d97fd4495240648405f7228554f/.src_sha",
+      "sha256": "105f44a44cf6a3b339a14799ed485c618b46d1b78de3e1f80d405bbf1da38bf1"
+    }
+  ],
+  "native_version": "0.00.000.519 I srv  llama_server: initializing ...\nversion: 0.4.1-dev (build 11057, commit 59657a613)\nbuilt with GNU 13.3.0 for Linux x86_64",
+  "no_driver_or_global_linker_changes": true,
+  "license_scope": "Local installation/use only; model and CUDA binary artifacts remain private and are not redistributed in this repository.",
+  "model_download": {
+    "exit": 0,
+    "seconds": 488.856,
+    "bytes": 18973870528,
+    "error": ""
+  },
+  "model_verification": {
+    "model_sha256": "c600de0300ae8a0eb3a6c0b8b5561b8b96f16bd2c863c2a66c42de29d391a747",
+    "matches": true,
+    "bytes": 18973870528,
+    "hash_seconds": 17.083,
+    "plan_sha256": "0067f2056a1638a6414b21c40b0d39b4828b096f12c49399ea0a423056350fda",
+    "prompt_sha256": "ddf87696c150dd92792911d4664341ab6b29996be07dbc2b5fb897a82d8d61f7",
+    "runner_sha256": "a64ab593587135d9587365fb5f9a93c84e1ffc62bcbaef32db30f84bc4a70d34"
+  }
+}

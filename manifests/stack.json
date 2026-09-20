@@ -175,7 +175,8 @@
         "token-practice-native-pairs-20260920",
         "token-practice-coverage-20260920",
         "native-research-efficiency-20260920",
-        "native-claude-child-patch-20260920"
+        "native-claude-child-patch-20260920",
+        "native-claude-session-recovery-20260920"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -258,7 +259,8 @@
         "token-practice-native-pairs-20260920",
         "token-practice-coverage-20260920",
         "token-practice-gap-followup-20260920",
-        "native-research-efficiency-20260920"
+        "native-research-efficiency-20260920",
+        "native-codex-session-recovery-20260920"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -1089,7 +1091,8 @@
         "native-paired-adoption-20260919",
         "native-convergence-review-20260919",
         "native-grand-dashboard-20260919",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "native-dagu-job-recovery-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1267,7 +1270,8 @@
       "profile": "supporting",
       "role": "Offline GitHub workflow security analysis with failing fixtures",
       "commands": [
-        "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\""
+        "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\"",
+        "python3 -m unittest -v tests.test_workflow_security"
       ],
       "evidence_ids": [
         "native-ci-security-20260920",
@@ -1342,6 +1346,26 @@
         "upstream-native-tools-20260920"
       ],
       "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim."
+    },
+    {
+      "id": "llama-cpp",
+      "repository": "https://github.com/ggml-org/llama.cpp",
+      "version": "b11057 (0.4.1-dev)",
+      "license": "MIT; bundled CUDA13.3 libraries retain NVIDIA license",
+      "role": "Trial local text inference with one qualified partial-offload planner repair on WSL RTX4090",
+      "source_pin": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+      "commands": [
+        "python3 blueprints/convergence-practice/gpu-inference/qualify.py --help"
+      ],
+      "evidence_ids": [
+        "native-gpu-patch-20260920"
+      ],
+      "profile": "optional",
+      "upstream_sources": [
+        "https://github.com/ggml-org/llama.cpp/releases/tag/b11057",
+        "https://github.com/ggml-org/llama.cpp/blob/59657a613ab0fa4ab327d6c790123dff30bfbd67/tools/server/README.md"
+      ],
+      "freshness": "Pinned September20 trial after archive digest/attestation/license checks and one actual task. Prerelease chosen for official Linux CUDA artifacts; no native-agent default replacement."
     }
   ],
   "profiles": [
@@ -1410,7 +1434,8 @@
         "playwright-cli",
         "promptfoo",
         "shanraisshan/claude-code-best-practice",
-        "worktrunk"
+        "worktrunk",
+        "llama-cpp"
       ]
     },
     {
@@ -1449,6 +1474,19 @@
       "dimensions": 2048,
       "evidence_ids": [
         "native-rag"
+      ]
+    },
+    {
+      "id": "ggml-org/Qwen3.8-27B-GGUF",
+      "revision": "efbb3b1f70a21d97fd4495240648405f7228554f",
+      "license": "Apache-2.0",
+      "runtime": "llama-cpp",
+      "quantization": "Q4_K_M",
+      "base_model": "Qwen/Qwen3.8-27B",
+      "base_revision": "1d4bf0f2ff6012fd82039f2fa52739d0dd7c60c0",
+      "file_sha256": "c600de0300ae8a0eb3a6c0b8b5561b8b96f16bd2c863c2a66c42de29d391a747",
+      "evidence_ids": [
+        "native-gpu-patch-20260920"
       ]
     }
   ],

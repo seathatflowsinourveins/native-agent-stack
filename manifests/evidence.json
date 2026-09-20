@@ -1167,6 +1167,64 @@
         "Earlier Mac and disposable GitHub CI acceptance receipts retain their original host scope.",
         "No provider task was run and zizmor supplies no verified lifetime token-savings counter."
       ]
+    },
+    {
+      "id": "native-dagu-job-recovery-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "dagu"
+      ],
+      "claim": "Native Dagu2.16.6 cancelled and retried only an unfinished final step on Mac and WSL, retaining one unchanged checkpoint and passing the12test oracle before and after.",
+      "limitations": [
+        "Deterministic synthetic job recovery only; no model/provider interruption, host reboot or independent-host restore qualification.",
+        "Initial native schema failure and earlier Mac success are retained; no savings comparison."
+      ],
+      "path": "evidence/receipts/native-dagu-job-recovery-20260920.json"
+    },
+    {
+      "id": "native-codex-session-recovery-20260920",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Native Codex on Mac interrupted an owned pending dynamic tool, reconnected through a new app-server and resumed the same native thread/session to finalize an unchanged single checkpoint.",
+      "limitations": [
+        "One synthetic two-turn fixture on the installed Mac bundled alpha; no general distributed exactly-once guarantee.",
+        "No arbitrary shell/MCP descendant, provider cancellation, power loss or independent-host restore test.",
+        "Native cumulative token categories counted once; retries, billing and enclosing coordinator usage unknown; no savings claim."
+      ],
+      "path": "evidence/receipts/native-codex-session-recovery-20260920.json"
+    },
+    {
+      "id": "native-gpu-patch-20260920",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "llama-cpp"
+      ],
+      "claim": "One pinned Qwen3.8-27B Q4_K_M local CUDA partial-offload repair passed independent source review and all12 original planner tests on WSL RTX4090.",
+      "limitations": [
+        "One visible fixture, one trial, configured32GPUlayers; exact layer placement count unavailable at native log verbosity.",
+        "Generation took179.191seconds near the180second cap. This is not an interactive default or frontier-model comparison.",
+        "Minimum whole-device sampled freeVRAM8223MiB includes other allocations; not an isolated process-peak benchmark.",
+        "Native model and archives were downloaded and hash-verified; archive attestations verified. CUDA licensing reviewed for local use, not redistribution.",
+        "No host recovery, concurrent serving, provider billing or whole-task savings qualification."
+      ],
+      "path": "evidence/receipts/native-gpu-patch-20260920.json"
+    },
+    {
+      "id": "native-claude-session-recovery-20260920",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "One native Claude Opus5 session on WSL was interrupted during an owned pending Bash wait and resumed under the same native session ID to finalize one unchanged checkpoint.",
+      "limitations": [
+        "One synthetic task with explicit Opus5/Ultracode; no general model, child-agent or cross-host guarantee.",
+        "Native SIGINT and owned-process retirement do not prove remote provider cancellation or billing cessation.",
+        "The two terminal usage views reconcile to30441tokens; resumed cumulative modelUsage is not an additional total. Native retries, billing and enclosing coordinator/reviewer usage remain unknown.",
+        "The executed runner is frozen separately from later private-log boundary and cleanup hardening; no new model attempt was run for those fixes."
+      ],
+      "path": "evidence/receipts/native-claude-session-recovery-20260920.json"
     }
   ],
   "files": [
@@ -1222,8 +1280,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "83527c9925c504a7988f681099610a369fc67424d157e10881171483f25c6702",
-      "bytes": 11571
+      "sha256": "d68d97a88c8081411156f2b0d2d806c2aaf0f35a189f3af96b3b993b7a2ed8e6",
+      "bytes": 12023
     },
     {
       "path": "adoption/paired/README.md",
@@ -1297,8 +1355,8 @@
     },
     {
       "path": "blueprints/convergence-practice/README.md",
-      "sha256": "ea29ca04da80e3503fe814f1220b02dc438b7d16fa7ff415ececd65b45b51042",
-      "bytes": 10073
+      "sha256": "5e259cc7d810606100601771d010b562f8e7e2242762773d7814133802d3d273",
+      "bytes": 10645
     },
     {
       "path": "blueprints/convergence-practice/arb-trace2code/README.md",
@@ -2632,8 +2690,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "e8ea080c06968626db396c661c3de23ae6029ca5a2e94439e6a5b1e339127b1b",
-      "bytes": 383265
+      "sha256": "40ab8492d2fdc1fcf2ee21241a2baa9efa2c2591410347f1289edca365a09344",
+      "bytes": 383461
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -2667,8 +2725,8 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "eab8b317848ddd9d9e08cf7840d3f7a37fa52c765f69d77ce59d9a59a4bf44ed",
-      "bytes": 2763
+      "sha256": "48f10f5682e83e38fdc9f74c16599ab283441b246775521d1361f6e7cb224bef",
+      "bytes": 3112
     },
     {
       "path": "catalogs/us-equities/model-followup.json",
@@ -2777,8 +2835,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "0fb1db299adfb581ae02141374517998e8a0266dfd4c570a7e14b2cb08082fb8",
-      "bytes": 1588108
+      "sha256": "eb3ba98ce257b44ba4adaeabfb97bc8cb826361938bee124b6cd965602726bf0",
+      "bytes": 1594804
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -2787,8 +2845,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "4cda6ca88f1c3aed3f894985a7308179e85833c8cca4309231f259ff405719b5",
-      "bytes": 15638
+      "sha256": "1bc5f65557d6c95c3ea5b29a164c1139b96bf603704425bf65325862a1bfcdc6",
+      "bytes": 16475
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -2827,8 +2885,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "714262f010864373d47e8708bd312efe55e1b9e196842beb30fdd573d9a813fb",
-      "bytes": 16706
+      "sha256": "ccb022e659daf6560f78517d56c3a274782504a00e63dc3cddcec384265cfcdc",
+      "bytes": 16919
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -3087,8 +3145,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "13f16e0d9a390b2053d338431e7fe89b19c9fd027e40c9f161af5e75eff565e7",
-      "bytes": 56920
+      "sha256": "6c67eedc0537228838c9744c0efc09e6b82e7f0ba712eb6e83bfa9ebb6d5f60b",
+      "bytes": 58645
     },
     {
       "path": "observability/README.md",
@@ -3732,8 +3790,8 @@
     },
     {
       "path": "docs/convergence-architecture.md",
-      "sha256": "3e40c442b43c1c117cba05c1f8ae90c90a0cddf7d5ff41aa1f28b8a10c42433c",
-      "bytes": 13123
+      "sha256": "7e4c209d461beaa5cad93050c2abb40af88714a89a2fd67c9129c4cb23baf8e7",
+      "bytes": 15150
     },
     {
       "path": "scripts/validate_convergence.py",
@@ -3794,6 +3852,331 @@
       "path": "evidence/receipts/native-linux-zizmor-20260920.json",
       "sha256": "88842d67b82948374f7e1fc2296be741c03aa38d986a2ae0421498d2751ba1a1",
       "bytes": 2465
+    },
+    {
+      "path": "blueprints/convergence-practice/gpu-inference/.gitignore",
+      "sha256": "1587a87c71d95435e7a1c4e0a6c431b3c65db6370b41179b75b58a39ae3301c2",
+      "bytes": 65
+    },
+    {
+      "path": "blueprints/convergence-practice/gpu-inference/README.md",
+      "sha256": "151ae6250dc9249c547d8df42a37f102b6e0dc6478b55ad95aa971e3d3a745f0",
+      "bytes": 7232
+    },
+    {
+      "path": "blueprints/convergence-practice/gpu-inference/accepted/planner.py",
+      "sha256": "53a2c5b34dd5265561741bab8fb27330951c39897ade398425aeb20f45d3f413",
+      "bytes": 1459
+    },
+    {
+      "path": "blueprints/convergence-practice/gpu-inference/checks.json",
+      "sha256": "af70cc9d7bf9e6ab7b2043fc2ceeeff71169afa1dcb4058e3c269fb494e25406",
+      "bytes": 543
+    },
+    {
+      "path": "blueprints/convergence-practice/gpu-inference/experiment.json",
+      "sha256": "fce8238cc6b708ea0ceda7740cac56e9e756f4943f761b9202ce915b25413d78",
+      "bytes": 6958
+    },
+    {
+      "path": "blueprints/convergence-practice/gpu-inference/independent-review.json",
+      "sha256": "f4b367b66735f22cfd576385b7841f63dcc33879d8e0c5f7cc59d2f68433cc88",
+      "bytes": 633
+    },
+    {
+      "path": "blueprints/convergence-practice/gpu-inference/plan.json",
+      "sha256": "0067f2056a1638a6414b21c40b0d39b4828b096f12c49399ea0a423056350fda",
+      "bytes": 2570
+    },
+    {
+      "path": "blueprints/convergence-practice/gpu-inference/preflight.json",
+      "sha256": "4130165de3bff86fcf09ebce1c42254dda9ff004f3a3af7bd72e3646de06d1fa",
+      "bytes": 7357
+    },
+    {
+      "path": "blueprints/convergence-practice/gpu-inference/prompt.txt",
+      "sha256": "ddf87696c150dd92792911d4664341ab6b29996be07dbc2b5fb897a82d8d61f7",
+      "bytes": 3411
+    },
+    {
+      "path": "blueprints/convergence-practice/gpu-inference/qualify.py",
+      "sha256": "a64ab593587135d9587365fb5f9a93c84e1ffc62bcbaef32db30f84bc4a70d34",
+      "bytes": 12900
+    },
+    {
+      "path": "blueprints/convergence-practice/gpu-inference/receipt.json",
+      "sha256": "48a25b9f9192783564bbc3b1fd3b75628efa0f2cddce2663e0cbdd9b577c9e6a",
+      "bytes": 2680
+    },
+    {
+      "path": "blueprints/convergence-practice/gpu-inference/test-output.txt",
+      "sha256": "5b7d9978947acc47b15c516090444a9e74ac7fe5439aa56ab46da8f8cd3855fc",
+      "bytes": 1177
+    },
+    {
+      "path": "blueprints/convergence-practice/gpu-inference/trial.json",
+      "sha256": "96a2b16b9b1e7741bd473702c073bd66b7da8bc172663e453556e5c6d9d187ed",
+      "bytes": 1153
+    },
+    {
+      "path": "blueprints/convergence-practice/job-recovery/README.md",
+      "sha256": "e9b7d89972d5851be268dd8a3a2346f470783043db3f794cf611f94d90f85b57",
+      "bytes": 4860
+    },
+    {
+      "path": "blueprints/convergence-practice/job-recovery/experiment-macos.json",
+      "sha256": "58224f456872f08ad65b18a76f020ba1c2c165cf012d13cdbe59be18f1b4dd1b",
+      "bytes": 8800
+    },
+    {
+      "path": "blueprints/convergence-practice/job-recovery/experiment-wsl.json",
+      "sha256": "5b5ae8d91064022449d40e654b653cd31095bd8e77078aadb12e9ea82dfdbcf2",
+      "bytes": 6844
+    },
+    {
+      "path": "blueprints/convergence-practice/job-recovery/fixture.py",
+      "sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+      "bytes": 3224
+    },
+    {
+      "path": "blueprints/convergence-practice/job-recovery/installation-wsl.json",
+      "sha256": "1f6fc17143898e30fb483f9afd6eab59ec2092758e10a2274f8070ce7f18bda1",
+      "bytes": 1032
+    },
+    {
+      "path": "blueprints/convergence-practice/job-recovery/macos-checkpoint-tests.txt",
+      "sha256": "5b7d9978947acc47b15c516090444a9e74ac7fe5439aa56ab46da8f8cd3855fc",
+      "bytes": 1177
+    },
+    {
+      "path": "blueprints/convergence-practice/job-recovery/macos-final-tests.txt",
+      "sha256": "5b7d9978947acc47b15c516090444a9e74ac7fe5439aa56ab46da8f8cd3855fc",
+      "bytes": 1177
+    },
+    {
+      "path": "blueprints/convergence-practice/job-recovery/plan.json",
+      "sha256": "0e6f3dffbc8c87094c660358874382987150bffb6a01b67de7e855d686f12aac",
+      "bytes": 1129
+    },
+    {
+      "path": "blueprints/convergence-practice/job-recovery/prior-attempts.json",
+      "sha256": "2a8c5f607f4c95075efa15ffef63c538ba7fb4579fe7bec8b486ee9f84e8c593",
+      "bytes": 5896
+    },
+    {
+      "path": "blueprints/convergence-practice/job-recovery/receipt-macos.json",
+      "sha256": "3b948ebef539f10d5d226c59e88f503d64cbd4d94b5d76310941932c797abef4",
+      "bytes": 3384
+    },
+    {
+      "path": "blueprints/convergence-practice/job-recovery/receipt-wsl.json",
+      "sha256": "5b57c61aa71fed3ab2424b6e3f6693c94b898967a0feb2ba925b994e31a295fd",
+      "bytes": 3413
+    },
+    {
+      "path": "blueprints/convergence-practice/job-recovery/run.py",
+      "sha256": "8ed7548112c45a88d57cabf917269ef34a99fbacaa2ce019325d92393a27d1af",
+      "bytes": 9547
+    },
+    {
+      "path": "blueprints/convergence-practice/job-recovery/wsl-checkpoint-tests.txt",
+      "sha256": "9896d8ab33fe7dabf8c6d21517a86c830aff3502817eee8110cbb3bdf45635df",
+      "bytes": 1177
+    },
+    {
+      "path": "blueprints/convergence-practice/job-recovery/wsl-final-tests.txt",
+      "sha256": "9896d8ab33fe7dabf8c6d21517a86c830aff3502817eee8110cbb3bdf45635df",
+      "bytes": 1177
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/README.md",
+      "sha256": "05e0ce2d521dad837452ee23a1527f76822b9897908c151d3430a891a9055987",
+      "bytes": 4319
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/accepted/checkpoint.json",
+      "sha256": "93f75c4a0a3dec080b19bdfc4fe30f4fd404776bdcfd6bbc86cb003133595f2b",
+      "bytes": 55
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/accepted/final.json",
+      "sha256": "324cfed55ef7e20818872b5793214c26a6293f28b14d7fab8998a48770496267",
+      "bytes": 134
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/audit.py",
+      "sha256": "12efdf7675461de1d8407b7a1d503b2ca33c6cee7d945cf0b2bfb4fa6bcb93d7",
+      "bytes": 6258
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/README.md",
+      "sha256": "741072c3c24a4c95cef57473ce60469c4fb001012cdcb5f86d256b9174c14aa6",
+      "bytes": 4311
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/TASK.md",
+      "sha256": "879bcd4b4e1e399ed96ca5fb7e6cc8a3bbdee912fe77ea87d4475981f7df3b43",
+      "bytes": 642
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/accepted/action-journal.json",
+      "sha256": "47a3d1dfc49b574f52efd1df4e98aa5e192cfdcb9b9e206620a3c0f1ff4fe8d1",
+      "bytes": 43
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/accepted/checkpoint.json",
+      "sha256": "93f75c4a0a3dec080b19bdfc4fe30f4fd404776bdcfd6bbc86cb003133595f2b",
+      "bytes": 55
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/accepted/final.json",
+      "sha256": "324cfed55ef7e20818872b5793214c26a6293f28b14d7fab8998a48770496267",
+      "bytes": 134
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/audit.py",
+      "sha256": "1ea1f0857d40e55b2388c46f1f6a8b289f8d1bd32c310a360741114603e87142",
+      "bytes": 4103
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/executed-runner.py.txt",
+      "sha256": "42137c0b58ba35907599e70ed6b2e45c7ffdf0f8829dcec248606d022d91fcfc",
+      "bytes": 13981
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/experiment.json",
+      "sha256": "395c74d58923cfcfb12b612ea8b810b06e1e6aca7702ea22f169ddf0b4ce4416",
+      "bytes": 7787
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/independent-audit.json",
+      "sha256": "8614cbe925311eb3337ca9c1b6d76af01a7af4fed99d3d4f05e9afbd2c115572",
+      "bytes": 1289
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/input.json",
+      "sha256": "9a1fd06380f086357597eaa4d7d83a9f97b665f7f32c79c1efb7285a1ec4c3f8",
+      "bytes": 116
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/plan.json",
+      "sha256": "cd462b5c8eafceaeb18ad02ef7923c0dc6a855a1736a5b35ccad186dfd4a8e7e",
+      "bytes": 1619
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/receipt.json",
+      "sha256": "f0d4bc0f1ec408c51b2297e16365fa59aa8317f6035415e2151d360d17e2b491",
+      "bytes": 7189
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/run.py",
+      "sha256": "946e6f558fc7778156aa7990e257fa41c5dac398d214a5086bb955f5ef6498ce",
+      "bytes": 15168
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/stage.py",
+      "sha256": "8b1ddd24fd6e53b34515f36afe0d45fba50fa38e2a4ec40d4e0c0b27578502f8",
+      "bytes": 3110
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/test_fixture.py",
+      "sha256": "8208a35d24a4ffc95f22ee8192aa59237fde26bac2631494892f784187845ce3",
+      "bytes": 2503
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/claude/test_supervisor.py",
+      "sha256": "c0ec606d0e4651d3d3553412e21395ca04ae34e6e8698b48af87bbdeb0212492",
+      "bytes": 2652
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/executed-runner.py.txt",
+      "sha256": "428cee7af6aeea4172aeb7e5c61d431c6c5a7692a90785d10a539b6ccfa14222",
+      "bytes": 16829
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/experiment.json",
+      "sha256": "5097663d81d1f36fd0244b27569298c7438ccdd65f5b2aabcee921b95f5d2b07",
+      "bytes": 6922
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/fixture.py",
+      "sha256": "3a9c7c55a84baf66e652d82be5e426a26a912178f4b6dee847c078100efce71d",
+      "bytes": 2598
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/independent-audit.json",
+      "sha256": "4216e74bb578b20cecefcc88bc688ffea0875e8cefbc783bbe092f8e9595a78d",
+      "bytes": 986
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/plan.json",
+      "sha256": "ec283b08ec39a1b8d30f46a05540d47435a274337e6b49c417c211b64deaa729",
+      "bytes": 1629
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/receipt.json",
+      "sha256": "b0b4a55ca5d74684285087f30599ac2e4557de84a7d4e79b7068b3fbb066b14e",
+      "bytes": 4245
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/run.py",
+      "sha256": "5ca454e42bb9ddfb29e2d24e1d5cb07da34ba32c36e38863241f6393cc3ba55e",
+      "bytes": 17286
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/seed/TASK.md",
+      "sha256": "03b794a9ac6fe53c4b32e3762d0f12aecb950185c16dd2418b4c75f46af0743a",
+      "bytes": 642
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/seed/input.json",
+      "sha256": "9a1fd06380f086357597eaa4d7d83a9f97b665f7f32c79c1efb7285a1ec4c3f8",
+      "bytes": 116
+    },
+    {
+      "path": "blueprints/convergence-practice/native-recovery/source-review.json",
+      "sha256": "b7473e6d67f6cac87d81991505586b24fafbe4ffd5900782383fb32270231317",
+      "bytes": 831
+    },
+    {
+      "path": "evidence/receipts/native-claude-session-recovery-20260920.json",
+      "sha256": "235b9f5c1c83d39da77c83a0c344d8fb0a13b7a6349d5729efa8491eeb75da1a",
+      "bytes": 1199
+    },
+    {
+      "path": "evidence/receipts/native-codex-session-recovery-20260920.json",
+      "sha256": "e0762b4680780885fcf2f47a0a955dc53a5bf2c3ce183d340475032055d827a4",
+      "bytes": 896
+    },
+    {
+      "path": "evidence/receipts/native-dagu-job-recovery-20260920.json",
+      "sha256": "b04679c42f9ca9c8f45a4e546fde77e4c477c58eb37686585cdde58dec499dbe",
+      "bytes": 888
+    },
+    {
+      "path": "evidence/receipts/native-gpu-patch-20260920.json",
+      "sha256": "32335e20e55ba3c93fecfef635ee5a3fd3d30a6b0d3625d8776d9fa2f5b9d5b5",
+      "bytes": 1176
+    },
+    {
+      "path": "tests/test_claude_recovery.py",
+      "sha256": "cb8ca511c898a86de80bca24dd96bdabe9d4545883abf299e2a8b07e45a1859e",
+      "bytes": 1379
+    },
+    {
+      "path": "tests/test_gpu_inference.py",
+      "sha256": "1e15d3750823bc9aad9a160f303d49be69fc04fd282f5673ef65bd8665127ee1",
+      "bytes": 4753
+    },
+    {
+      "path": "tests/test_job_recovery.py",
+      "sha256": "a985c9971492a945d8add60abf9fc77c5feab337c7f1fcd413643545024c4c20",
+      "bytes": 3534
+    },
+    {
+      "path": "tests/test_native_recovery.py",
+      "sha256": "99eee9a81f549b3c4e432ba686f0676cbc8a5691399413f8a437b7cff281bd4d",
+      "bytes": 3345
     }
   ]
 }

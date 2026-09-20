@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "id": "native-dagu-job-recovery-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "dagu"
+  ],
+  "claim": "Native Dagu2.16.6 cancelled and retried only an unfinished final step on Mac and WSL, retaining one unchanged checkpoint and passing the12test oracle before and after.",
+  "limitations": [
+    "Deterministic synthetic job recovery only; no model/provider interruption, host reboot or independent-host restore qualification.",
+    "Initial native schema failure and earlier Mac success are retained; no savings comparison."
+  ],
+  "evidence_paths": [
+    "blueprints/convergence-practice/job-recovery/receipt-macos.json",
+    "blueprints/convergence-practice/job-recovery/receipt-wsl.json",
+    "blueprints/convergence-practice/job-recovery/experiment-macos.json",
+    "blueprints/convergence-practice/job-recovery/experiment-wsl.json"
+  ]
+}
