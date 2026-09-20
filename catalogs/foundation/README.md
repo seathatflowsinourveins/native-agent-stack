@@ -110,3 +110,14 @@ decision may supersede only an earlier decision for the same capability and
 component scope, retaining the old record with a reason and scope. Structural
 validation cannot certify the truth or adequacy of a prose claim; review the cited
 receipt and its limitations before changing an adoption decision.
+
+## GitHub automation
+
+The [automation manifest](automation.json) selects maintained upstream interfaces
+and records revisions, commands, ownership, actual hosted results and remaining
+gaps. The [concise handbook](../../docs/github-automation.md) covers event handling,
+reviewed dependency updates, native publication provenance and research-task
+acceptance. Required checks, source integrity, setup-toolchain fixtures and useful
+Codex/Claude research output remain separate evidence. The existing daily Codex
+maintenance task owns source research; optional gh-aw and Renovate candidates do
+not add competing writers or schedules.

@@ -16,6 +16,11 @@ two hosted boot identities. Production data, client rebinding, cross-application
 atomicity, lost-account/key recovery and physical-host disaster recovery remain
 outside this acceptance. Local guard tests remain separately labelled.
 
+The current plan's workflow hash includes the separately qualified setup-python
+Action update from PR31. The accepted run retains its original execution head and
+plan digest in the receipt and captured freeze records; this prospective pin
+refresh does not claim a new recovery execution or rewrite historical evidence.
+
 [plan.json](plan.json) freezes the scope, source inputs, independent query
 expectations, key flow, finite deadlines and failure conditions. The workflow is
 [native-offhost-app-state.yml](../../../.github/workflows/native-offhost-app-state.yml).

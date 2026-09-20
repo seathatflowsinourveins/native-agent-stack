@@ -13,6 +13,11 @@ remain separate from the [upstream Go test outputs](../../../evidence/artifacts/
 This establishes the synthetic transfer boundary only; application queries,
 lost-key/account recovery and production disaster recovery remain unqualified.
 
+The active hosted plan includes later reviewed workflow logging and Action-pin
+updates for a future dispatch. The accepted run keeps its original execution
+revision and plan digest; neither the original preparation plan nor historical
+receipts are rewritten, and this binding refresh claims no new recovery run.
+
 The manual-only workflow first runs **seven unchanged upstream restic tests**,
 then attempts an independent-host restore of the separately retained synthetic
 repository. [Upstream source selection](upstream-source.json) pins restic0.19.1

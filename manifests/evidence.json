@@ -2032,8 +2032,8 @@
     },
     {
       "path": ".github/workflows/native-token-e2e.yml",
-      "sha256": "9fe7751f5df7adfd65295159fb6b54ac10d774d91ee01cbc2c4d3e008dddad8a",
-      "bytes": 1685
+      "sha256": "d98bbefddb1bed7f0d282ffc08195bef52f8dab4772d1caf8ec6c0bad149b75f",
+      "bytes": 1689
     },
     {
       "path": ".github/workflows/token-report.yml",
@@ -5123,8 +5123,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "755d977a32fdc7eb35ea130a3c5097a28b1699c0d32d10763e0dbff7b0d42982",
-      "bytes": 3761944
+      "sha256": "74e09a9cbcd00d87d38063a0ab7680a350a199899d05a17ba5e6357d2dd5711b",
+      "bytes": 3763327
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6118,13 +6118,13 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "42f49b071a9252bc62dea3fb223c32844a7687d4b5c51aeadfa27d2760f9fb32",
-      "bytes": 1814
+      "sha256": "cdeba9a8ab1a01fbbe2bfdc512de8088c0f8f8dacb5ee52395d9aabc95fa557d",
+      "bytes": 2005
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "580bd3e3c2df61683adeb93bbcda36eb56ac365752071e1a78c838d40c323914",
-      "bytes": 7511
+      "sha256": "2e463b51a2813f4cb71805ecafa1cd728b8a1daed89929d7ca297940653152ed",
+      "bytes": 8142
     },
     {
       "path": "catalogs/foundation/decisions.json",
@@ -6133,8 +6133,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "f7b02946bb7d7193e3e83c5a90bdd3b0f8b6927a84a674bbe830c40dbcbc79b2",
-      "bytes": 17554
+      "sha256": "52d2fee1481659e01eb774db3aeef943d38cf510f93ff54d0af156a7f14a6c43",
+      "bytes": 18101
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -6488,13 +6488,13 @@
     },
     {
       "path": ".github/workflows/native-offhost-restore.yml",
-      "sha256": "4525ef97b6827eccd02bb8effad79f15d10e436149ecdf6d33160ec82ba34efe",
-      "bytes": 6306
+      "sha256": "91ecb7bdc3bcc139e9b2574c1bbe164ada48c9e31971a4920f4d41d37fcedf03",
+      "bytes": 6310
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/README.md",
-      "sha256": "1ae8ed8e115c0e5b976ba1ebd2489e5ed9caee979ec78f1a062a63376965f499",
-      "bytes": 9260
+      "sha256": "9b99ef4765d2d12689b5f8e29f54c043c52c73106fe205a8c198641c7bfa6780",
+      "bytes": 9573
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/contract_probe.py",
@@ -6503,8 +6503,8 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/hosted-plan.json",
-      "sha256": "e60f2990b229a5b98f98031d04e0356f1e00f57c4fa6f10957223a2c188057d1",
-      "bytes": 5452
+      "sha256": "55e405c965943c29dacd71027e68eaf0594f42a840d562102a0a7f145c301a41",
+      "bytes": 5714
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/input.json",
@@ -6568,8 +6568,8 @@
     },
     {
       "path": ".github/workflows/native-service-reboot.yml",
-      "sha256": "33fc35a62c1d8932b1931673bac7341175d74aa09d97ba087922b73e31146620",
-      "bytes": 2832
+      "sha256": "3a0f3c3e98a50c5f333070a8db85b2d232e585d05bf07af631741ceaaeef6ad5",
+      "bytes": 2808
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/README.md",
@@ -7053,13 +7053,13 @@
     },
     {
       "path": ".github/workflows/native-offhost-app-state.yml",
-      "sha256": "120324ab2042f3a0b62eefe9e56d84a3fd354f668aa75628c5743a1bf6681cb4",
-      "bytes": 9017
+      "sha256": "76a49ffe92288eb5e5c337523797770e2474b23c6e0b58a4fc5e80a5ce7acd70",
+      "bytes": 9025
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/README.md",
-      "sha256": "05f9922e969adc880a3e5f26d704c49d282be12ebe548d9e975a427a7c86b9bf",
-      "bytes": 8218
+      "sha256": "49b4704fa43f0fc067196fcc9e565fd9a165b964701dd95897f493346398fc4e",
+      "bytes": 8538
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/memory-oracle.json",
@@ -7073,7 +7073,7 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/plan.json",
-      "sha256": "ba247c289d3f542491de15fddf6dd46de1822399b9f6967a5c44c0d8b3d24ffe",
+      "sha256": "631addc156b6d966d06b80cca850eaebb1f0b975bc3cb80b43c3c8268a3214bd",
       "bytes": 7010
     },
     {
@@ -7388,8 +7388,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "a1176511800c6b0a8a288392f29dd67a951920b18b0afd0496ca905766c2e903",
-      "bytes": 11240
+      "sha256": "af0a4c01ac520d8671ca22780fd3f9f6a3dbfd46186caedbf0eb155cbd053345",
+      "bytes": 13358
     },
     {
       "path": "docs/research-task-acceptance.md",
@@ -7413,8 +7413,8 @@
     },
     {
       "path": "docs/catalog-provenance.md",
-      "sha256": "cfdbdebda42c9b9113f407e07a1304b51af186a856e687dc4eb148d32f3ee2c1",
-      "bytes": 13873
+      "sha256": "15c20a89ad95ffb37d8c4b02f28addf9ff9939b6c2f6bb853017497733522c4e",
+      "bytes": 14270
     },
     {
       "path": "evidence/artifacts/native-offhost-app-state-20260920/README.md",
@@ -7800,6 +7800,31 @@
       "path": "evidence/receipts/native-offhost-app-state-20260920.json",
       "sha256": "7bdebe374142fd65dd02960a028c86b0d376f066194412467d9e452cf8ed355c",
       "bytes": 12548
+    },
+    {
+      "path": ".github/workflows/action-compatibility.yml",
+      "sha256": "e20225fdb57a2651bbd9cf5320fcb81e56e2fb6568c88e595dbb51f8d15d6677",
+      "bytes": 4750
+    },
+    {
+      "path": "catalogs/foundation/automation.json",
+      "sha256": "810120df9ec901fc0e8247fda6559ab46a352d469457524aa0798472cde9f8b4",
+      "bytes": 12635
+    },
+    {
+      "path": "docs/tasks/2026-09-20-automation-resolution.md",
+      "sha256": "d83d4414ce596236a9740fb9dcce8d275d13ce4edacd4313806835130753d454",
+      "bytes": 8181
+    },
+    {
+      "path": "docs/automation-upgrade-evidence.json",
+      "sha256": "afe31d3eec6b14f69721a810f8719d3326154c9f2e2fadedeb5e292bb92ca7df",
+      "bytes": 10044
+    },
+    {
+      "path": "tests/test_active_recovery_plans.py",
+      "sha256": "316a457f792412232b899d874297f7cc05c36a8b4a0ce8a4ef58e6bc37603a1c",
+      "bytes": 1238
     }
   ],
   "convergence_records": [

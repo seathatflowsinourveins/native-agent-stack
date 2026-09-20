@@ -1,0 +1,109 @@
+name: Qualify selected Action toolchains
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/action-compatibility.yml
+      - .github/workflows/native-offhost-app-state.yml
+      - .github/workflows/native-offhost-restore.yml
+      - .github/workflows/native-service-reboot.yml
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/action-compatibility.yml
+      - .github/workflows/native-offhost-app-state.yml
+      - .github/workflows/native-offhost-restore.yml
+      - .github/workflows/native-service-reboot.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  python:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Prepare owned evidence directory
+        run: mkdir -p "$RUNNER_TEMP/action-compatibility"
+      - name: Set up the selected Python line
+        id: python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Run the unchanged upstream version and executable-path tests
+        env:
+          PYTHON_PATH: ${{ steps.python.outputs.python-path }}
+        run: |
+          output="$RUNNER_TEMP/action-compatibility"
+          source=https://raw.githubusercontent.com/actions/setup-python/5fda3b95a4ea91299a34e894583c3862153e4b97/__tests__
+          curl --fail --silent --show-error --location --max-time 60 "$source/verify-python.py" --output "$output/verify-python.py"
+          curl --fail --silent --show-error --location --max-time 60 "$source/check-python-path.sh" --output "$output/check-python-path.sh"
+          printf '%s  %s\n' \
+            37e77a5c2d1721f02b772ad5bc16c49c2f62498217a9bfa50b490903932ca394 "$output/verify-python.py" \
+            2216d4d36962c15f7e414fe64e2648298bc020b2ddce84d920f985c506740280 "$output/check-python-path.sh" \
+            | sha256sum --check | tee "$output/upstream-hashes.log"
+          python "$output/verify-python.py" 3.13 2>&1 | tee "$output/upstream-version.log"
+          bash "$output/check-python-path.sh" "$PYTHON_PATH" 2>&1 | tee "$output/upstream-path.log"
+          python --version 2>&1 | tee "$output/selected-python.log"
+      - name: Retain upstream test output and failures
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: action-python-compatibility-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/action-compatibility/
+          if-no-files-found: warn
+          retention-days: 14
+
+  go:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ['1.25.10', '1.27.0']
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Prepare owned evidence directory
+        run: mkdir -p "$RUNNER_TEMP/action-compatibility"
+      - name: Set up the exact selected Go toolchain
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: ${{ matrix.go }}
+          check-latest: false
+          cache: false
+      - name: Run the unchanged upstream verifier and Go standard-library tests
+        env:
+          EXPECTED_GO: ${{ matrix.go }}
+          GOTOOLCHAIN: local
+          GOPROXY: 'off'
+          GOSUMDB: 'off'
+        run: |
+          output="$RUNNER_TEMP/action-compatibility"
+          curl --fail --silent --show-error --location --max-time 60 \
+            https://raw.githubusercontent.com/actions/setup-go/b7ad1dad31e06c5925ef5d2fc7ad053ef454303e/__tests__/verify-go.sh \
+            --output "$output/verify-go.sh"
+          printf '%s  %s\n' 727a28d47b25012e47b7095525f0cfcbcaad96654e71b96c627695c877c57244 "$output/verify-go.sh" \
+            | sha256sum --check | tee "$output/upstream-hashes.log"
+          bash "$output/verify-go.sh" "$EXPECTED_GO" 2>&1 | tee "$output/upstream-version.log"
+          go env GOVERSION 2>&1 | tee "$output/selected-go.log"
+          test "$(go env GOVERSION)" = "go$EXPECTED_GO"
+          go test -count=1 fmt 2>&1 | tee "$output/go-stdlib-fmt.log"
+      - name: Retain upstream test output and failures
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: action-go-${{ matrix.go }}-compatibility-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/action-compatibility/
+          if-no-files-found: warn
+          retention-days: 14
