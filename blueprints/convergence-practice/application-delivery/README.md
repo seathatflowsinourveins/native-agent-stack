@@ -81,6 +81,31 @@ The nested [project contract](project-contract.json) supplies actual setup, run,
 test and verify commands for native Codex/Claude integration. The enclosing
 repository's global actions were not modified by this bounded contribution.
 
+## Recipe portability follow-up
+
+The current PostgreSQL build/install entrypoints explicitly reset `MAKELEVEL=0`
+at the external source-tree boundary. PostgreSQL's own recursive make calls still
+advance normally. This prevents the enclosing application Makefile from causing
+PostgreSQL to skip its top-level generated-header prerequisites. The application
+port probe now uses `SO_REUSEADDR`, allowing normal restart after TIME_WAIT while
+still refusing a live listener. It does not enable `SO_REUSEPORT` or stop any
+unknown process.
+
+Five focused tests exercise both actual make command boundaries, reproduce the
+old recursion failure, create real loopback TIME_WAIT and live-listener sockets,
+and check historical byte identity. They pass on the Mac without rebuilding the
+application or PostgreSQL:
+
+```sh
+python3 -m unittest discover -s blueprints/convergence-practice/application-delivery -p 'test_portability.py' -v
+```
+
+Run that command from the repository root. The [recipe revision mapping](history/recipe-revisions.json)
+preserves the original Makefile and launcher bytes under their recorded hashes.
+The original receipt and experiment are unchanged and still describe that earlier
+recipe. These portability checks qualify only the two changes; later WSL full-stack
+acceptance is recorded separately.
+
 ## Qualification and limits
 
 [acceptance-plan.json](acceptance-plan.json) fixed the acceptance criteria;

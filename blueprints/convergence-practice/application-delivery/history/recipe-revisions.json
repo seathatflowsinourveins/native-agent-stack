@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "scope": "Separate native make and loopback socket portability regressions; no full application/PostgreSQL build or model rerun.",
+  "historical_acceptance": "Original receipt and experiment retain their original hashes. Resolve original Makefile/serve.py bytes through this explicit hash-to-retained-file mapping; original full-stack acceptance does not qualify the changed recipe.",
+  "recipes": [
+    {
+      "current_path": "Makefile",
+      "original": {
+        "revision": "cabbe2c96e39096b510f739f07a6e4132da082de",
+        "sha256": "dbab0b62a259b26a86a8e174b2ab17ba7ce28ac5d19f8412fb41c016f75bc011",
+        "retained_path": "history/Makefile.cabbe2c"
+      },
+      "current_sha256": "799c61469b98dddbc20870b6166737312968a97ddf16aa6ed3e7d50104278e80",
+      "change": "Reset MAKELEVEL only at both external PostgreSQL build/install entrypoints; internal recursive make still advances normally."
+    },
+    {
+      "current_path": "serve.py",
+      "original": {
+        "revision": "cabbe2c96e39096b510f739f07a6e4132da082de",
+        "sha256": "e3e59b5315d5f2b3c2fe863cdecabfd9f7ffd1977a83d332331a10e33a42a14e",
+        "retained_path": "history/serve.cabbe2c.py"
+      },
+      "current_sha256": "bba1f9655cce0b412257fbd0c40680b6b0ccc0ecffb91a2f3605323491655aed",
+      "change": "Set SO_REUSEADDR on the preflight bind so TIME_WAIT does not mimic a live listener; keep live listener refusal and never enable SO_REUSEPORT."
+    }
+  ],
+  "unchanged_historical_evidence": {
+    "receipt.json": "3c7fb4ec3b477b90f47b3765a0122a89aa39fb6c0fe3529818f6c4b4145e1cd7",
+    "experiment.json": "1d6df4651976293bef2a18867430912db51496ecb3fd60224b44061f31098556",
+    "freeze.json": "333198ba238dd35bea47882dea9e15fcadf1ab5b8609ed2bfa93aa21a1911720"
+  },
+  "qualification": {
+    "command": "python3 -m unittest discover -s blueprints/convergence-practice/application-delivery -p 'test_portability.py' -v",
+    "status": "passed",
+    "tests": 5,
+    "scope": "Native synthetic make recursion plus actual owned loopback TIME_WAIT/live-listener sockets; no unknown process stopped.",
+    "exit_code": 0,
+    "host": {
+      "system": "Darwin",
+      "macos": "26.5.1",
+      "architecture": "arm64",
+      "python": "3.14.7",
+      "make": "GNU Make 3.81"
+    },
+    "observed_make_levels": {
+      "original_external": [
+        "all:1"
+      ],
+      "fixed_build_install": [
+        "all:0",
+        "internal:1",
+        "install:0",
+        "internal:1"
+      ]
+    },
+    "observed_socket_results": {
+      "ordinary_bind_after_TIME_WAIT": "EADDRINUSE",
+      "reuseaddr_probe_after_TIME_WAIT": "passed",
+      "reuseaddr_probe_with_live_listener": "EADDRINUSE; listener remained usable"
+    },
+    "lint": {
+      "command": "ruff check --ignore EXE001 serve.py test_portability.py",
+      "status": "passed",
+      "retained_baseline_note": "serve.py already had a shebang with non-executable mode at cabbe2c and is invoked explicitly with python3; its mode is unchanged. EXE001 is excluded only from this focused lint invocation."
+    }
+  }
+}
