@@ -1,0 +1,426 @@
+{
+  "schema_version": 1,
+  "kind": "security_identity_source_review",
+  "checked_at": "2026-09-20T01:33:12Z",
+  "baseline_commit": "bf99d340f798bf72cc3104619edc482882eb423d",
+  "scope": "Six focused decisions over five existing catalog identities and one proposed conditional identity. Eight pinned source files reviewed in selected sections plus six license files and primary documentation. Identity/lifetime contracts only; no full-repository audit, whole-landscape ranking or native data acceptance.",
+  "review_boundaries": {
+    "activities": "Public source/license/documentation reads and existing catalog inspection only.",
+    "excluded": "No credential reads, account/market-data API requests, dataset downloads, installs, model calls, purchases or broker actions.",
+    "metadata_method": "Unauthenticated GitHub repository/default-branch commit and pinned license metadata; selected raw source files fetched at exact commits. Branch heads describe review time, not installed versions.",
+    "prior_alternative_review": "catalogs/us-equities/authenticated-data-review.json",
+    "prior_alternatives_not_repeated": [
+      "massive-com/client-python",
+      "databento/databento-python",
+      "OpenFIGI/api-examples",
+      "man-group/ArcticDB",
+      "unionai-oss/pandera",
+      "OpenBB-finance/OpenBB"
+    ]
+  },
+  "prior_star_refresh": {
+    "source": "blueprints/us-equities/authenticated-data/public-stars-refresh.json",
+    "checked_at_utc": "2026-09-20T00:55:35.729990+00:00",
+    "current_count": 342,
+    "new_pagination_this_wave": false,
+    "scope": "Complete identity refresh previously recorded; it does not imply all 342 repositories received a source audit."
+  },
+  "temporal_contract": {
+    "security_identity": "Provider-scoped stable security identity, separate from company identity and current ticker.",
+    "symbol_validity": "Dates over which a symbol refers to that security; a rename is not necessarily a new security.",
+    "vendor_revision": "Dataset vintage and record revision/availability, including mapping updates after the economic event.",
+    "local_observation": "When this acquisition actually received each response. Unknown historical first observation stays unknown."
+  },
+  "rename_probe_recommendation": {
+    "owner": "Coordinator; independent native plan/receipt is authoritative",
+    "status_in_this_document": "Recommended contract, not executed evidence",
+    "start_inclusive": "2022-06-08T00:00:00Z",
+    "end_exclusive": "2022-06-11T00:00:00Z",
+    "sessions": [
+      "2022-06-08",
+      "2022-06-09",
+      "2022-06-10"
+    ],
+    "timeframe": "1Day",
+    "feed": "sip",
+    "adjustment": "raw",
+    "sort": "asc",
+    "page_limit": 2,
+    "max_pages_per_case": 3,
+    "cases": [
+      {
+        "symbol": "META",
+        "asof": "2022-06-10",
+        "expected_sessions": 3
+      },
+      {
+        "symbol": "FB",
+        "asof": "2022-06-08",
+        "expected_sessions": 3
+      },
+      {
+        "symbol": "META",
+        "asof": "-",
+        "expected_sessions": 2
+      },
+      {
+        "symbol": "FB",
+        "asof": "-",
+        "expected_sessions": 1
+      }
+    ],
+    "current_asset_lookup": {
+      "symbol": "META",
+      "max_calls": 1,
+      "scope": "Current UUID/status/tradability snapshot only; do not infer UUID continuity across rename from one current lookup."
+    },
+    "acceptance": [
+      "Freeze plan and source hashes before acquisition; retain all pages, queries, local observation times and final pagination status.",
+      "Compare mapped-case timestamps and raw numeric rows after separating response ticker labels; compare the corresponding symbol-only subsets.",
+      "Treat missing/unexpected rows, unsupported parameter behavior or unexhausted pagination as explicit unresolved findings, not a retuned expectation.",
+      "Keep current asset status separate from historical rows; no orders, profitability, complete-universe or historically as-known claim."
+    ],
+    "availability_caveat": "Alpaca FAQ states FB/META mapping was available June 10, the day after the effective rename. Today's reconstructed mapping is not evidence that it existed on June 9."
+  },
+  "event_context": {
+    "source": "https://investor.atmeta.com/investor-news/press-release-details/2022/Meta-Platforms-Inc.-to-Change-Ticker-Symbol-to-META-on-June-9/default.aspx",
+    "publisher_claimed_publication_date": "2022-05-31",
+    "claimed_effective_date": "2022-06-09",
+    "claimed_effective_timing": "Prior to Nasdaq market open",
+    "scope": "Historical company announcement context only. Present-day source review does not reconstruct original API or local first-observed availability."
+  },
+  "decisions": [
+    {
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "commit": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "commit_date": "2026-09-15T09:35:45Z",
+      "default_branch": "master",
+      "current_metadata": {
+        "archived": false,
+        "license_spdx": "Apache-2.0"
+      },
+      "license_declared": "Apache-2.0",
+      "license_source": {
+        "url": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/LICENSE",
+        "sha256": "bc84da682744c6dd008cf9ad3306caf18444d613a80c1bcc3de0dd46094787ef"
+      },
+      "existing_identity": true,
+      "evidence_level": "source_sections_reviewed",
+      "reviewed_files": [
+        {
+          "path": "alpaca/trading/requests.py",
+          "sha256": "3290cc8b0d90cae87bc67b1e108b1a67b74d5ecc719dd7bb38026a99b6301552",
+          "total_file_lines": 718,
+          "reviewed_scope": "GetAssetsRequest fields, lines 127–141",
+          "url": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/alpaca/trading/requests.py"
+        },
+        {
+          "path": "alpaca/trading/client.py",
+          "sha256": "03f806b3ce6b4fabcc92f9e8eedf5f3ded817b7ec988bc8a854aa9268ea595de",
+          "total_file_lines": 784,
+          "reviewed_scope": "get_all_assets and get_asset request construction, lines 376–418",
+          "url": "https://github.com/alpacahq/alpaca-py/blob/232179c19091fd0f70daf0972a90bf8def329ec0/alpaca/trading/client.py"
+        }
+      ],
+      "decision": "retain_selected_bounded_identity_probe",
+      "role": "Current Alpaca asset lookup and historical ticker mapping",
+      "strengths": [
+        "GetAssetsRequest and TradingClient separate current asset enumeration/lookup from historical market-data requests. The current Assets API documents all statuses by default and filters for status, asset class, exchange and attributes.",
+        "Historical bars asof chooses the entity associated with the queried ticker on that date. '-' disables mapping; a ticker not found for asof falls back to symbol-only. Explicit mapping is suitable for a bounded rename continuity check."
+      ],
+      "limits": [
+        "Current asset UUID/status/tradable fields do not establish past tradability, a complete historical universe, all delistings or original mapping availability. This interface documents no historical asset-list asof parameter.",
+        "Alpaca's FAQ says FB-to-META mapping became available June 10, one day after the June 9 rename. Today's reconstructed continuity must not become a June 9 as-known signal.",
+        "Current SDK source review is not an upgrade: the selected native runtime remains alpaca-py 0.44.0. REST/SDK drift and actual data entitlement remain separate acceptance checks.",
+        "Apache-2.0 covers the client, not SIP market-data access or redistribution rights."
+      ],
+      "native_api_shapes_not_executed": [
+        "TradingClient.get_asset(symbol_or_asset_id='META')",
+        "TradingClient.get_all_assets(filter=GetAssetsRequest(status=AssetStatus.INACTIVE))",
+        "StockHistoricalDataClient.get_stock_bars(StockBarsRequest(symbol_or_symbols='META', timeframe=TimeFrame.Day, start=START_UTC, end=END_UTC, feed=DataFeed.SIP, adjustment=Adjustment.RAW, asof='2022-06-10'))"
+      ],
+      "sources": [
+        "https://docs.alpaca.markets/us/reference/stockbars",
+        "https://docs.alpaca.markets/us/docs/market-data-faq",
+        "https://docs.alpaca.markets/us/reference/get-v2-assets-1",
+        "https://docs.alpaca.markets/us/reference/get-v2-assets-symbol_or_asset_id"
+      ],
+      "next_bounded_acceptance": "Coordinator's frozen four-case June 8–10 2022 rename probe plus exactly one current META asset lookup. Raw request pagination is separately bounded; the high-level SDK method shown here is not a page-budget implementation.",
+      "selection_effect": "Retain the selected client; native execution and its receipt belong to the coordinator's separate identity-readiness task.",
+      "native_execution": "None in this source-review task"
+    },
+    {
+      "repository": "https://github.com/stefan-jansen/zipline-reloaded",
+      "commit": "943010b9da848e317fc520de87edade2b884d329",
+      "commit_date": "2025-11-13T15:14:32Z",
+      "default_branch": "main",
+      "current_metadata": {
+        "archived": false,
+        "license_spdx": "Apache-2.0"
+      },
+      "license_declared": "Apache-2.0",
+      "license_source": {
+        "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/LICENSE",
+        "sha256": "e35c4578f7db4498e62e278978f6c42e0fce6f21f9993a060b08a33549cd3044"
+      },
+      "existing_identity": true,
+      "evidence_level": "source_sections_reviewed",
+      "reviewed_files": [
+        {
+          "path": "src/zipline/assets/assets.py",
+          "sha256": "7c9c4d4b012ffc28231865e49c87c4b1c047e411146a4530f182458a41a621a1",
+          "total_file_lines": 1581,
+          "reviewed_scope": "lookup_symbol date/ambiguity contract, lines 930–989; lifetimes inclusion rules, lines 1419–1474",
+          "url": "https://github.com/stefan-jansen/zipline-reloaded/blob/943010b9da848e317fc520de87edade2b884d329/src/zipline/assets/assets.py"
+        }
+      ],
+      "decision": "retain_conditional_identity_fixture_reference",
+      "role": "Dated ticker ownership and equity lifetime masking",
+      "strengths": [
+        "AssetFinder.lookup_symbol accepts as_of_date and country_code with fuzzy=False. An omitted date resolves only unambiguous ownership; reused symbols can raise ambiguity instead of silently selecting a present-day owner.",
+        "lifetimes provides per-date asset masks and explicit start-date inclusion, addressing the first-session close being unavailable that morning."
+      ],
+      "limits": [
+        "Results depend on the ingested asset database and bundle. Local sids, start/end bounds and name histories are not an independently complete historical US-equities master.",
+        "Lookup dates and lifetime masks do not supply vendor revisions, original observation times, halted-session status or data rights."
+      ],
+      "native_api_shapes_not_executed": [
+        "finder.lookup_symbol('SYNTH', as_of_date=decision_date, fuzzy=False, country_code='US')",
+        "finder.lifetimes(dates=sessions, include_start_date=False, country_codes=['US'])"
+      ],
+      "sources": [
+        "https://zipline.ml4trading.io/bundles.html"
+      ],
+      "next_bounded_acceptance": "If an independent identity oracle is needed, use a tiny synthetic asset database with two disjoint owners of one ticker, a gap, overlapping/ambiguous ownership and first/last session boundaries. Assert lookup errors and dated masks; label it fixture behavior, not real historical-universe acceptance.",
+      "selection_effect": "No second production engine added. Retain as a focused correctness reference for symbol reuse and lifetime boundaries.",
+      "native_execution": "None in this source-review task"
+    },
+    {
+      "repository": "https://github.com/microsoft/qlib",
+      "commit": "be725493eb1a6bbb42bf11b37aa7669f59610ff1",
+      "commit_date": "2026-09-16T06:56:07Z",
+      "default_branch": "main",
+      "current_metadata": {
+        "archived": false,
+        "license_spdx": "MIT"
+      },
+      "license_declared": "MIT",
+      "license_source": {
+        "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/LICENSE",
+        "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      },
+      "existing_identity": true,
+      "evidence_level": "source_sections_reviewed",
+      "reviewed_files": [
+        {
+          "path": "qlib/data/data.py",
+          "sha256": "9156bfef585b9e2d22d4d1ba5831efdb63b419d24846ee738eee237090ff6a24",
+          "total_file_lines": 1332,
+          "reviewed_scope": "InstrumentProvider list_instruments contract, lines 267–286; LocalInstrumentProvider span clipping and as_list conversion, lines 678–723",
+          "url": "https://github.com/microsoft/qlib/blob/be725493eb1a6bbb42bf11b37aa7669f59610ff1/qlib/data/data.py"
+        }
+      ],
+      "decision": "retain_conditional_membership_span_reference",
+      "role": "Research universe spans separate from PIT factor storage",
+      "strengths": [
+        "LocalInstrumentProvider clips stored instrument spans to the requested interval and retains nonempty spans. as_list=False preserves those spans for per-date membership evaluation."
+      ],
+      "limits": [
+        "as_list=True returns only the union of surviving keys over the query interval; treating that union as membership on every date leaks future listings.",
+        "Stored spans require upstream listing/delisting provenance. They are not proof of contemporary observation or comprehensive US coverage.",
+        "The prior PIT factor review is a separate capability: publication/revision-aware factors do not make the instrument universe as-known. Existing upstream PIT tests acquire China fixtures and were not run here."
+      ],
+      "native_api_shapes_not_executed": [
+        "D.list_instruments(D.instruments(market=LOCAL_MARKET), start_time=START_DATE, end_time=END_DATE, freq='day', as_list=False)"
+      ],
+      "sources": [
+        "https://qlib.readthedocs.io/en/latest/component/data.html",
+        "https://qlib.readthedocs.io/en/latest/advanced/PIT.html"
+      ],
+      "next_bounded_acceptance": "Only against an already initialized local provider, compare stored spans with per-session expected inclusion across one synthetic listing and one delisting. Keep observation/revision timestamps in a separate provenance table; do not download a new Qlib dataset.",
+      "selection_effect": "Keep research candidate status; current gap is source provenance, not a replacement factor engine.",
+      "native_execution": "None in this source-review task"
+    },
+    {
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "commit": "519ed08313894a846a7015dd651963384d29d481",
+      "commit_date": "2026-09-20T00:44:15Z",
+      "default_branch": "develop",
+      "current_metadata": {
+        "archived": false,
+        "license_spdx": "LGPL-3.0"
+      },
+      "license_declared": "LGPL-3.0",
+      "license_source": {
+        "url": "https://github.com/nautechsystems/nautilus_trader/blob/519ed08313894a846a7015dd651963384d29d481/LICENSE",
+        "sha256": "ee907919ec88c9c017b1f8b608db20960b6598aefcc4fe58820bde955d65ed3c"
+      },
+      "existing_identity": true,
+      "evidence_level": "source_sections_reviewed",
+      "reviewed_files": [
+        {
+          "path": "crates/model/src/instruments/equity.rs",
+          "sha256": "816aee95311caad1a93692f648d061ddd48c247ee4b11645288bcde4c905b692",
+          "total_file_lines": 571,
+          "reviewed_scope": "Equity identity/raw symbol/optional ISIN/event and initialization fields, lines 38–110; equality by instrument id, lines 205–211",
+          "url": "https://github.com/nautechsystems/nautilus_trader/blob/519ed08313894a846a7015dd651963384d29d481/crates/model/src/instruments/equity.rs"
+        },
+        {
+          "path": "crates/model/src/identifiers/instrument_id.rs",
+          "sha256": "0f414626f6c4ee2d2f5d9a6fd9958a0250e00d319c7b815f4b9f1217e0c11219",
+          "total_file_lines": 496,
+          "reviewed_scope": "Symbol/venue identity fields, new/from_as_ref and parsing, lines 38–150",
+          "url": "https://github.com/nautechsystems/nautilus_trader/blob/519ed08313894a846a7015dd651963384d29d481/crates/model/src/identifiers/instrument_id.rs"
+        }
+      ],
+      "decision": "retain_conditional_runtime_not_security_master",
+      "role": "Execution instrument identity and explicit event/object timestamps",
+      "strengths": [
+        "InstrumentId consists of symbol plus venue. Equity additionally records raw_symbol, optional ISIN, ts_event and ts_init; equity equality uses its instrument id."
+      ],
+      "limits": [
+        "Symbol/venue identity does not by itself resolve ticker reuse or changing tickers to one permanent historical security. ISIN is optional.",
+        "ts_event is the supplied event time; ts_init is object initialization time. Neither guarantees vendor first publication or a complete historical instrument master.",
+        "Reviewed develop HEAD now uses Rust model paths; earlier Cython paths returned 404. This source review does not replace the catalog's previously selected release or prove Python API compatibility.",
+        "LGPL-3.0 code obligations and provider/venue data rights are separate."
+      ],
+      "native_api_shapes_not_executed": [
+        "InstrumentId::new(Symbol::new(\"META\"), Venue::new(\"XNAS\"))",
+        "InstrumentId::from_as_ref(\"META.XNAS\")"
+      ],
+      "sources": [
+        "https://nautilustrader.io/docs/latest/concepts/instruments/"
+      ],
+      "next_bounded_acceptance": "For a future pinned runtime adoption, build two explicit FB/META instrument records and retain their differing ids plus a separately proven stable-security mapping. Confirm supplied event/init timestamps survive serialization. This source task does not compile or run the new develop layout.",
+      "selection_effect": "Retain the existing runtime candidate, without representing an execution model as the missing historical identity dataset.",
+      "native_execution": "None in this source-review task"
+    },
+    {
+      "repository": "https://github.com/QuantConnect/Lean",
+      "commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "commit_date": "2026-09-18T14:03:24Z",
+      "default_branch": "master",
+      "current_metadata": {
+        "archived": false,
+        "license_spdx": "Apache-2.0"
+      },
+      "license_declared": "Apache-2.0",
+      "license_source": {
+        "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/LICENSE",
+        "sha256": "522cf0a716ce03f67d46f8fceb5bf78c5b84400ec5cd8d14bf9f02cddc1cb6ba"
+      },
+      "existing_identity": true,
+      "evidence_level": "source_sections_reviewed",
+      "reviewed_files": [
+        {
+          "path": "Common/Data/Auxiliary/MapFile.cs",
+          "sha256": "47a177002507105948617fa7313a21d7dd3d764b07233631a1f2c3bb2bf080a7",
+          "total_file_lines": 253,
+          "reviewed_scope": "FirstDate/DelistingDate and empty-map defaults, lines 44–86; GetMappedSymbol/HasData, lines 106–139",
+          "url": "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Data/Auxiliary/MapFile.cs"
+        }
+      ],
+      "decision": "retain_selected_map_semantics_with_coverage_guard",
+      "role": "Historical ticker map boundaries in the selected simulator",
+      "strengths": [
+        "MapFile derives FirstDate and DelistingDate from its first/last sorted rows and GetMappedSymbol chooses the first compatible row whose date is at or after the query date.",
+        "HasData bounds a populated map by those endpoint dates, supporting explicit before/inside/after tests."
+      ],
+      "limits": [
+        "An empty map uses beginning/end-of-time sentinels and HasData returns true. Therefore HasData alone is not evidence that bars or a valid historical universe exist.",
+        "A final map sentinel is not an observed delisting. Current map/factor files can be retrospective; first availability and revisions remain unproven.",
+        "Prior accepted AAPL native factor/map proof remains limited to its frozen sample. The broad upstream NUnit fixture was unresolved; this source review adds no new native pass."
+      ],
+      "native_api_shapes_not_executed": [
+        "map.GetMappedSymbol(queryDate, defaultReturnValue: \"UNKNOWN\")",
+        "map.HasData(queryDate)"
+      ],
+      "sources": [
+        "https://www.quantconnect.com/docs/v2/lean-engine/data-format/key-concepts"
+      ],
+      "next_bounded_acceptance": "Reuse the existing isolated LEAN API recipe only if needed: populated and empty map fixtures, dates before/at/after a rename and bounds, with explicit sentinel handling. Require separate bar existence and source-observation evidence before treating any result as coverage.",
+      "selection_effect": "Retain LEAN. Add coverage/provenance guards around supplied data instead of changing the simulation engine.",
+      "native_execution": "None in this source-review task"
+    },
+    {
+      "repository": "https://github.com/wharton/wrds",
+      "commit": "5d7bf38de5bd367852b7ccdd05079c1a1820f888",
+      "commit_date": "2026-02-10T22:38:10Z",
+      "default_branch": "main",
+      "current_metadata": {
+        "archived": false,
+        "license_spdx": "BSD-3-Clause"
+      },
+      "license_declared": "BSD-3-Clause",
+      "license_source": {
+        "url": "https://github.com/wharton/wrds/blob/5d7bf38de5bd367852b7ccdd05079c1a1820f888/LICENSE.txt",
+        "sha256": "11faa26ba3782a8148dbc31d8eac8d06ac932172096705abac06455540e5361f"
+      },
+      "existing_identity": false,
+      "evidence_level": "source_sections_reviewed",
+      "reviewed_files": [
+        {
+          "path": "wrds/sql.py",
+          "sha256": "458277a56bcea7d75f6457c3d848e126ddabc7722cc1001bc93d8a37792ccd74",
+          "total_file_lines": 684,
+          "reviewed_scope": "list_tables and schema permissions, lines 400–418; describe_table, lines 446–472; raw_sql precision/parameters/chunks, lines 499–533",
+          "url": "https://github.com/wharton/wrds/blob/5d7bf38de5bd367852b7ccdd05079c1a1820f888/wrds/sql.py"
+        }
+      ],
+      "decision": "add_conditional_licensed_identity_benchmark",
+      "role": "Optional WRDS access bridge to licensed CRSP identity, lifecycle and delisting research data",
+      "strengths": [
+        "CRSP documents PERMNO as a permanent security identifier; PERMCO identifies the company. Its historical stock data includes identity histories, distributions and delisting information.",
+        "The WRDS Python client exposes permission-checked table discovery, column inspection and parameterized SQL. coerce_float=False avoids the documented default precision conversion when retaining exact decimal metadata."
+      ],
+      "limits": [
+        "BSD-3-Clause licenses the client only. WRDS access and CRSP subscriptions, permitted use and redistribution require separate entitlement; none was requested or exercised.",
+        "Current CRSP data uses the CIZ transition. The final legacy SIZ release was December 2024 data released in February 2025. Inspect entitled tables and definitions; do not assume a legacy table name or transplant delisting-return formulas.",
+        "Permanent ids and a current research dataset vintage do not establish what our strategy knew at each decision. Retain dataset/release vintage, symbol validity, revision and observation metadata separately.",
+        "The public legacy demo documents missing delisting-value codes; a missing outcome must remain explicit rather than silently become zero. Demo metadata is not proof of current CIZ schema or free full-universe access."
+      ],
+      "native_api_shapes_not_executed": [
+        "db.list_tables(library=ENTITLED_SCHEMA)",
+        "db.describe_table(library=ENTITLED_SCHEMA, table=APPROVED_TABLE)",
+        "db.raw_sql(approved_bounded_sql, params=identity_and_date_parameters, coerce_float=False, chunksize=1000)"
+      ],
+      "sources": [
+        "https://indexes.morningstar.com/research-data-products",
+        "https://www.crsp.org/wp-content/uploads/appendix/FlagType_CL.html",
+        "https://wrds-www.wharton.upenn.edu/demo/crsp/form/",
+        "https://wrds-www.wharton.upenn.edu/pages/data-announcements/changes-to-crsp-data/",
+        "https://www.crsp.org/wp-content/uploads/appendix/FlagType_MU.html"
+      ],
+      "next_bounded_acceptance": "Only if existing rights are later confirmed: inspect a chosen entitled schema, freeze its CIZ/vintage definitions and three known lifecycle cases (rename, delisting, ticker reuse), then execute a bounded parameterized query. Preserve unknown outcomes and compare identity/validity intervals, not strategy returns.",
+      "selection_effect": "One new conditional catalog identity for a distinct licensed benchmark/access role; no install, subscription, replacement price feed or immediate blocker introduced.",
+      "native_execution": "None in this source-review task"
+    }
+  ],
+  "retained_discovery_failures": [
+    {
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "commit": "519ed08313894a846a7015dd651963384d29d481",
+      "path": "nautilus_trader/model/instruments/equity.pyx",
+      "result": "HTTP Error 404: Not Found",
+      "resolution": "Located and reviewed current Rust source paths at the same commit; no fallback to old Cython source or install."
+    },
+    {
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "commit": "519ed08313894a846a7015dd651963384d29d481",
+      "path": "nautilus_trader/model/identifiers.pyx",
+      "result": "HTTP Error 404: Not Found",
+      "resolution": "Located and reviewed current Rust source paths at the same commit; no fallback to old Cython source or install."
+    }
+  ],
+  "recommendation": {
+    "selected_minimal_path": "Retain Alpaca-py acquisition, DuckDB revision/provenance storage and LEAN map/simulation semantics; retain EdgarTools for filing provenance. Advance the frozen rename probe before larger universe work.",
+    "next_gate": "A bounded rename pass checks these historical symbol-query/mapping responses only. It does not prove permanent security identity. Historical candidate-universe acceptance still needs active/inactive membership, ticker reuse, delisting outcomes, observation/revision limits and rights for the selected data source.",
+    "conditional_paths": "Existing Massive/Databento decisions remain alternatives if required identity/revision coverage is missing. WRDS/CRSP is a licensed benchmark option; engine replacement or more repositories cannot supply absent source provenance.",
+    "registration": "Coordinator may register catalogs/us-equities/security-identity-review.json#/decisions. This worker does not edit the central decision index."
+  },
+  "limitations": [
+    "No new native execution or authentication acceptance in this document; consult the coordinator's separate receipt.",
+    "Five existing identities and one new conditional identity are reviewed; the broader catalog remains a dated evidence map, not a definitive universal SOTA list.",
+    "Code licenses, data entitlements, source truth, temporal availability and trading readiness are distinct."
+  ]
+}
