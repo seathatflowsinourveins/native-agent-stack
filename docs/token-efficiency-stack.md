@@ -5,7 +5,7 @@ This is the topic-specific entry point for the selected stack on September 20,
 upstream install, use and statistics commands, versioned sources, returned results,
 baseline comparisons and lifecycle limits for each tool. The
 [offline HTML](ecosystem/index.html#efficiency) embeds this guide and those rows;
-its Setup view contains all 65 selected components across ten layers. The broader
+its Setup view contains all 66 selected components across ten layers. The broader
 512-repository catalog includes alternatives and references, not 512 installations.
 
 The installed commands are usable in their recorded native lanes. Four tools

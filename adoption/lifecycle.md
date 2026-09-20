@@ -3,8 +3,8 @@
 Use the selected component's [native recipe](manifest.json), the current pin in
 [stack.json](../manifests/stack.json), and the stage record in the
 [component matrix](../blueprints/token-native-focus/saturation-audit.json).
-The matrix covers all 65 selected components; the 512-repository decision index
-also contains 447 alternatives or research identities. Installing every
+The matrix covers all 66 selected components; the 512-repository decision index
+also contains 446 alternatives or research identities. Installing every
 alternative is not a prerequisite for the selected workflow.
 
 An accepted stage means the linked dated operation passed within its stated

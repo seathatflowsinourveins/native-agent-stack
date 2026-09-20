@@ -1606,6 +1606,32 @@
       ],
       "source_pin": "1b025d7e20a026371cd5f98ba0cdce48892737c8",
       "freshness": "Latest stable release verified20 September2026; exact1.63.0 package integrity and Node>=20 requirement retained in application source review. Native WSL runner passed under Node24.21.0."
+    },
+    {
+      "id": "omniroute",
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "version": "3.8.50",
+      "license": "MIT",
+      "profile": "optional",
+      "role": "Optional authenticated model gateway with scoped compression previews and persisted usage/cache observations",
+      "commands": [
+        "npm install --global --prefix \"${OMNIROUTE_PREFIX}\" --include=optional omniroute@3.8.50",
+        "omniroute serve --port \"${OMNIROUTE_PORT}\" --no-open --no-tray --daemon",
+        "omniroute status",
+        "omniroute api compression post-api-compression-preview --body @preview.json"
+      ],
+      "evidence_ids": [
+        "foundation-native-20260920"
+      ],
+      "upstream_sources": [
+        "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",
+        "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/docs/guides/SETUP_GUIDE.md",
+        "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/src/app/api/compression/preview/route.ts",
+        "https://registry.npmjs.org/omniroute/3.8.50"
+      ],
+      "source_pin": "5458026c216f77a3da68ea49152dc33470cfe2cb",
+      "freshness": "Official GitHub and npm release 3.8.50 checked September 20, 2026. The published tag commit, npm integrity and runtime build identity remain separate. Isolated Linux install/start/restart/state continuity/plaintext restore/owned stop passed; encrypted native restore is unsupported. Gateway native/provider attempts retained model-prefix and quota failures, not a successful gateway task.",
+      "command_scope": "Use docs/foundation-stack.md for fresh-prefix guards, explicit DATA_DIR/loopback binding, private management authentication and exact provider scope. Optional only: existing native accounts, models, hooks and default routing remain unchanged. Local preview success does not establish semantic fidelity or provider-token savings."
     }
   ],
   "profiles": [
@@ -1683,7 +1709,8 @@
         "promptfoo",
         "shanraisshan/claude-code-best-practice",
         "worktrunk",
-        "llama-cpp"
+        "llama-cpp",
+        "omniroute"
       ]
     },
     {

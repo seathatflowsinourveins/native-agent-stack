@@ -31,13 +31,13 @@
     ]
   },
   "counts": {
-    "selected_components": 65,
+    "selected_components": 66,
     "catalog_identities": 512,
-    "nonselected_catalog_identities": 447,
+    "nonselected_catalog_identities": 446,
     "exclusive_identity_groups": {
       "star_review": 275,
-      "component_record": 65,
-      "catalog_card": 116,
+      "component_record": 66,
+      "catalog_card": 115,
       "research_supplement": 54,
       "legacy_candidate": 2
     }
@@ -46,7 +46,8 @@
     "rtk": "retained upstream command-output estimate; global/project overlap",
     "context-mode": "runtime-scoped retained-event/session heuristics; retention can decrease totals",
     "headroom": "native usage report window is capped; offline adapter fixtures do not populate that ledger automatically",
-    "all_other_components": "Components other than RTK, Context Mode, Headroom and jCodeMunch have no verified cumulative upstream savings history in this matrix. Consumption counters and exact one-off artifacts remain separate.",
+    "all_other_components": "Components other than RTK, Context Mode, Headroom, jCodeMunch and the optional OmniRoute gateway have no verified cumulative upstream savings history in this matrix. Consumption counters and exact one-off artifacts remain separate.",
+    "omniroute": "Gateway all-retained usage, persisted cache metrics and compression aggregates have different scopes. The captured gateway baseline had zero compression/cache savings; native gateway tasks failed model-prefix/quota checks. Do not promote local previews or sum global estimates into exact provider savings.",
     "exact_causal_lifetime_provider_tokens_saved": null,
     "never_sum": "overlapping snapshots, artifact reductions, cache subset counters or shared baseline representations",
     "jcodemunch-mcp": "Native repeated-use bytes/4 estimate at upstream default index root; schema payload estimate is not per-request savings or billed tokens."
@@ -3344,6 +3345,89 @@
       }
     },
     {
+      "component_id": "omniroute",
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "version": "3.8.50",
+      "profile": "optional",
+      "role": "Optional authenticated model gateway with scoped compression previews and persisted usage/cache observations",
+      "installation_assessment": "Clean isolated upstream npm installation and local Linux lifecycle accepted; the installed package is retained, with only its acceptance processes stopped and state archived.",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/omniroute",
+        "documented_commands": [
+          "npm install --global --prefix \"${OMNIROUTE_PREFIX}\" --include=optional omniroute@3.8.50",
+          "omniroute serve --port \"${OMNIROUTE_PORT}\" --no-open --no-tray --daemon",
+          "omniroute status",
+          "omniroute api compression post-api-compression-preview --body @preview.json"
+        ],
+        "scope": "Optional explicit gateway; use the recipe's owned prefix/DATA_DIR, loopback binding, native accounts, management authentication and scoped inference key. Existing native default routes are unchanged.",
+        "recipe_document": "docs/foundation-stack.md",
+        "lifecycle_guide": "adoption/lifecycle.md"
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "foundation-native-20260920",
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Isolated Linux installation, local preview and service lifecycle are recorded separately from gateway-native attempts. RTK/lite semantic-preview failures and model-prefix/quota failures remain failures; no successful native gateway task or provider-saving baseline is established."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Retain the working native routes. Reuse recorded local lifecycle evidence and only retry an exact-model gateway task when its documented model mapping and provider capacity have changed; do not retry unchanged quota failures or activate semantically failed compression defaults.",
+      "integration_mode": "Optional explicit process-level gateway; local installation is available while native gateway task acceptance remains incomplete.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Isolated Linux DATA_DIR and loopback listener only. Local state/password continuity and plaintext restore passed. Encrypted backup bytes were independently verified; the native restore command does not restore encrypted filenames. No package uninstall or production migration is claimed.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "The optional package is installed. Unresolved gateway-native use, exact-model/effort compatibility and encrypted native restore are functional/recovery limits, not missing package installation.",
+      "source_pin": "5458026c216f77a3da68ea49152dc33470cfe2cb",
+      "lifecycle_stages": {
+        "install": {
+          "status": "accepted_within_scope",
+          "scope": "Isolated Linux npm prefix at 3.8.50, scoped dependency postinstall and actual local server/database startup accepted. No default client route or global npm policy was changed.",
+          "evidence_refs": ["evidence/receipts/foundation-native-20260920.json"]
+        },
+        "use": {
+          "status": "partial_acceptance",
+          "scope": "Local health and bounded compression preview executed. Required-fact checks rejected RTK/lite outputs; native gateway/provider attempts retained model-prefix and quota failures. Local preview is not successful outer native integration or provider-token saving.",
+          "evidence_refs": ["evidence/receipts/foundation-native-20260920.json"]
+        },
+        "persistence": {
+          "status": "accepted_within_scope",
+          "scope": "Only the isolated Linux fixture: private password and synthetic state remained available across owned server restart with the same DATA_DIR. Production account/state migration is not claimed.",
+          "evidence_refs": ["evidence/receipts/foundation-native-20260920.json"]
+        },
+        "restart": {
+          "status": "accepted_within_scope",
+          "scope": "Only the isolated Linux fixture: upstream owned stop/start and successful loopback health/state continuity accepted. This is not host boot or existing Windows service restart qualification.",
+          "evidence_refs": ["evidence/receipts/foundation-native-20260920.json"]
+        },
+        "cleanup": {
+          "status": "accepted_within_scope",
+          "scope": "Only the isolated Linux fixture: owned server processes stopped and acceptance listener absent; private data/receipts archived and installed package retained. Working gateway processes/counters and authentication stores were preserved; package uninstall was not tested.",
+          "evidence_refs": ["evidence/receipts/foundation-native-20260920.json"]
+        },
+        "recovery": {
+          "status": "partial_acceptance",
+          "scope": "Plaintext upstream restore passed for isolated synthetic state. Encrypted backup was independently decrypted and SQLite-verified, but this release's native restore ignores encrypted filenames and can misleadingly report completion. Native encrypted restore and production recovery are not accepted.",
+          "evidence_refs": ["evidence/receipts/foundation-native-20260920.json"]
+        }
+      },
+      "baseline_applicability": {
+        "category": "direct_context",
+        "scope": "Compression and cache require exact task/provider/key/time scope and required-fact checks. Retain failed semantic previews, zero captured baseline counters and failed gateway requests; no matched provider-saving baseline is established by installation or local preview.",
+        "retained_artifact_comparisons": 0,
+        "matched_lifetime_provider_baseline": "not_established",
+        "regression_policy": "Keep the adequate native path and disable candidate compression when required information is removed or changed; retain signed expansion/no-op results and recovery overhead."
+      }
+    },
+    {
       "component_id": "openresearch",
       "repository": "https://github.com/alphaXiv/OpenResearch",
       "version": "0.2.4",
@@ -5626,7 +5710,7 @@
       "status": "0.25.0 remains accepted after0.29.0 failed actual WSL initialization."
     }
   ],
-  "installation_gap_conclusion": "No additional useful installation target is established by this reconciliation. The current 65 selected roles have recipes and explicit dated/partial/platform-specific evidence. Unestablished lifecycle stages and new-host acceptance remain visible; this is not universal saturation or a claim that every installed tool improves tokens.",
+  "installation_gap_conclusion": "The current 66 selected roles have recipes and explicit dated/partial/platform-specific evidence. Optional OmniRoute 3.8.50 is installed with isolated Linux lifecycle acceptance; native gateway use remains incomplete after model-prefix/quota failures and encrypted native restore is unsupported. These are functional/recovery limits rather than a missing installer. Unestablished lifecycle stages and new-host acceptance remain visible; this is not universal saturation or a claim that every installed tool improves tokens.",
   "integration_note": "Original wave based on8babbd6; integrated main9b7b5d9 preserves qualified recovery and adds llama-cpp, producing58 selected component records.",
   "reconciled_at_utc": "2026-09-20",
   "reconciliation_base_public_commit": "6f74bc503ccecaaf6ccebd53677b23aedab50921",
