@@ -16,8 +16,13 @@ successfully with an unchanged checkpoint and execution count one.
 [Receipt](receipt.json), [independent audit](independent-audit.json), and
 [accepted output](accepted/final.json) retain the result. [The plan](plan.json),
 [task](TASK.md), [input](input.json), [stage implementation](stage.py),
-[supervisor](run.py) and [test oracle](test_fixture.py) were frozen before execution.
+[executed supervisor](executed-runner.py.txt) and [test oracle](test_fixture.py) were frozen before execution.
 The native session IDs, process identities and complete streams remain private.
+The exact executed supervisor is retained as [inert source text](executed-runner.py.txt).
+After capture, review tightened the current runner's private-directory check to
+cover the containing Git repository and made cleanup races produce recorded errors
+instead of suppressing a failure receipt. Five offline supervisor tests cover
+those changes; the native trial was not repeated.
 
 The initial and resumed terminal usage categories total **14,590** and **15,851**
 tokens. Independent inspection reconciles their sum, **30,441**, with the resumed
@@ -48,7 +53,7 @@ process SIGINT; it does not equate the two transport mechanisms.
 Offline checks never launch a model:
 
 ```sh
-python3 -m unittest discover -s blueprints/convergence-practice/native-recovery/claude -p test_fixture.py
+python3 -m unittest discover -s blueprints/convergence-practice/native-recovery/claude -p 'test_*.py'
 python3 blueprints/convergence-practice/native-recovery/claude/audit.py /private/owned-attempt
 ```
 

@@ -38,9 +38,9 @@
   "failure": null,
   "frozen_files": {
     "TASK.md": "879bcd4b4e1e399ed96ca5fb7e6cc8a3bbdee912fe77ea87d4475981f7df3b43",
+    "executed-runner.py.txt": "42137c0b58ba35907599e70ed6b2e45c7ffdf0f8829dcec248606d022d91fcfc",
     "input.json": "9a1fd06380f086357597eaa4d7d83a9f97b665f7f32c79c1efb7285a1ec4c3f8",
     "plan.json": "cd462b5c8eafceaeb18ad02ef7923c0dc6a855a1736a5b35ccad186dfd4a8e7e",
-    "run.py": "42137c0b58ba35907599e70ed6b2e45c7ffdf0f8829dcec248606d022d91fcfc",
     "stage.py": "8b1ddd24fd6e53b34515f36afe0d45fba50fa38e2a4ec40d4e0c0b27578502f8",
     "test_fixture.py": "8208a35d24a4ffc95f22ee8192aa59237fde26bac2631494892f784187845ce3"
   },
@@ -64,6 +64,15 @@
   ],
   "native_version": "2.1.278 (Claude Code)",
   "platform": "Linux WSL2",
+  "post_capture_review": {
+    "additional_native_attempts": 0,
+    "executed_runner_retained_as_inert_text": true,
+    "future_runner_fixes": [
+      "Require private logs outside the source Git repository",
+      "Retain failure receipt and cleanup errors when owned-process cleanup races"
+    ],
+    "original_executed_runner_filename": "run.py"
+  },
   "private_stream_sha256": {
     "initial": "86a83aadc79a4aed7652ac81af48c4e18f896570913c99c0a79ea2473bd5e74c",
     "resumed": "67b18d55e9948edb7fa6f8b1bb2509fc37d57f10f4181c61b676132569aa39bf"

@@ -36,7 +36,7 @@
         "sha256": "8b1ddd24fd6e53b34515f36afe0d45fba50fa38e2a4ec40d4e0c0b27578502f8"
       },
       {
-        "path": "blueprints/convergence-practice/native-recovery/claude/run.py",
+        "path": "blueprints/convergence-practice/native-recovery/claude/executed-runner.py.txt",
         "sha256": "42137c0b58ba35907599e70ed6b2e45c7ffdf0f8829dcec248606d022d91fcfc"
       }
     ],
@@ -105,7 +105,7 @@
       "artifacts": [
         {
           "path": "blueprints/convergence-practice/native-recovery/claude/receipt.json",
-          "sha256": "d66dfc6a0e14274bdc69631ece1c338dd88925e9ca5bcea7a25851cc1b8c2cba"
+          "sha256": "f0d4bc0f1ec408c51b2297e16365fa59aa8317f6035415e2151d360d17e2b491"
         },
         {
           "path": "blueprints/convergence-practice/native-recovery/claude/independent-audit.json",
@@ -120,8 +120,8 @@
           "sha256": "324cfed55ef7e20818872b5793214c26a6293f28b14d7fab8998a48770496267"
         },
         {
-          "path": "blueprints/convergence-practice/native-recovery/claude/accepted/actions.jsonl",
-          "sha256": "fb0ea95e17af744965f9d93777ae8d7f2f9505d95af9e45118b4145d8093d012"
+          "path": "blueprints/convergence-practice/native-recovery/claude/accepted/action-journal.json",
+          "sha256": "47a3d1dfc49b574f52efd1df4e98aa5e192cfdcb9b9e206620a3c0f1ff4fe8d1"
         }
       ],
       "usage": {
@@ -144,7 +144,8 @@
     "Cumulative resumed results and per-model counters can have different scopes; interrupted usage can be incomplete. Retain categories separately and do not add them.",
     "Full streams, process identities and session identifiers remain private. Cleanup targets owned CLI process groups and the identity-verified owned wait, not shared services.",
     "Observed SIGINT timing and live-process state are supervisor evidence; the independent retained-stream audit verifies session identity, exact native actions, final bytes and accounting.",
-    "Both original terminal results are retained. The original recorder left a combined total unknown; the independent audit subsequently reconciles disjoint categories against cumulative model counts."
+    "Both original terminal results are retained. The original recorder left a combined total unknown; the independent audit subsequently reconciles disjoint categories against cumulative model counts.",
+    "The current supervisor now protects the containing source repository and retains cleanup errors after review; the native trial used the separately preserved executed runner, and no model rerun followed these hardening changes."
   ],
   "decision_and_scope": {
     "decision": "adopt_within_scope",

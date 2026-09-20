@@ -27,18 +27,6 @@ def write(path, data):
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
 
 
-def private_directory(value, source=HERE):
-    """Respect the containing checkout, including Git worktrees and copied sources."""
-    source = Path(source).resolve()
-    result = subprocess.run(["git", "-C", str(source), "rev-parse", "--show-toplevel"],
-                            capture_output=True, text=True, check=False)
-    boundary = Path(result.stdout.strip()).resolve() if result.returncode == 0 else source
-    destination = Path(value).resolve()
-    if destination == boundary or boundary in destination.parents:
-        raise ValueError("private_run_directory_must_be_outside_source_repository")
-    return destination
-
-
 def identity(pid):
     try:
         fields = Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()
@@ -124,26 +112,10 @@ def init(events):
     return [x for x in events if x.get("type") == "system" and x.get("subtype") == "init"]
 
 
-def cleanup_owned(clients, marker, workspace, cleanup):
-    """A cleanup race must remain evidence, never suppress the attempt receipt."""
-    cleanup.setdefault("errors", [])
-    for client in clients:
-        try:
-            if not client.out.closed:
-                cleanup["cli_cleanup_escalations"].append(client.close())
-        except Exception as exc:
-            cleanup["errors"].append({"scope": client.label, "type": type(exc).__name__})
-    try:
-        if marker is not None and wait_alive(marker):
-            cleanup["final_wait_cleanup_needed"] = stop_wait(marker, workspace)
-        cleanup["wait_stopped"] = marker is not None and not wait_alive(marker)
-    except Exception as exc:
-        cleanup["wait_stopped"] = False
-        cleanup["errors"].append({"scope": "owned_wait", "type": type(exc).__name__})
-
-
 def run(args):
-    root = private_directory(args.run_dir)
+    root = Path(args.run_dir).resolve()
+    if HERE == root or HERE in root.parents:
+        raise ValueError("private_run_directory_must_be_separate")
     root.mkdir(mode=0o700, parents=True, exist_ok=False)
     workspace = root / "fixture"
     workspace.mkdir()
@@ -232,10 +204,13 @@ def run(args):
         failure = {"stage": stage, "type": type(exc).__name__}
         write(root / "failure-private.json", {**failure, "reason": str(exc)})
     finally:
-        cleanup_owned(clients, marker, workspace, cleanup)
+        for client in clients:
+            if not client.out.closed:
+                cleanup["cli_cleanup_escalations"].append(client.close())
+        if marker is not None and wait_alive(marker):
+            cleanup["final_wait_cleanup_needed"] = stop_wait(marker, workspace)
     checks["owned_cli_processes_stopped"] = bool(clients) and all(c.proc.poll() is not None for c in clients)
-    checks["owned_wait_stopped"] = cleanup.get("wait_stopped", False)
-    checks["cleanup_errors_absent"] = not cleanup["errors"]
+    checks["owned_wait_stopped"] = marker is not None and not wait_alive(marker)
     checks["exact_action_journal"] = actions(workspace) == ["checkpoint", "wait", "finalize"]
     checks["checkpoint_executed_once"] = actions(workspace).count("checkpoint") == 1
     checks["frozen_files_unchanged"] = all(sha(HERE / name) == value for name, value in frozen.items()) and all(sha(workspace / name) == frozen[name] for name in ("stage.py", "input.json", "TASK.md"))
