@@ -1636,6 +1636,43 @@
         "Loki initially returned503 before returning200; the failure is retained. Optional viewers and separate native Claude/Windows profiles are not relabeled as active in this Desktop task."
       ],
       "path": "evidence/receipts/current-session-observation-20260920.json"
+    },
+    {
+      "id": "foundation-native-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory",
+        "qmd",
+        "qdrant",
+        "vllm",
+        "socraticode",
+        "serena",
+        "context-mode",
+        "jcodemunch-mcp",
+        "rtk",
+        "headroom",
+        "repomix",
+        "toon",
+        "codex",
+        "claude-code",
+        "opentelemetry-collector-contrib",
+        "prometheus",
+        "loki",
+        "omniroute"
+      ],
+      "claim": "The installed memory/RAG foundation was checked and Serena language coverage repaired; a clean pinned Linux OmniRoute installation passed scoped service, persistence and plaintext restore checks. Native client retrieval and gateway inference are reported separately, including failed compression fidelity and account-quota results.",
+      "limitations": [
+        "Dated Linux/WSL foundation acceptance is not a universal SOTA ranking, proof that every tool runs in this Desktop task, or acceptance on another PC.",
+        "OmniRoute gateway inference is not accepted in this wave: Claude returned429 and the connected Codex accounts reached their configured quota threshold. No repeated quota retries or model substitutions were made.",
+        "OmniRoute3.8.50 native encrypted restore ignores encrypted .enc files. Independent decryption succeeded; only the separate native plaintext restore path was proved.",
+        "RTK/lite compression previews failed preservation of a required value. Exact session-dedup passed a repeated-history preview; global router compression remains disabled pending successful real inference comparison.",
+        "Native estimates, overlapping lifetime/project counters, preview token differences, response cache counters and provider consumption are distinct and must not be added.",
+        "The already-loaded Desktop Serena connection does not reload language settings automatically. Fresh native server contexts picked up the Python/TypeScript repair.",
+        "No exact causal lifetime provider tokens saved is established. Provider quotas and metadata limitations remain explicit.",
+        "Claude's required answer content passed, but final text was not JSON-only. Native Codex usage matched Loki and Prometheus; the initial native Claude usage matched all six Loki requests while Prometheus missed the first two requests.",
+        "A separate fresh Claude run waited for upstream telemetry initialization and matched native/Loki/Prometheus consumption35537 in all four categories. This establishes the bounded observed-run recipe, not retrospective repair of the first run or a default client change."
+      ],
+      "path": "evidence/receipts/foundation-native-20260920.json"
     }
   ],
   "files": [
@@ -1691,7 +1728,7 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "9dda51b5accec2174996aba789ede62829836f371c7cfa3ec00e8e9b2c8602a6",
+      "sha256": "7c6fb7f9470265b18460ddc362b20230058012a7ba6d920ba87063a8fa26ed67",
       "bytes": 10128
     },
     {
@@ -1701,13 +1738,13 @@
     },
     {
       "path": "adoption/lifecycle.md",
-      "sha256": "bef87bce2a1107d7d4ed1a22b45af334d980f4f653d3b94bdc1f0179f79ecef2",
+      "sha256": "61d99434f9ece9fa8ff47605a6575fffd3c7294756fdd14bdd5528f5ea9845e0",
       "bytes": 15345
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "d0f785fe66f896a8362f48afda44fb483eb56138b33e1e3970af92b1c7de37ea",
-      "bytes": 13657
+      "sha256": "e5faef649b9897768e297025f6476f2afa95233b8ed2f478ef7c6656dcd8e92e",
+      "bytes": 13702
     },
     {
       "path": "adoption/paired/README.md",
@@ -3137,8 +3174,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "a4915f4065011f6c5dea37086f7368ff18b72ba0438f4e3a37dda37aab038033",
-      "bytes": 376040
+      "sha256": "5592acbb1404ad04aea14ad46e4d4aa6a1fcd2fb8bfdd43952457ff57cd82288",
+      "bytes": 386163
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -4572,8 +4609,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "fe1c1b297118bc242630728a3e96bd67f31156dd4cdd51063c26e2c849377253",
-      "bytes": 386800
+      "sha256": "0eca294429334350c19d177dee341015456c4e1d716ac2a75d5b1627e353f0fe",
+      "bytes": 386996
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -4737,8 +4774,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "c7aa65c9280c1e6bf462991f788d761d8019e0bef34e4aa66f5c48982c22e91c",
-      "bytes": 3127002
+      "sha256": "030b315aba093a94604d628850abf6d0f7b15574aa0151bd2cea2aebeb9f8bc8",
+      "bytes": 3276948
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -4747,8 +4784,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "8d7fdc2c3f35561c94e1e7625a2e5435b982dce75a42fd3cc4da297236c5ce9c",
-      "bytes": 27938
+      "sha256": "ea4006ea0a097f066187994e43cde591fc6e7ea57a7df0552bddecb72b03cd31",
+      "bytes": 28251
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -4776,6 +4813,11 @@
       "bytes": 11895
     },
     {
+      "path": "docs/foundation-stack.md",
+      "sha256": "6393d0317406b909393e61a7ba7b19f74f266aed04201ed233800fc99d08c257",
+      "bytes": 27915
+    },
+    {
       "path": "docs/landscape.md",
       "sha256": "b089e3876b24ef32ee806ddf057c6712a8ceb9cbc069add3b6b9976e9db6a312",
       "bytes": 9038
@@ -4787,23 +4829,23 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "d3aa773299a1b9ff62348d53f95f9a0baaf7d7a589184a16be799aa81f2f77f9",
-      "bytes": 128972
+      "sha256": "e49f38fd515490aa58147822dc2187f00df30366aa90c98d123abfc61fd57703",
+      "bytes": 133374
     },
     {
       "path": "docs/token-efficiency-stack.md",
-      "sha256": "e0bc45a476f3c385fb312f40d4544a507a5c2868e1a2f55159ae8422eb174662",
-      "bytes": 11635
+      "sha256": "423fda95c379a4f4111a551db6d1ba5d9a57baac43ca2a14e683710cc7ab812b",
+      "bytes": 12165
     },
     {
       "path": "docs/token-native-saturation.md",
-      "sha256": "b0c44fffb87af0bba8ab197aa238d0c75a606fc1f5e9ab9abc0502ecdab2ad83",
-      "bytes": 10776
+      "sha256": "33c3ae436dbb2147f1589641d0feb78bd2c6c7d0fd2bca1d7b5891c0a6b0bda7",
+      "bytes": 10956
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "8f24b4a48e7e9f2954c22336b80e77581e67cf741ccff89ea2d1ddecb6d9918d",
-      "bytes": 20702
+      "sha256": "552b6c6044e621261c46578e2e444a3dd020e87703330bd9fc4216c5995ff6da",
+      "bytes": 21008
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -4884,6 +4926,11 @@
       "path": "evidence/receipts/desktop-direct-rag.json",
       "sha256": "aa3f9b5605471f70f53bbcab135b685327445aeb05d2a2046f68e704c49fba15",
       "bytes": 1298
+    },
+    {
+      "path": "evidence/receipts/foundation-native-20260920.json",
+      "sha256": "92a1f872fc730bac644b6eac27ace8e3102b13829273c79945e408a0075f89a5",
+      "bytes": 25017
     },
     {
       "path": "evidence/receipts/mac-memory-patch-20260920.json",
@@ -5172,8 +5219,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "2ccf38ffd1cc853717120c3fdb990560b4720d9812c83829033e6ebf4f4d7be9",
-      "bytes": 69906
+      "sha256": "9e43e469b34ccda0fa707ca2eaea2fe348c31c81f019ad632ff370fa837c4f8e",
+      "bytes": 72475
     },
     {
       "path": "observability/README.md",
@@ -5362,8 +5409,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "a913b5af85f00ef6e5e427f98f0a757e5340a3bc944f294b9811b9331fd45564",
-      "bytes": 23407
+      "sha256": "e62567cffafd64393d3e77e68b9ff7fffc117632492db18f3c17a85e95a4696e",
+      "bytes": 23465
     },
     {
       "path": "scripts/catalog_decisions.py",

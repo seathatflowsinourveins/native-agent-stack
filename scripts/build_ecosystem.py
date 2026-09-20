@@ -248,7 +248,7 @@ def build_data(root):
         require(set(profile["component_ids"]).issubset(component_ids),
                 "adoption profile references an unknown component")
     guide_paths = list(SETUP_GUIDES)
-    for path in ("adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md"):
+    for path in ("adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md", "docs/foundation-stack.md"):
         if (root / path).exists():
             guide_paths.append(path)
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))
@@ -296,7 +296,7 @@ def build_data(root):
                          "current_host_acceptance": "Unknown on this browser's host"})
     token_receipts = []
     receipt_ids = list(TOKEN_RECEIPTS)
-    for receipt_id in ("token-practice-confirmation-20260920", "native-token-clean-prefix-20260920", "current-session-observation-20260920", "native-token-stack-final-20260920"):
+    for receipt_id in ("token-practice-confirmation-20260920", "native-token-clean-prefix-20260920", "current-session-observation-20260920", "native-token-stack-final-20260920", "foundation-native-20260920"):
         if receipt_id in receipts_by_id:
             receipt_ids.append(receipt_id)
     for receipt_id in receipt_ids:

@@ -384,6 +384,11 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [
@@ -947,6 +952,11 @@
             "id": "native-token-stack-final-20260920",
             "path": "evidence/receipts/native-token-stack-final-20260920.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [],
@@ -1262,6 +1272,11 @@
             "id": "native-token-stack-final-20260920",
             "path": "evidence/receipts/native-token-stack-final-20260920.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [],
@@ -1527,6 +1542,11 @@
             "id": "native-token-stack-final-20260920",
             "path": "evidence/receipts/native-token-stack-final-20260920.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [
@@ -2287,6 +2307,11 @@
             "id": "native-token-stack-final-20260920",
             "path": "evidence/receipts/native-token-stack-final-20260920.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [
@@ -2603,6 +2628,11 @@
             "id": "native-token-stack-final-20260920",
             "path": "evidence/receipts/native-token-stack-final-20260920.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "new_native_client_scope": "One bounded task in each native client passed project-file Context Mode reading and exact jCodeMunch symbol retrieval; six MCP calls, no failures. Consumption is separate from savings.",
@@ -2944,6 +2974,11 @@
             "id": "native-token-stack-final-20260920",
             "path": "evidence/receipts/native-token-stack-final-20260920.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [
@@ -3569,6 +3604,11 @@
             "id": "native-token-stack-final-20260920",
             "path": "evidence/receipts/native-token-stack-final-20260920.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [
@@ -4079,6 +4119,11 @@
             "id": "native-token-stack-final-20260920",
             "path": "evidence/receipts/native-token-stack-final-20260920.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [
@@ -4225,6 +4270,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [
@@ -4313,6 +4363,11 @@
             "id": "native-research-efficiency-20260920",
             "path": "blueprints/us-equities/research-efficiency/native-receipt.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [
@@ -4461,6 +4516,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [
@@ -4651,6 +4711,11 @@
             "id": "native-token-stack-final-20260920",
             "path": "evidence/receipts/native-token-stack-final-20260920.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [
@@ -4818,6 +4883,11 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [
@@ -5183,6 +5253,11 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [
@@ -5412,6 +5487,11 @@
             "id": "token-practice-native-counters-20260920",
             "path": "evidence/receipts/token-practice-native-counters-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [
@@ -5502,6 +5582,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "foundation-native-20260920",
+            "kind": "native_cli_e2e",
+            "path": "evidence/receipts/foundation-native-20260920.json"
           }
         ],
         "retained_operation_ids": [

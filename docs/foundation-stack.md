@@ -2,7 +2,7 @@
 
 This is the selected memory, retrieval and token-efficiency setup for native Codex and Claude, with an optional OmniRoute gateway. Start with [adoption](../adoption/README.md), retain the [component pins](../manifests/stack.json), and use the [owned lifecycle recipes](../adoption/lifecycle.md). A new PC collects its own results; importing this catalog does not qualify its accounts, GPU, hooks or client sessions. This is a dated selection, not a claim that the whole LLM ecosystem has a final best stack.
 
-The foundation wave's [acceptance receipt](../evidence/receipts/foundation-native-20260920.json) is the result authority. At this guide's drafting checkpoint, native/client checks and exact-dedup acceptance were still being assembled. The scoped memory/RAG checks and fresh Serena Python/CJS contexts passed; the isolated Linux OmniRoute installation/start/restart/plaintext-restore/stop checks also passed without provider calls. Gateway baseline counters were zero for compression and cache. RTK and lite previews failed required semantic checks. A native Codex gateway request with a provider-prefixed model returned 400; subsequent gateway provider probes returned quota 429 for Codex and Claude. Those failures remain evidence. Installation, local preview, model routing and an actual successful native task are separate stages.
+The foundation wave's [acceptance receipt](../evidence/receipts/foundation-native-20260920.json) is the result authority. Both native clients completed seven requested MCP calls with exact retrieved source and required answer content. Each jCodeMunch process reported 0 → 4,970 estimated tokens saved; the shared retained estimate reached 49,700. Scoped memory/RAG checks and eight fresh Serena Python/CJS checks passed. The isolated Linux OmniRoute installation/start/restart/plaintext-restore/stop checks passed without provider calls. Gateway compression and semantic response-cache counters were zero; historical provider-prefix cached tokens were 41,903 and unchanged. RTK and lite previews failed required semantic checks. Exact dedup preserved both required facts at 894 → 470 tokens for repeated history, and correctly left a single copy at 447 → 447. Gateway attempts retain a native Codex model400, a separate direct Codex quota429, and a malformed Claude-launch argument sequence with plaintext429. These are not accepted gateway native tasks. Installation, preview and successful model use remain separate stages.
 
 ## Select one useful lane
 
@@ -73,7 +73,7 @@ qmd --index "$QMD_INDEX" collection add "$PROJECT_ROOT/docs" \
   --name "$QMD_COLLECTION" --mask '**/*.md'
 qmd --index "$QMD_INDEX" update
 qmd --index "$QMD_INDEX" search 'native memory scope' \
-  -c "$QMD_COLLECTION" -n 3 --format json
+  -c "$QMD_COLLECTION" -n 3 --json
 qmd --index "$QMD_INDEX" get "$RETURNED_QMD_URI"
 qmd --index "$QMD_INDEX" status
 ```
@@ -142,15 +142,25 @@ OmniRoute 3.8.50 requires Node `>=22.22.2 <23` or `>=24 <27`. Install with upstr
 (
   set -eu
   : "${OMNIROUTE_PREFIX:?Set a new absolute owned prefix}"
+  : "${OMNIROUTE_DATA:?Set an absolute private data location}"
+  : "${OMNIROUTE_PORT:?Select an unused loopback port}"
+  : "${OMNIROUTE_URL:?Set the matching loopback root URL}"
   case "$OMNIROUTE_PREFIX" in /*) ;; *) exit 2 ;; esac
+  case "$OMNIROUTE_DATA" in /*) ;; *) exit 2 ;; esac
   test ! -e "$OMNIROUTE_PREFIX"
-  npm install --global --prefix "$OMNIROUTE_PREFIX" --include=optional omniroute@3.8.50
+  export DATA_DIR="$OMNIROUTE_DATA"
+  npm install --global --prefix "$OMNIROUTE_PREFIX" omniroute@3.8.50 \
+    --include=optional --no-audit --no-fund
+  npm rebuild --global --prefix "$OMNIROUTE_PREFIX" \
+    --allow-scripts=omniroute,keytar,onnxruntime-node,tls-client-node,@parcel/watcher,@swc/core,protobufjs,koffi,esbuild \
+    --foreground-scripts --no-audit --no-fund
   "$OMNIROUTE_PREFIX/bin/omniroute" --version
+  OMNIROUTE_SERVER_HOST=127.0.0.1 REQUIRE_API_KEY=true \
+    "$OMNIROUTE_PREFIX/bin/omniroute" serve --port "$OMNIROUTE_PORT" \
+      --no-open --no-tray --daemon
+  "$OMNIROUTE_PREFIX/bin/omniroute" status
+  curl --fail --silent --show-error "$OMNIROUTE_URL/api/health"
 )
-DATA_DIR="$OMNIROUTE_DATA" OMNIROUTE_SERVER_HOST=127.0.0.1 \
-  "$OMNIROUTE_PREFIX/bin/omniroute" serve --port "$OMNIROUTE_PORT" --no-open --no-tray --daemon
-DATA_DIR="$OMNIROUTE_DATA" "$OMNIROUTE_PREFIX/bin/omniroute" status
-curl --fail --silent --show-error "$OMNIROUTE_URL/api/health"
 ```
 
 Use a root URL without `/v1`, an unused loopback port, and private stable secrets from the [upstream setup](https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/docs/guides/SETUP_GUIDE.md). The server otherwise binds `0.0.0.0`. Node/package startup must also work under the host's native executable lookup; the recorded Windows repair restored process-local executable extensions after an invalid PATHEXT. Do not generalize that repair to unrelated hosts.
@@ -184,7 +194,9 @@ Exact dedup keeps the first occurrence and substitutes later equal suffix blocks
 
 For Claude, the documented process route is `ANTHROPIC_BASE_URL="$OMNIROUTE_URL" ANTHROPIC_AUTH_TOKEN="$OMNIROUTE_API_KEY" claude --model "$EXACT_CLAUDE_MODEL"`. Keep the native configuration home and model identity. OmniRoute's generic Claude launcher forces a 190000-token compaction window, so it does not preserve an existing larger native setting.
 
-For Codex, `omniroute launch-codex --remote "$OMNIROUTE_URL" -- ...` injects a Responses provider. Its token precedence is explicit `--api-key`, active context credential, then environment; an active context can shadow a trial environment key. Use a private in-memory launch or the launcher's [documented direct provider overrides](https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/bin/cli/commands/launch-codex.mjs) without printing credentials. Native passthrough currently retains the raw request model: `codex/gpt-6-astra` routed to Codex but reached the backend with the prefix and failed 400. The supported prepared correction is a single router alias, authenticated `PUT /api/models/alias` with `{"alias":"gpt-6-astra","model":"codex/gpt-6-astra"}`, then native `exec --model gpt-6-astra` at the same explicit effort. Preserve any prior alias, confirm readback and constrain the trial key. This is distinct from the model-deprecation settings map. Alias writes can sync to cloud when a cloud URL is configured; the observed server had no configured cloud URL.
+The corrected upstream launcher shape is `omniroute launch --remote "$OMNIROUTE_URL" --api-key "$OMNIROUTE_API_KEY" -- -p --model claude/claude-opus-5 --output-format stream-json --verbose --max-turns 2`. Keep the model flag after the separator: this release does not define it as a launcher option. The original attempt placed it before the separator and forwarded an extra literal `--` into Claude, so its later format and turn-limit flags were ineffective. Its plaintext429 remains a failed attempt; the corrected shape was source/parser checked without retrying the account limit. Load keys privately and do not place their values in saved commands.
+
+For Codex, `omniroute launch-codex --remote "$OMNIROUTE_URL" -- ...` injects a Responses provider. Its token precedence is explicit `--api-key`, active context credential, then environment; an active context can shadow a trial environment key. Use a private in-memory launch or the launcher's [documented direct provider overrides](https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/bin/cli/commands/launch-codex.mjs) without printing credentials. The native attempt with `codex/gpt-6-astra` returned400 for an unsupported prefixed model; that error alone does not independently identify the endpoint that received it. The released passthrough source retains a raw prefixed model, so the source-supported correction is a single router alias, authenticated `PUT /api/models/alias` with `{"alias":"gpt-6-astra","model":"codex/gpt-6-astra"}`, then native `exec --model gpt-6-astra` at the same explicit effort. The alias was installed and read back withHTTP200; corrected inference remains pending account capacity. Preserve any prior alias and constrain the trial key. This is distinct from the model-deprecation settings map. Alias writes can sync to cloud when a cloud URL is configured; the observed server had no configured cloud URL.
 
 Actual later provider probes returned Codex and Claude quota 429, so do not claim a passing gateway native task or retry the unchanged limits. The 3.8.50 executor also caps unknown-model reasoning effort at xhigh, including passthrough. It cannot certify preservation of Astra max/ultra. Native Codex passthrough skips router compression. Exact model, effort, tool behavior and continuation need actual accepted results once capacity is available; do not substitute a cheaper model to manufacture a pass.
 
@@ -203,5 +215,26 @@ For owned lifecycle, preserve the same DATA_DIR/secrets through restart. Upstrea
 | Gateway cache | `GET /api/cache`, field `semanticCache` | SQLite hits/misses/tokensSaved. `/api/cache/stats` supplies only in-memory LRU statistics. |
 
 Join observer events to the exact returned session/writer and a bounded interval. Compare successful calls and every provider response; leave unmatched startup events explicitly unattributed. A live service or increasing global counter is not independent proof of this task. Keep raw streams, request/response bodies, identifiers and hashes private; publish only the scoped facts and limitations. The [observability guide](../observability/README.md) documents existing native exporters and query methods.
+
+The fresh foundation Codex run matched native usage, Loki and Prometheus in all six categories: 219,725 consumed tokens, including cached input. The native Claude seven-tool run matched all six Loki API requests, totaling 254,111 consumed tokens. Its required answer content passed, while its JSON-only final-format check failed. Prometheus missed the first two Claude requests; the original partial record is retained. An isolated upstream Collector replay correctly preserved both delta and cumulative inputs, so changing the live Collector was not justified.
+
+A separate bounded Claude run resolved observation for a new process by waiting for telemetry initialization before its first user message. The same native Opus 5[1m] process accepted the upstream initialize control request over `--input-format stream-json`, kept stdin open, and waited for its fresh writer's session-count metric at the local exporter. The wait is bounded at45seconds; an unavailable counter ends the check without a model request. After11.138seconds the counter appeared, one short message was sent, and native/Loki/Prometheus all matched: input2, cache creation22728, cache read12792, output15, total35537. The process exited0 with no tools, subagents or remaining children. Use the receipt's `observation_resolution.recipe` for a deliberately observed run. This is an explicit measurement recipe, not a global wrapper, a change to normal native startup, or retrospective recovery of missing metrics. Native initialization responses can include account metadata and must stay private.
+
+The two stdin messages have these shapes; substitute fresh identifiers and send
+the second only after readiness, while keeping the same process and stdin open:
+
+```json
+{"type":"control_request","request_id":"<fresh-request-id>","request":{"subtype":"initialize"}}
+```
+
+```json
+{"type":"user","session_id":"<same-session-id>","message":{"role":"user","content":"Return exactly READY_OBSERVATION_OK. Do not call tools or delegate."},"parent_tool_use_id":null}
+```
+
+The tested local exporter was `http://127.0.0.1:18889/metrics`. Match
+`ecosystem_claude_code_session_count_total` to the exact fresh `instance` label
+from `service.instance.id`, then close stdin after the user message. Another host
+uses its own loopback exporter URL and fresh labels; it does not reuse recorded
+identifiers or initialize responses.
 
 Report exact artifact comparisons as original versus complete returned representation under the same tokenizer and required-fact check. Add cold setup, schemas and recovery overhead where relevant. Keep provider consumption separate from estimates and per-tool cache subsets. Save negative/no-op cases. The [lifetime reporter](../tools/token-report/README.md) retains these categories; refresh its native inputs after a meaningful accepted change, without replaying model tasks on every future session.

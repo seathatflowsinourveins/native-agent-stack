@@ -81,6 +81,7 @@ pairs, including losing comparisons; they are not provider lifetime savings.
 | `ntfy` | observability | use | supporting workflow / 0 |
 | `openresearch` | supporting | use | supporting workflow / 0 |
 | `opentelemetry-collector-contrib` | observability | use | supporting workflow / 0 |
+| `omniroute` | optional | install, persistence, restart, cleanup (isolated Linux fixture only) | optional gateway; use/recovery partial; preview comparisons retained separately |
 | `otel-tui` | supporting | use, cleanup | supporting workflow / 0 |
 | `pandas` | supporting | use | supporting workflow / 0 |
 | `playwright-cli` | optional | use, cleanup | supporting workflow / 0 |

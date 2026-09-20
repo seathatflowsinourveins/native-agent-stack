@@ -1,0 +1,538 @@
+{
+  "schema_version": 1,
+  "id": "foundation-native-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20T16:03:22.849491+00:00",
+  "component_ids": [
+    "ai-memory",
+    "qmd",
+    "qdrant",
+    "vllm",
+    "socraticode",
+    "serena",
+    "context-mode",
+    "jcodemunch-mcp",
+    "rtk",
+    "headroom",
+    "repomix",
+    "toon",
+    "codex",
+    "claude-code",
+    "opentelemetry-collector-contrib",
+    "prometheus",
+    "loki",
+    "omniroute"
+  ],
+  "claim": "The installed memory/RAG foundation was checked and Serena language coverage repaired; a clean pinned Linux OmniRoute installation passed scoped service, persistence and plaintext restore checks. Native client retrieval and gateway inference are reported separately, including failed compression fidelity and account-quota results.",
+  "limitations": [
+    "Dated Linux/WSL foundation acceptance is not a universal SOTA ranking, proof that every tool runs in this Desktop task, or acceptance on another PC.",
+    "OmniRoute gateway inference is not accepted in this wave: Claude returned429 and the connected Codex accounts reached their configured quota threshold. No repeated quota retries or model substitutions were made.",
+    "OmniRoute3.8.50 native encrypted restore ignores encrypted .enc files. Independent decryption succeeded; only the separate native plaintext restore path was proved.",
+    "RTK/lite compression previews failed preservation of a required value. Exact session-dedup passed a repeated-history preview; global router compression remains disabled pending successful real inference comparison.",
+    "Native estimates, overlapping lifetime/project counters, preview token differences, response cache counters and provider consumption are distinct and must not be added.",
+    "The already-loaded Desktop Serena connection does not reload language settings automatically. Fresh native server contexts picked up the Python/TypeScript repair.",
+    "No exact causal lifetime provider tokens saved is established. Provider quotas and metadata limitations remain explicit.",
+    "Claude's required answer content passed, but final text was not JSON-only. Native Codex usage matched Loki and Prometheus; the initial native Claude usage matched all six Loki requests while Prometheus missed the first two requests.",
+    "A separate fresh Claude run waited for upstream telemetry initialization and matched native/Loki/Prometheus consumption35537 in all four categories. This establishes the bounded observed-run recipe, not retrospective repair of the first run or a default client change."
+  ],
+  "memory_rag": {
+    "scope": "agent-lab only; local ai-memory, QMD BM25, Qdrant/vLLM embeddings and SocratiCode; no whole-home indexing or remote embedding activation.",
+    "ai_memory": {
+      "version": "2.3.2",
+      "commands": [
+        "ai-memory --version",
+        "memory_status(workspace=agent-lab, project=agent-lab)",
+        "memory_query(... scoped query ...)",
+        "memory_read_page(... scoped page ...)"
+      ],
+      "result": "Version, scoped status, query and page retrieval passed."
+    },
+    "qmd": {
+      "commands": [
+        "qmd --index agent-lab-docs status",
+        "qmd --index agent-lab-docs search '\"memory\"' -c agent-lab-docs -n 2 --json",
+        "qmd --index agent-lab-docs get '#662276:1:18'"
+      ],
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "result": "BM25 retrieval and source hash matched; pending vector embeddings are intentional in this lane."
+    },
+    "semantic_rag": {
+      "commands": [
+        "codebase_health({})",
+        "codebase_status({projectPath: PROJECT_ROOT})",
+        "codebase_search({projectPath: PROJECT_ROOT, query: 'parse native Codex usage counters', limit: 1, includeLinked: false})"
+      ],
+      "result": "Local Qdrant1.19.1 and vLLM/Nemotron healthy; selected project39files/196chunks and active watcher; scoped search passed."
+    },
+    "serena": {
+      "source_pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "repair": "Append python and typescript to existing bash language_servers; preserve all other settings.",
+      "config_sha256": "59cd14588844d534efd58845ea4e538e61dfbb3a17e6fd2c8ccbc39a5ff28090",
+      "upstream_dependency_commands": [
+        "npm install --prefix ./ typescript@5.9.3",
+        "npm install --prefix ./ typescript-language-server@5.1.3",
+        "uvx -p 3.13 --from pyright==1.1.403 pyright-langserver --stdio"
+      ],
+      "result": "Both npm installs returned success. Eight symbol/source/reference checks passed across fresh codex and claude-code MCP server contexts; exact Python parse_codex and CJS collect[0] source matched.",
+      "cleanup": "Four owned server processes and their children closed."
+    }
+  },
+  "omniroute": {
+    "repository": "https://github.com/diegosouzapw/OmniRoute",
+    "version": "3.8.50",
+    "release_source_commit": "5458026c216f77a3da68ea49152dc33470cfe2cb",
+    "development_branch_boundary": "Default repository branch was3.8.51 development; installed official latest release3.8.50.",
+    "install": {
+      "command": "npm install --global --prefix \"$OMNIROUTE_PREFIX\" omniroute@3.8.50 --include=optional --no-audit --no-fund",
+      "exit_code": 0,
+      "packages_added": 1165,
+      "initial_output_provenance": "Coordinator tool return; native install-script completion independently captured below.",
+      "rebuild_command": "DATA_DIR=\"$OMNIROUTE_DATA\" npm rebuild --global --prefix \"$OMNIROUTE_PREFIX\" --allow-scripts=omniroute,keytar,onnxruntime-node,tls-client-node,@parcel/watcher,@swc/core,protobufjs,koffi,esbuild --foreground-scripts --no-audit --no-fund",
+      "rebuild_exit_code": 0,
+      "global_script_allowlist_changed": false,
+      "native_path_version_returned": "3.8.50",
+      "native_path_registration": "Native bin/omniroute symlink targets the owned Linux prefix; Windows installation remains separate."
+    },
+    "service": {
+      "isolated_port": 20129,
+      "loopback_only": true,
+      "provider_connections": 0,
+      "checks_passed": 14,
+      "health": "healthy",
+      "native_restart": "passed; new process and persisted private dashboard password authenticated withHTTP200",
+      "native_plain_backup_restore": "passed; restored SQLite bytes exactly match original; four SQLite integrity checks passed",
+      "encrypted_backup": "created and independently authenticated/decrypted; native encrypted restore not supported by the shipped implementation",
+      "cleanup": "Owned PID absent and20129 listener closed; private fixture archived; installed prefix retained."
+    },
+    "windows_gateway_repair": "Restored inherited process PATHEXT from Machine/User settings in the existing launcher; no registry or global policy change. Existing loopback20128 health returned200.",
+    "configuration": {
+      "global_compression_enabled": false,
+      "global_default_mode": "off",
+      "existing_key_compression_enabled": false,
+      "existing_key_cache_default_mode": "bypass",
+      "omniroute_memory_enabled": false,
+      "provider_auth_stores_copied": false,
+      "model_alias": {
+        "alias": "gpt-6-astra",
+        "target": "codex/gpt-6-astra",
+        "put_status": 200,
+        "get_status": 200,
+        "runtime_status": "pending quota; avoids prefixed raw native request after source-supported correction"
+      },
+      "native_limits": [
+        "Native Codex passthrough is excluded from router compression.",
+        "Unknown Codex model reasoning effort above xhigh is clamped in3.8.50.",
+        "Upstream Claude launcher forces a190000-token compaction window; native1M equivalence is not established."
+      ]
+    },
+    "preview_comparisons": [
+      {
+        "fixture": "single public tool output containing repeated INFO and required ERROR/SUCCESS values",
+        "mode": "off",
+        "original_tokens": 447,
+        "compressed_tokens": 447,
+        "signed_delta": 0,
+        "validation_valid": true,
+        "required_values_preserved": true
+      },
+      {
+        "fixture": "same single public output",
+        "mode": "lite",
+        "original_tokens": 447,
+        "compressed_tokens": 444,
+        "signed_delta": 3,
+        "validation_valid": false,
+        "required_values_preserved": false,
+        "decision": "rejected"
+      },
+      {
+        "fixture": "same single public output",
+        "mode": "rtk",
+        "original_tokens": 447,
+        "compressed_tokens": 14,
+        "signed_delta": 433,
+        "validation_valid": false,
+        "required_values_preserved": false,
+        "decision": "rejected despite reported97percent reduction"
+      },
+      {
+        "fixture": "same single public output",
+        "mode": "session-dedup exact only",
+        "original_tokens": 447,
+        "compressed_tokens": 447,
+        "signed_delta": 0,
+        "validation_valid": true,
+        "required_values_preserved": true,
+        "decision": "safe no-op"
+      },
+      {
+        "fixture": "two copies of the same public tool history",
+        "mode": "session-dedup exact only",
+        "original_tokens": 894,
+        "compressed_tokens": 470,
+        "signed_delta": 424,
+        "validation_valid": true,
+        "required_values_preserved": true,
+        "decision": "accepted preview only;47percent reported reduction"
+      }
+    ],
+    "gateway_client_attempts": [
+      {
+        "client": "Codex",
+        "upstream_command": "omniroute launch-codex --remote http://127.0.0.1:20128 --api-key \"$OMNIROUTE_API_KEY\" -- exec --model codex/gpt-6-astra -c 'model_reasoning_effort=\"medium\"' --json -",
+        "exit_code": 1,
+        "result": "HTTP400: prefixed raw model not supported with the connected ChatGPT account",
+        "correction": "Stored alias and native --model gpt-6-astra; no further provider call after quota result.",
+        "route_observation": "Native error alone does not independently prove which endpoint received the request; retain separately from the direct HTTP429 probe."
+      },
+      {
+        "client": "Claude",
+        "upstream_command": "omniroute launch --remote http://127.0.0.1:20128 --api-key \"$OMNIROUTE_API_KEY\" --model claude/claude-opus-5 -- -p --model claude/claude-opus-5 --output-format stream-json --verbose --max-turns 2 --permission-prompts none",
+        "exit_code": 1,
+        "result": "HTTP429: connected gateway account rate limit; returned reset after1h.",
+        "parser_failure": "Pre-separator --model is not an upstream launcher option and forwarded a literal -- into Claude. The downstream format/turn flags were not effective; plaintext429 is not structured native acceptance.",
+        "prepared_corrected_command": "omniroute launch --remote http://127.0.0.1:20128 --api-key \"$OMNIROUTE_API_KEY\" -- -p --model claude/claude-opus-5 --output-format stream-json --verbose --max-turns 2 --permission-prompts none"
+      },
+      {
+        "client": "OpenAI-compatible upstream HTTP route",
+        "command": "POST /v1/chat/completions using exact codex/gpt-6-astra and repeated tool fixture",
+        "http_status": 429,
+        "result": "All connected codex accounts reached configured quota threshold; returned reset after133h3m35s. No model substitution."
+      }
+    ],
+    "retained_counter_snapshot": {
+      "captured_at_utc": "2026-09-20T15:46:53.097308+00:00",
+      "scope": "Existing Windows gateway data, retained history only",
+      "compression": {
+        "command": "GET /api/analytics/compression?since=all",
+        "http_status": 200,
+        "totalRequests": 0,
+        "totalTokensSaved": 0,
+        "totalSkipped": 3
+      },
+      "semantic_cache": {
+        "command": "GET /api/cache",
+        "http_status": 200,
+        "hits": 0,
+        "misses": 0,
+        "tokensSaved": 0
+      },
+      "usage": {
+        "command": "GET /api/usage/analytics?range=all",
+        "http_status": 200,
+        "totalRequests": 31,
+        "successfulRequests": 28,
+        "promptTokens": 55857,
+        "completionTokens": 1863,
+        "totalTokens": 57720
+      },
+      "boundary": "Usage covers older retained requests; failed acceptance requests do not establish savings. CLI period=all does not select all history; use the exact since=all route.",
+      "historical_provider_prefix_cache": {
+        "command": "GET /api/cache; promptCache",
+        "totalRequests": 31,
+        "requestsWithCacheControl": 21,
+        "totalInputTokens": 54894,
+        "totalCachedTokens": 41903,
+        "totalCacheCreationTokens": 12872,
+        "tokensSaved": 41903,
+        "boundary": "Unchanged historical upstream cache-usage aggregate, not new causal saved tokens; distinct from semantic response cache and compression."
+      }
+    }
+  },
+  "native_client_acceptance": {
+    "status": "Both native clients completed seven requested MCP calls with exact source and required answer content; observation boundaries below.",
+    "codex": {
+      "status": "seven_requested_MCP_calls_and_source_fidelity_pass",
+      "requested_model": "gpt-6-astra",
+      "returned_models": [
+        "gpt-6-astra"
+      ],
+      "same_process_jcode_delta": 4970,
+      "jcode_pid_confirmed": true,
+      "source_fidelity": {
+        "markdown": {
+          "heading": "# Native upstream additions — 2026-09-20",
+          "sha256": "9a6a8f19fe8171c87de9f42a935decf84a1b59e8822b3153b0a1192bb5a46684"
+        },
+        "function_id": "tools/ecosystem/evaluate-native.py::parse_codex#function",
+        "exact_full_function_body": true,
+        "function_sha256": "da3277537bf59cb63bc0b7bd2b25f86422d8f79679d382147d72863f9dc1dfd5",
+        "source_file_sha256": "3b3b1465377aaa2c952749fb3c25310a33ceb8969e29bdeee01631c4eba321e6",
+        "source_files_unchanged": true
+      },
+      "strict_final_JSON": true,
+      "content_pass": true,
+      "usage": {
+        "input_tokens": 219267,
+        "cached_input_tokens": 190336,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 458,
+        "reasoning_output_tokens": 0,
+        "total_tokens": 219725
+      },
+      "loki_matches_direct": true,
+      "loki_matched_requests": 9,
+      "prometheus_matches_direct": true,
+      "prometheus_missing": {
+        "input_tokens": 0,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 0,
+        "reasoning_output_tokens": 0,
+        "total_tokens": 0
+      },
+      "cleanup": {
+        "tagged_children_remaining": 0,
+        "jcode_pid_no_longer_exists": true,
+        "context_pid_tracking_scope": "Claude inherited marker is observed at all seven returns; Codex MCP sanitizes environment so only native client/code host are tagged."
+      },
+      "limits": [
+        "One fresh native invocation per client, no resume/PC reboot or Desktop reconnect in this acceptance.",
+        "No whole-provider savings baseline or billing receipt. Cached input/reasoning output are subset fields; never add snapshots.",
+        "Configured native hooks and tool discovery remain active. Claude uses one ToolSearch in addition to the seven requested MCP operations.",
+        "Observer values are independent backend copies of native usage, not an invoice or measured savings baseline.",
+        "All Loki bodies are omitted. Exact full source fidelity is established separately from retained direct MCP output.",
+        "Codex unmatched startup response usage remains separate and billing treatment is unknown."
+      ],
+      "upstream_argv": [
+        "${NATIVE_BIN}/codex",
+        "--ask-for-approval",
+        "never",
+        "--sandbox",
+        "danger-full-access",
+        "--cd",
+        "${PROJECT_ROOT}",
+        "exec",
+        "--model",
+        "gpt-6-astra",
+        "--json",
+        "--color",
+        "never",
+        "--output-last-message",
+        "${PRIVATE_RUN_DIR}/final.txt",
+        "-"
+      ],
+      "exit_code": 0,
+      "started_at_utc": "2026-09-20T15:46:10.031Z",
+      "completed_at_utc": "2026-09-20T15:46:43.151Z"
+    },
+    "claude": {
+      "status": "seven_requested_MCP_calls_and_source_fidelity_pass",
+      "requested_model": "claude-opus-5[1m]",
+      "returned_models": [
+        "claude-opus-5"
+      ],
+      "same_process_jcode_delta": 4970,
+      "jcode_pid_confirmed": true,
+      "source_fidelity": {
+        "markdown": {
+          "heading": "# Native upstream additions — 2026-09-20",
+          "sha256": "9a6a8f19fe8171c87de9f42a935decf84a1b59e8822b3153b0a1192bb5a46684"
+        },
+        "function_id": "tools/ecosystem/evaluate-native.py::parse_codex#function",
+        "exact_full_function_body": true,
+        "function_sha256": "da3277537bf59cb63bc0b7bd2b25f86422d8f79679d382147d72863f9dc1dfd5",
+        "source_file_sha256": "3b3b1465377aaa2c952749fb3c25310a33ceb8969e29bdeee01631c4eba321e6",
+        "source_files_unchanged": true
+      },
+      "strict_final_JSON": false,
+      "content_pass": true,
+      "usage": {
+        "input_tokens": 12,
+        "cache_creation_input_tokens": 34270,
+        "cache_read_input_tokens": 218267,
+        "output_tokens": 1562,
+        "total_tokens": 254111
+      },
+      "loki_matches_direct": true,
+      "loki_matched_requests": 6,
+      "prometheus_matches_direct": false,
+      "prometheus_missing": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 26668,
+        "cache_read_input_tokens": 50222,
+        "output_tokens": 423,
+        "total_tokens": 77317
+      },
+      "cleanup": {
+        "tagged_children_remaining": 0,
+        "jcode_pid_no_longer_exists": true,
+        "context_pid_tracking_scope": "Claude inherited marker is observed at all seven returns; Codex MCP sanitizes environment so only native client/code host are tagged."
+      },
+      "limits": [
+        "One fresh native invocation per client, no resume/PC reboot or Desktop reconnect in this acceptance.",
+        "No whole-provider savings baseline or billing receipt. Cached input/reasoning output are subset fields; never add snapshots.",
+        "Configured native hooks and tool discovery remain active. Claude uses one ToolSearch in addition to the seven requested MCP operations.",
+        "Observer values are independent backend copies of native usage, not an invoice or measured savings baseline.",
+        "All Loki bodies are omitted. Exact full source fidelity is established separately from retained direct MCP output.",
+        "Codex unmatched startup response usage remains separate and billing treatment is unknown."
+      ],
+      "upstream_argv": [
+        "${NATIVE_BIN}/claude",
+        "--permission-mode",
+        "bypassPermissions",
+        "-p",
+        "--model",
+        "claude-opus-5[1m]",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--include-hook-events",
+        "--max-turns",
+        "12",
+        "--session-id",
+        "<private-session-id>"
+      ],
+      "exit_code": 0,
+      "started_at_utc": "2026-09-20T15:49:15.562Z",
+      "completed_at_utc": "2026-09-20T15:49:29.154Z"
+    }
+  },
+  "native_counter_snapshot": {
+    "captured_at_utc": "2026-09-20T15:50:45.673231+00:00",
+    "report_refresh": "ecosystem-token-report refresh",
+    "exit_code": 0,
+    "issues": [],
+    "rtk": {
+      "global_retained_saved_estimate": 1722,
+      "project_subset": 234,
+      "retention_days": 90
+    },
+    "jcodemunch": {
+      "default_index_retained_saved_estimate": 49700,
+      "method": "upstream whole-file bytes/4 counterfactual; includes verification"
+    },
+    "headroom": {
+      "saved_estimate": 0,
+      "boundary": "upstream lifetime field capped at30days"
+    },
+    "context_mode": {
+      "desktop_retained_event_estimate": 2264064,
+      "native_claude_retained_event_estimate": 57856,
+      "native_codex_retained_event_estimate": 79616,
+      "boundary": "Latest persisted per-runtime upstream file, retained eventcount×256; not a sum of sessions or measured provider usage. Fresh-process stats narrative is not a trustworthy exact session delta."
+    }
+  },
+  "private_evidence": [
+    {
+      "label": "Memory/RAG and Serena receipt",
+      "sha256": "fcee0da4b51520949b3f6f11782d785a32e829fcedf034bf13c512d7badc8fb2"
+    },
+    {
+      "label": "Token foundation upstream audit",
+      "sha256": "ad404f6bf83ea158803e5bc06d31ebe1091dbccb2540e800322c836fedc6856a"
+    },
+    {
+      "label": "Isolated Linux OmniRoute lifecycle receipt",
+      "sha256": "0b32bd3d0d131c84b4005ceb2612312df82922f0cf8f2b45843ae882922e0a51"
+    },
+    {
+      "label": "Gateway all-history baseline",
+      "sha256": "e929c43ab6bd8e71812d4cad46389a2d1dd8dacf6f7f436db8e86cdd0c04f16f"
+    },
+    {
+      "label": "Rejected compression previews",
+      "sha256": "f8ca3b39a4766581791b44e3b8433669cf5ea910067270bce2f5f519feaf008e"
+    },
+    {
+      "label": "Exact dedup previews",
+      "sha256": "105ad9ff2c8c3ca4a87b396090c0096c536c9789cee72531797165a09f0103a6"
+    },
+    {
+      "label": "Post-attempt retained counters",
+      "sha256": "0730e591ff4b417a39bfa8eb6252dcbfdc01e97bfa572c30dd2c81fa1fda3752"
+    },
+    {
+      "label": "Exact model alias correction",
+      "sha256": "346bd7f48314846a6128dd19f2a9663f8e38183d238775cef7b83480f573602c"
+    },
+    {
+      "label": "Fresh native client acceptance and observation receipt",
+      "sha256": "3b1384b191d2f39160219c5be0656a0f42d46387c92cfadeb779b78ace29ad6b"
+    },
+    {
+      "label": "Fresh native Claude telemetry readiness acceptance",
+      "sha256": "7061c0b63429deb3c2c85821a5a5fe50c94407955641dab78685a017b317aaca"
+    },
+    {
+      "label": "Isolated upstream collector cumulative/delta preservation",
+      "sha256": "5aac4fc6bbfc9c7f2abe1ea9a21dec063e31ca929172d7e7f7103043b36fbee0"
+    }
+  ],
+  "observation_resolution": {
+    "status": "native_result_Loki_Prometheus_full_usage_match_after_readiness",
+    "scope": "One fresh native Claude process, initialized and observed before its one short user prompt; zero tools or agents. Does not erase the original seven-tool run observation gap.",
+    "model_requested": "claude-opus-5[1m]",
+    "canonical_model": "claude-opus-5",
+    "native_usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 22728,
+      "cache_read_input_tokens": 12792,
+      "output_tokens": 15,
+      "total_tokens": 35537
+    },
+    "Loki_usage": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 22728,
+      "cache_read_input_tokens": 12792,
+      "output_tokens": 15,
+      "total_tokens": 35537
+    },
+    "Prometheus_usage": {
+      "cache_creation_input_tokens": 22728,
+      "cache_read_input_tokens": 12792,
+      "input_tokens": 2,
+      "output_tokens": 15,
+      "total_tokens": 35537
+    },
+    "all_four_categories_match": true,
+    "result": "READY_OBSERVATION_OK",
+    "exit_code": 0,
+    "tool_calls": 0,
+    "subagents": 0,
+    "no_user_model_request_before_readiness": true,
+    "initialize_acknowledged": true,
+    "first_user_message_sent_at_utc": "2026-09-20T16:01:38.045Z",
+    "Loki_api_request_count": 1,
+    "Loki_api_event_utc": "2026-09-20T16:01:39.306Z",
+    "recipe": [
+      "Launch the configured native client with --input-format stream-json and --output-format stream-json, preserving account and native settings; assign one fresh service.instance.id and ecosystem.task.id before launch.",
+      "Send the upstream initialize control request, keep stdin open, and withhold user messages.",
+      "Poll the loopback collector exporter for that exact writer’s claude_code.session.count counter, with a 45-second ceiling. Counter creation precedes the native session increment in installed source. Stop cleanly without model calls if unavailable.",
+      "After the counter is observed, send one user message in the same stdin stream, close stdin, retain native result, then query Loki and Prometheus using the fresh identities and bounded times."
+    ],
+    "limits": [
+      "Explicit observed-run recipe, not a global wrapper or default workflow change.",
+      "Only one short request was measured after readiness; no tool-heavy replay or fresh Desktop acceptance.",
+      "Provider consumption is native reported usage confirmed in two backends, not a token-savings baseline or invoice.",
+      "Original earlier two-request metric loss is retained. This successful readiness run supports the asynchronous-startup hypothesis but does not retrospectively recover missing raw metric points."
+    ],
+    "captured_at_utc": "2026-09-20T16:03:22.849491+00:00",
+    "upstream_argv": [
+      "${NATIVE_BIN}/claude",
+      "--permission-mode",
+      "bypassPermissions",
+      "-p",
+      "--model",
+      "claude-opus-5[1m]",
+      "--input-format",
+      "stream-json",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--max-turns",
+      "2",
+      "--session-id",
+      "<private-session-id>"
+    ],
+    "readiness_elapsed_ms": 11138,
+    "tagged_processes_remaining": 0,
+    "collector_configuration_changed": false,
+    "default_native_workflow_changed": false,
+    "original_seven_tool_Prometheus_gap_preserved": true
+  }
+}

@@ -16,6 +16,14 @@ does not guarantee a reduction against the cheapest adequate baseline.
 
 ## Core list
 
+The later [foundation wave](foundation-stack.md) adds an optional OmniRoute
+runtime row alongside the fourteen core and nine observation rows. Both native
+clients passed seven requested MCP calls with exact source, each reporting a
+4,970-token jCodeMunch estimate; its shared retained estimate is now49,700.
+The foundation receipt also preserves rejected compression previews, gateway
+quota failures and the independently verified Claude telemetry-readiness recipe.
+Earlier figures below retain their original observation times.
+
 Commands below name the upstream operation; full arguments and portable path
 variables are in the machine list and each linked recipe. MCP operations use the
 installed native client or the upstream MCPorter bridge. Measurements are dated

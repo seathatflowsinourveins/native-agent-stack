@@ -8,9 +8,11 @@
   "counts": {
     "core": 14,
     "observation": 9,
-    "total_rows": 23,
-    "native_savings_counter_tools": 4,
-    "core_without_native_savings_counter": 10
+    "total_rows": 24,
+    "native_savings_counter_tools": 5,
+    "core_without_native_savings_counter": 10,
+    "runtime": 1,
+    "core_native_savings_counter_tools": 4
   },
   "method": [
     "Exact artifact counts, upstream byte/event estimates and provider consumption are separate.",
@@ -672,32 +674,38 @@
       },
       "returned_result_summary": "2026-09-20 14:55:58.940776 UTC upstream get_session_stats returned session_calls 0, session_tokens_saved 0 and total_tokens_saved 39,760 in the default index, generation 2. The earlier 14:18:33.801 UTC total was 29,820; both snapshots include verification retrievals. Native Codex and Claude retrieved the requested exact function. An isolated clean-prefix one-file, 12-symbol index returned exact unique_json before and after server restart; its separate estimate moved 0 → 2,781 → 5,562.",
       "session_statistics": {
-        "availability": "upstream_estimate",
-        "value": 0,
-        "unit": "estimated tokens saved",
-        "observed_at": "2026-09-20T14:55:58.940776+00:00",
-        "scope": "New statistics reporting process, session_calls 0; does not erase previous indexed retrieval.",
-        "summary": "0 estimated tokens saved and 0 calls in the fresh statistics reporting process at 2026-09-20 14:55:58 UTC. This does not erase previous indexed retrievals or describe another client session.",
-        "session_calls": 0,
-        "source_path": "evidence/receipts/native-token-stack-final-20260920.json"
+        "availability": "same_process_upstream_estimate",
+        "value": {
+          "codex": 4970,
+          "claude": 4970
+        },
+        "scope": "Two distinct fresh native MCP processes; before0,after4970 each.",
+        "summary": "Foundation runs: Codex and Claude each returned0→4970 in the same jCodeMunch process; neither value is provider savings."
       },
       "lifetime_statistics": {
         "availability": "upstream_estimate",
-        "value": 39760,
+        "value": 49700,
         "unit": "estimated tokens saved",
-        "observed_at": "2026-09-20T14:55:58.940776+00:00",
+        "observed_at": "2026-09-20T15:50:40.270638+00:00",
         "scope": "Default index-root bytes/4 ledger, generation 2; includes repeated verification retrievals. The isolated clean-prefix ledger is excluded. This is a whole-file counterfactual estimate, not measured provider savings.",
-        "summary": "39,760 estimated tokens saved at 2026-09-20 14:55:58 UTC in the persistent default index ledger, including validation retrievals. Earlier dated snapshot: 29,820. Isolated clean-prefix totals remain separate; schema-size estimates are never added.",
+        "summary": "Foundation snapshot:49,700 retained upstream whole-file bytes/4 estimate (earlier39,760); includes validation and both fresh native reads. Shared ledger, not additive with session subsets.",
         "earlier_observations": [
           {
             "observed_at": "2026-09-20T14:18:33.801Z",
             "value": 29820,
             "scope": "Default index-root bytes/4 ledger, generation 2, includes repeated verification reads. Isolated clean-prefix 5562 is excluded.",
             "source_path": "evidence/receipts/current-session-observation-20260920.json"
+          },
+          {
+            "observed_at": "2026-09-20T14:55:58.940776+00:00",
+            "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
+            "stdout_sha256": "586e1b1f3cdca3ebb2f8df72ef7d76721631652609a04ce166aff72cc3009539",
+            "scope": "Default index-root bytes/4 ledger, generation 2; includes repeated verification retrievals. The isolated clean-prefix ledger is excluded. This is a whole-file counterfactual estimate, not measured provider savings.",
+            "value": 39760
           }
         ],
-        "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
-        "stdout_sha256": "586e1b1f3cdca3ebb2f8df72ef7d76721631652609a04ce166aff72cc3009539"
+        "source_path": "evidence/receipts/foundation-native-20260920.json",
+        "stdout_sha256": "d2d1df1909c5cac9217f16ce93215f5907df4729c04bbf5b52c28984d98436f8"
       },
       "baseline_summary": "Whole-file retrieval: 5,476 → 861 tokens. Known focused source: 601 → 861, an expansion of 260, so keep the focused read. Clean-prefix indexed retrieval: 2,484 → 324; known exact function: 40 → 324, an expansion of 284. Exact function fidelity passed; these selected artifacts are separate from the retained 39,760 upstream estimate.",
       "artifact_baselines": [
@@ -760,7 +768,8 @@
         "evidence/receipts/native-token-focus-clients-20260920.json",
         "evidence/receipts/token-practice-confirmation-20260920.json",
         "evidence/receipts/native-token-clean-prefix-20260920.json",
-        "evidence/receipts/native-token-stack-final-20260920.json"
+        "evidence/receipts/native-token-stack-final-20260920.json",
+        "evidence/receipts/foundation-native-20260920.json"
       ]
     },
     {
@@ -857,7 +866,7 @@
         "install_note": "Native pinned execution: `uvx --from git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143 serena start-mcp-server --context codex --project-from-cwd`",
         "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
       },
-      "returned_result_summary": "2026-09-20 loaded Desktop get_current_config: active agent-lab project, language server ready, Bash. Initial pattern query returned empty; corrected explicit source request returned '172:def parse_codex(stream, env):'. Earlier native Codex find_symbol/find_referencing_symbols calls succeeded. Bash readiness is not proof of Python semantic support.",
+      "returned_result_summary": "2026-09-20 loaded Desktop get_current_config: active agent-lab project, language server ready, Bash. Initial pattern query returned empty; corrected explicit source request returned '172:def parse_codex(stream, env):'. Earlier native Codex find_symbol/find_referencing_symbols calls succeeded. Bash readiness is not proof of Python semantic support. Foundation repair enabled Python/TypeScript alongside Bash. Eight fresh Codex/Claude MCP-context source/reference checks passed for Python and CJS.",
       "session_statistics": {
         "availability": "none",
         "value": null,
@@ -898,7 +907,8 @@
         "evidence/receipts/current-session-observation-20260920.json",
         "evidence/receipts/native-context-memory.json",
         "evidence/receipts/component-history.json",
-        "evidence/receipts/token-practice-coverage-20260920.json"
+        "evidence/receipts/token-practice-coverage-20260920.json",
+        "evidence/receipts/foundation-native-20260920.json"
       ]
     },
     {
@@ -2014,6 +2024,53 @@
           "returned_body": "{\n  \"database\": \"ok\",\n  \"version\": \"13.2.2\",\n  \"commit\": \"1bea008f7e4e858b6824c9e364d608bd4d10b13a\"\n}"
         }
       ]
+    },
+    {
+      "component_id": "omniroute",
+      "group": "runtime",
+      "purpose": "Optional pinned local gateway; isolated lifecycle verified, connected-account inference remains unaccepted in this wave.",
+      "upstream_commands": {
+        "install": [
+          "DATA_DIR=\"$OMNIROUTE_DATA\" npm install --global --prefix \"$OMNIROUTE_PREFIX\" omniroute@3.8.50 --include=optional",
+          "DATA_DIR=\"$OMNIROUTE_DATA\" npm rebuild --global --prefix \"$OMNIROUTE_PREFIX\" --allow-scripts=omniroute,keytar,onnxruntime-node,tls-client-node,@parcel/watcher,@swc/core,protobufjs,koffi,esbuild --foreground-scripts"
+        ],
+        "use": [
+          "DATA_DIR=\"$OMNIROUTE_DATA\" OMNIROUTE_SERVER_HOST=127.0.0.1 REQUIRE_API_KEY=true \"$OMNIROUTE_PREFIX/bin/omniroute\" serve --port \"$OMNIROUTE_PORT\" --no-open --no-tray --daemon",
+          "\"$OMNIROUTE_PREFIX/bin/omniroute\" launch-codex --remote \"$OMNIROUTE_URL\" -- exec --model gpt-6-astra",
+          "\"$OMNIROUTE_PREFIX/bin/omniroute\" launch --remote \"$OMNIROUTE_URL\" -- -p --model claude/claude-opus-5"
+        ],
+        "statistics": [
+          "GET /api/analytics/compression?since=all",
+          "GET /api/cache",
+          "GET /api/usage/analytics?range=all"
+        ],
+        "command_kind": "Released upstream CLI and authenticated HTTP API. Use an explicit private gateway key; aliases and account capacity require their own accepted results."
+      },
+      "returned_result_summary": "Linux3.8.50 version and14 isolated lifecycle checks passed. Native encrypted restore is unsupported; separate plaintext restore was byte-exact. Gateway Codex attempt failed400, direct Codex request failed429, and Claude attempt returned plaintext429 after a retained argument-parser error. No successful gateway inference is claimed.",
+      "session_statistics": {
+        "availability": "not_established",
+        "value": null,
+        "scope": "No accepted current gateway inference savings comparison.",
+        "summary": "Exact-dedup preview894→470 preserves both facts; single447→447 is unchanged. This is a preview, not session/provider savings."
+      },
+      "lifetime_statistics": {
+        "availability": "upstream_retained_counters",
+        "value": null,
+        "scope": "Existing Windows gateway retained history at2026-09-20T15:46:53Z, separate from clean Linux fixture.",
+        "summary": "Compression saved0; semantic-cache saved0; historical provider-prefix cache field tokensSaved41903, unchanged. Retained consumed57720 is separate; new causal savings unavailable."
+      },
+      "baseline_summary": "RTK447→14 and lite447→444 both lost a required value and failed validation. Only exact session-dedup accepted the repeated-history preview. Global compression remainsoff.",
+      "native_client_evidence": {
+        "desktop": "The Linux CLI is now on native PATH. This Desktop task is not automatically rerouted.",
+        "codex": "Stored exact-model alias readback passed; corrected native routing remains pending connected-account quota. Native default GPT-6 Astra independently passed foundation retrieval.",
+        "claude": "Gateway task unaccepted; native default Opus5 independently passed foundation retrieval. The upstream gateway launcher uses190000-token compaction, not native1M equivalence."
+      },
+      "lifecycle_summary": "install/persistence/restart/cleanup accepted for isolated Linux fixture; use/recovery partial. Encrypted native restore and successful connected native gateway inference are not established.",
+      "source_paths": [
+        "evidence/receipts/foundation-native-20260920.json",
+        "docs/foundation-stack.md",
+        "blueprints/token-native-focus/saturation-audit.json"
+      ]
     }
   ],
   "latest_counter_capture": {
@@ -2022,5 +2079,6 @@
     "source_path": "evidence/receipts/native-token-stack-final-20260920.json",
     "boundary": "Read-only retained snapshots. Context Mode process-file session values are not linked to fresh client acceptance sessions; no cumulative snapshots or runtime scopes are summed."
   },
-  "native_client_acceptance_source": "evidence/receipts/native-token-stack-final-20260920.json"
+  "native_client_acceptance_source": "evidence/receipts/native-token-stack-final-20260920.json",
+  "foundation_acceptance_source": "evidence/receipts/foundation-native-20260920.json"
 }
