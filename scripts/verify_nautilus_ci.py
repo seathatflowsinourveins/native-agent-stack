@@ -16,7 +16,7 @@ import re
 SOURCE_SHA256 = "487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53"
 OBSERVER_SHA256 = "b5cb94472619f6cd5432b7e410f4657fcf8db966fada9032c7dc188739565d30"
 UUID4 = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$")
-ENVIRONMENT = {"HOME", "LANG", "PATH", "PYTHONDONTWRITEBYTECODE", "PYTHONHASHSEED",
+ENVIRONMENT = {"HOME", "LANG", "PATH", "PWD", "PYTHONDONTWRITEBYTECODE", "PYTHONHASHSEED",
                "OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS"}
 DISTRIBUTIONS = {"nautilus-trader==2.0.0rc5", "numpy==2.5.3", "pandas==3.0.6",
                  "python-dateutil==2.9.0.post0", "six==1.17.0"}

@@ -35,7 +35,7 @@ class NativeNautilusCITests(unittest.TestCase):
     def proof(self):
         return {"network_namespace": "net:[2]", "interfaces": [[1, "lo"]], "home_exists": False,
                 "environment_names": ["HOME", "LANG", "PATH", "PYTHONDONTWRITEBYTECODE",
-                                      "PYTHONHASHSEED", "OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS"]}
+                                      "PYTHONHASHSEED", "OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS", "PWD"]}
 
     def test_uuid_normalization_preserves_every_other_report_field(self):
         verifier = self.verifier()

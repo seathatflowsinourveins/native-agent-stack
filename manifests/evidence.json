@@ -6141,18 +6141,18 @@
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
-      "sha256": "050094f4c5ed715fb26441f663d758a121cde1ea68f6017bde3f65f1fa566387",
-      "bytes": 7291
+      "sha256": "0e1509b3e74d5254504deb76831d39ce7ef22defffadfa21d87d4061c2defc8b",
+      "bytes": 7745
     },
     {
       "path": "scripts/verify_nautilus_ci.py",
-      "sha256": "0a0c9d329f064fee88e59fea42ef2a2159de19d24347d024634dc082c38d1dcb",
-      "bytes": 8601
+      "sha256": "e14e3372815747eefa800f3538f30eabfb4fab7025ccc507bb0b946e67d2292f",
+      "bytes": 8608
     },
     {
       "path": "tests/test_native_nautilus_ci.py",
-      "sha256": "a42d461aa1f6c3b463b94f3b49ee57f4a19849be4c0c7d0b5c17fcb38892d5c8",
-      "bytes": 5695
+      "sha256": "8997b51d8400a77eb8a182254cd22e348a7cfde967b367373819d5c3af879eea",
+      "bytes": 5702
     },
     {
       "path": "blueprints/convergence-practice/worker-recovery/containment-independent-audit.json",
