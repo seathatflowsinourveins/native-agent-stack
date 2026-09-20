@@ -1,0 +1,3825 @@
+{
+  "schema_version": 1,
+  "recorded_date_utc": "2026-09-20",
+  "kind": "evidence_scope_audit",
+  "base_public_commit": "8babbd6",
+  "scope": "Read-only aggregation of selected component metadata, dated public receipts and immutable retained native operations. This matrix is not a new installation, model run or full-host certification.",
+  "sources": {
+    "selected_stack": "manifests/stack.json",
+    "canonical_repository_union": "catalogs/us-equities/decision-index.json",
+    "public_evidence": "manifests/evidence.json",
+    "retained_fresh_summary": {
+      "generated_at_utc": "2026-09-20T04:11:34.336Z",
+      "sha256": "c906ddb20af40d56af68709ee18e22838d71beeee8622bcf973372c932516903",
+      "public_scope_receipt": "evidence/receipts/token-native-retained-functional-20260920.json",
+      "raw_private_capture_published": false
+    },
+    "new_wave_receipts": [
+      "evidence/receipts/native-jcodemunch-20260920.json",
+      "evidence/receipts/native-headroom-mcp-20260920.json",
+      "evidence/receipts/native-token-focus-clients-20260920.json",
+      "evidence/receipts/native-sandbox-network-20260920.json",
+      "evidence/receipts/native-claude-hud-interactive-20260920.json"
+    ]
+  },
+  "counts": {
+    "selected_components": 58,
+    "catalog_identities": 505,
+    "nonselected_catalog_identities": 447,
+    "exclusive_identity_groups": {
+      "star_review": 275,
+      "component_record": 58,
+      "catalog_card": 116,
+      "research_supplement": 54,
+      "legacy_candidate": 2
+    }
+  },
+  "counter_policy": {
+    "rtk": "retained upstream command-output estimate; global/project overlap",
+    "context-mode": "runtime-scoped retained-event/session heuristics; retention can decrease totals",
+    "headroom": "native usage report window is capped; offline adapter fixtures do not populate that ledger automatically",
+    "all_other_components": "No other verified cumulative upstream token-savings history in the selected catalog. Consumption counters and exact one-off artifacts stay separate.",
+    "exact_causal_lifetime_provider_tokens_saved": null,
+    "never_sum": "overlapping snapshots, artifact reductions, cache subset counters or shared baseline representations",
+    "jcodemunch-mcp": "Native repeated-use bytes/4 estimate at upstream default index root; schema payload estimate is not per-request savings or billed tokens."
+  },
+  "next_wave": [
+    {
+      "component_id": "claude-hud",
+      "gap": "Synthetic renderer accepted. Real interactive attempt reached onboarding before HUD appeared despite existing authenticated state; live statusline remains unverified. No model/login route was changed."
+    },
+    {
+      "component_id": "context-mode",
+      "gap": "Project scope passes in fresh native sessions. Existing desktop process retains its loaded connection; no hot reload was claimed."
+    },
+    {
+      "component_id": "vllm",
+      "gap": "Retain working 0.25.0 on WSL; 0.29.0 initialization failed UVA support. Do not relabel version availability as runtime acceptance."
+    }
+  ],
+  "components": [
+    {
+      "component_id": "affaan-m/ECC",
+      "repository": "https://github.com/affaan-m/ECC",
+      "version": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+      "profile": "optional",
+      "role": "Selective on-demand community guidance",
+      "installation_assessment": "selected source/skill pin; no executable lifecycle required",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/affaan-m~1ECC",
+        "documented_commands": [
+          {
+            "skill_invocation": [
+              "search-first"
+            ],
+            "source_only": false
+          }
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Guidance/source repository; no executable functional entry point."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "On-demand selected guidance/skill source.",
+      "lifecycle_evidence": {
+        "assessment": "not_applicable_to_guidance",
+        "scope": "No executable process lifecycle applies to selected source guidance.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "Selected source guidance has no native executable to install."
+    },
+    {
+      "component_id": "agent-browser",
+      "repository": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
+      "version": "0.38.1",
+      "profile": "core",
+      "role": "Local native browser snapshot/ref interaction",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/agent-browser",
+        "documented_commands": [
+          "agent-browser --config examples/agent-browser.json --namespace native-stack --session selected-owned-session open \"file://${PROJECT_ROOT}/fixtures/greeting.html\""
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-cli-gaps",
+            "path": "evidence/receipts/native-cli-gaps.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "desktop-cli-workflows",
+            "path": "evidence/receipts/desktop-cli-workflows.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-observability",
+            "path": "observability/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-observability-followup",
+            "path": "observability/followup-receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-practice-artifacts-20260920",
+            "path": "evidence/receipts/token-practice-artifacts-20260920.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-browser-open",
+          "fresh-browser-full-snapshot",
+          "fresh-browser-interactive-snapshot",
+          "fresh-browser-fill",
+          "fresh-browser-click",
+          "fresh-browser-result",
+          "fresh-browser-close"
+        ],
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+      },
+      "artifact_baselines": [
+        {
+          "id": "fresh-agent-browser-db45d551cd230abf192878d8",
+          "baseline_tokens": 67,
+          "candidate_tokens": 38,
+          "tokens_removed": 29,
+          "acceptance_passed": true,
+          "limitations": [
+            "Noninteractive page content is omitted; scoped greeting fixture only."
+          ]
+        }
+      ],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Owned browser open/fill/click/result/close fixture passed.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "agentsview",
+      "repository": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
+      "version": "0.43.0",
+      "profile": "supporting",
+      "role": "Scoped historical Codex/Claude transcript lexical search",
+      "installation_assessment": "native installation/operation recorded in scoped public receipt",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/agentsview",
+        "documented_commands": [
+          "agentsview --help"
+        ],
+        "scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-gap-followup-20260920",
+            "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Six separately scoped follow-ups exercised a pinned Linux browser fixture, a single-session archive query, offline usage parsing, a synthetic HUD renderer, public-paper retrieval and one read-only native bridge backend task. Prior dated acceptance; no repeat provider or private archive operation in this audit."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "version": "2.3.2",
+      "profile": "core",
+      "role": "Shared scoped Markdown decisions and automatic heuristic cross-client handoffs",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/ai-memory",
+        "documented_commands": [
+          "ai-memory --version",
+          "ai-memory install-mcp --client codex --apply",
+          "ai-memory install-mcp --client claude-code --apply"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-memory",
+            "path": "evidence/receipts/native-memory.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "desktop-direct-rag",
+            "path": "evidence/receipts/desktop-direct-rag.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "native-observability-followup",
+            "path": "observability/followup-receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "ai-memory-native-state-recovery-20260919",
+            "path": "blueprints/us-equities/state-recovery/memory/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-memory-lifecycle-20260919",
+            "path": "blueprints/us-equities/memory-lifecycle/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "native-ai-memory-maintenance-20260920",
+            "path": "evidence/receipts/native-ai-memory-maintenance-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-memory-status"
+        ],
+        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Native lifecycle capture plus explicit scoped retrieval and user-authorized durable writes.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Scoped memory/client lifecycle and private backup/update/status/search accepted; earlier restoration evidence retains its dated scope.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "alertmanager",
+      "repository": "https://github.com/prometheus/alertmanager",
+      "version": "0.34.1",
+      "profile": "observability",
+      "role": "Native alert grouping and delivery",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/alertmanager",
+        "documented_commands": [
+          "amtool check-config \"$ALERTMANAGER_CONFIG\""
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-observability",
+            "path": "observability/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "desktop-restart-acceptance",
+            "path": "observability/restart-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-alertmanager-state"
+        ],
+        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Configured persistent native service; explicit task consumes the selected endpoint.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "alpaca-py",
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "version": "0.44.0",
+      "profile": "supporting",
+      "role": "Official Python SDK; offline intent guard and bounded native historical bars, corporate actions and symbol-mapping observations with current asset metadata",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/alpaca-py",
+        "documented_commands": [
+          "python3 blueprints/us-equities/order-contract/order_contract.py < blueprints/us-equities/order-contract/basic-intent.json",
+          "bwrap --unshare-net --ro-bind / / --proc /proc --dev /dev --die-with-parent \"$SDK_PYTHON\" blueprints/us-equities/order-contract/sdk_probe.py",
+          "\"$SDK_PYTHON\" blueprints/us-equities/alpaca-historical/collect.py collect --out \"$NEW_PRIVATE_RUN\""
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "alpaca-offline-order-contract-20260919",
+            "path": "blueprints/us-equities/order-contract/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-alpaca-historical-20260920",
+            "path": "blueprints/us-equities/authenticated-data/native-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-security-identity-20260920",
+            "path": "blueprints/us-equities/identity-readiness/native-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-alpaca-offline-contract"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Offline order contract and read-only historical data/identity acceptance; broker order submission/live trading outside scope.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "ast-grep",
+      "repository": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+      "version": "0.45.3",
+      "profile": "supporting",
+      "role": "Structural source search",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/ast-grep",
+        "documented_commands": [
+          "ast-grep run --lang javascript --pattern 'function $NAME($$$ARGS) { $$$BODY }' --json=compact --stdin < evidence/artifacts/usage-report.source.txt"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "portable-cli-artifacts",
+            "path": "evidence/receipts/portable-cli-artifacts.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-artifacts-20260920",
+            "path": "evidence/receipts/token-practice-artifacts-20260920.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-ast-grep-subprocess"
+        ],
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+      },
+      "artifact_baselines": [
+        {
+          "id": "fresh-ast-grep-0c3b77534fdd4c0875aafa7f",
+          "baseline_tokens": 1818,
+          "candidate_tokens": 686,
+          "tokens_removed": 1132,
+          "acceptance_passed": true,
+          "limitations": [
+            "Only the selected call set is complete; surrounding code is omitted."
+          ]
+        }
+      ],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "beads",
+      "repository": "https://github.com/gastownhall/beads",
+      "version": "1.3.0",
+      "profile": "supporting",
+      "role": "Selected-project persistent task claims and dependency queue",
+      "installation_assessment": "native installation/operation recorded in scoped public receipt",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/beads",
+        "documented_commands": [
+          "bd ready --json",
+          "bd show \"$RETURNED_TASK_ID\" --json"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "upstream-native-tools-20260920",
+            "path": "evidence/receipts/upstream-native-tools-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Three supplemental upstream tools installed natively: Beads persisted task claims and dependency transitions, skills-ref validated and rendered a selected skill, and otel-tui ingested and displayed one synthetic loopback trace."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Claim and dependency state persisted across processes; three fixture tasks closed; selected project queue initialized without extra hooks.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "ccusage",
+      "repository": "https://github.com/ccusage/ccusage",
+      "version": "20.0.23",
+      "profile": "supporting",
+      "role": "Read existing native provider usage logs",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/ccusage",
+        "documented_commands": [
+          "ccusage --help"
+        ],
+        "scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-gap-followup-20260920",
+            "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-ccusage-native-utc",
+          "fresh-ccusage-codex-utc"
+        ],
+        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "claude-code",
+      "repository": "https://github.com/anthropics/claude-code",
+      "version": "2.1.278",
+      "profile": "core",
+      "role": "Native subscription coding client",
+      "installation_assessment": "native installation/operation recorded in scoped public receipt",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/claude-code",
+        "documented_commands": [
+          "claude --version",
+          "claude -p --output-format stream-json --verbose --max-turns 14 < fixtures/native-gap-prompt.txt"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-context-memory",
+            "path": "evidence/receipts/native-context-memory.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-memory",
+            "path": "evidence/receipts/native-memory.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-rag",
+            "path": "evidence/receipts/native-rag.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "native-observability",
+            "path": "observability/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-research-runtime-20260919",
+            "path": "blueprints/us-equities/research-runtime/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-claude-convergence-review-20260919",
+            "path": "blueprints/us-equities/convergence-review/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-paired-adoption-20260919",
+            "path": "adoption/paired/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-architecture-review-20260919",
+            "path": "blueprints/us-equities/architecture/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-convergence-review-20260919",
+            "path": "blueprints/us-equities/convergence-program/review-receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-practice-native-pairs-20260920",
+            "path": "evidence/receipts/token-practice-native-pairs-20260920.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "native-research-efficiency-20260920",
+            "path": "blueprints/us-equities/research-efficiency/native-receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-claude-child-patch-20260920",
+            "path": "blueprints/convergence-practice/native-worker/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-claude-session-recovery-20260920",
+            "path": "evidence/receipts/native-claude-session-recovery-20260920.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-token-focus-clients-20260920",
+            "path": "evidence/receipts/native-token-focus-clients-20260920.json",
+            "kind": "native_model_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Native Claude Code2.1.278 on Ubuntu24.04 WSL2 used Opus5 through Max for one foreground isolated child repair. Only planner.py changed; all12 frozen visible tests pass independently after8 seed failures. Prior dated acceptance; no repeat provider or private archive operation in this audit.",
+        "new_native_client_scope": "One bounded task in each native client passed project-file Context Mode reading and exact jCodeMunch symbol retrieval; six MCP calls, no failures. Consumption is separate from savings."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false,
+        "additional_published_recovery": "blueprints/convergence-practice/native-recovery/claude/README.md"
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "claude-hud",
+      "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
+      "version": "0.8.0",
+      "profile": "optional",
+      "role": "Claude statusline rendering",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/claude-hud",
+        "documented_commands": [
+          {
+            "skill_invocation": null,
+            "source_only": true
+          }
+        ],
+        "scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-gap-followup-20260920",
+            "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-claude-hud-interactive-20260920",
+            "path": "evidence/receipts/native-claude-hud-interactive-20260920.json",
+            "kind": "compatibility_attempt"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-claude-hud-synthetic"
+        ],
+        "scope": "Representative synthetic stdin label and context bar; not a live interactive account display."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Synthetic renderer accepted. Real interactive attempt reached onboarding before HUD appeared despite existing authenticated state; live statusline remains unverified. No model/login route was changed.",
+      "integration_mode": "Configured automatic statusline renderer; actual interactive rendering not established because onboarding was shown.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Synthetic renderer passed. Actual interactive attempt stopped at onboarding before HUD display; native authenticated state was already reported.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "codebase-memory-mcp",
+      "repository": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
+      "version": "0.11.0",
+      "profile": "core",
+      "role": "Persistent static code graph and call tracing",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/codebase-memory-mcp",
+        "documented_commands": [
+          "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory.search_graph --args \"${GRAPH_QUERY_ARGS}\" --output json --no-oauth"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-cli-gaps",
+            "path": "evidence/receipts/native-cli-gaps.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "desktop-cli-workflows",
+            "path": "evidence/receipts/desktop-cli-workflows.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-static-graph",
+          "fresh-static-callees"
+        ],
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+      },
+      "artifact_baselines": [
+        {
+          "id": "fresh-codebase-memory-mcp-619fcd356f69e790656fa06f",
+          "baseline_tokens": 2731,
+          "candidate_tokens": 186,
+          "tokens_removed": 2545,
+          "acceptance_passed": true,
+          "limitations": [
+            "Static local helper calls only; the full implementation and dynamic behavior are not represented. MCPorter is a shared transport, not another independent saving."
+          ]
+        }
+      ],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "codex",
+      "repository": "https://github.com/openai/codex",
+      "version": "0.155.1",
+      "profile": "core",
+      "role": "Native subscription coding client",
+      "installation_assessment": "native installation/operation recorded in scoped public receipt",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/codex",
+        "documented_commands": [
+          "codex --version",
+          "codex exec -C \"${PROJECT_ROOT}\" --json - < fixtures/native-gap-prompt.txt"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-context-memory",
+            "path": "evidence/receipts/native-context-memory.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-memory",
+            "path": "evidence/receipts/native-memory.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-rag",
+            "path": "evidence/receipts/native-rag.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "desktop-cli-workflows",
+            "path": "evidence/receipts/desktop-cli-workflows.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-observability",
+            "path": "observability/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-observability-followup",
+            "path": "observability/followup-receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "desktop-restart-acceptance",
+            "path": "observability/restart-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "portable-sdk-adoption-20260919",
+            "path": "adoption/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-paired-adoption-20260919",
+            "path": "adoption/paired/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-architecture-review-20260919",
+            "path": "blueprints/us-equities/architecture/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-convergence-review-20260919",
+            "path": "blueprints/us-equities/convergence-program/review-receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-practice-native-pairs-20260920",
+            "path": "evidence/receipts/token-practice-native-pairs-20260920.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-gap-followup-20260920",
+            "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-research-efficiency-20260920",
+            "path": "blueprints/us-equities/research-efficiency/native-receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-codex-session-recovery-20260920",
+            "path": "evidence/receipts/native-codex-session-recovery-20260920.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-token-focus-clients-20260920",
+            "path": "evidence/receipts/native-token-focus-clients-20260920.json",
+            "kind": "native_model_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Eight fresh native answer invocations yielded four within-provider task comparisons. All eight semantic grades pass; six answers meet the shared structural and word protocol. Numeric differences are observed sample differences only. Prior dated acceptance; no repeat provider or private archive operation in this audit.",
+        "new_native_client_scope": "One bounded task in each native client passed project-file Context Mode reading and exact jCodeMunch symbol retrieval; six MCP calls, no failures. Consumption is separate from savings."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false,
+        "additional_published_recovery": "blueprints/convergence-practice/native-recovery/README.md"
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "codex-for-claude",
+      "repository": "https://github.com/openai/codex-plugin-cc/tree/v1.0.6",
+      "version": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "profile": "optional",
+      "role": "Official Claude plugin and native Codex companion delegation",
+      "installation_assessment": "native installation/operation recorded in scoped public receipt",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/codex-for-claude",
+        "documented_commands": [
+          {
+            "skill_invocation": [
+              "codex"
+            ],
+            "source_only": false
+          }
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-gap-followup-20260920",
+            "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Six separately scoped follow-ups exercised a pinned Linux browser fixture, a single-session archive query, offline usage parsing, a synthetic HUD renderer, public-paper retrieval and one read-only native bridge backend task. Prior dated acceptance; no repeat provider or private archive operation in this audit."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Native bridge backend task passed; outer Claude delegation and end-to-end parent/child interaction remain unexercised.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "context-hub",
+      "repository": "https://github.com/andrewyng/context-hub",
+      "version": "0.1.4",
+      "profile": "supporting",
+      "role": "Retrieve selected curated developer documentation",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/context-hub",
+        "documented_commands": [
+          "chub search \"python json\" --json"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-native-retained-functional-20260920",
+            "path": "evidence/receipts/token-native-retained-functional-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-chub-search",
+          "fresh-chub-get",
+          "fresh-chub-full-doc"
+        ],
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+      },
+      "artifact_baselines": [
+        {
+          "id": "fresh-context-hub-d6e54188fc269b6fad9d1804",
+          "baseline_tokens": 2070,
+          "candidate_tokens": 2155,
+          "tokens_removed": -85,
+          "acceptance_passed": true,
+          "limitations": [
+            "The selected call includes upstream feedback text and is larger than --full for this one-file entry. No feedback was sent. Retain the smaller applicable representation."
+          ]
+        }
+      ],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "context-mode",
+      "repository": "https://github.com/mksglu/context-mode",
+      "version": "1.0.169",
+      "profile": "core",
+      "role": "Local execution, file processing, indexed retrieval, native context hooks",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/context-mode",
+        "documented_commands": [
+          "mcporter --config \"${MCPORTER_CONFIG}\" call context-mode.ctx_doctor --args '{}' --output text --no-oauth"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-context-memory",
+            "path": "evidence/receipts/native-context-memory.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "artifact-reductions",
+            "path": "evidence/receipts/artifact-reductions.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "native-observability-followup",
+            "path": "observability/followup-receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "desktop-restart-acceptance",
+            "path": "observability/restart-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-native-pairs-20260920",
+            "path": "evidence/receipts/token-practice-native-pairs-20260920.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-native-counters-20260920",
+            "path": "evidence/receipts/token-practice-native-counters-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "native-token-focus-clients-20260920",
+            "path": "evidence/receipts/native-token-focus-clients-20260920.json",
+            "kind": "native_model_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-inspector-context-call"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance.",
+        "new_native_client_scope": "One bounded task in each native client passed project-file Context Mode reading and exact jCodeMunch symbol retrieval; six MCP calls, no failures. Consumption is separate from savings."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Project scope passes in fresh native sessions. Existing desktop process retains its loaded connection; no hot reload was claimed.",
+      "integration_mode": "Native lifecycle hooks plus explicit file/execute/retrieval calls; scoped server configured per project.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Fresh both-native-client file operations passed. Old Desktop connection retains prior loaded scope; fresh native PreCompact not forced.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "dagu",
+      "repository": "https://github.com/dagucloud/dagu",
+      "version": "2.16.6",
+      "profile": "supporting",
+      "role": "Manual native research workflows and private local run history",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/dagu",
+        "documented_commands": [
+          "dagu validate --dagu-home \"$RESEARCH_HOME\" \"$DAG\"",
+          "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id \"$NEW_RUN_ID\" \"$DAG\"",
+          "dagu history --context local --dagu-home \"$RESEARCH_HOME\" --format json"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-research-runtime-20260919",
+            "path": "blueprints/us-equities/research-runtime/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-paired-adoption-20260919",
+            "path": "adoption/paired/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-convergence-review-20260919",
+            "path": "blueprints/us-equities/convergence-program/review-receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-grand-dashboard-20260919",
+            "path": "observability/grand-dashboard/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "native-dagu-job-recovery-20260920",
+            "path": "evidence/receipts/native-dagu-job-recovery-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-dagu-history",
+          "fresh-dagu-isolated-native"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false,
+        "additional_published_recovery": "blueprints/convergence-practice/job-recovery/README.md"
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "davila7/claude-code-templates",
+      "repository": "https://github.com/davila7/claude-code-templates",
+      "version": "c840d6f626be7ba418da60aeb0f2080413562451",
+      "profile": "optional",
+      "role": "Selective on-demand community guidance",
+      "installation_assessment": "selected source/skill pin; no executable lifecycle required",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/davila7~1claude-code-templates",
+        "documented_commands": [
+          {
+            "skill_invocation": [
+              "concise-planning"
+            ],
+            "source_only": false
+          }
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Guidance/templates; setup or installation is excluded from this evidence pass."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "On-demand selected guidance/skill source.",
+      "lifecycle_evidence": {
+        "assessment": "not_applicable_to_guidance",
+        "scope": "No executable process lifecycle applies to selected source guidance.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "Selected source guidance has no native executable to install."
+    },
+    {
+      "component_id": "difftastic",
+      "repository": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+      "version": "0.71.0",
+      "profile": "supporting",
+      "role": "Syntax-aware source difference review",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/difftastic",
+        "documented_commands": [
+          "difft --exit-code --color never fixtures/before.py fixtures/after.py"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "portable-cli-artifacts",
+            "path": "evidence/receipts/portable-cli-artifacts.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-difftastic"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "duckdb",
+      "repository": "https://github.com/duckdb/duckdb",
+      "version": "1.5.5",
+      "profile": "supporting",
+      "role": "Native SQL/Parquet research data, exact decimal storage and source-anchored nanosecond observation eligibility with explicit quality flags",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/duckdb",
+        "documented_commands": [
+          "python -c \"import duckdb; print(duckdb.__version__)\"",
+          "python blueprints/us-equities/data/summarize_backtest.py \"$LEAN_EVENTS\" \"$NEW_PARQUET\""
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "sec-financial-data-20260919",
+            "path": "blueprints/us-equities/financial-data/receipt.json",
+            "kind": "compatibility_attempt"
+          },
+          {
+            "id": "native-research-runtime-20260919",
+            "path": "blueprints/us-equities/research-runtime/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "portable-sdk-adoption-20260919",
+            "path": "adoption/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-paired-adoption-20260919",
+            "path": "adoption/paired/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-point-in-time-contract-20260919",
+            "path": "blueprints/us-equities/point-in-time/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-exact-nanosecond-replay-20260919",
+            "path": "blueprints/us-equities/nanosecond-replay/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "sec-catalyst-dataset-native-20260920",
+            "path": "blueprints/us-equities/catalyst-dataset/native-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-security-identity-20260920",
+            "path": "blueprints/us-equities/identity-readiness/native-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "native-lifecycle-sample-20260920",
+            "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "synthetic-catalyst-contract-20260920",
+            "path": "blueprints/us-equities/catalyst-experiment/receipt.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-duckdb-parquet"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "edgartools",
+      "repository": "https://github.com/dgunning/edgartools",
+      "version": "5.58.0",
+      "profile": "supporting",
+      "role": "Native SEC filing-index acquisition and local parsing; bounded raw-source provenance with historical strategy availability still gated",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/edgartools",
+        "documented_commands": [
+          "uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock",
+          "\"$CATALYST_RUNTIME/sdk/bin/python\" blueprints/us-equities/catalyst-provenance/native_edgar.py --help",
+          "\"$CATALYST_RUNTIME/sdk/bin/python\" blueprints/us-equities/catalyst-provenance/native_document.py --help"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-edgartools-catalyst-20260919",
+            "path": "blueprints/us-equities/catalyst-provenance/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-sec-access-resolution-20260919",
+            "path": "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "sec-catalyst-dataset-native-20260920",
+            "path": "blueprints/us-equities/catalyst-dataset/native-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-artifacts-20260920",
+            "path": "evidence/receipts/token-practice-artifacts-20260920.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "native-lifecycle-sample-20260920",
+            "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-edgar-markdown"
+        ],
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+      },
+      "artifact_baselines": [
+        {
+          "id": "fresh-edgartools-62bf22ad7a51f63e8671063f",
+          "baseline_tokens": 10322,
+          "candidate_tokens": 1249,
+          "tokens_removed": 9073,
+          "acceptance_passed": true,
+          "limitations": [
+            "Selected identity facts are retained; original HTML formatting and markup are not. The two conversions share the same baseline and must not be summed."
+          ]
+        }
+      ],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "gitleaks",
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "version": "8.30.1",
+      "profile": "supporting",
+      "role": "Redacted Git history secret detection",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/gitleaks",
+        "documented_commands": [
+          "gitleaks dir --redact=100 --no-banner --no-color --report-format json --report-path \"${REPORT_PATH}\" \"${PROJECT_ROOT}\""
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "runtime-tools",
+            "path": "evidence/receipts/runtime-tools.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-gitleaks"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "grafana",
+      "repository": "https://github.com/grafana/grafana",
+      "version": "13.2.2",
+      "profile": "observability",
+      "role": "Local native observation dashboard",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/grafana",
+        "documented_commands": [
+          "grafana --version",
+          "curl --fail --silent http://127.0.0.1:13000/api/health"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-observability",
+            "path": "observability/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-observability-followup",
+            "path": "observability/followup-receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "desktop-restart-acceptance",
+            "path": "observability/restart-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-grand-dashboard-20260919",
+            "path": "observability/grand-dashboard/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-simulation-research-dashboard-20260919",
+            "path": "blueprints/us-equities/simulation-research/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-grafana-dashboard"
+        ],
+        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Configured persistent native service; explicit task consumes the selected endpoint.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "headroom",
+      "repository": "https://github.com/chopratejas/headroom",
+      "version": "0.37.0",
+      "profile": "supporting",
+      "role": "On-demand upstream MCP compression/retrieval and separately guarded offline artifact compression",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/headroom",
+        "documented_commands": [
+          "headroom mcp serve --proxy-url http://127.0.0.1:1",
+          "headroom savings --json"
+        ],
+        "scope": "Direct synthetic MCP compression/retrieval passed; global and isolated fixture ledgers remain separate. No automatic provider interception."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-native-counters-20260920",
+            "path": "evidence/receipts/token-practice-native-counters-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-native-retained-functional-20260920",
+            "path": "evidence/receipts/token-native-retained-functional-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-headroom-mcp-20260920",
+            "path": "evidence/receipts/native-headroom-mcp-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-headroom-guard"
+        ],
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings.",
+        "direct_mcp_scope": "Official MCP extra installed; direct compression/retrieve/stats and exact original recovery passed on owned synthetic artifacts. Global ledger0 remains separate from isolated fixture ledger1call/36719estimated saved."
+      },
+      "artifact_baselines": [
+        {
+          "id": "fresh-headroom-e1641a5b959bb3334f9020d9",
+          "baseline_tokens": 4044,
+          "candidate_tokens": 300,
+          "tokens_removed": 3744,
+          "acceptance_passed": true,
+          "limitations": [
+            "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+            "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+          ]
+        },
+        {
+          "id": "fresh-headroom-62321a612f2e09d18927fcce",
+          "baseline_tokens": 2360,
+          "candidate_tokens": 1298,
+          "tokens_removed": 1062,
+          "acceptance_passed": true,
+          "limitations": [
+            "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+            "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+          ]
+        },
+        {
+          "id": "fresh-headroom-43861024062687e0826ce5ab",
+          "baseline_tokens": 3032,
+          "candidate_tokens": 3032,
+          "tokens_removed": 0,
+          "acceptance_passed": true,
+          "limitations": [
+            "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+            "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+          ]
+        },
+        {
+          "id": "fresh-headroom-5a0ccf43a8a9a20cbb8b95d5",
+          "baseline_tokens": 235,
+          "candidate_tokens": 235,
+          "tokens_removed": 0,
+          "acceptance_passed": true,
+          "limitations": [
+            "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+            "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+          ]
+        },
+        {
+          "id": "fresh-headroom-4c309b573fdf934e1c1ca51a",
+          "baseline_tokens": 504,
+          "candidate_tokens": 246,
+          "tokens_removed": 258,
+          "acceptance_passed": true,
+          "limitations": [
+            "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+            "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+          ]
+        },
+        {
+          "id": "fresh-headroom-c8905930063d7fcc47127d2e",
+          "baseline_tokens": 1770,
+          "candidate_tokens": 1770,
+          "tokens_removed": 0,
+          "acceptance_passed": true,
+          "limitations": [
+            "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+            "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+          ]
+        },
+        {
+          "id": "fresh-headroom-7f9a4d938277a9293291cc56",
+          "baseline_tokens": 1744,
+          "candidate_tokens": 1744,
+          "tokens_removed": 0,
+          "acceptance_passed": true,
+          "limitations": [
+            "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+            "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+          ]
+        },
+        {
+          "id": "headroom-direct-mcp-20260920",
+          "baseline_tokens": 36625,
+          "candidate_tokens": 19714,
+          "tokens_removed": 16911,
+          "acceptance_passed": true,
+          "limitations": [
+            "Summary retains selected failure; exact retrieval is available but consumes original content. Owned synthetic fixture, no provider task."
+          ]
+        },
+        {
+          "id": "headroom-guard-positive-20260920",
+          "baseline_tokens": 26529,
+          "candidate_tokens": 191,
+          "tokens_removed": 26338,
+          "acceptance_passed": true,
+          "limitations": [
+            "Exact run-expansion recovery verified for selected synthetic logs; local guarded adapter around upstream APIs."
+          ]
+        }
+      ],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Use upstream direct MCP or existing guarded adapter for a matching selected artifact. Automatic agent-traffic interception is not configured.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Direct same-session compress/retrieve/stats with exact recovery; local global and isolated fixture ledgers kept separate. No automatic provider interception.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "huggingface-hub-native",
+      "repository": "https://github.com/huggingface/huggingface_hub",
+      "version": "1.32.0",
+      "profile": "core",
+      "role": "Native authenticated model discovery and revision-pinned downloads",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/huggingface-hub-native",
+        "documented_commands": [
+          "hf --version",
+          "hf download nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 --local-dir \"${MODEL_DIRECTORY}\" --max-workers 2 --json"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "native-rag",
+            "path": "evidence/receipts/native-rag.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-hf-cache"
+        ],
+        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "jcodemunch-mcp",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "version": "1.108.319",
+      "profile": "supporting",
+      "role": "Explicitly scoped code index and exact symbol retrieval through a six-tool MCP surface",
+      "installation_assessment": "Official native installation and direct/both-client acceptance recorded in scoped public receipts",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/jcodemunch-mcp",
+        "documented_commands": [
+          {
+            "tool": "order",
+            "arguments": {
+              "action": "get_session_stats",
+              "args": {}
+            }
+          }
+        ],
+        "scope": "Index only selected code; default upstream index root; sharing, AI summaries, watchers, cross-repository defaults and external context providers disabled. See native recipe and receipt for whole-file versus focused-source baselines."
+      },
+      "functional_evidence": {
+        "retained_operation_ids": [],
+        "public_receipts": [
+          {
+            "id": "native-jcodemunch-20260920",
+            "path": "evidence/receipts/native-jcodemunch-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-token-focus-clients-20260920",
+            "path": "evidence/receipts/native-token-focus-clients-20260920.json",
+            "kind": "native_model_e2e"
+          }
+        ],
+        "new_native_client_scope": "One bounded task in each native client passed project-file Context Mode reading and exact jCodeMunch symbol retrieval; six MCP calls, no failures. Consumption is separate from savings.",
+        "scope": "Scoped25-file290-symbol index returned byte-exact selected function; complete search-plus-source envelopes measured. Both native clients separately completed bounded tasks."
+      },
+      "artifact_baselines": [
+        {
+          "id": "jcodemunch-whole-file-20260920",
+          "baseline_tokens": 5476,
+          "candidate_tokens": 861,
+          "tokens_removed": 4615,
+          "acceptance_passed": true,
+          "limitations": [
+            "Complete search-plus-source envelopes, excluding initial index1332total and model prompts/usage."
+          ]
+        },
+        {
+          "id": "jcodemunch-known-focused-source-20260920",
+          "baseline_tokens": 601,
+          "candidate_tokens": 861,
+          "tokens_removed": -260,
+          "acceptance_passed": true,
+          "limitations": [
+            "Known exact source extraction is cheaper; do not replace it automatically."
+          ]
+        }
+      ],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Use indexed discovery when it replaces a broad read; prefer known exact source extraction when it is cheaper.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Selected local index persisted across direct/native-client retrieval. No watcher, cross-repository auto-index or paid summaries.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "lean",
+      "repository": "https://github.com/QuantConnect/Lean",
+      "version": "985ef30 with documented dependency remediation",
+      "profile": "supporting",
+      "role": "Deterministic native historical research backtest engine; no broker initialized",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/lean",
+        "documented_commands": [
+          "\"$DOTNET\" \"$LEAN_LAUNCHER\" --config \"$LEAN_CONFIG\" --environment backtesting --algorithm-location \"$LEAN_ALGORITHM\" --data-folder \"$LEAN_DATA\" --results-destination-folder \"$LEAN_RESULTS\""
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-research-runtime-20260919",
+            "path": "blueprints/us-equities/research-runtime/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-paired-adoption-20260919",
+            "path": "adoption/paired/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-lean-execution-sensitivity-20260919",
+            "path": "blueprints/us-equities/execution-realism/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-historical-leverage-stress-20260919",
+            "path": "blueprints/us-equities/historical-simulation/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-chronological-controls-20260919",
+            "path": "blueprints/us-equities/research-evaluation/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-corporate-actions-20260920",
+            "path": "blueprints/us-equities/corporate-action-readiness/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-alpaca-historical-20260920",
+            "path": "blueprints/us-equities/authenticated-data/native-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-lean-isolated-cases",
+          "fresh-lean-native-compile",
+          "fresh-lean-native-zero",
+          "fresh-lean-native-five_bps",
+          "fresh-lean-native-twenty_bps"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Owned deterministic backtest variants accepted; no live broker lifecycle.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "llama-cpp",
+      "repository": "https://github.com/ggml-org/llama.cpp",
+      "version": "b11057 (0.4.1-dev)",
+      "profile": "optional",
+      "role": "Trial local text inference with one qualified partial-offload planner repair on WSL RTX4090",
+      "installation_assessment": "Pinned native Linux CUDA archive and selected model; qualified source repair retained from merged main.",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/llama-cpp",
+        "documented_commands": [
+          "python3 blueprints/convergence-practice/gpu-inference/qualify.py --help"
+        ],
+        "scope": "Explicit optional local inference trial; native client defaults remain unchanged."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-gpu-patch-20260920",
+            "path": "evidence/receipts/native-gpu-patch-20260920.json",
+            "kind": "native_model_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "One Qwen3.8-27B planner repair passed independent source review and12 original tests; immutable published evidence reused."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse this bounded qualification for its applicable task; no general frontier parity or token-savings claim.",
+      "integration_mode": "Optional explicit native local inference recipe.",
+      "lifecycle_evidence": {
+        "assessment": "passed_within_scope",
+        "scope": "Temporary native server started, served one bounded repair and exited0; no daemon/service installed;179.191s generation and183.819s fulltask.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "Selected pinned runtime/model already installed and qualified in main-branch receipt."
+    },
+    {
+      "component_id": "loki",
+      "repository": "https://github.com/grafana/loki",
+      "version": "3.7.8",
+      "profile": "observability",
+      "role": "Native structured log storage",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/loki",
+        "documented_commands": [
+          "loki -config.file=\"$LOKI_CONFIG\" -verify-config=true"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-observability",
+            "path": "observability/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-observability-followup",
+            "path": "observability/followup-receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "desktop-restart-acceptance",
+            "path": "observability/restart-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-research-runtime-20260919",
+            "path": "blueprints/us-equities/research-runtime/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-claude-convergence-review-20260919",
+            "path": "blueprints/us-equities/convergence-review/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-paired-adoption-20260919",
+            "path": "adoption/paired/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-architecture-review-20260919",
+            "path": "blueprints/us-equities/architecture/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-grand-dashboard-20260919",
+            "path": "observability/grand-dashboard/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-simulation-research-dashboard-20260919",
+            "path": "blueprints/us-equities/simulation-research/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-loki-receipts"
+        ],
+        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Configured persistent native service; explicit task consumes the selected endpoint.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "markitdown",
+      "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.7",
+      "version": "0.1.7",
+      "profile": "supporting",
+      "role": "Convert supported source documents to readable Markdown",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/markitdown",
+        "documented_commands": [
+          "markitdown fixtures/greeting.html"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "portable-cli-artifacts",
+            "path": "evidence/receipts/portable-cli-artifacts.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-artifacts-20260920",
+            "path": "evidence/receipts/token-practice-artifacts-20260920.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-markitdown-html"
+        ],
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+      },
+      "artifact_baselines": [
+        {
+          "id": "fresh-markitdown-47190dd82f1c34d362a22b58",
+          "baseline_tokens": 10322,
+          "candidate_tokens": 1360,
+          "tokens_removed": 8962,
+          "acceptance_passed": true,
+          "limitations": [
+            "Selected identity facts are retained; original HTML formatting and markup are not. The two conversions share the same baseline and must not be summed."
+          ]
+        }
+      ],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "mcp-inspector",
+      "repository": "https://github.com/modelcontextprotocol/inspector",
+      "version": "2.7.0",
+      "profile": "supporting",
+      "role": "Upstream direct stdio tool inspection/calls",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/mcp-inspector",
+        "documented_commands": [
+          "npx @modelcontextprotocol/inspector@2.7.0 --help"
+        ],
+        "scope": "Direct upstream Inspector stdio call proved arithmetic execution; full plugin hooks and current desktop scope are separate."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-native-retained-functional-20260920",
+            "path": "evidence/receipts/token-native-retained-functional-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-inspector-context-call"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "mcporter",
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.13.13",
+      "version": "0.13.13",
+      "profile": "core",
+      "role": "Native CLI bridge with persistent MCP daemon connection",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/mcporter",
+        "documented_commands": [
+          "mcporter --config \"${MCPORTER_CONFIG}\" list --brief --no-oauth"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "desktop-restart-acceptance",
+            "path": "observability/restart-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-static-graph",
+          "fresh-static-callees",
+          "fresh-memory-status",
+          "fresh-socraticode-status"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "ntfy",
+      "repository": "https://github.com/binwiederhier/ntfy",
+      "version": "2.28.0",
+      "profile": "observability",
+      "role": "Local retained notification inbox",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/ntfy",
+        "documented_commands": [
+          "ntfy --version",
+          "curl --fail --silent http://127.0.0.1:18080/v1/health"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-observability",
+            "path": "observability/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "desktop-restart-acceptance",
+            "path": "observability/restart-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-ntfy-retained"
+        ],
+        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Configured persistent native service; explicit task consumes the selected endpoint.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "openresearch",
+      "repository": "https://github.com/alphaXiv/OpenResearch",
+      "version": "0.2.4",
+      "profile": "supporting",
+      "role": "Selected public literature discovery and extracted paper retrieval",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/openresearch",
+        "documented_commands": [
+          "orx --no-telemetry discover keyword \"local code retrieval\" --limit 3",
+          "orx --no-telemetry paper \"${PAPER_ID}\" --full"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "artifact-reductions",
+            "path": "evidence/receipts/artifact-reductions.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-gap-followup-20260920",
+            "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-openresearch-paper-full"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "opentelemetry-collector-contrib",
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "version": "0.161.0",
+      "profile": "observability",
+      "role": "Single native core/contrib Collector process; content filtering, metric conversion, upstream exporters and SDK file receiver",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/opentelemetry-collector-contrib",
+        "documented_commands": [
+          "otelcol-contrib validate --config=\"$OTEL_CONFIG\""
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-observability",
+            "path": "observability/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-observability-followup",
+            "path": "observability/followup-receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "desktop-restart-acceptance",
+            "path": "observability/restart-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-research-runtime-20260919",
+            "path": "blueprints/us-equities/research-runtime/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-claude-convergence-review-20260919",
+            "path": "blueprints/us-equities/convergence-review/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-paired-adoption-20260919",
+            "path": "adoption/paired/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-architecture-review-20260919",
+            "path": "blueprints/us-equities/architecture/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-otel-config-unit-env"
+        ],
+        "scope": "Native collector validates existing configuration with its required nonsecret unit environment; no service reload."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Configured persistent native service; explicit task consumes the selected endpoint.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "otel-tui",
+      "repository": "https://github.com/ymtdzzz/otel-tui",
+      "version": "0.7.5",
+      "profile": "supporting",
+      "role": "On-demand local OTLP receiver and terminal trace inspection",
+      "installation_assessment": "native installation/operation recorded in scoped public receipt",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/otel-tui",
+        "documented_commands": [
+          "otel-tui --host 127.0.0.1 --grpc 14317 --http 14318"
+        ],
+        "scope": "Choose unused loopback ports for an owned diagnostic session and close it afterward; synthetic trace acceptance only."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "upstream-native-tools-20260920",
+            "path": "evidence/receipts/upstream-native-tools-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Three supplemental upstream tools installed natively: Beads persisted task claims and dependency transitions, skills-ref validated and rendered a selected skill, and otel-tui ingested and displayed one synthetic loopback trace."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Owned synthetic trace received/displayed; native process shutdown exit0 recorded.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "pandas",
+      "repository": "https://github.com/pandas-dev/pandas",
+      "version": "3.0.6",
+      "profile": "supporting",
+      "role": "Existing dependency accepted for strict exact nanosecond timestamp parsing",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/pandas",
+        "documented_commands": [
+          "python blueprints/us-equities/nanosecond-replay/replay.py --help"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-exact-nanosecond-replay-20260919",
+            "path": "blueprints/us-equities/nanosecond-replay/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-chronological-controls-20260919",
+            "path": "blueprints/us-equities/research-evaluation/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-pandas-nanosecond"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "playwright-cli",
+      "repository": "https://github.com/microsoft/playwright-cli",
+      "version": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
+      "profile": "optional",
+      "role": "Native browser CLI with bounded Linux fixture acceptance and separately scoped Windows history",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/playwright-cli",
+        "documented_commands": [
+          "playwright-cli --help",
+          "playwright-cli --version"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-gap-followup-20260920",
+            "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-pw-open",
+          "fresh-pw-before",
+          "fresh-pw-fill",
+          "fresh-pw-click",
+          "fresh-pw-result",
+          "fresh-pw-after",
+          "fresh-pw-close",
+          "fresh-pw-before-corrected",
+          "fresh-pw-fill-corrected",
+          "fresh-pw-click-corrected",
+          "fresh-pw-result-corrected",
+          "fresh-pw-after-corrected",
+          "fresh-pw-close-corrected"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Owned browser fixture lifecycle passed after retained protocol/setup correction.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "prometheus",
+      "repository": "https://github.com/prometheus/prometheus",
+      "version": "3.14.0",
+      "profile": "observability",
+      "role": "Native operational metric storage and alert evaluation",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/prometheus",
+        "documented_commands": [
+          "promtool check config \"$PROMETHEUS_CONFIG\"",
+          "promtool query instant http://127.0.0.1:19090 up"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-observability",
+            "path": "observability/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-observability-followup",
+            "path": "observability/followup-receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "desktop-restart-acceptance",
+            "path": "observability/restart-receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-research-runtime-20260919",
+            "path": "blueprints/us-equities/research-runtime/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-claude-convergence-review-20260919",
+            "path": "blueprints/us-equities/convergence-review/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-paired-adoption-20260919",
+            "path": "adoption/paired/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-architecture-review-20260919",
+            "path": "blueprints/us-equities/architecture/receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-grand-dashboard-20260919",
+            "path": "observability/grand-dashboard/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-prometheus-metrics"
+        ],
+        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Configured persistent native service; explicit task consumes the selected endpoint.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "promptfoo",
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "version": "0.123.1",
+      "profile": "optional",
+      "role": "Explicit evaluation configuration/fixtures",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/promptfoo",
+        "documented_commands": [
+          "promptfoo --help"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-native-retained-functional-20260920",
+            "path": "evidence/receipts/token-native-retained-functional-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-promptfoo-local"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "qdrant",
+      "repository": "https://github.com/qdrant/qdrant",
+      "version": "1.19.1",
+      "profile": "core",
+      "role": "Local persistent vector and payload storage",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/qdrant",
+        "documented_commands": [
+          "qdrant --config-path \"${QDRANT_CONFIG}\" --disable-telemetry"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-rag",
+            "path": "evidence/receipts/native-rag.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "desktop-direct-rag",
+            "path": "evidence/receipts/desktop-direct-rag.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "qdrant-native-state-recovery-20260919",
+            "path": "blueprints/us-equities/state-recovery/qdrant/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-qdrant-collections"
+        ],
+        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Configured persistent native service; explicit task consumes the selected endpoint.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Persistent index/watch path and selected state-recovery receipt accepted.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "qmd",
+      "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+      "version": "2.8.3",
+      "profile": "core",
+      "role": "Local lexical retrieval over selected documentation",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/qmd",
+        "documented_commands": [
+          "qmd --index \"${QMD_INDEX}\" search \"automatic local code RAG Nemotron\" -c \"${QMD_COLLECTION}\" -n 2 --json"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-cli-gaps",
+            "path": "evidence/receipts/native-cli-gaps.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "desktop-cli-workflows",
+            "path": "evidence/receipts/desktop-cli-workflows.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "qmd-bm25-retrieval-20260919",
+            "path": "blueprints/us-equities/retrieval-evaluation/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-artifacts-20260920",
+            "path": "evidence/receipts/token-practice-artifacts-20260920.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "native-research-efficiency-20260920",
+            "path": "blueprints/us-equities/research-efficiency/native-receipt.json",
+            "kind": "native_model_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-qmd-search",
+          "fresh-qmd-full",
+          "fresh-qmd-window"
+        ],
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+      },
+      "artifact_baselines": [
+        {
+          "id": "fresh-qmd-9d2d88745e48e8f07ad34b46",
+          "baseline_tokens": 2672,
+          "candidate_tokens": 815,
+          "tokens_removed": 1857,
+          "acceptance_passed": true,
+          "limitations": [
+            "Retrieves a dated historical source, not new provider evidence. Other sections are omitted."
+          ]
+        }
+      ],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "repomix",
+      "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.0",
+      "version": "1.18.0",
+      "profile": "supporting",
+      "role": "Explicit repository packing and structural compression",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/repomix",
+        "documented_commands": [
+          "repomix --include fixtures/records.json,fixtures/example.sh --output \"${OUTPUT_DIR}/repomix.xml\""
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "portable-cli-artifacts",
+            "path": "evidence/receipts/portable-cli-artifacts.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-artifacts-20260920",
+            "path": "evidence/receipts/token-practice-artifacts-20260920.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-repomix-full",
+          "fresh-repomix-compressed"
+        ],
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+      },
+      "artifact_baselines": [
+        {
+          "id": "fresh-repomix-c4b1dc83abcb97ba615d5019",
+          "baseline_tokens": 3697,
+          "candidate_tokens": 663,
+          "tokens_removed": 3034,
+          "acceptance_passed": true,
+          "limitations": [
+            "Function names are retained; omitted implementation must be read before correctness decisions."
+          ]
+        }
+      ],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "restic",
+      "repository": "https://github.com/restic/restic",
+      "version": "0.19.1",
+      "profile": "supporting",
+      "role": "Encrypted same-host backup and verified restore of explicitly selected public files",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/restic",
+        "documented_commands": [
+          "restic backup --files-from \"$SELECTION\" --json",
+          "restic check --read-data",
+          "restic restore latest --target \"$NEW_RESTORE\" --verify"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "restic-local-public-reference-20260919",
+            "path": "blueprints/us-equities/hosting/backup/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "ai-memory-native-state-recovery-20260919",
+            "path": "blueprints/us-equities/state-recovery/memory/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "qdrant-native-state-recovery-20260919",
+            "path": "blueprints/us-equities/state-recovery/qdrant/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-restic-snapshots"
+        ],
+        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Explicit scoped encrypted backup and verified same-host restore accepted; broader disaster recovery depends on its dedicated receipt.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "rtk",
+      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
+      "version": "0.49.0",
+      "profile": "core",
+      "role": "Compact supported command outputs, retain failure/raw recovery",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/rtk",
+        "documented_commands": [
+          "rtk git status"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-context-memory",
+            "path": "evidence/receipts/native-context-memory.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "artifact-reductions",
+            "path": "evidence/receipts/artifact-reductions.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-artifacts-20260920",
+            "path": "evidence/receipts/token-practice-artifacts-20260920.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-native-counters-20260920",
+            "path": "evidence/receipts/token-practice-native-counters-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-git-log-rtk"
+        ],
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+      },
+      "artifact_baselines": [
+        {
+          "id": "fresh-rtk-81acf6b27117a5da282a3b33",
+          "baseline_tokens": 537,
+          "candidate_tokens": 178,
+          "tokens_removed": 359,
+          "acceptance_passed": true,
+          "limitations": [
+            "Metadata is omitted/reformatted and relative timestamps vary. No provider comparison."
+          ]
+        }
+      ],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Native Claude Bash rewriting and awareness; Codex uses explicit upstream commands and awareness.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "sandbox-runtime",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "version": "0.0.77",
+      "profile": "supporting",
+      "role": "On-demand OS isolation for selected native commands",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/sandbox-runtime",
+        "documented_commands": [
+          "srt --settings \"${SANDBOX_POLICY}\" -- COMMAND"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "runtime-tools",
+            "path": "evidence/receipts/runtime-tools.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "native-sandbox-network-20260920",
+            "path": "evidence/receipts/native-sandbox-network-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-srt-denied-read",
+          "fresh-srt-allowed-write",
+          "fresh-srt-denied-read-corrected"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance.",
+        "network_scope": "Native allowed, explicit-deny and default-deny IPv4 loopback HTTP cases passed. Initial listener readiness race retained; bounded connection-refused retries accepted."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse the accepted filesystem and HTTP proxy scopes; no general sandbox-escape or TLS/SOCKS coverage claimed.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Scoped filesystem cases and allowed/denied loopback HTTP proxy cases accepted. General sandbox escape/TLS/SOCKS/IPv6 not tested.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "serena",
+      "repository": "https://github.com/oraios/serena",
+      "version": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "profile": "core",
+      "role": "Language-server symbol and reference retrieval",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/serena",
+        "documented_commands": [
+          {
+            "tool": "find_symbol",
+            "arguments": {
+              "name_path_pattern": "greeting",
+              "relative_path": "fixtures/after.py",
+              "include_body": true
+            }
+          }
+        ],
+        "scope": "Native MCP example after configuring this selected project/language; existing historical native acceptance used a Bash symbol in its own project."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-context-memory",
+            "path": "evidence/receipts/native-context-memory.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-serena-symbol-direct"
+        ],
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+      },
+      "artifact_baselines": [
+        {
+          "id": "fresh-serena-d36fcddddbad3e9f1de3d640",
+          "baseline_tokens": 3129,
+          "candidate_tokens": 214,
+          "tokens_removed": 2915,
+          "acceptance_passed": true,
+          "limitations": [
+            "Retains only the requested function and metadata; not the whole file or measured provider savings.",
+            "The exact count covers the returned MCP text-content field, not a wire envelope or prompt overhead."
+          ]
+        }
+      ],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "shanraisshan/claude-code-best-practice",
+      "repository": "https://github.com/shanraisshan/claude-code-best-practice",
+      "version": "15969ed2471a177d938c889255d2f23f07e4742a",
+      "profile": "optional",
+      "role": "Selective on-demand community guidance",
+      "installation_assessment": "selected source/skill pin; no executable lifecycle required",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/shanraisshan~1claude-code-best-practice",
+        "documented_commands": [
+          {
+            "skill_invocation": null,
+            "source_only": true
+          }
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Guidance/source repository; no executable functional entry point."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "On-demand selected guidance/skill source.",
+      "lifecycle_evidence": {
+        "assessment": "not_applicable_to_guidance",
+        "scope": "No executable process lifecycle applies to selected source guidance.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "Selected source guidance has no native executable to install."
+    },
+    {
+      "component_id": "shellcheck",
+      "repository": "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0",
+      "version": "0.11.0",
+      "profile": "supporting",
+      "role": "Static shell review",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/shellcheck",
+        "documented_commands": [
+          "shellcheck fixtures/example.sh"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "portable-cli-artifacts",
+            "path": "evidence/receipts/portable-cli-artifacts.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-shellcheck"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "skfolio",
+      "repository": "https://github.com/skfolio/skfolio",
+      "version": "1.2.9",
+      "profile": "supporting",
+      "role": "Native chronological splitter accepted for a frozen raw-price control study; portfolio optimizers remain unaccepted",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/skfolio",
+        "documented_commands": [
+          "uv pip sync --python \"$WAVE_DIR/venv/bin/python\" --require-hashes blueprints/us-equities/research-evaluation/requirements.lock",
+          "\"$WAVE_DIR/venv/bin/python\" blueprints/us-equities/research-evaluation/evaluate.py --lean-source \"$LEAN_SOURCE\" --out \"$WAVE_DIR/run-1\""
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-chronological-controls-20260919",
+            "path": "blueprints/us-equities/research-evaluation/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-skfolio-walkforward"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Chronological splitter accepted; portfolio optimizer behavior remains outside selected role.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "skills-ref",
+      "repository": "https://github.com/agentskills/agentskills",
+      "version": "0.1.0",
+      "profile": "supporting",
+      "role": "On-demand portable Agent Skills reference/demo validation",
+      "installation_assessment": "native installation/operation recorded in scoped public receipt",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/skills-ref",
+        "documented_commands": [
+          "skills-ref validate \"$SKILL_DIRECTORY\"",
+          "skills-ref read-properties \"$SKILL_DIRECTORY\"",
+          "skills-ref to-prompt \"$SKILL_DIRECTORY\""
+        ],
+        "scope": "Reference/demo validation of selected portable skill metadata; not production native-client extension semantics."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "upstream-native-tools-20260920",
+            "path": "evidence/receipts/upstream-native-tools-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Three supplemental upstream tools installed natively: Beads persisted task claims and dependency transitions, skills-ref validated and rendered a selected skill, and otel-tui ingested and displayed one synthetic loopback trace."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "socraticode",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "version": "1.14.0",
+      "profile": "core",
+      "role": "Automatically refreshed semantic code retrieval and native code graph",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/socraticode",
+        "documented_commands": [
+          "mcporter --config \"${MCPORTER_CONFIG}\" call socraticode.codebase_health --args '{}' --output text --no-oauth",
+          "mcporter --config \"${MCPORTER_CONFIG}\" call socraticode.codebase_search --args \"${SEARCH_ARGS}\" --output text --no-oauth"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-rag",
+            "path": "evidence/receipts/native-rag.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "desktop-direct-rag",
+            "path": "evidence/receipts/desktop-direct-rag.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "artifact-reductions",
+            "path": "evidence/receipts/artifact-reductions.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "vllm-compatibility",
+            "path": "evidence/receipts/vllm-compatibility.json",
+            "kind": "compatibility_attempt"
+          },
+          {
+            "id": "native-observability-followup",
+            "path": "observability/followup-receipt.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "token-practice-artifacts-20260920",
+            "path": "evidence/receipts/token-practice-artifacts-20260920.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-socraticode-status"
+        ],
+        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Automatic watcher on the selected project; explicit semantic queries use local embedding services.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Selected-project add/change/delete watcher and persistent retrieval passed in dated native evidence.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "syft",
+      "repository": "https://github.com/anchore/syft",
+      "version": "1.52.0",
+      "profile": "supporting",
+      "role": "Scoped native SDK dependency inventory; no vulnerability verdict",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/syft",
+        "documented_commands": [
+          "syft version -o json",
+          "syft scan dir:/sdk --base-path /sdk --source-name equity-worker-sdk --parallelism 2 -o syft-json=/output/runtime.syft.json -o cyclonedx-json=/output/runtime.cdx.json"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "syft-sdk-inventory-20260919",
+            "path": "blueprints/us-equities/supply-chain/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-artifacts-20260920",
+            "path": "evidence/receipts/token-practice-artifacts-20260920.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-syft-sdk",
+          "fresh-syft-table"
+        ],
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+      },
+      "artifact_baselines": [
+        {
+          "id": "fresh-syft-fdff9a16cb91e56cd743572d",
+          "baseline_tokens": 471760,
+          "candidate_tokens": 465,
+          "tokens_removed": 471295,
+          "acceptance_passed": true,
+          "limitations": [
+            "Only name/version/type columns are equal. Most SBOM metadata is omitted; this is not full-SBOM equivalent content."
+          ]
+        }
+      ],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "systemd",
+      "repository": "https://github.com/systemd/systemd",
+      "version": "255.4-1ubuntu8.17",
+      "profile": "supporting",
+      "role": "Existing Linux user manager; bounded transient research process-tree supervision",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/systemd",
+        "documented_commands": [
+          "systemd-run --user --wait --property=RuntimeMaxSec=4s --property=TimeoutStopSec=1s --property=KillMode=control-group ...",
+          "systemctl --user show \"$SYNTHETIC_UNIT\""
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-worker-supervision-20260919",
+            "path": "blueprints/us-equities/worker-supervision/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-systemd-services"
+        ],
+        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "toon",
+      "repository": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+      "version": "4.1.1",
+      "profile": "supporting",
+      "role": "Compact suitable structured data with explicit decode",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/toon",
+        "documented_commands": [
+          "toon fixtures/records.json --stats -o \"${OUTPUT_DIR}/records.toon\"",
+          "toon \"${OUTPUT_DIR}/records.toon\" --decode --strict -o \"${OUTPUT_DIR}/recovered.json\""
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "portable-cli-artifacts",
+            "path": "evidence/receipts/portable-cli-artifacts.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "token-practice-artifacts-20260920",
+            "path": "evidence/receipts/token-practice-artifacts-20260920.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-catalog-toon-20260920",
+            "path": "evidence/receipts/token-practice-catalog-toon-20260920.json",
+            "kind": "artifact_measurement"
+          },
+          {
+            "id": "token-practice-native-counters-20260920",
+            "path": "evidence/receipts/token-practice-native-counters-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-components-toon",
+          "fresh-components-roundtrip"
+        ],
+        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+      },
+      "artifact_baselines": [
+        {
+          "id": "fresh-toon-ea4c555ad3d459cc4dbef61e",
+          "baseline_tokens": 1664,
+          "candidate_tokens": 1307,
+          "tokens_removed": 357,
+          "acceptance_passed": true,
+          "limitations": [
+            "Exact retained-artifact counts; native --stats uses a different heuristic. No model request."
+          ]
+        }
+      ],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "vllm",
+      "repository": "https://github.com/vllm-project/vllm",
+      "version": "0.25.0",
+      "profile": "core",
+      "role": "Native GPU serving for pinned recent local embeddings",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/vllm",
+        "documented_commands": [
+          "vllm serve \"${MODEL_DIRECTORY}\" --served-model-name nvidia/Nemotron-3-Embed-1B-BF16 --host 127.0.0.1 --port 8231 --max-model-len 4096 --max-num-seqs 4 --gpu-memory-utilization 0.16 --enforce-eager --no-enable-log-requests"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-rag",
+            "path": "evidence/receipts/native-rag.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "vllm-compatibility",
+            "path": "evidence/receipts/vllm-compatibility.json",
+            "kind": "compatibility_attempt"
+          },
+          {
+            "id": "desktop-direct-rag",
+            "path": "evidence/receipts/desktop-direct-rag.json",
+            "kind": "native_model_e2e"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-vllm-model-inventory"
+        ],
+        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Retain working 0.25.0 on WSL; 0.29.0 initialization failed UVA support. Do not relabel version availability as runtime acceptance.",
+      "integration_mode": "Configured persistent native service; explicit task consumes the selected endpoint.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Working0.25.0 serving/retrieval accepted;0.29.0 failed WSL UVA initialization and was not adopted.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "version": "0.78.0",
+      "profile": "optional",
+      "role": "Native Git worktree convenience CLI",
+      "installation_assessment": "runtime present at retained native operation date",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/worktrunk",
+        "documented_commands": [
+          "wt list"
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "worktrunk-list",
+            "path": "evidence/receipts/worktrunk-list.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "component-history",
+            "path": "evidence/receipts/component-history.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-practice-coverage-20260920",
+            "path": "evidence/receipts/token-practice-coverage-20260920.json",
+            "kind": "historical_inventory"
+          },
+          {
+            "id": "token-native-retained-functional-20260920",
+            "path": "evidence/receipts/token-native-retained-functional-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [
+          "fresh-worktrunk",
+          "fresh-wt-create",
+          "fresh-wt-switch",
+          "fresh-wt-list-created",
+          "fresh-wt-remove",
+          "fresh-wt-list-removed"
+        ],
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Owned disposable create/select/list/remove lifecycle passed; hooks disabled and only original worktree remained.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    },
+    {
+      "component_id": "zizmor",
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "version": "1.30.1",
+      "profile": "supporting",
+      "role": "Offline GitHub workflow security analysis with failing fixtures",
+      "installation_assessment": "native installation/operation recorded in scoped public receipt",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/zizmor",
+        "documented_commands": [
+          "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\""
+        ],
+        "scope": "Use the selected native recipe only when its task applies."
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-ci-security-20260920",
+            "path": "blueprints/convergence-practice/ci-security/receipt.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-linux-zizmor-20260920",
+            "path": "evidence/receipts/native-linux-zizmor-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "zizmor 1.30.1 installed in an isolated native Linux tool environment; offline repository workflow scan returned zero findings, while an inert unsafe fixture returned the expected diagnostics and exit code."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Reuse the linked task-specific native receipts. No additional complete startup/cleanup/persistence certification is inferred from a version or query alone.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit."
+    }
+  ],
+  "remaining_boundaries": [
+    {
+      "component_id": "claude-hud",
+      "type": "interactive_onboarding_boundary",
+      "status": "Live HUD not rendered; synthetic fixture remains separately valid."
+    },
+    {
+      "component_id": "codex-for-claude",
+      "type": "unexercised_optional_parent_flow",
+      "status": "Backend passed; outer Claude delegation was not exercised."
+    },
+    {
+      "component_id": "context-mode",
+      "type": "unforced_native_lifecycle",
+      "status": "Fresh native PreCompact unforced; existing Desktop process retains its loaded old connection."
+    },
+    {
+      "component_id": "agentsview",
+      "type": "scope_and_optional_discovery",
+      "status": "One explicitly scoped archive/endpoint passed; automatic discovery remains unestablished."
+    },
+    {
+      "component_id": "vllm",
+      "type": "working_compatibility_pin",
+      "status": "0.25.0 remains accepted after0.29.0 failed actual WSL initialization."
+    }
+  ],
+  "installation_gap_conclusion": "No additional useful installation gap identified for the selected roles after this bounded catalog/evidence review. This is not certification of all optional features or installation of all research candidates.",
+  "integration_note": "Original wave based on8babbd6; integrated main9b7b5d9 preserves qualified recovery and adds llama-cpp, producing58 selected component records."
+}

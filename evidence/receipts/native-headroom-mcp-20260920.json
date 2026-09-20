@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "native-headroom-mcp-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20T05:37:16.322Z",
+  "component_ids": [
+    "headroom"
+  ],
+  "claim": "Official Headroom 0.37.0 MCP extra installed in an isolated Python 3.13 tool environment; direct compression, exact retrieval and scoped native statistics passed on owned synthetic artifacts while the prior exact-recovery guard remained available.",
+  "limitations": [
+    "Owned synthetic acceptance artifacts demonstrate artifact reduction, not lifetime production or provider-token savings",
+    "MCP summary is not a lossless replacement of the original; its exact full retrieval consumes the original token count",
+    "Upstream Headroom CLI has no compress subcommand; on-demand compression/retrieval is exposed through MCP or SDK",
+    "No automatic agent-traffic interception was configured",
+    "Global native upstream savings ledger remains0; isolated fixture ledger is not merged into it",
+    "No new provider task or automatic native-client traffic interception is established by this direct MCP fixture."
+  ],
+  "data": {
+    "installation_command": "uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'",
+    "upstream_sources": [
+      "https://pypi.org/pypi/headroom-ai/json",
+      "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0"
+    ],
+    "native_mcp_command": "headroom mcp serve --proxy-url http://127.0.0.1:1",
+    "direct_tool_names": [
+      "headroom_compress",
+      "headroom_retrieve",
+      "headroom_stats"
+    ],
+    "lifetime_command": "headroom savings --json",
+    "global_native_ledger": {
+      "calls": 0,
+      "tokens_saved": 0
+    },
+    "isolated_synthetic_ledger": {
+      "calls": 1,
+      "tokens_saved": 36719,
+      "merged_into_global": false
+    },
+    "lifetime_bounds": {
+      "hard_maximum_retention_days": 30,
+      "source": "headroom/savings_ledger.py and headroom/cli/savings.py, upstream version0.37.0",
+      "not_provider_usage": true
+    },
+    "measured_quality": {
+      "tokenizer": "gpt-tokenizer3.4.0/o200k_base",
+      "guarded_request_input_tokens": 26529,
+      "guarded_request_retained_tokens": 191,
+      "guarded_request_saved": 26338,
+      "guarded_exact_recovery": "run-expansion",
+      "critical_error_and_summary_exact": true,
+      "mcp_compact_json_baseline": 36625,
+      "mcp_candidate_summary": 19714,
+      "mcp_compact_baseline_reduction": 16911,
+      "mcp_exact_recovery": true,
+      "mcp_critical_failure_retained": true,
+      "originals_retained": true
+    },
+    "existing_guard_preserved": true,
+    "model_routing_and_authentication_preserved": true,
+    "exact_causal_lifetime_provider_tokens_saved": null
+  }
+}

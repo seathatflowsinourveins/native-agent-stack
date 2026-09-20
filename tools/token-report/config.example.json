@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "state_dir": "${REPORT_STATE}",
+  "project": "${REPORT_PROJECT}",
+  "publication": "../..",
+  "catalog_index": "../../catalogs/us-equities/decision-index.json",
+  "stack_manifest": "../../manifests/stack.json",
+  "rtk": "rtk",
+  "headroom": "headroom",
+  "context_roots": [],
+  "inspect_hook_history": false,
+  "inspect_project_history": false,
+  "rtk_database": null,
+  "headroom_events": null,
+  "audit_json": null,
+  "gap_summary": null,
+  "toon": null,
+  "tokenizer_module": null
+}

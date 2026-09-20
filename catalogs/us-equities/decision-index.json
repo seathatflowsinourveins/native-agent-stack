@@ -164,11 +164,11 @@
     "repositories": 511,
     "public_star_repositories": 342,
     "beyond_public_stars": 169,
-    "references": 1061,
+    "references": 1063,
     "repositories_by_record_type": {
       "catalog_card": 147,
-      "component_record": 63,
-      "legacy_candidate": 19,
+      "component_record": 64,
+      "legacy_candidate": 20,
       "public_star": 342,
       "research_supplement": 103,
       "star_review": 342
@@ -511,7 +511,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/55",
+          "pointer": "/components/54",
           "id": "skills-ref"
         }
       ]
@@ -1516,7 +1516,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/62",
+          "pointer": "/components/63",
           "id": "apple-container"
         }
       ]
@@ -4202,7 +4202,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/59",
+          "pointer": "/components/60",
           "id": "fastapi"
         }
       ]
@@ -4530,7 +4530,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/54",
+          "pointer": "/components/53",
           "id": "beads"
         }
       ]
@@ -4650,7 +4650,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/53",
+          "pointer": "/components/56",
           "id": "llama-cpp"
         }
       ]
@@ -5708,6 +5708,8 @@
       "aliases": [],
       "public_star": true,
       "record_types": [
+        "component_record",
+        "legacy_candidate",
         "public_star",
         "research_supplement",
         "star_review"
@@ -5731,6 +5733,18 @@
           "decision": "obsolete_or_ineligible",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        },
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/19",
+          "decision": "Use when indexing and symbol discovery avoid an otherwise necessary broad file read. An already known focused source extraction was cheaper in the retained fixture. Historical source-review rejection remains dated; this bounded adoption does not establish commercial deployment eligibility."
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/57",
+          "id": "jcodemunch-mcp"
         }
       ]
     },
@@ -9152,7 +9166,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/60",
+          "pointer": "/components/61",
           "id": "postgresql"
         }
       ]
@@ -9757,7 +9771,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/58",
+          "pointer": "/components/59",
           "id": "react"
         }
       ]
@@ -11633,7 +11647,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/61",
+          "pointer": "/components/62",
           "id": "poppler"
         }
       ]
@@ -12208,7 +12222,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/57",
+          "pointer": "/components/58",
           "id": "nextjs"
         }
       ]
@@ -13080,7 +13094,7 @@
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
-          "pointer": "/components/56",
+          "pointer": "/components/55",
           "id": "otel-tui"
         }
       ]
