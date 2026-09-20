@@ -1,0 +1,371 @@
+{
+  "schema_version": 1,
+  "kind": "native_cli_e2e",
+  "recorded_at": "2026-09-20T17:21:49.707555+00:00",
+  "scope": "Actual restarted Codex Desktop task; direct exposed MCP connections and current shell. Dated authoring-host execution, not new-PC acceptance.",
+  "configured_mcp_servers_returning_success": [
+    "context-mode",
+    "jcodemunch",
+    "serena",
+    "ai-memory",
+    "socraticode"
+  ],
+  "environment": {
+    "shell_native_bin_first": true,
+    "shell_rtk_telemetry_disabled": "1",
+    "context_native_bin_first": true,
+    "context_resolved_commands": [
+      "rtk",
+      "context-mode",
+      "headroom",
+      "jcodemunch-mcp",
+      "qmd",
+      "serena-context",
+      "socraticode",
+      "ai-memory",
+      "repomix",
+      "toon",
+      "ast-grep",
+      "codebase-memory-mcp",
+      "chub",
+      "markitdown"
+    ],
+    "context_rtk_telemetry_disabled": null,
+    "scope_note": "Fourteen resolutions prove command discovery; do not count them as fourteen lifecycle tests. RTK telemetry flag is verified in the Codex shell, not inherited by the Context Mode subprocess."
+  },
+  "jcodemunch": {
+    "commands": [
+      {
+        "action": "get_session_stats",
+        "args": {}
+      },
+      {
+        "action": "get_symbol_source",
+        "args": {
+          "repo": "local/agent-lab",
+          "symbol_id": "tools/ecosystem/evaluate-native.py::parse_codex#function"
+        }
+      },
+      {
+        "action": "get_session_stats",
+        "args": {}
+      }
+    ],
+    "before": {
+      "session_tokens_saved": 0,
+      "session_calls": 0,
+      "total_tokens_saved": 54670,
+      "session_response_tokens": 0
+    },
+    "after": {
+      "session_tokens_saved": 4970,
+      "session_calls": 1,
+      "total_tokens_saved": 59640,
+      "session_response_tokens": 1339
+    },
+    "same_process": true,
+    "source_comparison": {
+      "byte_equal": true,
+      "sha256": "da3277537bf59cb63bc0b7bd2b25f86422d8f79679d382147d72863f9dc1dfd5",
+      "bytes": 2255
+    },
+    "basis": "Upstream estimate includes this verification retrieval; session is included in retained total. Not causal provider savings."
+  },
+  "rtk": {
+    "command": [
+      "rtk",
+      "gain",
+      "--format",
+      "json"
+    ],
+    "exit_code": 0,
+    "returned": {
+      "summary": {
+        "total_commands": 55,
+        "total_input": 18054,
+        "total_output": 16332,
+        "total_saved": 1722,
+        "avg_savings_pct": 9.538052509139249,
+        "total_time_ms": 1624,
+        "avg_time_ms": 29
+      }
+    },
+    "scope": "Retained native estimate; maximum 90-day retention; no session partition."
+  },
+  "headroom": {
+    "command": [
+      "headroom",
+      "savings",
+      "--json"
+    ],
+    "exit_code": 0,
+    "returned_lifetime": {
+      "tokens_saved": 0,
+      "tokens_before": 0,
+      "cost_usd": 0.0,
+      "calls": 0,
+      "savings_percent": 0.0
+    },
+    "scope": "Upstream lifetime query is capped at 30 days; actual ledger has 0 calls."
+  },
+  "context_mode": {
+    "command": "ctx_stats({})",
+    "returned_excerpts": [
+      "Without context-mode   50.3 KB",
+      "With context-mode       1.1 KB",
+      "This chat: 989 KB kept out",
+      "All your work: 1.7 MB kept out"
+    ],
+    "before_after_text_identical": true,
+    "current_task_tokens_saved": null,
+    "retained_tokens_saved_attributable_to_task": null,
+    "limitation": "Mixed historical and Claude-labelled aggregates despite codex platform; do not infer current-task tokens, money saved or longer sessions from these returned totals."
+  },
+  "retrieval": {
+    "socraticode": {
+      "status": "green",
+      "indexed_chunks": 196,
+      "watcher": "active",
+      "scoped_search_matches": 2
+    },
+    "serena": {
+      "name_path": "parse_claude",
+      "kind": "Function",
+      "zero_based_lines": [
+        142,
+        169
+      ]
+    },
+    "ai_memory": {
+      "scope": {
+        "workspace": "agent-lab",
+        "project": "agent-lab"
+      },
+      "query_hits": 2,
+      "status": {
+        "counts": {
+          "pages_latest": 40,
+          "pages_all": 123,
+          "sessions": 52,
+          "observations": 25705
+        }
+      }
+    },
+    "qmd": {
+      "search_command": [
+        "qmd",
+        "--index",
+        "agent-lab-docs",
+        "search",
+        "token session setup",
+        "-c",
+        "agent-lab-docs",
+        "-n",
+        "3"
+      ],
+      "search_exit": 0,
+      "get_command": [
+        "qmd",
+        "--index",
+        "agent-lab-docs",
+        "get",
+        "qmd://agent-lab-docs/tasks/2026-09-20-token-lifetime-coverage.md",
+        "--from",
+        "36",
+        "-l",
+        "18"
+      ],
+      "get_exit": 0,
+      "original_lines_match": 18
+    }
+  },
+  "plugin_repair": {
+    "cause_observed": "Desktop Context Mode cache directory was empty; native plugin list omitted it. Working project MCP server remained separate. Cause of earlier cache removal is unknown.",
+    "command": [
+      "codex",
+      "plugin",
+      "add",
+      "context-mode@context-mode",
+      "--json"
+    ],
+    "exit_code": 0,
+    "returned": {
+      "pluginId": "context-mode@context-mode",
+      "name": "context-mode",
+      "marketplaceName": "context-mode",
+      "version": "1.0.169",
+      "authPolicy": "ON_INSTALL"
+    },
+    "after": {
+      "pluginId": "context-mode@context-mode",
+      "version": "1.0.169",
+      "installed": true,
+      "enabled": true
+    },
+    "verification": {
+      "config_semantically_unchanged": true,
+      "hook_manifest_exists": true,
+      "hook_manifest_sha256": "6613bb6580906f76f9c9767d731af91b4b7c4c02692203e261bdfbc55f8b2456",
+      "configured_hooks": [
+        "PreToolUse",
+        "PostToolUse",
+        "SessionStart",
+        "PreCompact",
+        "UserPromptSubmit",
+        "Stop"
+      ]
+    },
+    "boundary": "Six restored definitions are not proof that every lifecycle hook fired in this ongoing task."
+  },
+  "observation": {
+    "recorded_at": "2026-09-20T17:15:51.971276+00:00",
+    "start_utc": "2026-09-20T17:08:33.467423+00:00",
+    "end_utc": "2026-09-20T17:13:33.467423+00:00",
+    "native_response_count": 7,
+    "loki_response_count": 7,
+    "unique_six_category_matches": 7,
+    "max_match_delay_seconds": 0.009817,
+    "usage": {
+      "input_tokens": 675390,
+      "cached_input_tokens": 416640,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 8100,
+      "reasoning_output_tokens": 729,
+      "total_tokens": 683490
+    },
+    "join": "Exact root conversation_id; response.completed; six-category token vector; unique matching native token_usage_record within100ms. Actual maximum delay below10ms. Loki response_id is absent, so response-ID equality is not claimed.",
+    "prometheus": {
+      "fresh_five_minute_job_filtered_series": 0,
+      "fresh_five_minute_unfiltered_series": 0,
+      "current_three_way_usage_join_available": false,
+      "historical_shared_series_scope": "Previous retained metrics used job=codex-app-server and instance=unscoped without per-thread labels; they cannot prove this restarted task.",
+      "current_limit": "No turn-token metric sample returned in the fixed fresh five-minute window, including the query without a job filter. The root task is ongoing; this observation alone does not establish exporter failure or when a completed-turn metric will appear. Native records and Loki already match each response.",
+      "query_correction_needed": false
+    },
+    "scope": "Consumption from unique selected post-restart root-task responses; not savings. Cached input and reasoning output are subsets. No response-ID equality claimed."
+  },
+  "reporter": {
+    "command": "ecosystem-token-report --context-stats-file PRIVATE_CAPTURE_JSON refresh",
+    "failed_attempts": [
+      {
+        "exit_code": 1,
+        "cause": "An initial text file argument failed JSON parsing; corrected to an MCP JSON envelope."
+      },
+      {
+        "exit_code": 1,
+        "issues": [
+          "Desktop WSL: incomplete hook inventory; inspect retained errors"
+        ],
+        "cause": "Empty installed plugin cache; repaired with upstream plugin add."
+      }
+    ],
+    "final": {
+      "exit_code": 0,
+      "issues": [],
+      "native_scopes": 7,
+      "unique_comparisons": 43,
+      "capture_id": "20260920T171830-be9c0795"
+    }
+  },
+  "limits": [
+    "All 24 topic repositories remain classified in the handbook; optional tools are not automatically invoked.",
+    "Tools without native savings ledgers remain unavailable, not zero.",
+    "A correct install does not establish superiority over a known-source baseline or exact provider tokens avoided.",
+    "This live check creates provider consumption in the surrounding task; no extra synthetic provider trial was launched.",
+    "Private config, paths, conversation text, identities and full responses are excluded from public artifacts."
+  ],
+  "private_artifact_hashes": [
+    {
+      "name": "direct-mcp-and-cli.private.json",
+      "sha256": "cf3d5289f3cef4d016547c845d19c2c31ef2d3f3f6fb89a298859f2813e9fd47",
+      "bytes": 39493,
+      "disclosure": "Retained privately; not copied into Git."
+    },
+    {
+      "name": "supplemental.private.json",
+      "sha256": "6e981efcb2dea15ae6aaa46bcda98e742cacc8c7838b94f9ab9fb07d4f5de2fc",
+      "bytes": 2387,
+      "disclosure": "Retained privately; not copied into Git."
+    },
+    {
+      "name": "context-direct.json",
+      "sha256": "db138467616b56c770d1f5e0e2e3517c9bc38cb6e81fea1488687c4507d5fe01",
+      "bytes": 3450,
+      "disclosure": "Retained privately; not copied into Git."
+    },
+    {
+      "name": "context-after.private.json",
+      "sha256": "b2d0b1f5e682dbc2b54c2710f324a0e289f082d43945e357e5de5729006cb717",
+      "bytes": 3254,
+      "disclosure": "Retained privately; not copied into Git."
+    },
+    {
+      "name": "plugin-list.private.json",
+      "sha256": "fd0a8902d77168eb121e25109f2c7927adac52811aa8e9a934a22675621e72d8",
+      "bytes": 7016,
+      "disclosure": "Retained privately; not copied into Git."
+    },
+    {
+      "name": "plugin-list-after.private.json",
+      "sha256": "3e5915fb4fddeff0655c13e645717bf6625d32611ca03bf5c9e3bdb4a33c0a8f",
+      "bytes": 7548,
+      "disclosure": "Retained privately; not copied into Git."
+    },
+    {
+      "name": "plugin-add.private.json",
+      "sha256": "082c8de7b4b58237a02de0ec28603c7e6c5c07e1152a127572af45e80243e23c",
+      "bytes": 259,
+      "disclosure": "Retained privately; not copied into Git."
+    },
+    {
+      "name": "plugin-add.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "disclosure": "Retained privately; not copied into Git."
+    },
+    {
+      "name": "plugin-repair-check.private.json",
+      "sha256": "d4c6d12ae2caa63cbc6d8af45ba174b9d24248c6b19811c82e6eb5536622de91",
+      "bytes": 421,
+      "disclosure": "Retained privately; not copied into Git."
+    },
+    {
+      "name": "observation/receipt.json",
+      "sha256": "3efa0fa003869da3b9d78d4e9b4b0cbba22ba96e56b15a543bd66cc67d99f95f",
+      "bytes": 16555,
+      "disclosure": "Retained privately; not copied into Git."
+    },
+    {
+      "name": "requests.private.json",
+      "sha256": "5c31f8fb682ca756ad6246d9a7e3cc631d419708f052006e027d71037603aae8",
+      "bytes": 2240,
+      "disclosure": "Exact tool arguments retained privately; host paths omitted from public copy."
+    }
+  ],
+  "execution_kind": "restarted_desktop_direct_mcp_e2e",
+  "id": "codex-desktop-live-20260920",
+  "component_ids": [
+    "codex",
+    "context-mode",
+    "jcodemunch-mcp",
+    "serena",
+    "ai-memory",
+    "socraticode",
+    "rtk",
+    "headroom",
+    "qmd",
+    "loki",
+    "prometheus"
+  ],
+  "claim": "The restarted Desktop task returned successful results through five configured MCP servers, verified current shell PATH and exact source retrieval, and matched seven fresh native/Loki usage records. A missing Desktop plugin cache was restored with upstream plugin add.",
+  "limitations": [
+    "All24topic repositories remain classified in the handbook; optional tools are not automatically invoked.",
+    "Tools without native savings ledgers remain unavailable, not zero.",
+    "A correct install does not establish superiority over a known-source baseline or exact provider tokens avoided.",
+    "This live check creates provider consumption in the surrounding task; no extra synthetic provider trial was launched.",
+    "Private config, paths, conversation text, identities and full responses are excluded from public artifacts.",
+    "Mixed historical and Claude-labelled aggregates despite codex platform; do not infer current-task tokens, money saved or longer sessions from these returned totals.",
+    "Six restored definitions are not proof that every lifecycle hook fired in this ongoing task.",
+    "No fresh Prometheus turn sample in the selected window; no three-way observation join."
+  ]
+}
