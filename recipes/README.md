@@ -258,8 +258,10 @@ Codex and Claude. Install once in the selected prefix and keep its executable
 directory on each client's PATH. Use these tools when their task applies; startup
 does not require another installation or acceptance campaign. The
 [dated receipt](../evidence/receipts/upstream-native-tools-20260920.json) records
-the tested scope and retained failures. These tools have no verified cumulative
-token-savings counters.
+the tested scope and retained failures on the source Linux/WSL host. These
+portable recipes do not establish installation or acceptance on macOS, VelaNext
+or another host; a selected host needs its own relevant check. These tools have
+no verified cumulative token-savings counters.
 
 ### Beads task dependencies
 

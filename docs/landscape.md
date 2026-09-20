@@ -43,8 +43,10 @@ The full candidate manifest includes native prospective commands and their prere
 
 The [supplemental native receipt](../evidence/receipts/upstream-native-tools-20260920.json)
 and [memory maintenance receipt](../evidence/receipts/native-ai-memory-maintenance-20260920.json)
-record the September 20 additions separately from the earlier landscape review.
-No lifetime token-savings counter or universal ranking is inferred from adoption.
+record the September 20 additions on their source Linux/WSL host separately from
+the earlier landscape review. Importing these receipts does not qualify macOS,
+VelaNext or another host. No lifetime token-savings counter or universal ranking
+is inferred from adoption.
 
 ## Recent models and runtime compatibility
 

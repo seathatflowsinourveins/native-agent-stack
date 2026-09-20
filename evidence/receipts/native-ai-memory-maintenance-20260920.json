@@ -6,8 +6,9 @@
   "component_ids": [
     "ai-memory"
   ],
-  "claim": "Official ai-memory 2.3.2 release installed over 2.3.1 after a private upstream backup; active service executable, native status, scoped search and configured direct MCP status verified.",
+  "claim": "Official ai-memory 2.3.2 release installed on the source Linux/WSL host over 2.3.1 after a private upstream backup; active service executable, native status, scoped search and configured direct MCP status verified.",
   "limitations": [
+    "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host.",
     "No new provider/model task was run. Existing dated client acceptance remains tied to its original version and scope.",
     "Private memory contents, counts, backup, paths and raw native/MCP responses are excluded from this publication.",
     "Native client configuration, service unit, lifecycle hooks, managed routing/skills, project scope and provider settings were preserved.",
@@ -65,5 +66,11 @@
       "Guessed unauthenticated HTTP health/status routes returned 404; acceptance instead used supported native status/search and configured direct MCP."
     ],
     "exact_causal_lifetime_provider_tokens_saved": null
+  },
+  "host_scope": {
+    "profile": "source-host-linux-wsl",
+    "platform": "Linux/WSL",
+    "identity": "Private source-host identity omitted",
+    "import_limit": "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
   }
 }

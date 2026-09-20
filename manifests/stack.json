@@ -104,7 +104,7 @@
         "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2"
       ],
       "source_pin": "353841d91618d20b110b208de284a74d0b960379",
-      "freshness": "Official 2.3.2 release and supported native status/search/direct MCP checked 2026-09-20. Older native-model receipts retain their original version and scope."
+      "freshness": "Official 2.3.2 release and supported native status/search/direct MCP checked 2026-09-20. Older native-model receipts retain their original version and scope. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import."
     },
     {
       "id": "ast-grep",
@@ -1315,7 +1315,7 @@
       "evidence_ids": [
         "upstream-native-tools-20260920"
       ],
-      "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim."
+      "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import."
     },
     {
       "id": "skills-ref",
@@ -1337,7 +1337,7 @@
       "evidence_ids": [
         "upstream-native-tools-20260920"
       ],
-      "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim."
+      "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import."
     },
     {
       "id": "otel-tui",
@@ -1357,7 +1357,7 @@
       "evidence_ids": [
         "upstream-native-tools-20260920"
       ],
-      "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim."
+      "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import."
     },
     {
       "id": "llama-cpp",

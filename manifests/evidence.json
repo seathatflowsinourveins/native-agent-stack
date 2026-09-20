@@ -1127,15 +1127,22 @@
         "skills-ref",
         "otel-tui"
       ],
-      "claim": "Three supplemental upstream tools installed natively: Beads persisted task claims and dependency transitions, skills-ref validated and rendered a selected skill, and otel-tui ingested and displayed one synthetic loopback trace.",
+      "claim": "Three supplemental upstream tools installed on the source Linux/WSL host: Beads persisted task claims and dependency transitions, skills-ref validated and rendered a selected skill, and otel-tui ingested and displayed one synthetic loopback trace.",
       "limitations": [
         "Bounded native CLI/TUI acceptance on Linux/WSL; no new native Codex or Claude provider task was run for these additions.",
         "Beads used one owned Git fixture with embedded Dolt, explicit task scope, skipped agent-instruction generation and skipped hooks. It does not replace ai-memory.",
         "skills-ref is upstream's reference/demo implementation; successful portable-format validation does not certify production client extensions or tool semantics.",
         "otel-tui received one synthetic local trace; no production or native-provider telemetry session was evaluated and no persistent exporter was installed.",
         "None of these three tools exposes a verified cumulative token-savings counter. Exact causal lifetime provider savings remain null.",
-        "Public command forms substitute portable variables for private host paths; private raw operation logs are not published."
-      ]
+        "Public command forms substitute portable variables for private host paths; private raw operation logs are not published.",
+        "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
+      ],
+      "host_scope": {
+        "profile": "source-host-linux-wsl",
+        "platform": "Linux/WSL",
+        "identity": "Private source-host identity omitted",
+        "import_limit": "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
+      }
     },
     {
       "id": "native-ai-memory-maintenance-20260920",
@@ -1144,14 +1151,21 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Official ai-memory 2.3.2 release installed over 2.3.1 after a private upstream backup; active service executable, native status, scoped search and configured direct MCP status verified.",
+      "claim": "Official ai-memory 2.3.2 release installed on the source Linux/WSL host over 2.3.1 after a private upstream backup; active service executable, native status, scoped search and configured direct MCP status verified.",
       "limitations": [
         "No new provider/model task was run. Existing dated client acceptance remains tied to its original version and scope.",
         "Private memory contents, counts, backup, paths and raw native/MCP responses are excluded from this publication.",
         "Native client configuration, service unit, lifecycle hooks, managed routing/skills, project scope and provider settings were preserved.",
         "This maintenance update does not demonstrate token savings; exact causal lifetime provider savings remain null.",
-        "Forward-only migrations may require restoring the retained private backup to downgrade."
-      ]
+        "Forward-only migrations may require restoring the retained private backup to downgrade.",
+        "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
+      ],
+      "host_scope": {
+        "profile": "source-host-linux-wsl",
+        "platform": "Linux/WSL",
+        "identity": "Private source-host identity omitted",
+        "import_limit": "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
+      }
     },
     {
       "id": "native-linux-zizmor-20260920",
@@ -1160,13 +1174,20 @@
       "component_ids": [
         "zizmor"
       ],
-      "claim": "zizmor 1.30.1 installed in an isolated native Linux tool environment; offline repository workflow scan returned zero findings, while an inert unsafe fixture returned the expected diagnostics and exit code.",
+      "claim": "zizmor 1.30.1 installed in an isolated tool environment on the source Linux/WSL host; offline repository workflow scan returned zero findings, while an inert unsafe fixture returned the expected diagnostics and exit code.",
       "limitations": [
         "Offline regular-persona static analysis only; no online credential-backed checks or workflow execution.",
         "The official uv package-index installation was used. The installed binary was separately hashed; no independent downloaded wheel archive verification was performed in this host follow-up.",
         "Earlier Mac and disposable GitHub CI acceptance receipts retain their original host scope.",
-        "No provider task was run and zizmor supplies no verified lifetime token-savings counter."
-      ]
+        "No provider task was run and zizmor supplies no verified lifetime token-savings counter.",
+        "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
+      ],
+      "host_scope": {
+        "profile": "source-host-linux-wsl",
+        "platform": "Linux/WSL",
+        "identity": "Private source-host identity omitted",
+        "import_limit": "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
+      }
     },
     {
       "id": "native-dagu-job-recovery-20260920",
@@ -1514,8 +1535,8 @@
     },
     {
       "path": "blueprints/convergence-practice/ci-security/README.md",
-      "sha256": "982b8d46dbc8981cdcfb85721314478869c4aa75190660f96343a3718e6c444c",
-      "bytes": 3105
+      "sha256": "ddf1c10dd276df424f6f237efe658707a82090cb51cee52975c2a5b81138606c",
+      "bytes": 3210
     },
     {
       "path": "blueprints/convergence-practice/ci-security/ci-acceptance.json",
@@ -3534,13 +3555,13 @@
     },
     {
       "path": "docs/ecosystem/README.md",
-      "sha256": "7f5e5f9844f36fe4ed99935eb3948b9843a9dbce4685ec3f8db0e5512bbd4540",
-      "bytes": 6253
+      "sha256": "cc28a95afdc8bd3967018d226a611cb9778c6590ddb4737252a3ceabf954bbeb",
+      "bytes": 6392
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "aa3a2a7c5753b4ee6dabf777c15e36aae47d28185205aab172c4134f55ab02c6",
-      "bytes": 1615620
+      "sha256": "95aef9c8bbae6c7e08d8d49dc251c80022dc8dfa4946f061eb61b1485d48bf90",
+      "bytes": 1616475
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -3579,8 +3600,8 @@
     },
     {
       "path": "docs/landscape.md",
-      "sha256": "b9ae3b6c5cac6cf236600e8c33044670193c65ca492673f51333bee1c29cb67d",
-      "bytes": 8932
+      "sha256": "b089e3876b24ef32ee806ddf057c6712a8ceb9cbc069add3b6b9976e9db6a312",
+      "bytes": 9038
     },
     {
       "path": "docs/stack.md",
@@ -3674,8 +3695,8 @@
     },
     {
       "path": "evidence/receipts/native-ai-memory-maintenance-20260920.json",
-      "sha256": "513095e6062ddd06fb285aecaf2ee73be6529d25c57709f09afcdfb144960a14",
-      "bytes": 3210
+      "sha256": "05173d379f777d26fa4264e759a89783e6508e0391e191943d9cfc7027431569",
+      "bytes": 3712
     },
     {
       "path": "evidence/receipts/native-claude-hud-interactive-20260920.json",
@@ -3724,8 +3745,8 @@
     },
     {
       "path": "evidence/receipts/native-linux-zizmor-20260920.json",
-      "sha256": "88842d67b82948374f7e1fc2296be741c03aa38d986a2ae0421498d2751ba1a1",
-      "bytes": 2465
+      "sha256": "f8ee45ad6267f67d62fd00d991bbfcf83f84fdedad5ea5780a58ee741c50dde4",
+      "bytes": 2954
     },
     {
       "path": "evidence/receipts/native-memory.json",
@@ -3794,8 +3815,8 @@
     },
     {
       "path": "evidence/receipts/upstream-native-tools-20260920.json",
-      "sha256": "bca6d58c2dc0e59d96140d4bee2efba4823355f46cb4aaf4b39ccdeeb536fe46",
-      "bytes": 6455
+      "sha256": "71f6a397542e18f8f0b204f356a00b9be0bc8aed8c8c6258d60d6545ad67dffd",
+      "bytes": 6948
     },
     {
       "path": "evidence/receipts/vllm-compatibility.json",
@@ -3919,8 +3940,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "bab21636c67db98993cde07efec739ec7e38152fee0857c817df4e08bfae4cba",
-      "bytes": 60683
+      "sha256": "045ffd4c3ed23d09103720129d73a7df3deda42c83193f7747fe251139d6494d",
+      "bytes": 61151
     },
     {
       "path": "observability/README.md",
@@ -4099,8 +4120,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "fcfa16acf27029337561bfe4bc9767a44d2226bca148a634b41d9aa38fb9bc88",
-      "bytes": 55595
+      "sha256": "2474ed161f1de3f64cf73b77f8de49f65603394e37ffc6d98b4b4eed8dcb259d",
+      "bytes": 55773
     },
     {
       "path": "scripts/adoption_status.py",

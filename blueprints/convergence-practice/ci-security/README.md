@@ -17,8 +17,9 @@ unsafe fixture returns exit 14 with `template-injection`, `unpinned-uses` and
 Replay with the selected native executable available:
 
 The later [native Linux receipt](../../../evidence/receipts/native-linux-zizmor-20260920.json)
-closes the local executable gap with upstream `uv tool install zizmor==1.30.1`
-in an isolated tool environment. The workflow-directory scan returned exit 0
+closes the executable gap on its recorded source Linux/WSL host with upstream
+`uv tool install zizmor==1.30.1` in an isolated tool environment. Importing that
+receipt does not qualify macOS, VelaNext or another host. The workflow-directory scan returned exit 0
 and no findings; the unchanged inert fixture returned exit 14 with all three
 diagnostics above. Both exact native acceptance tests passed with no skips.
 The installed binary was independently hashed; this follow-up did not repeat

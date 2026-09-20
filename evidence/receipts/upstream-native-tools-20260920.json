@@ -8,8 +8,9 @@
     "skills-ref",
     "otel-tui"
   ],
-  "claim": "Three supplemental upstream tools installed natively: Beads persisted task claims and dependency transitions, skills-ref validated and rendered a selected skill, and otel-tui ingested and displayed one synthetic loopback trace.",
+  "claim": "Three supplemental upstream tools installed on the source Linux/WSL host: Beads persisted task claims and dependency transitions, skills-ref validated and rendered a selected skill, and otel-tui ingested and displayed one synthetic loopback trace.",
   "limitations": [
+    "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host.",
     "Bounded native CLI/TUI acceptance on Linux/WSL; no new native Codex or Claude provider task was run for these additions.",
     "Beads used one owned Git fixture with embedded Dolt, explicit task scope, skipped agent-instruction generation and skipped hooks. It does not replace ai-memory.",
     "skills-ref is upstream's reference/demo implementation; successful portable-format validation does not certify production client extensions or tool semantics.",
@@ -140,5 +141,11 @@
       }
     ],
     "exact_causal_lifetime_provider_tokens_saved": null
+  },
+  "host_scope": {
+    "profile": "source-host-linux-wsl",
+    "platform": "Linux/WSL",
+    "identity": "Private source-host identity omitted",
+    "import_limit": "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
   }
 }

@@ -64,11 +64,12 @@ The two retrieval replay highlights are separately identified as recorded
 evaluations, with their own denominators and limits. Current acceptance on the
 browser's host stays unknown: a static HTML file probes no accounts or services.
 
-The [current primary-source review](source-review.json) records native Claude Code
-features, existing retrieval and memory options, and local inference gates. It
-does not install anything or change accepted pins. In particular, ai-memory 2.3.2
-remains a candidate for an isolated migration/scope trial; native 2.3.1 state was
-not upgraded by this work.
+The [dated primary-source review](source-review.json) records native Claude Code
+features, existing retrieval and memory options, and local inference gates. That
+review installed nothing and left ai-memory 2.3.2 as a candidate. The later
+[maintenance receipt](../../evidence/receipts/native-ai-memory-maintenance-20260920.json)
+records its bounded update on the source Linux/WSL host after a private backup.
+Importing that receipt does not upgrade or qualify macOS, VelaNext or another host.
 
 The [Tavily receipt](tavily-receipt.json) records CLI 0.1.8, eight official skills
 at a full source commit, native authentication and one three-result search.
