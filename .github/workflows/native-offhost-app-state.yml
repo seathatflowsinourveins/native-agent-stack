@@ -37,8 +37,8 @@ jobs:
         run: python3 blueprints/convergence-practice/offhost-app-state/run.py install --root "$APP_STATE_ROOT"
       - name: Prepare the exact upstream native test dependencies
         run: |
-          sudo apt-get update > "$APP_STATE_ROOT/reports/apt-update.txt" 2>&1
-          sudo apt-get install --yes --no-install-recommends pkg-config build-essential curl ca-certificates tar gzip iproute2 > "$APP_STATE_ROOT/reports/apt-install.txt" 2>&1
+          sudo apt-get update 2>&1 | tee "$APP_STATE_ROOT/reports/apt-update.txt"
+          sudo apt-get install --yes --no-install-recommends pkg-config build-essential curl ca-certificates tar gzip iproute2 2>&1 | tee "$APP_STATE_ROOT/reports/apt-install.txt"
           export RUSTUP_HOME="$APP_STATE_ROOT/rustup"
           export CARGO_HOME="$APP_STATE_ROOT/cargo"
           printf 'RUSTUP_HOME=%s\nCARGO_HOME=%s\n' "$RUSTUP_HOME" "$CARGO_HOME" >> "$GITHUB_ENV"
