@@ -1,7 +1,9 @@
 """Accounting invariants; offline and independent of native authentication."""
+from contextlib import closing, contextmanager
 import importlib.util
 import json
 from pathlib import Path
+import sqlite3
 import tempfile
 import unittest
 
@@ -40,6 +42,18 @@ class LedgerContract(unittest.TestCase):
         self.assertEqual(config["state_dir"],str(self.root/"state"))
         self.assertEqual(config["context_roots"][0]["path"],str(self.root/"stats"))
         self.assertEqual(config["output_json"],str(self.root/"state/manifest.json"))
+
+    def test_symlink_config_paths_resolve_beside_target(self):
+        target=self.root/"configuration";target.mkdir()
+        path=target/"config.json"
+        path.write_text(json.dumps({"state_dir":"state","project":".","context_roots":[{"name":"Chosen","path":"stats"}]}))
+        entrypoints=self.root/"entrypoints";entrypoints.mkdir()
+        alias=entrypoints/"config.json";alias.symlink_to(path)
+        config=m.load_config(alias)
+        self.assertEqual(config["project"],str(target))
+        self.assertEqual(config["state_dir"],str(target/"state"))
+        self.assertEqual(config["context_roots"][0]["path"],str(target/"stats"))
+        self.assertEqual(config["output_json"],str(target/"state/manifest.json"))
 
     def test_initializer_preserves_existing_configuration(self):
         path=self.root/"config.json"
@@ -139,7 +153,7 @@ class LedgerContract(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.root=Path(self.tmp.name)
+        self.root=Path(self.tmp.name).resolve()
         self.db=m.Ledger(self.root/"ledger.sqlite3")
         self.addCleanup(self.db.close)
     def snapshot(self, saved, scope="linux/global", success=True, stamp="2026-09-20T01:00:00Z"):
@@ -364,12 +378,11 @@ class LedgerContract(unittest.TestCase):
         self.assertEqual(receipt["artifact"]["sha256"],m.artifact(copied)["sha256"])
 
     def test_enabled_hooks_do_not_imply_observed_hooks_and_private_values_not_exported(self):
-        import sqlite3
         home=self.root/".codex";sessions=home/"context-mode/sessions";sessions.mkdir(parents=True)
         (home/"config.toml").write_text('[features]\nhooks=true\nplugin_hooks=true\n[plugins."context-mode@context-mode"]\nenabled=true\n[private]\nsecret="do-not-export"\n')
         hooks=home/"plugins/cache/context-mode/context-mode/1.0.169/.codex-plugin/hooks.json"
         hooks.parent.mkdir(parents=True);hooks.write_text(json.dumps({"hooks":{"PreCompact":[],"PostToolUse":[]}}))
-        with sqlite3.connect(sessions/"session.db") as db:
+        with closing(sqlite3.connect(sessions/"session.db")) as db, db:
             db.execute("CREATE TABLE session_events(id INTEGER,session_id TEXT,source_hook TEXT,created_at TEXT,project_dir TEXT,data TEXT)")
             db.execute("INSERT INTO session_events VALUES(1,'test','PostToolUse','2026-09-20','/fixture','private prompt content')")
         run=self.root/"observed";run.mkdir();issues=[]
@@ -387,6 +400,84 @@ class LedgerContract(unittest.TestCase):
         self.assertEqual(self.db.event_totals()[0]["events"],1)
         self.assertEqual(self.db.event_totals()[0]["estimated_saved"],256)
         self.assertEqual(issues,[])
+
+    @contextmanager
+    def assert_connections_closed(self):
+        from unittest.mock import patch
+        connect=sqlite3.connect;connections=[]
+        def tracked(*args,**kwargs):
+            db=connect(*args,**kwargs)
+            connections.append(db)
+            return db
+        try:
+            with patch.object(m.sqlite3,"connect",side_effect=tracked):
+                yield
+            self.assertTrue(connections)
+            for db in connections:
+                with self.assertRaisesRegex(sqlite3.ProgrammingError,"closed database"):
+                    db.execute("SELECT 1")
+        finally:
+            for db in connections:
+                db.close()
+
+    def test_ledger_initialization_errors_close_connection(self):
+        from unittest.mock import patch
+        with self.assert_connections_closed():
+            with patch.object(m.os,"chmod",side_effect=OSError("permission fixture")):
+                with self.assertRaisesRegex(OSError,"permission fixture"):
+                    m.Ledger(self.root/"permission.sqlite3")
+        malformed=self.root/"malformed.sqlite3";malformed.write_bytes(b"not a sqlite database")
+        with self.assert_connections_closed():
+            with self.assertRaises(sqlite3.DatabaseError):
+                m.Ledger(malformed)
+
+    def test_native_source_connections_close_after_success_and_query_errors(self):
+        for reader in ("archive","projects","hooks"):
+            for valid in (True,False):
+                with self.subTest(reader=reader,valid=valid):
+                    home=self.root/(reader+str(valid));sessions=home/"context-mode/sessions"
+                    sessions.mkdir(parents=True)
+                    (home/"config.toml").write_text("")
+                    hooks=home/"plugins/cache/context-mode/context-mode/fixture/.codex-plugin/hooks.json"
+                    hooks.parent.mkdir(parents=True);hooks.write_text('{"hooks":{}}')
+                    source=sessions/"source.db"
+                    with closing(sqlite3.connect(source)) as db, db:
+                        if valid:
+                            db.execute("CREATE TABLE commands(id INTEGER,timestamp TEXT,input_tokens INTEGER,output_tokens INTEGER,saved_tokens INTEGER,project_path TEXT)")
+                            db.execute("CREATE TABLE session_events(id INTEGER,session_id TEXT,source_hook TEXT,created_at TEXT,project_dir TEXT)")
+                    issues=[]
+                    config={"rtk_database":str(source),"context_roots":[{"name":"Fixture","path":str(sessions)}]}
+                    with self.assert_connections_closed():
+                        if reader=="archive":
+                            m.archive_native_events(config,self.db,issues)
+                        elif reader=="projects":
+                            m.retained_projects(config,home,[],issues)
+                        else:
+                            m.native_hook_inventory(config,home,issues,self.db)
+                    self.assertEqual(bool(issues),not valid)
+
+    def test_report_operations_close_ledger_after_success_and_errors(self):
+        from unittest.mock import patch
+        config=self.portable_config();before=self.root/"before.txt";after=self.root/"after.txt"
+        before.write_text("before");after.write_text("after")
+        counts=[m.artifact(before,2),m.artifact(after,1)]
+        for fails in (False,True):
+            with self.subTest(operation="compare",fails=fails):
+                with self.assert_connections_closed(), patch.object(m,"count_files",return_value=counts):
+                    if fails:
+                        with patch.object(m.Ledger,"comparison",side_effect=ValueError("comparison fixture")):
+                            with self.assertRaisesRegex(ValueError,"comparison fixture"):
+                                m.compare_artifacts(config,"fixture",before,after,"fixture")
+                    else:
+                        m.compare_artifacts(config,"fixture",before,after,"fixture")
+            with self.subTest(operation="refresh",fails=fails):
+                with self.assert_connections_closed():
+                    if fails:
+                        with patch.object(m,"render_reports",side_effect=ValueError("render fixture")):
+                            with self.assertRaisesRegex(ValueError,"render fixture"):
+                                m.refresh(config)
+                    else:
+                        m.refresh(config)
 
 if __name__=="__main__":
     unittest.main()
