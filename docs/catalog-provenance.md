@@ -5,11 +5,13 @@ packages one validated `main` commit and uses GitHub's native artifact attestati
 service to identify its origin. It has no schedule, model execution, release,
 registry push or Pages deployment. A dispatch on another branch is skipped.
 
-**Implementation status:** local verification is recorded below. Hosted issuance,
-artifact download and consumer verification require integration into `main` and a
-manual run. The [PR #26 qualification record](https://github.com/seathatflowsinourveins/native-agent-stack/pull/26)
-links the resulting run, source SHA and consumer observations when available;
-the local observations here do not establish those hosted outcomes.
+**Qualified on 2026-09-20:** [publication run 35541322881](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35541322881)
+succeeded at `d0fe136c218fedff93c93ac674e302ae19b2d924`. Independent consumer
+download, online and detached verification, altered-byte rejection, and archive
+content validation passed. [PR #26](https://github.com/seathatflowsinourveins/native-agent-stack/pull/26)
+retains the qualification record; [the automation manifest](../catalogs/foundation/automation.json)
+records exact artifact identity and remaining limits. Historical local observations
+below remain separate from this hosted result.
 An attestation proves origin and byte integrity; catalog correctness and practical
 usefulness still need their own [acceptance evidence](acceptance-evidence-policy.md).
 
@@ -101,9 +103,8 @@ Despite the API route's `zip` suffix, an artifact uploaded with `archive: false`
 contains the original file. Do not unzip that response. In the reviewed
 [GitHub CLI v2.101.0 implementation](https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/run/download/http.go),
 `gh run download` always tries ZIP extraction, so it is unsuitable for this plain
-archive. The first hosted qualification must check the downloaded digest and
-attestation; source inspection alone does not establish this repository's round
-trip. Verify the archive itself:
+archive. Check the downloaded digest and attestation on every selected publication;
+the first hosted round trip is recorded above. Verify the archive itself:
 
 ```bash
 repo=seathatflowsinourveins/native-agent-stack
@@ -187,9 +188,11 @@ sequence; retrying with a fresh temporary directory completed it. This is local
 consumer integration against an existing upstream attestation, not an unchanged
 upstream test suite or new repository issuance.
 
-Hosted signature issuance, upload digest equality, successful consumer download,
-main-only event handling and the workflow's complete negative control are not
-established by local lint or the upstream artifact example.
+The later hosted qualification established issuance, upload digest equality,
+consumer download and the complete negative control for the named commit only.
+[Non-main dispatch 35541389048](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35541389048)
+was skipped with zero job steps. Local lint and the upstream artifact example
+remain distinct evidence; neither establishes those hosted outcomes on its own.
 
 ## Ownership, limits and rollback
 

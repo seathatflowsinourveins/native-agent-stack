@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-09-20",
+  "purpose": "Selected GitHub automation with source-backed suitability and bounded observed results; not a count of repositories or an instruction to activate optional tools.",
+  "handbook": "docs/github-automation.md",
+  "resolution_record": "docs/tasks/2026-09-20-automation-resolution.md",
+  "ownership": {
+    "github_workflows": "GitHub automation maintainer; one coordinated writer per upgrade batch",
+    "action_pin_proposals": "Dependabot: weekly Monday 09:00 UTC, grouped minor/patch, two open version PRs, no auto-merge",
+    "upstream_research": "Existing active Codex task Maintain native foundation and trading catalogs, daily 09:00 America/New_York; sole scheduled source-review owner",
+    "publication": "Maintainer dispatch on main only; no schedule or deployment",
+    "runtime_acceptance": "Native foundation task and independently qualified domain work; action upgrades do not rewrite runtime receipts"
+  },
+  "active_baseline": {
+    "source_revision": "d0fe136c218fedff93c93ac674e302ae19b2d924",
+    "pull_request": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/26",
+    "ruleset": "https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774",
+    "required_checks": ["validate", "token-report"],
+    "check_source_app_id": 15368,
+    "bypass_actors": [],
+    "event_policy": "PR validation and relevant main pushes; no duplicate feature-branch push checks. Cancellation is limited to routine PR validation; native trial completion and cleanup remain intact.",
+    "post_merge_runs": [35541322355, 35541322357, 35541322339, 35541322336],
+    "post_merge_result": "Four successful workflows at the named integrated revision",
+    "dependabot_scans": [35541330440, 35541327481],
+    "dependabot_observation": "Initial scans succeeded, no minor/patch update matched the group, and two separate major proposals opened. Their reviewed-file hash failures correctly blocked integration."
+  },
+  "interfaces": [
+    {
+      "repository": "rhysd/actionlint",
+      "version": "1.7.12",
+      "revision": "914e7df21a07ef503a81201c76d2b11c789d3fca",
+      "source": "https://github.com/rhysd/actionlint/tree/914e7df21a07ef503a81201c76d2b11c789d3fca",
+      "command": "actionlint .github/workflows/*.yml",
+      "selection": "Maintained workflow expression, syntax and shell checks in routine validation; binary digest and upstream provenance verified."
+    },
+    {
+      "repository": "zizmorcore/zizmor",
+      "version": "1.30.1",
+      "pin_record": ".github/requirements-ci.lock",
+      "source": "https://docs.zizmor.sh/usage/",
+      "command": "zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json .github/workflows",
+      "selection": "Reuse the existing locked security analyzer; independent of actionlint and execution evidence."
+    },
+    {
+      "repository": "actions/setup-python",
+      "version": "7.0.0",
+      "revision": "5fda3b95a4ea91299a34e894583c3862153e4b97",
+      "source": "https://github.com/actions/setup-python/releases/tag/v7.0.0",
+      "source_interface": "https://github.com/actions/setup-python/blob/5fda3b95a4ea91299a34e894583c3862153e4b97/action.yml",
+      "selected_input": "python-version: 3.13; check-latest: false",
+      "selection": "Supported official setup action. ESM migration retains our inputs and Node 24 runtime. Removed pip-install input is unused; action.yml and release notes take precedence over the README's broad no-input-change claim.",
+      "reused_upstream_success_runs": [29713741887, 29713741877, 30785168507, 29713741708],
+      "acceptance": "Pinned unchanged verify-python.py 3.13 and check-python-path.sh with the action's python-path output, on ubuntu-24.04; helper byte hashes checked before execution."
+    },
+    {
+      "repository": "actions/setup-go",
+      "version": "7.0.0",
+      "revision": "b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+      "source": "https://github.com/actions/setup-go/releases/tag/v7.0.0",
+      "source_interface": "https://github.com/actions/setup-go/blob/b7ad1dad31e06c5925ef5d2fc7ad053ef454303e/action.yml",
+      "selected_inputs": ["go-version: 1.25.10", "go-version: 1.27.0", "cache: false", "check-latest: false"],
+      "selection": "Supported official setup action; ESM migration preserves selected inputs, outputs and Node 24 runtime. Replace both previous v6.4.0 and v6.5.0 pins; no Dagu or Go runtime pin upgrade.",
+      "reused_upstream_success_runs": [29467436914, 29467436969, 29467436747, 30228339243],
+      "acceptance": "Pinned unchanged verify-go.sh VERSION, exact go env GOVERSION assertion, then GOTOOLCHAIN=local GOPROXY=off GOSUMDB=off go test -count=1 fmt for each selected version on ubuntu-24.04. Exact assertion is local integration; fmt is unchanged Go standard-library testing."
+    },
+    {
+      "repository": "actions/setup-node",
+      "version": "7.0.0",
+      "revision": "820762786026740c76f36085b0efc47a31fe5020",
+      "source": "https://github.com/actions/setup-node/releases/tag/v7.0.0",
+      "source_interface": "https://github.com/actions/setup-node/blob/820762786026740c76f36085b0efc47a31fe5020/action.yml",
+      "selected_input": "node-version: 24; package-manager-cache: false",
+      "selection": "Supported official setup action; ESM migration and auth/cache fixes. Existing native-token workflow exercises its selected Node 24 environment; no package publication authentication configured.",
+      "acceptance": "Existing native-token-e2e.yml on this exact action revision; classify its fixtures separately from provider/native research usage."
+    },
+    {
+      "repository": "actions/attest",
+      "version": "4.2.2",
+      "revision": "1e69f48acb82d1966a394da916b4c1698aa569d6",
+      "source": "https://github.com/actions/attest/tree/1e69f48acb82d1966a394da916b4c1698aa569d6",
+      "selection": "Native explicit-subject provenance; current maintained interface replaces the attest-build-provenance compatibility wrapper. No registry push, storage record or content write.",
+      "acceptance": "docs/catalog-provenance.md: native gh attestation verify with expected repository, signer workflow, source ref/digest and hosted runner policy, then detached original/altered/original verification."
+    }
+  ],
+  "selected_upgrade_qualification": {
+    "status": "pending hosted execution on the review branch",
+    "workflow": ".github/workflows/action-compatibility.yml",
+    "upstream_helper_sources": {
+      "verify-python.py": "37e77a5c2d1721f02b772ad5bc16c49c2f62498217a9bfa50b490903932ca394",
+      "check-python-path.sh": "2216d4d36962c15f7e414fe64e2648298bc020b2ddce84d920f985c506740280",
+      "verify-go.sh": "727a28d47b25012e47b7095525f0cfcbcaad96654e71b96c627695c877c57244"
+    },
+    "original_blocked_runs": [35541399411, 35541500332],
+    "original_proposals": [29, 30],
+    "runner_requirement": "All three selected setup actions run Node 24 and require Actions runner 2.327.1 or later; already required by their prior v6 versions. Hosted compatibility targets ubuntu-24.04 only.",
+    "limits": "This qualifies setup interfaces and selected toolchains, not off-host recovery, application restores, model runs or broker adapters. Python 3.13 floats within that minor line; the hosted log records the exact selected patch."
+  },
+  "publication_qualification": {
+    "status": "qualified for the named commit; manual workflow active",
+    "run": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35541322881",
+    "source_revision": "d0fe136c218fedff93c93ac674e302ae19b2d924",
+    "elapsed_seconds": 23,
+    "catalog_artifact_id": 10615080901,
+    "catalog_bytes": 3958567,
+    "catalog_sha256": "93935ba33efcf578694973ba8e915318536bff2dc5eb2f9223397703dea5f69f",
+    "evidence_artifact_id": 10614957057,
+    "consumer_observation": "Independent download matched catalog digest. Online and detached original/altered/original verification returned 0/1/0; extracted integrity check passed: 68 components, 1021 hashed files, 4 profiles, 100 receipts.",
+    "non_main_dispatch": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35541389048",
+    "non_main_result": "skipped; zero executed job steps",
+    "retention_days": 7,
+    "limits": "Expiring Actions artifacts, not a release channel. Provenance does not prove correctness, currency or practical usefulness. Unchanged workflow qualification is reused; newer catalogs are not claimed to have been published."
+  },
+  "considered_not_activated": [
+    {
+      "repository": "github/gh-aw",
+      "revision": "bde367913adeb3132f0a171594c88a17f4b7d08c",
+      "version": "0.88.7",
+      "source": "https://github.com/github/gh-aw/tree/bde367913adeb3132f0a171594c88a17f4b7d08c",
+      "supported_path": "gh aw init; maintained skill/Markdown workflow compilation; read-only manual pilot before any schedule",
+      "decision": "Existing Codex maintenance task already owns material upstream detection. Avoid another schedule, writer and provider billing route; no engine activated, authorized new model spend is zero."
+    },
+    {
+      "repository": "githubnext/agentics",
+      "revision": "4bc8419fad05e6b032741cbfd189986700bcf71c",
+      "source": "https://github.com/githubnext/agentics/tree/4bc8419fad05e6b032741cbfd189986700bcf71c",
+      "decision": "Reuse maintained examples if a demonstrated gap justifies gh-aw; no imported workflow or duplicate recurring writer."
+    },
+    {
+      "repository": "renovatebot/renovate",
+      "version": "44.104.0",
+      "revision": "6a1a69c3efdfb3dbb534b970f08b7f49524cec8b",
+      "source": "https://github.com/renovatebot/renovate/tree/6a1a69c3efdfb3dbb534b970f08b7f49524cec8b",
+      "decision": "Custom catalog managers are a future option; no demonstrated independent gap beyond the existing catalog owner. Dependabot alone owns Action pin proposals."
+    }
+  ],
+  "research_acceptance": {
+    "policy": "docs/research-task-acceptance.md",
+    "pilot": "docs/upstream-maintenance-pilot.md",
+    "baseline": "Reused eight native Codex/Claude invocations: content 8/8, complete protocol 6/8. Preserve per-invocation time and available usage; hosted fixtures and context estimates are separate.",
+    "pilot_result": "Material NautilusTrader Parquet migration and interval-safety changes identified with pinned sources; focused update proposed. No Nautilus/IBKR or separate Alpaca runtime promotion; proposed acceptance commands remain unrun.",
+    "improvement_claim": "No session/lifetime savings, provider-usage reduction or improved research reliability is claimed from these CI changes."
+  },
+  "remaining_unverified": [
+    "Weekly Dependabot timing and nonempty minor/patch grouping",
+    "Actual superseded-PR cancellation under overlapping runs",
+    "Additional operating systems and self-hosted runner compatibility",
+    "Native research improvement over the declared baseline",
+    "Future publication artifacts after the named qualified commit"
+  ],
+  "rollback": "Revert the setup action pins, compatibility workflow and matching reviewed hashes through a PR if qualification regresses. Disable only the manual publisher to stop issuance; preserve historical attestations. Revert Dependabot config to stop future update proposals. Keep required integrity checks and the single research owner intact."
+}

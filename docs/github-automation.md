@@ -4,6 +4,11 @@ Use GitHub to maintain reproducible recipes and qualify selected changes. The
 useful result is a working research task, current instructions or a recoverable
 artifact. A green PR alone establishes only the checks that actually ran.
 
+The [automation manifest](../catalogs/foundation/automation.json) is the current
+inventory of selected interfaces, ownership, qualification and limitations. Use
+the [dependency resolution record](tasks/2026-09-20-automation-resolution.md) for
+the reviewed setup-action upgrades and their exact hosted acceptance.
+
 Start with [current verification and limitations](tasks/2026-09-20-github-automation.md),
 [publication provenance](catalog-provenance.md),
 [research-task acceptance](research-task-acceptance.md), and the
@@ -26,10 +31,20 @@ not automatically run them; opening the PR supplies the review check.
 | Manual dispatch | Run independently | Run independently | Run only the selected trial |
 
 Concurrency groups include the workflow and event. PR runs share their PR number;
-other runs use a unique run ID. Only the two short, read-only validation workflows
-cancel superseded PR runs. Native trials retain their existing completion and
+other runs use a unique run ID. The two short validation workflows and the bounded
+Action compatibility workflow cancel superseded PR runs. Native trials retain their existing completion and
 artifact/cleanup behavior. PR validation and validation after integration are
 different revision checks; branch-push duplication is removed.
+
+`action-compatibility.yml` runs on PR/main changes to itself or the three recovery
+workflows that consume the selected Python/Go actions, and on manual dispatch.
+It runs unchanged upstream Python 3.13 verifiers and checks both selected Go
+versions with the unchanged upstream verifier plus Go's `fmt` tests. It does not
+dispatch a recovery trial. Node setup is covered by the existing native-token
+fixture workflow when its own file changes. These filtered jobs are additional
+review evidence; they are not unconditional required checks that could remain
+pending on unrelated PRs. Failure artifacts use `always()` and fourteen-day
+retention; platform logs are the fallback when setup/upload itself fails.
 
 This uses GitHub's [branch/path filters](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax)
 and [native concurrency controls](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency).
@@ -40,8 +55,10 @@ the first PR/update/merge; local static analysis is not hosted scheduling eviden
 
 [Dependabot configuration](../.github/dependabot.yml) checks GitHub Actions weekly
 on Monday at 09:00 UTC, groups minor/patch updates and limits simultaneous version
-update PRs to two. Major versions remain separate. This config takes effect after
-it reaches the default branch. It does not enable repository-level security-update
+update PRs to two. Major versions remain separate. The initial scans succeeded
+after integration and opened PRs #29 and #30. Their integrity failures identified
+unreviewed workflow hashes; the coordinated resolution retains those failures.
+The weekly time and a nonempty minor/patch group remain unobserved. This does not enable repository-level security-update
 settings or auto-merge, and it does not update every version in the grand catalog.
 
 Retain full commit-SHA action pins and their release comments. Dependabot supports
@@ -50,6 +67,14 @@ or native checks, and update the reviewed hashes in `manifests/evidence.json`.
 An initial bot PR may correctly fail those hash checks until the changed source is
 reviewed and registered. Do not remove integrity checks or add a privileged
 untrusted-PR writer merely to make the bot's first check green.
+
+One maintenance writer owns an upgrade batch: inspect release notes and exact
+source interfaces, reuse matching upstream run evidence, test only the affected
+local/hosted behavior, then refresh hashes for the reviewed files. Combine related
+bot proposals in one review branch when they touch the shared evidence registry;
+retain their commits and close the original proposals after the replacement
+merges. Record the replacement PR and old failures in the manifest/task record.
+Do not blindly regenerate all file hashes or rewrite historical runtime receipts.
 
 Primary references: [Dependabot options](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference),
 [supported SHA updates](https://docs.github.com/en/code-security/reference/supply-chain-security/supported-ecosystems-and-repositories),
