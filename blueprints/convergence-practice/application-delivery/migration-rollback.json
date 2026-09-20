@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "id": "mac-native-application-migration-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20",
+  "component_ids": [
+    "fastapi",
+    "postgresql"
+  ],
+  "claim": "Native Alembic migration0001 upgraded a new empty PostgreSQL18.6 fixture, downgraded to base with both application tables removed, and upgraded again with exact schema names restored.",
+  "data": {
+    "checks": [
+      {
+        "name": "start",
+        "exit_code": 0,
+        "elapsed_seconds": 0.12,
+        "output_sha256": "66afd0411ccc09366e99fdd99b85f21899c8d2d064f5835126859618802153ad"
+      },
+      {
+        "name": "create-empty-database",
+        "exit_code": 0,
+        "elapsed_seconds": 0.085,
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "upgrade",
+        "exit_code": 0,
+        "elapsed_seconds": 0.384,
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "up-schema",
+        "exit_code": 0,
+        "elapsed_seconds": 0.279,
+        "output_sha256": "4861e38d1794e5f9e889b978c54f21c5b700122ad0cab273250237586cba709a"
+      },
+      {
+        "name": "downgrade",
+        "exit_code": 0,
+        "elapsed_seconds": 0.277,
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "down-schema",
+        "exit_code": 0,
+        "elapsed_seconds": 0.006,
+        "output_sha256": "ad48562dd20cb5108147d59c92e5af2ffc03cc1fb37402f169eabf2911f23eee"
+      },
+      {
+        "name": "re-upgrade",
+        "exit_code": 0,
+        "elapsed_seconds": 0.254,
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "restored-schema",
+        "exit_code": 0,
+        "elapsed_seconds": 0.006,
+        "output_sha256": "4861e38d1794e5f9e889b978c54f21c5b700122ad0cab273250237586cba709a"
+      },
+      {
+        "name": "remove-owned-database",
+        "exit_code": 0,
+        "elapsed_seconds": 0.17,
+        "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "stop-owned-cluster",
+        "exit_code": 0,
+        "elapsed_seconds": 0.114,
+        "output_sha256": "ca19178a35ab4153b75b494963b66ce8243e1b94c173107c87b44d09db23652d"
+      }
+    ],
+    "native_commands": [
+      "createdb <NEW_FIXTURE>",
+      "uv run --frozen alembic upgrade head",
+      "psql exact public schema query",
+      "uv run --frozen alembic downgrade base",
+      "uv run --frozen alembic upgrade head",
+      "dropdb <OWNED_FIXTURE>"
+    ],
+    "schema_before_downgrade": [
+      "alembic_version",
+      "run_events",
+      "runs"
+    ],
+    "schema_after_downgrade": [
+      "alembic_version"
+    ],
+    "schema_after_reupgrade": [
+      "alembic_version",
+      "run_events",
+      "runs"
+    ],
+    "cleanup": "Owned new database removed and owned cluster stopped; existing application databases unchanged."
+  },
+  "limitations": [
+    "New synthetic empty Mac database only; destructive downgrade deliberately drops application tables. This is schema reversibility, not retention of user data.",
+    "No production migration, rolling deployment, load or another host acceptance. The existing application data was not changed.",
+    "No model calls; whole-task provider usage unknown."
+  ]
+}

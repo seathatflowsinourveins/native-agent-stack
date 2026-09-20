@@ -66,7 +66,9 @@
     "current_headroom_mcp": "evidence/receipts/native-headroom-mcp-20260920.json",
     "current_jcodemunch": "evidence/receipts/native-jcodemunch-20260920.json",
     "current_native_token_clients": "evidence/receipts/native-token-focus-clients-20260920.json",
-    "current_native_sandbox_network": "evidence/receipts/native-sandbox-network-20260920.json"
+    "current_native_sandbox_network": "evidence/receipts/native-sandbox-network-20260920.json",
+    "current_cross_layer_acceptance": "blueprints/convergence-practice/layer-acceptance.md",
+    "wsl_native_quality": "blueprints/convergence-practice/wsl-native-tools/README.md"
   },
   "recipe_map": {
     "affaan-m/ECC": "recipes/README.md",
@@ -126,7 +128,13 @@
     "skills-ref": "recipes/README.md",
     "otel-tui": "recipes/README.md",
     "llama-cpp": "blueprints/convergence-practice/gpu-inference/README.md",
-    "jcodemunch-mcp": "recipes/README.md"
+    "jcodemunch-mcp": "recipes/README.md",
+    "react": "blueprints/convergence-practice/application-delivery/README.md",
+    "nextjs": "blueprints/convergence-practice/application-delivery/README.md",
+    "fastapi": "blueprints/convergence-practice/application-delivery/README.md",
+    "postgresql": "blueprints/convergence-practice/application-delivery/README.md",
+    "poppler": "blueprints/convergence-practice/document-ingestion/README.md",
+    "apple-container": "blueprints/convergence-practice/container-storage/README.md"
   },
   "profiles": [
     {

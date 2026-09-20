@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "retrieval",
+  "task_and_failure": "Page-grounded document ingestion was unqualified; installed version evidence and unrelated retrieval benchmarks did not establish source-to-excerpt fidelity.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://poppler.freedesktop.org/poppler-26.09.0.tar.xz",
+      "revision": "8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e"
+    },
+    {
+      "url": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+      "revision": "3df79d34abbca99308e79cb94461c1893582604d68329a41fd4bec1885e6adb4"
+    }
+  ],
+  "discovery_provenance": [
+    "Maintained ecosystem catalog document/PDF lookup followed by current official release, license and compatibility review."
+  ],
+  "license_and_compatibility": "Original MIT synthetic PDF plus unmodified public W3C test PDF with its notice. Poppler source is GPL; this repository redistributes no parser binary. Minimal macOS arm64 source build, exact locally reused dependency hashes.",
+  "baseline_and_candidate": {
+    "baseline": "Existing bundled Poppler 26.05.0 was version-inspected and used for visual QA; no matched text extraction baseline or efficiency experiment.",
+    "candidate": "Latest Poppler 26.09.0 native coordinate extraction and scoped deterministic evidence retrieval."
+  },
+  "frozen_inputs": {
+    "base_revision": "9b7b5d94cb082b78706c59e203250a4f4c8f4061",
+    "tasks": [
+      "document-to-evidence"
+    ],
+    "roles": [
+      "deterministic-pipeline"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/document-ingestion/ingest.py",
+        "sha256": "b62eb4a974fe6385d30e2243cdd4358c5153d1da2acbbfadb4f37942d066eaa9"
+      },
+      {
+        "path": "blueprints/convergence-practice/document-ingestion/corpus/authored-source.json",
+        "sha256": "9b294753d91abcbd8ebdd87460513014f179068796febfa9500ed25a5051ed34"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/document-ingestion/corpus/lumen-qualification.pdf",
+        "sha256": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5"
+      },
+      {
+        "path": "blueprints/convergence-practice/document-ingestion/corpus/w3c-dummy.pdf",
+        "sha256": "3df79d34abbca99308e79cb94461c1893582604d68329a41fd4bec1885e6adb4"
+      },
+      {
+        "path": "blueprints/convergence-practice/document-ingestion/layout.json",
+        "sha256": "644ab52d3f24f087119590b9840ad4f501630e11450186a6232f6dbf756e8aa4"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/document-ingestion/oracle.json",
+        "sha256": "5298f2943c528819efa8901c47532924ae8ea5cf4ddee8af80378eb72495d17a"
+      },
+      {
+        "path": "blueprints/convergence-practice/document-ingestion/plan.json",
+        "sha256": "864244dd87e5fcae16acb06b687fa7935f036847e8d10602b2dab8b7c8b9384c"
+      },
+      {
+        "path": "blueprints/convergence-practice/document-ingestion/freeze.json",
+        "sha256": "5816ea363d0203f5140646d36f9cb67322aae17d50090f65bcafe44871b5f6ea"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Exact page text, all table cells, positive source/page/provenance and four absent answers; bounded excerpts and native malformed-input refusal.",
+    "usage_rule": "No model/embedding/provider calls inside this deterministic native runner. Coordinator, preparation and research usage are outside scope and unknown; no savings claim."
+  },
+  "runtime_and_platform": {
+    "platform": "macOS 26.5.1 arm64; Apple clang 21.0.0",
+    "tools": [
+      {
+        "name": "Poppler pdftotext",
+        "version": "26.09.0"
+      },
+      {
+        "name": "CMake",
+        "version": "4.4.3"
+      },
+      {
+        "name": "Python",
+        "version": "3.14.7"
+      }
+    ],
+    "isolation": "Owned prefix outside Documents with copied pinned libraries; no global settings, dependency mutation or service registration."
+  },
+  "commands": [
+    "python3 fixture/ingest.py --pdftotext prefix/bin/pdftotext --output attempt-2 --attempt 2"
+  ],
+  "observations": [
+    {
+      "id": "mac-document-ingestion-2",
+      "task": "document-to-evidence",
+      "role": "deterministic-pipeline",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Three-page explicitly permitted born-digital corpus on one Mac; native text/page geometry, declared table templates and bounded exact-phrase retrieval",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/document-ingestion/accepted/receipt.json",
+          "sha256": "0562425838ff2a2a881e71ebac05563b9a0c32cad18e15f61c3199454795cf41"
+        },
+        {
+          "path": "blueprints/convergence-practice/document-ingestion/accepted/extraction.json",
+          "sha256": "ba6dbf08f4a05042e72c186de42eae22d1a70751c9b42f80eade44e8adb31e51"
+        },
+        {
+          "path": "blueprints/convergence-practice/document-ingestion/accepted/retrieval.json",
+          "sha256": "315980dd5fe7dc2134f763a1bc4dd9d74e0ab8ffe86cff7372fd5fd7a0308298"
+        },
+        {
+          "path": "blueprints/convergence-practice/document-ingestion/accepted/lumen.xhtml",
+          "sha256": "54841d5e136944233c0f5ca96f0974a8057ab2d4df3b222c2af5ada53e92f1b2"
+        },
+        {
+          "path": "blueprints/convergence-practice/document-ingestion/accepted/w3c.xhtml",
+          "sha256": "17a9352313657c7be7f7afd56563bbaca8a5545c25243dd122c22e96032fddef"
+        },
+        {
+          "path": "blueprints/convergence-practice/document-ingestion/build-pins.json",
+          "sha256": "9229ee609ab9294b378cdda0a686d93e2b71b98ee53a3dce9f20d7a028dcb0bc"
+        },
+        {
+          "path": "blueprints/convergence-practice/document-ingestion/preflight.json",
+          "sha256": "36b259dd87514c9cfe327287c2283b801da5280c12572540c7fabb377962e8e7"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    }
+  ],
+  "failures_and_skips": [],
+  "limitations": [
+    "Only one small designed corpus; original passed attempt retained under history/attempt-1, followed by one passing rerun after source-list guard hardening. No held-out task or matched baseline.",
+    "Table geometry is predeclared; no automatic table detection, OCR, multilingual CMaps or semantic retrieval.",
+    "Build/preflight failures are retained separately; neither blocked version command constituted a native corpus extraction attempt.",
+    "Full upstream parser test suite was not run. Copied libraries are exact compatible pins, not claims every transitive library is latest.",
+    "Source checksums identify retained source bytes; detached Poppler signature was not verified.",
+    "The same-binary location workaround is observed on one Mac, not a general OS permission diagnosis.",
+    "No model calls within runner; research/coordinator costs unknown. No token or cost saving is claimed.",
+    "The earlier source list relied on reviewed fixture content; the current runner additionally refuses unlisted, absolute, traversal, duplicate and symlink sources before any process launch. Historical attempt bytes are retained; current freeze was set before rerun."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "Three-page explicitly permitted born-digital corpus on one Mac; native text/page geometry, declared table templates and bounded exact-phrase retrieval",
+    "qualification_run_ids": [
+      "mac-document-ingestion-2"
+    ]
+  },
+  "rollback": "Keep bundled parser intact; retain receipts and remove only the owned private candidate prefix when unused.",
+  "next_decision_changing_test": "Freeze a permitted real report/multi-column/scanned corpus independently; measure failures before selecting a specialized Docling/OCR pipeline.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

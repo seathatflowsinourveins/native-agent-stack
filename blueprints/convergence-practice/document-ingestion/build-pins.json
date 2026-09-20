@@ -1,0 +1,97 @@
+{
+  "reviewed_at": "2026-09-20",
+  "platform": "macOS 26.5.1 arm64; Apple clang 21.0.0",
+  "poppler": {
+    "version": "26.09.0",
+    "url": "https://poppler.freedesktop.org/poppler-26.09.0.tar.xz",
+    "sha256": "8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e",
+    "bytes": 2041828,
+    "checksum_source": "https://formulae.brew.sh/api/formula/poppler.json"
+  },
+  "cmake": {
+    "url": "https://github.com/Kitware/CMake/releases/download/v4.4.3/cmake-4.4.3-macos-universal.tar.gz",
+    "sha256": "0c5d65251c14cc884bfa16bdbed3c263ce5bffe2e21c0d0d00962cb0610464fa",
+    "bytes": 89445170,
+    "release": "https://github.com/Kitware/CMake/releases/tag/v4.4.3"
+  },
+  "pkgconf": {
+    "name": "pkgconf",
+    "version": "3.0.1.post0",
+    "filename": "pkgconf-3.0.1.post0-py3-none-macosx_11_0_arm64.whl",
+    "sha256": "c4a12b0035b7273ad330bd36ebe421c2ce9c68f37487c857b49fbdf42a6e1579",
+    "url": "https://files.pythonhosted.org/packages/9f/9d/ee5f87b848cfd1cca79b67856d05ea4e5389460d640d1219db6737adaa98/pkgconf-3.0.1.post0-py3-none-macosx_11_0_arm64.whl",
+    "bytes": 60874
+  },
+  "freetype_headers": {
+    "url": "https://api.anaconda.org/download/conda-forge/freetype/2.14.3/osx-arm64/freetype-2.14.3-hce30654_0.conda",
+    "sha256": "5952bd9db12207a18a112e8924aa2ce8c2f9d57b62584d58a97d2f6afe1ea324",
+    "bytes": 173313,
+    "version": "2.14.3",
+    "build": "hce30654_0",
+    "reason": "Exact header/runtime ABI pairing with existing bundled libfreetype6 2.14.3 hdfa99f5_0; not a claim every library is latest."
+  },
+  "reused_dylibs": [
+    {
+      "name": "libfreetype.6.dylib",
+      "sha256": "5f11d2c3dae0078008564dac4b27e50e79b059b9e777b5a2ba68a772711862d9",
+      "bytes": 736528
+    },
+    {
+      "name": "libpng16.16.dylib",
+      "sha256": "da1a92de2fa3dc58708576a9706b4ce90fac0690df9f867d88f759b6d5337598",
+      "bytes": 258608
+    },
+    {
+      "name": "libz.1.dylib",
+      "sha256": "5aedf4488edbe21dd7c46f3aa47dc4f47e2e5bc42c153482650388f89e414e87",
+      "bytes": 124304
+    }
+  ],
+  "build_flags": [
+    "FONT_CONFIGURATION=generic",
+    "BUILD_SHARED_LIBS=OFF",
+    "ENABLE_UTILS=ON",
+    "ENABLE_CPP=OFF",
+    "ENABLE_GLIB=OFF",
+    "ENABLE_GOBJECT_INTROSPECTION=OFF",
+    "ENABLE_QT5=OFF",
+    "ENABLE_QT6=OFF",
+    "ENABLE_LIBOPENJPEG=OFF",
+    "ENABLE_LIBJPEG=OFF",
+    "ENABLE_LCMS=OFF",
+    "ENABLE_LIBCURL=OFF",
+    "ENABLE_LIBTIFF=OFF",
+    "ENABLE_NSS3=OFF",
+    "ENABLE_GPGME=OFF",
+    "ENABLE_HARFBUZZ=OFF",
+    "ENABLE_BOOST=OFF",
+    "BUILD_GTK_TESTS=OFF",
+    "BUILD_QT5_TESTS=OFF",
+    "BUILD_QT6_TESTS=OFF",
+    "BUILD_CPP_TESTS=OFF",
+    "BUILD_MANUAL_TESTS=OFF",
+    "RUN_GPERF_IF_PRESENT=OFF",
+    "CMAKE_DISABLE_FIND_PACKAGE_PNG=ON",
+    "CMAKE_DISABLE_FIND_PACKAGE_Cairo=ON",
+    "CMAKE_BUILD_TYPE=Release",
+    "CMAKE_INSTALL_RPATH=@loader_path/../lib",
+    "CMAKE_BUILD_WITH_INSTALL_RPATH=ON"
+  ],
+  "generator": "Unix Makefiles",
+  "authoring": {
+    "reportlab": "4.4.9",
+    "mode": "existing bundled Python; deterministic invariant=1; no new reportlab install"
+  },
+  "runtime_binaries": {
+    "pdftotext": {
+      "sha256": "f8ec16db1b1bc976807a4a2a58b6d6f0a9c449a1917aec259f8e98adcb6a3aa1",
+      "bytes": 3310376
+    },
+    "pdfinfo": {
+      "sha256": "8e7227090f160847a3a0342f2c944c56dc2f0602be2c9a8979acfe2ccb6c78c5",
+      "bytes": 3208360
+    }
+  },
+  "runtime_prefix_bytes": 7638176,
+  "binary_reproducibility": "Historical hashes identify this build; rebuild paths/compiler/SDK may change bytes. Source/dependency hashes and semantic acceptance are the portable checks."
+}

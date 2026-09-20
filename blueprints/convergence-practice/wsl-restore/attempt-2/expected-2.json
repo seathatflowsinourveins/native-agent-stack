@@ -1,0 +1,79 @@
+[
+  {
+    "path": ".",
+    "kind": "directory",
+    "mode": "0750"
+  },
+  {
+    "path": "blobs",
+    "kind": "directory",
+    "mode": "0750"
+  },
+  {
+    "path": "blobs/data.bin",
+    "kind": "file",
+    "mode": "0600",
+    "bytes": 1048576,
+    "sha256": "fbbab289f7f94b25736c58be46a994c441fd02552cc6022352e3d86d2fab7c83"
+  },
+  {
+    "path": "documents",
+    "kind": "directory",
+    "mode": "0750"
+  },
+  {
+    "path": "documents/notes",
+    "kind": "directory",
+    "mode": "0750"
+  },
+  {
+    "path": "documents/notes/café-研究.md",
+    "kind": "file",
+    "mode": "0640",
+    "bytes": 56,
+    "sha256": "7818dbcc25f8261e5c89a7c27080000188af955ccbb4e31932729dbb3399cc06"
+  },
+  {
+    "path": "empty",
+    "kind": "file",
+    "mode": "0600",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "empty-directory",
+    "kind": "directory",
+    "mode": "0750"
+  },
+  {
+    "path": "state",
+    "kind": "directory",
+    "mode": "0750"
+  },
+  {
+    "path": "state/added.txt",
+    "kind": "file",
+    "mode": "0640",
+    "bytes": 22,
+    "sha256": "c545874af6125ed6e7e174cb0537a307c6e68c2bc69e8e0433689ba9f73e55e0"
+  },
+  {
+    "path": "state/decision.json",
+    "kind": "file",
+    "mode": "0600",
+    "bytes": 35,
+    "sha256": "a949c0d5535aaa3ffe4534b56db7fc9bfa1a49999d5be183896e341251207740"
+  },
+  {
+    "path": "tools",
+    "kind": "directory",
+    "mode": "0750"
+  },
+  {
+    "path": "tools/check.sh",
+    "kind": "file",
+    "mode": "0750",
+    "bytes": 58,
+    "sha256": "51e6d74f540d1fa75a07cbe6ba84f60827b5e601a4fa6dc0bf0d31768e1d656d"
+  }
+]

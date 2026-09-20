@@ -1,0 +1,344 @@
+{
+  "checked_at_utc": "2026-09-20T05:45:58.135192+00:00",
+  "packages": [
+    {
+      "name": "next",
+      "version": "16.3.5",
+      "source_url": "https://registry.npmjs.org/next/16.3.5",
+      "license": "MIT",
+      "engines": {
+        "node": ">=20.9.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/vercel/next.js.git",
+        "type": "git"
+      },
+      "integrity": "sha512-MdtsTgzyfCPRLC6uJ1mN8ao7lyJ4BB0U6Inhnx3gta1UcCIdHK3yxLG0E8OWQteWD8/Q0qb8A5o7wJaL8M9y2w==",
+      "tarball": "https://registry.npmjs.org/next/-/next-16.3.5.tgz",
+      "metadata_sha256": "61d700bb41bbf69780758bc0b27b78603fcae5b150fcb18c89c7a1cea2a3b714",
+      "install_scripts": {}
+    },
+    {
+      "name": "react",
+      "version": "19.3.0",
+      "source_url": "https://registry.npmjs.org/react/19.3.0",
+      "license": "MIT",
+      "engines": {
+        "node": ">=0.10.0"
+      },
+      "repository": {
+        "url": "git+https://github.com/react/react.git",
+        "type": "git",
+        "directory": "packages/react"
+      },
+      "integrity": "sha512-E8LUcbtBWt20bbl2YoHfx4ZDBdxVTfOKtCZn9cDSJ4l6/nuoApcpIBcj47t2wZoVX8g2ZHuMHbiShgCR1T5Sog==",
+      "tarball": "https://registry.npmjs.org/react/-/react-19.3.0.tgz",
+      "metadata_sha256": "c9b7f5adeab67cd3146ffc69712aee7ddc37c23e656e41feaaa5624dff4e02aa",
+      "install_scripts": {}
+    },
+    {
+      "name": "react-dom",
+      "version": "19.3.0",
+      "source_url": "https://registry.npmjs.org/react-dom/19.3.0",
+      "license": "MIT",
+      "engines": null,
+      "repository": {
+        "url": "git+https://github.com/react/react.git",
+        "type": "git",
+        "directory": "packages/react-dom"
+      },
+      "integrity": "sha512-JDk8dgif51OjFoDE70+OT9ICyYr+69HlmihNwp1+Nsfbna3t5sIiCa9ZJktDmQ4/1b/rn26hIAR2uYXDMr5r0Q==",
+      "tarball": "https://registry.npmjs.org/react-dom/-/react-dom-19.3.0.tgz",
+      "metadata_sha256": "f7bb2eaf8d193af94c0b1749f05d7a0a8475c3d913aec87f1cb93e56ac860877",
+      "install_scripts": {}
+    },
+    {
+      "name": "pnpm",
+      "version": "12.4.2",
+      "source_url": "https://registry.npmjs.org/pnpm/12.4.2",
+      "license": "MIT",
+      "engines": {
+        "node": ">=18.*"
+      },
+      "repository": {
+        "url": "https://github.com/pnpm/pnpm",
+        "type": "git",
+        "directory": "pnpm/npm/pnpm"
+      },
+      "integrity": "sha512-CK3GYTGAJ1x8ntraOdzwjJxhrU5+rzMKTzRh8QKw+QdCNFTRF/mOctR/7wYWBwZE17/8lzpqV/UJCm18NosHyQ==",
+      "tarball": "https://registry.npmjs.org/pnpm/-/pnpm-12.4.2.tgz",
+      "metadata_sha256": "3385f22c75eaf4edff515ef577b19f4f2acabbaa7139ec43cc178e1843f24221",
+      "install_scripts": {
+        "preinstall": "node install.js",
+        "postinstall": "node install.js"
+      }
+    },
+    {
+      "name": "typescript",
+      "version": "5.9.3",
+      "source_url": "https://registry.npmjs.org/typescript/5.9.3",
+      "license": "Apache-2.0",
+      "engines": {
+        "node": ">=14.17"
+      },
+      "repository": {
+        "url": "git+https://github.com/microsoft/TypeScript.git",
+        "type": "git"
+      },
+      "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
+      "tarball": "https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz",
+      "metadata_sha256": "80f0d5d237c08c433b4cee823d75c4f54469beee86cc2fad5e1800f86b6243d8",
+      "install_scripts": {}
+    },
+    {
+      "name": "@types/react",
+      "version": "19.3.0",
+      "source_url": "https://registry.npmjs.org/@types%2freact/19.3.0",
+      "license": "MIT",
+      "engines": null,
+      "repository": {
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+        "type": "git",
+        "directory": "types/react"
+      },
+      "integrity": "sha512-N0rFCuH9YoxG9/m61l9MfpJKfmLOVU0em7ipIz6TRgSSkvReLB9vL85GB+yr8Bs5leqpvg96JSwF4ZS1s4viQg==",
+      "tarball": "https://registry.npmjs.org/@types/react/-/react-19.3.0.tgz",
+      "metadata_sha256": "eec8e8dd1f72955d2fa12e256cd5ab96d476342594cd2034398679a76cfdcac8",
+      "install_scripts": {}
+    },
+    {
+      "name": "@types/node",
+      "version": "24.13.6",
+      "source_url": "https://registry.npmjs.org/@types%2fnode/24.13.6",
+      "license": "MIT",
+      "engines": null,
+      "repository": {
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+        "type": "git",
+        "directory": "types/node"
+      },
+      "integrity": "sha512-SGrw/h3KPFshy3OE6ZL53LMBG5vGQQ8/gIpiqz/kRZhPJ7HgwCEs8LBuNtWLa8dvGZVpSF7+Bf+c11HUrCb/yg==",
+      "tarball": "https://registry.npmjs.org/@types/node/-/node-24.13.6.tgz",
+      "metadata_sha256": "25e1d1919e6ed57eb9805a34747064ce907d58b6f0092494d6210a3916adc83d",
+      "install_scripts": {}
+    },
+    {
+      "name": "@types/react-dom",
+      "version": "19.3.0",
+      "source_url": "https://registry.npmjs.org/@types%2freact-dom/latest",
+      "license": "MIT",
+      "engines": null,
+      "repository": {
+        "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+        "type": "git",
+        "directory": "types/react-dom"
+      },
+      "integrity": "sha512-ZI7bU42mZXXKHn/qNLEw2IrbiINU7X5+vfgdixBHkCNpYWXjKgfQ/P+uyGb5CjOLB9UcnTeg3rylQtV2hym44Q==",
+      "tarball": "https://registry.npmjs.org/@types/react-dom/-/react-dom-19.3.0.tgz",
+      "metadata_sha256": "4d8ed45d8ca1673b9e27017726cc0f97f65a177cb1499efd9d09f484d4e81f5c",
+      "install_scripts": {}
+    },
+    {
+      "name": "@playwright/test",
+      "version": "1.63.0",
+      "source_url": "https://registry.npmjs.org/@playwright%2ftest/1.63.0",
+      "license": "Apache-2.0",
+      "engines": {
+        "node": ">=20"
+      },
+      "repository": {
+        "url": "git+https://github.com/microsoft/playwright.git",
+        "type": "git"
+      },
+      "integrity": "sha512-oxMK4vllB9RK5NQ2l1pq1IfOf2AvnEuj/vYGDj0H2nMtmtZpKtCwt/l00GEO6xjGfpBNAvjovvYdCm50dRQkpQ==",
+      "tarball": "https://registry.npmjs.org/@playwright/test/-/test-1.63.0.tgz",
+      "metadata_sha256": "b73e1d67cc9ff3d0b759ee7e98a9058cff75dbcd93cbb2ab9b7b535b79272286",
+      "install_scripts": {}
+    },
+    {
+      "name": "openapi-typescript",
+      "version": "7.13.0",
+      "source_url": "https://registry.npmjs.org/openapi-typescript/latest",
+      "license": "MIT",
+      "engines": null,
+      "repository": {
+        "url": "git+https://github.com/openapi-ts/openapi-typescript.git",
+        "type": "git",
+        "directory": "packages/openapi-typescript"
+      },
+      "integrity": "sha512-EFP392gcqXS7ntPvbhBzbF8TyBA+baIYEm791Hy5YkjDYKTnk/Tn5OQeKm5BIZvJihpp8Zzr4hzx0Irde1LNGQ==",
+      "tarball": "https://registry.npmjs.org/openapi-typescript/-/openapi-typescript-7.13.0.tgz",
+      "metadata_sha256": "9bfffd334ca6fa077037de8ed0da27955bdba3c6c11760ac0817d7f268582c5e",
+      "install_scripts": {}
+    },
+    {
+      "name": "fastapi",
+      "version": "0.141.1",
+      "source_url": "https://pypi.org/pypi/fastapi/json",
+      "license": "MIT",
+      "requires_python": ">=3.10",
+      "repository": {
+        "Changelog": "https://fastapi.tiangolo.com/release-notes/",
+        "Documentation": "https://fastapi.tiangolo.com/",
+        "Homepage": "https://github.com/fastapi/fastapi",
+        "Issues": "https://github.com/fastapi/fastapi/issues",
+        "Repository": "https://github.com/fastapi/fastapi"
+      },
+      "metadata_sha256": "5ab86ffe97a080cf738190eee44c7608633e848f7d7eed19c10326ce88d65d96"
+    },
+    {
+      "name": "psycopg",
+      "version": "3.3.6",
+      "source_url": "https://pypi.org/pypi/psycopg/json",
+      "license": "LGPL-3.0-only",
+      "requires_python": ">=3.10",
+      "repository": {
+        "Changes": "https://psycopg.org/psycopg3/docs/news.html",
+        "Code": "https://github.com/psycopg/psycopg",
+        "Documentation": "https://psycopg.org/psycopg3/docs/",
+        "Funding": "https://github.com/sponsors/dvarrazzo",
+        "Homepage": "https://psycopg.org/",
+        "Issue Tracker": "https://github.com/psycopg/psycopg/issues"
+      },
+      "metadata_sha256": "a4806149d2b8bcfcd0ba7b96f202a79d7e02818dd8e3525105e53417fa120cfd"
+    },
+    {
+      "name": "uvicorn",
+      "version": "0.53.0",
+      "source_url": "https://pypi.org/pypi/uvicorn/json",
+      "license": "BSD-3-Clause",
+      "requires_python": ">=3.10",
+      "repository": {
+        "Changelog": "https://uvicorn.dev/release-notes",
+        "Funding": "https://github.com/sponsors/Kludex",
+        "Homepage": "https://uvicorn.dev/",
+        "Source": "https://github.com/Kludex/uvicorn"
+      },
+      "metadata_sha256": "65b766a71772e6994c4c30eadbd41c676eb7dd3809cf6a7d4c5afd34df757f6b"
+    },
+    {
+      "name": "pytest",
+      "version": "9.1.1",
+      "source_url": "https://pypi.org/pypi/pytest/json",
+      "license": "MIT",
+      "requires_python": ">=3.10",
+      "repository": {
+        "Changelog": "https://docs.pytest.org/en/stable/changelog.html",
+        "Contact": "https://docs.pytest.org/en/stable/contact.html",
+        "Funding": "https://docs.pytest.org/en/stable/sponsor.html",
+        "Homepage": "https://docs.pytest.org/en/latest/",
+        "Source": "https://github.com/pytest-dev/pytest",
+        "Tracker": "https://github.com/pytest-dev/pytest/issues"
+      },
+      "metadata_sha256": "203f15ce63523ec5dbbf3462328c7e26d9903240a5f7b1782d36b8f9f388bfac"
+    },
+    {
+      "name": "alembic",
+      "version": "1.20.0",
+      "source_url": "https://pypi.org/pypi/alembic/json",
+      "license": "MIT",
+      "requires_python": ">=3.10",
+      "repository": {
+        "Changelog": "https://alembic.sqlalchemy.org/en/latest/changelog.html",
+        "Documentation": "https://alembic.sqlalchemy.org/en/latest/",
+        "Homepage": "https://alembic.sqlalchemy.org",
+        "Issue Tracker": "https://github.com/sqlalchemy/alembic/issues/",
+        "Source": "https://github.com/sqlalchemy/alembic/"
+      },
+      "metadata_sha256": "2fc5722b46ffbfd43ee99311578984392322c44f204b68d3a63b3ca026e898eb"
+    },
+    {
+      "name": "sqlalchemy",
+      "version": "2.0.54",
+      "source_url": "https://pypi.org/pypi/sqlalchemy/json",
+      "license": "MIT",
+      "requires_python": ">=3.7",
+      "repository": {
+        "Documentation": "https://docs.sqlalchemy.org",
+        "Homepage": "https://www.sqlalchemy.org",
+        "Issue Tracker": "https://github.com/sqlalchemy/sqlalchemy/"
+      },
+      "metadata_sha256": "f737174c1e77c7be6dbe462d679705547aa2557c1cf9f13902f607b2821bab66"
+    },
+    {
+      "name": "httpx2",
+      "version": "2.13.0",
+      "source_url": "https://pypi.org/pypi/httpx2/2.13.0/json",
+      "metadata_sha256": "4b68a7e280f517201e85f8bb80273c1a7952c466dc8d3265b7a62dd8c0ed8f8f",
+      "license": "BSD-3-Clause",
+      "requires_python": ">=3.10",
+      "repository": {
+        "Changelog": "https://github.com/pydantic/httpx2/blob/main/src/httpx2/CHANGELOG.md",
+        "Homepage": "https://github.com/pydantic/httpx2",
+        "Source": "https://github.com/pydantic/httpx2"
+      }
+    }
+  ],
+  "postgres": {
+    "version": "18.6",
+    "release_date": "2026-08-13",
+    "release_url": "https://www.postgresql.org/docs/release/18.6/",
+    "official_image": "docker.io/library/postgres",
+    "tag": "18.6",
+    "index_digest": "sha256:86c951e05bf56c93d95d397747fb8820ac76cc3bedb78f43abd83eedbe3666ae",
+    "arm64_manifest_digest": "sha256:f4fcd2b983483177b15d72d94fb3614736211554f7cac5c2cc54a05c75110b90",
+    "manifest_sha256": "86c951e05bf56c93d95d397747fb8820ac76cc3bedb78f43abd83eedbe3666ae",
+    "metadata_url": "https://registry-1.docker.io/v2/library/postgres/manifests/18.6",
+    "source_recipe": "https://github.com/docker-library/postgres",
+    "license": "PostgreSQL License; image contains separately licensed Debian/runtime packages"
+  },
+  "selection_note": "Retain accepted pnpm12.4.2 although latest metadata reports12.5.1; no global upgrade. Package compatibility and the selected Postgres image must pass this scoped native application acceptance.",
+  "compatibility_failures": [
+    {
+      "component": "typescript",
+      "attempted_version": "7.0.2",
+      "status": "failed",
+      "stages": [
+        "pnpm peers check",
+        "pnpm types",
+        "pnpm typecheck"
+      ],
+      "cause": "openapi-typescript7.13.0 requires TypeScript^5.x; TypeScript7 has no ts.factory and native schema type generation failed before any browser test.",
+      "resolution": "Pin the latest stable TypeScript5.x supported by the current native generator; retain latest supported framework pins."
+    }
+  ],
+  "source_revisions": [
+    {
+      "component": "next",
+      "revision": "ca2c75eb7f8d9dd012a8bb83c06132149fe221f9"
+    },
+    {
+      "component": "react",
+      "revision": "1d34f91dfde6bba84d08b683aaba164c7194dacb"
+    },
+    {
+      "component": "fastapi",
+      "revision": "95f8322ee1dcda7ceace7b1c4f6c9915b36d748f"
+    },
+    {
+      "component": "postgres_image_recipe",
+      "revision": "e00e1bd34ec5c8a8e7ad89b273b3d42efaf6d5bc"
+    }
+  ],
+  "test_client_update": "The first12 passing API checks used httpx0.28.1 and emitted Starlette1.6.0 deprecation. The installed pinned upstream TestClient explicitly prefers httpx2; verified pydantic/httpx2 and replaced the test-only dependency with2.13.0, then reran the unchanged API oracle.",
+  "native_postgres": {
+    "version": "18.6",
+    "archive_url": "https://ftp.postgresql.org/pub/source/v18.6/postgresql-18.6.tar.bz2",
+    "checksum_url": "https://ftp.postgresql.org/pub/source/v18.6/postgresql-18.6.tar.bz2.sha256",
+    "archive_sha256": "555610c24d53e4316da5b7d3fc25c279d96856d5e0e23ee308c328c5fa881d9f",
+    "publisher_checksum_matched": true,
+    "license": "PostgreSQL License",
+    "copyright_sha256": "3d6af92ff8a4c2cdf69afb1cf44edea727922f5cd0cf8b5f72b11cdecac8fdfd",
+    "binary_sha256": "f960a1d839d0e8966887f14eb65a1013855535ab57f0029845a238b344be15b7",
+    "configure_flags": [
+      "--prefix=<PROJECT>/.runtime/postgresql/18.6",
+      "--without-icu",
+      "--without-readline",
+      "--without-zlib"
+    ],
+    "native_build_exit": 0,
+    "native_install_exit": 0,
+    "production_tls_or_icu_qualified": false,
+    "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)"
+  }
+}

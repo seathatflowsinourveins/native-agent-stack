@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "id": "mac-native-container-storage-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20T06:09:07.758337+00:00",
+  "host_scope": {
+    "profile": "mac-coordinator",
+    "platform": "macOS26.5.1 arm64",
+    "import_limit": "Actual Mac execution; no WSL/container-host acceptance inferred."
+  },
+  "claim": "Apple container1.4.1 boots pinned PostgreSQL18.6 with a native ext4 volume; the inserted row survives a native container stop/start. Owned fixtures were removed after verification.",
+  "component_ids": [
+    "apple-container",
+    "postgresql"
+  ],
+  "data": {
+    "source_revision": "d4d3084d8b21524cd90ffe433168853563318a0b",
+    "runtime_version": "1.4.1",
+    "runtime_commit": "9a8917ca2da5cd6ba059b9ba5ca5a74892e9bb7d",
+    "runtime_binary_sha256": "50edb17e6f1016c135cb9eed6f60cf9302d0091b39d67e155e952201848ac9c4",
+    "sources": [
+      "https://github.com/apple/container/releases/tag/1.4.1",
+      "https://github.com/apple/container/blob/1.4.1/docs/command-reference.md"
+    ],
+    "image": "docker.io/library/postgres@sha256:86c951e05bf56c93d95d397747fb8820ac76cc3bedb78f43abd83eedbe3666ae",
+    "image_observed_version": "18.6-1.pgdg13+2",
+    "volume": {
+      "format": "ext4",
+      "size_bytes": 268435456
+    },
+    "resources": {
+      "cpus": 1,
+      "memory_bytes": 536870912,
+      "published_ports": []
+    },
+    "checks": [
+      {
+        "name": "clean startup without bind mount",
+        "exit_code": 0,
+        "elapsed_seconds": 0.67
+      },
+      {
+        "name": "startup with native named volume",
+        "exit_code": 0,
+        "elapsed_seconds": 0.51
+      },
+      {
+        "name": "ready/create/insert/select",
+        "exit_code": 0,
+        "value": "native-volume-retained"
+      },
+      {
+        "name": "stop/start/ready/select",
+        "checks_file": "recovery-checks.json",
+        "all_exit_codes": 0,
+        "value_unchanged": true
+      },
+      {
+        "name": "cleanup owned containers and volume",
+        "exit_code": 0,
+        "remaining_container_count": 0
+      }
+    ],
+    "failed_attempts": [
+      {
+        "name": "Documents bind mount",
+        "outcome": "initial run failed after service restart; repeated25second start timeout",
+        "host_source_directory_empty": true,
+        "owned_runtime_sample": [
+          "VZVirtioFileSystemDeviceConfiguration _directorySharingDevice",
+          "VZSharedDirectory _directory",
+          "open"
+        ],
+        "cause": "Opening shared directory blocked; underlying macOS cause unproved."
+      },
+      {
+        "name": "no-bind probe before clearing previous blocked runtime",
+        "outcome": "25second timeout before new container creation",
+        "limit": "Not an independent VM boot failure; clean retry after native service restart passed."
+      }
+    ],
+    "global_permissions_changed": false,
+    "other_workloads_stopped": false,
+    "native_lifetime_token_savings": null,
+    "whole_task_usage": null
+  },
+  "limitations": [
+    "Synthetic single-row local persistence, not production durability, performance or crash/reboot recovery.",
+    "Trust authentication confined to this synthetic private container network with no published port; not a production authentication recipe.",
+    "Named ext4 volumes passed; Documents bind mounts remain unqualified. No macOS privacy policy or security attribute was changed.",
+    "Images remain cached; only owned empty failed container, test database container and test volume were removed.",
+    "Initial image selection/digest/license provenance belongs to the separately recorded application-delivery source review."
+  ]
+}

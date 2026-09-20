@@ -19,6 +19,49 @@ supersede older summaries only for their stated scope.
 
 Original raw native streams and account data remain private. Receipts publish selected factual fields and source-artifact hashes, omit personal paths/session identifiers, and distinguish observations from interpretations. This is evidence transparency with a privacy boundary, not independently attested provider telemetry.
 
+## Publication file and binary boundaries
+
+At the exact Git worktree root, `scripts/validate.py` scans tracked files plus
+untracked files that Git does not ignore. Tracked files remain subject to the
+scan even under ignored dependency, runtime or Python cache directories.
+Git discovery/enumeration errors fail validation. Both required manifests and
+every `files[]` entry in `manifests/evidence.json` are also scanned, including ignored paths. Symlinks,
+private authentication files and recognized private text remain forbidden.
+An export without its own `.git` marker uses a recursive filesystem scan,
+independent of any parent repository; only Git metadata and generated Python
+cache directories are pruned. Hash-listed cache files and cache symlinks are
+still inspected. Copy only intended publication files into an archive.
+
+Binary PNG and PDF files are allowed only when hash-listed under
+`evidence/artifacts/` or `blueprints/convergence-practice/`. PNG checks cover
+framing and checksums; their pixels need separate visual privacy review.
+PDF checks recognize only classic cross-reference framing with one revision
+and no literal encryption or previous-revision declaration. This is a limited
+framing check, not a PDF parser or security guarantee. Compressed streams,
+encoded names, attachments and active content are not decoded by the validator.
+Raw uncompressed bytes remain subject to the ordinary private-content scan.
+
+Each PDF's `files[]` entry must also include this declaration:
+
+```json
+"publication_review": {
+  "source": "Exact upstream source or synthetic generation provenance",
+  "license": "Applicable license or redistribution basis",
+  "reviewed_for_private_content": true,
+  "reviewed_sha256": "same lowercase SHA-256 as the reviewed PDF bytes",
+  "text_extraction_path": "blueprints/convergence-practice/corpus/example.pdf.txt",
+  "text_extraction_method": "Named extractor and retained source artifact"
+}
+```
+
+The extraction must be a separately hash-listed UTF-8 `.txt` or `.md` file and
+is scanned even when ignored. Review the PDF visually and inspect its metadata
+and other non-page content before declaring privacy review complete. Preserve
+the extractor's omissions and source provenance in the associated receipt.
+The matching review digest prevents accidental reuse after a PDF changes;
+hashes and declarations cannot prove that extraction or human review was
+complete or truthful. Other binary formats remain unsupported.
+
 ## Native workflow results
 
 - [LEAN cost sensitivity](../blueprints/us-equities/execution-realism/receipt.json): three native fixed-order simulations completed with distinct fee/slippage assumptions and reconciled serialized cash; full execution realism remains open.

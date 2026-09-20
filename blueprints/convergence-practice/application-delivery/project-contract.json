@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "purpose": "Build and verify a typed local run ledger with native Next.js, FastAPI and PostgreSQL. Run from this application directory. Start and migrate the dedicated ledger and ledger_test databases first. Verify requires installed Chrome and free application ports; Playwright owns its isolated browser and both application servers.",
+  "commands": {
+    "setup": {"command": "make setup", "evidence": ["Makefile", "pyproject.toml", "uv.lock", "package.json", "pnpm-lock.yaml"]},
+    "run": {"command": "make run", "evidence": ["Makefile", "serve.py", "backend/app.py", "package.json"]},
+    "test": {"command": "make test", "evidence": ["Makefile", "backend/test_api.py"]},
+    "verify": {"command": "make verify", "evidence": ["Makefile", "verify_schema.py", "playwright.config.ts", "browser/ledger.spec.ts", "backend/test_api.py"]}
+  }
+}

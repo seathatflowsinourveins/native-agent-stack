@@ -406,7 +406,8 @@
       "evidence_ids": [
         "runtime-tools",
         "component-history",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "velanext-native-quality-tools-20260920"
       ],
       "upstream_sources": [
         "https://github.com/gitleaks/gitleaks"
@@ -873,7 +874,8 @@
         "worktrunk-list",
         "component-history",
         "token-practice-coverage-20260920",
-        "token-native-retained-functional-20260920"
+        "token-native-retained-functional-20260920",
+        "velanext-native-quality-tools-20260920"
       ],
       "upstream_sources": [
         "https://github.com/max-sixty/worktrunk"
@@ -1078,7 +1080,8 @@
         "restic-local-public-reference-20260919",
         "ai-memory-native-state-recovery-20260919",
         "qdrant-native-state-recovery-20260919",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "native-wsl-restic-synthetic-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1406,6 +1409,141 @@
       ],
       "freshness": "Pinned upstream installation, direct artifact acceptance and one bounded task in each native client verified 2026-09-20; no causal provider savings claim.",
       "command_scope": "Index only selected code; default upstream index root; sharing, AI summaries, watchers, cross-repository defaults and external context providers disabled. See native recipe and receipt for whole-file versus focused-source baselines."
+    },
+    {
+      "id": "nextjs",
+      "repository": "https://github.com/vercel/next.js",
+      "version": "16.3.5",
+      "license": "MIT",
+      "role": "Typed production application UI with native build and browser acceptance",
+      "source_pin": "ca2c75eb7f8d9dd012a8bb83c06132149fe221f9",
+      "commands": [
+        "pnpm typecheck",
+        "pnpm build",
+        "pnpm test:e2e"
+      ],
+      "evidence_ids": [
+        "native-application-delivery-20260920"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://registry.npmjs.org/next/16.3.5"
+      ],
+      "freshness": "Primary-source checked September20,2026; acceptance is scoped to the dated host/task receipt. Compatibility can justify a supported older dependency."
+    },
+    {
+      "id": "react",
+      "repository": "https://github.com/react/react",
+      "version": "19.3.0",
+      "license": "MIT",
+      "role": "React UI with server-backed create/update and restart persistence",
+      "source_pin": "1d34f91dfde6bba84d08b683aaba164c7194dacb",
+      "commands": [
+        "pnpm build",
+        "pnpm test:e2e"
+      ],
+      "evidence_ids": [
+        "native-application-delivery-20260920"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://registry.npmjs.org/react/19.3.0"
+      ],
+      "freshness": "Primary-source checked September20,2026; acceptance is scoped to the dated host/task receipt. Compatibility can justify a supported older dependency."
+    },
+    {
+      "id": "fastapi",
+      "repository": "https://github.com/fastapi/fastapi",
+      "version": "0.141.1",
+      "license": "MIT",
+      "role": "Typed API with exact generated contract, validation/conflict and rollback checks",
+      "source_pin": "95f8322ee1dcda7ceace7b1c4f6c9915b36d748f",
+      "commands": [
+        "uv run --frozen pytest -q",
+        "uv run --frozen python verify_schema.py"
+      ],
+      "evidence_ids": [
+        "native-application-delivery-20260920",
+        "mac-native-application-migration-20260920"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://pypi.org/pypi/fastapi/0.141.1/json"
+      ],
+      "freshness": "Primary-source checked September20,2026; acceptance is scoped to the dated host/task receipt. Compatibility can justify a supported older dependency."
+    },
+    {
+      "id": "postgresql",
+      "repository": "https://github.com/postgres/postgres",
+      "version": "18.6",
+      "license": "PostgreSQL",
+      "role": "Local synthetic database with migration, transaction and stop/start persistence",
+      "source_pin": "555610c24d53e4316da5b7d3fc25c279d96856d5e0e23ee308c328c5fa881d9f",
+      "commands": [
+        "initdb",
+        "pg_ctl start",
+        "psql",
+        "pg_ctl stop"
+      ],
+      "evidence_ids": [
+        "native-application-delivery-20260920",
+        "mac-native-container-storage-20260920",
+        "mac-native-application-migration-20260920"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://ftp.postgresql.org/pub/source/v18.6/postgresql-18.6.tar.bz2",
+        "https://ftp.postgresql.org/pub/source/v18.6/postgresql-18.6.tar.bz2.sha256",
+        "https://www.postgresql.org/docs/release/18.6/"
+      ],
+      "freshness": "Primary-source checked September20,2026; acceptance is scoped to the dated host/task receipt. Compatibility can justify a supported older dependency."
+    },
+    {
+      "id": "poppler",
+      "repository": "https://github.com/tsdgeos/poppler_mirror",
+      "version": "26.09.0",
+      "license": "GPL; source COPYING v2 plus per-file notices, see document-ingestion/source-review.json",
+      "role": "Explicit PDF source to bounded text/page/coordinate evidence; official release source, GitHub identity is upstream-linked CI mirror",
+      "source_pin": "8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e",
+      "commands": [
+        "pdftotext -bbox-layout -enc UTF-8 \"$SOURCE\" -"
+      ],
+      "evidence_ids": [
+        "mac-native-document-ingestion-20260920"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://poppler.freedesktop.org/",
+        "https://poppler.freedesktop.org/poppler-26.09.0.tar.xz",
+        "https://gitlab.freedesktop.org/poppler/poppler"
+      ],
+      "freshness": "Primary-source checked September20,2026; acceptance is scoped to the dated host/task receipt. Compatibility can justify a supported older dependency.",
+      "canonical_repository": "https://gitlab.freedesktop.org/poppler/poppler"
+    },
+    {
+      "id": "apple-container",
+      "repository": "https://github.com/apple/container",
+      "version": "1.4.1",
+      "license": "Apache-2.0",
+      "role": "Native Mac isolated Linux container with pinned image and ext4-volume persistence",
+      "source_pin": "9a8917ca2da5cd6ba059b9ba5ca5a74892e9bb7d",
+      "commands": [
+        "container volume create",
+        "container run",
+        "container exec",
+        "container stop",
+        "container start",
+        "container volume delete"
+      ],
+      "evidence_ids": [
+        "mac-native-container-storage-20260920"
+      ],
+      "profile": "supporting",
+      "upstream_sources": [
+        "https://github.com/apple/container/releases/tag/1.4.1",
+        "https://github.com/apple/container/blob/1.4.1/docs/command-reference.md"
+      ],
+      "freshness": "Primary-source checked September20,2026; acceptance is scoped to the dated host/task receipt. Compatibility can justify a supported older dependency."
     }
   ],
   "profiles": [
@@ -1461,7 +1599,13 @@
         "beads",
         "skills-ref",
         "otel-tui",
-        "jcodemunch-mcp"
+        "jcodemunch-mcp",
+        "nextjs",
+        "react",
+        "fastapi",
+        "postgresql",
+        "poppler",
+        "apple-container"
       ]
     },
     {

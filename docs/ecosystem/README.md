@@ -100,3 +100,8 @@ boundaries, source/URL escaping, new-integration counts, input hashes, changed
 documents and generated-file tampering. Browser review covers searching, combined
 filters, dialogs, keyboard exit, small screens and the absence of external asset
 requests. Repository validation remains an integrity check, not a new native run.
+
+The [cross-layer native acceptance](../../blueprints/convergence-practice/layer-acceptance.md)
+adds Mac application/PDF/container proofs and VelaNext recovery/quality tools.
+Repository identities still resolve to immutable content revisions; current-host
+readiness requires that host’s own recorded acceptance.

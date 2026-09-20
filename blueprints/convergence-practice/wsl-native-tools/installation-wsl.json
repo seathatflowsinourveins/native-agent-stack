@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.13.15",
+  "components": [
+    {
+      "name": "gitleaks",
+      "version": "8.30.1",
+      "source_commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+      "license": "MIT",
+      "archive_sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb",
+      "publisher_checksum_verified": true,
+      "github_asset_digest_verified": true,
+      "license_matches_pinned_source": true,
+      "binary": "tools/gitleaks/8.30.1/gitleaks",
+      "binary_sha256": "88f91962aa2f93ac6ab281d553b9e125f5197bbbce38f9f2437f7299c32e5509",
+      "archive_members": [
+        "LICENSE",
+        "README.md",
+        "gitleaks"
+      ]
+    },
+    {
+      "name": "worktrunk",
+      "version": "0.78.0",
+      "source_commit": "bd49d14c52450c6c8a2cec5b01742c690c9c3ce7",
+      "license": "MIT OR Apache-2.0",
+      "archive_sha256": "f365db63805a75a76bed7a84c8bde7e8c27a248e23f9aeb9576eccba3f1d72de",
+      "publisher_checksum_verified": true,
+      "github_asset_digest_verified": true,
+      "license_matches_pinned_source": true,
+      "binary": "tools/worktrunk/0.78.0/worktrunk-x86_64-unknown-linux-musl/wt",
+      "binary_sha256": "7c3aa0de99df8e2705ccc83a6e37dcde36ffc05e00c0027874d9a3bba1f1da9d",
+      "archive_members": [
+        "worktrunk-x86_64-unknown-linux-musl",
+        "worktrunk-x86_64-unknown-linux-musl/README.md",
+        "worktrunk-x86_64-unknown-linux-musl/wt",
+        "worktrunk-x86_64-unknown-linux-musl/git-wt",
+        "worktrunk-x86_64-unknown-linux-musl/CHANGELOG.md",
+        "worktrunk-x86_64-unknown-linux-musl/LICENSE"
+      ]
+    }
+  ],
+  "scope": "New private versioned prefix only; no PATH, shell, Git or service changes"
+}

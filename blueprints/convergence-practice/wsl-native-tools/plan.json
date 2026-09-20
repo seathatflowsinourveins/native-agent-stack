@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "base_revision": "d4d3084d8b21524cd90ffe433168853563318a0b",
+  "scope": "WSL2 Linux x86_64 project-local gitleaks and Worktrunk synthetic qualification",
+  "checks": [
+    "Verify official archive, publisher checksum and pinned license bytes before native execution.",
+    "Default gitleaks rules detect exactly one generated inert github-pat fixture with exit 1, fully redacted reports and logs.",
+    "A clean synthetic directory returns exit 0 and an empty gitleaks JSON report.",
+    "Native Worktrunk creates and lists two named worktrees at owned paths from the frozen local main commit.",
+    "Native Worktrunk removes the clean tree in the foreground without force.",
+    "Native Worktrunk refuses removal of modified and untracked synthetic data; bytes and registration remain intact.",
+    "After reverting only fixture-authored bytes, native non-force removal succeeds; native list and Git agree only main remains.",
+    "Explicit --no-hooks suppresses fixture project hooks; no model, remote, user config or global changes."
+  ],
+  "failure_policy": "Retain logs and any remaining owned worktrees on failure; never force-delete changes or silently rerun.",
+  "usage": "No model/provider invocation in fixture; enclosing coordinator and child usage unknown; no savings claim."
+}

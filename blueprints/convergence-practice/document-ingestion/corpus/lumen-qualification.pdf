@@ -1,0 +1,187 @@
+%PDF-1.3
+%“Œ‹ž ReportLab Generated PDF document (opensource)
+1 0 obj
+<<
+/F1 2 0 R /F2 3 0 R
+>>
+endobj
+2 0 obj
+<<
+/BaseFont /Helvetica /Encoding /WinAnsiEncoding /Name /F1 /Subtype /Type1 /Type /Font
+>>
+endobj
+3 0 obj
+<<
+/BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding /Name /F2 /Subtype /Type1 /Type /Font
+>>
+endobj
+4 0 obj
+<<
+/Contents 9 0 R /MediaBox [ 0 0 612 792 ] /Parent 8 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+5 0 obj
+<<
+/Contents 10 0 R /MediaBox [ 0 0 612 792 ] /Parent 8 0 R /Resources <<
+/Font 1 0 R /ProcSet [ /PDF /Text /ImageB /ImageC /ImageI ]
+>> /Rotate 0 /Trans <<
+
+>> 
+  /Type /Page
+>>
+endobj
+6 0 obj
+<<
+/PageMode /UseNone /Pages 8 0 R /Type /Catalog
+>>
+endobj
+7 0 obj
+<<
+/Author (Native Agent Stack contributors) /CreationDate (D:20000101000000+00'00') /Creator (anonymous) /Keywords () /ModDate (D:20000101000000+00'00') /Producer (ReportLab PDF Library - \(opensource\)) 
+  /Subject (unspecified) /Title (Lumen systems - qualification packet \(synthetic\)) /Trapped /False
+>>
+endobj
+8 0 obj
+<<
+/Count 2 /Kids [ 4 0 R 5 0 R ] /Type /Pages
+>>
+endobj
+9 0 obj
+<<
+/Length 2059
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+BT /F2 17 Tf 20.4 TL ET
+BT 1 0 0 1 48 748 Tm (Lumen systems | Release qualification) Tj T* ET
+BT /F1 11 Tf 13.2 TL ET
+BT 1 0 0 1 48 709 Tm (This fictional packet defines release checks for a document pipeline.) Tj T* ET
+BT 1 0 0 1 48 688 Tm (Release owner: Mira Chen. Approval window: 2026-09-24 at 14:30 UTC.) Tj T* ET
+BT 1 0 0 1 48 667 Tm (The release checkpoint is CP-417; its restore target is 2026-09-23.) Tj T* ET
+BT 1 0 0 1 48 621 Tm (Service readiness - release values) Tj T* ET
+BT 1 0 0 1 48 442 Tm (Timeout values are seconds. Archive sizes are decimal megabytes \(MB\).) Tj T* ET
+BT 1 0 0 1 48 421 Tm (Aster requires checksum verification before the checkpoint is accepted.) Tj T* ET
+BT 1 0 0 1 48 400 Tm (The recovery checkpoint is specified separately on page 2.) Tj T* ET
+BT 1 0 0 1 48 345 Tm (Scope: born-digital text and positioned tables; scanned pages are excluded.) Tj T* ET
+BT 1 0 0 1 48 324 Tm (No production passwords, purchase limits or access tokens appear here.) Tj T* ET
+.91 .94 .97 rg
+n 48 577 516 25 re f*
+0 0 0 rg
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 55 585 Tm (Service) Tj T* ET
+BT 1 0 0 1 187 585 Tm (Timeout \(s\)) Tj T* ET
+BT 1 0 0 1 305 585 Tm (Archive \(MB\)) Tj T* ET
+BT 1 0 0 1 428 585 Tm (Status) Tj T* ET
+.7 .75 .8 RG
+n 48 577 m 564 577 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 55 557 Tm (Aster) Tj T* ET
+BT 1 0 0 1 187 557 Tm (30) Tj T* ET
+BT 1 0 0 1 305 557 Tm (128.5) Tj T* ET
+BT 1 0 0 1 428 557 Tm (READY) Tj T* ET
+.7 .75 .8 RG
+n 48 549 m 564 549 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 55 529 Tm (Birch) Tj T* ET
+BT 1 0 0 1 187 529 Tm (45) Tj T* ET
+BT 1 0 0 1 305 529 Tm (256.0) Tj T* ET
+BT 1 0 0 1 428 529 Tm (HOLD) Tj T* ET
+.7 .75 .8 RG
+n 48 521 m 564 521 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 55 501 Tm (Cedar) Tj T* ET
+BT 1 0 0 1 187 501 Tm (60) Tj T* ET
+BT 1 0 0 1 305 501 Tm (1024.0) Tj T* ET
+BT 1 0 0 1 428 501 Tm (READY) Tj T* ET
+.7 .75 .8 RG
+n 48 493 m 564 493 l S
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 48 32 Tm (Synthetic fixture | Revision LUM-2026-09-A | Page 1 of 2) Tj T* ET
+ 
+endstream
+endobj
+10 0 obj
+<<
+/Length 2084
+>>
+stream
+1 0 0 1 0 0 cm  BT /F1 12 Tf 14.4 TL ET
+BT /F2 17 Tf 20.4 TL ET
+BT 1 0 0 1 48 748 Tm (Lumen systems | Recovery qualification) Tj T* ET
+BT /F1 11 Tf 13.2 TL ET
+BT 1 0 0 1 48 709 Tm (Recovery owner: Omar Ellis. Drill window: 2026-09-25 at 09:00 UTC.) Tj T* ET
+BT 1 0 0 1 48 688 Tm (The recovery checkpoint is CP-902; its restore target is 2026-09-24.) Tj T* ET
+BT 1 0 0 1 48 667 Tm (The release checkpoint CP-417 is historical context, not the recovery ID.) Tj T* ET
+BT 1 0 0 1 48 621 Tm (Service readiness - recovery values) Tj T* ET
+BT 1 0 0 1 48 442 Tm (Recovery values override release values only within this recovery drill.) Tj T* ET
+BT 1 0 0 1 48 421 Tm (Aster requires one verified restore before the recovery checkpoint passes.) Tj T* ET
+BT 1 0 0 1 48 400 Tm (Archive sizes are decimal megabytes \(MB\); timeout values are seconds.) Tj T* ET
+BT 1 0 0 1 48 345 Tm (An absent field must be reported as no evidence in the selected document.) Tj T* ET
+BT 1 0 0 1 48 324 Tm (This synthetic packet grants no authority to run a production operation.) Tj T* ET
+.91 .94 .97 rg
+n 48 577 516 25 re f*
+0 0 0 rg
+BT /F2 10 Tf 12 TL ET
+BT 1 0 0 1 55 585 Tm (Service) Tj T* ET
+BT 1 0 0 1 187 585 Tm (Timeout \(s\)) Tj T* ET
+BT 1 0 0 1 305 585 Tm (Archive \(MB\)) Tj T* ET
+BT 1 0 0 1 428 585 Tm (Status) Tj T* ET
+.7 .75 .8 RG
+n 48 577 m 564 577 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 55 557 Tm (Aster) Tj T* ET
+BT 1 0 0 1 187 557 Tm (90) Tj T* ET
+BT 1 0 0 1 305 557 Tm (129.0) Tj T* ET
+BT 1 0 0 1 428 557 Tm (READY) Tj T* ET
+.7 .75 .8 RG
+n 48 549 m 564 549 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 55 529 Tm (Birch) Tj T* ET
+BT 1 0 0 1 187 529 Tm (120) Tj T* ET
+BT 1 0 0 1 305 529 Tm (258.0) Tj T* ET
+BT 1 0 0 1 428 529 Tm (READY) Tj T* ET
+.7 .75 .8 RG
+n 48 521 m 564 521 l S
+BT /F1 10 Tf 12 TL ET
+BT 1 0 0 1 55 501 Tm (Cedar) Tj T* ET
+BT 1 0 0 1 187 501 Tm (180) Tj T* ET
+BT 1 0 0 1 305 501 Tm (1028.0) Tj T* ET
+BT 1 0 0 1 428 501 Tm (HOLD) Tj T* ET
+.7 .75 .8 RG
+n 48 493 m 564 493 l S
+BT /F1 9 Tf 10.8 TL ET
+BT 1 0 0 1 48 32 Tm (Synthetic fixture | Revision LUM-2026-09-A | Page 2 of 2) Tj T* ET
+ 
+endstream
+endobj
+xref
+0 11
+0000000000 65535 f 
+0000000061 00000 n 
+0000000102 00000 n 
+0000000209 00000 n 
+0000000321 00000 n 
+0000000514 00000 n 
+0000000708 00000 n 
+0000000776 00000 n 
+0000001101 00000 n 
+0000001166 00000 n 
+0000003276 00000 n 
+trailer
+<<
+/ID 
+[<292fdf0cc497c027a093e16e05db26b5><292fdf0cc497c027a093e16e05db26b5>]
+% ReportLab generated PDF document -- digest (opensource)
+
+/Info 7 0 R
+/Root 6 0 R
+/Size 11
+>>
+startxref
+5412
+%%EOF

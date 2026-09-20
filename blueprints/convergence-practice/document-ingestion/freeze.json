@@ -1,0 +1,31 @@
+{
+  "frozen_at": "2026-09-20T05:59:01.013749+00:00",
+  "stage": "Before candidate extraction attempt 2: stricter source-list boundary; original corpus, layout and oracle unchanged.",
+  "files": {
+    "build_corpus.py": "2c84de93409ffacc33b20b7797683d81e530595c85c46381ec0bab46fd47dffe",
+    "corpus/authored-source.json": "9b294753d91abcbd8ebdd87460513014f179068796febfa9500ed25a5051ed34",
+    "corpus/lumen-qualification.pdf": "ca2b455ba16c76abdb26e198d95b27302cf4a0b8d00dd66c9a1f9d8be68d65f5",
+    "corpus/w3c-dummy.pdf": "3df79d34abbca99308e79cb94461c1893582604d68329a41fd4bec1885e6adb4",
+    "corpus/NOTICE.md": "292f6558c6a2a77050613d085d324053aa1fbb919edd89f6f4f6d22308aeb80a",
+    "layout.json": "644ab52d3f24f087119590b9840ad4f501630e11450186a6232f6dbf756e8aa4",
+    "oracle.json": "5298f2943c528819efa8901c47532924ae8ea5cf4ddee8af80378eb72495d17a",
+    "plan.json": "864244dd87e5fcae16acb06b687fa7935f036847e8d10602b2dab8b7c8b9384c",
+    "ingest.py": "b62eb4a974fe6385d30e2243cdd4358c5153d1da2acbbfadb4f37942d066eaa9"
+  },
+  "sources": [
+    {
+      "id": "lumen",
+      "path": "corpus/lumen-qualification.pdf",
+      "revision": "LUM-2026-09-A",
+      "origin": "Original authored synthetic source, repository MIT license"
+    },
+    {
+      "id": "w3c",
+      "path": "corpus/w3c-dummy.pdf",
+      "url": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+      "revision": "sha256:3df79d34abbca99308e79cb94461c1893582604d68329a41fd4bec1885e6adb4",
+      "license_url": "https://www.w3.org/copyright/document-license-2023/"
+    }
+  ],
+  "implementation_frozen_at": "2026-09-20T06:24:19.054478+00:00"
+}

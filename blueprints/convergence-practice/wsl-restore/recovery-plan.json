@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "frozen_before_corrected_restore": true,
+  "original_plan_sha256": "a73dfbedbc8db781416d4f0af4a42b7c7935224c26af6806ac4b25e8ac030a13",
+  "original_runner_sha256": "c9f6cbbf11e663e66483a8a3fb0848bf0ca869d8d77cdf1d816437709d9b6751",
+  "fixture_source_sha256": "153b0a13d80ab0c0eecb623942237664988c35cb586394f64e70e83106583bf1",
+  "retained_previous_receipt": "attempt-2/receipt.json",
+  "correction": "Restore exact snapshot-ID:owned-parent-subtree into a fresh target; assert its sole child is fixture, then compare the complete unchanged fixture oracle including its root mode. Native subtree target-container mode is outside backed-up fixture metadata.",
+  "preserved_inputs": "Same exact two encrypted snapshots, byte-identical healthy repository and same task-local mode0600 key. No backup replay or weakened fixture oracle.",
+  "runner_sha256": "5cd3783ccd75064fa2f74e4584b3d2ba6ba2be169406820f1f98f7ea1976ee5c",
+  "limitations": [
+    "No pruning, services, global PATH/configuration changes, credential access, model calls, reboot, or shared SSH transport changes.",
+    "Fresh-SSH recovery after explicit incorrect-input/corruption failures; process-crash and power-loss recovery not qualified.",
+    "Same-host password-file availability is a prerequisite; independent key recovery and offhost disaster recovery remain unknown.",
+    "No ACL/xattr/sparse/hardlink/symlink or cross-filesystem/Windows-NTFS/exFAT claims.",
+    "No token, storage-efficiency or backup performance claim.",
+    "Prior direct-subtree restore returned0 but failed the strict fixture-root mode gate. That attempt remains failed; the parent-subtree correction is a separate native run.",
+    "A fresh SSH connection proves channel-independent access with the retained local task key only; future same-host key availability, key-loss recovery and offhost disaster recovery remain unknown."
+  ]
+}

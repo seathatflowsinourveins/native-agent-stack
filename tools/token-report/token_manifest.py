@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Capture native savings reports; preserve evidence without adding overlapping counters."""
 import argparse
+from contextlib import closing
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -65,17 +66,21 @@ class Ledger:
         path=Path(path)
         path.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
         self.db=sqlite3.connect(path,timeout=30)
-        os.chmod(path,0o600)
-        self.db.row_factory=sqlite3.Row
-        self.db.executescript("""
-        CREATE TABLE IF NOT EXISTS snapshots(
-          id INTEGER PRIMARY KEY,tool TEXT,scope TEXT,observed_at TEXT,
-          success INTEGER,metrics TEXT,evidence TEXT);
-        CREATE TABLE IF NOT EXISTS comparisons(
-          id TEXT PRIMARY KEY,first_seen TEXT,last_seen TEXT,payload TEXT);
-        CREATE TABLE IF NOT EXISTS native_events(
-          id TEXT PRIMARY KEY,tool TEXT,scope TEXT,event_time TEXT,saved INTEGER,payload TEXT);
-        """)
+        try:
+            os.chmod(path,0o600)
+            self.db.row_factory=sqlite3.Row
+            self.db.executescript("""
+            CREATE TABLE IF NOT EXISTS snapshots(
+              id INTEGER PRIMARY KEY,tool TEXT,scope TEXT,observed_at TEXT,
+              success INTEGER,metrics TEXT,evidence TEXT);
+            CREATE TABLE IF NOT EXISTS comparisons(
+              id TEXT PRIMARY KEY,first_seen TEXT,last_seen TEXT,payload TEXT);
+            CREATE TABLE IF NOT EXISTS native_events(
+              id TEXT PRIMARY KEY,tool TEXT,scope TEXT,event_time TEXT,saved INTEGER,payload TEXT);
+            """)
+        except BaseException:
+            self.db.close()
+            raise
     def close(self):
         self.db.close()
     def snapshot(self,tool,scope,metrics,success,observed_at,evidence):
@@ -150,10 +155,9 @@ def archive_native_events(config,ledger,issues):
     db=Path(config["rtk_database"]) if config.get("rtk_database") else None
     if db and db.exists():
         try:
-            source=sqlite3.connect(db.as_uri()+"?mode=ro",uri=True)
-            source.row_factory=sqlite3.Row
-            rows=source.execute("SELECT id,timestamp,input_tokens,output_tokens,saved_tokens,project_path FROM commands").fetchall()
-            source.close()
+            with closing(sqlite3.connect(db.as_uri()+"?mode=ro",uri=True)) as source:
+                source.row_factory=sqlite3.Row
+                rows=source.execute("SELECT id,timestamp,input_tokens,output_tokens,saved_tokens,project_path FROM commands").fetchall()
             for row in rows:
                 d=dict(row)
                 ledger.event("rtk","Linux tracking database",d["timestamp"],d["saved_tokens"],[str(db),d["id"],d["timestamp"]],d)
@@ -210,7 +214,7 @@ def retained_projects(config,run,commands,issues):
     if not source.exists():
         return result
     try:
-        with sqlite3.connect(source.as_uri()+"?mode=ro",uri=True) as db:
+        with closing(sqlite3.connect(source.as_uri()+"?mode=ro",uri=True)) as db:
             db.row_factory=sqlite3.Row
             rows=db.execute("SELECT project_path,COUNT(*) AS events,SUM(input_tokens) AS input_tokens,SUM(output_tokens) AS output_tokens,SUM(saved_tokens) AS estimated_saved,MIN(timestamp) AS first_event,MAX(timestamp) AS last_event FROM commands GROUP BY project_path ORDER BY project_path").fetchall()
         for i,row in enumerate(rows):
@@ -311,7 +315,7 @@ def native_hook_inventory(config,run,issues,ledger=None):
             row["errors"].append("Configuration query: "+str(exc))
         for p in sorted(sessions.glob("*.db")):
             try:
-                with sqlite3.connect(p.as_uri()+"?mode=ro",uri=True,timeout=2) as db:
+                with closing(sqlite3.connect(p.as_uri()+"?mode=ro",uri=True,timeout=2)) as db, db:
                     db.execute("BEGIN")
                     found=db.execute(query).fetchall()
                     projects=db.execute("SELECT project_dir,COUNT(*),MIN(created_at),MAX(created_at) FROM session_events GROUP BY project_dir").fetchall()

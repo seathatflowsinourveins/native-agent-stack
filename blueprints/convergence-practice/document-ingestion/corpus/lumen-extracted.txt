@@ -1,0 +1,33 @@
+Page 1
+Lumen systems | Release qualification
+This fictional packet defines release checks for a document pipeline.
+Release owner: Mira Chen. Approval window: 2026-09-24 at 14:30 UTC.
+The release checkpoint is CP-417; its restore target is 2026-09-23.
+Service readiness - release values
+Service Timeout (s) Archive (MB) Status
+Aster 30 128.5 READY
+Birch 45 256.0 HOLD
+Cedar 60 1024.0 READY
+Timeout values are seconds. Archive sizes are decimal megabytes (MB).
+Aster requires checksum verification before the checkpoint is accepted.
+The recovery checkpoint is specified separately on page 2.
+Scope: born-digital text and positioned tables; scanned pages are excluded.
+No production passwords, purchase limits or access tokens appear here.
+Synthetic fixture | Revision LUM-2026-09-A | Page 1 of 2
+
+Page 2
+Lumen systems | Recovery qualification
+Recovery owner: Omar Ellis. Drill window: 2026-09-25 at 09:00 UTC.
+The recovery checkpoint is CP-902; its restore target is 2026-09-24.
+The release checkpoint CP-417 is historical context, not the recovery ID.
+Service readiness - recovery values
+Service Timeout (s) Archive (MB) Status
+Aster 90 129.0 READY
+Birch 120 258.0 READY
+Cedar 180 1028.0 HOLD
+Recovery values override release values only within this recovery drill.
+Aster requires one verified restore before the recovery checkpoint passes.
+Archive sizes are decimal megabytes (MB); timeout values are seconds.
+An absent field must be reported as no evidence in the selected document.
+This synthetic packet grants no authority to run a production operation.
+Synthetic fixture | Revision LUM-2026-09-A | Page 2 of 2

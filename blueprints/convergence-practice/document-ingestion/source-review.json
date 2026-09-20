@@ -1,0 +1,55 @@
+{
+  "reviewed_at": "2026-09-20",
+  "decisions": [
+    {
+      "component": "Poppler",
+      "latest_release": "26.09.0",
+      "released_at": "2026-09-03",
+      "source_urls": [
+        "https://poppler.freedesktop.org/",
+        "https://poppler.freedesktop.org/releases/",
+        "https://formulae.brew.sh/api/formula/poppler.json"
+      ],
+      "license": "GPL: source COPYING is GPL v2; per-file notices include GPL v2-or-later; Homebrew labels GPL-2.0-only OR GPL-3.0-only. Retain source/per-file notices; no binary redistribution in this repository.",
+      "decision": "adopt_within_scope",
+      "reason": "Latest upstream native text/page geometry extraction passes the frozen corpus; no inference/model weights are needed. Minimal static core, existing copied FreeType/PNG/zlib runtimes, system zlib/libc++/libSystem.",
+      "post_26_05_review": [
+        "26.06 crash/thread-safety fixes",
+        "26.07 malformed-document fixes and macOS font mutex correction",
+        "26.08 pdftohtml/data URL crash and image-size changes",
+        "26.09 malformed-document fixes and new pdftotext -urls; HarfBuzz is required only for optional font subsetting"
+      ],
+      "limits": "This is release-note review, not a security audit. Non-Latin CMaps, OCR, image decoding, font subsetting, signing, network fetch, table detection and wrapper APIs are excluded."
+    },
+    {
+      "component": "Docling",
+      "latest_release": "2.129.0",
+      "released_at": "2026-09-18T09:18:32Z",
+      "revision": "890dd42d017497c955a56a1d2cfc3f0af5bc2aa9",
+      "license": "MIT",
+      "source_urls": [
+        "https://github.com/docling-project/docling/releases/tag/v2.129.0",
+        "https://github.com/docling-project/docling/blob/890dd42d017497c955a56a1d2cfc3f0af5bc2aa9/LICENSE",
+        "https://docling-project.github.io/docling/"
+      ],
+      "decision": "defer",
+      "reason": "Candidate for detected layouts/tables or OCR if a frozen failure corpus demonstrates need. Its model-backed default PDF path is not required by this born-digital fixed-layout qualification. Not installed or run."
+    },
+    {
+      "component": "MarkItDown",
+      "latest_release": "0.1.7",
+      "released_at": "2026-07-29T18:19:15Z",
+      "revision": "fd239d5d2be43d9b68329730206b9312c7d5a388",
+      "license": "MIT",
+      "source_urls": [
+        "https://github.com/microsoft/markitdown/releases/tag/v0.1.7",
+        "https://github.com/microsoft/markitdown/blob/fd239d5d2be43d9b68329730206b9312c7d5a388/LICENSE",
+        "https://github.com/microsoft/markitdown/tree/fd239d5d2be43d9b68329730206b9312c7d5a388"
+      ],
+      "decision": "defer",
+      "reason": "Useful broad file-to-Markdown candidate. No unmet format-conversion need here; native coordinate output directly supplies this fixture page/table contract. Not installed or run."
+    }
+  ],
+  "discovery_provenance": "Maintained ecosystem catalog queried for document/PDF extraction, then exact official release, source and license checks. Stars are not acceptance.",
+  "smallest_sufficient_choice": "One native extractor, deterministic geometry processing, scoped exact phrase retrieval; no embeddings, model downloads, MCP registration or automatic memory."
+}

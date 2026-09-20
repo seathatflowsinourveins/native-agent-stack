@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "base_revision": "9b7b5d94cb082b78706c59e203250a4f4c8f4061",
+  "purpose": "Typed local run ledger: useful application delivery through a real Next.js/React UI, FastAPI API and PostgreSQL transaction boundary",
+  "acceptance": [
+    "Locked native Python and JavaScript restores succeed in the isolated application directory",
+    "Alembic upgrades an empty PostgreSQL18.6 database and repeat upgrade is idempotent",
+    "Invalid and extra request fields are rejected before writes",
+    "Create and status update write both run state and history in one transaction",
+    "A stale revision returns409; database-injected history failure rolls back the run update",
+    "An isolated real browser creates a run and changes its status; generated OpenAPI TypeScript types and production Next build pass",
+    "The UI-created run survives PostgreSQL stop/start and API process restart",
+    "Only owned loopback processes, container and test browser are stopped after verification"
+  ],
+  "limits": ["Local unauthenticated sample containing synthetic data only", "No cloud deployment, accounts, provider/model calls, trading or production operational readiness", "Mac arm64 host only unless another host is separately executed", "No token-saving claim; whole coordinator usage is unknown"]
+}

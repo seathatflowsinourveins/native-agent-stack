@@ -1,0 +1,10 @@
+.venv/
+node_modules/
+.next/
+.runtime/
+.playwright-cli/
+test-results/
+playwright-report/
+__pycache__/
+.pytest_cache/
+*.tsbuildinfo

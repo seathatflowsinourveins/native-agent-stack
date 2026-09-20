@@ -2,10 +2,14 @@
 
 import hashlib
 import json
+import os
 from pathlib import Path
+import shutil
 import struct
+import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 import zlib
 
 from scripts.validate import InvalidPublication, validate
@@ -224,6 +228,221 @@ class PublicationValidationTests(unittest.TestCase):
     def test_other_binary_formats_are_rejected_even_if_hash_listed(self):
         self.write_binary("evidence/artifacts/binary.dat", b"\xff\xfe\x00\x01")
         self.assert_invalid("cannot inspect as UTF-8")
+
+    def git(self, *arguments):
+        return subprocess.run(["git", "-C", str(self.root), *arguments],
+                              check=True, capture_output=True)
+
+    def init_git(self):
+        self.git("init", "--quiet")
+        self.write(".gitignore", "node_modules/\n.next/\n.runtime/\n__pycache__/\n.env\n")
+
+    def test_git_ignores_nested_runtime_files_and_symlinks(self):
+        self.init_git()
+        for folder in ("node_modules", ".next", ".runtime", "__pycache__"):
+            self.write_binary(f"project/{folder}/binary.dat", b"\xff\x00", hashed=False)
+            self.write(f"project/{folder}/auth.json", "private local state")
+            (self.root / f"project/{folder}/link").symlink_to(self.root)
+        self.assertEqual(validate(self.root)["hashed_files"], 2)
+
+    def test_git_tracked_ignored_private_text_is_still_scanned(self):
+        self.init_git()
+        for folder in ("node_modules", ".next", ".runtime", "__pycache__"):
+            with self.subTest(folder=folder):
+                name = f"project/{folder}/secret.txt"
+                self.write(name, "ghp" + "_" + "x" * 36)
+                self.git("add", "--force", "--", name)
+                self.assert_invalid("GitHub token")
+                self.git("rm", "--force", "--", name)
+
+    def test_git_tracked_ignored_auth_file_and_symlink_fail(self):
+        self.init_git()
+        self.write(".env", "EXAMPLE=value")
+        self.git("add", "--force", ".env")
+        self.assert_invalid("private authentication/environment file")
+        self.git("rm", "--force", ".env")
+        path = self.root / "project/.runtime/link"
+        path.parent.mkdir(parents=True)
+        path.symlink_to(self.root / "manifests/stack.json")
+        self.git("add", "--force", "--", str(path))
+        self.assert_invalid("symlinks are forbidden")
+
+    def test_git_untracked_nonignored_files_are_scanned(self):
+        self.init_git()
+        self.write("new/auth.json", "synthetic state")
+        self.assert_invalid("private authentication/environment file")
+
+    def test_git_ignored_hash_listed_evidence_is_always_scanned(self):
+        self.init_git()
+        self.write_binary("project/.runtime/secret.txt", ("hf" + "_" + "a" * 32).encode())
+        self.assert_invalid("Hugging Face token")
+
+    def test_git_ignored_required_manifests_are_always_scanned(self):
+        self.init_git()
+        self.write(".gitignore", "manifests/\n")
+        self.evidence["private_note"] = "hf" + "_" + "a" * 32
+        self.save()
+        self.assert_invalid("manifests/evidence.json: contains possible Hugging Face token")
+
+    def test_git_ignored_hash_listed_symlink_is_always_rejected(self):
+        self.init_git()
+        name = "project/.runtime/linked.txt"
+        self.write_binary(name, b"example")
+        path = self.root / name
+        path.unlink()
+        path.symlink_to(self.root / "evidence/artifacts/output.txt")
+        self.assert_invalid("symlinks are forbidden")
+
+    def test_git_ignored_unpublished_evidence_does_not_require_hash(self):
+        self.init_git()
+        self.write_binary("evidence/artifacts/.runtime/local.dat", b"\xff\x00", hashed=False)
+        validate(self.root)
+
+    def test_git_errors_never_fall_back_to_filesystem_success(self):
+        self.init_git()
+        for error in (OSError("unavailable"), subprocess.CalledProcessError(128, ["git"])):
+            with self.subTest(error=type(error).__name__), patch("scripts.validate.subprocess.run", side_effect=error):
+                self.assert_invalid("Git publication enumeration failed")
+        (self.root / ".git/index").write_bytes(b"broken index")
+        self.assert_invalid("Git publication enumeration failed")
+
+    def test_git_other_root_or_truncated_listing_fails_closed(self):
+        self.init_git()
+        with patch("scripts.validate.subprocess.run", return_value=subprocess.CompletedProcess([], 0, b"/\n")):
+            self.assert_invalid("Git publication enumeration failed")
+        outputs = [subprocess.CompletedProcess([], 0, os.fsencode(self.root) + b"\n"),
+                   subprocess.CompletedProcess([], 0, b"manifests/stack.json")]
+        with patch("scripts.validate.subprocess.run", side_effect=outputs):
+            self.assert_invalid("Git publication enumeration failed")
+
+    def test_git_ignores_inherited_checkout_and_index_routing(self):
+        self.init_git()
+        self.write("secret.txt", "ghp" + "_" + "x" * 36)
+        self.git("add", "secret.txt")
+        with patch.dict(os.environ, {"GIT_DIR": str(self.root / "missing"),
+                                     "GIT_INDEX_FILE": str(self.root / "empty-index")}):
+            self.assert_invalid("GitHub token")
+
+    def test_archive_scan_does_not_borrow_parent_repository_ignores(self):
+        export = self.root / "export"
+        export.mkdir()
+        for name in ("manifests", "evidence"):
+            shutil.move(str(self.root / name), export / name)
+        self.init_git()
+        self.root = export
+        self.write("project/.runtime/secret.txt", "hf" + "_" + "a" * 32)
+        self.assert_invalid("Hugging Face token")
+
+    def test_archive_without_git_retains_binary_and_symlink_refusals(self):
+        self.write_binary("project/node_modules/private.dat", b"\xff\x00", hashed=False)
+        self.assert_invalid("cannot inspect as UTF-8")
+        (self.root / "project/node_modules/private.dat").unlink()
+        (self.root / "project/__pycache__").symlink_to(self.root, target_is_directory=True)
+        self.assert_invalid("symlinks are forbidden")
+
+    def test_hash_listed_convergence_png_is_allowed(self):
+        self.write_binary("blueprints/convergence-practice/corpus/page.png", self.png_fixture())
+        validate(self.root)
+
+    @staticmethod
+    def pdf_fixture(text=b"Synthetic PDF", extra=b""):
+        stream = zlib.compress(b"BT /F1 12 Tf (" + text + b") Tj ET")
+        objects = [b"<< /Type /Catalog /Pages 2 0 R >>", b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+                   b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 100 100] /Contents 4 0 R >>",
+                   b"<< /Length " + str(len(stream)).encode() + b" /Filter /FlateDecode >>\nstream\n" + stream + b"\nendstream"]
+        output = b"%PDF-1.4\n%\xff\xfe\xfd\xfc\n" + extra
+        offsets = []
+        for number, content in enumerate(objects, 1):
+            offsets.append(len(output))
+            output += f"{number} 0 obj\n".encode() + content + b"\nendobj\n"
+        xref = len(output)
+        output += b"xref\n0 5\n0000000000 65535 f \n"
+        output += b"".join(f"{offset:010d} 00000 n \n".encode() for offset in offsets)
+        return output + b"trailer\n<< /Size 5 /Root 1 0 R >>\nstartxref\n" + str(xref).encode() + b"\n%%EOF\n"
+
+    def add_reviewed_pdf(self, relative="blueprints/convergence-practice/corpus/sample.pdf", *, raw=None, text=b"Synthetic PDF\n"):
+        self.write_binary(relative + ".txt", text)
+        self.write_binary(relative, self.pdf_fixture() if raw is None else raw)
+        record = self.evidence["files"][-1]
+        record["publication_review"] = {
+            "source": "Synthetic test fixture", "license": "MIT",
+            "reviewed_for_private_content": True, "reviewed_sha256": record["sha256"],
+            "text_extraction_path": relative + ".txt", "text_extraction_method": "Synthetic fixture text",
+        }
+        self.save()
+        return record
+
+    def test_reviewed_hash_listed_pdf_is_allowed_in_both_artifact_roots(self):
+        self.add_reviewed_pdf()
+        self.add_reviewed_pdf("evidence/artifacts/sample.pdf")
+        self.assertEqual(validate(self.root)["hashed_files"], 6)
+
+    def test_pdf_requires_review_even_when_all_bytes_are_utf8(self):
+        self.write_binary("evidence/artifacts/sample.pdf", b"%PDF-1.4\n%%EOF\n")
+        self.assert_invalid("PDF requires recorded review and provenance")
+
+    def test_unlisted_pdf_and_pdf_outside_allowed_roots_are_rejected(self):
+        self.write_binary("evidence/artifacts/sample.pdf", self.pdf_fixture(), hashed=False)
+        self.assert_invalid("PDF must be a hash-listed")
+        (self.root / "evidence/artifacts/sample.pdf").unlink()
+        self.add_reviewed_pdf("documents/sample.pdf")
+        self.assert_invalid("PDF must be a hash-listed")
+
+    def test_pdf_requires_provenance_review_digest_and_hashed_extraction(self):
+        record = self.add_reviewed_pdf()
+        review = dict(record["publication_review"])
+        for field in review:
+            with self.subTest(field=field):
+                record["publication_review"] = {key: value for key, value in review.items() if key != field}
+                self.save()
+                self.assert_invalid("publication_review")
+        record["publication_review"] = review
+        self.evidence["files"] = [item for item in self.evidence["files"] if item["path"] != review["text_extraction_path"]]
+        self.save()
+        self.assert_invalid("text_extraction_path must name hash-listed")
+
+    def test_pdf_extraction_hash_and_utf8_are_checked(self):
+        record = self.add_reviewed_pdf()
+        self.write(record["publication_review"]["text_extraction_path"], "Changed extraction")
+        self.assert_invalid("SHA-256 mismatch")
+        (self.root / record["publication_review"]["text_extraction_path"]).write_bytes(b"\xff\x00")
+        self.assert_invalid("cannot inspect as UTF-8")
+
+    def test_pdf_changed_bytes_need_a_new_review_even_after_rehashing(self):
+        record = self.add_reviewed_pdf()
+        updated = self.pdf_fixture(text=b"Changed PDF")
+        (self.root / record["path"]).write_bytes(updated)
+        record.update(sha256=hashlib.sha256(updated).hexdigest(), bytes=len(updated))
+        self.save()
+        self.assert_invalid("reviewed_sha256 must match PDF bytes")
+
+    def test_pdf_ignored_extraction_text_is_still_scanned(self):
+        self.init_git()
+        record = self.add_reviewed_pdf()
+        extraction = "project/.runtime/extracted.txt"
+        self.write_binary(extraction, ("hf" + "_" + "a" * 32).encode())
+        record["publication_review"]["text_extraction_path"] = extraction
+        self.save()
+        self.assert_invalid("extracted.txt: contains possible Hugging Face token")
+
+    def test_pdf_raw_metadata_and_extracted_compressed_text_are_scanned(self):
+        secret = ("hf" + "_" + "a" * 32).encode()
+        self.add_reviewed_pdf(raw=self.pdf_fixture(extra=b"% " + secret + b"\n"))
+        self.assert_invalid("Hugging Face token")
+        self.evidence["files"] = self.evidence["files"][:2]
+        self.add_reviewed_pdf(raw=self.pdf_fixture(text=secret), text=secret)
+        self.assert_invalid("sample.pdf.txt: contains possible Hugging Face token")
+
+    def test_pdf_fake_trailing_encrypted_incremental_and_bad_offset_are_rejected(self):
+        valid = self.pdf_fixture()
+        for raw in (b"not a PDF", valid + b"trailing", self.pdf_fixture(extra=b"% /Encrypt 5 0 R\n"),
+                    self.pdf_fixture(extra=b"% /Prev 1\n"), valid + b"\n%%EOF\n",
+                    valid.replace(b"startxref\n", b"startxref\n999999"),
+                    valid.replace(b"startxref\n", b"startxref\n" + b"9" * 5000)):
+            with self.subTest(size=len(raw)):
+                self.evidence["files"] = self.evidence["files"][:2]
+                self.add_reviewed_pdf(raw=raw)
+                self.assert_invalid("unsupported PDF framing")
 
 
 if __name__ == "__main__":
