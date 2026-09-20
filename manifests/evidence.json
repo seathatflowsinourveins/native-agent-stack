@@ -2006,8 +2006,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "d8b31b3d2489335143b6a673d46dbf97c1cf19773c6e2869bb90de57387edb33",
-      "bytes": 10385
+      "sha256": "3aba86df8e31d7b18a3ce15aff0eaefb638b737e777eac8c07b0528d27cd7654",
+      "bytes": 10415
     },
     {
       "path": "adoption/host-state.example.json",
@@ -2016,8 +2016,8 @@
     },
     {
       "path": "adoption/lifecycle.md",
-      "sha256": "61d99434f9ece9fa8ff47605a6575fffd3c7294756fdd14bdd5528f5ea9845e0",
-      "bytes": 15345
+      "sha256": "bb5e00a86aa25a414728c6f5a505492dc1a201b00c00045dd1f55b6670bced93",
+      "bytes": 15462
     },
     {
       "path": "adoption/manifest.json",
@@ -5052,8 +5052,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "2bb40bb95f2decd592397de4163469cfc90ba5356fd8713766168e6b88d5d7ca",
-      "bytes": 3701760
+      "sha256": "1bcd19649ce6832b47422a6456243316d4574a26799f04cb81820d561b58cfff",
+      "bytes": 3701969
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5062,7 +5062,7 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "c665e400970ef398343735588ebf6fa4b1fdfe63a312e96d466ac5b0a0e1be58",
+      "sha256": "ba9fc8e44ad4b89d39f0beaccab20b4234dc671126d39f12908dafddff8905ab",
       "bytes": 30149
     },
     {
@@ -5132,8 +5132,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "b0fdcfe5e6ef4814371f65bf92934c593e44529e5ccedf2334fceca6a046d254",
-      "bytes": 34172
+      "sha256": "6c1e46e47bcf73262efb9629cb20def96c3938cc24d57afa10941f14032faeab",
+      "bytes": 34232
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",

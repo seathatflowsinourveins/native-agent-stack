@@ -3,9 +3,11 @@
 Use the selected component's [native recipe](manifest.json), the current pin in
 [stack.json](../manifests/stack.json), and the stage record in the
 [component matrix](../blueprints/token-native-focus/saturation-audit.json).
-The matrix covers all 66 selected components; the 512-repository decision index
-also contains 446 alternatives or research identities. Installing every
-alternative is not a prerequisite for the selected workflow.
+The matrix covers every selected component. The broader
+[decision index](../catalogs/us-equities/decision-index.json) also contains
+alternatives and research identities. Current counts are generated in the
+[HTML catalog](../docs/ecosystem/index.html); installing every alternative is
+not a prerequisite for the selected workflow.
 
 An accepted stage means the linked dated operation passed within its stated
 scope. `observed_installed` means an executable or library was available; it does
