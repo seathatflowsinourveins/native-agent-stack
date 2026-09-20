@@ -1,0 +1,96 @@
+{
+  "accepted_claims": [
+    "Native TaskStop cancelled the child first wait; native SendMessage resumed that same child.",
+    "After owned runtime SIGKILL, the same parent session resumed and sent a message to the same child; no replacement Agent call occurred.",
+    "The child performed checkpoint,cancel-wait,crash-wait,finalize with exact frozen source and an unchanged checkpoint; one final effect exists.",
+    "After explicit identity-checked cleanup, both original wait identities were no longer alive and no process retained the fixture working directory."
+  ],
+  "child_model": "inherit",
+  "effort_requested": "ultracode",
+  "elapsed_seconds": 43.012,
+  "kind": "native_model_e2e",
+  "limitations": [
+    "One synthetic local fixture and one physical WSL host, not arbitrary application state.",
+    "Actual native child identities and paths remain private; hashes bind retained streams.",
+    "Native original runtime SIGKILL is a shared-process failure; task identity and effect continuation are distinct from process containment.",
+    "The updated runner parser is regression-tested offline; the one native attempt executed the separately retained source."
+  ],
+  "model": "claude-opus-5",
+  "native_child_spawns": 1,
+  "native_cli_invocations": 2,
+  "native_cli_version": "2.1.278",
+  "native_executable_hash_captured_after_attempt": true,
+  "native_executable_sha256": "5c4735937844e84f8a93306e841a5b0e12252909b07870f789b190468da147ab",
+  "outer_attempts": 1,
+  "private_evidence": {
+    "attempt.json": {
+      "bytes": 5153,
+      "sha256": "69e1d2fe530a5a8caf5422bf49abd8c3acbce3ed16cd44e68433ec61cfa4070c"
+    },
+    "commands-private.json": {
+      "bytes": 2485,
+      "sha256": "9f6bd92f4fb3ad52548b30ad78ee2032d9ae6f0cd410f636aadc5a3f4af98e49"
+    },
+    "freeze.json": {
+      "bytes": 727,
+      "sha256": "0089affc3c4bbfd5676b801113a1a02fae46bc5bcd2420f83007db9a2aa9b05e"
+    },
+    "initial.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "initial.stream.jsonl": {
+      "bytes": 68933,
+      "sha256": "5e19b6c8037e82e5b5ff1a716ccbeb2fbb5235ce7997562b068d55a61671e42d"
+    },
+    "native-help.txt": {
+      "bytes": 21401,
+      "sha256": "ae85d661e9c086f05637ebcd868f5702b477ff6e55e2e65b8ada7807cd51a4b6"
+    },
+    "native-identity.json": {
+      "bytes": 66,
+      "sha256": "06b8c81b35358afe7d88047c5447dafb5de96a9c81a9d4c3c61652a261192970"
+    },
+    "pre-crash-private.json": {
+      "bytes": 746,
+      "sha256": "e6dc93d6d0b7e1517fec1690a58e04e805df101aceecdaf761c0f25d9f6f6e27"
+    },
+    "resume-prompt-private.txt": {
+      "bytes": 541,
+      "sha256": "be003aade5da4764f1db010de98447f093019e30fa3b3fdd9ca30165f22cc0d3"
+    },
+    "resumed.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "resumed.stream.jsonl": {
+      "bytes": 80258,
+      "sha256": "78a6b4555fa022716655e7aedafc48c0a2c3517f30eae897f0ea8f6120938538"
+    }
+  },
+  "recorded_at_utc": "2026-09-20T18:42:46.825886+00:00",
+  "retained_recorder_failure": {
+    "audit": "independent-audit.json",
+    "executed_runner": "executed-runner.py.txt",
+    "model_rerun_after_correction": false,
+    "reason": "Original recorder assumed one init/result per CLI; resumed background-task delivery emitted three of each, all with the same session/model and success results.",
+    "source": "recorder-outcome.json",
+    "status": "failed"
+  },
+  "same_child_runs": 3,
+  "schema_version": 1,
+  "scope": "One actual native Claude background writing child on Linux/WSL; cancellation and same-child continuation after shared runtime SIGKILL, with explicit coordinator cleanup of its surviving owned wait.",
+  "status": "partial_acceptance",
+  "unaccepted_claims": [
+    "Automatic native crash descendant containment: the crash wait survived and needed supervisor SIGKILL.",
+    "Exact requested tool-only behavior: the child attempted an extra read-only ls/git-status command, which was refused.",
+    "Remote provider cancellation, billing cessation, independent child-process isolation, off-host recovery, power-loss durability and distributed exactly-once effects."
+  ],
+  "usage": {
+    "billing": null,
+    "complete_parent_child_retry_total": null,
+    "initial_terminal_missing_due_to_sigkill": true,
+    "native_views": "See independent-audit.json and recorder-outcome.json; repeated model views and task estimates are not additive.",
+    "savings_claim": null
+  }
+}

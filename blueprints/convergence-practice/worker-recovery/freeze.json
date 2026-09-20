@@ -1,0 +1,12 @@
+{
+  "at_utc": "2026-09-20T18:36:25.664495+00:00",
+  "sha256": {
+    "control.py": "e25f7758b5d374fea206b3b7936baa99e4ac5abeb9fd8aed2e83f1cae21006a7",
+    "input.json": "69741926414949ad09864359cb41523db6a94d093d5c44dc822982c8aab3ef2d",
+    "plan.json": "37dd427636fe5d9eef1dfbd5c9932d0343f2c8729962e9971a716f38bafb0b2e",
+    "prompt.txt": "a68ee7b3ce1bc73b4393b348d8e267ce34bee1337d2bc43c8b046df8f0e1811c",
+    "run.py": "7e3f40af6bd4be3996ffbee200e0c9ade2ce4eb142cde8ad8d0636ae28796a35",
+    "stage.py": "fdadd66e4b137940ee638c8e89747cfbf882241084cccb0a4e09b9c00d927214",
+    "test_oracle": "2761382a6b638eaa880463c94205404ef92920940868fbb33c5a9641af3176c6"
+  }
+}

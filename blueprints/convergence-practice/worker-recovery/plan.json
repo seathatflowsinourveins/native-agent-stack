@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "kind": "native_child_cancellation_crash_resume_plan",
+  "frozen_before_model_execution": true,
+  "public_base_commit": "10354bc0576165c617b6851e6760fe1dc9e54675",
+  "outer_attempts": 1,
+  "native_route": "Existing first-party Claude subscription; no sign-in changes or fallback",
+  "model": "claude-opus-5",
+  "effort": "ultracode",
+  "child_model": "inherit",
+  "parent_max_turns": 16,
+  "child_max_turns": 8,
+  "native_phase_deadline_seconds": 240,
+  "fixture": "One private Git fixture; child is sole writer of checkpoint, action journal and final effect. Parent control operations only observe.",
+  "sequence": ["one native Agent background child", "child checkpoint and pending cancel-wait", "native TaskStop", "same-child SendMessage", "child pending crash-wait", "supervisor SIGKILL of owned shared CLI process group", "same-parent CLI resume", "same-child SendMessage finalize"],
+  "acceptance": ["actual child delegation and same child identity", "cancelled owned wait stops", "second child wait unfinished at abrupt shared runtime failure", "same parent session and child continue", "checkpoint bytes and hash unchanged", "action journal exactly checkpoint,cancel-wait,crash-wait,finalize", "one final effect", "frozen input and code hashes unchanged", "owned processes stopped"],
+  "stop_conditions": ["quota or account refusal", "unsupported native child control", "permission refusal", "unexpected write or repeated effect", "deadline"],
+  "usage": "Retain native terminal/model/task views separately. SIGKILL can prevent a complete terminal ledger; unknown total stays unknown. No savings or billing claim.",
+  "limitations": ["Same physical WSL host and synthetic local writes", "Child agents share native CLI runtime; SIGKILL is shared-runtime failure, not an independently addressable child OS process", "Not remote provider cancellation, cost cessation, power loss or distributed exactly-once acceptance"],
+  "sources": ["https://code.claude.com/docs/en/sub-agents#resume-subagents", "https://code.claude.com/docs/en/cli-reference"]
+}
