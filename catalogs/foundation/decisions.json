@@ -624,16 +624,18 @@
       "evidence_ids": [
         "qmd-bm25-retrieval-20260919",
         "desktop-cli-workflows",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-catalog-retrieval-20260920"
       ],
-      "evidence_scope": "Native scoped QMD search/get passed; the fixed twelve-query benchmark returned the intended source in eight top-three results.",
+      "evidence_scope": "Native scoped QMD search/get passed; the fixed twelve-query benchmark returned the intended source in eight top-three results. The current-clone catalog repair returned both selected handbook sources first, with exact source bodies and independent configuration review.",
       "limitations": [
         "All four benchmark misses remain; exact source retrieval on a fixture does not establish arbitrary corpus recall.",
         "The selected BM25 lane needs no downloaded embedding model."
       ],
       "source_paths": [
         "blueprints/us-equities/retrieval-evaluation/README.md",
-        "docs/foundation-stack.md"
+        "docs/foundation-stack.md",
+        "docs/catalog-retrieval.md"
       ],
       "next_gap": "Evaluate positive and absent queries for a new corpus.",
       "lifecycle": {
@@ -2160,9 +2162,10 @@
       ],
       "candidate": null,
       "evidence_ids": [
-        "native-tavily-cli-20260920"
+        "native-tavily-cli-20260920",
+        "native-tavily-session-20260920"
       ],
-      "evidence_scope": "Upstream CLI0.1.8 installed and authenticated; live search returned four official sources and extraction returned one result with zero failures. Eight official skills were listed for both clients and discovered by fresh Codex probes for native and Desktop homes.",
+      "evidence_scope": "Upstream CLI0.1.8 installed and authenticated; live search returned four official sources and extraction returned one result with zero failures. Eight official skills were listed for both clients and discovered by fresh Codex probes for native and Desktop homes. A later current Desktop task received the eight skill entries and used the Search/Extract skills; the broad source-search miss and useful direct extraction are retained separately.",
       "limitations": [
         "Desktop-home discovery initially failed SQLite initialization and passed only with a temporary session-specific sqlite_home; the active Desktop registry was not hot-reloaded.",
         "Claude global skill listing and fresh Codex discovery do not prove actual model invocation of every skill. Map, Crawl and Research remain unqualified.",
@@ -2176,7 +2179,7 @@
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
         "scope": "Native install, Search/Extract and owned-probe cleanup are recorded; each stage retains its exact operation boundary.",
-        "unknown": "Independent key recovery, uninstall/reinstall and the active Desktop skill registry remain unverified.",
+        "unknown": "Independent key recovery and uninstall/reinstall remain unverified; current-task Search/Extract does not qualify all eight skills.",
         "stage_refs": [
           {
             "component_id": "tavily-cli",

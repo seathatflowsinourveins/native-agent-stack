@@ -16,8 +16,9 @@ system consent or an unresolved material decision, and continue independent work
 
 For a new machine or resumed ecosystem task, read `adoption/manifest.json` and
 `adoption/update.md` first; follow only the selected profile's native recipes.
-Component pins remain in `manifests/stack.json`; recorded limitations remain in
-`catalogs/us-equities/convergence-review.json`. Historical receipts are reference
+Component pins remain in `manifests/stack.json`; general foundation limitations
+remain in `catalogs/foundation/manifest.json`, and trading limitations in
+`catalogs/us-equities/runtime-target.json` and its linked domain receipts. Historical receipts are reference
 evidence, never a new host's passed status. Keep host paths and native sign-ins
 private, and use the nonmutating `scripts/adoption_status.py` for prerequisites.
 
@@ -57,7 +58,11 @@ For general engineering and ecosystem changes, start with
 `scripts/validate_convergence.py` with a scoped experiment record. Preserve failed
 attempts and unknown usage; the checker verifies declared consistency, not truth.
 
-The north star is US-equities research/backtesting followed by Alpaca paper.
+The north star is US-equities research and historical simulation with the selected
+NautilusTrader 2.0.0rc5/IBKR destination and a separate Alpaca adapter path, followed
+by independently qualified paper operation for each broker. Current selections
+are in `catalogs/us-equities/runtime-target.json`; dated LEAN/Alpaca receipts remain
+comparison evidence rather than overriding that destination.
 Read `catalogs/us-equities/README.md` for selection and `blueprints/us-equities/north-star.md`
 for boundaries; load only the layer needed for the current task. The native
 worker policy applies to workers launched by its example, not automatically to

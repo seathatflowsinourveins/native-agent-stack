@@ -658,7 +658,8 @@
         "token-practice-artifacts-20260920",
         "token-practice-coverage-20260920",
         "native-research-efficiency-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-catalog-retrieval-20260920"
       ],
       "upstream_sources": [
         "https://github.com/tobi/qmd/releases/tag/v2.8.3"
@@ -1663,7 +1664,8 @@
         "tvly extract \"$SELECTED_PUBLIC_URL\" --json"
       ],
       "evidence_ids": [
-        "native-tavily-cli-20260920"
+        "native-tavily-cli-20260920",
+        "native-tavily-session-20260920"
       ],
       "source_pin": null,
       "upstream_sources": [
@@ -1671,7 +1673,7 @@
         "https://pypi.org/project/tavily-cli/0.1.8/",
         "https://github.com/tavily-ai/skills"
       ],
-      "freshness": "Installed upstream CLI0.1.8 and eight skills on2026-09-20. Useful Search/Extract and fresh native discovery accepted; broader research and current Desktop registry remain separate."
+      "freshness": "Installed upstream CLI0.1.8 and eight skills on2026-09-20. Useful Search/Extract and fresh native discovery accepted; a later Desktop task received eight skill entries and used Search/Extract. Broader research operations remain unqualified."
     },
     {
       "id": "nautilus-trader",

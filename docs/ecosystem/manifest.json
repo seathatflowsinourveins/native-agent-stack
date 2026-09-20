@@ -441,6 +441,12 @@
       "body": "Observed Context Mode Agent-routing conflict, exact upstream source and unresolved restricted-role boundary. Normal native defaults remain intact.",
       "path": "docs/restricted-worker-compatibility.md",
       "category": "workers"
+    },
+    {
+      "title": "Retrieve the maintained catalogs",
+      "body": "Scoped native QMD registration, stale-checkout repair and exact-source retrieval for future sessions and PCs.",
+      "path": "docs/catalog-retrieval.md",
+      "category": "setup"
     }
   ],
   "highlights": [

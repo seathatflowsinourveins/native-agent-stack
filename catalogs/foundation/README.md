@@ -6,8 +6,8 @@ Start with the layer needed for the task in [manifest.json](manifest.json), then
 read its scoped capability decision in [decisions.json](decisions.json). A default
 is a selected way to do a task, not permission to install or activate every tool.
 
-The catalog references 61 selected components through 41 capability decisions. It cites 67 relevant registered
-receipts from the current 88-receipt inventory. These are coverage counts, not a
+The catalog references 61 selected components through 41 capability decisions. Its
+registered evidence references are listed per capability. These are coverage counts, not a
 score of complete installation, execution or lifecycle acceptance.
 
 | Layer | Purpose |
@@ -59,6 +59,9 @@ acceptance. Tavily has a [native CLI receipt](../../evidence/receipts/native-tav
 for upstream installation, Search/Extract and fresh eight-skill discovery. It retains
 the initial Desktop probe failure and temporary-state recovery; it does not claim
 that every skill ran in a model turn or that the current Desktop registry hot-reloaded.
+The later [current-task receipt](../../evidence/receipts/native-tavily-session-20260920.json)
+records eight host-supplied skill entries and actual Search/Extract skill use in
+the Desktop task, retaining a broad-search miss and useful direct extraction.
 
 The three current priorities are:
 
@@ -75,6 +78,8 @@ The three current priorities are:
 Use [the convergence guide](../../docs/convergence-architecture.md) for the work
 sequence and [the lifecycle guide](../../adoption/lifecycle.md) for selected native
 operations. Keep failed attempts, unknown usage and new-host limits intact.
+Use the [catalog retrieval recipe](../../docs/catalog-retrieval.md) to register the
+current clone's selected guidance in a named local index for future sessions.
 The newer vLLM startup failure, failed gateway inference/compression attempts,
 unverified live HUD and TOON expansion remain counterexamples, not successes.
 

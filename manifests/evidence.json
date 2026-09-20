@@ -1899,6 +1899,36 @@
         "Network namespace and available-interface observations are not measured counts of attempted external transports."
       ],
       "path": "evidence/receipts/native-nautilus-ci-20260920.json"
+    },
+    {
+      "id": "native-catalog-retrieval-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "qmd"
+      ],
+      "claim": "Repaired the named local catalog index to the maintained checkout, added two explicit handbook collections and retrieved both intended sources first with exact pinned-source bodies.",
+      "limitations": [
+        "This is a source-host index repair and two selected lexical queries, not arbitrary corpus recall or another PC acceptance.",
+        "The earlier twelve-query benchmark and its four misses remain separate and unchanged.",
+        "No embedding model was downloaded, no provider turn was run and no token-savings claim is made.",
+        "The public receipt omits personal filesystem paths; original command outputs and configuration backup remain private."
+      ],
+      "path": "evidence/receipts/native-catalog-retrieval-20260920.json"
+    },
+    {
+      "id": "native-tavily-session-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "tavily-cli"
+      ],
+      "claim": "The current Desktop task received eight Tavily skill entries, loaded the Search/Extract skills, ran both upstream commands and extracted the official IBKR adapter prerequisites.",
+      "limitations": [
+        "Host-supplied active-task skill discovery is distinct from the prior fresh native-process probes. Only Search and Extract were exercised in this task.",
+        "The broad search returned three official IBKR sources but missed the intended Nautilus adapter guide; direct known-URL extraction supplied the needed evidence.",
+        "Extracted current documentation is a source check, not an executed broker connection or version-pinned adapter behavior.",
+        "No provider usage, per-skill performance comparison or lifetime token-saving counter is claimed."
+      ],
+      "path": "evidence/receipts/native-tavily-session-20260920.json"
     }
   ],
   "files": [
@@ -1939,8 +1969,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "1027cebca227d24de79bf3ca22f01b2fcc36bd93f57ac77235510e8b19f447f3",
-      "bytes": 8616
+      "sha256": "be051bfc2c0419e624de2942f2a69b346157306c19cd8b12678fef75b33e2234",
+      "bytes": 9034
     },
     {
       "path": "CLAUDE.md",
@@ -5005,8 +5035,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "f03c5643f658e25d2b432ed6d484160a53b5b69ab0209353446a5d079f97ae14",
-      "bytes": 3682852
+      "sha256": "0f50b811b07db53e5094a29229c020f25bda5ab0ab75d38456eaef585ffa3da4",
+      "bytes": 3691295
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5015,8 +5045,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "01e99400f155c1cfcb402f5a0bb453607a0c465aab023cd9b44cdeb37e294c7c",
-      "bytes": 29889
+      "sha256": "a17ee1f18b1e0392b068a263499e6f07d8daa97615419a6f9490b111b885fef3",
+      "bytes": 30149
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -5520,8 +5550,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 74582,
-      "sha256": "d02b6e339b38a04713f71dbdb87709f1d29865f1a937728b6b0cb39b0a68a430"
+      "bytes": 74729,
+      "sha256": "c1fe97b9867bcfe926e6b27eb20121332e79b82fc2a77a1e50d0fbb8d71d7710"
     },
     {
       "path": "observability/README.md",
@@ -6005,13 +6035,13 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "42cfade7909b10c695fbce98b1dcc4b649d7edc5abcc80aeee0d71c41486e7ff",
-      "bytes": 6138
+      "sha256": "6398b7f71042faecead5117f3709809e42268c7a8324cf155268254572118fac",
+      "bytes": 6535
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "413e2fbc5d053a28219793b434f7a34ea65f8d23c36e4260c35ed1dd6bab7080",
-      "bytes": 95291
+      "sha256": "35228ef589e82d266d32a4903028c80debd8e591eb790d732e83587b377812ca",
+      "bytes": 95767
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -6035,8 +6065,8 @@
     },
     {
       "path": "recipes/tavily.md",
-      "sha256": "1cd29897af82114647214a6373a4d16188f530a8327cd0967fec29fd9de9daf0",
-      "bytes": 2690
+      "sha256": "f89a6ac377af1fc8ebdfd2482c749b79cf3fb7f9bcd7d33d5703ff8df275f8e8",
+      "bytes": 3617
     },
     {
       "path": "scripts/validate_foundation.py",
@@ -6237,6 +6267,21 @@
       "path": "docs/restricted-worker-compatibility.md",
       "sha256": "dadf3a3adc8bcc623d5e9ef431daa791d7648e79280a4763dcac634f3691a7dd",
       "bytes": 2367
+    },
+    {
+      "path": "docs/catalog-retrieval.md",
+      "sha256": "da565ea0f406e974cec85fa6242f9158683b50412eb3832dcd0a9220d692e5aa",
+      "bytes": 2827
+    },
+    {
+      "path": "evidence/receipts/native-catalog-retrieval-20260920.json",
+      "sha256": "eba4b2d11279f09de1d3481ee0c4890d233831ec6ac4c87ac5ec6c09e37550c8",
+      "bytes": 5071
+    },
+    {
+      "path": "evidence/receipts/native-tavily-session-20260920.json",
+      "sha256": "ab75fcf6ed4f5b7cbf9169b4da31c6476dd17e5960d390f39a898fb449cfe8ec",
+      "bytes": 5208
     }
   ],
   "convergence_records": [
