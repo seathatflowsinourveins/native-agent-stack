@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-20",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "88fe3804f123f8abf1a145e95d3df9b48087caef",
+  "source_revision": "8efc66cc76b99450fdfaecebc07a2a6eaff39b3e",
   "layers": [
     {
       "id": "agents",
@@ -234,6 +234,12 @@
       "body": "Native Claude features, scoped retrieval, memory update gates and local inference.",
       "path": "docs/ecosystem/source-review.json",
       "category": "agents"
+    },
+    {
+      "title": "Current catalyst convergence",
+      "body": "Lifecycle source proof, frozen daily/intraday protocol and native context comparison.",
+      "path": "blueprints/us-equities/catalyst-convergence/README.md",
+      "category": "research"
     }
   ],
   "highlights": [
@@ -264,6 +270,27 @@
       "status": "Dated standalone acceptance",
       "body": "The initial four-turn task stopped before tests. A revised standalone native Claude task completed 57 existing tests (exit 0), with no source product edits and complete worker cleanup. It reported 11 turns under a requested 12-turn bound. Effective effort remains unknown; delegation and whole-host acceptance are outside scope.",
       "path": "docs/ecosystem/legacy-worker-receipt.json"
+    },
+    {
+      "id": "native-context-comparison",
+      "title": "Eight native research invocations",
+      "status": "Bounded observed comparison",
+      "body": "Two Codex pairs passed the declared quality and output gates with15,411 and13,061 fewer observed tokens. Both Claude full-context answers violated the word cap; those pairs remain protocol-confounded. No causal or whole-session savings claim.",
+      "path": "blueprints/us-equities/research-efficiency/native-receipt.json"
+    },
+    {
+      "id": "lifecycle-proof",
+      "title": "Three documentary lifecycle claims",
+      "status": "Native offline acceptance",
+      "body": "Six complete source documents support rename, ticker reuse and suspension claims. Observation cutoffs preserve0/0/1/3 selections; historical universe and original revisions remain unknown.",
+      "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json"
+    },
+    {
+      "id": "catalyst-protocol",
+      "title": "Frozen daily and intraday research",
+      "status": "Synthetic mechanics accepted",
+      "body": "Candidate, timing, costs, labels and controls frozen before new outcome inspection. Native DuckDB cutoff and exact arithmetic proofs passed; empirical trading merit remains unmeasured.",
+      "path": "blueprints/us-equities/catalyst-experiment/receipt.json"
     }
   ],
   "annotations": [
