@@ -1,4 +1,10 @@
-# Architecture convergence and next roles — September 19, 2026
+# Architecture and next acceptance roles
+
+Current routing updated September 20, 2026. The September 19 source review and
+its native review receipts remain dated evidence below. The [runtime target](../../../catalogs/us-equities/runtime-target.json)
+selects **NautilusTrader 2.0.0rc5 with native IBKR integration and a separate
+Alpaca adapter**; the [acceptance plan](../engine-nautilus/acceptance-plan.md)
+specifies retained equity replay, deterministic failure cases and each paper gate.
 
 The subsequent [native acceptance wave](../acceptance-wave/README.md) supplies
 LEAN cost sensitivity, a synthetic temporal-data contract and a strict offline
@@ -7,8 +13,8 @@ including historical +200% movers. Remaining numeric, data and broker gates are
 recorded separately from those completed offline checks.
 
 The selected foundation is a **personal research and simulation system**, with
-Alpaca paper integration as a subsequent acceptance milestone. Its design uses
-models for bounded research and review, and deterministic services for data,
+independent IBKR and Alpaca paper integration as subsequent acceptance milestones.
+Its design uses models for bounded research and review, and deterministic services for data,
 simulation, risk and order state. The [decision index](../../../catalogs/us-equities/decision-index.json)
 records the repository union; [research sources](../../../catalogs/us-equities/architecture/README.md)
 record what this wave actually examined. A catalog entry is not an installation.
@@ -41,9 +47,10 @@ Separate writing worktrees and one integrating coordinator remain the practice.
 | Workflow ownership | Dagu for the accepted manual local workflow | DeerFlow 2.0 is optional research composition and already uses LangGraph; Temporal/Restate need a demonstrated durability/scale requirement. No overlapping scheduler ownership. |
 | Routing | Native direct clients by default; existing OmniRoute only for explicitly selected routes | Verify provider identity, access terms, request/usage accounting and failure behavior per route. A route is not a substitute for model entitlement. |
 | Historical data | Versioned raw inputs, Parquet, DuckDB and an explicit exchange calendar | Alpaca or another entitled point-in-time source; SQLMesh/OpenLineage/Marquez only for demonstrated transformation/lineage needs. Neither format nor lineage alone proves time correctness. |
-| Research and simulation | Accepted LEAN baseline; deterministic experiment ledger | NautilusTrader, HftBacktest, vectorbt, backtesting.py, Qlib and other challengers have distinct roles and limitations in the trading review. No wholesale engine swap is justified by popularity. |
+| Research and simulation | Selected NautilusTrader 2.0.0rc5; deterministic experiment ledger; retained LEAN comparison | Synthetic EUR/USD engine replay accepted; retained SPY equity parity still requires conversion, timing, costs and corporate-action acceptance. Other analysis engines remain scoped alternatives. |
 | Portfolio/statistics | Explicit constraints and dependence-aware validation; selected reports | Evaluate skfolio/QuantStats where they add a required calculation. Reports and a bootstrap function do not validate a strategy by themselves. |
-| Alpaca boundary | Current alpaca-py for observed basic SDK compatibility; future reviewed adapter | Elite DMA/VWAP/TWAP serialization is **not accepted**. LEAN adapter initialization/entitlement and actual account support remain separate. |
+| IBKR boundary | Native Nautilus socket adapter with signed-in TWS or IB Gateway | Account, market-data permissions, unique client ID, risk and reconnect/order-state acceptance remain open. |
+| Alpaca boundary | alpaca-py 0.44.0 for dated read-only data acceptance; separate deterministic execution adapter | Current account/Elite permissions and order execution remain open. Advanced instructions serialization is **not accepted**; the historical LEAN adapter has its own QuantConnect entitlement requirement. |
 | Observability and recovery | Native OTel Collector, Prometheus, Loki; gitleaks, Syft and Restic | Off-host backup/key recovery, external alerts and unattended failover remain gates. Add governance services only when their operational value exceeds their cost. |
 
 ```mermaid
@@ -54,16 +61,34 @@ flowchart LR
   M[Scoped memory and RAG] --> P
   P --> W[Native research and critic workers]
   W --> H[Reviewed hypothesis and versioned code]
-  H --> B[LEAN and execution sensitivity]
+  H --> B[Nautilus replay and execution sensitivity]
+  C[Retained LEAN comparison] --> B
   B --> E[Held-out evaluation and trial ledger]
   E -. acceptance gates .-> X[Deterministic risk and order service]
-  X -. separate authorization .-> A[Alpaca paper]
+  X -. separate acceptance and authorization .-> I[IBKR paper]
+  X -. separate acceptance and authorization .-> A[Alpaca paper]
   E --> L[Reviewed lessons]
   L --> M
 ```
 
 This is the selected boundary, not a claim that the future execution service or
 all arrows are implemented. Dagu currently hosts manual local research runs.
+
+## Broker boundaries
+
+The [native IBKR documentation](https://nautilustrader.io/docs/latest/integrations/interactive_brokers/)
+requires a running, signed-in TWS or IB Gateway with socket API access. Paper
+defaults differ: TWS `7497`, Gateway `4002`; the adapter defaults to
+`127.0.0.1:4002`. Configure the intended paper application explicitly and use a
+unique client ID. Market-data subscriptions and reconnect/order reconciliation
+need actual broker-specific evidence. No IBKR sign-in or paper run is recorded.
+The acceptance plan checks version-pinned API names before any connection.
+
+Alpaca's dated [authenticated read-only acquisition](../authenticated-data/README.md)
+and [identity continuation](../identity-readiness/README.md) establish bounded
+access at their observation times. They do not establish current account
+permissions, Elite activation, real-time feeds, paper fills or live execution.
+There is no official Nautilus Alpaca adapter in the reviewed integration list.
 
 ## Alpaca constraints that change the design
 

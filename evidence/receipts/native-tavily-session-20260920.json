@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "id": "native-tavily-session-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "tavily-cli"
+  ],
+  "claim": "The current Desktop task received eight Tavily skill entries, loaded the Search/Extract skills, ran both upstream commands and extracted the official IBKR adapter prerequisites.",
+  "limitations": [
+    "Host-supplied active-task skill discovery is distinct from the prior fresh native-process probes. Only Search and Extract were exercised in this task.",
+    "The broad search returned three official IBKR sources but missed the intended Nautilus adapter guide; direct known-URL extraction supplied the needed evidence.",
+    "Extracted current documentation is a source check, not an executed broker connection or version-pinned adapter behavior.",
+    "No provider usage, per-skill performance comparison or lifetime token-saving counter is claimed."
+  ],
+  "recorded_at": "2026-09-20",
+  "runtime": "Current Codex Desktop task using the existing native Linux CLI credential; no sign-in or global model/permission change.",
+  "upstream_cli_version": "0.1.8",
+  "host_skill_catalog_observation": {
+    "source": "Host-supplied available-skills catalog at this goal continuation",
+    "entries": [
+      {
+        "name": "tavily-best-practices",
+        "installed_source_sha256": "8972384d52e22c76b82928c309f8faff3bfa2f68c4e4d7ad3ce1fd882d99048e"
+      },
+      {
+        "name": "tavily-cli",
+        "installed_source_sha256": "f7b8f34b9059f0bce6c2b15b72efa3b8f5d8780799a5d70db3e93f06aa3b8556"
+      },
+      {
+        "name": "tavily-crawl",
+        "installed_source_sha256": "7384255f8e8916234b78a68070a969ab54c49fd47e5eca09afc059f20b7f9f3b"
+      },
+      {
+        "name": "tavily-dynamic-search",
+        "installed_source_sha256": "3c443efacd86d35a912de1908915c0528f66238ca262d72216e73f5758e43876"
+      },
+      {
+        "name": "tavily-extract",
+        "installed_source_sha256": "18964691b572d7857ab854a6a2b7bd0bc8ff068c83310395afbc17ae207e1316"
+      },
+      {
+        "name": "tavily-map",
+        "installed_source_sha256": "ecab50751a7186e092c1e8d7bdaebe6381e00505f3ae6ee8d4a879a3ec45fc54"
+      },
+      {
+        "name": "tavily-research",
+        "installed_source_sha256": "d62b2b1ba9804ec077c2e79f6433a3e60deb02a845d6481ac4b47d3961452970"
+      },
+      {
+        "name": "tavily-search",
+        "installed_source_sha256": "be3974d5763cc02d6c178fa32466767ec3ba2f4ce48ab1a7e9d926c02d6461fa"
+      }
+    ],
+    "loaded_and_used": [
+      "tavily-search",
+      "tavily-extract"
+    ],
+    "boundary": "Observed in the current agent context; not a claim that all eight capabilities ran."
+  },
+  "search": {
+    "command": "tvly search 'NautilusTrader Interactive Brokers paper trading TWS Gateway account connection clientId' --depth basic --max-results 3 --include-domains nautilustrader.io,ibkrcampus.com --json --output \"$PRIVATE_OUTPUT/tavily-paper-sources.json\"",
+    "sanitization": "Only the local output-directory path is replaced by a placeholder.",
+    "exit_code": 0,
+    "raw_result_bytes": 5237,
+    "raw_result_sha256": "b2bda88f71a0b3aba0ff3d356228696bc3b489c88681c672fd485c458ed93274",
+    "returned_results": [
+      {
+        "title": "Available Integrations | Interactive Brokers | Documentation",
+        "url": "https://ibkrcampus.com/docs/third-party-integrations/available-integrations",
+        "score": 0.27617094
+      },
+      {
+        "title": "Trading Web API | IBKR API | IBKR Campus",
+        "url": "https://ibkrcampus.com/campus/ibkr-api-page/web-api-trading",
+        "score": 0.14418527
+      },
+      {
+        "title": "Retrieving Historical Data from IBKR | IBKR Quant",
+        "url": "https://ibkrcampus.com/campus/ibkr-quant-news/retrieving-historical-data-from-ibkr",
+        "score": 0.12670976
+      }
+    ],
+    "intended_adapter_guide_found": false
+  },
+  "extract": {
+    "command": "tvly extract https://nautilustrader.io/docs/latest/integrations/interactive_brokers/ --extract-depth basic --query 'Paper trading TWS IB Gateway paper account port 7497 4002 client_id read only API market data permissions' --chunks-per-source 3 --timeout 30 --json --output \"$PRIVATE_OUTPUT/tavily-ibkr-extract.json\"",
+    "sanitization": "Only the local output-directory path is replaced by a placeholder.",
+    "exit_code": 0,
+    "results": 1,
+    "failed_results": [],
+    "raw_result_bytes": 2344,
+    "raw_result_sha256": "e160752611ceb55e5a40c7820df2dee239ba40af3c83288438daa6f275d9f932",
+    "returned_url": "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/",
+    "returned_title": "Interactive Brokers | NautilusTrader",
+    "returned_content_sha256": "930802f30cbd38b350fb671c1f6b85e95a97ebc1454e8041b1493fe0b060d463",
+    "source_findings": [
+      "Start signed-in TWS or IB Gateway with socket API access enabled.",
+      "Paper defaults: TWS7497 and IB Gateway4002; the adapter defaults to127.0.0.1:4002.",
+      "Use a client ID not already in use and verify the required market-data subscriptions.",
+      "Delayed market data is an explicit choice when acceptable, not proof of a real-time entitlement."
+    ]
+  },
+  "native_lifetime_tokens_saved": null
+}

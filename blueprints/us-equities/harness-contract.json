@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-09-19",
-  "target": "US-equities research/backtesting, then Alpaca paper",
+  "checked_at": "2026-09-20",
+  "target": "US-equities research and NautilusTrader 2.0.0rc5 replay, then independently accepted IBKR and Alpaca paper",
   "current_mode": "on_demand_research_and_local_backtest",
   "worker_entrypoint": "blueprints/us-equities/workers/native_worker.py",
   "worker_policy": "blueprints/us-equities/workers/policy.md",
@@ -17,19 +17,21 @@
     "One real embedded DeerFlow ACP-to-native-Astra research invocation, with actual ACP workspaceWrite approval preset disclosed",
     "Patched LEAN backtest and native source-integrated Alpaca library compilation; no brokerage initialization",
     "Dagu manual research DAG, authenticated local history server, failure/cancellation and completed-history persistence across restart",
-    "One exact Astra Responses text task through existing OmniRoute; failed attempts and usage uncertainty retained"
+    "One exact Astra Responses text task through existing OmniRoute; failed attempts and usage uncertainty retained",
+    "Pinned NautilusTrader 2.0.0rc5 unchanged synthetic EUR/USD quickstart, two isolated economic replays locally and on fresh hosted Linux; no equity or broker acceptance",
+    "Dated authenticated Alpaca read-only AAPL bars/actions and FB/META identity observations; current account/Elite/real-time entitlements remain unestablished"
   ],
   "not_implemented": [
     "Host-enforced removal of all inherited secrets and remote MCP capabilities",
     "Provider spending cap or independently attested per-request model route",
     "Durable worker queue, retries and full-process cancellation guarantees",
-    "Alpaca account/data/broker adapter acceptance",
+    "Retained equity replay and independent LEAN/Nautilus economic comparison; current IBKR sign-in, broker-specific paper execution and current Alpaca/IBKR entitlements",
     "Financial point-in-time ingestion or validated trading strategy",
     "Persistent order journal, deterministic risk checks, broker reconciliation and kill switch",
     "Unattended trading hosting, operational alerts and in-flight/broker recovery acceptance",
     "Native hook/tool/compaction parity and provider-budget enforcement through OmniRoute"
   ],
-  "broker_authority": "No broker keys or order tools supplied to the recorded research worker; no orders submitted.",
+  "broker_authority": "Recorded research workers receive no broker keys or order tools. Dated Alpaca authentication/data reads do not authorize orders; IBKR and Alpaca paper procedures require separately scoped execution authorization. No broker orders are established by this contract.",
   "future_sessions": "Installed native tools and project instructions persist. New tool registrations require normal client discovery/reload; other projects need deliberate scoped adoption. No blanket all-project hook or service deployment is implied. The Dagu user service is enabled for future local user-service sessions; it schedules no work and requires no conversation restart.",
   "evidence_refs": [
     "blueprints/us-equities/workers/receipt.json",
@@ -40,6 +42,14 @@
     "blueprints/us-equities/deerflow/research-receipt.json",
     "blueprints/us-equities/engine/resolution-receipt.json",
     "blueprints/us-equities/hosting/receipt.json",
-    "blueprints/us-equities/routing/astra-receipt.json"
-  ]
+    "blueprints/us-equities/routing/astra-receipt.json",
+    "evidence/receipts/native-nautilus-v2-20260920.json",
+    "evidence/receipts/native-nautilus-ci-20260920.json",
+    "blueprints/us-equities/historical-simulation/receipt.json",
+    "blueprints/us-equities/authenticated-data/native-receipt.json",
+    "blueprints/us-equities/identity-readiness/native-receipt.json"
+  ],
+  "runtime_target": "catalogs/us-equities/runtime-target.json",
+  "acceptance_plan": "blueprints/us-equities/engine-nautilus/acceptance-plan.md",
+  "historical_comparison": "LEAN source-build and retained SPY simulation; no cross-engine or broker parity inferred"
 }

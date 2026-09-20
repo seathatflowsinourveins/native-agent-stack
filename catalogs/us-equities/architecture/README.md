@@ -1,5 +1,11 @@
 # Source-reviewed architecture wave — September 19, 2026
 
+Current routing is maintained in the [runtime target](../runtime-target.json) and
+[execution acceptance plan](../../../blueprints/us-equities/engine-nautilus/acceptance-plan.md):
+NautilusTrader 2.0.0rc5 is selected, with native IBKR integration and a separate
+Alpaca adapter. LEAN remains the accepted historical comparison. This dated review
+preserves its original findings; it does not establish equity/paper acceptance.
+
 This wave refreshes public-star coverage, inspects current primary source, and
 tests the selected architecture with native model critics and an offline SDK
 probe. It does not identify a timeless, exhaustive or universally highest-quality

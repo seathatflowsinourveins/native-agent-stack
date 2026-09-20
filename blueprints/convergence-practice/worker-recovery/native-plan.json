@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "kind": "native_inherited_tool_child_cgroup_qualification",
+  "base_commit": "1445d1b19e1143e0cdb93d4f682448bccbf7822c",
+  "frozen_before_model_execution": true,
+  "changed_input": "Replace the experimental Bash-only child/tool surface and blanket MCP denial with supported native tool inheritance, additive fixture read/discovery approvals and an existing-program task contract. Keep every installed hook active.",
+  "contract_paths": ["native-role.json", "native-prompt.txt"],
+  "preserved_inputs": ["stage.py/control.py/input.json and exact effect oracle", "claude-opus-5 ultracode; child model inherit", "existing native account/global permissions/plugins/hooks", "dontAsk invocation policy and no failure retry", "owned transient systemd service properties and main-only SIGKILL"],
+  "preconditions": ["offline effect/protocol checks pass", "existing deterministic cgroup proof remains valid for unchanged service.py", "fresh no-model first-party account readiness", "freeze prompt/profile/runner/audit/test sources and complete fixture inventory before invocation"],
+  "outer_native_attempts": 1,
+  "maximum_native_cli_invocations": 2,
+  "native_phase_deadline_seconds": 240,
+  "acceptance": ["one native Agent child", "TaskStop followed by SendMessage to same child", "actual pending crash wait in owned service cgroup", "deliberate kill targets only owned MainPID", "systemd stops every cgroup member without direct wait PID cleanup", "native resume uses same parent and same child", "checkpoint unchanged and exact four-action journal with one final effect", "all original frozen fixture source hashes and full pre/post inventories inspected", "no native restart or remaining owned process/cgroup", "record actual effective tool pool and every tool call, including unexpected/refused operations"],
+  "stop_conditions": ["native quota or permission refusal", "unsupported native lifecycle operation", "fixture/source/effect/identity mismatch", "phase deadline or failed containment"],
+  "scope": "One same-host synthetic local-writing task. Native tool inheritance is compatibility, not an OS sandbox; allowedTools adds approvals to existing policy rather than exclusively limiting available capabilities.",
+  "usage": "SIGKILL can prevent initial terminal accounting. Retain separate native terminal/model/task views; complete aggregate, billing and savings remain unknown.",
+  "retained_prior_evidence": ["original explicit-cleanup partial acceptance", "original recorder false-negative", "setsid deterministic containment proof", "failed restricted-child systemd trial and upstream Context Mode incompatibility"],
+  "limitations": ["not host/user-manager crash, remote provider cancellation, cessation of billing, off-host restoration or distributed exactly-once effects", "passing inherited role does not qualify the restricted Bash-only role"],
+  "upstream_sources": ["https://code.claude.com/docs/en/sub-agents#available-tools", "https://code.claude.com/docs/en/sub-agents#permission-modes", "https://github.com/mksglu/context-mode/blob/589d8214d56740a28b5f7bf63167743d586b0b40/hooks/core/routing.mjs#L892-L915"]
+}

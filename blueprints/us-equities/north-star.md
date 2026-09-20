@@ -1,7 +1,7 @@
 # North star: evidence-led US-equities automation
 
 The selected destination is reproducible research and simulation leading to
-observable, recoverable **IBKR and Alpaca paper** runtimes. The requested engine
+observable, recoverable **IBKR and Alpaca paper** runtimes. The selected engine
 target is **NautilusTrader 2.0.0rc5**. Its IBKR integration and the separate Alpaca
 execution boundary need their own acceptance. LEAN remains an accepted historical
 comparison engine; its results do not establish Nautilus or broker parity.
@@ -11,7 +11,10 @@ This is not a deployed broker service or a validated profitable strategy.
 
 The current [architecture and next-role contract](architecture/README.md) records
 the latest research wave, official Alpaca limits, native SDK compatibility gap,
-simulation realism requirements and platform-specific acceptance.
+simulation realism requirements and platform-specific acceptance. The
+[execution acceptance plan](engine-nautilus/acceptance-plan.md) binds the next
+equity replay to retained SPY inputs and defines offline failure and separate
+broker paper gates; those planned stages have not run.
 
 ## A coherent default
 
@@ -25,7 +28,7 @@ simulation realism requirements and platform-specific acceptance.
 | Optional research orchestration | DeerFlow stable 2.0 reference; pinned development backend/ACP exploration | Embedded native ACP inference proved; full planner/UI hosting pending |
 | Market/filing ingestion | Alpaca SDK plus SEC-sourced filings; alternative commercial feeds only with entitlement | Bounded authenticated AAPL SIP bars/actions and FB/META identity observations accepted; current Elite routing/throughput and a point-in-time market-wide corpus remain unverified |
 | Research data | Immutable raw snapshots, Parquet and DuckDB; exchange calendars | Native sample-event pipeline proved |
-| Engine | Requested NautilusTrader 2.0.0rc5; retain LEAN as the historical comparison | Exact prerelease verified; each engine's native execution and data-equivalence results require separate receipts |
+| Engine | Selected NautilusTrader 2.0.0rc5; retain LEAN as the historical comparison | Unchanged synthetic EUR/USD replay accepted locally and on fresh hosted Linux; retained SPY equity parity remains open |
 | Broker adapters | Native Nautilus IBKR adapter; Alpaca through a separately validated deterministic adapter | Upstream Nautilus integration list has no Alpaca adapter; socket/API availability is not broker execution acceptance |
 | Strategy research | Simple lagged baselines, then selected Qlib/statistical/portfolio tools | Catalogued; no strategy accepted or performance asserted |
 | Execution state | Separate deterministic order writer, durable journal and broker reconciliation | Design requirement, not implemented |
@@ -96,7 +99,12 @@ benchmarks and a no-trade case. LLM sentiment, RL rewards, forecast error and a
 backtest Sharpe alone do not demonstrate deployable alpha. See the
 [strategy/engine catalog](../../catalogs/us-equities/engines-strategies.md).
 
-The completed LEAN sample proves an engine/data path: 3,943 data points and three
+The [Nautilus receipt](engine-nautilus/README.md) establishes synthetic engine
+repeatability only. The [six retained SPY scenarios](historical-simulation/README.md)
+provide the next comparison fixture, with explicit cash/dividend and margin-model
+limits. Neither is a catalyst-strategy or broker acceptance.
+
+The earlier completed LEAN sample proves an engine/data path: 3,943 data points and three
 simulated orders. Its 2013 sample is not a contemporary strategy evaluation.
 The original build's seven advisory/package pairs were resolved in the
 [pinned local patch](engine/resolution.md); standing trading deployment still needs

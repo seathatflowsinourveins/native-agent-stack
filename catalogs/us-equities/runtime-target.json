@@ -5,6 +5,7 @@
   "scope": "User-selected destination and current primary-source capability boundaries. Installation and broker acceptance are recorded separately.",
   "foundation_catalog": "catalogs/foundation/manifest.json",
   "north_star": "blueprints/us-equities/north-star.md",
+  "acceptance_plan": "blueprints/us-equities/engine-nautilus/acceptance-plan.md",
   "engine": {
     "repository": "https://github.com/nautechsystems/nautilus_trader",
     "requested_version": "2.0.0rc5",
@@ -81,6 +82,7 @@
     }
   ],
   "accepted_reference_paths": [
+    "evidence/receipts/native-nautilus-v2-20260920.json",
     "blueprints/us-equities/historical-simulation/receipt.json",
     "blueprints/us-equities/authenticated-data/native-receipt.json",
     "blueprints/us-equities/identity-readiness/native-receipt.json",
@@ -89,20 +91,19 @@
   ],
   "next_acceptance": [
     {
-      "id": "pinned-engine-fixture",
-      "scope": "Exact upstream seed42 synthetic EURUSD quickstart in an isolated environment; useful reports and repeatability; no broker credentials or network"
-    },
-    {
       "id": "retained-equity-replay",
-      "scope": "Reviewed converter for existing hashed equity fixture; compare orders, fills and cash with accepted LEAN baseline"
+      "status": "planned_not_executed",
+      "scope": "Acceptance plan sections 1–3: freeze the retained SPY inputs and mappings, then reproduce the one_zero orders, fills, dividend events and every cash transition against the dated LEAN oracle before extending the six-case matrix."
     },
     {
       "id": "broker-state-failures",
-      "scope": "Offline ambiguous submission, duplicate intent, partial fill, cancel race, stale input and restart reconciliation"
+      "status": "planned_not_executed",
+      "scope": "Acceptance plan section 4: ten deterministic offline failure cases require explicit outcomes for ambiguous submission, duplicate intent, partial fills, cancel races, stale inputs, disconnect/restart and ledger reconciliation."
     },
     {
       "id": "separate-paper-adapters",
-      "scope": "Broker-specific operational acceptance after native sign-in and explicit risk/account scope; no inferred live-trading authority"
+      "status": "planned_not_executed",
+      "scope": "Acceptance plan sections 5–6: separate IBKR and Alpaca readiness, read-only checks, risk-scoped paper procedures and reconciliation criteria. Dated Alpaca data authentication does not establish current entitlement or broker execution."
     }
   ],
   "limitations": [

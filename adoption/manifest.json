@@ -341,7 +341,6 @@
       "blueprints/us-equities/catalyst-convergence/README.md"
     ],
     "next_action_refs": [
-      "worker-cancellation-crash-resume",
       "offhost-keys-and-service-reboot"
     ],
     "public_state_is_reference_only": true,

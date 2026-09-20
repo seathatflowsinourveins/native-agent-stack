@@ -7,7 +7,6 @@ import importlib.util
 import json
 import os
 from pathlib import Path
-import re
 import shutil
 import signal
 import subprocess
@@ -44,21 +43,10 @@ def inventory(root):
     return result
 
 
-def exact_read_rule(workspace):
-    path=str(Path(workspace).resolve())
-    if re.fullmatch(r'/[A-Za-z0-9_./-]+',path) is None:
-        raise ValueError('exact_read_rule_requires_literal_owned_path')
-    return 'Bash(rtk ls -la '+path+')'
-
-
-def native_contract(profile,workspace=None):
-    if profile in ('native-inherited','native-inherited-exact-read'):
+def native_contract(profile):
+    if profile=='native-inherited':
         config=json.loads((HERE/'native-role.json').read_text())
-        approvals=config['additional_allowed_tools']
-        if profile=='native-inherited-exact-read':
-            if workspace is None:raise ValueError('owned_fixture_required_for_exact_read_rule')
-            approvals=approvals+[exact_read_rule(workspace)]
-        return config['agent'],approvals,['--tools','default'],'native-prompt.txt'
+        return config['agent'],config['additional_allowed_tools'],['--tools','default'],'native-prompt.txt'
     agent={'foundation-recovery-worker':{'description':'Only the owned child recovery fixture; execute exact stage commands.','prompt':'You are the sole writing worker for this owned recovery fixture. Execute only the exact python3 stage.py action requested by your parent. Never repeat checkpoint/finalize, modify inputs, delegate, access accounts or change settings. Cancellation and interruption are planned test stages; continue only when parent explicitly resumes you.','tools':['Bash'],'model':'inherit','maxTurns':8}}
     return agent,[],['--tools','Bash,Agent,SendMessage,TaskStop,TaskOutput','--disallowedTools','mcp__*'],'prompt.txt'
 
@@ -133,14 +121,13 @@ def run(args):
     if readiness.get('loggedIn') is not True or readiness.get('apiProvider')!='firstParty':raise RuntimeError('native_account_not_ready')
     (root/'native-help.txt').write_text(subprocess.check_output([str(executable),'--help'],text=True))
     session=str(uuid.uuid4()); write(root/'native-identity.json',{'parent_session_id':session})
-    agent,additional_allowed,surface,prompt_name=native_contract(args.profile,workspace)
+    agent,additional_allowed,surface,prompt_name=native_contract(args.profile)
     common=[str(executable),'-p','--model','claude-opus-5','--effort','ultracode','--max-turns','16','--output-format','stream-json','--verbose',*surface,'--allowedTools','Agent(foundation-recovery-worker)','SendMessage','TaskStop','TaskOutput','Bash(python3 stage.py *)','Bash(python3 control.py *)',*additional_allowed,'--permission-mode','dontAsk','--permission-prompts','none','--agents',json.dumps(agent)]
     units={phase:'foundation-recovery-'+uuid.uuid4().hex[:12]+'-'+phase for phase in ('initial','resumed')} if args.supervision=='systemd' else {}
     native_initial=common+['--session-id',session]
     commands={'initial':service.service_command(units['initial'],native_initial) if units else native_initial}
     sources=['stage.py','control.py','input.json',prompt_name,'run.py']+(['systemd-plan.json','service.py'] if units else ['plan.json'])
-    if args.profile.startswith('native-inherited'):sources+=['native-role.json','native-plan.json','native_audit.py']
-    if args.profile=='native-inherited-exact-read':sources+=['native-exact-read-plan.json']
+    if args.profile=='native-inherited':sources+=['native-role.json','native-plan.json','native_audit.py']
     frozen={name:sha(HERE/name) for name in sources}
     frozen['test_oracle']=sha(HERE.parents[2]/'tests/test_worker_recovery.py')
     frozen_sources=root/'frozen-sources';frozen_sources.mkdir()
@@ -244,5 +231,5 @@ def run(args):
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--run-dir',required=True);p.add_argument('--claude',default='claude');p.add_argument('--timeout',type=int,default=240)
     p.add_argument('--supervision',choices=['process-group','systemd'],default='process-group')
-    p.add_argument('--profile',choices=['restricted','native-inherited','native-inherited-exact-read'],default='restricted')
+    p.add_argument('--profile',choices=['restricted','native-inherited'],default='restricted')
     raise SystemExit(run(p.parse_args()))

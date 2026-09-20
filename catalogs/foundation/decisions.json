@@ -250,7 +250,7 @@
       "source_paths": [
         "blueprints/convergence-practice/native-worker/README.md"
       ],
-      "next_gap": "Exercise abrupt worker failure and effect-aware same-task resume.",
+      "next_gap": "Use the separately recorded native-child-interruption-recovery decision for its accepted inherited-role fixture; qualify a different task or effect before extending that claim.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
         "scope": "Only the listed canonical stages and their original host/operation scopes apply. One foreground native Opus child repaired the owned file; twelve frozen tests and independent exhaustive checks passed.",
@@ -624,16 +624,18 @@
       "evidence_ids": [
         "qmd-bm25-retrieval-20260919",
         "desktop-cli-workflows",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-catalog-retrieval-20260920"
       ],
-      "evidence_scope": "Native scoped QMD search/get passed; the fixed twelve-query benchmark returned the intended source in eight top-three results.",
+      "evidence_scope": "Native scoped QMD search/get passed; the fixed twelve-query benchmark returned the intended source in eight top-three results. The current-clone catalog repair returned both selected handbook sources first, with exact source bodies and independent configuration review.",
       "limitations": [
         "All four benchmark misses remain; exact source retrieval on a fixture does not establish arbitrary corpus recall.",
         "The selected BM25 lane needs no downloaded embedding model."
       ],
       "source_paths": [
         "blueprints/us-equities/retrieval-evaluation/README.md",
-        "docs/foundation-stack.md"
+        "docs/foundation-stack.md",
+        "docs/catalog-retrieval.md"
       ],
       "next_gap": "Evaluate positive and absent queries for a new corpus.",
       "lifecycle": {
@@ -1431,7 +1433,7 @@
         "native-worker-supervision-20260919",
         "native-worker-containment-20260920"
       ],
-      "evidence_scope": "The Linux user manager terminated a TERM-ignoring parent and descendants, retained timeout failure, and accepted a separate fresh run. A separate upstream user-service fixture also contained a TERM-ignoring setsid descendant after MainPID crash; the combined native child trial was refused before effects and remains unaccepted.",
+      "evidence_scope": "The Linux user manager terminated a TERM-ignoring parent and descendants, retained timeout failure, and accepted a separate fresh run. A separate upstream user-service fixture also contained a TERM-ignoring setsid descendant after MainPID crash. The earlier combined restricted-role trial remains refused; the native-child-interruption-recovery decision separately records the later accepted inherited-role result.",
       "limitations": [
         "Local process termination does not prove remote provider cancellation, spending caps or exactly-once effects."
       ],
@@ -1439,7 +1441,7 @@
         "blueprints/us-equities/worker-supervision/README.md",
         "blueprints/convergence-practice/worker-recovery/README.md"
       ],
-      "next_gap": "Test worker cancellation and reconcile external effects before any relaunch.",
+      "next_gap": "The separate native-child-interruption-recovery decision covers one local cancellation/crash fixture; reconcile external effects before any provider or application relaunch.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
         "scope": "Only the listed canonical stages and their original host/operation scopes apply. The Linux user manager terminated a TERM-ignoring parent and descendants, retained timeout failure, and accepted a separate fresh run.",
@@ -1858,7 +1860,7 @@
         "blueprints/convergence-practice/native-recovery/README.md",
         "blueprints/convergence-practice/native-recovery/claude/README.md"
       ],
-      "next_gap": "Qualify abrupt writing-worker failure with task-specific single-effect acceptance.",
+      "next_gap": "The separate native-child-interruption-recovery decision covers one abrupt writing-worker failure with a single local effect; qualify changed effects or another host before extending acceptance.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
         "scope": "Only the listed canonical stages and their original host/operation scopes apply. Codex on Mac and Claude on WSL resumed the same session to finish an unchanged single checkpoint; later bounded source tasks also retained continuations.",
@@ -2160,9 +2162,10 @@
       ],
       "candidate": null,
       "evidence_ids": [
-        "native-tavily-cli-20260920"
+        "native-tavily-cli-20260920",
+        "native-tavily-session-20260920"
       ],
-      "evidence_scope": "Upstream CLI0.1.8 installed and authenticated; live search returned four official sources and extraction returned one result with zero failures. Eight official skills were listed for both clients and discovered by fresh Codex probes for native and Desktop homes.",
+      "evidence_scope": "Upstream CLI0.1.8 installed and authenticated; live search returned four official sources and extraction returned one result with zero failures. Eight official skills were listed for both clients and discovered by fresh Codex probes for native and Desktop homes. A later current Desktop task received the eight skill entries and used the Search/Extract skills; the broad source-search miss and useful direct extraction are retained separately.",
       "limitations": [
         "Desktop-home discovery initially failed SQLite initialization and passed only with a temporary session-specific sqlite_home; the active Desktop registry was not hot-reloaded.",
         "Claude global skill listing and fresh Codex discovery do not prove actual model invocation of every skill. Map, Crawl and Research remain unqualified.",
@@ -2176,7 +2179,7 @@
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
         "scope": "Native install, Search/Extract and owned-probe cleanup are recorded; each stage retains its exact operation boundary.",
-        "unknown": "Independent key recovery, uninstall/reinstall and the active Desktop skill registry remain unverified.",
+        "unknown": "Independent key recovery and uninstall/reinstall remain unverified; current-task Search/Extract does not qualify all eight skills.",
         "stage_refs": [
           {
             "component_id": "tavily-cli",
@@ -2198,38 +2201,49 @@
         "recovery-portability"
       ],
       "selection": "conditional",
-      "review_status": "partial_acceptance",
-      "activation": "Use bounded native TaskStop/SendMessage and same-parent continuation; explicitly own and reconcile descendant processes and local effects.",
+      "review_status": "accepted_within_scope",
+      "activation": "Use the accepted inherited-tool role and owned user-service supervisor for the selected headless task; keep post-hook task permissions explicit and reconcile checkpoint/effects before continuation.",
       "component_ids": [
-        "claude-code"
+        "claude-code",
+        "systemd"
       ],
       "candidate": null,
       "evidence_ids": [
         "native-worker-recovery-20260920",
-        "native-worker-containment-20260920"
+        "native-worker-containment-20260920",
+        "native-worker-cgroup-20260920"
       ],
-      "evidence_scope": "One native background child retained its identity through TaskStop/SendMessage cancellation and same-parent continuation after abrupt runtime failure, producing one final local effect from an unchanged checkpoint after explicit supervisor cleanup.",
+      "evidence_scope": "One native inherited-tool child completed cancellation, same-child continuation, abrupt parent-runtime failure, automatic systemd descendant cleanup and same-parent/same-child finalization with an unchanged checkpoint and one local effect.",
       "limitations": [
-        "One synthetic local fixture and one physical WSL host, not arbitrary application state.",
-        "Actual native child identities and paths remain private; hashes bind retained streams.",
-        "Native original runtime SIGKILL is a shared-process failure; task identity and effect continuation are distinct from process containment.",
-        "The updated runner parser is regression-tested offline; the one native attempt executed the separately retained source.",
-        "Automatic native crash descendant containment: the crash wait survived and needed supervisor SIGKILL.",
-        "Exact requested tool-only behavior: the child attempted an extra read-only ls/git-status command, which was refused.",
-        "Remote provider cancellation, billing cessation, independent child-process isolation, off-host recovery, power-loss durability and distributed exactly-once effects.",
-        "The cgroup follow-up contained its deterministic detached fixture, but its native child prepended a refused command before checkpoint. No combined native result is accepted."
+        "One synthetic local task on this WSL host; not general worker reliability or an OS sandbox.",
+        "Not host/user-manager crash, independent-host recovery, remote provider cancellation, cessation of billing or distributed exactly-once effects.",
+        "Restricted Bash-only role incompatibility and every original failure remain retained; only this inherited role is accepted.",
+        "The successful run did not request ls, so the exact rewrite permission diagnosis is deterministic evidence rather than an exercised native approval success.",
+        "Native usage views overlap; initial SIGKILL has no terminal record. Complete parent/child/retry usage, billing and savings remain unknown."
       ],
       "source_paths": [
-        "blueprints/convergence-practice/worker-recovery/README.md"
+        "blueprints/convergence-practice/worker-recovery/README.md",
+        "blueprints/convergence-practice/worker-recovery/native-exact-read-receipt.json",
+        "docs/restricted-worker-compatibility.md"
       ],
-      "next_gap": "Resolve the frozen child command-contract mismatch before another changed native cgroup qualification; retain existing permissions, failed attempt and effect oracle.",
+      "next_gap": "Reuse the accepted same-host fixture while inputs match; qualify changed application effects or an independent host only when that scope is required.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
-        "scope": "Existing native-use stage is retained; this new child-continuation receipt explicitly needs supervisor cleanup.",
-        "unknown": "Native automatic crash containment failed in this attempt; provider cancellation and complete usage unknown.",
+        "scope": "One same-host native inherited-tool writing child completes cancellation, same-child continuation, abrupt parent runtime failure under an owned systemd cgroup and same-parent/same-child final continuation.",
+        "unknown": "Host/user-manager failure, off-host recovery, remote provider cancellation and complete usage remain unqualified.",
         "stage_refs": [
           {
             "component_id": "claude-code",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "claude-code",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "systemd",
             "stage": "use",
             "status": "accepted_within_scope"
           }

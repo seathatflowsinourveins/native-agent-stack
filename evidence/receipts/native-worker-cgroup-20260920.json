@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "native-worker-cgroup-20260920",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "claude-code",
+    "systemd"
+  ],
+  "claim": "One native inherited-tool child completed cancellation, same-child continuation, abrupt parent-runtime failure, automatic systemd descendant cleanup and same-parent/same-child finalization with an unchanged checkpoint and one local effect.",
+  "limitations": [
+    "One synthetic local task on this WSL host; not general worker reliability or an OS sandbox.",
+    "Not host/user-manager crash, independent-host recovery, remote provider cancellation, cessation of billing or distributed exactly-once effects.",
+    "Restricted Bash-only role incompatibility and every original failure remain retained; only this inherited role is accepted.",
+    "The successful run did not request ls, so the exact rewrite permission diagnosis is deterministic evidence rather than an exercised native approval success.",
+    "Native usage views overlap; initial SIGKILL has no terminal record. Complete parent/child/retry usage, billing and savings remain unknown."
+  ],
+  "recorded_at_utc": "2026-09-20T19:58:16.921543+00:00",
+  "scope": "One same-host native inherited-tool writing child completes cancellation, same-child continuation, abrupt parent runtime failure under an owned systemd cgroup and same-parent/same-child final continuation.",
+  "native_receipt": "blueprints/convergence-practice/worker-recovery/native-exact-read-receipt.json",
+  "audit": "blueprints/convergence-practice/worker-recovery/native-exact-read-independent-audit.json",
+  "freeze": "blueprints/convergence-practice/worker-recovery/native-exact-read-freeze.json",
+  "exact_commands_and_reproduction": "blueprints/convergence-practice/worker-recovery/README.md",
+  "retained_failures": [
+    "blueprints/convergence-practice/worker-recovery/receipt.json",
+    "blueprints/convergence-practice/worker-recovery/containment-receipt.json",
+    "blueprints/convergence-practice/worker-recovery/native-inherited-receipt.json"
+  ],
+  "rewrite_diagnosis": "blueprints/convergence-practice/worker-recovery/native-rewrite-diagnosis.json",
+  "qualification": {
+    "all_owned_processes_and_cgroups_cleaned": true,
+    "automatic_systemd_descendant_cleanup": true,
+    "checkpoint_and_sources_unchanged": true,
+    "direct_wait_PID_cleanup": false,
+    "exact_journal_and_single_effect": true,
+    "main_only_SIGKILL_with_actual_pending_child_wait": true,
+    "native_TaskStop_then_same_child_SendMessage": true,
+    "native_account_model_global_permissions_unchanged": true,
+    "normal_upstream_hooks_active": true,
+    "same_parent_resume_and_same_child_finalization": true
+  },
+  "elapsed_seconds": 42.656,
+  "native_cli_invocations": 2,
+  "native_child_spawns": 1,
+  "same_child_runs": 3,
+  "effects": 1,
+  "usage": {
+    "complete_parent_child_retry_total": null,
+    "billing": null,
+    "savings_claim": null,
+    "initial_terminal_missing_due_to_sigkill": true,
+    "boundary": "Overlapping native terminal/model/task views remain separate in the linked audit."
+  },
+  "independent_review": {
+    "accepted_run_private_hashes": 20,
+    "accepted_run_frozen_source_hashes": 12,
+    "preceding_failure_private_hashes": 12,
+    "preceding_failure_frozen_source_hashes": 11,
+    "rewrite_diagnosis_hashes": 7,
+    "verified": "Hashes, native same-identity control sequence, immutable checkpoint, one effect, original cgroup cleanup and full owned-file inventory were independently checked; public configuration values were minimized with private originals preserved."
+  }
+}

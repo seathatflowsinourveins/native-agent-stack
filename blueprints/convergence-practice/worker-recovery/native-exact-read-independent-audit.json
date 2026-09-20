@@ -1,0 +1,256 @@
+{
+  "child_run_count": 3,
+  "containment": {
+    "actual_native_wait_in_owned_cgroup": true,
+    "direct_wait_PID_cleanup": false,
+    "main_only_SIGKILL": true,
+    "native_restarts": 0,
+    "original_cgroup_removed": true,
+    "owned_processes_remaining": 0,
+    "systemd_automatic_descendant_cleanup": true
+  },
+  "effects": {
+    "added_files": [
+      "actions.jsonl",
+      "cancel-wait-interrupted.json",
+      "cancel-wait.json",
+      "checkpoint.json",
+      "crash-wait-interrupted.json",
+      "crash-wait.json",
+      "final.json",
+      "resume-authorized.json"
+    ],
+    "checkpoint_sha256": "55bff20c10c5625554ca7b553ecc8ffe0557592135463d331469c208d855167c",
+    "checkpoint_unchanged": true,
+    "child_alone_invoked_effects": true,
+    "frozen_source_count": 12,
+    "frozen_sources_unchanged": true,
+    "full_inventory_after_count": 39,
+    "full_inventory_before_count": 31,
+    "git_metadata_changed": [],
+    "journal": [
+      "checkpoint",
+      "cancel-wait",
+      "crash-wait",
+      "finalize"
+    ],
+    "single_final_effect": true
+  },
+  "limitations": [
+    "One same-host synthetic task; not host/user-manager crash, remote provider cancellation, cessation of billing, off-host restoration or distributed exactly-once effects.",
+    "Normal inherited-tool role acceptance does not qualify the earlier restricted Bash-only role.",
+    "All earlier recorder, descendant-survival and refused native trial evidence remains unchanged.",
+    "Native cumulative, terminal and task usage views overlap and must not be summed."
+  ],
+  "native_child_spawns": 1,
+  "native_cli_invocations": 2,
+  "native_control_sequence": [
+    "Agent",
+    "TaskStop",
+    "SendMessage",
+    "owned_service_MainPID_SIGKILL",
+    "same_parent_resume",
+    "SendMessage"
+  ],
+  "native_tools": {
+    "additional_inspection_calls": 1,
+    "child_pool": "Supported native inheritance with background filtering; not separately enumerated by init.",
+    "context_mode_active": true,
+    "exact_rewritten_ls_approval_exercised": false,
+    "inspection_tool_names": [
+      "ToolSearch"
+    ],
+    "normal_inherited_role": true,
+    "not_a_sandbox": true,
+    "parent_session_effective_tool_names": [
+      "Bash",
+      "CronCreate",
+      "CronDelete",
+      "CronList",
+      "DesignSync",
+      "Edit",
+      "EnterWorktree",
+      "ExitWorktree",
+      "Glob",
+      "Grep",
+      "ListAgents",
+      "ListMcpResourcesTool",
+      "Monitor",
+      "NotebookEdit",
+      "PushNotification",
+      "Read",
+      "ReadMcpResourceDirTool",
+      "ReadMcpResourceTool",
+      "RemoteTrigger",
+      "ReportFindings",
+      "ScheduleWakeup",
+      "SendMessage",
+      "Skill",
+      "Task",
+      "TaskStop",
+      "ToolSearch",
+      "WebFetch",
+      "WebSearch",
+      "Workflow",
+      "Write",
+      "mcp__claude_ai_Claude_Docs__batch",
+      "mcp__claude_ai_Claude_Docs__create",
+      "mcp__claude_ai_Claude_Docs__delete",
+      "mcp__claude_ai_Claude_Docs__export",
+      "mcp__claude_ai_Claude_Docs__guide",
+      "mcp__claude_ai_Claude_Docs__query",
+      "mcp__claude_ai_Claude_Docs__read",
+      "mcp__claude_ai_Claude_Docs__update",
+      "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
+      "mcp__plugin_context-mode_context-mode__ctx_doctor",
+      "mcp__plugin_context-mode_context-mode__ctx_execute",
+      "mcp__plugin_context-mode_context-mode__ctx_execute_file",
+      "mcp__plugin_context-mode_context-mode__ctx_fetch_and_index",
+      "mcp__plugin_context-mode_context-mode__ctx_index",
+      "mcp__plugin_context-mode_context-mode__ctx_insight",
+      "mcp__plugin_context-mode_context-mode__ctx_purge",
+      "mcp__plugin_context-mode_context-mode__ctx_search",
+      "mcp__plugin_context-mode_context-mode__ctx_stats",
+      "mcp__plugin_context-mode_context-mode__ctx_upgrade"
+    ],
+    "permission_mode": "dontAsk"
+  },
+  "outer_attempts": 1,
+  "same_parent_and_child": true,
+  "status": "accepted_within_scope_native_child_cgroup_recovery",
+  "usage": {
+    "billing": null,
+    "complete_parent_child_retry_total": null,
+    "completed_child_task_view": {
+      "duration_ms": 7574,
+      "tool_uses": 1,
+      "total_tokens": 25751
+    },
+    "initial_terminal_count": 0,
+    "resumed_model_usage_views": [
+      {},
+      {
+        "claude-opus-5": {
+          "cacheCreationInputTokens": 6008,
+          "cacheReadInputTokens": 184597,
+          "canonicalModel": "claude-opus-5",
+          "contextWindow": 1000000,
+          "costBasis": "list",
+          "costUSD": 0.27464725,
+          "inputTokens": 10,
+          "maxOutputTokens": 64000,
+          "outputTokens": 5026,
+          "provider": "firstParty",
+          "thinkingTokens": 2916,
+          "webSearchRequests": 0
+        }
+      },
+      {
+        "claude-opus-5": {
+          "cacheCreationInputTokens": 6008,
+          "cacheReadInputTokens": 184597,
+          "canonicalModel": "claude-opus-5",
+          "contextWindow": 1000000,
+          "costBasis": "list",
+          "costUSD": 0.27464725,
+          "inputTokens": 10,
+          "maxOutputTokens": 64000,
+          "outputTokens": 5026,
+          "provider": "firstParty",
+          "thinkingTokens": 2916,
+          "webSearchRequests": 0
+        }
+      }
+    ],
+    "resumed_terminal_usage_views": [
+      {
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 0,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "inference_geo": "",
+        "input_tokens": 0,
+        "iterations": [],
+        "output_tokens": 0,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "server_tool_use": {
+          "web_fetch_requests": 0,
+          "web_search_requests": 0
+        },
+        "service_tier": "standard",
+        "speed": "standard"
+      },
+      {
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 3690,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 3690,
+        "cache_read_input_tokens": 89487,
+        "inference_geo": "not_available",
+        "input_tokens": 4,
+        "iterations": [
+          {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 715,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 715,
+            "cache_read_input_tokens": 46231,
+            "input_tokens": 2,
+            "output_tokens": 162,
+            "type": "message"
+          }
+        ],
+        "output_tokens": 747,
+        "output_tokens_details": {
+          "thinking_tokens": 479
+        },
+        "server_tool_use": {
+          "web_fetch_requests": 0,
+          "web_search_requests": 0
+        },
+        "service_tier": "standard",
+        "speed": "standard"
+      },
+      {
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 1403,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "cache_creation_input_tokens": 1403,
+        "cache_read_input_tokens": 46946,
+        "inference_geo": "not_available",
+        "input_tokens": 2,
+        "iterations": [
+          {
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 1403,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "cache_creation_input_tokens": 1403,
+            "cache_read_input_tokens": 46946,
+            "input_tokens": 2,
+            "output_tokens": 2842,
+            "type": "message"
+          }
+        ],
+        "output_tokens": 2842,
+        "output_tokens_details": {
+          "thinking_tokens": 1827
+        },
+        "server_tool_use": {
+          "web_fetch_requests": 0,
+          "web_search_requests": 0
+        },
+        "service_tier": "standard",
+        "speed": "standard"
+      }
+    ],
+    "savings_claim": null
+  }
+}

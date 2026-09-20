@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-20",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "f10c08e726415668892c06286f02354df61c481c",
+  "source_revision": "d17b3cffa555b94615a2a78399bbd13dd1528b0c",
   "layers": [
     {
       "id": "agents",
@@ -441,6 +441,12 @@
       "body": "Observed Context Mode Agent-routing conflict, exact upstream source and unresolved restricted-role boundary. Normal native defaults remain intact.",
       "path": "docs/restricted-worker-compatibility.md",
       "category": "workers"
+    },
+    {
+      "title": "Retrieve the maintained catalogs",
+      "body": "Scoped native QMD registration, stale-checkout repair and exact-source retrieval for future sessions and PCs.",
+      "path": "docs/catalog-retrieval.md",
+      "category": "setup"
     }
   ],
   "highlights": [

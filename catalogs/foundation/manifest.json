@@ -40,8 +40,8 @@
       "purpose": "Delegate bounded independent work with an actual base, owned paths and independent acceptance.",
       "selection": "Native workers first; Beads only when a dependency-aware queue helps.",
       "activation": "One coordinator integrates; each writing worker uses its own worktree and concise task contract.",
-      "lifecycle_scope": "Native child repair and same-child interruption/crash continuation passed within their fixtures; crash descendant containment required explicit supervisor cleanup.",
-      "next_gap": "Qualify supported process containment for the observed survivor; independent-host and provider effects remain separate."
+      "lifecycle_scope": "Native child repair and a same-child cancellation/crash/resume fixture passed; an owned systemd cgroup automatically removed the pending descendant and continuation produced one final effect.",
+      "next_gap": "Qualify changed task effects, independent hosts and provider cancellation separately from the accepted same-host fixture."
     },
     {
       "id": "isolation",
@@ -130,8 +130,8 @@
       "purpose": "Schedule owned work, bound process lifetime and resume unfinished steps deliberately.",
       "selection": "Dagu for selected workflows and Linux user-manager supervision for owned process trees.",
       "activation": "Use explicit task/service ownership, bounded retries and independent state/effect checks.",
-      "lifecycle_scope": "Local descendant termination and Dagu cancel/retry/SSH continuation passed; full service reboot and provider cancellation remain unknown.",
-      "next_gap": "Test an owned scheduled service across reboot and reconcile pending native worker effects before resubmission."
+      "lifecycle_scope": "Local descendant termination, native child cgroup crash cleanup and Dagu cancel/retry/SSH continuation passed. Full service reboot and provider cancellation remain unknown.",
+      "next_gap": "Qualify the selected owned scheduled service after reboot on an available target host."
     },
     {
       "id": "hosting-services",
@@ -214,15 +214,16 @@
     {
       "id": "worker-cancellation-crash-resume",
       "priority": 2,
-      "status": "partial",
-      "scope": "One same-child cancellation/crash/resume with an unchanged checkpoint and one local effect passed after explicit supervisor cleanup. The pending wait survived the native runtime crash; automatic descendant containment remains open. A supported user-service cgroup contained the deterministic survivor fixture. The combined native follow-up stopped at a refused prefixed command before checkpoint.",
-      "next_action": "Use compatible native inherited-tool roles; qualify a deliberately restricted role only after resolving its instruction/tool contract. Context Mode1.0.169 has no supported Agent-routing opt-out; retain the failed trial and existing global permissions.",
+      "status": "accepted_within_scope",
+      "scope": "One native inherited-tool child completed cancellation, same-child continuation, abrupt parent-runtime failure, automatic systemd descendant cleanup and same-parent/same-child finalization with an unchanged checkpoint and one local effect. Prior manual-cleanup and permission-refused attempts remain retained; no host/provider/distributed guarantee is implied.",
+      "next_action": "Reuse the accepted role and supervisor for matching tasks. Qualify changed application effects or host boundaries separately; do not rerun this fixture merely to refresh a green status.",
       "source_paths": [
         "blueprints/convergence-practice/native-worker/README.md",
         "blueprints/convergence-practice/native-recovery/README.md",
         "blueprints/us-equities/worker-supervision/README.md",
         "blueprints/convergence-practice/worker-recovery/README.md",
-        "docs/restricted-worker-compatibility.md"
+        "docs/restricted-worker-compatibility.md",
+        "blueprints/convergence-practice/worker-recovery/native-exact-read-receipt.json"
       ]
     },
     {
@@ -239,10 +240,6 @@
     }
   ],
   "open_gates": [
-    {
-      "id": "worker-cancellation-crash-resume",
-      "gap_id": "worker-cancellation-crash-resume"
-    },
     {
       "id": "offhost-keys-and-service-reboot",
       "gap_id": "offhost-keys-and-service-reboot"

@@ -1,0 +1,4 @@
+{"action": "checkpoint"}
+{"action": "cancel-wait"}
+{"action": "crash-wait"}
+{"action": "finalize"}

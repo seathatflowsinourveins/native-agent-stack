@@ -1,0 +1,146 @@
+{
+  "accepted_artifact_hashes": {
+    "actions.jsonl": {
+      "bytes": 99,
+      "sha256": "498d1d6b788c82fa4bfb28bb96a56a1af6b906355d416b75220db2ddfe3e4e37"
+    },
+    "checkpoint.json": {
+      "bytes": 29,
+      "sha256": "55bff20c10c5625554ca7b553ecc8ffe0557592135463d331469c208d855167c"
+    },
+    "final.json": {
+      "bytes": 134,
+      "sha256": "b00398342db51dd3aa75cff5dd9f7768418af09b9b3b03f799d21093cb0dc238"
+    }
+  },
+  "effects": 1,
+  "elapsed_seconds": 42.656,
+  "limitations": [
+    "One synthetic local task on this WSL host; not general worker reliability or an OS sandbox.",
+    "Not host/user-manager crash, independent-host recovery, remote provider cancellation, cessation of billing or distributed exactly-once effects.",
+    "Restricted Bash-only role incompatibility and every original failure remain retained; only this inherited role is accepted.",
+    "The successful run did not request ls, so the exact rewrite permission diagnosis is deterministic evidence rather than an exercised native approval success.",
+    "Native usage views overlap; initial SIGKILL has no terminal record. Complete parent/child/retry usage, billing and savings remain unknown."
+  ],
+  "native_child_spawns": 1,
+  "native_cli_invocations": 2,
+  "outer_attempts": 1,
+  "private_evidence": {
+    "active-service-private.json": {
+      "bytes": 752,
+      "sha256": "11f91c29ed8e633a9c4a6bebbbde83aee14779cefdadf1aa979e6447f4b6c5bc"
+    },
+    "attempt.json": {
+      "bytes": 6471,
+      "sha256": "bc7cc05d75dd04e5c89b1de48a08b29ebadeb1ecb8f0c0ba61f3a200f7f9418d"
+    },
+    "commands-private.json": {
+      "bytes": 10267,
+      "sha256": "2d3cd3657d40844be06506f93e4afcc8f93f2e16ab36dba4688a896286b2cd78"
+    },
+    "effective-tools-private.json": {
+      "bytes": 13163,
+      "sha256": "108d09463098e023bcd347e1c25523086ee271a633ec848c25bb576884f85ab0"
+    },
+    "fixture-after.json": {
+      "bytes": 6987,
+      "sha256": "a51d2b39ccff37250cbcfa0c32340b573d7243b7d93e04f5000be995afb38d9b"
+    },
+    "fixture-before.json": {
+      "bytes": 5625,
+      "sha256": "45280d1d2194189eb7d80120eed0b68db6959e38c12b1e9bdbd15890ce095463"
+    },
+    "freeze.json": {
+      "bytes": 1206,
+      "sha256": "5527ae3812ea33fcbb665bd7435361fd3570ac2f5da8ba291b99f4ad68792dce"
+    },
+    "initial-service-start-private.json": {
+      "bytes": 475,
+      "sha256": "e7081947c293444f79ab1475bf66650c0fa53783e7e5eef0a5f85eeac0ecd651"
+    },
+    "initial.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "initial.stream.jsonl": {
+      "bytes": 76477,
+      "sha256": "c8be10049930402563bc465c33c0227e03b1fc38ae8a4097f3245caab9719663"
+    },
+    "main-kill-private.json": {
+      "bytes": 809,
+      "sha256": "75344f18af6e983e6b13bbb95f266e2e4264bd9d5e9d5a32dd0ae1d8198b5a64"
+    },
+    "native-help.txt": {
+      "bytes": 21401,
+      "sha256": "ae85d661e9c086f05637ebcd868f5702b477ff6e55e2e65b8ada7807cd51a4b6"
+    },
+    "native-identity.json": {
+      "bytes": 66,
+      "sha256": "fc0234811ef3612b6c0de1c799212ea8aabf711cb23caf69abd71db0514df764"
+    },
+    "pre-crash-private.json": {
+      "bytes": 1063,
+      "sha256": "b087f4fd6ab2f47b19b131b6a9e8eafdecc8aa41e3160fa60f581dc63110c81a"
+    },
+    "readiness.json": {
+      "bytes": 112,
+      "sha256": "2787312d33f250fa0cbd8ec50a0f1fe9e5b6b061abb72aa85b91c213f2bd3c08"
+    },
+    "resume-prompt-private.txt": {
+      "bytes": 541,
+      "sha256": "27315438d5ecd4ca0856b826b97623bdb9bf45932e8a348f1e2ecbee7a884b0d"
+    },
+    "resumed-service-start-private.json": {
+      "bytes": 475,
+      "sha256": "3f8f4ccc5d14be5c8f3d61e5f1e9b26d84524af3c78cf919c3641a1d2f212f4d"
+    },
+    "resumed.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "resumed.stream.jsonl": {
+      "bytes": 77503,
+      "sha256": "2d93f901b7ebfdb3f6f6831f651b04fa778b6e37354e81e12e22e0e31bd4b16c"
+    },
+    "stopped-service-private.json": {
+      "bytes": 363,
+      "sha256": "8407013c898ccb14ef6641f09a32e5fd7da387baa3779f0686546de09d9d3595"
+    }
+  },
+  "qualification": {
+    "all_owned_processes_and_cgroups_cleaned": true,
+    "automatic_systemd_descendant_cleanup": true,
+    "checkpoint_and_sources_unchanged": true,
+    "direct_wait_PID_cleanup": false,
+    "exact_journal_and_single_effect": true,
+    "main_only_SIGKILL_with_actual_pending_child_wait": true,
+    "native_TaskStop_then_same_child_SendMessage": true,
+    "native_account_model_global_permissions_unchanged": true,
+    "normal_upstream_hooks_active": true,
+    "same_parent_resume_and_same_child_finalization": true
+  },
+  "references": {
+    "accepted_artifacts": "accepted-inherited/",
+    "audit": "native-exact-read-independent-audit.json",
+    "freeze": "native-exact-read-freeze.json",
+    "plan": "native-exact-read-plan.json",
+    "preceding_failed_trial": "native-inherited-receipt.json",
+    "prompt": "native-prompt.txt",
+    "recorder": "native-exact-read-recorder-outcome.json",
+    "rewrite_diagnosis": "native-rewrite-diagnosis.json",
+    "role": "native-role.json"
+  },
+  "same_child_runs": 3,
+  "schema_version": 1,
+  "scope": "One same-host native inherited-tool writing child completes cancellation, same-child continuation, abrupt parent runtime failure under an owned systemd cgroup and same-parent/same-child final continuation.",
+  "status": "accepted_within_scope_native_child_cgroup_recovery",
+  "tool_scope": {
+    "additional_observed_discovery": "One parent ToolSearch for TaskStop and SendMessage; no extra Bash inspection or MCP execution.",
+    "experiment_mode": "dontAsk",
+    "literal_listing_approval_exercised_by_this_native_run": false,
+    "global_settings": "unchanged; experiment used stricter dontAsk",
+    "normal_inherited_tools": true,
+    "not_a_sandbox": true,
+    "one_literal_rtk_listing_approval_added_for_new_fixture": true
+  }
+}
