@@ -368,6 +368,9 @@ def capture_jcodemunch(config,ledger,run,commands,issues):
         issues.append("jcodemunch: native counter refresh failed; last successful snapshot remains separate")
     ledger.snapshot("jcodemunch","Linux / upstream default index",metrics,success,r["completed_at"],r)
 
+def native_tool_identity(component_id):
+    return {"jcodemunch-mcp":"jcodemunch"}.get(component_id,component_id)
+
 def coverage_matrix(stack,audit,gaps,fresh,comparisons):
     old={c["id"]:c for c in audit.get("coverage",[])}
     gap={c["id"]:c for c in (gaps or {}).get("components",[])}
@@ -382,7 +385,7 @@ def coverage_matrix(stack,audit,gaps,fresh,comparisons):
     result=[]
     for c in stack["components"]:
         identity=c["id"]
-        tool_identity={"jcodemunch-mcp":"jcodemunch"}.get(identity,identity)
+        tool_identity=native_tool_identity(identity)
         merged={**old.get(identity,{}),**c,**gap.get(identity,{})}
         related=[o for o in ops if identity in o.get("components",[])]
         measured=[p for p in comparisons if p["tool"]==tool_identity]
@@ -618,7 +621,7 @@ def refresh(config,context_file=None):
         hooks=native_hook_inventory(config,run,issues,ledger) if config.get("inspect_hook_history") else dict(
             runtimes=[],prior_scope="Hook and session-database inspection was not selected.")
         for component in matrix:
-            component["native_reports"]=[r for r in ledger.native_views() if r["tool"]==component["id"]]
+            component["native_reports"]=[r for r in ledger.native_views() if r["tool"]==native_tool_identity(component["id"])]
         try:
             registry=capture_json_source(Path(config["publication"])/"manifests/evidence.json",run,"publication-receipt-registry")
             extra["publication_registry"]=registry

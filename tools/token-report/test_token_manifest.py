@@ -328,6 +328,22 @@ class LedgerContract(unittest.TestCase):
         self.assertEqual(row["comparison_ids"],["retained-pair"])
         self.assertEqual(comparisons[0]["tool"],"jcodemunch")
 
+    def test_jcodemunch_component_attaches_its_existing_native_counter(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        stack=self.root/"stack.json"
+        stack.write_text(json.dumps({"components":[{"id":"jcodemunch-mcp","repository":"https://github.com/jgravelle/jcodemunch-mcp"}]}))
+        config["stack_manifest"]=str(stack)
+        config["jcodemunch_stats_argv"]=["selected-upstream","stats"]
+        result={"exit_code":0,"stdout_text":'{"total_tokens_saved":120}',"completed_at":m.now()}
+        with patch.object(m,"capture",return_value=result):m.refresh(config)
+        data=json.loads(Path(config["output_json"]).read_text())
+        reports=data["coverage_matrix"][0]["native_reports"]
+        self.assertEqual(len(reports),1)
+        self.assertEqual(reports[0]["tool"],"jcodemunch")
+        self.assertEqual(reports[0]["latest_success"]["metrics"]["saved"],120)
+        self.assertEqual(len(data["native"]),1)
+
     def test_disabled_or_nonexecuting_rtk_hook_is_not_enabled(self):
         config={"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"/bin/rtk hook claude"}]}]}}
         self.assertTrue(m.claude_rtk_hook_enabled(config))
