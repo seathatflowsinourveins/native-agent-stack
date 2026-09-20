@@ -1,0 +1,736 @@
+{
+  "schema_version": 1,
+  "id": "native-session-defaults-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "codex",
+    "claude-code",
+    "ai-memory",
+    "context-mode",
+    "rtk",
+    "qmd"
+  ],
+  "claim": "Persistent Linux/WSL defaults reach actual Codex command and MCP processes and the native Claude MCP child; reviewed hooks remain trusted, with four observed successful Claude startup completions.",
+  "limitations": [
+    "This is authoring-host setup and zero-model-turn acceptance, not a new-PC or provider-savings comparison.",
+    "Both Codex homes were tested with the installed native app-server; the active Desktop transport was not restarted or privately controlled.",
+    "Codex hooks/list proves trust and enablement, not hook execution. Neither initialization-only client path exposed SessionEnd completion.",
+    "The selected-project launch parents already had native defaults. The separate unadopted-directory Codex command/exec checks used a system-only parent PATH and no parent RTK flag.",
+    "Claude startup events join four starts to four completions but do not identify individual configured commands.",
+    "Global CLI defaults do not automatically adopt another repository into project-specific indexes, memory scope or MCP servers.",
+    "Exact current-task or provider tokens avoided are not established; retained counters and local fixture estimates are separate."
+  ],
+  "execution_kind": "persistent_native_defaults_launch_acceptance",
+  "recorded_at": "2026-09-20T17:52:18.311778+00:00",
+  "scope": "Existing authoring Linux/WSL host; Desktop and native Codex homes and native Claude keep their existing accounts/models/permissions.",
+  "persistent_configuration": {
+    "desktop_agent_wsl": true,
+    "desktop_terminal": "wsl",
+    "existing_desktop_environment_settings_preserved": true,
+    "resolved_path_entries": 29,
+    "codex_global_settings": [
+      "shell_environment_policy.set.PATH",
+      "shell_environment_policy.set.RTK_TELEMETRY_DISABLED"
+    ],
+    "claude_global_settings": [
+      "env.PATH",
+      "env.RTK_TELEMETRY_DISABLED"
+    ],
+    "rtk_telemetry_disabled": "1",
+    "four_project_stdio_mcp_envs_updated": true,
+    "short_global_instructions_updated": true,
+    "native_ui_side_effect": "Desktop TUI recorded the gpt-6-astra model-availability notification flag; selected model and model settings remain unchanged.",
+    "changes": [
+      {
+        "label": "desktop-codex",
+        "path": "<DESKTOP_CODEX_HOME>/config.toml",
+        "changed": true,
+        "before_sha256": "4308f96f5699dfeccc037b16991514795087c26015151b4f51a48116a19e67e7",
+        "after_sha256": "2a8f3ff50449617a76fe50c67bcb705e21fa95997bef071cf77ce165ccee0e55",
+        "final_sha256": "ff14755a652ae1eceef5d390187a8c56cdad5a25167537b83ed19cf5ec525442"
+      },
+      {
+        "label": "native-codex",
+        "path": "<NATIVE_CODEX_HOME>/config.toml",
+        "changed": true,
+        "before_sha256": "0fde226873c2a8173703cb0d3092442965a7dea0d2da3a5d591cea21e88f1ecb",
+        "after_sha256": "980162e652bd7a3a3acc0ee667a60f2df78bc7572fa514f4bd550233da024a58",
+        "final_sha256": "2d11216a0f0d98cd74a6f4891b806e372acff7d2c06cf89d2832e439ff3459d3"
+      },
+      {
+        "label": "native-claude",
+        "path": "<CLAUDE_HOME>/settings.json",
+        "changed": true,
+        "before_sha256": "cd25f6fc5029b69502aae73042f2aa2c72971a2750ebcb81f8c661c36d476eb3",
+        "after_sha256": "c7070c7973095ed24f86a9c71be7af78ae4085cbf2d2cec7fa42d7690136eec5",
+        "final_sha256": "45e81fa2ca7170f4f9a57296b3e4c8287355dc6864af6668dfc5c683711e3f1d"
+      },
+      {
+        "label": "project-codex",
+        "path": "<PROJECT>/.codex/config.toml",
+        "changed": true,
+        "before_sha256": "ef73ce5f638bf077a0461ffb7a1792fe715d651e7f2c1351e3172b7476383303",
+        "after_sha256": "771b110fa08732c68e65fb073ae775268e2f5ade6c9a46915897b1733160b9d5",
+        "final_sha256": "771b110fa08732c68e65fb073ae775268e2f5ade6c9a46915897b1733160b9d5"
+      },
+      {
+        "label": "shell-defaults",
+        "path": "<HOME>/.local/share/codex-ecosystem/native-defaults.sh",
+        "changed": true,
+        "before_sha256": null,
+        "after_sha256": "b924521cdd88c0c05ab2749c80f7c076d56daccaf2465bba69fc6eda4cf3ddc9",
+        "final_sha256": "c90bb060c83ff76998d7a55df1a959fb4138fbd30d314091c9f11b88473003f5"
+      },
+      {
+        "label": "profile",
+        "path": "<HOME>/.profile",
+        "changed": true,
+        "before_sha256": "b1042190871274ef6290944e8544130e908c3a199ab6ad077a816f47524fdef4",
+        "after_sha256": "55a6eecc048f8e7e6b9cc6311b8b4b1bc975245eaf566c17d436fb3c120c1bba",
+        "final_sha256": "55a6eecc048f8e7e6b9cc6311b8b4b1bc975245eaf566c17d436fb3c120c1bba"
+      },
+      {
+        "label": "bashrc",
+        "path": "<HOME>/.bashrc",
+        "changed": true,
+        "before_sha256": "06ead1408f2bc7a5957e5dcc75cf94886590e328da6b9f987c5a592571bf12a6",
+        "after_sha256": "8bd8eb1a3af887f0467090975815050708bb5c641c440e0a780873f288283d02",
+        "final_sha256": "8bd8eb1a3af887f0467090975815050708bb5c641c440e0a780873f288283d02"
+      },
+      {
+        "label": "ecosystem-env",
+        "path": "<HOME>/.local/share/codex-ecosystem/env.sh",
+        "changed": true,
+        "before_sha256": "585e8cf6990b0140139bf8293d0ea277697a5062d5009444edd7ad59f4929a52",
+        "after_sha256": "d48c72eadc70002cc93444ec346daf965e451c098678f2d34113733a6a3c53c7",
+        "final_sha256": "d48c72eadc70002cc93444ec346daf965e451c098678f2d34113733a6a3c53c7"
+      },
+      {
+        "label": "native-instructions",
+        "path": "<NATIVE_CODEX_HOME>/AGENTS.md",
+        "changed": true,
+        "before_sha256": "dc554122a79c87b553cc09ab5f8f2f77da34149e0cad748257823f6ca836e169",
+        "after_sha256": "5b76e2f33747117d4eb48a0bc9ff3e411276de1882581188bc91834487eb978b",
+        "final_sha256": "5b76e2f33747117d4eb48a0bc9ff3e411276de1882581188bc91834487eb978b"
+      },
+      {
+        "label": "desktop-instructions",
+        "path": "<DESKTOP_CODEX_HOME>/AGENTS.md",
+        "changed": true,
+        "before_sha256": "9c0b7d7d10ccdc8e3ebd3e3d264589e840cedf844ea1a95c7a6d5f4bce383aad",
+        "after_sha256": "2dabb7f2af850eb7dda5596a56849d7791cbe3af2e4ccd4b349f4add88951c0e",
+        "final_sha256": "2dabb7f2af850eb7dda5596a56849d7791cbe3af2e4ccd4b349f4add88951c0e"
+      },
+      {
+        "label": "claude-instructions",
+        "path": "<CLAUDE_HOME>/CLAUDE.md",
+        "changed": true,
+        "before_sha256": "13452734b0e27e619bccb5868e440d62b040d356c170c8b3edde4653d15bb86a",
+        "after_sha256": "cff395aefd86e8c0ad61afc4022bb86214272365555b6ae47f1a9db756dd77b1",
+        "final_sha256": "cff395aefd86e8c0ad61afc4022bb86214272365555b6ae47f1a9db756dd77b1"
+      }
+    ]
+  },
+  "codex_global_environment": {
+    "native_command": "codex --cd <UNADOPTED_PROBE> app-server --listen stdio:// --strict-config",
+    "rpc_methods": [
+      "initialize",
+      "config/read",
+      "command/exec"
+    ],
+    "results": [
+      {
+        "name": "native",
+        "config_home": "<NATIVE_CODEX_HOME>",
+        "initial_parent_path": "/usr/bin:/bin",
+        "initial_parent_rtk_flag_absent": true,
+        "command": {
+          "exitCode": 0,
+          "stdout": "{\"path_first\": \"<NATIVE_BIN>\", \"rtk_telemetry_disabled\": \"1\", \"rtk\": \"<NATIVE_BIN>/rtk\", \"qmd\": \"<NATIVE_BIN>/qmd\", \"project_config_exists\": false}\n",
+          "stderr": ""
+        },
+        "returned": {
+          "path_first": "<NATIVE_BIN>",
+          "rtk_telemetry_disabled": "1",
+          "rtk": "<NATIVE_BIN>/rtk",
+          "qmd": "<NATIVE_BIN>/qmd",
+          "project_config_exists": false
+        },
+        "passed": true,
+        "model_turns": 0
+      },
+      {
+        "name": "desktop",
+        "config_home": "<DESKTOP_CODEX_HOME>",
+        "initial_parent_path": "/usr/bin:/bin",
+        "initial_parent_rtk_flag_absent": true,
+        "command": {
+          "exitCode": 0,
+          "stdout": "{\"path_first\": \"<NATIVE_BIN>\", \"rtk_telemetry_disabled\": \"1\", \"rtk\": \"<NATIVE_BIN>/rtk\", \"qmd\": \"<NATIVE_BIN>/qmd\", \"project_config_exists\": false}\n",
+          "stderr": ""
+        },
+        "returned": {
+          "path_first": "<NATIVE_BIN>",
+          "rtk_telemetry_disabled": "1",
+          "rtk": "<NATIVE_BIN>/rtk",
+          "qmd": "<NATIVE_BIN>/qmd",
+          "project_config_exists": false
+        },
+        "passed": true,
+        "model_turns": 0
+      }
+    ],
+    "model_turns": 0
+  },
+  "shell_acceptance": [
+    {
+      "name": "login",
+      "argv": [
+        "/bin/bash",
+        "-lc",
+        "python3 -c 'import os,shutil,json;print(json.dumps({\"path_first\":os.environ[\"PATH\"].split(\":\")[0],\"rtk_telemetry_disabled\":os.environ.get(\"RTK_TELEMETRY_DISABLED\"),\"rtk\":shutil.which(\"rtk\"),\"qmd\":shutil.which(\"qmd\")}))'"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"path_first\": \"<NATIVE_BIN>\", \"rtk_telemetry_disabled\": \"1\", \"rtk\": \"<NATIVE_BIN>/rtk\", \"qmd\": \"<NATIVE_BIN>/qmd\"}\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "name": "interactive",
+      "argv": [
+        "/bin/bash",
+        "-ic",
+        "python3 -c 'import os,shutil,json;print(json.dumps({\"path_first\":os.environ[\"PATH\"].split(\":\")[0],\"rtk_telemetry_disabled\":os.environ.get(\"RTK_TELEMETRY_DISABLED\"),\"rtk\":shutil.which(\"rtk\"),\"qmd\":shutil.which(\"qmd\")}))'"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"path_first\": \"<NATIVE_BIN>\", \"rtk_telemetry_disabled\": \"1\", \"rtk\": \"<NATIVE_BIN>/rtk\", \"qmd\": \"<NATIVE_BIN>/qmd\"}\n",
+      "stderr": "bash: cannot set terminal process group (2180580): Inappropriate ioctl for device\nbash: no job control in this shell\n",
+      "passed": true
+    },
+    {
+      "name": "noninteractive-bashrc",
+      "argv": [
+        "/bin/bash",
+        "--noprofile",
+        "--norc",
+        "-c",
+        ". \"$HOME/.bashrc\"; python3 -c 'import os,shutil,json;print(json.dumps({\"path_first\":os.environ[\"PATH\"].split(\":\")[0],\"rtk_telemetry_disabled\":os.environ.get(\"RTK_TELEMETRY_DISABLED\"),\"rtk\":shutil.which(\"rtk\"),\"qmd\":shutil.which(\"qmd\")}))'"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"path_first\": \"<NATIVE_BIN>\", \"rtk_telemetry_disabled\": \"1\", \"rtk\": \"<NATIVE_BIN>/rtk\", \"qmd\": \"<NATIVE_BIN>/qmd\"}\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "existing_native_launcher_acceptance": {
+    "command": "node <ECOSYSTEM>/validation/verify-native-scope.cjs",
+    "returned": {
+      "passed": true,
+      "checks": 16,
+      "model_requests": 0
+    }
+  },
+  "hook_upgrade": {
+    "upstream": "https://github.com/akitaonrails/ai-memory",
+    "version": "2.3.2",
+    "commands": [
+      {
+        "target": "claude",
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory",
+          "--data-dir",
+          "<HOME>/.local/share/ai-memory",
+          "install-hooks",
+          "--agent",
+          "claude-code",
+          "--config-file",
+          "<CLAUDE_HOME>/settings.json",
+          "--server-url",
+          "http://127.0.0.1:49374",
+          "--no-capture-prompts",
+          "--apply"
+        ],
+        "exit_code": 0,
+        "stdout_excerpt": "capture mode: allowlist\n  repositories without a .ai-memory.toml marker emit no lifecycle events\n✓ updated <CLAUDE_HOME>/settings.json (backup written next to it)\n",
+        "stderr": "[ai-memory] capture-policy capability v1 enforced by this selected integration; re-run --apply to refresh existing installs.\n✓ staged 18 hook script(s) → <HOME>/.local/share/ai-memory/hooks/claude-code\n",
+        "stdout_raw_sha256": "566da87911e68ed8583a22adec386f7b0fa3c57ae95f6682e96b5d59ba1d163c",
+        "stderr_raw_sha256": "e8522a598e7a9acbcd46429b083f23a85a0d0048de8689ed6119c649580fe008"
+      },
+      {
+        "target": "native-codex",
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory",
+          "--data-dir",
+          "<HOME>/.local/share/ai-memory",
+          "install-hooks",
+          "--agent",
+          "codex",
+          "--config-file",
+          "<NATIVE_CODEX_HOME>/hooks.json",
+          "--server-url",
+          "http://127.0.0.1:49374",
+          "--apply"
+        ],
+        "exit_code": 0,
+        "stdout_excerpt": "capture mode: allowlist\n  repositories without a .ai-memory.toml marker emit no lifecycle events\n✓ updated <NATIVE_CODEX_HOME>/hooks.json (backup written next to it)\n",
+        "stderr": "[ai-memory] capture-policy capability v1 enforced by this selected integration; re-run --apply to refresh existing installs.\n✓ staged 14 hook script(s) → <HOME>/.local/share/ai-memory/hooks/codex\n",
+        "stdout_raw_sha256": "d534ced6f9406001810da8896ee5fdb65e90edef0bd12b25aa89291cdf371ac4",
+        "stderr_raw_sha256": "f6363e06e96c24048e2467ae4e494073481e7b15243a09b3e229f2446d953a4a"
+      },
+      {
+        "target": "desktop-codex",
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/tools/ai-memory-2.3.2/ai-memory",
+          "--data-dir",
+          "<HOME>/.local/share/ai-memory",
+          "install-hooks",
+          "--agent",
+          "codex",
+          "--config-file",
+          "<DESKTOP_CODEX_HOME>/hooks.json",
+          "--server-url",
+          "http://127.0.0.1:49374",
+          "--apply"
+        ],
+        "exit_code": 0,
+        "stdout_excerpt": "capture mode: allowlist\n  repositories without a .ai-memory.toml marker emit no lifecycle events\n✓ updated <DESKTOP_CODEX_HOME>/hooks.json (backup written next to it)\n",
+        "stderr": "[ai-memory] capture-policy capability v1 enforced by this selected integration; re-run --apply to refresh existing installs.\n✓ staged 14 hook script(s) → <HOME>/.local/share/ai-memory/hooks/codex\n",
+        "stdout_raw_sha256": "268a65b6698980df7d68184399ff6d55304ef4b7e5ef29e0e02d5803bb244015",
+        "stderr_raw_sha256": "f6363e06e96c24048e2467ae4e494073481e7b15243a09b3e229f2446d953a4a"
+      }
+    ],
+    "independent_asset_review": {
+      "claude_scripts": 18,
+      "codex_scripts": 14,
+      "shared_libraries": 2,
+      "all_34_match_upstream": true,
+      "hook_config_changes": "Only ai-memory executable prefix changed from2.3.1 to2.3.2; all existing event/options/scope/non-ai hooks preserved."
+    },
+    "trust_review": "Normal native Codex TUI /hooks review, seven changed entries per home; no bypass flag or manual trust-store edit.",
+    "trusted_inventory": [
+      {
+        "home": "native",
+        "hooks": 13,
+        "trusted_and_enabled": 13,
+        "ai_memory": 7,
+        "errors": [],
+        "warnings": []
+      },
+      {
+        "home": "desktop",
+        "hooks": 13,
+        "trusted_and_enabled": 13,
+        "ai_memory": 7,
+        "errors": [],
+        "warnings": []
+      }
+    ]
+  },
+  "native_launches": {
+    "codex": [
+      {
+        "lane": "native",
+        "status": "passed_within_scope",
+        "started_at_utc": "2026-09-20T17:48:13.680Z",
+        "completed_at_utc": "2026-09-20T17:48:17.593Z",
+        "client_binary_scope": "Separate installed native Codex0.155.1 app-server reading this configuration home; not the active Desktop transport.",
+        "argv": [
+          "<NATIVE_BIN>/codex",
+          "--cd",
+          "<PROJECT>",
+          "app-server",
+          "--listen",
+          "stdio://",
+          "--strict-config"
+        ],
+        "hooks": {
+          "count": 13,
+          "trusted_and_enabled": 13,
+          "current_ai_memory_2_3_2": 7,
+          "old_ai_memory_2_3_1": 0,
+          "errors": 0,
+          "warnings": 0,
+          "automatic_lifecycle_completion_observed": false,
+          "boundary": "hooks/list establishes configuration, enablement and trust. thread/start plus direct MCP call and thread/unsubscribe emitted no hook started/completed notifications, so SessionStart/SessionEnd execution is not established by this initialization-only path."
+        },
+        "model_turns_started": 0,
+        "actual_context_mode_calls": 1,
+        "config_and_hooks_unchanged": true,
+        "cleanup": {
+          "exit_code": 0,
+          "forced_terminations": [],
+          "owned_process_count": 13,
+          "remaining_owned_processes": []
+        },
+        "actual_child_returned": {
+          "native_bin_first": true,
+          "RTK_TELEMETRY_DISABLED": "1",
+          "rtk_path": "<NATIVE_BIN>/rtk"
+        },
+        "rpc_methods": [
+          "initialize",
+          "config/read",
+          "hooks/list",
+          "thread/start",
+          "mcpServerStatus/list",
+          "mcpServer/tool/call",
+          "thread/unsubscribe"
+        ],
+        "model_and_permission_cli_overrides": false
+      },
+      {
+        "lane": "desktop-home",
+        "status": "passed_within_scope",
+        "started_at_utc": "2026-09-20T17:48:13.681Z",
+        "completed_at_utc": "2026-09-20T17:48:21.000Z",
+        "client_binary_scope": "Separate installed native Codex0.155.1 app-server reading this configuration home; not the active Desktop transport.",
+        "argv": [
+          "<NATIVE_BIN>/codex",
+          "--cd",
+          "<PROJECT>",
+          "app-server",
+          "--listen",
+          "stdio://",
+          "--strict-config"
+        ],
+        "hooks": {
+          "count": 13,
+          "trusted_and_enabled": 13,
+          "current_ai_memory_2_3_2": 7,
+          "old_ai_memory_2_3_1": 0,
+          "errors": 0,
+          "warnings": 0,
+          "automatic_lifecycle_completion_observed": false,
+          "boundary": "hooks/list establishes configuration, enablement and trust. thread/start plus direct MCP call and thread/unsubscribe emitted no hook started/completed notifications, so SessionStart/SessionEnd execution is not established by this initialization-only path."
+        },
+        "model_turns_started": 0,
+        "actual_context_mode_calls": 1,
+        "config_and_hooks_unchanged": true,
+        "cleanup": {
+          "exit_code": 0,
+          "forced_terminations": [],
+          "owned_process_count": 14,
+          "remaining_owned_processes": []
+        },
+        "actual_child_returned": {
+          "native_bin_first": true,
+          "RTK_TELEMETRY_DISABLED": "1",
+          "rtk_path": "<NATIVE_BIN>/rtk"
+        },
+        "rpc_methods": [
+          "initialize",
+          "config/read",
+          "hooks/list",
+          "thread/start",
+          "mcpServerStatus/list",
+          "mcpServer/tool/call",
+          "thread/unsubscribe"
+        ],
+        "model_and_permission_cli_overrides": false
+      }
+    ],
+    "claude": {
+      "status": "passed_within_scope",
+      "started_at_utc": "2026-09-20T17:49:22.694Z",
+      "completed_at_utc": "2026-09-20T17:49:24.902Z",
+      "argv": [
+        "<NATIVE_BIN>/claude",
+        "-p",
+        "--input-format",
+        "stream-json",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--session-id",
+        "<PRIVATE_SESSION_ID>",
+        "--mcp-config",
+        "<HOME>/codex-ecosystem/state/foundation-20260920/defaults/launch-e2e/claude/probe-mcp.json"
+      ],
+      "initialize_response_subtype": "success",
+      "no_model_or_permission_cli_overrides": true,
+      "automatic_session_start_hooks": {
+        "started": 4,
+        "completed": 4,
+        "all_exit_zero": true,
+        "all_success": true,
+        "unique_id_join": true,
+        "completion_proofs": [
+          {
+            "hook_id_sha256": "fdd7466caa1bf21e58da2b2966a493e545bdfd55d6b0ad651c16b23ca7de7898",
+            "event": "SessionStart",
+            "outcome": "success",
+            "exit_code": 0,
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "hook_id_sha256": "1d54ba331573b80c1a84950025fd7c8766f0195bd099ee70495b7fa1cef2400a",
+            "event": "SessionStart",
+            "outcome": "success",
+            "exit_code": 0,
+            "stdout_sha256": "4a217171c0ad5f293ff533c0633ffec781f9338f32e9667599981fa2c1ae02cb",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "hook_id_sha256": "dee4d45c622e0abf8d76984a9f0a6efeffcfb34d3e6c0074fdc2fef9c7640eb5",
+            "event": "SessionStart",
+            "outcome": "success",
+            "exit_code": 0,
+            "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          {
+            "hook_id_sha256": "99fb4fb541cd2469b9bac05a0f9794960d00bb1c9f861386732172f3142db0da",
+            "event": "SessionStart",
+            "outcome": "success",
+            "exit_code": 0,
+            "stdout_sha256": "8365706b861f533e905e10198923456f5ee76d6563339791b7b2c6e27d2945b1",
+            "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        ],
+        "boundary": "Direct native Claude stream-json lifecycle events. Hook IDs join each start to completion; emitted names do not identify individual configuration command paths."
+      },
+      "session_end_completion_observed": false,
+      "session_end_boundary": "No SessionEnd completion event was exposed before clean EOF shutdown in this initialization-only run; graceful exit alone is not proof that a SessionEnd hook executed.",
+      "provider_user_messages_sent": 0,
+      "assistant_messages_observed": 0,
+      "result_messages_observed": 0,
+      "settings_unchanged": true,
+      "cleanup": {
+        "exit_code": 0,
+        "forced_terminations": [],
+        "owned_process_count": 6,
+        "remaining_owned_processes": []
+      },
+      "diagnostic_child_returned": {
+        "observed_at_utc": "2026-09-20T17:49:23.532672+00:00",
+        "native_bin_first": true,
+        "RTK_TELEMETRY_DISABLED": "1"
+      }
+    }
+  },
+  "local_ci": {
+    "receipt": "evidence/receipts/native-token-ci-local-20260920.json",
+    "command": "python3 scripts/native_token_ci.py --install --output <PRIVATE_NEW_RESULT>",
+    "passed_commands": 41,
+    "passed_acceptance_checks": 14,
+    "focused_failure_tests": 6
+  },
+  "report_refresh": {
+    "command": "ecosystem-token-report refresh",
+    "exit_code": 0,
+    "captured_at": "2026-09-20T17:51:45Z",
+    "issues": [],
+    "native_scopes": 7,
+    "unique_comparisons": 43,
+    "scope": "Separate retained snapshot; not a fresh current-task same-process savings measurement.",
+    "private_report_sha256": "cdffc8c023267fe7fc2118fbe301f22bcbc9dcaf00e5955ceecea5ff23566a27"
+  },
+  "private_artifact_hashes": [
+    {
+      "label": "configuration-changes.private.json",
+      "sha256": "a1b0afee6b528051a862c005a6e28e28731e5398dd672048f8de32f349c2677a",
+      "bytes": 4720
+    },
+    {
+      "label": "codex-defaults-result.private.json",
+      "sha256": "2a078c8900190ea66ba355e3ce6673c28c971ede7574516ea2a6184667a3db22",
+      "bytes": 1820
+    },
+    {
+      "label": "shell-checks.private.json",
+      "sha256": "f95f81d322233273df12c3b33bc16c96c93432979efafc8a2bbcda38052c5d02",
+      "bytes": 2100
+    },
+    {
+      "label": "upstream-hook-refresh.private.json",
+      "sha256": "adedcb494d5e480893af7ddf838cd0c0f39655572a80f71ea40ed539945f683c",
+      "bytes": 3769
+    },
+    {
+      "label": "hook-trust-result.private.json",
+      "sha256": "9a8ca2df2f4d20c5cfa3a20039a977093550c9c038f64033d1cce25a4ae35d3f",
+      "bytes": 8264
+    },
+    {
+      "label": "hook-ui-review.private.json",
+      "sha256": "458d1794e805460d9c6c2642659f032fcfebeb1a7ed3f8a70d1c1d345400bb0f",
+      "bytes": 30293
+    },
+    {
+      "label": "launch-e2e/receipt.json",
+      "sha256": "732e0fd9886e30cadff296f7e152885281bb3f4f2e0c0e7f2e27c91d71338ebd",
+      "bytes": 27819
+    },
+    {
+      "label": "launch-e2e/claude/diagnostic-child-environment.json",
+      "sha256": "f004bf5f7d1a2e4e645d331baa979a2016289cbab3d40a6a8972877399fec350",
+      "bytes": 158
+    },
+    {
+      "label": "launch-e2e/claude/execution.json",
+      "sha256": "d9112a0e0547716641c742ded780031accb8c4612ecc9b6c15845ff224368088",
+      "bytes": 1259
+    },
+    {
+      "label": "launch-e2e/claude/launch.json",
+      "sha256": "39a94a872c66a07294dac51f5e617163e4890f58150525e8fa3fb15f361ca1fe",
+      "bytes": 1167
+    },
+    {
+      "label": "launch-e2e/claude/messages.private.json",
+      "sha256": "f830ec252057659c306ca78440658aaccefe881c2c00d129295b05215fdf3ae5",
+      "bytes": 65490
+    },
+    {
+      "label": "launch-e2e/claude/probe-mcp.json",
+      "sha256": "4bf178fbaabbed833465ba8f791265e67a994e1f2f3239aee0a9a613d5b8fc25",
+      "bytes": 227
+    },
+    {
+      "label": "launch-e2e/claude/stderr.private.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "label": "launch-e2e/claude/stdout.private.jsonl",
+      "sha256": "685f061511b56071efb806816629c5ce55f7e94f18379d5c462efb92567e8dea",
+      "bytes": 54759
+    },
+    {
+      "label": "launch-e2e/claude-probe.py",
+      "sha256": "5fe2aae3c561163ca9e97166b9b0a917c49024908608e6979cf2425e0a71f3fb",
+      "bytes": 1166
+    },
+    {
+      "label": "launch-e2e/desktop-home/calls.private.json",
+      "sha256": "7f087a48018dcce5c6085855917677150f7c39c7ef2ad92b56d836bbae27c86b",
+      "bytes": 1373330
+    },
+    {
+      "label": "launch-e2e/desktop-home/context-environment.private.json",
+      "sha256": "5e09d941d934e022fcaf370b2013e59ebc12c39c547a4e5800d897ea0db0c2d0",
+      "bytes": 571
+    },
+    {
+      "label": "launch-e2e/desktop-home/effective-config.private.json",
+      "sha256": "ace35877a62919a4f7a549f39f194114753c52c66da283fecdb6d80e302ff8e3",
+      "bytes": 88325
+    },
+    {
+      "label": "launch-e2e/desktop-home/execution.json",
+      "sha256": "1d733e3fec5c63b01eafe47c8aede39b7c356b1d2e4f4ec40376b960568be42f",
+      "bytes": 2185
+    },
+    {
+      "label": "launch-e2e/desktop-home/hooks-list.private.json",
+      "sha256": "1a5f4da8066bf985c2e2c21ab5379c8e3f63fdbfddc36b7275114664ad7ac6b8",
+      "bytes": 11921
+    },
+    {
+      "label": "launch-e2e/desktop-home/launch.json",
+      "sha256": "72808b4e3ee423524b61910821bb9dbfc9ef7c382beb2d22898dd19b007ffc8f",
+      "bytes": 978
+    },
+    {
+      "label": "launch-e2e/desktop-home/mcp-inventory.private.json",
+      "sha256": "9ceeb2890542dfcf6adfaaa1800d44edb34ce5b62a496250d7b23720564d5fe9",
+      "bytes": 1110319
+    },
+    {
+      "label": "launch-e2e/desktop-home/notifications.private.json",
+      "sha256": "af42fbb129349c362f640c69e2929471f091a8f494e4037ecfaf2e9da9cc2c6f",
+      "bytes": 6654
+    },
+    {
+      "label": "launch-e2e/desktop-home/stderr.private.txt",
+      "sha256": "018baf26cee9c8471a06fc1b9cd070b99c89cef16783160f31b34e45edb22285",
+      "bytes": 5625
+    },
+    {
+      "label": "launch-e2e/desktop-home/stdout.private.jsonl",
+      "sha256": "0683dd5a5e1125e8c786948d54b8dde8451c9a957cc72b5013e36309290d36fb",
+      "bytes": 775738
+    },
+    {
+      "label": "launch-e2e/desktop-home/thread-start.private.json",
+      "sha256": "b4a96fcde3e543f577231725add5d53aabbf68b61c97f1fff2b9a20f2bfc2681",
+      "bytes": 1643
+    },
+    {
+      "label": "launch-e2e/desktop-home/unsubscribe.private.json",
+      "sha256": "bf4d32a40e7cb0e941277c3956da91af3104ecd4becf30e6588f64a04a58c25e",
+      "bytes": 31
+    },
+    {
+      "label": "launch-e2e/native/calls.private.json",
+      "sha256": "fdfcb5d238374234f2ede7079c7dd4d1aa00ed40789d80715ad016c94e5e9da4",
+      "bytes": 1334958
+    },
+    {
+      "label": "launch-e2e/native/context-environment.private.json",
+      "sha256": "886e23006a371067119b07109744a22ecdc71ab5d156fdea456edfd96bd73e24",
+      "bytes": 571
+    },
+    {
+      "label": "launch-e2e/native/effective-config.private.json",
+      "sha256": "8229e7c009b727631eeb04ffa6a25bc1b5083676bcab89d280e959a509c1b30f",
+      "bytes": 68752
+    },
+    {
+      "label": "launch-e2e/native/execution.json",
+      "sha256": "917f92ce1570bb6375126c0fca448ef856c60d7759f6714af3f95786e4eeb779",
+      "bytes": 2059
+    },
+    {
+      "label": "launch-e2e/native/hooks-list.private.json",
+      "sha256": "56b98e1acf347df1cc684b59b6a5a54ad73c1170d3eecf81051a466785c0c7d5",
+      "bytes": 11736
+    },
+    {
+      "label": "launch-e2e/native/launch.json",
+      "sha256": "20d99affd4d431da467b2096e27cd9b051ea6807b65c2707c5c2384befa3221f",
+      "bytes": 950
+    },
+    {
+      "label": "launch-e2e/native/mcp-inventory.private.json",
+      "sha256": "ace2c201283b49d4e65e999e547f0f361ccde7185eec4a13b7a7ad834390cc55",
+      "bytes": 1095930
+    },
+    {
+      "label": "launch-e2e/native/notifications.private.json",
+      "sha256": "d0d4d9976cc27636914081bf6884e36a170e7dbaa7f5dbb83493fca4e7420a5b",
+      "bytes": 6380
+    },
+    {
+      "label": "launch-e2e/native/stderr.private.txt",
+      "sha256": "62cca45cb329d4c3f57ad86f45f7be6ca255078f3124fac5d6c1cd6e14d71c2c",
+      "bytes": 2547
+    },
+    {
+      "label": "launch-e2e/native/stdout.private.jsonl",
+      "sha256": "4d7b77bf111d0aeb9fd2ce124dbe54db38768534315c382351c8eae3c15590e7",
+      "bytes": 748254
+    },
+    {
+      "label": "launch-e2e/native/thread-start.private.json",
+      "sha256": "536f0b7b5a5a838e9e8d8940534abb133362599adf97b3755eacb5f94869ebc2",
+      "bytes": 1625
+    },
+    {
+      "label": "launch-e2e/native/unsubscribe.private.json",
+      "sha256": "bf4d32a40e7cb0e941277c3956da91af3104ecd4becf30e6588f64a04a58c25e",
+      "bytes": 31
+    },
+    {
+      "label": "launch-e2e/run-claude.cjs",
+      "sha256": "5bcbfac9aa892cda7ee2ec03dd0e08a4bfa0622a1825edd8718a760c060b5aea",
+      "bytes": 5245
+    },
+    {
+      "label": "launch-e2e/run-codex.cjs",
+      "sha256": "71ee6cff0d9ae8c614ceb015bb20ca62318096d925307112c4d66ca0741dd89a",
+      "bytes": 7148
+    }
+  ]
+}
