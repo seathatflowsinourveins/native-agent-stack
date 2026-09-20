@@ -199,5 +199,5 @@
       "changed": true
     }
   },
-  "original_artifact_retention": "The original credential-bearing artifact is retained privately with its exact ZIP hash; the hosted original will be removed after this sanitized replacement is published."
+  "original_artifact_retention": "The original credential-bearing artifact is retained privately with its exact ZIP hash. After the sanitized replacement was published in PR27, the hosted original was removed successfully at 2026-09-20T22:00Z; its metadata and digest remain above."
 }

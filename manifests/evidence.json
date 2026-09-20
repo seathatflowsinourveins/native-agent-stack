@@ -5084,8 +5084,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "4f2574a446b80f7dc9aa02bf617be8d12d123e0f10e953344a0733417bd3a78b",
-      "bytes": 3719230
+      "sha256": "d9aa46f9bfa390ccbb86aa3a84b75e2aee902346db1c900961393f72799919d7",
+      "bytes": 3719321
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6094,8 +6094,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "239010ccc9abc258c3eb0344f482cd6afc3e46e21226cdfdc8b1867986c0731f",
-      "bytes": 17112
+      "sha256": "480988f1500bf01224ad767b104c62f9cffbcd6099ed149c77cded095ea4bd67",
+      "bytes": 17203
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -6984,8 +6984,8 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/attempt-2/publication.json",
-      "sha256": "ad03ef217ac6b38e6638f715ac0ab40c5041c666ce9a41da57fb4bfc3b196411",
-      "bytes": 8808
+      "sha256": "83e71fea7295d6c6fcc7a86922132c0f4026c995460f4f68c22d2e2d9ba8f951",
+      "bytes": 8885
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/attempt-2/qemu-block-device-help.stdout",
