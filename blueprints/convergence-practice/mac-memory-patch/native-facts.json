@@ -1,0 +1,533 @@
+{
+  "schema_version": 1,
+  "scope": "selected actual native outcomes for public synthetic oracle only",
+  "facts": [
+    {
+      "phase": "baseline",
+      "tool": "memory_write_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "path": "notes/alpha.md",
+        "body": "# Synthetic alpha decision\nMacpatchcobalt belongs only to alpha.\n"
+      },
+      "value": {
+        "acknowledged": true
+      }
+    },
+    {
+      "phase": "baseline",
+      "tool": "memory_write_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "beta",
+        "path": "notes/beta.md",
+        "body": "# Synthetic beta decision\nMacpatchamber belongs only to beta.\n"
+      },
+      "value": {
+        "acknowledged": true
+      }
+    },
+    {
+      "phase": "baseline",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "path": "notes/alpha.md"
+      },
+      "value": {
+        "body": "# Synthetic alpha decision\nMacpatchcobalt belongs only to alpha.\n"
+      }
+    },
+    {
+      "phase": "baseline",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "query": "Macpatchcobalt",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/alpha.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "baseline",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "beta",
+        "query": "Macpatchcobalt"
+      },
+      "value": {
+        "hits": [],
+        "streams_active": null
+      }
+    },
+    {
+      "phase": "baseline",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "beta",
+        "path": "notes/alpha.md"
+      },
+      "error": {
+        "code": -32603,
+        "message": "page notes/alpha.md not found in resolved scope mac-patch-synthetic/beta"
+      }
+    },
+    {
+      "phase": "baseline",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "beta",
+        "path": "notes/beta.md"
+      },
+      "value": {
+        "body": "# Synthetic beta decision\nMacpatchamber belongs only to beta.\n"
+      }
+    },
+    {
+      "phase": "baseline",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "beta",
+        "query": "Macpatchamber",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/beta.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "baseline",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "query": "Macpatchamber"
+      },
+      "value": {
+        "hits": [],
+        "streams_active": null
+      }
+    },
+    {
+      "phase": "baseline",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "path": "notes/beta.md"
+      },
+      "error": {
+        "code": -32603,
+        "message": "page notes/beta.md not found in resolved scope mac-patch-synthetic/alpha"
+      }
+    },
+    {
+      "phase": "baseline",
+      "tool": "memory_status",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha"
+      },
+      "value": {
+        "counts": {
+          "sessions": 0,
+          "observations": 0
+        }
+      }
+    },
+    {
+      "phase": "candidate",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "path": "notes/alpha.md"
+      },
+      "value": {
+        "body": "# Synthetic alpha decision\nMacpatchcobalt belongs only to alpha.\n"
+      }
+    },
+    {
+      "phase": "candidate",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "query": "Macpatchcobalt",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/alpha.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "candidate",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "beta",
+        "query": "Macpatchcobalt"
+      },
+      "value": {
+        "hits": [],
+        "streams_active": null
+      }
+    },
+    {
+      "phase": "candidate",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "beta",
+        "path": "notes/alpha.md"
+      },
+      "error": {
+        "code": -32603,
+        "message": "page notes/alpha.md not found in resolved scope mac-patch-synthetic/beta"
+      }
+    },
+    {
+      "phase": "candidate",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "beta",
+        "path": "notes/beta.md"
+      },
+      "value": {
+        "body": "# Synthetic beta decision\nMacpatchamber belongs only to beta.\n"
+      }
+    },
+    {
+      "phase": "candidate",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "beta",
+        "query": "Macpatchamber",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/beta.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "candidate",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "query": "Macpatchamber"
+      },
+      "value": {
+        "hits": [],
+        "streams_active": null
+      }
+    },
+    {
+      "phase": "candidate",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "path": "notes/beta.md"
+      },
+      "error": {
+        "code": -32603,
+        "message": "page notes/beta.md not found in resolved scope mac-patch-synthetic/alpha"
+      }
+    },
+    {
+      "phase": "candidate",
+      "tool": "memory_status",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha"
+      },
+      "value": {
+        "counts": {
+          "sessions": 0,
+          "observations": 0
+        }
+      }
+    },
+    {
+      "phase": "candidate",
+      "tool": "memory_write_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "path": ".git/config",
+        "body": "Synthetic rejected page.\n"
+      },
+      "error": {
+        "code": -32603,
+        "message": "invalid path: invalid page path: page path \".git/config\": component \".git\" is reserved by Git for repository metadata and refused in tree entries"
+      }
+    },
+    {
+      "phase": "candidate",
+      "tool": "memory_write_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "path": "notes/aéé/decision.md",
+        "body": "# Unicode fixture\nMacpatchunicode survives a five-byte Unicode directory component.\n"
+      },
+      "value": {
+        "acknowledged": true
+      }
+    },
+    {
+      "phase": "candidate",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "path": "notes/aéé/decision.md"
+      },
+      "value": {
+        "body": "# Unicode fixture\nMacpatchunicode survives a five-byte Unicode directory component.\n"
+      }
+    },
+    {
+      "phase": "candidate",
+      "tool": "memory_write_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "path": "notes/alpha.md",
+        "body": "# Updated synthetic alpha decision\nMacpatchwillow replaces the original alpha decision.\n"
+      },
+      "value": {
+        "acknowledged": true
+      }
+    },
+    {
+      "phase": "candidate-restart",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "path": "notes/alpha.md"
+      },
+      "value": {
+        "body": "# Updated synthetic alpha decision\nMacpatchwillow replaces the original alpha decision.\n"
+      }
+    },
+    {
+      "phase": "candidate-restart",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "query": "Macpatchwillow",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/alpha.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "candidate-restart",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "beta",
+        "query": "Macpatchwillow"
+      },
+      "value": {
+        "hits": [],
+        "streams_active": null
+      }
+    },
+    {
+      "phase": "candidate-restart",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "beta",
+        "path": "notes/alpha.md"
+      },
+      "error": {
+        "code": -32603,
+        "message": "page notes/alpha.md not found in resolved scope mac-patch-synthetic/beta"
+      }
+    },
+    {
+      "phase": "candidate-restart",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "beta",
+        "path": "notes/beta.md"
+      },
+      "value": {
+        "body": "# Synthetic beta decision\nMacpatchamber belongs only to beta.\n"
+      }
+    },
+    {
+      "phase": "candidate-restart",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "beta",
+        "query": "Macpatchamber",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/beta.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "candidate-restart",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "query": "Macpatchamber"
+      },
+      "value": {
+        "hits": [],
+        "streams_active": null
+      }
+    },
+    {
+      "phase": "candidate-restart",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "path": "notes/beta.md"
+      },
+      "error": {
+        "code": -32603,
+        "message": "page notes/beta.md not found in resolved scope mac-patch-synthetic/alpha"
+      }
+    },
+    {
+      "phase": "candidate-restart",
+      "tool": "memory_status",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha"
+      },
+      "value": {
+        "counts": {
+          "sessions": 0,
+          "observations": 0
+        }
+      }
+    },
+    {
+      "phase": "candidate-restart",
+      "tool": "memory_read_page",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "path": "notes/aéé/decision.md"
+      },
+      "value": {
+        "body": "# Unicode fixture\nMacpatchunicode survives a five-byte Unicode directory component.\n"
+      }
+    },
+    {
+      "phase": "candidate-restart",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "query": "Macpatchunicode",
+        "explain": true
+      },
+      "value": {
+        "hits": [
+          {
+            "path": "notes/aéé/decision.md"
+          }
+        ],
+        "streams_active": [
+          "fts",
+          "entity",
+          "graph"
+        ]
+      }
+    },
+    {
+      "phase": "candidate-restart",
+      "tool": "memory_query",
+      "arguments": {
+        "workspace": "mac-patch-synthetic",
+        "project": "alpha",
+        "query": "Macpatchcobalt"
+      },
+      "value": {
+        "hits": [],
+        "streams_active": null
+      }
+    }
+  ]
+}

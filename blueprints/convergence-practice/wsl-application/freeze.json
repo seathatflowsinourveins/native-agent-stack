@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "source_revision": "cabbe2c96e39096b510f739f07a6e4132da082de",
+  "source_repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+  "application": "blueprints/convergence-practice/application-delivery",
+  "oracle_unchanged": true,
+  "files": [
+    {
+      "path": "acceptance-plan.json",
+      "sha256": "a8ac3edea74e51294f8359a201d94cc963348dbc24ddd2faecf2e04a3ec9e29e"
+    },
+    {
+      "path": "backend/test_api.py",
+      "sha256": "404cef6a7ba380a331ee15dc7a9414756d84f12456f67c34982d5d8968ea813e"
+    },
+    {
+      "path": "browser/ledger.spec.ts",
+      "sha256": "1cd010bae5b7612023652a064e7a85a53b52dbe39ef46e97b8587439a0b064a6"
+    },
+    {
+      "path": "freeze.json",
+      "sha256": "333198ba238dd35bea47882dea9e15fcadf1ab5b8609ed2bfa93aa21a1911720"
+    },
+    {
+      "path": "Makefile",
+      "sha256": "dbab0b62a259b26a86a8e174b2ab17ba7ce28ac5d19f8412fb41c016f75bc011"
+    },
+    {
+      "path": "project-contract.json",
+      "sha256": "977bef87b2ff759c19b238e937553b307efa837d163ea19e8a72799f98af567a"
+    },
+    {
+      "path": "uv.lock",
+      "sha256": "552d8834e745d7c91daa15e47c5f6d0cd9063db18c98790d2f1af05038f7417d"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "73ba78a623c6448e5e67a3f488f2e50f20b3b4b4c2da12cd29077f25f6a57c2b"
+    },
+    {
+      "path": "openapi.json",
+      "sha256": "83346419cc47a151fad15bac80ddf67f013986f4c674b6ff9c2f82af71656a6c"
+    },
+    {
+      "path": "app/api.generated.ts",
+      "sha256": "dabe8af2f2ce36b03e51921df4fa574092b4e9aadf6306c046bc53d2c4db03da"
+    }
+  ]
+}

@@ -1,25 +1,19 @@
 #!/usr/bin/env python3
 """Run only the two owned loopback application processes in the foreground."""
 import os
+from pathlib import Path
 import signal
 import socket
 import subprocess
 import time
-from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 
 
-def probe_ports(ports):
-    """Allow ordinary restart reuse while refusing a live loopback listener."""
-    for port in ports:
-        with socket.socket() as probe:
-            probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            probe.bind(("127.0.0.1", port))
-
-
 def main():
-    probe_ports((18080, 18081))
+    for port in (18080, 18081):
+        with socket.socket() as probe:
+            probe.bind(("127.0.0.1", port))
     logs = HERE / ".runtime"
     logs.mkdir(exist_ok=True)
     children, handles = [], []

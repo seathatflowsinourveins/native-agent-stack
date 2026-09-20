@@ -1,0 +1,19 @@
+{
+  "id": "mac-memory-patch-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "ai-memory"
+  ],
+  "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+  "limitations": [
+    "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
+    "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
+    "No provider or whole-task token savings measurement."
+  ],
+  "schema_version": 1,
+  "checked_at": "2026-09-20",
+  "native_evidence": "blueprints/convergence-practice/mac-memory-patch/receipt.json",
+  "checks_passed": 56,
+  "protocol_requests": 42,
+  "native_tool_calls": 36
+}

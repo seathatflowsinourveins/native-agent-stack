@@ -97,14 +97,15 @@
         "ai-memory-native-state-recovery-20260919",
         "native-memory-lifecycle-20260919",
         "token-practice-coverage-20260920",
-        "native-ai-memory-maintenance-20260920"
+        "native-ai-memory-maintenance-20260920",
+        "mac-memory-patch-20260920"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory",
         "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2"
       ],
       "source_pin": "353841d91618d20b110b208de284a74d0b960379",
-      "freshness": "Official 2.3.2 release and supported native status/search/direct MCP checked 2026-09-20. Older native-model receipts retain their original version and scope. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import."
+      "freshness": "Official 2.3.2 release and supported native status/search/direct MCP checked 2026-09-20. Older native-model receipts retain their original version and scope. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import. Separate Mac arm64 synthetic patch acceptance passed on September20; production adoption remains host-scoped."
     },
     {
       "id": "ast-grep",
@@ -1423,7 +1424,8 @@
         "pnpm test:e2e"
       ],
       "evidence_ids": [
-        "native-application-delivery-20260920"
+        "native-application-delivery-20260920",
+        "wsl-application-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1443,7 +1445,8 @@
         "pnpm test:e2e"
       ],
       "evidence_ids": [
-        "native-application-delivery-20260920"
+        "native-application-delivery-20260920",
+        "wsl-application-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1464,7 +1467,8 @@
       ],
       "evidence_ids": [
         "native-application-delivery-20260920",
-        "mac-native-application-migration-20260920"
+        "mac-native-application-migration-20260920",
+        "wsl-application-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1488,7 +1492,8 @@
       "evidence_ids": [
         "native-application-delivery-20260920",
         "mac-native-container-storage-20260920",
-        "mac-native-application-migration-20260920"
+        "mac-native-application-migration-20260920",
+        "wsl-application-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1544,6 +1549,27 @@
         "https://github.com/apple/container/blob/1.4.1/docs/command-reference.md"
       ],
       "freshness": "Primary-source checked September20,2026; acceptance is scoped to the dated host/task receipt. Compatibility can justify a supported older dependency."
+    },
+    {
+      "id": "playwright-test",
+      "repository": "https://github.com/microsoft/playwright",
+      "version": "1.63.0",
+      "license": "Apache-2.0",
+      "profile": "supporting",
+      "role": "Locked project browser regression runner, distinct from optional interactive playwright-cli",
+      "commands": [
+        "pnpm exec playwright test"
+      ],
+      "evidence_ids": [
+        "wsl-application-20260920"
+      ],
+      "upstream_sources": [
+        "https://playwright.dev/docs/test-cli",
+        "https://github.com/microsoft/playwright/releases/tag/v1.63.0",
+        "https://registry.npmjs.org/@playwright%2ftest/1.63.0"
+      ],
+      "source_pin": "1b025d7e20a026371cd5f98ba0cdce48892737c8",
+      "freshness": "Latest stable release verified20 September2026; exact1.63.0 package integrity and Node>=20 requirement retained in application source review. Native WSL runner passed under Node24.21.0."
     }
   ],
   "profiles": [
@@ -1605,7 +1631,8 @@
         "fastapi",
         "postgresql",
         "poppler",
-        "apple-container"
+        "apple-container",
+        "playwright-test"
       ]
     },
     {

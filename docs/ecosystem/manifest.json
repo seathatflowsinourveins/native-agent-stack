@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-20",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "0d74c55d22d619fabe94d754fea2f4ed8a653c96",
+  "source_revision": "1d42918df85d9c3dd3795da6bf7660e8be58e820",
   "layers": [
     {
       "id": "agents",
@@ -354,6 +354,20 @@
       "status": "VelaNext native acceptance",
       "body": "Two synthetic restic snapshots restored with exact bytes/types/modes after fresh SSH. Verified gitleaks and Worktrunk pass positive/negative and dirty-refusal checks. Other hosts and key-loss recovery remain separate.",
       "path": "blueprints/convergence-practice/layer-acceptance.md"
+    },
+    {
+      "id": "wsl-application-native",
+      "title": "Same locked application on clean WSL",
+      "status": "WSL native acceptance",
+      "body": "Locked restore,12 API guards, production build, real browser and exact data/history after restart. Five native regressions verify corrected build recursion and port reuse on Mac and WSL.",
+      "path": "blueprints/convergence-practice/wsl-application/README.md"
+    },
+    {
+      "id": "mac-memory-patch",
+      "title": "Scoped memory patch with preserved failures",
+      "status": "Mac synthetic acceptance",
+      "body": "56 checks across migration, exact scope, FTS, reserved and Unicode paths, and restart. No capture or model calls. Failed OS-confinement attempt remains explicit.",
+      "path": "blueprints/convergence-practice/mac-memory-patch/README.md"
     }
   ],
   "annotations": [

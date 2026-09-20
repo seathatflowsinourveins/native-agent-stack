@@ -1458,6 +1458,39 @@
         "Whole coordinator/worker provider usage is unknown; no token or monetary savings claim."
       ],
       "path": "blueprints/convergence-practice/wsl-native-tools/receipt.json"
+    },
+    {
+      "id": "mac-memory-patch-20260920",
+      "path": "evidence/receipts/mac-memory-patch-20260920.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory"
+      ],
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "limitations": [
+        "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
+        "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
+        "No provider or whole-task token savings measurement."
+      ]
+    },
+    {
+      "path": "evidence/receipts/wsl-application-20260920.json",
+      "id": "wsl-application-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nextjs",
+        "react",
+        "fastapi",
+        "postgresql",
+        "playwright-test"
+      ],
+      "claim": "Clean isolated WSL runtime restored the same locked application, passed12 API checks, migration reversal, schema/types, production build and real browser flow; exact row/history persisted after PostgreSQL/API/Next restart.",
+      "limitations": [
+        "Synthetic loopback application; no production deployment, user authentication or another-host acceptance.",
+        "Official exact Ubuntu packages were extracted task-only with signed metadata/SHA verification; no package scripts or system database changes.",
+        "Historical application inputs remain frozen; Makelevel/TIME_WAIT recipe fixes were qualified separately with five real make/socket tests on Mac and WSL.",
+        "No model calls by application commands; whole-task usage remains unknown."
+      ]
     }
   ],
   "files": [
@@ -1478,8 +1511,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "7f1657842cd563b64474a3c44bd0a24ce4aa2df81ad6cf977e193d9af11d13d9",
-      "bytes": 1494
+      "sha256": "dff39c23273a7bf7d15e59d7838b9bd0936c687bc61ab54801198b253557e4a2",
+      "bytes": 1377
     },
     {
       "path": ".gitignore",
@@ -1523,8 +1556,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "79c91a03343f0ffcae3021b4a334318aae3b5e27d5530a7f18161e46819bc3f8",
-      "bytes": 13322
+      "sha256": "25cdc4638a02f6641c6c531ae1f71414e0f564deaa10362ba9c5711a6e9baab5",
+      "bytes": 13406
     },
     {
       "path": "adoption/paired/README.md",
@@ -1618,13 +1651,13 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/Makefile",
-      "sha256": "dbab0b62a259b26a86a8e174b2ab17ba7ce28ac5d19f8412fb41c016f75bc011",
-      "bytes": 2609
+      "sha256": "799c61469b98dddbc20870b6166737312968a97ddf16aa6ed3e7d50104278e80",
+      "bytes": 2641
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/README.md",
-      "sha256": "fbddacf7eea85f49d13206773b4913f2cfb0ce93f20b0c0e1614863ea2e6023e",
-      "bytes": 6990
+      "sha256": "a536189115ee351b903a5b815227e77b7da6caa31bf81b771c3915284405c7f2",
+      "bytes": 8302
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/acceptance-plan.json",
@@ -1697,6 +1730,21 @@
       "bytes": 1468
     },
     {
+      "path": "blueprints/convergence-practice/application-delivery/history/Makefile.cabbe2c",
+      "sha256": "dbab0b62a259b26a86a8e174b2ab17ba7ce28ac5d19f8412fb41c016f75bc011",
+      "bytes": 2609
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/history/recipe-revisions.json",
+      "sha256": "d7eb27d31cfdeac5a1664306d1ff94d5df1095f43f0d1041796dc6ef384132b1",
+      "bytes": 3077
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/history/serve.cabbe2c.py",
+      "sha256": "e3e59b5315d5f2b3c2fe863cdecabfd9f7ffd1977a83d332331a10e33a42a14e",
+      "bytes": 1842
+    },
+    {
       "path": "blueprints/convergence-practice/application-delivery/migration-rollback.json",
       "sha256": "c5f103b0336e904852aa29c136f4225b8f6784e6b77846f287e2329913b75eff",
       "bytes": 3455
@@ -1763,13 +1811,18 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/serve.py",
-      "sha256": "e3e59b5315d5f2b3c2fe863cdecabfd9f7ffd1977a83d332331a10e33a42a14e",
-      "bytes": 1842
+      "sha256": "bba1f9655cce0b412257fbd0c40680b6b0ccc0ecffb91a2f3605323491655aed",
+      "bytes": 2043
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/sources.json",
       "sha256": "a6b2cd68b9b518821d10ca8c17b438c426f0af9584926b1a00a12718dd29688a",
       "bytes": 14171
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/test_portability.py",
+      "sha256": "f36b9561325821310d11ac3c4bae9b8b2f14a75573d60466eac5bea58b4b1901",
+      "bytes": 5776
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/tsconfig.json",
@@ -1838,8 +1891,8 @@
     },
     {
       "path": "blueprints/convergence-practice/ci-security/README.md",
-      "sha256": "ddf1c10dd276df424f6f237efe658707a82090cb51cee52975c2a5b81138606c",
-      "bytes": 3210
+      "sha256": "6c55dbee18d6f1df0c1c9637cb1daa10a726719cbb115604d47e209886308b06",
+      "bytes": 3868
     },
     {
       "path": "blueprints/convergence-practice/ci-security/ci-acceptance.json",
@@ -1848,13 +1901,18 @@
     },
     {
       "path": "blueprints/convergence-practice/ci-security/experiment.json",
-      "sha256": "394a4cd2f6d74322dc5cf8e8c0e06f372d1c34e6428d6c4680f2c76319872768",
-      "bytes": 4378
+      "sha256": "9cccc8fc12cdf5e2a5e30c58a9f73ea5b36a95df453c7bd32e0c88f13791a2eb",
+      "bytes": 4418
     },
     {
       "path": "blueprints/convergence-practice/ci-security/observation.json",
       "sha256": "aebb8c8dd1b5d269fbbc1b3a3e66a591d3b7ea9f2caff23891ba6270ab55232f",
       "bytes": 707
+    },
+    {
+      "path": "blueprints/convergence-practice/ci-security/qualified-workflow.yml.txt",
+      "sha256": "7f1657842cd563b64474a3c44bd0a24ce4aa2df81ad6cf977e193d9af11d13d9",
+      "bytes": 1494
     },
     {
       "path": "blueprints/convergence-practice/ci-security/receipt.json",
@@ -2204,8 +2262,8 @@
     },
     {
       "path": "blueprints/convergence-practice/layer-acceptance.md",
-      "sha256": "1e24cc2fefe891294b94c4bf946a04bc3fbe9ebd688df4866b0e7114b16834fa",
-      "bytes": 3434
+      "sha256": "ad7e6f84ba8d959e33b4a3e2b9e53fc4d7b1b0f0dfa322986151e2abf364ed91",
+      "bytes": 4010
     },
     {
       "path": "blueprints/convergence-practice/local-fixture/corpus-manifest.json",
@@ -2236,6 +2294,81 @@
       "path": "blueprints/convergence-practice/local-fixture/rankings.json",
       "sha256": "35fc05c3483fa5f4a674ee190c543748c1f72d589d9b8f0ed83c2c667f8cd36e",
       "bytes": 55347
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/README.md",
+      "sha256": "21aa8d8b3702ab6add440c058da57fe7b3accd425c58bc604ea1bbbbcbfc5f2f",
+      "bytes": 5358
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/audit.py",
+      "sha256": "2c8de6b8f127701755de8263647053c716fc95029dfa02f75db6dc005ca3c490",
+      "bytes": 7615
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/config.toml",
+      "sha256": "5ee5fb3ddcb790c9a234143fdfa2f99b80ecf752a45c9e8cad625d75e9311331",
+      "bytes": 290
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/experiment.json",
+      "sha256": "e208c643c6cb7e34610d5404d8e9e0755e92788bb7453cf040550b0ab707548e",
+      "bytes": 8859
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/native-facts.json",
+      "sha256": "bcd2d2e56e00fe01e9fb844a177e58ed2fbd2f84a05ac9115615ae1b531c66e8",
+      "bytes": 12778
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/oracle-functional.json",
+      "sha256": "3b90e6fb176c1d668f574bb64cb081f4938d29da3783464d804aa002dd6a49f0",
+      "bytes": 2197
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/oracle.json",
+      "sha256": "e6a47cd25fb239403522b16acdde271b712ee31478265ea4092d6ddad6b92bd1",
+      "bytes": 1957
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/pins.json",
+      "sha256": "f0309ba2ba49a3e6214207dcd7633b0c605b2abe3b2abd6175265f6dc6daaa92",
+      "bytes": 796
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/prior-attempts.json",
+      "sha256": "d3b318fcb98d050f38c09c06a9e3b6fe4df6c8110aac10333f1bc0e6287e469e",
+      "bytes": 3226
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/receipt-attempt-1.json",
+      "sha256": "caefd13cf008499a589cc45dd0c11aa17ee941522778db9689d958b251100ebf",
+      "bytes": 3689
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/receipt.json",
+      "sha256": "ead0722d89768f5afd2a7c2daa5c0ed713387c677467aaef64591940485e0d8f",
+      "bytes": 11112
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/run-functional.py",
+      "sha256": "7008e10cf6124c816d8fc8e400aecabcb0c91f1f0e836a4a284fb45ffe548490",
+      "bytes": 18085
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/run.py",
+      "sha256": "5bd0b047a6050e1f3c512dc3cce62489210daa66e7f5391e47e866c0e97db492",
+      "bytes": 18786
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/test_evidence.py",
+      "sha256": "49a1652759f4ab46df7080745eb16a167c5f4694cd28a6aa3730022a33baf09f",
+      "bytes": 3994
+    },
+    {
+      "path": "blueprints/convergence-practice/mac-memory-patch/verification.json",
+      "sha256": "002473858c46d8facd504cb202f55ffe34fb947b228ba0d6d5d5709d1c9a1c05",
+      "bytes": 1129
     },
     {
       "path": "blueprints/convergence-practice/native-recovery/README.md",
@@ -2466,6 +2599,41 @@
       "path": "blueprints/convergence-practice/validation.json",
       "sha256": "2781bc66707fad526ae0798546cc4b6738f03964d6e4702dabd94f9f4172cf9d",
       "bytes": 2009
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-application/README.md",
+      "sha256": "222d0e21928da97b0c1abe5e62d31b901c415de5f84015239384239e4d14e16f",
+      "bytes": 8658
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-application/freeze.json",
+      "sha256": "aee6667328bd56eff9281f18eb113a4a8c1e473a2fe2ef6cc4089c8cf5e3ada1",
+      "bytes": 1590
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-application/playwright.config.ts",
+      "sha256": "24a34681ad712a85212dbc7a3c30b622a8a3348a7e1e04140c3d61a624249228",
+      "bytes": 766
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-application/portability-followup.json",
+      "sha256": "50a730f71f581c1c5203f9f2d977af4fca3d807498ee734db69eb3da0fc3befb",
+      "bytes": 5049
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-application/receipt.json",
+      "sha256": "515cc5226a4d60a7f352d2bf6b1f0a72b3c6b4d0db0302343ef14543569bc394",
+      "bytes": 9974
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-application/sources.json",
+      "sha256": "38b97a675a0e5a95a93e91ffc597959f03484398457275e83b7c2c53bdf1d04e",
+      "bytes": 3592
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-application/ubuntu-packages.json",
+      "sha256": "d34590b60b0e1dfd367eff08fb190a19a232966e344c1160c7bc87cb4dd770f2",
+      "bytes": 5419
     },
     {
       "path": "blueprints/convergence-practice/wsl-native-tools/README.md",
@@ -4109,8 +4277,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "f51e6164139ec2b9397a185dfb68c6b74cf36a326542c1eb805c381116eab2fd",
-      "bytes": 386412
+      "sha256": "fe1c1b297118bc242630728a3e96bd67f31156dd4cdd51063c26e2c849377253",
+      "bytes": 386800
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -4154,7 +4322,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "7c7f28f9aeed8578e5274a88cc08bc6608fe912a2f3e5651ff66db5b157b9d17",
+      "sha256": "eed10b65f08b0a4d5db5378ac93211d561ca7501136219178233879b5374bc06",
       "bytes": 3112
     },
     {
@@ -4269,8 +4437,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "5d82215163baf525c3fc684e558fc6c118a4cf352cf9168480ba644318c804db",
-      "bytes": 1644278
+      "sha256": "d932c3c088ec4f34864d04afe47665f5f69e45cdfe881ada25bf759c6c59a393",
+      "bytes": 1652967
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -4279,8 +4447,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "4fb8fe0d984147d3eee4042e4fbf3e1689da127b351743903087154810bd0adc",
-      "bytes": 18645
+      "sha256": "b5e2e45526e993616807863980cd834072fc208cd984370c5084245e9e55d025",
+      "bytes": 19475
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -4401,6 +4569,11 @@
       "path": "evidence/receipts/desktop-direct-rag.json",
       "sha256": "aa3f9b5605471f70f53bbcab135b685327445aeb05d2a2046f68e704c49fba15",
       "bytes": 1298
+    },
+    {
+      "path": "evidence/receipts/mac-memory-patch-20260920.json",
+      "sha256": "b8d09fda1ad56976d57d938af0eb7076223c79e39b2261ef4521413b15d8a0f1",
+      "bytes": 893
     },
     {
       "path": "evidence/receipts/native-ai-memory-maintenance-20260920.json",
@@ -4538,6 +4711,11 @@
       "bytes": 547
     },
     {
+      "path": "evidence/receipts/wsl-application-20260920.json",
+      "sha256": "c58daf0c213dc882543d9be13a43890e3ac39a4f6f4a6d97b8498a86b7053b90",
+      "bytes": 1205
+    },
+    {
       "path": "examples/agent-browser.json",
       "sha256": "36a05e4bfe7bbca6f673892b60bf6b109ea1f773a02796966fa8a95a2b1e0aea",
       "bytes": 25
@@ -4649,8 +4827,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "8d19fa0368d54a85dd5e155b1a47a2a9964d52f2501eaf1656ac9b7fb75552be",
-      "bytes": 66977
+      "sha256": "67670c777c5cdef5ea13b1e972f770e304a5e61aef6f130cada173f9bfc2ff50",
+      "bytes": 68224
     },
     {
       "path": "observability/README.md",
@@ -4864,8 +5042,8 @@
     },
     {
       "path": "scripts/validate_convergence.py",
-      "sha256": "a2ee2dbf280c699b5c6b84be97e449e7ab6533e327446024f9692fc0f8ea1e21",
-      "bytes": 12512
+      "sha256": "f8087ceb7a103130808b0cdc2b071cac02edf5fc6dd3e21870618b99c7678367",
+      "bytes": 14985
     },
     {
       "path": "tests/__init__.py",
@@ -4929,8 +5107,8 @@
     },
     {
       "path": "tests/test_convergence_contract.py",
-      "sha256": "8b989a25264c16129166496397ba514a3f07037007aad7039f1e75cc566907e8",
-      "bytes": 17133
+      "sha256": "9c17cdfeeeefcb70b14b91fa2654d90e8fe26adac7a1240c3bf9853e5f5d2276",
+      "bytes": 20810
     },
     {
       "path": "tests/test_corporate_action_readiness.py",
@@ -5001,6 +5179,11 @@
       "path": "tests/test_nanosecond_replay.py",
       "sha256": "50c4be832b9b7fe1dadc196fcc6dcfa854267d2b1de89eec2c95fb6cc6776b48",
       "bytes": 6756
+    },
+    {
+      "path": "tests/test_native_maintenance.py",
+      "sha256": "2ab5eda2f2dc79139087091ba02cec082615b62b7414533d06beb88bff3a3e7f",
+      "bytes": 750
     },
     {
       "path": "tests/test_native_recovery.py",
@@ -5092,5 +5275,18 @@
       "sha256": "8c32a6832b53baddfe895b0e5dd14319d955a4ac4e55b842e0e9fc2e91900b38",
       "bytes": 45037
     }
+  ],
+  "convergence_records": [
+    "blueprints/convergence-practice/application-delivery/experiment.json",
+    "blueprints/convergence-practice/ci-security/experiment.json",
+    "blueprints/convergence-practice/document-ingestion/experiment.json",
+    "blueprints/convergence-practice/gpu-inference/experiment.json",
+    "blueprints/convergence-practice/job-recovery/experiment-macos.json",
+    "blueprints/convergence-practice/job-recovery/experiment-wsl.json",
+    "blueprints/convergence-practice/mac-memory-patch/experiment.json",
+    "blueprints/convergence-practice/native-recovery/claude/experiment.json",
+    "blueprints/convergence-practice/native-recovery/experiment.json",
+    "blueprints/convergence-practice/native-worker/experiment.json",
+    "blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json"
   ]
 }

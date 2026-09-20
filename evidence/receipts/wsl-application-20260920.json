@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "wsl-application-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "nextjs",
+    "react",
+    "fastapi",
+    "postgresql",
+    "playwright-test"
+  ],
+  "recorded_at_utc": "2026-09-20T07:14:00.254217+00:00",
+  "claim": "Clean isolated WSL runtime restored the same locked application, passed12 API checks, migration reversal, schema/types, production build and real browser flow; exact row/history persisted after PostgreSQL/API/Next restart.",
+  "limitations": [
+    "Synthetic loopback application; no production deployment, user authentication or another-host acceptance.",
+    "Official exact Ubuntu packages were extracted task-only with signed metadata/SHA verification; no package scripts or system database changes.",
+    "Historical application inputs remain frozen; Makelevel/TIME_WAIT recipe fixes were qualified separately with five real make/socket tests on Mac and WSL.",
+    "No model calls by application commands; whole-task usage remains unknown."
+  ],
+  "native_receipt": "blueprints/convergence-practice/wsl-application/receipt.json",
+  "portability_followup": "blueprints/convergence-practice/wsl-application/portability-followup.json"
+}

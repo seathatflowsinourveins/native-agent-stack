@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "attempts": [
+    {
+      "id": "attempt-1",
+      "status": "failed",
+      "failure": "sandbox_network_and_write_guards",
+      "candidate_started": false,
+      "native_memory_processes_started": 0,
+      "diagnostics": [
+        {
+          "name": "sandbox-guards.command.private.json",
+          "exit_code": -6,
+          "stdout_empty": true,
+          "stderr_empty": true,
+          "private_record_sha256": "98433f25f4dc1ffc0110535d35c71e8c6fbf9f38a1529d7461d66658eb0c12aa"
+        },
+        {
+          "name": "diagnostic-nc.json",
+          "exit_code": -6,
+          "stdout_empty": true,
+          "stderr_empty": true,
+          "private_record_sha256": "a1ce495f29571845bb7cbfd898c4a218acfb40dea25656bd62337266f0c53288"
+        },
+        {
+          "name": "diagnostic-write.json",
+          "exit_code": -6,
+          "stdout_empty": true,
+          "stderr_empty": true,
+          "private_record_sha256": "a1ce495f29571845bb7cbfd898c4a218acfb40dea25656bd62337266f0c53288"
+        },
+        {
+          "name": "diagnostic-true.json",
+          "exit_code": -6,
+          "stdout_empty": true,
+          "stderr_empty": true,
+          "private_record_sha256": "a1ce495f29571845bb7cbfd898c4a218acfb40dea25656bd62337266f0c53288"
+        },
+        {
+          "name": "diagnostic-metadata.json",
+          "exit_code": -6,
+          "stdout_empty": true,
+          "stderr_empty": true,
+          "private_record_sha256": "a1ce495f29571845bb7cbfd898c4a218acfb40dea25656bd62337266f0c53288"
+        },
+        {
+          "name": "diagnostic-minimal.json",
+          "exit_code": 0,
+          "stdout_empty": true,
+          "stderr_empty": true,
+          "private_record_sha256": "260f689cc9d4459f74dc76c0a8005f7ef9b47b353a6e2ab33cf24573d6ca5525"
+        }
+      ]
+    },
+    {
+      "id": "attempt-2-functional",
+      "status": "passed",
+      "scope_change": "Coordinator explicitly restored original separate-store no-model/no-capture scope; no OS confinement claim. New oracle frozen before execution. Original sandbox oracle unchanged.",
+      "candidate_started": true,
+      "native_memory_processes_started": 3,
+      "native_protocol_requests": 42,
+      "native_mcp_calls": 36,
+      "checks_passed": 56
+    }
+  ],
+  "interpretation": "Restricted-profile Python and native built-ins aborted with signal6. A minimal deny-network profile allowed true, proving only sandbox-exec availability. The combined guard assertions remain unestablished; no isolation or functional acceptance is inferred.",
+  "repository_validation": [
+    {
+      "attempt": "system-temp",
+      "tests": 493,
+      "failures": 12,
+      "errors": 33,
+      "skipped": 49,
+      "exit_code": 1,
+      "reason": "Tests reject symlink ancestors; macOS system TMPDIR has /var alias resolving to /private/var. Other path-equality assertions also use that alias. Full log retained privately."
+    },
+    {
+      "attempt": "owned-real-temp",
+      "tests": 493,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 49,
+      "exit_code": 0,
+      "change": "Set TMPDIR only to an owned directory without symlink ancestors; no source assertion changed. Full log retained privately."
+    }
+  ]
+}

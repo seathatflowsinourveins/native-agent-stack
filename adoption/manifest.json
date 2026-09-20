@@ -134,7 +134,8 @@
     "fastapi": "blueprints/convergence-practice/application-delivery/README.md",
     "postgresql": "blueprints/convergence-practice/application-delivery/README.md",
     "poppler": "blueprints/convergence-practice/document-ingestion/README.md",
-    "apple-container": "blueprints/convergence-practice/container-storage/README.md"
+    "apple-container": "blueprints/convergence-practice/container-storage/README.md",
+    "playwright-test": "blueprints/convergence-practice/wsl-application/README.md"
   },
   "profiles": [
     {
