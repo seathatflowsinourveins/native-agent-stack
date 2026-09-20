@@ -1,8 +1,10 @@
 # Requirement coverage and remaining acceptance
 
-Checked 2026-09-19. This is a current, bounded architecture selection across
-seventeen requirements. The central identity union accounts for the full public
-star snapshot and explicitly registered beyond-star candidates. Identity coverage
+Source matrices checked 2026-09-19; current routing updated 2026-09-20. This is a
+bounded architecture selection across eighteen requirements. The [runtime target](../../../catalogs/us-equities/runtime-target.json)
+and [acceptance plan](../engine-nautilus/acceptance-plan.md) govern the selected
+Nautilus/IBKR and separate Alpaca paths; older source matrices retain their dates.
+The central identity union accounts for the full public star snapshot and explicitly registered beyond-star candidates. Identity coverage
 does not mean every file was reviewed or every repository installed.
 
 | Requirement | Current selection | Remaining acceptance |
@@ -20,9 +22,10 @@ does not mean every file was reviewed or every repository installed.
 | Historical/PIT data | LEAN baseline, reviewed universe semantics | Data rights, delistings, actions and original availability |
 | Events and exact time | Native integer-nanosecond replay | Actual provider capture, revisions and receipt timestamps |
 | Factors and extreme movers | Frozen daily/intraday catalyst protocol | All-candidate historical research and controls |
-| Backtests and evaluation | LEAN; skfolio as conditional evaluator | Holdouts, calibrated execution, funding, full trial ledger |
+| Backtests and evaluation | NautilusTrader 2.0.0rc5; LEAN historical comparison; skfolio conditional | Retained equity replay/parity; holdouts, calibrated execution, funding, full trial ledger |
 | Market-state transitions | Causal stress experiment; offline diagnostic candidates | General selector, stale-state rules and transition costs |
-| Alpaca | SDK and offline contract; dedicated paper account selected | Credentials, actual entitlements, risk journal/reconciliation |
+| IBKR | Native Nautilus socket adapter; paper path selected | Native TWS/Gateway sign-in, paper account, unique client ID, data permissions and execution/recovery acceptance |
+| Alpaca | SDK, offline contract and dated authenticated read-only acquisition; separate paper adapter | Current entitlements/Elite activation, execution adapter, risk journal/reconciliation and paper acceptance |
 | Grand dashboard | Native health/usage plus recorded decision/gate progress | Checkpoint maintenance and additional execution adapters |
 
 The new source matrices are [foundation](../../../catalogs/us-equities/convergence-program/foundation.md),
@@ -42,4 +45,10 @@ Alpaca Elite's 200/1,000 tier concerns **API calls per minute**, not completed
 trades. Current margin semantics differ from older PDT model implementations.
 Consult the [current primary-source review](../../../catalogs/us-equities/convergence-program/trading.json)
 and verify the actual account before paper execution. Simulation is the user's
-current priority; paper credentials will be configured locally later.
+current priority. September 20 [authenticated data receipts](../authenticated-data/README.md)
+and [identity observations](../identity-readiness/README.md) preserve actual read-only
+Alpaca access; the former also records the earlier read-only paper-account check.
+The remaining gate is current account/feed/routing permission and broker execution
+acceptance, not a blanket claim that Alpaca credentials are absent. IBKR native
+sign-in and broker acceptance remain unestablished. No credentials are copied or
+queried by this coverage update.

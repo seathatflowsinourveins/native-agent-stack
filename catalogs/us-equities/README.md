@@ -9,10 +9,13 @@ The current selected destination is **NautilusTrader 2.0.0rc5 with IBKR**, plus 
 separately validated **Alpaca** data/paper-execution boundary. LEAN remains the
 accepted historical comparison engine. See the [current target and official
 capability record](runtime-target.json) and updated [north star](../../blueprints/us-equities/north-star.md).
-Earlier research waves below retain their original decisions and evidence.
+The [next acceptance plan](../../blueprints/us-equities/engine-nautilus/acceptance-plan.md)
+binds equity replay to retained SPY inputs, an independent economic oracle and
+separate broker fault/paper gates. Earlier research waves below retain their
+original decisions and evidence.
 
-The [current token-practice audit](../../docs/token-practice.md) maps the selected
-the then-selected 52 components to their evidence levels and records ten exact artifact comparisons
+The [current token-practice audit](../../docs/token-practice.md) maps the
+then-selected 52 components to their evidence levels and records ten exact artifact comparisons
 plus four accepted native coding trials. Catalog inclusion does not supply a
 per-repository token-saving value.
 
@@ -93,7 +96,7 @@ Use the selected native capabilities from the foundation catalog. Keep **DuckDB/
 - Native LEAN source build and unchanged bundled backtest passed: 3,943 data points, 3 simulated orders, 13/13 local-data requests. Data transformed through DuckDB/Parquet successfully.
 - New native QMD catalog retrieval produced 490 tokens versus 6,398 for the full model-guide output: 5,908 fewer, 92.34% less retrieved text. Both artifacts and upstream tokenizer replay are retained.
 - Native HF discovery returned 17 model metadata records and 11 model cards. Only separately cited earlier/native runs establish inference; model-card retrieval does not.
-- New catalog recipes are prospective unless their referenced receipt explicitly establishes execution. No Alpaca connection, strategy edge or deterministic risk service was accepted. A later manual research DAG and authenticated local Dagu history host were accepted; this is not unattended trading.
+- New catalog recipes are prospective unless their referenced receipt explicitly establishes execution. Those early recipes did not accept broker execution, strategy edge or a deterministic risk service. Later Alpaca authenticated read-only acquisition and identity receipts establish only their bounded observed access. A later manual research DAG and authenticated local Dagu history host were accepted; this is not unattended trading.
 
 The later [native observability receipt](../../observability/receipt.json) establishes actual Codex/Claude log and metric export through the local Collector. [Backend evidence](../../observability/backends/receipt.json) covers Prometheus, Loki, Grafana and local alert delivery. These are bounded local runtime results; trace storage, broker monitoring, external alerts and maximum/net token-savings claims remain outside acceptance.
 
