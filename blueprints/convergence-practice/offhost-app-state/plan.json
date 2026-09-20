@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "status": "frozen-input-contract-execution-pending",
+  "scope": "One synthetic native application-state transfer between two fresh GitHub-hosted jobs; ai-memory2.3.2 and Qdrant1.19.1 only.",
+  "provenance": {
+    "upstream_tests": "Ten unchanged ai-memory tests plus four unchanged Qdrant pytest cases. Qdrant tests target the verified release binary, not the upstream debug build; full suites are not claimed.",
+    "upstream_fixture": "Unchanged Qdrant basic_collection_setup seeds ten public points.",
+    "local_integration": "Existing synthetic memory fixture, exact Restic transfer, full-state and post-restore queries, independent arithmetic oracle and metadata/cleanup guards are our composition."
+  },
+  "source_job": [
+    "Verify selected official archive/executable hashes and fixed upstream revisions.",
+    "Run selected unchanged application tests with their own fixtures before transfer preparation.",
+    "Run existing unmodified Linux memory runner with corrected frozen oracle; require native backup, same-host calibration restore and all query checks.",
+    "Create Qdrant public upstream fixture, city/price indexes and one alias; verify complete points and independently frozen dense/filter/sparse query results.",
+    "Create native full-storage snapshot; verify source unchanged; stop only owned application processes.",
+    "Encrypt only memory native backup and Qdrant snapshot in one new Restic repository, neutralize native key labels, full-read check, and freeze exact snapshot/archive/ciphertext identities."
+  ],
+  "destination_job": [
+    "Use fresh GitHub-hosted job; require distinct boot identity and same workflow run/head plus source output checksum.",
+    "Receive exact encrypted source artifact and independently deliver the existing fixture-only Actions secret.",
+    "Reject wrong key with no files, check --read-data, restore exact snapshot into an empty owned target, verify both archive hashes.",
+    "Native ai-memory restore without force; reopened stdio MCP exact reads, FTS, scope negatives, old-marker absence and no-capture SQLite checks.",
+    "Native Qdrant --storage-snapshot without force or storage.temp_path; complete points/config/schema/aliases and real dense/filter/sparse queries via collection and alias equal source and fixed public oracle.",
+    "Require unchanged incoming ciphertext and cleanup of owned processes, listeners, runtime and separately supplied password."
+  ],
+  "key_flow": {
+    "secret_name": "FOUNDATION_RESTORE_FIXTURE_20260920",
+    "delivery": "Each job receives the existing fixture-only Actions secret separately through a step-scoped environment and writes one new regular0600 private file; native child environments are allowlisted and receive its path only.",
+    "never_uploaded": [
+      "password file",
+      "bearer tokens",
+      "private configuration",
+      "plaintext database/archive/storage directories"
+    ],
+    "uploaded": [
+      "exact native encrypted app repository in verified text envelope",
+      "sanitized source/destination/native command reports",
+      "encrypted raw synthetic command/protocol proof, excluding key or credential files"
+    ],
+    "trust_limit": "Ciphertext artifacts and separately delivered secret share the same GitHub administrative account."
+  },
+  "boundaries": {
+    "source_job_minutes": 45,
+    "destination_job_minutes": 15,
+    "cargo_selection_seconds": 1500,
+    "native_command_seconds": 180,
+    "owned_qdrant_http": "127.0.0.1:6333; occupied port fails",
+    "upstream_http_fixture": "Unchanged helper binds all addresses inside a separate network namespace containing loopback only; packages are fetched before this phase.",
+    "providers": "No model, embedding or external account route; frozen memory config disables capture/maintenance/providers."
+  },
+  "failures": "First unsupported native error, refusal, oracle mismatch or cleanup failure ends that phase; record command and streams without unchanged retry. Evidence sealing and owned cleanup still run.",
+  "limitations": [
+    "Synthetic application usability only; no private user database, production recovery, client rebinding, reboot or whole-stack claim.",
+    "Exact snapshots created by the source job are frozen before destination execution; this does not retroactively qualify old private app-state archives.",
+    "Separate jobs and distinct boot identities support fresh-host separation; no independent administrative trust domain or account-loss recovery claim.",
+    "Sequential app snapshots are not one cross-application atomic transaction.",
+    "Selected source tests are distinct from the composed cross-host fixture and from actual destination acceptance.",
+    "Native applications run with owned paths and filtered environments on disposable runners; no general OS filesystem sandbox claim.",
+    "No token-saving claim; provider usage is not measured."
+  ],
+  "frozen_sources": [
+    {
+      "path": ".github/workflows/native-offhost-app-state.yml",
+      "sha256": "120324ab2042f3a0b62eefe9e56d84a3fd354f668aa75628c5743a1bf6681cb4"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/memory-oracle.json",
+      "sha256": "440331d2a2bdaa9c5dcb2cf53b21efe865a1c01140fe4347afa9f95756efc1dd"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/network.py",
+      "sha256": "6c160ec7dd152aa18e450582908006113da4f87dc0570c1df0744d0198b88212"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/qdrant-oracle.json",
+      "sha256": "e16f7490d75900a5fa74fbba82c3223c50952945797f831c82c8a0bf5a9366c9"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/run.py",
+      "sha256": "d5eddb06d7fc86218b98e11e84b70edd7ee7f72cdc31caeab454112bd1b2b950"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/upstream.json",
+      "sha256": "c65bf28411850891ef91607902d279391dc9464a74f93074920e8d846d13aa71"
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/verify.py",
+      "sha256": "fd51bb5c2ccdea21134b03848e53130bb0cf7dcf53840f988424533fa4bc772f"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-memory-maintenance/config.toml",
+      "sha256": "5ee5fb3ddcb790c9a234143fdfa2f99b80ecf752a45c9e8cad625d75e9311331"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-memory-maintenance/pins.json",
+      "sha256": "a8919332b6910adb2e3b6e8ff8153f24d258fbdae056d025c19cc7549996b1d7"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-memory-maintenance/run.py",
+      "sha256": "5abefd6083f2ac6057cd6ca6f64cf2fc77a68e6213b35f64bddfa5d18b169a3e"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/install.py",
+      "sha256": "243d7174ab90d3cac7667a6af74bb2062c9f0fc3275aa2b447b25afa870f3c07"
+    },
+    {
+      "path": "tests/test_offhost_app_state.py",
+      "sha256": "a763c8ed4d707bbe447a4af97c7545faabd75866f5ffea320d232285a9a0162c"
+    }
+  ]
+}

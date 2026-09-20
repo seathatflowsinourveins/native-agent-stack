@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "workspace": "wsl-maintenance-synthetic",
+  "alpha": {
+    "project": "alpha",
+    "path": "notes/alpha.md",
+    "body": "# Synthetic alpha decision\nWslpatchcobalt belongs only to alpha.\n",
+    "marker": "Wslpatchcobalt"
+  },
+  "beta": {
+    "project": "beta",
+    "path": "notes/beta.md",
+    "body": "# Synthetic beta decision\nWslpatchamber belongs only to beta.\n",
+    "marker": "Wslpatchamber"
+  },
+  "updated_alpha": {
+    "body": "# Updated synthetic alpha decision\nWslpatchwillow replaces the original alpha decision.\n",
+    "marker": "Wslpatchwillow"
+  },
+  "unicode": {
+    "project": "alpha",
+    "path": "notes/aéé/decision.md",
+    "body": "# Unicode fixture\nWslpatchunicode survives a five-byte Unicode directory component.\n",
+    "marker": "Wslpatchunicode"
+  },
+  "reserved_path": ".git/config",
+  "required_tools": [
+    "memory_query",
+    "memory_read_page",
+    "memory_write_page",
+    "memory_status"
+  ],
+  "acceptance": [
+    "Pinned official Linux x86_64 ai-memory 2.3.2 archive, sidecar, executable and license match",
+    "Native scoped writes, reads, FTS positives and cross-scope negatives match the public synthetic bodies",
+    "Unicode path and updated alpha persist through restart and native backup/restore",
+    "Native source-generated archive transfers through exact encrypted Restic snapshot to a distinct fresh hosted destination",
+    "Destination native restore and real MCP reads/queries reproduce exact source fixture bodies, scope negatives, old-marker absence and SQLite integrity",
+    "No captured history, embeddings or downloaded model files; all owned processes stop"
+  ],
+  "stop_conditions": [
+    "source, artifact or binary hash mismatch",
+    "unexpected native error or refusal",
+    "any failed frozen assertion",
+    "cleanup failure"
+  ],
+  "execution_scope": "Local integration of public synthetic state with pinned native operations; no production state, provider calls, client registration, OS sandbox or upstream-test authorship claim.",
+  "backup_restore": {
+    "backup_required": true,
+    "restore_outcomes": [
+      "passed",
+      "blocked_by_native_sibling_process_guard"
+    ],
+    "on_refusal": "Retain native exit, no retry, no process enumeration or unrelated signals, empty restore target unchanged.",
+    "on_success": "Exact updated scoped bodies and FTS, Unicode, negatives, capture-off, database integrity."
+  }
+}

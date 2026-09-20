@@ -1,0 +1,179 @@
+name: Native synthetic off-host application-state recovery
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    outputs:
+      source_record_sha256: ${{ steps.source-record.outputs.sha256 }}
+    steps:
+      - name: Check out the frozen workflow revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up the selected upstream Python line
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Create an owned empty runtime
+        run: |
+          umask 077
+          app_root=$(mktemp --directory /tmp/native-offhost-app.XXXXXXXX)
+          mkdir --mode=0700 -- "$app_root/reports" "$app_root/private"
+          printf 'APP_STATE_ROOT=%s\n' "$app_root" >> "$GITHUB_ENV"
+      - name: Check the frozen local guards without native applications
+        run: python3 -m unittest tests.test_offhost_app_state -v
+      - name: Install verified native releases into the owned prefix
+        run: python3 blueprints/convergence-practice/offhost-app-state/run.py install --root "$APP_STATE_ROOT"
+      - name: Prepare the exact upstream native test dependencies
+        run: |
+          sudo apt-get update 2>&1 | tee "$APP_STATE_ROOT/reports/apt-update.txt"
+          sudo apt-get install --yes --no-install-recommends pkg-config build-essential curl ca-certificates tar gzip iproute2 2>&1 | tee "$APP_STATE_ROOT/reports/apt-install.txt"
+          export RUSTUP_HOME="$APP_STATE_ROOT/rustup"
+          export CARGO_HOME="$APP_STATE_ROOT/cargo"
+          printf 'RUSTUP_HOME=%s\nCARGO_HOME=%s\n' "$RUSTUP_HOME" "$CARGO_HOME" >> "$GITHUB_ENV"
+          rustup toolchain install 1.95.0 --profile minimal --no-self-update > "$APP_STATE_ROOT/reports/rustup-install.txt" 2>&1
+          python3 -m venv "$APP_STATE_ROOT/python-tools"
+          "$APP_STATE_ROOT/python-tools/bin/python" -m pip install --disable-pip-version-check 'uv==0.9.17' > "$APP_STATE_ROOT/reports/uv-install.txt" 2>&1
+          printf '%s\n' "$APP_STATE_ROOT/python-tools/bin" >> "$GITHUB_PATH"
+      - name: Run selected unchanged native upstream application tests
+        run: python3 blueprints/convergence-practice/offhost-app-state/run.py upstream --root "$APP_STATE_ROOT"
+      - name: Deliver the existing fixture-only secret separately
+        env:
+          FIXTURE_PASSWORD: ${{ secrets.FOUNDATION_RESTORE_FIXTURE_20260920 }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          value = os.environ.pop('FIXTURE_PASSWORD', '').rstrip('\n')
+          if not value or len(value) > 256 or '\n' in value or '\r' in value:
+              raise SystemExit('Required fixture-only secret is missing or malformed')
+          path = Path(os.environ['APP_STATE_ROOT']) / 'private/password'
+          descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+          with os.fdopen(descriptor, 'w') as stream:
+              stream.write(value + '\n')
+          with open(os.environ['GITHUB_ENV'], 'a') as stream:
+              stream.write('APP_STATE_KEY_READY=true\n')
+          PY
+          unset FIXTURE_PASSWORD
+      - name: Prepare native public-fixture snapshots and exact encrypted transfer
+        id: prepare
+        run: python3 blueprints/convergence-practice/offhost-app-state/run.py source --root "$APP_STATE_ROOT"
+      - name: Bind the exact source record to this job
+        id: source-record
+        run: |
+          python3 - <<'PY'
+          import hashlib, os
+          from pathlib import Path
+          path = Path(os.environ['APP_STATE_ROOT']) / 'transfer/source.json'
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
+              stream.write('sha256=' + hashlib.sha256(path.read_bytes()).hexdigest() + '\n')
+          PY
+      - name: Upload only frozen ciphertext and the public source oracle
+        if: ${{ !cancelled() && steps.prepare.outcome == 'success' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: frozen-synthetic-app-transfer
+          path: ${{ env.APP_STATE_ROOT }}/transfer/
+          if-no-files-found: error
+          include-hidden-files: false
+          retention-days: 14
+      - name: Preserve recoverable encrypted raw native proof
+        if: ${{ always() && env.APP_STATE_KEY_READY == 'true' }}
+        run: python3 blueprints/convergence-practice/offhost-app-state/run.py seal --root "$APP_STATE_ROOT"
+      - name: Remove the delivered secret and disposable application runtime
+        if: ${{ always() && env.APP_STATE_ROOT != '' }}
+        run: python3 blueprints/convergence-practice/offhost-app-state/run.py cleanup --root "$APP_STATE_ROOT"
+      - name: Retain sanitized reports and encrypted proof only
+        if: ${{ !cancelled() && env.APP_STATE_ROOT != '' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: source-reports-and-encrypted-proof
+          path: |
+            ${{ env.APP_STATE_ROOT }}/reports/
+            ${{ env.APP_STATE_ROOT }}/encrypted-proof/
+          if-no-files-found: error
+          include-hidden-files: false
+          retention-days: 14
+
+  destination:
+    needs: source
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out the frozen workflow revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up the selected upstream Python line
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Create an owned empty runtime
+        run: |
+          umask 077
+          app_root=$(mktemp --directory /tmp/native-offhost-app.XXXXXXXX)
+          mkdir --mode=0700 -- "$app_root/reports" "$app_root/private"
+          printf 'APP_STATE_ROOT=%s\n' "$app_root" >> "$GITHUB_ENV"
+      - name: Check the frozen local guards without native applications
+        run: python3 -m unittest tests.test_offhost_app_state -v
+      - name: Install verified native releases into the owned prefix
+        run: python3 blueprints/convergence-practice/offhost-app-state/run.py install --root "$APP_STATE_ROOT"
+      - name: Download the exact encrypted source-job artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: frozen-synthetic-app-transfer
+          path: ${{ env.APP_STATE_ROOT }}/incoming
+      - name: Deliver the existing fixture-only secret separately
+        env:
+          FIXTURE_PASSWORD: ${{ secrets.FOUNDATION_RESTORE_FIXTURE_20260920 }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          value = os.environ.pop('FIXTURE_PASSWORD', '').rstrip('\n')
+          if not value or len(value) > 256 or '\n' in value or '\r' in value:
+              raise SystemExit('Required fixture-only secret is missing or malformed')
+          path = Path(os.environ['APP_STATE_ROOT']) / 'private/password'
+          descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+          with os.fdopen(descriptor, 'w') as stream:
+              stream.write(value + '\n')
+          with open(os.environ['GITHUB_ENV'], 'a') as stream:
+              stream.write('APP_STATE_KEY_READY=true\n')
+          PY
+          unset FIXTURE_PASSWORD
+      - name: Restore and query native applications on this distinct host
+        env:
+          SOURCE_RECORD_SHA256: ${{ needs.source.outputs.source_record_sha256 }}
+        run: python3 blueprints/convergence-practice/offhost-app-state/run.py destination --root "$APP_STATE_ROOT"
+      - name: Preserve recoverable encrypted raw native proof
+        if: ${{ always() && env.APP_STATE_KEY_READY == 'true' }}
+        run: python3 blueprints/convergence-practice/offhost-app-state/run.py seal --root "$APP_STATE_ROOT"
+      - name: Remove the delivered secret and disposable application runtime
+        if: ${{ always() && env.APP_STATE_ROOT != '' }}
+        run: python3 blueprints/convergence-practice/offhost-app-state/run.py cleanup --root "$APP_STATE_ROOT"
+      - name: Retain sanitized reports and encrypted proof only
+        if: ${{ !cancelled() && env.APP_STATE_ROOT != '' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: destination-reports-and-encrypted-proof
+          path: |
+            ${{ env.APP_STATE_ROOT }}/reports/
+            ${{ env.APP_STATE_ROOT }}/encrypted-proof/
+          if-no-files-found: error
+          include-hidden-files: false
+          retention-days: 14

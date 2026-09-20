@@ -74,9 +74,13 @@ The three tracked foundation priorities are:
    a forced parent-runtime crash, one unchanged checkpoint and one final effect.
    The earlier manual-cleanup and refused-role trials remain recorded failures;
    this WSL fixture does not establish whole-host or remote-provider recovery.
-3. Qualify independent off-host restore with separately available key recovery,
-   and scheduled-service acceptance after reboot. Same-host restore and ordinary
-   stop/start do not close these gaps.
+3. Complete independent off-host application queries and scheduled-service
+   acceptance after reboot. Synthetic Restic byte/mode recovery is accepted;
+   the [native application-state trial](../../blueprints/convergence-practice/offhost-app-state/README.md)
+   now defines separate fresh source/destination jobs and unchanged upstream
+   tests, but has not executed yet. The guest observer correction also awaits
+   its actual result. Same-host restore and ordinary stop/start do not qualify
+   these remaining boundaries.
 
 Use [the convergence guide](../../docs/convergence-architecture.md) for the work
 sequence and [the lifecycle guide](../../adoption/lifecycle.md) for selected native

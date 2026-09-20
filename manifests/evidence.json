@@ -5084,8 +5084,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "29f359cb6fcd7ce27953256ba651cccdb3bec52f7ed7d64e649717ef2fa137d4",
-      "bytes": 3719321
+      "sha256": "7db9b2ef45ef9bfdc903e12673ec337d81c4af78bfcd6d112e1f091a8d368bad",
+      "bytes": 3720076
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5094,7 +5094,7 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "29f4c329e4bbc4135842e7859501dc0b301fe4cea118a48c367a2c1e76f356cd",
+      "sha256": "b188bffd22ab9250afc7437075f8a7472b78666131b347c92bd3fe2711323424",
       "bytes": 31324
     },
     {
@@ -6084,8 +6084,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "794f9321b426b54e6db27c35dfc8fd0e4ae5c75fbf99d21062679ccacddcdf42",
-      "bytes": 6788
+      "sha256": "1a9e7678d331648d310647746638abe564cfc38fcb0147d39be2492075202fb4",
+      "bytes": 7112
     },
     {
       "path": "catalogs/foundation/decisions.json",
@@ -6094,8 +6094,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "480988f1500bf01224ad767b104c62f9cffbcd6099ed149c77cded095ea4bd67",
-      "bytes": 17203
+      "sha256": "1e1f916dfb2d176cac7a4cb639d1a9ad40bb07503b2d9a18ea730574a23b0fa9",
+      "bytes": 17274
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -7011,6 +7011,51 @@
       "path": "blueprints/convergence-practice/service-reboot/observer-repair.json",
       "sha256": "fec43c4bcc017fddb079c07ed77c6aa3e16638aa1bd87f10edcbddf2af2fe391",
       "bytes": 2199
+    },
+    {
+      "path": ".github/workflows/native-offhost-app-state.yml",
+      "sha256": "120324ab2042f3a0b62eefe9e56d84a3fd354f668aa75628c5743a1bf6681cb4",
+      "bytes": 9017
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/README.md",
+      "sha256": "11782066b26c31ce20e1ab355d28f1b7da6536a75741bf06b19658d8909a81a7",
+      "bytes": 7331
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/memory-oracle.json",
+      "sha256": "440331d2a2bdaa9c5dcb2cf53b21efe865a1c01140fe4347afa9f95756efc1dd",
+      "bytes": 2429
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/network.py",
+      "sha256": "6c160ec7dd152aa18e450582908006113da4f87dc0570c1df0744d0198b88212",
+      "bytes": 925
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/plan.json",
+      "sha256": "ba247c289d3f542491de15fddf6dd46de1822399b9f6967a5c44c0d8b3d24ffe",
+      "bytes": 7010
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/qdrant-oracle.json",
+      "sha256": "e16f7490d75900a5fa74fbba82c3223c50952945797f831c82c8a0bf5a9366c9",
+      "bytes": 3971
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/run.py",
+      "sha256": "d5eddb06d7fc86218b98e11e84b70edd7ee7f72cdc31caeab454112bd1b2b950",
+      "bytes": 43926
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/upstream.json",
+      "sha256": "c65bf28411850891ef91607902d279391dc9464a74f93074920e8d846d13aa71",
+      "bytes": 10004
+    },
+    {
+      "path": "tests/test_offhost_app_state.py",
+      "sha256": "a763c8ed4d707bbe447a4af97c7545faabd75866f5ffea320d232285a9a0162c",
+      "bytes": 9730
     }
   ],
   "convergence_records": [
