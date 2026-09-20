@@ -1,0 +1,61 @@
+{
+  "after_retry_status": "succeeded",
+  "architecture": "x86_64",
+  "before_retry_status": "aborted",
+  "checkpoint_execution_count": 1,
+  "checkpoint_sha256_unchanged": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+  "checkpoint_tests": 12,
+  "command_exit_codes": {
+    "history-aborted": 0,
+    "history-succeeded": 0,
+    "retry": 0,
+    "start": 0,
+    "stop": 0,
+    "validate": 0,
+    "version": 0
+  },
+  "completed_at_utc": "2026-09-20T05:09:34.381219+00:00",
+  "dagu_version": "2.16.6",
+  "final_tests": 12,
+  "frozen_inputs": {
+    "dagu_binary_sha256": "20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7",
+    "frozen_at_utc": "2026-09-20T05:09:33.574111+00:00",
+    "private_inputs": {
+      "config.yaml": "a2651229d74dd660c8f98f884292ecb8e405ea6ab3bc363ad4985d4d1eb4a087",
+      "expected.json": "b71639f796b744d6d3bf2897e34f64e9646b808e0136f6dd5222a0c6c47b1893",
+      "fixture.py": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+      "recovery.yaml": "a022101041859f5fdff56a928320bb64ddbd4366be9b05fe1ed2fe54fce1c244"
+    },
+    "python_version": "3.13.15",
+    "repository_inputs": {
+      "blueprints/convergence-practice/job-recovery/fixture.py": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+      "blueprints/convergence-practice/job-recovery/plan.json": "0e6f3dffbc8c87094c660358874382987150bffb6a01b67de7e855d686f12aac",
+      "blueprints/convergence-practice/job-recovery/run.py": "8ed7548112c45a88d57cabf917269ef34a99fbacaa2ce019325d92393a27d1af",
+      "blueprints/convergence-practice/native-worker/accepted/planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+      "blueprints/convergence-practice/native-worker/seed/test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+    }
+  },
+  "model_calls": 0,
+  "observed_owned_processes_remaining": 0,
+  "platform": "Linux 6.18.33.2-microsoft-standard-WSL2",
+  "python_version": "3.13.15",
+  "retained_native_outputs": {
+    "history-aborted.stderr": "33dfd844233dadd581db7c608b41bac2ecfd4cd353392e981d2dac7f8e9a1c17",
+    "history-aborted.stdout": "2f56113415bc1dce737351997fcd2d7d1b165937baff169c19d5336fdbc3d7b8",
+    "history-succeeded.stderr": "a21e33dc3454bb1b768710ae8def3c99f96086d0e645d32e22ef433582675e99",
+    "history-succeeded.stdout": "b019f630403ad1aa191d95fbff33c6981fe6a0682b22cc989928907ae9663f9a",
+    "retry.stderr": "858020b56cff33708707ab6a162755f438d44a8b1c49b33092098a134099aab3",
+    "retry.stdout": "52837f71c54a1f3fc5d564e92d0654216014f81d9c201efaae8c786fecbc1558",
+    "start.stderr": "b545197874e01d31f838c1562bfc63733c37f508be0d5104785b69b3198b980b",
+    "start.stdout": "f1b04eee9e94c4c1c41520dd207f2f4584fddd02827c4ea343bc0f254173f333",
+    "stop.stderr": "20a3447dc46d297d353b03b5531735dfb7c68043face730f014950f2740ce674",
+    "stop.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "validate.stderr": "450f4e0ff49ba84779a9210dc68596434f64a4938cc6e88deea7a46a3c7570f4",
+    "validate.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "version.stdout": "7ee203ac73fca7d93c699ceefabb5bb5cdea2e02213de22ceea56908ff0945c5"
+  },
+  "retry_finalizer_remaining": false,
+  "same_native_run_id": true,
+  "status": "passed"
+}

@@ -1,0 +1,103 @@
+{
+  "initial_validation_failure": {
+    "status": "failed",
+    "exit_code": 1,
+    "dag_started": false,
+    "native_diagnostic": "entrypoint document must not define name",
+    "correction": "Remove the explicit top-level name; Dagu derives the entrypoint identity from its filename. Frozen planner, test oracle and acceptance rules are unchanged.",
+    "freeze": {
+      "dagu_binary_sha256": "325ecbd0662d477146be95de57f36613529ddaad93a63a7447bcd615bf7ad1ce",
+      "frozen_at_utc": "2026-09-20T05:03:35.071012+00:00",
+      "private_inputs": {
+        "config.yaml": "a2651229d74dd660c8f98f884292ecb8e405ea6ab3bc363ad4985d4d1eb4a087",
+        "expected.json": "b71639f796b744d6d3bf2897e34f64e9646b808e0136f6dd5222a0c6c47b1893",
+        "fixture.py": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+        "recovery.yaml": "717645c2f20c683ff4b932e67263c8716822eb45c29ba8bc5694988ce9f06137"
+      },
+      "python_version": "3.14.7",
+      "repository_inputs": {
+        "blueprints/convergence-practice/job-recovery/fixture.py": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+        "blueprints/convergence-practice/job-recovery/plan.json": "0e6f3dffbc8c87094c660358874382987150bffb6a01b67de7e855d686f12aac",
+        "blueprints/convergence-practice/job-recovery/run.py": "3610052948624f45b1e05f5d7f011caa4a2b94c585e0ed7731b4d1fbac120f9f",
+        "blueprints/convergence-practice/native-worker/accepted/planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+        "blueprints/convergence-practice/native-worker/seed/test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+      }
+    },
+    "retained_output_sha256": {
+      "validate.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validate.stderr": "69f13be1c298852dfe09228f2b64b244c14ea5ffd75ad165cbbfa445ff23d90d"
+    }
+  },
+  "initial_native_success": {
+    "after_retry_status": "succeeded",
+    "architecture": "arm64",
+    "before_retry_status": "aborted",
+    "checkpoint_execution_count": 1,
+    "checkpoint_sha256_unchanged": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+    "checkpoint_tests": 12,
+    "command_exit_codes": {
+      "history-aborted": 0,
+      "history-succeeded": 0,
+      "retry": 0,
+      "start": 0,
+      "stop": 0,
+      "validate": 0,
+      "version": 0
+    },
+    "completed_at_utc": "2026-09-20T05:04:26.971367+00:00",
+    "dagu_version": "2.16.6",
+    "final_tests": 12,
+    "frozen_inputs": {
+      "dagu_binary_sha256": "325ecbd0662d477146be95de57f36613529ddaad93a63a7447bcd615bf7ad1ce",
+      "frozen_at_utc": "2026-09-20T05:04:26.175189+00:00",
+      "private_inputs": {
+        "config.yaml": "a2651229d74dd660c8f98f884292ecb8e405ea6ab3bc363ad4985d4d1eb4a087",
+        "expected.json": "b71639f796b744d6d3bf2897e34f64e9646b808e0136f6dd5222a0c6c47b1893",
+        "fixture.py": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+        "recovery.yaml": "1334cf32d84d5a41c87b996fcfae4e7a9fd903617450b78b1b6a4f2308c1c71d"
+      },
+      "python_version": "3.14.7",
+      "repository_inputs": {
+        "blueprints/convergence-practice/job-recovery/fixture.py": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+        "blueprints/convergence-practice/job-recovery/plan.json": "0e6f3dffbc8c87094c660358874382987150bffb6a01b67de7e855d686f12aac",
+        "blueprints/convergence-practice/job-recovery/run.py": "3b9448632b572375eeabe44b6498deb8fb73af7d8a451687991824029c47761f",
+        "blueprints/convergence-practice/native-worker/accepted/planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+        "blueprints/convergence-practice/native-worker/seed/test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+      }
+    },
+    "model_calls": 0,
+    "observed_owned_processes_remaining": 0,
+    "platform": "Darwin 25.5.0",
+    "python_version": "3.14.7",
+    "retained_native_outputs": {
+      "history-aborted.stderr": "2db4209c183f710544258403b6fcbc0d9c3dd674eb21c8724b6c3dce151c1ccd",
+      "history-aborted.stdout": "d8ac229c6e0deb0e6bd58affe1d289a68eb6c8494d08bb3454f4f6549074ebab",
+      "history-succeeded.stderr": "1f3b1658a5419901c2c60ef6bf7af66099cfa87bcd498f57424e767f987e4c1b",
+      "history-succeeded.stdout": "e0f69efcf5745b94e83e8122aa8ad7cef0a15c3befdbae5d72cf95766afd25ae",
+      "retry.stderr": "bf736fe98626880fb066845e5aca46a2117e2a9a7b2492d368c4cabfccea22ed",
+      "retry.stdout": "8fc59dec5c57cab8bffe4261d66967322baf5ecfb11f191dc44373e625d66fe9",
+      "start.stderr": "aba8b613335ecf5243dab506805fdd4a5928d7d70a04970df97eddeb30812fc3",
+      "start.stdout": "34f01ae2b9edea954f01bfd475a3d29a60c886bb40778bcfddbdcb064feb4a21",
+      "stop.stderr": "624d5014534b383fde9b261f069987148a00a6dd9c8751f7d8912cfcf1667a69",
+      "stop.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "validate.stderr": "b55ac99c4cb3448bbc7bb7da39e1daebd2da38edb2babeeae265e677261a3d45",
+      "validate.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version.stdout": "7ee203ac73fca7d93c699ceefabb5bb5cdea2e02213de22ceea56908ff0945c5"
+    },
+    "retry_finalizer_remaining": false,
+    "same_native_run_id": true,
+    "status": "passed"
+  },
+  "final_mac_repetition_reason": "After the initial passing native run, the CLI wrapper was hardened to terminate its own process group on a command timeout and preserve timeout output. The final frozen source passed again before WSL execution was requested. No oracle or acceptance rule changed.",
+  "regression_checks": {
+    "macos": {
+      "tests": 7,
+      "passed": 7
+    },
+    "wsl": {
+      "tests": 7,
+      "passed": 7
+    }
+  }
+}

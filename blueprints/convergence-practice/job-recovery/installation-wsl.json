@@ -1,0 +1,18 @@
+{
+  "verified_at_utc": "2026-09-20T05:09:07.907757+00:00",
+  "release_url": "https://github.com/dagucloud/dagu/releases/tag/v2.16.6",
+  "release_published_at": "2026-09-14T14:45:57Z",
+  "source_revision": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+  "artifact_url": "https://github.com/dagucloud/dagu/releases/download/v2.16.6/dagu_2.16.6_linux_amd64.tar.gz",
+  "artifact_bytes": 50466314,
+  "artifact_sha256": "06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717",
+  "publisher_checksum_matched": true,
+  "github_asset_digest_matched": true,
+  "license": "GPL-3.0",
+  "license_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+  "binary_sha256": "20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7",
+  "binary_platform": "ELF x86_64 Linux",
+  "install_path_relative": "tools/dagu/2.16.6/dagu",
+  "global_path_or_service_changed": false,
+  "rollback": "Retire only the task-owned qualification directory after preserving its receipts; no global configuration was installed."
+}
