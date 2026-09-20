@@ -10,8 +10,10 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import struct
+import subprocess
 import zlib
 from pathlib import Path, PurePosixPath
 
@@ -80,6 +82,26 @@ def is_structural_png(content: bytes) -> bool:
             return size == 0 and seen_data and end == len(content)
         offset = end
     return False
+
+
+def is_supported_pdf_framing(content: bytes) -> bool:
+    """Recognize bounded classic, single-revision PDF framing only.
+
+    This is not a PDF parser: streams, encoded names, text, attachments and
+    active content are not decoded or certified safe by this check.
+    """
+    if not re.match(rb"%PDF-(?:1\.[0-7]|2\.0)[\r\n]", content):
+        return False
+    ending = re.search(rb"startxref\s+([0-9]{1,20})\s+%%EOF\s*\Z", content)
+    if ending is None or content.count(b"%%EOF") != 1:
+        return False
+    offset = int(ending[1])
+    if offset >= ending.start() or not content[offset:].startswith(b"xref"):
+        return False
+    trailer = content[offset:ending.start()]
+    return (re.search(rb"\btrailer\s*<<", trailer) is not None
+            and re.search(rb"/Root\s+[0-9]+\s+[0-9]+\s+R\b", trailer) is not None
+            and re.search(rb"/(?:Encrypt|Prev)\b", content) is None)
 
 
 class Validator:
@@ -164,29 +186,98 @@ class Validator:
             self.error(f"{relative_path}: unsupported schema_version")
         return result
 
-    def scan_publication(self, hashed_paths=()) -> None:
-        for path in sorted(self.root.rglob("*")):
-            relative = path.relative_to(self.root)
-            if ".git" in relative.parts or "__pycache__" in relative.parts:
-                continue
-            if path.is_symlink():
-                self.error(f"{relative}: symlinks are forbidden")
-                continue
-            if not path.is_file():
+    def publication_paths(self, hashed_paths) -> list[str]:
+        """Use only this root's Git boundary; archives retain filesystem scanning."""
+        paths = {"manifests/stack.json", "manifests/evidence.json", *hashed_paths}
+        marker = self.root / ".git"
+        if marker.exists() or marker.is_symlink():
+            # Inherited Git routing/index variables must not select another
+            # checkout or hide tracked files in an alternate index.
+            environment = {key: value for key, value in os.environ.items() if not key.startswith("GIT_")}
+            try:
+                top = subprocess.run(
+                    ["git", "--no-optional-locks", "-C", str(self.root), "rev-parse", "--show-toplevel"],
+                    env=environment, capture_output=True, check=True,
+                )
+                if Path(os.fsdecode(top.stdout).rstrip("\r\n")).resolve() != self.root:
+                    raise ValueError("Git top level differs from publication root")
+                listing = subprocess.run(
+                    ["git", "--no-optional-locks", "-C", str(self.root), "ls-files", "--cached",
+                     "--others", "--exclude-standard", "-z"],
+                    env=environment, capture_output=True, check=True,
+                )
+                if listing.stdout and not listing.stdout.endswith(b"\0"):
+                    raise ValueError("Git listing is not NUL terminated")
+                paths.update(os.fsdecode(item) for item in listing.stdout.split(b"\0") if item)
+            except (OSError, subprocess.CalledProcessError, ValueError):
+                # Do not fall back to a success on an incomplete or redirected
+                # Git listing, and do not echo Git's possibly private stderr.
+                self.error("Git publication enumeration failed at the exact root")
+        else:
+            # A source archive can be inside some unrelated parent repository.
+            # Never borrow that ancestor's ignores. Prune only Git metadata and
+            # generated Python cache directories, without hiding cache symlinks.
+            def walk_error(_error):
+                self.error("Cannot enumerate publication archive")
+
+            for directory, folders, filenames in os.walk(self.root, onerror=walk_error):
+                parent = Path(directory)
+                folders[:] = [name for name in folders if name != ".git"
+                              and (name != "__pycache__" or (parent / name).is_symlink())]
+                for name in filenames + [name for name in folders if (parent / name).is_symlink()]:
+                    if name != ".git":
+                        paths.add((parent / name).relative_to(self.root).as_posix())
+        return sorted(paths)
+
+    def pdf_review(self, relative: str, raw: bytes, files: dict) -> None:
+        label = f"{relative}.publication_review"
+        record = files[relative]
+        review = record.get("publication_review")
+        if not isinstance(review, dict):
+            self.error(f"{label}: PDF requires recorded review and provenance")
+            return
+        for field in ("source", "license", "text_extraction_method"):
+            self.text(review.get(field), f"{label}.{field}")
+        if review.get("reviewed_for_private_content") is not True:
+            self.error(f"{label}: reviewed_for_private_content must be true")
+        if review.get("reviewed_sha256") != hashlib.sha256(raw).hexdigest():
+            self.error(f"{label}: reviewed_sha256 must match PDF bytes")
+        extraction = review.get("text_extraction_path")
+        if (not isinstance(extraction, str) or extraction not in files
+                or PurePosixPath(extraction).suffix.lower() not in {".txt", ".md"}):
+            self.error(f"{label}: text_extraction_path must name hash-listed UTF-8 text")
+        else:
+            self.path(extraction, f"{label}.text_extraction_path")
+
+    def scan_publication(self, files: dict) -> None:
+        artifact_roots = {("evidence", "artifacts"), ("blueprints", "convergence-practice")}
+        for name in self.publication_paths(files):
+            relative = PurePosixPath(name)
+            if relative.parts[:2] in {("evidence", "receipts"), ("evidence", "artifacts")} and name not in files:
+                self.error(f"{relative}: evidence file is not hash-listed")
+            path = self.path(name, name)
+            if path is None:
                 continue
             if path.name in {".env", ".credentials.json", "auth.json"}:
                 self.error(f"{relative}: private authentication/environment file is forbidden")
             try:
                 raw = path.read_bytes()
-                if path.suffix.lower() == ".png":
-                    if relative.parts[:2] != ("evidence", "artifacts") or relative.as_posix() not in hashed_paths:
-                        self.error(f"{relative}: PNG must be a hash-listed evidence artifact")
+                if path.suffix.lower() in {".png", ".pdf"}:
+                    kind = path.suffix[1:].upper()
+                    if relative.parts[:2] not in artifact_roots or name not in files:
+                        self.error(f"{relative}: {kind} must be a hash-listed evidence artifact or convergence-practice corpus artifact")
                         continue
-                    if not is_structural_png(raw):
+                    if kind == "PNG" and not is_structural_png(raw):
                         self.error(f"{relative}: invalid PNG structure or checksum")
                         continue
+                    if kind == "PDF":
+                        if not is_supported_pdf_framing(raw):
+                            self.error(f"{relative}: unsupported PDF framing (classic unencrypted single revision required)")
+                        self.pdf_review(name, raw, files)
                     # Still catch obvious uncompressed metadata; image content
-                    # requires the separate visual review recorded by the author.
+                    # and encoded/compressed PDF content require author review.
+                    # Required PDF extraction text is independently hash-checked
+                    # and scanned; stdlib byte scanning cannot extract it.
                     content = raw.decode("latin-1")
                 else:
                     content = raw.decode("utf-8")
@@ -297,10 +388,6 @@ class Validator:
                     if detail.get(key) != receipt.get(key):
                         self.error(f"{label}: payload {key} differs from manifest")
 
-        for folder in ("evidence/receipts", "evidence/artifacts"):
-            for path in (self.root / folder).rglob("*"):
-                if path.is_file() and path.relative_to(self.root).as_posix() not in files:
-                    self.error(f"{path.relative_to(self.root)}: evidence file is not hash-listed")
         model_ids = set()
         for model in self.sequence(stack.get("models", []), "models"):
             if not isinstance(model, dict):
