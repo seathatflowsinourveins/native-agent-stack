@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "id": "aapl-corporate-action-readiness-v1",
+  "frozen_before_native_calculation": true,
+  "symbol": "AAPL",
+  "start": "2020-08-03",
+  "end": "2020-09-04",
+  "expected_sessions": 25,
+  "product_verification": "Decimal products compared at70-significant-digit precision with absolute tolerance1e-25 USD for C#96-bit decimal rounding; all event dates, factors and amounts remain exact.",
+  "comparison_bases": ["2020-08-28", "2020-09-04"],
+  "lean_commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+  "scope": "Native LEAN factor/map/event APIs over existing retrospective sample files. No orders, position accounting, strategy scoring, dataset acquisition or historical first-observation claim.",
+  "price_convention": "Raw bundled integer OHLC divided by10000; exported factors/prices are invariant-culture decimal text. Adjusted prices use full-file factors. ScaledRaw fixes an explicit endDateTime basis; this is an adjustment convention, not proof that original factor metadata was available then.",
+  "dividend_convention": "Native GetSplitsAndDividends event distribution is retained in native units with its raw reference-price date and factor ratio. No distribution is multiplied by holdings or combined with a price-return label.",
+  "total_return_convention": "GetPriceFactor(TotalReturn) supplies the native split factor; a total-return price series also needs dividend accumulation. This probe does not report a total-return series or cash P&L.",
+  "guards": ["Reject an implicit ScaledRaw basis using upstream ArgumentException", "Reject a requested bar after its claimed decision cutoff in the adapter", "Require the native mapped symbol to match AAPL", "Reject altered frozen input bytes"],
+  "native_upstream_tests": "FullyQualifiedName~QuantConnect.Tests.Common.Data.Auxiliary.FactorFileTests",
+  "inputs": {
+    "Data/equity/usa/daily/aapl.zip": "a6f609711a1f550252f95a4edfaa5ac2c6dd75ca9a1fbbb417e853d1516831fe",
+    "Data/equity/usa/map_files/aapl.csv": "e9def8800d5d5553675cbe4c1955f264ae0bb9bd9e5f9d2faada780529b547c5",
+    "Data/equity/usa/factor_files/aapl.csv": "86f7f2508a11259dfbb53b2f81fc8e711c8a4b97a9ee599b661079a9566801c9",
+    "Data/market-hours/market-hours-database.json": "1b62943ab5e1d5a82214bd80b8a00d599da59d364d4b4d94a6d27b965c6878dc"
+  }
+}

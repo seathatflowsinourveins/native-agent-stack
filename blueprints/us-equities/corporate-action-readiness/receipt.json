@@ -1,0 +1,566 @@
+{
+  "schema_version": 1,
+  "id": "native-corporate-actions-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "lean"
+  ],
+  "observed_utc": "2026-09-20T00:22:25.672187+00:00",
+  "status": "accepted_native_factor_probe_upstream_nunit_unresolved",
+  "claim": "Native LEAN factor, mapping, scaling and event APIs verified 25 AAPL sessions, one dividend and one split from frozen bundled data. Direct probe accepted; upstream NUnit host aborted before executing any tests. No strategy, position accounting or historical-availability claim.",
+  "runtime": {
+    "lean_repository": "https://github.com/QuantConnect/Lean",
+    "lean_commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+    "license": "Apache-2.0",
+    "source_checkout": "existing accepted remediation build; no upgrades",
+    "dotnet_sdk": "10.0.401",
+    "python": "3.12.3",
+    "native_source_hashes": {
+      "Common/Data/Auxiliary/CorporateFactorProvider.cs": "10811c31a5b52ee82acc9384f2b4ab39eabc1460c6984f76ff2326b2ec46a4e0",
+      "Common/Data/Auxiliary/CorporateFactorRow.cs": "36758a669c139e4321d2209d7f7ba02ea4970d8d9da2d572e14aa24acb5c0117",
+      "Common/Data/Auxiliary/PriceScalingExtensions.cs": "1f096124ad43e0bba19a19c4d76cf08c020bcedff9c78f9225ff9037635145af",
+      "Common/Data/Auxiliary/MapFile.cs": "47a177002507105948617fa7313a21d7dd3d764b07233631a1f2c3bb2bf080a7",
+      "Common/Data/Market/Dividend.cs": "20c970cf46ddee47c463b5222076fbc374e4840e8afd6e9acabaf80cb81dec6a",
+      "Tests/Common/Data/Auxiliary/FactorFileTests.cs": "b0f1734c82455f2f7f5b4d4cc40cbd9d59b21816b380537efc7dc63468ca3867",
+      "Tests/AssemblyInitialize.cs": "0e51ebd4b2859f3457e821a68ef6b7afda7188b6371a5f24e01e5f43cf67cd3f"
+    }
+  },
+  "frozen_plan": {
+    "path": "blueprints/us-equities/corporate-action-readiness/plan.json",
+    "sha256": "a3db232b7ab898c32570eb504ef9f66c49718b6b87e920f491b86391db35ff91",
+    "frozen_utc": "2026-09-20T00:22:25.672187+00:00",
+    "before": "Compilation and data calculation in each isolated attempt",
+    "source_hashes": {
+      "run.py": "5d6c1b3091ec0147a229f08161b160ec9bd11c879b1116ac7493980b5783ab05",
+      "verify.py": "aee4432dabbe7224dd9162bc2da9d7ab9bbaa8644de39a1b82cc0f71e855006b",
+      "CorporateActionProbe.cs": "0326d0adc7c8335b86f0a2f5a21e5359dde40da40bf24453628a88887f698a57"
+    },
+    "helper_hashes": {
+      "run.py": "d42ab4b8d6a311fd3dc033b5faba975a9e97f58965905ffe4d98c60543f6b061",
+      "analyze.py": "45a53c0a454828f5e95ed7a16df783fddf1c50bd5bb422180a96eb56fe9070c7"
+    },
+    "input_hashes": {
+      "Data/equity/usa/daily/aapl.zip": "a6f609711a1f550252f95a4edfaa5ac2c6dd75ca9a1fbbb417e853d1516831fe",
+      "Data/equity/usa/map_files/aapl.csv": "e9def8800d5d5553675cbe4c1955f264ae0bb9bd9e5f9d2faada780529b547c5",
+      "Data/equity/usa/factor_files/aapl.csv": "86f7f2508a11259dfbb53b2f81fc8e711c8a4b97a9ee599b661079a9566801c9",
+      "Data/market-hours/market-hours-database.json": "1b62943ab5e1d5a82214bd80b8a00d599da59d364d4b4d94a6d27b965c6878dc"
+    }
+  },
+  "results": {
+    "probe": {
+      "sessions": 25,
+      "native_dividend_events": 1,
+      "native_split_events": 1,
+      "expected_guard_rejections": 2,
+      "dividend": {
+        "kind": "dividend",
+        "date": "2020-08-07",
+        "distribution": "0.82",
+        "reference_price": "455.61",
+        "units": "native cash distribution per raw share at event; no holdings multiplication"
+      },
+      "split": {
+        "kind": "split",
+        "date": "2020-08-31",
+        "factor": "0.25",
+        "reference_price": "499.23",
+        "split_type": "SplitOccurred"
+      },
+      "basis_comparison": {
+        "observation": "2020-08-28",
+        "raw_close": "499.23",
+        "pre_basis": "2020-08-28",
+        "pre_basis_close": "499.23",
+        "post_basis": "2020-09-04",
+        "post_basis_close": "124.8075"
+      },
+      "scope": "retrospective factor/map/event mechanics; no orders, cash P&L or original availability proof"
+    },
+    "upstream_tests": {
+      "status": "unresolved",
+      "failure_type": "RuntimeError",
+      "counters": {
+        "total": "0",
+        "executed": "0",
+        "passed": "0",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "cases": []
+    },
+    "mounted_inputs_unchanged": true,
+    "mounted_input_files": 2091,
+    "freeze_sha256": "78aeeee681033a77fefdd91259edfa0465a7d7bb223ea6cc34ea0ffb9b1d5c7e"
+  },
+  "native_commands": [
+    {
+      "stage": "compile",
+      "command": "/dotnet/dotnet /dotnet/sdk/10.0.401/Roslyn/bincore/csc.dll @/run/build/compiler.rsp",
+      "exit_code": 0
+    },
+    {
+      "stage": "probe",
+      "command": "/dotnet/dotnet exec --runtimeconfig /engine/QuantConnect.Lean.Launcher.runtimeconfig.json --depsfile /engine/QuantConnect.Lean.Launcher.deps.json /run/build/CorporateActionProbe.dll /run/native-results.json",
+      "exit_code": 0
+    },
+    {
+      "stage": "upstream_tests",
+      "command": "/dotnet/dotnet vstest /tests/QuantConnect.Tests.dll --TestCaseFilter:FullyQualifiedName~QuantConnect.Tests.Common.Data.Auxiliary.FactorFileTests --ResultsDirectory:/run/test-results --Logger:trx;LogFileName=factor-tests.trx",
+      "exit_code": 1,
+      "executed_cases": 0,
+      "status": "aborted before test execution"
+    }
+  ],
+  "isolation": {
+    "launcher": "bubblewrap --unshare-all --clearenv --cap-drop ALL --die-with-parent",
+    "read_only": [
+      "system libraries",
+      "isolated .NET SDK",
+      "LEAN engine binaries",
+      "bundled data",
+      "upstream test binaries"
+    ],
+    "writable": [
+      "fresh private /run",
+      "ephemeral /tmp"
+    ],
+    "host_home_credentials_and_network": "not mounted/available in native sandbox",
+    "test_configuration": "same explicit local /data config overlaid at /tests/config.json after upstream assembly resets its cwd/config",
+    "mounted_files_hashed_before_and_unchanged_after": 2091
+  },
+  "verification": {
+    "command": "python3 -m unittest discover -s tests -p test_corporate_action_readiness.py -v",
+    "passed": 9,
+    "expected_guard_rejections": 2,
+    "guard_roles": {"native_api": "Missing ScaledRaw endDateTime basis", "repository_adapter": "Bar after its decision cutoff"},
+    "corrupt_input_rejected_before_output_creation": true,
+    "product_absolute_tolerance_usd": "1e-25",
+    "exact_checks": "event amounts/dates, split factor, mapped symbol, basis identity, guard and scope booleans",
+    "test_source_sha256": "23146f72baddc05093fe234ced1e74c0a23aa5d23763a6c1138508911842b406"
+  },
+  "attempts": [
+    {
+      "run": "run-1",
+      "result": "compile failed: Python.Runtime reference missing and Dividend.PriceFactorRatio does not exist; native calculations not reached"
+    },
+    {
+      "run": "run-2",
+      "result": "compile passed; probe initialization failed because composer /tests directory was not mounted"
+    },
+    {
+      "run": "run-3",
+      "result": "native probe passed; Python comparison rejected C# decimal rounding at 1e-27 scale"
+    },
+    {
+      "run": "run-4",
+      "result": "probe and verifier passed; NUnit aborted 0 cases because assembly reset restored relative Data path and Python GIL finalizer failed"
+    },
+    {
+      "run": "run-5",
+      "result": "probe and verifier passed; config overlay applied; NUnit aborted 0 cases with missing SGX map directory and Python GIL finalizer error; unresolved"
+    }
+  ],
+  "alpaca_readiness": {
+    "alpaca_py": "0.44.0",
+    "corporate_actions_fields": [
+      "cusips",
+      "end",
+      "ids",
+      "limit",
+      "sort",
+      "start",
+      "symbols",
+      "types"
+    ],
+    "stock_bars_fields": [
+      "adjustment",
+      "asof",
+      "currency",
+      "end",
+      "feed",
+      "limit",
+      "sort",
+      "start",
+      "symbol_or_symbols",
+      "timeframe"
+    ],
+    "corporate_actions_client_module": "alpaca.data.historical.corporate_actions",
+    "client_instantiated": false,
+    "authenticated_fetch": false,
+    "scope": "Local model introspection only; installed SDK preserved, no client or authenticated fetch",
+    "current_rest_fields_missing_in_installed_request": [
+      "region",
+      "data_quality"
+    ],
+    "rest_default": "data_quality=complete can exclude early incomplete records; first availability has no guarantee",
+    "reference": "https://docs.alpaca.markets/us/reference/corporateactions-1"
+  },
+  "limitations": [
+    "Retrospective bundled AAPL sample only; no as-known universe, delisting completeness, extreme-mover coverage or alpha evidence.",
+    "Current map/factor files have no original first-observed timestamps; basis at or before decision does not prove metadata availability then.",
+    "Adjusted mode uses full-file factors; ScaledRaw fixes an explicit endDateTime basis. TotalReturn factor alone does not produce a total-return series.",
+    "Native dividend 0.82 uses raw pre-split share units. No holdings, dividend cash posting, financing, execution or P&L modeled.",
+    "Upstream NUnit tests attempted but 0 executed; the broader assembly fixture/Python environment is unresolved.",
+    "Authenticated Alpaca historical fetch remains deferred; no paid service, broker order, new dataset or SDK upgrade."
+  ],
+  "primary_references": [
+    "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Data/Auxiliary/CorporateFactorProvider.cs",
+    "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Data/Auxiliary/CorporateFactorRow.cs",
+    "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Data/Auxiliary/PriceScalingExtensions.cs",
+    "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Data/Auxiliary/MapFile.cs",
+    "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Common/Data/Market/Dividend.cs",
+    "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Tests/Common/Data/Auxiliary/FactorFileTests.cs",
+    "https://github.com/QuantConnect/Lean/blob/985ef30ad3ac774218c5ac516b4cb0aa2655730f/Tests/AssemblyInitialize.cs",
+    "https://www.quantconnect.com/docs/v2/writing-algorithms/securities/asset-classes/us-equity/requesting-data",
+    "https://docs.alpaca.markets/us/reference/corporateactions-1"
+  ],
+  "private_artifacts": {
+    "alpaca-local-readiness.json": {
+      "sha256": "31283d0032a829383619ef50d57b951e57241275fbc60d5793ab94fe2e1d5933",
+      "bytes": 489
+    },
+    "run-1/build/CorporateActionProbe.cs": {
+      "sha256": "d96179f63a9bb6c9d78c46c4f27b854458d284e376440c7201c35b6c49432cc3",
+      "bytes": 7656
+    },
+    "run-1/build/compiler.rsp": {
+      "sha256": "29634c9e53b265e6feb21b0241476a251b967ec22d383f3253e51f1148bdfab3",
+      "bytes": 17434
+    },
+    "run-1/compile.command.private.json": {
+      "sha256": "4a7a55cf124dea17ae3690064d71cac1dbded0be4a4ee60ca3a097a1087edbfd",
+      "bytes": 1731
+    },
+    "run-1/compile.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-1/compile.stdout.txt": {
+      "sha256": "2117298a3312ae683eb0cfdfacb8248bbc32477e195c6ad5027d8556face0a56",
+      "bytes": 1030
+    },
+    "run-1/config.json": {
+      "sha256": "9f0752f6feba3c429306c6d9db619d5a0744c1df72dcbb8a9bf0e4f1501e51e0",
+      "bytes": 308
+    },
+    "run-1/freeze.json": {
+      "sha256": "aca00fdc82af785dbdaf2caa8eb5c20702e65c6fc041c30bacb660c17fab69c7",
+      "bytes": 263431
+    },
+    "run-1/plan.json": {
+      "sha256": "12b0e03f85574e894ad14b22a5b1e68060b1126d70ef1343cacfa84674763aa6",
+      "bytes": 2105
+    },
+    "run-1.stderr.txt": {
+      "sha256": "da6da536b419b858a4f4b6edb0271ea1a41cf907c21963ff826014a499ce5f7b",
+      "bytes": 760
+    },
+    "run-1.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-2/build/CorporateActionProbe.cs": {
+      "sha256": "0326d0adc7c8335b86f0a2f5a21e5359dde40da40bf24453628a88887f698a57",
+      "bytes": 7603
+    },
+    "run-2/build/CorporateActionProbe.dll": {
+      "sha256": "9a221be7bb0cd40b1a6cd7919ed340adb30133bd3e3fd42e92ef6f4786d75bce",
+      "bytes": 22528
+    },
+    "run-2/build/compiler.rsp": {
+      "sha256": "89663f4f53accc1ca3bcdab7b1b2ce514afc02f4bebea9f4e5d5189c61360378",
+      "bytes": 17474
+    },
+    "run-2/compile.command.private.json": {
+      "sha256": "85038552026b689a4960c1d5568670b9eca05dedc86d5e9414bbb5e28c410750",
+      "bytes": 1731
+    },
+    "run-2/compile.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-2/compile.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-2/config.json": {
+      "sha256": "9f0752f6feba3c429306c6d9db619d5a0744c1df72dcbb8a9bf0e4f1501e51e0",
+      "bytes": 308
+    },
+    "run-2/freeze.json": {
+      "sha256": "8df14345c9c9e69a8ec43e11eef24c91eae0dca446987c4ea0b9494f203ab24a",
+      "bytes": 263431
+    },
+    "run-2/plan.json": {
+      "sha256": "12b0e03f85574e894ad14b22a5b1e68060b1126d70ef1343cacfa84674763aa6",
+      "bytes": 2105
+    },
+    "run-2/probe.command.private.json": {
+      "sha256": "d15be739d153bd3b4b2ca062d9e2f21a2d46af13fa2258a1b2a12030596d60ea",
+      "bytes": 1891
+    },
+    "run-2/probe.stderr.txt": {
+      "sha256": "fe709fddc39bb55eeaa2929ab6ff17e9746d5292d457a49611364875f17d7875",
+      "bytes": 2330
+    },
+    "run-2/probe.stdout.txt": {
+      "sha256": "749d990569564f0229758feccd0a97f544d0bd351d965dddeb248827f87ebffd",
+      "bytes": 73
+    },
+    "run-2.stderr.txt": {
+      "sha256": "b0f12dc52e9ab9b2eae6ae68cdf3546d268a37146398d5460e152fd561b35e8d",
+      "bytes": 736
+    },
+    "run-2.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-3/build/CorporateActionProbe.cs": {
+      "sha256": "0326d0adc7c8335b86f0a2f5a21e5359dde40da40bf24453628a88887f698a57",
+      "bytes": 7603
+    },
+    "run-3/build/CorporateActionProbe.dll": {
+      "sha256": "9a221be7bb0cd40b1a6cd7919ed340adb30133bd3e3fd42e92ef6f4786d75bce",
+      "bytes": 22528
+    },
+    "run-3/build/compiler.rsp": {
+      "sha256": "89663f4f53accc1ca3bcdab7b1b2ce514afc02f4bebea9f4e5d5189c61360378",
+      "bytes": 17474
+    },
+    "run-3/compile.command.private.json": {
+      "sha256": "788b83a8712830a0bcf988cb7717cf6b1bca3e86f2530ad7eb88d1a16f79aedd",
+      "bytes": 1731
+    },
+    "run-3/compile.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-3/compile.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-3/config.json": {
+      "sha256": "f412b21e5b56037e3cab6894c492ed626235b8252d92244a8ee2a891ed582d2b",
+      "bytes": 309
+    },
+    "run-3/freeze.json": {
+      "sha256": "a2706b57931a5b7e80056fe58c299124821d1ce1662b8a45e87fb98cd56cf59b",
+      "bytes": 263431
+    },
+    "run-3/native-results.json": {
+      "sha256": "b31c282c90367c3baf87232772fc78a7bc36a8c64229faa2ef86a9068e88b25b",
+      "bytes": 17325
+    },
+    "run-3/plan.json": {
+      "sha256": "12b0e03f85574e894ad14b22a5b1e68060b1126d70ef1343cacfa84674763aa6",
+      "bytes": 2105
+    },
+    "run-3/probe.command.private.json": {
+      "sha256": "48b22bd8133298c1364473a2a7a4d3dfe9a43e59aeb9cb438b2e891d7cd03f9d",
+      "bytes": 1889
+    },
+    "run-3/probe.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-3/probe.stdout.txt": {
+      "sha256": "f40793898ae80646db7a6e0c90e7cd8194e83ee832267de38587aa0574d64d17",
+      "bytes": 137
+    },
+    "run-3.stderr.txt": {
+      "sha256": "e6c43d88094152082faa69c7c8b37e72c6b23afeefb65e83d2045831908d2beb",
+      "bytes": 767
+    },
+    "run-3.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-4/build/CorporateActionProbe.cs": {
+      "sha256": "0326d0adc7c8335b86f0a2f5a21e5359dde40da40bf24453628a88887f698a57",
+      "bytes": 7603
+    },
+    "run-4/build/CorporateActionProbe.dll": {
+      "sha256": "9a221be7bb0cd40b1a6cd7919ed340adb30133bd3e3fd42e92ef6f4786d75bce",
+      "bytes": 22528
+    },
+    "run-4/build/compiler.rsp": {
+      "sha256": "89663f4f53accc1ca3bcdab7b1b2ce514afc02f4bebea9f4e5d5189c61360378",
+      "bytes": 17474
+    },
+    "run-4/compile.command.private.json": {
+      "sha256": "2ff5ae0224c3d194bab696e22642953cc1e80e404987ce778675ebf465e14c39",
+      "bytes": 1731
+    },
+    "run-4/compile.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-4/compile.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-4/config.json": {
+      "sha256": "f412b21e5b56037e3cab6894c492ed626235b8252d92244a8ee2a891ed582d2b",
+      "bytes": 309
+    },
+    "run-4/freeze.json": {
+      "sha256": "d2abf0622b007eb693cf825d182c5e5a99a64c1155e63a4ccfd54c06c72994ce",
+      "bytes": 263829
+    },
+    "run-4/native-results.json": {
+      "sha256": "b31c282c90367c3baf87232772fc78a7bc36a8c64229faa2ef86a9068e88b25b",
+      "bytes": 17325
+    },
+    "run-4/plan.json": {
+      "sha256": "a3db232b7ab898c32570eb504ef9f66c49718b6b87e920f491b86391db35ff91",
+      "bytes": 2308
+    },
+    "run-4/probe.command.private.json": {
+      "sha256": "2d2ea08eee1ce99502c2fae55809d5ae42dd4c4abc6d9c9915c9453659c0701e",
+      "bytes": 1889
+    },
+    "run-4/probe.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-4/probe.stdout.txt": {
+      "sha256": "2965d2b8ae0789a6de1abc8ff613f48bb0d91d1c5d921d0db0a14178b7834818",
+      "bytes": 137
+    },
+    "run-4/results.json": {
+      "sha256": "d9b4c41700ac447307a9f1cd2430c39a1c279a19f566785e18ef9d0367f40b86",
+      "bytes": 1556
+    },
+    "run-4/test-results/factor-tests.trx": {
+      "sha256": "69517183f9e23506c6e09d08115ad372e804c7614c643304cc7cd8240451cdd0",
+      "bytes": 3060
+    },
+    "run-4/upstream-tests.command.private.json": {
+      "sha256": "ea645e99436606452782320f36ccf7b9f875f084dade3cbc675db3d809c7f7e5",
+      "bytes": 2018
+    },
+    "run-4/upstream-tests.stderr.txt": {
+      "sha256": "cc6b69af18814cf6b961fdafd89d6b013cebdee4d1b773db9a022aff3e36371c",
+      "bytes": 564
+    },
+    "run-4/upstream-tests.stdout.txt": {
+      "sha256": "89938488f88afcb15a8664c863de602093eda60b6a5d9aedbad1b93cff711a97",
+      "bytes": 174
+    },
+    "run-4/verification.json": {
+      "sha256": "90851e88e3ff85d7cbb7e3350ba5b3e0083df2e2b2f046c6cb282d149969d04a",
+      "bytes": 818
+    },
+    "run-4.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-4.stdout.txt": {
+      "sha256": "d9b4c41700ac447307a9f1cd2430c39a1c279a19f566785e18ef9d0367f40b86",
+      "bytes": 1556
+    },
+    "run-5/build/CorporateActionProbe.cs": {
+      "sha256": "0326d0adc7c8335b86f0a2f5a21e5359dde40da40bf24453628a88887f698a57",
+      "bytes": 7603
+    },
+    "run-5/build/CorporateActionProbe.dll": {
+      "sha256": "9a221be7bb0cd40b1a6cd7919ed340adb30133bd3e3fd42e92ef6f4786d75bce",
+      "bytes": 22528
+    },
+    "run-5/build/compiler.rsp": {
+      "sha256": "89663f4f53accc1ca3bcdab7b1b2ce514afc02f4bebea9f4e5d5189c61360378",
+      "bytes": 17474
+    },
+    "run-5/compile.command.private.json": {
+      "sha256": "ea46f1cb0a3f5a4a8c84977d414597055607a0355217381eaf8a1059f9d8ff47",
+      "bytes": 1731
+    },
+    "run-5/compile.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-5/compile.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-5/config.json": {
+      "sha256": "f412b21e5b56037e3cab6894c492ed626235b8252d92244a8ee2a891ed582d2b",
+      "bytes": 309
+    },
+    "run-5/freeze.json": {
+      "sha256": "78aeeee681033a77fefdd91259edfa0465a7d7bb223ea6cc34ea0ffb9b1d5c7e",
+      "bytes": 263829
+    },
+    "run-5/native-results.json": {
+      "sha256": "b31c282c90367c3baf87232772fc78a7bc36a8c64229faa2ef86a9068e88b25b",
+      "bytes": 17325
+    },
+    "run-5/plan.json": {
+      "sha256": "a3db232b7ab898c32570eb504ef9f66c49718b6b87e920f491b86391db35ff91",
+      "bytes": 2308
+    },
+    "run-5/probe.command.private.json": {
+      "sha256": "ce251a32410c9c4175a15e5d4a7dbad00615be29be12ac7bb7b5e11e924ccbd6",
+      "bytes": 1889
+    },
+    "run-5/probe.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-5/probe.stdout.txt": {
+      "sha256": "84f7db747d8bc35bd7527c246a293e9b8ee8af0e892b43bd59337220b1ef3e2b",
+      "bytes": 137
+    },
+    "run-5/results.json": {
+      "sha256": "c14e60552c2c721b137b3f3d36401207878128a86420d0aad6e1ae36c4a5f5d0",
+      "bytes": 1556
+    },
+    "run-5/test-results/factor-tests.trx": {
+      "sha256": "dfa7f36eafa55739da27c4259c7617ed707f1665e894f5734159a88e5e7fecc1",
+      "bytes": 6494
+    },
+    "run-5/upstream-tests.command.private.json": {
+      "sha256": "51e3929a205ead660d61a104e47982fb198684784c919630ff52fe65ecfdf574",
+      "bytes": 2174
+    },
+    "run-5/upstream-tests.stderr.txt": {
+      "sha256": "d2d1953214ca55dd0402c3497d184c4375fa107eed93555a821205e01adf1c83",
+      "bytes": 556
+    },
+    "run-5/upstream-tests.stdout.txt": {
+      "sha256": "89938488f88afcb15a8664c863de602093eda60b6a5d9aedbad1b93cff711a97",
+      "bytes": 174
+    },
+    "run-5/verification.json": {
+      "sha256": "90851e88e3ff85d7cbb7e3350ba5b3e0083df2e2b2f046c6cb282d149969d04a",
+      "bytes": 818
+    },
+    "run-5.stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-5.stdout.txt": {
+      "sha256": "c14e60552c2c721b137b3f3d36401207878128a86420d0aad6e1ae36c4a5f5d0",
+      "bytes": 1556
+    },
+    "verifier-tests.stderr.txt": {
+      "sha256": "08d6522236a0c7918c9d1fbbe4dd551d9bd69b70bfdfe7f62c693a506d2c1519",
+      "bytes": 1501
+    },
+    "verifier-tests.stdout.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}
