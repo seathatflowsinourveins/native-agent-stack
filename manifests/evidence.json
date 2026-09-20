@@ -5084,8 +5084,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "522d6cba1f3fd25d992df00a1185628ec9785f966ac2be41244fc413975173ee",
-      "bytes": 3722377
+      "sha256": "5fcff42cbb9380122999cd715d27d083af54d81ffc36c5ec32d315d6bc366fc9",
+      "bytes": 3722454
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6094,8 +6094,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "af6bf3dd64e4b15661f1cd6db0c3378d5793a250f5a8c2e4b958e806f372a3f5",
-      "bytes": 17744
+      "sha256": "cc3ea65967a3960f36cfa3fbd2719b07eaaf432dd07045ff1644cf030cc62f49",
+      "bytes": 17821
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -7109,13 +7109,18 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "9dedc3723d22992f6909de782ce75a18491ef7fb5c61a9f06709fac382d9246e",
-      "bytes": 11404
+      "sha256": "810120df9ec901fc0e8247fda6559ab46a352d469457524aa0798472cde9f8b4",
+      "bytes": 12635
     },
     {
       "path": "docs/tasks/2026-09-20-automation-resolution.md",
-      "sha256": "0b4ecf13dfa60ae1720c3a921b2afbf8b69e4b3d5fdee092141e26859a49cbf1",
-      "bytes": 5630
+      "sha256": "d83d4414ce596236a9740fb9dcce8d275d13ce4edacd4313806835130753d454",
+      "bytes": 8181
+    },
+    {
+      "path": "docs/automation-upgrade-evidence.json",
+      "sha256": "afe31d3eec6b14f69721a810f8719d3326154c9f2e2fadedeb5e292bb92ca7df",
+      "bytes": 10044
     }
   ],
   "convergence_records": [

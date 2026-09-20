@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "observed_at": "2026-09-20",
+  "sanitization": "Public excerpts replace the hosted temporary directory with <RUNNER_TEMP>; raw-log hashes identify the unchanged privately retained CLI outputs.",
+  "scope": "Actual hosted setup/toolchain and native fixture results, plus original integrity failures. Not provider/research/recovery execution.",
+  "tested_source_revision": "d4d9011ea66c6539340e34e2b64ce9c73663b81d",
+  "run_records": [
+    {
+      "id": 35542681727,
+      "html_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35542681727",
+      "head_sha": "d4d9011ea66c6539340e34e2b64ce9c73663b81d",
+      "event": "pull_request",
+      "path": ".github/workflows/action-compatibility.yml",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "run_started_at": "2026-09-20T22:46:32Z",
+      "updated_at": "2026-09-20T22:47:36Z",
+      "jobs": [
+        {
+          "id": 106163073558,
+          "name": "python",
+          "html_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35542681727/job/106163073558",
+          "conclusion": "success",
+          "started_at": "2026-09-20T22:46:35Z",
+          "completed_at": "2026-09-20T22:46:41Z"
+        },
+        {
+          "id": 106163073680,
+          "name": "go (1.25.10)",
+          "html_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35542681727/job/106163073680",
+          "conclusion": "success",
+          "started_at": "2026-09-20T22:46:35Z",
+          "completed_at": "2026-09-20T22:46:54Z"
+        },
+        {
+          "id": 106163073705,
+          "name": "go (1.27.0)",
+          "html_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35542681727/job/106163073705",
+          "conclusion": "success",
+          "started_at": "2026-09-20T22:46:35Z",
+          "completed_at": "2026-09-20T22:47:35Z"
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 10615561920,
+          "name": "action-python-compatibility-35542681727-1",
+          "size_in_bytes": 1555,
+          "digest": "sha256:b64c5d356fb4cbc3fef75d271f1b19de00e3661d7d8bb3b0f7dcf91e6333b73e",
+          "expired": false,
+          "created_at": "2026-09-20T22:46:38Z",
+          "expires_at": "2026-10-04T22:46:37Z"
+        },
+        {
+          "id": 10615452313,
+          "name": "action-go-1.25.10-compatibility-35542681727-1",
+          "size_in_bytes": 931,
+          "digest": "sha256:45092414f6d3d5fac244b085ae341d30a2c4b229be93d209ef0dcaef2530d9b8",
+          "expired": false,
+          "created_at": "2026-09-20T22:46:52Z",
+          "expires_at": "2026-10-04T22:46:51Z"
+        },
+        {
+          "id": 10614998580,
+          "name": "action-go-1.27.0-compatibility-35542681727-1",
+          "size_in_bytes": 929,
+          "digest": "sha256:fe68ad71e57e75b3860852da4db809f4b6d12559e8eca2c08ba95b3b9e9e9887",
+          "expired": false,
+          "created_at": "2026-09-20T22:47:33Z",
+          "expires_at": "2026-10-04T22:47:32Z"
+        }
+      ],
+      "raw_gh_run_log_sha256": "1675f675985c484ee44e9927e8ff2e972d8a2310f19b072c19ca1aee408e46d7",
+      "returned_output_excerpts": [
+        "python\tRun the unchanged upstream version and executable-path tests\t2026-09-20T22:46:37.5560927Z <RUNNER_TEMP>/action-compatibility/verify-python.py: OK",
+        "python\tRun the unchanged upstream version and executable-path tests\t2026-09-20T22:46:37.5561676Z <RUNNER_TEMP>/action-compatibility/check-python-path.sh: OK",
+        "python\tRun the unchanged upstream version and executable-path tests\t2026-09-20T22:46:37.5889736Z Correct version of Python 3.13 detected",
+        "python\tRun the unchanged upstream version and executable-path tests\t2026-09-20T22:46:37.6162674Z Python 3.13.15",
+        "go (1.25.10)\tRun the unchanged upstream verifier and Go standard-library tests\t2026-09-20T22:46:44.2502242Z <RUNNER_TEMP>/action-compatibility/verify-go.sh: OK",
+        "go (1.25.10)\tRun the unchanged upstream verifier and Go standard-library tests\t2026-09-20T22:46:44.2549015Z Found go version 'go version go1.25.10 linux/amd64'",
+        "go (1.25.10)\tRun the unchanged upstream verifier and Go standard-library tests\t2026-09-20T22:46:51.3366516Z ok  \tfmt\t0.086s",
+        "go (1.27.0)\tRun the unchanged upstream verifier and Go standard-library tests\t2026-09-20T22:47:23.3650676Z <RUNNER_TEMP>/action-compatibility/verify-go.sh: OK",
+        "go (1.27.0)\tRun the unchanged upstream verifier and Go standard-library tests\t2026-09-20T22:47:23.3716006Z Found go version 'go version go1.27.0 linux/amd64'",
+        "go (1.27.0)\tRun the unchanged upstream verifier and Go standard-library tests\t2026-09-20T22:47:32.1561495Z ok  \tfmt\t0.055s"
+      ]
+    },
+    {
+      "id": 35542681732,
+      "html_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35542681732",
+      "head_sha": "d4d9011ea66c6539340e34e2b64ce9c73663b81d",
+      "event": "pull_request",
+      "path": ".github/workflows/native-token-e2e.yml",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "run_started_at": "2026-09-20T22:46:32Z",
+      "updated_at": "2026-09-20T22:47:10Z",
+      "jobs": [
+        {
+          "id": 106163073392,
+          "name": "native-token-tools",
+          "html_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35542681732/job/106163073392",
+          "conclusion": "success",
+          "started_at": "2026-09-20T22:46:35Z",
+          "completed_at": "2026-09-20T22:47:10Z"
+        }
+      ],
+      "artifacts": [
+        {
+          "id": 10615422411,
+          "name": "native-token-e2e-results",
+          "size_in_bytes": 8925,
+          "digest": "sha256:82189b40482762b987a95b4019775f360914522378e40251b13382f2540b8fc6",
+          "expired": false,
+          "created_at": "2026-09-20T22:47:07Z",
+          "expires_at": "2026-10-04T22:47:06Z"
+        }
+      ],
+      "raw_gh_run_log_sha256": "360fc0e094b3738a7b40bbd40f99da553e0e684ac56d067c9409a58957825430",
+      "returned_output_excerpts": [
+        "native-token-tools\tSet up native Node 24\t2026-09-20T22:46:40.7191791Z node: v24.20.0",
+        "native-token-tools\tSet up native Node 24\t2026-09-20T22:46:40.7192220Z npm: 11.19.0",
+        "native-token-tools\tInstall pinned upstream tools and exercise native fixtures\t2026-09-20T22:47:06.5775955Z {\"status\": \"passed\", \"commands\": 41, \"checks\": 14, \"failures\": [], \"cleanup\": {\"owned_temporary_directory_absent\": true, \"retained_output_exists\": true}}"
+      ]
+    },
+    {
+      "id": 35542681809,
+      "html_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35542681809",
+      "head_sha": "d4d9011ea66c6539340e34e2b64ce9c73663b81d",
+      "event": "pull_request",
+      "path": ".github/workflows/validate.yml",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "run_started_at": "2026-09-20T22:46:32Z",
+      "updated_at": "2026-09-20T22:47:03Z",
+      "jobs": [
+        {
+          "id": 106163073944,
+          "name": "validate",
+          "html_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35542681809/job/106163073944",
+          "conclusion": "success",
+          "started_at": "2026-09-20T22:46:36Z",
+          "completed_at": "2026-09-20T22:47:02Z"
+        }
+      ],
+      "artifacts": [],
+      "raw_gh_run_log_sha256": "0d9b2f8b003037603cdf7222b3443c5722d318a6693e4fbcc0aebed28de5be09",
+      "returned_output_excerpts": []
+    },
+    {
+      "id": 35542681702,
+      "html_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35542681702",
+      "head_sha": "d4d9011ea66c6539340e34e2b64ce9c73663b81d",
+      "event": "pull_request",
+      "path": ".github/workflows/token-report.yml",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "success",
+      "run_started_at": "2026-09-20T22:46:32Z",
+      "updated_at": "2026-09-20T22:46:42Z",
+      "jobs": [
+        {
+          "id": 106163073552,
+          "name": "token-report",
+          "html_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35542681702/job/106163073552",
+          "conclusion": "success",
+          "started_at": "2026-09-20T22:46:35Z",
+          "completed_at": "2026-09-20T22:46:41Z"
+        }
+      ],
+      "artifacts": [],
+      "raw_gh_run_log_sha256": "8c1f0541765b64856d0ef2f4971e6f630b50a8b51e0f477d47c74189ad85c455",
+      "returned_output_excerpts": []
+    }
+  ],
+  "original_failures": [
+    {
+      "run": 35541399411,
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35541399411",
+      "raw_gh_run_failed_log_sha256": "0e4579768a91d418f6206e82c34fb662b003c6a4450f00096b09077b916a366d",
+      "returned_errors": [
+        "validate\tValidate manifests and evidence integrity\t2026-09-20T22:21:12.9669880Z .github/workflows/native-offhost-app-state.yml: SHA-256 mismatch",
+        "validate\tValidate manifests and evidence integrity\t2026-09-20T22:21:12.9670299Z .github/workflows/native-offhost-app-state.yml: byte count mismatch"
+      ]
+    },
+    {
+      "run": 35541500332,
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35541500332",
+      "raw_gh_run_failed_log_sha256": "239d9045cd149b70e8ee0cfef443c1fe640344a51b9cdb38b022dff19dbc0d88",
+      "returned_errors": [
+        "validate\tValidate manifests and evidence integrity\t2026-09-20T22:22:57.2863886Z .github/workflows/native-offhost-restore.yml: SHA-256 mismatch",
+        "validate\tValidate manifests and evidence integrity\t2026-09-20T22:22:57.2864682Z .github/workflows/native-offhost-restore.yml: byte count mismatch",
+        "validate\tValidate manifests and evidence integrity\t2026-09-20T22:22:57.2865415Z .github/workflows/native-service-reboot.yml: SHA-256 mismatch"
+      ]
+    }
+  ]
+}

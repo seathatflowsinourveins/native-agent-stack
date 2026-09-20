@@ -122,7 +122,7 @@
       "selection": "Native publication checks, actionlint, zizmor, Dependabot, GitHub artifact attestations, gitleaks and scoped Syft inventory; selected revisions and ownership are in catalogs/foundation/automation.json.",
       "activation": "Use the GitHub automation handbook; qualify changed inputs and update only reviewed hashes. One existing Codex maintenance task owns source research; keep private state out of artifacts.",
       "lifecycle_scope": "Required PR checks and main-only publication passed. Independent archive download and online/detached provenance verification passed with altered-byte rejection. Workflow fixtures, source integrity, provenance and useful native output are separate claims.",
-      "next_gap": "Qualify selected action upgrades against their affected toolchains. Weekly Dependabot timing, nonempty grouping, hosted PR cancellation and improved native research outcomes remain unmeasured; no broad vulnerability assurance is accepted."
+      "next_gap": "Selected Python/Go setup upgrades passed unchanged upstream verifiers and Go standard-library tests; Node setup passed existing hosted fixtures. Weekly Dependabot timing, nonempty grouping, hosted PR cancellation and improved native research outcomes remain unmeasured; no broad vulnerability assurance is accepted."
     },
     {
       "id": "scheduling-supervision",

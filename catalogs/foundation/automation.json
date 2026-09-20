@@ -83,7 +83,16 @@
     }
   ],
   "selected_upgrade_qualification": {
-    "status": "pending hosted execution on the review branch",
+    "status": "qualified on the review branch; PR #31 records integration state",
+    "tested_source_revision": "d4d9011ea66c6539340e34e2b64ce9c73663b81d",
+    "pull_request": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/31",
+    "returned_evidence": "docs/automation-upgrade-evidence.json",
+    "compatibility_run": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35542681727",
+    "node_fixture_run": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35542681732",
+    "observed_versions": ["Python 3.13.15", "Go 1.25.10", "Go 1.27.0", "Node 24.20.0", "npm 11.19.0"],
+    "compatibility_job_seconds": {"python": 6, "go_1_25_10": 19, "go_1_27_0": 60},
+    "node_fixture_result": "35-second job; 41 commands, 14 checks, no failures, owned temporary directory absent and retained output present. These are existing hosted fixtures, not provider research tasks.",
+    "independent_observation": "Separate reviewers inspected actual hosted logs and artifact records, confirmed helper hashes/versions/results and found no actionable defect. An independent download of all four artifacts matched their platform digests. Final documentation changes reuse the same workflow bytes; source-bound results retain the tested SHA.",
     "workflow": ".github/workflows/action-compatibility.yml",
     "upstream_helper_sources": {
       "verify-python.py": "37e77a5c2d1721f02b772ad5bc16c49c2f62498217a9bfa50b490903932ca394",
