@@ -35,7 +35,8 @@ TOKEN_RECEIPTS = (
     "native-headroom-mcp-20260920", "token-practice-catalog-toon-20260920",
     "native-token-focus-clients-20260920",
 )
-NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json"}
+NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json",
+                    "docs/harness-defaults.md", "catalogs/README.md"}
 EXECUTION_KINDS = {"native_cli_e2e", "native_model_e2e"}
 
 
@@ -95,6 +96,89 @@ def source_links(value):
     return links
 
 
+def build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url):
+    """Join explicit capability decisions; repository execution flags are not acceptance."""
+    paths = config.get("grand_catalogs")
+    if paths is None:
+        return None
+    require(isinstance(paths, dict) and set(paths) == {
+        "foundation_manifest", "foundation_decisions", "trading_target"},
+        "grand catalogs need all three configured sources")
+    manifest, decisions, target = (read(paths[key]) for key in (
+        "foundation_manifest", "foundation_decisions", "trading_target"))
+    require(all(row.get("schema_version") == 1 for row in (manifest, decisions, target)),
+            "unsupported grand catalog schema")
+    components = {row["id"]: row for row in stack["components"]}
+    layers = manifest["layers"]
+    layer_ids = [row["id"] for row in layers]
+    require(len(set(layer_ids)) == len(layer_ids), "duplicate foundation layer")
+    decision_ids = [row["id"] for row in decisions["decisions"]]
+    require(len(set(decision_ids)) == len(decision_ids), "duplicate foundation decision")
+
+    def sources(values):
+        require(isinstance(values, list), "catalog source paths must be a list")
+        result = []
+        for path in values:
+            track(path)
+            result.append({"path": path, "url": file_url(path)})
+        return result
+
+    joined = []
+    for row in decisions["decisions"]:
+        require(set(row["layer_ids"]).issubset(layer_ids), "unknown foundation layer")
+        require(set(row["component_ids"]).issubset(components), "catalog references an unknown component")
+        require(set(row["evidence_ids"]).issubset(receipts_by_id), "catalog references an unknown receipt")
+        require(set(row.get("supersedes", [])).issubset(decision_ids), "catalog supersedes an unknown decision")
+        item = {**row, "sources": sources(row.get("source_paths", [])), "components": [], "receipts": []}
+        item.pop("source_paths", None)
+        for identifier in row["component_ids"]:
+            component = components[identifier]
+            item["components"].append({"id": identifier,
+                "repository": public_url(component.get("repository")),
+                "version": component.get("version", "Not recorded"),
+                "source_pin": component.get("source_pin", ""),
+                "source_commit": component.get("source_commit", ""),
+                "license": component.get("license", "Not recorded"), "url": file_url(STACK)})
+        for identifier in row["evidence_ids"]:
+            receipt = receipts_by_id[identifier]
+            detail = read(receipt["path"])
+            item["receipts"].append({"id": identifier, "kind": receipt["kind"],
+                "claim": receipt["claim"], "limitations": receipt["limitations"],
+                "date": stamp(detail), "url": file_url(receipt["path"])})
+        lifecycle = dict(row.get("lifecycle", {}))
+        if lifecycle.get("source_path"):
+            lifecycle["sources"] = sources([lifecycle.pop("source_path")])
+        for stage in lifecycle.get("stage_refs", []):
+            require(stage.get("component_id") in components, "lifecycle references an unknown component")
+        item["lifecycle"] = lifecycle
+        if row.get("candidate"):
+            item["candidate"] = {**row["candidate"], "repository": public_url(row["candidate"].get("repository"))}
+        joined.append(item)
+    for boundary in manifest.get("domain_boundary", []):
+        require(boundary.get("component_id") in components, "domain boundary references an unknown component")
+    gaps = []
+    for gap in manifest.get("top_gaps", []):
+        item = {**gap, "sources": sources(gap.get("source_paths", []))}
+        item.pop("source_paths", None)
+        gaps.append(item)
+    foundation = {**manifest, "decisions": joined, "top_gaps": gaps,
+        "url": file_url(paths["foundation_manifest"]), "decisions_url": file_url(paths["foundation_decisions"]),
+        "counts": {"layers": len(layers), "capabilities": len(joined),
+                   "accepted": sum(row.get("review_status") == "accepted_within_scope" for row in joined),
+                   "components": len({identifier for row in joined for identifier in row["component_ids"]})}}
+    engine = {**target["engine"], "repository": public_url(target["engine"].get("repository")),
+              "sources": source_links(target["engine"].get("sources", []))}
+    brokers = [{**row, "sources": source_links(row.get("sources", []))} for row in target["broker_boundaries"]]
+    trading = {**target, "engine": engine, "broker_boundaries": brokers,
+               "accepted_references": sources(target.get("accepted_reference_paths", [])),
+               "url": file_url(paths["trading_target"])}
+    trading.pop("accepted_reference_paths", None)
+    for key in ("north_star", "foundation_catalog"):
+        if target.get(key):
+            trading[key + "_source"] = sources([target[key]])[0]
+    return {"foundation": foundation, "trading": trading}
+
+
 def build_data(root):
     documents, inputs = {}, {}
 
@@ -127,7 +211,8 @@ def build_data(root):
         safe_file(root, path)
         # This packet is newer than the immutable base; its own new pages resolve
         # at the public branch after publication, with exact input hashes retained.
-        revision = "main" if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES else config["source_revision"]
+        new_catalog = path.startswith("catalogs/foundation/") or path in config.get("grand_catalogs", {}).values()
+        revision = "main" if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog else config["source_revision"]
         return f'{config["repository_url"]}/blob/{revision}/{quote(path, safe="/")}'
 
     index, stack, evidence, stars, review = (read(path) for path in (INDEX, STACK, EVIDENCE, STARS, REVIEW))
@@ -248,7 +333,8 @@ def build_data(root):
         require(set(profile["component_ids"]).issubset(component_ids),
                 "adoption profile references an unknown component")
     guide_paths = list(SETUP_GUIDES)
-    for path in ("adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md", "docs/foundation-stack.md", "docs/token-session-handbook.md"):
+    for path in ("adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md", "docs/foundation-stack.md", "docs/token-session-handbook.md",
+                 "docs/harness-defaults.md", "catalogs/README.md", "catalogs/foundation/README.md"):
         if (root / path).exists():
             guide_paths.append(path)
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))
@@ -348,6 +434,7 @@ def build_data(root):
                 item["sources"].append({"path": path, "url": file_url(path)})
             topic_rows.append(item)
         token_topic = {**topic_source, "rows": topic_rows, "url": file_url(TOKEN_TOPIC)}
+    grand_catalogs = build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url)
     return {"schema_version": 1, "snapshot_date": config["snapshot_date"],
             "repository_url": config["repository_url"], "source_revision": config["source_revision"],
             "stars_observed_at": stars["retrieved_at"], "component_snapshot_at": stamp(stack),
@@ -356,6 +443,7 @@ def build_data(root):
                        "source_reviewed": sum(row["source_reviewed"] for row in output),
                        "executed": sum(row["executed"] for row in output)},
             "layers": layers, "repositories": output, "integrations": integrations, "awesome": awesome,
+            "grand_catalogs": grand_catalogs,
             "setup": {"components": selected, "profiles": profiles, "recipes": recipes,
                       "default_profile": adoption["default_profile"],
                       "supported_platforms": adoption.get("supported_platforms", []),
