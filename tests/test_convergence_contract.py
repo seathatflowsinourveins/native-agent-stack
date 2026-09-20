@@ -10,7 +10,7 @@ import sys
 import tempfile
 import unittest
 
-from scripts.validate_convergence import CONTRACT, REPO, validate_record
+from scripts.validate_convergence import CONTRACT, REPO, recorded_paths, validate_record
 
 
 class ConvergenceContractTests(unittest.TestCase):
@@ -318,6 +318,74 @@ class ConvergenceContractTests(unittest.TestCase):
         failed = subprocess.run(command, capture_output=True, text=True, timeout=10, check=False)
         self.assertEqual(failed.returncode, 1)
         self.assertFalse(json.loads(failed.stdout)["valid"])
+
+    def manifest(self, names, declared=None):
+        if declared is None:
+            declared = [name for name in names if name != "unrelated.json"]
+        self.write("manifests/evidence.json", json.dumps({"convergence_records": declared, "files": [
+            {"path": name, "sha256": hashlib.sha256((self.root / name).read_bytes()).hexdigest()}
+            for name in names
+        ]}).encode())
+
+    def test_manifest_discovery_covers_nested_records_and_fails_new_invalid_record(self):
+        self.result()
+        self.write("nested/second.json", json.dumps(self.record).encode())
+        self.write("unrelated.json", b'{"example": true}')
+        self.manifest(["record.json", "nested/second.json", "unrelated.json"])
+        self.assertEqual(recorded_paths(self.root), ["nested/second.json", "record.json"])
+        command = [sys.executable, str(REPO / "scripts/validate_convergence.py"),
+                   "--all-recorded", "--root", str(self.root), "--json"]
+        passed = subprocess.run(command, capture_output=True, text=True, timeout=10)
+        self.assertEqual(passed.returncode, 0, passed.stderr)
+        self.assertEqual(len(json.loads(passed.stdout)["records"]), 2)
+        self.record["status"] = "observed"
+        self.write("nested/second.json", json.dumps(self.record).encode())
+        self.manifest(["record.json", "nested/second.json"])
+        failed = subprocess.run(command, capture_output=True, text=True, timeout=10)
+        self.assertEqual(failed.returncode, 1)
+        self.assertFalse(json.loads(failed.stdout)["valid"])
+
+    def test_declared_record_with_missing_or_misspelled_kind_cannot_disappear(self):
+        self.result()
+        for kind in (None, "convergence_experment"):
+            with self.subTest(kind=kind):
+                broken = copy.deepcopy(self.record)
+                if kind is None:
+                    del broken["kind"]
+                else:
+                    broken["kind"] = kind
+                self.write("second.json", json.dumps(broken).encode())
+                self.manifest(["record.json", "second.json"])
+                self.assertEqual(recorded_paths(self.root), ["record.json", "second.json"])
+                self.assertFalse(validate_record(self.root, "second.json")["valid"])
+
+    def test_undeclared_or_missing_records_fail_discovery(self):
+        self.result()
+        self.write("second.json", json.dumps(self.record).encode())
+        for files, declared in ((["record.json", "second.json"], ["record.json"]),
+                                (["record.json"], ["record.json", "missing.json"])):
+            with self.subTest(declared=declared):
+                self.manifest(files, declared)
+                with self.assertRaises(ValueError):
+                    recorded_paths(self.root)
+
+    def test_manifest_discovery_rejects_empty_changed_duplicate_or_linked_sources(self):
+        self.result()
+        self.manifest(["record.json"])
+        (self.root / "record.json").write_text('{"secret": "DO_NOT_ECHO_VALUE"}')
+        with self.assertRaisesRegex(ValueError, "invalid, changed or empty") as context:
+            recorded_paths(self.root)
+        self.assertNotIn("DO_NOT_ECHO", str(context.exception))
+        self.result()
+        for names in ([], ["record.json", "record.json"]):
+            with self.subTest(names=names):
+                self.manifest(names)
+                with self.assertRaises(ValueError):
+                    recorded_paths(self.root)
+        (self.root / "link.json").symlink_to(self.root / "record.json")
+        self.manifest(["link.json"])
+        with self.assertRaises(ValueError):
+            recorded_paths(self.root)
 
 
 if __name__ == "__main__":

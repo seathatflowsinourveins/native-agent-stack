@@ -81,7 +81,7 @@
     ],
     "inputs": [
       {
-        "path": ".github/workflows/validate.yml",
+        "path": "blueprints/convergence-practice/ci-security/qualified-workflow.yml.txt",
         "sha256": "7f1657842cd563b64474a3c44bd0a24ce4aa2df81ad6cf977e193d9af11d13d9"
       },
       {

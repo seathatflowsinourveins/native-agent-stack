@@ -161,13 +161,13 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 511,
+    "repositories": 512,
     "public_star_repositories": 342,
-    "beyond_public_stars": 169,
-    "references": 1063,
+    "beyond_public_stars": 170,
+    "references": 1064,
     "repositories_by_record_type": {
       "catalog_card": 147,
-      "component_record": 64,
+      "component_record": 65,
       "legacy_candidate": 20,
       "public_star": 342,
       "research_supplement": 103,
@@ -6992,6 +6992,22 @@
           "path": "manifests/stack.json",
           "pointer": "/components/18",
           "id": "markitdown"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/microsoft/playwright",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "component_record"
+      ],
+      "references": [
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/64",
+          "id": "playwright-test"
         }
       ]
     },

@@ -32,7 +32,8 @@ jobs:
       - name: Validate declared convergence evidence and scope
         run: >-
           python3 scripts/validate_convergence.py
-          --all-recorded --root . --json
+          blueprints/convergence-practice/ci-security/experiment.json
+          blueprints/convergence-practice/native-worker/experiment.json --root . --json
       - name: Check offline ecosystem explorer rebuild
         run: python3 scripts/build_ecosystem.py --check
       - name: Test validation failure modes

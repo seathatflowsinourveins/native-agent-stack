@@ -56,3 +56,14 @@ wheel hash and replay of both accepted and rejected cases.
 Rollback removes the selected CI analyzer step, lock and its tests together;
 the existing evidence and catalog validation remain the baseline. Public CI
 results qualify that runner only; another host must run its own acceptance.
+
+The original accepted workflow bytes are retained in `qualified-workflow.yml.txt`.
+The historical experiment references that immutable copy; current CI validates
+every convergence record registered in the evidence manifest with
+`python3 scripts/validate_convergence.py --all-recorded --json`. This checks
+declared hashes and scope without rerunning native commands or model trials.
+
+Every contract is explicitly listed in `manifests/evidence.json` under
+`convergence_records`. Discovery also rejects undeclared canonical experiment
+paths or tagged records. Missing/misspelled `kind` fields are validated instead
+of silently excluding a declared experiment.

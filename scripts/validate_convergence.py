@@ -200,13 +200,66 @@ def validate_record(root, relative_path):
             "observations": len(record.get("observations", [])) if isinstance(record, dict) and isinstance(record.get("observations"), list) else 0}
 
 
+def recorded_paths(root):
+    """Discover declared records from the hash manifest, without running commands."""
+    validator = Validator(root)
+    path = validator.path("manifests/evidence.json", "manifest")
+    if path is None or Path(root).is_symlink():
+        raise ValueError("record discovery: invalid manifest path")
+    try:
+        manifest = read_json(path)
+        rows = manifest["files"]
+        declared = manifest["convergence_records"]
+        if not isinstance(rows, list) or not rows:
+            raise ValueError
+        if (not isinstance(declared, list) or not declared
+                or any(not isinstance(name, str) for name in declared)
+                or len(set(declared)) != len(declared)):
+            raise ValueError
+        paths, seen = [], set()
+        for row in rows:
+            name = row["path"]
+            if not isinstance(name, str) or name in seen:
+                raise ValueError
+            seen.add(name)
+            if not name.endswith(".json"):
+                continue
+            source = validator.path(name, "manifest record")
+            if source is None:
+                raise ValueError
+            content = source.read_bytes()
+            if hashlib.sha256(content).hexdigest() != row["sha256"]:
+                raise ValueError
+            data = read_json(source)
+            is_record = isinstance(data, dict) and data.get("kind") == "convergence_experiment"
+            canonical = re.fullmatch(
+                r"blueprints/convergence-practice/(?:[^/]+/)+experiment(?:-[^/]+)?\.json", name)
+            if (is_record or canonical) and name not in declared:
+                raise ValueError
+            if name in declared:
+                paths.append(name)
+        if set(paths) != set(declared):
+            raise ValueError
+        return sorted(paths)
+    except (OSError, ValueError, KeyError, TypeError):
+        raise ValueError("record discovery: invalid, changed or empty evidence manifest") from None
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("records", nargs="+", help="Canonical paths relative to --root")
+    parser.add_argument("records", nargs="*", help="Canonical paths relative to --root")
+    parser.add_argument("--all-recorded", action="store_true",
+                        help="Validate every convergence record in the evidence hash manifest")
     parser.add_argument("--root", type=Path, default=REPO)
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
-    results = [validate_record(args.root, path) for path in args.records]
+    if args.all_recorded == bool(args.records):
+        parser.error("choose explicit records or --all-recorded")
+    try:
+        paths = recorded_paths(args.root) if args.all_recorded else args.records
+        results = [dict(path=path, **validate_record(args.root, path)) for path in paths]
+    except ValueError as error:
+        results = [{"valid": False, "errors": [str(error)], "observations": 0}]
     valid = all(item["valid"] for item in results)
     if args.json:
         print(json.dumps({"valid": valid, "records": results}, sort_keys=True))
