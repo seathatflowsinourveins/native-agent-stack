@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-09-20",
+  "selection": "One native current Poppler text/geometry extractor for the exact frozen corpus; no additional document framework, model or service.",
+  "poppler": {
+    "version": "26.09.0",
+    "released_at": "2026-09-03",
+    "official_release_url": "https://poppler.freedesktop.org/",
+    "release_history_url": "https://poppler.freedesktop.org/releases.html",
+    "archive_url": "https://poppler.freedesktop.org/poppler-26.09.0.tar.xz",
+    "archive_bytes": 2041828,
+    "archive_sha256": "8059eadb6805340768f138c465b57f8164c92b4a0773c37ef031ea6c0d987b2e",
+    "signature_url": "https://poppler.freedesktop.org/poppler-26.09.0.tar.xz.sig",
+    "publisher_fingerprint": "CA262C6C83DE4D2FB28A332A3A6A4DB839EAA6D7",
+    "signature_exit": 0,
+    "verified_certificate_url": "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xCA262C6C83DE4D2FB28A332A3A6A4DB839EAA6D7",
+    "checksum_boundary": "Archive SHA256 matches the original frozen pin and the current official detached signature verified against the publisher fingerprint from the official release page.",
+    "license": "Source COPYING is GPL v2; per-file notices, including GPL v2-or-later, remain applicable. No binary redistribution in this repository.",
+    "copyright_sha256": "ab15fd526bd8dd18a9e77ebc139656bf4d33e97fc7238cd11bf60e2b9b8666c6",
+    "linux_compatibility": "Official CI includes Ubuntu 24.04/GCC. Source requires CMake>=3.28, C++23 and FreeType>=2.13; native GCC 13.3 and FreeType 2.13.2 satisfy these selected build requirements."
+  },
+  "cmake": {
+    "version": "4.4.3",
+    "release_url": "https://github.com/Kitware/CMake/releases/tag/v4.4.3",
+    "archive_url": "https://github.com/Kitware/CMake/releases/download/v4.4.3/cmake-4.4.3-linux-x86_64.tar.gz",
+    "archive_bytes": 64872980,
+    "archive_sha256": "d6c83076c575bc00b823522ac974bda66d0af05d6ddc30e739c12385cf32c6cc",
+    "checksum_url": "https://github.com/Kitware/CMake/releases/download/v4.4.3/cmake-4.4.3-SHA-256.txt",
+    "publisher_checksum_matched": true,
+    "license": "BSD-3-Clause; bundled third-party notices retained",
+    "copyright_sha256": "4382e7c1879ac90e3f101a395d23846fa4dbcaa1eed7265b43681e348754825d"
+  },
+  "ubuntu_development_payloads": {
+    "authentication": [
+      {
+        "suite": "noble",
+        "signature_exit": 0,
+        "inrelease_sha256": "cdb2f31d809f589719a53c6ad15f255b27569c4059542ada282aaa21b8e164b0",
+        "packages_sha256": "8f6f71ae839c8cba390a7643fcbbdacddb0bc7d12c1583a2dd80a1f8443a30e5"
+      },
+      {
+        "suite": "noble-updates",
+        "signature_exit": 0,
+        "inrelease_sha256": "aeaf85abd41363b42bf9951020685e0f28971d0626afd28f210919a2b8f89810",
+        "packages_sha256": "06e10331f528fffa71c2bd4a47548cdefeb1c8b040c160c6dd8645e183fd7e76"
+      }
+    ],
+    "packages": [
+      {
+        "name": "libbrotli-dev",
+        "version": "1.1.0-2build2",
+        "architecture": "amd64",
+        "suite": "noble",
+        "url": "https://archive.ubuntu.com/ubuntu/pool/main/b/brotli/libbrotli-dev_1.1.0-2build2_amd64.deb",
+        "sha256": "2d56213247be7aca429c55c6136e371b670e2275c8d455ef3fe6a737f5b7da7b",
+        "depends": "libbrotli1 (= 1.1.0-2build2)",
+        "copyright_sha256": "24a64e5bb83d0960d1835696a1e23c0896ad6055b0ca47c66ab0eb9a766324b1",
+        "license_summary": "MIT/Expat"
+      },
+      {
+        "name": "libbz2-dev",
+        "version": "1.0.8-5.1ubuntu0.1",
+        "architecture": "amd64",
+        "suite": "noble-updates",
+        "url": "https://archive.ubuntu.com/ubuntu/pool/main/b/bzip2/libbz2-dev_1.0.8-5.1ubuntu0.1_amd64.deb",
+        "sha256": "f055bb5cb47117020a76dc40fcdb8164f4fa529df2b7f485faacc0b0f5083614",
+        "depends": "libbz2-1.0 (= 1.0.8-5.1ubuntu0.1), libc6-dev | libc-dev",
+        "copyright_sha256": "832ed535ff3c3d025a8d2348eb1b697b89addcf2eaadbc17650262040b9145e2",
+        "license_summary": "bzip2 license"
+      },
+      {
+        "name": "libfreetype-dev",
+        "version": "2.13.2+dfsg-1ubuntu0.1",
+        "architecture": "amd64",
+        "suite": "noble-updates",
+        "url": "https://archive.ubuntu.com/ubuntu/pool/main/f/freetype/libfreetype-dev_2.13.2+dfsg-1ubuntu0.1_amd64.deb",
+        "sha256": "85e0199f3e9670b77c219e2adcec572138a6840fd71b7bb3bf03f1b32c7057ea",
+        "depends": "libfreetype6 (= 2.13.2+dfsg-1ubuntu0.1), libbrotli-dev, libbz2-dev, libc6-dev | libc-dev, libpng-dev, zlib1g-dev | libz-dev",
+        "copyright_sha256": "ce6d766883ea111e7f47acc09e9d49be8827daa6a03f2c2707243a425d41f0e9",
+        "license_summary": "FTL and additional per-file licenses; retained Ubuntu copyright applies"
+      },
+      {
+        "name": "libpng-dev",
+        "version": "1.6.43-5ubuntu0.6",
+        "architecture": "amd64",
+        "suite": "noble-updates",
+        "url": "https://archive.ubuntu.com/ubuntu/pool/main/libp/libpng1.6/libpng-dev_1.6.43-5ubuntu0.6_amd64.deb",
+        "sha256": "5dc18bc99a592bd21f26a4efec92e56dd05a7e95aad9eee588697cf8965faca1",
+        "depends": "libpng16-16t64 (= 1.6.43-5ubuntu0.6), zlib1g-dev",
+        "copyright_sha256": "4620d402b97601a910946acccbbe2e15bdffac11615bf9046520990d3b00f2b9",
+        "license_summary": "libpng license and associated notices"
+      },
+      {
+        "name": "zlib1g-dev",
+        "version": "1:1.3.dfsg-3.1ubuntu2.2",
+        "architecture": "amd64",
+        "suite": "noble-updates",
+        "url": "https://archive.ubuntu.com/ubuntu/pool/main/z/zlib/zlib1g-dev_1.3.dfsg-3.1ubuntu2.2_amd64.deb",
+        "sha256": "e9152a08af21ab22bc99e8bfa98f1eb83955b2cc3653bcefecab394ecf9d1b63",
+        "depends": "zlib1g (= 1:1.3.dfsg-3.1ubuntu2.2), libc6-dev | libc-dev",
+        "copyright_sha256": "9e5b96d63773a5d177ba264254390f792be07e41748ebd94730981c6cac31cc6",
+        "license_summary": "Zlib"
+      }
+    ]
+  },
+  "runtime_dependencies": [
+    {
+      "name": "libfreetype.so.6",
+      "real_path": "/usr/lib/x86_64-linux-gnu/libfreetype.so.6.20.1",
+      "package": "libfreetype6:amd64",
+      "version": "2.13.2+dfsg-1ubuntu0.1",
+      "sha256": "c14c53c5baff12afafb610c6312fb879e9bb77e80dd42e27504d52d6d8bcd059",
+      "package_md5_matched": true,
+      "license_sha256": "ce6d766883ea111e7f47acc09e9d49be8827daa6a03f2c2707243a425d41f0e9"
+    },
+    {
+      "name": "libz.so.1",
+      "real_path": "/usr/lib/x86_64-linux-gnu/libz.so.1.3",
+      "package": "zlib1g:amd64",
+      "version": "1:1.3.dfsg-3.1ubuntu2.2",
+      "sha256": "86200da370f20476a2507e9097a789b5ef97269b4ca8d5e164ad82dab9d99892",
+      "package_md5_matched": true,
+      "license_sha256": "9e5b96d63773a5d177ba264254390f792be07e41748ebd94730981c6cac31cc6"
+    },
+    {
+      "name": "libbz2.so.1.0",
+      "real_path": "/usr/lib/x86_64-linux-gnu/libbz2.so.1.0.4",
+      "package": "libbz2-1.0:amd64",
+      "version": "1.0.8-5.1ubuntu0.1",
+      "sha256": "cc08c9f50a8009ffd6391e0116a100369b11ca9238fa52392c019e6645b122a1",
+      "package_md5_matched": true,
+      "license_sha256": "832ed535ff3c3d025a8d2348eb1b697b89addcf2eaadbc17650262040b9145e2"
+    },
+    {
+      "name": "libpng16.so.16",
+      "real_path": "/usr/lib/x86_64-linux-gnu/libpng16.so.16.43.0",
+      "package": "libpng16-16t64:amd64",
+      "version": "1.6.43-5ubuntu0.6",
+      "sha256": "eac265b3506df0d9110dd9143e1d0503e2daabafe1d98b23fac8ca17b71d1f6b",
+      "package_md5_matched": true,
+      "license_sha256": "4620d402b97601a910946acccbbe2e15bdffac11615bf9046520990d3b00f2b9"
+    },
+    {
+      "name": "libbrotlidec.so.1",
+      "real_path": "/usr/lib/x86_64-linux-gnu/libbrotlidec.so.1.1.0",
+      "package": "libbrotli1:amd64",
+      "version": "1.1.0-2build2",
+      "sha256": "64d8a5019d4c294b89fde1193343ea324bbd8603652554e5545f0a01595fa2c5",
+      "package_md5_matched": true,
+      "license_sha256": "24a64e5bb83d0960d1835696a1e23c0896ad6055b0ca47c66ab0eb9a766324b1"
+    },
+    {
+      "name": "libbrotlicommon.so.1",
+      "real_path": "/usr/lib/x86_64-linux-gnu/libbrotlicommon.so.1.1.0",
+      "package": "libbrotli1:amd64",
+      "version": "1.1.0-2build2",
+      "sha256": "a91ead095d2c80520c55a89057bbe10b031a075340442e63f44b310f93883a1b",
+      "package_md5_matched": true,
+      "license_sha256": "24a64e5bb83d0960d1835696a1e23c0896ad6055b0ca47c66ab0eb9a766324b1"
+    },
+    {
+      "name": "libc.so.6",
+      "real_path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "package": "libc6:amd64",
+      "version": "2.39-0ubuntu8.9",
+      "sha256": "3a15d66867d83762c7f2f1e37359cb8f6c5743edb369c65285cb0b1c4f7498bf",
+      "package_md5_matched": true,
+      "license_sha256": "d3c95b56fa33e28b57860580f0baf4e4f4de2a268a2b80f1d031a5191bade265"
+    },
+    {
+      "name": "libm.so.6",
+      "real_path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+      "package": "libc6:amd64",
+      "version": "2.39-0ubuntu8.9",
+      "sha256": "fce00b6f25f459cf4ae0b7fae4257909a1a8a86f9149e7c029a5d617baf1ccd0",
+      "package_md5_matched": true,
+      "license_sha256": "d3c95b56fa33e28b57860580f0baf4e4f4de2a268a2b80f1d031a5191bade265"
+    },
+    {
+      "name": "libstdc++.so.6",
+      "real_path": "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+      "package": "libstdc++6:amd64",
+      "version": "14.2.0-4ubuntu2~24.04.1",
+      "sha256": "1fd75fe70354a416d75aef22bcae68c47bd25d20e2d0568c30b1a9838cf62f11",
+      "package_md5_matched": true,
+      "license_sha256": "20390f8a6f3b1e4d7cb45dd8652dabb259bbef688cbad839bcdb0b9ba7252f79"
+    },
+    {
+      "name": "libgcc_s.so.1",
+      "real_path": "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+      "package": "libgcc-s1:amd64",
+      "version": "14.2.0-4ubuntu2~24.04.1",
+      "sha256": "d93224d2b0dab4247598be683adca02f5cf00586f99c187579cd7e92058fb7cb",
+      "package_md5_matched": true,
+      "license_sha256": "20390f8a6f3b1e4d7cb45dd8652dabb259bbef688cbad839bcdb0b9ba7252f79"
+    },
+    {
+      "name": "libpkgconf.so.3",
+      "real_path": "/usr/lib/x86_64-linux-gnu/libpkgconf.so.3.0.0",
+      "package": "libpkgconf3:amd64",
+      "version": "1.8.1-2build1",
+      "sha256": "519e14004c822ce83c50dadbe3f2fd1d664364bed89961da7cf5253e8c872ed8",
+      "package_md5_matched": true,
+      "license_sha256": "676c75e54ff7e3b9892940fbf1b31763cb6f2a6527a5607a3640ac59a2441fba"
+    },
+    {
+      "name": "ld-linux-x86-64.so.2",
+      "real_path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "package": "libc6:amd64",
+      "version": "2.39-0ubuntu8.9",
+      "sha256": "c20a2dc8917c755f02b94049356320fe1f62ac7d9f8994731f807d9df39302da",
+      "package_md5_matched": true,
+      "license_sha256": "d3c95b56fa33e28b57860580f0baf4e4f4de2a268a2b80f1d031a5191bade265"
+    }
+  ],
+  "dependency_policy": "Existing native libraries verified against package checksum records and frozen SHA256; development package archives authenticated through Ubuntu signed InRelease -> Packages -> .deb SHA256. Payload extraction only, no installation or maintainer scripts. Runtime and development copyright notices retained under task prefix/licenses.",
+  "toolchain": {
+    "compiler": "gcc/g++ (Ubuntu13.3.0-6ubuntu2~24.04.1)13.3.0",
+    "make": "GNU Make 4.3",
+    "pkgconf": "1.8.1-2build1; ISC license",
+    "python": "3.13.15; existing native runtime; stdlib-only ingestion",
+    "cpu_limit": "taskset CPUs0-3 and CMake --parallel 4"
+  },
+  "configure_argv": [
+    "<QUAL_DIR>/tools/cmake-4.4.3-linux-x86_64/bin/cmake",
+    "-S",
+    "<QUAL_DIR>/tools/poppler-26.09.0",
+    "-B",
+    "<QUAL_DIR>/build",
+    "-G",
+    "Unix Makefiles",
+    "-DPKG_CONFIG_EXECUTABLE=/usr/bin/pkg-config",
+    "-DFREETYPE_INCLUDE_DIR_freetype2=<QUAL_DIR>/tools/sysroot/usr/include/freetype2",
+    "-DFREETYPE_INCLUDE_DIR_ft2build=<QUAL_DIR>/tools/sysroot/usr/include/freetype2",
+    "-DFREETYPE_LIBRARY_RELEASE=/usr/lib/x86_64-linux-gnu/libfreetype.so.6.20.1",
+    "-DZLIB_INCLUDE_DIR=<QUAL_DIR>/tools/sysroot/usr/include",
+    "-DZLIB_LIBRARY_RELEASE=/usr/lib/x86_64-linux-gnu/libz.so.1.3",
+    "-DCMAKE_INSTALL_PREFIX=<QUAL_DIR>/prefix",
+    "-DFONT_CONFIGURATION=generic",
+    "-DBUILD_SHARED_LIBS=OFF",
+    "-DENABLE_UTILS=ON",
+    "-DENABLE_CPP=OFF",
+    "-DENABLE_GLIB=OFF",
+    "-DENABLE_GOBJECT_INTROSPECTION=OFF",
+    "-DENABLE_QT5=OFF",
+    "-DENABLE_QT6=OFF",
+    "-DENABLE_LIBOPENJPEG=OFF",
+    "-DENABLE_LIBJPEG=OFF",
+    "-DENABLE_LCMS=OFF",
+    "-DENABLE_LIBCURL=OFF",
+    "-DENABLE_LIBTIFF=OFF",
+    "-DENABLE_NSS3=OFF",
+    "-DENABLE_GPGME=OFF",
+    "-DENABLE_HARFBUZZ=OFF",
+    "-DENABLE_BOOST=OFF",
+    "-DBUILD_GTK_TESTS=OFF",
+    "-DBUILD_QT5_TESTS=OFF",
+    "-DBUILD_QT6_TESTS=OFF",
+    "-DBUILD_CPP_TESTS=OFF",
+    "-DBUILD_MANUAL_TESTS=OFF",
+    "-DRUN_GPERF_IF_PRESENT=OFF",
+    "-DCMAKE_DISABLE_FIND_PACKAGE_PNG=ON",
+    "-DCMAKE_DISABLE_FIND_PACKAGE_Cairo=ON",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON",
+    "-DCMAKE_INSTALL_RPATH=$ORIGIN/../lib",
+    "-DCMAKE_FIND_USE_PACKAGE_REGISTRY=OFF",
+    "-DCMAKE_FIND_USE_SYSTEM_PACKAGE_REGISTRY=OFF"
+  ],
+  "build_argv": [
+    "<QUAL_DIR>/tools/cmake-4.4.3-linux-x86_64/bin/cmake",
+    "--build",
+    "<QUAL_DIR>/build",
+    "--target",
+    "pdftotext",
+    "pdfinfo",
+    "--parallel",
+    "4"
+  ],
+  "binary_sha256": {
+    "pdftotext": "90870f4bd7a7cd50b18cb1537c95a2a401069f88d9019d9b39e8085056f15af5",
+    "pdfinfo": "73f2583f0b0a7302f77d53ff1b378c79b11d90881ee8199c1fe384b66c9a181e"
+  },
+  "platform_adaptations": [
+    "Linux CMake artifact replaces Mac universal artifact, with the same CMake 4.4.3 pin.",
+    "Native Ubuntu FreeType 2.13.2 and its verified library closure replace the Mac2.14.3 dylibs; source minimum 2.13 and native semantic acceptance both pass.",
+    "Ubuntu pkgconf 1.8.1 and GNU GCC 13.3/Make 4.3 replace the Mac build tools.",
+    "Linux $ORIGIN/../lib replaces @loader_path/../lib; runtime libraries remain the explicit frozen native system libraries.",
+    "The original Mac-only bootstrap is not invoked or changed. Source, corpus, layout, ingestion code and oracle remain unchanged."
+  ]
+}

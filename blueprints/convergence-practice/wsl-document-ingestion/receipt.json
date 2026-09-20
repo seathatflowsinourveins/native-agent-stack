@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "kind": "native_cli_e2e",
+  "status": "passed",
+  "completed_at_utc": "2026-09-20T07:53:49.603757+00:00",
+  "host": {
+    "role": "velanext",
+    "os": "Ubuntu 24.04.5 LTS",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "architecture": "x86_64"
+  },
+  "source_revision": "76f839249f78482ead10ad700a268009d091aad5",
+  "scope": "New isolated WSL native build and execution of the unchanged frozen born-digital PDF ingestion protocol.",
+  "protocol_freeze": "freeze.json",
+  "source_provenance": "sources.json",
+  "execution": {
+    "configure_exit": 0,
+    "build_exit": 0,
+    "build_seconds": 42.39,
+    "native_version": "pdftotext version 26.09.0",
+    "command": "python3.13 <FIXTURE>/ingest.py --pdftotext <QUAL_DIR>/prefix/bin/pdftotext --output <QUAL_DIR>/attempt-1 --attempt 1",
+    "ingestion_exit": 0,
+    "upstream_commands": [
+      {
+        "argv": [
+          "pdftotext",
+          "-bbox-layout",
+          "-enc",
+          "UTF-8",
+          "corpus/lumen-qualification.pdf",
+          "-"
+        ],
+        "exit_code": 0,
+        "source": "lumen",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "pdftotext",
+          "-bbox-layout",
+          "-enc",
+          "UTF-8",
+          "corpus/w3c-dummy.pdf",
+          "-"
+        ],
+        "exit_code": 0,
+        "source": "w3c",
+        "stderr": ""
+      }
+    ],
+    "pdfinfo_exits": [
+      0,
+      0
+    ],
+    "binary_sha256": {
+      "pdftotext": "90870f4bd7a7cd50b18cb1537c95a2a401069f88d9019d9b39e8085056f15af5",
+      "pdfinfo": "73f2583f0b0a7302f77d53ff1b378c79b11d90881ee8199c1fe384b66c9a181e"
+    }
+  },
+  "acceptance": {
+    "documents": 2,
+    "pages": 3,
+    "tables": 2,
+    "data_cells": 24,
+    "positive_queries_passed": 8,
+    "absent_queries_passed": 4,
+    "checks": {
+      "bounded_output": true,
+      "exact_page_text": true,
+      "exact_table_cells": true,
+      "frozen_inputs_unchanged": true,
+      "invalid_pdf_native_refusal": true,
+      "negative_retrieval": true,
+      "positive_provenance": true,
+      "positive_retrieval": true
+    },
+    "query_limit": 3,
+    "excerpt_character_limit": 240,
+    "native_invalid_pdf": {
+      "exit_code": 1,
+      "stderr": "Syntax Warning: May not be a PDF file (continuing anyway)\nSyntax Error: Couldn't find trailer dictionary\nSyntax Error: Couldn't find trailer dictionary\nSyntax Error: Couldn't read xref table\n",
+      "stdout_bytes": 0
+    },
+    "hash_mismatch_guard": {
+      "status": "passed",
+      "native_subprocess_calls": 0,
+      "output_directory_created": false,
+      "refusal": "frozen source mismatch: corpus/lumen-qualification.pdf"
+    }
+  },
+  "cross_host_artifact_equality": {
+    "extraction.json": {
+      "wsl_sha256": "ba6dbf08f4a05042e72c186de42eae22d1a70751c9b42f80eade44e8adb31e51",
+      "mac_sha256": "ba6dbf08f4a05042e72c186de42eae22d1a70751c9b42f80eade44e8adb31e51",
+      "equal": true
+    },
+    "lumen.xhtml": {
+      "wsl_sha256": "54841d5e136944233c0f5ca96f0974a8057ab2d4df3b222c2af5ada53e92f1b2",
+      "mac_sha256": "54841d5e136944233c0f5ca96f0974a8057ab2d4df3b222c2af5ada53e92f1b2",
+      "equal": true
+    },
+    "retrieval.json": {
+      "wsl_sha256": "315980dd5fe7dc2134f763a1bc4dd9d74e0ab8ffe86cff7372fd5fd7a0308298",
+      "mac_sha256": "315980dd5fe7dc2134f763a1bc4dd9d74e0ab8ffe86cff7372fd5fd7a0308298",
+      "equal": true
+    },
+    "w3c.xhtml": {
+      "wsl_sha256": "17a9352313657c7be7f7afd56563bbaca8a5545c25243dd122c22e96032fddef",
+      "mac_sha256": "17a9352313657c7be7f7afd56563bbaca8a5545c25243dd122c22e96032fddef",
+      "equal": true
+    }
+  },
+  "frozen_state": {
+    "selected_files_unchanged": 972,
+    "runtime_libraries_unchanged": 12,
+    "original_corpus_layout_oracle_ingest_changed": false
+  },
+  "retained_failures": [
+    {
+      "stage": "First detached signature verification",
+      "exit": 2,
+      "error": "gpgv: Can't check signature: No public key",
+      "cause": "First key-service response had no usable identity; its displayed pub record was invalid and no uid records appeared.",
+      "resolution": "Full certificate fetched from Ubuntu keyserver; primary fingerprint rechecked against official Poppler page; gpgv returned 0 before any candidate execution.",
+      "private_logs_retained": true
+    },
+    {
+      "stage": "Initial CMake license location lookup",
+      "error": "Requested share/cmake-4.4/Copyright.txt did not exist.",
+      "resolution": "Located and read actual bundled doc/cmake/LICENSE.rst before executing CMake; retained with prefix licenses."
+    }
+  ],
+  "expected_build_warnings": [
+    "DCT/JPEG and JPX decoders disabled; documents needing them are outside this fixture.",
+    "Boost omitted as in the frozen minimal profile; upstream recommends it for performance."
+  ],
+  "cleanup": {
+    "owned_processes_remaining": 0,
+    "temporary_scratch_remaining": [],
+    "servers_or_listeners_started": false,
+    "global_packages_settings_services_accounts_changed": false,
+    "retained": "Selected source archives, exact dependency headers, native binaries/licenses, synthetic negative-control fixture, original frozen reference and native output/logs in task-owned prefix."
+  },
+  "private_evidence": {
+    "indexed_files": 69,
+    "indexed_bytes": 1282764,
+    "index_sha256": "714038bc4a4fc5e871c6829e995c0229c3f2a698eaea0c2a9b973dc7f52fc232",
+    "full_freeze_sha256": "1cdbf7d1479466988e930e6f47437f97102071de95b74ce5be91890743f2444b",
+    "configure_command_sha256": "2832d6fdbd4447401d7615a81efebd727b1aebbb00e86d63b83d64cfbadab2a5",
+    "location": "Private task-owned WSL prefix; machine-specific paths omitted from publication."
+  },
+  "usage": {
+    "deterministic_runner_model_calls": 0,
+    "embedding_calls": 0,
+    "provider_tokens": 0,
+    "whole_task_model_usage": "unknown",
+    "savings_claim": false
+  },
+  "limits": [
+    "Three designed born-digital Latin pages with known table geometry and exact lexical retrieval; not a held-out general document benchmark.",
+    "No OCR, inferred table layout, embeddings, arbitrary questions, non-Latin CMaps, image decoding, signatures, network-enabled parser or model/GPU run.",
+    "No new visual-renderer or broad upstream Poppler corpus qualification; the exact visually qualified source PDF bytes are retained.",
+    "Native binary hashes differ by platform; all four extracted evidence artifacts are byte-identical to retained Mac output.",
+    "Runtime prefix bytes 8014107 include copied license notices but exclude system shared libraries, source, build tools, build files, caches and evidence."
+  ],
+  "rollback": "No persistent services or global changes. Preserve required evidence, then remove only this newly created qualification prefix after review."
+}
