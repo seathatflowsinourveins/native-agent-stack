@@ -1,0 +1,157 @@
+{
+  "repository": "eyuansu62/agent-retrieval-bench",
+  "requested_repository": "eyuansu62/agent-retrieval-bench",
+  "checked_at": "2026-09-20T04:10:41.321629+00:00",
+  "source_depth": "pinned_README_license_overview_only",
+  "metadata": {
+    "html_url": "https://github.com/eyuansu62/agent-retrieval-bench",
+    "default_branch": "main",
+    "archived": false,
+    "disabled": false,
+    "pushed_at": "2026-08-04T04:01:12Z",
+    "description": "Agentic code retrieval benchmark for coding agents",
+    "license": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    }
+  },
+  "default_head": "07014c986f3deadb1548c62b32c0ffbe6a81465d",
+  "release": {
+    "tag_name": "v0.2.1",
+    "published_at": "2026-07-26T01:08:48Z",
+    "html_url": "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1",
+    "prerelease": false,
+    "draft": false
+  },
+  "source_commit": "b487f3866cc13dd971819cb902517a6a50282404",
+  "source_basis": "latest release",
+  "access": [
+    {
+      "endpoint": "https://api.github.com/repos/eyuansu62/agent-retrieval-bench",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/eyuansu62/agent-retrieval-bench/commits/main",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/eyuansu62/agent-retrieval-bench/releases/latest",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/eyuansu62/agent-retrieval-bench/commits/v0.2.1",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/eyuansu62/agent-retrieval-bench/readme?ref=b487f3866cc13dd971819cb902517a6a50282404",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/eyuansu62/agent-retrieval-bench/license?ref=b487f3866cc13dd971819cb902517a6a50282404",
+      "exit_code": 0
+    }
+  ],
+  "baseline_index_matches": [
+    {
+      "repository": "https://github.com/eyuansu62/agent-retrieval-bench",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "catalog_card",
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/source-review.json",
+          "pointer": "/candidates/0",
+          "decision": "investigate",
+          "review_level": "source_review",
+          "evidence_level": "pinned_source_review"
+        },
+        {
+          "kind": "catalog_card",
+          "path": "catalogs/us-equities/foundation-memory.json",
+          "pointer": "/entries/33",
+          "id": "foundation-agent-retrieval-bench",
+          "decision": "conditional",
+          "evidence_level": "source_review"
+        }
+      ]
+    }
+  ],
+  "readme": {
+    "path": "README.md",
+    "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md",
+    "sha256": "494b73638318f3e8958422e6ac49e6c62d13973c0e4d947c186ed3b305c3dbc4",
+    "git_blob_sha": "d5be7aaea6e17ace0a36b319c03e71199aa84ef6",
+    "bytes": 9985,
+    "matched_excerpts": [
+      {
+        "term": "trace2code",
+        "line": 26,
+        "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md#L26"
+      },
+      {
+        "term": "trace2code",
+        "line": 55,
+        "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md#L55"
+      },
+      {
+        "term": "all_files",
+        "line": 47,
+        "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md#L47"
+      },
+      {
+        "term": "all_files",
+        "line": 183,
+        "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md#L183"
+      },
+      {
+        "term": "retriev",
+        "line": 1,
+        "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md#L1"
+      },
+      {
+        "term": "retriev",
+        "line": 3,
+        "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md#L3"
+      },
+      {
+        "term": "benchmark",
+        "line": 18,
+        "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md#L18"
+      },
+      {
+        "term": "benchmark",
+        "line": 53,
+        "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md#L53"
+      }
+    ]
+  },
+  "license_at_source": {
+    "path": "LICENSE",
+    "url": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/LICENSE",
+    "metadata": {
+      "key": "other",
+      "name": "Other",
+      "spdx_id": "NOASSERTION",
+      "url": null,
+      "node_id": "MDc6TGljZW5zZTA="
+    },
+    "sha256": "f821747bf0011218a8d18a6030b3343384a2c68478e643e26e057732fc89aa31",
+    "bytes": 1091
+  },
+  "decision": {
+    "disposition": "retain-reference",
+    "license_text_classification": "MIT",
+    "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+    "concrete_gap_or_overlap": "Existing exact-release trace2code replay measures file retrieval; root-cause file ranking does not establish edits or lower total provider cost.",
+    "next_acceptance": "Add separate held-out patch/test acceptance after retrieval; preserve all_files and corpus/source pins.",
+    "installation_performed": false,
+    "model_calls": 0
+  }
+}

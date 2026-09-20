@@ -1,0 +1,127 @@
+{
+  "repository": "UKGovernmentBEIS/inspect_ai",
+  "requested_repository": "UKGovernmentBEIS/inspect_ai",
+  "checked_at": "2026-09-20T04:10:41.320145+00:00",
+  "source_depth": "pinned_README_license_overview_only",
+  "metadata": {
+    "html_url": "https://github.com/UKGovernmentBEIS/inspect_ai",
+    "default_branch": "main",
+    "archived": false,
+    "disabled": false,
+    "pushed_at": "2026-09-19T13:21:18Z",
+    "description": "Inspect: A framework for large language model evaluations",
+    "license": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    }
+  },
+  "default_head": "ec4dfc6953784dc45b79de3147530c89868c6e26",
+  "release": null,
+  "source_commit": "ec4dfc6953784dc45b79de3147530c89868c6e26",
+  "source_basis": "default branch HEAD",
+  "access": [
+    {
+      "endpoint": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai/commits/main",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai/releases/latest",
+      "exit_code": 1,
+      "error": "gh: Not Found (HTTP 404)"
+    },
+    {
+      "endpoint": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai/commits/ec4dfc6953784dc45b79de3147530c89868c6e26",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai/readme?ref=ec4dfc6953784dc45b79de3147530c89868c6e26",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/UKGovernmentBEIS/inspect_ai/license?ref=ec4dfc6953784dc45b79de3147530c89868c6e26",
+      "exit_code": 0
+    }
+  ],
+  "baseline_index_matches": [
+    {
+      "repository": "https://github.com/ukgovernmentbeis/inspect_ai",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "catalog_card",
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/source-review.json",
+          "pointer": "/candidates/1",
+          "decision": "investigate",
+          "review_level": "source_review",
+          "evidence_level": "pinned_source_review"
+        },
+        {
+          "kind": "catalog_card",
+          "path": "catalogs/us-equities/agents-operations.json",
+          "pointer": "/entries/30",
+          "id": "inspect-ai",
+          "decision": "default",
+          "evidence_level": "source_review"
+        }
+      ]
+    }
+  ],
+  "readme": {
+    "path": "README.md",
+    "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/README.md",
+    "sha256": "a9a1e07b955d869137d8ad109f1c238268f361dcdfac30cfcc94983a51a99b17",
+    "git_blob_sha": "1e58c142b2e05faf2e3dba9a487450c0845c4576",
+    "bytes": 3099,
+    "matched_excerpts": [
+      {
+        "term": "evaluat",
+        "line": 3,
+        "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/README.md#L3"
+      },
+      {
+        "term": "evaluat",
+        "line": 5,
+        "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/README.md#L5"
+      },
+      {
+        "term": "agent",
+        "line": 11,
+        "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/README.md#L11"
+      }
+    ]
+  },
+  "license_at_source": {
+    "path": "LICENSE",
+    "url": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/LICENSE",
+    "metadata": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    },
+    "sha256": "c593c2afc81388521eaeb03f0d1a4b01bc3e5147ed9cb16c1f129e5be353b6af",
+    "bytes": 1081
+  },
+  "decision": {
+    "disposition": "retain-reference",
+    "license_text_classification": "MIT",
+    "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+    "concrete_gap_or_overlap": "Existing evaluation candidate can standardize task/scorer/log receipts; missing acceptance is resumability and bounded failure behavior, not another framework identity.",
+    "next_acceptance": "One mock-model task with deterministic scoring, bounded concurrency/retries, retained failure log, interruption and resume; no provider request.",
+    "installation_performed": false,
+    "model_calls": 0
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "accepted_frozen_tests": {
+    "errors": 0,
+    "failures": 0,
+    "passed": true,
+    "tests": 12
+  },
+  "acyclic_graphs": 543,
+  "cyclic_graphs": 64993,
+  "directed_graphs_including_self_edges": 65536,
+  "graph_nodes": [
+    "a",
+    "b",
+    "c",
+    "d"
+  ],
+  "graph_oracle": "First valid permutation in independently enumerated lexicographic order.",
+  "input_immutability_checked_on_success_and_rejection": true,
+  "kind": "offline_independent_planner_review",
+  "limitations": [
+    "Exhaustive only for directed graphs over four named nodes; larger graphs are not exhaustively tested.",
+    "Input contract is string task names mapped to lists of string prerequisites; malformed types are outside scope.",
+    "Independent offline code/oracle review; no native model, account, remote host or provider call was repeated.",
+    "Matching plan hashes verifies current bytes, not independently attested pre-execution chronology.",
+    "Native worker/runtime claims rely on their separate execution evidence.",
+    "No matched model baseline, whole-workflow token savings or billing reduction is established."
+  ],
+  "outcome": "passed",
+  "plan_seed_and_prompt_hashes_match": true,
+  "representations_checked": 131072,
+  "reviewed_bytes_unchanged": true,
+  "reviewed_files_sha256": {
+    "accepted/planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+    "plan.json": "84b46b5b3f996e0ae7dcb80ba4b45d675a3e47150959880d23071f5ce759fcec",
+    "prompt.txt": "643713536c3711d1f7135579eb81fc0e4e942c628da012e0f75aef7d0aefe6f1",
+    "seed/TASK.md": "0807600d365213edbbc2a65c4e2833e1b997b66b932adc88b2542fab638a4bd8",
+    "seed/planner.py": "ba9155fd203a5d23e12ea7f842ccc5ac033249db4a64ec525374fa2db9d71082",
+    "seed/test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937",
+    "usage.json": "db253301dc4f69db52c9607878f6d6c72ea11c1d58b86eac0c4858847d6f319d"
+  },
+  "reviewer_script_sha256": "3196a23d66c1f60bcd9e9520d12d6c87bdc4c956d27ea78524534681aa6022a6",
+  "schema_version": 1,
+  "second_representation": "Reversed mapping/prerequisite order with duplicated prerequisites.",
+  "seed_negative_control": {
+    "errors": 0,
+    "failures": 8,
+    "passed": false,
+    "tests": 12
+  },
+  "undeclared_prerequisite_cases": 6,
+  "usage_scope_review": {
+    "child_summary_total": 27865,
+    "cost_basis": "list",
+    "model_usage_category_sum": 277732,
+    "native_retries": null,
+    "relationship": "Different native scopes remain unreconciled; do not add these totals.",
+    "savings_claim": null,
+    "terminal_category_sum": 105297,
+    "whole_desktop_task_usage": null
+  }
+}

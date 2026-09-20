@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "native-ci-security-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "zizmor"
+  ],
+  "claim": "Native zizmor1.30.1 on macOS accepts the published workflow under offline regular analysis and rejects an inert unsafe fixture with three findings; two executable regression checks pass.",
+  "limitations": [
+    "Offline regular analysis is scoped static evidence, not absence of every vulnerability or signature verification.",
+    "Mac binary and the checksum-locked Linux CI wheel are distinct artifacts; new runner execution is established by its own CI result.",
+    "The unsafe fixture was analyzed but never executed. No model calls, broker actions or savings measurement."
+  ],
+  "recorded_at_utc": "2026-09-20T04:30:41.591503+00:00"
+}

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "kind": "integration_validation_record",
+  "recorded_at_utc": "2026-09-20T04:35:19.970224+00:00",
+  "scope": "Integrated public working tree; exact immutable publication head is checked again by GitHub CI. No new provider run is implied by test replay.",
+  "runs": [
+    {
+      "id": "partial-private-python-profile",
+      "status": "failed",
+      "command": "python -m unittest",
+      "tests": 404,
+      "errors": 10,
+      "skipped": 24,
+      "reason": "Selecting the private tool environment activated optional DuckDB tests but that environment lacked pytz. This environment is not the public SDK profile; no global package mutation was made."
+    },
+    {
+      "id": "public-stdlib-profile",
+      "status": "passed",
+      "command": "python3 -m unittest (explicit CPython3.14.7; zizmor1.30.1 on PATH)",
+      "tests": 404,
+      "errors": 0,
+      "skipped": 47,
+      "reason": "Optional SDK/data/platform tests explicitly skip without their selected dependencies. All new convergence, fixture and native static-analysis checks execute."
+    },
+    {
+      "id": "convergence-focused",
+      "status": "passed",
+      "tests": 35,
+      "skipped": 0,
+      "scope": "31contract checks,2nativezizmor checks,2frozenpatch replays."
+    }
+  ],
+  "independent_review": {
+    "contract_findings_fixed": [
+      "Unequal passing repetition counts can no longer produce a savings claim.",
+      "An earlier passing candidate cannot qualify after a later failure or skip in its same task/role/scope."
+    ],
+    "regression_tests": 4,
+    "verification": "Independent reproductions rejected after fix.",
+    "patch_review": "native-worker/independent-review.json"
+  },
+  "limitations": [
+    "Local stdlib pass is not acceptance of every optional dependency profile.",
+    "The failed partial-profile attempt remains recorded; no savings claim uses these validation runs.",
+    "Native model evidence is in native-worker/receipt.json, not inferred from offline replays."
+  ]
+}

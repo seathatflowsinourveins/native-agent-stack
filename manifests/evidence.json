@@ -915,6 +915,35 @@
         "This session uses these hosted research worker invocations; it does not establish token savings for the enclosing Desktop conversation or whole ecosystem."
       ],
       "path": "blueprints/us-equities/research-efficiency/native-receipt.json"
+    },
+    {
+      "id": "native-ci-security-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "zizmor"
+      ],
+      "claim": "Native zizmor1.30.1 on macOS accepts the published workflow under offline regular analysis and rejects an inert unsafe fixture with three findings; two executable regression checks pass.",
+      "limitations": [
+        "Offline regular analysis is scoped static evidence, not absence of every vulnerability or signature verification.",
+        "Mac binary and the checksum-locked Linux CI wheel are distinct artifacts; new runner execution is established by its own CI result.",
+        "The unsafe fixture was analyzed but never executed. No model calls, broker actions or savings measurement."
+      ],
+      "path": "blueprints/convergence-practice/ci-security/receipt.json"
+    },
+    {
+      "id": "native-claude-child-patch-20260920",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "Native Claude Code2.1.278 on Ubuntu24.04 WSL2 used Opus5 through Max for one foreground isolated child repair. Only planner.py changed; all12 frozen visible tests pass independently after8 seed failures.",
+      "limitations": [
+        "One synthetic visible-oracle fixture, not a held-out benchmark, real application or GPU acceptance.",
+        "Ultracode was requested; observed native delegation does not establish dynamic-workflow selection or an OS sandbox.",
+        "Three native usage views retain different scopes; native retries and whole Desktop usage are unknown. No matched model baseline or savings claim.",
+        "Local supervision completed without timeout; provider cancellation, crash recovery and full-host backup were not tested."
+      ],
+      "path": "blueprints/convergence-practice/native-worker/receipt.json"
     }
   ],
   "files": [
@@ -924,9 +953,14 @@
       "bytes": 304
     },
     {
+      "path": ".github/requirements-ci.lock",
+      "sha256": "e475964596b4439d069891ef3f194efe7f8eea9fe1c9478d944001644fcab083",
+      "bytes": 283
+    },
+    {
       "path": ".github/workflows/validate.yml",
-      "sha256": "03209e2a5501975de1994576f99ce09a8f928bd7098cfa70500c224f383a9b53",
-      "bytes": 755
+      "sha256": "7f1657842cd563b64474a3c44bd0a24ce4aa2df81ad6cf977e193d9af11d13d9",
+      "bytes": 1494
     },
     {
       "path": ".gitignore",
@@ -940,8 +974,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "0fbc2500fbd7e391c375c62ddfc327ae41d9847340459e72c00b83cc92730305",
-      "bytes": 5922
+      "sha256": "7aa89a4049f2db683002e47f2d1e967aaf4e43977ebef6423b8910739b6343d4",
+      "bytes": 6209
     },
     {
       "path": "CLAUDE.md",
@@ -955,8 +989,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "3d972f00791ab729f92bbbfed9635fa3722806606c69476b18247220790948c9",
-      "bytes": 14244
+      "sha256": "fd32db3711b19d4f01974af193a7e5e8fb89372c437f1cf644dc7f8dd63af20f",
+      "bytes": 14695
     },
     {
       "path": "adoption/README.md",
@@ -970,8 +1004,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "ed2bf9bcf66a5261313cc5a4ece2bc258572b4726eebbcd9bd9447a2e7b02a27",
-      "bytes": 10376
+      "sha256": "42ceea1048fd2b86b30e0b79d32b4fc1e4e7d03ddd11fae8699649c7d2c7fdcf",
+      "bytes": 10623
     },
     {
       "path": "adoption/paired/README.md",
@@ -1045,8 +1079,8 @@
     },
     {
       "path": "blueprints/convergence-practice/README.md",
-      "sha256": "c2fe9c4d70e5df43f5ea537ab9355c4afe2c3cafbad21a5dd40b46c1ac2fe429",
-      "bytes": 9616
+      "sha256": "ea29ca04da80e3503fe814f1220b02dc438b7d16fa7ff415ececd65b45b51042",
+      "bytes": 10073
     },
     {
       "path": "blueprints/convergence-practice/arb-trace2code/README.md",
@@ -1094,6 +1128,36 @@
       "bytes": 129
     },
     {
+      "path": "blueprints/convergence-practice/ci-security/README.md",
+      "sha256": "725e3d43817a0d6f7ac30e40480e245d9deff6feece60658496e95b534d5ec21",
+      "bytes": 1922
+    },
+    {
+      "path": "blueprints/convergence-practice/ci-security/experiment.json",
+      "sha256": "eb5116f2664dec9ad194ac1a2991aa64e01d8203a7f886aa7195f5310f0607bc",
+      "bytes": 4345
+    },
+    {
+      "path": "blueprints/convergence-practice/ci-security/observation.json",
+      "sha256": "aebb8c8dd1b5d269fbbc1b3a3e66a591d3b7ea9f2caff23891ba6270ab55232f",
+      "bytes": 707
+    },
+    {
+      "path": "blueprints/convergence-practice/ci-security/receipt.json",
+      "sha256": "218dca2e923462c85c08cd7ff07edeb20f1e784cd409988f2e201ad2351c8b31",
+      "bytes": 787
+    },
+    {
+      "path": "blueprints/convergence-practice/contract-reference.md",
+      "sha256": "fe2fe90486c16f93daa9ed3b9855b02f8acdcd6737f484015e92436499cef19e",
+      "bytes": 7089
+    },
+    {
+      "path": "blueprints/convergence-practice/contract.schema.json",
+      "sha256": "c544cfe4294316bee825eb3ae976b1321a63e848d326214b3efb065a990daaae",
+      "bytes": 7081
+    },
+    {
       "path": "blueprints/convergence-practice/local-fixture/corpus-manifest.json",
       "sha256": "7bb986160b332e205208b6767b95b6f019423ffed1f50843534ff7e4272fdded",
       "bytes": 4436
@@ -1124,9 +1188,84 @@
       "bytes": 55347
     },
     {
+      "path": "blueprints/convergence-practice/native-worker/README.md",
+      "sha256": "f04976e11b165463e774deb64517d16da33d77331cb995ebeb76e4cd75701095",
+      "bytes": 4363
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/accepted/planner.py",
+      "sha256": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+      "bytes": 1972
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/checks.json",
+      "sha256": "5716e42cbb9b9d31b16defe18a7ab3a91f134c7f71b9883480929e586690b817",
+      "bytes": 571
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/experiment.json",
+      "sha256": "a8bbd1cb0f63bf96f9f82ab604b9ac03c6262671afcc1d845a9a739f915bda13",
+      "bytes": 7570
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/independent-review.json",
+      "sha256": "7751cec857832486f8b460b450d282c5679af061e807351947c118ef3fab0c76",
+      "bytes": 2639
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/independent_review.py",
+      "sha256": "3196a23d66c1f60bcd9e9520d12d6c87bdc4c956d27ea78524534681aa6022a6",
+      "bytes": 7753
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/plan.json",
+      "sha256": "84b46b5b3f996e0ae7dcb80ba4b45d675a3e47150959880d23071f5ce759fcec",
+      "bytes": 1510
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/prompt.txt",
+      "sha256": "643713536c3711d1f7135579eb81fc0e4e942c628da012e0f75aef7d0aefe6f1",
+      "bytes": 1074
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/receipt.json",
+      "sha256": "6c663f07a8738d3df74c38db073c7a6eb1030dd9b84b4c25385f32630ce848d6",
+      "bytes": 955
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/seed/TASK.md",
+      "sha256": "0807600d365213edbbc2a65c4e2833e1b997b66b932adc88b2542fab638a4bd8",
+      "bytes": 1023
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/seed/planner.py",
+      "sha256": "ba9155fd203a5d23e12ea7f842ccc5ac033249db4a64ec525374fa2db9d71082",
+      "bytes": 227
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/seed/test_planner.py",
+      "sha256": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937",
+      "bytes": 2072
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/test-output.txt",
+      "sha256": "9896d8ab33fe7dabf8c6d21517a86c830aff3502817eee8110cbb3bdf45635df",
+      "bytes": 1177
+    },
+    {
+      "path": "blueprints/convergence-practice/native-worker/usage.json",
+      "sha256": "db253301dc4f69db52c9607878f6d6c72ea11c1d58b86eac0c4858847d6f319d",
+      "bytes": 1807
+    },
+    {
       "path": "blueprints/convergence-practice/protocol.json",
       "sha256": "7176889bb4f8e3839c5230918c1e23ff89bdd3778a8f333db2ea881731a08e45",
       "bytes": 2595
+    },
+    {
+      "path": "blueprints/convergence-practice/validation.json",
+      "sha256": "2781bc66707fad526ae0798546cc4b6738f03964d6e4702dabd94f9f4172cf9d",
+      "bytes": 2009
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -2324,6 +2463,76 @@
       "bytes": 1309
     },
     {
+      "path": "catalogs/convergence-practice/architecture-wave/README.md",
+      "sha256": "b28bb92eb51da98ab63a3705b45215c344c01394fe6aab0a61160833eeeef38b",
+      "bytes": 3353
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/UKGovernmentBEIS__inspect_ai.json",
+      "sha256": "aa45ade36e6cc2dc8d0916b466d0858566dabcdc98fdf6aae1c5e4d7c53a2da9",
+      "bytes": 4640
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/astral-sh__uv.json",
+      "sha256": "6ab933f3f6b20832c4f41778ed0bef2fb34c7926a13d8dba8830692f54644a63",
+      "bytes": 5466
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/dagucloud__dagu.json",
+      "sha256": "be902af6d071e0b051ce9c761d3b77dfe0ecdf5fb363a1b34cad8b52383c7721",
+      "bytes": 6558
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/eyuansu62__agent-retrieval-bench.json",
+      "sha256": "47b5e3763b3739f5f438b49a84102158bb3fb4e37f53631e7807c637698083a1",
+      "bytes": 5726
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/harbor-framework__harbor.json",
+      "sha256": "cb5b011dc53ba1868841ea18c503c635b55d61bcc7f6f68f0fea741a3b36461b",
+      "bytes": 4619
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/jaywcjlove__awesome-mac.json",
+      "sha256": "0a77e11938b43bcf93c080236a02e057dd70e662f9f5c309ff878b012493f8e8",
+      "bytes": 6063
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/jgravelle__jcodemunch-mcp.json",
+      "sha256": "4993341d973d229fcb9eec8ca70aa3aafa6601e27e5eb8ea4cb9877a47aceda7",
+      "bytes": 5659
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/own-repository.json",
+      "sha256": "1e88fa73217da209f83239ace7271482bc4f5ee66c610a0b49c488673dc723e1",
+      "bytes": 710
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/public-star-delta.json",
+      "sha256": "afba692a2849361d785e61d90c9eda1cdcf4762b424ab41d33046a6b7ec80cef",
+      "bytes": 11245
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/sigstore__cosign.json",
+      "sha256": "0aba570f5b7256d2b8d97c984839ff145e507b9ba76bc3e26b217aac894ce201",
+      "bytes": 4857
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+      "sha256": "a39ea78a9c8cb9722d3647f11a94771c8f22aa6e92662260d8e7ded94a74d6d0",
+      "bytes": 15471
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/tobi__qmd.json",
+      "sha256": "bd6405abb939342eec8e25da4ec8069de666cff7cff9e05465a8f84c82dc9b0d",
+      "bytes": 6353
+    },
+    {
+      "path": "catalogs/convergence-practice/architecture-wave/zizmorcore__zizmor.json",
+      "sha256": "25c5ead3bb9660aeae390f7c0f3076e3db26014c3ac31d9f1686849d803ab679",
+      "bytes": 4679
+    },
+    {
       "path": "catalogs/convergence-practice/public-owned.json",
       "sha256": "541528d9cf379a9bb0b7793d3984c62412d7753b4cb614df15d4d9d798a48f5f",
       "bytes": 810
@@ -2345,7 +2554,7 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "483ad2424434b4346893ec5d6978ae11d0aac7f2e96156a886b6cf125b134b85",
+      "sha256": "bcc80c7b4eb6bf56238db7cbc92b834942b3d3582bd31bf63b1ef13738c9bdb7",
       "bytes": 12611
     },
     {
@@ -2490,8 +2699,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "1bf6ae0cee5ca96bd26429d31243eee36a54224933b7620d72568f242d0b11c4",
-      "bytes": 380072
+      "sha256": "ac8a912a2d1a6c83ff21522ca67b871da12c159d2563abcb3fe49164fe9d7852",
+      "bytes": 382740
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -2535,8 +2744,8 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "daa0187e8726f9745bad3892402edeaaa1e30745ecdc44eb83363d26257c61d5",
-      "bytes": 2633
+      "sha256": "eab8b317848ddd9d9e08cf7840d3f7a37fa52c765f69d77ce59d9a59a4bf44ed",
+      "bytes": 2763
     },
     {
       "path": "catalogs/us-equities/model-followup.json",
@@ -2629,6 +2838,11 @@
       "bytes": 5180
     },
     {
+      "path": "docs/convergence-architecture.md",
+      "sha256": "3e40c442b43c1c117cba05c1f8ae90c90a0cddf7d5ff41aa1f28b8a10c42433c",
+      "bytes": 13123
+    },
+    {
       "path": "docs/convergence-audit.md",
       "sha256": "52ba119dadd6aaed191c6e182a38cfa201c35d4c58db9aa10880f750a806f23a",
       "bytes": 5966
@@ -2640,13 +2854,13 @@
     },
     {
       "path": "docs/ecosystem/README.md",
-      "sha256": "0d03ead725224343cec59556c2df21694bf546148702d2a4b37ae880cf53edf5",
+      "sha256": "7f5e5f9844f36fe4ed99935eb3948b9843a9dbce4685ec3f8db0e5512bbd4540",
       "bytes": 6253
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "bb0dbee3274d6675099703daa44cf99e5cc83edf6c4fae19b2db82d61ad91cef",
-      "bytes": 1460474
+      "sha256": "c3b8d616d5deaedb4809db184e6b7a04f4ae9f63d6283f0dc54e5996ebe4da48",
+      "bytes": 1470410
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -2920,8 +3134,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "c7bad49183f8930563b746e61c1043d77d1435700d0bbb8048027f4a001d829a",
-      "bytes": 49172
+      "sha256": "c4447759ccec63f68399c24b2967add627356cca97145698da18ddf99d130efe",
+      "bytes": 49993
     },
     {
       "path": "observability/README.md",
@@ -3080,8 +3294,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "bbef5201f609bbd6f2e9f8a5c8c1aab74fa20c11d35108da66502c6ad8fe8dd3",
-      "bytes": 5409
+      "sha256": "1433945181a68d987200eabeefd78c54c82322548b6d7c4954227f5ec0b47a92",
+      "bytes": 5983
     },
     {
       "path": "observability/receipt.json",
@@ -3134,9 +3348,19 @@
       "bytes": 24776
     },
     {
+      "path": "scripts/validate_convergence.py",
+      "sha256": "a2ee2dbf280c699b5c6b84be97e449e7ab6533e327446024f9692fc0f8ea1e21",
+      "bytes": 12512
+    },
+    {
       "path": "tests/__init__.py",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "bytes": 0
+    },
+    {
+      "path": "tests/fixtures/workflow-security/unsafe.yml.txt",
+      "sha256": "9e1c6130a396200387a0b9f1d445a33dbf154370db5460a3b50e086321bb737a",
+      "bytes": 304
     },
     {
       "path": "tests/test_adoption_contract.py",
@@ -3182,6 +3406,11 @@
       "path": "tests/test_catalyst_provenance.py",
       "sha256": "d97ef06024b15d92c7447ee889c708a2975ec583d947c1e3590471373872164d",
       "bytes": 12522
+    },
+    {
+      "path": "tests/test_convergence_contract.py",
+      "sha256": "8b989a25264c16129166496397ba514a3f07037007aad7039f1e75cc566907e8",
+      "bytes": 17133
     },
     {
       "path": "tests/test_corporate_action_readiness.py",
@@ -3239,6 +3468,11 @@
       "bytes": 6756
     },
     {
+      "path": "tests/test_native_worker_fixture.py",
+      "sha256": "e4bd5345e9d23a338602fd0f6f34a67d959af51cb7939f4112dced74bcb01301",
+      "bytes": 1341
+    },
+    {
       "path": "tests/test_observability.py",
       "sha256": "acdb0bbc1e0d8a28ff12a6d13188d048d4f916c10dc94d983bfe9c6d07f8ed06",
       "bytes": 5474
@@ -3277,6 +3511,11 @@
       "path": "tests/test_validate.py",
       "sha256": "8ffe84e3e14d87a1858033cbb0137eddde8ed4623909961c6d469077ae6716f8",
       "bytes": 10863
+    },
+    {
+      "path": "tests/test_workflow_security.py",
+      "sha256": "2c260c8d7fd58e747819037177ec9e077ee1cac7dc1e8ebd1ff7ddd1c405266b",
+      "bytes": 2582
     }
   ]
 }

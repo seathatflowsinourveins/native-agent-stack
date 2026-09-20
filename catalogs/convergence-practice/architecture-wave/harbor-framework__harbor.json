@@ -1,0 +1,128 @@
+{
+  "repository": "harbor-framework/harbor",
+  "requested_repository": "harbor-framework/harbor",
+  "checked_at": "2026-09-20T04:10:41.321531+00:00",
+  "source_depth": "pinned_README_license_overview_only",
+  "metadata": {
+    "html_url": "https://github.com/harbor-framework/harbor",
+    "default_branch": "main",
+    "archived": false,
+    "disabled": false,
+    "pushed_at": "2026-09-19T18:59:40Z",
+    "description": "Framework for evaluating and improving agents ",
+    "license": {
+      "key": "apache-2.0",
+      "name": "Apache License 2.0",
+      "spdx_id": "Apache-2.0",
+      "url": "https://api.github.com/licenses/apache-2.0",
+      "node_id": "MDc6TGljZW5zZTI="
+    }
+  },
+  "default_head": "71c77fdd119df12eb6ab56e5bc0f29bf62fad338",
+  "release": {
+    "tag_name": "v0.23.0",
+    "published_at": "2026-09-12T04:55:17Z",
+    "html_url": "https://github.com/harbor-framework/harbor/releases/tag/v0.23.0",
+    "prerelease": false,
+    "draft": false
+  },
+  "source_commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+  "source_basis": "latest release",
+  "access": [
+    {
+      "endpoint": "https://api.github.com/repos/harbor-framework/harbor",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/harbor-framework/harbor/commits/main",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/harbor-framework/harbor/releases/latest",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/harbor-framework/harbor/commits/v0.23.0",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/harbor-framework/harbor/readme?ref=1e5c5c6db929a10a140d05e606882c671ae20729",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/harbor-framework/harbor/license?ref=1e5c5c6db929a10a140d05e606882c671ae20729",
+      "exit_code": 0
+    }
+  ],
+  "baseline_index_matches": [
+    {
+      "repository": "https://github.com/harbor-framework/harbor",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/source-review.json",
+          "pointer": "/candidates/2",
+          "decision": "investigate",
+          "review_level": "source_review",
+          "evidence_level": "pinned_source_review"
+        }
+      ]
+    }
+  ],
+  "readme": {
+    "path": "README.md",
+    "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md",
+    "sha256": "687e4f416b43e1ab28afb3cd48f556d7a9f4d664ac78ac1a2a07a7ab9b95b1b7",
+    "git_blob_sha": "4ae345184f65e2c0ff8cce8e496a8fdcc439f9bc",
+    "bytes": 2984,
+    "matched_excerpts": [
+      {
+        "term": "sandbox",
+        "line": 14,
+        "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md#L14"
+      },
+      {
+        "term": "evaluat",
+        "line": 10,
+        "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md#L10"
+      },
+      {
+        "term": "evaluat",
+        "line": 12,
+        "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md#L12"
+      },
+      {
+        "term": "Docker",
+        "line": 41,
+        "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md#L41"
+      }
+    ]
+  },
+  "license_at_source": {
+    "path": "LICENSE",
+    "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/LICENSE",
+    "metadata": {
+      "key": "apache-2.0",
+      "name": "Apache License 2.0",
+      "spdx_id": "Apache-2.0",
+      "url": "https://api.github.com/licenses/apache-2.0",
+      "node_id": "MDc6TGljZW5zZTI="
+    },
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "bytes": 11357
+  },
+  "decision": {
+    "disposition": "defer-install",
+    "license_text_classification": "Apache-2.0",
+    "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+    "concrete_gap_or_overlap": "Existing source-reviewed comparator packages runnable agent tasks and deterministic verification. It adds Docker or a cloud environment before a selected benchmark needs it.",
+    "next_acceptance": "Revisit only for a named container task; use oracle-only packaging test first and preserve cleanup evidence.",
+    "installation_performed": false,
+    "model_calls": 0
+  }
+}

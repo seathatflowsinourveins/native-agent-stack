@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "discovery_provenance": [
+    "Measured gap in public native workflow acceptance; stars and awesome lists used only for discovery."
+  ],
+  "license_and_compatibility": "See pinned source review; original fixture under repository MIT license. No new native authentication or model default.",
+  "predeclared_metrics": {
+    "quality_rule": "Preserve frozen acceptance oracle and inspect actual exit, changes and intended failure cases.",
+    "usage_rule": "Known native fields retained separately; unknown stays null; no savings claim."
+  },
+  "commands": [
+    "python3 -m unittest -v test_planner",
+    "claude -p --model claude-opus-5 --effort ultracode --max-turns 12 --output-format stream-json --verbose --tools Bash,Read,Edit,Write,Agent --allowedTools Bash,Read,Edit,Write,Agent --permission-mode dontAsk --permission-prompts none < prompt.txt"
+  ],
+  "observations": [
+    {
+      "id": "seed-oracle",
+      "task": "dependency-planner",
+      "role": "verifier",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Frozen dependency-planner seed",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/native-worker/seed/planner.py",
+          "sha256": "ba9155fd203a5d23e12ea7f842ccc5ac033249db4a64ec525374fa2db9d71082"
+        },
+        {
+          "path": "tests/test_native_worker_fixture.py",
+          "sha256": "e4bd5345e9d23a338602fd0f6f34a67d959af51cb7939f4112dced74bcb01301"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "native-child-repair",
+      "task": "dependency-planner",
+      "role": "native-parent-and-child",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "model_task_execution",
+      "scope": "One frozen dependency-planner repair by native Claude Opus5 parent and isolated child on Ubuntu24.04 WSL2",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/native-worker/checks.json",
+          "sha256": "5716e42cbb9b9d31b16defe18a7ab3a91f134c7f71b9883480929e586690b817"
+        },
+        {
+          "path": "blueprints/convergence-practice/native-worker/accepted/planner.py",
+          "sha256": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef"
+        },
+        {
+          "path": "blueprints/convergence-practice/native-worker/test-output.txt",
+          "sha256": "9896d8ab33fe7dabf8c6d21517a86c830aff3502817eee8110cbb3bdf45635df"
+        },
+        {
+          "path": "blueprints/convergence-practice/native-worker/usage.json",
+          "sha256": "db253301dc4f69db52c9607878f6d6c72ea11c1d58b86eac0c4858847d6f319d"
+        },
+        {
+          "path": "blueprints/convergence-practice/native-worker/independent_review.py",
+          "sha256": "3196a23d66c1f60bcd9e9520d12d6c87bdc4c956d27ea78524534681aa6022a6"
+        },
+        {
+          "path": "blueprints/convergence-practice/native-worker/independent-review.json",
+          "sha256": "7751cec857832486f8b460b450d282c5679af061e807351947c118ef3fab0c76"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "seed-oracle",
+      "reason": "Expected8 failures in12tests expose the original defect; failed seed is retained, not a model-efficiency baseline."
+    }
+  ],
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  },
+  "task_and_failure": "Clean WSL native Claude child editing, exact-base isolation and real correctness had not been demonstrated by authentication or version checks.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/anthropics/claude-code",
+      "revision": "bf7d404e26a5fb6167d21b46c93a2bf6c22ab274"
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "revision": "3d7bd63d00e19e93902f0457786891324df71851"
+    }
+  ],
+  "baseline_and_candidate": {
+    "baseline": "Frozen planner stub; deterministic tests only, no model baseline",
+    "candidate": "One bounded native parent delegates the exact repair to its configured child"
+  },
+  "frozen_inputs": {
+    "base_revision": "3d7bd63d00e19e93902f0457786891324df71851",
+    "tasks": [
+      "dependency-planner"
+    ],
+    "roles": [
+      "verifier",
+      "native-parent-and-child"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/native-worker/seed/planner.py",
+        "sha256": "ba9155fd203a5d23e12ea7f842ccc5ac033249db4a64ec525374fa2db9d71082"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/native-worker/seed/TASK.md",
+        "sha256": "0807600d365213edbbc2a65c4e2833e1b997b66b932adc88b2542fab638a4bd8"
+      },
+      {
+        "path": "blueprints/convergence-practice/native-worker/prompt.txt",
+        "sha256": "643713536c3711d1f7135579eb81fc0e4e942c628da012e0f75aef7d0aefe6f1"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/native-worker/seed/test_planner.py",
+        "sha256": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+      },
+      {
+        "path": "blueprints/convergence-practice/native-worker/plan.json",
+        "sha256": "84b46b5b3f996e0ae7dcb80ba4b45d675a3e47150959880d23071f5ce759fcec"
+      }
+    ]
+  },
+  "runtime_and_platform": {
+    "platform": "Ubuntu24.04 WSL2 x86_64",
+    "tools": [
+      {
+        "name": "claude-code",
+        "version": "2.1.278"
+      },
+      {
+        "name": "model",
+        "version": "claude-opus-5"
+      }
+    ],
+    "isolation": "One native child worktree at frozen fixture base; global configuration not isolated by worktrees."
+  },
+  "limitations": [
+    "One synthetic visible-oracle fixture, not a held-out benchmark, real application or GPU acceptance.",
+    "Ultracode was requested; observed native delegation does not establish dynamic-workflow selection or an OS sandbox.",
+    "Three native usage views retain different scopes; native retries and whole Desktop usage are unknown. No matched model baseline or savings claim.",
+    "Local supervision completed without timeout; provider cancellation, crash recovery and full-host backup were not tested."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "One frozen dependency-planner repair by native Claude Opus5 parent and isolated child on Ubuntu24.04 WSL2",
+    "qualification_run_ids": [
+      "native-child-repair"
+    ]
+  },
+  "rollback": "Preserve accepted source and receipt; retire only the owned disposable native fixture.",
+  "next_decision_changing_test": "A real repository issue with frozen quality and complete matched coordinator, child, retry and cache accounting."
+}

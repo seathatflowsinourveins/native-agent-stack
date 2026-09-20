@@ -9,6 +9,12 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+      "collection": "/reviewed_repositories",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/convergence-practice/source-review.json",
       "collection": "/candidates",
       "repository_field": "repository",
@@ -155,16 +161,16 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 504,
+    "repositories": 505,
     "public_star_repositories": 342,
-    "beyond_public_stars": 162,
-    "references": 1040,
+    "beyond_public_stars": 163,
+    "references": 1051,
     "repositories_by_record_type": {
       "catalog_card": 147,
-      "component_record": 52,
+      "component_record": 53,
       "legacy_candidate": 19,
       "public_star": 342,
-      "research_supplement": 100,
+      "research_supplement": 103,
       "star_review": 342
     }
   },
@@ -1657,6 +1663,11 @@
           "path": "adoption/research.json",
           "pointer": "/candidates/1",
           "decision": "required_reuse_existing_native_python_layer"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/1"
         }
       ]
     },
@@ -3048,6 +3059,11 @@
       ],
       "references": [
         {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/2"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
           "pointer": "/entries/6",
@@ -4064,6 +4080,11 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/3"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/convergence-practice/source-review.json",
           "pointer": "/candidates/0",
           "decision": "investigate",
@@ -5007,6 +5028,11 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/4"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/convergence-practice/source-review.json",
           "pointer": "/candidates/2",
           "decision": "investigate",
@@ -5524,6 +5550,11 @@
       ],
       "references": [
         {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/5"
+        },
+        {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
           "pointer": "/stars/138",
@@ -5625,9 +5656,15 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/6"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -10340,9 +10377,15 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/7"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -11219,6 +11262,11 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/8"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/convergence-practice/source-review.json",
           "pointer": "/candidates/6",
           "decision": "retain",
@@ -11690,6 +11738,11 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/0"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/convergence-practice/source-review.json",
@@ -13063,6 +13116,28 @@
           "decision": "alternative",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "component_record",
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
+          "pointer": "/reviewed_repositories/9"
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/52",
+          "id": "zizmor"
         }
       ]
     },

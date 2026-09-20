@@ -44,7 +44,9 @@
     "ecosystem_explorer_guide": "docs/ecosystem/README.md",
     "current_lifecycle_sample": "blueprints/us-equities/lifecycle-sample/native-receipt.json",
     "current_frozen_catalyst_protocol": "blueprints/us-equities/catalyst-experiment/protocol.json",
-    "current_native_efficiency": "blueprints/us-equities/research-efficiency/native-receipt.json"
+    "current_native_efficiency": "blueprints/us-equities/research-efficiency/native-receipt.json",
+    "current_engineering_convergence": "docs/convergence-architecture.md",
+    "current_native_child_acceptance": "blueprints/convergence-practice/native-worker/receipt.json"
   },
   "recipe_map": {
     "affaan-m/ECC": "recipes/README.md",
@@ -98,7 +100,8 @@
     "pandas": "blueprints/us-equities/nanosecond-replay/README.md",
     "systemd": "blueprints/us-equities/worker-supervision/README.md",
     "skfolio": "blueprints/us-equities/research-evaluation/README.md",
-    "edgartools": "blueprints/us-equities/catalyst-provenance/README.md"
+    "edgartools": "blueprints/us-equities/catalyst-provenance/README.md",
+    "zizmor": "blueprints/convergence-practice/ci-security/README.md"
   },
   "profiles": [
     {

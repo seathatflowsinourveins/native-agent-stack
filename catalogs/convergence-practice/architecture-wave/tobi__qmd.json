@@ -1,0 +1,185 @@
+{
+  "repository": "tobi/qmd",
+  "requested_repository": "tobi/qmd",
+  "checked_at": "2026-09-20T04:10:41.323452+00:00",
+  "source_depth": "pinned_README_license_overview_only",
+  "metadata": {
+    "html_url": "https://github.com/tobi/qmd",
+    "default_branch": "main",
+    "archived": false,
+    "disabled": false,
+    "pushed_at": "2026-09-09T20:51:56Z",
+    "description": "mini cli search engine for your docs, knowledge bases, meeting notes, whatever. Tracking current sota approaches while being all local",
+    "license": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    }
+  },
+  "default_head": "04e4dbd8245c527a88f1a8f0bda547aef9ca81fb",
+  "release": {
+    "tag_name": "v2.8.3",
+    "published_at": "2026-08-16T22:30:34Z",
+    "html_url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+    "prerelease": false,
+    "draft": false
+  },
+  "source_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+  "source_basis": "latest release",
+  "access": [
+    {
+      "endpoint": "https://api.github.com/repos/tobi/qmd",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/tobi/qmd/commits/main",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/tobi/qmd/releases/latest",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/tobi/qmd/commits/v2.8.3",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/tobi/qmd/readme?ref=facd35e01359e59d938bc9418e93fb9318addee3",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/tobi/qmd/license?ref=facd35e01359e59d938bc9418e93fb9318addee3",
+      "exit_code": 0
+    }
+  ],
+  "baseline_index_matches": [
+    {
+      "repository": "https://github.com/tobi/qmd",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "catalog_card",
+        "component_record",
+        "legacy_candidate",
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/convergence-practice/source-review.json",
+          "pointer": "/candidates/6",
+          "decision": "retain",
+          "review_level": "source_review",
+          "evidence_level": "pinned_source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/2",
+          "decision": "retain",
+          "evidence_depth": "pinned_primary_source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/foundation.json",
+          "pointer": "/repositories/3",
+          "decision": "retain",
+          "evidence_level": "pinned_primary_source_reuse"
+        },
+        {
+          "kind": "catalog_card",
+          "path": "catalogs/us-equities/foundation-memory.json",
+          "pointer": "/entries/3",
+          "id": "foundation-qmd",
+          "decision": "default",
+          "evidence_level": "native_proven"
+        },
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/7",
+          "decision": "First evaluate semantic mode of existing install"
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/25",
+          "id": "qmd"
+        }
+      ]
+    }
+  ],
+  "readme": {
+    "path": "README.md",
+    "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md",
+    "sha256": "24c049f59408d3d021fbee70d4cd5dd744cdb51f5caea956b417f4dfe7e26880",
+    "git_blob_sha": "2c697f3ee9cdb7f53aea1b41342563a88887f7d4",
+    "bytes": 50056,
+    "matched_excerpts": [
+      {
+        "term": "hybrid",
+        "line": 56,
+        "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md#L56"
+      },
+      {
+        "term": "hybrid",
+        "line": 408,
+        "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md#L408"
+      },
+      {
+        "term": "collection",
+        "line": 40,
+        "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md#L40"
+      },
+      {
+        "term": "collection",
+        "line": 41,
+        "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md#L41"
+      },
+      {
+        "term": "search",
+        "line": 3,
+        "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md#L3"
+      },
+      {
+        "term": "search",
+        "line": 5,
+        "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md#L5"
+      },
+      {
+        "term": "MCP",
+        "line": 89,
+        "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md#L89"
+      },
+      {
+        "term": "MCP",
+        "line": 91,
+        "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md#L91"
+      }
+    ]
+  },
+  "license_at_source": {
+    "path": "LICENSE",
+    "url": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/LICENSE",
+    "metadata": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    },
+    "sha256": "24c446836e7e2cdea13a914de10c88c553e6297366061ba24013b8ce73c8f7fa",
+    "bytes": 1072
+  },
+  "decision": {
+    "disposition": "retain-current-route",
+    "license_text_classification": "MIT",
+    "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+    "concrete_gap_or_overlap": "Existing on-device BM25/vector/reranking route addresses explicit document collections. Public open gate still records weak held-out retrieval; another MCP index would not close it.",
+    "next_acceptance": "Freeze new judgments and compare existing lexical/hybrid query shaping on the same collection with quality and usage reported separately.",
+    "installation_performed": false,
+    "model_calls": 0
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "repository": "dagucloud/dagu",
+  "requested_repository": "dagucloud/dagu",
+  "checked_at": "2026-09-20T04:10:43.242091+00:00",
+  "source_depth": "pinned_README_license_overview_only",
+  "metadata": {
+    "html_url": "https://github.com/dagucloud/dagu",
+    "default_branch": "main",
+    "archived": false,
+    "disabled": false,
+    "pushed_at": "2026-09-19T16:09:43Z",
+    "description": "Self-hostable workflow orchestrator for teams whose main work isn't orchestration. Declarative YAML over your scripts, SSH commands, containers, etc; keep workflows separate from business logic. One binary, no database, runs on limited H/W resources. Alternative to Airflow / Cron / Job Scheduler.",
+    "license": {
+      "key": "gpl-3.0",
+      "name": "GNU General Public License v3.0",
+      "spdx_id": "GPL-3.0",
+      "url": "https://api.github.com/licenses/gpl-3.0",
+      "node_id": "MDc6TGljZW5zZTk="
+    }
+  },
+  "default_head": "0a8edff8e55c281c2f217ef4383fbf5262138def",
+  "release": {
+    "tag_name": "v2.16.6",
+    "published_at": "2026-09-14T14:45:57Z",
+    "html_url": "https://github.com/dagucloud/dagu/releases/tag/v2.16.6",
+    "prerelease": false,
+    "draft": false
+  },
+  "source_commit": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+  "source_basis": "latest release",
+  "access": [
+    {
+      "endpoint": "https://api.github.com/repos/dagucloud/dagu",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/dagucloud/dagu/commits/main",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/dagucloud/dagu/releases/latest",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/dagucloud/dagu/commits/v2.16.6",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/dagucloud/dagu/readme?ref=58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/dagucloud/dagu/license?ref=58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "exit_code": 0
+    }
+  ],
+  "baseline_index_matches": [
+    {
+      "repository": "https://github.com/dagucloud/dagu",
+      "aliases": [
+        "dagu-org/dagu"
+      ],
+      "public_star": false,
+      "record_types": [
+        "catalog_card",
+        "component_record",
+        "legacy_candidate",
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "catalog_card",
+          "path": "catalogs/us-equities/agents-operations.json",
+          "pointer": "/entries/6",
+          "id": "dagu",
+          "decision": "conditional",
+          "evidence_level": "native_proven"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/architecture/foundation.json",
+          "pointer": "/repositories/4",
+          "decision": "retain",
+          "evidence_depth": "pinned_primary_source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-program/hosting.json",
+          "pointer": "/candidates/0",
+          "decision": "retain",
+          "evidence_depth": "selected_primary_source_review"
+        },
+        {
+          "kind": "legacy_candidate",
+          "path": "manifests/candidates.json",
+          "pointer": "/candidates/17",
+          "decision": "Conditional: select when a real multi-step local refresh/report workflow needs persisted run state, retries or human tasks. No persistent job proposed this turn."
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/44",
+          "id": "dagu"
+        }
+      ]
+    }
+  ],
+  "readme": {
+    "path": "README.md",
+    "url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+    "sha256": "153ec405b99603e6d52772eb152f00505c24c02ec24b463691dcbd7cb4fc2658",
+    "git_blob_sha": "0e8a3c0a0e9cef9c71f864608f4b0d1108cbac76",
+    "bytes": 50594,
+    "matched_excerpts": [
+      {
+        "term": "retry",
+        "line": 318,
+        "url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md#L318"
+      },
+      {
+        "term": "retry",
+        "line": 405,
+        "url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md#L405"
+      },
+      {
+        "term": "persist",
+        "line": 142,
+        "url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md#L142"
+      },
+      {
+        "term": "persist",
+        "line": 191,
+        "url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md#L191"
+      },
+      {
+        "term": "YAML",
+        "line": 8,
+        "url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md#L8"
+      },
+      {
+        "term": "YAML",
+        "line": 18,
+        "url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md#L18"
+      },
+      {
+        "term": "distributed",
+        "line": 190,
+        "url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md#L190"
+      },
+      {
+        "term": "distributed",
+        "line": 191,
+        "url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md#L191"
+      }
+    ]
+  },
+  "license_at_source": {
+    "path": "LICENSE",
+    "url": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/LICENSE",
+    "metadata": {
+      "key": "gpl-3.0",
+      "name": "GNU General Public License v3.0",
+      "spdx_id": "GPL-3.0",
+      "url": "https://api.github.com/licenses/gpl-3.0",
+      "node_id": "MDc6TGljZW5zZTk="
+    },
+    "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "bytes": 35149
+  },
+  "decision": {
+    "disposition": "retain-existing-workflow",
+    "license_text_classification": "GPL-3.0",
+    "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+    "concrete_gap_or_overlap": "Existing adopted workflow engine already has persisted run state and workers. Remaining public gate concerns actual workload interruption/recovery and unattended host availability.",
+    "next_acceptance": "Reuse one real bounded workflow and prove restart/cancellation on the intended host; do not introduce another scheduler.",
+    "installation_performed": false,
+    "model_calls": 0
+  }
+}

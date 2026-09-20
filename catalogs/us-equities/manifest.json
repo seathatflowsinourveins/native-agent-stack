@@ -43,13 +43,15 @@
     "catalogs/us-equities/lifecycle-source-review.json",
     "blueprints/us-equities/lifecycle-sample/native-receipt.json",
     "blueprints/us-equities/catalyst-experiment/receipt.json",
-    "blueprints/us-equities/research-efficiency/native-receipt.json"
+    "blueprints/us-equities/research-efficiency/native-receipt.json",
+    "blueprints/convergence-practice/ci-security/receipt.json",
+    "blueprints/convergence-practice/native-worker/receipt.json"
   ],
   "north_star": "blueprints/us-equities/north-star.md",
   "harness_contract": "blueprints/us-equities/harness-contract.json",
   "broader_reference_union": 171,
   "star_audit_file": "catalogs/us-equities/star-audit.json",
-  "grand_index_repositories": 504,
-  "grand_index_beyond_stars": 162,
+  "grand_index_repositories": 505,
+  "grand_index_beyond_stars": 163,
   "decision_index_file": "catalogs/us-equities/decision-index.json"
 }

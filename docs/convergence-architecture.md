@@ -46,7 +46,7 @@ freeze the question, corpus, scoring rule and required uncertainty handling.
 Keep complete logs and source bytes outside the prompt, with precise locators
 and hashes in the handoff.
 
-The proposed [contract reference](../blueprints/convergence-practice/contract-reference.md)
+The [contract reference](../blueprints/convergence-practice/contract-reference.md)
 and [schema](../blueprints/convergence-practice/contract.schema.json) accompany
 the [convergence validator](../scripts/validate_convergence.py) in this integration
 wave:
@@ -57,8 +57,9 @@ python3 scripts/validate_convergence.py RECORD.json --root . --json
 
 `RECORD.json` means the selected contract/receipt described by that reference.
 Schema validation checks recorded structure and evidence references; it does
-not enforce permissions, reserve resources or run the acceptance task. These
-links are integration dependencies until the coordinator includes those files.
+not enforce permissions, reserve resources or run the acceptance task. The executable validator also checks artifact hashes, matching conditions,
+retained failures and the latest scoped qualification; it does not certify that
+a declaration is truthful.
 
 ## 2. Review a component against the gap it would close
 
@@ -188,10 +189,14 @@ malformed or contradictory evidence is rejected. A hosted pass checks the
 publication and its deterministic behavior. A native model run, GPU operation,
 client activation or another host requires its own observed acceptance.
 
-**Integration checkpoint, pending:** this wave plans a bounded native-worker
-patch fixture and a deliberate CI failure/rejection case. The coordinator will
-add the final paths and outcomes after execution and review. Until then, neither
-is a passed result of this guide. Existing receipts remain the evidence baseline.
+The [native child repair](../blueprints/convergence-practice/native-worker/README.md)
+now records one Opus5 parent/child execution in WSL: twelve unchanged tests pass,
+only the assigned file changes, and independent exhaustive four-node checks pass.
+The [CI security qualification](../blueprints/convergence-practice/ci-security/README.md)
+accepts the published workflow and rejects an inert unsafe fixture under a pinned
+native analyzer. Thirty-one contract tests include unequal comparison counts and
+later-failed qualification cases discovered during independent review. These
+results retain their exact fixture, host, persona and accounting limits.
 
 ## 8. Close the task with a recoverable decision
 
