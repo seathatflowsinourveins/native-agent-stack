@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "provenance_type": "local-acceptance",
+  "status": "failed-before-native-restic",
+  "run_url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35536387838",
+  "execution_source_commit": "b2b07714c9ac3fe7c6e92c3649c22a403fbd65be",
+  "failure": "Local runner used the same wrong-password path for a regular negative-key file and the command output directory. FileExistsError occurred before any native restic command.",
+  "native_restic_commands": 0,
+  "installation_and_namespace_contract_passed": true,
+  "private_password_cleanup_passed": true,
+  "correction": "Keep the existing negative-key file and create each operation output under a distinct commands/ directory. Regression executes the real setup against the unchanged ciphertext envelope.",
+  "evidence": [
+    {
+      "path": "receipt.json",
+      "sha256": "7492c2b3f0509719170a3f0e50f58503af21faca40e6a71ad07508cebedd072d"
+    },
+    {
+      "path": "secret-cleanup.json",
+      "sha256": "f13c688d5e19ff5fc4c0476048a92ee7ff5008d40eebde07e7d5615402fdea1b"
+    },
+    {
+      "path": "namespace-contract.json",
+      "sha256": "403910d11feb8655a21798fd572c89f4c5da84cfc11327848d0bc85248dee2a6"
+    },
+    {
+      "path": "installation.json",
+      "sha256": "b4f4eeabf9769c0c4141209d18661db655bfc09e6496fd17d97a07844c631e6d"
+    },
+    {
+      "path": "hosted-plan.json",
+      "sha256": "4ba9e561bd42cebe1f0e4795f06fdeb400f3545f38fb0a62d86bb2821feefeef"
+    }
+  ]
+}

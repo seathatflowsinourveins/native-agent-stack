@@ -1,0 +1,68 @@
+name: Native owned guest service reboot
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  upstream-dagu-retry:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out public test invocation
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install the Go version required by pinned upstream go.mod
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0, also pinned by Dagu CI
+        with:
+          go-version: '1.27.0'
+          cache: false
+      - name: Run unchanged upstream Dagu native retry tests
+        run: bash blueprints/convergence-practice/service-reboot/upstream-tests.sh
+      - name: Preserve upstream native output and source identity
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: native-service-reboot-upstream-dagu-tests
+          path: ${{ runner.temp }}/native-service-reboot-upstream/reports
+          if-no-files-found: warn
+          retention-days: 14
+  owned-guest-reboot:
+    needs: upstream-dagu-retry
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out frozen public sources
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check additional synthetic integration failure modes
+        run: python3 -m unittest tests.test_service_reboot tests.test_job_recovery -v
+      - name: Validate units with the native systemd verifier
+        run: |
+          systemd-analyze --man=no verify \
+            blueprints/convergence-practice/service-reboot/native-reboot.service \
+            blueprints/convergence-practice/service-reboot/native-reboot.timer \
+            blueprints/convergence-practice/service-reboot/native-reboot-observer.service
+      - name: Install upstream guest tools on this disposable runner only
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends qemu-system-x86 qemu-utils cloud-image-utils genisoimage ubuntu-cloudimage-keyring
+      - name: Run finite native guest reboot acceptance
+        run: |
+          python3 blueprints/convergence-practice/service-reboot/run.py \
+            --work "$RUNNER_TEMP/native-service-reboot"
+      - name: Preserve success or failure evidence without keys or disks
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: native-service-reboot-evidence
+          path: ${{ runner.temp }}/native-service-reboot/reports
+          if-no-files-found: warn
+          retention-days: 14

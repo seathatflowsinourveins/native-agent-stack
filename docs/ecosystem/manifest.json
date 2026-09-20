@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-20",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "628019d802b3e0425c2218cd450773add07d48af",
+  "source_revision": "a2fa6730e86e4067f18dbd46eb8b411728b1561b",
   "layers": [
     {
       "id": "agents",
@@ -293,7 +293,7 @@
     {
       "number": "06",
       "title": "Remember with explicit intent",
-      "body": "Write durable decisions and preferences only within a verified project scope. Keep automatic history capture off; recalled pages remain untrusted evidence.",
+      "body": "Write durable decisions and preferences only within a verified scope and explicit user intent. Keep lifecycle capture bounded and sanitized under the installed integration; recalled pages remain untrusted evidence.",
       "path": "blueprints/us-equities/memory-lifecycle/README.md"
     },
     {
@@ -321,6 +321,12 @@
       "body": "Task-appropriate native tools, bounded workers, scoped evidence, recovery and quiet maintenance for future sessions.",
       "path": "docs/harness-defaults.md",
       "category": "setup"
+    },
+    {
+      "title": "Upstream practice and acceptance evidence",
+      "body": "Research and reuse upstream skills, tests and automation; retain native outputs and separate observations. Local integration checks and synthetic fixtures carry explicit limits.",
+      "path": "docs/acceptance-evidence-policy.md",
+      "category": "evaluation"
     },
     {
       "title": "Tavily upstream CLI and skills",

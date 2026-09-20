@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "provenance_type": "upstream-unmodified",
+  "review_status": "source-reviewed-not-executed",
+  "repository": "https://github.com/restic/restic",
+  "version": "0.19.1",
+  "source_commit": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+  "source_tree_unmodified": true,
+  "toolchain": "go1.25.10",
+  "toolchain_basis": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/go.mod#L1-L5",
+  "upstream_ci": {
+    "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/.github/workflows/tests.yml#L149-L153",
+    "command": "go test -cover ${{matrix.test_opts}} ./...",
+    "relationship": "This lane runs selected original tests using the same native Go test driver; -count=1, -json, exact -run selection and finite timeout are local invocation controls. Test code and bundled fixtures are unchanged."
+  },
+  "test_command": [
+    "go",
+    "test",
+    "-cover",
+    "-count=1",
+    "-json",
+    "-timeout",
+    "5m",
+    "-run",
+    "^(TestCheckRestoreNoLock|TestRestore|TestCheckWithSnaphotFilter|TestRestoreWithPermissionFailure|TestRestorer|TestRestorePermissions|TestRestorerConsistentTimestampsAndPermissions)$",
+    "./cmd/restic",
+    "./internal/restorer"
+  ],
+  "selected_tests": [
+    {
+      "package": "github.com/restic/restic/cmd/restic",
+      "name": "TestCheckRestoreNoLock",
+      "source": "cmd/restic/integration_test.go",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/integration_test.go#L20",
+      "coverage": "Bundled small-repo.tar.gz is made read-only; native check with ReadData=true and restore use NoLock."
+    },
+    {
+      "package": "github.com/restic/restic/cmd/restic",
+      "name": "TestRestore",
+      "source": "cmd/restic/cmd_restore_integration_test.go",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/cmd_restore_integration_test.go#L239",
+      "coverage": "Upstream temporary random-file backup, full check and restore with upstream directory metadata comparison."
+    },
+    {
+      "package": "github.com/restic/restic/cmd/restic",
+      "name": "TestCheckWithSnaphotFilter",
+      "source": "cmd/restic/cmd_check_integration_test.go",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/cmd_check_integration_test.go#L48",
+      "coverage": "Native full ReadData and snapshot-filter scenarios using upstream backup-data.tar.gz."
+    },
+    {
+      "package": "github.com/restic/restic/cmd/restic",
+      "name": "TestRestoreWithPermissionFailure",
+      "source": "cmd/restic/cmd_restore_integration_test.go",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/cmd_restore_integration_test.go#L331",
+      "coverage": "Unchanged upstream repo-restore-permissions-test.tar.gz; restored expected files remain nonempty."
+    },
+    {
+      "package": "github.com/restic/restic/internal/restorer",
+      "name": "TestRestorer",
+      "source": "internal/restorer/restorer_test.go",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/internal/restorer/restorer_test.go#L190",
+      "coverage": "Upstream restorer cases invoke RestoreTo and VerifyFiles and check expected contents/errors."
+    },
+    {
+      "package": "github.com/restic/restic/internal/restorer",
+      "name": "TestRestorePermissions",
+      "source": "internal/restorer/restorer_unix_test.go",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/internal/restorer/restorer_unix_test.go#L112",
+      "coverage": "Native restore returns a tampered mode0700 file to recorded0600 for both overwrite policies."
+    },
+    {
+      "package": "github.com/restic/restic/internal/restorer",
+      "name": "TestRestorerConsistentTimestampsAndPermissions",
+      "source": "internal/restorer/restorer_test.go",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/internal/restorer/restorer_test.go#L782",
+      "coverage": "Upstream file/directory metadata cases require recorded permissions and timestamps."
+    }
+  ],
+  "source_files": [
+    {
+      "path": "go.mod",
+      "sha256": "d166913ed4897cf69069ef5be090b2d79a857fc28328bb950e12655b5a54f176",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/go.mod"
+    },
+    {
+      "path": "go.sum",
+      "sha256": "e2d2bab6fc96eeaf53d9460af8b43e25d4c5c5de6c1aa6c1306550e6b62b26bc",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/go.sum"
+    },
+    {
+      "path": ".github/workflows/tests.yml",
+      "sha256": "dc60680c71e15870524df6ca82251d65d4b5b06b77d7a1a247f08111d15a78cc",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/.github/workflows/tests.yml"
+    },
+    {
+      "path": "cmd/restic/integration_test.go",
+      "sha256": "8a4c9e9a316c8ab12dcc7162612067607dfa8efb8131aaa08ba6a621fc4a0503",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/integration_test.go"
+    },
+    {
+      "path": "cmd/restic/cmd_restore_integration_test.go",
+      "sha256": "56d79f8eba12e99aa2dfa0ee72442b21849bdedebc073543b5e67f1f463e4348",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/cmd_restore_integration_test.go"
+    },
+    {
+      "path": "cmd/restic/cmd_check_integration_test.go",
+      "sha256": "8db9717a7f7c64dd1f6867c721586b58b80fc4d37b773390e6fad5f5661b48bd",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/cmd_check_integration_test.go"
+    },
+    {
+      "path": "cmd/restic/integration_helpers_test.go",
+      "sha256": "7bd699fa48f7a6e2a07861190e48d1d62182e7f5bce15941e7ee6c9f503070ca",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/integration_helpers_test.go"
+    },
+    {
+      "path": "cmd/restic/integration_helpers_unix_test.go",
+      "sha256": "a5479a6043c4018a5985d3c0b648ea391eb381b5b1197a77858bd1be6153a454",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/integration_helpers_unix_test.go"
+    },
+    {
+      "path": "internal/restorer/restorer_test.go",
+      "sha256": "1343f7e7a7b807732cabf55c881f3e4c9d057ae08f8ab7c3efd5eeade4925331",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/internal/restorer/restorer_test.go"
+    },
+    {
+      "path": "internal/restorer/restorer_unix_test.go",
+      "sha256": "59b7b7c0c86bbfbaf3dafa0aa6f217650f9ae5a8f568d126680281d3d66c1e66",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/internal/restorer/restorer_unix_test.go"
+    },
+    {
+      "path": "internal/test/vars.go",
+      "sha256": "e8517a9113bce95c97178ea7c69b2b9bdfd6dff47e310207c25a7f314b0be8e5",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/internal/test/vars.go"
+    },
+    {
+      "path": "cmd/restic/main.go",
+      "sha256": "5ec6244896cfad78a2a93d9c4ac0db9168d3c446bc70f2a40d657bae6068ac75",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/main.go"
+    },
+    {
+      "path": "doc/050_restore.rst",
+      "sha256": "00d39803cfcb17158c2ee1d835de6351c902e66067d2493438831580e9b04251",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/doc/050_restore.rst"
+    },
+    {
+      "path": "doc/075_scripting.rst",
+      "sha256": "922289a229d7026fb23f0d9f857a84a952a217548af05b0d8d3406a759834917",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/doc/075_scripting.rst"
+    },
+    {
+      "path": "cmd/restic/testdata/small-repo.tar.gz",
+      "sha256": "060c8a1dd02f1108d2636c984668f2c664c9fc126f88d7c19171f64fc5446d33",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/testdata/small-repo.tar.gz"
+    },
+    {
+      "path": "cmd/restic/testdata/repo-restore-permissions-test.tar.gz",
+      "sha256": "c7f57a7fd685f720ab742100022f670ef4bac58607a2a8d31764e5a9d02cfb22",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/testdata/repo-restore-permissions-test.tar.gz"
+    },
+    {
+      "path": "cmd/restic/testdata/backup-data.tar.gz",
+      "sha256": "ce072b93ffd06f25bd59a7b5fef576c03aa0bc6b8334571b924871eeb1c29729",
+      "url": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/testdata/backup-data.tar.gz"
+    }
+  ],
+  "assertion_provenance": [
+    {
+      "assertion": "Read-only repository check/restore with --no-lock and full-data verification",
+      "type": "upstream-referenced-local-acceptance",
+      "source": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/integration_test.go#L20",
+      "relationship": "Original local wrapper follows documented native CLI behavior; now separately runs this unchanged upstream regression."
+    },
+    {
+      "assertion": "Complete local fixture path/type/length/SHA256/POSIX modes including root0750 and Unicode/changed-deleted-added transition",
+      "type": "local-acceptance",
+      "source": "../wsl-restore/fixture.py",
+      "relationship": "Locally authored fixture and oracle, not copied from upstream. Related upstream restorer content/mode tests run separately; this must not be relabeled upstream-native-test evidence."
+    },
+    {
+      "assertion": "Wrong password returns native exit12 and restores no files",
+      "type": "upstream-referenced-local-acceptance",
+      "source": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/doc/075_scripting.rst",
+      "implementation_reference": "https://github.com/restic/restic/blob/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/cmd/restic/main.go#L207",
+      "relationship": "Exit12 is upstream documentation/implementation; this exact negative CLI scenario is local acceptance, not an unchanged upstream test located by this review."
+    },
+    {
+      "assertion": "Fresh runner, separate Actions secret, ciphertext equality, namespace isolation, cleanup, Base64 decoder and workspace collision prevention",
+      "type": "local-harness-guard",
+      "relationship": "Repository-specific orchestration/transport guards; do not claim these are restic upstream tests."
+    }
+  ],
+  "execution_limitations": [
+    "Source review is not test execution. Actual Go JSON events and every selected top-level pass are required; absent, skipped or failed tests reject acceptance.",
+    "Selected source-built upstream tests are not the entire upstream CI suite and do not establish off-host recovery of the separate retained fixture.",
+    "Upstream tests create and clean their own ephemeral test repositories and use upstream public fixture passwords/low-security test KDF settings. The private Actions fixture password is not exposed to this step.",
+    "The pinned published restic binary and source-built test code have separate execution records. No cloud-backend, FUSE, account credential, production-data or reboot acceptance.",
+    "Module acquisition uses the upstream Go proxy/checksum database and locked go.mod/go.sum; this Go step is not claimed network-isolated. The later native snapshot-transfer commands retain mandatory network namespaces."
+  ]
+}

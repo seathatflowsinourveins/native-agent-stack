@@ -1,0 +1,43 @@
+{
+  "date": "2026-09-20",
+  "status": "local-contract-and-static-checks-passed-native-trial-pending",
+  "checks": [
+    {
+      "command": "python3 -m unittest tests.test_service_reboot tests.test_job_recovery -q",
+      "result": "25 passed",
+      "scope": "Authored synthetic integration/evidence checks and original synthetic job fixture; no native Dagu or guest invocation."
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "result": "passed: 68 components, 890 hashed files, 4 profiles, 98 receipts",
+      "scope": "Existing repository integrity and declared evidence scope, not native execution."
+    },
+    {
+      "command": "shellcheck blueprints/convergence-practice/service-reboot/setup.sh blueprints/convergence-practice/service-reboot/upstream-tests.sh",
+      "result": "passed"
+    },
+    {
+      "command": "zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json .github/workflows/native-service-reboot.yml",
+      "result": "passed: no findings"
+    },
+    {
+      "command": "systemd-analyze --man=no verify blueprints/convergence-practice/service-reboot/native-reboot.service blueprints/convergence-practice/service-reboot/native-reboot.timer blueprints/convergence-practice/service-reboot/native-reboot-observer.service",
+      "runtime": "systemd 255 (255.4-1ubuntu8.17)",
+      "result": "passed",
+      "scope": "Native upstream unit configuration verification; no unit was installed or started."
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "not_executed": [
+    "Pinned unmodified Dagu upstream Go retry tests; configured as the first hosted workflow job.",
+    "QEMU guest creation, user manager activation, kernel reboot and same-run native recovery.",
+    "GitHub workflow dispatch or any publication."
+  ],
+  "prior_local_findings": [
+    "Shellcheck SC2154 on the EXIT-trap variable was fixed by explicit initialization; the check passed afterward.",
+    "Independent review caught blocking oneshot observer startup, unsupported user-unit namespace controls, failure evidence loss, and a process-teardown race; these were corrected before any hosted trial."
+  ]
+}

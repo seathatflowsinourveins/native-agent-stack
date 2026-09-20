@@ -24,6 +24,21 @@ def sanitize(text):
     return re.sub(r'by \S+@synthetic-wsl-restore', 'by $SOURCE_USER@synthetic-wsl-restore', text)
 
 
+def initialize_recovery(root, bundle, expected):
+    decode_repository(bundle, expected, root / 'repository')
+    wrong = root / 'wrong-password'
+    wrong.write_text('deliberately-invalid-offhost-fixture-password\n')
+    wrong.chmod(0o600)
+    (root / 'commands').mkdir(mode=0o700)
+    return wrong
+
+
+def create_command_output(root, label):
+    output = root / 'commands' / label
+    output.mkdir(mode=0o755)
+    return output
+
+
 def sandbox_command(binary, repository, key, output, probe, native):
     # sudo is provided by the workflow for this entire recorder. The native process
     # receives only these mounts and environment entries; it has no host network.
@@ -100,7 +115,7 @@ def main():
         'model_calls':0,'exact_causal_lifetime_provider_tokens_saved':None}
     expected = load(HERE / 'repository-manifest.json')
     def call(label, native, supplied_key, expected_exit):
-        output = root / label; output.mkdir(mode=0o755)
+        output = create_command_output(root, label)
         argv = sandbox_command(staged_binary, root/'repository', supplied_key, output, staged_probe, native)
         replacements = [(str(root),'$OWNED_RUN'), (str(binary),'$RESTIC'),(str(HERE),'$BLUEPRINT'),(str(key),'$FIXTURE_PASSWORD_FILE')]
         def public(value):
@@ -136,9 +151,8 @@ def main():
             raise ValueError('native operation changed input ciphertext')
         return output
     try:
-        decode_repository(load(HERE/'repository.json'), expected, root/'repository')
+        wrong = initialize_recovery(root, load(HERE/'repository.json'), expected)
         report['checks']['ciphertext_exact_before_restore'] = True
-        wrong = root / 'wrong-password'; wrong.write_text('deliberately-invalid-offhost-fixture-password\n'); wrong.chmod(0o600)
         output = call('wrong-password', ['restore',data['snapshots'][1]+':'+data['source_parent'],'--target','/out/restore','--verify'], wrong, 12)
         target = output / 'restore'
         if target.exists() and (not target.is_dir() or any(target.iterdir())):

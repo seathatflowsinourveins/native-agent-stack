@@ -1986,8 +1986,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "be051bfc2c0419e624de2942f2a69b346157306c19cd8b12678fef75b33e2234",
-      "bytes": 9034
+      "sha256": "0d805ccc085506e8c17913022f21fb66443e1b19cb78ecc9b9d3345e7b7b8015",
+      "bytes": 9506
     },
     {
       "path": "CLAUDE.md",
@@ -5052,8 +5052,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "1bcd19649ce6832b47422a6456243316d4574a26799f04cb81820d561b58cfff",
-      "bytes": 3701969
+      "sha256": "41c0fb242912f283890fcc2cafd82cef16be5791b088367292342a795fe99b9a",
+      "bytes": 3703447
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5062,8 +5062,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "ba9fc8e44ad4b89d39f0beaccab20b4234dc671126d39f12908dafddff8905ab",
-      "bytes": 30149
+      "sha256": "d904b68ae4e7f52e77ffdfb131054748c10c00c0602ec22f8839ea98b85ffe56",
+      "bytes": 30559
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6047,8 +6047,8 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "da0bdd0bfe99ce19235aa29f3b20a01eac1c38a0edf19804eb5a6550943bbc18",
-      "bytes": 1279
+      "sha256": "7404e514011d172c6a00ffad970b11c0c1b334d7489ed7aa3b5ff6dff6da64f3",
+      "bytes": 1582
     },
     {
       "path": "catalogs/foundation/README.md",
@@ -6072,8 +6072,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "18e77aff133b5dc47506d3d20bff9ea9ea9f8efc4c60eb1e8dbe8cb2b56c64f2",
-      "bytes": 5809
+      "sha256": "43c27b6561c032e6fc6846f7dc225b4b4689d0df3845a412c62e5a630ad896cb",
+      "bytes": 6350
     },
     {
       "path": "evidence/receipts/native-harness-defaults-20260920.json",
@@ -6417,13 +6417,13 @@
     },
     {
       "path": ".github/workflows/native-offhost-restore.yml",
-      "sha256": "2eff16eb2a7403f620a6d4df8f431a95fca09bd3edd5a5ce35ee0decdd701d4b",
-      "bytes": 5310
+      "sha256": "a9c7c95034206b338a7a4a5dd5f8731d51a24c9e3a75f0faad46fc787a4e8eca",
+      "bytes": 6296
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/README.md",
-      "sha256": "871a667d170dd800fe98f84a2b0a2c42e74ed36d8d4c2d10d01c310eea0924b8",
-      "bytes": 6008
+      "sha256": "968da7dd77e3a6fa86821d1fea063b168e366fbdcdde7e0e2780d9617309ac8d",
+      "bytes": 8230
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/contract_probe.py",
@@ -6432,8 +6432,8 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/hosted-plan.json",
-      "sha256": "4ba9e561bd42cebe1f0e4795f06fdeb400f3545f38fb0a62d86bb2821feefeef",
-      "bytes": 3803
+      "sha256": "e60f2990b229a5b98f98031d04e0356f1e00f57c4fa6f10957223a2c188057d1",
+      "bytes": 5452
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/input.json",
@@ -6472,8 +6472,8 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/run.py",
-      "sha256": "897cc019d2f8195d3212ac6ab41ef8eff84f528d85fabdb72c54e1cd60378f17",
-      "bytes": 10876
+      "sha256": "a13558374624422d4b0e3b8ff275b73267077e3f0f0a94762da939b375243402",
+      "bytes": 11170
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/source-receipt.json",
@@ -6487,8 +6487,128 @@
     },
     {
       "path": "tests/test_offhost_restore.py",
-      "sha256": "77ac24a0d2094856b2d5dfcccafbef49ff7e7f0d5ee90628293e64b076c030a8",
-      "bytes": 6340
+      "sha256": "fd2d27a7cc03077d6f68b5118db557c2f896014ee0b535647049d2f2eceb7e6e",
+      "bytes": 10524
+    },
+    {
+      "path": "docs/acceptance-evidence-policy.md",
+      "sha256": "cff82f8a59a57f9c51d6d9d18a4d02bdde978f8c4fe928e7a4af219894bed964",
+      "bytes": 4916
+    },
+    {
+      "path": ".github/workflows/native-service-reboot.yml",
+      "sha256": "33fc35a62c1d8932b1931673bac7341175d74aa09d97ba087922b73e31146620",
+      "bytes": 2832
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/README.md",
+      "sha256": "d1cb0dc51a5ba32d478287ac2f10d1edf3011cceb1848cf54d0562495990c26d",
+      "bytes": 5379
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/guest.py",
+      "sha256": "609186c1a5651166c8654d0f8d9c2b57a1caabefffacd3bb4efe719bb8c17d93",
+      "bytes": 10168
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/local-verification.json",
+      "sha256": "36357dee51c90409106d3e13b8667dbfb0b4c8c55f9bd40d7cde3b1375e54bad",
+      "bytes": 2210
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/native-reboot-observer.service",
+      "sha256": "e296c8f589626e9624f128281f08edd7fdbb612259a3785cc84ae4c361a42827",
+      "bytes": 372
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/native-reboot.service",
+      "sha256": "3f79504f7812dc2fbc38cbc29dd862fcb245a1eb48097d9eb614f22f43a6620f",
+      "bytes": 330
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/native-reboot.timer",
+      "sha256": "3deb371b58abed60210f673405f3f56b34f349ee0fc7dd0d08abb91a0a11379c",
+      "bytes": 182
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/observer.py",
+      "sha256": "02a2fb86741c7739046e42626d2b47eda63eb5fabf2b8db31d5f8f0a83e1d65c",
+      "bytes": 1496
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/plan-initial.json",
+      "sha256": "f9056bd2b04c6d72ac9d329c3821cc8b93c1f1e1b706f99fb4942de8adab1f47",
+      "bytes": 3562
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/plan.json",
+      "sha256": "f535beb53ef4046a02b39cd85a146d9f3136ad2e9b2e1b57390352133f2871f3",
+      "bytes": 4467
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/run.py",
+      "sha256": "1f14f31bbbecda1a955c2988c5e2e9591ab825a881d67cfcf97c8596cce6338d",
+      "bytes": 22396
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/setup.sh",
+      "sha256": "662da3b254f3cfdf93cce61c96dadfbd0885661cf0e1fc50c408785f60f1e893",
+      "bytes": 1436
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/source-review.md",
+      "sha256": "158c982983449487d8a502157e47d0ab27331cb907d187fb2b4ba39244304f76",
+      "bytes": 6311
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/upstream-tests.sh",
+      "sha256": "8143d570f8f321db56b5deefc718c9e7aa7e4e00676c7f146f196b55272d0e7c",
+      "bytes": 2816
+    },
+    {
+      "path": "tests/test_service_reboot.py",
+      "sha256": "07c57ed8e5d229b45253de079944d1d4a79e64c58ee398263a1e7c5c3c8e144a",
+      "bytes": 9464
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/attempt-1/hosted-plan.json",
+      "sha256": "4ba9e561bd42cebe1f0e4795f06fdeb400f3545f38fb0a62d86bb2821feefeef",
+      "bytes": 3803
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/attempt-1/installation.json",
+      "sha256": "b4f4eeabf9769c0c4141209d18661db655bfc09e6496fd17d97a07844c631e6d",
+      "bytes": 6937
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/attempt-1/namespace-contract.json",
+      "sha256": "403910d11feb8655a21798fd572c89f4c5da84cfc11327848d0bc85248dee2a6",
+      "bytes": 2009
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/attempt-1/receipt.json",
+      "sha256": "7492c2b3f0509719170a3f0e50f58503af21faca40e6a71ad07508cebedd072d",
+      "bytes": 2328
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/attempt-1/result.json",
+      "sha256": "9a64dc45827a685a8216d5b1764527664511994f9ccc89fb78bf4049644934ec",
+      "bytes": 1482
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/attempt-1/secret-cleanup.json",
+      "sha256": "f13c688d5e19ff5fc4c0476048a92ee7ff5008d40eebde07e7d5615402fdea1b",
+      "bytes": 177
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/upstream-source.json",
+      "sha256": "926a5de880f31b40053f92e7f8252c89f8738259d2b3943105df30275f8dd325",
+      "bytes": 11687
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-restore/upstream_tests.py",
+      "sha256": "2a27ea638d96f583b24af2518afbaceab49fe548e70c5d2fa4a6c01eafc98574",
+      "bytes": 6157
     }
   ],
   "convergence_records": [

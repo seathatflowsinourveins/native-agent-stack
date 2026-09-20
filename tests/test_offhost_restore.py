@@ -1,6 +1,8 @@
 """Offline refusal cases; no native services, password reads or provider calls."""
 import base64
 import copy
+from datetime import datetime
+import errno
 import hashlib
 import importlib.util
 import json
@@ -111,6 +113,66 @@ class RestoreTests(unittest.TestCase):
         self.assertIn('path: ${{ env.FOUNDATION_RESTORE_ROOT }}/reports/',text)
         self.assertIn('secrets.FOUNDATION_RESTORE_FIXTURE_20260920',text)
         self.assertNotIn('bypass',text)
+
+    def test_actual_recovery_workspace_keeps_negative_key_separate_from_every_command_output(self):
+        # Reproduce the hosted setup with the exact encrypted input, no model,
+        # correct password or native operation. The old wrong-password output
+        # mkdir collided with the regular negative-key file here.
+        spec = importlib.util.spec_from_file_location('offhost_run', HERE/'run.py')
+        module = importlib.util.module_from_spec(spec)
+        with patch.dict(sys.modules, {'verify':verify}): spec.loader.exec_module(module)
+        expected = verify.load(HERE/'repository-manifest.json')
+        wrong = module.initialize_recovery(self.target, verify.load(HERE/'repository.json'), expected)
+        for label in ['wrong-password','check-read-data','restore-1','restore-2']:
+            output = module.create_command_output(self.target,label)
+            self.assertTrue(output.is_dir())
+            self.assertNotEqual(wrong,output)
+        self.assertTrue(wrong.is_file())
+        self.assertEqual(wrong.stat().st_mode & 0o777,0o600)
+        self.assertEqual(verify.repository_manifest(self.target/'repository'),expected)
+
+
+class UpstreamResultGuardTests(unittest.TestCase):
+    def module(self):
+        spec=importlib.util.spec_from_file_location('offhost_upstream',HERE/'upstream_tests.py')
+        module=importlib.util.module_from_spec(spec)
+        with patch.dict(sys.modules,{'verify':verify}):spec.loader.exec_module(module)
+        return module
+
+    def test_only_exact_passed_upstream_tests_are_accepted(self):
+        selected=[{'package':'upstream/package','name':'TestNative'}]
+        event={'Package':'upstream/package','Test':'TestNative','Action':'pass'}
+        self.assertEqual(self.module().check_test_events(json.dumps(event),selected)[0]['status'],'pass')
+        for action in ['skip','fail']:
+            with self.subTest(action=action),self.assertRaises(ValueError):
+                self.module().check_test_events(json.dumps(dict(event,Action=action)),selected)
+        with self.assertRaises(ValueError):self.module().check_test_events('',selected)
+        with self.assertRaises(ValueError):self.module().check_test_events(json.dumps(event)+'\n'+json.dumps(event),selected)
+
+    def test_launch_failures_retain_attempted_command_and_empty_streams(self):
+        for error in [FileNotFoundError(errno.ENOENT,'missing executable'),
+                      PermissionError(errno.EACCES,'executable permission denied')]:
+            with self.subTest(error=type(error).__name__), tempfile.TemporaryDirectory() as directory:
+                root=Path(directory);source=root/'source';source.mkdir();reports=root/'reports';reports.mkdir()
+                module=self.module()
+                argv=['upstream_tests.py','--source',str(source),'--reports',str(reports)]
+                with patch.object(sys,'argv',argv), patch.object(module.subprocess,'run',side_effect=error), patch('builtins.print'):
+                    self.assertTrue(module.main())
+                report=json.loads((reports/'upstream-tests.json').read_text())
+                self.assertEqual(report['status'],'failed')
+                self.assertEqual(len(report['commands']),1)
+                command=report['commands'][0]
+                self.assertEqual(command['argv'],['git','rev-parse','HEAD'])
+                self.assertEqual(command['cwd'],'$UPSTREAM_SOURCE')
+                self.assertFalse(command['launched']);self.assertFalse(command['timeout'])
+                self.assertIsNone(command['exit_code'])
+                self.assertEqual(command['launch_error']['type'],type(error).__name__)
+                self.assertEqual(command['launch_error']['errno'],error.errno)
+                self.assertGreaterEqual(datetime.fromisoformat(command['finished_at_utc']),datetime.fromisoformat(command['started_at_utc']))
+                self.assertGreaterEqual(command['seconds'],0)
+                for name in ['stdout','stderr']:
+                    self.assertEqual((reports/command[name]['path']).read_bytes(),b'')
+                    self.assertEqual(command[name]['sha256'],hashlib.sha256(b'').hexdigest())
 
 
 if __name__ == '__main__': unittest.main()
