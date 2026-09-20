@@ -77,7 +77,8 @@
       "evidence_ids": [
         "codex-session-environment-20260920",
         "codex-desktop-live-20260920",
-        "native-session-defaults-20260920"
+        "native-session-defaults-20260920",
+        "native-harness-defaults-20260920"
       ],
       "evidence_scope": "Fresh native processes resolved selected commands/MCP servers and Claude startup hooks; restarted Desktop source retrieval has its own dated receipt.",
       "limitations": [
@@ -85,7 +86,8 @@
         "The Linux/WSL and Desktop process/configuration boundaries remain distinct."
       ],
       "source_paths": [
-        "docs/convergence-architecture.md"
+        "docs/convergence-architecture.md",
+        "docs/harness-defaults.md"
       ],
       "next_gap": "Collect the specific new-host or changed-session activation evidence; do not copy account stores.",
       "lifecycle": {
@@ -2140,37 +2142,46 @@
       "supersedes": []
     },
     {
-      "id": "tavily-native-integration-pending",
-      "capability": "Bind Tavily source review to the intended native CLI and skill activation receipt",
+      "id": "tavily-native-search-extract",
+      "capability": "Search and extract primary web sources through the upstream Tavily CLI",
       "capability_key": "tavily-native-integration",
       "checked_at": "2026-09-20",
       "layer_ids": [
         "web-research",
         "instructions-skills"
       ],
-      "selection": "candidate",
-      "review_status": "source_review",
-      "activation": "Select the needed Tavily operation after native CLI and eight-skill discovery acceptance is explicitly reconciled for the intended host.",
-      "component_ids": [],
-      "candidate": {
-        "id": "tavily",
-        "repository": "https://github.com/tavily-ai/skills"
-      },
-      "evidence_ids": [],
-      "evidence_scope": "The existing source/integration receipt is referenced without creating a selected component or a new host success claim. The current native CLI integration receipt is pending coordinator reconciliation.",
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use tvly Search or Extract on demand with native private authentication; eight official skills provide task-specific guidance.",
+      "component_ids": [
+        "tavily-cli"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-tavily-cli-20260920"
+      ],
+      "evidence_scope": "Upstream CLI0.1.8 installed and authenticated; live search returned four official sources and extraction returned one result with zero failures. Eight official skills were listed for both clients and discovered by fresh Codex probes for native and Desktop homes.",
       "limitations": [
-        "Earlier source-host CLI/search/discovery observations retain their original scope; this pending entry neither repeats nor erases them.",
-        "The eight skills are on-demand operations, not a requirement to run every web tool or activate every provider."
+        "Desktop-home discovery initially failed SQLite initialization and passed only with a temporary session-specific sqlite_home; the active Desktop registry was not hot-reloaded.",
+        "Claude global skill listing and fresh Codex discovery do not prove actual model invocation of every skill. Map, Crawl and Research remain unqualified.",
+        "No causal lifetime token savings or full lifecycle recovery is measured."
       ],
       "source_paths": [
-        "docs/ecosystem/tavily-receipt.json"
+        "recipes/tavily.md",
+        "evidence/receipts/native-tavily-cli-20260920.json"
       ],
-      "next_gap": "Attach the intended-host native CLI acceptance and fresh Codex/Claude skill discovery evidence, then make an explicit component/adoption decision.",
+      "next_gap": "Use the accepted CLI now; check the intended fresh client for skill activation when needed, and qualify broader operations only for a concrete task.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
-        "scope": "No selected component lifecycle is asserted by this source-review entry.",
-        "unknown": "Native CLI integration and applicable lifecycle stages remain pending for the current intended-host adoption.",
-        "stage_refs": []
+        "scope": "Native install, Search/Extract and owned-probe cleanup are recorded; each stage retains its exact operation boundary.",
+        "unknown": "Independent key recovery, uninstall/reinstall and the active Desktop skill registry remain unverified.",
+        "stage_refs": [
+          {
+            "component_id": "tavily-cli",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
       },
       "supersedes": []
     }

@@ -8,7 +8,7 @@
       "id": "agents",
       "name": "Native agents",
       "summary": "Keep the clients, accounts and compaction that already work.",
-      "examples": "Codex \u00b7 Claude Code \u00b7 native SDKs",
+      "examples": "Codex · Claude Code · native SDKs",
       "keywords": [
         "native-workers",
         "native-agent",
@@ -25,7 +25,7 @@
       "id": "skills",
       "name": "Skills & playbooks",
       "summary": "Load one useful instruction set when the task needs it.",
-      "examples": "Progressive disclosure \u00b7 selected skills",
+      "examples": "Progressive disclosure · selected skills",
       "keywords": [
         "skill",
         "awesome",
@@ -41,7 +41,7 @@
       "id": "retrieval",
       "name": "Code & document retrieval",
       "summary": "Start exact. Add semantic search for a demonstrated gap.",
-      "examples": "rg / ast-grep \u00b7 QMD \u00b7 SocratiCode",
+      "examples": "rg / ast-grep · QMD · SocratiCode",
       "keywords": [
         "retrieval",
         "code-search",
@@ -57,7 +57,7 @@
       "id": "memory",
       "name": "Explicit scoped memory",
       "summary": "Save deliberate decisions and useful handoffs with provenance.",
-      "examples": "ai-memory \u00b7 project scope \u00b7 recovery",
+      "examples": "ai-memory · project scope · recovery",
       "keywords": [
         "memory",
         "continuity",
@@ -71,7 +71,7 @@
       "id": "workers",
       "name": "Workers & execution",
       "summary": "Delegate independent work with one owner and a compact result.",
-      "examples": "Native subagents \u00b7 worktrees \u00b7 supervision",
+      "examples": "Native subagents · worktrees · supervision",
       "keywords": [
         "worker",
         "workflow",
@@ -86,7 +86,7 @@
       "id": "evaluation",
       "name": "Evaluation & evidence",
       "summary": "Match inputs, quality and full usage before claiming an improvement.",
-      "examples": "Retrieval tests \u00b7 replay \u00b7 native acceptance",
+      "examples": "Retrieval tests · replay · native acceptance",
       "keywords": [
         "evaluation",
         "benchmark",
@@ -103,7 +103,7 @@
       "id": "research",
       "name": "Research & data",
       "summary": "Keep research flexible and numerical state deterministic.",
-      "examples": "Filings \u00b7 reproducible studies \u00b7 paper gates",
+      "examples": "Filings · reproducible studies · paper gates",
       "keywords": [
         "research",
         "data",
@@ -120,7 +120,7 @@
       "id": "operations",
       "name": "Operations & local inference",
       "summary": "Observe, recover and test the platform before depending on it.",
-      "examples": "Local models \u00b7 hosting \u00b7 recovery",
+      "examples": "Local models · hosting · recovery",
       "keywords": [
         "inference",
         "hosting",
@@ -137,7 +137,7 @@
       "id": "applications",
       "name": "Applications & APIs",
       "summary": "Use project locks, typed contracts, real database tests and isolated browser workflows.",
-      "examples": "Next / React \u00b7 FastAPI \u00b7 PostgreSQL",
+      "examples": "Next / React · FastAPI · PostgreSQL",
       "keywords": [
         "application delivery",
         "typed api",
@@ -155,7 +155,7 @@
       "id": "beyond",
       "name": "Beyond the current stack",
       "summary": "Keep useful alternatives discoverable without installing the catalog.",
-      "examples": "Product \u00b7 frontend \u00b7 wider ecosystem",
+      "examples": "Product · frontend · wider ecosystem",
       "keywords": [],
       "repositories": []
     }
@@ -263,7 +263,7 @@
     {
       "number": "01",
       "title": "Keep native context mechanics",
-      "body": "Preserve each runtime\u2019s native cache and compaction. Codex and Claude Code keep their own accounts, history and usage conventions.",
+      "body": "Preserve each runtime’s native cache and compaction. Codex and Claude Code keep their own accounts, history and usage conventions.",
       "path": "docs/landscape.md"
     },
     {
@@ -310,6 +310,30 @@
     }
   ],
   "guides": [
+    {
+      "title": "Two grand catalogs: Foundation and Trading",
+      "body": "General native harness capability decisions stay separate from the IBKR, Nautilus and Alpaca domain architecture.",
+      "path": "catalogs/README.md",
+      "category": "setup"
+    },
+    {
+      "title": "Persistent native harness defaults",
+      "body": "Task-appropriate native tools, bounded workers, scoped evidence, recovery and quiet maintenance for future sessions.",
+      "path": "docs/harness-defaults.md",
+      "category": "setup"
+    },
+    {
+      "title": "Tavily upstream CLI and skills",
+      "body": "Native install, Search/Extract outputs, eight-skill discovery and explicit Desktop probe limits.",
+      "path": "recipes/tavily.md",
+      "category": "evaluation"
+    },
+    {
+      "title": "NautilusTrader pinned native acceptance",
+      "body": "Two offline upstream synthetic FX replays, native reports, independent reconciliation and broker boundaries.",
+      "path": "blueprints/us-equities/engine-nautilus/README.md",
+      "category": "evaluation"
+    },
     {
       "title": "Memory, RAG and token-efficiency foundation",
       "body": "Fresh native client results, repaired Python/JavaScript retrieval, clean OmniRoute installation and explicit preview, quota and observation limits.",
@@ -523,35 +547,35 @@
   "annotations": [
     {
       "repository": "anthropics/claude-code",
-      "title": "Current primary-source review \u00b7 v2.1.278",
+      "title": "Current primary-source review · v2.1.278",
       "body": "Native harness/subagents/skills/worktrees already cover the requested Claude features. Decision: retain. Source commit: bf7d404e26a5fb6167d21b46c93a2bf6c22ab274. Verify native authentication and renewed session on each target host; no credential copying. Qualify bounded worker completion, cancellation, exact-session resume, crash cleanup, and worktree base.",
       "date": "2026-09-20T02:45:27.024112+00:00",
       "path": "docs/ecosystem/source-review.json"
     },
     {
       "repository": "tobi/qmd",
-      "title": "Current primary-source review \u00b7 v2.8.3",
+      "title": "Current primary-source review · v2.8.3",
       "body": "Document retrieval complements code retrieval; use an explicit collection rather than every local document. Decision: retain; trial semantic mode. Source commit: facd35e01359e59d938bc9418e93fb9318addee3. Run a fixed labeled corpus against lexical and hybrid modes; include missing collection, no-answer, conflicting source and stale-index cases. Record citation correctness, recall, latency, peak memory and whole-workflow token use before enabling semantic defaults.",
       "date": "2026-09-20T02:45:27.254891+00:00",
       "path": "docs/ecosystem/source-review.json"
     },
     {
       "repository": "giancarloerra/SocratiCode",
-      "title": "Current primary-source review \u00b7 v1.14.0",
+      "title": "Current primary-source review · v1.14.0",
       "body": "Conceptual code retrieval/AST chunks/dependency graph complements rg and ast-grep; confirm retrieved claims against actual source. Decision: retain. Source commit: 2218f25153d0f3f4a76ee240a5643dbc873e80be. Index only intended repository and verify revision/worktree scope. Compare fixed conceptual queries and cross-file impact tasks with lexical baseline; retain existing native services and avoid managed Docker duplicates.",
       "date": "2026-09-20T02:45:27.251141+00:00",
       "path": "docs/ecosystem/source-review.json"
     },
     {
       "repository": "akitaonrails/ai-memory",
-      "title": "Current primary-source review \u00b7 v2.3.2",
+      "title": "Current primary-source review · v2.3.2",
       "body": "Explicit scoped durable decisions complement retrieved documents; upstream lifecycle capture is outside the accepted explicit-memory policy. Decision: trial update to 2.3.2. Source commit: 353841d91618d20b110b208de284a74d0b960379. Test v2.3.2 against isolated copied state with backup/rollback; migration and scope-negative checks before any accepted pin change. Keep automatic history capture, scheduler and LLM consolidation off; test only explicit scoped read/write decisions.",
       "date": "2026-09-20T02:45:26.984389+00:00",
       "path": "docs/ecosystem/source-review.json"
     },
     {
       "repository": "ollama/ollama",
-      "title": "Current primary-source review \u00b7 v0.34.2",
+      "title": "Current primary-source review · v0.34.2",
       "body": "Already selected local embedding runtime; qualify one bounded inference workload before adding another serving engine. Decision: retain; qualify one local model. Source commit: dfabde4539e42ba1e1eab50a3a50b88aea7958a0. Pin exact model digest and model license separately. Measure cold/warm load, context fit, task correctness, latency and memory; verify intended GPU after restart/suspend, and no cloud fallback.",
       "date": "2026-09-20T02:45:27.046113+00:00",
       "path": "docs/ecosystem/source-review.json"
@@ -567,17 +591,22 @@
   "integrations": [
     {
       "id": "tavily",
-      "name": "Tavily \u00b7 native research search",
+      "name": "Tavily · native research search",
       "description": "Optional research search with eight official skills for Codex and Claude Code. Start with bounded search; escalate to extract, map/crawl or research only when useful.",
       "layers": [
         "research",
         "skills"
       ],
-      "status": "Dated native CLI observation",
-      "date": "2026-09-20T02:48:47.669977+00:00",
-      "pin": "CLI 0.1.8 \u00b7 skills 778122e5f9c680f541eeceda5a5b36405eb7980c",
+      "status": "Native Search/Extract accepted within scope",
+      "date": "2026-09-20",
+      "pin": "CLI 0.1.8; eight official skills",
       "url": "https://tavily.com/agent-setup/SKILL.md",
-      "receipt_path": "docs/ecosystem/tavily-receipt.json"
+      "receipt_path": "evidence/receipts/native-tavily-cli-20260920.json"
     }
-  ]
+  ],
+  "grand_catalogs": {
+    "foundation_manifest": "catalogs/foundation/manifest.json",
+    "foundation_decisions": "catalogs/foundation/decisions.json",
+    "trading_target": "catalogs/us-equities/runtime-target.json"
+  }
 }

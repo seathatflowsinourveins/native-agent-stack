@@ -1,5 +1,12 @@
 # Repository work
 
+The two maintained catalogs start at `catalogs/README.md`. Use
+`catalogs/foundation/manifest.json` for general native harness layers and
+`catalogs/us-equities/README.md` for the separate trading architecture. Apply
+`docs/harness-defaults.md` when building or changing a harness: supported upstream
+installation, capability-specific evidence, bounded workers, scoped state and
+recoverable lifecycle acceptance. Load only the layer needed by the task.
+
 Carry authorized setup, fixes, checks and documentation through useful completion.
 Use a short internal plan; do not add intake, brainstorming or separate planning
 approval to bounded work. Reuse passing evidence when its inputs still match and

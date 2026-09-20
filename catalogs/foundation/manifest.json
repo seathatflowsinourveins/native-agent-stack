@@ -92,10 +92,10 @@
       "id": "web-research",
       "title": "Web research",
       "purpose": "Find current primary sources and inspect selected web content.",
-      "selection": "Native browser and bounded literature retrieval; Tavily retained as a separate integration candidate in this view.",
+      "selection": "Native browser, bounded literature retrieval and the upstream Tavily CLI/skills for selected web research.",
       "activation": "Use an existing authenticated route on demand; load only the research operation needed.",
-      "lifecycle_scope": "Local browser and selected paper retrieval have dated acceptance; the pending Tavily native CLI integration receipt must be bound explicitly.",
-      "next_gap": "Complete the intended-host Tavily CLI and eight-skill activation receipt without inferring acceptance from source review."
+      "lifecycle_scope": "Dated browser/paper retrieval and Tavily Search/Extract passed. Eight official skills were discovered in fresh Codex probes; broader operations and the active Desktop registry remain separate.",
+      "next_gap": "Qualify Map, Crawl or Research only for a concrete task; retain current Desktop discovery and account limits."
     },
     {
       "id": "token-efficiency",
@@ -191,6 +191,11 @@
       "component_id": "pandas",
       "catalog": "catalogs/us-equities/README.md",
       "scope": "Current accepted use is exact timestamp parsing and chronological financial controls, not blanket dataframe acceptance."
+    },
+    {
+      "component_id": "nautilus-trader",
+      "catalog": "catalogs/us-equities/runtime-target.json",
+      "scope": "Pinned synthetic trading-engine replay belongs to TRADING; it does not establish historical equities or broker execution."
     }
   ],
   "top_gaps": [

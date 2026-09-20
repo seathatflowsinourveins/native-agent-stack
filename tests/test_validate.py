@@ -133,6 +133,7 @@ class PublicationValidationTests(unittest.TestCase):
         for content, expected in (("/" + "home" + "/private-person/project", "personal home path"),
                                   ("hf" + "_" + "x" * 32, "Hugging Face token"),
                                   ("ghp" + "_" + "y" * 36, "GitHub token"),
+                                  ("tvly" + "-prod-" + "z" * 40, "Tavily token"),
                                   ("C:" + "\\Users\\private-person\\project", "Windows user path")):
             with self.subTest(expected=expected):
                 self.write("README.md", content)

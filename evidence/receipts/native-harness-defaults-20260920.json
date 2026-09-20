@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "native-harness-defaults-20260920",
+  "kind": "artifact_measurement",
+  "component_ids": [
+    "codex",
+    "claude-code"
+  ],
+  "claim": "One short native-harness policy block is persisted in both Codex global instruction homes and native Claude global instructions; original bytes are preserved as a prefix and the current task instruction feed contains the block.",
+  "limitations": [
+    "Saved instruction bytes are not proof that every future model decision will follow them.",
+    "This wave leaves existing native account, model, permissions, shell PATH and Desktop WSL settings unchanged; earlier process checks retain their separate scope.",
+    "The daily maintenance automation is scheduled; no scheduled execution or reboot recovery is claimed by its creation."
+  ],
+  "recorded_date_utc": "2026-09-20",
+  "policy_path": "docs/harness-defaults.md",
+  "catalogs": [
+    "catalogs/foundation/manifest.json",
+    "catalogs/us-equities/runtime-target.json"
+  ],
+  "measurement": "SHA-256, byte length, append-only comparison and managed-block count against private pre-edit backups; no auth store was read.",
+  "files": [
+    {
+      "client_home": "native-codex",
+      "file": "AGENTS.md",
+      "bytes": 5716,
+      "sha256": "9bcfd9dc672aeafcf4bb6093c67a78df9e7be9ba614510f72cf2407ab50b85fc",
+      "previous_sha256": "5b76e2f33747117d4eb48a0bc9ff3e411276de1882581188bc91834487eb978b",
+      "append_only": true,
+      "managed_block_count": 1
+    },
+    {
+      "client_home": "desktop-codex",
+      "file": "AGENTS.md",
+      "bytes": 5723,
+      "sha256": "99cab7fadec388b31b44e73fb0217948931ac53760793bc16d14befa0f01e887",
+      "previous_sha256": "2dabb7f2af850eb7dda5596a56849d7791cbe3af2e4ccd4b349f4add88951c0e",
+      "append_only": true,
+      "managed_block_count": 1
+    },
+    {
+      "client_home": "native-claude",
+      "file": "CLAUDE.md",
+      "bytes": 5438,
+      "sha256": "a19d997bebf4d8af75598d5f6909dfb7b0fc064da4c83c9c26df4e58c74f09fc",
+      "previous_sha256": "cff395aefd86e8c0ad61afc4022bb86214272365555b6ae47f1a9db756dd77b1",
+      "append_only": true,
+      "managed_block_count": 1
+    }
+  ],
+  "maintenance": {
+    "id": "maintain-native-foundation-and-trading-catalogs",
+    "name": "Maintain native foundation and trading catalogs",
+    "kind": "thread heartbeat",
+    "status": "ACTIVE",
+    "schedule": "Daily at09:00 America/New_York",
+    "notification": "Quiet unchanged; notify meaningful improvement, completion, failure or required user input.",
+    "authorization_boundary": "No live orders, purchases, paid hosting or credential publication."
+  },
+  "native_setup_reference": "docs/token-session-handbook.md",
+  "new_desktop_restart_required_for_saved_policy": false,
+  "future_process_note": "Future native sessions load their global instruction files. Newly installed skill discovery is qualified only by its explicit fresh-client receipts."
+}

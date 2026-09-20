@@ -6,8 +6,7 @@ Start with the layer needed for the task in [manifest.json](manifest.json), then
 read its scoped capability decision in [decisions.json](decisions.json). A default
 is a selected way to do a task, not permission to install or activate every tool.
 
-The catalog references 60 selected components through 39 capability decisions,
-plus one separate Tavily integration candidate. It cites 63 relevant registered
+The catalog references 61 selected components through 40 capability decisions. It cites 65 relevant registered
 receipts from the current 88-receipt inventory. These are coverage counts, not a
 score of complete installation, execution or lifecycle acceptance.
 
@@ -51,15 +50,15 @@ research inventory at its existing path. Discovery lists, candidates and older
 available. Their directory placement and reviewed source pins do not supersede
 the currently selected component pin or qualify an entire repository.
 
-The manifest explicitly leaves LEAN, Alpaca, skfolio, EdgarTools and the currently
+The manifest explicitly leaves NautilusTrader, LEAN, Alpaca, skfolio, EdgarTools and the currently
 financial-only DuckDB/pandas claims in the [US-equities domain](../us-equities/README.md).
 Some domain-located fixtures demonstrate reusable operations such as process-tree
 termination, dependency inventory or state restore. A FOUNDATION decision cites
 only that operation; it does not import strategy, market-data, broker or trading
-acceptance. The Tavily entry references its
-[existing source/integration receipt](../../docs/ecosystem/tavily-receipt.json)
-and leaves current intended-host native CLI integration pending reconciliation.
-It does not erase earlier dated observations or create an adopted component.
+acceptance. Tavily has a [native CLI receipt](../../evidence/receipts/native-tavily-cli-20260920.json)
+for upstream installation, Search/Extract and fresh eight-skill discovery. It retains
+the initial Desktop probe failure and temporary-state recovery; it does not claim
+that every skill ran in a model turn or that the current Desktop registry hot-reloaded.
 
 The three current priorities are:
 
