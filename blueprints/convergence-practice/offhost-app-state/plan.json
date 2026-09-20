@@ -77,7 +77,7 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/run.py",
-      "sha256": "314e40f60b65a2c034341e176a1b20b21033bcb8a9e160be55eb25d969c4af70"
+      "sha256": "d5eddb06d7fc86218b98e11e84b70edd7ee7f72cdc31caeab454112bd1b2b950"
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/upstream.json",
@@ -105,7 +105,7 @@
     },
     {
       "path": "tests/test_offhost_app_state.py",
-      "sha256": "60bf9d067a4d753f64147cdf77cf4898374a2686b3b29a4820740ad79ab5208a"
+      "sha256": "a763c8ed4d707bbe447a4af97c7545faabd75866f5ffea320d232285a9a0162c"
     }
   ]
 }

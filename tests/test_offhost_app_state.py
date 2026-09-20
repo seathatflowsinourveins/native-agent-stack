@@ -40,7 +40,8 @@ class EvidenceGuards(unittest.TestCase):
         good = 'test a::test ... ok\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured\n'
         app.check_rust_tests(good, ['a::test'])
         for text in ['', good.replace('... ok', '... ignored'), good + 'test a::test ... ok\n',
-                     good + 'skipping GNU sparse fixture']:
+                     good + 'skipping restore_round_trips_a_real_gnu_sparse_sqlite_snapshot: '
+                     'GNU tar with --sparse not available on PATH\n']:
             with self.subTest(text=text), self.assertRaises(ValueError): app.check_rust_tests(text, ['a::test'])
 
     def test_pytest_requires_all_four_native_cases_and_no_skip(self):

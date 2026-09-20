@@ -130,7 +130,8 @@ def check_rust_tests(output, names):
     actual = re.findall(r'^test (\S+) \.\.\. (\S+)$', output, flags=re.M)
     if sorted(actual) != sorted((name, 'ok') for name in names):
         raise ValueError('selected Rust tests missing, duplicated, ignored or failed')
-    if 'skipping GNU sparse' in output or not re.search(r'test result: ok\. \d+ passed; 0 failed; 0 ignored;', output):
+    skipped_sparse = re.search(r'^skipping restore_round_trips_a_real_gnu_sparse_sqlite_snapshot:', output, flags=re.M)
+    if skipped_sparse or not re.search(r'test result: ok\. \d+ passed; 0 failed; 0 ignored;', output):
         raise ValueError('upstream test body skipped or terminal result absent')
 
 
