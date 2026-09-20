@@ -185,7 +185,8 @@
         "native-claude-session-recovery-20260920",
         "native-token-focus-clients-20260920",
         "native-token-stack-final-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-worker-cgroup-20260920"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -1248,7 +1249,8 @@
       ],
       "evidence_ids": [
         "native-worker-supervision-20260919",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "native-worker-cgroup-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [

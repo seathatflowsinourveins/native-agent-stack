@@ -33,3 +33,28 @@ work; qualify any deliberately restricted role against its actual loaded hooks.
 Do not invent an opt-out, patch the installed upstream plugin, disable every hook
 or change global permissions to turn this fixture green. A future changed trial
 must resolve the role/instruction contract first and preserve the original failure.
+
+## Accepted inherited-tool recovery and post-hook permissions
+
+The [later inherited-tool trial](../blueprints/convergence-practice/worker-recovery/native-exact-read-receipt.json)
+kept upstream hooks and global settings unchanged. It completed native cancellation,
+same-child continuation, an abrupt parent-runtime failure, automatic systemd cgroup
+cleanup and same-parent/same-child finalization. Its checkpoint and frozen sources
+were unchanged, with one final local effect and no direct descendant PID cleanup.
+This qualifies the recorded role, task and same-host supervisor boundary. Host
+crashes, independent-host recovery and provider cancellation remain unqualified.
+
+A preceding inherited-role attempt failed during read-only inspection. The
+[retained hook diagnosis](../blueprints/convergence-practice/worker-recovery/native-rewrite-diagnosis.json)
+shows RTK 0.49.0 rewriting the original listing to `rtk ls`. Claude checks
+permissions against a hook's updated input, so an invocation rule for the original
+`ls` executable did not cover that transformed command. RTK's settings-file check
+does not see the experiment's command-line permission rules. The actual hook row,
+deterministic hook output and pinned upstream sources establish this mechanism.
+
+The next profile retained the experiment's stricter `dontAsk` mode and added only
+the exact rewritten listing for its owned fixture. The successful model run did
+not request that listing; its extra read-only operation was tool discovery.
+Accordingly, the native recovery result and deterministic listing-permission
+diagnosis remain separate evidence. Keep required post-hook commands explicit in
+a restricted task's local contract, without broad proxy grants or global changes.

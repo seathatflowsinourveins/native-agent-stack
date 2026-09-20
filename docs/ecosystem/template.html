@@ -51,7 +51,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <div id="foundation-summary" class="catalog-summary"></div><div id="foundation-guides" class="setup-guides"></div>
 <div class="controls catalog-controls"><div class="control"><label for="foundation-search">Find a capability</label><input id="foundation-search" type="search" placeholder="Try memory, research, recovery…" autocomplete="off"></div><div class="control"><label for="foundation-layer">Layer</label><select id="foundation-layer"><option value="">All foundation layers</option></select></div><div class="control"><label for="foundation-status">Evidence</label><select id="foundation-status"><option value="">All recorded decisions</option><option value="accepted_within_scope">Accepted within its scope</option><option value="partial_acceptance">Partly accepted</option><option value="source_review">Source reviewed</option><option value="discovery">Discovery</option><option value="not_established">Not established</option></select></div></div>
 <p id="foundation-result-count" class="catalog-scope" role="status" aria-live="polite"></p><div id="foundation-layers" class="catalog-grid"></div>
-<div id="foundation-gap-section" hidden><div class="section-head"><div><div class="eyebrow">Useful next checks</div><h2>What remains open.</h2></div></div><div id="foundation-gaps" class="catalog-grid"></div></div>
+<div id="foundation-gap-section" hidden><div class="section-head"><div><div class="eyebrow">Evidence and next steps</div><h2>Foundation progress.</h2></div></div><div id="foundation-gaps" class="catalog-grid"></div></div>
 </section>
 <section id="trading" role="tabpanel" aria-labelledby="tab-trading" hidden>
 <div class="page-heading"><div><div class="eyebrow">US equities / research to separate paper adapters</div><h2>A trading architecture with clear gates.</h2><p>Trading uses the foundation and adds its own data, strategy, risk and broker checks. The selected destination and recorded acceptance remain separate.</p></div></div>
@@ -245,6 +245,7 @@ function renderGrandCatalogs() {
   add($("trading-summary"), make("strong", "", "Research and simulation → broker-specific paper acceptance"), make("p", "muted", trading.scope));
   add($("trading-guides"), catalogAction("foundation", "Open shared Foundation →"));
   if(trading.north_star_source) add($("trading-guides"), link("Trading north star ↗", trading.north_star_source.url));
+  if(trading.acceptance_plan_source) add($("trading-guides"), link("Historical and broker acceptance plan ↗", trading.acceptance_plan_source.url));
   const engine = trading.engine;
   const name = engine.repository ? engine.repository.split("/").pop().replaceAll("_", " ") : "Selected engine";
   const engineCard = add(make("article", "catalog-card"), make("div", "eyebrow", "Selected engine destination"), make("h3", "", name), make("p", "", "Requested version: " + engine.requested_version), make("p", "", engine.acceptance || "Acceptance not recorded"));

@@ -957,6 +957,11 @@
             "id": "foundation-native-20260920",
             "kind": "native_cli_e2e",
             "path": "evidence/receipts/foundation-native-20260920.json"
+          },
+          {
+            "id": "native-worker-cgroup-20260920",
+            "path": "evidence/receipts/native-worker-cgroup-20260920.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -982,7 +987,7 @@
         "persistence": {"status": "accepted_within_scope", "scope": "A retained native session resumed the owned task in the selected client; receipt scope, interruption method and usage remain explicit. Authentication-store migration and another-PC session transfer were not established.", "evidence_refs": ["blueprints/convergence-practice/native-recovery/claude/README.md"]},
         "restart": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
         "cleanup": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
-        "recovery": {"status": "accepted_within_scope", "scope": "A retained native session resumed the owned task in the selected client; receipt scope, interruption method and usage remain explicit. Authentication-store migration and another-PC session transfer were not established.", "evidence_refs": ["blueprints/convergence-practice/native-recovery/claude/README.md"]}
+        "recovery": {"status": "accepted_within_scope", "scope": "A retained native session resumed the owned task in the selected client; receipt scope, interruption method and usage remain explicit. Authentication-store migration and another-PC session transfer were not established. The later inherited-tool native child fixture adds automatic owned-systemd descendant cleanup and same-identity single-effect continuation on the recorded WSL host.", "evidence_refs": ["blueprints/convergence-practice/native-recovery/claude/README.md", "evidence/receipts/native-worker-cgroup-20260920.json"]}
       },
       "baseline_applicability": {
         "category": "supporting_workflow",
@@ -4368,6 +4373,11 @@
             "id": "foundation-native-20260920",
             "kind": "native_cli_e2e",
             "path": "evidence/receipts/foundation-native-20260920.json"
+          },
+          {
+            "id": "native-catalog-retrieval-20260920",
+            "path": "evidence/receipts/native-catalog-retrieval-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5400,6 +5410,11 @@
             "kind": "native_cli_e2e"
           },
           {
+            "id": "native-worker-cgroup-20260920",
+            "path": "evidence/receipts/native-worker-cgroup-20260920.json",
+            "kind": "native_model_e2e"
+          },
+          {
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
@@ -5424,7 +5439,7 @@
       "source_pin": null,
       "lifecycle_stages": {
         "install": {"status": "observed_installed", "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.", "evidence_refs": ["blueprints/us-equities/worker-supervision/receipt.json", "evidence/receipts/token-practice-coverage-20260920.json"]},
-        "use": {"status": "accepted_within_scope", "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim.", "evidence_refs": ["blueprints/us-equities/worker-supervision/receipt.json"]},
+        "use": {"status": "accepted_within_scope", "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim. The later inherited-tool native child fixture adds automatic owned-systemd descendant cleanup and same-identity single-effect continuation on the recorded WSL host.", "evidence_refs": ["blueprints/us-equities/worker-supervision/receipt.json", "evidence/receipts/native-worker-cgroup-20260920.json"]},
         "persistence": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
         "restart": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
         "cleanup": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
@@ -5791,6 +5806,11 @@
           {
             "id": "native-tavily-cli-20260920",
             "path": "evidence/receipts/native-tavily-cli-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-tavily-session-20260920",
+            "path": "evidence/receipts/native-tavily-session-20260920.json",
             "kind": "native_cli_e2e"
           }
         ],

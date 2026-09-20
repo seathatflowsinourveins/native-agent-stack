@@ -107,7 +107,7 @@ def validate_foundation(root: Path) -> dict:
         fields(gap, {"id", "priority", "status", "scope", "next_action", "source_paths"}, "top_gaps")
         require(type(gap["priority"]) is int, "top_gaps.priority", "expected integer priority")
         priorities.append(gap["priority"])
-        enum(gap["status"], {"open", "partial", "addressed_in_catalog"}, "top_gaps.status")
+        enum(gap["status"], {"open", "partial", "addressed_in_catalog", "accepted_within_scope"}, "top_gaps.status")
         text(gap["scope"], "top_gaps.scope")
         text(gap["next_action"], "top_gaps.next_action")
         source_paths(gap["source_paths"], validator, "top_gaps.source_paths")
@@ -121,7 +121,7 @@ def validate_foundation(root: Path) -> dict:
         require(gap_id in gaps, "open_gates", "unknown gap")
         gate_ids.add(gate_id)
         gap_ids.add(gap_id)
-    require(gap_ids == {identifier for identifier, gap in gaps.items() if gap["status"] != "addressed_in_catalog"},
+    require(gap_ids == {identifier for identifier, gap in gaps.items() if gap["status"] in {"open", "partial"}},
             "open_gates", "must reference exactly the unfinished gaps")
 
     document = validator.load(DECISIONS)

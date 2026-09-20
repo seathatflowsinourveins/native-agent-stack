@@ -470,12 +470,19 @@ class EcosystemManifestTests(unittest.TestCase):
 
     def test_catalog_inputs_and_foundation_guides_are_hashed_and_publicly_linked(self):
         self.grand_catalog_fixture()
+        plan = "blueprints/trading/acceptance-plan.md"
+        self.write(plan, "# Planned replay\n\nNo broker execution is accepted.")
+        self.trading["acceptance_plan"] = plan
+        self.save_grand_catalogs()
         page, _ = self.build()
         data = json.loads(page.data)
         sources = {row["path"]: row for row in data["inputs"]}
-        for path in self.config["grand_catalogs"].values():
+        for path in [*self.config["grand_catalogs"].values(), plan]:
             self.assertIn(path, sources)
             self.assertEqual(sources[path]["sha256"], hashlib.sha256((self.root / path).read_bytes()).hexdigest())
+        trading = data["grand_catalogs"]["trading"]
+        self.assertTrue(trading["acceptance_plan_source"]["url"].endswith("/" + plan))
+        self.assertNotIn(plan, [row["path"] for row in trading["accepted_references"]])
         recipes = {row["path"]: row for row in data["setup"]["recipes"]}
         for path in ("docs/harness-defaults.md", "catalogs/README.md", "catalogs/foundation/README.md"):
             self.assertIn(path, recipes)
@@ -522,9 +529,17 @@ class EcosystemManifestTests(unittest.TestCase):
 
     def test_catalog_trading_reference_cannot_escape_repository(self):
         self.grand_catalog_fixture()
-        self.trading["accepted_reference_paths"] = ["../private.json"]
-        self.save_grand_catalogs()
-        self.assertNotEqual(self.run_generator("--write").returncode, 0)
+        for field, value in (("accepted_reference_paths", ["../private.json"]),
+                             ("acceptance_plan", "../private.json")):
+            with self.subTest(field=field):
+                original = self.trading.get(field)
+                self.trading[field] = value
+                self.save_grand_catalogs()
+                self.assertNotEqual(self.run_generator("--write").returncode, 0)
+                if original is None:
+                    self.trading.pop(field)
+                else:
+                    self.trading[field] = original
 
     def test_catalog_structured_supersession_preserves_scope_and_reason(self):
         self.grand_catalog_fixture()

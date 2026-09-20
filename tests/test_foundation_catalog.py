@@ -170,6 +170,14 @@ class FoundationCatalogTests(unittest.TestCase):
         self.manifest["open_gates"].pop(0)
         self.assert_invalid("unfinished gaps")
 
+    def test_scoped_accepted_gap_stays_recorded_without_an_open_gate(self):
+        self.manifest["top_gaps"][0]["status"] = "accepted_within_scope"
+        closed_gate = self.manifest["open_gates"].pop(0)
+        result, report = self.run_check()
+        self.assertEqual(result.returncode, 0, result.stderr or str(report))
+        self.manifest["open_gates"].append(closed_gate)
+        self.assert_invalid("unfinished gaps")
+
     def test_supersession_requires_same_capability_and_earlier_date(self):
         old = copy.deepcopy(self.decision)
         old.update(id="older", checked_at="2026-09-19")

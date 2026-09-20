@@ -1,5 +1,11 @@
 # Convergence program and next roles
 
+This program records the earlier LEAN/Alpaca research wave. Current destinations
+are [NautilusTrader 2.0.0rc5 with IBKR and a separate Alpaca path](../../../catalogs/us-equities/runtime-target.json),
+with the [equity replay and broker acceptance plan](../engine-nautilus/acceptance-plan.md).
+Preserve the dated results below; they do not establish the new target's equity
+or broker acceptance.
+
 This goal continues the dated architecture through evidence-driven research,
 native acceptance and publication. The [structured plan](plan.json) defines
 ownership, requirements, quality rules and stopping criteria. It does not claim
@@ -13,7 +19,7 @@ code owns data arithmetic, validation, process policy, risk and order state.
 The new native acceptances address disposable memory lifecycle and scope,
 exact nanosecond replay, and whole-worker-tree supervision. Source reviews
 also challenge current choices across all seventeen mapped requirements, including
-macOS/WSL, community/awesome-list discovery and the Alpaca north star.
+macOS/WSL, community/awesome-list discovery and that wave's Alpaca destination.
 
 Complete identity coverage is separate from source/code review. A new model,
 large star count or awesome-list entry is not sufficient to replace an accepted
@@ -36,8 +42,12 @@ gates. The [native Astra/Claude review](review-adjudication.md) records direct
 workflow results and **37,151 reported tokens**, with interpretive corrections.
 The [grand dashboard](../../../observability/grand-dashboard/README.md) exposes
 live telemetry alongside recorded experiment, decision, gate and worker state.
-Historical simulation is the current execution priority; paper credentials will
-be configured locally later by the user.
+Historical simulation remains the execution priority. The first Alpaca profile
+already passed [dated read-only authentication](../authenticated-data/README.md);
+current entitlements, broker-order behavior and separate IBKR sign-in remain
+unverified. Follow the current plan's broker-specific readiness checks when that
+stage is selected; do not repeat authentication setup just because this older
+program originally listed it as pending.
 
 The [new historical simulation](../historical-simulation/README.md) completed six
 frozen SPY hourly scenarios across 104 sessions. From USD 100,000, stressed-cost

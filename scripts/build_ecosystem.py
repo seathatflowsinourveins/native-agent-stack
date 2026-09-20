@@ -180,7 +180,7 @@ def build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url):
                "accepted_references": sources(target.get("accepted_reference_paths", [])),
                "url": file_url(paths["trading_target"])}
     trading.pop("accepted_reference_paths", None)
-    for key in ("north_star", "foundation_catalog"):
+    for key in ("north_star", "foundation_catalog", "acceptance_plan"):
         if target.get(key):
             trading[key + "_source"] = sources([target[key]])[0]
     return {"foundation": foundation, "trading": trading}

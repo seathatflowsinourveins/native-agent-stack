@@ -63,14 +63,17 @@ The later [current-task receipt](../../evidence/receipts/native-tavily-session-2
 records eight host-supplied skill entries and actual Search/Extract skill use in
 the Desktop task, retaining a broad-search miss and useful direct extraction.
 
-The three current priorities are:
+The three tracked foundation priorities are:
 
 1. Keep general capabilities and financial-domain decisions separate, with
    explicit claim scope. This catalog addresses that structure; maintain the
    references when evidence changes rather than migrating the broad inventory.
-2. Complete crash descendant containment after the recorded same-child cancellation
-   and crash continuation. The new fixture retained one checkpoint and final effect,
-   but needed explicit supervisor cleanup for a surviving wait.
+2. Preserve the accepted inherited-tool worker recovery scope. The
+   [combined native receipt](../../evidence/receipts/native-worker-cgroup-20260920.json)
+   records same-child continuation, automatic systemd descendant cleanup after
+   a forced parent-runtime crash, one unchanged checkpoint and one final effect.
+   The earlier manual-cleanup and refused-role trials remain recorded failures;
+   this WSL fixture does not establish whole-host or remote-provider recovery.
 3. Qualify independent off-host restore with separately available key recovery,
    and scheduled-service acceptance after reboot. Same-host restore and ordinary
    stop/start do not close these gaps.

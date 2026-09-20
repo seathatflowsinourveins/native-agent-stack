@@ -43,10 +43,10 @@ uses retained SEC sources and LEAN corporate-action data. One additional catalog
 identity, pandas-datareader, is explicitly omitted as an equity-data shortcut;
 catalog growth does not imply installation.
 
-The [latest convergence program](../../blueprints/us-equities/convergence-program/README.md)
-adds 36 bounded decisions across foundation, trading/data and hosting, with two
+The [recorded convergence program](../../blueprints/us-equities/convergence-program/README.md)
+retains 36 bounded decisions across foundation, trading/data and hosting, with two
 challenge rounds per matrix. Its [coverage map](../../blueprints/us-equities/convergence-program/coverage.md)
-states the current defaults and open requirements. Native historical simulation
+relates the dated acceptance to current selections and open requirements. Native historical simulation
 results and the grand dashboard are linked separately from source-only candidates.
 
 The [next simulation/SEC wave](../../blueprints/us-equities/simulation-research/README.md)

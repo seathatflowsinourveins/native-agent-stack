@@ -1929,6 +1929,23 @@
         "No provider usage, per-skill performance comparison or lifetime token-saving counter is claimed."
       ],
       "path": "evidence/receipts/native-tavily-session-20260920.json"
+    },
+    {
+      "id": "native-worker-cgroup-20260920",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "systemd"
+      ],
+      "claim": "One native inherited-tool child completed cancellation, same-child continuation, abrupt parent-runtime failure, automatic systemd descendant cleanup and same-parent/same-child finalization with an unchanged checkpoint and one local effect.",
+      "limitations": [
+        "One synthetic local task on this WSL host; not general worker reliability or an OS sandbox.",
+        "Not host/user-manager crash, independent-host recovery, remote provider cancellation, cessation of billing or distributed exactly-once effects.",
+        "Restricted Bash-only role incompatibility and every original failure remain retained; only this inherited role is accepted.",
+        "The successful run did not request ls, so the exact rewrite permission diagnosis is deterministic evidence rather than an exercised native approval success.",
+        "Native usage views overlap; initial SIGKILL has no terminal record. Complete parent/child/retry usage, billing and savings remain unknown."
+      ],
+      "path": "evidence/receipts/native-worker-cgroup-20260920.json"
     }
   ],
   "files": [
@@ -2004,8 +2021,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "bytes": 14910,
-      "sha256": "7c5f80e7c6e40431829c069bbeecc6a399d77208add0a06674e900783b856f16"
+      "bytes": 14868,
+      "sha256": "ba6087d3d6dbe6d6f34a9c7f0de2b3cea00d87fba8bcd25b0fda2954067cf69f"
     },
     {
       "path": "adoption/paired/README.md",
@@ -3435,13 +3452,13 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "b4e3407c30be9c5e39b612493a41f083bec89bafdc2e4f215023d4a87fb0cc3e",
-      "bytes": 396074
+      "sha256": "045e50230b37a538dc0e2d6e1bca8c88cc4b0bde87763a26f3fe71f5f17c498e",
+      "bytes": 397286
     },
     {
       "path": "blueprints/us-equities/README.md",
-      "sha256": "268f4d9e91d250177ed27324ea09e84149ece10a575c4102522b70f7bb26045d",
-      "bytes": 8344
+      "sha256": "c96eac4c51466043a7091d464262afa96f6cda1dffda754b22d1545f13cb7314",
+      "bytes": 9946
     },
     {
       "path": "blueprints/us-equities/acceptance-wave/README.md",
@@ -3480,8 +3497,8 @@
     },
     {
       "path": "blueprints/us-equities/architecture/README.md",
-      "sha256": "f3d659b54386c89c08b6bb92bfdcac508e43903989ea0d8cfdabf0eb1b8a5025",
-      "bytes": 14555
+      "sha256": "0eef5b253a2753f81eb88b998b887acf42e6cc92de28d863319895d25b4d3f56",
+      "bytes": 16417
     },
     {
       "path": "blueprints/us-equities/architecture/alpaca-probe.json",
@@ -3685,8 +3702,8 @@
     },
     {
       "path": "blueprints/us-equities/convergence-program/README.md",
-      "sha256": "7d760175397e417b807fa664c352773b260aa7b937a7b87e87a72375b4994927",
-      "bytes": 3273
+      "sha256": "6bac03b29e8740dd0d8231266cc8f0bf87b9194f4fd162163e9c09ef450c772a",
+      "bytes": 3994
     },
     {
       "path": "blueprints/us-equities/convergence-program/astra.report.json",
@@ -3700,8 +3717,8 @@
     },
     {
       "path": "blueprints/us-equities/convergence-program/coverage.md",
-      "sha256": "64ed61b784d9b713c493d786ce8614027b7a52970f566d577e174300a6108156",
-      "bytes": 3786
+      "sha256": "37e5f253020df450d27f8bef8e6938b48733bace3a15cbc6a9c0a18a227769ba",
+      "bytes": 4854
     },
     {
       "path": "blueprints/us-equities/convergence-program/plan.json",
@@ -4055,8 +4072,8 @@
     },
     {
       "path": "blueprints/us-equities/harness-contract.json",
-      "sha256": "dee5819f5e20e7a322b12c29a4c40922a5be831f19a57d4bab5aab6c566aa56d",
-      "bytes": 3091
+      "sha256": "731b37b3e674ec4c6b45bdd59a7c0d6392b4d33d8ef682f15f9826277facd09b",
+      "bytes": 4357
     },
     {
       "path": "blueprints/us-equities/historical-simulation/HistoricalSimulationAlgorithm.cs",
@@ -4245,8 +4262,8 @@
     },
     {
       "path": "blueprints/us-equities/north-star.md",
-      "sha256": "b63cd6ce493983ebc47deb7216ef811b0646c52837655e99df031548c8193eeb",
-      "bytes": 11813
+      "sha256": "240fe1070c49c61bcb36508a8677b76b0572978b79d760c3bf376f87eb6047b2",
+      "bytes": 12350
     },
     {
       "path": "blueprints/us-equities/order-contract/README.md",
@@ -4725,8 +4742,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "1f4757134e778a3087b5d7ab785085efe25530e0a2d51b36ad587a5d1bd668c2",
-      "bytes": 13722
+      "sha256": "83e1a3fefe73a9a0d0f2d452188b12d0dd3564a3dbd2e546a7a204e8ce4ff4dd",
+      "bytes": 14080
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -4740,8 +4757,8 @@
     },
     {
       "path": "catalogs/us-equities/architecture/README.md",
-      "sha256": "195f642f0c217827c5b7d296416f0778212486cd192a27e519bf89fa6e81d633",
-      "bytes": 6518
+      "sha256": "d85cc452c869f7820a74d56050d0eeaaacfc0048964983e6162e307009896693",
+      "bytes": 6942
     },
     {
       "path": "catalogs/us-equities/architecture/alpaca-organization.json",
@@ -5035,8 +5052,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "0f50b811b07db53e5094a29229c020f25bda5ab0ab75d38456eaef585ffa3da4",
-      "bytes": 3691295
+      "sha256": "0f13a35d10e62434822fcf341e10346e77051104016413fe3f1af5aa42dd4a28",
+      "bytes": 3701760
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5065,8 +5082,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "10a913d9c300c3b2092cbc52eff4ae054a87fb6cc2e1eaa2464cf93744e8df29",
-      "bytes": 76228
+      "sha256": "4ae02aaa971508447b9ac5717c6c1dab431d0812dd84285c067f5eeb93bb4bdb",
+      "bytes": 76385
     },
     {
       "path": "docs/evidence.md",
@@ -5550,8 +5567,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 74729,
-      "sha256": "c1fe97b9867bcfe926e6b27eb20121332e79b82fc2a77a1e50d0fbb8d71d7710"
+      "bytes": 74811,
+      "sha256": "a8c97d8b2cc1f99a3d5f5b0e0165680131bd287c5b632812be1697b3ddc3eced"
     },
     {
       "path": "observability/README.md",
@@ -5740,8 +5757,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "988b8103e63714a1669878524a6c5bd89e8987bceb96622a1301aec79316ee1a",
-      "bytes": 29449
+      "sha256": "0820d962351dbe74bac7dbbe4477e5b45794117c1ef6fe717bab57e629aaf082",
+      "bytes": 29468
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -5850,8 +5867,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "b1a46cd1f3076da054bf0ad87db08a6f0c11d72674206e8b6edd5d54886d026b",
-      "bytes": 31898
+      "sha256": "37724bcdbd6d0d064896a2ccdb153b0dd309f905069fdde94781f661721a7323",
+      "bytes": 32740
     },
     {
       "path": "tests/test_execution_realism.py",
@@ -6020,8 +6037,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/README.md",
-      "sha256": "659edadf891429c123d43b54c5330b5fa6951c2f68af1ea6fe11f64ec4486f0e",
-      "bytes": 4189
+      "sha256": "7009cf85f1166d58e21f65ad93d6929b65eecd9d5cb46b5d70854b04672ad64a",
+      "bytes": 4309
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/observe_quickstart.py",
@@ -6035,28 +6052,28 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "6398b7f71042faecead5117f3709809e42268c7a8324cf155268254572118fac",
-      "bytes": 6535
+      "sha256": "ba563618533a3bdfd4be96eff48691f8d8a736b3443187ee21910888efaac038",
+      "bytes": 6788
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "35228ef589e82d266d32a4903028c80debd8e591eb790d732e83587b377812ca",
-      "bytes": 95767
+      "sha256": "b060fab3bc669bd0fbc0033b88926a5e8e6b327dbac2c2bd7550fe8aad51cb96",
+      "bytes": 96428
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "1901931828b3f32508294b853ddfe053a47c0d12b37abe0cf34af23412058440",
-      "bytes": 16764
+      "sha256": "7e7a3b091b6e10d56b4c67526be3eac9c3a78210082ae7a373886e9db4cf55e6",
+      "bytes": 16695
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "72c3afc2475e2c202d9a75213554ecbc325ce7087a0c04f87d8fecab095f89a1",
-      "bytes": 5640
+      "sha256": "2fea7b737a3b9f18be5e2717e3bfbfed27c8b20fa79a25d54fa041bb43e360b7",
+      "bytes": 6025
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "3c03839c02adba85ca184d39d3180c94b5f10002a0fe1193ed232780e5b48b20",
-      "bytes": 5613
+      "sha256": "18e77aff133b5dc47506d3d20bff9ea9ea9f8efc4c60eb1e8dbe8cb2b56c64f2",
+      "bytes": 5809
     },
     {
       "path": "evidence/receipts/native-harness-defaults-20260920.json",
@@ -6070,18 +6087,18 @@
     },
     {
       "path": "scripts/validate_foundation.py",
-      "sha256": "0edc63d9364543f07f20587802f6d813fe86e946a7ee7bf8a349803eb59111a9",
-      "bytes": 15299
+      "sha256": "fdf2386935c8297d919feb282aa6e21d59c735ad45b5f55392e98897a3c9189e",
+      "bytes": 15321
     },
     {
       "path": "tests/test_foundation_catalog.py",
-      "sha256": "db733637abda822a8ec846794ec18b333abe20e03a1866b4b0565f8528a9ff0b",
-      "bytes": 11296
+      "sha256": "b2623dea825017638d2a17a506b32fc10e77fd9fd4096f83a84691c824859de6",
+      "bytes": 11725
     },
     {
       "path": "blueprints/convergence-practice/worker-recovery/README.md",
-      "sha256": "79cc97216a288268e4956823b26722a5dff00ac842163fc7460eed53d5e1c872",
-      "bytes": 9530
+      "sha256": "baa312ed72f0217295dd6ac17ad6790b6608bae34d3bd5b10c30bb7818271c30",
+      "bytes": 15544
     },
     {
       "path": "blueprints/convergence-practice/worker-recovery/accepted/actions.jsonl",
@@ -6155,8 +6172,8 @@
     },
     {
       "path": "blueprints/convergence-practice/worker-recovery/run.py",
-      "sha256": "a1d2fd6033bc49cae83e024bd23504fa0afc9fdc0011ca0323735472b5aa672d",
-      "bytes": 15128
+      "sha256": "c3c463f45dd55b024ad558bb9e15c0c789665fce3e165069f2569bf2f3a2b5dd",
+      "bytes": 17747
     },
     {
       "path": "blueprints/convergence-practice/worker-recovery/source-review.json",
@@ -6180,8 +6197,8 @@
     },
     {
       "path": "tests/test_worker_recovery.py",
-      "sha256": "61fade1a8307e0ab5d955bd32227bccbd8c863df819d49c1359b901e94fd93ca",
-      "bytes": 6867
+      "sha256": "a72811afe7e61c1ba433e9ff29be61066e5983027b3fca14a039a1247ec6e946",
+      "bytes": 11205
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
@@ -6265,8 +6282,8 @@
     },
     {
       "path": "docs/restricted-worker-compatibility.md",
-      "sha256": "dadf3a3adc8bcc623d5e9ef431daa791d7648e79280a4763dcac634f3691a7dd",
-      "bytes": 2367
+      "sha256": "aac2349d063fffcf90c5dba0cbce89741962b41279a7b07d1453f0c261242954",
+      "bytes": 4106
     },
     {
       "path": "docs/catalog-retrieval.md",
@@ -6282,6 +6299,121 @@
       "path": "evidence/receipts/native-tavily-session-20260920.json",
       "sha256": "ab75fcf6ed4f5b7cbf9169b4da31c6476dd17e5960d390f39a898fb449cfe8ec",
       "bytes": 5208
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/accepted-inherited/actions.jsonl",
+      "sha256": "498d1d6b788c82fa4bfb28bb96a56a1af6b906355d416b75220db2ddfe3e4e37",
+      "bytes": 99
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/accepted-inherited/checkpoint.json",
+      "sha256": "55bff20c10c5625554ca7b553ecc8ffe0557592135463d331469c208d855167c",
+      "bytes": 29
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/accepted-inherited/final.json",
+      "sha256": "b00398342db51dd3aa75cff5dd9f7768418af09b9b3b03f799d21093cb0dc238",
+      "bytes": 134
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/executed-exact-read-audit.py.txt",
+      "sha256": "a0063d35b3dc740d37579b2b853778cd21370c6cc35baf6e23cb24a2debc2687",
+      "bytes": 17038
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/executed-inherited-audit.py.txt",
+      "sha256": "5f357f5f14446729cf3fc375984e564fbd59522014b75b36178e4e928948b073",
+      "bytes": 11104
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/executed-inherited-runner.py.txt",
+      "sha256": "db0d0f9330cdeb286103f4cf05451523dc6ff0bd63352d4a5545f9d84085945d",
+      "bytes": 17068
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/executed-inherited-test-oracle.py.txt",
+      "sha256": "5439474997cc86f710a6d0b2838b589376d3a629f99dc282b4a2267f79d96093",
+      "bytes": 10324
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/native-exact-read-freeze.json",
+      "sha256": "5527ae3812ea33fcbb665bd7435361fd3570ac2f5da8ba291b99f4ad68792dce",
+      "bytes": 1206
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/native-exact-read-independent-audit.json",
+      "sha256": "20d72a72d1a60a8a09c5b16a294941444ca777c5a0c6402ccdca5c8b09efbbc9",
+      "bytes": 7836
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/native-exact-read-plan.json",
+      "sha256": "7fcd57132b6fc5a20d15b2e0f49b7b268969046d96aff334fea23224753a769b",
+      "bytes": 2452
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/native-exact-read-receipt.json",
+      "sha256": "77e865d9c9618ae1fea0ed68dbe172136131ec8a681bf384df3906f4d184e40d",
+      "bytes": 5939
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/native-exact-read-recorder-outcome.json",
+      "sha256": "2b3e4fedad15229a2dca2a5b5217603b24db73bd15be0c230d24f838b9d1afc1",
+      "bytes": 6275
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/native-inherited-freeze.json",
+      "sha256": "9fe88a3d372aa420eb7c394ceacc546766963e4835549c735f3f5cf4b891ec71",
+      "bytes": 1103
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/native-inherited-independent-audit.json",
+      "sha256": "1ad9ff456f8ee6ea04ca7e1304b1c78c328100e3cce9240f810f8a4ca72a6619",
+      "bytes": 1758
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/native-inherited-receipt.json",
+      "sha256": "5dd0bfa425857ac73b17d0a9868b0fb6152c3ac5420ef80d1366d386cf016eff",
+      "bytes": 2953
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/native-inherited-recorder-outcome.json",
+      "sha256": "b4527b684b73a376f8d6499118f7eb5b22e02623a66965b544be44dfc0085a52",
+      "bytes": 1682
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/native-plan.json",
+      "sha256": "9399e234d0da613c65d00a0395f56245498993f7c0c0cbf48442196926a95b9e",
+      "bytes": 3156
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/native-prompt.txt",
+      "sha256": "5d73688c5ffe9e2973a4b28de03c6c004ee65cb3736a6b9c6e6d0b2b79b8bc1d",
+      "bytes": 2419
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/native-rewrite-diagnosis.json",
+      "sha256": "1ee43000c5041b751590d103720cf7ef967b34df7f3bf5f49265ae94a1fe869d",
+      "bytes": 2340
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/native-role.json",
+      "sha256": "f42b9cf64a365092cc63c08d874ddeb7a5d75e98ff37715b438871fcade4ea14",
+      "bytes": 2264
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/native_audit.py",
+      "sha256": "ebbba4c062d7a8e3f6f4bfbbc97b92fce2ec1bc731fe6191d902f58f58c85520",
+      "bytes": 17849
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/acceptance-plan.md",
+      "sha256": "311e97e678d10dd7399182a4ed300be473f245a5f9c2b63d3eefb740960587c4",
+      "bytes": 18463
+    },
+    {
+      "path": "evidence/receipts/native-worker-cgroup-20260920.json",
+      "sha256": "6f378629b2e631e205bf449c923aa8d1fb20d0010f02e5aa2a1bdbf85104b2a5",
+      "bytes": 3600
     }
   ],
   "convergence_records": [
