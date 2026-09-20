@@ -1,0 +1,43 @@
+{
+  "kind": "build_preflight_failures_and_limits",
+  "latest_component_retained": "Poppler 26.09.0",
+  "native_extraction_attempts": 1,
+  "entries": [
+    {
+      "stage": "PyPI CMake 4.4.3 from hashed wheel under Documents",
+      "outcome": "Initial configure blocked before output; isolated --version timed out after 10s. Owned process terminated.",
+      "diagnostic": "Owned process sample showed macOS path normalization waiting in open(O_SYMLINK | O_RDONLY). Exact underlying OS cause is unknown.",
+      "evidence": "Private process sample and logs retained; no personal paths/process IDs published."
+    },
+    {
+      "stage": "Same-version Kitware official binary under Documents",
+      "outcome": "--version timed out at 10s, including clean environment and alternate cwd; no security overrides or version change."
+    },
+    {
+      "stage": "Same verified Kitware binary copied with ditto outside Documents",
+      "outcome": "--version returned 4.4.3 immediately; the executable hash was identical before/after. Source and dependencies built in this separate location.",
+      "limit": "Demonstrates this location workaround on the observed host; not a general macOS permission diagnosis or fix."
+    },
+    {
+      "stage": "Initial source configure with PkgConfig disabled",
+      "outcome": "Exit 1: upstream unconditionally calls pkg_check_modules for optional poppler-data. Fixed by explicit pinned pkgconf executable; no source patch."
+    },
+    {
+      "stage": "Native extraction build",
+      "outcome": "Configure/build passed after that supported correction. No poppler upstream test corpus was present; its broad upstream test suite was not run. Compiler emitted existing deprecation warnings. Optional codec/font/network/signature features remain disabled."
+    },
+    {
+      "stage": "PDF visual rendering",
+      "outcome": "Bundled Poppler 26.05 renderer warned about missing default Fontconfig configuration; all 3 rendered pages were visually inspected and were legible with clean layout."
+    },
+    {
+      "stage": "Native invalid PDF negative",
+      "outcome": "Expected nonzero refusal and zero output; retained in accepted receipt. This is an acceptance negative, not a pipeline regression."
+    }
+  ],
+  "metadata_refusals": [
+    "A maintainer GitHub mirror tag lookup returned 404; official release source/checksum was used.",
+    "A PyPI lookup for a maintained alternative CMake branch returned 404; no package was installed. The latest version ultimately worked outside Documents."
+  ],
+  "security_verification": "Source SHA-256 matched the independent Homebrew formula checksum. Kitware release asset digest and PyPI package hashes verified. Poppler detached signature was not verified. No xattr removal, signature override or global permission change."
+}

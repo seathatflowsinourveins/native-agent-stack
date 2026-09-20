@@ -1,0 +1,23 @@
+{
+  "kind": "bounded_document_ingestion_qualification",
+  "attempt": 1,
+  "baseline_revision": "9b7b5d94cb082b78706c59e203250a4f4c8f4061",
+  "selected_runtime": "Poppler 26.09.0 native pdftotext -bbox-layout -enc UTF-8",
+  "corpus": "Two explicitly permitted documents, three pages; original table/text packet plus W3C format smoke fixture. No private ingestion.",
+  "predeclared_checks": [
+    "exact per-page normalized text in visual reading order",
+    "all table headers and 24 data cells match",
+    "all eight positive retrieval records have correct document/page/hash/bounds",
+    "all four explicit absent-answer cases return zero records",
+    "excerpts <=240 characters and max 3 records",
+    "input hash mismatch refuses before native command",
+    "non-PDF file native command returns failure and no indexed text"
+  ],
+  "evidence_class": "native_cli_execution",
+  "limits": [
+    "Born-digital Latin text; manually declared table regions/columns; no table detector or OCR",
+    "Deterministic lexical phrase retrieval, not semantic question answering",
+    "PDF render uses existing bundled Poppler 26.05.0 for visual QA only",
+    "No model, embedding, provider or memory service calls; no token savings claim"
+  ]
+}
