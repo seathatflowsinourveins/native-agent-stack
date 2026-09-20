@@ -3,11 +3,11 @@
 Recorded September 20, 2026. Read this guide on demand when selecting a context
 lane, interpreting native counters, or designing a measured comparison.
 
-The current selection has **56 component records**. The broader catalog has
-**505 repository identities: 342 public stars and 163 beyond stars, with 1,054
+The current selection has **57 component records**. The broader catalog has
+**505 repository identities: 342 public stars and 163 beyond stars, with 1,056
 typed references**. The earlier audit retains its 52-component scope, and the
 full-catalog TOON receipt retains the 502-repository input actually measured.
-These are bounded catalog counts, not a universal ranking, 56 successful full
+These are bounded catalog counts, not a universal ranking, 57 successful full
 E2E runs, or savings from every repository. Supporting runtimes and historical
 alternative installations retain separate scope.
 
@@ -162,8 +162,10 @@ configured; current Codex practice uses explicit RTK commands. A stale trust ent
 for an absent hook file does not activate it. Per-client hook inventories should
 respect disabled-hook flags and retain unobserved lifecycle paths.
 
-Only RTK, Context Mode and Headroom expose verified native savings-history
-reports in the selected stack. TOON has per-conversion statistics; usage and
+RTK, Context Mode, Headroom and the newly adopted jCodeMunch expose native savings-history
+estimates with different retention and counting rules. jCodeMunch includes repeated
+reads and uses bytes/4; its schema estimate is payload size, not per-request savings.
+TOON has per-conversion statistics; usage and
 telemetry tools report consumption or state. Keep every catalog repository's
 adoption and baseline availability explicit, with unknown values left null.
 Run role-specific acceptance where applicable; guidance and research catalog
@@ -171,6 +173,22 @@ entries are not implied executable deployments. Preserve failed quality gates
 when importing new matched-task or retrieval evaluations.
 
 ## Coverage and future acceptance
+
+The [57-component saturation matrix](token-native-saturation.md) links each
+selected role to installation, integration, functional and lifecycle evidence.
+The focus wave added exact jCodeMunch retrieval, direct upstream Headroom MCP,
+both-native-client project-file/symbol acceptance and explicit sandbox network
+allow/deny fixtures. The [native client receipt](../evidence/receipts/native-token-focus-clients-20260920.json)
+records 101,605 consumed Codex tokens and 151,528 consumed Claude tokens, with
+cache/reasoning subset rules retained. They are acceptance costs, not savings.
+
+jCodeMunch's complete search/source sequence used 861 tokens versus a 5,476-token
+whole file, but exceeded an existing 601-token focused extraction. Headroom's
+direct summary used 19,714 versus 36,625 tokens with exact original recovery
+available; its separate guarded log fixture used 191 versus 26,529 tokens.
+Keep these accepted artifact comparisons and native repeated-use estimates
+separate from all lifetime provider claims. The [upstream recipes](../recipes/README.md)
+show actual install, registration, retrieval and stats commands for future PCs.
 
 ### Supplemental native adoption on September 20
 

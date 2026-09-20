@@ -55,7 +55,13 @@
     "current_native_child_acceptance": "blueprints/convergence-practice/native-worker/receipt.json",
     "current_supplemental_native_tools": "evidence/receipts/upstream-native-tools-20260920.json",
     "current_memory_maintenance": "evidence/receipts/native-ai-memory-maintenance-20260920.json",
-    "current_native_workflow_analyzer": "evidence/receipts/native-linux-zizmor-20260920.json"
+    "current_native_workflow_analyzer": "evidence/receipts/native-linux-zizmor-20260920.json",
+    "current_token_saturation": "docs/token-native-saturation.md",
+    "current_token_saturation_matrix": "blueprints/token-native-focus/saturation-audit.json",
+    "current_headroom_mcp": "evidence/receipts/native-headroom-mcp-20260920.json",
+    "current_jcodemunch": "evidence/receipts/native-jcodemunch-20260920.json",
+    "current_native_token_clients": "evidence/receipts/native-token-focus-clients-20260920.json",
+    "current_native_sandbox_network": "evidence/receipts/native-sandbox-network-20260920.json"
   },
   "recipe_map": {
     "affaan-m/ECC": "recipes/README.md",
@@ -113,7 +119,8 @@
     "zizmor": "blueprints/convergence-practice/ci-security/README.md",
     "beads": "recipes/README.md",
     "skills-ref": "recipes/README.md",
-    "otel-tui": "recipes/README.md"
+    "otel-tui": "recipes/README.md",
+    "jcodemunch-mcp": "recipes/README.md"
   },
   "profiles": [
     {

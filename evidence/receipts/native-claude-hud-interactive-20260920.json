@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "id": "native-claude-hud-interactive-20260920",
+  "kind": "compatibility_attempt",
+  "recorded_at_utc": "2026-09-20T05:46:12.429Z",
+  "component_ids": [
+    "claude-hud"
+  ],
+  "claim": "A bounded real native Claude terminal launch reached onboarding before the conversation UI, so configured interactive HUD rendering remains unverified despite existing native authentication.",
+  "limitations": [
+    "The earlier synthetic HUD renderer acceptance remains valid only for its fixture; it is not live interactive rendering.",
+    "No model prompt, login route, account action, permission override, model change or statusLine change was used to bypass onboarding.",
+    "This is an unresolved interactive boundary, not an installation failure or a successful live HUD claim."
+  ],
+  "data": {
+    "status": "interactive_onboarding_blocked",
+    "native_claude_version": "2.1.278",
+    "terminal_size": {
+      "rows": 36,
+      "columns": 130
+    },
+    "deadline_seconds": 55,
+    "observed": [
+      "Native welcome rendered",
+      "Existing selected Dark theme accepted",
+      "Login-method onboarding appeared before conversation UI"
+    ],
+    "native_auth_ready": true,
+    "hud_observed": false,
+    "model_prompts_submitted": 0,
+    "login_route_selected": false,
+    "account_actions_performed": false,
+    "cleanup": {
+      "control_c_sent": true,
+      "recorder_inner_exit": 0,
+      "outer_timeout_exit": 124,
+      "owned_launcher_and_recorder_remaining": false
+    },
+    "exact_causal_lifetime_provider_tokens_saved": null
+  }
+}

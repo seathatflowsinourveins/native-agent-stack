@@ -1167,6 +1167,110 @@
         "Earlier Mac and disposable GitHub CI acceptance receipts retain their original host scope.",
         "No provider task was run and zizmor supplies no verified lifetime token-savings counter."
       ]
+    },
+    {
+      "id": "token-native-retained-functional-20260920",
+      "path": "evidence/receipts/token-native-retained-functional-20260920.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "context-hub",
+        "headroom",
+        "mcp-inspector",
+        "promptfoo",
+        "worktrunk"
+      ],
+      "claim": "Previously executed native functional operations are now linked to selected components: Context Hub search/retrieval, Inspector stdio arithmetic, deterministic promptfoo evaluation, Worktrunk disposable worktree lifecycle and a local guard using upstream Headroom APIs.",
+      "limitations": [
+        "Retrospective publication of retained September 20 evidence; these operations were not rerun by this documentation update.",
+        "The source summary and private raw operation captures were retained and reviewed on the original host. Their public hashes bind the source but do not let CI reproduce unpublished raw data.",
+        "Headroom was exercised through a local guarded adapter to upstream APIs, not a direct upstream compression CLI or provider proxy; no native client configuration changed.",
+        "Inspector launched the pinned npm Context Mode CLI for arithmetic only. It does not certify the complete client plugin, hooks, project-file scope or current desktop connection.",
+        "promptfoo used a local echo provider with two assertions and zero model tokens, not an external model evaluation. Worktrunk operated only in a disposable repository with hooks disabled.",
+        "Context Hub candidate output grew by 85 tokens for the retained query. These per-artifact comparisons are not cumulative or causal provider savings; exact lifetime provider savings remain null."
+      ]
+    },
+    {
+      "id": "native-jcodemunch-20260920",
+      "path": "evidence/receipts/native-jcodemunch-20260920.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "jcodemunch-mcp"
+      ],
+      "claim": "Official jCodeMunch 1.108.319 installed and a deliberately scoped local code index returned the exact requested function; the complete search-plus-source response was measured against both whole-file and existing focused-source baselines.",
+      "limitations": [
+        "Single bounded code-reading task, not a native provider A/B trial.",
+        "Whole-file comparison is beneficial; focused existing source extraction is cheaper for this known symbol, shown separately.",
+        "Lifetime upstream estimate includes repeat validation calls and must not be deduplicated into causal lifetime provider savings.",
+        "receipt CLI explicitly scanned only an empty owned transcript directory; no historical client transcript traversal.",
+        "No client hooks, paid models, cloud keys, watchers or automatic index expansion enabled.",
+        "Upstream dual-use license retained; this acceptance does not establish eligibility for commercial deployment.",
+        "Native client registration and later provider task acceptance are separate evidence; these direct MCP operations do not establish both-client task acceptance."
+      ]
+    },
+    {
+      "id": "native-headroom-mcp-20260920",
+      "path": "evidence/receipts/native-headroom-mcp-20260920.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "headroom"
+      ],
+      "claim": "Official Headroom 0.37.0 MCP extra installed in an isolated Python 3.13 tool environment; direct compression, exact retrieval and scoped native statistics passed on owned synthetic artifacts while the prior exact-recovery guard remained available.",
+      "limitations": [
+        "Owned synthetic acceptance artifacts demonstrate artifact reduction, not lifetime production or provider-token savings",
+        "MCP summary is not a lossless replacement of the original; its exact full retrieval consumes the original token count",
+        "Upstream Headroom CLI has no compress subcommand; on-demand compression/retrieval is exposed through MCP or SDK",
+        "No automatic agent-traffic interception was configured",
+        "Global native upstream savings ledger remains0; isolated fixture ledger is not merged into it",
+        "No new provider task or automatic native-client traffic interception is established by this direct MCP fixture."
+      ]
+    },
+    {
+      "id": "native-token-focus-clients-20260920",
+      "path": "evidence/receipts/native-token-focus-clients-20260920.json",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "context-mode",
+        "jcodemunch-mcp"
+      ],
+      "claim": "One bounded task in each signed-in native client successfully read a project document through Context Mode and retrieved the exact selected implementation through jCodeMunch; all six selected MCP calls completed.",
+      "limitations": [
+        "Existing Desktop process retains its original loaded MCP connection; fresh native Codex verifies corrected project scope.",
+        "Only selected MCP actions exercised; lifecycle compaction and interactive HUD are separate.",
+        "Native usage includes prompts, tool schemas, cache reads and reasoning; it is consumed usage, not avoided lifetime tokens.",
+        "This is functional integration acceptance with normal configured clients, not a randomized or matched token-savings A/B comparison.",
+        "Raw private prompts, client streams, account identifiers and host paths are not published."
+      ]
+    },
+    {
+      "id": "native-sandbox-network-20260920",
+      "path": "evidence/receipts/native-sandbox-network-20260920.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "sandbox-runtime"
+      ],
+      "claim": "Native sandbox-runtime 0.0.77 allowed one configured loopback HTTP request and blocked both explicit-deny and empty-allowlist requests before they reached the owned fixture server.",
+      "limitations": [
+        "HTTP proxy path tested on this Linux/WSL host",
+        "Immediate client startup can race the upstream local proxy; the tested command uses bounded connection-refused retries",
+        "Does not establish TLS, SOCKS, DNS rebinding, IPv6, remote-host, or general sandbox-escape coverage",
+        "Bounded local proxy-policy acceptance, not a full security certification or proof that every native client command is sandboxed."
+      ]
+    },
+    {
+      "id": "native-claude-hud-interactive-20260920",
+      "path": "evidence/receipts/native-claude-hud-interactive-20260920.json",
+      "kind": "compatibility_attempt",
+      "component_ids": [
+        "claude-hud"
+      ],
+      "claim": "A bounded real native Claude terminal launch reached onboarding before the conversation UI, so configured interactive HUD rendering remains unverified despite existing native authentication.",
+      "limitations": [
+        "The earlier synthetic HUD renderer acceptance remains valid only for its fixture; it is not live interactive rendering.",
+        "No model prompt, login route, account action, permission override, model change or statusLine change was used to bypass onboarding.",
+        "This is an unresolved interactive boundary, not an installation failure or a successful live HUD claim."
+      ]
     }
   ],
   "files": [
@@ -1192,8 +1296,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "10523a601aac0bbd01180a73ab2b7650f289b25b78f2f07034bcbd8172ed634f",
-      "bytes": 6482
+      "sha256": "d5a3272caa23cbf8b2321f62ddbe9bd56fe8cbeb670ff97c1b673bc9ee39849c",
+      "bytes": 6764
     },
     {
       "path": "CLAUDE.md",
@@ -1207,8 +1311,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "54e1d4aeb234185222eed8dff3caa0958c14b3ba6259271a9b6b5d854d4c9381",
-      "bytes": 15156
+      "sha256": "c6767f4226ae44993e910f030ac43763132bc8eb5c11475fc2c4a61817c30046",
+      "bytes": 15253
     },
     {
       "path": "adoption/README.md",
@@ -1222,8 +1326,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "83527c9925c504a7988f681099610a369fc67424d157e10881171483f25c6702",
-      "bytes": 11571
+      "sha256": "37eea7f431d0f34897bd9c531522395aa7442b7ea6e3b6cd65314f6f8bf939d5",
+      "bytes": 12131
     },
     {
       "path": "adoption/paired/README.md",
@@ -2487,7 +2591,7 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "63097f101b52ccae8225e945d7595ecc68ce4a44838765f318a392670b17d3fc",
+      "sha256": "4f012ffd9426931513c2664b10b309c083b9581db3ac576b4fcf04ea9e88acf4",
       "bytes": 12889
     },
     {
@@ -2632,8 +2736,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "e8ea080c06968626db396c661c3de23ae6029ca5a2e94439e6a5b1e339127b1b",
-      "bytes": 383265
+      "sha256": "ef98f06356ef066c86536b737eb071045940c1acd764791536318633cce0bc94",
+      "bytes": 383954
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -2777,8 +2881,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "0fb1db299adfb581ae02141374517998e8a0266dfd4c570a7e14b2cb08082fb8",
-      "bytes": 1588108
+      "sha256": "341586f6b26a5c677124f6f75d9c4bf1806fedb905223e77ed655b26c85f46c0",
+      "bytes": 1608415
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -2817,8 +2921,8 @@
     },
     {
       "path": "docs/landscape.md",
-      "sha256": "0c52f493834a4bbd89edfcd95975bd822363c9c0f04c47637f5c7297289c9ff5",
-      "bytes": 8153
+      "sha256": "b9ae3b6c5cac6cf236600e8c33044670193c65ca492673f51333bee1c29cb67d",
+      "bytes": 8932
     },
     {
       "path": "docs/stack.md",
@@ -2827,8 +2931,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "714262f010864373d47e8708bd312efe55e1b9e196842beb30fdd573d9a813fb",
-      "bytes": 16706
+      "sha256": "999578b346c8d1d127d9d864b7db05437a984e18c3b4d499b4c96e57b4a4fbf3",
+      "bytes": 18002
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -3077,8 +3181,8 @@
     },
     {
       "path": "manifests/candidates.json",
-      "sha256": "9cbbaa0bc6e96f60e530aa3a51019005a028a1a796cecb41eb542dd588008e22",
-      "bytes": 24351
+      "sha256": "5b214b52322b6aaf3d6d63c28f2bded9f478534723ce5070454e739d8743b6e9",
+      "bytes": 25490
     },
     {
       "path": "manifests/landscape.json",
@@ -3087,8 +3191,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "13f16e0d9a390b2053d338431e7fe89b19c9fd027e40c9f161af5e75eff565e7",
-      "bytes": 56920
+      "sha256": "62e57cb4808ecddf52a8fdee03e580738373178a9f29d89886caa59cfea7887a",
+      "bytes": 58958
     },
     {
       "path": "observability/README.md",
@@ -3267,8 +3371,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "67f841e28eff962bb1a5fbaad183c9431d5cfda4cc07cc71f0c7cc4c99a929eb",
-      "bytes": 48783
+      "sha256": "fcfa16acf27029337561bfe4bc9767a44d2226bca148a634b41d9aa38fb9bc88",
+      "bytes": 55595
     },
     {
       "path": "scripts/adoption_status.py",
@@ -3794,6 +3898,46 @@
       "path": "evidence/receipts/native-linux-zizmor-20260920.json",
       "sha256": "88842d67b82948374f7e1fc2296be741c03aa38d986a2ae0421498d2751ba1a1",
       "bytes": 2465
+    },
+    {
+      "path": "evidence/receipts/token-native-retained-functional-20260920.json",
+      "sha256": "3d68bc99234035207d7b6b9b5a7161b53c9bf7ffd73366250f7ce65f9d183b91",
+      "bytes": 17135
+    },
+    {
+      "path": "evidence/receipts/native-jcodemunch-20260920.json",
+      "sha256": "2cfc81a26a8f126541a186a7f07c0bcb9cb903f64138d46d1f0029c26e8db83c",
+      "bytes": 5491
+    },
+    {
+      "path": "evidence/receipts/native-headroom-mcp-20260920.json",
+      "sha256": "28e71ba00f3306aff103f52f2f82fb711e2e1ef95d35cf718b0afe72ed144b2a",
+      "bytes": 2727
+    },
+    {
+      "path": "evidence/receipts/native-token-focus-clients-20260920.json",
+      "sha256": "bd101c71255fcee84fb2181604c101f3c2ade4e64a9801959071feaca89c2ee4",
+      "bytes": 3004
+    },
+    {
+      "path": "evidence/receipts/native-sandbox-network-20260920.json",
+      "sha256": "e934457a442f01bcf564fa1e37777f35e6a64eff0455c572efb382a6c652dd4b",
+      "bytes": 2504
+    },
+    {
+      "path": "evidence/receipts/native-claude-hud-interactive-20260920.json",
+      "sha256": "8df52f91877e20e0aa0672f463260e193e5ca33f730439a3d21286100a50853f",
+      "bytes": 1574
+    },
+    {
+      "path": "docs/token-native-saturation.md",
+      "sha256": "56e0de2c868297a60ae8c20a8a5c2735daa6f47454227b6a9986475f33b596b6",
+      "bytes": 9857
+    },
+    {
+      "path": "blueprints/token-native-focus/saturation-audit.json",
+      "sha256": "ad0ce02f022760aa44e902a87ae6a96d9c0a6a0bfa13b3172c7c51cfb36b58fa",
+      "bytes": 177474
     }
   ]
 }

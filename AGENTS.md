@@ -14,6 +14,11 @@ counter scopes and measured comparisons. Do not rerun the full audit or model
 trials at startup. Never sum cumulative snapshots, overlapping artifact reductions
 or provider/cache subset counters.
 
+For a concrete native tool gap, consult docs/token-native-saturation.md and its
+component matrix; reuse matching acceptance and run only the missing check.
+The complete repository research catalog is not an instruction to install every
+alternative or start every optional service.
+
 Use upstream executables and supported integration formats. Keep client accounts, model routes, native caching and tool discovery intact. Load detailed guides only for the current task. Run the repository validation command before committing changed evidence or manifests. Do not fetch private state or authentication stores.
 
 One coordinator integrates. Writing workers need separate worktrees and bounded file ownership. Evidence belongs in compact sanitized receipts; no raw conversations, tokens, personal paths or machine-specific active client configuration.
