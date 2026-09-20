@@ -1,0 +1,7 @@
+*.gguf
+*.tar.gz
+*.part
+*.private.*
+downloads/
+runtime/
+licenses/

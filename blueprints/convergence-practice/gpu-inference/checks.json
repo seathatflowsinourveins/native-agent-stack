@@ -1,0 +1,11 @@
+{
+  "exit_code": 0,
+  "source_sha256": "53a2c5b34dd5265561741bab8fb27330951c39897ade398425aeb20f45d3f413",
+  "oracle_sha256": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937",
+  "test_output_sha256": "5b7d9978947acc47b15c516090444a9e74ac7fe5439aa56ab46da8f8cd3855fc",
+  "cpu_seconds_limit": 5,
+  "address_space_mib_limit": 512,
+  "wall_seconds_limit": 15,
+  "source_review_before_execution": true,
+  "isolation": "fresh owned directory, minimal environment, isolated Python and resource limits; not an OS security sandbox"
+}
