@@ -32,14 +32,21 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Create an owned traversable root for public CI inputs and reports
+        run: |
+          umask 022
+          foundation_root=$(mktemp --directory /tmp/native-foundation-e2e.XXXXXX)
+          chmod 0755 -- "$foundation_root"
+          mkdir --mode=0755 -- "$foundation_root/reports"
+          printf 'NATIVE_FOUNDATION_ROOT=%s\n' "$foundation_root" >> "$GITHUB_ENV"
       - name: Check independent verification failure modes
         run: |
-          mkdir -p "$RUNNER_TEMP/native-foundation-e2e"
           python3 -m unittest tests.test_native_nautilus_ci -v 2>&1 \
-            | tee "$RUNNER_TEMP/native-foundation-e2e/checks.txt"
+            | tee "$NATIVE_FOUNDATION_ROOT/reports/checks.txt"
       - name: Prepare native CPython and mandatory namespace isolation
         run: |
-          output="$RUNNER_TEMP/native-foundation-e2e"
+          umask 022
+          output="$NATIVE_FOUNDATION_ROOT/reports"
           sudo apt-get update 2>&1 | tee "$output/apt-update.txt"
           sudo apt-get install --yes --no-install-recommends bubblewrap python3.12-venv \
             2>&1 | tee "$output/apt-install.txt"
@@ -47,28 +54,30 @@ jobs:
           bwrap --version >"$output/bubblewrap-version.txt"
           ldd --version >"$output/glibc-version.txt"
           readlink /proc/self/ns/net >"$output/host-network-namespace.txt"
-          python3.12 -m venv "$RUNNER_TEMP/nautilus-ci-env"
+          python3.12 -m venv "$NATIVE_FOUNDATION_ROOT/venv"
       - name: Install exact accepted distributions using upstream pip
         run: |
-          output="$RUNNER_TEMP/native-foundation-e2e"
-          python="$RUNNER_TEMP/nautilus-ci-env/bin/python"
+          umask 022
+          output="$NATIVE_FOUNDATION_ROOT/reports"
+          python="$NATIVE_FOUNDATION_ROOT/venv/bin/python"
           packages=(nautilus_trader==2.0.0rc5 numpy==2.5.3 pandas==3.0.6 python-dateutil==2.9.0.post0 six==1.17.0)
           "$python" -m pip --isolated download --disable-pip-version-check --no-input \
             --index-url https://pypi.org/simple --only-binary=:all: --no-deps --pre \
-            --dest "$RUNNER_TEMP/nautilus-ci-wheels" "${packages[@]}" \
+            --dest "$NATIVE_FOUNDATION_ROOT/wheels" "${packages[@]}" \
             >"$output/download.stdout" 2>"$output/download.stderr"
           printf '%s  %s\n' eab45fafd2312deda1236554c49a9798bfc76bc8465af864878e2f70189ebebe \
-            "$RUNNER_TEMP/nautilus-ci-wheels/nautilus_trader-2.0.0rc5-cp312-cp312-manylinux_2_34_x86_64.whl" \
+            "$NATIVE_FOUNDATION_ROOT/wheels/nautilus_trader-2.0.0rc5-cp312-cp312-manylinux_2_34_x86_64.whl" \
             | sha256sum --check >"$output/engine-wheel-check.txt"
-          sha256sum "$RUNNER_TEMP/nautilus-ci-wheels/"*.whl >"$output/downloaded-wheel-hashes.txt"
+          sha256sum "$NATIVE_FOUNDATION_ROOT/wheels/"*.whl >"$output/downloaded-wheel-hashes.txt"
           "$python" -m pip --isolated install --disable-pip-version-check --no-input \
-            --no-index --find-links "$RUNNER_TEMP/nautilus-ci-wheels" --no-deps --pre \
+            --no-index --find-links "$NATIVE_FOUNDATION_ROOT/wheels" --no-deps --pre \
             "${packages[@]}" >"$output/install.stdout" 2>"$output/install.stderr"
           "$python" -m pip --isolated freeze >"$output/freeze.txt" 2>"$output/freeze.stderr"
           "$python" -m pip --isolated check >"$output/pip-check.stdout" 2>"$output/pip-check.stderr"
       - name: Fetch unchanged pinned upstream source and verify observer bytes
         run: |
-          output="$RUNNER_TEMP/native-foundation-e2e"
+          umask 022
+          output="$NATIVE_FOUNDATION_ROOT/reports"
           curl --fail --silent --show-error --location --max-time 60 \
             https://raw.githubusercontent.com/nautechsystems/nautilus_trader/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/quickstart.py \
             --output "$output/quickstart.py" >"$output/source-fetch.stdout" 2>"$output/source-fetch.stderr"
@@ -80,7 +89,7 @@ jobs:
       - name: Run the original quickstart twice without network or host credentials
         run: |
           umask 022
-          output="$RUNNER_TEMP/native-foundation-e2e"
+          output="$NATIVE_FOUNDATION_ROOT/reports"
           for run in run-1 run-2; do
             run_output="$output/$run"
             # Refuse existing paths: ownership changes apply only to this new run directory.
@@ -91,11 +100,11 @@ jobs:
               --uid "$(id -u)" --gid "$(id -g)" --cap-drop ALL
               --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib
               --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp
-              --ro-bind "$RUNNER_TEMP/nautilus-ci-env" /venv
+              --ro-bind "$NATIVE_FOUNDATION_ROOT/venv" /venv
               --ro-bind "$output/quickstart.py" /input/quickstart.py
               --ro-bind "$output/observe_quickstart.py" /input/observe_quickstart.py
               --bind "$run_output" /out --chdir /out
-              --setenv HOME /tmp --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin
+              --setenv HOME /tmp --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PWD /out
               --setenv PYTHONDONTWRITEBYTECODE 1 --setenv PYTHONHASHSEED 0
               --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1
               /venv/bin/python -I /input/observe_quickstart.py)
@@ -115,14 +124,14 @@ jobs:
             fi
           done
       - name: Independently verify isolation, cleanup, cash and exact economic replay
-        if: ${{ !cancelled() }}
-        run: python3 scripts/verify_nautilus_ci.py --output "$RUNNER_TEMP/native-foundation-e2e"
+        if: ${{ !cancelled() && env.NATIVE_FOUNDATION_ROOT != '' }}
+        run: python3 scripts/verify_nautilus_ci.py --output "$NATIVE_FOUNDATION_ROOT/reports"
       - name: Retain original commands, outputs and verification failures
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && env.NATIVE_FOUNDATION_ROOT != '' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: native-foundation-e2e-results
-          path: ${{ runner.temp }}/native-foundation-e2e/
+          path: ${{ env.NATIVE_FOUNDATION_ROOT }}/reports/
           if-no-files-found: error
           include-hidden-files: false
           retention-days: 14
