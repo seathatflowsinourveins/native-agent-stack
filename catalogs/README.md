@@ -12,5 +12,8 @@ Both follow the [upstream acceptance evidence policy](../docs/acceptance-evidenc
 The [GitHub automation handbook](../docs/github-automation.md) defines check and
 maintenance ownership, manual publication provenance, and representative native
 research acceptance with measured baselines and explicit limitations.
+The [automation manifest](foundation/automation.json) records selected upstream
+revisions, maintenance ownership and actual hosted qualification separately from
+proposals and remaining gaps.
 
 The broad repository decision union remains at [its existing path](us-equities/decision-index.json) for compatibility; it contains shared research discovery, not just trading adoption. Curated lists and stars are discovery sources. Explicit catalog decisions establish selected capabilities, and execution receipts establish only the workflows they actually measured.

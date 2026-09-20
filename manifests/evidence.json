@@ -1993,8 +1993,8 @@
     },
     {
       "path": ".github/workflows/native-token-e2e.yml",
-      "sha256": "9fe7751f5df7adfd65295159fb6b54ac10d774d91ee01cbc2c4d3e008dddad8a",
-      "bytes": 1685
+      "sha256": "d98bbefddb1bed7f0d282ffc08195bef52f8dab4772d1caf8ec6c0bad149b75f",
+      "bytes": 1689
     },
     {
       "path": ".github/workflows/token-report.yml",
@@ -5084,8 +5084,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "88970d78d82a75afeb2b9d2b36e3eab0edbfed3584527454a7c83a8446db85f8",
-      "bytes": 3721071
+      "sha256": "4d6c3a41959c7fd49b29ff69b9e57d8d8fc6c89e7f8b9aaa0c6c81b9ffc30775",
+      "bytes": 3722454
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5094,7 +5094,7 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "caf5dbb711d05d2c3dee07195b84f46afb9f8083e314903c6f3a4591cf1c2825",
+      "sha256": "bd6f64626084130eb6febc533d5ddf4e1dc7decb6f20270faadd6a0cc7a7e8eb",
       "bytes": 31611
     },
     {
@@ -6079,13 +6079,13 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "42f49b071a9252bc62dea3fb223c32844a7687d4b5c51aeadfa27d2760f9fb32",
-      "bytes": 1814
+      "sha256": "cdeba9a8ab1a01fbbe2bfdc512de8088c0f8f8dacb5ee52395d9aabc95fa557d",
+      "bytes": 2005
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "1a9e7678d331648d310647746638abe564cfc38fcb0147d39be2492075202fb4",
-      "bytes": 7112
+      "sha256": "447a12067bad9d8841c0f56a4a18e90599e6b2442ee756ad865d703c1050fe9e",
+      "bytes": 7743
     },
     {
       "path": "catalogs/foundation/decisions.json",
@@ -6094,8 +6094,8 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "1e1f916dfb2d176cac7a4cb639d1a9ad40bb07503b2d9a18ea730574a23b0fa9",
-      "bytes": 17274
+      "sha256": "cc3ea65967a3960f36cfa3fbd2719b07eaaf432dd07045ff1644cf030cc62f49",
+      "bytes": 17821
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -6449,8 +6449,8 @@
     },
     {
       "path": ".github/workflows/native-offhost-restore.yml",
-      "sha256": "4525ef97b6827eccd02bb8effad79f15d10e436149ecdf6d33160ec82ba34efe",
-      "bytes": 6306
+      "sha256": "91ecb7bdc3bcc139e9b2574c1bbe164ada48c9e31971a4920f4d41d37fcedf03",
+      "bytes": 6310
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/README.md",
@@ -6529,8 +6529,8 @@
     },
     {
       "path": ".github/workflows/native-service-reboot.yml",
-      "sha256": "33fc35a62c1d8932b1931673bac7341175d74aa09d97ba087922b73e31146620",
-      "bytes": 2832
+      "sha256": "3a0f3c3e98a50c5f333070a8db85b2d232e585d05bf07af631741ceaaeef6ad5",
+      "bytes": 2808
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/README.md",
@@ -7029,8 +7029,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "a1176511800c6b0a8a288392f29dd67a951920b18b0afd0496ca905766c2e903",
-      "bytes": 11240
+      "sha256": "5ee2c5a1a3549320460cf28a39183a3ce672bd2ba24c66c1d85e8adc3f1249bf",
+      "bytes": 13048
     },
     {
       "path": "docs/research-task-acceptance.md",
@@ -7054,13 +7054,13 @@
     },
     {
       "path": "docs/catalog-provenance.md",
-      "sha256": "cfdbdebda42c9b9113f407e07a1304b51af186a856e687dc4eb148d32f3ee2c1",
-      "bytes": 13873
+      "sha256": "15c20a89ad95ffb37d8c4b02f28addf9ff9939b6c2f6bb853017497733522c4e",
+      "bytes": 14270
     },
     {
       "path": ".github/workflows/native-offhost-app-state.yml",
-      "sha256": "120324ab2042f3a0b62eefe9e56d84a3fd354f668aa75628c5743a1bf6681cb4",
-      "bytes": 9017
+      "sha256": "76a49ffe92288eb5e5c337523797770e2474b23c6e0b58a4fc5e80a5ce7acd70",
+      "bytes": 9025
     },
     {
       "path": "blueprints/convergence-practice/offhost-app-state/README.md",
@@ -7101,6 +7101,26 @@
       "path": "tests/test_offhost_app_state.py",
       "sha256": "a763c8ed4d707bbe447a4af97c7545faabd75866f5ffea320d232285a9a0162c",
       "bytes": 9730
+    },
+    {
+      "path": ".github/workflows/action-compatibility.yml",
+      "sha256": "e20225fdb57a2651bbd9cf5320fcb81e56e2fb6568c88e595dbb51f8d15d6677",
+      "bytes": 4750
+    },
+    {
+      "path": "catalogs/foundation/automation.json",
+      "sha256": "810120df9ec901fc0e8247fda6559ab46a352d469457524aa0798472cde9f8b4",
+      "bytes": 12635
+    },
+    {
+      "path": "docs/tasks/2026-09-20-automation-resolution.md",
+      "sha256": "d83d4414ce596236a9740fb9dcce8d275d13ce4edacd4313806835130753d454",
+      "bytes": 8181
+    },
+    {
+      "path": "docs/automation-upgrade-evidence.json",
+      "sha256": "afe31d3eec6b14f69721a810f8719d3326154c9f2e2fadedeb5e292bb92ca7df",
+      "bytes": 10044
     }
   ],
   "convergence_records": [

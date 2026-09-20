@@ -119,10 +119,10 @@
       "id": "ci-supply-chain",
       "title": "CI and supply chain",
       "purpose": "Check published artifacts, workflow permissions, secret controls and scoped dependency identity.",
-      "selection": "Native publication checks, zizmor, gitleaks and scoped Syft inventory.",
-      "activation": "Run the relevant offline checks and current CI for changed inputs; keep private state out of artifacts.",
-      "lifecycle_scope": "Workflow/secret negative fixtures and clean native token-tool CI passed; inventory is not a vulnerability or provenance verdict.",
-      "next_gap": "Qualify changed distribution inputs and applicable hosted jobs; no broad vulnerability assurance is accepted."
+      "selection": "Native publication checks, actionlint, zizmor, Dependabot, GitHub artifact attestations, gitleaks and scoped Syft inventory; selected revisions and ownership are in catalogs/foundation/automation.json.",
+      "activation": "Use the GitHub automation handbook; qualify changed inputs and update only reviewed hashes. One existing Codex maintenance task owns source research; keep private state out of artifacts.",
+      "lifecycle_scope": "Required PR checks and main-only publication passed. Independent archive download and online/detached provenance verification passed with altered-byte rejection. Workflow fixtures, source integrity, provenance and useful native output are separate claims.",
+      "next_gap": "Selected Python/Go setup upgrades passed unchanged upstream verifiers and Go standard-library tests; Node setup passed existing hosted fixtures. Weekly Dependabot timing, nonempty grouping, hosted PR cancellation and improved native research outcomes remain unmeasured; no broad vulnerability assurance is accepted."
     },
     {
       "id": "scheduling-supervision",
