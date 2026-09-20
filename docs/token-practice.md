@@ -19,6 +19,11 @@ together. Its historical results do not become a new PC's acceptance. Use the
 [lifecycle guide](../adoption/lifecycle.md) for installation ownership, restart,
 recovery and rollback; collect that PC's counters with the portable reporter.
 
+The [session observation guide](current-session-observation.md) distinguishes
+directly loaded tools, explicit native commands and observed telemetry. Its
+September 20 checks correlate this Desktop task's returned tool results with
+the same task's Loki records; installed services alone do not establish that.
+
 ## Default practice
 
 Carry out authorized work directly. Keep the plan and verification proportional

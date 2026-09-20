@@ -270,6 +270,11 @@
             "id": "token-practice-gap-followup-20260920",
             "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -373,6 +378,11 @@
             "id": "wsl-memory-maintenance-20260920",
             "path": "evidence/receipts/wsl-memory-maintenance-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -441,6 +451,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -786,6 +801,11 @@
             "id": "token-practice-gap-followup-20260920",
             "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -997,6 +1017,11 @@
             "id": "native-claude-hud-interactive-20260920",
             "path": "evidence/receipts/native-claude-hud-interactive-20260920.json",
             "kind": "compatibility_attempt"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -1481,6 +1506,11 @@
             "id": "token-practice-confirmation-20260920",
             "path": "evidence/receipts/token-practice-confirmation-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2137,6 +2167,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2225,6 +2260,11 @@
           {
             "id": "native-token-clean-prefix-20260920",
             "path": "evidence/receipts/native-token-clean-prefix-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -2531,6 +2571,11 @@
           {
             "id": "native-token-clean-prefix-20260920",
             "path": "evidence/receipts/native-token-clean-prefix-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -2863,6 +2908,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3083,6 +3133,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3218,6 +3273,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3385,6 +3445,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3442,6 +3507,11 @@
           {
             "id": "upstream-native-tools-20260920",
             "path": "evidence/receipts/upstream-native-tools-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -3880,6 +3950,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4442,6 +4517,11 @@
             "id": "token-practice-confirmation-20260920",
             "path": "evidence/receipts/token-practice-confirmation-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4604,6 +4684,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4964,6 +5049,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "current-session-observation-20260920",
+            "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [

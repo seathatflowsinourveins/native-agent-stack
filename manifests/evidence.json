@@ -1573,6 +1573,42 @@
         "Process exits, uninstall and retained-byte checks establish this bounded local lifecycle only; provider-mediated client workflows, every optional feature and OS reboot were not replayed."
       ],
       "path": "evidence/receipts/native-token-clean-prefix-20260920.json"
+    },
+    {
+      "id": "current-session-observation-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "agentsview",
+        "ai-memory",
+        "alertmanager",
+        "ccusage",
+        "claude-hud",
+        "context-mode",
+        "grafana",
+        "headroom",
+        "jcodemunch-mcp",
+        "loki",
+        "mcporter",
+        "ntfy",
+        "opentelemetry-collector-contrib",
+        "otel-tui",
+        "prometheus",
+        "rtk",
+        "serena",
+        "socraticode"
+      ],
+      "claim": "The recorded Desktop parent task used loaded MCP tools and explicit native commands; independent exact-parent Loki events and retained hook/RTK metadata confirm bounded live observation, while the older Context Mode connection and task-level metrics attribution retain explicit limits.",
+      "limitations": [
+        "Single dated Desktop parent task only; these results do not mean every selected repository is continuously active or certify another PC.",
+        "Native CLI statistics prove the queried upstream command is responding; they do not prove automatic prompt compression or a new complete functional trial for Headroom and jCodeMunch.",
+        "The existing directly loaded Context Mode connection rejects project-file reads; the separate supported native bridge succeeded without restarting this task or widening access policy.",
+        "Some ai-memory lifecycle bodies identify outer exec wrappers as unknown; Context Mode event-row and metadata counters differ. Neither is a complete per-tool native transcript.",
+        "Exact-parent Loki delivery is confirmed. Current Prometheus/Loki task consumption equality and exact causal lifetime provider tokens saved remain unestablished.",
+        "Root tool-return hashes and metadata timestamps corroborate delivery and outcomes within their stated boundaries; no public raw prompts, account identifiers or task ID are included.",
+        "Native estimates include verification operations, overlap across scopes and have retention limits. Response-consumption examples, cache subsets and native savings estimates must not be added.",
+        "Loki initially returned503 before returning200; the failure is retained. Optional viewers and separate native Claude/Windows profiles are not relabeled as active in this Desktop task."
+      ],
+      "path": "evidence/receipts/current-session-observation-20260920.json"
     }
   ],
   "files": [
@@ -3074,8 +3110,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "36d856af431951b2ee736675c8cd954170977f37b953d3f116680c5595eb051d",
-      "bytes": 370595
+      "sha256": "e57a9ee3497ea0b92cb7f4b5432e91d7a37c94812c0b1d84676aae204de4312b",
+      "bytes": 374249
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -4658,6 +4694,11 @@
       "bytes": 5966
     },
     {
+      "path": "docs/current-session-observation.md",
+      "sha256": "f531d9a279f8bab2caf56efcdb810a8d54853c83d3c348be1e620fb83869349c",
+      "bytes": 9108
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -4669,8 +4710,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "fca3bd5790df32fea9eaa451a14fe60545458dd672e4a6149097345f2cdb663e",
-      "bytes": 2726963
+      "sha256": "8a04a793f9504de713abc2fdadbe8efa9b6bde879ff704e60863b958fbff7a0b",
+      "bytes": 2852209
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -4679,8 +4720,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "d411c3e473cd2fc0e69dcdbdb51dfe0bce608d7d795937a64d7d41105f2213e4",
-      "bytes": 27230
+      "sha256": "d7f1144c628ed9061c523159383867f3c9b46667fd323d038c88ba41bb91cad6",
+      "bytes": 27567
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -4699,8 +4740,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "003096be53d2bf94ff23884ec557f1e964a7546b2dddb5d28cfc9d5f31ca9e55",
-      "bytes": 55400
+      "sha256": "1c1116cc83b47bdd14ab5ea2499510afb5ec6385ca1de7aca07cc941803abcf5",
+      "bytes": 55582
     },
     {
       "path": "docs/evidence.md",
@@ -4724,8 +4765,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "3801b1cc41d65ae54f9c2bc1048a8bc4acb105f95135a47ed05e0ac845ef1996",
-      "bytes": 20392
+      "sha256": "8f24b4a48e7e9f2954c22336b80e77581e67cf741ccff89ea2d1ddecb6d9918d",
+      "bytes": 20702
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -4791,6 +4832,11 @@
       "path": "evidence/receipts/component-history.json",
       "sha256": "43a1badf70c33922b45a959e5ee64f2ad411b8a5218d1b69ad11fdfd18269d88",
       "bytes": 28885
+    },
+    {
+      "path": "evidence/receipts/current-session-observation-20260920.json",
+      "sha256": "6f699d8fa92af16f9f70214c89469e8e60fb50fc0aa262c52410fccbbd2c296a",
+      "bytes": 55987
     },
     {
       "path": "evidence/receipts/desktop-cli-workflows.json",
@@ -5084,8 +5130,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "40ab333f81eaf8933576f3f60a5ebe714eca2717106558feb2627666ae1351e0",
-      "bytes": 68637
+      "sha256": "e05249744633f1436839ac6b19f65ad3e24712e74b36a90e996328692b461d9d",
+      "bytes": 69501
     },
     {
       "path": "observability/README.md",
@@ -5274,8 +5320,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "cabceabcf409ad2a54bb688a4b599ce4c5f8cacc63ae66e127efb3b92742d7ca",
-      "bytes": 20906
+      "sha256": "2f90a85c883f93960111507722b94d26d5d3f57e6c6f11dd2b0d6cb8aa4126cf",
+      "bytes": 20998
     },
     {
       "path": "scripts/catalog_decisions.py",

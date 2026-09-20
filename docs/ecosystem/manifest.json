@@ -291,6 +291,12 @@
   ],
   "guides": [
     {
+      "title": "What was live in the recorded session?",
+      "body": "Current-session upstream probes, matching observation events, active services and explicit connection limits. Dated evidence, not automatic acceptance on another PC.",
+      "path": "docs/current-session-observation.md",
+      "category": "evaluation"
+    },
+    {
       "title": "Install, recover and clean up selected tools",
       "body": "Native lifecycle commands, owned prefixes, preservation of state and per-stage acceptance boundaries.",
       "path": "adoption/lifecycle.md",

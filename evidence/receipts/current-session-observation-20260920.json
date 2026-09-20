@@ -1,0 +1,1279 @@
+{
+  "schema_version": 1,
+  "id": "current-session-observation-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20T14:28:53.815791+00:00",
+  "component_ids": [
+    "agentsview",
+    "ai-memory",
+    "alertmanager",
+    "ccusage",
+    "claude-hud",
+    "context-mode",
+    "grafana",
+    "headroom",
+    "jcodemunch-mcp",
+    "loki",
+    "mcporter",
+    "ntfy",
+    "opentelemetry-collector-contrib",
+    "otel-tui",
+    "prometheus",
+    "rtk",
+    "serena",
+    "socraticode"
+  ],
+  "claim": "The recorded Desktop parent task used loaded MCP tools and explicit native commands; independent exact-parent Loki events and retained hook/RTK metadata confirm bounded live observation, while the older Context Mode connection and task-level metrics attribution retain explicit limits.",
+  "limitations": [
+    "Single dated Desktop parent task only; these results do not mean every selected repository is continuously active or certify another PC.",
+    "Native CLI statistics prove the queried upstream command is responding; they do not prove automatic prompt compression or a new complete functional trial for Headroom and jCodeMunch.",
+    "The existing directly loaded Context Mode connection rejects project-file reads; the separate supported native bridge succeeded without restarting this task or widening access policy.",
+    "Some ai-memory lifecycle bodies identify outer exec wrappers as unknown; Context Mode event-row and metadata counters differ. Neither is a complete per-tool native transcript.",
+    "Exact-parent Loki delivery is confirmed. Current Prometheus/Loki task consumption equality and exact causal lifetime provider tokens saved remain unestablished.",
+    "Root tool-return hashes and metadata timestamps corroborate delivery and outcomes within their stated boundaries; no public raw prompts, account identifiers or task ID are included.",
+    "Native estimates include verification operations, overlap across scopes and have retention limits. Response-consumption examples, cache subsets and native savings estimates must not be added.",
+    "Loki initially returned503 before returning200; the failure is retained. Optional viewers and separate native Claude/Windows profiles are not relabeled as active in this Desktop task."
+  ],
+  "data": {
+    "parent_task_sha256": "d7563b05405ada7a3b70d9f22a4666e31c02b6b3d266f1bc85da9d2dd210c0df",
+    "command_scope": "Source-host Linux/WSL; parameterized public paths and task IDs, with exact private returned envelopes hashed below. Observation outputs retain their own UTC timestamps.",
+    "native_operations": [
+      {
+        "component_id": "context-mode",
+        "surface": "loaded MCP",
+        "tool": "ctx_execute",
+        "state": "executed",
+        "returned_fields": {
+          "probe": "native-session-live-20260920",
+          "computed": 42,
+          "utc": "2026-09-20T14:16:49.339Z"
+        },
+        "private_probe_key": "context-execute",
+        "captured_at_utc": "2026-09-20T14:16:50.519Z",
+        "canonical_returned_result_sha256": "0bf36e47172c0933548f415294ca7f38f58d91f0b05a466ef1c6170604f134c9"
+      },
+      {
+        "component_id": "context-mode",
+        "surface": "loaded MCP",
+        "tool": "ctx_execute_file",
+        "arguments": {
+          "path": "$PROJECT/AGENTS.md",
+          "language": "python",
+          "operation": "return input length and SHA-256"
+        },
+        "state": "failed_project_root_scope",
+        "is_error": true,
+        "sanitized_returned_text": "File access blocked: \"$PROJECT/AGENTS.md\" resolves outside the project root ($LOADED_PLUGIN_ROOT). context-mode confines ctx_execute_file to the workspace so it cannot be used to bypass the host's sandbox/permission controls (issue #852). To intentionally process a file outside the project, add a host allow rule, e.g. \"permissions\": { \"allow\": [\"Read($PROJECT/AGENTS.md)\"] } in your settings.",
+        "private_probe_key": "context-project-read",
+        "captured_at_utc": "2026-09-20T14:16:50.519Z",
+        "canonical_returned_result_sha256": "2936a8e6eda9d7bb6b4fb42830dac7d32729ee34970e81c6c3b7572e2d54a975"
+      },
+      {
+        "component_id": "context-mode",
+        "via_component_id": "mcporter",
+        "surface": "native upstream CLI bridge",
+        "command": "mcporter --config $MCPORTER_CONFIG call context-mode.ctx_execute_file --args '<path, language and code JSON>' --output json --no-oauth",
+        "state": "executed",
+        "exit_code": 0,
+        "returned_fields": {
+          "probe": "current-native-bridge-project-read",
+          "bytes": 8689,
+          "sha256": "2bf8707272db1a9271cbbb2c69ac8402dd4423775a0b9658b178868e0186f066"
+        },
+        "private_probe_key": "context-native-bridge",
+        "captured_at_utc": "2026-09-20T14:19:03.815Z"
+      },
+      {
+        "component_id": "socraticode",
+        "surface": "loaded MCP",
+        "tool": "codebase_health",
+        "state": "healthy",
+        "sanitized_returned_text": "SocratiCode \u2014 Infrastructure Health Check:\n\nQdrant mode: external\nQdrant endpoint: http://127.0.0.1:16333\n[OK] External Qdrant (http://127.0.0.1:16333): Reachable\n\nEmbedding provider: lmstudio\n[OK] LM Studio: Reachable at http://127.0.0.1:8231/v1\n[OK] Embedding model (nvidia/Nemotron-3-Embed-1B-BF16): Loaded\n\nExternal Qdrant mode \u2014 Docker is not required for the vector database.",
+        "private_probe_key": "socraticode-health",
+        "captured_at_utc": "2026-09-20T14:16:50.519Z",
+        "canonical_returned_result_sha256": "afc70b2c85190a0df08b051ffc8d1c05163192e6faeed8a9c49f82e1174e9e90"
+      },
+      {
+        "component_id": "socraticode",
+        "surface": "loaded MCP",
+        "tool": "codebase_status",
+        "state": "index_ready",
+        "sanitized_returned_text": "Project: $PROJECT\nCollection: codebase_72cfa87c5abf\nStatus: green\nIndexed chunks: 196\n\nLast operation: Incremental update \u2014 completed\n  Files: 0, Chunks: 0\n  33237s ago (took 0.3s)\n\nFile watcher: active (watched by another process)\n\nCode graph: 26 files, 3 edges\n  Last built: 29530s ago",
+        "private_probe_key": "socraticode-status",
+        "captured_at_utc": "2026-09-20T14:16:50.519Z",
+        "canonical_returned_result_sha256": "bb2204b3a19e04aebb458e0a86d0811126d71b61c66f3d5ddcddda630f1cebe8"
+      },
+      {
+        "component_id": "socraticode",
+        "surface": "loaded MCP",
+        "tool": "codebase_search",
+        "arguments": {
+          "projectPath": "$PROJECT",
+          "query": "parse native Codex usage counters",
+          "limit": 1,
+          "includeLinked": false
+        },
+        "state": "retrieval_returned",
+        "returned_match": {
+          "path": "tools/ecosystem/evaluate-native.py",
+          "lines": [
+            171,
+            195
+          ],
+          "symbol": "parse_codex"
+        },
+        "private_probe_key": "socraticode-search",
+        "captured_at_utc": "2026-09-20T14:18:00.239Z",
+        "canonical_returned_result_sha256": "d35b8df23dfa1a49468ea48feb5c0d40724c0eee75ca996a2b0318854f7bb938"
+      },
+      {
+        "component_id": "serena",
+        "surface": "loaded MCP",
+        "tool": "get_current_config",
+        "state": "ready",
+        "returned_fields": {
+          "version": "2.0.0.dev0",
+          "active_project": "agent-lab",
+          "language_server_status": "ready",
+          "active_language_server": "bash"
+        },
+        "private_probe_key": "serena-config",
+        "captured_at_utc": "2026-09-20T14:18:00.239Z",
+        "canonical_returned_result_sha256": "7ba11fb266fb88d14d8ae06c1b737159cf7020086475f9e633ba6a5f1249b529"
+      },
+      {
+        "component_id": "serena",
+        "surface": "loaded MCP",
+        "tool": "search_for_pattern",
+        "state": "empty_first_result",
+        "returned_fields": {},
+        "boundary": "Anchored/ignored-path search returned no match, not a failed RPC.",
+        "private_probe_key": "serena-project-read",
+        "captured_at_utc": "2026-09-20T14:19:02.856Z",
+        "canonical_returned_result_sha256": "3693513c56e6af8efba1c952d17941a0958a3f8ddd8289b4936d0d4f39a6f8f1"
+      },
+      {
+        "component_id": "serena",
+        "surface": "loaded MCP",
+        "tool": "search_for_pattern",
+        "arguments": {
+          "relative_path": "tools/ecosystem/evaluate-native.py",
+          "substring_pattern": "def parse_codex",
+          "multiline": false,
+          "skip_ignored_files": false,
+          "max_answer_chars": 700
+        },
+        "state": "source_match_returned",
+        "returned_fields": {
+          "tools/ecosystem/evaluate-native.py": [
+            "  > 172:def parse_codex(stream, env):"
+          ]
+        },
+        "private_probe_key": "serena-project-read-retry",
+        "captured_at_utc": "2026-09-20T14:19:39.418Z",
+        "canonical_returned_result_sha256": "3c84cced3063f349b0c503ed12ea6d29db098302779871daa216f0952d5099c5"
+      },
+      {
+        "component_id": "ai-memory",
+        "surface": "loaded MCP",
+        "tool": "memory_status",
+        "arguments": {
+          "workspace": "agent-lab",
+          "project": "agent-lab"
+        },
+        "state": "responding",
+        "returned_fields": {
+          "counts": {
+            "pages_latest": 35,
+            "pages_all": 102,
+            "sessions": 45,
+            "observations": 22542
+          }
+        },
+        "private_probe_key": "memory-status",
+        "captured_at_utc": "2026-09-20T14:18:00.239Z",
+        "canonical_returned_result_sha256": "04596919bcc070689024f643eef878a14ec3f333575f39cf1c1b1544a607ec86"
+      },
+      {
+        "component_id": "ai-memory",
+        "surface": "loaded MCP",
+        "tool": "memory_read_session_observations",
+        "arguments": {
+          "workspace": "agent-lab",
+          "project": "agent-lab",
+          "session_id": "$PARENT_TASK_ID",
+          "limit": 3,
+          "order": "desc",
+          "kinds": [
+            "pre-tool-use",
+            "post-tool-use"
+          ],
+          "body_max_chars": 200
+        },
+        "state": "exact_parent_observations_returned",
+        "returned_fields": {
+          "agent_kind": "codex",
+          "started_at": "2026-09-20T05:04:45.547137Z",
+          "ended_at": null,
+          "observation_count": 3578,
+          "filtered_total": 3556,
+          "limit": 3,
+          "elided_other_scope": 0,
+          "observations": [
+            {
+              "kind": "post-tool-use",
+              "created_at": "2026-09-20T14:17:58.289705Z",
+              "title": "tool unknown",
+              "tool_family": "unknown"
+            },
+            {
+              "kind": "pre-tool-use",
+              "created_at": "2026-09-20T14:17:58.288188Z",
+              "title": "tool unknown",
+              "tool_family": "unknown"
+            },
+            {
+              "kind": "post-tool-use",
+              "created_at": "2026-09-20T14:17:58.286797Z",
+              "title": "tool unknown",
+              "tool_family": "unknown"
+            }
+          ]
+        },
+        "private_probe_key": "memory-current-observations",
+        "captured_at_utc": "2026-09-20T14:18:00.239Z",
+        "canonical_returned_result_sha256": "3ce3fe150eac0f696f685bde18b72708275949198877fa5cdb13da0a5ff7f316"
+      },
+      {
+        "component_id": "rtk",
+        "surface": "native upstream CLI",
+        "commands": [
+          "rtk gain --format json",
+          "rtk git log -3",
+          "rtk gain --format json"
+        ],
+        "state": "executed_counter_updated",
+        "exit_codes": [
+          0,
+          0,
+          0
+        ],
+        "returned_before": {
+          "summary": {
+            "total_commands": 54,
+            "total_input": 17936,
+            "total_output": 16228,
+            "total_saved": 1708,
+            "avg_savings_pct": 9.522747546833186,
+            "total_time_ms": 1615,
+            "avg_time_ms": 29
+          }
+        },
+        "returned_after": {
+          "summary": {
+            "total_commands": 55,
+            "total_input": 18054,
+            "total_output": 16332,
+            "total_saved": 1722,
+            "avg_savings_pct": 9.538052509139249,
+            "total_time_ms": 1624,
+            "avg_time_ms": 29
+          }
+        },
+        "measurement": "Upstream estimate; independent row confirmation is in routing.independent_rtk_metadata",
+        "private_probe_keys": [
+          "rtk-before",
+          "rtk-use",
+          "rtk-after"
+        ]
+      },
+      {
+        "component_id": "headroom",
+        "surface": "native upstream CLI",
+        "command": "headroom savings --json",
+        "state": "statistics_responding",
+        "exit_code": 0,
+        "returned_fields": {
+          "schema_version": 1,
+          "top_model": "unknown",
+          "lifetime": {
+            "tokens_saved": 0,
+            "tokens_before": 0,
+            "cost_usd": 0.0,
+            "calls": 0,
+            "savings_percent": 0.0
+          },
+          "windows": {
+            "today": {
+              "tokens_saved": 0,
+              "tokens_before": 0,
+              "cost_usd": 0.0,
+              "calls": 0,
+              "savings_percent": 0.0
+            },
+            "last_7_days": {
+              "tokens_saved": 0,
+              "tokens_before": 0,
+              "cost_usd": 0.0,
+              "calls": 0,
+              "savings_percent": 0.0
+            },
+            "last_30_days": {
+              "tokens_saved": 0,
+              "tokens_before": 0,
+              "cost_usd": 0.0,
+              "calls": 0,
+              "savings_percent": 0.0
+            }
+          },
+          "by_model": [],
+          "by_client": []
+        },
+        "private_probe_key": "headroom-native",
+        "captured_at_utc": "2026-09-20T14:18:33.322Z",
+        "canonical_returned_result_sha256": "fe57e070cce21932a87c807669a5ed46855fe7b9f1d721de52c68d149a56cefe"
+      },
+      {
+        "component_id": "jcodemunch-mcp",
+        "via_component_id": "mcporter",
+        "surface": "native upstream CLI bridge",
+        "command": "mcporter call --stdio jcodemunch-mcp --env CODE_INDEX_PATH=$INDEX_DIR --env JCODEMUNCH_SHARE_SAVINGS=0 --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth",
+        "state": "statistics_responding",
+        "directly_loaded_in_desktop_catalog": false,
+        "exit_code": 0,
+        "returned_fields": {
+          "session_tokens_saved": 0,
+          "session_calls": 0,
+          "total_tokens_saved": 29820,
+          "total_tokens_saved_basis": {
+            "generation": 2,
+            "first_generation": 2,
+            "mixed_basis": false
+          },
+          "lifetime_by_tool": {
+            "get_symbol_source": 29820,
+            "search_symbols": 0
+          },
+          "lifetime_by_tool_since": "2026-09-20"
+        },
+        "private_probe_key": "jcodemunch-native",
+        "captured_at_utc": "2026-09-20T14:18:33.801Z",
+        "canonical_returned_result_sha256": "47168a3603f1ce61e78d1a3b2dd0c6c995fb43b99bd95f6b2fefc54bb0b92669"
+      },
+      {
+        "component_id": "context-mode",
+        "surface": "loaded MCP",
+        "tool": "ctx_stats",
+        "state": "statistics_responding",
+        "upstream_returned_text": "1.1M tokens saved  \u00b7  98.9% reduction  \u00b7  9h 17m  \u00b7  ~$5.33 saved (Opus)\n\nWithout context-mode  |\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 4.1 MB\nWith context-mode     |\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591| 47.4 KB\n\n4.1 MB kept out of your conversation \u2014 89\u00d7 longer sessions before compact.\n\n15 calls\n\n  ctx_batch_execute          1 calls    1.5 MB saved\n  ctx_execute                5 calls    1.2 MB saved\n  ctx_stats                  3 calls    818 KB saved\n  ctx_search                 4 calls    431 KB saved\n  ctx_execute_file           2 calls   96.7 KB saved\n\n  All your work  \u00b7  453 events captured across 4 projects  \u00b7  45 conversations\n\n  Project rules (CLAUDE.md)    102   \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\n  Your messages remembered      26   \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\n  session                       24   \u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\n  MCP tools called              22   \u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\n  mcp_tool_call                 22   \u2588\u2588\u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\n  sandbox                       15   \u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\n  Data references               15   \u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\n  External docs indexed         12   \u2588\u2588\u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\n  Your decisions                 7   \u2588\u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\n  Constraints you set            4   \u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\n  Session intent                 4   \u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\n  Behavior rules                 4   \u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\n  Errors caught                  3   \u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\n  Git operations                 2   \u2588\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\n  Skipped (2): Claude Code, Codex CLI\n  These adapters have DBs on disk but only test fixtures, dev skeletons,\n  or detection probes \u2014 no real chat activity.\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nYour AI talks less, remembers more, costs less.\n$5.33 this session  \u00b7  $5.67 lifetime\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nv1.0.169",
+        "measurement": "Returned illustrative byte/event estimate and rounded footer; multiple project/conversation scope, not exact task provider savings.",
+        "private_probe_key": "context-stats",
+        "captured_at_utc": "2026-09-20T14:19:39.671Z",
+        "canonical_returned_result_sha256": "e307c0445bf31c8f50d04b9adab9c8e99d3a82a77911686710d6988451a5ec90"
+      }
+    ],
+    "observation_routing": {
+      "schema_version": 1,
+      "kind": "read_only_native_observation_route_metadata",
+      "captured_at_utc": "2026-09-20T14:22:07Z",
+      "source_revision": "55ff225c6f0ecebf48515eee4e567c0d91a11065",
+      "parent_session_sha256": "d7563b05405ada7a3b70d9f22a4666e31c02b6b3d266f1bc85da9d2dd210c0df",
+      "scope": "Current Desktop parent task, selected observer configuration and retained hook metadata. No prompts, observation bodies, account identifiers, secret values or process IDs are included. No model calls, configuration edits, monitor health probes or Prometheus/Loki queries were performed by this audit.",
+      "selected_repositories": [
+        {
+          "id": "opentelemetry-collector-contrib",
+          "repository": "open-telemetry/opentelemetry-collector-contrib",
+          "version": "0.161.0",
+          "classification": "configured_service",
+          "role": "Receives native OTLP logs/metrics and scoped SDK receipt files; applies privacy processing. Runtime health is checked separately by the monitor reviewer."
+        },
+        {
+          "id": "prometheus",
+          "repository": "prometheus/prometheus",
+          "version": "3.14.0",
+          "classification": "configured_service",
+          "role": "Scrapes Collector-exported metrics and host/health series. Backend health and exact-task query results are outside this sub-audit."
+        },
+        {
+          "id": "loki",
+          "repository": "grafana/loki",
+          "version": "3.7.8",
+          "classification": "configured_service",
+          "role": "Receives native OTLP and SDK-receipt logs through the Collector. Exact task linkage must be established from the independent scoped query."
+        },
+        {
+          "id": "grafana",
+          "repository": "grafana/grafana",
+          "version": "13.2.2",
+          "classification": "configured_service",
+          "role": "Displays local metric/log observations; dashboard visibility alone does not prove exact-task usage attribution."
+        },
+        {
+          "id": "alertmanager",
+          "repository": "prometheus/alertmanager",
+          "version": "0.34.1",
+          "classification": "configured_service",
+          "role": "Local alert routing. No new external paging route was found in the selected documented scope."
+        },
+        {
+          "id": "ntfy",
+          "repository": "binwiederhier/ntfy",
+          "version": "2.28.0",
+          "classification": "configured_service",
+          "role": "Local notification receiver for the selected alert path; not a token meter."
+        },
+        {
+          "id": "context-mode",
+          "repository": "mksglu/context-mode",
+          "version": "1.0.169",
+          "classification": "loaded_with_scope_limitation",
+          "role": "The current Desktop exposes Context Mode tools and has exact-parent hook metadata. The coordinator's current probe confirms computation works, while project-file reading on the old loaded plugin connection remains blocked by its working directory."
+        },
+        {
+          "id": "ai-memory",
+          "repository": "akitaonrails/ai-memory",
+          "version": "2.3.2",
+          "classification": "loaded_parent_verified",
+          "role": "Global native/desktop lifecycle-hook registrations and direct loaded MCP are present. Coordinator independently queried exact-parent observations; this sub-audit did not read observation bodies."
+        },
+        {
+          "id": "rtk",
+          "repository": "rtk-ai/rtk",
+          "version": "0.49.0",
+          "classification": "active_explicit_command",
+          "role": "Coordinator invoked the native command in this task; its newest SQLite accounting row independently matches the reported counter increment. Native Claude has a Bash rewrite hook; this Desktop uses explicit RTK commands."
+        },
+        {
+          "id": "agentsview",
+          "repository": "kenn-io/agentsview",
+          "version": "0.43.0",
+          "classification": "available_scoped_archive_stopped",
+          "role": "Installed upstream executable and explicitly scoped historical archive. Native serve status returned no running server; this is not a continuously updating observer for the current task."
+        },
+        {
+          "id": "ccusage",
+          "repository": "ccusage/ccusage",
+          "version": "20.0.23",
+          "classification": "available_on_demand_not_loaded_mcp",
+          "role": "Installed native usage parser. Only help was inspected here; no current-task usage parse or broader session scan was performed."
+        },
+        {
+          "id": "otel-tui",
+          "repository": "ymtdzzz/otel-tui",
+          "version": "0.7.5",
+          "classification": "available_on_demand_not_current_receiver",
+          "role": "Native viewer is installed, but the configured clients export to the existing Collector. Its earlier synthetic receiver/rendering acceptance does not establish a live current-task token feed."
+        },
+        {
+          "id": "claude-hud",
+          "repository": "jarrodwatts/claude-hud",
+          "version": "0.8.0",
+          "classification": "claude_configured_not_desktop_loaded",
+          "role": "Native Claude plugin and statusLine are enabled. Historical real interactive attempt stopped at onboarding before HUD rendering; no HUD is part of this Codex Desktop task."
+        }
+      ],
+      "native_client_configuration": {
+        "desktop_codex": {
+          "scope": "Desktop user's Codex config plus agent-lab project config",
+          "hooks_feature_enabled": true,
+          "trusted_hook_state_entries": 13,
+          "explicit_disabled_hook_state_entries": 0,
+          "analytics_enabled": true,
+          "otlp_logs": "http://127.0.0.1:14318/v1/logs",
+          "otlp_metrics": "http://127.0.0.1:14318/v1/metrics",
+          "protocol": "binary",
+          "traces_exporter": "none",
+          "log_user_prompt": false,
+          "tool_result_max_bytes": 0,
+          "memory_hook_events": [
+            "SessionStart",
+            "UserPromptSubmit",
+            "PreToolUse",
+            "PostToolUse",
+            "PreCompact",
+            "Stop",
+            "SessionEnd"
+          ],
+          "context_mode_plugin_enabled": true,
+          "project_context_mode_replacement_configured": true,
+          "running_connection_hot_reload_established": false
+        },
+        "native_codex": {
+          "scope": "Linux native Codex user config plus selected project config",
+          "hooks_feature_enabled": true,
+          "trusted_hook_state_entries": 14,
+          "explicit_disabled_hook_state_entries": 0,
+          "analytics_enabled": true,
+          "otlp_logs": "http://127.0.0.1:14318/v1/logs",
+          "otlp_metrics": "http://127.0.0.1:14318/v1/metrics",
+          "protocol": "binary",
+          "traces_exporter": "none",
+          "log_user_prompt": false,
+          "tool_result_max_bytes": 0,
+          "memory_hook_events": [
+            "SessionStart",
+            "UserPromptSubmit",
+            "PreToolUse",
+            "PostToolUse",
+            "PreCompact",
+            "Stop",
+            "SessionEnd"
+          ],
+          "context_mode_plugin_enabled": true,
+          "parent_session_events_in_this_runtime_store": 0,
+          "zero_parent_rows_meaning": "The current parent is a Desktop task; this separate native store is not its accounting scope."
+        },
+        "native_claude": {
+          "scope": "Linux native Claude settings and selected project settings",
+          "enabled_plugins": [
+            "context-mode@context-mode",
+            "claude-hud@claude-hud",
+            "codex@openai-codex"
+          ],
+          "configured_hook_events": [
+            "PreToolUse",
+            "SessionStart",
+            "SubagentStop",
+            "PostToolUse",
+            "PreCompact",
+            "Stop",
+            "SessionEnd",
+            "SubagentStart"
+          ],
+          "hook_integrations": [
+            "context-mode",
+            "ai-memory",
+            "rtk"
+          ],
+          "hud_statusline_configured": true,
+          "telemetry_enabled": true,
+          "otlp_endpoint": "http://127.0.0.1:14318",
+          "otlp_protocol": "http/protobuf",
+          "logs_exporter": "otlp",
+          "metrics_exporter": "otlp",
+          "traces_exporter": "none",
+          "metric_export_interval_ms": 10000,
+          "log_export_interval_ms": 1000,
+          "log_user_prompts": false,
+          "log_assistant_responses": false,
+          "log_tool_details": false,
+          "log_tool_content": false,
+          "log_raw_api_bodies": false,
+          "metrics_include_account_uuid": false,
+          "metrics_include_session_id": false,
+          "metrics_include_version": true,
+          "parent_session_events_in_this_runtime_store": 0
+        },
+        "windows_claude_settings": {
+          "scope": "Separate Windows Claude settings; not the Linux native profile",
+          "observed_integrations": [
+            "RTK PreToolUse"
+          ],
+          "native_linux_telemetry_configuration_inherited": false
+        }
+      },
+      "collector_routes_from_current_configuration": [
+        {
+          "pipeline": "logs",
+          "receivers": [
+            "otlp"
+          ],
+          "processors": [
+            "memory_limiter",
+            "transform/privacy",
+            "batch"
+          ],
+          "exporters": [
+            "otlphttp/loki",
+            "file/events"
+          ]
+        },
+        {
+          "pipeline": "metrics",
+          "receivers": [
+            "otlp"
+          ],
+          "processors": [
+            "memory_limiter",
+            "transform/privacy",
+            "deltatocumulative",
+            "batch"
+          ],
+          "exporters": [
+            "prometheus"
+          ]
+        },
+        {
+          "pipeline": "sdk_receipts",
+          "receivers": [
+            "file_log/sdk_receipts"
+          ],
+          "processors": [
+            "memory_limiter",
+            "transform/sdk_receipt",
+            "transform/privacy",
+            "batch"
+          ],
+          "exporters": [
+            "otlphttp/loki",
+            "file/events"
+          ],
+          "source": "Explicit private sdk-receipts/*.json spool; begin at retained file start, filename included, full path omitted"
+        },
+        {
+          "pipeline": "host_and_health",
+          "receivers": [
+            "host_metrics",
+            "http_check/ecosystem"
+          ],
+          "exporters": [
+            "prometheus"
+          ],
+          "scope": "Configured as separate pipelines; this describes routing, not current health results"
+        }
+      ],
+      "independent_exact_parent_context_metadata": {
+        "runtime": "Desktop WSL",
+        "sqlite_open_mode": "read_only",
+        "retained_event_rows": 538,
+        "first_event_utc": "2026-09-20T05:04:45Z",
+        "last_event_utc": "2026-09-20T14:17:59Z",
+        "rows_by_source_hook": {
+          "PostToolUse": 517,
+          "PreCompact": 3,
+          "Stop": 4,
+          "UserPromptSubmit": 14
+        },
+        "session_meta_event_count": 407,
+        "session_meta_compact_count": 3,
+        "parent_tool_calls_rows": 0,
+        "attribution_source_rows": {
+          "event_path": 85,
+          "input_cwd": 435,
+          "last_seen": 7,
+          "unknown": 11
+        },
+        "interpretation": "These are retained event-row counts grouped by source hook, not unique hook invocations, complete tool calls, provider tokens or confirmed failed operations. Three current-Desktop PreCompact events are observed; the previous fresh-native fixture's unforced PreCompact remains separately scoped. The metadata event_count differs from the actual row count and must not replace it. Empty tool_calls rows do not imply no tool execution."
+      },
+      "independent_rtk_metadata": {
+        "sqlite_open_mode": "read_only",
+        "newest_row_id": 55,
+        "newest_timestamp_utc": "2026-09-20T14:19:03.026948393Z",
+        "newest_command": "rtk git log -3",
+        "input_tokens_estimate": 118,
+        "output_tokens_estimate": 104,
+        "saved_tokens_estimate": 14,
+        "execution_ms": 9,
+        "project_scope": "Canonical public stack checkout",
+        "total_commands": 55,
+        "total_input_estimate": 18054,
+        "total_output_estimate": 16332,
+        "total_saved_estimate": 1722,
+        "exact_parent_hook_decision_rows": 0,
+        "independent_match": "Matches coordinator's direct native gain54\u219255 commands and1708\u21921722 saved estimate. This confirms RTK's retained accounting increment, not independent provider avoided-token savings."
+      },
+      "memory_metadata_confirmation": {
+        "default_unit_database_parent_match": false,
+        "independent_database_scope_confirmed": false,
+        "interpretation": "The default unit database returned no exact raw/hash parent-ID match. Its storage/identity mapping to the currently loaded MCP was not established. This is an unconfirmed storage scope, not evidence of missing capture. Coordinator's direct loaded-MCP exact-parent observations remain the relevant current evidence.",
+        "coordinator_reported_exact_parent": {
+          "active": true,
+          "ended_at": null,
+          "observation_count": 3578,
+          "pre_post_filtered_total": 3556,
+          "latest_observed_utc": "2026-09-20T14:17:58Z"
+        },
+        "coordinator_reported_limit": "Outer execution wrappers leave tool-family/outcome fields unknown in bounded hook observations; bodies were not inspected by this reviewer."
+      },
+      "upstream_commands": [
+        {
+          "argv": [
+            "rtk",
+            "gain",
+            "--format",
+            "json"
+          ],
+          "execution": "Coordinator direct output independently checked against the latest native SQLite row and aggregate"
+        },
+        {
+          "argv": [
+            "rtk",
+            "gain",
+            "--project",
+            "--format",
+            "json"
+          ],
+          "execution": "Verified by installed help; available for the explicitly selected working directory, not rerun here"
+        },
+        {
+          "argv": [
+            "agentsview",
+            "serve",
+            "status"
+          ],
+          "environment": {
+            "AGENTSVIEW_DATA_DIR": "${SCOPED_ARCHIVE}",
+            "AGENTSVIEW_TELEMETRY_ENABLED": "0",
+            "AGENTSVIEW_DISABLE_UPDATE_CHECK": "1"
+          },
+          "execution": "Executed against the existing explicitly scoped archive",
+          "returned_stdout": "No agentsview server is running."
+        },
+        {
+          "argv": [
+            "ccusage",
+            "codex",
+            "session",
+            "--help"
+          ],
+          "execution": "Executed; confirms --json, --since, --until, --offline, --no-cost and --config options. No session usage scan performed."
+        },
+        {
+          "argv": [
+            "otel-tui",
+            "--help"
+          ],
+          "execution": "Executed; viewer available. No receiver was started or client exporter redirected."
+        },
+        {
+          "mcp_tool": "ctx_stats",
+          "execution": "Loaded current Desktop tool; coordinator probes direct result. Its own runtime estimate is distinct from persisted per-parent event metadata."
+        },
+        {
+          "mcp_tool": "memory_read_session_observations",
+          "arguments": {
+            "session_id": "${EXACT_PARENT_SESSION_ID}"
+          },
+          "execution": "Coordinator exact-parent direct call with its supported observation-kind filters; raw identifier remains private. This reviewer read only independent metadata and reports the unconfirmed default-database scope."
+        }
+      ],
+      "independent_read_only_sql": [
+        {
+          "database_scope": "Desktop Context Mode project database",
+          "sql": "SELECT source_hook, COUNT(*) FROM session_events WHERE session_id = ? GROUP BY source_hook",
+          "parameters": [
+            "${EXACT_PARENT_SESSION_ID}"
+          ]
+        },
+        {
+          "database_scope": "Desktop Context Mode project database",
+          "sql": "SELECT COUNT(*), MIN(created_at), MAX(created_at) FROM session_events WHERE session_id = ?",
+          "parameters": [
+            "${EXACT_PARENT_SESSION_ID}"
+          ]
+        },
+        {
+          "database_scope": "Desktop Context Mode project database",
+          "sql": "SELECT event_count, compact_count FROM session_meta WHERE session_id = ?",
+          "parameters": [
+            "${EXACT_PARENT_SESSION_ID}"
+          ]
+        },
+        {
+          "database_scope": "Native RTK retained history",
+          "sql": "SELECT id, timestamp, rtk_cmd, input_tokens, output_tokens, saved_tokens, exec_time_ms FROM commands ORDER BY id DESC LIMIT 1",
+          "parameters": []
+        },
+        {
+          "database_scope": "Native RTK retained history",
+          "sql": "SELECT COUNT(*), SUM(input_tokens), SUM(output_tokens), SUM(saved_tokens) FROM commands",
+          "parameters": []
+        }
+      ],
+      "current_task_blind_spots": [
+        "A configured export route and healthy backend cannot alone attribute current Desktop task usage; use the independent exact-task monitor evidence.",
+        "Current native Claude metrics omit session/account identifiers by configuration; multiwriter and task attribution need the separately established metadata route.",
+        "This running Desktop Context Mode connection still has its old project-file scope. Corrected project configuration and the successful native bridge are distinct routes.",
+        "Retained Context Mode event rows, session_meta counters, direct tool statistics and ai-memory observations are different accounting populations; never sum them as tokens or complete tool counts.",
+        "The observed event timestamps bound freshness; configured hooks do not prove every later nested operation, provider call or lifecycle event has been captured.",
+        "AgentsView's selected archive server is stopped and requires explicit scoped refresh for newer historical sessions.",
+        "ccusage and otel-tui are available commands, not continuously loaded MCP observers for this task; Claude HUD is outside the Codex Desktop UI.",
+        "SDK spool ingestion is configured for processes that publish those receipts; the current Desktop cannot be assumed to have inherited a later launcher environment or SDK writer identity.",
+        "RTK's matched native accounting increment confirms its own estimate. No full-PC causal lifetime provider-token saving is established."
+      ]
+    },
+    "monitor_correlation": {
+      "schema_version": 1,
+      "scope": "Current Desktop parent task; bounded independent read-only observation review, 2026-09-20 14:17\u201314:19 UTC",
+      "parent_identity_sha256": "d7563b05405ada7a3b70d9f22a4666e31c02b6b3d266f1bc85da9d2dd210c0df",
+      "root_probe_file_sha256": "4de64fe52da679386e25773df966376a3df55f2ae83e69dd4f077f24db3bc86a",
+      "root_probe_file_bytes": 41865,
+      "parent_query_sha256": "73d6a70f9ddaa775452d8f8dcc41572270dd0c8d562ad0b6c15cf4e206e311e5",
+      "correlations": [
+        {
+          "tool_namespace": "mcp__socraticode",
+          "tool_name": "codebase_search",
+          "root_probe_capture_utc": "2026-09-20T14:18:00.239Z",
+          "loki_event_utc": "2026-09-20T14:17:59.634735+00:00",
+          "loki_success": true,
+          "root_result_is_error": false,
+          "capture_minus_event_seconds": 0.604265,
+          "canonical_root_result_sha256": "f2e8d33530ca4f3e37c1b0b9e8ac4ae9d755dd427f036bb7d1cb5155614c298b",
+          "semantic_boundary": "Root returned content supports the requested native retrieval."
+        },
+        {
+          "tool_namespace": "mcp__ai_memory",
+          "tool_name": "memory_read_session_observations",
+          "root_probe_capture_utc": "2026-09-20T14:18:00.239Z",
+          "loki_event_utc": "2026-09-20T14:17:58.774973+00:00",
+          "loki_success": true,
+          "root_result_is_error": false,
+          "capture_minus_event_seconds": 1.464027,
+          "canonical_root_result_sha256": "15741ff7112def41fcf775fdab880c8464a7a5f7936b95a49b284cd2100aeeb1",
+          "semantic_boundary": "Root returned content supports the requested native retrieval."
+        },
+        {
+          "tool_namespace": "mcp__serena",
+          "tool_name": "search_for_pattern",
+          "root_probe_capture_utc": "2026-09-20T14:19:02.856Z",
+          "loki_event_utc": "2026-09-20T14:19:02.659207+00:00",
+          "loki_success": true,
+          "root_result_is_error": false,
+          "capture_minus_event_seconds": 0.196793,
+          "canonical_root_result_sha256": "3693513c56e6af8efba1c952d17941a0958a3f8ddd8289b4936d0d4f39a6f8f1",
+          "semantic_boundary": "First pattern call returned an empty result object; later native retry is separate and outside this retained Loki sample."
+        },
+        {
+          "tool_namespace": "mcp__serena",
+          "tool_name": "search_for_pattern",
+          "root_probe_capture_utc": "2026-09-20T14:19:39.418Z",
+          "loki_event_utc": "2026-09-20T14:19:39.213505+00:00",
+          "loki_success": true,
+          "root_result_is_error": false,
+          "capture_minus_event_seconds": 0.204495,
+          "canonical_root_result_sha256": "3c84cced3063f349b0c503ed12ea6d29db098302779871daa216f0952d5099c5",
+          "semantic_boundary": "Later retry returned the requested parse_codex source-pattern match in tools/ecosystem/evaluate-native.py; one successful exact-parent Loki event matches the retained root completion window.",
+          "followup_evidence": "serena-retry-correlation.json"
+        }
+      ],
+      "prometheus_loki_consumption_reconciliation": {
+        "status": "not_established",
+        "reason": "Current retained Prometheus token series lack the exact task/client scope needed to join the parent Loki response.completed events. Specific sdk-worker6h query has no matching series; other unscoped codex-app-server series exist.",
+        "session_total_tokens": null,
+        "avoided_tokens": null
+      },
+      "native_health": [
+        {
+          "name": "collector_health",
+          "argv": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "10",
+            "--write-out",
+            "\n%{http_code}",
+            "http://127.0.0.1:14333/"
+          ],
+          "observed_at_utc": "2026-09-20T14:17:13.228733+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "body": "{\"status\":\"Server available\",\"upSince\":\"2026-09-19T11:28:52.529351607-04:00\",\"uptime\":\"21h55m12.872514984s\"}",
+          "stderr": ""
+        },
+        {
+          "name": "prometheus_ready",
+          "argv": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "10",
+            "--write-out",
+            "\n%{http_code}",
+            "http://127.0.0.1:19090/-/ready"
+          ],
+          "observed_at_utc": "2026-09-20T14:17:13.228939+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "body": "Prometheus Server is Ready.\n",
+          "stderr": ""
+        },
+        {
+          "name": "loki_ready",
+          "argv": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "10",
+            "--write-out",
+            "\n%{http_code}",
+            "http://127.0.0.1:13100/ready"
+          ],
+          "observed_at_utc": "2026-09-20T14:17:13.229242+00:00",
+          "exit_code": 22,
+          "http_status": 503,
+          "body": "Ingester not ready: waiting for 15s after being ready\n",
+          "stderr": "curl: (22) The requested URL returned error: 503\n"
+        },
+        {
+          "name": "grafana_health",
+          "argv": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "10",
+            "--write-out",
+            "\n%{http_code}",
+            "http://127.0.0.1:13000/api/health"
+          ],
+          "observed_at_utc": "2026-09-20T14:17:13.229410+00:00",
+          "exit_code": 0,
+          "http_status": 200,
+          "body": "{\n  \"database\": \"ok\",\n  \"version\": \"13.2.2\",\n  \"commit\": \"1bea008f7e4e858b6824c9e364d608bd4d10b13a\"\n}",
+          "stderr": ""
+        }
+      ],
+      "native_followup": [
+        {
+          "name": "loki_ready_followup",
+          "argv": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "10",
+            "--write-out",
+            "\n%{http_code}",
+            "http://127.0.0.1:13100/ready"
+          ],
+          "observed_at_utc": "2026-09-20T14:18:31.942375+00:00",
+          "exit_code": 0,
+          "stdout": "ready\n\n200",
+          "stderr": ""
+        },
+        {
+          "name": "otel_tui_process",
+          "argv": [
+            "pgrep",
+            "-x",
+            "otel-tui"
+          ],
+          "observed_at_utc": "2026-09-20T14:18:31.947452+00:00",
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "name": "alloy_process",
+          "argv": [
+            "pgrep",
+            "-x",
+            "alloy"
+          ],
+          "observed_at_utc": "2026-09-20T14:18:31.961369+00:00",
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "name": "all_six_services",
+          "argv": [
+            "systemctl",
+            "--user",
+            "is-active",
+            "ecosystem-otelcol.service",
+            "ecosystem-prometheus.service",
+            "ecosystem-loki.service",
+            "ecosystem-grafana.service",
+            "ecosystem-alertmanager.service",
+            "ecosystem-ntfy.service"
+          ],
+          "observed_at_utc": "2026-09-20T14:18:31.966779+00:00",
+          "exit_code": 0,
+          "stdout": "active\nactive\nactive\nactive\nactive\nactive\n",
+          "stderr": ""
+        }
+      ],
+      "aggregate_queries": [
+        {
+          "name": "prometheus_targets",
+          "observed_at_utc": "2026-09-20T14:18:02.188109+00:00",
+          "argv": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "10",
+            "--get",
+            "http://127.0.0.1:19090/api/v1/query",
+            "--data-urlencode",
+            "query=up",
+            "--write-out",
+            "\n%{http_code}"
+          ],
+          "http_status": 200,
+          "exit_code": 0,
+          "status": "success",
+          "results": [
+            {
+              "metric": {
+                "__name__": "up",
+                "instance": "127.0.0.1:16333",
+                "job": "qdrant"
+              },
+              "value": [
+                1789913882.193,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "up",
+                "instance": "127.0.0.1:18888",
+                "job": "collector-health"
+              },
+              "value": [
+                1789913882.193,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "up",
+                "instance": "127.0.0.1:19090",
+                "job": "prometheus"
+              },
+              "value": [
+                1789913882.193,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "up",
+                "instance": "127.0.0.1:13100",
+                "job": "loki"
+              },
+              "value": [
+                1789913882.193,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "up",
+                "instance": "127.0.0.1:19093",
+                "job": "alertmanager"
+              },
+              "value": [
+                1789913882.193,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "up",
+                "instance": "127.0.0.1:8231",
+                "job": "vllm"
+              },
+              "value": [
+                1789913882.193,
+                "1"
+              ]
+            },
+            {
+              "metric": {
+                "__name__": "up",
+                "instance": "127.0.0.1:18889",
+                "job": "collector-native"
+              },
+              "value": [
+                1789913882.193,
+                "1"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "sdk_usage_6h",
+          "observed_at_utc": "2026-09-20T14:18:02.188442+00:00",
+          "argv": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "10",
+            "--get",
+            "http://127.0.0.1:19090/api/v1/query",
+            "--data-urlencode",
+            "query=last_over_time(ecosystem_codex_turn_token_usage_sum{client_scope=\"sdk-worker\"}[6h])",
+            "--write-out",
+            "\n%{http_code}"
+          ],
+          "http_status": 200,
+          "exit_code": 0,
+          "status": "success",
+          "results": []
+        },
+        {
+          "name": "provider_metric_writer_scopes_6h",
+          "observed_at_utc": "2026-09-20T14:18:02.188719+00:00",
+          "argv": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "10",
+            "--get",
+            "http://127.0.0.1:19090/api/v1/query",
+            "--data-urlencode",
+            "query=count by (client_scope,job) (last_over_time(ecosystem_codex_turn_token_usage_sum[6h]))",
+            "--write-out",
+            "\n%{http_code}"
+          ],
+          "http_status": 200,
+          "exit_code": 0,
+          "status": "success",
+          "results": [
+            {
+              "metric": {
+                "job": "codex-app-server"
+              },
+              "value": [
+                1789913882.192,
+                "12"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "current_parent_records_24h",
+          "observed_at_utc": "2026-09-20T14:18:02.188991+00:00",
+          "argv": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "10",
+            "--get",
+            "http://127.0.0.1:13100/loki/api/v1/query",
+            "--data-urlencode",
+            "query=sum by (service_name) (count_over_time({service_name=~\".+\"} | conversation_id = \"${DESKTOP_THREAD_ID}\" or thread_id = \"${DESKTOP_THREAD_ID}\" or session_id = \"${DESKTOP_THREAD_ID}\" or ecosystem_task_id = \"${DESKTOP_THREAD_ID}\" [24h]))",
+            "--write-out",
+            "\n%{http_code}"
+          ],
+          "http_status": 200,
+          "exit_code": 0,
+          "status": "success",
+          "results": [
+            {
+              "metric": {
+                "service_name": "codex-app-server"
+              },
+              "value": [
+                1789913882.193,
+                "2778"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "recent_provider_records_15m",
+          "observed_at_utc": "2026-09-20T14:18:02.189241+00:00",
+          "argv": [
+            "curl",
+            "--silent",
+            "--show-error",
+            "--fail-with-body",
+            "--max-time",
+            "10",
+            "--get",
+            "http://127.0.0.1:13100/loki/api/v1/query",
+            "--data-urlencode",
+            "query=sum by (service_name) (count_over_time({service_name=~\"codex.*|Codex.*|claude.*\"}[15m]))",
+            "--write-out",
+            "\n%{http_code}"
+          ],
+          "http_status": 200,
+          "exit_code": 0,
+          "status": "success",
+          "results": [
+            {
+              "metric": {
+                "service_name": "codex-app-server"
+              },
+              "value": [
+                1789913882.193,
+                "391"
+              ]
+            }
+          ]
+        }
+      ],
+      "response_consumption_examples": [
+        {
+          "at": "2026-09-20T14:18:32.821521+00:00",
+          "event_kind": "response.completed",
+          "input": "99030",
+          "cached_subset": "95232",
+          "output": "927",
+          "reasoning_subset": "516",
+          "total_field": "99957"
+        },
+        {
+          "at": "2026-09-20T14:19:02.617919+00:00",
+          "event_kind": "response.completed",
+          "input": "101526",
+          "cached_subset": "98816",
+          "output": "874",
+          "reasoning_subset": "516",
+          "total_field": "102400"
+        }
+      ],
+      "source_receipt": {
+        "path": "receipt.json",
+        "sha256": "dfce3dcffa40ba2d63c6db578321b1804a04b9a35ca53d74239c7cfb53b8cde6"
+      },
+      "limitations": [
+        "The two response.completed usage examples are event-scoped reported consumption; cache/reasoning fields are subsets, not extra usage or savings.",
+        "The 13:22 earlier empty monitor queries selected SDK fixture labels and a six-hour window. They did not establish absence of all Loki events.",
+        "Current exact-parent Loki records establish delivery; they do not prove every installed component is active.",
+        "No new provider request, synthetic telemetry injection, service/config mutation or repository edit was performed."
+      ]
+    },
+    "current_task_total_provider_tokens": null,
+    "exact_causal_lifetime_provider_tokens_saved": null,
+    "verification_injected_model_requests": 0,
+    "synthetic_telemetry_injected": false,
+    "service_or_account_configuration_changed": false,
+    "private_evidence": [
+      {
+        "path": "root-probes.json",
+        "sha256": "4de64fe52da679386e25773df966376a3df55f2ae83e69dd4f077f24db3bc86a",
+        "bytes": 41865
+      },
+      {
+        "path": "layer-routing.json",
+        "sha256": "312064d514e9585db0676130db9ab0a72ff42b7b87013d672fb20cd969275446",
+        "bytes": 15232
+      },
+      {
+        "path": "monitor-review/receipt.json",
+        "sha256": "dfce3dcffa40ba2d63c6db578321b1804a04b9a35ca53d74239c7cfb53b8cde6",
+        "bytes": 53393
+      },
+      {
+        "path": "monitor-review/correlation.json",
+        "sha256": "362a16d95e3d5294ad96d38c9edbab75842acad6006f5ff2b205a12b74b9dc99",
+        "bytes": 13393
+      },
+      {
+        "path": "monitor-review/serena-retry-correlation.json",
+        "sha256": "e7d54823aa141aff62e83a44fc936625df97a02845bf5a621aeff2cf55f79931",
+        "bytes": 9296
+      }
+    ]
+  }
+}

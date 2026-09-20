@@ -159,6 +159,7 @@ add($("setup-summary"), make("strong", "", setup.components.length + " selected 
 if(setup.missing_audit_count) add($("setup-summary"), make("p", "stack-notice", setup.missing_audit_count + " current components have no row in the dated lifecycle audit. Their recipes and linked receipts remain available below."));
 [["adoption/README.md", "New-PC setup"], ["adoption/update.md", "Resume and update"], ["tools/token-report/README.md", "Capture this PC's lifetime results"]].forEach(([path, label]) => add($("setup-guides"), recipeButton(path, label)));
 if(recipeMap.has("adoption/lifecycle.md")) add($("setup-guides"), recipeButton("adoption/lifecycle.md", "Lifecycle checks and recovery"));
+if(recipeMap.has("docs/current-session-observation.md")) add($("setup-guides"), recipeButton("docs/current-session-observation.md", "Recorded session: live tools and observation"));
 data.layers.forEach(layer => { const option = make("option", "", layer.name); option.value = layer.id; add($("stack-layer"), option); });
 setup.profiles.forEach(profile => {
   const option = make("option", "", profile.label); option.value = profile.id; add($("stack-profile"), option);
