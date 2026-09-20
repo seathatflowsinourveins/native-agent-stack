@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-09-20T02:48:47.669977+00:00",
+  "component": "tavily",
+  "version": "0.1.8",
+  "source": "https://pypi.org/project/tavily-cli/0.1.8/",
+  "license": "MIT",
+  "skills_source": "https://github.com/tavily-ai/skills/tree/778122e5f9c680f541eeceda5a5b36405eb7980c",
+  "skills_pin": "778122e5f9c680f541eeceda5a5b36405eb7980c",
+  "skill_count": 8,
+  "skill_files": [
+    {
+      "path": "tavily-best-practices/SKILL.md",
+      "sha256": "8972384d52e22c76b82928c309f8faff3bfa2f68c4e4d7ad3ce1fd882d99048e",
+      "bytes": 4377
+    },
+    {
+      "path": "tavily-best-practices/references/crawl.md",
+      "sha256": "725e613330a6a3775fe265e6fa0c782f469f6f8580788012c78893a9ac010b84",
+      "bytes": 10204
+    },
+    {
+      "path": "tavily-best-practices/references/extract.md",
+      "sha256": "7995998ce1969bf54892f84c9f1e583582eea9a354ab666c0869607635e41d5e",
+      "bytes": 7381
+    },
+    {
+      "path": "tavily-best-practices/references/integrations.md",
+      "sha256": "d53ba9f73d14f24a4ac81f5d77d584b4ff7fbbd4dd3b70f5e7c21cbc175cb65b",
+      "bytes": 17980
+    },
+    {
+      "path": "tavily-best-practices/references/research.md",
+      "sha256": "99e3c706b5ed3a51842204f43c552b75e3243d6facc3b8b7c9878a1a163e1ec7",
+      "bytes": 10090
+    },
+    {
+      "path": "tavily-best-practices/references/sdk.md",
+      "sha256": "b0c745315f2ca16647a2c298644dc9918ea31bf732921b02841e26814da2087a",
+      "bytes": 8353
+    },
+    {
+      "path": "tavily-best-practices/references/search.md",
+      "sha256": "db5d7f52e42ec93f54b6cb04224e63ce689fd54ca2e3011754908eb54ce82261",
+      "bytes": 12088
+    },
+    {
+      "path": "tavily-cli/SKILL.md",
+      "sha256": "f7b8f34b9059f0bce6c2b15b72efa3b8f5d8780799a5d70db3e93f06aa3b8556",
+      "bytes": 4900
+    },
+    {
+      "path": "tavily-crawl/SKILL.md",
+      "sha256": "7384255f8e8916234b78a68070a969ab54c49fd47e5eca09afc059f20b7f9f3b",
+      "bytes": 4470
+    },
+    {
+      "path": "tavily-dynamic-search/SKILL.md",
+      "sha256": "3c443efacd86d35a912de1908915c0528f66238ca262d72216e73f5758e43876",
+      "bytes": 5963
+    },
+    {
+      "path": "tavily-extract/SKILL.md",
+      "sha256": "18964691b572d7857ab854a6a2b7bd0bc8ff068c83310395afbc17ae207e1316",
+      "bytes": 3475
+    },
+    {
+      "path": "tavily-map/SKILL.md",
+      "sha256": "ecab50751a7186e092c1e8d7bdaebe6381e00505f3ae6ee8d4a879a3ec45fc54",
+      "bytes": 3685
+    },
+    {
+      "path": "tavily-research/SKILL.md",
+      "sha256": "d62b2b1ba9804ec077c2e79f6433a3e60deb02a845d6481ac4b47d3961452970",
+      "bytes": 4076
+    },
+    {
+      "path": "tavily-search/SKILL.md",
+      "sha256": "be3974d5763cc02d6c178fa32466767ec3ba2f4ce48ab1a7e9d926c02d6461fa",
+      "bytes": 4138
+    }
+  ],
+  "authentication": "verified-with-native-cli",
+  "live_search": {
+    "passed": true,
+    "max_results": 3,
+    "actual_results": 3,
+    "sources": [
+      "https://code.claude.com/docs/en/agent-sdk/subagents",
+      "https://code.claude.com/docs/en/sub-agents",
+      "https://code.claude.com/docs/en/costs"
+    ]
+  },
+  "agent_discovery": {
+    "codex": "fresh-native-cli-metadata-verified-eight-skills",
+    "claude_code": "fresh-native-initialize-discovered-eight-skills",
+    "codex_native_probe": {
+      "checked_at": "2026-09-20T03:10:33.482926+00:00",
+      "native_cli": "codex debug prompt-input",
+      "exit": 0,
+      "model_call": false,
+      "discovered_skill_metadata": [
+        "tavily-cli",
+        "tavily-search",
+        "tavily-extract",
+        "tavily-map",
+        "tavily-crawl",
+        "tavily-research",
+        "tavily-dynamic-search",
+        "tavily-best-practices"
+      ],
+      "all_expected_discovered": true,
+      "scope": "Fresh native Codex CLI prompt rendering; existing desktop task hot reload is not inferred."
+    },
+    "claude_native_probe": {
+      "verified_at": "2026-09-20T03:13:21.182245+00:00",
+      "native_probe": "Fresh Claude initialize-only protocol",
+      "exit": 0,
+      "model_calls": 0,
+      "discovered_skill_names": [
+        "tavily-best-practices",
+        "tavily-cli",
+        "tavily-crawl",
+        "tavily-dynamic-search",
+        "tavily-extract",
+        "tavily-map",
+        "tavily-research",
+        "tavily-search"
+      ],
+      "source_receipt_sha256": "09cebb997e37ebb320574f7dd5ed0bdf981a2dce3d05a99cdf7c5d92fde6329a",
+      "scope": "Fresh native Claude metadata process; no current desktop hot-reload inference."
+    },
+    "current_desktop_task_hot_reload": "unverified"
+  },
+  "kind": "dated_native_cli_acceptance",
+  "scope": "One authoring environment; not acceptance on the viewing host.",
+  "onboarding": {
+    "url": "https://tavily.com/agent-setup/SKILL.md",
+    "sha256": "54dabed97d84c99c46d89ccba578367d8bb084583724f13611675d71183e5ac6"
+  },
+  "wheel_sha256": "75d307879a9cf37cf693785662ec842063d8c0ac3287125c142e31888afd45d5",
+  "installation": "Isolated native uv tool environment using Python 3.13; official pinned skills shared by the two native clients.",
+  "limits": [
+    "One bounded three-result search and native authentication were observed; deep research, extraction and crawl acceptance were not exercised.",
+    "All eight skills were discovered by fresh native Codex CLI prompt rendering and Claude initialization without model calls. Hot reload of the existing desktop task remains unverified.",
+    "No token-savings or universal host-readiness claim. Public evidence contains no account identifiers, credentials or personal paths."
+  ],
+  "discovery_summary": "Verified search and fresh Codex / Claude skill discovery"
+}

@@ -4,6 +4,11 @@ A current, evidence-backed reference for native **Codex + Claude Code**, with sc
 
 **Snapshot: September 20, 2026.** This repository records a tested selection and its limits. It is not a claim that every available framework is installed or that an independent universal SOTA benchmark has been won.
 
+Open the **[offline ecosystem explorer](docs/ecosystem/README.md)** for the full
+layer map, searchable public repository index, native skills and workers, scoped
+memory/retrieval, and token-efficiency policy. Its downloadable single HTML file
+keeps dated source reviews, recorded execution and current-host acceptance distinct.
+
 The new **[evidence-led convergence practice](blueprints/convergence-practice/README.md)**
 connects public own repositories, stars and curated-list discovery to pinned
 source review, frozen experiments and explicit adoption decisions. It adds an
