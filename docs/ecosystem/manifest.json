@@ -435,6 +435,12 @@
       "body": "Pinned partial-offload task with retained runtime, quality and memory limits.",
       "path": "blueprints/convergence-practice/gpu-inference/README.md",
       "category": "agents"
+    },
+    {
+      "title": "Restricted worker compatibility",
+      "body": "Observed Context Mode Agent-routing conflict, exact upstream source and unresolved restricted-role boundary. Normal native defaults remain intact.",
+      "path": "docs/restricted-worker-compatibility.md",
+      "category": "workers"
     }
   ],
   "highlights": [

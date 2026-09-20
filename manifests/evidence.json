@@ -1885,6 +1885,20 @@
         "No host/user-manager restart, provider cancellation, billing cessation, off-host restoration or distributed exactly-once acceptance."
       ],
       "path": "evidence/receipts/native-worker-containment-20260920.json"
+    },
+    {
+      "id": "native-nautilus-ci-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nautilus-trader"
+      ],
+      "claim": "A fresh GitHub Ubuntu24.04 runner installed five exact distributions, verified the downloaded engine wheel and unchanged upstream source, and passed two mandatory-offline native engine replays with identical economic reports and original cleanup.",
+      "limitations": [
+        "Synthetic EUR/USD engine fixture only; no historical equities, broker order, account entitlement, strategy-quality or provider token-saving acceptance.",
+        "GitHub raw artifacts expire after14days; retained local copies and this public sanitized result/hash manifest preserve the dated evidence.",
+        "Network namespace and available-interface observations are not measured counts of attempted external transports."
+      ],
+      "path": "evidence/receipts/native-nautilus-ci-20260920.json"
     }
   ],
   "files": [
@@ -3391,8 +3405,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "18e49dabde5c15ebd7218e8f247609552aa78cebc722ca488754dd27d79f3368",
-      "bytes": 395779
+      "sha256": "b4e3407c30be9c5e39b612493a41f083bec89bafdc2e4f215023d4a87fb0cc3e",
+      "bytes": 396074
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -4991,8 +5005,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "fecf98b04d8a6fe835ae2e3d51554fc1af61aef9bc3ecf6bd98323c8e9c47e2c",
-      "bytes": 3678693
+      "sha256": "3b8bee99ad7cb0ca4907aabbb6208377710fe66c28f1a86f7acc921c25636d2b",
+      "bytes": 3682852
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5001,8 +5015,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "46ea00961112e37393523316b9c9d78b75a89010dc8c6679fea243aef8a79867",
-      "bytes": 29577
+      "sha256": "caccbed00dff18ed6049ed6ee07437a105988d6fdfa62f11d1dddda36842f3c1",
+      "bytes": 29889
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -5506,8 +5520,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 74543,
-      "sha256": "b562dd43c2c9b1d070a8c07b500fd408af2cd8e2a455fff866c9bdc2f18dee7e"
+      "bytes": 74582,
+      "sha256": "d02b6e339b38a04713f71dbdb87709f1d29865f1a937728b6b0cb39b0a68a430"
     },
     {
       "path": "observability/README.md",
@@ -5976,8 +5990,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/README.md",
-      "sha256": "fd137e146862d6768e6ce505de4036d832320fc63f8edcc6d86c69d20d92ccc5",
-      "bytes": 3719
+      "sha256": "659edadf891429c123d43b54c5330b5fa6951c2f68af1ea6fe11f64ec4486f0e",
+      "bytes": 4189
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/observe_quickstart.py",
@@ -6001,18 +6015,18 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "109fb499ad315343f41472e678f6a7865fafd622ed5f870297d657f19abac7bc",
-      "bytes": 16724
+      "sha256": "1901931828b3f32508294b853ddfe053a47c0d12b37abe0cf34af23412058440",
+      "bytes": 16764
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "074a079b95091e127494cdc4369f0095a329dbd97b3f3a20c7d2efa9310c6c49",
-      "bytes": 5493
+      "sha256": "72c3afc2475e2c202d9a75213554ecbc325ce7087a0c04f87d8fecab095f89a1",
+      "bytes": 5640
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "3b5640d34e1adb414a13e61b7f6425289c33bef8731dcfb6debd18a03533510f",
-      "bytes": 5285
+      "sha256": "3c03839c02adba85ca184d39d3180c94b5f10002a0fe1193ed232780e5b48b20",
+      "bytes": 5613
     },
     {
       "path": "evidence/receipts/native-harness-defaults-20260920.json",
@@ -6213,6 +6227,16 @@
       "path": "evidence/receipts/native-worker-containment-20260920.json",
       "sha256": "82cf764c6dc67dec6d55b2ee36d41ef2fb1ff6e786751d352c3504b7a376c30f",
       "bytes": 2238
+    },
+    {
+      "path": "evidence/receipts/native-nautilus-ci-20260920.json",
+      "sha256": "a0d17cc26dff8ef3c4ed076060b1e98f68cf946e5319509454c2b4cf7c56a108",
+      "bytes": 13303
+    },
+    {
+      "path": "docs/restricted-worker-compatibility.md",
+      "sha256": "dadf3a3adc8bcc623d5e9ef431daa791d7648e79280a4763dcac634f3691a7dd",
+      "bytes": 2367
     }
   ],
   "convergence_records": [

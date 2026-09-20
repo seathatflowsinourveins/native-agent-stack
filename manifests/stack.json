@@ -1685,7 +1685,8 @@
         "\"$NAUTILUS_ENV/bin/python\" \"$UPSTREAM_QUICKSTART\""
       ],
       "evidence_ids": [
-        "native-nautilus-v2-20260920"
+        "native-nautilus-v2-20260920",
+        "native-nautilus-ci-20260920"
       ],
       "source_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
       "upstream_sources": [

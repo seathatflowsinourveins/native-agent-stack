@@ -17,7 +17,7 @@
     "install_command": "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --pre \"nautilus_trader==2.0.0rc5\"",
     "supported_python": ">=3.12,<3.15; vanilla CPython",
     "linux_support": "Official installation guide: Ubuntu22.04+ and glibc>=2.35; wheel platform tags are not a broader tested-host claim.",
-    "acceptance": "isolated native upstream synthetic EURUSD quickstart accepted; two economic replay runs; no equity/broker acceptance",
+    "acceptance": "isolated native upstream synthetic EURUSD quickstart accepted; two economic replay runs; no equity/broker acceptance; fresh GitHub Ubuntu24.04 exact wheel/source installation and two offline replays passed",
     "retained_comparison_engine": "LEAN native source-build and dated historical simulation receipts",
     "sources": [
       "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc5",
@@ -84,7 +84,8 @@
     "blueprints/us-equities/historical-simulation/receipt.json",
     "blueprints/us-equities/authenticated-data/native-receipt.json",
     "blueprints/us-equities/identity-readiness/native-receipt.json",
-    "blueprints/us-equities/acceptance-wave/README.md"
+    "blueprints/us-equities/acceptance-wave/README.md",
+    "evidence/receipts/native-nautilus-ci-20260920.json"
   ],
   "next_acceptance": [
     {

@@ -5882,10 +5882,15 @@
             "id": "native-nautilus-v2-20260920",
             "path": "evidence/receipts/native-nautilus-v2-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-nautilus-ci-20260920",
+            "path": "evidence/receipts/native-nautilus-ci-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
-        "scope": "Pinned NautilusTrader2.0.0rc5 unchanged upstream synthetic EURUSD quickstart passed two isolated offline runs with exact cash reconciliation, repeatable economic reports and original cleanup; two empty-report attempts remain retained."
+        "scope": "Pinned NautilusTrader2.0.0rc5 unchanged upstream synthetic EURUSD quickstart passed two isolated offline runs with exact cash reconciliation, repeatable economic reports and original cleanup; two empty-report attempts remain retained. Fresh hosted CI also passed exact wheel/source checks, two offline replays and independent report validation."
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,

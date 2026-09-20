@@ -216,12 +216,13 @@
       "priority": 2,
       "status": "partial",
       "scope": "One same-child cancellation/crash/resume with an unchanged checkpoint and one local effect passed after explicit supervisor cleanup. The pending wait survived the native runtime crash; automatic descendant containment remains open. A supported user-service cgroup contained the deterministic survivor fixture. The combined native follow-up stopped at a refused prefixed command before checkpoint.",
-      "next_action": "Keep the combined native gate open. A future explicitly scoped qualification must address the child command-contract mismatch while retaining existing permissions and original failures; do not repeat setup or label deterministic proof as native child acceptance.",
+      "next_action": "Use compatible native inherited-tool roles; qualify a deliberately restricted role only after resolving its instruction/tool contract. Context Mode1.0.169 has no supported Agent-routing opt-out; retain the failed trial and existing global permissions.",
       "source_paths": [
         "blueprints/convergence-practice/native-worker/README.md",
         "blueprints/convergence-practice/native-recovery/README.md",
         "blueprints/us-equities/worker-supervision/README.md",
-        "blueprints/convergence-practice/worker-recovery/README.md"
+        "blueprints/convergence-practice/worker-recovery/README.md",
+        "docs/restricted-worker-compatibility.md"
       ]
     },
     {
