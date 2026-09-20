@@ -2,6 +2,11 @@
 
 Use [manifest.json](manifest.json) as a small reference map. Do not load every catalog, memory archive or repository into a worker. The accepted pins live in `manifests/stack.json`; dated research and open gates live in `catalogs/us-equities/convergence-review.json`; receipt claims and hashes live in `manifests/evidence.json`.
 
+For context/tool selection and usage comparisons, read the current
+[token practice](../docs/token-practice.md). Retained-history counters, conversion
+heuristics, exact artifact counts and final provider usage are separate. Keep their
+scope and failures; do not sum snapshots or rerun model trials on ordinary resume.
+
 ## Resume an existing checkout
 
 ```sh

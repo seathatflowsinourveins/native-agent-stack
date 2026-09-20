@@ -9,6 +9,11 @@ private, and use the nonmutating `scripts/adoption_status.py` for prerequisites.
 
 This is a portable reference stack with evidence, native recipes and examples. Preserve the distinction between historical host execution, reproducible artifact checks and live provider/GPU acceptance. Never describe a version check or recorded receipt replay as a new model run.
 
+Read docs/token-practice.md on demand for the selected context lane, native
+counter scopes and measured comparisons. Do not rerun the full audit or model
+trials at startup. Never sum cumulative snapshots, overlapping artifact reductions
+or provider/cache subset counters.
+
 Use upstream executables and supported integration formats. Keep client accounts, model routes, native caching and tool discovery intact. Load detailed guides only for the current task. Run the repository validation command before committing changed evidence or manifests. Do not fetch private state or authentication stores.
 
 One coordinator integrates. Writing workers need separate worktrees and bounded file ownership. Evidence belongs in compact sanitized receipts; no raw conversations, tokens, personal paths or machine-specific active client configuration.

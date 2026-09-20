@@ -1,0 +1,168 @@
+# Token practice and measured native results
+
+Recorded September 20, 2026. Read this guide on demand when selecting a context
+lane, interpreting native counters, or designing a measured comparison.
+
+The selection has **52 component records**. The broader catalog now has **504
+repository identities: 342 public stars and 162 beyond stars, with 1,037 typed
+references**. The earlier audit and full-catalog TOON receipt retain the 502-repository
+input that was actually measured. These are bounded catalog counts, not universal SOTA, 52 successful
+E2E runs, or savings from every repository. Supporting runtimes and historical
+alternative installations retain separate scope.
+
+## Default practice
+
+1. Retrieve what the current decision needs: exact code with rg/Serena,
+   structural patterns with ast-grep, conceptual code with SocratiCode, selected
+   Markdown with scoped QMD, and durable decisions with scoped ai-memory.
+2. Choose one suitable lane per artifact. RTK formats supported command output;
+   Context Mode processes or retrieves bounded results; TOON suits some
+   structured data only when the measured representation helps; Repomix outlines selected source; the local Headroom guard
+   retains the original. Do not stack transformations to increase a counter.
+3. Preserve raw output, errors, input identity and source for recovery. Read
+   original implementation before correctness decisions. Lossy retrieval and
+   compression can omit necessary information.
+4. Preserve native caching, compaction, tool discovery, accounts and model
+   behavior. Shared PATH is not host acceptance. Do not add hooks or schedulers,
+   override providers, or rerun model trials during ordinary startup.
+5. Count once at the proper boundary. Missing measurements are unknown.
+   Never add cumulative snapshots, cache subsets, provider usage and artifact
+   differences, or multiply a measured difference by repository count.
+
+## Four accepted native coding trials
+
+All four trials passed shared visible tests, hidden acceptance, file-scope and
+workflow checks on fixture revision c0bb7561a9c88a98ceaa06d6fcc153f35f55dd69.
+Each client ran baseline first, then explicit Context Mode use in a fresh workspace.
+
+| Native client/model | Baseline tokens | Candidate tokens | Observed difference | Wall seconds, baseline → candidate |
+| --- | ---: | ---: | ---: | ---: |
+| Codex / GPT-6 Astra | 135,217 | 119,998 | 15,219 fewer (11.26%) | 56.129 → 50.207 |
+| Claude Code / Claude Opus 5 | 292,561 | 368,121 | 75,560 more (25.83%) | 27.465 → 34.056 |
+
+The candidate made two Context Mode calls in Codex and three in Claude; neither
+baseline used it. Native caches were retained and their warmth was uncontrolled.
+Plugin tool availability was not fully controlled. One fixed-order pair per
+client does not isolate a causal Context Mode effect, establish a repeatable
+saving rate, compare model quality generally, or measure the entire stack.
+
+Codex total is input plus output; cached input and reasoning are subsets.
+Claude total is ordinary input plus cache creation plus cache reads plus output;
+thinking is included in output. Final cumulative task counters exclude the
+coordinator, reviewers, audit tooling and report. Billed cost is unknown.
+See the [native-pair receipt](../evidence/receipts/token-practice-native-pairs-20260920.json).
+
+## Ten exact retained-artifact comparisons
+
+Counts use gpt-tokenizer 3.4.0 with o200k_base. They describe complete retained
+UTF-8 artifacts at the stated boundary, not whole-task or billed usage.
+
+| Native operation | Before | After | Tokens removed | Information boundary |
+| --- | ---: | ---: | ---: | --- |
+| RTK Git log | 537 | 178 | 359 | Formatting at a fixed six-commit input |
+| TOON components | 1,664 | 1,307 | 357 | Structured serialization with native strict decode |
+| ast-grep selection | 1,818 | 674 | 1,144 | Selected expression versus complete source |
+| QMD source window | 2,672 | 815 | 1,857 | Selected lines versus complete indexed document |
+| SocratiCode retrieval | 2,731 | 491 | 2,240 | Selected result versus complete source |
+| Repomix outline | 3,697 | 663 | 3,034 | Lossy outline versus complete pack |
+| EdgarTools HTML | 10,322 | 1,249 | 9,073 | Offline upstream HTML fixture to Markdown |
+| agent-browser snapshot | 67 | 38 | 29 | Interactive controls versus full accessibility view |
+| MarkItDown HTML | 10,322 | 1,360 | 8,962 | Exact stored HTML input to Markdown |
+| Syft inventory table | 471,760 | 465 | 471,295 | Package columns; other SBOM metadata omitted |
+
+Do not sum the rows. Several share a source or supporting services. Crediting
+the SocratiCode difference again to Qdrant, vLLM or MCPorter would count the same
+effect repeatedly. Syft package name/version/type columns were checked for equality,
+but its table does not retain the complete SBOM. The corrected MarkItDown baseline
+uses the exact stored input; the earlier one-byte mismatch is not the accepted pair.
+
+The [artifact receipt](../evidence/receipts/token-practice-artifacts-20260920.json)
+publishes counts, byte sizes and hashes. Original host artifacts remain private;
+CI does not independently recount those private pairs. Existing public fixture
+recounts in [the evidence guide](evidence.md) retain their separate counts.
+
+## A separate full-catalog TOON counterexample
+
+A later conversion used all 502 repository identities. Native TOON 4.1.1
+reported approximately 84,907 JSON tokens → 71,770 TOON tokens: 13,137 fewer
+(15.5%) under its tokenx 1.3.0 heuristic. Its strict decode round trip passed.
+The exact o200k_base comparison instead counted **59,792 compact-JSON tokens →
+66,815 TOON tokens: 7,023 more**. The source representations and estimators
+are different, so the native estimate is not an exact saving result.
+
+The guard selected the original compact JSON. Keep JSON when conversion
+increases the relevant measured input. This is one additional comparison,
+separate from the ten retained-artifact pairs above. The [full-catalog receipt](../evidence/receipts/token-practice-catalog-toon-20260920.json)
+retains sanitized upstream output, methods and artifact identities; it does not
+establish provider savings.
+
+## Native counters and their limits
+
+The [dated native-counter receipt](../evidence/receipts/token-practice-native-counters-20260920.json)
+retains returned RTK and Headroom fields, TOON comparison methods and separate
+Desktop WSL, native Claude and native Codex Context Mode runtime scopes.
+
+| Upstream command/tool | Native scope | Interpretation |
+| --- | --- | --- |
+| rtk gain --format json | Retained command-history estimates | Installed 0.49.0 defaults history_days to 90; this is not a forever ledger or provider accounting. |
+| rtk gain --project --format json | Same history, selected project | A subset of the all-history view, not another total to add. |
+| toon input.json --stats -o output.toon | One conversion | TOON 4.1.1 uses tokenx 1.3.0 estimates here; no native cross-run savings ledger. Exact o200k_base recount is separate. |
+| Context Mode ctx_stats | Connection/session and reported lifetime estimates | Session estimates differ from lifetime event-count × 256-token heuristics; neither is exact provider usage. A new Inspector connection has its own session. |
+| headroom savings --json | Native usage ledger report | In 0.37.0, the field named lifetime is capped by a 30-day report lookback. Offline guard results do not populate it automatically. |
+
+The reviewed RTK retained-history snapshot reported 46 commands, 11,509 input,
+9,852 output and 1,657 estimated saved tokens (14.3974%). Its project view
+reported 11 commands, 3,949 input, 3,749 output and 200 estimated saved.
+These are dated upstream estimates, not maintained live counters.
+
+The reviewed Headroom ledger returned zero calls and zero tokens in its capped
+reporting window. Its separate local guard passed seven fixtures. A zero ledger
+does not establish zero guard activity, zero provider usage or zero possible
+benefit. Heuristic counters and illustrative API prices are not subscription bills.
+
+## Coverage and future acceptance
+
+The [coverage receipt](../evidence/receipts/token-practice-coverage-20260920.json)
+preserves all 52 classifications and 70 captured operations: 66 expected process
+checks passed and four failed attempts remain. This is not 52 full-stack passes.
+
+Coverage comprises ten artifact-pair entries, three native-task-pair entries,
+19 bounded functional entries, ten current queries, one configuration check,
+five historical-only entries, one host-blocked component and three guidance
+repositories. Dependency effects overlap even where component classifications differ.
+
+The original audit recorded Linux Playwright ENOENT failures; the then-available
+Windows installation was a different host scope. A later separately scoped Linux
+acceptance used @playwright/cli 0.1.21, existing Chrome 153 and a loopback HTTP
+fixture: seven native commands passed and returned Hello, Playwright!. The earlier
+file-URL attempt was blocked. This does not establish default-browser download
+or arbitrary-site acceptance. OTel environment and Dagu environment-filter failures have
+separately recorded successful corrections. Configuration checks, current alert,
+backup and cache queries, renderer fixtures and native model workflows close
+different gates. Guidance repositories are not executable tools.
+
+The [later six-component follow-up](../evidence/receipts/token-practice-gap-followup-20260920.json)
+retains 31 operations: 28 accepted checks and three failed attempts. In addition
+to Playwright, it confirms a one-session AgentsView retrieval, offline ccusage
+parsing, a synthetic HUD renderer and full public-paper retrieval with OpenResearch.
+These close only their stated gates; live HUD interaction and archive auto-discovery
+remain unestablished. The original 70-operation coverage receipt remains unchanged.
+
+Its read-only bridge backend task used 44,908 input + 124 output = 45,032 native
+tokens in 11.225 seconds. Cached input of 22,016 is already inside input. This is
+additional usage, with no matched saving baseline or outer Claude interaction.
+The separate UTC usage parser returned 2,573,385 combined tokens, including its
+819,530 Codex subset. Do not add the subset, this trial or earlier task totals to
+that overlapping report. Tracked source remained unchanged; native MCP startup
+created untracked metadata, and owned temporary services were stopped.
+
+For another experiment, freeze a useful task and acceptance rubric, retain exact
+inputs and outputs, record native versions, commands, failures and cache conditions,
+and compare final task usage including retries. Repeat or balance run order
+before treating a difference as reliable. Keep model trials explicitly scoped;
+normal future-session work uses selected retrieval rather than a full audit.
+
+Use the existing [update protocol](../adoption/update.md) and native
+[recipes](../recipes/README.md). Append dated sanitized receipts with reciprocal
+component links, then refresh the existing catalog generator and integrity map.
+Do not publish private transcripts, credentials, environment values or host paths.

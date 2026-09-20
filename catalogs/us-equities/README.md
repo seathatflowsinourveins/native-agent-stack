@@ -1,5 +1,10 @@
 # US-equities grand catalog
 
+The [current token-practice audit](../../docs/token-practice.md) maps the selected
+52 components to their evidence levels and records ten exact artifact comparisons
+plus four accepted native coding trials. Catalog inclusion does not supply a
+per-repository token-saving value.
+
 **Dated decision catalog: September 20, 2026.** The north star is native, token-efficient research → reproducible backtesting → Alpaca paper automation. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
 
 The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **504 repository identities**, including all 342 public stars and 162 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 1,037 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.

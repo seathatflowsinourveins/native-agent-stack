@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "id": "token-practice-native-counters-20260920",
+  "kind": "historical_inventory",
+  "recorded_at_utc": "2026-09-20T03:18:40.861878+00:00",
+  "component_ids": [
+    "context-mode",
+    "headroom",
+    "rtk",
+    "toon"
+  ],
+  "claim": "Dated native counter snapshots retain RTK output, the capped Headroom ledger result, per-conversion TOON estimates and three separate Context Mode runtime scopes without treating them as exact provider savings.",
+  "limitations": [
+    "This historical snapshot is a dated report only, not a live dashboard or new-host execution acceptance.",
+    "RTK counters estimate retained command history and default to 90-day retention; selected-project values are a subset of the global result. Do not add snapshots or assume a forever ledger.",
+    "Headroom 0.37.0 caps the report at 30 days despite naming a field lifetime; zero ledger calls do not establish zero offline guard use or provider usage.",
+    "Context Mode uses byte/event heuristics and separate runtime state. Illustrative cost estimates are not bills, and persisted files must not be added to a direct MCP connection snapshot.",
+    "TOON statistics are tokenx heuristics for one conversion, not a native cumulative ledger. The compact-JSON exact counterexample is represented by the separate catalog receipt and must not be counted twice.",
+    "Raw private files, host paths, full command outputs and session identifiers are omitted. Sanitized fields and aggregate hashes do not independently attest provider activity."
+  ],
+  "data": {
+    "native_snapshots": [
+      {
+        "tool": "context-mode",
+        "observed_at_utc": "2026-09-20T03:18:38.612334+00:00",
+        "snapshot_success": true,
+        "version": "1.0.169",
+        "scope": "Desktop WSL",
+        "access": "Latest persisted upstream stats file in the explicitly selected runtime root",
+        "native_tool": "ctx_stats",
+        "native_tool_arguments": {},
+        "direct_tool_call_establishes_same_persisted_scope": false,
+        "session_formula": "kept-out bytes / 4",
+        "reported_lifetime_formula": "retained event count * 256",
+        "measurement": "upstream event/byte heuristic",
+        "frozen_numeric_token_or_cost_total": null,
+        "scope_rule": "Each runtime has separate persisted files; the latest file is not a sum of sessions. A new Inspector connection has its own session. Direct Desktop ctx_stats output is a separate snapshot."
+      },
+      {
+        "tool": "context-mode",
+        "observed_at_utc": "2026-09-20T03:18:38.602512+00:00",
+        "snapshot_success": true,
+        "version": "1.0.169",
+        "scope": "Native Claude",
+        "access": "Latest persisted upstream stats file in the explicitly selected runtime root",
+        "native_tool": "ctx_stats",
+        "native_tool_arguments": {},
+        "direct_tool_call_establishes_same_persisted_scope": false,
+        "session_formula": "kept-out bytes / 4",
+        "reported_lifetime_formula": "retained event count * 256",
+        "measurement": "upstream event/byte heuristic",
+        "frozen_numeric_token_or_cost_total": null,
+        "scope_rule": "Each runtime has separate persisted files; the latest file is not a sum of sessions. A new Inspector connection has its own session. Direct Desktop ctx_stats output is a separate snapshot."
+      },
+      {
+        "tool": "context-mode",
+        "observed_at_utc": "2026-09-20T03:18:38.599253+00:00",
+        "snapshot_success": true,
+        "version": "1.0.169",
+        "scope": "Native Codex",
+        "access": "Latest persisted upstream stats file in the explicitly selected runtime root",
+        "native_tool": "ctx_stats",
+        "native_tool_arguments": {},
+        "direct_tool_call_establishes_same_persisted_scope": false,
+        "session_formula": "kept-out bytes / 4",
+        "reported_lifetime_formula": "retained event count * 256",
+        "measurement": "upstream event/byte heuristic",
+        "frozen_numeric_token_or_cost_total": null,
+        "scope_rule": "Each runtime has separate persisted files; the latest file is not a sum of sessions. A new Inspector connection has its own session. Direct Desktop ctx_stats output is a separate snapshot."
+      },
+      {
+        "tool": "headroom",
+        "observed_at_utc": "2026-09-20T03:18:38.595269+00:00",
+        "snapshot_success": true,
+        "version": "0.37.0",
+        "scope": "native ledger report with 30-day maximum lookback",
+        "command": "headroom savings --json",
+        "exit_code": 0,
+        "native_returned_lifetime": {
+          "tokens_saved": 0,
+          "tokens_before": 0,
+          "cost_usd": 0.0,
+          "calls": 0,
+          "savings_percent": 0.0
+        },
+        "field_name": "lifetime",
+        "effective_maximum_report_lookback_days": 30,
+        "offline_guard_calls_automatically_populate_ledger": false
+      },
+      {
+        "tool": "rtk",
+        "observed_at_utc": "2026-09-20T03:18:38.390269+00:00",
+        "snapshot_success": true,
+        "version": "0.49.0",
+        "scope": "all retained projects command history",
+        "command": "rtk gain --format json",
+        "exit_code": 0,
+        "native_returned_summary": {
+          "total_commands": 46,
+          "total_input": 11509,
+          "total_output": 9852,
+          "total_saved": 1657,
+          "avg_savings_pct": 14.397428099748023,
+          "total_time_ms": 1325,
+          "avg_time_ms": 28
+        },
+        "measurement": "upstream token estimate",
+        "default_history_days": 90,
+        "subset_of_all_projects": false
+      },
+      {
+        "tool": "rtk",
+        "observed_at_utc": "2026-09-20T03:18:38.395624+00:00",
+        "snapshot_success": true,
+        "version": "0.49.0",
+        "scope": "selected project retained command history",
+        "command": "rtk gain --project --format json",
+        "exit_code": 0,
+        "native_returned_summary": {
+          "total_commands": 11,
+          "total_input": 3949,
+          "total_output": 3749,
+          "total_saved": 200,
+          "avg_savings_pct": 5.064573309698658,
+          "total_time_ms": 61,
+          "avg_time_ms": 5
+        },
+        "measurement": "upstream token estimate",
+        "default_history_days": 90,
+        "subset_of_all_projects": true
+      }
+    ],
+    "toon_conversion": {
+      "version": "4.1.1",
+      "native_command_template": "toon <decision-index.json> --stats --output <catalog.toon>",
+      "native_estimator": "tokenx 1.3.0",
+      "native_estimated_json_tokens": 84907,
+      "native_estimated_toon_tokens": 71770,
+      "native_estimated_tokens_saved": 13137,
+      "native_estimated_reduction_percent": 15.5,
+      "comparison_scope": "one full-catalog conversion",
+      "native_cumulative_savings_ledger": false,
+      "exact_compact_json_tokens": 59792,
+      "exact_toon_tokens": 66815,
+      "exact_tokens_removed": -7023,
+      "selected_representation": "compact JSON",
+      "evidence_id": "token-practice-catalog-toon-20260920"
+    },
+    "exact_causal_provider_tokens_saved": null,
+    "addition_rule": "Never sum runtime snapshots, retained-history snapshots, overlapping artifact comparisons, cached-token subsets and native provider task totals."
+  },
+  "provenance": {
+    "source_label": "retained_private_native_counter_aggregate",
+    "sha256": "2a04d53ce875bce1413b223fb3e1d9972f420d6331a238b4f8abbf267447dc2c",
+    "publication_method": "Explicit allowlist of dated native numeric outputs and scope metadata; paths, complete persisted records and direct MCP heuristic totals omitted."
+  }
+}
