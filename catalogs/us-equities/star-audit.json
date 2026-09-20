@@ -12515,13 +12515,13 @@
     }
   ],
   "latest_public_refresh": {
-    "checked_at_utc": "2026-09-19T22:56:04.023626+00:00",
+    "checked_at_utc": "2026-09-20T00:03:16.689897+00:00",
     "endpoint": "GET /users/seathatflowsinourveins/starred?per_page=100 (all pages)",
     "public_repositories": 342,
-    "added_since_recorded_snapshot": 5,
+    "added_since_recorded_snapshot": 0,
     "removed_since_recorded_snapshot": 0,
     "duplicate_ids": 0,
-    "evidence_ref": "blueprints/us-equities/catalyst-provenance/public-stars-refresh.json",
+    "evidence_ref": "blueprints/us-equities/data-readiness/public-stars-refresh.json",
     "scope": "Public endpoint identity refresh; no private-star inventory or source-execution claim."
   }
 }

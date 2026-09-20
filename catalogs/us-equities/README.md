@@ -1,8 +1,14 @@
 # US-equities grand catalog
 
-**Dated decision catalog: September 19, 2026.** The north star is native, token-efficient research → reproducible backtesting → Alpaca paper automation. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
+**Dated decision catalog: September 20, 2026.** The north star is native, token-efficient research → reproducible backtesting → Alpaca paper automation. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
 
-The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **499 repository identities**, including all 342 public stars and 157 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 1,012 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
+The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **500 repository identities**, including all 342 public stars and 158 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 1,018 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
+
+The [September 20 selected review](data-readiness-review.json) records six current
+repository/API decisions. The [data-readiness wave](../../blueprints/us-equities/data-readiness/README.md)
+uses retained SEC sources and LEAN corporate-action data. One additional catalog
+identity, pandas-datareader, is explicitly omitted as an equity-data shortcut;
+catalog growth does not imply installation.
 
 The [latest convergence program](../../blueprints/us-equities/convergence-program/README.md)
 adds 36 bounded decisions across foundation, trading/data and hosting, with two
@@ -63,9 +69,15 @@ The later [native observability receipt](../../observability/receipt.json) estab
 
 ## Starred repositories and beyond
 
-The latest native public-endpoint refresh contained **337 public stars**, unchanged from the recorded snapshot. **42** have current catalog cards; **10** more have adopted baseline records; **285** have no current catalog/baseline card. All337 now also have individual dispositions in the [complete star audit](star-audit.md), with README/license overview separated from deeper source inspection. Absence of a full catalog card is no longer an unreviewed identity. **105** catalog repositories are beyond the starred snapshot. [All identities and joins](coverage.json).
+The September 20 native public-endpoint refresh contained **342 public stars**, with
+zero added, removed or renamed identity pairs since the previous refresh. The
+[refresh receipt](../../blueprints/us-equities/data-readiness/public-stars-refresh.json)
+preserves the identity hash and scope. The card-membership ledger and 105
+beyond-star baseline card identities remain in [coverage.json](coverage.json);
+the [complete star audit](star-audit.md) and typed union include subsequent
+additions. A recorded disposition is distinct from code review or native execution.
 
-Source review covered current official metadata, README/license text and relevant API/source documentation at the depth stated per record. It did not deeply benchmark all 337stars or every project beyond them. Repository freshness, stars, model launch dates and author benchmarks do not establish superiority. The catalog exposes missing acceptance work rather than turning a list into a deployment claim.
+Source review covered official metadata, README/license text and relevant API/source documentation at the date and depth stated per record. It did not deeply benchmark all 342 stars or every project beyond them. Repository freshness, stars, model launch dates and author benchmarks do not establish superiority. The catalog exposes missing acceptance work rather than turning a list into a deployment claim.
 
 ## Decision and evidence vocabulary
 

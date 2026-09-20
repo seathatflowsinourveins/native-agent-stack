@@ -69,6 +69,12 @@ Use `qmd get` on the exact returned document URI with a bounded range. [Native c
 
 ## Current next moves
 
+Continue with the [September 20 data-readiness plan](../blueprints/us-equities/data-readiness/plan.json)
+and its [native recipes and source decisions](../blueprints/us-equities/data-readiness/README.md).
+Reuse verified retained sources where available; a new machine must acquire its
+own permitted data and establish its own observations. A historical receipt is
+not that host's first-received evidence or an authenticated provider result.
+
 Start with the [latest offline acceptances](../blueprints/us-equities/acceptance-wave/README.md)
 and the selected [daily/intraday catalyst protocol](../blueprints/us-equities/acceptance-wave/research-protocol.md).
 The +200% historical mover cohort is a discovery design, not a collected dataset

@@ -55,7 +55,9 @@
     "blueprints/us-equities/architecture/receipt.json",
     "blueprints/us-equities/execution-realism/receipt.json",
     "blueprints/us-equities/point-in-time/receipt.json",
-    "blueprints/us-equities/order-contract/receipt.json"
+    "blueprints/us-equities/order-contract/receipt.json",
+    "blueprints/us-equities/catalyst-dataset/native-receipt.json",
+    "blueprints/us-equities/corporate-action-readiness/receipt.json"
   ],
   "previous_runtime_evidence": [
     "observability/restart-receipt.json",
@@ -76,9 +78,9 @@
     },
     {
       "id": "accepted-pit-source",
-      "state": "native_sec_acquisition_accepted_historical_pit_pending",
-      "required": "Native EdgarTools5.58.0 contact-corrected archive request completed with371indexentries (360uniqueaccessions). Raw daily index and bounded headers are retained. Historical public dissemination/observation, source revisions, identifier/universe coverage, issuer-level prices and entitlements remain separate requirements; see current follow-up.",
-      "evidence": "blueprints/us-equities/catalyst-provenance/access-resolution.json"
+      "state": "native_sec_metadata_materialized_historical_pit_pending",
+      "required": "371 issuer/accession memberships materialized with five headers and nine item declarations; 366 headers, ticker and amendment-parent mappings remain unknown. Historical cutoff rejects all five present-day observations. Native AAPL factor/map mechanics accepted for25sessions; original corporate-action availability, historical universe/security mappings, issuer-price coverage and authenticated provider acceptance remain open.",
+      "evidence": "blueprints/us-equities/catalyst-dataset/native-receipt.json"
     },
     {
       "id": "retrieval-quality",
@@ -197,5 +199,30 @@
     "native_access": "HTTP200 / native index acquisition accepted",
     "interactive_login_required": false,
     "historical_pit": false
+  },
+  "data_readiness_followup": {
+    "plan": "blueprints/us-equities/data-readiness/plan.json",
+    "catalyst_receipt": "blueprints/us-equities/catalyst-dataset/native-receipt.json",
+    "corporate_action_receipt": "blueprints/us-equities/corporate-action-readiness/receipt.json",
+    "source_review": "catalogs/us-equities/data-readiness-review.json",
+    "public_stars": 342,
+    "new_star_identities": 0,
+    "catalog_identities": 500,
+    "typed_references": 1018,
+    "sec_members": 371,
+    "unique_accessions": 360,
+    "qualified_headers": 5,
+    "item_declarations": 9,
+    "unfetched_headers": 366,
+    "historical_eligible_headers": 0,
+    "observed_eligible_headers": 5,
+    "deterministic_parquet": true,
+    "aapl_sessions": 25,
+    "dividend_usd_per_raw_share": "0.82",
+    "split_factor": "0.25",
+    "upstream_nunit_executed": 0,
+    "upstream_nunit_status": "unresolved / fixture abort",
+    "broker_orders": 0,
+    "net_provider_token_savings": null
   }
 }

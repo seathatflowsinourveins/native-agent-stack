@@ -47,6 +47,12 @@ The later `blueprints/us-equities/catalyst-provenance/access-resolution.md` reco
 SEC access and real-index compatibility. Keep its monitored contact private;
 bounded streaming diagnostics must bypass the upstream cache after closing clients.
 
+The subsequent `blueprints/us-equities/data-readiness/README.md` links the
+September 20 catalyst-dataset and corporate-action wave. Retained source bytes,
+native parser behavior, materialized data integrity and actual historical
+availability are separate claims. Read that plan and the matching receipt before
+repeating acquisition or advancing a strategy gate.
+
 For the next research/acceptance work, read `blueprints/us-equities/acceptance-wave/README.md`
 and its research protocol on demand. The selected direction is daily/intraday
 catalyst research, including historical +200% mover discovery. Preserve as-known

@@ -69,6 +69,12 @@
       "kind": "public_star"
     },
     {
+      "path": "catalogs/us-equities/data-readiness-review.json",
+      "collection": "/decisions",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/data-research.json",
       "collection": "/entries",
       "repository_field": "repository",
@@ -125,16 +131,16 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 499,
+    "repositories": 500,
     "public_star_repositories": 342,
-    "beyond_public_stars": 157,
-    "references": 1012,
+    "beyond_public_stars": 158,
+    "references": 1018,
     "repositories_by_record_type": {
       "catalog_card": 147,
       "component_record": 52,
       "legacy_candidate": 19,
       "public_star": 342,
-      "research_supplement": 89,
+      "research_supplement": 91,
       "star_review": 342
     }
   },
@@ -832,6 +838,13 @@
           "pointer": "/entries/2",
           "decision": "retain_sdk_capture_raw_before_timestamp_conversion",
           "evidence_level": "source_sections_reviewed"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/data-readiness-review.json",
+          "pointer": "/decisions/2",
+          "decision": "retain_preferred_authenticated_data_path",
+          "evidence_level": "official_documentation_and_installed_api_introspection"
         },
         {
           "kind": "catalog_card",
@@ -3049,6 +3062,13 @@
           "evidence_level": "source_sections_reviewed"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/data-readiness-review.json",
+          "pointer": "/decisions/4",
+          "decision": "retain_conditional_reference_data",
+          "evidence_level": "current_metadata_and_primary_schema_review"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
           "pointer": "/entries/1",
@@ -3405,6 +3425,13 @@
           "path": "catalogs/us-equities/coverage.json",
           "pointer": "/stars/84",
           "disposition": "catalog_reviewed"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/data-readiness-review.json",
+          "pointer": "/decisions/0",
+          "decision": "retain_pinned_native_parser",
+          "evidence_level": "current_metadata_plus_pinned_native_api_research"
         },
         {
           "kind": "catalog_card",
@@ -6493,9 +6520,17 @@
       ],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/data-readiness-review.json",
+          "pointer": "/decisions/3",
+          "decision": "retain_conditional_alternative",
+          "evidence_level": "current_metadata_and_primary_product_documentation"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
@@ -9136,6 +9171,23 @@
       ]
     },
     {
+      "repository": "https://github.com/pydata/pandas-datareader",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/data-readiness-review.json",
+          "pointer": "/decisions/5",
+          "decision": "omit_as_equity_data_shortcut",
+          "evidence_level": "current_metadata_and_readme_review"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/pyportfolio/pyportfolioopt",
       "aliases": [],
       "public_star": false,
@@ -9242,6 +9294,13 @@
           "pointer": "/entries/0",
           "decision": "retain_primary_offline_engine",
           "evidence_level": "retained_prior_native_acceptance"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/data-readiness-review.json",
+          "pointer": "/decisions/1",
+          "decision": "retain_native_factor_map_acceptance",
+          "evidence_level": "current_metadata_and_official_semantics_review"
         },
         {
           "kind": "catalog_card",

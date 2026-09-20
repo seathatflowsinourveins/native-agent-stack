@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-19T23:52:30Z",
+  "recorded_at_utc": "2026-09-20T00:30:35Z",
   "meaning": "Recorded checkpoint; freshness of emission is separate from source update. Worker states are coordinator checkpoints, not process heartbeats.",
   "lanes": [
     {
@@ -93,33 +93,40 @@
       "kind": "gate",
       "id": "sec-provenance",
       "title": "Native SEC catalyst provenance",
-      "state": "HTTP 200 / 371 index rows / 5 headers / historical PIT pending",
-      "evidence_ref": "blueprints/us-equities/catalyst-provenance/access-resolution.json"
+      "state": "371 members / 5 headers / 9 item links / historical eligibility 0",
+      "evidence_ref": "blueprints/us-equities/catalyst-dataset/native-receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "corporate-action-data",
+      "title": "Split and dividend data semantics",
+      "state": "25 AAPL sessions / probe accepted / upstream suite unresolved",
+      "evidence_ref": "blueprints/us-equities/corporate-action-readiness/receipt.json"
     }
   ],
   "workers": [
     {
       "kind": "worker",
       "id": "evaluation-worker",
-      "title": "Chronological evaluation worker",
-      "state": "native study complete / independent review accepted",
-      "evidence_ref": "blueprints/us-equities/research-evaluation/receipt.json"
+      "title": "Corporate-action data worker",
+      "state": "native probe accepted / upstream NUnit unresolved",
+      "evidence_ref": "blueprints/us-equities/corporate-action-readiness/receipt.json"
     },
     {
       "kind": "worker",
       "id": "data-worker",
-      "title": "SEC and starred data research worker",
-      "state": "native acquisition and temporal packets accepted / research coverage pending",
-      "evidence_ref": "blueprints/us-equities/catalyst-provenance/access-resolution.json"
+      "title": "Catalyst dataset worker",
+      "state": "native dataset and independent review accepted",
+      "evidence_ref": "blueprints/us-equities/catalyst-dataset/native-receipt.json"
     },
     {
       "kind": "worker",
       "id": "independent-reviewer",
       "title": "Independent evidence reviewer",
-      "state": "worker and integration reviews accepted / publication tracked by GitHub CI",
-      "evidence_ref": "blueprints/us-equities/simulation-research/plan.json"
+      "state": "review and 259 integrated tests accepted / publication tracked by GitHub CI",
+      "evidence_ref": "blueprints/us-equities/data-readiness/plan.json"
     }
   ],
-  "plan_ref": "blueprints/us-equities/simulation-research/plan.json",
-  "stars_ref": "blueprints/us-equities/catalyst-provenance/public-stars-refresh.json"
+  "plan_ref": "blueprints/us-equities/data-readiness/plan.json",
+  "stars_ref": "blueprints/us-equities/data-readiness/public-stars-refresh.json"
 }

@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "kind": "integrated_data_readiness_verification",
+  "baseline_commit": "85bdaa5eedf5a40aa9fa65acba69292c54c51581",
+  "recorded_at_utc": "2026-09-20T00:34:00Z",
+  "worker_commits": {
+    "catalyst": "124b3ec9473e615a1079bb67811c9ced4422e65c",
+    "corporate_actions": "2036bc3b7e9f1c50d430edd347b20b58c279d2f2"
+  },
+  "integrated_unit_tests": {
+    "command": "\"$SDK_ENV/bin/python\" -m unittest discover -s tests -q",
+    "exit_code": 0,
+    "tests": 259,
+    "skipped": 0,
+    "duration_seconds": 5.567,
+    "scope": "Adopted base SDK on Linux/WSL; synthetic adapter checks plus retained recipe contracts, not a repeat of native model or upstream LEAN suite execution."
+  },
+  "independent_review": {
+    "status": "accepted",
+    "catalyst_focused_tests": 14,
+    "catalyst_receipt_artifact_checks": 17,
+    "corporate_action_focused_tests": 9,
+    "corporate_action_artifact_checks": 84,
+    "findings_resolved": [
+      "Require strict guard schema/boolean checks.",
+      "Reject zero or inconsistent upstream test/TRX counts as acceptance.",
+      "Distinguish native missing-basis rejection from adapter future-bar rejection.",
+      "Keep public reproduction host paths portable."
+    ]
+  },
+  "observation": {
+    "checkpoint_utc": "2026-09-20T00:30:35Z",
+    "service_command": "systemctl --user start ecosystem-research-progress.service",
+    "service_result": "success",
+    "service_exit": 0,
+    "loki_endpoint": "GET /loki/api/v1/query_range",
+    "loki_query": "{service_name=\"agent-stack-progress\",record_kind=\"gate\"} | json | source_updated_at=\"2026-09-20T00:30:35+00:00\"",
+    "loki_http": 200,
+    "loki_status": "success",
+    "gate_rows": 11,
+    "verified_entities": [
+      "sec-provenance",
+      "corporate-action-data"
+    ],
+    "browser": "Native agent-browser, isolated existing viewer session; current checkpoint and corporate-action gate visible.",
+    "password_inputs": 0
+  },
+  "preserved_failures": [
+    {
+      "layer": "progress receipt integration",
+      "outcome": "First service emission failed: new compact star receipt lacked expected current_count/repositories. Verified matching identity list was added; native service subsequently exited0."
+    },
+    {
+      "layer": "upstream LEAN NUnit",
+      "outcome": "Direct factor/map probe accepted independently. Broader fixture aborted before cases; exit1 and0executed upstream tests remain unresolved in its receipt."
+    },
+    {
+      "layer": "publication registration",
+      "outcome": "First integrated validators rejected the new catalyst receipt's missing schema_version and the newly changed catalog baseline date. Added schema_version1; retained the September19 baseline catalog date with the selected September20 review separately dated. Native payload/behavior unchanged."
+    }
+  ],
+  "repository_checks": {
+    "status": "passed",
+    "unit_tests": 259,
+    "unit_skips": 0,
+    "secret_scan": {
+      "command": "gitleaks dir . --redact --no-banner",
+      "exit_code": 0,
+      "leaks": 0
+    },
+    "catalog_union": {
+      "repositories": 500,
+      "public_stars": 342,
+      "beyond_stars": 158,
+      "references": 1018
+    },
+    "commands": [
+      {
+        "command": "python3 scripts/validate.py",
+        "exit_code": 0,
+        "components": 52,
+        "profiles": 4,
+        "receipts": 41,
+        "hashed_files": 389
+      },
+      {
+        "command": "python3 scripts/validate_catalogs.py",
+        "exit_code": 0
+      },
+      {
+        "command": "python3 scripts/catalog_decisions.py --check",
+        "exit_code": 0
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ]
+  },
+  "publication": {
+    "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+    "workflow": "Repository verification on pushed commit; final status is GitHub CI, not asserted by this pre-publication file."
+  },
+  "limits": [
+    "No new SEC/market-data acquisition, provider login, dependency upgrade, broker order or native model-acceptance run.",
+    "Task-agent inference is not quantified. No causal net token savings, profitable strategy, historical dataset completeness or new-host acceptance is established."
+  ]
+}

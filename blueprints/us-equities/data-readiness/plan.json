@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "catalyst-and-price-readiness-20260920",
+  "base_commit": "85bdaa5eedf5a40aa9fa65acba69292c54c51581",
+  "recorded_date": "2026-09-20",
+  "objective": "Materialize accepted SEC sources into a verified catalyst metadata dataset and exercise existing historical-price corporate-action semantics, then publish independently reviewed native evidence and current source decisions.",
+  "scope": {
+    "catalyst_inputs": "The retained 2020-03-02 SEC daily index and five raw SGML headers, actually observed in September 2026. Reparse immutable bytes rather than trust earlier quarantined derived events.",
+    "price_inputs": "Existing LEAN AAPL sample, 2020-08-03 through 2020-09-04, with map/factor files; selected data mechanics only.",
+    "new_data_acquisition": false,
+    "broker_orders": false,
+    "paid_resources": false,
+    "automatic_live_promotion": false
+  },
+  "waves": [
+    {
+      "id": "selected_primary_source_review",
+      "state": "completed / selected APIs and public-star identity delta",
+      "purpose": "Compare native parser, historical data, corporate actions and access requirements without installing duplicate frameworks."
+    },
+    {
+      "id": "catalyst_dataset",
+      "state": "native metadata accepted / independent review accepted",
+      "purpose": "Preserve all index identities, source hashes, missing enrichment and actual availability in typed native-queryable outputs."
+    },
+    {
+      "id": "corporate_action_readiness",
+      "state": "native factor probe accepted / upstream NUnit unresolved",
+      "purpose": "Exercise native factor/map APIs and distinguish retrospective adjustment from historically known features."
+    },
+    {
+      "id": "review_publication",
+      "state": "reviewed / 259 integrated tests accepted / publication tracked by GitHub CI",
+      "purpose": "Resolve independent findings; update catalog, dashboard, portability and evidence maps; verify published commit CI."
+    }
+  ],
+  "acceptance": [
+    "Freeze selected source hashes, time window and intended assertions before examining outputs.",
+    "Keep 371 CIK/accession memberships and 360 accessions distinct; preserve all 366 unfetched headers as unknown.",
+    "Use complementary native EdgarTools header views with strict source identity and timezone validation; item declarations are not narrative sentiment or verified catalysts.",
+    "Hash and validate inputs, extraction, parser code and materialized outputs; refuse stale output reuse and fail on source tampering.",
+    "Native SQL must exclude present-day observations at the 2020 cutoff. No ticker or original-amendment relationship is inferred.",
+    "Native LEAN normalization checks must preserve unknown historical observation and distinguish future corporate-action factors from causal features.",
+    "No strategy result, broad market-data completeness or net provider token saving is inferred from data engineering acceptance.",
+    "Run meaningful acceptance, independent review, repository integrity and secret checks before publication."
+  ],
+  "continuation": "After acceptance, select a bounded authenticated Alpaca historical SIP acquisition with explicit feed/adjustment/asof/pagination and reconcile corporate-action API drift. Credentials remain deferred; no present login is required for this offline wave.",
+  "results": {
+    "catalyst_receipt": "blueprints/us-equities/catalyst-dataset/native-receipt.json",
+    "corporate_action_receipt": "blueprints/us-equities/corporate-action-readiness/receipt.json",
+    "source_review": "catalogs/us-equities/data-readiness-review.json",
+    "public_stars": 342,
+    "new_star_identities": 0,
+    "catalog_identities": 500,
+    "typed_references": 1018,
+    "sec_members": 371,
+    "unique_accessions": 360,
+    "qualified_headers": 5,
+    "item_declarations": 9,
+    "unfetched_headers": 366,
+    "historical_eligible_headers": 0,
+    "observed_eligible_headers": 5,
+    "deterministic_parquet": true,
+    "aapl_sessions": 25,
+    "dividend_usd_per_raw_share": "0.82",
+    "split_factor": "0.25",
+    "upstream_nunit_executed": 0,
+    "upstream_nunit_status": "unresolved / fixture abort",
+    "broker_orders": 0,
+    "net_provider_token_savings": null
+  },
+  "results_recorded_at_utc": "2026-09-20T00:30:35Z"
+}

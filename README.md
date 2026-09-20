@@ -2,12 +2,12 @@
 
 A current, evidence-backed reference for native **Codex + Claude Code**, with scoped memory, automatic local code RAG, context-efficient retrieval and reproducible upstream workflows.
 
-**Snapshot: September 19, 2026.** This repository records a tested selection and its limits. It is not a claim that every available framework is installed or that an independent universal SOTA benchmark has been won.
+**Snapshot: September 20, 2026.** This repository records a tested selection and its limits. It is not a claim that every available framework is installed or that an independent universal SOTA benchmark has been won.
 
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
 and an auditable **342-star coverage ledger**. Its combined index includes
-**499 repository identities** across all 342 public stars and 157 beyond them,
+**500 repository identities** across all 342 public stars and 158 beyond them,
 with typed, validated pointers to decisions and evidence. The latest
 [architecture research wave](catalogs/us-equities/architecture/README.md) adds
 source reviews, awesome-list coverage and official Alpaca constraints.
@@ -27,6 +27,12 @@ The subsequent [simulation and SEC wave](blueprints/us-equities/simulation-resea
 adds frozen chronological control evaluation and native EdgarTools provenance
 work. Price-label results, actual engine execution, filing parsing and live SEC
 access are recorded separately; follow the receipts before adopting a capability.
+
+The [September 20 data-readiness wave](blueprints/us-equities/data-readiness/README.md)
+targets a provenance-preserving SEC metadata dataset and native LEAN split/dividend
+semantics on retained local data. Its plan, native results, source review and
+remaining historical-availability gates are kept together. This wave does not
+require a new provider login or duplicate data framework.
 
 The latest [native acceptance wave](blueprints/us-equities/acceptance-wave/README.md)
 adds LEAN cost sensitivity, synthetic DuckDB temporal selection and an offline
@@ -67,7 +73,7 @@ explicit open gates, not a claim of universal completeness.
 
 ## What is here
 
-- **47 adopted components** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup, dependency inventory and local observability.
+- **52 component records** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup, dependency inventory and local observability; adoption scope remains receipt-specific.
 - **19 researched alternatives** with adoption decisions, model requirements and prospective commands.
 - A [six-candidate portability comparison](adoption/research.md), with 41 selected primary source files and a native uv adoption decision.
 - **Four extended catalog layers** covering foundations/memory/RAG, agents/hosting/operations, data, and strategy/engine research; source review remains distinct from native execution.

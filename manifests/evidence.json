@@ -782,6 +782,44 @@
         "No account login, broker order, paid resource, support message or additional native model acceptance run was required. Task-agent inference and net provider token savings are not quantified."
       ],
       "path": "blueprints/us-equities/catalyst-provenance/access-resolution.json"
+    },
+    {
+      "id": "sec-catalyst-dataset-native-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "edgartools",
+        "duckdb"
+      ],
+      "claim": "Pinned EdgarTools parsed five verified retained SEC headers through complementary native views; pinned DuckDB materialized the full 371-identity cohort and nine item links to deterministic Parquet, preserving 366 unfetched rows and rejecting historical availability before local observation.",
+      "limitations": [
+        "Offline conversion of previously accepted sources; no new SEC request, model call or dependency installation.",
+        "This is metadata dataset acceptance, not historical point-in-time strategy data or profitability evidence.",
+        "First observation is completion in the retained acquisition run; 2020 acceptance does not prove historical dissemination or receipt.",
+        "Five headers are the deterministic acquisition cap, not a representative or outcome-selected trading universe; 366 remain unfetched.",
+        "Header item declarations and native taxonomy labels do not establish catalysts, economic incentives, sentiment or trading signals.",
+        "All tickers and amendment-parent accessions remain unknown; no price, adjustment, corporate-action or return join is performed.",
+        "Parquet determinism is scoped to the pinned runtime and these inputs; no provider token-saving claim is made.",
+        "The repository CLI is a custom integrity/temporal bridge around native SDK APIs; synthetic contract tests are separate from actual native header parsing.",
+        "Public hashes are local integrity anchors, not signed SEC attestations; private source bytes and contact identity are not published."
+      ],
+      "path": "blueprints/us-equities/catalyst-dataset/native-receipt.json"
+    },
+    {
+      "id": "native-corporate-actions-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "lean"
+      ],
+      "claim": "Native LEAN factor, mapping, scaling and event APIs verified 25 AAPL sessions, one dividend and one split from frozen bundled data. Direct probe accepted; upstream NUnit host aborted before executing any tests. No strategy, position accounting or historical-availability claim.",
+      "limitations": [
+        "Retrospective bundled AAPL sample only; no as-known universe, delisting completeness, extreme-mover coverage or alpha evidence.",
+        "Current map/factor files have no original first-observed timestamps; basis at or before decision does not prove metadata availability then.",
+        "Adjusted mode uses full-file factors; ScaledRaw fixes an explicit endDateTime basis. TotalReturn factor alone does not produce a total-return series.",
+        "Native dividend 0.82 uses raw pre-split share units. No holdings, dividend cash posting, financing, execution or P&L modeled.",
+        "Upstream NUnit tests attempted but 0 executed; the broader assembly fixture/Python environment is unresolved.",
+        "Authenticated Alpaca historical fetch remains deferred; no paid service, broker order, new dataset or SDK upgrade."
+      ],
+      "path": "blueprints/us-equities/corporate-action-readiness/receipt.json"
     }
   ],
   "files": [
@@ -807,8 +845,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "f717304ec2cb083f858b2dbed6660716ff82fbf7cccff8d5227df4dc538c5207",
-      "bytes": 4655
+      "sha256": "de46cca5e14630b3780b61463953061a1a911e42b8b399a17baf94b1454d4578",
+      "bytes": 5018
     },
     {
       "path": "CLAUDE.md",
@@ -822,12 +860,12 @@
     },
     {
       "path": "README.md",
-      "sha256": "6f8098bdfbad8fc96cdd2edcc1b7966c9b39ae9d192b228c59ab845fcfc629a0",
-      "bytes": 11663
+      "sha256": "de49f6645c1e9722e537fd275319abd3d50b5ea901ca99210e48633799882ffe",
+      "bytes": 12090
     },
     {
       "path": "adoption/README.md",
-      "sha256": "0dde05109ea1892c6fc2802b6b9b2bbf6eefade16854386234af8130d860892d",
+      "sha256": "5e554f816905070b474aaa8e177fbc7b4ed81e017019fb3067ec08ca67b6c568",
       "bytes": 9783
     },
     {
@@ -837,8 +875,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "387da710a5d475781f576c04cb2262c88a99e5ebe2e79e6766c283c9b7c90e14",
-      "bytes": 8902
+      "sha256": "01ec3920039bcda10e283e8835388a4b42ec5c59cf4779b360332a5790545389",
+      "bytes": 9377
     },
     {
       "path": "adoption/paired/README.md",
@@ -907,8 +945,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "085908462d698c4ffbf3be36f8b8ebc989df31e36c192984d76ed159d0e2118f",
-      "bytes": 7781
+      "sha256": "c4a8085e721516a1e8bba07531c86e5efd79b88050d8613a2eedcfb394a83438",
+      "bytes": 8222
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -984,6 +1022,21 @@
       "path": "blueprints/us-equities/architecture/review-prompt.txt",
       "sha256": "ce5ccf53ffb05a79f6cb86d293f9161e4dd97e1b6cfd7312d948cc5dd34cf9a9",
       "bytes": 6997
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-dataset/README.md",
+      "sha256": "0933fa810e52f2e9f002fae0a1bae65e67070b3d2125f00b97c7ea1d2b39b85d",
+      "bytes": 10582
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-dataset/dataset.py",
+      "sha256": "d4ad517451b37e418a4b9a522952e9188c29e4b2cb260a7f27a041fd5a030d1b",
+      "bytes": 24438
+    },
+    {
+      "path": "blueprints/us-equities/catalyst-dataset/native-receipt.json",
+      "sha256": "ff9578bff25c7303a9b6820521ed8173285df8027079a5152ae5eb5874a25c43",
+      "bytes": 10671
     },
     {
       "path": "blueprints/us-equities/catalyst-provenance/README.md",
@@ -1104,6 +1157,56 @@
       "path": "blueprints/us-equities/convergence-review/receipt.json",
       "sha256": "f2f5c80626f8e29cae6f91abfd1c0a5d75762cecb90330b6b4413cb5fc07263d",
       "bytes": 3188
+    },
+    {
+      "path": "blueprints/us-equities/corporate-action-readiness/CorporateActionProbe.cs",
+      "sha256": "0326d0adc7c8335b86f0a2f5a21e5359dde40da40bf24453628a88887f698a57",
+      "bytes": 7603
+    },
+    {
+      "path": "blueprints/us-equities/corporate-action-readiness/README.md",
+      "sha256": "752c3bd98424fcaa09fa44abf122bad2af499a9c2da22610363562b7b113ecef",
+      "bytes": 8339
+    },
+    {
+      "path": "blueprints/us-equities/corporate-action-readiness/plan.json",
+      "sha256": "a3db232b7ab898c32570eb504ef9f66c49718b6b87e920f491b86391db35ff91",
+      "bytes": 2308
+    },
+    {
+      "path": "blueprints/us-equities/corporate-action-readiness/receipt.json",
+      "sha256": "581f445e9affa18eab9a788e92dc916942d78dec9f253a7906858901035369e6",
+      "bytes": 22873
+    },
+    {
+      "path": "blueprints/us-equities/corporate-action-readiness/run.py",
+      "sha256": "5d6c1b3091ec0147a229f08161b160ec9bd11c879b1116ac7493980b5783ab05",
+      "bytes": 6236
+    },
+    {
+      "path": "blueprints/us-equities/corporate-action-readiness/verify.py",
+      "sha256": "aee4432dabbe7224dd9162bc2da9d7ab9bbaa8644de39a1b82cc0f71e855006b",
+      "bytes": 4590
+    },
+    {
+      "path": "blueprints/us-equities/data-readiness/README.md",
+      "sha256": "77ac8fa53c3fca2ede3824a80a17d448a37f28d36e872c4d619af2c4be55642a",
+      "bytes": 5426
+    },
+    {
+      "path": "blueprints/us-equities/data-readiness/plan.json",
+      "sha256": "ee0c0ba571e6d163160748534b7bf7d3a3db46e16ec1e431dac0eb1243f3c9d4",
+      "bytes": 4298
+    },
+    {
+      "path": "blueprints/us-equities/data-readiness/public-stars-refresh.json",
+      "sha256": "ff6e179930f2a3b9bfb188a270fef25f43de41189591e173191b45d63f3d7a76",
+      "bytes": 28944
+    },
+    {
+      "path": "blueprints/us-equities/data-readiness/verification.json",
+      "sha256": "ffd2dcd2d798f5400ff846f1965be72fa053f6b1caf4ca35e374c4b0a7a69a63",
+      "bytes": 4229
     },
     {
       "path": "blueprints/us-equities/data/README.md",
@@ -1847,8 +1950,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "7df6d4f3a7080e87e49f00f7a643ec5c7f43de05650bd4c113c938ccc462e41d",
-      "bytes": 11259
+      "sha256": "a09dc04f993c77a2369258ebd64189c3ad0707ff73a0e6bddc1206ad7be727e1",
+      "bytes": 11651
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -1942,8 +2045,8 @@
     },
     {
       "path": "catalogs/us-equities/convergence-review.json",
-      "sha256": "3a5a71b35acf089070fc39ef5e748e0751813fd174f3524c9e153a6a71024c3f",
-      "bytes": 10860
+      "sha256": "80af6eadc3773ab4562969f0b15607570f3f132103122cc81888a5cd9fc3a1d3",
+      "bytes": 12048
     },
     {
       "path": "catalogs/us-equities/convergence-review.md",
@@ -1952,8 +2055,8 @@
     },
     {
       "path": "catalogs/us-equities/coverage.json",
-      "sha256": "5d1362ca7386fb85fb92a7841b0b97929d4409167e34d74d4d67f44d48b5ad5c",
-      "bytes": 82425
+      "sha256": "8ea11d0f58d809f8358a68057b69eb28c71f58ab97a88fe6a7b4e1b522a6954f",
+      "bytes": 82420
     },
     {
       "path": "catalogs/us-equities/data-evaluation-followup.json",
@@ -1964,6 +2067,11 @@
       "path": "catalogs/us-equities/data-evaluation-followup.md",
       "sha256": "8aef44a02489fc8a1e54e7fbcc6d7c93f42c6e999385f932cd5f6c40bb680298",
       "bytes": 7596
+    },
+    {
+      "path": "catalogs/us-equities/data-readiness-review.json",
+      "sha256": "bcd52c1c5aa5f8adf56f0e130a97ec563666d1ccc6fd4d3a77eeb9c0f54db3ea",
+      "bytes": 6308
     },
     {
       "path": "catalogs/us-equities/data-research.json",
@@ -1977,8 +2085,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "2a7f8b11c987801a809ae9a5efa6c4e59d726b5bfa9947c7a5ffba5462cc7132",
-      "bytes": 369466
+      "sha256": "3200305fed1c7a2e2b7336a0e9aa15e68c98f14fc093d8c5a12848621107466d",
+      "bytes": 371723
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -2012,8 +2120,8 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "a677339488f8c9633e1cd20371f0aa3e519e56c5acc5405e129f33bb6c62f3b3",
-      "bytes": 2115
+      "sha256": "9ade5d79507ce7be670a0b15775ce5777724c1de1e50e063571ac9fae555cbce",
+      "bytes": 2307
     },
     {
       "path": "catalogs/us-equities/model-followup.json",
@@ -2077,8 +2185,8 @@
     },
     {
       "path": "catalogs/us-equities/star-audit.json",
-      "sha256": "568186e489f0e239aa47b29bcf45c28f9fa39027fe2cd7345d7c7738d9179cd4",
-      "bytes": 561638
+      "sha256": "bb07a94277ba72dc493801b3bfbf6a7974f30f29c650dde138e6df12a56ef1a1",
+      "bytes": 561633
     },
     {
       "path": "catalogs/us-equities/star-audit.md",
@@ -2347,8 +2455,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "eb9b90c56cff53eb1b33901ed71558ed93d3aea301a539239817a6794587b94f",
-      "bytes": 48320
+      "sha256": "62a81e4042603a9b5a4241e4f4d6587eead8a27e43f411294e67f6d87a8da712",
+      "bytes": 48461
     },
     {
       "path": "observability/README.md",
@@ -2507,8 +2615,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "c051e26328dfec61662f8d0a870dd138d380e49b7e25244b1fffd1bfa35f05dc",
-      "bytes": 4454
+      "sha256": "0a8bf6444420dc7e0e7c6de853ff4a4454cdf4b5165fc78afc6444f2637ad5db",
+      "bytes": 4681
     },
     {
       "path": "observability/receipt.json",
@@ -2586,9 +2694,19 @@
       "bytes": 21921
     },
     {
+      "path": "tests/test_catalyst_dataset.py",
+      "sha256": "d7ce7a2c9eff5dcce9fff9ed6fb662b9f9bade4f35b0978c6630694a0bc28e70",
+      "bytes": 12856
+    },
+    {
       "path": "tests/test_catalyst_provenance.py",
       "sha256": "d97ef06024b15d92c7447ee889c708a2975ec583d947c1e3590471373872164d",
       "bytes": 12522
+    },
+    {
+      "path": "tests/test_corporate_action_readiness.py",
+      "sha256": "23146f72baddc05093fe234ced1e74c0a23aa5d23763a6c1138508911842b406",
+      "bytes": 4471
     },
     {
       "path": "tests/test_execution_realism.py",

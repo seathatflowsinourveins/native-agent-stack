@@ -143,6 +143,8 @@
     "command": "python3 -m unittest discover -s tests -p test_corporate_action_readiness.py -v",
     "passed": 9,
     "expected_guard_rejections": 2,
+    "native_guard_rejections": 1,
+    "adapter_guard_rejections": 1,
     "guard_roles": {"native_api": "Missing ScaledRaw endDateTime basis", "repository_adapter": "Bar after its decision cutoff"},
     "corrupt_input_rejected_before_output_creation": true,
     "product_absolute_tolerance_usd": "1e-25",

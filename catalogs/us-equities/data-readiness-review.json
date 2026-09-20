@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "kind": "catalyst_and_price_data_readiness_review",
+  "checked_at": "2026-09-20T00:09:34.316149+00:00",
+  "baseline_commit": "85bdaa5eedf5a40aa9fa65acba69292c54c51581",
+  "scope": "Six selected repository metadata checks and bounded primary-source/native-API research. Current upstream HEAD is distinct from the version/commit actually executed in each receipt. No universal SOTA or full-source audit claim.",
+  "metadata_command": "gh api repos/OWNER/REPOSITORY; gh api repos/OWNER/REPOSITORY/commits/DEFAULT_BRANCH",
+  "public_stars": "blueprints/us-equities/data-readiness/public-stars-refresh.json",
+  "decisions": [
+    {
+      "repository": "dgunning/edgartools",
+      "commit": "e23d04eba952e70310c0f62402f4c2523f9a44bf",
+      "license_declared": "MIT",
+      "decision": "retain_pinned_native_parser",
+      "evidence_level": "current_metadata_plus_pinned_native_api_research",
+      "reason": "Installed5.58.0 has complementary SGML header views: one retains acceptance/items, the other identity/filers. Combine them with strict existing provenance checks; no dependency upgrade or filing reacquisition.",
+      "sources": [
+        "https://github.com/dgunning/edgartools/releases/tag/v5.58.0",
+        "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/edgar/sgml/sgml_header.py",
+        "https://www.sec.gov/about/forms/form8-k.pdf"
+      ],
+      "native_evidence": "blueprints/us-equities/catalyst-dataset/native-receipt.json",
+      "acceptance_status": "Bounded offline native SDK dataset accepted; no fresh acquisition."
+    },
+    {
+      "repository": "QuantConnect/Lean",
+      "commit": "985ef30ad3ac774218c5ac516b4cb0aa2655730f",
+      "license_declared": "Apache-2.0",
+      "decision": "retain_native_factor_map_acceptance",
+      "evidence_level": "current_metadata_and_official_semantics_review",
+      "reason": "Existing local AAPL sample spans split and dividend adjustments. Native factor/map semantics can be exercised without another data framework. Full-history adjusted prices are retrospective; ScaledRaw is a normalization primitive, not evidence of historical source receipt.",
+      "sources": [
+        "https://www.quantconnect.com/docs/v2/writing-algorithms/securities/asset-classes/us-equity/requesting-data",
+        "https://www.quantconnect.com/docs/v2/writing-algorithms/securities/asset-classes/us-equity/corporate-actions"
+      ],
+      "native_evidence": "blueprints/us-equities/corporate-action-readiness/receipt.json",
+      "acceptance_status": "Direct native API probe accepted; upstream NUnit host aborted with0cases."
+    },
+    {
+      "repository": "alpacahq/alpaca-py",
+      "commit": "232179c19091fd0f70daf0972a90bf8def329ec0",
+      "license_declared": "Apache-2.0",
+      "decision": "retain_preferred_authenticated_data_path",
+      "evidence_level": "official_documentation_and_installed_api_introspection",
+      "reason": "Installed0.44.0 provides native stock bars and corporate-action clients. Basic historical data starts2016; historical SIP older than15minutes does not intrinsically require a paid live-feed plan. Authentication remains mandatory. Installed CorporateActionsRequest lacks current REST region/data_quality; default complete-only results do not prove comprehensive events.",
+      "sources": [
+        "https://docs.alpaca.markets/us/docs/about-market-data-api",
+        "https://docs.alpaca.markets/us/docs/market-data-faq",
+        "https://docs.alpaca.markets/us/reference/stockbars",
+        "https://docs.alpaca.markets/us/reference/corporateactions-1"
+      ],
+      "acceptance_status": "No authenticated acquisition in this wave. Future request must explicitly select SIP, RAW, symbol-asof, dates, pagination and reconcile API drift; no TradingClient."
+    },
+    {
+      "repository": "massive-com/client-python",
+      "commit": "481e5c270ea85e8eae5e96f8b9fda34e5e2a674a",
+      "license_declared": "MIT",
+      "decision": "retain_conditional_alternative",
+      "evidence_level": "current_metadata_and_primary_product_documentation",
+      "reason": "Basic public offer advertises two years of end-of-day data and account/key access. Split adjustment excludes dividends; source terms and redistribution must be established independently of SDK license. No duplicate installation or account acquisition.",
+      "sources": [
+        "https://massive.com/stocks",
+        "https://massive.com/knowledge-base/article/is-massives-stock-data-adjusted-for-splits-or-dividends"
+      ]
+    },
+    {
+      "repository": "databento/databento-python",
+      "commit": "e675ef30369f5ee9f68b04606080c519adf3be69",
+      "license_declared": "Apache-2.0",
+      "decision": "retain_conditional_reference_data",
+      "evidence_level": "current_metadata_and_primary_schema_review",
+      "reason": "Corporate-action schema distinguishes issuer/security/listing identities, delistings and record/creation timestamps. SDK license does not provide dataset entitlement or prove point-in-time universe completeness.",
+      "sources": [
+        "https://databento.com/docs/schemas-and-data-formats/corporate-actions"
+      ]
+    },
+    {
+      "repository": "pydata/pandas-datareader",
+      "commit": "9a3e2fe8c4e202bf9be6b4543fd1a06c3cdce7de",
+      "license_declared": "NOASSERTION",
+      "decision": "omit_as_equity_data_shortcut",
+      "evidence_level": "current_metadata_and_readme_review",
+      "reason": "Current README emphasizes macro/factor sources; it does not justify promising a maintained authoritative stock-history downloader. Existing role can remain conditional; no new install or replacement price plane.",
+      "sources": [
+        "https://github.com/pydata/pandas-datareader/blob/9a3e2fe8c4e202bf9be6b4543fd1a06c3cdce7de/README.md"
+      ]
+    }
+  ],
+  "additional_primary_sources": [
+    {
+      "url": "https://www.nasdaqtrader.com/Trader.aspx?id=SymbolDirDefs",
+      "finding": "Current symbol directories and file creation time do not reconstruct a historical delisted universe."
+    }
+  ],
+  "stopping_basis": "Existing EdgarTools, DuckDB and LEAN cover this bounded acceptance. Account-backed history and a historically observed universe remain explicit subsequent gates. Additional runtimes do not substitute for those inputs."
+}

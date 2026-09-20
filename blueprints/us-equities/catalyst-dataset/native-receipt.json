@@ -1,4 +1,5 @@
 {
+  "schema_version": 1,
   "id": "sec-catalyst-dataset-native-20260920",
   "kind": "native_cli_e2e",
   "component_ids": ["edgartools", "duckdb"],

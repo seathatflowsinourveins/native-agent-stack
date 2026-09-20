@@ -963,7 +963,8 @@
         "portable-sdk-adoption-20260919",
         "native-paired-adoption-20260919",
         "native-point-in-time-contract-20260919",
-        "native-exact-nanosecond-replay-20260919"
+        "native-exact-nanosecond-replay-20260919",
+        "sec-catalyst-dataset-native-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1033,7 +1034,8 @@
         "native-paired-adoption-20260919",
         "native-lean-execution-sensitivity-20260919",
         "native-historical-leverage-stress-20260919",
-        "native-chronological-controls-20260919"
+        "native-chronological-controls-20260919",
+        "native-corporate-actions-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1155,7 +1157,8 @@
       ],
       "evidence_ids": [
         "native-edgartools-catalyst-20260919",
-        "native-sec-access-resolution-20260919"
+        "native-sec-access-resolution-20260919",
+        "sec-catalyst-dataset-native-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
