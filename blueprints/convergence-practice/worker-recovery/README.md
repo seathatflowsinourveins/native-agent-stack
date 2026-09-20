@@ -1,5 +1,23 @@
 # Native child cancellation and crash continuation
 
+The later inherited-tool trial **accepts the combined native lifecycle within its
+scope**: one actual child was cancelled, continued under the same identity,
+interrupted by a main-process SIGKILL, automatically contained by its owned
+systemd cgroup, and resumed under the same parent and child identities to produce
+one final effect. No direct wait-process cleanup was needed. The checkpoint and
+all original fixture files stayed unchanged. See the
+[accepted receipt](native-exact-read-receipt.json),
+[independent audit](native-exact-read-independent-audit.json), and
+[accepted artifacts](accepted-inherited/).
+
+This qualifies one same-host synthetic task with a normal inherited native role.
+It does not establish host/user-manager crash recovery, remote provider
+cancellation, independent-host restoration, billing cessation, or general worker
+reliability. The inherited tool pool is not an OS sandbox. All earlier failures
+below remain evidence; the restricted Bash-only role remains unqualified.
+
+## Prior trial: continuation after explicit cleanup
+
 One actual native Claude background child was cancelled with `TaskStop`, resumed
 with `SendMessage`, and resumed again after the owned native CLI runtime was
 abruptly killed. The same parent session and child identity completed one local
@@ -155,7 +173,88 @@ python3 blueprints/convergence-practice/worker-recovery/containment_audit.py \
 python3 -m unittest tests.test_worker_recovery
 ```
 
-The next specific unresolved condition is the native child's command-contract
+At this stage, the specific unresolved condition was the native child's command-contract
 mismatch under the existing permissions. The combined native containment/resume
-gate remains open. Neither fixture claims host/user-manager crash recovery,
+gate remained open. Neither fixture claims host/user-manager crash recovery,
 remote provider cancellation, billing cessation or independent-host restoration.
+
+## Follow-up: inherited native role and combined acceptance
+
+The [normal role](native-role.json) omits its `tools` field and uses native
+inheritance, including the background-worker filters. The CLI uses `--tools default`
+and retains every installed hook and plugin. The task describes `stage.py` as an
+already-built stateful program: invoking it through Bash does not require file
+authoring or an analysis sandbox. Native model/account configuration remains
+unchanged. The explicit experiment mode is still `dontAsk`, which is stricter
+than this PC's unchanged native user default. Invocation approvals add to existing
+policy; they are not an exclusive tool or filesystem boundary.
+
+The first [inherited-role plan](native-plan.json) failed before an effect. The
+parent requested a directory listing, which the native RTK hook changed from
+`ls -la <fixture>` to `rtk ls -la <fixture>`. Claude checks hook `updatedInput`
+against permissions, so the experiment's `Bash(ls *)` approval did not cover the
+transformed executable. RTK reads rules from settings files; it did not see that
+invocation-only approval. The [diagnosis](native-rewrite-diagnosis.json) retains
+the actual RTK tracking row joined to the native tool ID, a deterministic hook
+input/output match and pinned upstream source references. The native account and
+global permission settings were not changed.
+
+The parent requested an Agent and Glob after that refusal, contrary to the task's
+stop instruction. The recorder stopped the service. All 31 owned files,
+including hidden fixture metadata, were unchanged; no child tool or stage effect
+ran. This [failed receipt](native-inherited-receipt.json), its
+[audit](native-inherited-independent-audit.json),
+[source freeze](native-inherited-freeze.json), and
+[recorder output](native-inherited-recorder-outcome.json) remain intact.
+
+One separately authorized [changed trial](native-exact-read-plan.json) added
+only `Bash(rtk ls -la <new absolute owned fixture>)` to that invocation. It did
+not approve an RTK wildcard/proxy, change permission mode, or disable a hook.
+The full native sequence then passed in 42.656 seconds: two CLI invocations, one
+child, three runs of that same child, and the exact four-stage journal. Only the
+owned service MainPID received the deliberate SIGKILL. Systemd removed the
+actual pending native wait and the cgroup; there was no separate wait PID kill,
+restart or remaining owned process. Native `--resume` reopened the same parent,
+which used `SendMessage` to the same child for finalization.
+
+The full inventory grew from 31 to 39 files through exactly eight expected stage
+and supervisor artifacts. The 12 frozen sources and every original file,
+including `.git` contents, remained unchanged. The native session listed 49 tools;
+that is the parent/session surface, not a separately measured child tool list.
+The only additional inspection was a parent `ToolSearch` for native control
+tools. **This successful run did not request `ls`**, so the exact listing approval
+is supported by the deterministic rewrite diagnosis but was not exercised by
+the successful model run. This evidence cannot assign success solely to that rule.
+
+The [frozen inputs](native-exact-read-freeze.json),
+[recorder](native-exact-read-recorder-outcome.json) and
+[read-only oracle](native_audit.py) retain this distinction. Initial SIGKILL
+prevented a terminal usage record. Repeated native cumulative, terminal and
+child-task views overlap; do not sum them. Provider list-price fields are native
+estimates, not subscription bills. Complete parent/child/retry usage, billing and
+savings remain unknown.
+
+Read-only verification of the deliberately retained private runs:
+
+```sh
+python3 -m unittest tests.test_worker_recovery
+python3 blueprints/convergence-practice/worker-recovery/native_audit.py \
+  /private/native-inherited-attempt-1
+python3 blueprints/convergence-practice/worker-recovery/native_audit.py \
+  /private/native-inherited-exact-read-attempt-1
+```
+
+For a separately authorized new qualification, the portable invocation is:
+
+```sh
+python3 blueprints/convergence-practice/worker-recovery/run.py \
+  --profile native-inherited-exact-read --supervision systemd \
+  --claude /path/to/native/claude --run-dir /private/new-owned-attempt
+```
+
+The exact rewritten-read approval is constructed for that fresh fixture path.
+The runner refuses path metacharacters, snapshots its source bytes and all owned
+files before the call, and retains streams, commands and inventory afterward.
+Acceptance still requires the independent oracle and review of actual calls;
+the runner's passing status is provisional. These trials establish neither
+universal instruction-following nor success for the earlier Bash-only contract.

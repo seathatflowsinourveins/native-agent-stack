@@ -1,0 +1,18 @@
+{
+  "at_utc": "2026-09-20T19:46:52.970153+00:00",
+  "fixture_base": "2ac5186e3dec02cf987c33fb28bb37b650b69a82",
+  "sha256": {
+    "control.py": "e25f7758b5d374fea206b3b7936baa99e4ac5abeb9fd8aed2e83f1cae21006a7",
+    "input.json": "69741926414949ad09864359cb41523db6a94d093d5c44dc822982c8aab3ef2d",
+    "native-exact-read-plan.json": "2007210385968a95e79f4fed9567775b803117f94bdbfbf7018effcccf985d66",
+    "native-plan.json": "9399e234d0da613c65d00a0395f56245498993f7c0c0cbf48442196926a95b9e",
+    "native-prompt.txt": "5d73688c5ffe9e2973a4b28de03c6c004ee65cb3736a6b9c6e6d0b2b79b8bc1d",
+    "native-role.json": "f42b9cf64a365092cc63c08d874ddeb7a5d75e98ff37715b438871fcade4ea14",
+    "native_audit.py": "a0063d35b3dc740d37579b2b853778cd21370c6cc35baf6e23cb24a2debc2687",
+    "run.py": "c3c463f45dd55b024ad558bb9e15c0c789665fce3e165069f2569bf2f3a2b5dd",
+    "service.py": "88b2922a5c415238c0abf06fb4e6fd3f13b98c884e1ee113802e9a85e0b3dae5",
+    "stage.py": "fdadd66e4b137940ee638c8e89747cfbf882241084cccb0a4e09b9c00d927214",
+    "systemd-plan.json": "5e8e69cea6fbc3d802a8e8ccbb6af724f828fb868b9850d8896f86381ab3a5da",
+    "test_oracle": "a72811afe7e61c1ba433e9ff29be61066e5983027b3fca14a039a1247ec6e946"
+  }
+}

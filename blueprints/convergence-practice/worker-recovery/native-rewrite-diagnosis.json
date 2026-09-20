@@ -1,0 +1,53 @@
+{
+  "actual_recorded_hook_command": "rtk ls -la <owned fixture>",
+  "actual_recorded_hook_decision": "ask",
+  "deterministic_hook_updatedInput_matches_native_record": true,
+  "experiment_override_mode": "dontAsk",
+  "hook_permissionDecision_field": "absent; native host decides",
+  "model_calls": 0,
+  "native_permission_rule_target": "hook updatedInput, as documented by Claude",
+  "native_user_default_mode": "bypassPermissions",
+  "next_exact_rule_template": "Bash(rtk ls -la <new absolute owned fixture>)",
+  "original_native_command": "ls -la <owned fixture>",
+  "permission_change_during_diagnosis": false,
+  "private_evidence": {
+    "actual-native-hook-decision-private.json": {
+      "bytes": 643,
+      "sha256": "48fa15da38f284e6c0f83bec06497b772a68f64f74a9113947922f7a348f366d"
+    },
+    "diagnosis-private.json": {
+      "bytes": 1121,
+      "sha256": "eff8f22d6736b281c800b8eeefda1ae6eaecd0f50131954e48ed1a6785446f20"
+    },
+    "hook-input-private.json": {
+      "bytes": 434,
+      "sha256": "0ab1633af520a0b903f192b959e412aa6bcf990b890a2c76085f915730f6b741"
+    },
+    "hook-stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "hook-stdout-private.json": {
+      "bytes": 302,
+      "sha256": "ea2b57f63ed78082a4dbd02927a3fcc9758508a098543d68de98c0e2fb5f3621"
+    },
+    "hook_cmd.rs": {
+      "bytes": 89403,
+      "sha256": "65b6825f0b7c41711ca457427ae9c65d8293c36f3693c68ee7bf006664b6f04a"
+    },
+    "permissions.rs": {
+      "bytes": 42843,
+      "sha256": "490750f4c665432ac0a9e90a1905741c4f9a81eee976f795a6dc5b1634934156"
+    }
+  },
+  "rtk_rule_source": "on-disk Claude settings; invocation --allowedTools is not included",
+  "rtk_source_commit": "b1c0dc00649c50fbe8930f849c800d4d6ca12091",
+  "rtk_version": "0.49.0",
+  "scope": "Exact rewritten read-only listing only; no rtk wildcard/proxy approval or native default change.",
+  "sources": [
+    "https://github.com/rtk-ai/rtk/blob/b1c0dc00649c50fbe8930f849c800d4d6ca12091/src/hooks/hook_cmd.rs#L600-L668",
+    "https://github.com/rtk-ai/rtk/blob/b1c0dc00649c50fbe8930f849c800d4d6ca12091/src/hooks/permissions.rs#L135-L169",
+    "https://code.claude.com/docs/en/hooks#pretooluse-decision-control"
+  ],
+  "status": "native_rewritten_input_permission_mismatch_confirmed"
+}

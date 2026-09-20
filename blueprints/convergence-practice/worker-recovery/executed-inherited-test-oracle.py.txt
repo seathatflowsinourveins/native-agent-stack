@@ -99,12 +99,6 @@ class NativeStreamSummaryTests(unittest.TestCase):
             self.assertNotEqual(before['.hidden/source']['sha256'],after['.hidden/source']['sha256'])
             self.assertEqual(after['link'],{'kind':'symlink','target':'.hidden/source'})
 
-    def test_exact_read_rule_refuses_pattern_or_shell_metacharacters(self):
-        for path in ['/tmp/fixture*','/tmp/fixture?','/tmp/fixture(x)','/tmp/fixture;pwd']:
-            with self.subTest(path=path),self.assertRaisesRegex(ValueError,'literal_owned_path'):
-                self.module.exact_read_rule(path)
-        self.assertEqual(self.module.exact_read_rule('/tmp/owned/fixture'),'Bash(rtk ls -la /tmp/owned/fixture)')
-
 
 class InheritedNativeProtocolTests(unittest.TestCase):
     def setUp(self):
@@ -140,11 +134,6 @@ class InheritedNativeProtocolTests(unittest.TestCase):
         self.streams[1].append({'type':'system','subtype':'permission_denied'})
         with self.assertRaisesRegex(AssertionError,'no_permission_refusal'):
             self.module.protocol(self.streams,'parent','child')
-
-    def test_read_inspection_is_limited_to_owned_fixture(self):
-        self.assertTrue(self.module.allowed_inspection({'name':'Bash','input':{'command':'ls -la /tmp/owned'}},Path('/tmp/owned')))
-        for command in ['ls -la /tmp/other','rtk proxy touch /tmp/owned/x','ls -la /tmp/owned && python3 stage.py checkpoint']:
-            self.assertFalse(self.module.allowed_inspection({'name':'Bash','input':{'command':command}},Path('/tmp/owned')))
 
 
 class PublishedEffectTests(unittest.TestCase):

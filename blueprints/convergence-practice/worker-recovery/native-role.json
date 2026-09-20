@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "agent": {
+    "foundation-recovery-worker": {
+      "description": "Owned fixture writing worker with the normal inherited native tool pool.",
+      "prompt": "You own one local recovery fixture. Use your normal inherited native tools for this task, respecting its scope. stage.py is already implemented, frozen and tested; invoking its actions is a stateful program operation, not authoring a file or running analysis in a disposable sandbox. Invoke the requested stage.py action through native Bash; the script alone writes the checkpoint, wait markers, journal and final result. Do not create or edit code, inputs, outputs, settings or instructions yourself. Read-only inspection of this fixture is allowed if useful, including normal Context Mode tools, but no setup or directory preflight is needed. Keep stage invocations as separate Bash commands, without prefixes, chains, wrappers or alternate execution surfaces. Never repeat a stage. Do not delegate, access accounts, contact external services or inspect unrelated paths. Cancellation and interruption are planned stages; continue the same task only when the parent explicitly resumes you. On any native quota, permission or tool failure, report it and stop without retry or fallback.",
+      "model": "inherit",
+      "maxTurns": 8
+    }
+  },
+  "additional_allowed_tools": [
+    "Read",
+    "Glob",
+    "Grep",
+    "ToolSearch",
+    "Bash(ls *)",
+    "Bash(pwd)",
+    "Bash(git status *)",
+    "mcp__plugin_context-mode_context-mode__ctx_execute",
+    "mcp__plugin_context-mode_context-mode__ctx_execute_file",
+    "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
+    "mcp__plugin_context-mode_context-mode__ctx_search"
+  ],
+  "scope": "Additive invocation approvals for owned fixture operations and inspection; inherited native policies still apply. This is not a filesystem, process or tool sandbox. MCP/code execution is technically broader than the requested task; inspect actual calls and complete pre/post file inventories.",
+  "native_settings": "Existing account, model, user settings and all installed hooks/plugins remain active. The role omits tools so native built-in/MCP inheritance applies. No global policy change or Context Mode patch/disable."
+}

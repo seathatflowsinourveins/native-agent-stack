@@ -1,0 +1,77 @@
+{
+  "child_tool_calls": 0,
+  "effects": 0,
+  "limitations": [
+    "The parent requested Agent and Glob after its own ls refusal; requested model stop compliance did not pass.",
+    "The recorder stopped and cleaned the one service; no unchanged model retry.",
+    "The complete 31-file before/after inventory is identical, including hidden fixture metadata.",
+    "The experiment explicitly used dontAsk, stricter than unchanged user native defaults.",
+    "Terminal usage is missing after supervisor abort; complete usage, billing and savings are unknown."
+  ],
+  "native_child_spawns": 1,
+  "native_cli_invocations": 1,
+  "outer_attempts": 1,
+  "private_evidence": {
+    "attempt.json": {
+      "bytes": 1878,
+      "sha256": "2900ef10095de88906cb12550b29a6942fc34c82f65c485a611c23ca4bce2e09"
+    },
+    "commands-private.json": {
+      "bytes": 4988,
+      "sha256": "98c54c0778308b3005c87e6a88b7c5f221ba339cfa27bbea15b8a3da766070ee"
+    },
+    "effective-tools-private.json": {
+      "bytes": 3482,
+      "sha256": "c452c58059014bd4fb1e93fb2d0fd3c329884bc48a310ecedb8fc575d5e99968"
+    },
+    "fixture-after.json": {
+      "bytes": 5625,
+      "sha256": "ae20336463c2591d83eb0f7bc663fcd369e68b815ed9fc04b184e54e839762fa"
+    },
+    "fixture-before.json": {
+      "bytes": 5625,
+      "sha256": "ae20336463c2591d83eb0f7bc663fcd369e68b815ed9fc04b184e54e839762fa"
+    },
+    "freeze.json": {
+      "bytes": 1103,
+      "sha256": "9fe88a3d372aa420eb7c394ceacc546766963e4835549c735f3f5cf4b891ec71"
+    },
+    "initial-service-start-private.json": {
+      "bytes": 475,
+      "sha256": "6f196db8cf020afc9a31814d9df1e531d892b1f248a49f5dfb1af3b6c1d5f1ae"
+    },
+    "initial.stderr.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "initial.stream.jsonl": {
+      "bytes": 49978,
+      "sha256": "341b3cf4b72d4b4f0f1a59ddff4988ed6cd8afc07451284720a2963d8f9c0e32"
+    },
+    "native-help.txt": {
+      "bytes": 21401,
+      "sha256": "ae85d661e9c086f05637ebcd868f5702b477ff6e55e2e65b8ada7807cd51a4b6"
+    },
+    "native-identity.json": {
+      "bytes": 66,
+      "sha256": "53be1ff561d0ada0ded1fee000ca905fd822e2fb9b2a3cfd406af87d297218bd"
+    },
+    "readiness.json": {
+      "bytes": 112,
+      "sha256": "2787312d33f250fa0cbd8ec50a0f1fe9e5b6b061abb72aa85b91c213f2bd3c08"
+    }
+  },
+  "references": {
+    "audit": "native-inherited-independent-audit.json",
+    "diagnosis": "native-rewrite-diagnosis.json",
+    "freeze": "native-inherited-freeze.json",
+    "plan": "native-plan.json",
+    "prompt": "native-prompt.txt",
+    "recorder": "native-inherited-recorder-outcome.json",
+    "role": "native-role.json"
+  },
+  "retained_prior_trials_unchanged": true,
+  "schema_version": 1,
+  "scope": "One native inherited-tool child task stopped before its first effect; combined child/cgroup recovery is not qualified.",
+  "status": "not_accepted_native_inherited_profile_permission_refusal"
+}

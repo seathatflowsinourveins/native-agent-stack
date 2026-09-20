@@ -1,0 +1,214 @@
+{
+  "billing": null,
+  "checks": {
+    "actual_child_wait_in_owned_cgroup": true,
+    "cancelled_wait_stopped": true,
+    "checkpoint_unchanged": true,
+    "child_second_wait_pending": true,
+    "cleanup_errors_absent": true,
+    "final_matches_oracle": true,
+    "native_model_preserved": true,
+    "native_taskstop_then_message_observed": true,
+    "no_replacement_child": true,
+    "one_native_child_spawn": true,
+    "owned_cli_processes_stopped": true,
+    "owned_crash_wait_stopped": true,
+    "owned_runtime_sigkill_exit": true,
+    "pre_crash_journal_exact": true,
+    "resumed_native_success": true,
+    "same_child_message_target": true,
+    "same_parent_session": true,
+    "single_effect_journal": true,
+    "systemd_all_descendants_stopped": true
+  },
+  "cleanup": {
+    "cancel-wait.json_forced_cleanup": false,
+    "crash-wait.json_forced_cleanup": false,
+    "crash_wait_additional_cleanup": false,
+    "errors": [],
+    "initial_exit": 255,
+    "owned_services": {
+      "initial": {
+        "after": {
+          "ActiveState": "failed",
+          "ExecMainCode": "2",
+          "ExecMainStatus": "9",
+          "KillMode": "control-group",
+          "MainPID": "0",
+          "NRestarts": "0",
+          "Restart": "no",
+          "Result": "signal",
+          "SendSIGKILL": "yes",
+          "SubState": "failed",
+          "TimeoutStopUSec": "2s",
+          "Type": "exec"
+        },
+        "remaining_members": [],
+        "stop_needed": false
+      },
+      "resumed": {
+        "after": {
+          "ActiveState": "inactive",
+          "ExecMainCode": "0",
+          "ExecMainStatus": "0",
+          "KillMode": "control-group",
+          "MainPID": "0",
+          "NRestarts": "0",
+          "Restart": "no",
+          "Result": "success",
+          "SendSIGKILL": "yes",
+          "SubState": "dead",
+          "TimeoutStopUSec": "1min 30s",
+          "Type": ""
+        },
+        "remaining_members": [],
+        "stop_needed": false
+      }
+    }
+  },
+  "complete_parent_child_usage": null,
+  "elapsed_seconds": 42.656,
+  "failure": null,
+  "native_invocations": [
+    {
+      "exit_code": 255,
+      "invalid_stream_lines": 0,
+      "model_usage": [],
+      "phase": "initial",
+      "terminal_count": 0,
+      "terminal_usage": []
+    },
+    {
+      "exit_code": 0,
+      "invalid_stream_lines": 0,
+      "model_usage": [
+        {},
+        {
+          "claude-opus-5": {
+            "cacheCreationInputTokens": 6008,
+            "cacheReadInputTokens": 184597,
+            "canonicalModel": "claude-opus-5",
+            "contextWindow": 1000000,
+            "costBasis": "list",
+            "costUSD": 0.27464725,
+            "inputTokens": 10,
+            "maxOutputTokens": 64000,
+            "outputTokens": 5026,
+            "provider": "firstParty",
+            "thinkingTokens": 2916,
+            "webSearchRequests": 0
+          }
+        },
+        {
+          "claude-opus-5": {
+            "cacheCreationInputTokens": 6008,
+            "cacheReadInputTokens": 184597,
+            "canonicalModel": "claude-opus-5",
+            "contextWindow": 1000000,
+            "costBasis": "list",
+            "costUSD": 0.27464725,
+            "inputTokens": 10,
+            "maxOutputTokens": 64000,
+            "outputTokens": 5026,
+            "provider": "firstParty",
+            "thinkingTokens": 2916,
+            "webSearchRequests": 0
+          }
+        }
+      ],
+      "phase": "resumed",
+      "terminal_count": 3,
+      "terminal_usage": [
+        {
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 0,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 0,
+          "inference_geo": "",
+          "input_tokens": 0,
+          "iterations": [],
+          "output_tokens": 0,
+          "output_tokens_details": {
+            "thinking_tokens": 0
+          },
+          "server_tool_use": {
+            "web_fetch_requests": 0,
+            "web_search_requests": 0
+          },
+          "service_tier": "standard",
+          "speed": "standard"
+        },
+        {
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 3690,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "cache_creation_input_tokens": 3690,
+          "cache_read_input_tokens": 89487,
+          "inference_geo": "not_available",
+          "input_tokens": 4,
+          "iterations": [
+            {
+              "cache_creation": {
+                "ephemeral_1h_input_tokens": 715,
+                "ephemeral_5m_input_tokens": 0
+              },
+              "cache_creation_input_tokens": 715,
+              "cache_read_input_tokens": 46231,
+              "input_tokens": 2,
+              "output_tokens": 162,
+              "type": "message"
+            }
+          ],
+          "output_tokens": 747,
+          "output_tokens_details": {
+            "thinking_tokens": 479
+          },
+          "server_tool_use": {
+            "web_fetch_requests": 0,
+            "web_search_requests": 0
+          },
+          "service_tier": "standard",
+          "speed": "standard"
+        },
+        {
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 1403,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "cache_creation_input_tokens": 1403,
+          "cache_read_input_tokens": 46946,
+          "inference_geo": "not_available",
+          "input_tokens": 2,
+          "iterations": [
+            {
+              "cache_creation": {
+                "ephemeral_1h_input_tokens": 1403,
+                "ephemeral_5m_input_tokens": 0
+              },
+              "cache_creation_input_tokens": 1403,
+              "cache_read_input_tokens": 46946,
+              "input_tokens": 2,
+              "output_tokens": 2842,
+              "type": "message"
+            }
+          ],
+          "output_tokens": 2842,
+          "output_tokens_details": {
+            "thinking_tokens": 1827
+          },
+          "server_tool_use": {
+            "web_fetch_requests": 0,
+            "web_search_requests": 0
+          },
+          "service_tier": "standard",
+          "speed": "standard"
+        }
+      ]
+    }
+  ],
+  "savings_claim": null,
+  "status": "passed_pending_independent_audit"
+}
