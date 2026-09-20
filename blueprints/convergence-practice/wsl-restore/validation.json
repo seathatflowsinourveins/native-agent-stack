@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-20T06:11:10.736149+00:00",
+  "checks": [
+    {
+      "host": "Mac coordinator",
+      "command": "python3 -m unittest tests.test_wsl_restore -v",
+      "passed": 10,
+      "skipped": 0,
+      "exit_code": 0,
+      "seconds": 0.027
+    },
+    {
+      "host": "VelaNext Linux/WSL2",
+      "python": "3.12.3",
+      "command": "python3 -m unittest discover -s tests -p test_wsl_restore.py -v",
+      "passed": 10,
+      "skipped": 0,
+      "exit_code": 0,
+      "seconds": 0.072
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "scope": "Existing publication integrity and publication-wide private-content scan. Root integrator registers the new lane hashes and receipt separately."
+    },
+    {
+      "command": "gitleaks dir blueprints/convergence-practice/wsl-restore --redact --no-banner",
+      "exit_code": 0,
+      "result": "No leaks found"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "tested_sources": [
+    {
+      "path": "tests/test_wsl_restore.py",
+      "sha256": "9df52e8b163627955662dadf5ca72ab19b1db6ab340a29522fb8b69faa928833"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/fixture.py",
+      "sha256": "153b0a13d80ab0c0eecb623942237664988c35cb586394f64e70e83106583bf1"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/corruption.py",
+      "sha256": "8f9220e40a8fb550d77b7ef7afec4dd81b591134c190a904d9abc018c2f1b96e"
+    },
+    {
+      "path": "blueprints/convergence-practice/wsl-restore/recover.py",
+      "sha256": "5cd3783ccd75064fa2f74e4584b3d2ba6ba2be169406820f1f98f7ea1976ee5c"
+    }
+  ],
+  "retained_verification_events": [
+    {
+      "check": "Initial gitleaks scan",
+      "result": "Generic-api-key heuristic flagged the public upstream PGP fingerprint because its field name contained signing_key. The value is the official public fingerprint, never a secret. Renamed the field public_pgp_fingerprint; unchanged scanning rules then passed."
+    },
+    {
+      "check": "Mac-to-WSL test source transfer",
+      "result": "GNU tar ignored Mac LIBARCHIVE extended provenance headers; source byte hashes and the native WSL test run were checked separately."
+    }
+  ],
+  "scope": "Offline oracle/guard checks and publication hygiene; separate from the 19 retained native restic commands and their declared acceptance."
+}

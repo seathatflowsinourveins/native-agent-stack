@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "checked_at_utc": "2026-09-20T06:00:48.607696+00:00",
+  "scope": "Bounded official release and source/license review for WSL synthetic recovery qualification; no private state inspection.",
+  "host_observation": {
+    "profile": "velanext-linux-wsl2",
+    "os": "Linux",
+    "architecture": "x86_64",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2",
+    "python": "3.12.3",
+    "filesystem_free_mib_at_preflight": 942959,
+    "command_lookup_scope": "Current native noninteractive SSH PATH and conventional user-local, /usr/local/bin, /usr/bin paths only; no whole-host executable search.",
+    "restic_available_before": false,
+    "gitleaks_available_before": false,
+    "worktrunk_available_before": false,
+    "gpgv_available": true,
+    "curl_available": true
+  },
+  "components": [
+    {
+      "id": "restic",
+      "repository": "https://github.com/restic/restic",
+      "version": "0.19.1",
+      "release_url": "https://github.com/restic/restic/releases/tag/v0.19.1",
+      "published_at": "2026-07-05T08:13:33Z",
+      "source_commit": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+      "archived": false,
+      "prerelease": false,
+      "license": "BSD-2-Clause",
+      "source_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "6f08a01a9fab5b24e139a09f15cc24a73087c7bc09e3bacf099fdf2d767bf897",
+          "bytes": 1345
+        },
+        {
+          "path": "doc/020_installation.rst",
+          "sha256": "843597eb1ab3ce889dc8e1726b0879a920a9ccae4dc0338b67c142eb965958dc",
+          "bytes": 13199
+        }
+      ],
+      "signing_key_url": "https://restic.net/gpg-key-alex.asc",
+      "decision": "Install exact verified Linux amd64 binary in owned task lane for synthetic backup/restore only; leave global PATH and configuration untouched.",
+      "public_pgp_fingerprint": "CF8F18F2844575973F79D4E191A6868BD3F7A907"
+    },
+    {
+      "id": "gitleaks",
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "version": "8.30.1",
+      "release_url": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
+      "published_at": "2026-03-21T02:17:58Z",
+      "source_commit": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e",
+      "archived": false,
+      "prerelease": false,
+      "license": "MIT",
+      "source_files": [
+        {
+          "path": "LICENSE",
+          "sha256": "e3884b252b3bfc045e55be43a34d1e80da070bc6f804ac95bf4660e97d62ebc6",
+          "bytes": 1069
+        }
+      ],
+      "decision": "Retain current catalog pin. No WSL installation or native qualification in this backup lane; scan publication on the already-qualified Mac tool."
+    },
+    {
+      "id": "worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "version": "0.78.0",
+      "release_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.78.0",
+      "published_at": "2026-09-16T21:04:33Z",
+      "source_commit": "bd49d14c52450c6c8a2cec5b01742c690c9c3ce7",
+      "archived": false,
+      "prerelease": false,
+      "github_license_detection": "NOASSERTION",
+      "license": "MIT OR Apache-2.0",
+      "source_files": [
+        {
+          "path": "Cargo.toml",
+          "sha256": "e31c32c9a599c7b55bbaf7925498e5ff8b87acddbc1a1aa8bd7630ab3889a098",
+          "bytes": 16721
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "eda019abe602c101e9d9c2d7723aa4c4cb2b1ae0e0e0915c37976d5c1d3bb632",
+          "bytes": 11813
+        }
+      ],
+      "decision": "Retain optional native-worktree convenience role; no installation or acceptance needed for this synthetic recovery test."
+    }
+  ],
+  "documentation": [
+    {
+      "url": "https://restic.readthedocs.io/en/latest/020_installation.html",
+      "claim": "Official platform binaries and signed SHA256SUMS are supported; pin actual release bytes before execution."
+    },
+    {
+      "url": "https://restic.readthedocs.io/en/latest/045_working_with_repos.html",
+      "claim": "check --read-data reads and verifies repository pack content rather than metadata alone."
+    },
+    {
+      "url": "https://restic.readthedocs.io/en/latest/050_restore.html",
+      "claim": "Restore into new owned targets; interrupted in-place restores can leave partial state."
+    }
+  ],
+  "retained_access_failures": [
+    {
+      "operation": "Browser fetch of official signing-key link",
+      "result": "Browser extractor returned internal error; exact key link and fingerprint were recovered from pinned upstream installation source and actual key fetched/verified on WSL."
+    },
+    {
+      "operation": "Direct Python request to ReadTheDocs installation page",
+      "result": "HTTP403; official documentation content available through browser and pinned repository source."
+    },
+    {
+      "operation": "Worktrunk guessed split LICENSE-MIT and LICENSE-APACHE filenames",
+      "result": "Not found; exact pinned tree has combined LICENSE, which was inspected and hashed."
+    }
+  ],
+  "limitations": [
+    "Release metadata is dated September20 evidence, not an automatic update policy.",
+    "Source license checks and WSL execution are separate scopes.",
+    "No gitleaks/Worktrunk host adoption is inferred from current source review."
+  ]
+}

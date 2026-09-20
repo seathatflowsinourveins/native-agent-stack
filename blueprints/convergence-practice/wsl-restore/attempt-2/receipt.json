@@ -1,0 +1,280 @@
+{
+  "schema_version": 1,
+  "id": "synthetic-wsl-restic-20260920",
+  "started_at_utc": "2026-09-20T06:02:39.279242+00:00",
+  "host_profile": "velanext-linux-wsl2",
+  "scope": "Synthetic task state in one isolated encrypted local repository on the qualified WSL host.",
+  "binary_sha256": "20d4142678d0d95ec11a4759def1b73fd9190abc9ca19e4b62d067c0b387e639",
+  "plan_sha256": "a73dfbedbc8db781416d4f0af4a42b7c7935224c26af6806ac4b25e8ac030a13",
+  "runner_sha256": "c9f6cbbf11e663e66483a8a3fb0848bf0ca869d8d77cdf1d816437709d9b6751",
+  "status": "failed",
+  "commands": [
+    {
+      "id": "init",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "$RUN_DIR/repository",
+        "--password-file",
+        "$RUN_DIR/password",
+        "init",
+        "--repository-version",
+        "2"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "expected_failure": false,
+      "seconds": 3.051,
+      "stdout": "created restic repository 3b0c5915bc at $RUN_DIR/repository\n\nPlease note that knowledge of your password is required to access\nthe repository. Losing your password means that your data is\nirrecoverably lost.\n",
+      "stderr": ""
+    },
+    {
+      "id": "backup-1",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "$RUN_DIR/repository",
+        "--password-file",
+        "$RUN_DIR/password",
+        "backup",
+        "--json",
+        "--host",
+        "synthetic-wsl-restore",
+        "--tag",
+        "synthetic-1",
+        "$RUN_DIR/fixture"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "expected_failure": false,
+      "seconds": 0.748,
+      "stdout": "{\"message_type\":\"summary\",\"files_new\":6,\"files_changed\":0,\"files_unmodified\":0,\"dirs_new\":12,\"dirs_changed\":0,\"dirs_unmodified\":0,\"data_blobs\":5,\"tree_blobs\":13,\"data_added\":1055424,\"data_added_packed\":5050,\"total_files_processed\":6,\"total_bytes_processed\":1048747,\"total_duration\":0.731129564,\"backup_start\":\"2026-09-20T02:02:42.346147661-04:00\",\"backup_end\":\"2026-09-20T02:02:43.077277235-04:00\",\"snapshot_id\":\"be1cb76f7675788389e1da436001f664bcbf811ddc5e7950132ba4531486668f\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "snapshot-id-1",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "$RUN_DIR/repository",
+        "--password-file",
+        "$RUN_DIR/password",
+        "snapshots",
+        "--json",
+        "--tag",
+        "synthetic-1"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "expected_failure": false,
+      "seconds": 0.719,
+      "stdout": "[{\"time\":\"2026-09-20T02:02:42.346147661-04:00\",\"tree\":\"89d078cc802ee3915b471ffb7aee0461b60c3b6e5045837d7586d60c84c2365a\",\"paths\":[\"$RUN_DIR/fixture\"],\"hostname\":\"synthetic-wsl-restore\",\"username\":\"$USER\",\"uid\":1000,\"gid\":1000,\"tags\":[\"synthetic-1\"],\"program_version\":\"restic 0.19.1\",\"summary\":{\"backup_start\":\"2026-09-20T02:02:42.346147661-04:00\",\"backup_end\":\"2026-09-20T02:02:43.077277235-04:00\",\"files_new\":6,\"files_changed\":0,\"files_unmodified\":0,\"dirs_new\":12,\"dirs_changed\":0,\"dirs_unmodified\":0,\"data_blobs\":5,\"tree_blobs\":13,\"data_added\":1055424,\"data_added_packed\":5050,\"total_files_processed\":6,\"total_bytes_processed\":1048747},\"id\":\"be1cb76f7675788389e1da436001f664bcbf811ddc5e7950132ba4531486668f\",\"short_id\":\"be1cb76f\"}]\n",
+      "stderr": ""
+    },
+    {
+      "id": "backup-2",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "$RUN_DIR/repository",
+        "--password-file",
+        "$RUN_DIR/password",
+        "backup",
+        "--json",
+        "--host",
+        "synthetic-wsl-restore",
+        "--tag",
+        "synthetic-2",
+        "$RUN_DIR/fixture"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "expected_failure": false,
+      "seconds": 0.747,
+      "stdout": "{\"message_type\":\"summary\",\"files_new\":1,\"files_changed\":5,\"files_unmodified\":0,\"dirs_new\":0,\"dirs_changed\":12,\"dirs_unmodified\":0,\"data_blobs\":2,\"tree_blobs\":12,\"data_added\":6717,\"data_added_packed\":4253,\"total_files_processed\":6,\"total_bytes_processed\":1048747,\"total_duration\":0.729580677,\"backup_start\":\"2026-09-20T02:02:43.821749619-04:00\",\"backup_end\":\"2026-09-20T02:02:44.551330296-04:00\",\"snapshot_id\":\"a9af88f3d21a772d5e4cc610b75dcd0862cbc7ae8ae5263b20c892b079318d38\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "snapshot-id-2",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "$RUN_DIR/repository",
+        "--password-file",
+        "$RUN_DIR/password",
+        "snapshots",
+        "--json",
+        "--tag",
+        "synthetic-2"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "expected_failure": false,
+      "seconds": 0.715,
+      "stdout": "[{\"time\":\"2026-09-20T02:02:43.821749619-04:00\",\"parent\":\"be1cb76f7675788389e1da436001f664bcbf811ddc5e7950132ba4531486668f\",\"tree\":\"0ecb255d7e88f043914ecdd8d1d709e02710fcffe9c5de2eee0c3f46fbc8f560\",\"paths\":[\"$RUN_DIR/fixture\"],\"hostname\":\"synthetic-wsl-restore\",\"username\":\"$USER\",\"uid\":1000,\"gid\":1000,\"tags\":[\"synthetic-2\"],\"program_version\":\"restic 0.19.1\",\"summary\":{\"backup_start\":\"2026-09-20T02:02:43.821749619-04:00\",\"backup_end\":\"2026-09-20T02:02:44.551330296-04:00\",\"files_new\":1,\"files_changed\":5,\"files_unmodified\":0,\"dirs_new\":0,\"dirs_changed\":12,\"dirs_unmodified\":0,\"data_blobs\":2,\"tree_blobs\":12,\"data_added\":6717,\"data_added_packed\":4253,\"total_files_processed\":6,\"total_bytes_processed\":1048747},\"id\":\"a9af88f3d21a772d5e4cc610b75dcd0862cbc7ae8ae5263b20c892b079318d38\",\"short_id\":\"a9af88f3\"}]\n",
+      "stderr": ""
+    },
+    {
+      "id": "healthy-read-all-data",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "$RUN_DIR/repository",
+        "--password-file",
+        "$RUN_DIR/password",
+        "check",
+        "--read-data"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "expected_failure": false,
+      "seconds": 0.724,
+      "stdout": "create exclusive lock for repository\nload indexes\ncheck all packs\ncheck snapshots, trees and blobs\n[0:00] 100.00%  2 / 2 snapshots\nread all data\n[0:00] 100.00%  4 / 4 packs\nno errors were found\n",
+      "stderr": ""
+    },
+    {
+      "id": "wrong-password-restore",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "$RUN_DIR/repository",
+        "--password-file",
+        "$RUN_DIR/wrong-password",
+        "restore",
+        "a9af88f3d21a772d5e4cc610b75dcd0862cbc7ae8ae5263b20c892b079318d38:$RUN_DIR/fixture",
+        "--target",
+        "$RUN_DIR/wrong-target",
+        "--verify"
+      ],
+      "exit_code": 12,
+      "timeout": false,
+      "expected_failure": true,
+      "seconds": 0.5,
+      "stdout": "",
+      "stderr": "Fatal: wrong password or no key found\n"
+    },
+    {
+      "id": "corrupted-copy-read-all-data",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "$RUN_DIR/corrupted-copy",
+        "--password-file",
+        "$RUN_DIR/password",
+        "check",
+        "--read-data"
+      ],
+      "exit_code": 1,
+      "timeout": false,
+      "expected_failure": true,
+      "seconds": 0.714,
+      "stdout": "create exclusive lock for repository\nload indexes\ncheck all packs\ncheck snapshots, trees and blobs\n[0:00] 100.00%  2 / 2 snapshots\nread all data\n[0:00] 100.00%  4 / 4 packs\n",
+      "stderr": "error for tree d75c971f:\n  decrypting blob <tree/d75c971f> from pack 18c079d64c0174682c528f5d0f8c683c1d344555c0fa94a69242c2386ce00782 failed: ciphertext verification failed\npack 18c079d64c0174682c528f5d0f8c683c1d344555c0fa94a69242c2386ce00782 contains 2 errors: [blob d75c971f68d01f588e8032fcf268ac7de3a437db33b01914e1696d3c3a807002: decrypting blob <tree/d75c971f> from pack 18c079d64c0174682c528f5d0f8c683c1d344555c0fa94a69242c2386ce00782 failed: ciphertext verification failed unexpected pack id 44812d43a69b4d5077faa822a180802477ca784c43d92b2b94620b875c2fbf9e]\n\nThe repository contains damaged pack files. These damaged files must be removed to repair the repository. This can be done using the following commands. Please read the troubleshooting guide at https://restic.readthedocs.io/en/stable/077_troubleshooting.html first.\n\nrestic repair packs 18c079d64c0174682c528f5d0f8c683c1d344555c0fa94a69242c2386ce00782\nrestic repair snapshots --forget\n\nDamaged pack files can be caused by backend problems, hardware problems or bugs in restic. Please open an issue at https://github.com/restic/restic/issues/new/choose for further troubleshooting!\nFatal: repository contains errors\n"
+    },
+    {
+      "id": "restore-1-fresh-channel",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "$RUN_DIR/repository",
+        "--password-file",
+        "$RUN_DIR/password",
+        "restore",
+        "be1cb76f7675788389e1da436001f664bcbf811ddc5e7950132ba4531486668f:$RUN_DIR/fixture",
+        "--target",
+        "$RUN_DIR/restore-1",
+        "--verify"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "expected_failure": false,
+      "seconds": 0.725,
+      "stdout": "restoring snapshot be1cb76f of [$RUN_DIR/fixture] at 2026-09-20 02:02:42.346147661 -0400 EDT by $USER@synthetic-wsl-restore to $RUN_DIR/restore-1\nSummary: Restored 12 files/dirs (1.000 MiB) in 0:00\nverifying files in $RUN_DIR/restore-1\nfinished verifying 6 files in $RUN_DIR/restore-1 (took 1ms)\n",
+      "stderr": ""
+    }
+  ],
+  "checks": [
+    {
+      "name": "snapshot-1-matches-independent-frozen-oracle",
+      "passed": true
+    },
+    {
+      "name": "exact-snapshot-1-identity",
+      "passed": true
+    },
+    {
+      "name": "snapshot-2-matches-independent-frozen-oracle",
+      "passed": true
+    },
+    {
+      "name": "exact-snapshot-2-identity",
+      "passed": true
+    },
+    {
+      "name": "wrong-password-native-exit-12",
+      "passed": true
+    },
+    {
+      "name": "wrong-password-produced-no-files",
+      "passed": true
+    },
+    {
+      "name": "corrupted-copy-native-exit-1",
+      "passed": true
+    },
+    {
+      "name": "original-repository-unchanged-by-negative-tests",
+      "passed": true
+    },
+    {
+      "name": "same-host-key-files-still-mode0600",
+      "passed": true
+    },
+    {
+      "name": "original-bytes-match-prior-channel",
+      "passed": true
+    }
+  ],
+  "stages": [
+    {
+      "stage": "prepare",
+      "started_at_utc": "2026-09-20T06:02:39.279595+00:00",
+      "finished_at_utc": "2026-09-20T06:02:47.344986+00:00"
+    },
+    {
+      "stage": "recover",
+      "started_at_utc": "2026-09-20T06:03:11.769341+00:00",
+      "finished_at_utc": "2026-09-20T06:03:12.505609+00:00"
+    }
+  ],
+  "limits": [
+    "No pruning, services, global PATH/configuration changes, credential access, model calls, reboot, or shared SSH transport changes.",
+    "Fresh-SSH recovery after explicit incorrect-input/corruption failures; process-crash and power-loss recovery not qualified.",
+    "Same-host password-file availability is a prerequisite; independent key recovery and offhost disaster recovery remain unknown.",
+    "No ACL/xattr/sparse/hardlink/symlink or cross-filesystem/Windows-NTFS/exFAT claims.",
+    "No token, storage-efficiency or backup performance claim."
+  ],
+  "exact_causal_lifetime_provider_tokens_saved": null,
+  "snapshots": [
+    "be1cb76f7675788389e1da436001f664bcbf811ddc5e7950132ba4531486668f",
+    "a9af88f3d21a772d5e4cc610b75dcd0862cbc7ae8ae5263b20c892b079318d38"
+  ],
+  "corruption": {
+    "copied_pack_relative_path": "data/18/18c079d64c0174682c528f5d0f8c683c1d344555c0fa94a69242c2386ce00782",
+    "bytes": 4135,
+    "change": "One byte XOR 1 at floor(size/2), on isolated copied repository only; copied pack owner-write bit enabled."
+  },
+  "failure": {
+    "type": "ValueError",
+    "message": "restored path/type/byte/hash/mode manifest does not match frozen snapshot"
+  }
+}

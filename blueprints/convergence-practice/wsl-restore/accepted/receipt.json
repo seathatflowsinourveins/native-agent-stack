@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "id": "native-wsl-restic-restore-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "restic"
+  ],
+  "host_scope": {
+    "profile": "velanext-linux-wsl2",
+    "platform": "Linux x86_64 on WSL2",
+    "import_limit": "Synthetic same-host qualification only; no Mac, legacy WSL, offhost repository or disaster-recovery inference."
+  },
+  "recorded_at_utc": "2026-09-20T06:05:57.655198+00:00",
+  "status": "qualified-synthetic-same-host-restore",
+  "claim": "Native restic restores both exact synthetic snapshots after wrong-password and corrupted-copy failures, through a fresh SSH connection.",
+  "binary_sha256": "20d4142678d0d95ec11a4759def1b73fd9190abc9ca19e4b62d067c0b387e639",
+  "plan_sha256": "fee76988b7ece109f8a9abb14422c11a5ca2036bb3de3f05497263d2bfa00793",
+  "runner_sha256": "5cd3783ccd75064fa2f74e4584b3d2ba6ba2be169406820f1f98f7ea1976ee5c",
+  "prior_run_receipt_sha256": "86a72a8869390e75a57461550f5225c876b2326e247733a5c8162b0fb6caf446",
+  "commands": [
+    {
+      "id": "restore-1-parent-subtree",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "$RUN_DIR/repository",
+        "--password-file",
+        "$RUN_DIR/password",
+        "restore",
+        "be1cb76f7675788389e1da436001f664bcbf811ddc5e7950132ba4531486668f:$RUN_DIR",
+        "--target",
+        "$RUN_DIR/corrected-recovery/restore-1",
+        "--verify"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "seconds": 0.726,
+      "stdout": "restoring snapshot be1cb76f of [$RUN_DIR/fixture] at 2026-09-20 02:02:42.346147661 -0400 EDT by $USER@synthetic-wsl-restore to $RUN_DIR/corrected-recovery/restore-1\nSummary: Restored 13 files/dirs (1.000 MiB) in 0:00\nverifying files in $RUN_DIR/corrected-recovery/restore-1\nfinished verifying 6 files in $RUN_DIR/corrected-recovery/restore-1 (took 1ms)\n",
+      "stderr": ""
+    },
+    {
+      "id": "restore-2-parent-subtree",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "$RUN_DIR/repository",
+        "--password-file",
+        "$RUN_DIR/password",
+        "restore",
+        "a9af88f3d21a772d5e4cc610b75dcd0862cbc7ae8ae5263b20c892b079318d38:$RUN_DIR",
+        "--target",
+        "$RUN_DIR/corrected-recovery/restore-2",
+        "--verify"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "seconds": 0.725,
+      "stdout": "restoring snapshot a9af88f3 of [$RUN_DIR/fixture] at 2026-09-20 02:02:43.821749619 -0400 EDT by $USER@synthetic-wsl-restore to $RUN_DIR/corrected-recovery/restore-2\nSummary: Restored 13 files/dirs (1.000 MiB) in 0:00\nverifying files in $RUN_DIR/corrected-recovery/restore-2\nfinished verifying 6 files in $RUN_DIR/corrected-recovery/restore-2 (took 1ms)\n",
+      "stderr": ""
+    },
+    {
+      "id": "healthy-repository-final-read-all-data",
+      "argv": [
+        "$RESTIC",
+        "--no-cache",
+        "--repo",
+        "$RUN_DIR/repository",
+        "--password-file",
+        "$RUN_DIR/password",
+        "check",
+        "--read-data"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "seconds": 0.733,
+      "stdout": "create exclusive lock for repository\nload indexes\ncheck all packs\ncheck snapshots, trees and blobs\n[0:00] 100.00%  2 / 2 snapshots\nread all data\n[0:00] 100.00%  4 / 4 packs\nno errors were found\n",
+      "stderr": ""
+    }
+  ],
+  "checks": [
+    {
+      "name": "same-host-key-regular-mode0600-and-original-repository-bytes-intact",
+      "passed": true
+    },
+    {
+      "name": "snapshot-1-exact-path-type-byte-sha256-mode-equality-including-fixture-root",
+      "passed": true
+    },
+    {
+      "name": "snapshot-2-exact-path-type-byte-sha256-mode-equality-including-fixture-root",
+      "passed": true
+    },
+    {
+      "name": "healthy-repository-byte-manifest-unchanged-after-recovery",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "No pruning, services, global PATH/configuration changes, credential access, model calls, reboot, or shared SSH transport changes.",
+    "Fresh-SSH recovery after explicit incorrect-input/corruption failures; process-crash and power-loss recovery not qualified.",
+    "Same-host password-file availability is a prerequisite; independent key recovery and offhost disaster recovery remain unknown.",
+    "No ACL/xattr/sparse/hardlink/symlink or cross-filesystem/Windows-NTFS/exFAT claims.",
+    "No token, storage-efficiency or backup performance claim.",
+    "Prior direct-subtree restore returned0 but failed the strict fixture-root mode gate. That attempt remains failed; the parent-subtree correction is a separate native run.",
+    "A fresh SSH connection proves channel-independent access with the retained local task key only; future same-host key availability, key-loss recovery and offhost disaster recovery remain unknown."
+  ],
+  "exact_causal_lifetime_provider_tokens_saved": null,
+  "finished_at_utc": "2026-09-20T06:05:59.855105+00:00"
+}

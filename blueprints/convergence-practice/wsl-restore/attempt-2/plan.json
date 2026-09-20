@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "id": "wsl-restic-restore-20260920",
+  "frozen_before_native_backup": true,
+  "runtime": "VelaNext Linux/WSL2 x86_64; user-owned temporary encrypted repository",
+  "restic_version": "0.19.1",
+  "fixture_source_sha256": "153b0a13d80ab0c0eecb623942237664988c35cb586394f64e70e83106583bf1",
+  "fixture_scope": "Synthetic selected task state only; no user projects, client state, histories, accounts or existing backup repositories.",
+  "snapshots": [
+    {
+      "number": 1,
+      "expected_manifest": [
+        {
+          "path": ".",
+          "kind": "directory",
+          "mode": "0750"
+        },
+        {
+          "path": "blobs",
+          "kind": "directory",
+          "mode": "0750"
+        },
+        {
+          "path": "blobs/data.bin",
+          "kind": "file",
+          "mode": "0600",
+          "bytes": 1048576,
+          "sha256": "fbbab289f7f94b25736c58be46a994c441fd02552cc6022352e3d86d2fab7c83"
+        },
+        {
+          "path": "documents",
+          "kind": "directory",
+          "mode": "0750"
+        },
+        {
+          "path": "documents/notes",
+          "kind": "directory",
+          "mode": "0750"
+        },
+        {
+          "path": "documents/notes/café-研究.md",
+          "kind": "file",
+          "mode": "0640",
+          "bytes": 56,
+          "sha256": "7818dbcc25f8261e5c89a7c27080000188af955ccbb4e31932729dbb3399cc06"
+        },
+        {
+          "path": "empty",
+          "kind": "file",
+          "mode": "0600",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "empty-directory",
+          "kind": "directory",
+          "mode": "0750"
+        },
+        {
+          "path": "state",
+          "kind": "directory",
+          "mode": "0750"
+        },
+        {
+          "path": "state/decision.json",
+          "kind": "file",
+          "mode": "0600",
+          "bytes": 35,
+          "sha256": "01d0d5b0f5768d1773163d1febeddb49ede89073052c709646f6072b0b142daf"
+        },
+        {
+          "path": "state/deleted.txt",
+          "kind": "file",
+          "mode": "0640",
+          "bytes": 22,
+          "sha256": "fa4abc8c86375a5858900dce9f24cb40e212b22fa6f4981a993de97a8e505e5d"
+        },
+        {
+          "path": "tools",
+          "kind": "directory",
+          "mode": "0750"
+        },
+        {
+          "path": "tools/check.sh",
+          "kind": "file",
+          "mode": "0750",
+          "bytes": 58,
+          "sha256": "51e6d74f540d1fa75a07cbe6ba84f60827b5e601a4fa6dc0bf0d31768e1d656d"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "expected_manifest": [
+        {
+          "path": ".",
+          "kind": "directory",
+          "mode": "0750"
+        },
+        {
+          "path": "blobs",
+          "kind": "directory",
+          "mode": "0750"
+        },
+        {
+          "path": "blobs/data.bin",
+          "kind": "file",
+          "mode": "0600",
+          "bytes": 1048576,
+          "sha256": "fbbab289f7f94b25736c58be46a994c441fd02552cc6022352e3d86d2fab7c83"
+        },
+        {
+          "path": "documents",
+          "kind": "directory",
+          "mode": "0750"
+        },
+        {
+          "path": "documents/notes",
+          "kind": "directory",
+          "mode": "0750"
+        },
+        {
+          "path": "documents/notes/café-研究.md",
+          "kind": "file",
+          "mode": "0640",
+          "bytes": 56,
+          "sha256": "7818dbcc25f8261e5c89a7c27080000188af955ccbb4e31932729dbb3399cc06"
+        },
+        {
+          "path": "empty",
+          "kind": "file",
+          "mode": "0600",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "empty-directory",
+          "kind": "directory",
+          "mode": "0750"
+        },
+        {
+          "path": "state",
+          "kind": "directory",
+          "mode": "0750"
+        },
+        {
+          "path": "state/added.txt",
+          "kind": "file",
+          "mode": "0640",
+          "bytes": 22,
+          "sha256": "c545874af6125ed6e7e174cb0537a307c6e68c2bc69e8e0433689ba9f73e55e0"
+        },
+        {
+          "path": "state/decision.json",
+          "kind": "file",
+          "mode": "0600",
+          "bytes": 35,
+          "sha256": "a949c0d5535aaa3ffe4534b56db7fc9bfa1a49999d5be183896e341251207740"
+        },
+        {
+          "path": "tools",
+          "kind": "directory",
+          "mode": "0750"
+        },
+        {
+          "path": "tools/check.sh",
+          "kind": "file",
+          "mode": "0750",
+          "bytes": 58,
+          "sha256": "51e6d74f540d1fa75a07cbe6ba84f60827b5e601a4fa6dc0bf0d31768e1d656d"
+        }
+      ]
+    }
+  ],
+  "procedure": [
+    "Verify official release digest, signed SHA256SUMS and pinned signing-key fingerprint before executing native binary.",
+    "Create isolated mode0700 task root and new random mode0600 password files outside Git. Initialize native encrypted repository.",
+    "Materialize snapshot one and independently check its frozen manifest before backup.",
+    "Apply frozen changed/deleted/added-file transition; check snapshot two manifest before backup.",
+    "Native check --read-data on healthy repository. Save both exact snapshot IDs.",
+    "Wrong-password restore must fail and create no restored fixture files.",
+    "Copy only owned repository; change one byte of one copied pack. Native check --read-data must fail. Original repository bytes must remain unchanged.",
+    "End first SSH invocation. New SSH invocation restores both exact snapshots from healthy original using same retained task-local password, --verify and fresh targets.",
+    "Compare complete relative path/type/size/SHA256/mode manifests including empty file and directory, binary and UTF8 names. Recheck healthy repository."
+  ],
+  "command_timeout_seconds": 120,
+  "limits": [
+    "No pruning, services, global PATH/configuration changes, credential access, model calls, reboot, or shared SSH transport changes.",
+    "Fresh-SSH recovery after explicit incorrect-input/corruption failures; process-crash and power-loss recovery not qualified.",
+    "Same-host password-file availability is a prerequisite; independent key recovery and offhost disaster recovery remain unknown.",
+    "No ACL/xattr/sparse/hardlink/symlink or cross-filesystem/Windows-NTFS/exFAT claims.",
+    "No token, storage-efficiency or backup performance claim."
+  ],
+  "snapshot_tree_selection": "Absolute owned fixture path; native restore uses exact snapshot-ID:subfolder into a fresh owned target.",
+  "runner_source_sha256": "c9f6cbbf11e663e66483a8a3fb0848bf0ca869d8d77cdf1d816437709d9b6751",
+  "wrong_password_expected_exit": 12,
+  "corrupt_pack_check_expected_exit": 1,
+  "attempt": 2,
+  "retained_prior_attempt": "attempt-1/receipt.json",
+  "implementation_correction": "Enable owner-write on the selected copied pack before flipping one byte; original repository permissions/bytes remain untouched."
+}

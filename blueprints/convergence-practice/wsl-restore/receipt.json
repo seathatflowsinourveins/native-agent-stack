@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "id": "native-wsl-restic-synthetic-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20T06:09:06.301119+00:00",
+  "component_ids": [
+    "restic"
+  ],
+  "claim": "On VelaNext Linux/WSL2, verified native restic0.19.1 recovered both exact synthetic snapshots through a fresh SSH connection after isolated wrong-password and corrupt-copy failures. Complete fixture path/type/byte/hash/POSIX-mode equality passed, including the fixture root.",
+  "limitations": [
+    "No pruning, services, global PATH/configuration changes, credential access, model calls, reboot, or shared SSH transport changes.",
+    "Fresh-SSH recovery after explicit incorrect-input/corruption failures; process-crash and power-loss recovery not qualified.",
+    "Same-host password-file availability is a prerequisite; independent key recovery and offhost disaster recovery remain unknown.",
+    "No ACL/xattr/sparse/hardlink/symlink or cross-filesystem/Windows-NTFS/exFAT claims.",
+    "No token, storage-efficiency or backup performance claim.",
+    "Prior direct-subtree restore returned0 but failed the strict fixture-root mode gate. That attempt remains failed; the parent-subtree correction is a separate native run.",
+    "A fresh SSH connection proves channel-independent access with the retained local task key only; future same-host key availability, key-loss recovery and offhost disaster recovery remain unknown.",
+    "Native gitleaks and Worktrunk were absent in the bounded lookup and were not installed or qualified by this lane.",
+    "The corrected reusable run.py/plan.json combine the observed fixes; they were not replayed as a third full backup trial. Actual executed runner/plan bytes are retained per attempt.",
+    "Ten offline oracle/guard tests are distinct from the actual native restic commands."
+  ],
+  "data": {
+    "runtime": "Linux x86_64 on WSL2",
+    "native_restic": "0.19.1",
+    "binary_sha256": "20d4142678d0d95ec11a4759def1b73fd9190abc9ca19e4b62d067c0b387e639",
+    "native_qualification_status": "qualified-synthetic-same-host-restore",
+    "snapshots": 2,
+    "fixture_regular_files_per_snapshot": 6,
+    "fixture_directories_including_root_per_snapshot": 7,
+    "fixture_file_bytes_per_snapshot": 1048747,
+    "native_commands_across_retained_attempts": 19,
+    "expected_wrong_password_exits": [
+      12,
+      12
+    ],
+    "expected_corrupt_copy_exit": 1,
+    "final_restore_exits": [
+      0,
+      0
+    ],
+    "final_read_data_exit": 0,
+    "failed_attempts_retained": [
+      {
+        "path": "attempt-1/receipt.json",
+        "failure": "Read-only copied pack rejected corruption write; corrected only copied pack owner-write mode."
+      },
+      {
+        "path": "attempt-2/receipt.json",
+        "failure": "Direct-subtree restore returned0 but fixture root mode was0700 instead of0750; parent-subtree correction reused exact snapshots and unchanged oracle."
+      }
+    ],
+    "key_scope": "New task-only random passwords remained regular mode0600 files in the private WSL lane; no key or password content is published. Future same-host key availability and offhost recovery remain unknown.",
+    "transport": {
+      "method": "Separate foreground SSH invocations with ControlMaster=no and ControlPath=none",
+      "prepare_attempt_2_exit": 0,
+      "initial_fresh_channel_restore_exit": 1,
+      "corrected_fresh_channel_restore_exit": 0,
+      "boundaries": "No host reboot, client credential migration, network routing change, shared SSH service change or transport interruption was performed."
+    },
+    "global_path_modified": false,
+    "existing_backup_repository_accessed": false,
+    "prune_executed": false,
+    "model_calls": 0,
+    "exact_causal_lifetime_provider_tokens_saved": null,
+    "verification": "validation.json"
+  },
+  "evidence": [
+    {
+      "path": "source-review.json",
+      "sha256": "4485a95f7d3fcb3b6dbc30bd3bccf449db1f3e914d7f019277a03e3fa7111899",
+      "bytes": 5213
+    },
+    {
+      "path": "installation.json",
+      "sha256": "dd4603b26ca0bdcc9b6c6007574ae1788e83374781321bd8eeec4d7d496c65db",
+      "bytes": 6935
+    },
+    {
+      "path": "attempt-1/plan.json",
+      "sha256": "821810246bfa52b15726656da36c44a430db85e4f0483fa0852f26ac3d3a3fa2",
+      "bytes": 6817
+    },
+    {
+      "path": "attempt-1/executed-runner.py.txt",
+      "sha256": "8179e4299f31c4f5ca560eb9708fcb65ac94ae8a8104c1f085dfa3f761ea2ce1",
+      "bytes": 9534
+    },
+    {
+      "path": "attempt-1/receipt.json",
+      "sha256": "1088a9228976bdfb12c77080091c97ec32467a13a06aa00b4de55135a33aff93",
+      "bytes": 8775
+    },
+    {
+      "path": "attempt-2/plan.json",
+      "sha256": "a73dfbedbc8db781416d4f0af4a42b7c7935224c26af6806ac4b25e8ac030a13",
+      "bytes": 7050
+    },
+    {
+      "path": "attempt-2/executed-runner.py.txt",
+      "sha256": "c9f6cbbf11e663e66483a8a3fb0848bf0ca869d8d77cdf1d816437709d9b6751",
+      "bytes": 9084
+    },
+    {
+      "path": "attempt-2/receipt.json",
+      "sha256": "86a72a8869390e75a57461550f5225c876b2326e247733a5c8162b0fb6caf446",
+      "bytes": 12048
+    },
+    {
+      "path": "attempt-2/original-repository-manifest.json",
+      "sha256": "3bd4dac7dff31a093646a351f396cb6aab23f7e6ac1f861c7cb9c966da1982d2",
+      "bytes": 1897
+    },
+    {
+      "path": "recovery-plan.json",
+      "sha256": "fee76988b7ece109f8a9abb14422c11a5ca2036bb3de3f05497263d2bfa00793",
+      "bytes": 1905
+    },
+    {
+      "path": "recover.py",
+      "sha256": "5cd3783ccd75064fa2f74e4584b3d2ba6ba2be169406820f1f98f7ea1976ee5c",
+      "bytes": 7070
+    },
+    {
+      "path": "fixture.py",
+      "sha256": "153b0a13d80ab0c0eecb623942237664988c35cb586394f64e70e83106583bf1",
+      "bytes": 3377
+    },
+    {
+      "path": "corruption.py",
+      "sha256": "8f9220e40a8fb550d77b7ef7afec4dd81b591134c190a904d9abc018c2f1b96e",
+      "bytes": 1322
+    },
+    {
+      "path": "accepted/receipt.json",
+      "sha256": "baf02f1eed7272c869ae7a195872bad530ade0a06e4c16e7129f63e288d03b40",
+      "bytes": 4934
+    },
+    {
+      "path": "accepted/restored-1.json",
+      "sha256": "72bba97f54f1baefb1f3179e4823976d2074a653987e52c200052e64d98ddfb6",
+      "bytes": 1623
+    },
+    {
+      "path": "accepted/restored-2.json",
+      "sha256": "252b94638ee49bded6de21d11dc6cf8b7689548041ad2416dfb26aeb6ae78c56",
+      "bytes": 1621
+    },
+    {
+      "path": "run.py",
+      "sha256": "aa6a18135141b937f700b162afd40200aadc7ec9a2b1829e223deace8c689b76",
+      "bytes": 9251
+    },
+    {
+      "path": "plan.json",
+      "sha256": "51713da3bf2be0902e059067d9a287ce2870a93d5a4fd2a4747d4fb702d5c0b3",
+      "bytes": 7615
+    },
+    {
+      "path": "install.py",
+      "sha256": "243d7174ab90d3cac7667a6af74bb2062c9f0fc3275aa2b447b25afa870f3c07",
+      "bytes": 4952
+    },
+    {
+      "path": "validation.json",
+      "sha256": "558b43769f30e3e7924d7a7ed789670fb063b330feed207e4dfba39d093e1438",
+      "bytes": 2429
+    },
+    {
+      "path": "README.md",
+      "sha256": "164586b31773b2da8392bcbb458d4050729621f782fabdee02488bf2c1877de2",
+      "bytes": 4749
+    }
+  ]
+}
