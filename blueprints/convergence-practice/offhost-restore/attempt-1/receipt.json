@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "status": "failed",
+  "started_at_utc": "2026-09-20T20:42:33.637792+00:00",
+  "scope": "One fresh GitHub-hosted Ubuntu runner restores two exact synthetic snapshots using a separately delivered fixture password.",
+  "run_id": "35536387838",
+  "source_sha": "b2b07714c9ac3fe7c6e92c3649c22a403fbd65be",
+  "runner_environment": "github-hosted",
+  "binary_sha256": "20d4142678d0d95ec11a4759def1b73fd9190abc9ca19e4b62d067c0b387e639",
+  "input_sha256": "1f4b22364d60ee63280afc8734dcd61a996c84e4282384e9a6bb66a93e1dafef",
+  "plan_sha256": "284939a99b6d1136edc655ceed16c4f423eb926ad2a4618e35821b0c326b79ca",
+  "snapshots": [
+    "071e8951efdb088585a3d4c31680bc660276eed9e11ecd562f44e22b6c2ddc80",
+    "584e40a22ffbb39c814b9322daf22b0001e165e37c1518d484f6d5d2464f5a21"
+  ],
+  "hosted_plan_sha256": "4ba9e561bd42cebe1f0e4795f06fdeb400f3545f38fb0a62d86bb2821feefeef",
+  "host_network_namespace": "net:[4026531833]",
+  "host_mount_namespace": "mnt:[4026531832]",
+  "commands": [],
+  "checks": {
+    "ciphertext_exact_before_restore": true,
+    "owned_native_runtime_removed": true
+  },
+  "limitations": [
+    "Local synthetic preparation is not independent-host acceptance; hosted success must be recorded separately.",
+    "Same GitHub account stores public ciphertext and separately protected Actions secret; not independent administrative trust domains or GitHub-account-loss recovery.",
+    "No reboot, power-loss, production disaster recovery, credential recovery, lost-password recovery, or long-term storage availability claim.",
+    "Only complete fixture path/type/length/SHA256/POSIX-mode equality is qualified; not UID/GID, timestamps, ACL/xattrs, sparse files, links or Windows filesystems.",
+    "No token, performance, or storage-efficiency savings claim."
+  ],
+  "sanitization": "Owned runner paths are replaced by role placeholders; native source username in restore banners is replaced. Raw stdout/stderr SHA256 and lengths are retained. Raw streams are held in memory only; password contents are neither read by this recorder nor returned.",
+  "model_calls": 0,
+  "exact_causal_lifetime_provider_tokens_saved": null,
+  "failure": {
+    "type": "FileExistsError",
+    "message": "[Errno 17] File exists: '$OWNED_RUN/wrong-password'"
+  },
+  "finished_at_utc": "2026-09-20T20:42:33.667791+00:00"
+}

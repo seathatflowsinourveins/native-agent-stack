@@ -28,6 +28,25 @@ jobs:
           printf 'FOUNDATION_RESTORE_ROOT=%s\n' "$fixture_root" >> "$GITHUB_ENV"
       - name: Verify the oracle and ciphertext decoder refusal cases
         run: python3 -m unittest tests.test_wsl_restore tests.test_offhost_restore -v
+      - name: Set up the exact upstream-selected Go toolchain
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: '1.25.10'
+          check-latest: false
+          cache: false
+      - name: Fetch the unmodified pinned upstream test source
+        run: |
+          source="$FOUNDATION_RESTORE_ROOT/upstream-restic"
+          git init --quiet "$source"
+          git -C "$source" remote add origin https://github.com/restic/restic.git
+          git -C "$source" fetch --quiet --depth 1 origin 6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf
+          git -C "$source" checkout --quiet --detach FETCH_HEAD
+      - name: Run selected unchanged restic integration and permission tests
+        timeout-minutes: 9
+        run: |
+          python3 blueprints/convergence-practice/offhost-restore/upstream_tests.py \
+            --source "$FOUNDATION_RESTORE_ROOT/upstream-restic" \
+            --reports "$FOUNDATION_RESTORE_ROOT/reports"
       - name: Install required native namespace tool and verified restic release
         run: |
           output="$FOUNDATION_RESTORE_ROOT/reports"

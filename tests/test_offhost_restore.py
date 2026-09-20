@@ -112,5 +112,40 @@ class RestoreTests(unittest.TestCase):
         self.assertIn('secrets.FOUNDATION_RESTORE_FIXTURE_20260920',text)
         self.assertNotIn('bypass',text)
 
+    def test_actual_recovery_workspace_keeps_negative_key_separate_from_every_command_output(self):
+        # Reproduce the hosted setup with the exact encrypted input, no model,
+        # correct password or native operation. The old wrong-password output
+        # mkdir collided with the regular negative-key file here.
+        spec = importlib.util.spec_from_file_location('offhost_run', HERE/'run.py')
+        module = importlib.util.module_from_spec(spec)
+        with patch.dict(sys.modules, {'verify':verify}): spec.loader.exec_module(module)
+        expected = verify.load(HERE/'repository-manifest.json')
+        wrong = module.initialize_recovery(self.target, verify.load(HERE/'repository.json'), expected)
+        for label in ['wrong-password','check-read-data','restore-1','restore-2']:
+            output = module.create_command_output(self.target,label)
+            self.assertTrue(output.is_dir())
+            self.assertNotEqual(wrong,output)
+        self.assertTrue(wrong.is_file())
+        self.assertEqual(wrong.stat().st_mode & 0o777,0o600)
+        self.assertEqual(verify.repository_manifest(self.target/'repository'),expected)
+
+
+class UpstreamResultGuardTests(unittest.TestCase):
+    def module(self):
+        spec=importlib.util.spec_from_file_location('offhost_upstream',HERE/'upstream_tests.py')
+        module=importlib.util.module_from_spec(spec)
+        with patch.dict(sys.modules,{'verify':verify}):spec.loader.exec_module(module)
+        return module
+
+    def test_only_exact_passed_upstream_tests_are_accepted(self):
+        selected=[{'package':'upstream/package','name':'TestNative'}]
+        event={'Package':'upstream/package','Test':'TestNative','Action':'pass'}
+        self.assertEqual(self.module().check_test_events(json.dumps(event),selected)[0]['status'],'pass')
+        for action in ['skip','fail']:
+            with self.subTest(action=action),self.assertRaises(ValueError):
+                self.module().check_test_events(json.dumps(dict(event,Action=action)),selected)
+        with self.assertRaises(ValueError):self.module().check_test_events('',selected)
+        with self.assertRaises(ValueError):self.module().check_test_events(json.dumps(event)+'\n'+json.dumps(event),selected)
+
 
 if __name__ == '__main__': unittest.main()
