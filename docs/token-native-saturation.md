@@ -1,6 +1,6 @@
 # Native token-practice saturation audit
 
-This dated matrix covers all 58 selected component records and distinguishes them from the 505-repository research catalog. Every selected component has an installation assessment, integration mode, native recipe, functional and lifecycle boundaries, and baseline status in the [machine-readable matrix](../blueprints/token-native-focus/saturation-audit.json). The other 447 identities are reviewed choices or alternatives; catalog inclusion is not installed adoption.
+This dated matrix covers all 65 selected component records and distinguishes them from the 512-repository research catalog. Every selected component has an installation assessment, integration mode, native recipe, functional and lifecycle boundaries, and baseline status in the [machine-readable matrix](../blueprints/token-native-focus/saturation-audit.json). The other 447 identities are reviewed choices or alternatives; catalog inclusion is not installed adoption.
 
 The audit reuses retained acceptance whose inputs still match. This aggregation launches no provider model tasks; the later focus wave separately records one bounded task in each native client. It does not manufacture a counter or require every specialist to run at startup. Exact per-artifact reductions, native historical estimates and provider usage remain separate. No evidence establishes a universal SOTA ranking or exact causal lifetime provider savings.
 
@@ -8,69 +8,112 @@ The [retained functional follow-up](../evidence/receipts/token-native-retained-f
 
 The focus wave closed the avoidable project-scope, upstream Headroom MCP and sandbox HTTP-network gaps. Both native clients passed the selected Context Mode/jCodeMunch task with six successful MCP calls. Existing desktop processes retain their loaded connection; fresh native sessions prove the corrected scope. The newly selected jCodeMunch server has exact retrieval evidence and both-client acceptance, with its cheaper known-source alternative documented.
 
-Remaining boundaries are explicit: Claude HUD's actual interactive attempt reached onboarding before rendering; the bridge backend passed but an outer Claude delegation was not exercised; fresh native PreCompact was not forced. AgentsView has scoped explicit-endpoint acceptance, while automatic archive discovery remains unestablished. vLLM 0.25.0 is the working WSL compatibility pin after 0.29.0 failed initialization. These do not justify repeating every installation or a broad synthetic campaign. No additional useful installation gap was identified for the selected roles after this bounded catalog/evidence review; that is not a claim that every optional feature or all 505 research repositories passed a lifecycle test.
+Remaining boundaries are explicit: Claude HUD's actual interactive attempt reached onboarding before rendering; the bridge backend passed but an outer Claude delegation was not exercised; fresh native PreCompact was not forced. AgentsView has scoped explicit-endpoint acceptance, while automatic archive discovery remains unestablished. vLLM 0.25.0 is the working WSL compatibility pin after 0.29.0 failed initialization. These do not justify repeating every installation or a broad synthetic campaign. No additional useful installation gap was identified for the selected roles after this bounded catalog/evidence review; that is not a claim that every optional feature or all 512 research repositories passed a lifecycle test.
 
-| Component | Installation evidence | Retained functional scope | Exact artifact baseline |
+The current reconciliation includes the later native application, Poppler, Apple
+Container and WSL memory/transport evidence. The original source pins and dated
+receipts remain intact; `reconciliation_base_public_commit` records the newer
+input without rewriting historical provenance. A new PC follows the
+[native lifecycle guide](../adoption/lifecycle.md), including isolated install,
+real use, state persistence, stop/start, owned cleanup and empty-target recovery.
+
+Each matrix row now has `lifecycle_stages` and `baseline_applicability`:
+
+- **Accepted within scope** means the linked dated operation passed on its stated host.
+- **Observed installed** confirms runtime availability, not a clean reinstall/removal cycle.
+- **Partial acceptance** preserves an accepted fixture/backend while its outer integration remains unverified.
+- **Documented, not replayed** and **not established** remain explicit unknown stages.
+- **Not applicable** is reserved for stages absent from the selected role, such as state recovery for a finite formatter or process startup for source guidance.
+
+Cleanup can mean the owned process/listener exited while its evidence, binaries
+and synthetic data remain retained. It does not claim package uninstallation or
+deletion of a user's state. Every row keeps its exact stage scope and receipt
+links; this compact table lists accepted stages only. Omitted stages must be
+read in the matrix, not assumed passed. Baseline counts are retained artifact
+pairs, including losing comparisons; they are not provider lifetime savings.
+
+| Component | Profile | Accepted dated stages | Baseline role / retained pairs |
 | --- | --- | --- | --- |
-| `affaan-m/ECC` | Source pin | Selected guidance; no executable lifecycle | Not measured for this role |
-| `agent-browser` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
-| `agentsview` | Dated native receipt/operation | Not executed in this pass | Not measured for this role |
-| `ai-memory` | Dated native receipt/operation | Current read-only query | Not measured for this role |
-| `ast-grep` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
-| `ccusage` | Dated native receipt/operation | Current read-only query | Not measured for this role |
-| `claude-code` | Dated native receipt/operation | Bounded native task: Context Mode read and exact jCodeMunch retrieval | Dated provider observations; no causal lifetime total |
-| `claude-hud` | Dated native receipt/operation | Synthetic renderer passed; real interactive attempt reached onboarding | Not measured for this role |
-| `codebase-memory-mcp` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
-| `codex` | Dated native receipt/operation | Bounded native task: Context Mode read and exact jCodeMunch retrieval | Dated provider observations; no causal lifetime total |
-| `codex-for-claude` | Dated native receipt/operation | Not executed in this pass | Not measured for this role |
-| `context-hub` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
-| `context-mode` | Dated native receipt/operation | Both native clients passed project-file reading; fresh native PreCompact unforced | Not measured for this role |
-| `davila7/claude-code-templates` | Source pin | Selected guidance; no executable lifecycle | Not measured for this role |
-| `difftastic` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `gitleaks` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `headroom` | Dated native receipt/operation | Upstream MCP compression/retrieval and separate exact-recovery guard | 9 retained comparison(s) |
-| `huggingface-hub-native` | Dated native receipt/operation | Current read-only query | Not measured for this role |
-| `markitdown` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
-| `mcp-inspector` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `mcporter` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `openresearch` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `playwright-cli` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `promptfoo` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `qdrant` | Dated native receipt/operation | Current read-only query | Not measured for this role |
-| `qmd` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
-| `repomix` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
-| `rtk` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
-| `sandbox-runtime` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `serena` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
-| `shanraisshan/claude-code-best-practice` | Source pin | Selected guidance; no executable lifecycle | Not measured for this role |
-| `shellcheck` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `socraticode` | Dated native receipt/operation | Current read-only query | Not measured for this role |
-| `toon` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
-| `vllm` | Dated native receipt/operation | Current read-only query | Not measured for this role |
-| `worktrunk` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `opentelemetry-collector-contrib` | Dated native receipt/operation | Configuration validation | Not measured for this role |
-| `prometheus` | Dated native receipt/operation | Current read-only query | Not measured for this role |
-| `llama-cpp` | Pinned native CUDA runtime and model | Published main-branch planner repair: independent source review, 12 original tests, owned server exited | One scoped local task; no token-savings or general frontier-parity claim |
-| `loki` | Dated native receipt/operation | Current read-only query | Not measured for this role |
-| `grafana` | Dated native receipt/operation | Current read-only query | Not measured for this role |
-| `alertmanager` | Dated native receipt/operation | Current read-only query | Not measured for this role |
-| `ntfy` | Dated native receipt/operation | Current read-only query | Not measured for this role |
-| `duckdb` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `restic` | Dated native receipt/operation | Current read-only query | Not measured for this role |
-| `dagu` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `lean` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `syft` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
-| `alpaca-py` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `systemd` | Dated native receipt/operation | Current read-only query | Not measured for this role |
-| `pandas` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `skfolio` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
-| `edgartools` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
-| `zizmor` | Dated native receipt/operation | Dated public native receipt | Not measured for this role |
-| `beads` | Dated native receipt/operation | Dated public native receipt | Not measured for this role |
-| `skills-ref` | Dated native receipt/operation | Dated public native receipt | Not measured for this role |
-| `otel-tui` | Dated native receipt/operation | Dated public native receipt | Not measured for this role |
-| `jcodemunch-mcp` | Dated direct and both-client native receipts | Exact scoped symbol retrieval; whole-file and known-source alternatives | 2 retained comparisons; one increases tokens |
+| `affaan-m/ECC` | optional | None; inspect documented/partial scope | guidance / 0 |
+| `agent-browser` | core | use, cleanup | direct context / 1 |
+| `agentsview` | supporting | use | supporting workflow / 0 |
+| `ai-memory` | core | install, use, persistence, restart, cleanup, recovery | supporting workflow / 0 |
+| `alertmanager` | observability | use | supporting workflow / 0 |
+| `alpaca-py` | supporting | use | supporting workflow / 0 |
+| `apple-container` | supporting | install, use | supporting workflow / 0 |
+| `ast-grep` | supporting | use | direct context / 1 |
+| `beads` | supporting | use, persistence, cleanup | supporting workflow / 0 |
+| `ccusage` | supporting | use | supporting workflow / 0 |
+| `claude-code` | core | use, persistence, recovery | supporting workflow / 0 |
+| `claude-hud` | optional | None; inspect documented/partial scope | supporting workflow / 0 |
+| `codebase-memory-mcp` | core | use | direct context / 1 |
+| `codex` | core | use, persistence, recovery | supporting workflow / 0 |
+| `codex-for-claude` | optional | None; inspect documented/partial scope | supporting workflow / 0 |
+| `context-hub` | supporting | use | direct context / 1 |
+| `context-mode` | core | use, restart | direct context / 0 |
+| `dagu` | supporting | use, persistence, restart, cleanup, recovery | supporting workflow / 0 |
+| `davila7/claude-code-templates` | optional | None; inspect documented/partial scope | guidance / 0 |
+| `difftastic` | supporting | use | supporting workflow / 0 |
+| `duckdb` | supporting | use | supporting workflow / 0 |
+| `edgartools` | supporting | use | supporting workflow / 1 |
+| `fastapi` | supporting | install, use, persistence, restart, cleanup | supporting workflow / 0 |
+| `gitleaks` | supporting | use | supporting workflow / 0 |
+| `grafana` | observability | use | supporting workflow / 0 |
+| `headroom` | supporting | use, recovery | direct context / 9 |
+| `huggingface-hub-native` | core | use | supporting workflow / 0 |
+| `jcodemunch-mcp` | supporting | use, persistence | direct context / 2 |
+| `lean` | supporting | use | supporting workflow / 0 |
+| `llama-cpp` | optional | use, cleanup | supporting workflow / 0 |
+| `loki` | observability | use | supporting workflow / 0 |
+| `markitdown` | supporting | use | direct context / 1 |
+| `mcp-inspector` | supporting | use | supporting workflow / 0 |
+| `mcporter` | core | use | supporting workflow / 0 |
+| `nextjs` | supporting | install, use, persistence, restart, cleanup | supporting workflow / 0 |
+| `ntfy` | observability | use | supporting workflow / 0 |
+| `openresearch` | supporting | use | supporting workflow / 0 |
+| `opentelemetry-collector-contrib` | observability | use | supporting workflow / 0 |
+| `otel-tui` | supporting | use, cleanup | supporting workflow / 0 |
+| `pandas` | supporting | use | supporting workflow / 0 |
+| `playwright-cli` | optional | use, cleanup | supporting workflow / 0 |
+| `playwright-test` | supporting | install, use, cleanup | supporting workflow / 0 |
+| `poppler` | supporting | install, use, cleanup | direct context / 0 |
+| `postgresql` | supporting | install, use, persistence, restart, cleanup | supporting workflow / 0 |
+| `prometheus` | observability | use | supporting workflow / 0 |
+| `promptfoo` | optional | use | supporting workflow / 0 |
+| `qdrant` | core | use, persistence, recovery | supporting workflow / 0 |
+| `qmd` | core | use | direct context / 1 |
+| `react` | supporting | install, use, persistence, restart, cleanup | supporting workflow / 0 |
+| `repomix` | supporting | use | direct context / 1 |
+| `restic` | supporting | use, recovery | supporting workflow / 0 |
+| `rtk` | core | use | direct context / 1 |
+| `sandbox-runtime` | supporting | use | supporting workflow / 0 |
+| `serena` | core | use | direct context / 1 |
+| `shanraisshan/claude-code-best-practice` | optional | None; inspect documented/partial scope | guidance / 0 |
+| `shellcheck` | supporting | use | supporting workflow / 0 |
+| `skfolio` | supporting | use | supporting workflow / 0 |
+| `skills-ref` | supporting | use | supporting workflow / 0 |
+| `socraticode` | core | use, persistence | direct context / 0 |
+| `syft` | supporting | use | supporting workflow / 1 |
+| `systemd` | supporting | use | supporting workflow / 0 |
+| `toon` | supporting | use | direct context / 1 |
+| `vllm` | core | install, use | supporting workflow / 0 |
+| `worktrunk` | optional | use, cleanup | supporting workflow / 0 |
+| `zizmor` | supporting | use | supporting workflow / 0 |
 
-Use the [upstream recipes](../recipes/README.md) and each component's dedicated native guide. The machine-readable rows preserve exact receipt references and do not turn current-state queries, configuration checks or source libraries into full lifecycle acceptance.
+The role-specific commands remain in each row's `native_integration.recipe_document`
+and [adoption recipe map](../adoption/manifest.json). The lifecycle guide adds
+native package removal/rollback and state-recovery procedures without running
+them on a working host. Command help was checked for uv, npm, native Codex/Claude
+MCP removal, systemd, ai-memory backup/restore and Restic restore; this verifies
+documented argument shapes, not a new uninstall or recovery run.
 
-For a new machine, run the selected profile's actual acceptance. For an unchanged working machine, retrieve the matching dated receipt, identify a concrete difference and run only the check that resolves it.
+An installation does not imply better token use. The candidate must preserve the
+task's required result and beat its cheapest adequate native alternative when a
+direct saving is claimed. A support runtime can be valuable without a token
+reduction; an expanded serialization stays rejected. A dated provider trial or
+counter estimate does not establish universal SOTA rank or causal lifetime savings.
+
+For an unchanged working machine, retrieve matching acceptance and resolve only
+a concrete changed or missing stage. For another machine, collect that machine's
+own native command/results and applicable lifecycle evidence. Do not relabel the
+447 nonselected research identities as installed or require them at startup.
