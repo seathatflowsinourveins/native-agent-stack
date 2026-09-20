@@ -2,6 +2,8 @@
 
 Start from a reviewed checkout, select capabilities, and record new local evidence. Historical receipts describe the authoring host; a clone does not inherit its logins, service state, tool discovery or acceptance.
 
+For daily Codex use, environment setup, reload decisions and the complete 24-repository token workflow, use the [session handbook](../docs/token-session-handbook.md). It maps native integration and upstream commands to the task that needs each capability.
+
 The initial target is **Linux/WSL2 x86_64**. The SDK was recreated in a new prefix on the existing host with **Python 3.13.15 and uv 0.12.17**. A second physical machine, macOS, Windows-native and ARM are not accepted by that result. See [the receipt](receipt.json) and [SDK lock/replay](sdk/README.md).
 
 ## Choose a small starting profile

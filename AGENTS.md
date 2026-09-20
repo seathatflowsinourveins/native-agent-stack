@@ -21,6 +21,10 @@ counter scopes and measured comparisons. Do not rerun the full audit or model
 trials at startup. Never sum cumulative snapshots, overlapping artifact reductions
 or provider/cache subset counters.
 
+For Codex session environment, MCP reload or another PC, read
+`docs/token-session-handbook.md` on demand. Select each capability for its useful
+task; keep the full catalog out of the startup instruction chain.
+
 For a new host's lifetime JSON/HTML manifest, use `tools/token-report/README.md`.
 Its native counter snapshots are separate from exact artifact comparisons and
 provider consumption. Keep its private state outside the checkout.

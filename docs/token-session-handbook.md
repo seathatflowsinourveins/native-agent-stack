@@ -4,6 +4,8 @@ Use the installed tools for the current task; setup is a one-time operation per 
 
 ## Start or resume work
 
+The [authoring-host environment receipt](../evidence/receipts/codex-session-environment-20260920.json) records a fresh native Codex app-server connecting five selected MCP servers, resolving fourteen native commands and completing five read-only calls with no model turn. It verifies the project PATH setup, not a reload of an already-running Desktop task or acceptance on a new PC.
+
 1. Open the intended project in the intended client. Desktop, native Linux Codex and Claude may use different homes, environments and loaded connections. Keep their existing native sign-ins and model settings.
 2. Read the project's short `AGENTS.md`/`CLAUDE.md` routing instructions. Open a detailed recipe only for the chosen operation; do not paste the catalog into every prompt.
 3. Select one useful retrieval path. Exact identifier/location: `rg`, an original source read or Serena. Unknown code concept: SocratiCode. Indexed Markdown: QMD search then get. Large selected output: Context Mode. Use the smaller complete representation when an extra layer adds overhead.
