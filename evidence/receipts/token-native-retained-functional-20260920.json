@@ -1,0 +1,536 @@
+{
+  "schema_version": 1,
+  "id": "token-native-retained-functional-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20T04:11:34.336Z",
+  "component_ids": [
+    "context-hub",
+    "headroom",
+    "mcp-inspector",
+    "promptfoo",
+    "worktrunk"
+  ],
+  "claim": "Previously executed native functional operations are now linked to selected components: Context Hub search/retrieval, Inspector stdio arithmetic, deterministic promptfoo evaluation, Worktrunk disposable worktree lifecycle and a local guard using upstream Headroom APIs.",
+  "limitations": [
+    "Retrospective publication of retained September 20 evidence; these operations were not rerun by this documentation update.",
+    "The source summary and private raw operation captures were retained and reviewed on the original host. Their public hashes bind the source but do not let CI reproduce unpublished raw data.",
+    "Headroom was exercised through a local guarded adapter to upstream APIs, not a direct upstream compression CLI or provider proxy; no native client configuration changed.",
+    "Inspector launched the pinned npm Context Mode CLI for arithmetic only. It does not certify the complete client plugin, hooks, project-file scope or current desktop connection.",
+    "promptfoo used a local echo provider with two assertions and zero model tokens, not an external model evaluation. Worktrunk operated only in a disposable repository with hooks disabled.",
+    "Context Hub candidate output grew by 85 tokens for the retained query. These per-artifact comparisons are not cumulative or causal provider savings; exact lifetime provider savings remain null."
+  ],
+  "data": {
+    "source_summary_sha256": "c906ddb20af40d56af68709ee18e22838d71beeee8622bcf973372c932516903",
+    "source_generated_at_utc": "2026-09-20T04:11:34.336Z",
+    "operations": [
+      {
+        "id": "fresh-worktrunk",
+        "components": [
+          "worktrunk"
+        ],
+        "kind": "upstream_cli",
+        "purpose": "Native current worktree inventory",
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "passed": true,
+        "checks": [
+          {
+            "name": "expected process exit",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "fresh-headroom-guard",
+        "components": [
+          "headroom"
+        ],
+        "kind": "local_guard_using_upstream_API",
+        "purpose": "Seven selected local guard fixtures using upstream Headroom APIs",
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "passed": true,
+        "checks": [
+          {
+            "name": "expected process exit",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "fresh-chub-search",
+        "components": [
+          "context-hub"
+        ],
+        "kind": "upstream_cli",
+        "purpose": "Direct upstream documentation lookup",
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "passed": true,
+        "checks": [
+          {
+            "name": "expected process exit",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "fresh-inspector-context-call",
+        "components": [
+          "mcp-inspector",
+          "context-mode"
+        ],
+        "kind": "upstream_cli",
+        "purpose": "Direct Inspector invokes native Context Mode execution",
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "passed": true,
+        "checks": [
+          {
+            "name": "expected process exit",
+            "passed": true
+          },
+          {
+            "name": "42 computed",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "fresh-promptfoo-local",
+        "components": [
+          "promptfoo"
+        ],
+        "kind": "upstream_cli",
+        "purpose": "Two deterministic local evaluator assertions; zero model calls",
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "passed": true,
+        "checks": [
+          {
+            "name": "expected process exit",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "fresh-chub-get",
+        "components": [
+          "context-hub"
+        ],
+        "kind": "upstream_cli",
+        "purpose": "Retrieve selected upstream indexed Python package documentation",
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "passed": true,
+        "checks": [
+          {
+            "name": "expected process exit",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "fresh-wt-create",
+        "components": [
+          "worktrunk"
+        ],
+        "kind": "upstream_cli",
+        "purpose": "Native create branch and worktree in the owned fixture",
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "passed": true,
+        "checks": [
+          {
+            "name": "expected process exit",
+            "passed": true
+          },
+          {
+            "name": "created branch returned",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "fresh-wt-switch",
+        "components": [
+          "worktrunk"
+        ],
+        "kind": "upstream_cli",
+        "purpose": "Native selection of the existing owned worktree",
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "passed": true,
+        "checks": [
+          {
+            "name": "expected process exit",
+            "passed": true
+          },
+          {
+            "name": "selected branch returned",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "fresh-wt-list-created",
+        "components": [
+          "worktrunk"
+        ],
+        "kind": "upstream_cli",
+        "purpose": "Native list used to verify created worktree",
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "passed": true,
+        "checks": [
+          {
+            "name": "expected process exit",
+            "passed": true
+          },
+          {
+            "name": "created worktree visible",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "fresh-wt-remove",
+        "components": [
+          "worktrunk"
+        ],
+        "kind": "upstream_cli",
+        "purpose": "Native removal of the clean owned fixture worktree",
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "passed": true,
+        "checks": [
+          {
+            "name": "expected process exit",
+            "passed": true
+          },
+          {
+            "name": "structured removal result",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "fresh-wt-list-removed",
+        "components": [
+          "worktrunk"
+        ],
+        "kind": "upstream_cli",
+        "purpose": "Native final list; acceptance verifies only original disposable worktree remains",
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "passed": true,
+        "checks": [
+          {
+            "name": "expected process exit",
+            "passed": true
+          },
+          {
+            "name": "structured final list",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "id": "fresh-chub-full-doc",
+        "components": [
+          "context-hub"
+        ],
+        "kind": "upstream_cli",
+        "purpose": "Full native document bundle for same entry as selected-doc request",
+        "exit_code": 0,
+        "expected_exit_codes": [
+          0
+        ],
+        "passed": true,
+        "checks": [
+          {
+            "name": "expected process exit",
+            "passed": true
+          },
+          {
+            "name": "formatter documented",
+            "passed": true
+          }
+        ]
+      }
+    ],
+    "quality_gates": [
+      {
+        "id": "headroom-repeated-log-with-error",
+        "passed": true,
+        "details": {
+          "native_guard_accepted": true,
+          "exact_tool_recovery": [
+            {
+              "message_index": 3,
+              "block_index": null,
+              "exact": true,
+              "method": "run-expansion"
+            }
+          ],
+          "structure_preserved": true,
+          "native_compact_tiktoken_before": 3952,
+          "native_compact_tiktoken_after": 208
+        }
+      },
+      {
+        "id": "headroom-code-search-results",
+        "passed": true,
+        "details": {
+          "native_guard_accepted": true,
+          "exact_tool_recovery": [
+            {
+              "message_index": 3,
+              "block_index": null,
+              "exact": true,
+              "method": "search-heading"
+            }
+          ],
+          "structure_preserved": true,
+          "native_compact_tiktoken_before": 2268,
+          "native_compact_tiktoken_after": 1206
+        }
+      },
+      {
+        "id": "headroom-structured-json",
+        "passed": true,
+        "details": {
+          "native_guard_accepted": true,
+          "exact_tool_recovery": [
+            {
+              "message_index": 3,
+              "block_index": null,
+              "exact": true,
+              "method": "unchanged"
+            }
+          ],
+          "structure_preserved": true,
+          "native_compact_tiktoken_before": 2941,
+          "native_compact_tiktoken_after": 2941
+        }
+      },
+      {
+        "id": "headroom-short-dense-response",
+        "passed": true,
+        "details": {
+          "native_guard_accepted": true,
+          "exact_tool_recovery": [
+            {
+              "message_index": 3,
+              "block_index": null,
+              "exact": true,
+              "method": "unchanged"
+            }
+          ],
+          "structure_preserved": true,
+          "native_compact_tiktoken_before": 144,
+          "native_compact_tiktoken_after": 144
+        }
+      },
+      {
+        "id": "headroom-unicode-and-identifiers",
+        "passed": true,
+        "details": {
+          "native_guard_accepted": true,
+          "exact_tool_recovery": [
+            {
+              "message_index": 3,
+              "block_index": null,
+              "exact": true,
+              "method": "run-expansion"
+            }
+          ],
+          "structure_preserved": true,
+          "native_compact_tiktoken_before": 412,
+          "native_compact_tiktoken_after": 154
+        }
+      },
+      {
+        "id": "headroom-anthropic-tool-roundtrip-shape",
+        "passed": true,
+        "details": {
+          "native_guard_accepted": true,
+          "exact_tool_recovery": [
+            {
+              "message_index": 2,
+              "block_index": 0,
+              "exact": true,
+              "method": "unchanged"
+            }
+          ],
+          "structure_preserved": true,
+          "native_compact_tiktoken_before": 1663,
+          "native_compact_tiktoken_after": 1663
+        }
+      },
+      {
+        "id": "headroom-ansi-byte-fidelity-fallback",
+        "passed": true,
+        "details": {
+          "native_guard_accepted": false,
+          "exact_tool_recovery": [
+            {
+              "message_index": 3,
+              "block_index": null,
+              "exact": false,
+              "method": "no exact inverse matched; original retained"
+            }
+          ],
+          "structure_preserved": true,
+          "native_compact_tiktoken_before": 1653,
+          "native_compact_tiktoken_after": 1653,
+          "validation_correction": "The rejected compression candidate has no exact inverse, so the guard intentionally retains the exact original request. Compare final before/after equality for this fallback rather than requiring candidate recovery.",
+          "final_original_request_retained_exactly": true
+        }
+      },
+      {
+        "id": "worktrunk-owned-lifecycle",
+        "passed": true,
+        "details": {
+          "created_worktrees": 2,
+          "remaining_worktrees": 1,
+          "remaining_branch": "main",
+          "hooks_disabled": true,
+          "disposable_repository_only": true
+        }
+      },
+      {
+        "id": "promptfoo-local-assertions",
+        "passed": true,
+        "details": {
+          "local_assertions": 2,
+          "provider_tokens": 0,
+          "echo_provider_only": true
+        }
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "fresh-context-hub-d6e54188fc269b6fad9d1804",
+        "component": "context-hub",
+        "baseline_tokens": 2070,
+        "candidate_tokens": 2155,
+        "tokens_removed": -85,
+        "acceptance_passed": true,
+        "limitations": [
+          "The selected call includes upstream feedback text and is larger than --full for this one-file entry. No feedback was sent. Retain the smaller applicable representation."
+        ]
+      },
+      {
+        "id": "fresh-headroom-e1641a5b959bb3334f9020d9",
+        "component": "headroom",
+        "baseline_tokens": 4044,
+        "candidate_tokens": 300,
+        "tokens_removed": 3744,
+        "acceptance_passed": true,
+        "limitations": [
+          "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+          "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+        ]
+      },
+      {
+        "id": "fresh-headroom-62321a612f2e09d18927fcce",
+        "component": "headroom",
+        "baseline_tokens": 2360,
+        "candidate_tokens": 1298,
+        "tokens_removed": 1062,
+        "acceptance_passed": true,
+        "limitations": [
+          "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+          "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+        ]
+      },
+      {
+        "id": "fresh-headroom-43861024062687e0826ce5ab",
+        "component": "headroom",
+        "baseline_tokens": 3032,
+        "candidate_tokens": 3032,
+        "tokens_removed": 0,
+        "acceptance_passed": true,
+        "limitations": [
+          "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+          "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+        ]
+      },
+      {
+        "id": "fresh-headroom-5a0ccf43a8a9a20cbb8b95d5",
+        "component": "headroom",
+        "baseline_tokens": 235,
+        "candidate_tokens": 235,
+        "tokens_removed": 0,
+        "acceptance_passed": true,
+        "limitations": [
+          "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+          "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+        ]
+      },
+      {
+        "id": "fresh-headroom-4c309b573fdf934e1c1ca51a",
+        "component": "headroom",
+        "baseline_tokens": 504,
+        "candidate_tokens": 246,
+        "tokens_removed": 258,
+        "acceptance_passed": true,
+        "limitations": [
+          "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+          "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+        ]
+      },
+      {
+        "id": "fresh-headroom-c8905930063d7fcc47127d2e",
+        "component": "headroom",
+        "baseline_tokens": 1770,
+        "candidate_tokens": 1770,
+        "tokens_removed": 0,
+        "acceptance_passed": true,
+        "limitations": [
+          "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+          "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+        ]
+      },
+      {
+        "id": "fresh-headroom-7f9a4d938277a9293291cc56",
+        "component": "headroom",
+        "baseline_tokens": 1744,
+        "candidate_tokens": 1744,
+        "tokens_removed": 0,
+        "acceptance_passed": true,
+        "limitations": [
+          "Retained pretty-JSON artifact counts differ from the native guard compact-JSON counters; both methods remain labeled.",
+          "Exact tool-content recovery and protected metadata gates apply to this fixture, not a provider task. A rejected compression candidate uses the original request."
+        ]
+      }
+    ],
+    "operation_count": 12,
+    "operations_passed": 12,
+    "new_provider_model_calls": 0,
+    "exact_causal_lifetime_provider_tokens_saved": null
+  }
+}

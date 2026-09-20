@@ -38,3 +38,5 @@ jobs:
         run: python3 scripts/build_ecosystem.py --check
       - name: Test validation failure modes
         run: python3 -m unittest
+      - name: Test portable lifetime accounting
+        run: python3 -m unittest discover -s tools/token-report -p test_token_manifest.py -q

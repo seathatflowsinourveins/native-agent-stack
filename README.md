@@ -117,7 +117,7 @@ explicit open gates, not a claim of universal completeness.
 
 ## What is here
 
-- **56 component records** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup, dependency inventory and local observability; adoption scope remains receipt-specific. The original token study retains its 52-component scope.
+- **58 component records** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup, dependency inventory and local observability; adoption scope remains receipt-specific. The [native saturation matrix](docs/token-native-saturation.md) records current role boundaries; the original token study retains its 52-component scope.
 - **19 researched alternatives** with adoption decisions, model requirements and prospective commands.
 - A [six-candidate portability comparison](adoption/research.md), with 41 selected primary source files and a native uv adoption decision.
 - **Four extended catalog layers** covering foundations/memory/RAG, agents/hosting/operations, data, and strategy/engine research; source review remains distinct from native execution.
