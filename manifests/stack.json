@@ -1649,6 +1649,51 @@
       "source_pin": "5458026c216f77a3da68ea49152dc33470cfe2cb",
       "freshness": "Official GitHub and npm release 3.8.50 checked September 20, 2026. The published tag commit, npm integrity and runtime build identity remain separate. Isolated Linux install/start/restart/state continuity/plaintext restore/owned stop passed; encrypted native restore is unsupported. Gateway native/provider attempts retained model-prefix and quota failures, not a successful gateway task.",
       "command_scope": "Use docs/foundation-stack.md for fresh-prefix guards, explicit DATA_DIR/loopback binding, private management authentication and exact provider scope. Optional only: existing native accounts, models, hooks and default routing remain unchanged. Local preview success does not establish semantic fidelity or provider-token savings."
+    },
+    {
+      "id": "tavily-cli",
+      "repository": "https://github.com/tavily-ai/tavily-cli",
+      "version": "0.1.8",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "On-demand authenticated web Search/Extract and official global skills for native Codex/Claude",
+      "commands": [
+        "tvly auth --json",
+        "tvly search \"Tavily Search API\" --json",
+        "tvly extract \"$SELECTED_PUBLIC_URL\" --json"
+      ],
+      "evidence_ids": [
+        "native-tavily-cli-20260920"
+      ],
+      "source_pin": null,
+      "upstream_sources": [
+        "https://tavily.com/agent-setup/SKILL.md",
+        "https://pypi.org/project/tavily-cli/0.1.8/",
+        "https://github.com/tavily-ai/skills"
+      ],
+      "freshness": "Installed upstream CLI0.1.8 and eight skills on2026-09-20. Useful Search/Extract and fresh native discovery accepted; broader research and current Desktop registry remain separate."
+    },
+    {
+      "id": "nautilus-trader",
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "version": "2.0.0rc5",
+      "license": "LGPL-3.0-only",
+      "profile": "optional",
+      "role": "User-selected trading-engine destination; isolated upstream synthetic FX acceptance, separate from equity data and broker adapters",
+      "commands": [
+        "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --pre nautilus_trader==2.0.0rc5",
+        "\"$NAUTILUS_ENV/bin/python\" \"$UPSTREAM_QUICKSTART\""
+      ],
+      "evidence_ids": [
+        "native-nautilus-v2-20260920",
+        "native-nautilus-ci-20260920"
+      ],
+      "source_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "upstream_sources": [
+        "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc5",
+        "https://nautilustrader.io/docs/latest/getting_started/installation/"
+      ],
+      "freshness": "Exact requested release candidate installed in isolated native prefix; two offline synthetic upstream runs accepted. No broker connection, equity replay or paper acceptance."
     }
   ],
   "profiles": [
@@ -1711,7 +1756,8 @@
         "postgresql",
         "poppler",
         "apple-container",
-        "playwright-test"
+        "playwright-test",
+        "tavily-cli"
       ]
     },
     {
@@ -1727,7 +1773,8 @@
         "shanraisshan/claude-code-best-practice",
         "worktrunk",
         "llama-cpp",
-        "omniroute"
+        "omniroute",
+        "nautilus-trader"
       ]
     },
     {

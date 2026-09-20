@@ -1,0 +1,51 @@
+{
+  "deterministic": {
+    "all_original_identities_stopped": true,
+    "cgroup_removed": true,
+    "initial_harness_refusal_retained": true,
+    "main_only_SIGKILL": true,
+    "model_calls": 0,
+    "native_restarts": 0,
+    "same_cgroup_before": true,
+    "status": "accepted_within_scope",
+    "term_ignoring_setsid_descendant": true
+  },
+  "limitations": [
+    "Deterministic cgroup proof is not successful native child crash/resume acceptance.",
+    "Earlier same-child continuation still required explicit direct descendant cleanup.",
+    "No host/user-manager restart, provider cancellation, billing cessation, off-host restoration or distributed exactly-once acceptance."
+  ],
+  "native": {
+    "attempts": 1,
+    "child_command_refused": "ls -la && python3 stage.py checkpoint",
+    "child_spawns": 1,
+    "cli_invocations": 1,
+    "fixture_effects": 0,
+    "frozen_source_count": 8,
+    "frozen_sources_unchanged": true,
+    "owned_cgroup_removed": true,
+    "owned_processes_remaining": 0,
+    "owned_service_aborted_main_only": true,
+    "permission_mode_unchanged": "dontAsk",
+    "permission_widening": false,
+    "resumed_attempts": 0,
+    "status": "not_accepted",
+    "stop_condition": "native child permission refusal before checkpoint"
+  },
+  "readiness": {
+    "model_calls": 0,
+    "native_path_and_home_match": true,
+    "native_version": "2.1.278 (Claude Code)",
+    "omitted_unsupported_environment_names": [
+      "PROGRAMFILES(X86)"
+    ],
+    "status": "passed"
+  },
+  "status": "deterministic_containment_accepted_native_combination_not_accepted",
+  "usage": {
+    "billing": null,
+    "complete_parent_child_retry_total": null,
+    "reason": "Native service aborted after refusal; terminal/task views are not complete enclosing usage.",
+    "savings_claim": null
+  }
+}

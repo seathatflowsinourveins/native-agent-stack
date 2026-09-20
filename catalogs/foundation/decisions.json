@@ -1,0 +1,2241 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-20",
+  "scope": "Capability-specific general FOUNDATION selection; original pins, full receipt claims and per-component lifecycle stages remain canonical. Shared research and financial examples are not blanket adoption.",
+  "decisions": [
+    {
+      "id": "native-source-tasks",
+      "capability": "Use native client tools to retrieve exact project evidence",
+      "capability_key": "native-source-tasks",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "native-clients"
+      ],
+      "selection": "default",
+      "review_status": "accepted_within_scope",
+      "activation": "Use the native client and selected project tools for an actual coding or research task.",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "foundation-native-20260920",
+        "native-token-focus-clients-20260920",
+        "native-token-stack-final-20260920"
+      ],
+      "evidence_scope": "Both signed-in native clients completed the bounded source-retrieval tasks; the final receipt also retains scoped continuation and observation results.",
+      "limitations": [
+        "Earlier refused MCP calls, Claude format failures and source-host account limits remain recorded.",
+        "Successful retrieval does not qualify every installed tool, all prompts, another PC or complete causal token savings."
+      ],
+      "source_paths": [
+        "docs/foundation-stack.md",
+        "blueprints/convergence-practice/README.md"
+      ],
+      "next_gap": "Verify changed native process/tool activation on the intended host; retain failed attempts.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Both signed-in native clients completed the bounded source-retrieval tasks; the final receipt also retains scoped continuation and observation results.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Verify changed native process/tool activation on the intended host; retain failed attempts.",
+        "stage_refs": [
+          {
+            "component_id": "codex",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "claude-code",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "native-process-defaults",
+      "capability": "Resolve persistent native command and MCP environments",
+      "capability_key": "native-process-defaults",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "native-clients",
+        "instructions-skills"
+      ],
+      "selection": "default",
+      "review_status": "accepted_within_scope",
+      "activation": "Reuse accepted persistent settings and inspect a fresh native process when environment inputs change.",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "context-mode",
+        "rtk",
+        "qmd",
+        "ai-memory"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "codex-session-environment-20260920",
+        "codex-desktop-live-20260920",
+        "native-session-defaults-20260920",
+        "native-harness-defaults-20260920"
+      ],
+      "evidence_scope": "Fresh native processes resolved selected commands/MCP servers and Claude startup hooks; restarted Desktop source retrieval has its own dated receipt.",
+      "limitations": [
+        "Configuration presence does not prove an already-running task hot-reloaded it.",
+        "The Linux/WSL and Desktop process/configuration boundaries remain distinct."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "docs/harness-defaults.md"
+      ],
+      "next_gap": "Collect the specific new-host or changed-session activation evidence; do not copy account stores.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Fresh native processes resolved selected commands/MCP servers and Claude startup hooks; restarted Desktop source retrieval has its own dated receipt.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Collect the specific new-host or changed-session activation evidence; do not copy account stores.",
+        "stage_refs": [
+          {
+            "component_id": "codex",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "claude-code",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "context-mode",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "rtk",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "qmd",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "ai-memory",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "on-demand-guidance",
+      "capability": "Load selected community procedures only for the current operation",
+      "capability_key": "on-demand-guidance",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "instructions-skills"
+      ],
+      "selection": "optional",
+      "review_status": "source_review",
+      "activation": "Load the named skill only when its procedure helps the authorized task.",
+      "component_ids": [
+        "affaan-m/ECC",
+        "davila7/claude-code-templates",
+        "shanraisshan/claude-code-best-practice"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "component-history",
+        "token-practice-coverage-20260920"
+      ],
+      "evidence_scope": "Selected guidance/source records are retained; they have no executable installation or process lifecycle.",
+      "limitations": [
+        "Source selection is not execution acceptance and does not activate a complete skills catalog."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Review a newly selected skill against current project rules before activation.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Selected guidance/source records are retained; they have no executable installation or process lifecycle.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Review a newly selected skill against current project rules before activation.",
+        "stage_refs": [
+          {
+            "component_id": "affaan-m/ECC",
+            "stage": "use",
+            "status": "not_applicable"
+          },
+          {
+            "component_id": "davila7/claude-code-templates",
+            "stage": "use",
+            "status": "not_applicable"
+          },
+          {
+            "component_id": "shanraisshan/claude-code-best-practice",
+            "stage": "use",
+            "status": "not_applicable"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "portable-skill-reference",
+      "capability": "Validate and render a selected portable skill",
+      "capability_key": "portable-skill-reference",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "instructions-skills",
+        "quality-evaluation"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Run the reference validator for a portable-format compatibility question.",
+      "component_ids": [
+        "skills-ref"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "upstream-native-tools-20260920"
+      ],
+      "evidence_scope": "The native reference validator accepted and rendered one selected skill.",
+      "limitations": [
+        "The reference format does not define every Codex or Claude extension."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Check client discovery/extension behavior separately on the target client.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. The native reference validator accepted and rendered one selected skill.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Check client discovery/extension behavior separately on the target client.",
+        "stage_refs": [
+          {
+            "component_id": "skills-ref",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "owned-native-child",
+      "capability": "Implement a bounded repair through an owned native child",
+      "capability_key": "owned-native-child",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "workers"
+      ],
+      "selection": "default",
+      "review_status": "accepted_within_scope",
+      "activation": "Dispatch independent bounded work with base commit, owned paths and acceptance; the coordinator integrates.",
+      "component_ids": [
+        "claude-code"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-claude-child-patch-20260920"
+      ],
+      "evidence_scope": "One foreground native Opus child repaired the owned file; twelve frozen tests and independent exhaustive checks passed.",
+      "limitations": [
+        "One successful child task does not establish arbitrary delegation quality, crash recovery or total workflow efficiency."
+      ],
+      "source_paths": [
+        "blueprints/convergence-practice/native-worker/README.md"
+      ],
+      "next_gap": "Exercise abrupt worker failure and effect-aware same-task resume.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. One foreground native Opus child repaired the owned file; twelve frozen tests and independent exhaustive checks passed.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Exercise abrupt worker failure and effect-aware same-task resume.",
+        "stage_refs": [
+          {
+            "component_id": "claude-code",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "companion-backend",
+      "capability": "Use the scoped native companion backend when explicitly selected",
+      "capability_key": "companion-backend",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "workers"
+      ],
+      "selection": "optional",
+      "review_status": "partial_acceptance",
+      "activation": "Use the selected companion only for a concrete cross-client task with native readiness checked.",
+      "component_ids": [
+        "codex-for-claude",
+        "codex"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "token-practice-gap-followup-20260920"
+      ],
+      "evidence_scope": "One read-only native bridge backend task passed.",
+      "limitations": [
+        "The backend result is narrower than complete plugin integration; native account allowance and interactive activation remain separate."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Qualify the intended outer plugin invocation before calling full integration accepted.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. One read-only native bridge backend task passed.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Qualify the intended outer plugin invocation before calling full integration accepted.",
+        "stage_refs": [
+          {
+            "component_id": "codex-for-claude",
+            "stage": "use",
+            "status": "partial_acceptance"
+          },
+          {
+            "component_id": "codex",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "dependency-task-queue",
+      "capability": "Persist selected project claims and task dependencies",
+      "capability_key": "dependency-task-queue",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "workers",
+        "scheduling-supervision"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use one explicitly scoped queue when dependencies improve coordination.",
+      "component_ids": [
+        "beads"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "upstream-native-tools-20260920"
+      ],
+      "evidence_scope": "Native Beads persisted task claims and dependency transitions in the selected fixture.",
+      "limitations": [
+        "A queue is not worker cancellation, distributed lease correctness or restored task-effect acceptance."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Test the selected queue restart/recovery boundary before unattended reliance.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Native Beads persisted task claims and dependency transitions in the selected fixture.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Test the selected queue restart/recovery boundary before unattended reliance.",
+        "stage_refs": [
+          {
+            "component_id": "beads",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "beads",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "beads",
+            "stage": "recovery",
+            "status": "not_established"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "owned-worktrees",
+      "capability": "Create and retire bounded native Git worktrees",
+      "capability_key": "owned-worktrees",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "workers",
+        "isolation"
+      ],
+      "selection": "default",
+      "review_status": "accepted_within_scope",
+      "activation": "Give each writer an owned branch/worktree and exact base; retain dirty work until reconciled.",
+      "component_ids": [
+        "worktrunk"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "worktrunk-list",
+        "token-native-retained-functional-20260920",
+        "velanext-native-quality-tools-20260920"
+      ],
+      "evidence_scope": "Native listing and disposable create/list/remove passed; dirty removal was refused without loss.",
+      "limitations": [
+        "Worktrees isolate edits, not permissions, accounts, global settings or shared services."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Prove any required crash cleanup without deleting unrelated or dirty state.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Native listing and disposable create/list/remove passed; dirty removal was refused without loss.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Prove any required crash cleanup without deleting unrelated or dirty state.",
+        "stage_refs": [
+          {
+            "component_id": "worktrunk",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "scoped-os-isolation",
+      "capability": "Enforce the selected filesystem and HTTP network boundaries",
+      "capability_key": "scoped-os-isolation",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "isolation"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Apply native restrictions only to the owned command and policy required by the task.",
+      "component_ids": [
+        "sandbox-runtime"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "runtime-tools",
+        "native-sandbox-network-20260920"
+      ],
+      "evidence_scope": "Permitted/protected filesystem checks and loopback allow/deny HTTP fixtures passed.",
+      "limitations": [
+        "This is not a general escape audit or TLS/SOCKS/network-stack qualification."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Qualify a new protocol/platform boundary if the task actually needs it.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Permitted/protected filesystem checks and loopback allow/deny HTTP fixtures passed.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Qualify a new protocol/platform boundary if the task actually needs it.",
+        "stage_refs": [
+          {
+            "component_id": "sandbox-runtime",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "language-symbols",
+      "capability": "Retrieve exact symbols and references in configured languages",
+      "capability_key": "language-symbols",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "code-navigation"
+      ],
+      "selection": "default",
+      "review_status": "accepted_within_scope",
+      "activation": "Use symbols/references for known identifiers and inspect original code before editing.",
+      "component_ids": [
+        "serena"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-context-memory",
+        "foundation-native-20260920"
+      ],
+      "evidence_scope": "Serena native symbol operations passed; the foundation wave adds eight fresh Python/CJS checks after language coverage repair.",
+      "limitations": [
+        "A configured Bash server or one passing extension cannot establish every language server."
+      ],
+      "source_paths": [
+        "docs/foundation-stack.md"
+      ],
+      "next_gap": "Run the relevant extension/language operation for a newly adopted project.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Serena native symbol operations passed; the foundation wave adds eight fresh Python/CJS checks after language coverage repair.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Run the relevant extension/language operation for a newly adopted project.",
+        "stage_refs": [
+          {
+            "component_id": "serena",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "structural-code-lane",
+      "capability": "Search syntax and inspect a selected static call graph",
+      "capability_key": "structural-code-lane",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "code-navigation"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Choose exact structural search or the graph lane when it answers the actual code question.",
+      "component_ids": [
+        "ast-grep",
+        "codebase-memory-mcp"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "portable-cli-artifacts",
+        "desktop-cli-workflows",
+        "native-cli-gaps"
+      ],
+      "evidence_scope": "Native structural-source fixtures and selected static graph search/trace passed.",
+      "limitations": [
+        "The earlier Codex attempt in native-cli-gaps was quota-blocked; later Desktop acceptance does not rewrite that attempt.",
+        "Static graph coverage is language/project-specific and does not establish runtime call behavior."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Check target-language and changed-source coverage rather than assuming a universal graph.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Native structural-source fixtures and selected static graph search/trace passed.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Check target-language and changed-source coverage rather than assuming a universal graph.",
+        "stage_refs": [
+          {
+            "component_id": "ast-grep",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "codebase-memory-mcp",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "scoped-symbol-index",
+      "capability": "Retrieve exact implementation from a scoped symbol index",
+      "capability_key": "scoped-symbol-index",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "code-navigation",
+        "token-efficiency"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use indexed discovery when it replaces broad reads; use the cheaper known-source read when adequate.",
+      "component_ids": [
+        "jcodemunch-mcp"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-jcodemunch-20260920",
+        "native-token-focus-clients-20260920",
+        "native-token-clean-prefix-20260920"
+      ],
+      "evidence_scope": "Exact function retrieval and bounded native client calls passed; isolated install/restart/uninstall has its own receipt.",
+      "limitations": [
+        "The complete search/source sequence was smaller than a whole file and larger than a known focused read.",
+        "Native estimated tokens avoided are not exact causal provider savings."
+      ],
+      "source_paths": [
+        "docs/foundation-stack.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Verify symbol updates/deletions or recovery only after a relevant index/input change.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Exact function retrieval and bounded native client calls passed; isolated install/restart/uninstall has its own receipt.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Verify symbol updates/deletions or recovery only after a relevant index/input change.",
+        "stage_refs": [
+          {
+            "component_id": "jcodemunch-mcp",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "jcodemunch-mcp",
+            "stage": "install",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "jcodemunch-mcp",
+            "stage": "restart",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "jcodemunch-mcp",
+            "stage": "cleanup",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "jcodemunch-mcp",
+            "stage": "recovery",
+            "status": "not_established"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "scoped-document-bm25",
+      "capability": "Search and read a named local Markdown corpus",
+      "capability_key": "scoped-document-bm25",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "document-retrieval"
+      ],
+      "selection": "default",
+      "review_status": "accepted_within_scope",
+      "activation": "Name the index/collection, refresh changed files, search then get the selected source.",
+      "component_ids": [
+        "qmd"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "qmd-bm25-retrieval-20260919",
+        "desktop-cli-workflows",
+        "foundation-native-20260920"
+      ],
+      "evidence_scope": "Native scoped QMD search/get passed; the fixed twelve-query benchmark returned the intended source in eight top-three results.",
+      "limitations": [
+        "All four benchmark misses remain; exact source retrieval on a fixture does not establish arbitrary corpus recall.",
+        "The selected BM25 lane needs no downloaded embedding model."
+      ],
+      "source_paths": [
+        "blueprints/us-equities/retrieval-evaluation/README.md",
+        "docs/foundation-stack.md"
+      ],
+      "next_gap": "Evaluate positive and absent queries for a new corpus.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Native scoped QMD search/get passed; the fixed twelve-query benchmark returned the intended source in eight top-three results.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Evaluate positive and absent queries for a new corpus.",
+        "stage_refs": [
+          {
+            "component_id": "qmd",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "source-document-conversion",
+      "capability": "Convert supported local documents into bounded source evidence",
+      "capability_key": "source-document-conversion",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "document-retrieval"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Select the supported input format and retain document/page/hash boundaries.",
+      "component_ids": [
+        "markitdown",
+        "poppler"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "portable-cli-artifacts",
+        "mac-native-document-ingestion-20260920",
+        "wsl-document-ingestion-20260920"
+      ],
+      "evidence_scope": "Selected HTML conversion passed; native Poppler preserved three designed PDF pages, twenty-four cells and twelve positive/absent queries on Mac and WSL.",
+      "limitations": [
+        "Base MarkItDown HTML acceptance does not imply optional PDF/Office extras.",
+        "The designed born-digital PDF fixture does not qualify OCR, arbitrary layouts or semantic retrieval."
+      ],
+      "source_paths": [
+        "blueprints/convergence-practice/document-ingestion/README.md",
+        "blueprints/convergence-practice/wsl-document-ingestion/README.md"
+      ],
+      "next_gap": "Freeze a representative layout/OCR protocol before extending the claim.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Selected HTML conversion passed; native Poppler preserved three designed PDF pages, twenty-four cells and twelve positive/absent queries on Mac and WSL.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Freeze a representative layout/OCR protocol before extending the claim.",
+        "stage_refs": [
+          {
+            "component_id": "markitdown",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "poppler",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "curated-developer-docs",
+      "capability": "Retrieve selected curated developer documentation",
+      "capability_key": "curated-developer-docs",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "document-retrieval"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use for a named documentation gap and inspect the returned primary source.",
+      "component_ids": [
+        "context-hub"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "token-native-retained-functional-20260920"
+      ],
+      "evidence_scope": "Retained native Context Hub search/retrieval supports its selected developer-document operation.",
+      "limitations": [
+        "This is not a claim that all external documentation is current or indexed."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Recheck the relevant source revision when its API or requirement changes.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Retained native Context Hub search/retrieval supports its selected developer-document operation.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Recheck the relevant source revision when its API or requirement changes.",
+        "stage_refs": [
+          {
+            "component_id": "context-hub",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "project-semantic-index",
+      "capability": "Maintain conceptual code retrieval for one project",
+      "capability_key": "project-semantic-index",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "semantic-rag",
+        "code-navigation"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Adopt one explicit project index when conceptual search helps; keep exact identifiers in focused source tools.",
+      "component_ids": [
+        "socraticode",
+        "qdrant"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-rag",
+        "desktop-direct-rag",
+        "foundation-native-20260920"
+      ],
+      "evidence_scope": "Correct project code and automatic add/update/delete persisted in the selected local vector store; direct Desktop retrieval is separately recorded.",
+      "limitations": [
+        "Another project/index and full-service restart/recovery need their own scope."
+      ],
+      "source_paths": [
+        "docs/foundation-stack.md"
+      ],
+      "next_gap": "Verify changed-project freshness before relying on retrieved code.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Correct project code and automatic add/update/delete persisted in the selected local vector store; direct Desktop retrieval is separately recorded.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Verify changed-project freshness before relying on retrieved code.",
+        "stage_refs": [
+          {
+            "component_id": "socraticode",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "socraticode",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "socraticode",
+            "stage": "recovery",
+            "status": "not_established"
+          },
+          {
+            "component_id": "qdrant",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "qdrant",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "qdrant",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "local-embedding-runtime",
+      "capability": "Serve accepted local embeddings with pinned model inputs",
+      "capability_key": "local-embedding-runtime",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "semantic-rag",
+        "observation-inference"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Retain the compatible runtime/model revision and native GPU evidence.",
+      "component_ids": [
+        "vllm",
+        "huggingface-hub-native"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-rag",
+        "vllm-compatibility",
+        "foundation-native-20260920"
+      ],
+      "evidence_scope": "Native local embedding/model retrieval supports the accepted runtime; a later runtime installed but failed GPU startup and the accepted environment was restored.",
+      "limitations": [
+        "The newer WSL startup failure remains failed; release availability is not runtime acceptance.",
+        "Model downloads and embedding acceptance do not qualify local text-generation quality."
+      ],
+      "source_paths": [
+        "docs/foundation-stack.md"
+      ],
+      "next_gap": "Test a changed GPU/runtime only for an actual compatibility need.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Native local embedding/model retrieval supports the accepted runtime; a later runtime installed but failed GPU startup and the accepted environment was restored.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Test a changed GPU/runtime only for an actual compatibility need.",
+        "stage_refs": [
+          {
+            "component_id": "vllm",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "huggingface-hub-native",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "scoped-memory-lifecycle",
+      "capability": "Persist and retrieve approved cross-client project memory",
+      "capability_key": "scoped-memory-lifecycle",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "durable-memory",
+        "recovery-portability"
+      ],
+      "selection": "default",
+      "review_status": "accepted_within_scope",
+      "activation": "Use one explicitly scoped memory of record; durable writes require explicit intent.",
+      "component_ids": [
+        "ai-memory"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-memory",
+        "native-memory-lifecycle-20260919",
+        "native-ai-memory-maintenance-20260920",
+        "mac-memory-patch-20260920",
+        "wsl-memory-maintenance-20260920"
+      ],
+      "evidence_scope": "Scoped native retrieval, lifecycle negatives, migration, restart, upstream backup and empty-target restore have distinct accepted receipts.",
+      "limitations": [
+        "Lifecycle capture is bounded sanitized observations, not complete transcripts.",
+        "Synthetic maintenance and production activation differ; TTL observations are not immediate access revocation."
+      ],
+      "source_paths": [
+        "adoption/lifecycle.md",
+        "blueprints/convergence-practice/wsl-memory-maintenance/README.md"
+      ],
+      "next_gap": "Establish independent-host/key recovery and the target production activation separately.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Scoped native retrieval, lifecycle negatives, migration, restart, upstream backup and empty-target restore have distinct accepted receipts.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Establish independent-host/key recovery and the target production activation separately.",
+        "stage_refs": [
+          {
+            "component_id": "ai-memory",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "ai-memory",
+            "stage": "install",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "ai-memory",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "ai-memory",
+            "stage": "restart",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "ai-memory",
+            "stage": "cleanup",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "ai-memory",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "bounded-browser-operations",
+      "capability": "Inspect and interact with selected browser pages",
+      "capability_key": "bounded-browser-operations",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "web-research"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use the selected browser lane for the requested page and retain bounded results.",
+      "component_ids": [
+        "agent-browser",
+        "playwright-cli"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "desktop-cli-workflows",
+        "token-practice-gap-followup-20260920"
+      ],
+      "evidence_scope": "Selected local browser snapshot/ref interactions and the pinned Linux browser fixture passed.",
+      "limitations": [
+        "Local fixture acceptance does not authorize unrelated websites, accounts or messages.",
+        "Browser-session recovery and arbitrary website compatibility remain unestablished."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Check a changed website/browser operation only when the task depends on it.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Selected local browser snapshot/ref interactions and the pinned Linux browser fixture passed.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Check a changed website/browser operation only when the task depends on it.",
+        "stage_refs": [
+          {
+            "component_id": "agent-browser",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "playwright-cli",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "public-literature-retrieval",
+      "capability": "Discover and retrieve selected public research papers",
+      "capability_key": "public-literature-retrieval",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "web-research"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use for a bounded literature question and verify the selected paper/source.",
+      "component_ids": [
+        "openresearch"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "artifact-reductions",
+        "token-practice-gap-followup-20260920"
+      ],
+      "evidence_scope": "Retained public-paper retrieval and selected extracted artifacts support the narrow research operation.",
+      "limitations": [
+        "Discovery and extracted text do not establish paper conclusions or exhaustive literature coverage."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Evaluate missing/ambiguous source handling for the next research corpus.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Retained public-paper retrieval and selected extracted artifacts support the narrow research operation.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Evaluate missing/ambiguous source handling for the next research corpus.",
+        "stage_refs": [
+          {
+            "component_id": "openresearch",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "selected-context-processing",
+      "capability": "Process large tool output while preserving useful source facts",
+      "capability_key": "selected-context-processing",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "token-efficiency"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use an explicit filter/execution lane when cheaper than a short direct read, retaining raw errors and recovery.",
+      "component_ids": [
+        "context-mode",
+        "rtk"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-context-memory",
+        "token-practice-artifacts-20260920",
+        "token-practice-native-pairs-20260920",
+        "native-token-focus-clients-20260920",
+        "foundation-native-20260920"
+      ],
+      "evidence_scope": "Selected explicit native calls and exact artifact checks passed; paired trials retain both a Codex reduction and a Claude increase.",
+      "limitations": [
+        "Cache conditions were uncontrolled and enclosing workflow usage was incomplete.",
+        "The foundation gateway RTK/lite previews failed required semantic checks; general CLI acceptance does not repair those failures."
+      ],
+      "source_paths": [
+        "docs/token-practice.md",
+        "docs/foundation-stack.md"
+      ],
+      "next_gap": "Measure only a concrete changed workload, with correctness and complete attempt accounting.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Selected explicit native calls and exact artifact checks passed; paired trials retain both a Codex reduction and a Claude increase.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Measure only a concrete changed workload, with correctness and complete attempt accounting.",
+        "stage_refs": [
+          {
+            "component_id": "context-mode",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "rtk",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "guarded-recoverable-compression",
+      "capability": "Compress selected artifacts with exact-source recovery",
+      "capability_key": "guarded-recoverable-compression",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "token-efficiency"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use upstream direct MCP or the guarded adapter for a matching selected artifact.",
+      "component_ids": [
+        "headroom"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-headroom-mcp-20260920",
+        "native-token-clean-prefix-20260920",
+        "token-practice-confirmation-20260920"
+      ],
+      "evidence_scope": "Owned synthetic MCP compression/retrieval and isolated install/restart/uninstall passed; retained guard comparisons preserve counterexamples.",
+      "limitations": [
+        "Automatic interception of all agent traffic is not configured.",
+        "Capped native counters and exact artifact comparisons do not establish lifetime causal provider savings."
+      ],
+      "source_paths": [
+        "docs/token-practice.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Reject a candidate representation that loses required facts or costs more than the adequate baseline.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Owned synthetic MCP compression/retrieval and isolated install/restart/uninstall passed; retained guard comparisons preserve counterexamples.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Reject a candidate representation that loses required facts or costs more than the adequate baseline.",
+        "stage_refs": [
+          {
+            "component_id": "headroom",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "headroom",
+            "stage": "install",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "headroom",
+            "stage": "restart",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "headroom",
+            "stage": "cleanup",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "headroom",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "selected-file-representations",
+      "capability": "Pack selected files or encode structured data only when useful",
+      "capability_key": "selected-file-representations",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "token-efficiency",
+        "code-navigation"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use explicit file selection and keep the smallest adequate decoded representation.",
+      "component_ids": [
+        "repomix",
+        "toon"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "portable-cli-artifacts",
+        "token-practice-artifacts-20260920",
+        "token-practice-catalog-toon-20260920"
+      ],
+      "evidence_scope": "Selected-file packing and TOON roundtrip passed; exact full-catalog tokens increased under TOON and compact JSON was retained.",
+      "limitations": [
+        "Structural compression omits implementation details; originals remain required for edits and correctness.",
+        "A smaller heuristic estimate is not an exact token reduction."
+      ],
+      "source_paths": [
+        "docs/token-practice.md"
+      ],
+      "next_gap": "Recount a changed artifact only when representation choice matters.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Selected-file packing and TOON roundtrip passed; exact full-catalog tokens increased under TOON and compact JSON was retained.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Recount a changed artifact only when representation choice matters.",
+        "stage_refs": [
+          {
+            "component_id": "repomix",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "toon",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "native-usage-reading",
+      "capability": "Read native provider usage without mixing counter scopes",
+      "capability_key": "native-usage-reading",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "token-efficiency",
+        "observation-inference"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Read the selected native ledger and retain its aggregation scope.",
+      "component_ids": [
+        "ccusage"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "token-practice-gap-followup-20260920",
+        "current-session-observation-20260920"
+      ],
+      "evidence_scope": "Offline native usage parsing and scoped current-session observations have retained outputs.",
+      "limitations": [
+        "Provider consumption, estimated savings, billing and cache subsets are distinct.",
+        "Repeated cumulative snapshots cannot be summed as additional usage."
+      ],
+      "source_paths": [
+        "docs/token-practice.md"
+      ],
+      "next_gap": "Resolve missing attempt/child coverage before any whole-workflow efficiency claim.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Offline native usage parsing and scoped current-session observations have retained outputs.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Resolve missing attempt/child coverage before any whole-workflow efficiency claim.",
+        "stage_refs": [
+          {
+            "component_id": "ccusage",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "deterministic-quality-tools",
+      "capability": "Evaluate fixtures and review shell/source changes",
+      "capability_key": "deterministic-quality-tools",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "quality-evaluation"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use the smallest meaningful project acceptance plus independent review for substantive changes.",
+      "component_ids": [
+        "promptfoo",
+        "difftastic",
+        "shellcheck",
+        "playwright-test"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "token-native-retained-functional-20260920",
+        "portable-cli-artifacts",
+        "wsl-application-20260920"
+      ],
+      "evidence_scope": "Deterministic promptfoo, native shell/structural comparison and the locked browser application flow have scoped acceptance.",
+      "limitations": [
+        "Fixture success does not prove universal model quality or production application correctness."
+      ],
+      "source_paths": [
+        "blueprints/convergence-practice/wsl-application/README.md"
+      ],
+      "next_gap": "Add the missing behavioral negative case exposed by the next task.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Deterministic promptfoo, native shell/structural comparison and the locked browser application flow have scoped acceptance.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Add the missing behavioral negative case exposed by the next task.",
+        "stage_refs": [
+          {
+            "component_id": "promptfoo",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "difftastic",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "shellcheck",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "playwright-test",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "offline-security-inventory",
+      "capability": "Check workflow/secret controls and selected dependency identity",
+      "capability_key": "offline-security-inventory",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "ci-supply-chain",
+        "quality-evaluation"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Run selected offline checks on changed published files and an explicitly scoped dependency source.",
+      "component_ids": [
+        "gitleaks",
+        "zizmor",
+        "syft"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "velanext-native-quality-tools-20260920",
+        "native-ci-security-20260920",
+        "native-linux-zizmor-20260920",
+        "syft-sdk-inventory-20260919"
+      ],
+      "evidence_scope": "Native gitleaks and zizmor accepted clean controls and rejected inert unsafe fixtures; Syft matched thirty-six selected SDK distributions.",
+      "limitations": [
+        "Secret scanning is not proof of no secret anywhere; regular offline workflow analysis is scoped.",
+        "The financial SDK fixture supports dependency enumeration only, not financial behavior or vulnerability assurance."
+      ],
+      "source_paths": [
+        "blueprints/convergence-practice/ci-security/README.md",
+        "blueprints/us-equities/supply-chain/README.md"
+      ],
+      "next_gap": "Qualify new distributions or security boundaries independently.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Native gitleaks and zizmor accepted clean controls and rejected inert unsafe fixtures; Syft matched thirty-six selected SDK distributions.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Qualify new distributions or security boundaries independently.",
+        "stage_refs": [
+          {
+            "component_id": "gitleaks",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "zizmor",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "syft",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "clean-token-tool-ci",
+      "capability": "Reproduce native context-tool commands in a clean CI environment",
+      "capability_key": "clean-token-tool-ci",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "ci-supply-chain",
+        "token-efficiency"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Run the existing job when its pinned inputs or acceptance code change.",
+      "component_ids": [
+        "rtk",
+        "qmd",
+        "repomix",
+        "toon"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-token-ci-local-20260920",
+        "native-token-ci-github-20260920"
+      ],
+      "evidence_scope": "Local and GitHub clean installation passed forty-one command expectations and fourteen fidelity/recovery checks; retained artifact/source hashes matched.",
+      "limitations": [
+        "CI acceptance covers these four tool fixtures, not live providers, GPU execution or a full new-PC stack."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Extend a specific missing native-tool CI behavior only with its own useful fixture.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Local and GitHub clean installation passed forty-one command expectations and fourteen fidelity/recovery checks; retained artifact/source hashes matched.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Extend a specific missing native-tool CI behavior only with its own useful fixture.",
+        "stage_refs": [
+          {
+            "component_id": "rtk",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "qmd",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "repomix",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "toon",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "owned-process-deadlines",
+      "capability": "Terminate an owned local process tree at its deadline",
+      "capability_key": "owned-process-deadlines",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "scheduling-supervision",
+        "workers"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use a transient owned unit for a task that needs process-tree supervision.",
+      "component_ids": [
+        "systemd"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-worker-supervision-20260919",
+        "native-worker-containment-20260920"
+      ],
+      "evidence_scope": "The Linux user manager terminated a TERM-ignoring parent and descendants, retained timeout failure, and accepted a separate fresh run. A separate upstream user-service fixture also contained a TERM-ignoring setsid descendant after MainPID crash; the combined native child trial was refused before effects and remains unaccepted.",
+      "limitations": [
+        "Local process termination does not prove remote provider cancellation, spending caps or exactly-once effects."
+      ],
+      "source_paths": [
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/convergence-practice/worker-recovery/README.md"
+      ],
+      "next_gap": "Test worker cancellation and reconcile external effects before any relaunch.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. The Linux user manager terminated a TERM-ignoring parent and descendants, retained timeout failure, and accepted a separate fresh run.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Test worker cancellation and reconcile external effects before any relaunch.",
+        "stage_refs": [
+          {
+            "component_id": "systemd",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "checkpointed-workflow-resume",
+      "capability": "Retry unfinished workflow steps while preserving a checkpoint",
+      "capability_key": "checkpointed-workflow-resume",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "scheduling-supervision",
+        "recovery-portability"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Run an owned workflow with explicit checkpoints and bounded retry conditions.",
+      "component_ids": [
+        "dagu"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-dagu-job-recovery-20260920",
+        "wsl-transport-recovery-20260920"
+      ],
+      "evidence_scope": "Native cancellation/retry retained one checkpoint on Mac and WSL; separate SSH-client termination left the same job running to completion.",
+      "limitations": [
+        "Controlled transport interruption is not a real network outage or host reboot.",
+        "This does not establish remote model cancellation or distributed exactly-once effects."
+      ],
+      "source_paths": [
+        "blueprints/convergence-practice/job-recovery/README.md",
+        "blueprints/convergence-practice/wsl-transport-recovery/README.md"
+      ],
+      "next_gap": "Qualify scheduled-service restart/reboot and unfinished worker effect reconciliation.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Native cancellation/retry retained one checkpoint on Mac and WSL; separate SSH-client termination left the same job running to completion.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Qualify scheduled-service restart/reboot and unfinished worker effect reconciliation.",
+        "stage_refs": [
+          {
+            "component_id": "dagu",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "dagu",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "dagu",
+            "stage": "restart",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "dagu",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "local-typed-application",
+      "capability": "Build a typed local UI/API with persistent database state",
+      "capability_key": "local-typed-application",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "hosting-services",
+        "quality-evaluation"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use the selected locked project and owned native database/application processes.",
+      "component_ids": [
+        "nextjs",
+        "react",
+        "fastapi",
+        "postgresql"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-application-delivery-20260920",
+        "mac-native-application-migration-20260920",
+        "wsl-application-20260920"
+      ],
+      "evidence_scope": "Locked UI/API, twelve API checks, browser create/update, migration reversal and exact rows/history after restart passed on named Mac/WSL fixtures.",
+      "limitations": [
+        "No production authentication, cloud hosting or independent-host database restore is accepted.",
+        "The failed newer TypeScript generator attempt remains separate from the retained supported runtime."
+      ],
+      "source_paths": [
+        "blueprints/convergence-practice/application-delivery/README.md",
+        "blueprints/convergence-practice/wsl-application/README.md"
+      ],
+      "next_gap": "Qualify independent restore and the requested deployment-specific access/runtime conditions.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Locked UI/API, twelve API checks, browser create/update, migration reversal and exact rows/history after restart passed on named Mac/WSL fixtures.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Qualify independent restore and the requested deployment-specific access/runtime conditions.",
+        "stage_refs": [
+          {
+            "component_id": "nextjs",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "nextjs",
+            "stage": "install",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "nextjs",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "nextjs",
+            "stage": "restart",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "nextjs",
+            "stage": "recovery",
+            "status": "not_established"
+          },
+          {
+            "component_id": "react",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "react",
+            "stage": "install",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "react",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "react",
+            "stage": "restart",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "react",
+            "stage": "recovery",
+            "status": "not_established"
+          },
+          {
+            "component_id": "fastapi",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "fastapi",
+            "stage": "install",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "fastapi",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "fastapi",
+            "stage": "restart",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "fastapi",
+            "stage": "recovery",
+            "status": "not_established"
+          },
+          {
+            "component_id": "postgresql",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "postgresql",
+            "stage": "install",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "postgresql",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "postgresql",
+            "stage": "restart",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "postgresql",
+            "stage": "recovery",
+            "status": "not_established"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "mac-container-volume",
+      "capability": "Retain a database row in an owned native Mac container volume",
+      "capability_key": "mac-container-volume",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "hosting-services",
+        "isolation"
+      ],
+      "selection": "optional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use only the matching Mac container/volume recipe; WSL has a separate direct database recipe.",
+      "component_ids": [
+        "apple-container"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "mac-native-container-storage-20260920"
+      ],
+      "evidence_scope": "Pinned PostgreSQL image on Apple container retained its row after native stop/start; owned fixtures were removed.",
+      "limitations": [
+        "Mac Documents bind mount stalled; accepted ext4 named-volume behavior does not erase that failure.",
+        "Mac-only fixture; no crash/reboot or production durability claim."
+      ],
+      "source_paths": [
+        "blueprints/convergence-practice/container-storage/README.md"
+      ],
+      "next_gap": "Qualify crash/reboot persistence only when that deployment needs it.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Pinned PostgreSQL image on Apple container retained its row after native stop/start; owned fixtures were removed.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Qualify crash/reboot persistence only when that deployment needs it.",
+        "stage_refs": [
+          {
+            "component_id": "apple-container",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "apple-container",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "apple-container",
+            "stage": "restart",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "apple-container",
+            "stage": "cleanup",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "apple-container",
+            "stage": "recovery",
+            "status": "not_established"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "native-mcp-adapters",
+      "capability": "Bridge or inspect selected MCP operations through upstream tools",
+      "capability_key": "native-mcp-adapters",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "hosting-services",
+        "code-navigation"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use the configured project bridge or Inspector for a concrete operation/protocol check.",
+      "component_ids": [
+        "mcporter",
+        "mcp-inspector"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "desktop-restart-acceptance",
+        "token-native-retained-functional-20260920"
+      ],
+      "evidence_scope": "Retained native bridge recovery and Inspector stdio arithmetic support their selected operations.",
+      "limitations": [
+        "A shared daemon is not an owned disposable service; removing one registration is not an uninstall or all-client cleanup."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Qualify changed process roots and scoped registration recovery without disturbing unrelated consumers.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Retained native bridge recovery and Inspector stdio arithmetic support their selected operations.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Qualify changed process roots and scoped registration recovery without disturbing unrelated consumers.",
+        "stage_refs": [
+          {
+            "component_id": "mcporter",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "mcp-inspector",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "same-host-restore",
+      "capability": "Restore selected native state into an isolated empty target",
+      "capability_key": "same-host-restore",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "recovery-portability",
+        "durable-memory",
+        "semantic-rag"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Retain the exact snapshot and separately available private key source; restore into an empty owned target.",
+      "component_ids": [
+        "restic",
+        "ai-memory",
+        "qdrant"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "restic-local-public-reference-20260919",
+        "ai-memory-native-state-recovery-20260919",
+        "qdrant-native-state-recovery-20260919",
+        "native-wsl-restic-synthetic-20260920"
+      ],
+      "evidence_scope": "Selected public bytes, native memory/FTS state and Qdrant snapshot/query results survived same-host backup/restore; synthetic wrong-key/corrupt-copy refusals were retained.",
+      "limitations": [
+        "Independent physical host, lost-key recovery and the whole stack after disaster remain unestablished.",
+        "Financial-blueprint location supplies reusable state-recovery evidence only."
+      ],
+      "source_paths": [
+        "adoption/lifecycle.md",
+        "blueprints/convergence-practice/wsl-restore/README.md"
+      ],
+      "next_gap": "Run independent off-host recovery with a separately accessible key and real post-restore application queries.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Selected public bytes, native memory/FTS state and Qdrant snapshot/query results survived same-host backup/restore; synthetic wrong-key/corrupt-copy refusals were retained.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Run independent off-host recovery with a separately accessible key and real post-restore application queries.",
+        "stage_refs": [
+          {
+            "component_id": "restic",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "ai-memory",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "qdrant",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "native-session-resume",
+      "capability": "Resume the same native session after an owned interruption",
+      "capability_key": "native-session-resume",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "recovery-portability",
+        "native-clients",
+        "workers"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Reconcile native session identity and saved effects before resubmitting unfinished work.",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-codex-session-recovery-20260920",
+        "native-claude-session-recovery-20260920",
+        "native-token-stack-final-20260920"
+      ],
+      "evidence_scope": "Codex on Mac and Claude on WSL resumed the same session to finish an unchanged single checkpoint; later bounded source tasks also retained continuations.",
+      "limitations": [
+        "Individual session continuation does not establish arbitrary worker crash, provider cancellation or whole-host recovery.",
+        "Resumed cumulative usage must not be added again to earlier included totals."
+      ],
+      "source_paths": [
+        "blueprints/convergence-practice/native-recovery/README.md",
+        "blueprints/convergence-practice/native-recovery/claude/README.md"
+      ],
+      "next_gap": "Qualify abrupt writing-worker failure with task-specific single-effect acceptance.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Codex on Mac and Claude on WSL resumed the same session to finish an unchanged single checkpoint; later bounded source tasks also retained continuations.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Qualify abrupt writing-worker failure with task-specific single-effect acceptance.",
+        "stage_refs": [
+          {
+            "component_id": "codex",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "claude-code",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "loopback-usage-observation",
+      "capability": "Observe bounded native outcomes and reconcile usage categories",
+      "capability_key": "loopback-usage-observation",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "observation-inference"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Keep local observation access separate from workflow operator authentication and inference accounts.",
+      "component_ids": [
+        "opentelemetry-collector-contrib",
+        "prometheus",
+        "loki",
+        "grafana",
+        "alertmanager",
+        "ntfy"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-observability",
+        "native-observability-followup",
+        "native-token-stack-final-20260920",
+        "current-session-observation-20260920"
+      ],
+      "evidence_scope": "Native tasks, loopback queries/dashboard and local firing/resolved notifications passed; later writer-scoped results reconcile selected native usage.",
+      "limitations": [
+        "Liveness, checkpoint age, source attribution and consumed tokens are different observations.",
+        "Extra startup events and unlabelled historical invocations retain attribution limits; no exact causal lifetime savings are inferred."
+      ],
+      "source_paths": [
+        "observability/README.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Qualify scheduled-service/reboot persistence and missing task attribution only in the needed scope.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Native tasks, loopback queries/dashboard and local firing/resolved notifications passed; later writer-scoped results reconcile selected native usage.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Qualify scheduled-service/reboot persistence and missing task attribution only in the needed scope.",
+        "stage_refs": [
+          {
+            "component_id": "opentelemetry-collector-contrib",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "prometheus",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "loki",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "grafana",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "alertmanager",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "ntfy",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "bounded-history-and-traces",
+      "capability": "Inspect selected native session history and local traces",
+      "capability_key": "bounded-history-and-traces",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "observation-inference"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use a selected archive or loopback receiver when a concrete diagnostic needs it.",
+      "component_ids": [
+        "agentsview",
+        "otel-tui"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "token-practice-gap-followup-20260920",
+        "upstream-native-tools-20260920",
+        "current-session-observation-20260920"
+      ],
+      "evidence_scope": "One scoped session archive query and a synthetic loopback terminal trace were accepted; current observations retain their separate bounds.",
+      "limitations": [
+        "Archive retrieval requires explicit scope/refresh and is not every native transcript or durable memory.",
+        "Synthetic trace acceptance is not production tracing completeness."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Test changed archive/session scope and missing attribution before drawing broader conclusions.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. One scoped session archive query and a synthetic loopback terminal trace were accepted; current observations retain their separate bounds.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Test changed archive/session scope and missing attribution before drawing broader conclusions.",
+        "stage_refs": [
+          {
+            "component_id": "agentsview",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "otel-tui",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "interactive-hud-boundary",
+      "capability": "Retain synthetic HUD rendering separately from live activation",
+      "capability_key": "interactive-hud-boundary",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "observation-inference"
+      ],
+      "selection": "optional",
+      "review_status": "partial_acceptance",
+      "activation": "Keep the configured optional statusline scoped and use native usage for authoritative accounting.",
+      "component_ids": [
+        "claude-hud"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "token-practice-gap-followup-20260920",
+        "native-claude-hud-interactive-20260920"
+      ],
+      "evidence_scope": "Synthetic renderer passed; the real terminal launch reached onboarding before the conversation HUD appeared.",
+      "limitations": [
+        "Live interactive HUD rendering remains unverified despite existing authentication; a synthetic rendering pass does not replace it."
+      ],
+      "source_paths": [
+        "docs/convergence-architecture.md",
+        "adoption/lifecycle.md"
+      ],
+      "next_gap": "Observe the real statusline only after the native onboarding condition is resolved.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Synthetic renderer passed; the real terminal launch reached onboarding before the conversation HUD appeared.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Observe the real statusline only after the native onboarding condition is resolved.",
+        "stage_refs": [
+          {
+            "component_id": "claude-hud",
+            "stage": "use",
+            "status": "partial_acceptance"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "local-generation-trial",
+      "capability": "Trial local text generation against a frozen repair oracle",
+      "capability_key": "local-generation-trial",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "observation-inference"
+      ],
+      "selection": "trial",
+      "review_status": "accepted_within_scope",
+      "activation": "Use an isolated local trial only when a concrete inference gap warrants it; native workers remain default.",
+      "component_ids": [
+        "llama-cpp"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-gpu-patch-20260920"
+      ],
+      "evidence_scope": "One pinned partial-offload local CUDA repair passed independent source review and twelve original tests on WSL RTX4090.",
+      "limitations": [
+        "Single-task trial, not general frontier parity, host portability or causal token savings.",
+        "Memory reserve, model/hash provenance and missing exact layer telemetry remain in the receipt."
+      ],
+      "source_paths": [
+        "blueprints/convergence-practice/gpu-inference/README.md"
+      ],
+      "next_gap": "Freeze a representative next workload and resource acceptance before expanding use.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. One pinned partial-offload local CUDA repair passed independent source review and twelve original tests on WSL RTX4090.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Freeze a representative next workload and resource acceptance before expanding use.",
+        "stage_refs": [
+          {
+            "component_id": "llama-cpp",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "optional-gateway-lifecycle",
+      "capability": "Keep optional gateway lifecycle separate from inference acceptance",
+      "capability_key": "optional-gateway-lifecycle",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "observation-inference",
+        "hosting-services"
+      ],
+      "selection": "trial",
+      "review_status": "partial_acceptance",
+      "activation": "Retain native account/model routes; use the optional gateway only for an explicit qualified routing need.",
+      "component_ids": [
+        "omniroute"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "foundation-native-20260920"
+      ],
+      "evidence_scope": "Clean native Linux installation, service restart, persistence, plaintext restore and stop passed; inference and compression are separately scoped attempts.",
+      "limitations": [
+        "Native Codex model400, direct quota429 and malformed Claude launch/plaintext429 remain unsuccessful gateway tasks.",
+        "RTK/lite semantic previews failed; exact dedup retained its matching-scope result; cache/compression counters are not provider savings."
+      ],
+      "source_paths": [
+        "docs/foundation-stack.md"
+      ],
+      "next_gap": "Retry an exact-model task only after model mapping/provider capacity changes; do not repeat unchanged refusals.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Clean native Linux installation, service restart, persistence, plaintext restore and stop passed; inference and compression are separately scoped attempts.",
+        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Retry an exact-model task only after model mapping/provider capacity changes; do not repeat unchanged refusals.",
+        "stage_refs": [
+          {
+            "component_id": "omniroute",
+            "stage": "use",
+            "status": "partial_acceptance"
+          },
+          {
+            "component_id": "omniroute",
+            "stage": "install",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "omniroute",
+            "stage": "restart",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "omniroute",
+            "stage": "recovery",
+            "status": "partial_acceptance"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "tavily-native-search-extract",
+      "capability": "Search and extract primary web sources through the upstream Tavily CLI",
+      "capability_key": "tavily-native-integration",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "web-research",
+        "instructions-skills"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use tvly Search or Extract on demand with native private authentication; eight official skills provide task-specific guidance.",
+      "component_ids": [
+        "tavily-cli"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-tavily-cli-20260920"
+      ],
+      "evidence_scope": "Upstream CLI0.1.8 installed and authenticated; live search returned four official sources and extraction returned one result with zero failures. Eight official skills were listed for both clients and discovered by fresh Codex probes for native and Desktop homes.",
+      "limitations": [
+        "Desktop-home discovery initially failed SQLite initialization and passed only with a temporary session-specific sqlite_home; the active Desktop registry was not hot-reloaded.",
+        "Claude global skill listing and fresh Codex discovery do not prove actual model invocation of every skill. Map, Crawl and Research remain unqualified.",
+        "No causal lifetime token savings or full lifecycle recovery is measured."
+      ],
+      "source_paths": [
+        "recipes/tavily.md",
+        "evidence/receipts/native-tavily-cli-20260920.json"
+      ],
+      "next_gap": "Use the accepted CLI now; check the intended fresh client for skill activation when needed, and qualify broader operations only for a concrete task.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Native install, Search/Extract and owned-probe cleanup are recorded; each stage retains its exact operation boundary.",
+        "unknown": "Independent key recovery, uninstall/reinstall and the active Desktop skill registry remain unverified.",
+        "stage_refs": [
+          {
+            "component_id": "tavily-cli",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "native-child-interruption-recovery",
+      "capability": "Resume the same native child and reconcile a local effect after interruption",
+      "capability_key": "native-child-interruption-recovery",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "workers",
+        "scheduling-supervision",
+        "recovery-portability"
+      ],
+      "selection": "conditional",
+      "review_status": "partial_acceptance",
+      "activation": "Use bounded native TaskStop/SendMessage and same-parent continuation; explicitly own and reconcile descendant processes and local effects.",
+      "component_ids": [
+        "claude-code"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-worker-recovery-20260920",
+        "native-worker-containment-20260920"
+      ],
+      "evidence_scope": "One native background child retained its identity through TaskStop/SendMessage cancellation and same-parent continuation after abrupt runtime failure, producing one final local effect from an unchanged checkpoint after explicit supervisor cleanup.",
+      "limitations": [
+        "One synthetic local fixture and one physical WSL host, not arbitrary application state.",
+        "Actual native child identities and paths remain private; hashes bind retained streams.",
+        "Native original runtime SIGKILL is a shared-process failure; task identity and effect continuation are distinct from process containment.",
+        "The updated runner parser is regression-tested offline; the one native attempt executed the separately retained source.",
+        "Automatic native crash descendant containment: the crash wait survived and needed supervisor SIGKILL.",
+        "Exact requested tool-only behavior: the child attempted an extra read-only ls/git-status command, which was refused.",
+        "Remote provider cancellation, billing cessation, independent child-process isolation, off-host recovery, power-loss durability and distributed exactly-once effects.",
+        "The cgroup follow-up contained its deterministic detached fixture, but its native child prepended a refused command before checkpoint. No combined native result is accepted."
+      ],
+      "source_paths": [
+        "blueprints/convergence-practice/worker-recovery/README.md"
+      ],
+      "next_gap": "Resolve the frozen child command-contract mismatch before another changed native cgroup qualification; retain existing permissions, failed attempt and effect oracle.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Existing native-use stage is retained; this new child-continuation receipt explicitly needs supervisor cleanup.",
+        "unknown": "Native automatic crash containment failed in this attempt; provider cancellation and complete usage unknown.",
+        "stage_refs": [
+          {
+            "component_id": "claude-code",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    }
+  ]
+}

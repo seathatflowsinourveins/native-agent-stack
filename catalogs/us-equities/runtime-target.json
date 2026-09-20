@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "id": "ibkr-nautilus-alpaca-20260920",
+  "reviewed_at": "2026-09-20",
+  "scope": "User-selected destination and current primary-source capability boundaries. Installation and broker acceptance are recorded separately.",
+  "foundation_catalog": "catalogs/foundation/manifest.json",
+  "north_star": "blueprints/us-equities/north-star.md",
+  "engine": {
+    "repository": "https://github.com/nautechsystems/nautilus_trader",
+    "requested_version": "2.0.0rc5",
+    "tag": "v2.0.0rc5",
+    "tag_object": "34de0d6f886a9fe8359f9d6590f43f53c86b1d32",
+    "source_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "release_published_at": "2026-09-15T06:17:23Z",
+    "prerelease": true,
+    "decision": "selected_destination",
+    "install_command": "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --pre \"nautilus_trader==2.0.0rc5\"",
+    "supported_python": ">=3.12,<3.15; vanilla CPython",
+    "linux_support": "Official installation guide: Ubuntu22.04+ and glibc>=2.35; wheel platform tags are not a broader tested-host claim.",
+    "acceptance": "isolated native upstream synthetic EURUSD quickstart accepted; two economic replay runs; no equity/broker acceptance; fresh GitHub Ubuntu24.04 exact wheel/source installation and two offline replays passed",
+    "retained_comparison_engine": "LEAN native source-build and dated historical simulation receipts",
+    "sources": [
+      "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc5",
+      "https://pypi.org/pypi/nautilus_trader/2.0.0rc5/json",
+      "https://nautilustrader.io/docs/latest/getting_started/installation/",
+      "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/quickstart.py"
+    ],
+    "native_receipt": "evidence/receipts/native-nautilus-v2-20260920.json"
+  },
+  "broker_boundaries": [
+    {
+      "id": "ibkr",
+      "selected_path": "Nautilus native IBKR socket adapter with signed-in TWS or IB Gateway",
+      "upstream_supported": true,
+      "local_broker_acceptance": "not_established",
+      "paper_socket_defaults": {
+        "tws": 7497,
+        "gateway": 4002
+      },
+      "required_inputs": [
+        "native gateway sign-in",
+        "paper account",
+        "market-data permissions",
+        "unique client ID",
+        "risk/universe/session contract"
+      ],
+      "limitations": [
+        "Adapter installation does not establish socket access, paper order behavior, cancellation races or reconnect reconciliation."
+      ],
+      "sources": [
+        "https://nautilustrader.io/docs/latest/integrations/interactive_brokers/"
+      ]
+    },
+    {
+      "id": "alpaca",
+      "selected_path": "Official Alpaca SDK for accepted read-only ingestion; separately validated deterministic execution adapter",
+      "upstream_nautilus_adapter_present": false,
+      "local_data_acceptance": [
+        "bounded AAPL SIP/raw daily bars and corporate actions",
+        "bounded FB/META identity observations and current asset snapshot"
+      ],
+      "local_broker_execution_acceptance": "not_established",
+      "elite_account_activation": "not_established_by_existing_receipts",
+      "documented_trading_rate": {
+        "value": 1000,
+        "unit": "API calls per minute",
+        "scope": "Elite Smart Router advertised throughput; not executed trades/fills"
+      },
+      "documented_market_data": {
+        "basic_historical_calls_per_minute": 200,
+        "algo_trader_plus_historical_calls_per_minute": 10000,
+        "equity_history_start_year": 2016,
+        "boundary": "Feed, subscription, asset and account entitlements remain separate. Unlimited streaming symbols is not unlimited history or throughput."
+      },
+      "sources": [
+        "https://alpaca.markets/elite",
+        "https://docs.alpaca.markets/us/docs/about-market-data-api",
+        "https://docs.alpaca.markets/us/docs/paper-trading",
+        "https://nautilustrader.io/docs/latest/integrations/"
+      ]
+    }
+  ],
+  "accepted_reference_paths": [
+    "blueprints/us-equities/historical-simulation/receipt.json",
+    "blueprints/us-equities/authenticated-data/native-receipt.json",
+    "blueprints/us-equities/identity-readiness/native-receipt.json",
+    "blueprints/us-equities/acceptance-wave/README.md",
+    "evidence/receipts/native-nautilus-ci-20260920.json"
+  ],
+  "next_acceptance": [
+    {
+      "id": "pinned-engine-fixture",
+      "scope": "Exact upstream seed42 synthetic EURUSD quickstart in an isolated environment; useful reports and repeatability; no broker credentials or network"
+    },
+    {
+      "id": "retained-equity-replay",
+      "scope": "Reviewed converter for existing hashed equity fixture; compare orders, fills and cash with accepted LEAN baseline"
+    },
+    {
+      "id": "broker-state-failures",
+      "scope": "Offline ambiguous submission, duplicate intent, partial fill, cancel race, stale input and restart reconciliation"
+    },
+    {
+      "id": "separate-paper-adapters",
+      "scope": "Broker-specific operational acceptance after native sign-in and explicit risk/account scope; no inferred live-trading authority"
+    }
+  ],
+  "limitations": [
+    "These are source-reviewed public terms, not a query of the user's current Elite or IBKR account.",
+    "Synthetic EURUSD engine acceptance is not historical US-equity data or strategy acceptance.",
+    "Paper fills omit market impact, realistic queue position and some costs; they cannot establish deployable profitability or execution capacity.",
+    "No broker orders, paid hosting, purchases or live trading are authorized by catalog inclusion."
+  ]
+}

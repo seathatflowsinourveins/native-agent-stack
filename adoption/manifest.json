@@ -23,7 +23,7 @@
   "sources": {
     "components": "manifests/stack.json",
     "evidence": "manifests/evidence.json",
-    "open_gates": "catalogs/us-equities/convergence-review.json",
+    "open_gates": "catalogs/foundation/manifest.json",
     "instructions": "AGENTS.md",
     "boundaries": "docs/evidence.md",
     "current_activation": "observability/desktop-restart.md",
@@ -31,14 +31,14 @@
     "adoption_receipt": "adoption/receipt.json",
     "portability_research": "adoption/research.json",
     "current_paired_acceptance": "adoption/paired/receipt.json",
-    "current_convergence": "blueprints/us-equities/convergence-program/plan.json",
+    "current_convergence": "catalogs/foundation/manifest.json",
     "grand_dashboard": "observability/grand-dashboard/README.md",
     "current_historical_simulation": "blueprints/us-equities/historical-simulation/receipt.json",
     "current_data_readiness": "blueprints/us-equities/data-readiness/plan.json",
     "current_catalyst_dataset": "blueprints/us-equities/catalyst-dataset/native-receipt.json",
     "current_corporate_action_readiness": "blueprints/us-equities/corporate-action-readiness/receipt.json",
     "current_authenticated_data": "blueprints/us-equities/authenticated-data/native-receipt.json",
-    "current_wave": "blueprints/us-equities/catalyst-convergence/plan.json",
+    "current_wave": "catalogs/foundation/decisions.json",
     "current_identity_observation": "blueprints/us-equities/identity-readiness/native-receipt.json",
     "ecosystem_explorer": "docs/ecosystem/index.html",
     "ecosystem_explorer_guide": "docs/ecosystem/README.md",
@@ -71,7 +71,14 @@
     "wsl_native_quality": "blueprints/convergence-practice/wsl-native-tools/README.md",
     "current_selected_lifecycle": "adoption/lifecycle.md",
     "current_token_confirmation": "evidence/receipts/token-practice-confirmation-20260920.json",
-    "current_token_clean_prefix": "evidence/receipts/native-token-clean-prefix-20260920.json"
+    "current_token_clean_prefix": "evidence/receipts/native-token-clean-prefix-20260920.json",
+    "foundation_catalog": "catalogs/foundation/manifest.json",
+    "foundation_decisions": "catalogs/foundation/decisions.json",
+    "harness_defaults": "docs/harness-defaults.md",
+    "trading_target": "catalogs/us-equities/runtime-target.json",
+    "trading_open_gates": "catalogs/us-equities/convergence-review.json",
+    "trading_convergence": "blueprints/us-equities/convergence-program/plan.json",
+    "trading_wave": "blueprints/us-equities/catalyst-convergence/plan.json"
   },
   "recipe_map": {
     "omniroute": "docs/foundation-stack.md",
@@ -139,7 +146,9 @@
     "postgresql": "blueprints/convergence-practice/application-delivery/README.md",
     "poppler": "blueprints/convergence-practice/document-ingestion/README.md",
     "apple-container": "blueprints/convergence-practice/container-storage/README.md",
-    "playwright-test": "blueprints/convergence-practice/wsl-application/README.md"
+    "playwright-test": "blueprints/convergence-practice/wsl-application/README.md",
+    "tavily-cli": "recipes/tavily.md",
+    "nautilus-trader": "blueprints/us-equities/engine-nautilus/README.md"
   },
   "profiles": [
     {
@@ -282,6 +291,23 @@
         "blueprints/us-equities/state-recovery/README.md",
         "blueprints/us-equities/hosting/backup/README.md"
       ]
+    },
+    {
+      "id": "trading-nautilus",
+      "label": "Optional pinned Nautilus engine with separate broker boundaries",
+      "required_commands": [
+        "python3",
+        "uv",
+        "bwrap"
+      ],
+      "component_ids": [
+        "nautilus-trader",
+        "alpaca-py"
+      ],
+      "recipe_paths": [
+        "blueprints/us-equities/engine-nautilus/README.md",
+        "catalogs/us-equities/runtime-target.json"
+      ]
     }
   ],
   "toolchain": {
@@ -303,6 +329,9 @@
       "adoption/update.md"
     ],
     "read_on_demand": [
+      "catalogs/README.md",
+      "catalogs/foundation/README.md",
+      "docs/harness-defaults.md",
       "catalogs/us-equities/convergence-review.json",
       "docs/activation.md",
       "docs/evidence.md",
@@ -312,13 +341,17 @@
       "blueprints/us-equities/catalyst-convergence/README.md"
     ],
     "next_action_refs": [
+      "worker-cancellation-crash-resume",
+      "offhost-keys-and-service-reboot"
+    ],
+    "public_state_is_reference_only": true,
+    "trading_next_action_refs": [
       "research-specification",
       "accepted-pit-source",
       "retrieval-quality",
       "memory-lifecycle",
       "off-host-recovery"
-    ],
-    "public_state_is_reference_only": true
+    ]
   },
   "policy": {
     "historical_acceptance_transfers": false,

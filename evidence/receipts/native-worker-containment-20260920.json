@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "native-worker-containment-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "systemd",
+    "claude-code"
+  ],
+  "claim": "The existing native user manager contained an owned TERM-ignoring setsid descendant after only MainPID was killed. One changed native child trial under that wrapper stopped before checkpoint because its extra-prefixed command was refused; combined native child containment/resume remains unaccepted.",
+  "limitations": [
+    "Deterministic cgroup proof is not successful native child crash/resume acceptance.",
+    "Earlier same-child continuation still required explicit direct descendant cleanup.",
+    "No host/user-manager restart, provider cancellation, billing cessation, off-host restoration or distributed exactly-once acceptance."
+  ],
+  "recorded_at_utc": "2026-09-20T18:56:47.623853+00:00",
+  "scope": "One deterministic detached-descendant proof; no-model native route readiness; one unsuccessful combined native child trial.",
+  "receipt": "blueprints/convergence-practice/worker-recovery/containment-receipt.json",
+  "independent_audit": "blueprints/convergence-practice/worker-recovery/containment-independent-audit.json",
+  "upstream_commands_and_results": "blueprints/convergence-practice/worker-recovery/README.md",
+  "failed_attempts_retained": [
+    "Initial deterministic builder rejected unsupported inherited PROGRAMFILES(X86) before service launch; corrected environment-name handling retained all valid native variables.",
+    "The single native child attempted ls -la && python3 stage.py checkpoint; permission denied it before any effect. Supervisor aborted only the owned service main process. No retries or widened permissions."
+  ],
+  "next_action": "Keep the combined native gate open. A future explicitly scoped qualification must address the child command-contract mismatch while retaining existing permissions and original failures; do not repeat setup or label deterministic proof as native child acceptance.",
+  "usage": {
+    "billing": null,
+    "complete_parent_child_retry_total": null,
+    "reason": "Native service aborted after refusal; terminal/task views are not complete enclosing usage.",
+    "savings_claim": null
+  }
+}

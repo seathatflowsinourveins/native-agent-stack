@@ -18,6 +18,8 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 #token-topic th:nth-child(1){width:15%}#token-topic th:nth-child(2){width:25%}#token-topic th:nth-child(3){width:32%}#token-topic th:nth-child(4){width:28%}
 #token-topic .topic-detail td{padding-top:0;padding-bottom:20px}#token-topic .topic-detail pre{max-width:100%}
 #token-topic-section{scroll-margin-top:160px}
+.navigation{flex-wrap:wrap;column-gap:22px;row-gap:0}.navigation button:last-child{margin-left:0}
+.catalog-entries,.catalog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:0 0 36px}.catalog-entry,.catalog-layer,.catalog-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:25px;background:var(--white);overflow-wrap:anywhere}.catalog-entry:first-child{background:#e8eddf}.catalog-entry h2{margin:12px 0;font-size:35px}.catalog-entry p,.catalog-layer p,.catalog-card p{font-size:13px;margin:12px 0;color:var(--muted)}.catalog-entry .button{margin-top:15px}.catalog-entry .catalog-count{color:var(--green);font-weight:600}.catalog-layer h3,.catalog-card h3{font-size:20px}.catalog-layer .eyebrow{color:var(--copper);margin-bottom:8px}.catalog-layer .accepted-scope{color:var(--green)}.catalog-gap{border-left:3px solid var(--copper);padding-left:12px;margin:16px 0;font-size:12px}.catalog-gap strong{display:block}.catalog-gap p{margin:5px 0}.catalog-detail{border-top:1px solid var(--line);padding:15px 0 0;margin-top:16px;min-width:0}.catalog-detail p,.catalog-detail li{font-size:12px}.catalog-detail summary,.catalog-detail a{overflow-wrap:anywhere}.catalog-capability{border-top:1px solid var(--line);padding:18px 0 4px}.catalog-capability h4{font-size:15px;margin:0 0 9px}.catalog-capability .badge{font-size:10px}.catalog-sources{display:flex;flex-direction:column;gap:8px;margin:14px 0;font-size:12px}.catalog-facts{display:grid;grid-template-columns:minmax(90px,1fr) minmax(0,2fr);gap:9px 16px;font-size:12px;margin:15px 0}.catalog-facts dt{color:var(--muted)}.catalog-facts dd{margin:0;overflow-wrap:anywhere}.catalog-layer .catalog-detail .catalog-detail{padding-left:12px}.catalog-summary{margin:0 0 22px}.catalog-summary p{font-size:13px;margin-top:10px}.catalog-controls{margin-bottom:20px}.catalog-scope{font-size:12px;color:var(--muted);margin:15px 0 25px}.catalog-empty{padding:30px;border:1px dashed var(--line);border-radius:12px;margin-bottom:30px}.catalog-grid>*{min-width:0}.catalog-card pre{max-width:100%}@media(max-width:800px){.catalog-entries,.catalog-grid{grid-template-columns:1fr}}@media(max-width:670px){.navigation{overflow:visible;column-gap:16px}.catalog-entry,.catalog-layer,.catalog-card{padding:20px}.catalog-facts{grid-template-columns:1fr}.catalog-facts dd{margin-bottom:7px}.catalog-entry h2{font-size:31px}}
 </style>
 </head>
 <body>
@@ -26,6 +28,8 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <div class="masthead"><a class="brand" href="#overview" aria-label="Native stack overview"><span class="mark" aria-hidden="true">n</span><span><strong>native stack</strong><span class="small">ECOSYSTEM MANIFEST</span></span></a><div class="edition"><span class="dot"></span><span>Public reference <span class="optional">/ </span><span id="edition-date"></span></span></div></div>
 <nav class="navigation" role="tablist" aria-label="Manifest sections">
 <button role="tab" id="tab-overview" aria-controls="overview" aria-selected="true" data-tab="overview"><span class="tab-number">01</span>Ecosystem map</button>
+<button role="tab" id="tab-foundation" aria-controls="foundation" aria-selected="false" tabindex="-1" data-tab="foundation" data-catalog-tab hidden>Foundation</button>
+<button role="tab" id="tab-trading" aria-controls="trading" aria-selected="false" tabindex="-1" data-tab="trading" data-catalog-tab hidden>Trading</button>
 <button role="tab" id="tab-explorer" aria-controls="explorer" aria-selected="false" tabindex="-1" data-tab="explorer"><span class="tab-number">02</span>Repository explorer</button>
 <button role="tab" id="tab-setup" aria-controls="setup" aria-selected="false" tabindex="-1" data-tab="setup"><span class="tab-number">03</span>Selected stack & setup</button>
 <button role="tab" id="tab-efficiency" aria-controls="efficiency" aria-selected="false" tabindex="-1" data-tab="efficiency"><span class="tab-number">04</span>Token efficiency</button>
@@ -35,14 +39,30 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 @@BODY@@
 <section id="overview" role="tabpanel" aria-labelledby="tab-overview">
 <div class="hero"><div><div class="eyebrow">A connected system. A deliberate selection.</div><h1>Native by design.<br><em>Selective by default.</em></h1><p>Agents, skills, workers, retrieval and research—one navigable map of what exists, what was reviewed, and what actually ran.</p></div><aside class="hero-note"><div class="eyebrow">Built around the work</div><p>Keep native runtimes. Bring in the right context. Verify a useful result. Carry forward only the decisions that matter.</p><button class="button" data-open="explorer">Explore the repositories <span aria-hidden="true">↗</span></button></aside></div>
+<div id="catalog-entry-points" class="catalog-entries" aria-label="Two maintained catalogs" hidden></div>
 <div class="stat-row" id="overview-stats"></div>
 <div class="section-head"><div><div class="eyebrow" id="layer-heading">The ecosystem / connected layers</div><h2>Find the capability.<br>Follow its evidence.</h2></div><p>Layer tags help you navigate. The source records retain their own decisions, pins and limits. Inclusion never means installed or accepted.</p></div>
 <div class="layer-grid" id="layer-grid"></div><p class="subnote">Layers overlap. Classification is a navigation aid based on public roles, tags and selected identities; it is not a quality ranking.</p>
 <div class="efficiency-banner"><div><div class="eyebrow">Across every runtime</div><h2>Use less context.<br>Keep the evidence.</h2></div><div><p>Token efficiency starts with scoped retrieval, native cache and compaction, progressive skill loading and compact handoffs. Savings still need a matched, complete measurement.</p><button class="button" data-open="efficiency">Read the operating policy <span aria-hidden="true">↗</span></button></div></div>
 <div class="section-head"><div><div class="eyebrow">Practical entry points</div><h2>From the map to the work.</h2></div></div><div id="guide-grid" class="guide-grid"></div>
 </section>
+<section id="foundation" role="tabpanel" aria-labelledby="tab-foundation" hidden>
+<div class="page-heading"><div><div class="eyebrow">General engineering / native Codex and Claude</div><h2>The foundation for the work.</h2><p>Choose the layers a task needs. Each capability keeps its own selection, activation, evidence and next check.</p></div></div>
+<div id="foundation-summary" class="catalog-summary"></div><div id="foundation-guides" class="setup-guides"></div>
+<div class="controls catalog-controls"><div class="control"><label for="foundation-search">Find a capability</label><input id="foundation-search" type="search" placeholder="Try memory, research, recovery…" autocomplete="off"></div><div class="control"><label for="foundation-layer">Layer</label><select id="foundation-layer"><option value="">All foundation layers</option></select></div><div class="control"><label for="foundation-status">Evidence</label><select id="foundation-status"><option value="">All recorded decisions</option><option value="accepted_within_scope">Accepted within its scope</option><option value="partial_acceptance">Partly accepted</option><option value="source_review">Source reviewed</option><option value="discovery">Discovery</option><option value="not_established">Not established</option></select></div></div>
+<p id="foundation-result-count" class="catalog-scope" role="status" aria-live="polite"></p><div id="foundation-layers" class="catalog-grid"></div>
+<div id="foundation-gap-section" hidden><div class="section-head"><div><div class="eyebrow">Useful next checks</div><h2>What remains open.</h2></div></div><div id="foundation-gaps" class="catalog-grid"></div></div>
+</section>
+<section id="trading" role="tabpanel" aria-labelledby="tab-trading" hidden>
+<div class="page-heading"><div><div class="eyebrow">US equities / research to separate paper adapters</div><h2>A trading architecture with clear gates.</h2><p>Trading uses the foundation and adds its own data, strategy, risk and broker checks. The selected destination and recorded acceptance remain separate.</p></div></div>
+<div id="trading-summary" class="catalog-summary"></div><div id="trading-guides" class="setup-guides"></div>
+<div id="trading-engine" class="catalog-grid"></div>
+<div class="section-head"><div><div class="eyebrow">Each broker has its own boundary</div><h2>Data access and execution.</h2></div></div><div id="trading-brokers" class="catalog-grid"></div>
+<div class="section-head"><div><div class="eyebrow">Next acceptance</div><h2>Advance one check at a time.</h2></div></div><div id="trading-next" class="catalog-grid"></div>
+<details class="catalog-card" style="margin-bottom:35px"><summary>Retained evidence and limits</summary><div id="trading-evidence"></div></details>
+</section>
 <section id="explorer" role="tabpanel" aria-labelledby="tab-explorer" hidden>
-<div class="page-heading"><div><div class="eyebrow">The public decision index</div><h2>Explore the whole field.</h2><p>Search names, roles, layers and decisions. Open a record to inspect its dated sources, distinct pins and bounded receipts.</p></div><button class="button secondary small" id="reset-filters">Reset filters</button></div>
+<div class="page-heading"><div><div class="eyebrow">Discovery / the broad public index</div><h2>Explore the whole field.</h2><p>Search names, roles, layers and decisions. Open a record to inspect its dated sources, distinct pins and bounded receipts. Repository discovery is broader than either maintained catalog.</p></div><button class="button secondary small" id="reset-filters">Reset filters</button></div>
 <div class="controls"><div class="control"><label for="search">Search repositories <span class="muted">/ press /</span></label><input type="search" id="search" placeholder="Try memory, Claude, retrieval, skills…" autocomplete="off"></div><div class="control"><label for="layer-filter">Layer</label><select id="layer-filter"><option value="">All layers</option></select></div><div class="control"><label for="evidence-filter">Evidence</label><select id="evidence-filter"><option value="">Any evidence depth</option><option value="reviewed">Source reviewed</option><option value="executed">Linked native execution</option><option value="component">Recorded component pin</option><option value="discovery">Discovery / metadata only</option></select></div></div>
 <div class="filter-row"><div id="result-count" class="result-count" role="status" aria-live="polite"></div><label><input type="checkbox" id="stars-only">Public stars only</label></div>
 <div id="integration-area"><div class="eyebrow integration-heading">Current integrations / separate from the repository index</div><div id="integration-list"></div></div>
@@ -88,7 +108,8 @@ const make = (tag, cls, content) => { const node = document.createElement(tag); 
 const add = (parent, ...children) => { children.forEach(child => parent.appendChild(child)); return parent; };
 const link = (label, url) => { const node = make("a", "", label); node.href = url; node.target = "_blank"; node.rel = "noopener noreferrer"; return node; };
 const layerNames = new Map(data.layers.map(layer => [layer.id, layer.name]));
-const tabs = [...document.querySelectorAll("[data-tab]")];
+document.querySelectorAll("[data-catalog-tab]").forEach(tab => { tab.hidden = !data.grand_catalogs; });
+const tabs = [...document.querySelectorAll("[data-tab]")].filter(tab => !tab.hidden);
 function showTab(id, focus = false) {
   if(!tabs.some(tab => tab.dataset.tab === id)) id = "overview";
   tabs.forEach(tab => { const active = tab.dataset.tab === id; tab.setAttribute("aria-selected", String(active)); tab.tabIndex = active ? 0 : -1; $(tab.dataset.tab).hidden = !active; if(active && focus) tab.focus(); });
@@ -131,6 +152,120 @@ const stringify = value => typeof value === "string" ? value : JSON.stringify(va
 const codeBlock = value => make("pre", "native-code", stringify(value));
 const recipeMap = new Map(data.setup.recipes.map(recipe => [recipe.path, recipe]));
 const profileMap = new Map(data.setup.profiles.map(profile => [profile.id, profile]));
+const readable = value => String(value || "Not recorded").replaceAll("_", " ").replaceAll("-", " ");
+const reviewLabels = {accepted_within_scope: "Accepted within scope", partial_acceptance: "Partly accepted", source_review: "Source reviewed", discovery: "Discovery", not_established: "Not established"};
+function catalogSources(parent, sources) {
+  const links = make("div", "catalog-sources");
+  (sources || []).forEach((source, index) => add(links, link(typeof source === "string" ? "Primary source " + (index + 1) + " ↗" : source.path + " ↗", typeof source === "string" ? source : source.url)));
+  if(links.childElementCount) add(parent, links);
+}
+function catalogFacts(parent, values) {
+  const facts = make("dl", "catalog-facts");
+  Object.entries(values).forEach(([key, value]) => {
+    if(value === undefined || value === null || value === "" || key === "sources") return;
+    const cell = make("dd");
+    if(Array.isArray(value)) value.forEach(item => add(cell, make("p", "", typeof item === "string" ? item : stringify(item))));
+    else if(typeof value === "object") catalogFacts(cell, value);
+    else cell.textContent = typeof value === "boolean" ? (value ? "Yes" : "No") : String(value);
+    add(facts, make("dt", "", readable(key)), cell);
+  });
+  add(parent, facts);
+}
+function catalogAction(id, label) {
+  const button = make("button", "button", label);
+  button.addEventListener("click", () => showTab(id, true));
+  return button;
+}
+function foundationCapability(row) {
+  const item = add(make("article", "catalog-capability"), make("h4", "", row.capability));
+  add(item, add(make("div", "badges"), make("span", "badge " + (row.review_status === "accepted_within_scope" ? "execution" : "unknown"), reviewLabels[row.review_status] || readable(row.review_status)), make("span", "badge", readable(row.selection))));
+  add(item, make("p", "", row.evidence_scope), make("p", "small", "Use when: " + row.activation));
+  if(row.next_gap) add(item, add(make("div", "catalog-gap"), make("strong", "", "Next check"), make("p", "", row.next_gap)));
+  const detail = add(make("details", "catalog-detail"), make("summary", "", "Pins, evidence and lifecycle"));
+  row.components.forEach(component => {
+    const pin = add(make("p", ""), make("strong", "", component.id + " · " + component.version));
+    if(component.source_pin || component.source_commit) add(pin, make("span", "", " · " + (component.source_pin || component.source_commit)));
+    add(detail, pin, link("Canonical component record ↗", component.url));
+    if(component.repository) add(detail, add(make("p"), link("Upstream repository ↗", component.repository)));
+  });
+  if(row.candidate?.repository) add(detail, link("Candidate source ↗", row.candidate.repository));
+  listLimits(detail, row.limitations);
+  row.receipts.forEach(receipt => {
+    const receiptDetail = add(make("details", "catalog-detail"), make("summary", "", receipt.id), make("p", "", receipt.claim), make("p", "small muted", readable(receipt.kind) + " · " + receipt.date));
+    listLimits(receiptDetail, receipt.limitations); add(receiptDetail, link("Read this receipt ↗", receipt.url)); add(detail, receiptDetail);
+  });
+  if(!row.receipts.length) add(detail, make("p", "muted", "No execution receipt is attached to this capability."));
+  catalogFacts(detail, {lifecycle_scope: row.lifecycle.scope, still_unknown: row.lifecycle.unknown});
+  if(row.lifecycle.stage_refs?.length) {
+    const stages = add(make("details", "catalog-detail"), make("summary", "", "Recorded lifecycle stages"));
+    row.lifecycle.stage_refs.forEach(stage => add(stages, make("p", "", stage.component_id + " · " + readable(stage.stage) + ": " + readable(stage.status))));
+    add(detail, stages);
+  }
+  catalogSources(detail, row.lifecycle.sources); catalogSources(detail, row.sources);
+  return add(item, detail);
+}
+function renderFoundation() {
+  if(!data.grand_catalogs) return;
+  const foundation = data.grand_catalogs.foundation;
+  const words = $("foundation-search").value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const layerFilter = $("foundation-layer").value, status = $("foundation-status").value;
+  const grid = $("foundation-layers"); grid.replaceChildren(); const shown = new Set();
+  foundation.layers.forEach((layer, index) => {
+    if(layerFilter && layerFilter !== layer.id) return;
+    const matches = foundation.decisions.filter(row => row.layer_ids.includes(layer.id) && (!status || row.review_status === status) && words.every(word => [layer.title, layer.purpose, row.capability, row.selection, row.activation, row.evidence_scope, row.next_gap, ...row.component_ids].join(" ").toLowerCase().includes(word)));
+    if(!matches.length && (words.length || status)) return;
+    matches.forEach(row => shown.add(row.id));
+    const card = add(make("article", "catalog-layer"), make("div", "eyebrow", "Layer " + String(index + 1).padStart(2, "0")), make("h3", "", layer.title), make("p", "", layer.purpose));
+    add(card, make("p", "", "Selection: " + layer.selection), make("p", "small", "Use when: " + layer.activation));
+    const accepted = matches.filter(row => row.review_status === "accepted_within_scope");
+    add(card, make("p", "accepted-scope", accepted.length ? "Accepted within scope: " + accepted.map(row => row.capability).join("; ") : "No accepted capability in this view."));
+    add(card, add(make("div", "catalog-gap"), make("strong", "", "Next gap"), make("p", "", layer.next_gap)));
+    const detail = add(make("details", "catalog-detail"), make("summary", "", "Capabilities · " + matches.length), make("p", "small muted", "Lifecycle scope: " + layer.lifecycle_scope));
+    matches.forEach(row => add(detail, foundationCapability(row)));
+    add(card, detail); add(grid, card);
+  });
+  $("foundation-result-count").textContent = grid.childElementCount + " layers · " + shown.size + " distinct capabilities shown. A capability can belong to more than one layer.";
+  if(!grid.childElementCount) add(grid, make("p", "catalog-empty", "No capabilities match. Clear the search or choose another layer."));
+}
+function renderGrandCatalogs() {
+  if(!data.grand_catalogs) return;
+  const {foundation, trading} = data.grand_catalogs;
+  const entry = $("catalog-entry-points"); entry.hidden = false;
+  add(entry, add(make("article", "catalog-entry"), make("div", "eyebrow", "01 / General engineering"), make("h2", "", "Foundation"), make("p", "", "Native harnesses, instructions, skills, workers, context, research and recovery. Choose the layers needed for the task."), make("p", "catalog-count", foundation.counts.layers + " layers · " + foundation.counts.capabilities + " scoped capabilities"), catalogAction("foundation", "Open Foundation →")));
+  add(entry, add(make("article", "catalog-entry"), make("div", "eyebrow", "02 / Domain architecture"), make("h2", "", "Trading"), make("p", "", "US-equities research and simulation, with separate engine, data and broker acceptance. Reuses the foundation."), make("p", "catalog-count", trading.broker_boundaries.length + " broker boundaries · " + trading.next_acceptance.length + " next checks"), catalogAction("trading", "Open Trading →")));
+  add($("foundation-summary"), make("strong", "", foundation.counts.layers + " layers · " + foundation.counts.capabilities + " capabilities · " + foundation.counts.accepted + " accepted within scope"), make("p", "muted", foundation.scope || "Recorded capability decisions for general engineering."), make("p", "catalog-scope", "Acceptance describes the linked work only. Current-host state is unknown from this offline page."));
+  [["docs/harness-defaults.md", "Harness defaults"], ["catalogs/foundation/README.md", "Foundation guide"], ["catalogs/README.md", "How the catalogs fit"]].forEach(([path, label]) => { if(recipeMap.has(path)) add($("foundation-guides"), recipeButton(path, label)); });
+  foundation.layers.forEach(layer => { const option = make("option", "", layer.title); option.value = layer.id; add($("foundation-layer"), option); });
+  [$("foundation-search"), $("foundation-layer"), $("foundation-status")].forEach(control => control.addEventListener(control.tagName === "SELECT" ? "change" : "input", renderFoundation));
+  $("foundation-gap-section").hidden = !foundation.top_gaps.length;
+  foundation.top_gaps.forEach(gap => {
+    const card = add(make("article", "catalog-card"), make("div", "eyebrow", readable(gap.status)), make("h3", "", readable(gap.id)), make("p", "", gap.scope), make("p", "", "Next: " + gap.next_action));
+    const detail = add(make("details", "catalog-detail"), make("summary", "", "Source and priority")); catalogFacts(detail, {priority: gap.priority}); catalogSources(detail, gap.sources); add(card, detail); add($("foundation-gaps"), card);
+  });
+  add($("trading-summary"), make("strong", "", "Research and simulation → broker-specific paper acceptance"), make("p", "muted", trading.scope));
+  add($("trading-guides"), catalogAction("foundation", "Open shared Foundation →"));
+  if(trading.north_star_source) add($("trading-guides"), link("Trading north star ↗", trading.north_star_source.url));
+  const engine = trading.engine;
+  const name = engine.repository ? engine.repository.split("/").pop().replaceAll("_", " ") : "Selected engine";
+  const engineCard = add(make("article", "catalog-card"), make("div", "eyebrow", "Selected engine destination"), make("h3", "", name), make("p", "", "Requested version: " + engine.requested_version), make("p", "", engine.acceptance || "Acceptance not recorded"));
+  const engineDetail = add(make("details", "catalog-detail"), make("summary", "", "Exact pin, installation and sources"));
+  catalogFacts(engineDetail, {source_commit: engine.source_commit, tag: engine.tag, release: engine.release_published_at, prerelease: engine.prerelease, supported_python: engine.supported_python, linux_support: engine.linux_support, retained_comparison_engine: engine.retained_comparison_engine});
+  if(engine.install_command) add(engineDetail, codeBlock(engine.install_command));
+  catalogSources(engineDetail, engine.sources); add(engineCard, engineDetail); add($("trading-engine"), engineCard);
+  add($("trading-engine"), add(make("article", "catalog-card"), make("div", "eyebrow", "What the next check must establish"), make("h3", "", "Useful results, then broader scope."), make("p", "", "An engine fixture measures that fixture. Historical equity replay, strategy quality, account permissions and broker execution each need their own evidence."), make("p", "", "Recorded source terms do not reveal the current account's entitlements.")));
+  trading.broker_boundaries.forEach(broker => {
+    const card = add(make("article", "catalog-card"), make("h3", "", broker.id === "ibkr" ? "IBKR" : broker.id === "alpaca" ? "Alpaca" : readable(broker.id)), make("p", "", broker.selected_path));
+    add(card, make("p", "", "Broker execution: " + readable(broker.local_broker_execution_acceptance || broker.local_broker_acceptance || "not_established")));
+    if(broker.local_data_acceptance?.length) { add(card, make("strong", "small", "Recorded data acceptance")); listLimits(card, broker.local_data_acceptance); }
+    listLimits(card, broker.limitations);
+    const detail = add(make("details", "catalog-detail"), make("summary", "", "Requirements, documented limits and sources"));
+    const facts = {...broker}; ["id", "selected_path", "local_data_acceptance", "limitations", "sources"].forEach(key => delete facts[key]); catalogFacts(detail, facts); catalogSources(detail, broker.sources); add(card, detail); add($("trading-brokers"), card);
+  });
+  trading.next_acceptance.forEach(step => add($("trading-next"), add(make("article", "catalog-card"), make("h3", "", readable(step.id)), make("p", "", step.scope))));
+  listLimits($("trading-evidence"), trading.limitations); catalogSources($("trading-evidence"), trading.accepted_references); catalogSources($("trading-evidence"), [{path: "Trading target record", url: trading.url}]);
+  renderFoundation();
+}
+renderGrandCatalogs();
 function recipeButton(path, label, component = "") {
   const button = make("button", "button secondary small", label);
   button.addEventListener("click", () => showRecipe(path, component));

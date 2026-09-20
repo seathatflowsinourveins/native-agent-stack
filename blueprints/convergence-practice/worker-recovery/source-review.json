@@ -1,0 +1,32 @@
+{
+  "checked_at": "2026-09-20",
+  "native_help_sha256": "ae85d661e9c086f05637ebcd868f5702b477ff6e55e2e65b8ada7807cd51a4b6",
+  "native_runtime": {
+    "version": "2.1.278 (Claude Code)",
+    "executable_sha256": "5c4735937844e84f8a93306e841a5b0e12252909b07870f789b190468da147ab",
+    "captured_after_native_attempt": true
+  },
+  "sources": [
+    {
+      "url": "https://code.claude.com/docs/en/sub-agents",
+      "reviewed_via": "official documentation page opened with web retrieval before native execution",
+      "relevant_protocol": "TaskStop-stopped child can resume via SendMessage; same child transcript persists across parent-session restart.",
+      "full_source_sha256": null
+    },
+    {
+      "url": "https://code.claude.com/docs/en/cli-reference",
+      "reviewed_via": "official documentation page and actual local CLI help before native execution",
+      "relevant_protocol": "Native --agents, stream-json, scoped tools, --session-id and --resume.",
+      "full_source_sha256": null
+    }
+  ],
+  "direct_source_capture": {
+    "url": "https://code.claude.com/docs/en/sub-agents.md",
+    "outcome": "HTTP403",
+    "retried": false
+  },
+  "limitations": [
+    "Official pages were reviewed before execution; full web-page bytes were not retained. A later direct Markdown capture was refused.",
+    "Executable hash is a post-attempt local read; the native stream independently records the running CLI version."
+  ]
+}

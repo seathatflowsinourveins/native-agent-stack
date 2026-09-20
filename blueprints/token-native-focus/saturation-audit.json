@@ -31,13 +31,13 @@
     ]
   },
   "counts": {
-    "selected_components": 66,
-    "catalog_identities": 512,
-    "nonselected_catalog_identities": 446,
+    "selected_components": 68,
+    "catalog_identities": 513,
+    "nonselected_catalog_identities": 445,
     "exclusive_identity_groups": {
       "star_review": 275,
-      "component_record": 66,
-      "catalog_card": 115,
+      "component_record": 68,
+      "catalog_card": 114,
       "research_supplement": 54,
       "legacy_candidate": 2
     }
@@ -5766,6 +5766,193 @@
         "matched_lifetime_provider_baseline": "not_established",
         "regression_policy": "Keep the cheaper adequate native path when a candidate expands tokens or fails required information/quality checks."
       }
+    },
+    {
+      "component_id": "tavily-cli",
+      "repository": "https://github.com/tavily-ai/tavily-cli",
+      "version": "0.1.8",
+      "profile": "supporting",
+      "role": "On-demand authenticated web Search/Extract and official global skills for native Codex/Claude",
+      "installation_assessment": "Native installation and selected upstream operation recorded in the referenced receipt",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/tavily-cli",
+        "documented_commands": [
+          "tvly auth --json",
+          "tvly search \"Tavily Search API\" --json",
+          "tvly extract \"$SELECTED_PUBLIC_URL\" --json"
+        ],
+        "scope": "Use the selected native recipe only when its task applies.",
+        "recipe_document": "recipes/tavily.md",
+        "lifecycle_guide": "adoption/lifecycle.md"
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-tavily-cli-20260920",
+            "path": "evidence/receipts/native-tavily-cli-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Upstream Tavily CLI0.1.8 installation, authenticated live Search/Extract and eight official skills passed scoped native discovery; Desktop-home probe required an isolated session-only SQLite path."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
+      "lifecycle_stages": {
+        "install": {
+          "status": "accepted_within_scope",
+          "scope": "Official installer selected uv and installed CLI0.1.8; official skill installer installed eight native skills.",
+          "evidence_refs": [
+            "evidence/receipts/native-tavily-cli-20260920.json"
+          ]
+        },
+        "use": {
+          "status": "accepted_within_scope",
+          "scope": "Live Search returned four official sources; Extract returned one result and zero failures.",
+          "evidence_refs": [
+            "evidence/receipts/native-tavily-cli-20260920.json"
+          ]
+        },
+        "persistence": {
+          "status": "partial_acceptance",
+          "scope": "Native auth persisted across separate commands; private config mode0600. Key recovery was not exercised.",
+          "evidence_refs": [
+            "evidence/receipts/native-tavily-cli-20260920.json"
+          ]
+        },
+        "restart": {
+          "status": "partial_acceptance",
+          "scope": "Fresh Codex probes discovered eight skills in both homes. Desktop probe needed a temporary sqlite_home after a retained failure; current Desktop registry is unverified.",
+          "evidence_refs": [
+            "evidence/receipts/native-tavily-cli-20260920.json"
+          ]
+        },
+        "cleanup": {
+          "status": "accepted_within_scope",
+          "scope": "Owned app-server probes exited and none remained in process checks. Package uninstall was not replayed.",
+          "evidence_refs": [
+            "evidence/receipts/native-tavily-cli-20260920.json"
+          ]
+        },
+        "recovery": {
+          "status": "not_established",
+          "scope": "Independent host and credential recovery remain untested.",
+          "evidence_refs": []
+        }
+      },
+      "baseline_applicability": {
+        "category": "supporting_workflow",
+        "scope": "This role supports quality, execution, state or observation. A direct token-saving claim needs a separately defined same-task comparison; installation alone has no token baseline.",
+        "retained_artifact_comparisons": 0,
+        "matched_lifetime_provider_baseline": "not_established",
+        "regression_policy": "Keep the cheaper adequate native path when a candidate expands tokens or fails required information/quality checks."
+      }
+    },
+    {
+      "component_id": "nautilus-trader",
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "version": "2.0.0rc5",
+      "profile": "optional",
+      "role": "User-selected trading-engine destination; isolated upstream synthetic FX acceptance, separate from equity data and broker adapters",
+      "installation_assessment": "Native installation and selected upstream operation recorded in the referenced receipt",
+      "current_host_recertified_by_this_audit": false,
+      "native_integration": {
+        "recipe_source": "adoption/manifest.json#/recipe_map/nautilus-trader",
+        "documented_commands": [
+          "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --pre nautilus_trader==2.0.0rc5",
+          "\"$NAUTILUS_ENV/bin/python\" \"$UPSTREAM_QUICKSTART\""
+        ],
+        "scope": "Use the selected native recipe only when its task applies.",
+        "recipe_document": "blueprints/us-equities/engine-nautilus/README.md",
+        "lifecycle_guide": "adoption/lifecycle.md"
+      },
+      "functional_evidence": {
+        "public_receipts": [
+          {
+            "id": "native-nautilus-v2-20260920",
+            "path": "evidence/receipts/native-nautilus-v2-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-nautilus-ci-20260920",
+            "path": "evidence/receipts/native-nautilus-ci-20260920.json",
+            "kind": "native_cli_e2e"
+          }
+        ],
+        "retained_operation_ids": [],
+        "scope": "Pinned NautilusTrader2.0.0rc5 unchanged upstream synthetic EURUSD quickstart passed two isolated offline runs with exact cash reconciliation, repeatable economic reports and original cleanup; two empty-report attempts remain retained. Fresh hosted CI also passed exact wheel/source checks, two offline replays and independent report validation."
+      },
+      "artifact_baselines": [],
+      "exact_causal_lifetime_provider_tokens_saved": null,
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
+      "lifecycle_evidence": {
+        "assessment": "bounded_role_evidence",
+        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability.",
+        "all_optional_features_exercised": false
+      },
+      "remaining_install_gap": null,
+      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
+      "lifecycle_stages": {
+        "install": {
+          "status": "accepted_within_scope",
+          "scope": "uv installed exact2.0.0rc5 into an isolated CPython3.12 prefix. Published wheel hash is metadata; archive was not separately retained/rehashed.",
+          "evidence_refs": [
+            "evidence/receipts/native-nautilus-v2-20260920.json"
+          ]
+        },
+        "use": {
+          "status": "accepted_within_scope",
+          "scope": "Two unchanged pinned upstream synthetic FX replays passed:10000bars,902fills,451closedpositions and equal economic results after defined UUID-only normalization.",
+          "evidence_refs": [
+            "evidence/receipts/native-nautilus-v2-20260920.json"
+          ]
+        },
+        "persistence": {
+          "status": "partial_acceptance",
+          "scope": "Native CSV reports were retained with hashes. Engine state restoration was not exercised.",
+          "evidence_refs": [
+            "evidence/receipts/native-nautilus-v2-20260920.json"
+          ]
+        },
+        "restart": {
+          "status": "partial_acceptance",
+          "scope": "Two fresh offline processes replayed seed42; this does not establish interrupted-state recovery.",
+          "evidence_refs": [
+            "evidence/receipts/native-nautilus-v2-20260920.json"
+          ]
+        },
+        "cleanup": {
+          "status": "accepted_within_scope",
+          "scope": "Accepted processes exited zero; original dispose completed and subsequent empty reports confirmed observed cleanup. Prefix retained.",
+          "evidence_refs": [
+            "evidence/receipts/native-nautilus-v2-20260920.json"
+          ]
+        },
+        "recovery": {
+          "status": "not_established",
+          "scope": "Crash-resume and broker-effect reconciliation remain untested.",
+          "evidence_refs": []
+        }
+      },
+      "baseline_applicability": {
+        "category": "supporting_workflow",
+        "scope": "This role supports quality, execution, state or observation. A direct token-saving claim needs a separately defined same-task comparison; installation alone has no token baseline.",
+        "retained_artifact_comparisons": 0,
+        "matched_lifetime_provider_baseline": "not_established",
+        "regression_policy": "Keep the cheaper adequate native path when a candidate expands tokens or fails required information/quality checks."
+      },
+      "source_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
     }
   ],
   "remaining_boundaries": [

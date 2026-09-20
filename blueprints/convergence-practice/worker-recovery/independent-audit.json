@@ -1,0 +1,107 @@
+{
+  "action_journal": [
+    "checkpoint",
+    "cancel-wait",
+    "crash-wait",
+    "finalize"
+  ],
+  "checkpoint_sha256": "55bff20c10c5625554ca7b553ecc8ffe0557592135463d331469c208d855167c",
+  "checkpoint_unchanged": true,
+  "child_effect_commands": [
+    "python3 stage.py checkpoint",
+    "python3 stage.py cancel-wait",
+    "python3 stage.py crash-wait",
+    "python3 stage.py finalize"
+  ],
+  "cleanup": {
+    "crash_descendant_containment": "not_accepted",
+    "fixture_cwd_processes_remaining": 0,
+    "original_wait_identities_not_alive": true,
+    "surviving_owned_wait_required_explicit_identity_checked_SIGKILL": true
+  },
+  "extra_child_command": {
+    "command": "ls -1 && git status --porcelain",
+    "denied_or_error": true
+  },
+  "final_sha256": "b00398342db51dd3aa75cff5dd9f7768418af09b9b3b03f799d21093cb0dc238",
+  "fixture_tracked_changes": [],
+  "frozen_sources_unchanged": true,
+  "limitations": [
+    "Not native crash descendant containment, independent child-process isolation or remote provider cancellation.",
+    "No power-loss, independent-host, billing-cessation or distributed exactly-once acceptance.",
+    "The child attempted an extra read-only command which was refused; exact requested tool-only behavior did not pass.",
+    "Original failed recorder result is retained; audit changes made no model calls."
+  ],
+  "native_child_control": [
+    "Agent",
+    "TaskStop",
+    "SendMessage",
+    "runtime_SIGKILL",
+    "parent_resume",
+    "SendMessage"
+  ],
+  "native_child_spawn_count": 1,
+  "native_cli_invocations": 2,
+  "original_recorder_status": "failed",
+  "outer_native_attempts": 1,
+  "parent_control_commands": [
+    "python3 control.py await-cancel-wait",
+    "python3 control.py verify-cancelled",
+    "python3 control.py await-crash-wait"
+  ],
+  "recorder_false_negative": "Resumed native background-task delivery emitted three init and three success results; the original recorder required exactly one.",
+  "same_child_identity": true,
+  "same_child_run_count": 3,
+  "same_parent_identity": true,
+  "scope": "One same-host native child local-writing continuation after native cancellation and abrupt shared-runtime failure, with explicit coordinator descendant cleanup.",
+  "single_final_effect": true,
+  "status": "accepted_within_scope_after_explicit_cleanup",
+  "usage": {
+    "billing": null,
+    "complete_parent_child_retry_total": null,
+    "completed_child_run_usage": {
+      "duration_ms": 12777,
+      "tool_uses": 2,
+      "total_tokens": 11334
+    },
+    "initial_terminal_missing_due_to_SIGKILL": true,
+    "one_observed_cumulative_model_view": {
+      "claude-opus-5": {
+        "cacheCreationInputTokens": 7002,
+        "cacheReadInputTokens": 85797,
+        "canonicalModel": "claude-opus-5",
+        "contextWindow": 1000000,
+        "costBasis": "list",
+        "costUSD": 0.24804849999999998,
+        "inputTokens": 12,
+        "maxOutputTokens": 64000,
+        "outputTokens": 5725,
+        "provider": "firstParty",
+        "thinkingTokens": 3378,
+        "webSearchRequests": 0
+      }
+    },
+    "repeated_final_model_usage_count": 2,
+    "resumed_terminal_category_views": [
+      {
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      {
+        "cache_creation_input_tokens": 3496,
+        "cache_read_input_tokens": 37747,
+        "input_tokens": 4,
+        "output_tokens": 636
+      },
+      {
+        "cache_creation_input_tokens": 1358,
+        "cache_read_input_tokens": 20957,
+        "input_tokens": 2,
+        "output_tokens": 2850
+      }
+    ],
+    "savings_claim": null
+  }
+}

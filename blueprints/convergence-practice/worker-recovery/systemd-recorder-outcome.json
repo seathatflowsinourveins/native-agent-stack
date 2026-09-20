@@ -1,0 +1,68 @@
+{
+  "billing": null,
+  "checks": {
+    "cleanup_errors_absent": true,
+    "owned_cli_processes_stopped": true
+  },
+  "cleanup": {
+    "cancel-wait.json_forced_cleanup": false,
+    "crash-wait.json_forced_cleanup": false,
+    "errors": [],
+    "owned_services": {
+      "initial": {
+        "after": {
+          "ActiveState": "failed",
+          "ExecMainCode": "2",
+          "ExecMainStatus": "9",
+          "KillMode": "control-group",
+          "MainPID": "0",
+          "NRestarts": "0",
+          "Restart": "no",
+          "Result": "signal",
+          "SendSIGKILL": "yes",
+          "SubState": "failed",
+          "TimeoutStopUSec": "2s",
+          "Type": "exec"
+        },
+        "remaining_members": [],
+        "stop_needed": false
+      },
+      "resumed": {
+        "after": {
+          "ActiveState": "inactive",
+          "ExecMainCode": "0",
+          "ExecMainStatus": "0",
+          "KillMode": "control-group",
+          "MainPID": "0",
+          "NRestarts": "0",
+          "Restart": "no",
+          "Result": "success",
+          "SendSIGKILL": "yes",
+          "SubState": "dead",
+          "TimeoutStopUSec": "1min 30s",
+          "Type": ""
+        },
+        "remaining_members": [],
+        "stop_needed": false
+      }
+    }
+  },
+  "complete_parent_child_usage": null,
+  "elapsed_seconds": 99.481,
+  "failure": {
+    "reason": "initial_native_exit_before_child_crash_wait",
+    "type": "RuntimeError"
+  },
+  "native_invocations": [
+    {
+      "exit_code": 255,
+      "invalid_stream_lines": 0,
+      "model_usage": [],
+      "phase": "initial",
+      "terminal_count": 0,
+      "terminal_usage": []
+    }
+  ],
+  "savings_claim": null,
+  "status": "failed"
+}

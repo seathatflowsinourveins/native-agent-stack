@@ -1,0 +1,251 @@
+{
+  "schema_version": 1,
+  "catalog_id": "foundation",
+  "checked_at": "2026-09-20",
+  "scope": "General native engineering, research, documentation, applications, workers, observation and recovery. FOUNDATION is a capability selection over canonical evidence, separate from the US-equities domain catalog.",
+  "limitations": [
+    "Historical receipts qualify their named host, input and operation only; this catalog does not run or certify a new host.",
+    "Component pins and original evidence claims remain canonical; discoveries, source review, deployment and successful execution are distinct.",
+    "The broad repository union remains shared research inventory at catalogs/us-equities/decision-index.json; it is not an installation or adoption list."
+  ],
+  "canonical_sources": {
+    "components": "manifests/stack.json",
+    "evidence": "manifests/evidence.json",
+    "lifecycle": "blueprints/token-native-focus/saturation-audit.json",
+    "shared_research_inventory": "catalogs/us-equities/decision-index.json"
+  },
+  "decisions_file": "catalogs/foundation/decisions.json",
+  "layers": [
+    {
+      "id": "native-clients",
+      "title": "Native clients",
+      "purpose": "Run ordinary coding, research and review through locally signed-in native clients.",
+      "selection": "Codex and Claude keep native accounts, model selection, caching and compaction.",
+      "activation": "Use the intended native client and inspect its loaded project tools; new process defaults require a fresh session.",
+      "lifecycle_scope": "Dated native source retrieval, process environment and scoped session continuation passed; host-wide restart recovery is separate.",
+      "next_gap": "Bind fresh-session activation and resumed effects to the next target host without repeating accepted model trials."
+    },
+    {
+      "id": "instructions-skills",
+      "title": "Instructions and skills",
+      "purpose": "Keep project rules short and load detailed task procedures on demand.",
+      "selection": "Canonical project instructions plus selected upstream skills; reference validation is optional.",
+      "activation": "Load only the skill needed for the requested operation; repository discovery never activates every skill.",
+      "lifecycle_scope": "Selected skill format and renderer checks exist; source guidance has no executable lifecycle.",
+      "next_gap": "Check the target client actually discovers a newly selected skill before claiming integration."
+    },
+    {
+      "id": "workers",
+      "title": "Workers and task ownership",
+      "purpose": "Delegate bounded independent work with an actual base, owned paths and independent acceptance.",
+      "selection": "Native workers first; Beads only when a dependency-aware queue helps.",
+      "activation": "One coordinator integrates; each writing worker uses its own worktree and concise task contract.",
+      "lifecycle_scope": "Native child repair and same-child interruption/crash continuation passed within their fixtures; crash descendant containment required explicit supervisor cleanup.",
+      "next_gap": "Qualify supported process containment for the observed survivor; independent-host and provider effects remain separate."
+    },
+    {
+      "id": "isolation",
+      "title": "Isolation",
+      "purpose": "Bound filesystem, network, checkout and shared-resource ownership.",
+      "selection": "Git worktrees for edits; optional native sandbox for a task requiring enforced restrictions.",
+      "activation": "Assign ownership before writes and use supported OS permissions for enforcement; prose is not a sandbox.",
+      "lifecycle_scope": "Disposable worktree operations and filesystem/HTTP allow-deny fixtures passed; worktrees do not isolate accounts or services.",
+      "next_gap": "Qualify only the required platform/network boundary; broader sandbox escape and crash isolation are unknown."
+    },
+    {
+      "id": "code-navigation",
+      "title": "Code navigation",
+      "purpose": "Find exact implementations, symbols, references and structural relationships.",
+      "selection": "Known source or exact search first; Serena, ast-grep, static graph or scoped jCodeMunch when useful.",
+      "activation": "Choose one fitting retrieval lane and read original implementation before edits or correctness decisions.",
+      "lifecycle_scope": "Recorded exact source/symbol checks passed; language coverage and index freshness stay project-specific.",
+      "next_gap": "Test the actual target language and a changed/deleted symbol after moving to a new project."
+    },
+    {
+      "id": "document-retrieval",
+      "title": "Documents and ingestion",
+      "purpose": "Retrieve bounded, source-attributed documentation and supported document text.",
+      "selection": "Scoped QMD BM25, selected Context Hub documentation, MarkItDown HTML and Poppler PDF fixtures.",
+      "activation": "Name the collection/corpus, refresh changed files, search then read the selected source.",
+      "lifecycle_scope": "Lexical retrieval and designed PDF/text fixtures passed with retained misses; arbitrary OCR/layout is unknown.",
+      "next_gap": "Freeze a representative new corpus and negative queries before claiming wider retrieval quality."
+    },
+    {
+      "id": "semantic-rag",
+      "title": "Semantic code retrieval",
+      "purpose": "Retrieve conceptual code using the selected project index and local embeddings.",
+      "selection": "SocratiCode with Qdrant and the accepted local vLLM embedding runtime.",
+      "activation": "Activate only the selected project and models; do not index unrelated folders or change the accepted runtime for release novelty.",
+      "lifecycle_scope": "Native source retrieval and add/change/delete persistence passed; a newer GPU runtime startup failed and remains failed.",
+      "next_gap": "Retain the accepted environment and collect changed-runtime/GPU acceptance only when a concrete need warrants it."
+    },
+    {
+      "id": "durable-memory",
+      "title": "Durable memory",
+      "purpose": "Preserve scoped decisions, approved durable knowledge and recoverable handoffs across clients.",
+      "selection": "One ai-memory store as cross-harness memory of record.",
+      "activation": "Retrieve relevant history when needed; durable writes require explicit intent and recalled text never authorizes actions.",
+      "lifecycle_scope": "Synthetic migration, scope, restart, backup and empty-target restore passed; capture is bounded, not a full transcript.",
+      "next_gap": "Establish independent-host/key recovery and the target host production activation separately."
+    },
+    {
+      "id": "web-research",
+      "title": "Web research",
+      "purpose": "Find current primary sources and inspect selected web content.",
+      "selection": "Native browser, bounded literature retrieval and the upstream Tavily CLI/skills for selected web research.",
+      "activation": "Use an existing authenticated route on demand; load only the research operation needed.",
+      "lifecycle_scope": "Dated browser/paper retrieval and Tavily Search/Extract passed. Eight official skills were discovered in fresh Codex probes; broader operations and the active Desktop registry remain separate.",
+      "next_gap": "Qualify Map, Crawl or Research only for a concrete task; retain current Desktop discovery and account limits."
+    },
+    {
+      "id": "token-efficiency",
+      "title": "Context and usage efficiency",
+      "purpose": "Reduce task context only while preserving required facts, source recovery and answer quality.",
+      "selection": "Known focused reads, RTK, Context Mode, scoped jCodeMunch, guarded Headroom and selected representations.",
+      "activation": "Choose the cheapest sufficient lane for each artifact; preserve raw failure output and native caching.",
+      "lifecycle_scope": "Exact artifact comparisons and mixed native trial results are retained; heuristic counters and consumed usage are separate.",
+      "next_gap": "Measure complete matched attempts only for a decision-changing optimization; do not infer causal lifetime savings."
+    },
+    {
+      "id": "quality-evaluation",
+      "title": "Quality and evaluation",
+      "purpose": "Use deterministic oracles and independent review to accept the actual requested behavior.",
+      "selection": "Project tests, browser acceptance, promptfoo fixtures, shell review and structural diffs as applicable.",
+      "activation": "Freeze useful acceptance and negative cases before a substantive change; reuse matching passing evidence.",
+      "lifecycle_scope": "Selected deterministic fixtures and browser flows passed; no universal model-quality or production guarantee follows.",
+      "next_gap": "Add a representative failure oracle when the next task exposes an untested behavior."
+    },
+    {
+      "id": "ci-supply-chain",
+      "title": "CI and supply chain",
+      "purpose": "Check published artifacts, workflow permissions, secret controls and scoped dependency identity.",
+      "selection": "Native publication checks, zizmor, gitleaks and scoped Syft inventory.",
+      "activation": "Run the relevant offline checks and current CI for changed inputs; keep private state out of artifacts.",
+      "lifecycle_scope": "Workflow/secret negative fixtures and clean native token-tool CI passed; inventory is not a vulnerability or provenance verdict.",
+      "next_gap": "Qualify changed distribution inputs and applicable hosted jobs; no broad vulnerability assurance is accepted."
+    },
+    {
+      "id": "scheduling-supervision",
+      "title": "Scheduling and supervision",
+      "purpose": "Schedule owned work, bound process lifetime and resume unfinished steps deliberately.",
+      "selection": "Dagu for selected workflows and Linux user-manager supervision for owned process trees.",
+      "activation": "Use explicit task/service ownership, bounded retries and independent state/effect checks.",
+      "lifecycle_scope": "Local descendant termination and Dagu cancel/retry/SSH continuation passed; full service reboot and provider cancellation remain unknown.",
+      "next_gap": "Test an owned scheduled service across reboot and reconcile pending native worker effects before resubmission."
+    },
+    {
+      "id": "hosting-services",
+      "title": "Application and service hosting",
+      "purpose": "Build, run and inspect recoverable local application and MCP services.",
+      "selection": "Locked Next/React/FastAPI/PostgreSQL fixture; platform-specific container and MCP tools only as needed.",
+      "activation": "Select the target host recipe, explicit service owner and isolated prefix; external hosting is a separate action.",
+      "lifecycle_scope": "Typed API/browser flows, migration reversal and rows after restart passed on named hosts; production auth and cloud deployment are unqualified.",
+      "next_gap": "Qualify independent database restore and production-specific access requirements before broader hosting claims."
+    },
+    {
+      "id": "recovery-portability",
+      "title": "Recovery and portability",
+      "purpose": "Retain pinned inputs and prove usable restore, continuity and cleanup at the intended boundary.",
+      "selection": "Owned lifecycle recipes, Restic, native application backups and native session resume.",
+      "activation": "Use exact snapshots and empty restore targets; keep keys/account sign-ins private and separate from the checkout.",
+      "lifecycle_scope": "Same-host restores and individual session/job continuations passed; a whole-stack independent-host disaster recovery has not.",
+      "next_gap": "Run independent off-host restore with separately available key recovery and affected service acceptance."
+    },
+    {
+      "id": "observation-inference",
+      "title": "Observation and optional inference",
+      "purpose": "Observe bounded native outcomes and usage; trial local inference or routing only against a concrete gap.",
+      "selection": "Loopback native telemetry and scoped history; local model and gateway remain optional trials.",
+      "activation": "Preserve writer/task attribution, account boundaries and native default routes; dashboards do not grant operator authority.",
+      "lifecycle_scope": "Recorded telemetry reconciles scoped usage; HUD live rendering and exact-model gateway inference remain incomplete.",
+      "next_gap": "Resolve only the selected unknown attribution, interactive rendering or provider compatibility condition before retrying."
+    }
+  ],
+  "domain_boundary": [
+    {
+      "component_id": "lean",
+      "catalog": "catalogs/us-equities/README.md",
+      "scope": "Historical execution engine and market-data assumptions belong to TRADING."
+    },
+    {
+      "component_id": "alpaca-py",
+      "catalog": "catalogs/us-equities/README.md",
+      "scope": "Broker/data SDK contract and observation acceptance belong to TRADING; no order authority is conveyed."
+    },
+    {
+      "component_id": "skfolio",
+      "catalog": "catalogs/us-equities/README.md",
+      "scope": "Only chronological financial splitter/control evidence is accepted; portfolio optimization is not a general foundation capability."
+    },
+    {
+      "component_id": "edgartools",
+      "catalog": "catalogs/us-equities/README.md",
+      "scope": "SEC acquisition and filing provenance belong to the financial data domain."
+    },
+    {
+      "component_id": "duckdb",
+      "catalog": "catalogs/us-equities/README.md",
+      "scope": "Current accepted use is financial/synthetic temporal materialization; a general SQL product claim requires its own workload acceptance."
+    },
+    {
+      "component_id": "pandas",
+      "catalog": "catalogs/us-equities/README.md",
+      "scope": "Current accepted use is exact timestamp parsing and chronological financial controls, not blanket dataframe acceptance."
+    },
+    {
+      "component_id": "nautilus-trader",
+      "catalog": "catalogs/us-equities/runtime-target.json",
+      "scope": "Pinned synthetic trading-engine replay belongs to TRADING; it does not establish historical equities or broker execution."
+    }
+  ],
+  "top_gaps": [
+    {
+      "id": "catalog-capability-separation",
+      "priority": 1,
+      "status": "addressed_in_catalog",
+      "scope": "General foundation capabilities now have an explicit home and scoped claims; the broad research union keeps its existing path.",
+      "next_action": "Maintain these capability joins when a decision changes; do not migrate or adopt every discovery by directory placement.",
+      "source_paths": [
+        "catalogs/foundation/manifest.json",
+        "catalogs/foundation/decisions.json",
+        "catalogs/us-equities/decision-index.json"
+      ]
+    },
+    {
+      "id": "worker-cancellation-crash-resume",
+      "priority": 2,
+      "status": "partial",
+      "scope": "One same-child cancellation/crash/resume with an unchanged checkpoint and one local effect passed after explicit supervisor cleanup. The pending wait survived the native runtime crash; automatic descendant containment remains open. A supported user-service cgroup contained the deterministic survivor fixture. The combined native follow-up stopped at a refused prefixed command before checkpoint.",
+      "next_action": "Use compatible native inherited-tool roles; qualify a deliberately restricted role only after resolving its instruction/tool contract. Context Mode1.0.169 has no supported Agent-routing opt-out; retain the failed trial and existing global permissions.",
+      "source_paths": [
+        "blueprints/convergence-practice/native-worker/README.md",
+        "blueprints/convergence-practice/native-recovery/README.md",
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/convergence-practice/worker-recovery/README.md",
+        "docs/restricted-worker-compatibility.md"
+      ]
+    },
+    {
+      "id": "offhost-keys-and-service-reboot",
+      "priority": 3,
+      "status": "open",
+      "scope": "Same-host backup/restore and service stop/start do not establish independent off-host key recovery or scheduled-service continuity after reboot.",
+      "next_action": "Exercise a separately accessible key and exact snapshot on an independent host, then qualify the selected owned scheduled service after reboot.",
+      "source_paths": [
+        "adoption/lifecycle.md",
+        "blueprints/convergence-practice/wsl-restore/README.md",
+        "blueprints/convergence-practice/wsl-transport-recovery/README.md"
+      ]
+    }
+  ],
+  "open_gates": [
+    {
+      "id": "worker-cancellation-crash-resume",
+      "gap_id": "worker-cancellation-crash-resume"
+    },
+    {
+      "id": "offhost-keys-and-service-reboot",
+      "gap_id": "offhost-keys-and-service-reboot"
+    }
+  ]
+}

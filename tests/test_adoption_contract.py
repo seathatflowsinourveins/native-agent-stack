@@ -31,6 +31,18 @@ class AdoptionContractTests(unittest.TestCase):
         self.assertNotIn('open_gates', self.adoption)
         self.assertFalse(self.adoption['policy']['historical_acceptance_transfers'])
 
+    def test_foundation_and_trading_continuations_keep_separate_gates(self):
+        sources = self.adoption['sources']
+        self.assertEqual(sources['open_gates'], sources['foundation_catalog'])
+        self.assertEqual(sources['current_convergence'], sources['foundation_catalog'])
+        self.assertNotEqual(sources['open_gates'], sources['trading_open_gates'])
+        trading = json.loads((ROOT / sources['trading_open_gates']).read_text())
+        identifiers = {gate['id'] for gate in trading['open_gates']}
+        references = set(self.adoption['continuation']['trading_next_action_refs'])
+        self.assertTrue(references)
+        self.assertTrue(references <= identifiers)
+        self.assertFalse(references & set(self.adoption['continuation']['next_action_refs']))
+
     def test_lock_matches_accepted_inventory_and_all_pins_have_hashes(self):
         normal = lambda value: re.sub(r'[-_.]+', '-', value).lower()
         inventory = json.loads((ROOT / 'blueprints/us-equities/supply-chain/receipt.json').read_text())

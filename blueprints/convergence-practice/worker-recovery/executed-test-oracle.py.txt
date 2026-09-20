@@ -1,0 +1,54 @@
+"""A repeated or unauthorized effect must fail before a native worker runs."""
+import importlib.util
+import json
+from pathlib import Path
+import tempfile
+import unittest
+
+HERE = Path(__file__).resolve().parents[1] / 'blueprints/convergence-practice/worker-recovery'
+
+
+class WorkerRecoveryFixtureTests(unittest.TestCase):
+    def setUp(self):
+        spec = importlib.util.spec_from_file_location('worker_recovery_stage', HERE / 'stage.py')
+        self.module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(self.module)
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.root = Path(temp.name)
+        (self.root / 'input.json').write_text('{"records":[{"id":"b","value":7},{"id":"a","value":5}]}')
+
+    def test_checkpoint_is_exact_and_repetition_is_rejected(self):
+        self.module.execute(self.root, 'checkpoint')
+        self.assertEqual((self.root / 'checkpoint.json').read_bytes(), b'{"ids":["a","b"],"total":12}\n')
+        with self.assertRaisesRegex(ValueError, 'order'):
+            self.module.execute(self.root, 'checkpoint')
+
+    def test_finalize_refuses_missing_interruption_or_supervisor_authorization(self):
+        self.module.execute(self.root, 'checkpoint')
+        with self.assertRaisesRegex(ValueError, 'order'):
+            self.module.execute(self.root, 'finalize')
+        (self.root / 'actions.jsonl').write_text('\n'.join(json.dumps({'action':x}) for x in ['checkpoint','cancel-wait','crash-wait'])+'\n')
+        with self.assertRaisesRegex(ValueError, 'authorization'):
+            self.module.execute(self.root, 'finalize')
+
+    def test_finalize_writes_one_effect_and_keeps_checkpoint(self):
+        self.module.execute(self.root, 'checkpoint')
+        before = (self.root / 'checkpoint.json').read_bytes()
+        (self.root / 'actions.jsonl').write_text('\n'.join(json.dumps({'action':x}) for x in ['checkpoint','cancel-wait','crash-wait'])+'\n')
+        (self.root / 'resume-authorized.json').write_text('{}')
+        self.module.execute(self.root, 'finalize')
+        self.assertEqual((self.root / 'checkpoint.json').read_bytes(), before)
+        self.assertEqual(json.loads((self.root / 'final.json').read_text())['execution_count'], 1)
+        with self.assertRaisesRegex(ValueError, 'order'):
+            self.module.execute(self.root, 'finalize')
+
+    def test_changed_checkpoint_or_input_is_not_accepted(self):
+        (self.root / 'input.json').write_text('{"records":[]}')
+        with self.assertRaisesRegex(ValueError, 'oracle'):
+            self.module.execute(self.root, 'checkpoint')
+        self.assertFalse((self.root / 'checkpoint.json').exists())
+
+
+if __name__ == '__main__':
+    unittest.main()

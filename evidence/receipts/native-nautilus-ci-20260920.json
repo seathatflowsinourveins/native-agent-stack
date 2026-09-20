@@ -1,0 +1,308 @@
+{
+  "schema_version": 1,
+  "id": "native-nautilus-ci-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "nautilus-trader"
+  ],
+  "claim": "A fresh GitHub Ubuntu24.04 runner installed five exact distributions, verified the downloaded engine wheel and unchanged upstream source, and passed two mandatory-offline native engine replays with identical economic reports and original cleanup.",
+  "limitations": [
+    "Synthetic EUR/USD engine fixture only; no historical equities, broker order, account entitlement, strategy-quality or provider token-saving acceptance.",
+    "GitHub raw artifacts expire after14days; retained local copies and this public sanitized result/hash manifest preserve the dated evidence.",
+    "Network namespace and available-interface observations are not measured counts of attempted external transports."
+  ],
+  "recorded_at": "2026-09-20T19:09:11.807265+00:00",
+  "accepted_run": {
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35531326386",
+    "event": "pull_request",
+    "head_sha": "82c7b0ef3215d201ea9a2e15cd6b69d7fd43b315",
+    "conclusion": "success",
+    "second_successful_run": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35531324912"
+  },
+  "workflow": ".github/workflows/native-foundation-e2e.yml",
+  "independent_verifier": "scripts/verify_nautilus_ci.py",
+  "environment": {
+    "platform": "GitHub Ubuntu24.04 hosted x86_64",
+    "python_return": "Python 3.12.3",
+    "bubblewrap_return": "bubblewrap 0.9.0",
+    "installed_distributions": [
+      "nautilus-trader==2.0.0rc5",
+      "numpy==2.5.3",
+      "pandas==3.0.6",
+      "python-dateutil==2.9.0.post0",
+      "six==1.17.0"
+    ]
+  },
+  "upstream_returns": {
+    "install.stdout": "Looking in links: $CI_ROOT/wheels\nProcessing $CI_ROOT/wheels/nautilus_trader-2.0.0rc5-cp312-cp312-manylinux_2_34_x86_64.whl\nProcessing $CI_ROOT/wheels/numpy-2.5.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl\nProcessing $CI_ROOT/wheels/pandas-3.0.6-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl\nProcessing $CI_ROOT/wheels/python_dateutil-2.9.0.post0-py2.py3-none-any.whl\nProcessing $CI_ROOT/wheels/six-1.17.0-py2.py3-none-any.whl\nInstalling collected packages: six, python-dateutil, pandas, numpy, nautilus_trader\nSuccessfully installed nautilus_trader-2.0.0rc5 numpy-2.5.3 pandas-3.0.6 python-dateutil-2.9.0.post0 six-1.17.0\n",
+    "pip-check.stdout": "No broken requirements found.\n",
+    "engine-wheel-check.txt": "$CI_ROOT/wheels/nautilus_trader-2.0.0rc5-cp312-cp312-manylinux_2_34_x86_64.whl: OK\n",
+    "source-check.txt": "$CI_ROOT/reports/quickstart.py: OK\n$CI_ROOT/reports/observe_quickstart.py: OK\n"
+  },
+  "run_commands": {
+    "run-1": "timeout --signal=TERM --kill-after=5 120 sudo --non-interactive bwrap --unshare-all --unshare-net --die-with-parent --new-session --clearenv --uid 1001 --gid 1001 --cap-drop ALL --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind $CI_ROOT/venv /venv --ro-bind $CI_ROOT/reports/quickstart.py /input/quickstart.py --ro-bind $CI_ROOT/reports/observe_quickstart.py /input/observe_quickstart.py --bind $CI_ROOT/reports/run-1 /out --chdir /out --setenv HOME /tmp --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PWD /out --setenv PYTHONDONTWRITEBYTECODE 1 --setenv PYTHONHASHSEED 0 --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 /venv/bin/python -I /input/observe_quickstart.py ",
+    "run-2": "timeout --signal=TERM --kill-after=5 120 sudo --non-interactive bwrap --unshare-all --unshare-net --die-with-parent --new-session --clearenv --uid 1001 --gid 1001 --cap-drop ALL --ro-bind /usr /usr --symlink usr/bin /bin --symlink usr/lib /lib --symlink usr/lib64 /lib64 --proc /proc --dev /dev --tmpfs /tmp --ro-bind $CI_ROOT/venv /venv --ro-bind $CI_ROOT/reports/quickstart.py /input/quickstart.py --ro-bind $CI_ROOT/reports/observe_quickstart.py /input/observe_quickstart.py --bind $CI_ROOT/reports/run-2 /out --chdir /out --setenv HOME /tmp --setenv LANG C.UTF-8 --setenv PATH /usr/bin:/bin --setenv PWD /out --setenv PYTHONDONTWRITEBYTECODE 1 --setenv PYTHONHASHSEED 0 --setenv OPENBLAS_NUM_THREADS 1 --setenv OMP_NUM_THREADS 1 /venv/bin/python -I /input/observe_quickstart.py "
+  },
+  "run_exit_codes": {
+    "run-1": 0,
+    "run-2": 0
+  },
+  "results": {
+    "cash_reconciliation": [
+      {
+        "starting_cash_usd": "1000000.00",
+        "ending_cash_usd": "1000431.00000",
+        "realized_pnl_usd": "431.00"
+      },
+      {
+        "starting_cash_usd": "1000000.00",
+        "ending_cash_usd": "1000431.00000",
+        "realized_pnl_usd": "431.00"
+      }
+    ],
+    "report_comparison": {
+      "account.csv": {
+        "rows": 903,
+        "raw_sha256_equal": true,
+        "normalized_sha256": "65c096a413387a9d6b6343e16a35670b6975f14985eb68a7dc4d4611f88d3659"
+      },
+      "positions.csv": {
+        "rows": 451,
+        "raw_sha256_equal": false,
+        "normalized_sha256": "da4a1d6334328a91b2e4548dbb7b852e1ec63d32c848b9b44f5345fc0767da6c"
+      },
+      "fills.csv": {
+        "rows": 902,
+        "raw_sha256_equal": false,
+        "normalized_sha256": "a8686491d2aef90b4b88199a84948473ced7f7aa9b4748a43e0e0741eed4a2ea"
+      }
+    },
+    "native_result_equal": true,
+    "source_sha256": "487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53",
+    "observer_sha256": "b5cb94472619f6cd5432b7e410f4657fcf8db966fada9032c7dc188739565d30"
+  },
+  "isolation": {
+    "separate_network_namespace": true,
+    "interfaces": [
+      [
+        1,
+        "lo"
+      ]
+    ],
+    "home_exists": false,
+    "environment_names": [
+      "HOME",
+      "LANG",
+      "OMP_NUM_THREADS",
+      "OPENBLAS_NUM_THREADS",
+      "PATH",
+      "PWD",
+      "PYTHONDONTWRITEBYTECODE",
+      "PYTHONHASHSEED"
+    ]
+  },
+  "cleanup": {
+    "upstream_script_completed_after_dispose": true,
+    "account_rows_after_dispose": 0
+  },
+  "independent_download_check": {
+    "all_artifact_hashes_verified": 46,
+    "full_verifier_results_equal": true,
+    "scope": "Coordinator rehashed every downloaded artifact and reran the complete independent verifier; no local engine rerun."
+  },
+  "retained_failed_run": {
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35530898030",
+    "head_sha": "148a807e79b40415d51787a85660061f353cf4db",
+    "stderr": "bwrap: Can't find source path $RUNNER_TEMP/nautilus-ci-env: Permission denied\n",
+    "stderr_sha256": "6347c661a0131445dec12320997f047dbd0b96e70b84ac622b3af740d9f6f87d",
+    "correction": "Only owned task files were moved under a fresh0755 /tmp root; no shared ancestor permissions or namespace isolation were weakened. Explicit PWD=/out matches Bubblewrap behavior."
+  },
+  "original_verification_sha256": "057cb8a7759226655523afbd0eaa423bbf7cf318477b7269f7dd18a80ba1704f",
+  "raw_artifact_hashes": {
+    "apt-install.txt": {
+      "sha256": "c1004352fe14bdb97564286b0dae28f9d6614082da5770873e4e64bd97136d83",
+      "bytes": 5045
+    },
+    "apt-update.txt": {
+      "sha256": "60b36c29e165e471b09b7bca3e695160c7f815648c73aadd3710da77a6c0b38f",
+      "bytes": 3195
+    },
+    "bubblewrap-version.txt": {
+      "sha256": "3a0618bed56bc5ced74eea5965def37047e2b879a25ceb85bbc964efbe00489e",
+      "bytes": 17
+    },
+    "checks.txt": {
+      "sha256": "3295b886e4253fd0511e3fe65974749371be7fb21a01fd3a09b40353f31bc790",
+      "bytes": 1179
+    },
+    "download.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "download.stdout": {
+      "sha256": "3ef0f1e2c6608857ddbb00a03055dba36a10ecb5d82644a88db3c2134205d406",
+      "bytes": 2549
+    },
+    "downloaded-wheel-hashes.txt": {
+      "sha256": "ed7e3cec6bd423c4a06cd547913a710e7fbb09ff1eb86d4ad798dbee9d971bc5",
+      "bytes": 824
+    },
+    "engine-wheel-check.txt": {
+      "sha256": "b8715ed02796b45a115616e24632477e79abef41ff5f29d31f4e04326d05165c",
+      "bytes": 108
+    },
+    "freeze.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "freeze.txt": {
+      "sha256": "9a2c65a6102be63a64f65f2c489ddcdd144bacadeee63a05b119e8e038a67f75",
+      "bytes": 94
+    },
+    "glibc-version.txt": {
+      "sha256": "6513e05931915b34e4fed9713f540659e914cbc508a9bdf1687482c10cb01cd0",
+      "bytes": 287
+    },
+    "host-network-namespace.txt": {
+      "sha256": "fe50dd5e5a7f72627cc0c52a6cb6ca6c043032fd15edfa678477400ba07a9e86",
+      "bytes": 17
+    },
+    "install.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "install.stdout": {
+      "sha256": "8b04d924b647fd19f20e3758d185fb49a0e7f333e9050ce1664b8acd5b4a3273",
+      "bytes": 804
+    },
+    "observe_quickstart.py": {
+      "sha256": "b5cb94472619f6cd5432b7e410f4657fcf8db966fada9032c7dc188739565d30",
+      "bytes": 2625
+    },
+    "pip-check.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "pip-check.stdout": {
+      "sha256": "9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09",
+      "bytes": 30
+    },
+    "python-version.txt": {
+      "sha256": "5b3e43dc38ca01e3f5a7854ba50d4330864b0c1e0f646650b2c78cf072acc366",
+      "bytes": 14
+    },
+    "quickstart.py": {
+      "sha256": "487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53",
+      "bytes": 9054
+    },
+    "run-1/account.csv": {
+      "sha256": "2237e2b39391f2a3a3be8337b60ada25d4f05206aeeffa72b29ae490fe6f5751",
+      "bytes": 134786
+    },
+    "run-1/cleanup.json": {
+      "sha256": "dc4fb1fe0b0610c58259993aacdc975e114d864967d6fab5e66d489cdd7cf36b",
+      "bytes": 89
+    },
+    "run-1/command.txt": {
+      "sha256": "061fa40c44e7bdce49c62c97e61233618d77cbaadaff9c3a360d41d4896e43de",
+      "bytes": 882
+    },
+    "run-1/exit-code.txt": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "run-1/fills.csv": {
+      "sha256": "d7ebe362e020ca553117236e7b69811d91514b12d4e898ca3c7052769e95dbd6",
+      "bytes": 277736
+    },
+    "run-1/finished.txt": {
+      "sha256": "9eb34f150cd37191e31abce7538c7c2897f7f1ccf6c3ef770b13969c005760ff",
+      "bytes": 26
+    },
+    "run-1/isolation.json": {
+      "sha256": "81f572b635fc92794607addc586330999ffc1c28eb875764d3ee5b9a75b351dd",
+      "bytes": 305
+    },
+    "run-1/positions.csv": {
+      "sha256": "ac2853dce49250cd6f6994dad378792171eb7192a0bf086a4111b088dcc94d3d",
+      "bytes": 800929
+    },
+    "run-1/started.txt": {
+      "sha256": "4fc2861aa7073d6a3a86607c1d7a317b962a2023ea07e794dd59a755c7239042",
+      "bytes": 26
+    },
+    "run-1/stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-1/stdout": {
+      "sha256": "4d30225421691d8079cc1caa6fdb6819a751630154c3ccfd79addc6160d1c071",
+      "bytes": 5115
+    },
+    "run-1/summary.json": {
+      "sha256": "ad78032b0ad560f15ef56e8d5d4ac1d0eb1c998aac0b9995ac6236ab4f6c5146",
+      "bytes": 7581
+    },
+    "run-2/account.csv": {
+      "sha256": "2237e2b39391f2a3a3be8337b60ada25d4f05206aeeffa72b29ae490fe6f5751",
+      "bytes": 134786
+    },
+    "run-2/cleanup.json": {
+      "sha256": "dc4fb1fe0b0610c58259993aacdc975e114d864967d6fab5e66d489cdd7cf36b",
+      "bytes": 89
+    },
+    "run-2/command.txt": {
+      "sha256": "0a6b950bc70be5e5b8e963cade62e3c875e8afb9e11f8cb849d1d732bf61b305",
+      "bytes": 882
+    },
+    "run-2/exit-code.txt": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "run-2/fills.csv": {
+      "sha256": "a57f46219e2004a7dbebdd704c8e79e98ea30228edda664acc8e66fa9896ed47",
+      "bytes": 277736
+    },
+    "run-2/finished.txt": {
+      "sha256": "160549f723759a4ef9fa9ca588d44af286b5572c6b80df47667d1268e101216d",
+      "bytes": 26
+    },
+    "run-2/isolation.json": {
+      "sha256": "81f572b635fc92794607addc586330999ffc1c28eb875764d3ee5b9a75b351dd",
+      "bytes": 305
+    },
+    "run-2/positions.csv": {
+      "sha256": "a389d26196fa2fa1b6bf664e56f3e95bc7248995eefcb5ce86baa6c2e410f5c3",
+      "bytes": 800929
+    },
+    "run-2/started.txt": {
+      "sha256": "9eb34f150cd37191e31abce7538c7c2897f7f1ccf6c3ef770b13969c005760ff",
+      "bytes": 26
+    },
+    "run-2/stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-2/stdout": {
+      "sha256": "69336ab8351a8894a8664c5533c98308230fdc4d3860bba56c60b0ca7f462cda",
+      "bytes": 5115
+    },
+    "run-2/summary.json": {
+      "sha256": "2fdc092b8669ca647f0ab0ec113a1ccf0c0d5512a9b365c5d8967387f4c805e9",
+      "bytes": 7581
+    },
+    "source-check.txt": {
+      "sha256": "77facb0404f422f1b95e16eadafc6d1c2d239bb8d9f3d9c71b9bf9aff3ffdaf6",
+      "bytes": 128
+    },
+    "source-fetch.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "source-fetch.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  "exact_causal_lifetime_provider_tokens_saved": null
+}

@@ -1,13 +1,24 @@
 # US-equities grand catalog
 
+This is the **trading architecture catalog**. General Codex/Claude runtimes,
+workers, skills, memory, retrieval, efficiency and operations are maintained in
+the separate [foundation catalog](../foundation/README.md). Trading work reuses
+that foundation and adds data, strategy, risk and broker-specific requirements.
+
+The current selected destination is **NautilusTrader 2.0.0rc5 with IBKR**, plus a
+separately validated **Alpaca** data/paper-execution boundary. LEAN remains the
+accepted historical comparison engine. See the [current target and official
+capability record](runtime-target.json) and updated [north star](../../blueprints/us-equities/north-star.md).
+Earlier research waves below retain their original decisions and evidence.
+
 The [current token-practice audit](../../docs/token-practice.md) maps the selected
-52 components to their evidence levels and records ten exact artifact comparisons
+the then-selected 52 components to their evidence levels and records ten exact artifact comparisons
 plus four accepted native coding trials. Catalog inclusion does not supply a
 per-repository token-saving value.
 
-**Dated decision catalog: September 20, 2026.** The north star is native, token-efficient research → reproducible backtesting → Alpaca paper automation. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
+**Dated decision catalog: September 20, 2026.** The north star is native research → reproducible backtesting → independently accepted IBKR and Alpaca paper workflows. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
 
-The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **505 repository identities**, including all 342 public stars and 163 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 1,057 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
+The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **513 repository identities**, including all 342 public stars and 171 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 1,067 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
 
 The newest [security-identity review](security-identity-review.md) examines Alpaca,
 Zipline, Qlib, NautilusTrader, LEAN and WRDS. It separates engine identity/lifetime
@@ -72,7 +83,7 @@ summary](convergence-review.json) preserves every remaining gate.
 
 ## Recommended convergence
 
-Use native **Codex SDK/Astra + Claude Opus**, **Context Mode/RTK**, **ai-memory**, scoped **QMD/Serena/SocratiCode**, and existing **Nemotron/vLLM/Qdrant**. Keep **DuckDB/Parquet + exchange calendars** for deterministic data work and **LEAN** as the accepted source-built backtest engine. The official **Alpaca adapter** is the paper target, with the SDK as a read-only observer and one future order writer. QuantStats is a proposed reporting layer; selected statistical/ML tools follow only after point-in-time data exists.
+Use the selected native capabilities from the foundation catalog. Keep **DuckDB/Parquet + exchange calendars** for deterministic data work and **LEAN** as the accepted source-built comparison engine. Advance the requested **NautilusTrader 2.0.0rc5 / IBKR** destination with its own scoped evidence; **Alpaca** requires a separate adapter because the official Nautilus integration list has none. The Alpaca SDK's authenticated data receipts remain read-only evidence. QuantStats is a proposed reporting layer; selected statistical/ML tools follow only after point-in-time data exists.
 
 **OmniRoute** remains an optional route with explicit model fidelity and usage checks; **DeerFlow** remains a research orchestration candidate whose backend, ACP discovery and later bounded native task have separate [receipts](../../blueprints/us-equities/deerflow/research-receipt.json). Add document RAG, a temporal graph, durable scheduling, remote sandboxes or managed hosting only for a concrete requirement. A healthy endpoint, installed SDK or paper simulator is not a complete automated trading runtime.
 

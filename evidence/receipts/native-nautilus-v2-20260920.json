@@ -1,0 +1,1077 @@
+{
+  "schema_version": 1,
+  "id": "native-nautilus-v2-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "nautilus-trader"
+  ],
+  "claim": "Pinned NautilusTrader2.0.0rc5 unchanged upstream synthetic EURUSD quickstart passed two isolated offline runs with exact cash reconciliation, repeatable economic reports and original cleanup; two empty-report attempts remain retained.",
+  "limitations": [
+    "Release candidate, not production/live-capital acceptance.",
+    "Synthetic FX, not historical US-equity, corporate-action, PIT/universe or historical-mover acceptance.",
+    "No IBKR Gateway/TWS authentication, data entitlement, adapter connectivity or Alpaca integration acceptance.",
+    "No broker-connected paper execution, fault-injection, ambiguous-submission recovery or persisted-order restart rehearsal.",
+    "Account CSV is byte-identical; fill UUIDs, position episode UUID suffixes and nested fill event UUIDs differ. Reproducibility comparison normalizes only those validated UUIDv4 fields, retains every other CSV field and raw files.",
+    "Native analyzer PnL is floating point430.9999999998836; decimal reconciliation from all902exported fills and451positions equals431.00USD. This synthetic result is not alpha or an investment claim.",
+    "No global defaults, LEAN installation, repository files or shared model routes changed. Isolated package installation retained for reuse."
+  ],
+  "recorded_at": "2026-09-20T18:18:25.622377+00:00",
+  "execution_kind": "upstream_offline_synthetic_engine_acceptance",
+  "scope": "Unchanged upstream synthetic EUR/USD quickstart; no broker, historical financial dataset, model/provider request, live/paper order or strategy acceptance.",
+  "upstream": {
+    "release": "v2.0.0rc5",
+    "commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+    "source_url": "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/quickstart.py",
+    "source_sha256": "487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53",
+    "source_unchanged": true,
+    "wheel_filename": "nautilus_trader-2.0.0rc5-cp312-cp312-manylinux_2_34_x86_64.whl",
+    "published_wheel_sha256": "eab45fafd2312deda1236554c49a9798bfc76bc8465af864878e2f70189ebebe",
+    "wheel_hash_scope": "Published PyPI metadata; installation performed by native uv using explicit PyPI index. Wheel archive was not separately retained or re-hashed."
+  },
+  "runtime": {
+    "python": "3.12.3",
+    "uv": "0.12.17",
+    "bubblewrap": "0.9.0",
+    "glibc": "2.39",
+    "platform": "Ubuntu Linux/WSL2 x86_64",
+    "installed_distributions": [
+      "nautilus-trader==2.0.0rc5",
+      "numpy==2.5.3",
+      "pandas==3.0.6",
+      "python-dateutil==2.9.0.post0",
+      "six==1.17.0"
+    ],
+    "prefix": "<NAUTILUS_ENV>"
+  },
+  "isolation": {
+    "method": "Bubblewrap --unshare-all --clearenv with read-only /usr, isolated environment prefix and upstream/observer source; only each run output directory writable plus private tmpfs /tmp. Broker credentials, original home and account stores were not mounted or inherited. Timeout120seconds with five-second forced-termination grace.",
+    "observed_interfaces": [
+      [
+        1,
+        "lo"
+      ]
+    ],
+    "network_namespace_distinct_from_host": true,
+    "external_transport_attempts_measured": false
+  },
+  "method": "A Python trace observes the unchanged quickstart immediately before its original engine.dispose() call, invokes documented native result/report methods, retains native CSV reports, then permits original disposal. It does not modify strategy, data generation or engine implementation. Fresh process repeats the run from the retained installed prefix. No process-restart recovery of positions is claimed.",
+  "results": {
+    "seed": 42,
+    "instrument": "EUR/USD.SIM",
+    "generated_bars": 10000,
+    "iterations": 10000,
+    "events": 1804,
+    "orders": 902,
+    "positions": 451,
+    "fills": 902,
+    "account_rows": 903,
+    "cash_and_cleanup_checks": {
+      "run-3": {
+        "starting_cash_usd": "1000000.00",
+        "ending_cash_usd": "1000431.00000",
+        "realized_pnl_usd": "431.00",
+        "all_positions_flat": true,
+        "native_cleanup_completed": true,
+        "stderr_bytes": 0
+      },
+      "run-4": {
+        "starting_cash_usd": "1000000.00",
+        "ending_cash_usd": "1000431.00000",
+        "realized_pnl_usd": "431.00",
+        "all_positions_flat": true,
+        "native_cleanup_completed": true,
+        "stderr_bytes": 0
+      }
+    },
+    "report_comparison": {
+      "account.csv": {
+        "rows": 903,
+        "raw_sha256_equal": true,
+        "raw_differing_columns_counts": {},
+        "equal_after_explicit_uuid4_normalization": true,
+        "normalized_sha256": "65c096a413387a9d6b6343e16a35670b6975f14985eb68a7dc4d4611f88d3659"
+      },
+      "positions.csv": {
+        "rows": 451,
+        "raw_sha256_equal": false,
+        "raw_differing_columns_counts": {
+          "position_id": 450,
+          "events": 451
+        },
+        "equal_after_explicit_uuid4_normalization": true,
+        "normalized_sha256": "da4a1d6334328a91b2e4548dbb7b852e1ec63d32c848b9b44f5345fc0767da6c"
+      },
+      "fills.csv": {
+        "rows": 902,
+        "raw_sha256_equal": false,
+        "raw_differing_columns_counts": {
+          "init_id": 902
+        },
+        "equal_after_explicit_uuid4_normalization": true,
+        "normalized_sha256": "a8686491d2aef90b4b88199a84948473ced7f7aa9b4748a43e0e0741eed4a2ea"
+      }
+    },
+    "native_result_equal": true
+  },
+  "preserved_unsuccessful_observation_attempts": {
+    "runs": [
+      "run-1",
+      "run-2"
+    ],
+    "process_returncodes": [
+      0,
+      0
+    ],
+    "issue": "After-dispose observer found empty native reports in both runs; exit0 alone did not meet useful-result acceptance. Before-dispose observer corrected the capture, with assertions for10000iterations and nonempty reports.",
+    "files": [
+      "observe_quickstart_after_dispose.py",
+      "execute_acceptance_attempt1.py",
+      "execution-commands-attempt1.json"
+    ]
+  },
+  "commands": {
+    "install": [
+      {
+        "label": "uv-version",
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/tools/uv-0.12.17/uv",
+          "--version"
+        ],
+        "cwd": "<PRIVATE_EVIDENCE>/nautilus-acceptance",
+        "started_utc": "2026-09-20T18:12:47.957829+00:00",
+        "finished_utc": "2026-09-20T18:12:47.965394+00:00",
+        "returncode": 0,
+        "stdout": {
+          "path": "uv-version.stdout",
+          "bytes": 38,
+          "sha256": "dd643ebda7165a77a7fe3c9f445ec1a2cfebe1bfe0329015937763dce919c33d"
+        },
+        "stderr": {
+          "path": "uv-version.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout_returned": "uv 0.12.17 (x86_64-unknown-linux-gnu)\n",
+        "stderr_returned": ""
+      },
+      {
+        "label": "python-version",
+        "argv": [
+          "/usr/bin/python3.12",
+          "--version"
+        ],
+        "cwd": "<PRIVATE_EVIDENCE>/nautilus-acceptance",
+        "started_utc": "2026-09-20T18:12:47.965617+00:00",
+        "finished_utc": "2026-09-20T18:12:47.966969+00:00",
+        "returncode": 0,
+        "stdout": {
+          "path": "python-version.stdout",
+          "bytes": 14,
+          "sha256": "5b3e43dc38ca01e3f5a7854ba50d4330864b0c1e0f646650b2c78cf072acc366"
+        },
+        "stderr": {
+          "path": "python-version.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout_returned": "Python 3.12.3\n",
+        "stderr_returned": ""
+      },
+      {
+        "label": "bwrap-version",
+        "argv": [
+          "/usr/bin/bwrap",
+          "--version"
+        ],
+        "cwd": "<PRIVATE_EVIDENCE>/nautilus-acceptance",
+        "started_utc": "2026-09-20T18:12:47.967147+00:00",
+        "finished_utc": "2026-09-20T18:12:47.968406+00:00",
+        "returncode": 0,
+        "stdout": {
+          "path": "bwrap-version.stdout",
+          "bytes": 17,
+          "sha256": "3a0618bed56bc5ced74eea5965def37047e2b879a25ceb85bbc964efbe00489e"
+        },
+        "stderr": {
+          "path": "bwrap-version.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout_returned": "bubblewrap 0.9.0\n",
+        "stderr_returned": ""
+      },
+      {
+        "label": "glibc-version",
+        "argv": [
+          "/usr/bin/ldd",
+          "--version"
+        ],
+        "cwd": "<PRIVATE_EVIDENCE>/nautilus-acceptance",
+        "started_utc": "2026-09-20T18:12:47.974445+00:00",
+        "finished_utc": "2026-09-20T18:12:47.975680+00:00",
+        "returncode": 0,
+        "stdout": {
+          "path": "glibc-version.stdout",
+          "bytes": 287,
+          "sha256": "0a361b537ea92ca84098127af4bbb1aa2144b39551239bdcd1bccb53ec4c5df0"
+        },
+        "stderr": {
+          "path": "glibc-version.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout_returned": "ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39\nCopyright (C) 2024 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\nWritten by Roland McGrath and Ulrich Drepper.\n",
+        "stderr_returned": ""
+      },
+      {
+        "label": "venv",
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/tools/uv-0.12.17/uv",
+          "--no-config",
+          "venv",
+          "--python",
+          "/usr/bin/python3.12",
+          "<NAUTILUS_ENV>"
+        ],
+        "cwd": "<PRIVATE_EVIDENCE>/nautilus-acceptance",
+        "started_utc": "2026-09-20T18:12:47.975825+00:00",
+        "finished_utc": "2026-09-20T18:12:48.039305+00:00",
+        "returncode": 0,
+        "stdout": {
+          "path": "venv.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "venv.stderr",
+          "bytes": 155,
+          "sha256": "eb67d26cabaff77052aee38927d34e5d194250ee4afbdcecd541a88e4d9c2ece"
+        },
+        "stdout_returned": "",
+        "stderr_returned": "Using CPython 3.12.3 interpreter at: /usr/bin/python3.12\nCreating virtual environment at: <NAUTILUS_ENV>\n"
+      },
+      {
+        "label": "install",
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/tools/uv-0.12.17/uv",
+          "--no-config",
+          "pip",
+          "install",
+          "--python",
+          "<NAUTILUS_ENV>/bin/python",
+          "--pre",
+          "--index-url",
+          "https://pypi.org/simple",
+          "nautilus_trader==2.0.0rc5",
+          "numpy",
+          "pandas"
+        ],
+        "cwd": "<PRIVATE_EVIDENCE>/nautilus-acceptance",
+        "started_utc": "2026-09-20T18:12:48.039616+00:00",
+        "finished_utc": "2026-09-20T18:12:49.655724+00:00",
+        "returncode": 0,
+        "stdout": {
+          "path": "install.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "install.stderr",
+          "bytes": 457,
+          "sha256": "1a19ca655c0cf11d1fd645bf8b1088643d1ff29f88881b4777bdfa23d8a940fc"
+        },
+        "stdout_returned": "",
+        "stderr_returned": "Using Python 3.12.3 environment at: <NAUTILUS_ENV>\nResolved 5 packages in 166ms\nDownloading nautilus-trader (66.7MiB)\nDownloading numpy (15.9MiB)\nDownloading pandas (10.3MiB)\n Downloaded pandas\n Downloaded numpy\n Downloaded nautilus-trader\nPrepared 5 packages in 1.35s\nInstalled 5 packages in 22ms\n + nautilus-trader==2.0.0rc5\n + numpy==2.5.3\n + pandas==3.0.6\n + python-dateutil==2.9.0.post0\n + six==1.17.0\n"
+      },
+      {
+        "label": "freeze",
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/tools/uv-0.12.17/uv",
+          "--no-config",
+          "pip",
+          "freeze",
+          "--python",
+          "<NAUTILUS_ENV>/bin/python"
+        ],
+        "cwd": "<PRIVATE_EVIDENCE>/nautilus-acceptance",
+        "started_utc": "2026-09-20T18:12:49.656103+00:00",
+        "finished_utc": "2026-09-20T18:12:49.663513+00:00",
+        "returncode": 0,
+        "stdout": {
+          "path": "freeze.stdout",
+          "bytes": 94,
+          "sha256": "9a2c65a6102be63a64f65f2c489ddcdd144bacadeee63a05b119e8e038a67f75"
+        },
+        "stderr": {
+          "path": "freeze.stderr",
+          "bytes": 101,
+          "sha256": "e9199d4740f98b6d63706c3bfc6fd638c632af1dd5e43c965a83025ffb2dafb9"
+        },
+        "stdout_returned": "nautilus-trader==2.0.0rc5\nnumpy==2.5.3\npandas==3.0.6\npython-dateutil==2.9.0.post0\nsix==1.17.0\n",
+        "stderr_returned": "Using Python 3.12.3 environment at: <NAUTILUS_ENV>\n"
+      },
+      {
+        "label": "pip-check",
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/tools/uv-0.12.17/uv",
+          "--no-config",
+          "pip",
+          "check",
+          "--python",
+          "<NAUTILUS_ENV>/bin/python"
+        ],
+        "cwd": "<PRIVATE_EVIDENCE>/nautilus-acceptance",
+        "started_utc": "2026-09-20T18:12:49.663854+00:00",
+        "finished_utc": "2026-09-20T18:12:49.671452+00:00",
+        "returncode": 0,
+        "stdout": {
+          "path": "pip-check.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "pip-check.stderr",
+          "bytes": 168,
+          "sha256": "995950ca5e558d43ac0fc388cc0e97057f618d63312450521ab45c3b5b114280"
+        },
+        "stdout_returned": "",
+        "stderr_returned": "Using Python 3.12.3 environment at: <NAUTILUS_ENV>\nChecked 5 packages in 0.17ms\nAll installed packages are compatible\n"
+      },
+      {
+        "label": "source-fetch",
+        "argv": [
+          "/usr/bin/curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "60",
+          "--output",
+          "<PRIVATE_EVIDENCE>/nautilus-acceptance/quickstart.py",
+          "https://raw.githubusercontent.com/nautechsystems/nautilus_trader/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/quickstart.py"
+        ],
+        "cwd": "<PRIVATE_EVIDENCE>/nautilus-acceptance",
+        "started_utc": "2026-09-20T18:12:49.671719+00:00",
+        "finished_utc": "2026-09-20T18:12:49.785877+00:00",
+        "returncode": 0,
+        "stdout": {
+          "path": "source-fetch.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "source-fetch.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout_returned": "",
+        "stderr_returned": ""
+      },
+      {
+        "label": "pypi-fetch",
+        "argv": [
+          "/usr/bin/curl",
+          "--fail",
+          "--silent",
+          "--show-error",
+          "--location",
+          "--max-time",
+          "60",
+          "--output",
+          "<PRIVATE_EVIDENCE>/nautilus-acceptance/pypi-metadata.json",
+          "https://pypi.org/pypi/nautilus_trader/2.0.0rc5/json"
+        ],
+        "cwd": "<PRIVATE_EVIDENCE>/nautilus-acceptance",
+        "started_utc": "2026-09-20T18:12:49.786431+00:00",
+        "finished_utc": "2026-09-20T18:12:49.850331+00:00",
+        "returncode": 0,
+        "stdout": {
+          "path": "pypi-fetch.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "path": "pypi-fetch.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout_returned": "",
+        "stderr_returned": ""
+      }
+    ],
+    "initial_observation": [
+      {
+        "id": "run-1",
+        "argv": [
+          "/usr/bin/timeout",
+          "--signal=TERM",
+          "--kill-after=5",
+          "120",
+          "/usr/bin/bwrap",
+          "--unshare-all",
+          "--die-with-parent",
+          "--new-session",
+          "--clearenv",
+          "--ro-bind",
+          "/usr",
+          "/usr",
+          "--symlink",
+          "usr/bin",
+          "/bin",
+          "--symlink",
+          "usr/lib",
+          "/lib",
+          "--symlink",
+          "usr/lib64",
+          "/lib64",
+          "--proc",
+          "/proc",
+          "--dev",
+          "/dev",
+          "--tmpfs",
+          "/tmp",
+          "--ro-bind",
+          "<NAUTILUS_ENV>",
+          "<NAUTILUS_ENV>",
+          "--ro-bind",
+          "<PRIVATE_EVIDENCE>/nautilus-acceptance/quickstart.py",
+          "/input/quickstart.py",
+          "--ro-bind",
+          "<PRIVATE_EVIDENCE>/nautilus-acceptance/observe_quickstart.py",
+          "/input/observe_quickstart.py",
+          "--bind",
+          "<PRIVATE_EVIDENCE>/nautilus-acceptance/run-1",
+          "/out",
+          "--chdir",
+          "/out",
+          "--setenv",
+          "HOME",
+          "/tmp",
+          "--setenv",
+          "LANG",
+          "C.UTF-8",
+          "--setenv",
+          "PATH",
+          "/usr/bin:/bin",
+          "--setenv",
+          "PYTHONDONTWRITEBYTECODE",
+          "1",
+          "--setenv",
+          "PYTHONHASHSEED",
+          "0",
+          "--setenv",
+          "OPENBLAS_NUM_THREADS",
+          "1",
+          "--setenv",
+          "OMP_NUM_THREADS",
+          "1",
+          "<NAUTILUS_ENV>/bin/python",
+          "-I",
+          "/input/observe_quickstart.py"
+        ],
+        "start_utc": "2026-09-20T18:14:07.207498+00:00",
+        "end_utc": "2026-09-20T18:14:08.324041+00:00",
+        "returncode": 0,
+        "outputs": {
+          "account.csv": {
+            "bytes": 3,
+            "sha256": "bd85bcdb8d4e613a79cb62d0903946ad10c83e63dc75f67614c159c0dbf4d184"
+          },
+          "fills.csv": {
+            "bytes": 3,
+            "sha256": "bd85bcdb8d4e613a79cb62d0903946ad10c83e63dc75f67614c159c0dbf4d184"
+          },
+          "isolation.json": {
+            "bytes": 304,
+            "sha256": "9ecb8d81549f124f3c877f28f20062ec881bb90e26d506e827d76bdfe7e5c6a8"
+          },
+          "positions.csv": {
+            "bytes": 3,
+            "sha256": "bd85bcdb8d4e613a79cb62d0903946ad10c83e63dc75f67614c159c0dbf4d184"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stdout": {
+            "bytes": 268,
+            "sha256": "eaab4ece04a1ab6757655949b7480fec58ec0aa1f9c75c77ba9b6188a0a4285f"
+          },
+          "summary.json": {
+            "bytes": 368,
+            "sha256": "a02ccbee0384dc3759e87244b0fad67f9b09f8688876e33a73bc6507ca948e6f"
+          }
+        }
+      },
+      {
+        "id": "run-2",
+        "argv": [
+          "/usr/bin/timeout",
+          "--signal=TERM",
+          "--kill-after=5",
+          "120",
+          "/usr/bin/bwrap",
+          "--unshare-all",
+          "--die-with-parent",
+          "--new-session",
+          "--clearenv",
+          "--ro-bind",
+          "/usr",
+          "/usr",
+          "--symlink",
+          "usr/bin",
+          "/bin",
+          "--symlink",
+          "usr/lib",
+          "/lib",
+          "--symlink",
+          "usr/lib64",
+          "/lib64",
+          "--proc",
+          "/proc",
+          "--dev",
+          "/dev",
+          "--tmpfs",
+          "/tmp",
+          "--ro-bind",
+          "<NAUTILUS_ENV>",
+          "<NAUTILUS_ENV>",
+          "--ro-bind",
+          "<PRIVATE_EVIDENCE>/nautilus-acceptance/quickstart.py",
+          "/input/quickstart.py",
+          "--ro-bind",
+          "<PRIVATE_EVIDENCE>/nautilus-acceptance/observe_quickstart.py",
+          "/input/observe_quickstart.py",
+          "--bind",
+          "<PRIVATE_EVIDENCE>/nautilus-acceptance/run-2",
+          "/out",
+          "--chdir",
+          "/out",
+          "--setenv",
+          "HOME",
+          "/tmp",
+          "--setenv",
+          "LANG",
+          "C.UTF-8",
+          "--setenv",
+          "PATH",
+          "/usr/bin:/bin",
+          "--setenv",
+          "PYTHONDONTWRITEBYTECODE",
+          "1",
+          "--setenv",
+          "PYTHONHASHSEED",
+          "0",
+          "--setenv",
+          "OPENBLAS_NUM_THREADS",
+          "1",
+          "--setenv",
+          "OMP_NUM_THREADS",
+          "1",
+          "<NAUTILUS_ENV>/bin/python",
+          "-I",
+          "/input/observe_quickstart.py"
+        ],
+        "start_utc": "2026-09-20T18:14:08.324639+00:00",
+        "end_utc": "2026-09-20T18:14:10.975610+00:00",
+        "returncode": 0,
+        "outputs": {
+          "account.csv": {
+            "bytes": 3,
+            "sha256": "bd85bcdb8d4e613a79cb62d0903946ad10c83e63dc75f67614c159c0dbf4d184"
+          },
+          "fills.csv": {
+            "bytes": 3,
+            "sha256": "bd85bcdb8d4e613a79cb62d0903946ad10c83e63dc75f67614c159c0dbf4d184"
+          },
+          "isolation.json": {
+            "bytes": 304,
+            "sha256": "1bac91906d68a4ba9c5ef9902ce05f2ca53d425780b0a6bc2eb96f741d5ca164"
+          },
+          "positions.csv": {
+            "bytes": 3,
+            "sha256": "bd85bcdb8d4e613a79cb62d0903946ad10c83e63dc75f67614c159c0dbf4d184"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stdout": {
+            "bytes": 268,
+            "sha256": "eaab4ece04a1ab6757655949b7480fec58ec0aa1f9c75c77ba9b6188a0a4285f"
+          },
+          "summary.json": {
+            "bytes": 368,
+            "sha256": "a02ccbee0384dc3759e87244b0fad67f9b09f8688876e33a73bc6507ca948e6f"
+          }
+        }
+      }
+    ],
+    "accepted_execution": [
+      {
+        "id": "run-3",
+        "argv": [
+          "/usr/bin/timeout",
+          "--signal=TERM",
+          "--kill-after=5",
+          "120",
+          "/usr/bin/bwrap",
+          "--unshare-all",
+          "--die-with-parent",
+          "--new-session",
+          "--clearenv",
+          "--ro-bind",
+          "/usr",
+          "/usr",
+          "--symlink",
+          "usr/bin",
+          "/bin",
+          "--symlink",
+          "usr/lib",
+          "/lib",
+          "--symlink",
+          "usr/lib64",
+          "/lib64",
+          "--proc",
+          "/proc",
+          "--dev",
+          "/dev",
+          "--tmpfs",
+          "/tmp",
+          "--ro-bind",
+          "<NAUTILUS_ENV>",
+          "<NAUTILUS_ENV>",
+          "--ro-bind",
+          "<PRIVATE_EVIDENCE>/nautilus-acceptance/quickstart.py",
+          "/input/quickstart.py",
+          "--ro-bind",
+          "<PRIVATE_EVIDENCE>/nautilus-acceptance/observe_quickstart.py",
+          "/input/observe_quickstart.py",
+          "--bind",
+          "<PRIVATE_EVIDENCE>/nautilus-acceptance/run-3",
+          "/out",
+          "--chdir",
+          "/out",
+          "--setenv",
+          "HOME",
+          "/tmp",
+          "--setenv",
+          "LANG",
+          "C.UTF-8",
+          "--setenv",
+          "PATH",
+          "/usr/bin:/bin",
+          "--setenv",
+          "PYTHONDONTWRITEBYTECODE",
+          "1",
+          "--setenv",
+          "PYTHONHASHSEED",
+          "0",
+          "--setenv",
+          "OPENBLAS_NUM_THREADS",
+          "1",
+          "--setenv",
+          "OMP_NUM_THREADS",
+          "1",
+          "<NAUTILUS_ENV>/bin/python",
+          "-I",
+          "/input/observe_quickstart.py"
+        ],
+        "start_utc": "2026-09-20T18:15:33.400956+00:00",
+        "end_utc": "2026-09-20T18:15:35.418610+00:00",
+        "returncode": 0,
+        "outputs": {
+          "account.csv": {
+            "bytes": 134786,
+            "sha256": "2237e2b39391f2a3a3be8337b60ada25d4f05206aeeffa72b29ae490fe6f5751"
+          },
+          "cleanup.json": {
+            "bytes": 89,
+            "sha256": "dc4fb1fe0b0610c58259993aacdc975e114d864967d6fab5e66d489cdd7cf36b"
+          },
+          "fills.csv": {
+            "bytes": 277736,
+            "sha256": "f9fff44e676d38581a7fe5f6fbe7daae6d831d694b47ccad17d22b119946be31"
+          },
+          "isolation.json": {
+            "bytes": 304,
+            "sha256": "9ecb8d81549f124f3c877f28f20062ec881bb90e26d506e827d76bdfe7e5c6a8"
+          },
+          "positions.csv": {
+            "bytes": 800929,
+            "sha256": "5c354704a1d84d7a2120e096108ccccaa2daee5413b563214abdc6bef4fee615"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stdout": {
+            "bytes": 5115,
+            "sha256": "dba377f02a25b2ac3a7ae7fc2820fc53c8444a73355f67778a9b8cfa88ec377a"
+          },
+          "summary.json": {
+            "bytes": 7581,
+            "sha256": "6eee92f368d36683ede7079f6c4b376ee9c7ff41d942b4cc01671e27f4c4b8f2"
+          }
+        }
+      },
+      {
+        "id": "run-4",
+        "argv": [
+          "/usr/bin/timeout",
+          "--signal=TERM",
+          "--kill-after=5",
+          "120",
+          "/usr/bin/bwrap",
+          "--unshare-all",
+          "--die-with-parent",
+          "--new-session",
+          "--clearenv",
+          "--ro-bind",
+          "/usr",
+          "/usr",
+          "--symlink",
+          "usr/bin",
+          "/bin",
+          "--symlink",
+          "usr/lib",
+          "/lib",
+          "--symlink",
+          "usr/lib64",
+          "/lib64",
+          "--proc",
+          "/proc",
+          "--dev",
+          "/dev",
+          "--tmpfs",
+          "/tmp",
+          "--ro-bind",
+          "<NAUTILUS_ENV>",
+          "<NAUTILUS_ENV>",
+          "--ro-bind",
+          "<PRIVATE_EVIDENCE>/nautilus-acceptance/quickstart.py",
+          "/input/quickstart.py",
+          "--ro-bind",
+          "<PRIVATE_EVIDENCE>/nautilus-acceptance/observe_quickstart.py",
+          "/input/observe_quickstart.py",
+          "--bind",
+          "<PRIVATE_EVIDENCE>/nautilus-acceptance/run-4",
+          "/out",
+          "--chdir",
+          "/out",
+          "--setenv",
+          "HOME",
+          "/tmp",
+          "--setenv",
+          "LANG",
+          "C.UTF-8",
+          "--setenv",
+          "PATH",
+          "/usr/bin:/bin",
+          "--setenv",
+          "PYTHONDONTWRITEBYTECODE",
+          "1",
+          "--setenv",
+          "PYTHONHASHSEED",
+          "0",
+          "--setenv",
+          "OPENBLAS_NUM_THREADS",
+          "1",
+          "--setenv",
+          "OMP_NUM_THREADS",
+          "1",
+          "<NAUTILUS_ENV>/bin/python",
+          "-I",
+          "/input/observe_quickstart.py"
+        ],
+        "start_utc": "2026-09-20T18:15:35.420040+00:00",
+        "end_utc": "2026-09-20T18:15:37.186479+00:00",
+        "returncode": 0,
+        "outputs": {
+          "account.csv": {
+            "bytes": 134786,
+            "sha256": "2237e2b39391f2a3a3be8337b60ada25d4f05206aeeffa72b29ae490fe6f5751"
+          },
+          "cleanup.json": {
+            "bytes": 89,
+            "sha256": "dc4fb1fe0b0610c58259993aacdc975e114d864967d6fab5e66d489cdd7cf36b"
+          },
+          "fills.csv": {
+            "bytes": 277736,
+            "sha256": "45453ac7b546a53d665594501de9a59c1b6cfa6ebb2bb3270fcc169b2429e817"
+          },
+          "isolation.json": {
+            "bytes": 304,
+            "sha256": "faf33ff006c50ee81b723497ce236be26a30289eba8d8700c73ac2b3b4a517f4"
+          },
+          "positions.csv": {
+            "bytes": 800929,
+            "sha256": "3004e50565991a26df56570a26bda5825ea6232043f4f257092e1a431abb3bc8"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stdout": {
+            "bytes": 5115,
+            "sha256": "95c111f9979d3c1e1777cc8e65b1bcc8f923f129a4b6942d9de848e6672cf1c7"
+          },
+          "summary.json": {
+            "bytes": 7581,
+            "sha256": "86cd829d571213a82b5566656d4ce8a583e9da30619644f3767a6c3615674a75"
+          }
+        }
+      }
+    ]
+  },
+  "private_artifact_hashes": {
+    "bwrap-version.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "bwrap-version.stdout": {
+      "sha256": "3a0618bed56bc5ced74eea5965def37047e2b879a25ceb85bbc964efbe00489e",
+      "bytes": 17
+    },
+    "execute_acceptance.py": {
+      "sha256": "729b60e3155bb931ff31003f8f13f87c5f92f179c870ec7cbcadcf7c07fa79c2",
+      "bytes": 2187
+    },
+    "execute_acceptance_attempt1.py": {
+      "sha256": "db0ef4c8499346bf0f7bac7fa83d188df22ebe1e2a29a67758a3feb716c85fb3",
+      "bytes": 2187
+    },
+    "execution-commands-attempt1.json": {
+      "sha256": "d98302d632a87254d4bead88dd55d96b38b8d44f9c0322c192fd105c166ff47b",
+      "bytes": 5631
+    },
+    "execution-commands.json": {
+      "sha256": "f91211a04c15d69c672996a8039a6282e9b3a38392227290943b0e9b2d4600ea",
+      "bytes": 5943
+    },
+    "finalize_acceptance.py": {
+      "sha256": "641597c6dccb7c5ea4848cfd398f0cbcae76c88c02ad79fdce303182b8d183d0",
+      "bytes": 8998
+    },
+    "freeze.stderr": {
+      "sha256": "e9199d4740f98b6d63706c3bfc6fd638c632af1dd5e43c965a83025ffb2dafb9",
+      "bytes": 101
+    },
+    "freeze.stdout": {
+      "sha256": "9a2c65a6102be63a64f65f2c489ddcdd144bacadeee63a05b119e8e038a67f75",
+      "bytes": 94
+    },
+    "glibc-version.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "glibc-version.stdout": {
+      "sha256": "0a361b537ea92ca84098127af4bbb1aa2144b39551239bdcd1bccb53ec4c5df0",
+      "bytes": 287
+    },
+    "install-commands.json": {
+      "sha256": "7c8f604260a051c9e836d58d7bffea2371b13aab5af45b3c2ef9c560cfc0cac2",
+      "bytes": 8008
+    },
+    "install.stderr": {
+      "sha256": "1a19ca655c0cf11d1fd645bf8b1088643d1ff29f88881b4777bdfa23d8a940fc",
+      "bytes": 457
+    },
+    "install.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "install_acceptance.py": {
+      "sha256": "179240475d8d218f02913274794c084cb124bed71dd8330c10d351449b5f92e1",
+      "bytes": 2710
+    },
+    "observe_quickstart.py": {
+      "sha256": "b5cb94472619f6cd5432b7e410f4657fcf8db966fada9032c7dc188739565d30",
+      "bytes": 2625
+    },
+    "observe_quickstart_after_dispose.py": {
+      "sha256": "50e79beeb23078d9220d71b93f198f6141aaea9da34a61d712b539d3c47f26cc",
+      "bytes": 1316
+    },
+    "pip-check.stderr": {
+      "sha256": "995950ca5e558d43ac0fc388cc0e97057f618d63312450521ab45c3b5b114280",
+      "bytes": 168
+    },
+    "pip-check.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "pypi-fetch.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "pypi-fetch.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "pypi-metadata.json": {
+      "sha256": "df9676f435aa0e28ca70b40cc097854488f6bed47c56a636e4f6ef7bdd3c84bd",
+      "bytes": 52521
+    },
+    "python-version.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "python-version.stdout": {
+      "sha256": "5b3e43dc38ca01e3f5a7854ba50d4330864b0c1e0f646650b2c78cf072acc366",
+      "bytes": 14
+    },
+    "quickstart.py": {
+      "sha256": "487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53",
+      "bytes": 9054
+    },
+    "run-1/account.csv": {
+      "sha256": "bd85bcdb8d4e613a79cb62d0903946ad10c83e63dc75f67614c159c0dbf4d184",
+      "bytes": 3
+    },
+    "run-1/fills.csv": {
+      "sha256": "bd85bcdb8d4e613a79cb62d0903946ad10c83e63dc75f67614c159c0dbf4d184",
+      "bytes": 3
+    },
+    "run-1/isolation.json": {
+      "sha256": "9ecb8d81549f124f3c877f28f20062ec881bb90e26d506e827d76bdfe7e5c6a8",
+      "bytes": 304
+    },
+    "run-1/positions.csv": {
+      "sha256": "bd85bcdb8d4e613a79cb62d0903946ad10c83e63dc75f67614c159c0dbf4d184",
+      "bytes": 3
+    },
+    "run-1/stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-1/stdout": {
+      "sha256": "eaab4ece04a1ab6757655949b7480fec58ec0aa1f9c75c77ba9b6188a0a4285f",
+      "bytes": 268
+    },
+    "run-1/summary.json": {
+      "sha256": "a02ccbee0384dc3759e87244b0fad67f9b09f8688876e33a73bc6507ca948e6f",
+      "bytes": 368
+    },
+    "run-2/account.csv": {
+      "sha256": "bd85bcdb8d4e613a79cb62d0903946ad10c83e63dc75f67614c159c0dbf4d184",
+      "bytes": 3
+    },
+    "run-2/fills.csv": {
+      "sha256": "bd85bcdb8d4e613a79cb62d0903946ad10c83e63dc75f67614c159c0dbf4d184",
+      "bytes": 3
+    },
+    "run-2/isolation.json": {
+      "sha256": "1bac91906d68a4ba9c5ef9902ce05f2ca53d425780b0a6bc2eb96f741d5ca164",
+      "bytes": 304
+    },
+    "run-2/positions.csv": {
+      "sha256": "bd85bcdb8d4e613a79cb62d0903946ad10c83e63dc75f67614c159c0dbf4d184",
+      "bytes": 3
+    },
+    "run-2/stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-2/stdout": {
+      "sha256": "eaab4ece04a1ab6757655949b7480fec58ec0aa1f9c75c77ba9b6188a0a4285f",
+      "bytes": 268
+    },
+    "run-2/summary.json": {
+      "sha256": "a02ccbee0384dc3759e87244b0fad67f9b09f8688876e33a73bc6507ca948e6f",
+      "bytes": 368
+    },
+    "run-3/account.csv": {
+      "sha256": "2237e2b39391f2a3a3be8337b60ada25d4f05206aeeffa72b29ae490fe6f5751",
+      "bytes": 134786
+    },
+    "run-3/cleanup.json": {
+      "sha256": "dc4fb1fe0b0610c58259993aacdc975e114d864967d6fab5e66d489cdd7cf36b",
+      "bytes": 89
+    },
+    "run-3/fills.csv": {
+      "sha256": "f9fff44e676d38581a7fe5f6fbe7daae6d831d694b47ccad17d22b119946be31",
+      "bytes": 277736
+    },
+    "run-3/isolation.json": {
+      "sha256": "9ecb8d81549f124f3c877f28f20062ec881bb90e26d506e827d76bdfe7e5c6a8",
+      "bytes": 304
+    },
+    "run-3/positions.csv": {
+      "sha256": "5c354704a1d84d7a2120e096108ccccaa2daee5413b563214abdc6bef4fee615",
+      "bytes": 800929
+    },
+    "run-3/stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-3/stdout": {
+      "sha256": "dba377f02a25b2ac3a7ae7fc2820fc53c8444a73355f67778a9b8cfa88ec377a",
+      "bytes": 5115
+    },
+    "run-3/summary.json": {
+      "sha256": "6eee92f368d36683ede7079f6c4b376ee9c7ff41d942b4cc01671e27f4c4b8f2",
+      "bytes": 7581
+    },
+    "run-4/account.csv": {
+      "sha256": "2237e2b39391f2a3a3be8337b60ada25d4f05206aeeffa72b29ae490fe6f5751",
+      "bytes": 134786
+    },
+    "run-4/cleanup.json": {
+      "sha256": "dc4fb1fe0b0610c58259993aacdc975e114d864967d6fab5e66d489cdd7cf36b",
+      "bytes": 89
+    },
+    "run-4/fills.csv": {
+      "sha256": "45453ac7b546a53d665594501de9a59c1b6cfa6ebb2bb3270fcc169b2429e817",
+      "bytes": 277736
+    },
+    "run-4/isolation.json": {
+      "sha256": "faf33ff006c50ee81b723497ce236be26a30289eba8d8700c73ac2b3b4a517f4",
+      "bytes": 304
+    },
+    "run-4/positions.csv": {
+      "sha256": "3004e50565991a26df56570a26bda5825ea6232043f4f257092e1a431abb3bc8",
+      "bytes": 800929
+    },
+    "run-4/stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "run-4/stdout": {
+      "sha256": "95c111f9979d3c1e1777cc8e65b1bcc8f923f129a4b6942d9de848e6672cf1c7",
+      "bytes": 5115
+    },
+    "run-4/summary.json": {
+      "sha256": "86cd829d571213a82b5566656d4ce8a583e9da30619644f3767a6c3615674a75",
+      "bytes": 7581
+    },
+    "source-fetch.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "source-fetch.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "uv-version.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "uv-version.stdout": {
+      "sha256": "dd643ebda7165a77a7fe3c9f445ec1a2cfebe1bfe0329015937763dce919c33d",
+      "bytes": 38
+    },
+    "venv.stderr": {
+      "sha256": "eb67d26cabaff77052aee38927d34e5d194250ee4afbdcecd541a88e4d9c2ece",
+      "bytes": 155
+    },
+    "venv.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  "private_receipt_sha256": "e412341dc02c60a65d666992ec48d6df0f4b9b577ac9e34ad4eeba7eacd15017",
+  "published_observer_path": "blueprints/us-equities/engine-nautilus/observe_quickstart.py",
+  "published_observer_sha256": "b5cb94472619f6cd5432b7e410f4657fcf8db966fada9032c7dc188739565d30"
+}

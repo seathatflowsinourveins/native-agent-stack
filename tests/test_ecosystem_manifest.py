@@ -395,6 +395,161 @@ class EcosystemManifestTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("must be selected and unique", result.stdout)
 
+    def grand_catalog_fixture(self):
+        self.config["grand_catalogs"] = {
+            "foundation_manifest": "catalogs/foundation/manifest.json",
+            "foundation_decisions": "catalogs/foundation/decisions.json",
+            "trading_target": "catalogs/us-equities/runtime-target.json",
+        }
+        layer = {"id": "retrieval", "title": "Retrieval", "purpose": "Find the needed source",
+                 "selection": "Use a focused lane", "activation": "On demand",
+                 "lifecycle_scope": "One scoped index", "next_gap": "Restore on a new host"}
+        self.foundation = {"schema_version": 1, "scope": "General engineering",
+                           "layers": [layer], "top_gaps": []}
+        self.decisions = {"schema_version": 1, "decisions": [
+            {"id": "search-use", "capability": "Find a source", "layer_ids": ["retrieval"],
+             "selection": "default", "review_status": "accepted_within_scope", "activation": "On demand",
+             "component_ids": ["search"], "evidence_ids": ["historical-only"],
+             "evidence_scope": "Only the retained search fixture", "limitations": ["No recovery test"],
+             "source_paths": ["evidence/history.json"], "next_gap": "Restore the index",
+             "lifecycle": {"scope": "Dated fixture", "unknown": "Recovery", "stage_refs": []},
+             "supersedes": []},
+            {"id": "search-recovery", "capability": "Restore a source index", "layer_ids": ["retrieval"],
+             "selection": "trial", "review_status": "not_established", "activation": "When needed",
+             "component_ids": ["search"], "evidence_ids": [], "evidence_scope": "No recovery execution",
+             "limitations": [], "source_paths": [], "next_gap": "Run a restore fixture",
+             "lifecycle": {"scope": "Unmeasured", "unknown": "All recovery", "stage_refs": []},
+             "supersedes": []},
+        ]}
+        self.trading = {"schema_version": 1, "scope": "Trading-specific acceptance",
+                        "engine": {"repository": "https://github.com/example/engine", "requested_version": "2.0rc5",
+                                   "source_commit": "c" * 40, "acceptance": "source review",
+                                   "sources": ["https://example.org/engine"]},
+                        "broker_boundaries": [{"id": "alpaca", "selected_path": "Read-only data",
+                                               "local_broker_execution_acceptance": "not_established",
+                                               "sources": ["https://example.org/broker"]}],
+                        "accepted_reference_paths": ["evidence/history.json"],
+                        "next_acceptance": [{"id": "replay", "scope": "Run a retained fixture"}],
+                        "limitations": ["No broker orders"]}
+        for path in ("docs/harness-defaults.md", "catalogs/README.md", "catalogs/foundation/README.md"):
+            self.write(path, "# General foundation\n\nSelect only the needed layer.")
+        self.save_grand_catalogs()
+
+    def save_grand_catalogs(self):
+        self.write(self.config["grand_catalogs"]["foundation_manifest"], self.foundation)
+        self.write(self.config["grand_catalogs"]["foundation_decisions"], self.decisions)
+        self.write(self.config["grand_catalogs"]["trading_target"], self.trading)
+        self.save()
+
+    def test_optional_catalogs_absent_preserves_repository_discovery(self):
+        page, _ = self.build()
+        data = json.loads(page.data)
+        self.assertIsNone(data.get("grand_catalogs"))
+        self.assertEqual(len(data["repositories"]), 2)
+
+    def test_foundation_joins_exact_capability_receipts_and_current_component_pin(self):
+        self.stack["components"][0]["source_pin"] = "d" * 40
+        self.grand_catalog_fixture()
+        page, _ = self.build()
+        data = json.loads(page.data)
+        self.assertIn("grand_catalogs", data, "Configured catalogs need a first-class payload")
+        foundation = data["grand_catalogs"]["foundation"]
+        accepted, untested = foundation["decisions"]
+        self.assertEqual(accepted["components"][0]["version"], "1.0")
+        self.assertEqual(accepted["components"][0].get("source_pin"), "d" * 40)
+        self.assertEqual([r["id"] for r in accepted["receipts"]], ["historical-only"])
+        self.assertEqual(accepted["evidence_scope"], "Only the retained search fixture")
+        self.assertEqual(untested["receipts"], [])
+        self.assertEqual(untested["review_status"], "not_established")
+        self.assertEqual(foundation["counts"], {"layers": 1, "capabilities": 2, "accepted": 1, "components": 1})
+        self.assertEqual(foundation["layers"][0]["next_gap"], "Restore on a new host")
+        self.assertEqual(data["grand_catalogs"]["trading"]["engine"]["requested_version"], "2.0rc5")
+        self.assertEqual(data["grand_catalogs"]["trading"]["broker_boundaries"][0]
+                         ["local_broker_execution_acceptance"], "not_established")
+        self.assertEqual(len(data["grand_catalogs"]["trading"]["accepted_references"]), 1)
+
+    def test_catalog_inputs_and_foundation_guides_are_hashed_and_publicly_linked(self):
+        self.grand_catalog_fixture()
+        page, _ = self.build()
+        data = json.loads(page.data)
+        sources = {row["path"]: row for row in data["inputs"]}
+        for path in self.config["grand_catalogs"].values():
+            self.assertIn(path, sources)
+            self.assertEqual(sources[path]["sha256"], hashlib.sha256((self.root / path).read_bytes()).hexdigest())
+        recipes = {row["path"]: row for row in data["setup"]["recipes"]}
+        for path in ("docs/harness-defaults.md", "catalogs/README.md", "catalogs/foundation/README.md"):
+            self.assertIn(path, recipes)
+            self.assertIn("/blob/main/", recipes[path]["url"])
+        self.assertIn("/blob/main/catalogs/foundation/", data["grand_catalogs"]["foundation"]["url"])
+        self.foundation["layers"][0]["next_gap"] = "A changed next check"
+        self.save_grand_catalogs()
+        self.assertNotEqual(self.run_generator("--check").returncode, 0)
+
+    def test_catalog_references_must_resolve_before_publication(self):
+        self.grand_catalog_fixture()
+        for field, invalid, message in (
+            ("component_ids", ["unknown"], "unknown component"),
+            ("evidence_ids", ["unknown"], "unknown receipt"),
+            ("layer_ids", ["unknown"], "unknown foundation layer"),
+            ("source_paths", ["../private.json"], "confined"),
+        ):
+            with self.subTest(field=field):
+                row = self.decisions["decisions"][0]
+                original = row[field]
+                row[field] = invalid
+                self.save_grand_catalogs()
+                result = self.run_generator("--write")
+                self.assertNotEqual(result.returncode, 0, field)
+                self.assertIn(message, result.stdout)
+                row[field] = original
+
+    def test_catalog_source_text_is_inert_and_unsafe_external_links_are_removed(self):
+        self.grand_catalog_fixture()
+        hostile = '</script><img src="https://evil.example/steal"><script>alert(1)</script>'
+        self.decisions["decisions"][0]["capability"] = hostile
+        self.trading["engine"]["sources"] = ["javascript:alert(1)", "https://good.example/engine"]
+        self.trading["broker_boundaries"][0]["sources"] = ["https://user:secret@example.org/"]
+        self.save_grand_catalogs()
+        page, _ = self.build()
+        self.assertEqual(len(page.scripts), 2)
+        self.assertEqual(page.external_assets, [])
+        data = json.loads(page.data)
+        self.assertIn("grand_catalogs", data)
+        catalogs = data["grand_catalogs"]
+        self.assertEqual(catalogs["foundation"]["decisions"][0]["capability"], hostile)
+        self.assertEqual(catalogs["trading"]["engine"]["sources"], ["https://good.example/engine"])
+        self.assertEqual(catalogs["trading"]["broker_boundaries"][0]["sources"], [])
+
+    def test_catalog_trading_reference_cannot_escape_repository(self):
+        self.grand_catalog_fixture()
+        self.trading["accepted_reference_paths"] = ["../private.json"]
+        self.save_grand_catalogs()
+        self.assertNotEqual(self.run_generator("--write").returncode, 0)
+
+    def test_catalog_structured_supersession_preserves_scope_and_reason(self):
+        self.grand_catalog_fixture()
+        current = self.decisions["decisions"][0]
+        current.update(capability_key="scoped-search", checked_at="2026-09-20", candidate=None)
+        previous = dict(current, id="search-use-previous", checked_at="2026-09-19")
+        self.decisions["decisions"].append(previous)
+        supersession = {"decision_id": previous["id"], "scope": "The same retained search fixture",
+                        "reason": "A later bounded acceptance replaces the earlier decision"}
+        current["supersedes"] = [supersession]
+        self.save_grand_catalogs()
+        page, _ = self.build()
+        decision = json.loads(page.data)["grand_catalogs"]["foundation"]["decisions"][0]
+        self.assertEqual(decision["supersedes"], [supersession])
+        self.assertEqual(decision["components"][0]["id"], "search")
+
+    def test_catalog_structured_supersession_rejects_unknown_decision(self):
+        self.grand_catalog_fixture()
+        self.decisions["decisions"][0]["supersedes"] = [{
+            "decision_id": "unknown", "scope": "Same capability", "reason": "Later acceptance"}]
+        self.save_grand_catalogs()
+        result = self.run_generator("--write")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("supersedes an unknown decision", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

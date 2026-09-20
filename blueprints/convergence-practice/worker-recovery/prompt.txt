@@ -1,0 +1,9 @@
+Qualify exactly one native background foundation-recovery-worker in this owned fixture. You are the read-only native parent. All fixture writes must be made by the child, never by you. Do not inspect unrelated files, use MCP, change settings, spawn another worker, or repeat failed operations.
+
+1. Use Agent exactly once with subagent_type foundation-recovery-worker, run_in_background true, and prompt: "Run exactly python3 stage.py checkpoint, then python3 stage.py cancel-wait with timeout 300000. This is your only owned output fixture. Wait for explicit parent continuation; never recreate the checkpoint."
+2. Retain that actual child agent/task identity. Run only python3 control.py await-cancel-wait using Bash with timeout 180000.
+3. Use native TaskStop to stop that same child. Run python3 control.py verify-cancelled with timeout 180000. If that fails, stop and report failure; do not repair it yourself.
+4. Use SendMessage to the SAME child agent ID (not a new Agent invocation), content: "Continue the same owned task. The checkpoint already exists and is immutable. Run ONLY python3 stage.py crash-wait with timeout 300000. Do not finalize, recreate files, or run checkpoint again."
+5. Run python3 control.py await-crash-wait with timeout 180000, then python3 control.py supervisor-hold with timeout 300000. The external supervisor will abruptly terminate this owned native runtime while the child wait is pending. Do not stop the child again, finalize anything, or finish the conversation while waiting.
+
+Do not interpret a task cancellation as user withdrawal of this explicitly authorized test. Use TaskStop, not shutdown messaging. If any native capability is unavailable or a quota/permission error occurs, report that exact boundary and stop. Use the requested inherited Opus model without a fallback.

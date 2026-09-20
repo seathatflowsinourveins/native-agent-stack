@@ -1,0 +1,735 @@
+{
+  "schema_version": 1,
+  "id": "native-tavily-cli-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "tavily-cli",
+    "codex",
+    "claude-code"
+  ],
+  "claim": "Upstream Tavily CLI0.1.8 installation, authenticated live Search/Extract and eight official skills passed scoped native discovery; Desktop-home probe required an isolated session-only SQLite path.",
+  "limitations": [
+    "Fresh native app-server discovery is not observation of the currently running Desktop skill registry.",
+    "Claude global skill listing is not a Claude model-turn execution of every skill.",
+    "Map, Crawl, Research and dynamic routing were not exercised by this bounded acceptance.",
+    "Search/Extract results do not independently establish their source claims or a complete research deliverable.",
+    "No native lifetime or exact provider-token savings counter is established.",
+    "The original Desktop SQLite failure and initial publisher-tag counting error remain retained; recovered skill count is eight."
+  ],
+  "recorded_at": "2026-09-20T18:17:15.848Z",
+  "scope": "New Linux native CLI installation and native fresh-process skill discovery; separate from previous dated explorer integration.",
+  "install": {
+    "setup_skill": "https://tavily.com/agent-setup/SKILL.md",
+    "installer": "https://cli.tavily.com/install.sh",
+    "installer_sha256": "7d1dc17e2dbe384a6c47c85e0c84c3f48bca6ab7a3994baa5fae87c4f5bc37e0",
+    "upstream_instruction": "curl -fsSL https://cli.tavily.com/install.sh | bash",
+    "actual_transport": "Fetched upstream script with Python urllib and sent its unchanged bytes to bash standard input.",
+    "selected_upstream_command": "uv tool install tavily-cli",
+    "exit_code": 0,
+    "returned_excerpt": "Installed 21 packages; tavily-cli==0.1.8; Installed 1 executable: tvly; Success! tavily-cli 0.1.8 is installed.",
+    "skills_command": [
+      "npx",
+      "--yes",
+      "skills",
+      "add",
+      "tavily-ai/skills",
+      "--skill",
+      "*",
+      "--agent",
+      "claude-code",
+      "--agent",
+      "codex",
+      "--global",
+      "--yes"
+    ],
+    "skills_exit_code": 0,
+    "skills_returned_count": 8
+  },
+  "authentication": {
+    "command": [
+      "tvly",
+      "login",
+      "--api-key",
+      "<REDACTED>",
+      "--json"
+    ],
+    "exit_code": 0,
+    "authenticated": true,
+    "native_storage_mode": "0600",
+    "credential_content_published": false
+  },
+  "commands_and_returns": [
+    {
+      "name": "tavily-search.SKILL.md",
+      "source": "<HOME>/.agents/skills/tavily-search/SKILL.md",
+      "sha256": "be3974d5763cc02d6c178fa32466767ec3ba2f4ce48ab1a7e9d926c02d6461fa"
+    },
+    {
+      "name": "tavily-extract.SKILL.md",
+      "source": "<HOME>/.agents/skills/tavily-extract/SKILL.md",
+      "sha256": "18964691b572d7857ab854a6a2b7bd0bc8ff068c83310395afbc17ae207e1316"
+    },
+    {
+      "name": "SkillsListParams.schema.json",
+      "source": "<HOME>/codex-ecosystem/state/foundation-20260920/session-env/native-config-e2e/schema/v2/SkillsListParams.json",
+      "sha256": "1d245374e64c5acc9739dfc68a4fe5114c6c9147af04c480886f1846d2ca6239"
+    },
+    {
+      "name": "prior-native-defaults-harness.cjs",
+      "source": "<HOME>/codex-ecosystem/state/foundation-20260920/defaults/check-codex-defaults.cjs",
+      "sha256": "67c5e92d072334d28ce167aaae0edd11575d1e88d8773840c492862976c99041"
+    },
+    {
+      "name": "tvly-help",
+      "command": [
+        "tvly",
+        "--help"
+      ],
+      "started": "2026-09-20T18:12:41.047Z",
+      "finished": "2026-09-20T18:12:41.180Z",
+      "exit_code": 0,
+      "signal": null,
+      "output_chars": 1024
+    },
+    {
+      "name": "tvly-version",
+      "command": [
+        "tvly",
+        "--version"
+      ],
+      "started": "2026-09-20T18:12:41.180Z",
+      "finished": "2026-09-20T18:12:41.308Z",
+      "exit_code": 0,
+      "signal": null,
+      "output_chars": 17
+    },
+    {
+      "name": "tvly-auth",
+      "command": [
+        "tvly",
+        "auth",
+        "--json"
+      ],
+      "started": "2026-09-20T18:12:41.308Z",
+      "finished": "2026-09-20T18:12:41.432Z",
+      "exit_code": 0,
+      "signal": null,
+      "authenticated": true,
+      "method": "api_key",
+      "field_names": [
+        "authenticated",
+        "method",
+        "source"
+      ],
+      "raw_status_persisted": false
+    },
+    {
+      "name": "codex-skills-cli",
+      "command": [
+        "npx",
+        "--yes",
+        "skills",
+        "list",
+        "--global",
+        "--agent",
+        "codex"
+      ],
+      "started": "2026-09-20T18:12:41.432Z",
+      "finished": "2026-09-20T18:12:41.909Z",
+      "exit_code": 0,
+      "signal": null,
+      "tavily_names": [
+        "tavily-ai",
+        "tavily-best-practices",
+        "tavily-cli",
+        "tavily-crawl",
+        "tavily-dynamic-search",
+        "tavily-extract",
+        "tavily-map",
+        "tavily-research",
+        "tavily-search"
+      ]
+    },
+    {
+      "name": "claude-skills-cli",
+      "command": [
+        "npx",
+        "--yes",
+        "skills",
+        "list",
+        "--global",
+        "--agent",
+        "claude-code"
+      ],
+      "started": "2026-09-20T18:12:41.433Z",
+      "finished": "2026-09-20T18:12:41.910Z",
+      "exit_code": 0,
+      "signal": null,
+      "tavily_names": [
+        "tavily-ai",
+        "tavily-best-practices",
+        "tavily-cli",
+        "tavily-crawl",
+        "tavily-dynamic-search",
+        "tavily-extract",
+        "tavily-map",
+        "tavily-research",
+        "tavily-search"
+      ]
+    },
+    {
+      "name": "tavily-search",
+      "command": [
+        "tvly",
+        "search",
+        "Codex CLI Claude Code native agent harness skills official documentation",
+        "--depth",
+        "basic",
+        "--max-results",
+        "4",
+        "--include-domains",
+        "developers.openai.com,code.claude.com",
+        "--json"
+      ],
+      "started": "2026-09-20T18:12:41.434Z",
+      "finished": "2026-09-20T18:12:44.414Z",
+      "exit_code": 0,
+      "signal": null,
+      "top_level_fields": [
+        "query",
+        "follow_up_questions",
+        "answer",
+        "images",
+        "results",
+        "response_time",
+        "request_id"
+      ],
+      "result_count": 4,
+      "failed_count": null,
+      "results": [
+        {
+          "url": "https://code.claude.com/docs/en/sub-agents",
+          "title": "Create custom subagents - Claude Code Docs",
+          "content_chars": 1095
+        },
+        {
+          "url": "https://code.claude.com/docs/en/cli-reference",
+          "title": "CLI reference - Claude Code Docs",
+          "content_chars": 1445
+        },
+        {
+          "url": "https://code.claude.com/docs/en/overview",
+          "title": "Overview - Claude Code Docs",
+          "content_chars": 1450
+        },
+        {
+          "url": "https://code.claude.com/docs/en/agent-sdk/overview",
+          "title": "Agent SDK overview - Claude Code Docs",
+          "content_chars": 849
+        }
+      ]
+    },
+    {
+      "name": "tavily-extract",
+      "command": [
+        "tvly",
+        "extract",
+        "https://code.claude.com/docs/en/sub-agents",
+        "--extract-depth",
+        "basic",
+        "--query",
+        "native command line agent harness skills configuration",
+        "--chunks-per-source",
+        "3",
+        "--timeout",
+        "30",
+        "--json"
+      ],
+      "started": "2026-09-20T18:12:44.414Z",
+      "finished": "2026-09-20T18:12:44.789Z",
+      "exit_code": 0,
+      "signal": null,
+      "top_level_fields": [
+        "results",
+        "failed_results",
+        "response_time",
+        "request_id"
+      ],
+      "result_count": 1,
+      "failed_count": 0,
+      "results": [
+        {
+          "url": "https://code.claude.com/docs/en/sub-agents",
+          "title": "Create custom subagents - Claude Code Docs",
+          "content_chars": 2052
+        }
+      ]
+    }
+  ],
+  "expected_skills": [
+    "tavily-best-practices",
+    "tavily-cli",
+    "tavily-crawl",
+    "tavily-dynamic-search",
+    "tavily-extract",
+    "tavily-map",
+    "tavily-research",
+    "tavily-search"
+  ],
+  "native_discovery": {
+    "name": "native-codex-skills",
+    "config_home": "<NATIVE_CODEX_HOME>",
+    "started": "2026-09-20T18:12:44.793Z",
+    "finished": "2026-09-20T18:12:44.989Z",
+    "tavily_names": [
+      "tavily-best-practices",
+      "tavily-cli",
+      "tavily-crawl",
+      "tavily-dynamic-search",
+      "tavily-extract",
+      "tavily-map",
+      "tavily-research",
+      "tavily-search"
+    ],
+    "tavily_count": 8,
+    "missing": [],
+    "skills": [
+      {
+        "name": "tavily-best-practices",
+        "path": "<HOME>/.agents/skills/tavily-best-practices/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      },
+      {
+        "name": "tavily-cli",
+        "path": "<HOME>/.agents/skills/tavily-cli/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      },
+      {
+        "name": "tavily-crawl",
+        "path": "<HOME>/.agents/skills/tavily-crawl/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      },
+      {
+        "name": "tavily-dynamic-search",
+        "path": "<HOME>/.agents/skills/tavily-dynamic-search/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      },
+      {
+        "name": "tavily-extract",
+        "path": "<HOME>/.agents/skills/tavily-extract/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      },
+      {
+        "name": "tavily-map",
+        "path": "<HOME>/.agents/skills/tavily-map/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      },
+      {
+        "name": "tavily-research",
+        "path": "<HOME>/.agents/skills/tavily-research/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      },
+      {
+        "name": "tavily-search",
+        "path": "<HOME>/.agents/skills/tavily-search/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      }
+    ],
+    "discovery_errors": [],
+    "model_turns": 0,
+    "passed": true,
+    "exit": {
+      "code": 0,
+      "signal": null
+    },
+    "child_closed": true
+  },
+  "desktop_initial_failure": {
+    "name": "desktop-home-codex-skills",
+    "config_home": "<DESKTOP_CODEX_HOME>",
+    "started": "2026-09-20T18:12:45.013Z",
+    "finished": "2026-09-20T18:13:16.622Z",
+    "error": "Error: initialize timed out",
+    "model_turns": 0,
+    "passed": false,
+    "exit": {
+      "code": 1,
+      "signal": null
+    },
+    "child_closed": true
+  },
+  "desktop_recovery": {
+    "name": "desktop-home-isolated-state-codex-skills",
+    "config_home": "<DESKTOP_CODEX_HOME>",
+    "started": "2026-09-20T18:15:05.793Z",
+    "finished": "2026-09-20T18:15:15.947Z",
+    "tavily_names": [
+      "tavily-best-practices",
+      "tavily-cli",
+      "tavily-crawl",
+      "tavily-dynamic-search",
+      "tavily-extract",
+      "tavily-map",
+      "tavily-research",
+      "tavily-search"
+    ],
+    "tavily_count": 8,
+    "missing": [],
+    "skills": [
+      {
+        "name": "tavily-best-practices",
+        "path": "<HOME>/.agents/skills/tavily-best-practices/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      },
+      {
+        "name": "tavily-cli",
+        "path": "<HOME>/.agents/skills/tavily-cli/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      },
+      {
+        "name": "tavily-crawl",
+        "path": "<HOME>/.agents/skills/tavily-crawl/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      },
+      {
+        "name": "tavily-dynamic-search",
+        "path": "<HOME>/.agents/skills/tavily-dynamic-search/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      },
+      {
+        "name": "tavily-extract",
+        "path": "<HOME>/.agents/skills/tavily-extract/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      },
+      {
+        "name": "tavily-map",
+        "path": "<HOME>/.agents/skills/tavily-map/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      },
+      {
+        "name": "tavily-research",
+        "path": "<HOME>/.agents/skills/tavily-research/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      },
+      {
+        "name": "tavily-search",
+        "path": "<HOME>/.agents/skills/tavily-search/SKILL.md",
+        "scope": "user",
+        "enabled": true
+      }
+    ],
+    "discovery_errors": [],
+    "model_turns": 0,
+    "passed": true,
+    "exit": {
+      "code": 0,
+      "signal": null
+    },
+    "child_closed": true
+  },
+  "desktop_recovery_scope": "The native home passed directly. The Desktop home initially failed SQLite initialization; a fresh native app-server using that unchanged CODEX_HOME with a session-only sqlite_home override was tested separately. No ongoing Desktop process registry or private active transport was accessed. npx skill listings verify installation for the named agents, not an actual Claude model turn.",
+  "skill_listing": {
+    "codex-skills-cli": {
+      "name": "codex-skills-cli",
+      "command": [
+        "npx",
+        "--yes",
+        "skills",
+        "list",
+        "--global",
+        "--agent",
+        "codex"
+      ],
+      "started": "2026-09-20T18:12:41.432Z",
+      "finished": "2026-09-20T18:12:41.909Z",
+      "exit_code": 0,
+      "signal": null,
+      "tavily_names": [
+        "tavily-best-practices",
+        "tavily-cli",
+        "tavily-crawl",
+        "tavily-dynamic-search",
+        "tavily-extract",
+        "tavily-map",
+        "tavily-research",
+        "tavily-search"
+      ],
+      "tavily_count": 8
+    },
+    "claude-skills-cli": {
+      "name": "claude-skills-cli",
+      "command": [
+        "npx",
+        "--yes",
+        "skills",
+        "list",
+        "--global",
+        "--agent",
+        "claude-code"
+      ],
+      "started": "2026-09-20T18:12:41.433Z",
+      "finished": "2026-09-20T18:12:41.910Z",
+      "exit_code": 0,
+      "signal": null,
+      "tavily_names": [
+        "tavily-best-practices",
+        "tavily-cli",
+        "tavily-crawl",
+        "tavily-dynamic-search",
+        "tavily-extract",
+        "tavily-map",
+        "tavily-research",
+        "tavily-search"
+      ],
+      "tavily_count": 8
+    }
+  },
+  "parser_correction": "Initial installation-list name matching included the tavily-ai publisher tag; corrected receipts count only the eight exact installed skill names. Original source output and original receipts retained.",
+  "cleanup": {
+    "checked_at": "2026-09-20T18:16:02.420Z",
+    "remaining_probe_processes": []
+  },
+  "model_turns": 0,
+  "private_artifact_hashes": [
+    {
+      "name": "desktop-home-codex-skills.stdout.private.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "codex-skills-cli.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "tavily-extract.SKILL.md",
+      "bytes": 3475,
+      "sha256": "18964691b572d7857ab854a6a2b7bd0bc8ff068c83310395afbc17ae207e1316"
+    },
+    {
+      "name": "desktop-home-codex-skills.receipt.json",
+      "bytes": 327,
+      "sha256": "72c89d9a84b26d0802fbc287c7297fce72224f84e6d11c2d87616460912e8ff0"
+    },
+    {
+      "name": "codex-skills-cli.corrected-receipt.json",
+      "bytes": 490,
+      "sha256": "ff9da41545663afcf6c3e825ec2eb61a4d921e5eb78d0d041588987a1340c183"
+    },
+    {
+      "name": "tavily-extract.receipt.json",
+      "bytes": 762,
+      "sha256": "2661bd6e426c22621e25b1291f052bebd7ae38dce0b1358f5225898f896aa3ac"
+    },
+    {
+      "name": "desktop-home-isolated-state-codex-skills.stdout.private.txt",
+      "bytes": 25237,
+      "sha256": "391bc9922ff8db361b3ecaab395023bc1780fabf346c9f36a936f4a359eb6b9d"
+    },
+    {
+      "name": "native-codex-skills.stderr.private.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "tvly-help.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "desktop-home-isolated-state-codex-skills.receipt.json",
+      "bytes": 1857,
+      "sha256": "12b3841f263ad9fbe530c965249cf00a0461f33928cdcb6e1445515324147e46"
+    },
+    {
+      "name": "tvly-version.receipt.json",
+      "bytes": 218,
+      "sha256": "bb90936e13034f67dc155e1dcf5b06156d99d69b57e34dcfaafafe9b913a26f2"
+    },
+    {
+      "name": "native-codex-skills.receipt.json",
+      "bytes": 1829,
+      "sha256": "edc5eb5ececae64020b1293b556380cfb09b6c58b53db6add5cd7d66c4559460"
+    },
+    {
+      "name": "accept.initial.cjs",
+      "bytes": 9537,
+      "sha256": "256588db820f02e04927606d4bbfbb962752a91d6cae36226ab7ac634419e4ec"
+    },
+    {
+      "name": "claude-skills-cli.stdout.txt",
+      "bytes": 1294,
+      "sha256": "7b50438a6729e8d48e60d616e35d595a8dc36ac53878c981f052e1657ef4cadb"
+    },
+    {
+      "name": "RECEIPT.md",
+      "bytes": 4180,
+      "sha256": "951b2bac54b1d5ecf336c9237b6fec00a2522ea73fc9de48d35d8b1991ce1df2"
+    },
+    {
+      "name": "SkillsListParams.schema.json",
+      "bytes": 453,
+      "sha256": "1d245374e64c5acc9739dfc68a4fe5114c6c9147af04c480886f1846d2ca6239"
+    },
+    {
+      "name": "codex-skills-cli.stdout.txt",
+      "bytes": 1364,
+      "sha256": "0800aa52cdc6545eb9cf34efc3b4e5c8cf5a2d5b634461f564aff0c4d3b4cf22"
+    },
+    {
+      "name": "tavily-search.SKILL.md",
+      "bytes": 4138,
+      "sha256": "be3974d5763cc02d6c178fa32466767ec3ba2f4ce48ab1a7e9d926c02d6461fa"
+    },
+    {
+      "name": "tavily-search.receipt.json",
+      "bytes": 1252,
+      "sha256": "2e1540a6c07b8a19bf67a3d6db201ac654d660d58781f5b1803877ca77a7bb7d"
+    },
+    {
+      "name": "tavily-search.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "codex-skills-cli.receipt.json",
+      "bytes": 486,
+      "sha256": "f3e08beb5b1e9e0f5ae10672bd0de8172ba72fee2068a6caccd228e6f8a923a9"
+    },
+    {
+      "name": "tavily-extract.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "native-codex-skills.stdout.private.txt",
+      "bytes": 23729,
+      "sha256": "e200059c0181cbed02419ad65cf61bb68edf7b5213aa6e27b3fc4f2111db6033"
+    },
+    {
+      "name": "native-codex-skills.rpc.private.json",
+      "bytes": 34049,
+      "sha256": "fef13a59c1505ae1fa4a7ffb48585ce29c02794286362405265a019b96c8da29"
+    },
+    {
+      "name": "claude-skills-cli.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "tvly-auth.receipt.json",
+      "bytes": 355,
+      "sha256": "66b79641fae2cd3d0482d8d801e30d41dae6357f53733d803431f6ff803dc11b"
+    },
+    {
+      "name": "claude-skills-cli.corrected-receipt.json",
+      "bytes": 497,
+      "sha256": "e70434eb391c1e8638050c4db8f30064ff9cc63c2acb5b73c9ccbdda8469b811"
+    },
+    {
+      "name": "desktop-home-codex-skills.rpc.private.json",
+      "bytes": 649,
+      "sha256": "649054db01c954a41577b342b1f6af269e4f904b4443a6d6e4db27d572d0cff2"
+    },
+    {
+      "name": "tvly-version.stdout.txt",
+      "bytes": 17,
+      "sha256": "c73223cbe97117324b832cfd3511f10dca1401e0d0c0e3dff251669700cbbe34"
+    },
+    {
+      "name": "desktop-home-isolated-state-codex-skills.rpc.private.json",
+      "bytes": 36242,
+      "sha256": "3581d30027f5b921c1d0c8585b376efe4a7c6877cf33a024f231566dc80b7b47"
+    },
+    {
+      "name": "acceptance-summary.private.json",
+      "bytes": 12239,
+      "sha256": "a88346d1705d926ffd05e450cfae2ea00688624c97640cde5ace8979f908b226"
+    },
+    {
+      "name": "prior-native-defaults-harness.cjs",
+      "bytes": 3940,
+      "sha256": "67c5e92d072334d28ce167aaae0edd11575d1e88d8773840c492862976c99041"
+    },
+    {
+      "name": "desktop-home-codex-skills.stderr.private.txt",
+      "bytes": 146,
+      "sha256": "d8a5bb2a494d327adae716b863927450e8a2396aa81f15b6720a90d6a22a9efd"
+    },
+    {
+      "name": "tvly-auth.sanitized.json",
+      "bytes": 156,
+      "sha256": "1623abc2d6b8a1a2c360e6e66c85683c4aadfd9e466caac412183c3f48f17f53"
+    },
+    {
+      "name": "claude-skills-cli.receipt.json",
+      "bytes": 493,
+      "sha256": "de928c76a28c9b497ef1bcdac34978b37eec6841347fda904ae265b1a89ed705"
+    },
+    {
+      "name": "accept.cjs",
+      "bytes": 9813,
+      "sha256": "d0aedb273237686e82b8805b786b1d19adb56ce041fcf7633639b9bbad9f6e5e"
+    },
+    {
+      "name": "tvly-version.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "tavily-search.stdout.json",
+      "bytes": 6040,
+      "sha256": "6366b15f946b21c8c1ece0561fd7fd47280535a97ff410524d7d2d7921420ce4"
+    },
+    {
+      "name": "tvly-help.stdout.txt",
+      "bytes": 1034,
+      "sha256": "c0f9bb013b6b13cece4fa29817f20a7fc9d0a6a72293b8c8c3881264bfcb6deb"
+    },
+    {
+      "name": "desktop-home-isolated-state-codex-skills.stderr.private.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "tavily-extract.stdout.json",
+      "bytes": 2401,
+      "sha256": "df8a2ff1f647acfc5bd088ebdca700c8cfd0328ff15cbca6d1a15e1749bb973a"
+    },
+    {
+      "name": "tvly-help.receipt.json",
+      "bytes": 214,
+      "sha256": "d715effad7f507aee5d39133d79de5213357400586e8fb7d7719fd80483f7e05"
+    },
+    {
+      "name": "recover-desktop.cjs",
+      "bytes": 2072,
+      "sha256": "4add4c0090549aaeb0be972a64bc0cf1de5df83bf215f21e2e7f6d09f62ffdfa"
+    },
+    {
+      "name": "cleanup.receipt.json",
+      "bytes": 82,
+      "sha256": "2c222ebf007ea11d2a8356bd3084d688da640f812a88f6d8cba43d990826c826"
+    },
+    {
+      "name": "acceptance-summary.private.json",
+      "bytes": 12239,
+      "sha256": "a88346d1705d926ffd05e450cfae2ea00688624c97640cde5ace8979f908b226"
+    }
+  ]
+}

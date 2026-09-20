@@ -1,0 +1,106 @@
+{
+  "reviewed_at": "2026-09-20T18:43:07.452860+00:00",
+  "scope": "Independent read-only integrated Foundation/Trading catalog review; own native agent-browser session closed.",
+  "source_git_head": "7229e7f4f5ac5549c4c959888fb231f287b3464a",
+  "html_sha256": "eefb2d6c20178045b4fe7e5794c6beea20bab5778441ecb5afa09bdc5b494bf1",
+  "reviewed_files": [
+    "scripts/build_ecosystem.py",
+    "docs/ecosystem/template.html",
+    "tests/test_ecosystem_manifest.py",
+    "adoption/manifest.json",
+    "blueprints/token-native-focus/saturation-audit.json",
+    "manifests/stack.json",
+    "catalogs/foundation/manifest.json",
+    "catalogs/foundation/decisions.json",
+    "catalogs/us-equities/runtime-target.json",
+    "docs/harness-defaults.md",
+    "catalogs/README.md",
+    "recipes/tavily.md",
+    "blueprints/us-equities/engine-nautilus/README.md"
+  ],
+  "observed_checks": {
+    "foundation_initial": "16 layers / 40 distinct capabilities / 36 accepted within scope / 61 component joins",
+    "tavily_search": "2 layers / 1 distinct capability; layer=web-research plus accepted filter => 1 layer / 1 capability",
+    "empty_filter": "0 layers / 0 capabilities, explicit no-match message",
+    "expand": "Layer + capability + exact pin/evidence/lifecycle rendered; Enter toggles summary closed then reopened",
+    "keyboard_tabs": "ArrowRight from Foundation selected and focused Trading and set #trading hash",
+    "mobile_dialog": "Harness defaults dialog width354px on390px viewport; Escape closed",
+    "desktop_layout": "1440px viewport/document width1440; screenshot inspected",
+    "mobile_layout": "390px viewport/document width390 for both Foundation and Trading; expanded cards inspected",
+    "trading": "Nautilus2.0.0rc5; IBKR+Alpaca; both broker execution not established; Elite1000 API calls/min notfills; marketdata10000/200 and history2016 displayed with boundaries",
+    "primary_link": "Clicked release source opened new owned tab; title Release NautilusTrader2.0.0rc5 and exact GitHub tagURL verified",
+    "js_errors": "Native errors command returned no entries (retained empty file)",
+    "cleanup": "Native close exit0 Browser closed"
+  },
+  "browser_final_dom": {
+    "captured_at": "2026-09-20T18:43:06.758Z",
+    "page": "docs/ecosystem/index.html#foundation",
+    "viewport": {
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390
+    },
+    "counts": {
+      "accepted": 36,
+      "capabilities": 40,
+      "components": 61,
+      "layers": 16
+    },
+    "source_revision": "61dbf7821f9184461a1fd26adb872063188a0201",
+    "filteredResult": "1 layers \u00b7 1 distinct capabilities shown. A capability can belong to more than one layer.",
+    "engineRequested": "2.0.0rc5",
+    "brokerIds": [
+      "ibkr",
+      "alpaca"
+    ],
+    "unsafeLinks": 0,
+    "localPageExternalResources": 0,
+    "overflow": []
+  },
+  "limitations": [
+    "Source pin/publication URLs pending parent final source commit and regeneration.",
+    "No provider/broker execution or broad regression rerun performed.",
+    "Previously reported101 focused tests are coordinator evidence, not rerun during UI review."
+  ],
+  "actionable_findings": [],
+  "private_artifact_hashes": [
+    {
+      "path": "browser-errors.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "browser-final-dom.txt",
+      "sha256": "cf668bbd7ca5153afd47dc020a76cbb8d1cf6c48e17ab5300bd27e5e79b7c7aa",
+      "bytes": 624
+    },
+    {
+      "path": "foundation-mobile-expanded.png",
+      "sha256": "cccbd8e558e4f6bd2ae40feba95e9cc870c1d9354400e3c0aa5bdd0016e32655",
+      "bytes": 68654
+    },
+    {
+      "path": "foundation-mobile.png",
+      "sha256": "9dc56b3237421d1ee9967ab6137fc743314f33f39224f4561a34e1ce98fe7766",
+      "bytes": 67682
+    },
+    {
+      "path": "trading-desktop.png",
+      "sha256": "4c31dd4471d60041e5f284df445ac3b558144404947b792bcb4865486f156e1b",
+      "bytes": 150491
+    },
+    {
+      "path": "trading-mobile.png",
+      "sha256": "683b7ced639ba4827142fb8e22876589a4cdfd0f5d4688e7bf5ed862b23edcba",
+      "bytes": 60651
+    }
+  ],
+  "schema_version": 1,
+  "id": "foundation-catalog-ui-20260920",
+  "kind": "artifact_measurement",
+  "component_ids": [
+    "agent-browser"
+  ],
+  "claim": "Independent native-browser inspection of the Foundation/Trading catalog passed capability filtering, source navigation, keyboard interaction, scoped evidence rendering and desktop/mobile layout with no page errors.",
+  "private_review_sha256": "7aab8593558e69bc178fda7c7dd117b959502d08459bbc78821fae896d1955bb"
+}

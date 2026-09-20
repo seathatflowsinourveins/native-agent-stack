@@ -1,9 +1,13 @@
 # North star: evidence-led US-equities automation
 
-The target is a system that moves from reproducible research to an observable,
-recoverable **Alpaca paper** runtime. The present deliverable is its native
-research/backtest foundation and examined [grand catalog](../../catalogs/us-equities/README.md).
-It is not a deployed broker service or a validated profitable strategy.
+The selected destination is reproducible research and simulation leading to
+observable, recoverable **IBKR and Alpaca paper** runtimes. The requested engine
+target is **NautilusTrader 2.0.0rc5**. Its IBKR integration and the separate Alpaca
+execution boundary need their own acceptance. LEAN remains an accepted historical
+comparison engine; its results do not establish Nautilus or broker parity.
+The [trading catalog](../../catalogs/us-equities/README.md) is separate from the
+general [native harness foundation](../../catalogs/foundation/README.md).
+This is not a deployed broker service or a validated profitable strategy.
 
 The current [architecture and next-role contract](architecture/README.md) records
 the latest research wave, official Alpaca limits, native SDK compatibility gap,
@@ -19,9 +23,10 @@ simulation realism requirements and platform-specific acceptance.
 | Retrieval | QMD for scoped Markdown; Serena for symbols; SocratiCode → Nemotron → Qdrant for code | Local automatic code refresh proved; no financial corpus implied |
 | Optional routing | OmniRoute for deliberately selected, independently verified routes | Healthy; prior Opus/Qwen and new bounded Astra text proof; full native parity unproved |
 | Optional research orchestration | DeerFlow stable 2.0 reference; pinned development backend/ACP exploration | Embedded native ACP inference proved; full planner/UI hosting pending |
-| Market/filing ingestion | Alpaca SDK plus SEC-sourced filings; alternative commercial feeds only with entitlement | SDK installed; financial ingestion and account access pending |
+| Market/filing ingestion | Alpaca SDK plus SEC-sourced filings; alternative commercial feeds only with entitlement | Bounded authenticated AAPL SIP bars/actions and FB/META identity observations accepted; current Elite routing/throughput and a point-in-time market-wide corpus remain unverified |
 | Research data | Immutable raw snapshots, Parquet and DuckDB; exchange calendars | Native sample-event pipeline proved |
-| Engine | LEAN native source build, one engine-owned paper adapter later | Bundled backtest proved; patched build and source-integrated adapter evidence recorded; credentialed runtime pending |
+| Engine | Requested NautilusTrader 2.0.0rc5; retain LEAN as the historical comparison | Exact prerelease verified; each engine's native execution and data-equivalence results require separate receipts |
+| Broker adapters | Native Nautilus IBKR adapter; Alpaca through a separately validated deterministic adapter | Upstream Nautilus integration list has no Alpaca adapter; socket/API availability is not broker execution acceptance |
 | Strategy research | Simple lagged baselines, then selected Qlib/statistical/portfolio tools | Catalogued; no strategy accepted or performance asserted |
 | Execution state | Separate deterministic order writer, durable journal and broker reconciliation | Design requirement, not implemented |
 | Hosting | On-demand native research and Dagu history service now; dedicated identity for paper later | No new cloud account or standing trading service |
@@ -41,11 +46,12 @@ flowchart TB
     memory[Scoped ai-memory + code context] --> research
     research --> proposal[Source-linked research proposal]
     proposal --> review[Versioned strategy review + held-out evaluation]
-    review --> lean[LEAN deterministic replay]
-    lean --> acceptance[Paper acceptance requirements]
+    review --> replay[Nautilus deterministic replay / LEAN comparison]
+    replay --> acceptance[Broker-specific paper acceptance requirements]
     acceptance -. pending .-> execution[One deterministic order writer]
     execution <--> journal[Durable intents / orders / fills / reconciliation]
-    execution <--> alpaca[Alpaca paper]
+    execution <--> ibkr[IBKR paper / native TWS or Gateway]
+    execution <--> alpaca[Alpaca paper / separate adapter]
     risk[Independent numeric risk checks + kill switch] -. required .-> execution
     observe[Health / lag / fills / recovery / model usage] -. required .-> execution
 ```
@@ -97,6 +103,20 @@ The original build's seven advisory/package pairs were resolved in the
 broker, risk and recovery acceptance. Do not interpret a successful build as dependency security acceptance.
 
 ## Paper runtime acceptance
+
+The [current broker target and capability record](../../catalogs/us-equities/runtime-target.json)
+pins the requested Nautilus release and current official broker documentation.
+Nautilus' native IBKR socket adapter requires a signed-in TWS or IB Gateway,
+selected market-data permissions and a distinct client ID. Its presence does not
+qualify account access, paper orders, reconnect reconciliation or the Alpaca route.
+
+Alpaca Elite advertises **1,000 API calls per minute**, not a guaranteed trade or
+fill rate. Trading requests and historical market-data throughput are different
+limits. Current Algo Trader Plus documentation lists 10,000 historical calls per
+minute and equity history since 2016; feed coverage, subscriptions and account
+entitlement still matter. The existing historical-data GET receipts do not prove
+Elite activation or every data entitlement. [Elite terms](https://alpaca.markets/elite),
+[market-data plans](https://docs.alpaca.markets/us/docs/about-market-data-api).
 
 The future paper service needs explicit numeric limits, an allowed universe,
 session/extended-hours policy and data-feed entitlement. Maintain one order writer
