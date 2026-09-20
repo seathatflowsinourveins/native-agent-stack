@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "scope": "One diagnostic repair of the same interrupted-transport run; transport survival remains unqualified",
+  "observed_failure": "The owned native SSH client handled SIGTERM and returned255 with empty stderr. The frozen driver expected-15, failed before its reconnect snapshot, and explicitly invoked native stop on its owned run.",
+  "observed_reconnect": "A fresh independent SSH snapshot reports the same run ID, native aborted status, unchanged checkpoint and effect count1.",
+  "repair": [
+    "Freeze this repair source/protocol plus hashes of the original failure, disconnect and reconnect records before any retry.",
+    "Do not launch a new job, rerun checkpoint, interrupt another client or modify the original frozen source/oracle.",
+    "Release only finalization and use native retry --step finalize under the same native run ID once.",
+    "Require native succeeded, the exact original12-test final oracle, byte-identical checkpoint and effect count1.",
+    "Verify observed original processes/listeners and retry finalizer are gone; preserve both the failed original attempt and repaired result."
+  ],
+  "remaining_gate": "A separately frozen corrected attempt is required to qualify unattended transport survival. Native stop/retry does not establish that property.",
+  "limits": ["No second transport interruption", "No host/network/power outage", "No new native job or checkpoint execution", "No model/provider call", "No distributed exactly-once claim"]
+}

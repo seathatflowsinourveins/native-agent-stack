@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "base_revision": "76f839249f78482ead10ad700a268009d091aad5",
+  "scope": "Separately frozen corrected attempt: owned Mac-to-VelaNext SSH client disconnect with native job survival and fresh same-run reconciliation",
+  "native_pin": {
+    "version": "2.16.6",
+    "source_revision": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+    "license": "GPL-3.0",
+    "binary_sha256": "20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7",
+    "license_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+  },
+  "sources": {
+    "planner.py": {
+      "path": "blueprints/convergence-practice/native-worker/accepted/planner.py",
+      "sha256": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef"
+    },
+    "test_planner.py": {
+      "path": "blueprints/convergence-practice/native-worker/seed/test_planner.py",
+      "sha256": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+    },
+    "fixture.py": {
+      "path": "blueprints/convergence-practice/job-recovery/fixture.py",
+      "sha256": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7"
+    }
+  },
+  "ssh_options": [
+    "ControlMaster=no",
+    "ControlPath=none",
+    "BatchMode=yes",
+    "ConnectTimeout=10"
+  ],
+  "protocol": [
+    "Freeze local protocol/controller/source/oracle hashes and native binary before execution; refuse prefix reuse.",
+    "Launch native dagu start under an owned remote supervisor; Dagu has a separate process session and private file-backed logs, no server or scheduler. Keep its launching SSH client connected.",
+    "Wait for native running history and the finalizer-ready marker; verify the exact checkpoint, fsync its closed files and directory, record owned process identities.",
+    "Terminate only the recorded local SSH client process. Do not modify routes, firewall, host, distro, shared mux or other client.",
+    "Immediately open a fresh independent SSH session before cleanup/stop; require native running status, the same run ID, unchanged checkpoint and execution_count1.",
+    "Release only the still-running finalizer input and require native success under the original run ID; do not retry. Any failure ends this bounded corrected experiment.",
+    "Require native succeeded, unchanged checkpoint, exclusive execution claim1, exact completed result, all12 final oracle tests and no owned live processes/listeners."
+  ],
+  "bounds": {
+    "readiness_seconds": 25,
+    "fixture_finalize_wait_seconds": 60,
+    "dag_timeout_seconds": 90,
+    "command_seconds": 20,
+    "controlled_transport_interruptions": 1,
+    "diagnostic_repair_attempts_max": 0
+  },
+  "acceptance": [
+    "original12-test oracle passes at checkpoint and finalization",
+    "same native run ID before disconnect, after reconnect and success",
+    "checkpoint/effect count remains1 with byte-identical checkpoint",
+    "only own local SSH client interrupted; fresh nonmultiplexed SSH used afterward",
+    "owned remote job/controller/processes and listeners cleaned up",
+    "all frozen inputs unchanged"
+  ],
+  "limits": [
+    "Controlled local SSH-client termination is not evidence of a real network outage, power loss, host restart or credential recovery.",
+    "Separate remote process session and file-backed logs deliberately remove SSH-pipe dependence; this does not qualify arbitrary foreground processes.",
+    "Exclusive checkpoint claim is a local synthetic effect, not distributed exactly-once external side effects.",
+    "No model, provider, broker, GPU, global service, authentication or package changes.",
+    "Enclosing agent usage remains unknown; no token-savings claim."
+  ],
+  "corrected_precondition": "After signalling the live owned SSH client with SIGTERM, accept its observed native exit255 or raw SIGTERM exit-15; preserve actual return code. Require fresh native running status before any cleanup or release. No selected-step retry may qualify survival."
+}
