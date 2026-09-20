@@ -2,11 +2,16 @@ name: Validate published evidence
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   validate:
@@ -25,6 +30,19 @@ jobs:
           -r .github/requirements-ci.lock
       - name: Audit GitHub workflows without network or credentials
         run: zizmor --offline --no-config --no-ignores --persona regular --strict-collection .github/workflows
+      - name: Check workflow syntax and expressions with pinned upstream actionlint
+        env:
+          ACTIONLINT_VERSION: '1.7.12'
+          ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+        run: |
+          mkdir -p "$RUNNER_TEMP/actionlint"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz" \
+            --output "$RUNNER_TEMP/actionlint/archive.tar.gz"
+          printf '%s  %s\n' "$ACTIONLINT_SHA256" "$RUNNER_TEMP/actionlint/archive.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/actionlint/archive.tar.gz" -C "$RUNNER_TEMP/actionlint" actionlint
+          "$RUNNER_TEMP/actionlint/actionlint" -version
+          "$RUNNER_TEMP/actionlint/actionlint" -color
       - name: Validate manifests and evidence integrity
         run: python3 scripts/validate.py
       - name: Validate catalog evidence and coverage joins

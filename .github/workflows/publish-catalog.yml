@@ -1,0 +1,128 @@
+name: Publish attested catalog archive
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    if: github.repository == 'seathatflowsinourveins/native-agent-stack' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - name: Prepare publication evidence
+        run: |
+          PUBLICATION_DIR="$RUNNER_TEMP/catalog-publication"
+          mkdir -p "$PUBLICATION_DIR"
+          printf 'PUBLICATION_DIR=%s\n' "$PUBLICATION_DIR" >> "$GITHUB_ENV"
+          printf 'repository=%s\ncommit=%s\nref=%s\nrun=https://github.com/%s/actions/runs/%s\n' \
+            "$GITHUB_REPOSITORY" "$GITHUB_SHA" "$GITHUB_REF" \
+            "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" > "$PUBLICATION_DIR/source.log"
+          gh --version >> "$PUBLICATION_DIR/source.log"
+      - name: Check out the event commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate the catalog and recorded evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/validate.py 2>&1 | tee "$PUBLICATION_DIR/validation.log"
+          python3 scripts/validate_catalogs.py 2>&1 | tee -a "$PUBLICATION_DIR/validation.log"
+          python3 scripts/validate_foundation.py --root . --json 2>&1 | tee -a "$PUBLICATION_DIR/validation.log"
+          python3 scripts/validate_convergence.py --all-recorded --root . --json 2>&1 | tee -a "$PUBLICATION_DIR/validation.log"
+          python3 scripts/build_ecosystem.py --check 2>&1 | tee -a "$PUBLICATION_DIR/validation.log"
+      - name: Archive only the validated Git commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test -z "$(git status --porcelain)"
+          archive="$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.tar.gz"
+          git archive --format=tar.gz --prefix=native-agent-stack/ --output="$archive" "$GITHUB_SHA"
+          cd "$PUBLICATION_DIR"
+          sha256sum "$(basename "$archive")" | tee archive.sha256
+          stat --format='archive_bytes=%s' "$archive" | tee -a source.log
+      - name: Attest the catalog archive
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.tar.gz
+          push-to-registry: false
+          create-storage-record: false
+      - name: Verify provenance and reject modified archive bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ATTESTATION_BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="$PUBLICATION_DIR/native-agent-stack-${GITHUB_SHA}.tar.gz"
+          cp "$ATTESTATION_BUNDLE" "$PUBLICATION_DIR/attestation.json"
+          policy=(--repo "$GITHUB_REPOSITORY"
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/publish-catalog.yml"
+            --source-ref refs/heads/main --source-digest "$GITHUB_SHA"
+            --deny-self-hosted-runners --format json)
+          gh attestation verify "$archive" "${policy[@]}" \
+            > "$PUBLICATION_DIR/verify-online.json" 2> "$PUBLICATION_DIR/verify-online.log"
+          gh attestation trusted-root > "$PUBLICATION_DIR/trusted-root.jsonl" \
+            2> "$PUBLICATION_DIR/trusted-root.log"
+          offline=(--bundle "$PUBLICATION_DIR/attestation.json"
+            --custom-trusted-root "$PUBLICATION_DIR/trusted-root.jsonl")
+          gh attestation verify "$archive" "${policy[@]}" "${offline[@]}" \
+            > "$PUBLICATION_DIR/verify-bundle.json" 2> "$PUBLICATION_DIR/verify-bundle.log"
+          mkdir "$PUBLICATION_DIR/tampered"
+          tampered="$PUBLICATION_DIR/tampered/$(basename "$archive")"
+          cp "$archive" "$tampered"
+          printf '\ncontrolled digest mismatch test\n' >> "$tampered"
+          sha256sum "$archive" "$tampered" > "$PUBLICATION_DIR/tamper-digests.log"
+          if gh attestation verify "$tampered" "${policy[@]}" "${offline[@]}" \
+            > "$PUBLICATION_DIR/tamper-rejected.json" 2> "$PUBLICATION_DIR/tamper-rejected.log"; then
+            echo 'ERROR: modified archive passed provenance verification' | tee -a "$PUBLICATION_DIR/tamper-rejected.log"
+            exit 1
+          else
+            status=$?
+            printf 'expected_verification_failure_exit=%s\n' "$status" | tee -a "$PUBLICATION_DIR/tamper-rejected.log"
+            test "$status" -eq 1
+          fi
+          # Recheck the original with identical offline policy after the negative control.
+          gh attestation verify "$archive" "${policy[@]}" "${offline[@]}" \
+            > "$PUBLICATION_DIR/verify-after-tamper.json" 2> "$PUBLICATION_DIR/verify-after-tamper.log"
+      - name: Upload the verified archive without a ZIP wrapper
+        id: archive
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          path: ${{ runner.temp }}/catalog-publication/native-agent-stack-${{ github.sha }}.tar.gz
+          archive: false
+          if-no-files-found: error
+          retention-days: 7
+      - name: Match the uploaded digest to the attested file
+        env:
+          UPLOADED_DIGEST: ${{ steps.archive.outputs.artifact-digest }}
+          ARTIFACT_ID: ${{ steps.archive.outputs.artifact-id }}
+          ARTIFACT_URL: ${{ steps.archive.outputs.artifact-url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          read -r expected _ < "$PUBLICATION_DIR/archive.sha256"
+          printf 'expected_sha256=%s\nuploaded_sha256=%s\nartifact_id=%s\nartifact_url=%s\n' \
+            "$expected" "$UPLOADED_DIGEST" "$ARTIFACT_ID" "$ARTIFACT_URL" | tee "$PUBLICATION_DIR/upload.log"
+          test "$UPLOADED_DIGEST" = "$expected"
+      - name: Preserve publication success or failure evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: catalog-publication-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/catalog-publication/*.log
+            ${{ runner.temp }}/catalog-publication/*.json
+            ${{ runner.temp }}/catalog-publication/*.jsonl
+            ${{ runner.temp }}/catalog-publication/*.sha256
+          if-no-files-found: error
+          retention-days: 7

@@ -9,4 +9,8 @@ Both catalogs reference shared component pins, upstream source reviews and scope
 
 Both follow the [upstream acceptance evidence policy](../docs/acceptance-evidence-policy.md): research and reuse supported upstream skills, examples, tests and automation; retain actual native results and independent observations. Our integration tests and synthetic fixtures remain explicitly scoped.
 
+The [GitHub automation handbook](../docs/github-automation.md) defines check and
+maintenance ownership, manual publication provenance, and representative native
+research acceptance with measured baselines and explicit limitations.
+
 The broad repository decision union remains at [its existing path](us-equities/decision-index.json) for compatibility; it contains shared research discovery, not just trading adoption. Curated lists and stars are discovery sources. Explicit catalog decisions establish selected capabilities, and execution receipts establish only the workflows they actually measured.
