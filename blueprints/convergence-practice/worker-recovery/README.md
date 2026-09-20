@@ -185,8 +185,8 @@ inheritance, including the background-worker filters. The CLI uses `--tools defa
 and retains every installed hook and plugin. The task describes `stage.py` as an
 already-built stateful program: invoking it through Bash does not require file
 authoring or an analysis sandbox. Native model/account configuration remains
-unchanged. The explicit experiment mode is still `dontAsk`, which is stricter
-than this PC's unchanged native user default. Invocation approvals add to existing
+unchanged. Global settings stayed unchanged; the experiment used stricter
+`dontAsk`. Invocation approvals add to existing
 policy; they are not an exclusive tool or filesystem boundary.
 
 The first [inherited-role plan](native-plan.json) failed before an effect. The
@@ -233,6 +233,11 @@ prevented a terminal usage record. Repeated native cumulative, terminal and
 child-task views overlap; do not sum them. Provider list-price fields are native
 estimates, not subscription bills. Complete parent/child/retry usage, billing and
 savings remain unknown.
+
+The public changed-trial plan is explicitly marked as a sanitized projection.
+Its original frozen bytes and hash remain in private proof; the public copy
+omits the personal active permission-default value. Acceptance and usage facts
+are unchanged.
 
 Read-only verification of the deliberately retained private runs:
 

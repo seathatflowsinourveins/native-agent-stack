@@ -138,7 +138,7 @@
     "additional_observed_discovery": "One parent ToolSearch for TaskStop and SendMessage; no extra Bash inspection or MCP execution.",
     "experiment_mode": "dontAsk",
     "literal_listing_approval_exercised_by_this_native_run": false,
-    "native_user_default_mode": "bypassPermissions",
+    "global_settings": "unchanged; experiment used stricter dontAsk",
     "normal_inherited_tools": true,
     "not_a_sandbox": true,
     "one_literal_rtk_listing_approval_added_for_new_fixture": true

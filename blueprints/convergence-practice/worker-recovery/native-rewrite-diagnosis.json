@@ -6,7 +6,7 @@
   "hook_permissionDecision_field": "absent; native host decides",
   "model_calls": 0,
   "native_permission_rule_target": "hook updatedInput, as documented by Claude",
-  "native_user_default_mode": "bypassPermissions",
+  "global_settings": "unchanged; experiment used stricter dontAsk",
   "next_exact_rule_template": "Bash(rtk ls -la <new absolute owned fixture>)",
   "original_native_command": "ls -la <owned fixture>",
   "permission_change_during_diagnosis": false,
