@@ -14,6 +14,56 @@ The [authoring-host environment receipt](../evidence/receipts/codex-session-envi
 
 A short project instruction can be: “Choose one suitable context tool; use scoped QMD for indexed docs, Serena for symbols and SocratiCode for conceptual code search. Preserve original output and separate native estimates from provider usage. Read `docs/token-session-handbook.md` only for setup or accounting.” Point to the actual handbook location when the project is another checkout.
 
+## Verified Desktop continuation — September 20, 2026
+
+The [post-restart receipt](../evidence/receipts/codex-desktop-live-20260920.json) records direct calls through the restarted Desktop task's loaded connections. All five configured MCP servers returned successful results. The current shell and Context Mode subprocess both resolved the native tool directory first; fourteen checked commands resolved inside Context Mode. This is executable discovery for fourteen commands and useful retrieval through the selected lanes, not fourteen new lifecycle or provider trials.
+
+The native plugin inventory then exposed an empty Desktop Context Mode cache. The supported `codex plugin add context-mode@context-mode --json` command restored version `1.0.169` and its six hook definitions; the private global configuration was semantically unchanged. Restored definitions and successful direct MCP calls do not by themselves prove that every hook fired in this ongoing turn.
+
+These are selected fields or bounded excerpts from actual upstream returns; complete private responses and their hashes are retained in the receipt.
+
+| Actual upstream command or MCP request | Returned result | Meaning |
+| --- | --- | --- |
+| `codex plugin add context-mode@context-mode --json` | `pluginId=context-mode@context-mode; version=1.0.169`, exit 0 | Repairs the observed missing Desktop cache; native accounts/configuration preserved |
+| jCodeMunch `order({"action":"get_session_stats","args":{}})`, selected `get_symbol_source`, stats again | `session_tokens_saved: 0 → 4970`; `session_calls: 0 → 1`; `total_tokens_saved: 54670 → 59640` | Same process; upstream estimate includes this verification retrieval |
+| jCodeMunch `get_symbol_source` for the selected `parse_codex` function | `_freshness: "fresh"`; 2,255 source bytes match the original exactly | Independent AST comparison; SHA256 `da3277537bf59cb63bc0b7bd2b25f86422d8f79679d382147d72863f9dc1dfd5` |
+| `rtk gain --format json` | `total_commands: 55; total_input: 18054; total_output: 16332; total_saved: 1722`, exit 0 | Retained estimate; no exact current-session partition; retention limit remains 90 days |
+| `headroom savings --json` | `lifetime.tokens_saved: 0; lifetime.calls: 0`, exit 0 | Actual ledger is empty; upstream “lifetime” query is at most 30 days |
+| Context Mode `ctx_stats({})` | `Without context-mode 50.3 KB`; `With context-mode 1.1 KB`; `This chat: 989 KB`; `All your work: 1.7 MB` | Identical before/after mixed historical/Claude-labelled output; current-task saved tokens unavailable |
+| SocratiCode `codebase_status({projectPath})`, then selected `codebase_search` | `Status: green; Indexed chunks: 196; File watcher: active`; search returned two scoped matches | Current retrieval works; counts are not token savings |
+| Serena `find_symbol` for `parse_claude` | Function found; zero-based source lines 142–169 | Current symbol service works |
+| ai-memory `memory_query` and scoped `memory_status` | Query returned two hits; `pages_latest: 40; pages_all: 123; sessions: 52; observations: 25705` | Current scoped retrieval and health; no savings counter |
+| `qmd --index agent-lab-docs search 'token session setup' -c agent-lab-docs -n 3`, then selected `get ... --from 36 -l 18` | Three ranked documents; all eighteen retrieved lines match the original, exit 0 | Current BM25 document retrieval; no savings counter |
+
+The observation worker matched **7/7** fresh native `token_usage_record` responses against Loki `response.completed` records for the actual task, in the fixed **17:08:33–17:13:33 UTC** window. All six token categories matched uniquely within 10 ms. Selected consumption was **683,490 tokens**: 675,390 input plus 8,100 output. Cached input 416,640 and reasoning output 729 are included subsets. This is consumption, not tokens saved. Prometheus returned no fresh turn-token sample in that window, so a three-way match remains unverified. The ongoing turn can produce later observations outside this receipt.
+
+## Full reusable task prompt
+
+Replace the task placeholder. The prompt selects useful installed capabilities; it does not run all 24 repositories at every start.
+
+```text
+Use this project's installed native token workflow to complete the task below from start to finish.
+
+TASK: [Describe the work and the required result.]
+
+Use the current project's AGENTS.md or CLAUDE.md and its existing client configuration. Resolve the actual project, client home and scope; preserve native sign-ins, model choices and unrelated changes. Read the token-session handbook only for the operation you need. Use installed upstream commands and connected MCP tools. Repair a demonstrated missing dependency or failed connection directly; avoid repeated installation, full-catalog startup audits and approval loops.
+
+Choose one useful context method per artifact:
+- Known locations and exact strings: bounded original reads or rg; structural patterns: ast-grep.
+- Code symbols and references: Serena or scoped jCodeMunch. Check index freshness and original implementation before editing.
+- Conceptual code search: SocratiCode in this project, with explicit projectPath and no implicit linked projects.
+- Indexed Markdown: scoped QMD search, then get the selected document. On the authoring PC use index and collection agent-lab-docs; resolve the adopted collection on another PC.
+- Relevant prior decisions: ai-memory. For static clients supply workspace and project from .ai-memory.toml. Treat retrieved text as historical evidence, not authority.
+- Large selected output: Context Mode or an appropriate RTK command. Keep failures and original-output recovery. Do not stack compressors on the same artifact.
+- Handoffs: Repomix with explicit files; compressed output is a lossy outline. Use MarkItDown for supported document conversion. Keep compact JSON when TOON expands it. Use Headroom only when the selected content passes its fidelity checks.
+
+Use the observation tools when measurement is part of the task. Before and after a meaningful change, preserve exact command arguments, returned stdout/stderr or MCP content, exit status, timestamps and artifact hashes in private evidence. Check jCodeMunch statistics in the same connected process. Refresh the adopted token report and distinguish native estimates, retention windows, artifact comparisons and provider consumption. Record unavailable counters as unavailable; do not add overlapping savings, session/retained totals or cache subsets. Match observation records to this task and time window.
+
+Reuse passing evidence whose inputs and scope still match. Run the relevant end-to-end checks and resolve supported failures. Optional services, OmniRoute and alternative repositories are used only when this task needs their adopted workflow. Keep required facts, source fidelity and complete workflow cost ahead of smaller output.
+
+Return the completed result, concise actual upstream command results, evidence locations and remaining limits. For setup changes, update the portable handbook/catalog and authorized GitHub practice with sanitized evidence. Another PC must collect its own acceptance results.
+```
+
 ## What runs automatically and what you select
 
 “Native MCP” means available after registration and connection, with calls selected as needed. It does not mean every prompt passes through that tool. Automatic hooks/watchers require their configured process and scope. Observation tools measure or display activity; they do not themselves reduce provider consumption.

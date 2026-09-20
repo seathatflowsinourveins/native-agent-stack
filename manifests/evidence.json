@@ -511,7 +511,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1493,7 +1493,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -1696,6 +1696,35 @@
         "Zero provider turns refers to this isolated configuration/MCP acceptance harness, not the surrounding authoring conversation."
       ],
       "path": "evidence/receipts/codex-session-environment-20260920.json"
+    },
+    {
+      "id": "codex-desktop-live-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "context-mode",
+        "jcodemunch-mcp",
+        "serena",
+        "ai-memory",
+        "socraticode",
+        "rtk",
+        "headroom",
+        "qmd",
+        "loki",
+        "prometheus"
+      ],
+      "claim": "The restarted Desktop task returned successful results through five configured MCP servers, verified current shell PATH and exact source retrieval, and matched seven fresh native/Loki usage records. A missing Desktop plugin cache was restored with upstream plugin add.",
+      "limitations": [
+        "All24topic repositories remain classified in the handbook; optional tools are not automatically invoked.",
+        "Tools without native savings ledgers remain unavailable, not zero.",
+        "A correct install does not establish superiority over a known-source baseline or exact provider tokens avoided.",
+        "This live check creates provider consumption in the surrounding task; no extra synthetic provider trial was launched.",
+        "Private config, paths, conversation text, identities and full responses are excluded from public artifacts.",
+        "Mixed historical and Claude-labelled aggregates despite codex platform; do not infer current-task tokens, money saved or longer sessions from these returned totals.",
+        "Six restored definitions are not proof that every lifecycle hook fired in this ongoing task.",
+        "No fresh Prometheus turn sample in the selected window; no three-way observation join."
+      ],
+      "path": "evidence/receipts/codex-desktop-live-20260920.json"
     }
   ],
   "files": [
@@ -4797,8 +4826,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "54b6fe90b6ff5173a774d08b38afa3b37a0a18e3f1fd783394495404a725bf76",
-      "bytes": 3319099
+      "sha256": "3daabafe171381531ef82df9914f9aada0a92b866d439d697adde6e26b532559",
+      "bytes": 3326318
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -4872,8 +4901,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "8ddfc96dd67d2e469c08e4831d1435a8e36734b7d3b0094ab1c4872b12d9ef2f",
-      "bytes": 19849
+      "sha256": "f8dfbb8238a0e6b6ac701ffcf98a8703c67e46f6acf98341042a612f56bf956e",
+      "bytes": 27010
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -4934,6 +4963,11 @@
       "path": "evidence/receipts/artifact-reductions.json",
       "sha256": "7d222b20b6f42dd340137df3ea46c012c8d10cb47efc911ab839aa3ad135d7dc",
       "bytes": 3450
+    },
+    {
+      "path": "evidence/receipts/codex-desktop-live-20260920.json",
+      "sha256": "4333ca2c8b4f78caee98f9e38ae624104e6cbd410134a9f103153d47d5c97551",
+      "bytes": 12905
     },
     {
       "path": "evidence/receipts/codex-session-environment-20260920.json",
