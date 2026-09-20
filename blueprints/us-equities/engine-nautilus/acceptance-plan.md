@@ -9,9 +9,13 @@ unchanged synthetic EUR/USD quickstart repeatability only. It does not establish
 US-equity conversion, corporate actions, strategy quality, broker connectivity or
 paper orders. LEAN results remain independent dated evidence.
 
-This plan authorizes no connections or orders. Implementation and offline checks
-can proceed within their assigned scope; broker-connected work requires the
-particular account, permissions and order/risk scope to be authorized first.
+The user has explicitly authorized broker-specific paper E2E after the current
+foundation work, including bounded paper orders needed for acceptance. Follow the
+[current paper policy](../../../docs/paper-lane-policy.md) without renewed human
+approval. Actual native paper sign-in/configuration, endpoint and account identity,
+broker entitlements, numeric risk and result criteria remain prerequisites. Live
+credentials/configuration are separate and do not gate paper. This authorization
+changes no dated execution result above.
 No new framework, model in the execution loop or broad data acquisition is needed.
 
 ## 1. Freeze the retained equity comparison
@@ -171,7 +175,7 @@ paper gate. Existing offline Alpaca guards accept only their own
 
 ## 5. IBKR paper procedure
 
-Prerequisites: passed offline suite; authorized paper account and numeric risk,
+Prerequisites: passed offline suite; identified native paper account and numeric risk,
 universe/session limits; native TWS or IB Gateway sign-in; socket API enabled;
 explicit host/port and unused API client ID; qualified contract identity, trading
 permissions and data subscriptions. Paper defaults are TWS `7497`, Gateway `4002`;
@@ -189,11 +193,12 @@ container substitution.
 1. Begin with read-only socket access and execution disabled. Retain sanitized
    paper-mode/account-scope verification, contract/currency/exchange, clock/session,
    quote source/type/age and positions/open-order snapshots. Unexplained existing
-   orders/positions block progress. Delayed data requires explicit test permission.
+   orders/positions block progress. Predeclare the data mode and acceptable quote
+   age; delayed data cannot satisfy a case requiring a current real-time feed.
 2. Verify client-ID ownership and broker order/execution-ID mappings. Freeze maximum
    orders, shares/notional, exposure/loss, quote age, request rate, timeouts and
-   observation window. Missing values/permissions block submission.
-3. In a separately authorized paper run, execute only frozen bounded cases:
+   observation window. Missing values or required broker entitlements block submission.
+3. Under the standing paper authorization, execute only frozen bounded cases:
    submit/acknowledge, fill or cancel, reconnect with an open order and restart
    reconciliation. Retain actual responses and every outbound request. Unobserved
    partial fills/cancel races stay unobserved at the broker; do not relabel offline
@@ -201,7 +206,7 @@ container substitution.
 4. Stop at the declared boundary and apply the predeclared outstanding-order and
    position disposition. Reconcile snapshots, executions, commissions and account
    changes against the journal, including fee-posting timing. Exercise alert and
-   kill-switch behavior without extra unapproved trades.
+   kill-switch behavior within the frozen paper operation budget.
 
 Pass requires every declared case's evidence, zero duplicate submissions/economic
 effects, zero unexplained open-order/position/cash differences, no risk breach and
@@ -216,11 +221,13 @@ Alpaca uses a **separate adapter**, not an upstream Nautilus plugin. Retain
 `alpaca-py==0.44.0` read-only ingestion and its dated
 [AAPL acquisition](../authenticated-data/README.md) and
 [FB/META observations](../identity-readiness/README.md). A read-only account request
-was previously recorded too. Credentials therefore cannot be described as absent;
-current trading/data permissions and Elite activation remain unverified. No
-credential store is read by this plan.
+was previously recorded too. That historical authentication does not establish
+current native paper configuration or trading/data entitlements. Verify the
+selected paper account and feed directly; optional Elite features are required
+only for cases that use them. Live credentials have not been provided and are not
+a paper prerequisite. No credential store is read by this plan.
 
-1. Use separately authorized private paper configuration and the SDK's
+1. Use the selected private paper configuration and the SDK's
    `TradingClient(..., paper=True)` boundary. Verify paper endpoint/account with
    execution disabled; recheck restrictions/buying power, asset/session, selected
    feed and positions/open orders. Historical SIP GETs do not prove current
@@ -231,7 +238,7 @@ credential store is read by this plan.
    fail locally. The [advanced-instructions probe](../architecture/alpaca-probe.json)
    shows a serialization gap; DMA/VWAP/TWAP stays excluded until separate serialization
    and entitled-provider acceptance passes.
-3. After its own offline suite and explicit paper-order scope pass, run bounded
+3. After its own offline suite and frozen numeric paper scope pass, run bounded
    submit/fill-or-cancel, disconnect and restart cases. Reconcile stream and REST
    snapshots by stable client/broker identity. Use actual account request limits,
    reserving capacity for cancels/reconciliation. Elite's advertised 1,000 API
@@ -245,5 +252,8 @@ credential store is read by this plan.
 Follow the [official paper contract](https://docs.alpaca.markets/us/docs/paper-trading)
 and [market-data permissions](https://docs.alpaca.markets/us/docs/about-market-data-api).
 Paper omits material live-market effects. Report each adapter's scoped outcome
-separately; neither result authorizes live trading, establishes capacity or
-validates profitability.
+separately. Predeclare and measure strategy-specific net returns, costs, drawdown,
+fill/slippage behavior and operational criteria; retain failed and inconclusive
+results. A connectivity or order-state pass alone does not establish strategy
+performance. Paper results do not authorize live trading or establish live
+capacity or future profitability.

@@ -2,8 +2,13 @@
 
 This is a numeric exploratory protocol for two US-equity research hypotheses.
 It extends the [earlier research contract](../acceptance-wave/research-protocol.json)
-without claiming a strategy works. [protocol.json](protocol.json) is authoritative;
-its first executed hash is retained in the [native receipt](receipt.json).
+without claiming a strategy works. [protocol.json](protocol.json) is authoritative
+for the frozen research parameters and result criteria; its first executed hash
+is retained in the [native receipt](receipt.json). Its dated `promotion.scope`
+wording remains unchanged for that evidence binding. Current execution authority
+comes from the [paper lane policy](../../../docs/paper-lane-policy.md): the user
+has already authorized paper E2E after the current foundation work. The frozen
+wording does not require renewed human permission for that continuation.
 
 | Lane | Fixed candidate rule | Timing |
 | --- | --- | --- |
@@ -103,9 +108,12 @@ predeclared1×cost/latency stress. The protocol fixes bootstrap settings and ret
 every arm and stress path. Rare +200%labels require separate minimum counts;
 insufficient evidence never permits lowering the threshold after inspection.
 
-These gates can authorize proposing a separately reviewed paper candidate.
-Neither passing a synthetic test nor a favorable historical result submits orders
-or authorizes live trading.
+These gates determine whether this research candidate has sufficient evidence
+for paper evaluation; retain independent technical review and the frozen numeric
+criteria. Paper E2E already has user authorization and proceeds after foundation
+work and the relevant native readiness checks, with actual performance and
+operational results deciding acceptance. Neither passing a synthetic test nor a
+favorable historical result establishes executed orders or authorizes live trading.
 
 ## What actually ran
 

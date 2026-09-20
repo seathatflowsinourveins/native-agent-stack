@@ -182,7 +182,7 @@
       "native_commands": [
         "python -m pytest -q tests/test_broker_sync_positions.py"
       ],
-      "acceptance_needed": "Clarify license, build isolated dependencies, then compare a fixed corporate-action fixture and broker-state failure contract against the primary engine; require explicit paper authority for live endpoints.",
+      "acceptance_needed": "Clarify license, build isolated dependencies, then compare a fixed corporate-action fixture and broker-state failure contract against the primary engine. Any later paper trial uses the standing authorization in docs/paper-lane-policy.md after native paper endpoint/account and numeric-risk readiness; live endpoints are outside that scope.",
       "command_scope": "Prospective fake-broker unit tests only; external dividend/API tests deliberately not proposed as account-free checks.",
       "wave": 1,
       "starred_in_base_public_ledger": true,
@@ -637,7 +637,7 @@
         "No durable client-order idempotency/restart reconciliation was established by the reviewed executor."
       ],
       "native_commands": [],
-      "acceptance_needed": "Do not launch upstream trading entrypoints. Require real historical instrument mapping and fail-closed quote/position behavior, then deterministic no-network adapter fixtures and explicit authorization before any paper endpoint.",
+      "acceptance_needed": "Do not launch upstream trading entrypoints while the unsafe fallbacks remain. Require real historical instrument mapping, fail-closed quote/position behavior and deterministic no-network adapter fixtures. Any later paper trial uses docs/paper-lane-policy.md and verified native paper configuration, numeric risk and measured acceptance; existing paper authorization is not candidate acceptance.",
       "command_scope": "No execution acceptance command recommended while concrete unsafe fallback behavior remains; source inspection only.",
       "wave": 2,
       "starred_in_base_public_ledger": false,
@@ -1136,7 +1136,7 @@
       "gh api repos/OWNER/REPO/git/trees/REF?recursive=1",
       "Read selected raw.githubusercontent.com files at explicit commit SHAs; hash retained bytes."
     ],
-    "native_acceptance_commands_in_entries": "Prospective only. Execute only after scoped prerequisites/authorization; read command_scope and acceptance_needed first.",
+    "native_acceptance_commands_in_entries": "Prospective only. Read command_scope and acceptance_needed first and satisfy the scoped technical prerequisites. Paper E2E already has user authorization under docs/paper-lane-policy.md after the current foundation work; live execution remains outside that authorization. No execution result is inferred from this source review.",
     "quality_axes": [
       "Selected implementation semantics",
       "Tests present and relevant, not claimed passed",

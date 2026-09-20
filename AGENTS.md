@@ -76,7 +76,11 @@ worker policy applies to workers launched by its example, not automatically to
 unrelated SDKs or projects. Keep models in research and deterministic code in
 numeric/risk/order state. Catalogued candidates are not installed or accepted by
 inclusion; a default is a recommendation with an explicit adoption status.
-Never infer live-trading, paid-hosting or broker-order authority from this catalog.
+The user has explicitly authorized broker-specific paper-trading E2E after the
+current foundation work. Follow `docs/paper-lane-policy.md`: proceed through native
+paper readiness and measured acceptance without repeated human approval. Missing
+live credentials or live configuration do not gate paper. Catalog inclusion alone
+does not grant authority; live trading and paid hosting remain separate scopes.
 
 For architecture or research waves, read `blueprints/us-equities/architecture/README.md`
 and the matching source-review supplement. `catalogs/us-equities/decision-index.json`

@@ -31,7 +31,7 @@
     "Unattended trading hosting, operational alerts and in-flight/broker recovery acceptance",
     "Native hook/tool/compaction parity and provider-budget enforcement through OmniRoute"
   ],
-  "broker_authority": "Recorded research workers receive no broker keys or order tools. Dated Alpaca authentication/data reads do not authorize orders; IBKR and Alpaca paper procedures require separately scoped execution authorization. No broker orders are established by this contract.",
+  "broker_authority": "Recorded research workers receive no broker keys or order tools. The user has explicitly authorized IBKR and Alpaca paper E2E after the current foundation work under docs/paper-lane-policy.md; renewed human approval is not a paper prerequisite. Each adapter still needs verified native paper configuration, frozen numeric risk and measured operational/performance acceptance. Live credentials/configuration are separate and do not gate paper. Dated read-only authentication/data receipts and this contract establish no executed broker orders.",
   "future_sessions": "Installed native tools and project instructions persist. New tool registrations require normal client discovery/reload; other projects need deliberate scoped adoption. No blanket all-project hook or service deployment is implied. The Dagu user service is enabled for future local user-service sessions; it schedules no work and requires no conversation restart.",
   "evidence_refs": [
     "blueprints/us-equities/workers/receipt.json",
