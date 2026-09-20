@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-20",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "9e236061bd199760527cef184497149b03531232",
+  "source_revision": "2f6490a233be97cc2e0b8d7a2c2476a164f9094b",
   "layers": [
     {
       "id": "agents",
@@ -132,6 +132,24 @@
         "sysadmin"
       ],
       "repositories": []
+    },
+    {
+      "id": "applications",
+      "name": "Applications & APIs",
+      "summary": "Use project locks, typed contracts, real database tests and isolated browser workflows.",
+      "examples": "Next / React \u00b7 FastAPI \u00b7 PostgreSQL",
+      "keywords": [
+        "application delivery",
+        "typed api",
+        "production application",
+        "transactional database"
+      ],
+      "repositories": [
+        "vercel/next.js",
+        "react/react",
+        "fastapi/fastapi",
+        "postgres/postgres"
+      ]
     },
     {
       "id": "beyond",
@@ -315,6 +333,27 @@
       "status": "Synthetic mechanics accepted",
       "body": "Candidate, timing, costs, labels and controls frozen before new outcome inspection. Native DuckDB cutoff and exact arithmetic proofs passed; empirical trading merit remains unmeasured.",
       "path": "blueprints/us-equities/catalyst-experiment/receipt.json"
+    },
+    {
+      "id": "application-delivery-native",
+      "title": "Typed application through real PostgreSQL",
+      "status": "Mac native acceptance",
+      "body": "12 API checks, generated contract, production UI and browser create/update passed. Exact row survives database/app restart; separate empty-database migration reversal passed. Local synthetic scope only.",
+      "path": "blueprints/convergence-practice/application-delivery/README.md"
+    },
+    {
+      "id": "document-ingestion-native",
+      "title": "Bounded PDF source-to-excerpt fidelity",
+      "status": "Mac native acceptance",
+      "body": "Poppler26.09.0:3 permitted pages,24 data cells,8 cited positive and4 absent queries. Strict frozen-source guard; explicit table geometry. OCR/general semantic accuracy unqualified.",
+      "path": "blueprints/convergence-practice/document-ingestion/README.md"
+    },
+    {
+      "id": "wsl-native-recovery",
+      "title": "WSL restore and dirty-worktree refusal",
+      "status": "VelaNext native acceptance",
+      "body": "Two synthetic restic snapshots restored with exact bytes/types/modes after fresh SSH. Verified gitleaks and Worktrunk pass positive/negative and dirty-refusal checks. Other hosts and key-loss recovery remain separate.",
+      "path": "blueprints/convergence-practice/layer-acceptance.md"
     }
   ],
   "annotations": [

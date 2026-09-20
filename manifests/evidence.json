@@ -4264,13 +4264,13 @@
     },
     {
       "path": "docs/ecosystem/README.md",
-      "sha256": "cc28a95afdc8bd3967018d226a611cb9778c6590ddb4737252a3ceabf954bbeb",
-      "bytes": 6392
+      "sha256": "2f4307fe69cd1338ac9eaa70b06652971b8a4378b684cf0ad6d6b994e64463b2",
+      "bytes": 6706
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "2166766e8bad5a4809f9d9a81c6318941318b0442c070ebb5ba72571e597f554",
-      "bytes": 1641810
+      "sha256": "f53e56321fe75a7cc9a851eb6064c3c53fc2fb11f315c409dff80fdcef8ea055",
+      "bytes": 1644278
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -4279,8 +4279,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "b56662904a00857948d1650bf66f650068a899059bf3af0b1ed071ae39b18d54",
-      "bytes": 16770
+      "sha256": "f1d0138d106dc8a51c0c2a091f55d034e6f8f2711c47536ab3b89dac5d6d47ca",
+      "bytes": 18645
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
