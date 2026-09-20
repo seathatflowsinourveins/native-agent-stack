@@ -2012,18 +2012,18 @@
     },
     {
       "path": ".github/workflows/native-token-e2e.yml",
-      "sha256": "cb4e0dfdc19345ea56b2ee7e1d13926cdd095c3f3a550d330fae2c08881ba9b6",
-      "bytes": 1665
+      "sha256": "9fe7751f5df7adfd65295159fb6b54ac10d774d91ee01cbc2c4d3e008dddad8a",
+      "bytes": 1685
     },
     {
       "path": ".github/workflows/token-report.yml",
-      "sha256": "17a3f226fd2e91e398f9e634679d509029b65d3d4f2d1441be9bf41a079b5097",
-      "bytes": 509
+      "sha256": "c5f8465130ccb06c4e96d6fa5f241c3ef57da27a2f47e3b1688f580c6c80ca9d",
+      "bytes": 723
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "3b5f2dd559aa08e2c441844d0256c64af9a0c50ea354c88dc048454ece5152b1",
-      "bytes": 1505
+      "sha256": "dc0405f71df254ca0b0af91f52f763492e495ca4a2291629e315c328ca9a4c7a",
+      "bytes": 2603
     },
     {
       "path": ".gitignore",
@@ -5103,8 +5103,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "b3c22e3abaf5c5ea42ff049913f4c746b658e259347ecbb45042eb336fdce7ad",
-      "bytes": 3738713
+      "sha256": "48905afe24c23fa67bd6e6f8b035ee0cd010b69c021a51d002430821e4a950fe",
+      "bytes": 3739708
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5113,8 +5113,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "b188bffd22ab9250afc7437075f8a7472b78666131b347c92bd3fe2711323424",
-      "bytes": 31324
+      "sha256": "caf5dbb711d05d2c3dee07195b84f46afb9f8083e314903c6f3a4591cf1c2825",
+      "bytes": 31611
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6098,8 +6098,8 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "7404e514011d172c6a00ffad970b11c0c1b334d7489ed7aa3b5ff6dff6da64f3",
-      "bytes": 1582
+      "sha256": "42f49b071a9252bc62dea3fb223c32844a7687d4b5c51aeadfa27d2760f9fb32",
+      "bytes": 1814
     },
     {
       "path": "catalogs/foundation/README.md",
@@ -6123,8 +6123,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "51f603954ee5fd26bf600624000a3321e6ba8bd795498420b203345dfa803fdf",
-      "bytes": 6879
+      "sha256": "6ed3941360da4b963ee4afcc620336d2c11192171735fc70ae5e71e5ebe8f637",
+      "bytes": 7137
     },
     {
       "path": "evidence/receipts/native-harness-defaults-20260920.json",
@@ -6253,8 +6253,8 @@
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
-      "sha256": "0e1509b3e74d5254504deb76831d39ce7ef22defffadfa21d87d4061c2defc8b",
-      "bytes": 7745
+      "sha256": "cfcf4a6fe6f7a9e33d7cffeaa13d73830f49b12800b0b22cb1cfa308016bad9e",
+      "bytes": 7766
     },
     {
       "path": "scripts/verify_nautilus_ci.py",
@@ -6468,8 +6468,8 @@
     },
     {
       "path": ".github/workflows/native-offhost-restore.yml",
-      "sha256": "a9c7c95034206b338a7a4a5dd5f8731d51a24c9e3a75f0faad46fc787a4e8eca",
-      "bytes": 6296
+      "sha256": "4525ef97b6827eccd02bb8effad79f15d10e436149ecdf6d33160ec82ba34efe",
+      "bytes": 6306
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/README.md",
@@ -7350,6 +7350,51 @@
       "path": "evidence/receipts/native-service-reboot-20260920.json",
       "sha256": "7f13f5bfe6072465d09aa725d766fb880eb865f6c0452902a41cf7f5b446a0d0",
       "bytes": 5495
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "sha256": "d2f1900108fff96b1d677f0c5fb62a9513e89a122aac08d3eb50350bc372aa05",
+      "bytes": 350
+    },
+    {
+      "path": ".github/main-ruleset.json",
+      "sha256": "e466d3a4f52f6c4b2e0dcb6e73b10875b9a9a3c2bd65a2651db4ef458d47e1cd",
+      "bytes": 594
+    },
+    {
+      "path": "docs/github-automation-evidence.json",
+      "sha256": "0ba607adbe2cca73708bd727a3458be94a46ee3c83f91361366761cc88bc7518",
+      "bytes": 4770
+    },
+    {
+      "path": "docs/github-automation.md",
+      "sha256": "a1176511800c6b0a8a288392f29dd67a951920b18b0afd0496ca905766c2e903",
+      "bytes": 11240
+    },
+    {
+      "path": "docs/research-task-acceptance.md",
+      "sha256": "82669589d53b1dda2e6fb779343d5d892ef940562648da06a9c9c54028234351",
+      "bytes": 5928
+    },
+    {
+      "path": "docs/tasks/2026-09-20-github-automation.md",
+      "sha256": "2644001cf9d53d993e74ce47245fac0bb4cefad34c6007823d97ff840bf1b0b8",
+      "bytes": 6869
+    },
+    {
+      "path": "docs/upstream-maintenance-pilot.md",
+      "sha256": "4b3410eed8701056b412c65938aac3a453e4d72a2fb70ee59313170433c970de",
+      "bytes": 7856
+    },
+    {
+      "path": ".github/workflows/publish-catalog.yml",
+      "sha256": "94a3a78e8e4db96198cd51e551485bd4347ab0937457f8c2f83144cc00f1ed4b",
+      "bytes": 6585
+    },
+    {
+      "path": "docs/catalog-provenance.md",
+      "sha256": "cfdbdebda42c9b9113f407e07a1304b51af186a856e687dc4eb148d32f3ee2c1",
+      "bytes": 13873
     }
   ],
   "convergence_records": [

@@ -2,6 +2,7 @@ name: Native token tools E2E
 
 on:
   push:
+    branches: [main]
     paths:
       - '.github/workflows/native-token-e2e.yml'
       - 'scripts/native_token_ci.py'
@@ -49,4 +50,3 @@ jobs:
           if-no-files-found: warn
           include-hidden-files: false
           retention-days: 14
-

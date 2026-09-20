@@ -50,8 +50,8 @@ jobs:
       - name: Install required native namespace tool and verified restic release
         run: |
           output="$FOUNDATION_RESTORE_ROOT/reports"
-          sudo apt-get update >"$output/apt-update.txt" 2>&1
-          sudo apt-get install --yes --no-install-recommends bubblewrap >"$output/apt-install.txt" 2>&1
+          sudo apt-get update 2>&1 | tee "$output/apt-update.txt"
+          sudo apt-get install --yes --no-install-recommends bubblewrap 2>&1 | tee "$output/apt-install.txt"
           install_status=0
           python3 blueprints/convergence-practice/wsl-restore/install.py \
             --destination "$FOUNDATION_RESTORE_ROOT/tool" >"$output/install-summary.json" \
