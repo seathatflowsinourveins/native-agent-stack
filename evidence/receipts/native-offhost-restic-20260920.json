@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "id": "native-offhost-restic-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": ["restic"],
+  "claim": "A fresh GitHub-hosted runner passed seven unchanged upstream restic tests, then checked and restored two exact synthetic snapshots using a password delivered separately from the published ciphertext; independent review reconciled the returned outputs, file manifests and platform record.",
+  "limitations": [
+    "Synthetic byte/POSIX-mode recovery only, not ai-memory/Qdrant application-state recovery, reboot, production disaster recovery, lost-password recovery or provider savings.",
+    "The ciphertext and separate protected secret share a GitHub administrative account; account-loss recovery and independent trust domains are not established.",
+    "The seven selected upstream tests are a focused subset, not the entire upstream suite. Our transfer fixture and complete-file oracle are explicitly local integration checks.",
+    "UID/GID restoration, timestamps, ACL/xattrs, sparse files, links, Windows filesystems and long-term storage availability were not qualified.",
+    "Interface inventory is unavailable; distinct native network/mount namespaces and frozen read-only bindings are the observed isolation properties.",
+    "Two restore banners replace the source username with $SOURCE_USER; their original raw hashes cannot be recomputed from the sanitized public text. Other declared stream hashes were independently checked."
+  ],
+  "recorded_at": "2026-09-20T21:05:46.003218+00:00",
+  "accepted_run": {
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35537533416",
+    "event": "workflow_dispatch",
+    "head_sha": "3745f0ad5519a34c5ca095bd4389485943ab5a1c",
+    "conclusion": "success",
+    "platform_record": "evidence/artifacts/native-offhost-restore-20260920/github-run.json"
+  },
+  "workflow": ".github/workflows/native-offhost-restore.yml",
+  "upstream_source": "blueprints/convergence-practice/offhost-restore/upstream-source.json",
+  "frozen_plan": "blueprints/convergence-practice/offhost-restore/hosted-plan.json",
+  "prior_failure": "blueprints/convergence-practice/offhost-restore/attempt-1/result.json",
+  "native_results": "evidence/artifacts/native-offhost-restore-20260920/receipt.json",
+  "upstream_test_results": "evidence/artifacts/native-offhost-restore-20260920/upstream-tests.json",
+  "upstream_test_command": "go test -cover -count=1 -json -timeout 5m -run '^(TestCheckRestoreNoLock|TestRestore|TestCheckWithSnaphotFilter|TestRestoreWithPermissionFailure|TestRestorer|TestRestorePermissions|TestRestorerConsistentTimestampsAndPermissions)$' ./cmd/restic ./internal/restorer",
+  "upstream_test_return": {
+    "source_commit": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+    "toolchain": "go1.25.10 linux/amd64",
+    "exit_code": 0,
+    "selected_top_level_passes": 7,
+    "subtest_passes": 9,
+    "package_passes": 2,
+    "skips": 0,
+    "failures": 0,
+    "raw_json_events": 195,
+    "source_unchanged_before_after": true,
+    "module_verification": "all modules verified"
+  },
+  "native_binary": {
+    "version": "0.19.1",
+    "sha256": "20d4142678d0d95ec11a4759def1b73fd9190abc9ca19e4b62d067c0b387e639",
+    "installation_record": "evidence/artifacts/native-offhost-restore-20260920/installation.json"
+  },
+  "native_command_prefix": "/tool/restic --no-cache --no-lock --repo /repository --password-file /secret/password",
+  "native_returns": [
+    {
+      "operation": "restore snapshot 2 with an invalid password",
+      "exit_code": 12,
+      "stderr": "Fatal: wrong password or no key found\n",
+      "restored_files": 0
+    },
+    {
+      "operation": "check --read-data",
+      "exit_code": 0,
+      "snapshots_checked": 2,
+      "packs_read": 4,
+      "final_stdout_line": "no errors were found"
+    },
+    {
+      "operation": "restore each exact snapshot subfolder --target /out/restore --verify",
+      "snapshots": [
+        "071e8951efdb088585a3d4c31680bc660276eed9e11ecd562f44e22b6c2ddc80",
+        "584e40a22ffbb39c814b9322daf22b0001e165e37c1518d484f6d5d2464f5a21"
+      ],
+      "exit_codes": [0, 0],
+      "verified_files_each": 6,
+      "directories_each": 7,
+      "file_bytes_each": 1048747,
+      "complete_path_type_length_sha256_mode_oracle": "passed for both snapshots"
+    }
+  ],
+  "independent_review": {
+    "method": "Read-only reviewer independently fetched the GitHub artifact, compared all native streams and restored manifests with the frozen source and a separate fixture oracle, and checked platform job records; no native restore rerun or secret access.",
+    "artifact_id": 10613203968,
+    "downloaded_zip_sha256": "c27d9823f62f69892af32999ba6e55fa4b8091ea6eb5eb2624ee52afd2d20ce4",
+    "downloaded_reports_matched": 24,
+    "executed_source_hashes_matched": 16,
+    "upstream_source_hashes_matched": 17,
+    "upstream_stream_hashes_matched": 12,
+    "ciphertext_objects": 10,
+    "ciphertext_bytes": 11506,
+    "ciphertext_unchanged": true,
+    "native_runtime_removed": true,
+    "separate_password_file_removed": true,
+    "status": "accepted_within_scope"
+  },
+  "native_lifetime_tokens_saved": null,
+  "exact_causal_lifetime_provider_tokens_saved": null
+}

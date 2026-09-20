@@ -1,0 +1,195 @@
+{"Time":"2026-09-20T21:05:25.735996543Z","Action":"start","Package":"github.com/restic/restic/cmd/restic"}
+{"Time":"2026-09-20T21:05:25.766374991Z","Action":"run","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter"}
+{"Time":"2026-09-20T21:05:25.766402563Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Output":"=== RUN   TestCheckWithSnaphotFilter\n"}
+{"Time":"2026-09-20T21:05:25.76644912Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:25.766455512Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:25.76645957Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:25.766463537Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:25.766467755Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Output":"    lock.go:96: setting lock timeout to 0s\n"}
+{"Time":"2026-09-20T21:05:25.821921506Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Output":"    cmd_init_integration_test.go:25: repository initialized at /tmp/native-foundation-offhost-ci.1W7l62ev/upstream-tmp/restic-test-328787403/repo\n"}
+{"Time":"2026-09-20T21:05:25.842165047Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Output":"    cmd_backup_integration_test.go:22: backing up [for_cmd_ls] in /tmp/native-foundation-offhost-ci.1W7l62ev/upstream-tmp/restic-test-328787403/testdata/0\n"}
+{"Time":"2026-09-20T21:05:25.842194643Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Output":"    cmd_backup_integration_test.go:24: chdir to /tmp/native-foundation-offhost-ci.1W7l62ev/upstream-tmp/restic-test-328787403/testdata/0\n"}
+{"Time":"2026-09-20T21:05:25.862793313Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Output":"    cmd_backup_integration_test.go:29: chdir back to /tmp/native-foundation-offhost-ci.1W7l62ev/upstream-restic/cmd/restic\n"}
+{"Time":"2026-09-20T21:05:25.862826415Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Output":"    cmd_backup_integration_test.go:22: backing up [0/9] in /tmp/native-foundation-offhost-ci.1W7l62ev/upstream-tmp/restic-test-328787403/testdata/0\n"}
+{"Time":"2026-09-20T21:05:25.862833058Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Output":"    cmd_backup_integration_test.go:24: chdir to /tmp/native-foundation-offhost-ci.1W7l62ev/upstream-tmp/restic-test-328787403/testdata/0\n"}
+{"Time":"2026-09-20T21:05:25.880967543Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Output":"    cmd_backup_integration_test.go:29: chdir back to /tmp/native-foundation-offhost-ci.1W7l62ev/upstream-restic/cmd/restic\n"}
+{"Time":"2026-09-20T21:05:26.008743743Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Output":"--- PASS: TestCheckWithSnaphotFilter (0.24s)\n"}
+{"Time":"2026-09-20T21:05:26.008763551Z","Action":"pass","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckWithSnaphotFilter","Elapsed":0.24}
+{"Time":"2026-09-20T21:05:26.008827424Z","Action":"run","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestore"}
+{"Time":"2026-09-20T21:05:26.008837352Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestore","Output":"=== RUN   TestRestore\n"}
+{"Time":"2026-09-20T21:05:26.008885695Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestore","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.008922965Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestore","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:26.009183508Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestore","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.009196413Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestore","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:26.009203586Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestore","Output":"    lock.go:96: setting lock timeout to 0s\n"}
+{"Time":"2026-09-20T21:05:26.028223647Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestore","Output":"    cmd_init_integration_test.go:25: repository initialized at /tmp/native-foundation-offhost-ci.1W7l62ev/upstream-tmp/restic-test-3301922010/repo\n"}
+{"Time":"2026-09-20T21:05:26.098757775Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestore","Output":"    cmd_backup_integration_test.go:22: backing up [testdata] in /tmp/native-foundation-offhost-ci.1W7l62ev/upstream-tmp/restic-test-3301922010\n"}
+{"Time":"2026-09-20T21:05:26.098779757Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestore","Output":"    cmd_backup_integration_test.go:24: chdir to /tmp/native-foundation-offhost-ci.1W7l62ev/upstream-tmp/restic-test-3301922010\n"}
+{"Time":"2026-09-20T21:05:26.216084082Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestore","Output":"    cmd_backup_integration_test.go:29: chdir back to /tmp/native-foundation-offhost-ci.1W7l62ev/upstream-restic/cmd/restic\n"}
+{"Time":"2026-09-20T21:05:26.249048005Z","Action":"start","Package":"github.com/restic/restic/internal/restorer"}
+{"Time":"2026-09-20T21:05:26.252767106Z","Action":"run","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer"}
+{"Time":"2026-09-20T21:05:26.252793595Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer","Output":"=== RUN   TestRestorer\n"}
+{"Time":"2026-09-20T21:05:26.252836576Z","Action":"run","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00"}
+{"Time":"2026-09-20T21:05:26.252840604Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Output":"=== RUN   TestRestorer/#00\n"}
+{"Time":"2026-09-20T21:05:26.252845653Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.252858327Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:26.259759842Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Output":"    restorer_test.go:366: snapshot saved as 1f8a4314\n"}
+{"Time":"2026-09-20T21:05:26.260125017Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Output":"    restorer_test.go:375: restore /dirtest\n"}
+{"Time":"2026-09-20T21:05:26.260222019Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Output":"    restorer_test.go:375: restore /dirtest/file\n"}
+{"Time":"2026-09-20T21:05:26.260267765Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Output":"    restorer_test.go:375: restore /foo\n"}
+{"Time":"2026-09-20T21:05:26.260507084Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Output":"    restorer_test.go:375: restore /dirtest\n"}
+{"Time":"2026-09-20T21:05:26.260546077Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Output":"    restorer_test.go:375: restore /dirtest/file\n"}
+{"Time":"2026-09-20T21:05:26.260619114Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Output":"    restorer_test.go:375: restore /foo\n"}
+{"Time":"2026-09-20T21:05:26.260697642Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Output":"    restorer_test.go:375: restore /dirtest\n"}
+{"Time":"2026-09-20T21:05:26.261561232Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Output":"    restorer_test.go:375: restore /dirtest/file\n"}
+{"Time":"2026-09-20T21:05:26.261572103Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Output":"    restorer_test.go:375: restore /foo\n"}
+{"Time":"2026-09-20T21:05:26.261582803Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Output":"--- PASS: TestRestorer/#00 (0.01s)\n"}
+{"Time":"2026-09-20T21:05:26.261587231Z","Action":"pass","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#00","Elapsed":0.01}
+{"Time":"2026-09-20T21:05:26.261595136Z","Action":"run","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01"}
+{"Time":"2026-09-20T21:05:26.261598743Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"=== RUN   TestRestorer/#01\n"}
+{"Time":"2026-09-20T21:05:26.26160235Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.261607259Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:26.266315283Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:366: snapshot saved as eaedee55\n"}
+{"Time":"2026-09-20T21:05:26.26656956Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /dir\n"}
+{"Time":"2026-09-20T21:05:26.266678815Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /dir/file\n"}
+{"Time":"2026-09-20T21:05:26.266716085Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /dir/subdir\n"}
+{"Time":"2026-09-20T21:05:26.266876947Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /dir/subdir/file\n"}
+{"Time":"2026-09-20T21:05:26.266922387Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /top\n"}
+{"Time":"2026-09-20T21:05:26.267311873Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /dir\n"}
+{"Time":"2026-09-20T21:05:26.267774309Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /dir/file\n"}
+{"Time":"2026-09-20T21:05:26.267791141Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /dir/subdir\n"}
+{"Time":"2026-09-20T21:05:26.267796531Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /dir/subdir/file\n"}
+{"Time":"2026-09-20T21:05:26.26780161Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /top\n"}
+{"Time":"2026-09-20T21:05:26.267805989Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /dir\n"}
+{"Time":"2026-09-20T21:05:26.267810166Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /dir/file\n"}
+{"Time":"2026-09-20T21:05:26.267814214Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /dir/subdir\n"}
+{"Time":"2026-09-20T21:05:26.267818141Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /dir/subdir/file\n"}
+{"Time":"2026-09-20T21:05:26.267821928Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"    restorer_test.go:375: restore /top\n"}
+{"Time":"2026-09-20T21:05:26.268266473Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Output":"--- PASS: TestRestorer/#01 (0.01s)\n"}
+{"Time":"2026-09-20T21:05:26.268278415Z","Action":"pass","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#01","Elapsed":0.01}
+{"Time":"2026-09-20T21:05:26.26828624Z","Action":"run","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#02"}
+{"Time":"2026-09-20T21:05:26.268289927Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#02","Output":"=== RUN   TestRestorer/#02\n"}
+{"Time":"2026-09-20T21:05:26.268296108Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#02","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.268300436Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#02","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:26.272296206Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#02","Output":"    restorer_test.go:366: snapshot saved as e3e5cb96\n"}
+{"Time":"2026-09-20T21:05:26.272503951Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#02","Output":"    restorer_test.go:375: restore /dir\n"}
+{"Time":"2026-09-20T21:05:26.272803798Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#02","Output":"    restorer_test.go:375: restore /file\n"}
+{"Time":"2026-09-20T21:05:26.272987593Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#02","Output":"    restorer_test.go:375: restore /dir\n"}
+{"Time":"2026-09-20T21:05:26.273026151Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#02","Output":"    restorer_test.go:375: restore /file\n"}
+{"Time":"2026-09-20T21:05:26.273153234Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#02","Output":"    restorer_test.go:375: restore /dir\n"}
+{"Time":"2026-09-20T21:05:26.273163273Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#02","Output":"    restorer_test.go:375: restore /file\n"}
+{"Time":"2026-09-20T21:05:26.273457645Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#02","Output":"--- PASS: TestRestorer/#02 (0.01s)\n"}
+{"Time":"2026-09-20T21:05:26.27350258Z","Action":"pass","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#02","Elapsed":0.01}
+{"Time":"2026-09-20T21:05:26.273532876Z","Action":"run","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#03"}
+{"Time":"2026-09-20T21:05:26.273554176Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#03","Output":"=== RUN   TestRestorer/#03\n"}
+{"Time":"2026-09-20T21:05:26.273576368Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#03","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.273623847Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#03","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:26.284103882Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#03","Output":"    restorer_test.go:366: snapshot saved as b7d347ad\n"}
+{"Time":"2026-09-20T21:05:26.28440113Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#03","Output":"    restorer_test.go:375: restore /dir\n"}
+{"Time":"2026-09-20T21:05:26.284498723Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#03","Output":"    restorer_test.go:375: restore /dir/file\n"}
+{"Time":"2026-09-20T21:05:26.284712214Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#03","Output":"    restorer_test.go:375: restore /dir\n"}
+{"Time":"2026-09-20T21:05:26.284768369Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#03","Output":"    restorer_test.go:375: restore /dir/file\n"}
+{"Time":"2026-09-20T21:05:26.284898874Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#03","Output":"    restorer_test.go:375: restore /dir\n"}
+{"Time":"2026-09-20T21:05:26.284940222Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#03","Output":"    restorer_test.go:375: restore /dir/file\n"}
+{"Time":"2026-09-20T21:05:26.285280851Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#03","Output":"--- PASS: TestRestorer/#03 (0.01s)\n"}
+{"Time":"2026-09-20T21:05:26.285288275Z","Action":"pass","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#03","Elapsed":0.01}
+{"Time":"2026-09-20T21:05:26.285327108Z","Action":"run","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#04"}
+{"Time":"2026-09-20T21:05:26.28534455Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#04","Output":"=== RUN   TestRestorer/#04\n"}
+{"Time":"2026-09-20T21:05:26.285361973Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#04","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.285379887Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#04","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:26.291769792Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#04","Output":"    restorer_test.go:366: snapshot saved as 151704f4\n"}
+{"Time":"2026-09-20T21:05:26.292017147Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#04","Output":"    restorer_test.go:375: restore /topfile\n"}
+{"Time":"2026-09-20T21:05:26.292344821Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#04","Output":"    restorer_test.go:375: restore /topfile\n"}
+{"Time":"2026-09-20T21:05:26.292351203Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#04","Output":"    restorer_test.go:375: restore /topfile\n"}
+{"Time":"2026-09-20T21:05:26.293779343Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#04","Output":"--- PASS: TestRestorer/#04 (0.01s)\n"}
+{"Time":"2026-09-20T21:05:26.293786897Z","Action":"pass","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#04","Elapsed":0.01}
+{"Time":"2026-09-20T21:05:26.293793309Z","Action":"run","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#05"}
+{"Time":"2026-09-20T21:05:26.293796575Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#05","Output":"=== RUN   TestRestorer/#05\n"}
+{"Time":"2026-09-20T21:05:26.293800082Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#05","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.29380419Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#05","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:26.299676208Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#05","Output":"    restorer_test.go:366: snapshot saved as bc99c037\n"}
+{"Time":"2026-09-20T21:05:26.3003676Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#05","Output":"    restorer_test.go:375: restore /dir\n"}
+{"Time":"2026-09-20T21:05:26.300429076Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#05","Output":"    restorer_test.go:375: restore /dir/file\n"}
+{"Time":"2026-09-20T21:05:26.300504076Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#05","Output":"    restorer_test.go:375: restore /dir\n"}
+{"Time":"2026-09-20T21:05:26.300567976Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#05","Output":"    restorer_test.go:375: restore /dir/file\n"}
+{"Time":"2026-09-20T21:05:26.300717196Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#05","Output":"    restorer_test.go:375: restore /dir\n"}
+{"Time":"2026-09-20T21:05:26.30079915Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#05","Output":"    restorer_test.go:375: restore /dir/file\n"}
+{"Time":"2026-09-20T21:05:26.30130018Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#05","Output":"--- PASS: TestRestorer/#05 (0.01s)\n"}
+{"Time":"2026-09-20T21:05:26.301344072Z","Action":"pass","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#05","Elapsed":0.01}
+{"Time":"2026-09-20T21:05:26.301367246Z","Action":"run","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#06"}
+{"Time":"2026-09-20T21:05:26.301386071Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#06","Output":"=== RUN   TestRestorer/#06\n"}
+{"Time":"2026-09-20T21:05:26.301403865Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#06","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.30142265Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#06","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:26.306512586Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#06","Output":"    restorer_test.go:366: snapshot saved as 33a96df9\n"}
+{"Time":"2026-09-20T21:05:26.306548774Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestore","Output":"    io.go:318: Summary: Restored 13 files/dirs (29.952 MiB) in 0:00\n"}
+{"Time":"2026-09-20T21:05:26.307112647Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#06","Output":"    restorer_test.go:375: restore /..\\..\\foo\\..\\bar\\..\\xx\\test2\n"}
+{"Time":"2026-09-20T21:05:26.307134167Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#06","Output":"    restorer_test.go:375: restore /..\\test\n"}
+{"Time":"2026-09-20T21:05:26.307278879Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#06","Output":"    restorer_test.go:375: restore /..\\..\\foo\\..\\bar\\..\\xx\\test2\n"}
+{"Time":"2026-09-20T21:05:26.307340765Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#06","Output":"    restorer_test.go:375: restore /..\\test\n"}
+{"Time":"2026-09-20T21:05:26.307609539Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#06","Output":"--- PASS: TestRestorer/#06 (0.01s)\n"}
+{"Time":"2026-09-20T21:05:26.307648392Z","Action":"pass","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#06","Elapsed":0.01}
+{"Time":"2026-09-20T21:05:26.307676004Z","Action":"run","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#07"}
+{"Time":"2026-09-20T21:05:26.307692916Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#07","Output":"=== RUN   TestRestorer/#07\n"}
+{"Time":"2026-09-20T21:05:26.307708425Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#07","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.307758649Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#07","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:26.310223204Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#07","Output":"    restorer_test.go:366: snapshot saved as bc009c2b\n"}
+{"Time":"2026-09-20T21:05:26.310353368Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#07","Output":"    restorer_test.go:386: restore returned error for \"/\": invalid child node name ../../foo/../bar/../xx/test2\n"}
+{"Time":"2026-09-20T21:05:26.310454868Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#07","Output":"    restorer_test.go:386: restore returned error for \"/\": invalid child node name ../test\n"}
+{"Time":"2026-09-20T21:05:26.310764092Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#07","Output":"    restorer_test.go:386: restore returned error for \"/\": invalid child node name ../../foo/../bar/../xx/test2\n"}
+{"Time":"2026-09-20T21:05:26.310783138Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#07","Output":"    restorer_test.go:386: restore returned error for \"/\": invalid child node name ../test\n"}
+{"Time":"2026-09-20T21:05:26.310905838Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#07","Output":"--- PASS: TestRestorer/#07 (0.00s)\n"}
+{"Time":"2026-09-20T21:05:26.310914424Z","Action":"pass","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#07","Elapsed":0}
+{"Time":"2026-09-20T21:05:26.310938289Z","Action":"run","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08"}
+{"Time":"2026-09-20T21:05:26.310945602Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08","Output":"=== RUN   TestRestorer/#08\n"}
+{"Time":"2026-09-20T21:05:26.310979136Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.310984115Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:26.316403193Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08","Output":"    restorer_test.go:366: snapshot saved as 64ce5249\n"}
+{"Time":"2026-09-20T21:05:26.316853966Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08","Output":"    restorer_test.go:375: restore /top\n"}
+{"Time":"2026-09-20T21:05:26.317007617Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08","Output":"    restorer_test.go:375: restore /x\n"}
+{"Time":"2026-09-20T21:05:26.317114799Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08","Output":"    restorer_test.go:386: restore returned error for \"/x\": invalid child node name ..\n"}
+{"Time":"2026-09-20T21:05:26.317152189Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08","Output":"    restorer_test.go:375: restore /x/file1\n"}
+{"Time":"2026-09-20T21:05:26.317397159Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08","Output":"    restorer_test.go:375: restore /top\n"}
+{"Time":"2026-09-20T21:05:26.317451521Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08","Output":"    restorer_test.go:375: restore /x\n"}
+{"Time":"2026-09-20T21:05:26.317523402Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08","Output":"    restorer_test.go:386: restore returned error for \"/x\": invalid child node name ..\n"}
+{"Time":"2026-09-20T21:05:26.317540003Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08","Output":"    restorer_test.go:375: restore /x/file1\n"}
+{"Time":"2026-09-20T21:05:26.317943283Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08","Output":"--- PASS: TestRestorer/#08 (0.01s)\n"}
+{"Time":"2026-09-20T21:05:26.317953031Z","Action":"pass","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer/#08","Elapsed":0.01}
+{"Time":"2026-09-20T21:05:26.317958502Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer","Output":"--- PASS: TestRestorer (0.07s)\n"}
+{"Time":"2026-09-20T21:05:26.317962589Z","Action":"pass","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorer","Elapsed":0.07}
+{"Time":"2026-09-20T21:05:26.317965876Z","Action":"run","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorerConsistentTimestampsAndPermissions"}
+{"Time":"2026-09-20T21:05:26.3179683Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorerConsistentTimestampsAndPermissions","Output":"=== RUN   TestRestorerConsistentTimestampsAndPermissions\n"}
+{"Time":"2026-09-20T21:05:26.318008967Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorerConsistentTimestampsAndPermissions","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.318029926Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorerConsistentTimestampsAndPermissions","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:26.324818792Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorerConsistentTimestampsAndPermissions","Output":"--- PASS: TestRestorerConsistentTimestampsAndPermissions (0.01s)\n"}
+{"Time":"2026-09-20T21:05:26.324838899Z","Action":"pass","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorerConsistentTimestampsAndPermissions","Elapsed":0.01}
+{"Time":"2026-09-20T21:05:26.32485007Z","Action":"run","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorePermissions"}
+{"Time":"2026-09-20T21:05:26.324854358Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorePermissions","Output":"=== RUN   TestRestorePermissions\n"}
+{"Time":"2026-09-20T21:05:26.324896758Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorePermissions","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.32490321Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorePermissions","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:26.331609224Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestore","Output":"--- PASS: TestRestore (0.32s)\n"}
+{"Time":"2026-09-20T21:05:26.331625935Z","Action":"pass","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestore","Elapsed":0.32}
+{"Time":"2026-09-20T21:05:26.33163392Z","Action":"run","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestoreWithPermissionFailure"}
+{"Time":"2026-09-20T21:05:26.331637888Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestoreWithPermissionFailure","Output":"=== RUN   TestRestoreWithPermissionFailure\n"}
+{"Time":"2026-09-20T21:05:26.331695145Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestoreWithPermissionFailure","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.331705304Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestoreWithPermissionFailure","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:26.339035712Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorePermissions","Output":"    restorer_unix_test.go:125: snapshot saved as 1c993779\n"}
+{"Time":"2026-09-20T21:05:26.33999384Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorePermissions","Output":"--- PASS: TestRestorePermissions (0.02s)\n"}
+{"Time":"2026-09-20T21:05:26.34001526Z","Action":"pass","Package":"github.com/restic/restic/internal/restorer","Test":"TestRestorePermissions","Elapsed":0.02}
+{"Time":"2026-09-20T21:05:26.340027513Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Output":"PASS\n"}
+{"Time":"2026-09-20T21:05:26.340938903Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Output":"coverage: 58.3% of statements\n"}
+{"Time":"2026-09-20T21:05:26.342515607Z","Action":"output","Package":"github.com/restic/restic/internal/restorer","Output":"ok  \tgithub.com/restic/restic/internal/restorer\t0.093s\tcoverage: 58.3% of statements\n"}
+{"Time":"2026-09-20T21:05:26.342535575Z","Action":"pass","Package":"github.com/restic/restic/internal/restorer","Elapsed":0.093}
+{"Time":"2026-09-20T21:05:26.646586913Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestoreWithPermissionFailure","Output":"    io.go:318: Summary: Restored 4 files/dirs (9 B) in 0:00\n"}
+{"Time":"2026-09-20T21:05:26.804078908Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestoreWithPermissionFailure","Output":"--- PASS: TestRestoreWithPermissionFailure (0.47s)\n"}
+{"Time":"2026-09-20T21:05:26.804113633Z","Action":"pass","Package":"github.com/restic/restic/cmd/restic","Test":"TestRestoreWithPermissionFailure","Elapsed":0.47}
+{"Time":"2026-09-20T21:05:26.804121939Z","Action":"run","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckRestoreNoLock"}
+{"Time":"2026-09-20T21:05:26.804124885Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckRestoreNoLock","Output":"=== RUN   TestCheckRestoreNoLock\n"}
+{"Time":"2026-09-20T21:05:26.80412783Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckRestoreNoLock","Output":"    testing.go:29: using low-security KDF parameters for test\n"}
+{"Time":"2026-09-20T21:05:26.804130164Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckRestoreNoLock","Output":"    config.go:60: disabling check of the chunker polynomial\n"}
+{"Time":"2026-09-20T21:05:27.287299677Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckRestoreNoLock","Output":"    io.go:318: Summary: Restored 3 files/dirs (8 B) in 0:00\n"}
+{"Time":"2026-09-20T21:05:27.302094749Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckRestoreNoLock","Output":"--- PASS: TestCheckRestoreNoLock (0.50s)\n"}
+{"Time":"2026-09-20T21:05:27.30211129Z","Action":"pass","Package":"github.com/restic/restic/cmd/restic","Test":"TestCheckRestoreNoLock","Elapsed":0.5}
+{"Time":"2026-09-20T21:05:27.302120858Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Output":"PASS\n"}
+{"Time":"2026-09-20T21:05:27.303697166Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Output":"coverage: 10.7% of statements\n"}
+{"Time":"2026-09-20T21:05:27.305660859Z","Action":"output","Package":"github.com/restic/restic/cmd/restic","Output":"ok  \tgithub.com/restic/restic/cmd/restic\t1.568s\tcoverage: 10.7% of statements\n"}
+{"Time":"2026-09-20T21:05:27.305679814Z","Action":"pass","Package":"github.com/restic/restic/cmd/restic","Elapsed":1.5699999999999998}

@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "provenance_type": "upstream-unmodified",
+  "status": "passed-selected-unmodified-upstream-tests",
+  "started_at_utc": "2026-09-20T21:04:28.035582+00:00",
+  "source_commit": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+  "selection_sha256": "926a5de880f31b40053f92e7f8252c89f8738259d2b3943105df30275f8dd325",
+  "scope": "Selected unchanged upstream restic Go integration/unit tests using their own upstream fixtures and temporary repositories; separate from the private-key transfer acceptance.",
+  "commands": [
+    {
+      "id": "upstream-commit",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "$UPSTREAM_SOURCE",
+      "started_at_utc": "2026-09-20T21:04:28.035666+00:00",
+      "timeout_seconds": 30,
+      "launched": true,
+      "exit_code": 0,
+      "timeout": false,
+      "finished_at_utc": "2026-09-20T21:04:28.037289+00:00",
+      "seconds": 0.001625,
+      "stdout": {
+        "path": "upstream-commit.stdout",
+        "sha256": "ac2e51985cfdc42047bbe7e8538cbb8980d9b6307380dc5de2da9c66bb32426e",
+        "bytes": 41
+      },
+      "stderr": {
+        "path": "upstream-commit.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "upstream-clean-before",
+      "argv": [
+        "git",
+        "status",
+        "--porcelain",
+        "--untracked-files=all"
+      ],
+      "cwd": "$UPSTREAM_SOURCE",
+      "started_at_utc": "2026-09-20T21:04:28.038370+00:00",
+      "timeout_seconds": 30,
+      "launched": true,
+      "exit_code": 0,
+      "timeout": false,
+      "finished_at_utc": "2026-09-20T21:04:28.127468+00:00",
+      "seconds": 0.089108,
+      "stdout": {
+        "path": "upstream-clean-before.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "upstream-clean-before.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "upstream-go-version",
+      "argv": [
+        "go",
+        "version"
+      ],
+      "cwd": "$UPSTREAM_SOURCE",
+      "started_at_utc": "2026-09-20T21:04:28.127984+00:00",
+      "timeout_seconds": 30,
+      "launched": true,
+      "exit_code": 0,
+      "timeout": false,
+      "finished_at_utc": "2026-09-20T21:04:28.130549+00:00",
+      "seconds": 0.002566,
+      "stdout": {
+        "path": "upstream-go-version.stdout",
+        "sha256": "a08991d861bf7c5f227a77fca116cc77d9f618e9682140c86702325c33c5bb43",
+        "bytes": 33
+      },
+      "stderr": {
+        "path": "upstream-go-version.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "upstream-go-tests",
+      "argv": [
+        "go",
+        "test",
+        "-cover",
+        "-count=1",
+        "-json",
+        "-timeout",
+        "5m",
+        "-run",
+        "^(TestCheckRestoreNoLock|TestRestore|TestCheckWithSnaphotFilter|TestRestoreWithPermissionFailure|TestRestorer|TestRestorePermissions|TestRestorerConsistentTimestampsAndPermissions)$",
+        "./cmd/restic",
+        "./internal/restorer"
+      ],
+      "cwd": "$UPSTREAM_SOURCE",
+      "started_at_utc": "2026-09-20T21:04:28.131257+00:00",
+      "timeout_seconds": 480,
+      "launched": true,
+      "exit_code": 0,
+      "timeout": false,
+      "finished_at_utc": "2026-09-20T21:05:27.542508+00:00",
+      "seconds": 59.41126,
+      "stdout": {
+        "path": "upstream-go-tests.stdout",
+        "sha256": "f58451394703d872a30501141c3a9412e907a9d68e73e144ef9c2965f87ab495",
+        "bytes": 38286
+      },
+      "stderr": {
+        "path": "upstream-go-tests.stderr",
+        "sha256": "cd93b84ae62124ce4f7a351ffd1313900c2ac1739b6f8f165221f2167b41439b",
+        "bytes": 4810
+      }
+    },
+    {
+      "id": "upstream-modules-verify",
+      "argv": [
+        "go",
+        "mod",
+        "verify"
+      ],
+      "cwd": "$UPSTREAM_SOURCE",
+      "started_at_utc": "2026-09-20T21:05:27.543763+00:00",
+      "timeout_seconds": 60,
+      "launched": true,
+      "exit_code": 0,
+      "timeout": false,
+      "finished_at_utc": "2026-09-20T21:05:30.142073+00:00",
+      "seconds": 2.598315,
+      "stdout": {
+        "path": "upstream-modules-verify.stdout",
+        "sha256": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+        "bytes": 21
+      },
+      "stderr": {
+        "path": "upstream-modules-verify.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "id": "upstream-clean-after",
+      "argv": [
+        "git",
+        "status",
+        "--porcelain",
+        "--untracked-files=all"
+      ],
+      "cwd": "$UPSTREAM_SOURCE",
+      "started_at_utc": "2026-09-20T21:05:30.142693+00:00",
+      "timeout_seconds": 30,
+      "launched": true,
+      "exit_code": 0,
+      "timeout": false,
+      "finished_at_utc": "2026-09-20T21:05:30.148558+00:00",
+      "seconds": 0.005865,
+      "stdout": {
+        "path": "upstream-clean-after.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "path": "upstream-clean-after.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    }
+  ],
+  "limitations": [
+    "Source review is not test execution. Actual Go JSON events and every selected top-level pass are required; absent, skipped or failed tests reject acceptance.",
+    "Selected source-built upstream tests are not the entire upstream CI suite and do not establish off-host recovery of the separate retained fixture.",
+    "Upstream tests create and clean their own ephemeral test repositories and use upstream public fixture passwords/low-security test KDF settings. The private Actions fixture password is not exposed to this step.",
+    "The pinned published restic binary and source-built test code have separate execution records. No cloud-backend, FUSE, account credential, production-data or reboot acceptance.",
+    "Module acquisition uses the upstream Go proxy/checksum database and locked go.mod/go.sum; this Go step is not claimed network-isolated. The later native snapshot-transfer commands retain mandatory network namespaces."
+  ],
+  "native_toolchain": "go version go1.25.10 linux/amd64",
+  "tests": [
+    {
+      "package": "github.com/restic/restic/cmd/restic",
+      "name": "TestCheckRestoreNoLock",
+      "status": "pass"
+    },
+    {
+      "package": "github.com/restic/restic/cmd/restic",
+      "name": "TestCheckWithSnaphotFilter",
+      "status": "pass"
+    },
+    {
+      "package": "github.com/restic/restic/cmd/restic",
+      "name": "TestRestore",
+      "status": "pass"
+    },
+    {
+      "package": "github.com/restic/restic/cmd/restic",
+      "name": "TestRestoreWithPermissionFailure",
+      "status": "pass"
+    },
+    {
+      "package": "github.com/restic/restic/internal/restorer",
+      "name": "TestRestorePermissions",
+      "status": "pass"
+    },
+    {
+      "package": "github.com/restic/restic/internal/restorer",
+      "name": "TestRestorer",
+      "status": "pass"
+    },
+    {
+      "package": "github.com/restic/restic/internal/restorer",
+      "name": "TestRestorerConsistentTimestampsAndPermissions",
+      "status": "pass"
+    }
+  ],
+  "finished_at_utc": "2026-09-20T21:05:30.149079+00:00"
+}

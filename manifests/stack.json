@@ -1117,7 +1117,7 @@
       "repository": "https://github.com/restic/restic",
       "version": "0.19.1",
       "license": "BSD-2-Clause",
-      "role": "Encrypted same-host backup and verified restore of explicitly selected public files",
+      "role": "Scoped encrypted backup and verified restore, including synthetic independent-host recovery",
       "source_pin": "v0.19.1",
       "commands": [
         "restic backup --files-from \"$SELECTION\" --json",
@@ -1129,7 +1129,8 @@
         "ai-memory-native-state-recovery-20260919",
         "qdrant-native-state-recovery-20260919",
         "token-practice-coverage-20260920",
-        "native-wsl-restic-synthetic-20260920"
+        "native-wsl-restic-synthetic-20260920",
+        "native-offhost-restic-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1156,7 +1157,8 @@
         "native-grand-dashboard-20260919",
         "token-practice-coverage-20260920",
         "native-dagu-job-recovery-20260920",
-        "wsl-transport-recovery-20260920"
+        "wsl-transport-recovery-20260920",
+        "native-dagu-retry-tests-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [

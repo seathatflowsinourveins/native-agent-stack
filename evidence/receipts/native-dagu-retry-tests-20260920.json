@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "native-dagu-retry-tests-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": ["dagu"],
+  "claim": "The unchanged official Dagu retry tests passed on a fresh hosted runner with the exact source archive and required Go toolchain; independent review reconciled all source and artifact hashes and the platform job.",
+  "limitations": [
+    "Selected upstream retry tests only, not the entire Dagu test suite, a production workload or actual guest reboot recovery.",
+    "The same workflow's later guest job failed before boot because our QEMU launcher placed the serial property on the wrong option. Overall workflow failure is retained separately from this successful upstream test job.",
+    "No broker/provider operations or token savings were measured.",
+    "The public reports are explicitly projected: CI home paths, two upstream UI-route path families and synthetic test UUIDs are replaced with placeholders. Independent source/artifact hashes below refer to the untouched original download; publication.json records both raw and public hashes."
+  ],
+  "recorded_at": "2026-09-20T21:08:05Z",
+  "run": {
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35537534779",
+    "head_sha": "3745f0ad5519a34c5ca095bd4389485943ab5a1c",
+    "event": "workflow_dispatch",
+    "overall_conclusion": "failure",
+    "accepted_job_id": 106149131086,
+    "accepted_job_name": "upstream-dagu-retry",
+    "accepted_job_conclusion": "success",
+    "platform_record": "evidence/artifacts/native-dagu-retry-20260920/github-run.json"
+  },
+  "source_review": "blueprints/convergence-practice/service-reboot/source-review.md",
+  "upstream_command_recipe": "blueprints/convergence-practice/service-reboot/upstream-tests.sh",
+  "public_projection_manifest": "evidence/artifacts/native-dagu-retry-20260920/publication.json",
+  "upstream": {
+    "repository": "https://github.com/dagucloud/dagu",
+    "source_commit": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+    "source_archive_sha256": "8f4b1095a88bb037b582f8b5e337360b1702879f1abb9cfc319643ef1a775746",
+    "native_go_version": "go version go1.27.0 linux/amd64",
+    "command": "go test -count=1 -run '^TestRetryCommand($|_)' -timeout 12m -v ./internal/cmd",
+    "exit_code": 0,
+    "top_level_tests": 3,
+    "nested_subtests": 12,
+    "pass_records": 15,
+    "leaf_cases": 14,
+    "failures": 0,
+    "skips": 0,
+    "reported_package_seconds": 7.491
+  },
+  "independent_review": {
+    "method": "Read-only reviewer independently fetched the GitHub artifact and pinned official source archive; compared all regular source files, native output and platform records without executing a replacement test.",
+    "artifact_id": 10613528746,
+    "downloaded_zip_sha256": "d0fab2d0434f65b645cff114aa6db07cca774bd1e42d6909c2c5b94f67457109",
+    "downloaded_reports_matched": 7,
+    "regular_upstream_source_files_matched": 3261,
+    "source_manifest_before_after_sha256": "19971cd08178383e63dadc9e4bac3a45b34c0a2afec74e56586be0d935d51012",
+    "native_test_output_sha256": "6f69ab98891f4870c8f4adc2a6073279ab07348369305f0cb8f4bdac0dd2c0d3",
+    "status": "accepted_within_scope"
+  },
+  "native_lifetime_tokens_saved": null,
+  "exact_causal_lifetime_provider_tokens_saved": null
+}

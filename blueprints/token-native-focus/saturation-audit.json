@@ -1643,6 +1643,11 @@
             "id": "wsl-transport-recovery-20260920",
             "path": "evidence/receipts/wsl-transport-recovery-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dagu-retry-tests-20260920",
+            "path": "evidence/receipts/native-dagu-retry-tests-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -1668,7 +1673,7 @@
         "install": {"status": "observed_installed", "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.", "evidence_refs": ["blueprints/us-equities/research-runtime/receipt.json", "adoption/paired/receipt.json", "blueprints/us-equities/convergence-program/review-receipt.json", "observability/grand-dashboard/receipt.json", "evidence/receipts/token-practice-coverage-20260920.json", "evidence/receipts/native-dagu-job-recovery-20260920.json", "evidence/receipts/wsl-transport-recovery-20260920.json"]},
         "use": {"status": "accepted_within_scope", "scope": "Owned nonmultiplexed SSH client termination/reconnect observed the same detached Dagu job/checkpoint and final completion; owned listener/processes retired. This is controlled transport interruption, not host restart or a real network outage.", "evidence_refs": ["blueprints/convergence-practice/wsl-transport-recovery/receipt.json"]},
         "persistence": {"status": "accepted_within_scope", "scope": "Owned nonmultiplexed SSH client termination/reconnect observed the same detached Dagu job/checkpoint and final completion; owned listener/processes retired. This is controlled transport interruption, not host restart or a real network outage.", "evidence_refs": ["blueprints/convergence-practice/wsl-transport-recovery/receipt.json"]},
-        "restart": {"status": "accepted_within_scope", "scope": "Native same-run stop/retry and at-most-once checkpoint behavior passed the retained deterministic fixture; this is job retry, not scheduler/host restart.", "evidence_refs": ["blueprints/convergence-practice/job-recovery/README.md"]},
+        "restart": {"status": "accepted_within_scope", "scope": "Native same-run stop/retry passed the retained integration fixture and selected unchanged official retry tests passed on a fresh runner. This qualifies job retry, not scheduler/host restart; the later guest launch failed before boot.", "evidence_refs": ["blueprints/convergence-practice/job-recovery/README.md", "evidence/receipts/native-dagu-retry-tests-20260920.json"]},
         "cleanup": {"status": "accepted_within_scope", "scope": "Owned nonmultiplexed SSH client termination/reconnect observed the same detached Dagu job/checkpoint and final completion; owned listener/processes retired. This is controlled transport interruption, not host restart or a real network outage.", "evidence_refs": ["blueprints/convergence-practice/wsl-transport-recovery/receipt.json"]},
         "recovery": {"status": "accepted_within_scope", "scope": "Owned nonmultiplexed SSH client termination/reconnect observed the same detached Dagu job/checkpoint and final completion; owned listener/processes retired. This is controlled transport interruption, not host restart or a real network outage.", "evidence_refs": ["blueprints/convergence-practice/wsl-transport-recovery/receipt.json"]}
       },
@@ -4583,7 +4588,7 @@
       "repository": "https://github.com/restic/restic",
       "version": "0.19.1",
       "profile": "supporting",
-      "role": "Encrypted same-host backup and verified restore of explicitly selected public files",
+      "role": "Scoped encrypted backup and verified restore, including synthetic independent-host recovery",
       "installation_assessment": "runtime present at retained native operation date",
       "current_host_recertified_by_this_audit": false,
       "native_integration": {
@@ -4623,6 +4628,11 @@
             "id": "native-wsl-restic-synthetic-20260920",
             "path": "blueprints/convergence-practice/wsl-restore/receipt.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-offhost-restic-20260920",
+            "path": "evidence/receipts/native-offhost-restic-20260920.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4636,7 +4646,7 @@
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Explicit scoped encrypted backup and verified same-host restore accepted; broader disaster recovery depends on its dedicated receipt.",
+        "scope": "Scoped same-host application restores and separate synthetic independent-host byte/POSIX-mode recovery accepted; application-state off-host recovery and production disaster recovery remain unqualified.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
@@ -4648,7 +4658,7 @@
         "persistence": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
         "restart": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
         "cleanup": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
-        "recovery": {"status": "accepted_within_scope", "scope": "Dated isolated native backup/restore acceptance passed within the linked scope. Same-host restoration is distinct from independent-host disaster recovery; no production state was overwritten.", "evidence_refs": ["blueprints/convergence-practice/wsl-restore/receipt.json"]}
+        "recovery": {"status": "accepted_within_scope", "scope": "Retained same-host restores and a fresh hosted runner's exact two-snapshot synthetic byte/POSIX-mode restore passed. The latter used separately delivered fixture credentials and retained seven unchanged upstream test passes; ai-memory/Qdrant off-host queries and production disaster recovery remain unqualified.", "evidence_refs": ["blueprints/convergence-practice/wsl-restore/receipt.json", "evidence/receipts/native-offhost-restic-20260920.json"]}
       },
       "baseline_applicability": {
         "category": "supporting_workflow",

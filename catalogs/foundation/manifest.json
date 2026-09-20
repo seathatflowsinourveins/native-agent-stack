@@ -148,8 +148,8 @@
       "purpose": "Retain pinned inputs and prove usable restore, continuity and cleanup at the intended boundary.",
       "selection": "Owned lifecycle recipes, Restic, native application backups and native session resume.",
       "activation": "Use exact snapshots and empty restore targets; keep keys/account sign-ins private and separate from the checkout.",
-      "lifecycle_scope": "Same-host restores and individual session/job continuations passed; a whole-stack independent-host disaster recovery has not.",
-      "next_gap": "Run independent off-host restore with separately available key recovery and affected service acceptance."
+      "lifecycle_scope": "Same-host application restores, synthetic independent-host Restic recovery with a separately supplied password, and individual session/job continuations passed. Whole-stack independent-host disaster recovery has not.",
+      "next_gap": "Qualify affected application-state queries after off-host restore and the selected scheduled service after reboot."
     },
     {
       "id": "observation-inference",
@@ -229,13 +229,16 @@
     {
       "id": "offhost-keys-and-service-reboot",
       "priority": 3,
-      "status": "open",
-      "scope": "Same-host backup/restore and service stop/start do not establish independent off-host key recovery or scheduled-service continuity after reboot.",
-      "next_action": "Exercise a separately accessible key and exact snapshot on an independent host, then qualify the selected owned scheduled service after reboot.",
+      "status": "partial",
+      "scope": "Synthetic independent-host Restic recovery passed with separately supplied fixture credentials. Actual application-state queries and scheduled-service continuity after reboot remain unqualified; the first guest launch failed before boot and is retained.",
+      "next_action": "Run the reviewed correction for the owned guest launcher, then qualify real application-state off-host queries at the selected adoption boundary.",
       "source_paths": [
         "adoption/lifecycle.md",
         "blueprints/convergence-practice/wsl-restore/README.md",
-        "blueprints/convergence-practice/wsl-transport-recovery/README.md"
+        "blueprints/convergence-practice/wsl-transport-recovery/README.md",
+        "blueprints/convergence-practice/offhost-restore/README.md",
+        "evidence/receipts/native-offhost-restic-20260920.json",
+        "blueprints/convergence-practice/service-reboot/README.md"
       ]
     }
   ],

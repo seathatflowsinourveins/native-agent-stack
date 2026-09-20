@@ -329,6 +329,18 @@
       "category": "evaluation"
     },
     {
+      "title": "Upstream restic tests and independent-host restore",
+      "body": "Seven unchanged upstream tests passed; two exact synthetic snapshots restored with a separately supplied key. Native outputs, independent artifact checks and the initial failed attempt are retained.",
+      "path": "blueprints/convergence-practice/offhost-restore/README.md",
+      "category": "evaluation"
+    },
+    {
+      "title": "Unchanged upstream Dagu retry results",
+      "body": "Selected official retry tests passed with all 3,261 source files unchanged. Their result is separate from the later guest launch failure and pending reboot qualification.",
+      "path": "evidence/receipts/native-dagu-retry-tests-20260920.json",
+      "category": "evaluation"
+    },
+    {
       "title": "Tavily upstream CLI and skills",
       "body": "Native install, Search/Extract outputs, eight-skill discovery and explicit Desktop probe limits.",
       "path": "recipes/tavily.md",
