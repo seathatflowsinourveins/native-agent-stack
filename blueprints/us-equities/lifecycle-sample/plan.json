@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "bounded-lifecycle-source-v1",
+  "sources": [
+    {
+      "source_id": "meta_release",
+      "role": "issuer_announcement",
+      "url": "https://investor.atmeta.com/investor-news/press-release-details/2022/Meta-Platforms-Inc.-to-Change-Ticker-Symbol-to-META-on-June-9/default.aspx"
+    },
+    {
+      "source_id": "roundhill_release",
+      "role": "issuer_distributed_announcement",
+      "url": "https://www.prnewswire.com/news-releases/roundhill-ball-metaverse-etf-to-change-ticker-symbol-to-metv-301461328.html"
+    },
+    {
+      "source_id": "twtr_8k_sgml",
+      "role": "issuer_sec_submission",
+      "url": "https://www.sec.gov/Archives/edgar/data/1418091/000119312522272772/0001193125-22-272772.txt"
+    },
+    {
+      "source_id": "twtr_8k_index",
+      "role": "sec_submission_metadata",
+      "url": "https://www.sec.gov/Archives/edgar/data/1418091/000119312522272772/0001193125-22-272772-index.htm"
+    },
+    {
+      "source_id": "twtr_25_sgml",
+      "role": "exchange_sec_submission",
+      "url": "https://www.sec.gov/Archives/edgar/data/1418091/000087666122000890/0000876661-22-000890.txt"
+    },
+    {
+      "source_id": "twtr_25_index",
+      "role": "sec_submission_metadata",
+      "url": "https://www.sec.gov/Archives/edgar/data/1418091/000087666122000890/0000876661-22-000890-index.htm"
+    }
+  ],
+  "request_limits": {
+    "max_attempts": 6,
+    "max_attempts_per_source": 1,
+    "max_body_bytes": 8388608,
+    "timeout_seconds": [
+      10,
+      30
+    ],
+    "redirects": false,
+    "cache_reuse": false,
+    "after_origin_access_refusal": "skip_remaining_same_origin"
+  },
+  "case_ids": [
+    "meta_rename",
+    "roundhill_rename",
+    "twitter_suspension"
+  ],
+  "strict_availability": "available_ns equals actual response observed_ns; publisher-claimed dates are separate facts, not local knowledge",
+  "legal_delisting_effective_at": null,
+  "provider_revision_at": null,
+  "permanent_security_id": null,
+  "historical_universe_eligible": false,
+  "retained_identity_receipt_sha256": "2d1bd1f31288782d819cbdba8c30f79d436133049fa5dc35b10887fa24b7283d",
+  "retained_identity_scope": "Independent retrospective alias-query evidence; never merge documentary identity or infer zero-bar origin",
+  "new_alpaca_requests": 0
+}

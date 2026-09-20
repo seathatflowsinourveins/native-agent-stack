@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "kind": "lifecycle_source_review",
+  "baseline_commit": "cb79080cf5d9510818c67ac51c521b1d2a1b80fe",
+  "review_date": "2026-09-20",
+  "scope": "Three hand-selected documentary cases; installed parser source sections and public primary contracts, not a universe audit or new provider subscription.",
+  "source_plan": "blueprints/us-equities/lifecycle-sample/plan.json",
+  "source_plan_sha256": "1324845825796e32b46d502884bf036e6b9211ca9976b7e9684dfda5b9b7f72b",
+  "sources": [
+    {
+      "source_id": "meta_release",
+      "role": "issuer_announcement",
+      "url": "https://investor.atmeta.com/investor-news/press-release-details/2022/Meta-Platforms-Inc.-to-Change-Ticker-Symbol-to-META-on-June-9/default.aspx"
+    },
+    {
+      "source_id": "roundhill_release",
+      "role": "issuer_distributed_announcement",
+      "url": "https://www.prnewswire.com/news-releases/roundhill-ball-metaverse-etf-to-change-ticker-symbol-to-metv-301461328.html"
+    },
+    {
+      "source_id": "twtr_8k_sgml",
+      "role": "issuer_sec_submission",
+      "url": "https://www.sec.gov/Archives/edgar/data/1418091/000119312522272772/0001193125-22-272772.txt"
+    },
+    {
+      "source_id": "twtr_8k_index",
+      "role": "sec_submission_metadata",
+      "url": "https://www.sec.gov/Archives/edgar/data/1418091/000119312522272772/0001193125-22-272772-index.htm"
+    },
+    {
+      "source_id": "twtr_25_sgml",
+      "role": "exchange_sec_submission",
+      "url": "https://www.sec.gov/Archives/edgar/data/1418091/000087666122000890/0000876661-22-000890.txt"
+    },
+    {
+      "source_id": "twtr_25_index",
+      "role": "sec_submission_metadata",
+      "url": "https://www.sec.gov/Archives/edgar/data/1418091/000087666122000890/0000876661-22-000890-index.htm"
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "meta_rename",
+      "documentary_identity": "Meta Platforms Class A common stock",
+      "source_id": "meta_release",
+      "publisher_claimed_publication": "2022-05-31",
+      "claimed_event_date": "2022-06-09",
+      "timing": "prior to market open",
+      "before": "FB",
+      "after": "META",
+      "continuity_claim": "Issuer states class remains listed and CUSIP unchanged; actual identifier unknown here."
+    },
+    {
+      "case_id": "roundhill_rename",
+      "documentary_identity": "Roundhill Ball Metaverse ETF shares",
+      "source_id": "roundhill_release",
+      "publisher_claimed_publication": "2022-01-14 16:30 ET",
+      "claimed_event_date": "2022-01-31",
+      "timing": "start of trading",
+      "before": "META",
+      "after": "METV",
+      "continuity_claim": "Issuer describes ticker change for the same fund. Separate from company stock."
+    },
+    {
+      "case_id": "twitter_suspension",
+      "documentary_identity": "Twitter common stock on NYSE",
+      "source_id": "twtr_8k_sgml",
+      "publisher_claimed_publication": null,
+      "claimed_event_date": "2022-10-28",
+      "timing": "prior to exchange open",
+      "event_kind": "exchange trading suspension",
+      "legal_delisting_effective_at": null
+    }
+  ],
+  "temporal_policy": {
+    "original_publication": "Publisher-displayed date or native SEC acceptance text retained separately; unknown precise times/zone stay null.",
+    "effective": "Date-level event statement and source timing language; no invented midnight or permanent security lifetime.",
+    "observed": "Actual local receipt UTC nanoseconds; unchanged on parsing/replay.",
+    "available": "Equals observed UTC nanoseconds for strict local-observer claim selection.",
+    "revisions": "Unknown ordering/availability. No local file order masquerades as provider revision sequence."
+  },
+  "native_shapes": [
+    {
+      "component": "edgartools",
+      "installed_version": "5.58.0",
+      "apis": [
+        "FilingSGML.from_text(local_text)",
+        "FilingSGML.get_document_by_sequence(\"1\")",
+        "HTMLParser().parse(local_bytes).to_markdown()"
+      ],
+      "source_sections": [
+        "edgar/sgml/sgml_common.py: parse_submission_text, from_text, get_document_by_sequence",
+        "edgar/sgml/sgml_header.py: filing_date, acceptance_datetime",
+        "edgar/sgml/sgml_parser.py: SGMLDocument",
+        "edgar/documents/parser.py: HTMLParser.parse"
+      ],
+      "review_pin": "Existing adopted runtime; four installed whole-file hashes frozen in native derivation",
+      "license": "MIT client license; does not license third-party publisher content"
+    },
+    {
+      "component": "duckdb",
+      "installed_version": "1.5.5",
+      "apis": [
+        "duckdb.connect(\":memory:\")",
+        "execute(parameterized_sql)",
+        "COPY ... FORMAT PARQUET",
+        "read_parquet(local_verified_file)"
+      ],
+      "purpose": "Exact BIGINT observer cutoffs and immutable source-to-row reconciliation"
+    },
+    {
+      "component": "alpaca-py",
+      "installed_version": "0.44.0",
+      "new_requests": 0,
+      "decision": "Reuse accepted retrospective alias receipt; no current asset lookup can supply missing historical lifetimes."
+    }
+  ],
+  "conditional_source": {
+    "component": "WRDS/CRSP",
+    "decision": "Not acquired or accepted",
+    "reasons": [
+      "No account or licensed entitlement established",
+      "No permitted redistribution scope established",
+      "No complete vintage/revision or original-availability evidence acquired"
+    ],
+    "prior_review": "catalogs/us-equities/security-identity-review.json"
+  },
+  "native_request_budget": {
+    "max_attempts": 6,
+    "max_attempts_per_source": 1,
+    "max_body_bytes": 8388608,
+    "timeout_seconds": [
+      10,
+      30
+    ],
+    "redirects": false,
+    "cache_reuse": false,
+    "after_origin_access_refusal": "skip_remaining_same_origin"
+  },
+  "native_execution_record": "Coordinator convergence receipt; source research alone does not establish native execution.",
+  "retained_alias_receipt_sha256": "2d1bd1f31288782d819cbdba8c30f79d436133049fa5dc35b10887fa24b7283d",
+  "acceptance": {
+    "documentary_event_claims": "Permitted when exact source bytes and fixed reviewed text witnesses qualify; actual status is receipt-bound.",
+    "ticker_reuse": "Distinct ETF and company-stock documentary scopes and ordered rename claims; no continuous ownership history or zero-bar origin inference.",
+    "strict_observer_eligibility": "Native DuckDB cutoff proof over supported claims; historical cutoff zero for now-observed documents.",
+    "historical_universe": false,
+    "permanent_identity_crosswalk": false,
+    "provider_revision_acceptance": false,
+    "broker_tradability": false
+  },
+  "rejection_reasons": [
+    "No complete active/inactive historical security population",
+    "No stable provider security crosswalk or full listing/delisting intervals",
+    "No original observer capture or ordered provider revisions",
+    "Suspension/form25 notification is not a proven legal delisting instant",
+    "Current broker status cannot fill historical gaps"
+  ],
+  "research_diagnostics": [
+    {
+      "source": "Form25 raw XML/SGML through web tool",
+      "result": "Internal error; rendered filing page and index available",
+      "effect": "No inferred absence; coordinator fixed native capture is separate evidence"
+    }
+  ]
+}
