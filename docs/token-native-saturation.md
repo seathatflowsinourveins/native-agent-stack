@@ -18,10 +18,10 @@ Remaining boundaries are explicit: Claude HUD's actual interactive attempt reach
 | `ai-memory` | Dated native receipt/operation | Current read-only query | Not measured for this role |
 | `ast-grep` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
 | `ccusage` | Dated native receipt/operation | Current read-only query | Not measured for this role |
-| `claude-code` | Dated native receipt/operation | Not executed in this pass | Dated provider observations; no causal lifetime total |
-| `claude-hud` | Dated native receipt/operation | Synthetic renderer fixture | Not measured for this role |
+| `claude-code` | Dated native receipt/operation | Bounded native task: Context Mode read and exact jCodeMunch retrieval | Dated provider observations; no causal lifetime total |
+| `claude-hud` | Dated native receipt/operation | Synthetic renderer passed; real interactive attempt reached onboarding | Not measured for this role |
 | `codebase-memory-mcp` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
-| `codex` | Dated native receipt/operation | Not executed in this pass | Dated provider observations; no causal lifetime total |
+| `codex` | Dated native receipt/operation | Bounded native task: Context Mode read and exact jCodeMunch retrieval | Dated provider observations; no causal lifetime total |
 | `codex-for-claude` | Dated native receipt/operation | Not executed in this pass | Not measured for this role |
 | `context-hub` | Dated native receipt/operation | Functional operation and artifact comparison | 1 retained comparison(s) |
 | `context-mode` | Dated native receipt/operation | Both native clients passed project-file reading; fresh native PreCompact unforced | Not measured for this role |
@@ -50,6 +50,7 @@ Remaining boundaries are explicit: Claude HUD's actual interactive attempt reach
 | `worktrunk` | Dated native receipt/operation | Bounded functional operation | Not measured for this role |
 | `opentelemetry-collector-contrib` | Dated native receipt/operation | Configuration validation | Not measured for this role |
 | `prometheus` | Dated native receipt/operation | Current read-only query | Not measured for this role |
+| `llama-cpp` | Pinned native CUDA runtime and model | Published main-branch planner repair: independent source review, 12 original tests, owned server exited | One scoped local task; no token-savings or general frontier-parity claim |
 | `loki` | Dated native receipt/operation | Current read-only query | Not measured for this role |
 | `grafana` | Dated native receipt/operation | Current read-only query | Not measured for this role |
 | `alertmanager` | Dated native receipt/operation | Current read-only query | Not measured for this role |

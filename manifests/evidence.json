@@ -1129,13 +1129,13 @@
       ],
       "claim": "Three supplemental upstream tools installed on the source Linux/WSL host: Beads persisted task claims and dependency transitions, skills-ref validated and rendered a selected skill, and otel-tui ingested and displayed one synthetic loopback trace.",
       "limitations": [
+        "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host.",
         "Bounded native CLI/TUI acceptance on Linux/WSL; no new native Codex or Claude provider task was run for these additions.",
         "Beads used one owned Git fixture with embedded Dolt, explicit task scope, skipped agent-instruction generation and skipped hooks. It does not replace ai-memory.",
         "skills-ref is upstream's reference/demo implementation; successful portable-format validation does not certify production client extensions or tool semantics.",
         "otel-tui received one synthetic local trace; no production or native-provider telemetry session was evaluated and no persistent exporter was installed.",
         "None of these three tools exposes a verified cumulative token-savings counter. Exact causal lifetime provider savings remain null.",
-        "Public command forms substitute portable variables for private host paths; private raw operation logs are not published.",
-        "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
+        "Public command forms substitute portable variables for private host paths; private raw operation logs are not published."
       ],
       "host_scope": {
         "profile": "source-host-linux-wsl",
@@ -1153,12 +1153,12 @@
       ],
       "claim": "Official ai-memory 2.3.2 release installed on the source Linux/WSL host over 2.3.1 after a private upstream backup; active service executable, native status, scoped search and configured direct MCP status verified.",
       "limitations": [
+        "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host.",
         "No new provider/model task was run. Existing dated client acceptance remains tied to its original version and scope.",
         "Private memory contents, counts, backup, paths and raw native/MCP responses are excluded from this publication.",
         "Native client configuration, service unit, lifecycle hooks, managed routing/skills, project scope and provider settings were preserved.",
         "This maintenance update does not demonstrate token savings; exact causal lifetime provider savings remain null.",
-        "Forward-only migrations may require restoring the retained private backup to downgrade.",
-        "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
+        "Forward-only migrations may require restoring the retained private backup to downgrade."
       ],
       "host_scope": {
         "profile": "source-host-linux-wsl",
@@ -1176,11 +1176,11 @@
       ],
       "claim": "zizmor 1.30.1 installed in an isolated tool environment on the source Linux/WSL host; offline repository workflow scan returned zero findings, while an inert unsafe fixture returned the expected diagnostics and exit code.",
       "limitations": [
+        "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host.",
         "Offline regular-persona static analysis only; no online credential-backed checks or workflow execution.",
         "The official uv package-index installation was used. The installed binary was separately hashed; no independent downloaded wheel archive verification was performed in this host follow-up.",
         "Earlier Mac and disposable GitHub CI acceptance receipts retain their original host scope.",
-        "No provider task was run and zizmor supplies no verified lifetime token-savings counter.",
-        "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
+        "No provider task was run and zizmor supplies no verified lifetime token-savings counter."
       ],
       "host_scope": {
         "profile": "source-host-linux-wsl",
@@ -3560,7 +3560,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "95aef9c8bbae6c7e08d8d49dc251c80022dc8dfa4946f061eb61b1485d48bf90",
+      "sha256": "56fd8f99f0de48765903d561dfc8c5cc16fbeb3a4659d8a52b73f98751d62e98",
       "bytes": 1616475
     },
     {
@@ -3570,7 +3570,7 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "85efceb62bfce8d83650d027a202614917c6419a8dcef40edab10f162f4d98fb",
+      "sha256": "95c61dbe44c4b96787c30383f6953d5af4fb1ef016387c47cda8be5677dc71b2",
       "bytes": 16770
     },
     {
@@ -3610,8 +3610,8 @@
     },
     {
       "path": "docs/token-native-saturation.md",
-      "sha256": "51ea23eece666ff74674bf35f14b81327e267ab8a0ff108c500df335bc1e3f67",
-      "bytes": 9857
+      "sha256": "81f3ea585b30c047c7166db174d555c912e71f13d85cd63ba28c1bfe1071d1bb",
+      "bytes": 10225
     },
     {
       "path": "docs/token-practice.md",
