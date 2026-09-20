@@ -1,0 +1,608 @@
+{
+  "schema_version": 1,
+  "phase": "destination",
+  "status": "passed",
+  "commands": [
+    {
+      "id": "wrong-password-restore",
+      "argv": [
+        "$OWNED_RUN/tools/restic/restic",
+        "--no-cache",
+        "--no-lock",
+        "--repo",
+        "$OWNED_RUN/input-repository",
+        "--password-file",
+        "$WRONG_PASSWORD_FILE",
+        "restore",
+        "0fd4395da35e8ebde5335c0985e349cab7f81f6491c49e102dffbeb87d791134:/tmp/native-offhost-app.9njsr7Va",
+        "--target",
+        "$OWNED_RUN/wrong-target",
+        "--verify"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:34.020675+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 12,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:34.361948+00:00",
+      "seconds": 0.34129,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "wrong-password-restore.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "5350d639b7c6932a5cb55c8d6efee0eee512cf3ba361449e550be42e98fee4da",
+        "raw_bytes": 38,
+        "public_path": "wrong-password-restore.stderr",
+        "public_sha256": "5350d639b7c6932a5cb55c8d6efee0eee512cf3ba361449e550be42e98fee4da",
+        "public_bytes": 38,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "received-repository-check",
+      "argv": [
+        "$OWNED_RUN/tools/restic/restic",
+        "--no-cache",
+        "--no-lock",
+        "--repo",
+        "$OWNED_RUN/input-repository",
+        "--password-file",
+        "$FIXTURE_PASSWORD_FILE",
+        "check",
+        "--read-data"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:34.362844+00:00",
+      "timeout_seconds": 180,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:34.699574+00:00",
+      "seconds": 0.336747,
+      "stdout": {
+        "raw_sha256": "519b580db41d7223cc5c81b17ffc8b4f36d9e8260b5e391afe97cef15bcdbb14",
+        "raw_bytes": 157,
+        "public_path": "received-repository-check.stdout",
+        "public_sha256": "519b580db41d7223cc5c81b17ffc8b4f36d9e8260b5e391afe97cef15bcdbb14",
+        "public_bytes": 157,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "received-repository-check.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "exact-snapshot-restore",
+      "argv": [
+        "$OWNED_RUN/tools/restic/restic",
+        "--no-cache",
+        "--no-lock",
+        "--repo",
+        "$OWNED_RUN/input-repository",
+        "--password-file",
+        "$FIXTURE_PASSWORD_FILE",
+        "restore",
+        "0fd4395da35e8ebde5335c0985e349cab7f81f6491c49e102dffbeb87d791134:/tmp/native-offhost-app.9njsr7Va",
+        "--target",
+        "$OWNED_RUN/restored-archive",
+        "--verify",
+        "--overwrite",
+        "never"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:34.700449+00:00",
+      "timeout_seconds": 180,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:35.039815+00:00",
+      "seconds": 0.339385,
+      "stdout": {
+        "raw_sha256": "030d8f580a5850c34b30e9d409220351459cbefdb94a6b014b871e7c265f2d25",
+        "raw_bytes": 414,
+        "public_path": "exact-snapshot-restore.stdout",
+        "public_sha256": "f1ed7520d197b8e674aaaea30321a52ac475d1d7277de115bae39a80bcca36db",
+        "public_bytes": 354,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "exact-snapshot-restore.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "native-memory-restore",
+      "argv": [
+        "$OWNED_RUN/tools/ai-memory",
+        "--data-dir",
+        "$OWNED_RUN/restored-memory-data",
+        "--config",
+        "$CHECKOUT/blueprints/convergence-practice/wsl-memory-maintenance/config.toml",
+        "restore",
+        "--from",
+        "$OWNED_RUN/restored-archive/payload/memory.tar.gz"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:35.045132+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:35.058472+00:00",
+      "seconds": 0.01334,
+      "stdout": {
+        "raw_sha256": "44b9d00db83d42b368be0fb6e368f9304794990092d0246486f05d14cbd1907d",
+        "raw_bytes": 138,
+        "public_path": "native-memory-restore.stdout",
+        "public_sha256": "f67facff84cedb82d903852ae302a2fd49ec6c0c9d966679f1257905d3d3f6d1",
+        "public_bytes": 94,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "03d5bf3c980b7ad6fc34e8dc21bbebeed88ae75a5e01bba5915812c960f23e79",
+        "raw_bytes": 1105,
+        "public_path": "native-memory-restore.stderr",
+        "public_sha256": "7042237da9aea260eda84a0a520dc6542e3454abf581dc1c2b553266a6a6b57c",
+        "public_bytes": 1039,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "restored-memory-stdio",
+      "argv": [
+        "$OWNED_RUN/tools/ai-memory",
+        "--data-dir",
+        "$OWNED_RUN/restored-memory-data",
+        "--config",
+        "$CHECKOUT/blueprints/convergence-practice/wsl-memory-maintenance/config.toml",
+        "serve",
+        "--transport",
+        "stdio",
+        "--no-watcher",
+        "--workspace",
+        "wsl-maintenance-synthetic",
+        "--project",
+        "alpha"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:35.059456+00:00",
+      "launched": true,
+      "finished_at_utc": "2026-09-20T22:24:35.184995+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "raw_sha256": "65f88074c4af06df74a2ab52b0c84b1f458c04b42f52d49c76095a68db5d7365",
+        "raw_bytes": 20183,
+        "public_path": "restored-memory-stdio.stdout",
+        "public_sha256": "65f88074c4af06df74a2ab52b0c84b1f458c04b42f52d49c76095a68db5d7365",
+        "public_bytes": 20183,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "652da269ecbde78da107162b5b69829a477cde1841aef14fa1b94bbf7cb34b3e",
+        "raw_bytes": 4520,
+        "public_path": "restored-memory-stdio.stderr",
+        "public_sha256": "8342e3f996872ec6ebde41cf51e3b567c61da162dfc4f6a4d82fc7d339388b05",
+        "public_bytes": 4476,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "destination-qdrant",
+      "argv": [
+        "$OWNED_RUN/tools/qdrant",
+        "--config-path",
+        "$OWNED_RUN/destination-qdrant/config.yaml",
+        "--disable-telemetry",
+        "--storage-snapshot",
+        "$OWNED_RUN/restored-archive/payload/qdrant.snapshot"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:35.189985+00:00",
+      "stdout": {
+        "raw_sha256": "7558fea97356bd1c01545ee6bcc8061e451c971a01500c5666fb0173446edd3c",
+        "raw_bytes": 5155,
+        "public_path": "destination-qdrant.stdout",
+        "public_sha256": "bb71083f71ea631fce5052c0dbe97136ca58984852b03c63486d021a2b22ef0f",
+        "public_bytes": 5045,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "destination-qdrant.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "finished_at_utc": "2026-09-20T22:24:35.919474+00:00",
+      "exit_code": 0
+    },
+    {
+      "id": "destination-collections",
+      "method": "GET",
+      "url": "http://127.0.0.1:6333/collections",
+      "body": null,
+      "started_at_utc": "2026-09-20T22:24:35.528227+00:00",
+      "timeout_seconds": 30,
+      "finished_at_utc": "2026-09-20T22:24:35.528643+00:00",
+      "http_status": 200,
+      "response": {
+        "raw_sha256": "828e466664b571c5b8d1e0a8fdd4fb6bcb9b2a93e942f8ce53b0d3e6d9195b37",
+        "raw_bytes": 87,
+        "public_path": "destination-collections.response",
+        "public_sha256": "828e466664b571c5b8d1e0a8fdd4fb6bcb9b2a93e942f8ce53b0d3e6d9195b37",
+        "public_bytes": 87,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "destination-collection",
+      "method": "GET",
+      "url": "http://127.0.0.1:6333/collections/synthetic_offhost",
+      "body": null,
+      "started_at_utc": "2026-09-20T22:24:35.529614+00:00",
+      "timeout_seconds": 30,
+      "finished_at_utc": "2026-09-20T22:24:35.530375+00:00",
+      "http_status": 200,
+      "response": {
+        "raw_sha256": "757c916e21cd165a08dac8b01c7b0cc53616a4cb6d668ad4f45811ecc14b14c2",
+        "raw_bytes": 964,
+        "public_path": "destination-collection.response",
+        "public_sha256": "757c916e21cd165a08dac8b01c7b0cc53616a4cb6d668ad4f45811ecc14b14c2",
+        "public_bytes": 964,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "destination-scroll-0",
+      "method": "POST",
+      "url": "http://127.0.0.1:6333/collections/synthetic_offhost/points/scroll",
+      "body": {
+        "limit": 4,
+        "with_payload": true,
+        "with_vector": true
+      },
+      "started_at_utc": "2026-09-20T22:24:35.531371+00:00",
+      "timeout_seconds": 30,
+      "finished_at_utc": "2026-09-20T22:24:35.532484+00:00",
+      "http_status": 200,
+      "response": {
+        "raw_sha256": "bda3dc3c2d30773585bab3a3b7a0050e320902097f24e317972ca2e6e191f90b",
+        "raw_bytes": 429,
+        "public_path": "destination-scroll-0.response",
+        "public_sha256": "bda3dc3c2d30773585bab3a3b7a0050e320902097f24e317972ca2e6e191f90b",
+        "public_bytes": 429,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "destination-scroll-1",
+      "method": "POST",
+      "url": "http://127.0.0.1:6333/collections/synthetic_offhost/points/scroll",
+      "body": {
+        "limit": 4,
+        "with_payload": true,
+        "with_vector": true,
+        "offset": 5
+      },
+      "started_at_utc": "2026-09-20T22:24:35.533431+00:00",
+      "timeout_seconds": 30,
+      "finished_at_utc": "2026-09-20T22:24:35.534452+00:00",
+      "http_status": 200,
+      "response": {
+        "raw_sha256": "3b761673ce1b70ef9ed591947eb5666f6078cefbbdd9aa6eb60b291d9dc61a8c",
+        "raw_bytes": 341,
+        "public_path": "destination-scroll-1.response",
+        "public_sha256": "3b761673ce1b70ef9ed591947eb5666f6078cefbbdd9aa6eb60b291d9dc61a8c",
+        "public_bytes": 341,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "destination-scroll-2",
+      "method": "POST",
+      "url": "http://127.0.0.1:6333/collections/synthetic_offhost/points/scroll",
+      "body": {
+        "limit": 4,
+        "with_payload": true,
+        "with_vector": true,
+        "offset": 9
+      },
+      "started_at_utc": "2026-09-20T22:24:35.535415+00:00",
+      "timeout_seconds": 30,
+      "finished_at_utc": "2026-09-20T22:24:35.536558+00:00",
+      "http_status": 200,
+      "response": {
+        "raw_sha256": "5e8dcdf8c35bb451133808f80d5c397e3c2dd53c587a8021c294016f33dff123",
+        "raw_bytes": 277,
+        "public_path": "destination-scroll-2.response",
+        "public_sha256": "5e8dcdf8c35bb451133808f80d5c397e3c2dd53c587a8021c294016f33dff123",
+        "public_bytes": 277,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "destination-dense",
+      "method": "POST",
+      "url": "http://127.0.0.1:6333/collections/synthetic_offhost/points/query",
+      "body": {
+        "query": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "limit": 8,
+        "params": {
+          "exact": true
+        },
+        "with_payload": true,
+        "with_vector": true
+      },
+      "started_at_utc": "2026-09-20T22:24:35.537632+00:00",
+      "timeout_seconds": 30,
+      "finished_at_utc": "2026-09-20T22:24:35.539278+00:00",
+      "http_status": 200,
+      "response": {
+        "raw_sha256": "8bc2ac79ae3130a439f0c7f3cde082563bee3839a5170d359b23dfb2062434ad",
+        "raw_bytes": 873,
+        "public_path": "destination-dense.response",
+        "public_sha256": "8bc2ac79ae3130a439f0c7f3cde082563bee3839a5170d359b23dfb2062434ad",
+        "public_bytes": 873,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "destination-dense-alias",
+      "method": "POST",
+      "url": "http://127.0.0.1:6333/collections/synthetic_offhost_alias/points/query",
+      "body": {
+        "query": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "limit": 8,
+        "params": {
+          "exact": true
+        },
+        "with_payload": true,
+        "with_vector": true
+      },
+      "started_at_utc": "2026-09-20T22:24:35.540402+00:00",
+      "timeout_seconds": 30,
+      "finished_at_utc": "2026-09-20T22:24:35.541110+00:00",
+      "http_status": 200,
+      "response": {
+        "raw_sha256": "e614410331e290ee9b71a5381487b980bb81974e3d16c076f44942e898f5cff3",
+        "raw_bytes": 873,
+        "public_path": "destination-dense-alias.response",
+        "public_sha256": "e614410331e290ee9b71a5381487b980bb81974e3d16c076f44942e898f5cff3",
+        "public_bytes": 873,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "destination-berlin",
+      "method": "POST",
+      "url": "http://127.0.0.1:6333/collections/synthetic_offhost/points/query",
+      "body": {
+        "query": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "limit": 8,
+        "params": {
+          "exact": true
+        },
+        "with_payload": true,
+        "with_vector": true,
+        "filter": {
+          "must": [
+            {
+              "key": "city",
+              "match": {
+                "value": "Berlin"
+              }
+            }
+          ]
+        }
+      },
+      "started_at_utc": "2026-09-20T22:24:35.542241+00:00",
+      "timeout_seconds": 30,
+      "finished_at_utc": "2026-09-20T22:24:35.543094+00:00",
+      "http_status": 200,
+      "response": {
+        "raw_sha256": "c1fabdacab45fa7fc623b3c2416b149dbe94fee8c21bc3f0a2606c44468a4d3a",
+        "raw_bytes": 395,
+        "public_path": "destination-berlin.response",
+        "public_sha256": "c1fabdacab45fa7fc623b3c2416b149dbe94fee8c21bc3f0a2606c44468a4d3a",
+        "public_bytes": 395,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "destination-berlin-alias",
+      "method": "POST",
+      "url": "http://127.0.0.1:6333/collections/synthetic_offhost_alias/points/query",
+      "body": {
+        "query": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "limit": 8,
+        "params": {
+          "exact": true
+        },
+        "with_payload": true,
+        "with_vector": true,
+        "filter": {
+          "must": [
+            {
+              "key": "city",
+              "match": {
+                "value": "Berlin"
+              }
+            }
+          ]
+        }
+      },
+      "started_at_utc": "2026-09-20T22:24:35.544218+00:00",
+      "timeout_seconds": 30,
+      "finished_at_utc": "2026-09-20T22:24:35.544870+00:00",
+      "http_status": 200,
+      "response": {
+        "raw_sha256": "1236cd26442da49b5ce1f9c487ce6391fd2e1e6c92bc75587e47de6eed7eb5da",
+        "raw_bytes": 395,
+        "public_path": "destination-berlin-alias.response",
+        "public_sha256": "1236cd26442da49b5ce1f9c487ce6391fd2e1e6c92bc75587e47de6eed7eb5da",
+        "public_bytes": 395,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "destination-sparse",
+      "method": "POST",
+      "url": "http://127.0.0.1:6333/collections/synthetic_offhost/points/query",
+      "body": {
+        "query": {
+          "indices": [
+            66
+          ],
+          "values": [
+            1
+          ]
+        },
+        "using": "sparse-text",
+        "limit": 10,
+        "with_payload": true,
+        "with_vector": true
+      },
+      "started_at_utc": "2026-09-20T22:24:35.596625+00:00",
+      "timeout_seconds": 30,
+      "finished_at_utc": "2026-09-20T22:24:35.597651+00:00",
+      "http_status": 200,
+      "response": {
+        "raw_sha256": "079a86d93e201a0b2ebc4a3e814f5d4f4b0a8ecf28d49de9c2f2ebf6572c8402",
+        "raw_bytes": 166,
+        "public_path": "destination-sparse.response",
+        "public_sha256": "079a86d93e201a0b2ebc4a3e814f5d4f4b0a8ecf28d49de9c2f2ebf6572c8402",
+        "public_bytes": 166,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "destination-sparse-alias",
+      "method": "POST",
+      "url": "http://127.0.0.1:6333/collections/synthetic_offhost_alias/points/query",
+      "body": {
+        "query": {
+          "indices": [
+            66
+          ],
+          "values": [
+            1
+          ]
+        },
+        "using": "sparse-text",
+        "limit": 10,
+        "with_payload": true,
+        "with_vector": true
+      },
+      "started_at_utc": "2026-09-20T22:24:35.600536+00:00",
+      "timeout_seconds": 30,
+      "finished_at_utc": "2026-09-20T22:24:35.601487+00:00",
+      "http_status": 200,
+      "response": {
+        "raw_sha256": "e310b58a929b973a1ff3ee25d83cf8f6bf97b6a3da2cdc7eb9d2e69310738830",
+        "raw_bytes": 166,
+        "public_path": "destination-sparse-alias.response",
+        "public_sha256": "e310b58a929b973a1ff3ee25d83cf8f6bf97b6a3da2cdc7eb9d2e69310738830",
+        "public_bytes": 166,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "destination-aliases",
+      "method": "GET",
+      "url": "http://127.0.0.1:6333/aliases",
+      "body": null,
+      "started_at_utc": "2026-09-20T22:24:35.602739+00:00",
+      "timeout_seconds": 30,
+      "finished_at_utc": "2026-09-20T22:24:35.603100+00:00",
+      "http_status": 200,
+      "response": {
+        "raw_sha256": "99fa4349d2563de4b727a04bf729bd29c64a29d7fbcba258250477597e1e190d",
+        "raw_bytes": 133,
+        "public_path": "destination-aliases.response",
+        "public_sha256": "99fa4349d2563de4b727a04bf729bd29c64a29d7fbcba258250477597e1e190d",
+        "public_bytes": 133,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    }
+  ],
+  "started_at_utc": "2026-09-20T22:24:34.018674+00:00",
+  "provenance_type": "local-integration",
+  "plan_sha256": "ba247c289d3f542491de15fddf6dd46de1822399b9f6967a5c44c0d8b3d24ffe",
+  "cleanup": [
+    {
+      "phase": "restored-memory",
+      "exit_code": 0,
+      "forced_termination": false,
+      "reader_closed": true,
+      "owned_process_exited": true,
+      "protocol_requests": 15
+    },
+    {
+      "process": "destination-qdrant",
+      "exit_code": 0,
+      "forced": false,
+      "listener_closed": true
+    }
+  ],
+  "limitations": [
+    "Synthetic application usability only; no private user database, production recovery, client rebinding, reboot or whole-stack claim.",
+    "Exact snapshots created by the source job are frozen before destination execution; this does not retroactively qualify old private app-state archives.",
+    "Separate jobs and distinct boot identities support fresh-host separation; no independent administrative trust domain or account-loss recovery claim.",
+    "Sequential app snapshots are not one cross-application atomic transaction.",
+    "Selected source tests are distinct from the composed cross-host fixture and from actual destination acceptance.",
+    "Native applications run with owned paths and filtered environments on disposable runners; no general OS filesystem sandbox claim.",
+    "No token-saving claim; provider usage is not measured."
+  ],
+  "identity": {
+    "run_id": "35541091430",
+    "run_attempt": "1",
+    "head_sha": "2e7b4624b85a828be11752238e2806efa420ba3c",
+    "job": "destination",
+    "runner_environment": "github-hosted",
+    "boot_id_sha256": "3fe8501ee3eac19330a037c970e35ca0e55b8b193c09641e7d10f56bac2a7687"
+  },
+  "checks": {
+    "distinct_host_boot_identity": true,
+    "exact_archives": true,
+    "real_memory_queries": true,
+    "complete_qdrant_state_and_queries": true,
+    "ciphertext_unchanged": true
+  },
+  "finished_at_utc": "2026-09-20T22:24:35.921272+00:00"
+}

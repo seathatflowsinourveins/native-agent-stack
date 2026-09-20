@@ -1,0 +1,1 @@
+{"result":{"points":[{"id":5,"payload":{"count":0},"vector":[0.24,0.18,0.22,0.44]},{"id":6,"payload":{},"vector":[0.35,0.08,0.11,0.44]},{"id":7,"payload":{"city":null,"price":null},"vector":[0.25,0.98,0.14,0.43]},{"id":8,"payload":{"city":[],"price":[]},"vector":[0.79,0.53,0.72,0.15]}],"next_page_offset":9},"status":"ok","time":0.000090889}

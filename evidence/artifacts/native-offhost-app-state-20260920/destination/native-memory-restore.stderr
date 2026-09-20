@@ -1,0 +1,10 @@
+[2m2026-09-20T22:24:35.049180Z[0m [32m INFO[0m [2mai_memory_cli[0m[2m:[0m ai-memory starting [3mversion[0m[2m=[0m"2.3.2" [3mserver_url[0m[2m=[0mhttp://127.0.0.1:49374 [3mdata_dir[0m[2m=[0m$OWNED_RUN/restored-memory-data [3mbind[0m[2m=[0m127.0.0.1:49374
+[2m2026-09-20T22:24:35.055713Z[0m [32m INFO[0m [2mai_memory_cli::commands::restore[0m[2m:[0m tarball extracted [3mfrom[0m[2m=[0m$OWNED_RUN/restored-archive/payload/memory.tar.gz [3minto[0m[2m=[0m$OWNED_RUN/restored-memory-data
+[2m2026-09-20T22:24:35.057482Z[0m [32m INFO[0m [2mrefinery_core::traits[0m[2m:[0m current version: 64
+[2m2026-09-20T22:24:35.057521Z[0m [32m INFO[0m [2mrefinery_core::traits::sync[0m[2m:[0m no migrations to apply
+[2m2026-09-20T22:24:35.057525Z[0m [32m INFO[0m [2mrefinery_core::traits::sync[0m[2m:[0m preparing to apply 0 migrations: Map {
+    iter: Iter(
+        [],
+    ),
+}
+[2m2026-09-20T22:24:35.057663Z[0m [32m INFO[0m [2mai_memory_cli::commands::restore[0m[2m:[0m restore complete

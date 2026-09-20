@@ -1,0 +1,283 @@
+[
+  {
+    "tool": "memory_read_page",
+    "arguments": {
+      "workspace": "wsl-maintenance-synthetic",
+      "project": "alpha",
+      "path": "notes/alpha.md"
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"path\": \"notes/alpha.md\",\n  \"title\": \"Updated synthetic alpha decision\",\n  \"body\": \"# Updated synthetic alpha decision\\nWslpatchwillow replaces the original alpha decision.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.2\",\n      \"at\": \"2026-09-20T22:23:56Z\"\n    }\n  }\n}"
+          }
+        ],
+        "isError": false
+      }
+    }
+  },
+  {
+    "tool": "memory_query",
+    "arguments": {
+      "workspace": "wsl-maintenance-synthetic",
+      "project": "alpha",
+      "query": "Wslpatchwillow",
+      "explain": true
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"hits\": [\n    {\n      \"id\": \"SYNTHETIC_OBJECT_ID_1\",\n      \"path\": \"notes/alpha.md\",\n      \"title\": \"Updated synthetic alpha decision\",\n      \"snippet\": \"# Updated synthetic alpha decision\\n<mark>Wslpatchwillow</mark> replaces the original alpha decision.\\n\",\n      \"rank\": -0.018032786885245903,\n      \"score_details\": {\n        \"fts_rank\": 1,\n        \"fts_score\": -0.8153147775804968,\n        \"rrf\": {\n          \"fts\": 0.01639344262295082,\n          \"vector\": 0.0,\n          \"graph\": 0.0,\n          \"entity\": 0.0\n        },\n        \"fused\": 0.01639344262295082,\n        \"authority\": 1.1,\n        \"evidence_count\": 0\n      }\n    }\n  ],\n  \"streams_active\": [\n    \"fts\",\n    \"entity\",\n    \"graph\"\n  ]\n}"
+          }
+        ],
+        "isError": false
+      }
+    }
+  },
+  {
+    "tool": "memory_query",
+    "arguments": {
+      "workspace": "wsl-maintenance-synthetic",
+      "project": "beta",
+      "query": "Wslpatchwillow"
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 4,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"hits\": []\n}"
+          }
+        ],
+        "isError": false
+      }
+    }
+  },
+  {
+    "tool": "memory_read_page",
+    "arguments": {
+      "workspace": "wsl-maintenance-synthetic",
+      "project": "beta",
+      "path": "notes/alpha.md"
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 5,
+      "error": {
+        "code": -32603,
+        "message": "page notes/alpha.md not found in resolved scope wsl-maintenance-synthetic/beta"
+      }
+    }
+  },
+  {
+    "tool": "memory_read_page",
+    "arguments": {
+      "workspace": "wsl-maintenance-synthetic",
+      "project": "beta",
+      "path": "notes/beta.md"
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 6,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"path\": \"notes/beta.md\",\n  \"title\": \"Synthetic beta decision\",\n  \"body\": \"# Synthetic beta decision\\nWslpatchamber belongs only to beta.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.2\",\n      \"at\": \"2026-09-20T22:23:56Z\"\n    }\n  }\n}"
+          }
+        ],
+        "isError": false
+      }
+    }
+  },
+  {
+    "tool": "memory_query",
+    "arguments": {
+      "workspace": "wsl-maintenance-synthetic",
+      "project": "beta",
+      "query": "Wslpatchamber",
+      "explain": true
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 7,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"hits\": [\n    {\n      \"id\": \"SYNTHETIC_OBJECT_ID_2\",\n      \"path\": \"notes/beta.md\",\n      \"title\": \"Synthetic beta decision\",\n      \"snippet\": \"# Synthetic beta decision\\n<mark>Wslpatchamber</mark> belongs only to beta.\\n\",\n      \"rank\": -0.018032786885245903,\n      \"score_details\": {\n        \"fts_rank\": 1,\n        \"fts_score\": -0.8717234873682569,\n        \"rrf\": {\n          \"fts\": 0.01639344262295082,\n          \"vector\": 0.0,\n          \"graph\": 0.0,\n          \"entity\": 0.0\n        },\n        \"fused\": 0.01639344262295082,\n        \"authority\": 1.1,\n        \"evidence_count\": 0\n      }\n    }\n  ],\n  \"streams_active\": [\n    \"fts\",\n    \"entity\",\n    \"graph\"\n  ]\n}"
+          }
+        ],
+        "isError": false
+      }
+    }
+  },
+  {
+    "tool": "memory_query",
+    "arguments": {
+      "workspace": "wsl-maintenance-synthetic",
+      "project": "alpha",
+      "query": "Wslpatchamber"
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 8,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"hits\": []\n}"
+          }
+        ],
+        "isError": false
+      }
+    }
+  },
+  {
+    "tool": "memory_read_page",
+    "arguments": {
+      "workspace": "wsl-maintenance-synthetic",
+      "project": "alpha",
+      "path": "notes/beta.md"
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 9,
+      "error": {
+        "code": -32603,
+        "message": "page notes/beta.md not found in resolved scope wsl-maintenance-synthetic/alpha"
+      }
+    }
+  },
+  {
+    "tool": "memory_read_page",
+    "arguments": {
+      "workspace": "wsl-maintenance-synthetic",
+      "project": "alpha",
+      "path": "notes/aéé/decision.md"
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 10,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"path\": \"notes/aéé/decision.md\",\n  \"title\": \"Unicode fixture\",\n  \"body\": \"# Unicode fixture\\nWslpatchunicode survives a five-byte Unicode directory component.\\n\",\n  \"frontmatter\": {\n    \"tier\": \"semantic\",\n    \"type\": \"Note\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.2\",\n      \"at\": \"2026-09-20T22:23:56Z\"\n    }\n  }\n}"
+          }
+        ],
+        "isError": false
+      }
+    }
+  },
+  {
+    "tool": "memory_query",
+    "arguments": {
+      "workspace": "wsl-maintenance-synthetic",
+      "project": "alpha",
+      "query": "Wslpatchunicode",
+      "explain": true
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 11,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"hits\": [\n    {\n      \"id\": \"SYNTHETIC_OBJECT_ID_3\",\n      \"path\": \"notes/aéé/decision.md\",\n      \"title\": \"Unicode fixture\",\n      \"snippet\": \"# Unicode fixture\\n<mark>Wslpatchunicode</mark> survives a five-byte Unicode directory component.\\n\",\n      \"rank\": -0.018032786885245903,\n      \"score_details\": {\n        \"fts_rank\": 1,\n        \"fts_score\": -0.8332886489784747,\n        \"rrf\": {\n          \"fts\": 0.01639344262295082,\n          \"vector\": 0.0,\n          \"graph\": 0.0,\n          \"entity\": 0.0\n        },\n        \"fused\": 0.01639344262295082,\n        \"authority\": 1.1,\n        \"evidence_count\": 0\n      }\n    }\n  ],\n  \"streams_active\": [\n    \"fts\",\n    \"entity\",\n    \"graph\"\n  ]\n}"
+          }
+        ],
+        "isError": false
+      }
+    }
+  },
+  {
+    "tool": "memory_query",
+    "arguments": {
+      "workspace": "wsl-maintenance-synthetic",
+      "project": "beta",
+      "query": "Wslpatchunicode"
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 12,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"hits\": []\n}"
+          }
+        ],
+        "isError": false
+      }
+    }
+  },
+  {
+    "tool": "memory_read_page",
+    "arguments": {
+      "workspace": "wsl-maintenance-synthetic",
+      "project": "beta",
+      "path": "notes/aéé/decision.md"
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 13,
+      "error": {
+        "code": -32603,
+        "message": "page notes/aéé/decision.md not found in resolved scope wsl-maintenance-synthetic/beta"
+      }
+    }
+  },
+  {
+    "tool": "memory_query",
+    "arguments": {
+      "workspace": "wsl-maintenance-synthetic",
+      "project": "alpha",
+      "query": "Wslpatchcobalt"
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 14,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"hits\": []\n}"
+          }
+        ],
+        "isError": false
+      }
+    }
+  },
+  {
+    "tool": "memory_status",
+    "arguments": {
+      "workspace": "wsl-maintenance-synthetic",
+      "project": "alpha"
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 15,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\n  \"counts\": {\n    \"pages_latest\": 2,\n    \"pages_all\": 3,\n    \"sessions\": 0,\n    \"observations\": 0\n  }\n}"
+          }
+        ],
+        "isError": false
+      }
+    }
+  }
+]

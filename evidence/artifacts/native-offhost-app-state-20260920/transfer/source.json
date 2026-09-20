@@ -1,0 +1,452 @@
+{
+  "schema_version": 1,
+  "status": "source-prepared-only",
+  "identity": {
+    "run_id": "35541091430",
+    "run_attempt": "1",
+    "head_sha": "2e7b4624b85a828be11752238e2806efa420ba3c",
+    "job": "source",
+    "runner_environment": "github-hosted",
+    "boot_id_sha256": "691610a311bfee15519b65d252265c4f83dfb551a377b6ec12e6bd1de5f318eb"
+  },
+  "plan_sha256": "ba247c289d3f542491de15fddf6dd46de1822399b9f6967a5c44c0d8b3d24ffe",
+  "snapshot": "0fd4395da35e8ebde5335c0985e349cab7f81f6491c49e102dffbeb87d791134",
+  "source_parent": "/tmp/native-offhost-app.9njsr7Va",
+  "files": [
+    {
+      "name": "memory.tar.gz",
+      "bytes": 44941,
+      "sha256": "7880de6795f6b02da5f78c86815e238a9cda814c62013aecafe917b096f1003c"
+    },
+    {
+      "name": "qdrant.snapshot",
+      "bytes": 171520,
+      "sha256": "c4b6423cd66b3c7089ecb0ecb823a2ee785b504a43e58c23fde4dd749ee78f02"
+    }
+  ],
+  "memory_database": {
+    "integrity": "ok",
+    "forbidden_population": {
+      "sessions": 0,
+      "observations": 0,
+      "workstream_events": 0,
+      "workstream_native_sessions": 0,
+      "page_embeddings": 0
+    },
+    "v62_present": true,
+    "missing_page_windows": 0,
+    "page_versions": 4
+  },
+  "qdrant": {
+    "points": [
+      {
+        "id": 1,
+        "payload": {
+          "city": "Berlin",
+          "price": 10.0
+        },
+        "vector": [
+          0.05,
+          0.61,
+          0.76,
+          0.74
+        ]
+      },
+      {
+        "id": 2,
+        "payload": {
+          "city": [
+            "Berlin",
+            "London"
+          ],
+          "price": 11.0
+        },
+        "vector": [
+          0.19,
+          0.81,
+          0.75,
+          0.11
+        ]
+      },
+      {
+        "id": 3,
+        "payload": {
+          "city": [
+            "Berlin",
+            "Moscow"
+          ],
+          "price": 9.5
+        },
+        "vector": [
+          0.36,
+          0.55,
+          0.47,
+          0.94
+        ]
+      },
+      {
+        "id": 4,
+        "payload": {
+          "city": [
+            "London",
+            "Moscow"
+          ],
+          "price": 9
+        },
+        "vector": [
+          0.18,
+          0.01,
+          0.85,
+          0.8
+        ]
+      },
+      {
+        "id": 5,
+        "payload": {
+          "count": 0
+        },
+        "vector": [
+          0.24,
+          0.18,
+          0.22,
+          0.44
+        ]
+      },
+      {
+        "id": 6,
+        "payload": {},
+        "vector": [
+          0.35,
+          0.08,
+          0.11,
+          0.44
+        ]
+      },
+      {
+        "id": 7,
+        "payload": {
+          "city": null,
+          "price": null
+        },
+        "vector": [
+          0.25,
+          0.98,
+          0.14,
+          0.43
+        ]
+      },
+      {
+        "id": 8,
+        "payload": {
+          "city": [],
+          "price": []
+        },
+        "vector": [
+          0.79,
+          0.53,
+          0.72,
+          0.15
+        ]
+      },
+      {
+        "id": 9,
+        "payload": {},
+        "vector": {
+          "sparse-text": {
+            "indices": [
+              12,
+              66
+            ],
+            "values": [
+              0.5,
+              0.5
+            ]
+          }
+        }
+      },
+      {
+        "id": 10,
+        "payload": {
+          "city": [],
+          "price": []
+        },
+        "vector": {
+          "sparse-text": {
+            "indices": [
+              1,
+              2,
+              3
+            ],
+            "values": [
+              0.1,
+              0.2,
+              0.3
+            ]
+          }
+        }
+      }
+    ],
+    "config": {
+      "params": {
+        "vectors": {
+          "size": 4,
+          "distance": "Dot",
+          "on_disk": false
+        },
+        "shard_number": 1,
+        "replication_factor": 1,
+        "write_consistency_factor": 1,
+        "on_disk_payload": false,
+        "sparse_vectors": {
+          "sparse-text": {}
+        }
+      },
+      "hnsw_config": {
+        "m": 16,
+        "ef_construct": 100,
+        "full_scan_threshold": 10000,
+        "max_indexing_threads": 0,
+        "on_disk": false
+      },
+      "optimizer_config": {
+        "deleted_threshold": 0.2,
+        "vacuum_min_vector_number": 1000,
+        "default_segment_number": 0,
+        "max_segment_size": null,
+        "memmap_threshold": null,
+        "indexing_threshold": 10000,
+        "flush_interval_sec": 5,
+        "max_optimization_threads": null,
+        "prevent_unoptimized": null
+      },
+      "wal_config": {
+        "wal_capacity_mb": 32,
+        "wal_segments_ahead": 0,
+        "wal_retain_closed": 1
+      },
+      "quantization_config": null
+    },
+    "payload_schema": {
+      "city": {
+        "data_type": "keyword",
+        "points": 4
+      },
+      "price": {
+        "data_type": "float",
+        "points": 4
+      }
+    },
+    "aliases": {
+      "aliases": [
+        {
+          "alias_name": "synthetic_offhost_alias",
+          "collection_name": "synthetic_offhost"
+        }
+      ]
+    },
+    "queries": {
+      "dense": [
+        {
+          "id": 8,
+          "version": 1,
+          "score": 0.79,
+          "payload": {
+            "city": [],
+            "price": []
+          },
+          "vector": [
+            0.79,
+            0.53,
+            0.72,
+            0.15
+          ]
+        },
+        {
+          "id": 3,
+          "version": 1,
+          "score": 0.36,
+          "payload": {
+            "city": [
+              "Berlin",
+              "Moscow"
+            ],
+            "price": 9.5
+          },
+          "vector": [
+            0.36,
+            0.55,
+            0.47,
+            0.94
+          ]
+        },
+        {
+          "id": 6,
+          "version": 1,
+          "score": 0.35,
+          "payload": {},
+          "vector": [
+            0.35,
+            0.08,
+            0.11,
+            0.44
+          ]
+        },
+        {
+          "id": 7,
+          "version": 1,
+          "score": 0.25,
+          "payload": {
+            "city": null,
+            "price": null
+          },
+          "vector": [
+            0.25,
+            0.98,
+            0.14,
+            0.43
+          ]
+        },
+        {
+          "id": 5,
+          "version": 1,
+          "score": 0.24,
+          "payload": {
+            "count": 0
+          },
+          "vector": [
+            0.24,
+            0.18,
+            0.22,
+            0.44
+          ]
+        },
+        {
+          "id": 2,
+          "version": 1,
+          "score": 0.19,
+          "payload": {
+            "city": [
+              "Berlin",
+              "London"
+            ],
+            "price": 11.0
+          },
+          "vector": [
+            0.19,
+            0.81,
+            0.75,
+            0.11
+          ]
+        },
+        {
+          "id": 4,
+          "version": 1,
+          "score": 0.18,
+          "payload": {
+            "city": [
+              "London",
+              "Moscow"
+            ],
+            "price": 9
+          },
+          "vector": [
+            0.18,
+            0.01,
+            0.85,
+            0.8
+          ]
+        },
+        {
+          "id": 1,
+          "version": 1,
+          "score": 0.05,
+          "payload": {
+            "city": "Berlin",
+            "price": 10.0
+          },
+          "vector": [
+            0.05,
+            0.61,
+            0.76,
+            0.74
+          ]
+        }
+      ],
+      "berlin": [
+        {
+          "id": 3,
+          "version": 1,
+          "score": 0.36,
+          "payload": {
+            "city": [
+              "Berlin",
+              "Moscow"
+            ],
+            "price": 9.5
+          },
+          "vector": [
+            0.36,
+            0.55,
+            0.47,
+            0.94
+          ]
+        },
+        {
+          "id": 2,
+          "version": 1,
+          "score": 0.19,
+          "payload": {
+            "city": [
+              "Berlin",
+              "London"
+            ],
+            "price": 11.0
+          },
+          "vector": [
+            0.19,
+            0.81,
+            0.75,
+            0.11
+          ]
+        },
+        {
+          "id": 1,
+          "version": 1,
+          "score": 0.05,
+          "payload": {
+            "city": "Berlin",
+            "price": 10.0
+          },
+          "vector": [
+            0.05,
+            0.61,
+            0.76,
+            0.74
+          ]
+        }
+      ],
+      "sparse": [
+        {
+          "id": 9,
+          "version": 1,
+          "score": 0.5,
+          "payload": {},
+          "vector": {
+            "sparse-text": {
+              "indices": [
+                12,
+                66
+              ],
+              "values": [
+                0.5,
+                0.5
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "manifest_sha256": "80dc7b8af5cb01df8f7159ef6ec1ee09d7b0f9c61b8ed9f2f7d5cc245ba5490f",
+  "envelope_sha256": "9dadb39f78bc647c97b7a0c8911ee214cb1494635d1b45409ed1d831524cfc1e"
+}

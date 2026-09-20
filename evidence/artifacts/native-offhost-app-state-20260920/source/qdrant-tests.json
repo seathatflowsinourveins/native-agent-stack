@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "phase": "qdrant-tests",
+  "status": "passed",
+  "commands": [
+    {
+      "id": "upstream-private-network-interfaces",
+      "argv": [
+        "/usr/sbin/ip",
+        "-json",
+        "link",
+        "show"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:23:48.154899+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:23:48.156589+00:00",
+      "seconds": 0.001687,
+      "stdout": {
+        "raw_sha256": "f9684fc248a6a175c6a7370f407cb4acf85fe5ed6558c1204260656b8860584a",
+        "raw_bytes": 257,
+        "public_path": "upstream-private-network-interfaces.stdout",
+        "public_sha256": "f9684fc248a6a175c6a7370f407cb4acf85fe5ed6558c1204260656b8860584a",
+        "public_bytes": 257,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "upstream-private-network-interfaces.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "upstream-qdrant-service",
+      "argv": [
+        "$OWNED_RUN/tools/qdrant",
+        "--config-path",
+        "$OWNED_RUN/upstream-qdrant-service/config.yaml",
+        "--disable-telemetry"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:23:48.158168+00:00",
+      "stdout": {
+        "raw_sha256": "f7e608cc606468234fb455d63fc46b5c190d5f0542c60a8d6bb0745710442854",
+        "raw_bytes": 17246,
+        "public_path": "upstream-qdrant-service.stdout",
+        "public_sha256": "6b413bd449bb3711c322142bbb0488683b42df20c80b35620f4ab46312f23887",
+        "public_bytes": 16960,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "upstream-qdrant-service.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "finished_at_utc": "2026-09-20T22:23:55.392244+00:00",
+      "exit_code": 0
+    },
+    {
+      "id": "qdrant-upstream-tests",
+      "argv": [
+        "uv",
+        "--project",
+        "$OWNED_RUN/upstream-qdrant/tests",
+        "run",
+        "--no-sync",
+        "--offline",
+        "pytest",
+        "$OWNED_RUN/upstream-qdrant/tests/openapi/test_snapshot.py::test_collection_snapshot_operations",
+        "$OWNED_RUN/upstream-qdrant/tests/openapi/test_snapshot.py::test_full_snapshot_operations",
+        "-v",
+        "-p",
+        "no:cacheprovider",
+        "--junitxml",
+        "$OWNED_RUN/raw/qdrant-upstream.xml"
+      ],
+      "cwd": "$OWNED_RUN/upstream-qdrant",
+      "started_at_utc": "2026-09-20T22:23:48.189522+00:00",
+      "timeout_seconds": 300,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:23:55.074454+00:00",
+      "seconds": 6.884938,
+      "stdout": {
+        "raw_sha256": "11129a9b249301db8afb1da3422cd8f20f83144040129e2ce7f4cd986a78fe1e",
+        "raw_bytes": 1064,
+        "public_path": "qdrant-upstream-tests.stdout",
+        "public_sha256": "f6f8013375e4392898c7e2446809c70c06b9001f3aed59c8d865dff268426663",
+        "public_bytes": 998,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-upstream-tests.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    }
+  ],
+  "started_at_utc": "2026-09-20T22:23:48.153685+00:00",
+  "provenance_type": "upstream-unmodified-release-target-adaptation",
+  "plan_sha256": "ba247c289d3f542491de15fddf6dd46de1822399b9f6967a5c44c0d8b3d24ffe",
+  "cleanup": [
+    {
+      "process": "upstream-qdrant-service",
+      "exit_code": 0,
+      "forced": false,
+      "listener_closed": true
+    }
+  ],
+  "limitations": [
+    "Synthetic application usability only; no private user database, production recovery, client rebinding, reboot or whole-stack claim.",
+    "Exact snapshots created by the source job are frozen before destination execution; this does not retroactively qualify old private app-state archives.",
+    "Separate jobs and distinct boot identities support fresh-host separation; no independent administrative trust domain or account-loss recovery claim.",
+    "Sequential app snapshots are not one cross-application atomic transaction.",
+    "Selected source tests are distinct from the composed cross-host fixture and from actual destination acceptance.",
+    "Native applications run with owned paths and filtered environments on disposable runners; no general OS filesystem sandbox claim.",
+    "No token-saving claim; provider usage is not measured."
+  ],
+  "network_boundary": {
+    "distinct_parent_namespace": true,
+    "interfaces": [
+      "lo"
+    ],
+    "scope": "Qdrant and unchanged upstream all-interface HTTP test helper share only the new loopback network."
+  },
+  "finished_at_utc": "2026-09-20T22:23:55.393569+00:00"
+}

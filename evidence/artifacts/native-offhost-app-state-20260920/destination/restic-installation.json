@@ -1,0 +1,208 @@
+{
+  "version": "0.19.1",
+  "source_commit": "6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf",
+  "commands": [
+    {
+      "argv": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--connect-timeout",
+        "15",
+        "--max-time",
+        "90",
+        "--output",
+        "$TOOL_DIR/restic_0.19.1_linux_amd64.bz2",
+        "https://github.com/restic/restic/releases/download/v0.19.1/restic_0.19.1_linux_amd64.bz2"
+      ],
+      "exit_code": 0,
+      "seconds": 0.388,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--connect-timeout",
+        "15",
+        "--max-time",
+        "90",
+        "--output",
+        "$TOOL_DIR/SHA256SUMS",
+        "https://github.com/restic/restic/releases/download/v0.19.1/SHA256SUMS"
+      ],
+      "exit_code": 0,
+      "seconds": 0.233,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--connect-timeout",
+        "15",
+        "--max-time",
+        "90",
+        "--output",
+        "$TOOL_DIR/SHA256SUMS.asc",
+        "https://github.com/restic/restic/releases/download/v0.19.1/SHA256SUMS.asc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.222,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--connect-timeout",
+        "15",
+        "--max-time",
+        "90",
+        "--output",
+        "$TOOL_DIR/signing-key.asc",
+        "https://restic.net/gpg-key-alex.asc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.625,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--connect-timeout",
+        "15",
+        "--max-time",
+        "90",
+        "--output",
+        "$TOOL_DIR/LICENSE",
+        "https://raw.githubusercontent.com/restic/restic/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/LICENSE"
+      ],
+      "exit_code": 0,
+      "seconds": 0.149,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "gpg",
+        "--batch",
+        "--homedir",
+        "$TOOL_DIR/gpg",
+        "--with-colons",
+        "--show-keys",
+        "$TOOL_DIR/signing-key.asc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.02,
+      "stdout": "pub:r:1024:17:141138DDA3E45D66:1013444567:::-:::sca::::::::0:\nfpr:::::::::7BC3013F8489FADC424A07B9141138DDA3E45D66:\nuid:r::::1176935063::2F6D56C4EB7D5963C4302D97898D82F0DA564FB8::Alexander Neumann <alexander@lochraster.org>::::::::::0:\nuid:r::::1021232402::43BC2791246D6AC1E6368E99783E0F67C6867C77::Alexander Neumann <alexander@debian.org>::::::::::0:\nuid:r::::1013444567::35EB167E10CFAEC94D7C7BCB7F2B2C9B42816A32::Alexander Neumann <alexander@bumpern.de>::::::::::0:\nsub:r:1024:16:D51EE87A47E08045:1013444569::::::er:::::::\nfpr:::::::::2BD582F16C9D1F363977F1E0D51EE87A47E08045:\npub:-:4096:1:91A6868BD3F7A907:1414865343:::-:::scESC::::::23::0:\nfpr:::::::::CF8F18F2844575973F79D4E191A6868BD3F7A907:\nuid:-::::1414867341::35EB167E10CFAEC94D7C7BCB7F2B2C9B42816A32::Alexander Neumann <alexander@bumpern.de>::::::::::0:\nuid:r::::::43BC2791246D6AC1E6368E99783E0F67C6867C77::Alexander Neumann <alexander@debian.org>::::::::::0:\nsub:-:4096:1:D5FC2ACF4043FDF1:1414865343::::::e::::::23:\nfpr:::::::::07C478580126F4E4006FABA1D5FC2ACF4043FDF1:\n",
+      "stderr": "gpg: keybox '$TOOL_DIR/gpg/pubring.kbx' created\ngpg: $TOOL_DIR/gpg/trustdb.gpg: trustdb created\ngpg: WARNING: No valid encryption subkey left over.\n"
+    },
+    {
+      "argv": [
+        "gpg",
+        "--batch",
+        "--homedir",
+        "$TOOL_DIR/gpg",
+        "--dearmor",
+        "--output",
+        "$TOOL_DIR/keyring.gpg",
+        "$TOOL_DIR/signing-key.asc"
+      ],
+      "exit_code": 0,
+      "seconds": 0.002,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "gpgv",
+        "--homedir",
+        "$TOOL_DIR/gpg",
+        "--keyring",
+        "$TOOL_DIR/keyring.gpg",
+        "--status-fd",
+        "1",
+        "$TOOL_DIR/SHA256SUMS.asc",
+        "$TOOL_DIR/SHA256SUMS"
+      ],
+      "exit_code": 0,
+      "seconds": 0.009,
+      "stdout": "[GNUPG:] NEWSIG\n[GNUPG:] KEY_CONSIDERED CF8F18F2844575973F79D4E191A6868BD3F7A907 0\n[GNUPG:] SIG_ID +eIreAWhq4Qp+XrVPUIexDxuNZk 2026-07-05 1783238366\n[GNUPG:] GOODSIG 91A6868BD3F7A907 Alexander Neumann <alexander@bumpern.de>\n[GNUPG:] VALIDSIG CF8F18F2844575973F79D4E191A6868BD3F7A907 2026-07-05 1783238366 0 4 0 1 10 00 CF8F18F2844575973F79D4E191A6868BD3F7A907\n",
+      "stderr": "gpgv: Signature made Sun Jul  5 07:59:26 2026 UTC\ngpgv:                using RSA key CF8F18F2844575973F79D4E191A6868BD3F7A907\ngpgv: Good signature from \"Alexander Neumann <alexander@bumpern.de>\"\n"
+    },
+    {
+      "argv": [
+        "$TOOL_DIR/restic",
+        "version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.007,
+      "stdout": "restic 0.19.1 compiled with go1.26.4 on linux/amd64\n",
+      "stderr": ""
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "restic_0.19.1_linux_amd64.bz2",
+      "url": "https://github.com/restic/restic/releases/download/v0.19.1/restic_0.19.1_linux_amd64.bz2",
+      "bytes": 10107515,
+      "sha256": "f415415624dcc452f2a02b8c33641791a8c6d6d3b65bbb3543fcf9a25151585c",
+      "expected_digest_verified": true
+    },
+    {
+      "name": "SHA256SUMS",
+      "url": "https://github.com/restic/restic/releases/download/v0.19.1/SHA256SUMS",
+      "bytes": 2503,
+      "sha256": "fb520966ee01d2a3d4219c66762c66efa56300833b6f639f36082b7462f91cb8",
+      "expected_digest_verified": true
+    },
+    {
+      "name": "SHA256SUMS.asc",
+      "url": "https://github.com/restic/restic/releases/download/v0.19.1/SHA256SUMS.asc",
+      "bytes": 833,
+      "sha256": "649f3a48d322c3d7a457ef58e2dc4c5094b1f823192cdbac3f092ea23e194d9a",
+      "expected_digest_verified": true
+    },
+    {
+      "name": "signing-key.asc",
+      "url": "https://restic.net/gpg-key-alex.asc",
+      "bytes": 33940,
+      "sha256": "e4f09134173fdd60ece4454d30e38459d172f3ea9a97b32a37324b4f0515a289",
+      "expected_digest_verified": false
+    },
+    {
+      "name": "LICENSE",
+      "url": "https://raw.githubusercontent.com/restic/restic/6aa3a516ce654808a1f28f9fa21e9b7c8e6e90bf/LICENSE",
+      "bytes": 1345,
+      "sha256": "6f08a01a9fab5b24e139a09f15cc24a73087c7bc09e3bacf099fdf2d767bf897",
+      "expected_digest_verified": true
+    }
+  ],
+  "status": "verified-project-local-installation",
+  "binary": {
+    "name": "restic",
+    "bytes": 30941346,
+    "sha256": "20d4142678d0d95ec11a4759def1b73fd9190abc9ca19e4b62d067c0b387e639"
+  },
+  "native_version": "restic 0.19.1 compiled with go1.26.4 on linux/amd64"
+}

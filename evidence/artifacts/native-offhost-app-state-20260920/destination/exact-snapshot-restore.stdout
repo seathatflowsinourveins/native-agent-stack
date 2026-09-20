@@ -1,0 +1,4 @@
+restoring snapshot 0fd4395d of [/tmp/native-offhost-app.9njsr7Va/payload] at 2026-09-20 22:24:06.381914388 +0000 UTC by $RUNNER_USER@synthetic-offhost-app to $OWNED_RUN/restored-archive
+Summary: Restored 3 files/dirs (211.388 KiB) in 0:00
+verifying files in $OWNED_RUN/restored-archive
+finished verifying 2 files in $OWNED_RUN/restored-archive (took 0s)
