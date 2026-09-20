@@ -135,6 +135,27 @@ CODEX_HOME="$NATIVE_CODEX_HOME" "$NATIVE_CODEX_BIN" exec \
 # A separate Claude process must get a new instance ID and native-claude scope.
 ```
 
+For a native Claude continuation with session-ID privacy enabled, retain that
+privacy setting and supply process-local writer and hashed task attributes.
+Use the configured native shell/launcher so its existing account and project
+configuration are selected. `$TASK_SHA256` is the stable SHA-256 of the private
+task identity; `$WRITER_ID` is newly generated for each invocation:
+
+```bash
+env OTEL_RESOURCE_ATTRIBUTES="service.instance.id=${WRITER_ID},ecosystem.client.scope=native-claude,ecosystem.task.id=${TASK_SHA256}" \
+  "$NATIVE_CLAUDE_BIN" -p --output-format stream-json --verbose \
+  --include-hook-events --max-turns 2 --permission-prompts none \
+  --resume "$NATIVE_CLAUDE_SESSION_ID" < "$PROMPT_FILE"
+```
+
+The September 20 [native client receipt](../evidence/receipts/native-token-stack-final-20260920.json)
+matched that invocation's input 2, cache creation 2,300, cache read 43,698 and
+output 11 in the returned Claude stream, Loki and Prometheus. Direct launches
+without writer/task attributes still produced telemetry, but did not support
+the same exact-session join. Do not infer no telemetry from an empty raw-session
+query when session IDs are intentionally suppressed. Prometheus uses the writer
+as its instance; a hashed task label is not a license to publish raw local IDs.
+
 The SDK and ACP examples also assign per-process IDs. The SDK helper accepts
 `--observation-dir "$STACK_DATA_ROOT/sdk-receipts"` (or the native environment
 variable `ECOSYSTEM_SDK_OBSERVATION_DIR`) to publish bounded result metadata

@@ -941,6 +941,11 @@
             "id": "native-token-focus-clients-20260920",
             "path": "evidence/receipts/native-token-focus-clients-20260920.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-token-stack-final-20260920",
+            "path": "evidence/receipts/native-token-stack-final-20260920.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1251,6 +1256,11 @@
             "id": "native-token-focus-clients-20260920",
             "path": "evidence/receipts/native-token-focus-clients-20260920.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "native-token-stack-final-20260920",
+            "path": "evidence/receipts/native-token-stack-final-20260920.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1511,6 +1521,11 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-token-stack-final-20260920",
+            "path": "evidence/receipts/native-token-stack-final-20260920.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2266,6 +2281,11 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-token-stack-final-20260920",
+            "path": "evidence/receipts/native-token-stack-final-20260920.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2577,6 +2597,11 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-token-stack-final-20260920",
+            "path": "evidence/receipts/native-token-stack-final-20260920.json",
+            "kind": "native_model_e2e"
           }
         ],
         "new_native_client_scope": "One bounded task in each native client passed project-file Context Mode reading and exact jCodeMunch symbol retrieval; six MCP calls, no failures. Consumption is separate from savings.",
@@ -2913,6 +2938,11 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-token-stack-final-20260920",
+            "path": "evidence/receipts/native-token-stack-final-20260920.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3450,6 +3480,11 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-token-stack-final-20260920",
+            "path": "evidence/receipts/native-token-stack-final-20260920.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3955,6 +3990,11 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-token-stack-final-20260920",
+            "path": "evidence/receipts/native-token-stack-final-20260920.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4522,6 +4562,11 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-token-stack-final-20260920",
+            "path": "evidence/receipts/native-token-stack-final-20260920.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [

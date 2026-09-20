@@ -182,7 +182,8 @@
         "native-research-efficiency-20260920",
         "native-claude-child-patch-20260920",
         "native-claude-session-recovery-20260920",
-        "native-token-focus-clients-20260920"
+        "native-token-focus-clients-20260920",
+        "native-token-stack-final-20260920"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -269,7 +270,8 @@
         "token-practice-gap-followup-20260920",
         "native-research-efficiency-20260920",
         "native-codex-session-recovery-20260920",
-        "native-token-focus-clients-20260920"
+        "native-token-focus-clients-20260920",
+        "native-token-stack-final-20260920"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -346,7 +348,8 @@
         "token-practice-native-counters-20260920",
         "native-token-focus-clients-20260920",
         "token-practice-confirmation-20260920",
-        "current-session-observation-20260920"
+        "current-session-observation-20260920",
+        "native-token-stack-final-20260920"
       ],
       "upstream_sources": [
         "https://github.com/mksglu/context-mode"
@@ -442,7 +445,8 @@
         "native-headroom-mcp-20260920",
         "token-practice-confirmation-20260920",
         "native-token-clean-prefix-20260920",
-        "current-session-observation-20260920"
+        "current-session-observation-20260920",
+        "native-token-stack-final-20260920"
       ],
       "upstream_sources": [
         "https://github.com/chopratejas/headroom"
@@ -695,7 +699,8 @@
         "token-practice-coverage-20260920",
         "token-practice-native-counters-20260920",
         "token-practice-confirmation-20260920",
-        "current-session-observation-20260920"
+        "current-session-observation-20260920",
+        "native-token-stack-final-20260920"
       ],
       "upstream_sources": [
         "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0"
@@ -919,7 +924,8 @@
         "native-paired-adoption-20260919",
         "native-architecture-review-20260919",
         "token-practice-coverage-20260920",
-        "current-session-observation-20260920"
+        "current-session-observation-20260920",
+        "native-token-stack-final-20260920"
       ],
       "source_pin": null,
       "upstream_sources": [
@@ -948,7 +954,8 @@
         "native-architecture-review-20260919",
         "native-grand-dashboard-20260919",
         "token-practice-coverage-20260920",
-        "current-session-observation-20260920"
+        "current-session-observation-20260920",
+        "native-token-stack-final-20260920"
       ],
       "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
       "upstream_sources": [
@@ -977,7 +984,8 @@
         "native-grand-dashboard-20260919",
         "native-simulation-research-dashboard-20260919",
         "token-practice-coverage-20260920",
-        "current-session-observation-20260920"
+        "current-session-observation-20260920",
+        "native-token-stack-final-20260920"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [
@@ -1428,7 +1436,8 @@
         "native-token-focus-clients-20260920",
         "token-practice-confirmation-20260920",
         "native-token-clean-prefix-20260920",
-        "current-session-observation-20260920"
+        "current-session-observation-20260920",
+        "native-token-stack-final-20260920"
       ],
       "upstream_sources": [
         "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",

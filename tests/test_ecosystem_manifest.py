@@ -365,5 +365,36 @@ class EcosystemManifestTests(unittest.TestCase):
         self.assertIn("/blob/main/adoption/lifecycle.md", guide["url"])
 
 
+    def test_topic_list_preserves_missing_counters_and_negative_baseline(self):
+        row = {"component_id": "search", "group": "core", "purpose": "Find exact source",
+               "upstream_commands": {"use": "search --native"},
+               "returned_result_summary": "Exact source returned",
+               "session_statistics": {"value": None, "summary": "Not provided by upstream"},
+               "lifetime_statistics": {"value": None, "summary": "No cumulative savings counter"},
+               "baseline_summary": "40 native tokens versus 324 response tokens; keep the focused read",
+               "baseline_tokens_removed": -284,
+               "lifecycle_summary": "Existing dated acceptance; no full host recertification",
+               "source_paths": ["evidence/history.json"]}
+        self.write("docs/token-efficiency-stack.json", {"schema_version": 1,
+                   "scope": "Dated topic evidence", "rows": [row]})
+        page, _ = self.build()
+        topic = json.loads(page.data)["efficiency"]["topic"]
+        self.assertEqual(len(topic["rows"]), 1)
+        actual = topic["rows"][0]
+        self.assertIsNone(actual["session_statistics"]["value"])
+        self.assertIsNone(actual["lifetime_statistics"]["value"])
+        self.assertEqual(actual["baseline_tokens_removed"], -284)
+        self.assertEqual(actual["version"], "1.0")
+        self.assertEqual(actual["repository"], "https://github.com/example/search")
+        self.assertTrue(actual["sources"][0]["url"].endswith("/evidence/history.json"))
+
+    def test_topic_list_rejects_unselected_component(self):
+        self.write("docs/token-efficiency-stack.json", {"schema_version": 1,
+                   "rows": [{"component_id": "unselected", "group": "core"}]})
+        result = self.run_generator("--write")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("must be selected and unique", result.stdout)
+
+
 if __name__ == "__main__":
     unittest.main()

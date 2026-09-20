@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-20",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "a487a3214ea54b8edd8332fc277097add368b4d8",
+  "source_revision": "ff299948c52dcc5ee83e29121f1f299f10ad9635",
   "layers": [
     {
       "id": "agents",
@@ -290,6 +290,12 @@
     }
   ],
   "guides": [
+    {
+      "title": "Final token-efficiency repositories and native client results",
+      "body": "Fourteen core tools with upstream commands, returned results, scoped counters and baseline comparisons; native Codex and Claude acceptance plus independently correlated observation.",
+      "path": "docs/token-efficiency-stack.md",
+      "category": "evaluation"
+    },
     {
       "title": "What was live in the recorded session?",
       "body": "Current-session upstream probes, matching observation events, active services and explicit connection limits. Dated evidence, not automatic acceptance on another PC.",
