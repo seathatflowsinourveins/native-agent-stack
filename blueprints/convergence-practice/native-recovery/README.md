@@ -22,6 +22,9 @@ enclosing coordinator/review usage are unknown. There is no matched baseline
 or savings claim.
 
 This qualifies one same-host native dynamic-tool interruption and continuation.
+The separately frozen [Claude CLI recovery](claude/README.md) now qualifies its
+own SIGINT and same-session Bash continuation on Linux/WSL; it has distinct
+process, model and usage boundaries.
 It does not qualify shell descendant cancellation, remote provider cancellation,
 network or power loss, independent-host restoration, or a distributed exactly-once
 guarantee. The tool service remains alive in the coordinator while the two native

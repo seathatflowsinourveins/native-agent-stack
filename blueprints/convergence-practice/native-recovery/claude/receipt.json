@@ -1,0 +1,193 @@
+{
+  "action_journal": [
+    "checkpoint",
+    "wait",
+    "finalize"
+  ],
+  "attempt": 1,
+  "checkpoint_sha256": "93f75c4a0a3dec080b19bdfc4fe30f4fd404776bdcfd6bbc86cb003133595f2b",
+  "checks": {
+    "checkpoint_executed_once": true,
+    "checkpoint_unchanged": true,
+    "exact_action_journal": true,
+    "final_matches_oracle": true,
+    "first_cli_sigint_exit": true,
+    "frozen_files_unchanged": true,
+    "initial_model_observed": true,
+    "initial_session_id_matches": true,
+    "native_bash_wait_observed": true,
+    "native_final_result_success": true,
+    "owned_cli_processes_stopped": true,
+    "owned_wait_stopped": true,
+    "owned_wait_stopped_before_resume": true,
+    "resumed_cli_exit_zero": true,
+    "resumed_model_observed": true,
+    "resumed_native_tool_is_finalize_only": true,
+    "same_native_session_id": true,
+    "wait_unfinished_at_interrupt": true
+  },
+  "cleanup": {
+    "cli_cleanup_escalations": [
+      false,
+      false
+    ],
+    "explicit_wait_cleanup_needed": false
+  },
+  "effort_requested": "ultracode",
+  "executable_sha256": "5c4735937844e84f8a93306e841a5b0e12252909b07870f789b190468da147ab",
+  "failure": null,
+  "frozen_files": {
+    "TASK.md": "879bcd4b4e1e399ed96ca5fb7e6cc8a3bbdee912fe77ea87d4475981f7df3b43",
+    "input.json": "9a1fd06380f086357597eaa4d7d83a9f97b665f7f32c79c1efb7285a1ec4c3f8",
+    "plan.json": "cd462b5c8eafceaeb18ad02ef7923c0dc6a855a1736a5b35ccad186dfd4a8e7e",
+    "run.py": "42137c0b58ba35907599e70ed6b2e45c7ffdf0f8829dcec248606d022d91fcfc",
+    "stage.py": "8b1ddd24fd6e53b34515f36afe0d45fba50fa38e2a4ec40d4e0c0b27578502f8",
+    "test_fixture.py": "8208a35d24a4ffc95f22ee8192aa59237fde26bac2631494892f784187845ce3"
+  },
+  "invalid_stdout_lines": [
+    0,
+    0
+  ],
+  "kind": "claude_native_session_recovery",
+  "limitations": [
+    "One synthetic same-host CLI session recovery attempt; no independent-host, network, power-loss or whole-ecosystem guarantee.",
+    "SIGINT and process observations do not confirm remote provider cancellation or billing cessation.",
+    "The same native session ID is verified privately; no raw transcript replay or --fork-session is used.",
+    "Explicit Opus5 and Ultracode are scoped to this trial; this does not qualify the best alias or another model. No child agent is allowed.",
+    "Cumulative resumed results and per-model counters can have different scopes; interrupted usage can be incomplete. Retain categories separately and do not add them.",
+    "Full streams, process identities and session identifiers remain private. Cleanup targets owned CLI process groups and the identity-verified owned wait, not shared services."
+  ],
+  "model_requested": "claude-opus-5",
+  "native_cli_exit_codes": [
+    0,
+    0
+  ],
+  "native_version": "2.1.278 (Claude Code)",
+  "platform": "Linux WSL2",
+  "private_stream_sha256": {
+    "initial": "86a83aadc79a4aed7652ac81af48c4e18f896570913c99c0a79ea2473bd5e74c",
+    "resumed": "67b18d55e9948edb7fa6f8b1bb2509fc37d57f10f4181c61b676132569aa39bf"
+  },
+  "recorded_at_utc": "2026-09-20T05:21:04.222766+00:00",
+  "schema_version": 1,
+  "status": "passed",
+  "usage": {
+    "billed_cost": null,
+    "complete_two_invocation_total": null,
+    "coordinator_and_review_usage": null,
+    "invocations": [
+      {
+        "invocation": "initial",
+        "partial_assistant_messages": 5,
+        "per_model_usage": {
+          "claude-opus-5": {
+            "cacheCreationInputTokens": 7260,
+            "cacheReadInputTokens": 6849,
+            "canonicalModel": "claude-opus-5",
+            "contextWindow": 1000000,
+            "costBasis": "list",
+            "costUSD": 0.08796949999999999,
+            "inputTokens": 4,
+            "maxOutputTokens": 64000,
+            "outputTokens": 477,
+            "provider": "firstParty",
+            "thinkingTokens": 242,
+            "webSearchRequests": 0
+          }
+        },
+        "terminal_result_observed": true,
+        "terminal_usage": {
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 7260,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "cache_creation_input_tokens": 7260,
+          "cache_read_input_tokens": 6849,
+          "inference_geo": "not_available",
+          "input_tokens": 4,
+          "iterations": [
+            {
+              "cache_creation": {
+                "ephemeral_1h_input_tokens": 411,
+                "ephemeral_5m_input_tokens": 0
+              },
+              "cache_creation_input_tokens": 411,
+              "cache_read_input_tokens": 6849,
+              "input_tokens": 2,
+              "output_tokens": 175,
+              "type": "message"
+            }
+          ],
+          "output_tokens": 477,
+          "output_tokens_details": {
+            "thinking_tokens": 242
+          },
+          "server_tool_use": {
+            "web_fetch_requests": 0,
+            "web_search_requests": 0
+          },
+          "service_tier": "standard",
+          "speed": "standard"
+        }
+      },
+      {
+        "invocation": "resumed",
+        "partial_assistant_messages": 3,
+        "per_model_usage": {
+          "claude-opus-5": {
+            "cacheCreationInputTokens": 7871,
+            "cacheReadInputTokens": 21777,
+            "canonicalModel": "claude-opus-5",
+            "contextWindow": 1000000,
+            "costBasis": "list",
+            "costUSD": 0.1092635,
+            "inputTokens": 8,
+            "maxOutputTokens": 64000,
+            "outputTokens": 785,
+            "provider": "firstParty",
+            "thinkingTokens": 250,
+            "webSearchRequests": 0
+          }
+        },
+        "terminal_result_observed": true,
+        "terminal_usage": {
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 611,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "cache_creation_input_tokens": 611,
+          "cache_read_input_tokens": 14928,
+          "inference_geo": "not_available",
+          "input_tokens": 4,
+          "iterations": [
+            {
+              "cache_creation": {
+                "ephemeral_1h_input_tokens": 203,
+                "ephemeral_5m_input_tokens": 0
+              },
+              "cache_creation_input_tokens": 203,
+              "cache_read_input_tokens": 7668,
+              "input_tokens": 2,
+              "output_tokens": 212,
+              "type": "message"
+            }
+          ],
+          "output_tokens": 308,
+          "output_tokens_details": {
+            "thinking_tokens": 8
+          },
+          "server_tool_use": {
+            "web_fetch_requests": 0,
+            "web_search_requests": 0
+          },
+          "service_tier": "standard",
+          "speed": "standard"
+        }
+      }
+    ],
+    "native_retries": null,
+    "provider_cancellation_confirmed": null,
+    "savings_claim": null
+  },
+  "wall_seconds": 14.592
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "status": "frozen_before_native_attempt",
+  "task": "claude-native-bash-interrupt-resume",
+  "attempt_limit": 1,
+  "native_cli_invocations": 2,
+  "model": "claude-opus-5",
+  "effort": "ultracode",
+  "native_version_expected": "2.1.278",
+  "tool_scope": "Bash only; no child agents; exact owned stage.py commands",
+  "sources": ["https://code.claude.com/docs/en/cli-reference", "https://code.claude.com/docs/en/how-claude-code-works"],
+  "source_reviewed_at": "2026-09-20",
+  "quality_rule": "Observe native unfinished Bash wait and durable expected checkpoint; send SIGINT to owned first CLI and observe exit; confirm owned wait is stopped; resume same stream session ID via --resume; complete finalization without checkpoint replay; unchanged frozen files and exact action journal; no surviving owned CLI or wait processes",
+  "usage_rule": "Retain each CLI terminal usage object separately when present. Interrupted partial assistant usage is not a complete task total. No addition of overlapping resumed or model usage fields; unknown totals, retries, provider cancellation and billing remain null; no savings claim.",
+  "stop_conditions": ["unexpected Bash command or child", "session identity mismatch", "native process exits before pending wait", "SIGINT fails to stop first CLI within 20 seconds", "repeated checkpoint", "changed frozen bytes", "stage deadline"],
+  "rollback": "Stop only the owned CLI process groups and the identity-verified owned wait process; retain native session history and private attempt evidence. Never alter native settings, accounts or shared services."
+}
