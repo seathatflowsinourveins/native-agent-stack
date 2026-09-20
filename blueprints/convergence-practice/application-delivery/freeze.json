@@ -1,0 +1,38 @@
+{
+  "initial_freeze": {
+    "frozen_at_utc": "2026-09-20T05:52:36.090080+00:00",
+    "base_revision": "9b7b5d94cb082b78706c59e203250a4f4c8f4061",
+    "acceptance_sha256": [
+      {
+        "source": "acceptance-plan.json",
+        "sha256": "a8ac3edea74e51294f8359a201d94cc963348dbc24ddd2faecf2e04a3ec9e29e"
+      },
+      {
+        "source": "backend/test_api.py",
+        "sha256": "ff26b57c6919bb702a879e2861f7aada1fab7c97b377abb3fc69d3146da4d3ef"
+      },
+      {
+        "source": "browser/ledger.spec.ts",
+        "sha256": "0b23125d9b3337a6cbdbd0aa713842b9d99916c648c994a671268a9be7edde15"
+      }
+    ]
+  },
+  "final_freeze": {
+    "frozen_at_utc": "2026-09-20T06:03:05.030585+00:00",
+    "acceptance_sha256": [
+      {
+        "source": "acceptance-plan.json",
+        "sha256": "a8ac3edea74e51294f8359a201d94cc963348dbc24ddd2faecf2e04a3ec9e29e"
+      },
+      {
+        "source": "backend/test_api.py",
+        "sha256": "404cef6a7ba380a331ee15dc7a9414756d84f12456f67c34982d5d8968ea813e"
+      },
+      {
+        "source": "browser/ledger.spec.ts",
+        "sha256": "1cd010bae5b7612023652a064e7a85a53b52dbe39ef46e97b8587439a0b064a6"
+      }
+    ]
+  },
+  "oracle_refinement": "Before final acceptance, added a fail-closed dedicated-test-database guard and made the browser synthetic title unique so repeated execution cannot collide with retained results. Quality assertions and acceptance criteria are unchanged; original successful checks are retained."
+}

@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "id": "native-application-delivery-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "nextjs",
+    "react",
+    "fastapi",
+    "postgresql"
+  ],
+  "recorded_at_utc": "2026-09-20T06:14:58.731521+00:00",
+  "claim": "On Mac arm64, a locked Next16.3.5/React19.3.0 production UI and FastAPI0.141.1 API created and updated a typed run in real PostgreSQL18.6; API validation/conflict/transaction negatives, browser workflow and exact record persistence after database and application restart passed.",
+  "status": "passed",
+  "runtime": {
+    "platform": "macOS-26.5.1-arm64-arm-64bit-Mach-O",
+    "python": "3.14.7",
+    "node": "24.21.0",
+    "pnpm": "12.4.2",
+    "uv": "0.12.17",
+    "next": "16.3.5",
+    "react": "19.3.0",
+    "fastapi": "0.141.1",
+    "postgresql": "18.6",
+    "typescript": "5.9.3",
+    "playwright_test": "1.63.0",
+    "playwright_cli": "0.1.21",
+    "chrome": "153.0.8010.53"
+  },
+  "checks": {
+    "locked_setup_repeat": "passed",
+    "native_dependency_consistency": "passed",
+    "alembic_revision": "0001",
+    "alembic_repeat_upgrade": "passed",
+    "api_tests": {
+      "passed": 12,
+      "failed": 0,
+      "warnings": 1,
+      "database": "dedicated ledger_test"
+    },
+    "api_history_failure_rollback": "passed",
+    "stale_revision_conflict": "passed",
+    "native_schema_and_generated_type_drift": "passed",
+    "deliberate_stale_schema_negative_cases": [
+      {
+        "case": "stale-openapi",
+        "exit_code": 1,
+        "expected_diagnostic": "OpenAPI schema drift",
+        "refused": true
+      },
+      {
+        "case": "stale-generated-types",
+        "exit_code": 1,
+        "expected_diagnostic": "Generated API type drift",
+        "refused": true
+      }
+    ],
+    "production_build": "passed",
+    "browser": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "flaky": 0
+    },
+    "separate_playwright_cli_create_update": "passed",
+    "final_cli_console": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "restart_persistence": {
+      "database_stop_start": true,
+      "api_and_next_restart": true,
+      "same_exact_record": true,
+      "before_sha256": "865fd380b72993ed593e6590b870804ac66d17d52f5556a388bd494f392c48d8",
+      "after_sha256": "865fd380b72993ed593e6590b870804ac66d17d52f5556a388bd494f392c48d8"
+    },
+    "cleanup": {
+      "owned_loopback_ports_released": [
+        15432,
+        18080,
+        18081
+      ],
+      "owned_postmaster_identity_exited": true,
+      "playwright_owned_servers_stopped": true,
+      "explicit_cli_browser_closed": true,
+      "container_cleanup": "coordinator-owned; reported removed after separate storage qualification"
+    },
+    "fresh_next_type_generation": "passed after moving prior .next output aside; native next typegen followed by tsc and production build",
+    "nested_project_contract": "validated against installed project-readiness contract validator; enclosing worktree actions not modified",
+    "publication_validation": {
+      "scoped_convergence": "passed",
+      "catalog": "passed",
+      "staged_secret_scan": "passed",
+      "tracked_only_export": "only expected pending finding: preview.png must be registered in coordinator-owned evidence hashes",
+      "working_copy_scan_limit": "existing recursive validator scans ignored installed/generated app files; coordinator owns the publication enumeration correction"
+    }
+  },
+  "native_commands": [
+    "make setup",
+    "uv run --frozen alembic upgrade head (twice)",
+    "DATABASE_URL=<DEDICATED_TEST_DATABASE> uv run --frozen pytest -q",
+    "pnpm types",
+    "pnpm typecheck",
+    "NEXT_TELEMETRY_DISABLED=1 pnpm build",
+    "pnpm test:e2e",
+    "playwright-cli -s=<ISOLATED_SESSION> open http://127.0.0.1:18080 --browser=chrome",
+    "playwright-cli isolated fill/click/select/screenshot/console/close",
+    "native pg_ctl stop/start; restart API and Next; compare exact browser-created record",
+    "make verify",
+    "uv run --frozen python verify_schema.py",
+    "make postgres-stop"
+  ],
+  "failures": [
+    {
+      "id": "typescript7",
+      "stage": "native API type generation",
+      "exit_code": 1,
+      "cause": "TypeScript7.0.2 does not satisfy openapi-typescript7.13.0 peer ^5.x and lacks the JS ts.factory API used by that generator.",
+      "resolution": "Verified and pinned supported TypeScript5.9.3; peer checks, schema generation, type checking and production build then passed."
+    },
+    {
+      "id": "container-bind",
+      "stage": "official PostgreSQL image container startup",
+      "exit_code": 1,
+      "cause": "Owned container with Documents-directory bind stalled before guest boot. Pending CLI exited after coordinator service intervention with interrupted XPC connection. Image pull succeeded; database was never ready through this path.",
+      "resolution": "Used verified native PostgreSQL18.6 for application qualification. Coordinator separately qualified the same image through a named ext4 volume; that is separate container-storage evidence."
+    }
+  ],
+  "limitations": [
+    "Mac arm64 local synthetic vertical slice only. No WSL/cloud/application production, authenticated users, broker or trading qualification.",
+    "The native PostgreSQL source build omits ICU, readline, zlib and TLS; uses UTF-8/C locale, loopback TCP, no Unix socket and local trust authentication. Not a production database profile.",
+    "PostgreSQL named-volume container storage was separately tested by the coordinator. This application receipt uses native PostgreSQL; it does not claim the failed bind-mounted container passed.",
+    "Initial HTTPX tests passed with upstream deprecation; final tests use verified Pydantic httpx2. One upstream Starlette/AnyIO alias deprecation remains.",
+    "Initial CLI browser observation logged missing favicon404; the application icon was added. Final CLI observation has zero console errors or warnings.",
+    "The original oracle freeze is retained. Dedicated test-database guarding and unique synthetic browser titles were added before the final freeze without weakening quality assertions.",
+    "No model/provider calls were made by the application or qualification commands. Whole coordinator/worker usage is unknown; no token-saving claim.",
+    "No production load test, external ingestion, pagination beyond100 rows, independent-host restore or deployment was qualified."
+  ],
+  "model_calls": 0,
+  "whole_task_token_usage": null,
+  "private_raw_artifact_hashes": [
+    {
+      "artifact": "verify-final.log",
+      "sha256": "ce3376bc669ab876de530aa004c3169d38ee237d3d765a45764c113218c97605"
+    },
+    {
+      "artifact": "build-final.log",
+      "sha256": "3bfdbaa349af01e600aef2119267a004951162649041aa50ac732b92be01388c"
+    },
+    {
+      "artifact": "schema-final.log",
+      "sha256": "0ba386232a8477c2ad1875a1f76666f206ec09da8314a84534102793c370b8a1"
+    },
+    {
+      "artifact": "schema-negative-results.json",
+      "sha256": "f3449b8e8bef67cb1d5280684c4b8f4190e767e830e4fc6d5e2d5353aed2e14f"
+    },
+    {
+      "artifact": "api-results.xml",
+      "sha256": "04efe8946a6d9b219e641ff0e73312164f4b803d25f679ab1dd0fe6f555ec0ca"
+    },
+    {
+      "artifact": "api-results-final.xml",
+      "sha256": "b948930ef7cd5fa6f9d6bf08856fccd9c18ba4ef4c96d8cc1dd80dd8a70ac101"
+    },
+    {
+      "artifact": "api-results-final-isolated.xml",
+      "sha256": "79c6dda1e09a3dc4ab493f6046ed261d83117f6581f3c1a17bb0f82b27cf861a"
+    },
+    {
+      "artifact": "browser-results.json",
+      "sha256": "1cfb9c0b87a8fa62eb6460b8aa028898261d485da2652f2e71093e73eb9ff7c0"
+    },
+    {
+      "artifact": "persistence-before.json",
+      "sha256": "865fd380b72993ed593e6590b870804ac66d17d52f5556a388bd494f392c48d8"
+    },
+    {
+      "artifact": "persistence-after.json",
+      "sha256": "865fd380b72993ed593e6590b870804ac66d17d52f5556a388bd494f392c48d8"
+    },
+    {
+      "artifact": "postgresql-build/configure.log",
+      "sha256": "298aefc19ee316329a0018976c3c3ba509b51d854f47c60d04d8e38a4c4ba7ef"
+    },
+    {
+      "artifact": "postgresql-build/build.log",
+      "sha256": "9e893c6afb6adcdd2a0930bf2d4c7afcb4d38ddab00d9b86b3cd893749673c73"
+    },
+    {
+      "artifact": "postgresql-build/install.log",
+      "sha256": "20fa8ce2becaeb33a744c4f1ba751bfc58fe95043e78f7a13c0721a7964f0ecd"
+    },
+    {
+      "artifact": "typecheck-fresh.log",
+      "sha256": "99d7c2179cdd316467c51f37901025a0753453664d741214ba56fc631fa6c0bc"
+    },
+    {
+      "artifact": "build-fresh.log",
+      "sha256": "496147ee88f2e74d931b9835a139a5f655a8ed08ca8b44f907139b1a963bee12"
+    }
+  ],
+  "artifact_sha256": [
+    {
+      "artifact": "sources.json",
+      "sha256": "a6b2cd68b9b518821d10ca8c17b438c426f0af9584926b1a00a12718dd29688a"
+    },
+    {
+      "artifact": "freeze.json",
+      "sha256": "333198ba238dd35bea47882dea9e15fcadf1ab5b8609ed2bfa93aa21a1911720"
+    },
+    {
+      "artifact": "acceptance-plan.json",
+      "sha256": "a8ac3edea74e51294f8359a201d94cc963348dbc24ddd2faecf2e04a3ec9e29e"
+    },
+    {
+      "artifact": "uv.lock",
+      "sha256": "552d8834e745d7c91daa15e47c5f6d0cd9063db18c98790d2f1af05038f7417d"
+    },
+    {
+      "artifact": "pnpm-lock.yaml",
+      "sha256": "73ba78a623c6448e5e67a3f488f2e50f20b3b4b4c2da12cd29077f25f6a57c2b"
+    },
+    {
+      "artifact": "pyproject.toml",
+      "sha256": "9d018dc267a087d0e2fb12db1935ceab9b0ca31a8b213a67dcefb8f3b2187097"
+    },
+    {
+      "artifact": "package.json",
+      "sha256": "dfcda7940e4723c79e5675f55bf713fa1d8c49c2ab0d2b828f061010536238c9"
+    },
+    {
+      "artifact": "openapi.json",
+      "sha256": "83346419cc47a151fad15bac80ddf67f013986f4c674b6ff9c2f82af71656a6c"
+    },
+    {
+      "artifact": "app/api.generated.ts",
+      "sha256": "dabe8af2f2ce36b03e51921df4fa574092b4e9aadf6306c046bc53d2c4db03da"
+    },
+    {
+      "artifact": "backend/app.py",
+      "sha256": "0dbd2f601405cb670b7f2d3bb944aef362333d44b07374e9b00e698c87ee1ff4"
+    },
+    {
+      "artifact": "backend/test_api.py",
+      "sha256": "404cef6a7ba380a331ee15dc7a9414756d84f12456f67c34982d5d8968ea813e"
+    },
+    {
+      "artifact": "browser/ledger.spec.ts",
+      "sha256": "1cd010bae5b7612023652a064e7a85a53b52dbe39ef46e97b8587439a0b064a6"
+    },
+    {
+      "artifact": "playwright.config.ts",
+      "sha256": "d36c63919e0a2d8a680fde36cb8a8a4c5dc1b160430112f35a5fd894aa79c44b"
+    },
+    {
+      "artifact": "verify_schema.py",
+      "sha256": "d1e8a5df945bc207fd5d1707f59eba12b9c5e22dde7cfc2b7d340ee109130c1b"
+    },
+    {
+      "artifact": "serve.py",
+      "sha256": "e3e59b5315d5f2b3c2fe863cdecabfd9f7ffd1977a83d332331a10e33a42a14e"
+    },
+    {
+      "artifact": "Makefile",
+      "sha256": "dbab0b62a259b26a86a8e174b2ab17ba7ce28ac5d19f8412fb41c016f75bc011"
+    },
+    {
+      "artifact": "preview.png",
+      "sha256": "09113070baefc8d1d130012524e9823fdaf226417fb602718f0bf9ff3e2bbc13"
+    },
+    {
+      "artifact": "verification.txt",
+      "sha256": "2ad1bb295d3ac5d934e95694e0c99c72f85f5e9917618316c7689584270a3c60"
+    },
+    {
+      "artifact": "project-contract.json",
+      "sha256": "977bef87b2ff759c19b238e937553b307efa837d163ea19e8a72799f98af567a"
+    },
+    {
+      "artifact": "next-env.d.ts",
+      "sha256": "1862ac4bbbc5192d4bf562161df66ea547ed3e67173100656ab606ae9797db2b"
+    },
+    {
+      "artifact": "tsconfig.json",
+      "sha256": "fe301561c5f9f7556924d85c875b73846f4fc6891001acb4ce3ca299984d06c0"
+    }
+  ]
+}

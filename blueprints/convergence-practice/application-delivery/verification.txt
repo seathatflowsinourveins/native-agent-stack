@@ -1,0 +1,52 @@
+pnpm peers check
+No peer dependency issues found
+pnpm typecheck
+$ tsc --noEmit
+NEXT_TELEMETRY_DISABLED=1 pnpm build
+$ next build
+▲ Next.js 16.3.5 (Turbopack)
+✓ Running next.config.ts took 10ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 211ms
+  Running TypeScript ...
+  Finished TypeScript in 441ms ...
+  Collecting page data using 5 workers ...
+  Generating static pages using 5 workers (0/4) ...
+  Generating static pages using 5 workers (1/4)
+  Generating static pages using 5 workers (2/4)
+  Generating static pages using 5 workers (3/4)
+✓ Generating static pages using 5 workers (4/4) in 162ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+└ ○ /icon.svg
+
+
+○  (Static)  prerendered as static content
+
+DATABASE_URL=postgresql://postgres@127.0.0.1:15432/ledger_test uv run --frozen pytest -q
+............                                                             [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/starlette/testclient.py:53
+  <APPLICATION>/.venv/lib/python3.14/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+12 passed, 1 warning in 0.20s
+pnpm test:e2e
+$ playwright test
+
+Running 1 test using 1 worker
+
+(node:<PID>) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 browser/ledger.spec.ts:4:5 › create and update a recorded run through the production UI (320ms)
+
+  1 passed (1.4s)
+
+✨ openapi-typescript 7.13.0
+🚀 openapi.json → <APPLICATION>/.runtime/schema-e_pcogor/api.generated.ts [11.2ms]
+Native API schema and generated TypeScript agree.
