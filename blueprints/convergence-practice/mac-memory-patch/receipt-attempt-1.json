@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "host_scope": "macOS arm64 isolated synthetic qualification",
+  "started_utc": "2026-09-20T06:57:57.426219+00:00",
+  "finished_utc": "2026-09-20T06:57:58.482503+00:00",
+  "platform": {
+    "macos": "26.5.1",
+    "architecture": "arm64",
+    "python": "3.14.7"
+  },
+  "pins": {
+    "base_revision": "cabbe2c96e39096b510f739f07a6e4132da082de",
+    "source_commit": "353841d91618d20b110b208de284a74d0b960379",
+    "release_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2",
+    "archive_url": "https://github.com/akitaonrails/ai-memory/releases/download/v2.3.2/ai-memory-macos-aarch64.tar.gz",
+    "archive_sha256": "e0f07ad28938f3ed98a5feb21d11917245d77501764e0005049e7d9c1c16f28a",
+    "sidecar_sha256": "65d687fded968657b7227395ce1421dff8bf2a6f415c6515e0847090e94ed9be",
+    "binary_sha256": "23e64ae838efa5c100be5ec188dd9b395873e6bfa5078a1034c695aa48e6669d",
+    "license": "MIT",
+    "license_sha256": "18332c61780ce8e694d4fa330770cd4d8c85e33f47ac13a80d72d70bb032ae72",
+    "baseline_binary_sha256": "aa6f81b58db56a9c23e37e1252a4aed806a1190c03111a1db302319f129e6f90"
+  },
+  "frozen_inputs": {
+    "config.toml": "5ee5fb3ddcb790c9a234143fdfa2f99b80ecf752a45c9e8cad625d75e9311331",
+    "oracle.json": "e6a47cd25fb239403522b16acdde271b712ee31478265ea4092d6ddad6b92bd1",
+    "pins.json": "f0309ba2ba49a3e6214207dcd7633b0c605b2abe3b2abd6175265f6dc6daaa92",
+    "run.py": "5bd0b047a6050e1f3c512dc3cce62489210daa66e7f5391e47e866c0e97db492"
+  },
+  "checks": {
+    "baseline_binary_hash": true,
+    "archive_sha256": true,
+    "sidecar_sha256": true,
+    "archive_hash": true,
+    "sidecar_hash": true,
+    "sidecar_names_exact_archive": true,
+    "candidate_binary_hash": true,
+    "bundled_mit_license_hash": true,
+    "native_arm64_format": true,
+    "native_signature_integrity": true,
+    "sandbox_network_and_write_guards": false
+  },
+  "cleanup": [],
+  "production_promoted": false,
+  "production_state_opened": false,
+  "model_invocation": false,
+  "enclosing_agent_usage": null,
+  "signature_assessment": {
+    "integrity_exit": 0,
+    "ad_hoc": true,
+    "gatekeeper_exit": 3,
+    "gatekeeper_accepted": false,
+    "overrides_or_signature_changes": false,
+    "gatekeeper_summary": "rejected; raw assessment retained privately"
+  },
+  "passed": false,
+  "failure": {
+    "type": "AssertionError",
+    "message": "sandbox_network_and_write_guards"
+  },
+  "id": "mac-ai-memory-232-preflight-20260920",
+  "evidence_class": "native_distribution_preflight",
+  "native_memory_processes_started": 0,
+  "native_mcp_calls": 0,
+  "decision": "retain_2.3.1_pending_functional_acceptance",
+  "functional_checks": "not run: frozen sandbox precondition not established",
+  "limitations": [
+    "Checksum integrity shares the upstream release trust channel; no independent signed-release attestation was verified.",
+    "Native code-signature integrity passed; the artifact is ad-hoc signed, without a Developer ID team, and Gatekeeper assessment rejected it. No xattr removal, re-signing or protection override was used.",
+    "No ai-memory candidate execution, migration, scoped retrieval, no-capture runtime or restart acceptance occurred.",
+    "An additional sandbox condition introduced by this recipe failed before native memory startup. This does not establish a defect in ai-memory or claim that the original narrower synthetic task is impossible.",
+    "Private raw commands, assessment output and diagnostic stderr remain outside the checkout. No production memory, credentials, accounts or services were accessed by this execution.",
+    "No model run or token-savings claim; enclosing parent and child provider usage remains unknown."
+  ]
+}

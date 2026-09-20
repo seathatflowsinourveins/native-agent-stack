@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Qualify an official Mac ai-memory patch on synthetic scoped state before a coordinator-owned service change. Detect migration, scope leakage, reserved-path and restart failures without model or history capture.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2",
+      "revision": "353841d91618d20b110b208de284a74d0b960379"
+    }
+  ],
+  "discovery_provenance": [
+    "Existing selected ai-memory2.3.1 and retained pinned2.3.2 source review; imported Linux/WSL receipt is not Mac acceptance."
+  ],
+  "license_and_compatibility": "MIT license hash matches tagged source and bundled archive. Official macOS arm64 binary; native format and signature integrity passed on macOS26.5.1. Ad-hoc signature lacks a Developer ID team; Gatekeeper assessment rejected. No signing or quarantine override.",
+  "baseline_and_candidate": {
+    "baseline": "Accepted Mac2.3.1 binary; planned populated synthetic baseline, production store excluded.",
+    "candidate": "Pinned Mac2.3.2 archive; new original-scope functional oracle against the same populated synthetic2.3.1 store, followed by candidate restart. Stronger initial sandbox attempt failed and is preserved."
+  },
+  "frozen_inputs": {
+    "base_revision": "cabbe2c96e39096b510f739f07a6e4132da082de",
+    "tasks": [
+      "mac-memory-patch"
+    ],
+    "roles": [
+      "deterministic-runner"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/mac-memory-patch/run.py",
+        "sha256": "5bd0b047a6050e1f3c512dc3cce62489210daa66e7f5391e47e866c0e97db492"
+      },
+      {
+        "path": "blueprints/convergence-practice/mac-memory-patch/run-functional.py",
+        "sha256": "7008e10cf6124c816d8fc8e400aecabcb0c91f1f0e836a4a284fb45ffe548490"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/mac-memory-patch/pins.json",
+        "sha256": "f0309ba2ba49a3e6214207dcd7633b0c605b2abe3b2abd6175265f6dc6daaa92"
+      },
+      {
+        "path": "blueprints/convergence-practice/mac-memory-patch/config.toml",
+        "sha256": "5ee5fb3ddcb790c9a234143fdfa2f99b80ecf752a45c9e8cad625d75e9311331"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/mac-memory-patch/oracle.json",
+        "sha256": "e6a47cd25fb239403522b16acdde271b712ee31478265ea4092d6ddad6b92bd1"
+      },
+      {
+        "path": "blueprints/convergence-practice/mac-memory-patch/oracle-functional.json",
+        "sha256": "3b90e6fb176c1d668f574bb64cb081f4938d29da3783464d804aa002dd6a49f0"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "All frozen oracle criteria must pass; distribution integrity cannot substitute for native migration, scope, no-capture or persistence acceptance.",
+    "usage_rule": "No model/provider invocation by fixture. Enclosing coordinator and child usage unknown; no token-savings claim."
+  },
+  "runtime_and_platform": {
+    "platform": "macOS26.5.1 arm64",
+    "tools": [
+      {
+        "name": "python",
+        "version": "3.14.7"
+      },
+      {
+        "name": "ai-memory",
+        "version": "baseline2.3.1 and candidate2.3.2; actual version and MCP server execution observed"
+      }
+    ],
+    "isolation": "Separate synthetic store and explicit no-model/no-capture config, clean child environment, real HOME unchanged. No production/global changes. Failed stronger sandbox attempt retained; no OS filesystem/network confinement claim."
+  },
+  "commands": [
+    "python3 blueprints/convergence-practice/mac-memory-patch/run.py --prefix \"$REVIEWED_PRIVATE_PREFIX\" --old-binary \"$REVIEWED_231_BINARY\" --attempt attempt-1",
+    "python3 blueprints/convergence-practice/mac-memory-patch/run-functional.py --prefix \"$REVIEWED_PRIVATE_PREFIX\" --old-binary \"$REVIEWED_231_BINARY\" --attempt attempt-2-functional"
+  ],
+  "observations": [
+    {
+      "id": "mac-memory-patch-attempt-1",
+      "task": "mac-memory-patch",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "macOS arm64 isolated synthetic ai-memory 2.3.1 to 2.3.2 qualification",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/mac-memory-patch/receipt-attempt-1.json",
+          "sha256": "caefd13cf008499a589cc45dd0c11aa17ee941522778db9689d958b251100ebf"
+        },
+        {
+          "path": "blueprints/convergence-practice/mac-memory-patch/prior-attempts.json",
+          "sha256": "d3b318fcb98d050f38c09c06a9e3b6fe4df6c8110aac10333f1bc0e6287e469e"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "mac-memory-patch-attempt-2",
+      "task": "mac-memory-patch",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "macOS arm64 isolated synthetic ai-memory 2.3.1 to 2.3.2 qualification",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/mac-memory-patch/receipt.json",
+          "sha256": "ead0722d89768f5afd2a7c2daa5c0ed713387c677467aaef64591940485e0d8f"
+        },
+        {
+          "path": "blueprints/convergence-practice/mac-memory-patch/native-facts.json",
+          "sha256": "bcd2d2e56e00fe01e9fb844a177e58ed2fbd2f84a05ac9115615ae1b531c66e8"
+        },
+        {
+          "path": "blueprints/convergence-practice/mac-memory-patch/audit.py",
+          "sha256": "2c8de6b8f127701755de8263647053c716fc95029dfa02f75db6dc005ca3c490"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "mac-memory-patch-attempt-1",
+      "reason": "Frozen sandbox probe and native built-ins abort with signal6; combined network/write guards unestablished. No ai-memory executable or server was started."
+    }
+  ],
+  "limitations": [
+    "Functional scope was re-frozen for attempt2 after coordinator direction; the failed stronger sandbox oracle and all diagnostics remain intact. OS filesystem/network confinement was not established.",
+    "Official hashes and signature integrity passed. Artifact is ad-hoc signed and Gatekeeper assessment rejected; actual version and server execution were allowed without xattr, signing, security-policy changes or an execution-denial bypass.",
+    "Acceptance uses synthetic scoped decisions only, not production backup/restore, real data migration, local embeddings, client reconnection, an active LaunchAgent or another host.",
+    "No production state, accounts, credentials, hooks, services, client registration or command symlinks were changed. Only the exact known2.3.1 binary was used.",
+    "Provider/model features were explicitly disabled, environment credentials were not forwarded, and capture/embedding tables remain empty. This is not an independent OS network-traffic audit.",
+    "Raw logs, synthetic state, archive and frozen baseline are retained privately. Public selected facts preserve synthetic requests and relevant native outcomes; hashes alone do not independently certify historical execution.",
+    "Fixture performs no model/provider calls; enclosing parent/child provider usage is unknown. No token-saving claim."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "macOS arm64 isolated synthetic ai-memory 2.3.1 to 2.3.2 qualification",
+    "qualification_run_ids": [
+      "mac-memory-patch-attempt-2"
+    ]
+  },
+  "rollback": "No production change occurred. Preserve frozen inputs and all failed-attempt logs; retire only the owned private distribution/attempt prefix when appropriate.",
+  "next_decision_changing_test": "Coordinator-owned native production backup and copied-state acceptance, then actual LaunchAgent switch and native-client reconnect/read verification. Synthetic acceptance does not promote production or requalify local embedding behavior.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

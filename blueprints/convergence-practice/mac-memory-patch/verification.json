@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "commands": [
+    {
+      "command": "python3 blueprints/convergence-practice/mac-memory-patch/audit.py",
+      "exit_code": 0,
+      "meaning": "Selected native facts satisfy functional oracle; initial failure preserved; no production/OS confinement claim."
+    },
+    {
+      "command": "python3 -m unittest discover -s blueprints/convergence-practice/mac-memory-patch -p 'test_*.py' -v",
+      "exit_code": 0,
+      "tests": 13,
+      "skipped": 0
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "components": 64,
+      "hashed_files": 723,
+      "profiles": 4,
+      "receipts": 73
+    },
+    {
+      "command": "python3 scripts/validate_catalogs.py",
+      "exit_code": 0
+    },
+    {
+      "command": "TMPDIR=\"$OWNED_REAL_TEMP\" python3 -m unittest discover -s tests -v",
+      "exit_code": 0,
+      "tests": 493,
+      "skipped": 49,
+      "prior_failure_retained_in": "prior-attempts.json"
+    }
+  ],
+  "limit": "Offline consistency and regression checks do not rerun native memory, establish production acceptance or measure enclosing agent usage."
+}

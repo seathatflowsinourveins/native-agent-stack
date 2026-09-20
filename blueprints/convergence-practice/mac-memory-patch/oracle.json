@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "workspace": "mac-patch-synthetic",
+  "alpha": {"project": "alpha", "path": "notes/alpha.md", "body": "# Synthetic alpha decision\nMacpatchcobalt belongs only to alpha.\n", "marker": "Macpatchcobalt"},
+  "beta": {"project": "beta", "path": "notes/beta.md", "body": "# Synthetic beta decision\nMacpatchamber belongs only to beta.\n", "marker": "Macpatchamber"},
+  "updated_alpha": {"body": "# Updated synthetic alpha decision\nMacpatchwillow replaces the original alpha decision.\n", "marker": "Macpatchwillow"},
+  "unicode": {"project": "alpha", "path": "notes/aéé/decision.md", "body": "# Unicode fixture\nMacpatchunicode survives a five-byte Unicode directory component.\n", "marker": "Macpatchunicode"},
+  "reserved_path": ".git/config",
+  "required_tools": ["memory_query", "memory_read_page", "memory_write_page", "memory_status"],
+  "acceptance": [
+    "official archive, sidecar, binary and MIT license hashes match pins",
+    "arm64 Mach-O, valid native code signature verification, retained Gatekeeper assessment, native version 2.3.2",
+    "sandbox denies outbound network and writes outside the owned attempt",
+    "baseline 2.3.1 writes, scoped exact reads and FTS positives; cross-scope queries empty and exact reads rejected",
+    "frozen cold 2.3.1 state reopens under 2.3.2 with identical scoped bodies and retrieval",
+    "candidate rejects reserved Git path and accepts the five-byte Unicode path component",
+    "candidate update and Unicode page persist through a clean restart; old marker absent",
+    "V62 is present and populated before and after; baseline snapshot remains byte-identical",
+    "no captured history, embeddings or downloaded model files; no forceful termination or owned process left running"
+  ],
+  "stop_conditions": ["hash mismatch", "signature verification failure", "native execution blocked", "sandbox guard failure", "unexpected native error", "any failed acceptance assertion"]
+}
