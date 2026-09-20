@@ -2,6 +2,7 @@ name: Native foundation offline engine E2E
 
 on:
   push:
+    branches: [main]
     paths:
       - '.github/workflows/native-foundation-e2e.yml'
       - 'scripts/verify_nautilus_ci.py'

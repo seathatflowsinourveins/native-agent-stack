@@ -34,4 +34,6 @@ Keep component pins in `manifests/stack.json`, scoped claims and hashes in `mani
 
 The daily task maintenance loop examines actionable upstream changes or a selected unresolved gap. It stays quiet when nothing useful changed. An update can open a trial without replacing an accepted default. Account sign-in, an independent recovery destination, a deployment decision and real broker behavior remain explicit inputs; maintenance does not grant new authority for orders, purchases or hosting.
 
+Use the [GitHub automation guide](github-automation.md) for event selection, upstream dependency updates, workflow checks and the bounded agentic-workflow adoption path. Keep publication checks distinct from native task acceptance and measured improvement.
+
 The current session defaults and returned checks remain in the [session handbook](token-session-handbook.md). A new PC uses its own paths and credentials and collects its own acceptance. The dated catalog is a maintained reference, not a claim that the evolving field has been permanently exhausted.

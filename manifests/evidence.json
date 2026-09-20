@@ -1993,18 +1993,18 @@
     },
     {
       "path": ".github/workflows/native-token-e2e.yml",
-      "sha256": "cb4e0dfdc19345ea56b2ee7e1d13926cdd095c3f3a550d330fae2c08881ba9b6",
-      "bytes": 1665
+      "sha256": "9fe7751f5df7adfd65295159fb6b54ac10d774d91ee01cbc2c4d3e008dddad8a",
+      "bytes": 1685
     },
     {
       "path": ".github/workflows/token-report.yml",
-      "sha256": "17a3f226fd2e91e398f9e634679d509029b65d3d4f2d1441be9bf41a079b5097",
-      "bytes": 509
+      "sha256": "c5f8465130ccb06c4e96d6fa5f241c3ef57da27a2f47e3b1688f580c6c80ca9d",
+      "bytes": 723
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "3b5f2dd559aa08e2c441844d0256c64af9a0c50ea354c88dc048454ece5152b1",
-      "bytes": 1505
+      "sha256": "56a48bc10a8f67b99b926961551e1b040b2ccbb239081dd388af3d6eac6b7ad1",
+      "bytes": 1719
     },
     {
       "path": ".gitignore",
@@ -5084,8 +5084,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "4f2574a446b80f7dc9aa02bf617be8d12d123e0f10e953344a0733417bd3a78b",
-      "bytes": 3719230
+      "sha256": "d837e3d61a9c2ab23ebd5aa159cf0aa5c25cac6da870dbfbe365a31e2059fb9d",
+      "bytes": 3719994
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5094,8 +5094,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "85ad673ffe908d678a9fa2804946206aae4f7a25eecfb81d99eacbd12ff9584c",
-      "bytes": 31324
+      "sha256": "62838ab427c8657a63d7401ebc651053c8da334cf18abf73bff1b6474745bdd0",
+      "bytes": 31617
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6104,8 +6104,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "43c27b6561c032e6fc6846f7dc225b4b4689d0df3845a412c62e5a630ad896cb",
-      "bytes": 6350
+      "sha256": "730277a0af25a31339e971d8dbeea6b701555aad9ba6e7f6ee7ed5197e9dd203",
+      "bytes": 6608
     },
     {
       "path": "evidence/receipts/native-harness-defaults-20260920.json",
@@ -6234,8 +6234,8 @@
     },
     {
       "path": ".github/workflows/native-foundation-e2e.yml",
-      "sha256": "0e1509b3e74d5254504deb76831d39ce7ef22defffadfa21d87d4061c2defc8b",
-      "bytes": 7745
+      "sha256": "cfcf4a6fe6f7a9e33d7cffeaa13d73830f49b12800b0b22cb1cfa308016bad9e",
+      "bytes": 7766
     },
     {
       "path": "scripts/verify_nautilus_ci.py",
@@ -6871,6 +6871,16 @@
       "path": "evidence/artifacts/native-dagu-retry-20260920/publication.json",
       "sha256": "b2a4734fa1c64dc17958dd5ce9132eefe2d3118f326e321751173ceb258e0216",
       "bytes": 4041
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "sha256": "d2f1900108fff96b1d677f0c5fb62a9513e89a122aac08d3eb50350bc372aa05",
+      "bytes": 350
+    },
+    {
+      "path": "docs/github-automation.md",
+      "sha256": "6a31aa647d4289f4266bc3d3012f0249ed0298342a4983d81e8e21afe5f11f96",
+      "bytes": 8113
     }
   ],
   "convergence_records": [

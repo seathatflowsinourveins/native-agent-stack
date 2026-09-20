@@ -329,6 +329,12 @@
       "category": "evaluation"
     },
     {
+      "title": "GitHub automation and upstream maintenance",
+      "body": "Focused PR checks, grouped upstream Action updates, native workflow validators and a bounded GitHub Agentic Workflows adoption path.",
+      "path": "docs/github-automation.md",
+      "category": "setup"
+    },
+    {
       "title": "Upstream restic tests and independent-host restore",
       "body": "Seven unchanged upstream tests passed; two exact synthetic snapshots restored with a separately supplied key. Native outputs, independent artifact checks and the initial failed attempt are retained.",
       "path": "blueprints/convergence-practice/offhost-restore/README.md",
