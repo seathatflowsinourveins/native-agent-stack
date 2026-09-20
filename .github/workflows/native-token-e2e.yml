@@ -1,0 +1,52 @@
+name: Native token tools E2E
+
+on:
+  push:
+    paths:
+      - '.github/workflows/native-token-e2e.yml'
+      - 'scripts/native_token_ci.py'
+      - 'tests/test_native_token_ci.py'
+      - 'fixtures/**'
+      - 'manifests/stack.json'
+  pull_request:
+    paths:
+      - '.github/workflows/native-token-e2e.yml'
+      - 'scripts/native_token_ci.py'
+      - 'tests/test_native_token_ci.py'
+      - 'fixtures/**'
+      - 'manifests/stack.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-token-tools:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out public fixture source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up native Node 24
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Check the fixture acceptance failure modes
+        run: python3 -m unittest tests.test_native_token_ci -v
+      - name: Install pinned upstream tools and exercise native fixtures
+        run: >-
+          python3 scripts/native_token_ci.py --install
+          --output "$RUNNER_TEMP/native-token-e2e-results"
+      - name: Upload only sanitized fixture evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: native-token-e2e-results
+          path: ${{ runner.temp }}/native-token-e2e-results/
+          if-no-files-found: warn
+          include-hidden-files: false
+          retention-days: 14
+
