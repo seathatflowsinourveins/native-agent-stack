@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-09-20",
+  "base_revision": "d4d3084d8b21524cd90ffe433168853563318a0b",
+  "decision": "adopt_within_scope",
+  "scope": "Project-local WSL binaries for the recorded synthetic checks; PATH promotion remains coordinator-owned",
+  "sources": [
+    {
+      "component": "gitleaks",
+      "url": "https://github.com/gitleaks/gitleaks/blob/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/LICENSE",
+      "sha256": "e3884b252b3bfc045e55be43a34d1e80da070bc6f804ac95bf4660e97d62ebc6"
+    },
+    {
+      "component": "gitleaks",
+      "url": "https://github.com/gitleaks/gitleaks/blob/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/README.md",
+      "sha256": "022fd4d9fb53a8e7eb6b6e49875052e571f784bafab387deb484e28f8a1ea38b"
+    },
+    {
+      "component": "gitleaks",
+      "url": "https://github.com/gitleaks/gitleaks/blob/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/config/gitleaks.toml",
+      "sha256": "e163e53b9e7e8a8511e77271e2b323ed057759542a6d988258afe3a1fa329caf"
+    },
+    {
+      "component": "worktrunk",
+      "url": "https://github.com/max-sixty/worktrunk/blob/bd49d14c52450c6c8a2cec5b01742c690c9c3ce7/LICENSE",
+      "sha256": "eda019abe602c101e9d9c2d7723aa4c4cb2b1ae0e0e0915c37976d5c1d3bb632"
+    },
+    {
+      "component": "worktrunk",
+      "url": "https://github.com/max-sixty/worktrunk/blob/bd49d14c52450c6c8a2cec5b01742c690c9c3ce7/Cargo.toml",
+      "sha256": "e31c32c9a599c7b55bbaf7925498e5ff8b87acddbc1a1aa8bd7630ab3889a098"
+    },
+    {
+      "component": "worktrunk",
+      "url": "https://github.com/max-sixty/worktrunk/blob/bd49d14c52450c6c8a2cec5b01742c690c9c3ce7/src/cli/mod.rs",
+      "sha256": "032f3dd3c114c99231ba8b2a70fe14247b9ae2fb21b4e3218ae431f9053aaea6"
+    },
+    {
+      "component": "worktrunk",
+      "url": "https://github.com/max-sixty/worktrunk/blob/bd49d14c52450c6c8a2cec5b01742c690c9c3ce7/src/config/user/path.rs",
+      "sha256": "f376502d105ea9652a7b6ce458def6963867a0aea05c8139e875f097307e4dbd"
+    },
+    {
+      "component": "worktrunk",
+      "url": "https://github.com/max-sixty/worktrunk/blob/bd49d14c52450c6c8a2cec5b01742c690c9c3ce7/src/config/project.rs",
+      "sha256": "8366d8b601fab285198be7b7f61980cd1ef29263f74fc09c862a8d33a977776d"
+    }
+  ],
+  "supply_chain": {
+    "publisher_checksums": "Both archives match both the pinned GitHub asset digest and the downloaded publisher checksum; checksum files themselves also match GitHub asset digests.",
+    "license": "Archive LICENSE bytes match the license file at the exact pinned source commit.",
+    "attestations": "Both official repository attestations endpoints returned HTTP 404 for these exact archive digests. No cryptographically verified attestation is claimed. Publisher hashes are from the same GitHub release trust channel.",
+    "installers": "No upstream installer, shell initialization, Git hook installation or global package manager was executed."
+  },
+  "reviewed_behavior": {
+    "gitleaks": "dir targets only generated synthetic fixtures. Empty child environment selects built-in default rules; --redact=100 and JSON report bytes are checked.",
+    "worktrunk": "Source and native help confirm --no-hooks for switch/remove, --no-cd for switch, --foreground for removal. Without foreground removal normally detaches cleanup. Dirty removal requires force, which this fixture never passes.",
+    "config": "WORKTRUNK_CONFIG_PATH and WORKTRUNK_SYSTEM_CONFIG_PATH select owned files; user and system Git config are disabled for child processes, Git hooks point to /dev/null. list full/summary are false; no remote exists.",
+    "resource_cleanup": "Only clean and dirty fixture branches were created. Both worktree paths and branches are absent after foreground removal; primary fixture, archives, binaries, configs, source and logs are retained.",
+    "release_binding": "Current runner matches exact component/version/source/archive/license identity to frozen pins, rechecks retained official archive SHA256 and derives executable SHA256 from its bytes, then requires native version output to match. Mutable installation metadata alone cannot reauthorize changed binary bytes.",
+    "timeout": "Timed-out commands retain redacted partial streams, timed_out=true, null native exit and a failed receipt; tested with a deterministic fake subprocess, not a live timeout."
+  },
+  "compatibility": {
+    "executed_platform": "Linux 6.18.33.2-microsoft-standard-WSL2 x86_64 with glibc 2.39",
+    "python": "3.13.15",
+    "git": "2.55.0",
+    "artifacts": [
+      "gitleaks linux_x64",
+      "worktrunk x86_64-unknown-linux-musl"
+    ],
+    "worktrunk_source_build": "Cargo.toml declares Rust 1.97 and edition 2024; no source build or compiler installation was needed."
+  },
+  "usage": {
+    "fixture_model_calls": 0,
+    "provider_usage_in_fixture": 0,
+    "enclosing_task_usage": null,
+    "savings_claim": false
+  },
+  "private_evidence": "Retained in the task-owned installation prefix (downloads/, help/, attempt-1/logs/, attempt-2-hardened/logs/ and each receipt.json), separate original/revised private source directories, and coordinator private evidence directory. Public path placeholders do not resolve across hosts.",
+  "native_attempts": {
+    "original": {
+      "runner": "executed-run-v1.py",
+      "receipt": "receipt-wsl.json",
+      "status": "passed"
+    },
+    "hardened": {
+      "runner": "run.py",
+      "receipt": "receipt-wsl-hardened.json",
+      "status": "passed"
+    }
+  }
+}

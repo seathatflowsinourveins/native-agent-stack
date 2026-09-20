@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Missing WSL native quality/worktree commands need bounded useful acceptance before any coordinator-owned PATH promotion. Detect an inert secret, clear a clean fixture, and preserve dirty worktree data during refused removal.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
+      "revision": "83d9cd684c87d95d656c1458ef04895a7f1cbd8e"
+    },
+    {
+      "url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.78.0",
+      "revision": "bd49d14c52450c6c8a2cec5b01742c690c9c3ce7"
+    }
+  ],
+  "discovery_provenance": [
+    "Existing selected gitleaks and Worktrunk stack components; reviewed WSL preflight found no native commands on the selected PATH/conventional bins. No discovery-list installation."
+  ],
+  "license_and_compatibility": "gitleaks 8.30.1 MIT, Worktrunk 0.78.0 MIT OR Apache-2.0; official Linux x86_64 prebuilt archives, verified publisher checksums and GitHub asset digests, source-matching packaged licenses. WSL2 Linux 6.18.33.2 x86_64, glibc2.39, Git2.55.0, Python3.13.15. Attestation lookups returned HTTP404; no verified signature claim.",
+  "baseline_and_candidate": {
+    "baseline": "Selected WSL environment lacks these native commands; no competing tool benchmark executed.",
+    "candidate": "Pinned project-local official binaries using frozen synthetic fixtures and explicit owned configuration."
+  },
+  "frozen_inputs": {
+    "base_revision": "d4d3084d8b21524cd90ffe433168853563318a0b",
+    "tasks": [
+      "quality-and-worktree-qualification"
+    ],
+    "roles": [
+      "deterministic-runner"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/wsl-native-tools/run.py",
+        "sha256": "834ecb98cf1953cb9e1b282e6b1f104b4969abc2a8e008439b2c383328338aaa"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-native-tools/executed-run-v1.py",
+        "sha256": "bb7a8af2e002c259fdd6d9efcff7f74ca7b723fdaaf898b5d50e5a9f6fdf6d3b"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-native-tools/install.py",
+        "sha256": "563254d0fc38dd6e98158a905792c121ffdaed6d2be3157a16a45ad9ba79a255"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/wsl-native-tools/pins.json",
+        "sha256": "38cf36587276f76e0f9c748c1aa245cb085546601c4c9b12f79c7b463677007c"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-native-tools/plan.json",
+        "sha256": "10a7781aaee484954e047b4eac4bda545df7376d080a4ebeb66d00381957e4a8"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/wsl-native-tools/plan.json",
+        "sha256": "10a7781aaee484954e047b4eac4bda545df7376d080a4ebeb66d00381957e4a8"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Exactly one fully redacted github-pat positive at exit1 and empty clean report at exit0; two native worktrees at frozen commit; clean removal; dirty refusal preserves bytes and registration; cleanup without force leaves only main; no hook marker.",
+    "usage_rule": "No model/provider invocation by this fixture. Enclosing coordinator and child model usage unknown; no savings comparison."
+  },
+  "runtime_and_platform": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "tools": [
+      {
+        "name": "gitleaks",
+        "version": "8.30.1"
+      },
+      {
+        "name": "worktrunk",
+        "version": "0.78.0"
+      },
+      {
+        "name": "git",
+        "version": "2.55.0"
+      },
+      {
+        "name": "python",
+        "version": "3.13.15"
+      }
+    ],
+    "isolation": "New project-local versioned binaries and disposable synthetic Git repository; explicit owned user/system Worktrunk configs, empty child environment, disabled user/system Git config and Git hooks. No remotes, provider runs, PATH, shell, services or account changes."
+  },
+  "commands": [
+    "python3 blueprints/convergence-practice/wsl-native-tools/run.py --prefix \"$REVIEWED_PRIVATE_PREFIX\" --work \"$REVIEWED_PRIVATE_PREFIX/attempt-1\"",
+    "python3 blueprints/convergence-practice/wsl-native-tools/run.py --prefix \"$REVIEWED_PRIVATE_PREFIX\" --work \"$REVIEWED_PRIVATE_PREFIX/attempt-2-hardened\""
+  ],
+  "observations": [
+    {
+      "id": "wsl-native-qualified",
+      "task": "quality-and-worktree-qualification",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "WSL2 Linux x86_64 project-local gitleaks and Worktrunk synthetic qualification",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/wsl-native-tools/receipt-wsl.json",
+          "sha256": "6f088bbf5463e529221290a51679f4f5d07be96788a56b49afdf8ee174b4ba4e"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-native-tools/installation-wsl.json",
+          "sha256": "d0d02d297add27458a1f870e40e4d57b64754eaaee413d1da58ab8ee4bde95cc"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-native-tools/offline-wsl-tests.txt",
+          "sha256": "f4aa85cdf85b38cb0035645205988fd3a55006da5e149ab9940996b3c8a08d59"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "wsl-hardened-qualified",
+      "task": "quality-and-worktree-qualification",
+      "role": "deterministic-runner",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "WSL2 Linux x86_64 project-local gitleaks and Worktrunk synthetic qualification",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "blueprints/convergence-practice/wsl-native-tools/receipt-wsl-hardened.json",
+          "sha256": "0adbcfd5a0bf570d059db47422f9811346836426bdd10d6a8cd8b647fe8bfee9"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-native-tools/installation-wsl.json",
+          "sha256": "d0d02d297add27458a1f870e40e4d57b64754eaaee413d1da58ab8ee4bde95cc"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-native-tools/offline-wsl-hardened-tests.txt",
+          "sha256": "d8fff1ad7130f2bfff165f1745f8099a4a4af7747e8def430f3639ebb4c84b56"
+        },
+        {
+          "path": "blueprints/convergence-practice/wsl-native-tools/prior-attempts.json",
+          "sha256": "15e49ef4081e92e77f28801d48ee58ea1b437c7240c11cb954980539784e8a7a"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    }
+  ],
+  "failures_and_skips": [],
+  "limitations": [
+    "This is bounded synthetic native execution on one WSL host, not a real-project security audit, model-client worktree integration or another host qualification.",
+    "Native exit1 for the positive secret and dirty refusal are expected successful negative controls, not hidden failed qualification attempts.",
+    "Both native attempts passed; source-access, initial offline test-harness diagnostics and the single review are retained in prior-attempts.json. The second native attempt validates guards changed after review. Original runner and receipt remain byte-identical.",
+    "Optional archive attestation endpoints returned HTTP404. Verified release checksums and GitHub asset digests share the publisher release trust channel.",
+    "Private logs and primary synthetic fixture remain in the owned prefix. Public hashes prove byte identity, not independent observation truth.",
+    "No model/provider calls were made by the fixture; enclosing coordinator/child usage is not completely metered and remains unknown. No token-saving claim.",
+    "The original receipt records run.py as executed in its retained private source directory; public executed-run-v1.py preserves those same bytes. The current run.py is frozen separately by receipt-wsl-hardened.json."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "WSL2 Linux x86_64 project-local gitleaks and Worktrunk synthetic qualification",
+    "qualification_run_ids": [
+      "wsl-hardened-qualified"
+    ]
+  },
+  "rollback": "Retain task evidence, then retire only its private installation/qualification prefix. No global configuration, shell hooks or services were installed.",
+  "next_decision_changing_test": "Coordinator chooses a real project and reviewed configuration for a bounded current-tree scan and native-client worktree integration. PATH promotion is separately owned by the coordinator.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

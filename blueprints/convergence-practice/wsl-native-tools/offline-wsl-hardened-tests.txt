@@ -1,0 +1,25 @@
+test_archive_accepts_regular_nested_files (test_wsl_native_tools.ArchiveChecks.test_archive_accepts_regular_nested_files) ... ok
+test_archive_rejects_path_escape_links_and_special_files (test_wsl_native_tools.ArchiveChecks.test_archive_rejects_path_escape_links_and_special_files) ... ok
+test_checksum_requires_exact_unique_filename_and_digest (test_wsl_native_tools.ArchiveChecks.test_checksum_requires_exact_unique_filename_and_digest) ... ok
+test_modified_asset_rejected (test_wsl_native_tools.ArchiveChecks.test_modified_asset_rejected) ... ok
+test_changed_binary_fails_before_native_execution (test_wsl_native_tools.QualificationChecks.test_changed_binary_fails_before_native_execution) ... ok
+test_child_environment_excludes_inherited_tokens_and_configuration (test_wsl_native_tools.QualificationChecks.test_child_environment_excludes_inherited_tokens_and_configuration) ... ok
+test_clean_false_positive_is_rejected (test_wsl_native_tools.QualificationChecks.test_clean_false_positive_is_rejected) ... ok
+test_dirty_data_must_survive_unchanged (test_wsl_native_tools.QualificationChecks.test_dirty_data_must_survive_unchanged) ... ok
+test_modified_manifest_cannot_reauthorize_changed_binary (test_wsl_native_tools.QualificationChecks.test_modified_manifest_cannot_reauthorize_changed_binary) ... ok
+test_native_failure_retains_exit_and_failed_receipt (test_wsl_native_tools.QualificationChecks.test_native_failure_retains_exit_and_failed_receipt) ... ok
+test_native_version_must_match_pins_before_qualification (test_wsl_native_tools.QualificationChecks.test_native_version_must_match_pins_before_qualification) ... ok
+test_oracle_accepts_redacted_positive_and_clean_negative (test_wsl_native_tools.QualificationChecks.test_oracle_accepts_redacted_positive_and_clean_negative) ... ok
+test_oracle_rejects_missing_duplicate_or_wrong_rule (test_wsl_native_tools.QualificationChecks.test_oracle_rejects_missing_duplicate_or_wrong_rule) ... ok
+test_oracle_rejects_unredacted_report_and_log (test_wsl_native_tools.QualificationChecks.test_oracle_rejects_unredacted_report_and_log) ... ok
+test_release_identity_rejects_changed_or_duplicate_components (test_wsl_native_tools.QualificationChecks.test_release_identity_rejects_changed_or_duplicate_components) ... ok
+test_retained_archive_must_match_frozen_pin (test_wsl_native_tools.QualificationChecks.test_retained_archive_must_match_frozen_pin) ... ok
+test_reuse_preserves_existing_directory_before_any_command (test_wsl_native_tools.QualificationChecks.test_reuse_preserves_existing_directory_before_any_command) ... ok
+test_run_outside_private_prefix_is_rejected (test_wsl_native_tools.QualificationChecks.test_run_outside_private_prefix_is_rejected) ... ok
+test_timeout_retains_redacted_partial_streams_and_null_exit (test_wsl_native_tools.QualificationChecks.test_timeout_retains_redacted_partial_streams_and_null_exit) ... ok
+test_worktree_oracle_rejects_extra_missing_and_outside_paths (test_wsl_native_tools.QualificationChecks.test_worktree_oracle_rejects_extra_missing_and_outside_paths) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.022s
+
+OK

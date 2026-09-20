@@ -1,0 +1,393 @@
+{
+  "cleanup": {
+    "owned_clean_path_absent": true,
+    "owned_dirty_path_absent": true,
+    "primary_fixture_and_logs_retained": true,
+    "remaining_branches": [
+      "main"
+    ],
+    "remaining_worktrees": [
+      "repo"
+    ],
+    "services_or_models_started": false
+  },
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "--version"
+      ],
+      "cwd": "$RUN",
+      "elapsed_seconds": 0.00208,
+      "exit_code": 0,
+      "name": "git-version",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e928567de6f903039a669b7647bf037309d50e4f7916bb5c06f7b05d3bf966fe",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "$PREFIX/tools/gitleaks/8.30.1/gitleaks",
+        "version"
+      ],
+      "cwd": "$RUN",
+      "elapsed_seconds": 0.21024,
+      "exit_code": 0,
+      "name": "gitleaks-version",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "c9fd9ccb6682c54b5fcb0363757b6c6873564e7c067f70b3b5581b611528b9f4",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "$PREFIX/tools/worktrunk/0.78.0/worktrunk-x86_64-unknown-linux-musl/wt",
+        "--version"
+      ],
+      "cwd": "$RUN",
+      "elapsed_seconds": 0.010122,
+      "exit_code": 0,
+      "name": "wt-version",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "4649f59cd93070cfe40b01d7af7178f172971230a4fe87c28be32795f7be45f8",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "$PREFIX/tools/gitleaks/8.30.1/gitleaks",
+        "dir",
+        "$RUN/positive",
+        "--redact=100",
+        "--no-banner",
+        "--report-format=json",
+        "--report-path",
+        "$RUN/positive.json",
+        "--timeout=30"
+      ],
+      "cwd": "$RUN",
+      "elapsed_seconds": 0.330002,
+      "exit_code": 1,
+      "name": "gitleaks-positive",
+      "stderr_sha256": "387fc287e064f3ee61409daccb331ba42d939086f62290467dcc7f0690705aa2",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "$PREFIX/tools/gitleaks/8.30.1/gitleaks",
+        "dir",
+        "$RUN/negative",
+        "--redact=100",
+        "--no-banner",
+        "--report-format=json",
+        "--report-path",
+        "$RUN/negative.json",
+        "--timeout=30"
+      ],
+      "cwd": "$RUN",
+      "elapsed_seconds": 0.32494,
+      "exit_code": 0,
+      "name": "gitleaks-negative",
+      "stderr_sha256": "6fa3e744b897ddee1e997055e864918d44180b9141c9d0eb3d876dc6cc35eb4e",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "init",
+        "--initial-branch=main",
+        "$RUN/repo"
+      ],
+      "cwd": "$RUN",
+      "elapsed_seconds": 0.006868,
+      "exit_code": 0,
+      "name": "git-init",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "71d716db4ed51b07b407e4fb27cf41635c4b05dbe79ddbcc5589d92791662d53",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "add",
+        "fixture.txt",
+        ".config/wt.toml"
+      ],
+      "cwd": "$RUN/repo",
+      "elapsed_seconds": 0.002911,
+      "exit_code": 0,
+      "name": "git-add",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "commit",
+        "-m",
+        "Frozen synthetic worktree fixture"
+      ],
+      "cwd": "$RUN/repo",
+      "elapsed_seconds": 0.00686,
+      "exit_code": 0,
+      "name": "git-commit",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "cd7ba5183d7a2909cb3ba68564a74e033b5dd572b92103fee31d582b7978f7aa",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "$RUN/repo",
+      "elapsed_seconds": 0.001598,
+      "exit_code": 0,
+      "name": "git-head",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "b88222ba7242daad597f74eb7c44ac97a7f89337d84fa1a5c8e1b485768e64a8",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "$PREFIX/tools/worktrunk/0.78.0/worktrunk-x86_64-unknown-linux-musl/wt",
+        "switch",
+        "--create",
+        "clean",
+        "--base=main",
+        "--no-hooks",
+        "--no-cd",
+        "--format=json"
+      ],
+      "cwd": "$RUN/repo",
+      "elapsed_seconds": 0.033274,
+      "exit_code": 0,
+      "name": "wt-create-clean",
+      "stderr_sha256": "07e480b81923d95df224b3a9026327bcc9ef9010f1801fbab1e6e810e24110bb",
+      "stdout_sha256": "247066406d304878271fb6ace0e12c8c14213d462c2537481f8e00e769b78eb7",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "$RUN/owned-clean",
+      "elapsed_seconds": 0.001617,
+      "exit_code": 0,
+      "name": "git-head-clean",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "b88222ba7242daad597f74eb7c44ac97a7f89337d84fa1a5c8e1b485768e64a8",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "$PREFIX/tools/worktrunk/0.78.0/worktrunk-x86_64-unknown-linux-musl/wt",
+        "switch",
+        "--create",
+        "dirty",
+        "--base=main",
+        "--no-hooks",
+        "--no-cd",
+        "--format=json"
+      ],
+      "cwd": "$RUN/repo",
+      "elapsed_seconds": 0.030845,
+      "exit_code": 0,
+      "name": "wt-create-dirty",
+      "stderr_sha256": "f19be09501293cb925273ef7dbe216f1291f0172d0759fd2b9df5765f58fb4d4",
+      "stdout_sha256": "f10e649e84d6b0d75693285d6cc25beaf28677f203586a4e9dee2b0eec24bbc7",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "$RUN/owned-dirty",
+      "elapsed_seconds": 0.001581,
+      "exit_code": 0,
+      "name": "git-head-dirty",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "b88222ba7242daad597f74eb7c44ac97a7f89337d84fa1a5c8e1b485768e64a8",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "$PREFIX/tools/worktrunk/0.78.0/worktrunk-x86_64-unknown-linux-musl/wt",
+        "list",
+        "--format=json"
+      ],
+      "cwd": "$RUN/repo",
+      "elapsed_seconds": 0.039399,
+      "exit_code": 0,
+      "name": "wt-list-created",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "34d5359156a3f7f8daeb9a11ec2aebe4480061ec9aadbfb2bb6d516488487c32",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "$PREFIX/tools/worktrunk/0.78.0/worktrunk-x86_64-unknown-linux-musl/wt",
+        "remove",
+        "clean",
+        "--foreground",
+        "--no-hooks",
+        "--format=json"
+      ],
+      "cwd": "$RUN/repo",
+      "elapsed_seconds": 0.044952,
+      "exit_code": 0,
+      "name": "wt-remove-clean",
+      "stderr_sha256": "ab06fbc8a3addbaf746b23d2c6d00739802d6451fc6b9ccb09cb0ad3f4489523",
+      "stdout_sha256": "f1cf064db668c4087b2a8b64fb552e22a23974cc15187bbea3fab957b4578b51",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "$PREFIX/tools/worktrunk/0.78.0/worktrunk-x86_64-unknown-linux-musl/wt",
+        "remove",
+        "dirty",
+        "--foreground",
+        "--no-hooks",
+        "--format=json"
+      ],
+      "cwd": "$RUN/repo",
+      "elapsed_seconds": 0.018724,
+      "exit_code": 1,
+      "name": "wt-remove-dirty-refused",
+      "stderr_sha256": "ead4a00cefd69df2d421d389657f60f82b6a9e80bcc424eeffc5574b628330d3",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "$PREFIX/tools/worktrunk/0.78.0/worktrunk-x86_64-unknown-linux-musl/wt",
+        "list",
+        "--format=json"
+      ],
+      "cwd": "$RUN/repo",
+      "elapsed_seconds": 0.039233,
+      "exit_code": 0,
+      "name": "wt-list-refused",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "046e66f199807f7d5d7a04925f61041ef4bacccc5dea269a7eab062d3a33c5c9",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "$PREFIX/tools/worktrunk/0.78.0/worktrunk-x86_64-unknown-linux-musl/wt",
+        "remove",
+        "dirty",
+        "--foreground",
+        "--no-hooks",
+        "--format=json"
+      ],
+      "cwd": "$RUN/repo",
+      "elapsed_seconds": 0.040492,
+      "exit_code": 0,
+      "name": "wt-remove-restored",
+      "stderr_sha256": "728e47770f1b6c0d7d6bfba91ba6601eb17360345e212d402b3f2ff915e07a21",
+      "stdout_sha256": "958fecc2fad4684439b727b0763cd9679d302603d6eddd4305b4f6e7a2c4bce6",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "$PREFIX/tools/worktrunk/0.78.0/worktrunk-x86_64-unknown-linux-musl/wt",
+        "list",
+        "--format=json"
+      ],
+      "cwd": "$RUN/repo",
+      "elapsed_seconds": 0.028629,
+      "exit_code": 0,
+      "name": "wt-list-final",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "8083397fc2c26a55093c445552f19203cf496a5d2dc06931fabadddb0622b41c",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "worktree",
+        "list",
+        "--porcelain"
+      ],
+      "cwd": "$RUN/repo",
+      "elapsed_seconds": 0.001495,
+      "exit_code": 0,
+      "name": "git-worktree-final",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "1bbef3f659fdb5786354f68b2c70122309b102897b6540a513829c6df7381365",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "branch",
+        "--format=%(refname:short)"
+      ],
+      "cwd": "$RUN/repo",
+      "elapsed_seconds": 0.001502,
+      "exit_code": 0,
+      "name": "git-branches-final",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "6403203dd5a0867eb14d104ee8a73730bd72dd9ad92e78d996a6dba0a5dcfc01",
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--porcelain"
+      ],
+      "cwd": "$RUN/repo",
+      "elapsed_seconds": 0.00196,
+      "exit_code": 0,
+      "name": "git-status-final",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "timed_out": false
+    }
+  ],
+  "dirty_refusal": {
+    "modified_sha256": "c37af475ffe2027b59a4dc8a2fbb3440141e7ebf0b85085d05bf756ac83d60a3",
+    "registration_preserved": true,
+    "untracked_sha256": "6984b46b6abb43fb7ea12da9d50dccc1b6f583d6f39e830b0195c50152d98086"
+  },
+  "finished_at": "2026-09-20T06:32:29.837131+00:00",
+  "frozen_inputs": {
+    "install.py": "563254d0fc38dd6e98158a905792c121ffdaed6d2be3157a16a45ad9ba79a255",
+    "pins.json": "38cf36587276f76e0f9c748c1aa245cb085546601c4c9b12f79c7b463677007c",
+    "plan.json": "10a7781aaee484954e047b4eac4bda545df7376d080a4ebeb66d00381957e4a8",
+    "run.py": "834ecb98cf1953cb9e1b282e6b1f104b4969abc2a8e008439b2c383328338aaa"
+  },
+  "gitleaks": {
+    "fully_redacted": true,
+    "negative_findings": 0,
+    "negative_report_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "positive_findings": 1,
+    "positive_report_sha256": "a953f93e58cf17fe3d675bbcc68a886c24f054d32c9b5ad3233f572b8df46a57",
+    "rule": "github-pat"
+  },
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.13.15",
+  "schema_version": 1,
+  "started_at": "2026-09-20T06:32:27.951777+00:00",
+  "status": "passed",
+  "versions": {
+    "git": "git version 2.55.0",
+    "gitleaks": "8.30.1",
+    "worktrunk": "wt v0.78.0"
+  },
+  "worktrunk": {
+    "created": 2,
+    "dirty_removal_refused": true,
+    "frozen_commit": "a6c3ba5985390c3a220f832314d9efed03673a3a",
+    "project_hooks_suppressed": true,
+    "removed_without_force": 2
+  }
+}

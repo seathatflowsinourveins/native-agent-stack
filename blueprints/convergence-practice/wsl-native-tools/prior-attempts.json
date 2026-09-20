@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "qualification_attempts": 2,
+  "native_qualification_failures": 0,
+  "retained_diagnostics": [
+    {
+      "stage": "metadata source path lookup",
+      "exit_code": 1,
+      "detail": "A guessed Worktrunk LICENSE-MIT path returned HTTP 404. The exact pinned source tree resolved the real combined LICENSE file; its bytes later matched the archive."
+    },
+    {
+      "stage": "optional archive attestation lookup",
+      "exit_code": 1,
+      "detail": "Both exact archive-digest GitHub attestations endpoints returned HTTP 404. Publisher checksums and GitHub asset digests passed; no attestation verification is claimed."
+    },
+    {
+      "stage": "offline regression development on macOS",
+      "exit_code": 1,
+      "tests": 15,
+      "failures": 1,
+      "errors": 1,
+      "detail": "Test harness used a symlinked temporary path and globally mocked subprocess while platform metadata invoked uname/file. Resolved the test root and mocked platform metadata within tests. Production runner and frozen acceptance remained unchanged. Final 15 tests passed on both macOS and WSL."
+    },
+    {
+      "stage": "single independent source review",
+      "native_qualification_failed": false,
+      "findings": [
+        "The original runner checked the binary against the installation receipt but did not bind that receipt to the frozen release pins.",
+        "A timed-out native command lost partial captured streams and lacked a journal entry."
+      ],
+      "resolution": "Current runner checks exact release identity, verifies retained archive against frozen digest, derives executable hash from archive bytes and checks native version. Timeout retains redacted partial streams, timed_out=true and null exit. Five regression tests added; revised native attempt passed. Original executed-run-v1.py and receipt-wsl.json retained byte-for-byte."
+    }
+  ]
+}
