@@ -1767,6 +1767,25 @@
         "Retained text replaces local paths; raw byte hashes precede sanitization"
       ],
       "path": "evidence/receipts/native-token-ci-local-20260920.json"
+    },
+    {
+      "id": "native-token-ci-github-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "rtk",
+        "qmd",
+        "repomix",
+        "toon"
+      ],
+      "claim": "GitHub Ubuntu24.04 clean installation passed all41upstream command expectations and14acceptance checks; five retained artifacts and seven source hashes matched after download.",
+      "limitations": [
+        "Not a new-PC, native Codex/Claude, GPU or provider acceptance",
+        "Top-level package pins; npm transitive ranges resolve at installation",
+        "RTK counters are fixture-local estimates, not provider savings",
+        "No token-saving requirement: fidelity may need the larger representation",
+        "Retained text replaces local paths; raw byte hashes precede sanitization"
+      ],
+      "path": "evidence/receipts/native-token-ci-github-20260920.json"
     }
   ],
   "files": [
@@ -4953,8 +4972,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "fe50d13c9fbca994ff8d58552f4b06b38251c9cd217e31b85f362387be12c6e6",
-      "bytes": 33574
+      "sha256": "b0fdcfe5e6ef4814371f65bf92934c593e44529e5ccedf2334fceca6a046d254",
+      "bytes": 34172
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -5010,6 +5029,31 @@
       "path": "evidence/artifacts/usage-report.source.txt",
       "sha256": "e5ba2fc9e397b97888a4929069434321e4ea17ea298a536ae20360638a304d50",
       "bytes": 11763
+    },
+    {
+      "path": "evidence/native-token-ci/20260920/qmd-input.md",
+      "sha256": "6fd148f20e3aeac8e835cd8509090aa02d2d0fa7818453776fbc62124f82e32a",
+      "bytes": 388
+    },
+    {
+      "path": "evidence/native-token-ci/20260920/records.recovered.json",
+      "sha256": "fbb7def43d291ae3f375cd83c04f367a993044fea454e6851fc499dccd4cec34",
+      "bytes": 172
+    },
+    {
+      "path": "evidence/native-token-ci/20260920/records.toon",
+      "sha256": "9446df1ab35a750ac3bccc1777934ce0f979bad805e4efa3b21c7fbbe7a505e3",
+      "bytes": 60
+    },
+    {
+      "path": "evidence/native-token-ci/20260920/repomix-originals.xml",
+      "sha256": "a860736a54fbdac8e9babf486ad87180cca6c490f946f76e4a2dad2482f45cd6",
+      "bytes": 289
+    },
+    {
+      "path": "evidence/native-token-ci/20260920/repomix-structure.xml",
+      "sha256": "7c8e37eb454f14dc58f308ed94957aace08cb2505aff26dbf428e04cecdbc2f7",
+      "bytes": 195
     },
     {
       "path": "evidence/receipts/artifact-reductions.json",
@@ -5130,6 +5174,11 @@
       "path": "evidence/receipts/native-session-defaults-20260920.json",
       "sha256": "0da307248aa3809c09519dd64020e8744d2edd5f565f052a1a8c0af7489b819f",
       "bytes": 29978
+    },
+    {
+      "path": "evidence/receipts/native-token-ci-github-20260920.json",
+      "sha256": "e34a6a48d212e58737e469e03309f69bab7eeb46325d34e8678ee623a784d006",
+      "bytes": 39217
     },
     {
       "path": "evidence/receipts/native-token-ci-local-20260920.json",

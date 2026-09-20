@@ -28,6 +28,8 @@ The [native token CI workflow](../.github/workflows/native-token-e2e.yml) instal
 
 The [local clean-install receipt](../evidence/receipts/native-token-ci-local-20260920.json) retains actual arguments, returned outputs, exits and hashes for **41 commands and 14 acceptance checks**. Six focused tests cover rejection and failure handling. RTK's isolated fixture ledger returned `total_commands: 3`, `total_input: 124`, `total_output: 118`, `total_saved: 6`; this small fixture estimate is separate from the host's retained history. QMD has no downloaded model in this lane. The [CI guide](native-token-ci.md) gives the commands and boundaries; each run uploads sanitized evidence for 14 days.
 
+The actual [GitHub Linux run](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35527455997) also passed all 41 command expectations and 14 checks on September 20, 2026. Its downloaded receipt, five retained fixture artifacts and seven input hashes were verified; the [permanent hosted receipt](../evidence/receipts/native-token-ci-github-20260920.json) and [fixture outputs](../evidence/native-token-ci/20260920/) remain in Git after the temporary Actions artifact expires. This is fresh Linux CLI acceptance; native client launch acceptance is recorded separately above.
+
 ### Applying the defaults on another host
 
 First install the selected profile with the pinned upstream recipes. Then resolve that host's native executable directory and stable inherited PATH. Set the following in each intended Codex home's `config.toml`, merging with existing settings:
