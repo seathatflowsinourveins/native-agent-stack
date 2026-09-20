@@ -119,5 +119,5 @@
     ]
   },
   "rollback": "Remove analyzer step, lock and matching CI tests together; preserve prior validators.",
-  "next_decision_changing_test": "Run exact Linux wheel and both fixtures in public CI; broader persona or signature checks need separate evidence."
+  "next_decision_changing_test": "Linux wheel and fixtures now pass in the separately linked CI receipt; broader persona and signature checks require separate scoped qualification."
 }

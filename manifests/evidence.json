@@ -1129,13 +1129,18 @@
     },
     {
       "path": "blueprints/convergence-practice/ci-security/README.md",
-      "sha256": "725e3d43817a0d6f7ac30e40480e245d9deff6feece60658496e95b534d5ec21",
-      "bytes": 1922
+      "sha256": "e30226b3e8715d64a5010762eb6bcef78aa5c37e6d5765a39d115801e6908a02",
+      "bytes": 2042
+    },
+    {
+      "path": "blueprints/convergence-practice/ci-security/ci-acceptance.json",
+      "sha256": "11d819eee7ecfefcc0fd07987ed273d8a245bbe888145c94d0a47b67c52211df",
+      "bytes": 1109
     },
     {
       "path": "blueprints/convergence-practice/ci-security/experiment.json",
-      "sha256": "eb5116f2664dec9ad194ac1a2991aa64e01d8203a7f886aa7195f5310f0607bc",
-      "bytes": 4345
+      "sha256": "394a4cd2f6d74322dc5cf8e8c0e06f372d1c34e6428d6c4680f2c76319872768",
+      "bytes": 4378
     },
     {
       "path": "blueprints/convergence-practice/ci-security/observation.json",

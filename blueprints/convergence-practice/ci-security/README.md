@@ -2,7 +2,9 @@
 
 The public CI now installs **zizmor 1.30.1** from a SHA-256-locked official PyPI
 wheel and analyzes workflows offline. It adds no persistent service or account.
-The Linux x86_64 wheel is isolated to GitHub's disposable Ubuntu runner; its
+The Linux x86_64 wheel passed the [exact-head CI run](ci-acceptance.json),
+including all 404 tests with 40 explicit optional-profile skips. It is isolated
+to GitHub's disposable Ubuntu runner; its
 [lock](../../../.github/requirements-ci.lock) is not a portable Mac install recipe.
 
 The [source review](../../../catalogs/convergence-practice/architecture-wave/zizmorcore__zizmor.json)
