@@ -45,7 +45,12 @@
     "blueprints/us-equities/catalyst-experiment/receipt.json",
     "blueprints/us-equities/research-efficiency/native-receipt.json",
     "blueprints/convergence-practice/ci-security/receipt.json",
-    "blueprints/convergence-practice/native-worker/receipt.json"
+    "blueprints/convergence-practice/native-worker/receipt.json",
+    "blueprints/convergence-practice/job-recovery/receipt-macos.json",
+    "blueprints/convergence-practice/job-recovery/receipt-wsl.json",
+    "blueprints/convergence-practice/native-recovery/receipt.json",
+    "blueprints/convergence-practice/gpu-inference/receipt.json",
+    "blueprints/convergence-practice/native-recovery/claude/receipt.json"
   ],
   "north_star": "blueprints/us-equities/north-star.md",
   "harness_contract": "blueprints/us-equities/harness-contract.json",

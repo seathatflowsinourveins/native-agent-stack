@@ -167,6 +167,12 @@ automatic loop or paid fallback. Native `/usage` cost estimates and account
 credit spend answer different questions; a print-mode dollar cap is not proof
 that no usage credits can be spent. [Claude usage accounting](https://code.claude.com/docs/en/costs).
 
+The later [native token-practice comparisons](token-practice.md) retain both a
+Codex reduction and a Claude increase under explicit Context Mode use. The
+cache conditions were uncontrolled and the enclosing workflow was not fully
+metered. Use the smallest sufficient tool path for the current task; adding a
+compression call to every short output is not an accepted optimization.
+
 ## 7. Separate deterministic checks from live qualification
 
 Let deterministic code own arithmetic, schema validation, source hashes and
@@ -198,6 +204,13 @@ native analyzer. Thirty-one contract tests include unequal comparison counts and
 later-failed qualification cases discovered during independent review. These
 results retain their exact fixture, host, persona and accounting limits.
 
+The later [local GPU trial](../blueprints/convergence-practice/gpu-inference/README.md)
+adds a pinned llama.cpp CUDA runtime and Qwen3.8-27B quant on WSL RTX4090.
+One generated repair passed independent source review and the twelve unchanged
+tests. Its partial-offload generation took 179.191 seconds; native Codex and Claude
+remain the default workers. Archive attestations, model hashes, memory reserve
+and missing exact layer-count telemetry are retained with the result.
+
 ## 8. Close the task with a recoverable decision
 
 Choose retain, trial, adopt within scope, defer or reject. State the accepted
@@ -220,6 +233,15 @@ interruption, reconcile the native task identity and any external effects
 before resubmitting. A successful same-host restore or a service that restarts
 does not certify an entire Mac/WSL ecosystem after power loss or network change.
 
+The subsequent [job-recovery qualification](../blueprints/convergence-practice/job-recovery/README.md)
+now observes native Dagu cancellation and retry of only the unfinished final
+step on both Mac and WSL. The saved checkpoint stays unchanged and executes
+once; the twelve-test oracle passes before and after. The separate
+[Codex session qualification](../blueprints/convergence-practice/native-recovery/README.md)
+interrupts a pending native tool turn, reconnects through a new app-server and
+resumes the same native thread and session to finish one saved effect. These
+close the named fixture gaps while preserving the broader lifecycle limits.
+
 ## Apply the loop to the next repository
 
 For an application bug: select the existing engineering profile, record its
@@ -234,3 +256,5 @@ and completeness, then compare usage within the same provider/task conditions.
 Promote only the demonstrated change. That makes the ecosystem useful for
 building complex systems while keeping evidence, ownership and recovery small
 enough to inspect.
+
+The companion [Claude session qualification](../blueprints/convergence-practice/native-recovery/claude/README.md) now exercises native interruption during an owned Bash wait on WSL and resumes the same session to finalize its checkpoint. The action journal rejects repeated checkpoint work. Its two native terminal usage views reconcile without adding the resumed cumulative view again. Later no-model guard tests harden private-log placement and failure cleanup; the original execution source remains frozen separately.

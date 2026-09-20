@@ -52,7 +52,11 @@
     "current_token_native_pairs": "evidence/receipts/token-practice-native-pairs-20260920.json",
     "current_token_catalog_conversion": "evidence/receipts/token-practice-catalog-toon-20260920.json",
     "current_token_native_counters": "evidence/receipts/token-practice-native-counters-20260920.json",
-    "current_token_gap_followup": "evidence/receipts/token-practice-gap-followup-20260920.json"
+    "current_token_gap_followup": "evidence/receipts/token-practice-gap-followup-20260920.json",
+    "current_job_recovery": "blueprints/convergence-practice/job-recovery/README.md",
+    "current_codex_session_recovery": "blueprints/convergence-practice/native-recovery/README.md",
+    "current_gpu_trial": "blueprints/convergence-practice/gpu-inference/README.md",
+    "current_claude_session_recovery": "blueprints/convergence-practice/native-recovery/claude/README.md"
   },
   "recipe_map": {
     "affaan-m/ECC": "recipes/README.md",
@@ -107,7 +111,8 @@
     "systemd": "blueprints/us-equities/worker-supervision/README.md",
     "skfolio": "blueprints/us-equities/research-evaluation/README.md",
     "edgartools": "blueprints/us-equities/catalyst-provenance/README.md",
-    "zizmor": "blueprints/convergence-practice/ci-security/README.md"
+    "zizmor": "blueprints/convergence-practice/ci-security/README.md",
+    "llama-cpp": "blueprints/convergence-practice/gpu-inference/README.md"
   },
   "profiles": [
     {

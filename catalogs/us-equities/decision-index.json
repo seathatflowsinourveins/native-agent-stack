@@ -164,10 +164,10 @@
     "repositories": 505,
     "public_star_repositories": 342,
     "beyond_public_stars": 163,
-    "references": 1051,
+    "references": 1052,
     "repositories_by_record_type": {
       "catalog_card": 147,
-      "component_record": 53,
+      "component_record": 54,
       "legacy_candidate": 19,
       "public_star": 342,
       "research_supplement": 103,
@@ -4589,6 +4589,7 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
+        "component_record",
         "research_supplement"
       ],
       "references": [
@@ -4599,6 +4600,12 @@
           "decision": "investigate",
           "review_level": "source_review",
           "evidence_level": "pinned_source_review"
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/53",
+          "id": "llama-cpp"
         }
       ]
     },

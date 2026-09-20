@@ -20,6 +20,14 @@ adds the [general engineering guide](../../docs/convergence-architecture.md), an
 [workflow security qualification](ci-security/README.md). It retains the earlier
 retrieval results below and does not convert them into patch-success or savings claims.
 
+The later recovery wave adds [deterministic job recovery on Mac and WSL](job-recovery/README.md)
+and [native Codex same-session recovery](native-recovery/README.md). These retain
+their frozen inputs, failed adapter attempt, native statuses and process scope.
+The merged [token-practice guide](../../docs/token-practice.md) keeps provider
+usage, retained-history estimates and artifact reductions separate.
+The [local GPU trial](gpu-inference/README.md) qualifies one pinned partial-offload
+repair on WSL RTX4090, with a slow-latency boundary and no default model change.
+
 ## This wave's evidence
 
 The [source review](../../catalogs/convergence-practice/source-review.md) refreshed

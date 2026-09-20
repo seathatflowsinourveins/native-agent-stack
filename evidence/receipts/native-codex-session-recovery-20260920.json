@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "id": "native-codex-session-recovery-20260920",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "codex"
+  ],
+  "claim": "Native Codex on Mac interrupted an owned pending dynamic tool, reconnected through a new app-server and resumed the same native thread/session to finalize an unchanged single checkpoint.",
+  "limitations": [
+    "One synthetic two-turn fixture on the installed Mac bundled alpha; no general distributed exactly-once guarantee.",
+    "No arbitrary shell/MCP descendant, provider cancellation, power loss or independent-host restore test.",
+    "Native cumulative token categories counted once; retries, billing and enclosing coordinator usage unknown; no savings claim."
+  ],
+  "evidence_paths": [
+    "blueprints/convergence-practice/native-recovery/receipt.json",
+    "blueprints/convergence-practice/native-recovery/experiment.json"
+  ]
+}
