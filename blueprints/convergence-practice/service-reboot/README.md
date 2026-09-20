@@ -1,6 +1,12 @@
 # Owned guest user-service reboot acceptance
 
 This is a **protocol and executable trial**, with no native reboot receipt yet.
+The [first hosted attempt](prior-attempts.json) passed the unchanged upstream
+Dagu tests but failed before guest boot because QEMU8.2.2 rejected `serial` on
+the qcow2 backend. Its original freeze, launcher, error, cleanup and plan remain
+retained in [attempt-1](attempt-1/). The launcher correction places the serial
+on an explicit `virtio-blk-pci` device connected to the same named disk backend;
+mandatory native device-help validation runs before the next guest launch.
 Local regression tests do not establish that the guest can reboot or recover.
 The manual-only `Native owned guest service reboot` workflow is the execution
 entry point; the coordinator dispatches it after reviewing the frozen patch.

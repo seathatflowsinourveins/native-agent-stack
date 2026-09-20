@@ -7,6 +7,7 @@ import io
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import signal
 import socket
@@ -18,6 +19,25 @@ import urllib.request
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 MARKER = 'NATIVE_REBOOT_OBSERVER '
+
+
+def qemu_arguments(disk, private, serial, port):
+    # QEMU8.2.2's virtio-blk device owns `serial`; the qcow2 backend does not.
+    # Keep a separately named backend, matching upstream virtio-blk qtests.
+    return ['qemu-system-x86_64', '-machine', 'accel=tcg', '-m', '2048', '-smp', '2',
+            '-display', 'none', '-monitor', 'none', '-serial', 'file:' + str(serial),
+            '-drive', 'file=' + str(disk) + ',format=qcow2,if=none,id=service-reboot-disk',
+            '-device', 'virtio-blk-pci,drive=service-reboot-disk,serial=native-reboot-disk',
+            '-drive', 'file=' + str(private / 'seed.iso') + ',format=raw,media=cdrom,readonly=on',
+            '-drive', 'file=' + str(private / 'payload.iso') + ',format=raw,media=cdrom,readonly=on',
+            '-netdev', f'user,id=net0,restrict=on,hostfwd=tcp:127.0.0.1:{port}-:22',
+            '-device', 'virtio-net-pci,netdev=net0', '-no-shutdown']
+
+
+def verify_block_device_help(output):
+    for name in ('drive', 'serial'):
+        if not re.search(r'^\s*' + name + r'=<str>(?:\s|$)', output, re.MULTILINE):
+            raise ValueError('Native virtio-blk-pci lacks required device property: ' + name)
 
 
 def digest(path):
@@ -216,6 +236,8 @@ def run(work):
         disk = private / 'persistent.qcow2'
         command('disk-create', ['qemu-img', 'create', '-f', 'qcow2', '-F', 'qcow2', '-b', str(image_path), str(disk), '8G'])
         command('qemu-version', ['qemu-system-x86_64', '--version'])
+        device_help = command('qemu-block-device-help', ['qemu-system-x86_64', '-device', 'virtio-blk-pci,help'])
+        verify_block_device_help((device_help.stdout + device_help.stderr).decode())
         command('runner-packages', ['dpkg-query', '-W', 'qemu-system-x86', 'qemu-utils', 'cloud-image-utils', 'ubuntu-cloudimage-keyring'])
         inputs = sorted(set(source_paths + [p for p in HERE.iterdir() if p.is_file()] +
                             [ROOT / '.github/workflows/native-service-reboot.yml', ROOT / 'tests/test_service_reboot.py']))
@@ -234,13 +256,7 @@ def run(work):
                '-o', 'StrictHostKeyChecking=accept-new', '-o', 'UserKnownHostsFile=' + str(private / 'known_hosts'),
                '-o', 'ControlMaster=no', '-o', 'ControlPath=none', '-o', 'ConnectTimeout=10', 'example@127.0.0.1']
         serial = reports / 'serial.log'
-        args = ['qemu-system-x86_64', '-machine', 'accel=tcg', '-m', '2048', '-smp', '2',
-                '-display', 'none', '-monitor', 'none', '-serial', 'file:' + str(serial),
-                '-drive', 'file=' + str(disk) + ',format=qcow2,if=virtio,serial=native-reboot-disk',
-                '-drive', 'file=' + str(private / 'seed.iso') + ',format=raw,media=cdrom,readonly=on',
-                '-drive', 'file=' + str(private / 'payload.iso') + ',format=raw,media=cdrom,readonly=on',
-                '-netdev', f'user,id=net0,restrict=on,hostfwd=tcp:127.0.0.1:{port}-:22',
-                '-device', 'virtio-net-pci,netdev=net0', '-no-shutdown']
+        args = qemu_arguments(disk, private, serial, port)
         write_json(reports / 'qemu.command.json', {'argv': args, 'started_utc': datetime.now(timezone.utc).isoformat()})
         with (reports / 'qemu.stdout').open('xb') as out, (reports / 'qemu.stderr').open('xb') as err:
             qemu = subprocess.Popen(args, env=env, stdout=out, stderr=err, start_new_session=True)

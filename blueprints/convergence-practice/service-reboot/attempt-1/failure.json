@@ -1,0 +1,6 @@
+{
+  "detail": "Owned QEMU exited before observation",
+  "error_type": "RuntimeError",
+  "events": {},
+  "status": "failed"
+}

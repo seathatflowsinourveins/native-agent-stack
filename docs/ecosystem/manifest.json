@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-20",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "a2fa6730e86e4067f18dbd46eb8b411728b1561b",
+  "source_revision": "61310ec541184bb7c4da5ec65a5e16c3fa09ee9e",
   "layers": [
     {
       "id": "agents",
@@ -326,6 +326,18 @@
       "title": "Upstream practice and acceptance evidence",
       "body": "Research and reuse upstream skills, tests and automation; retain native outputs and separate observations. Local integration checks and synthetic fixtures carry explicit limits.",
       "path": "docs/acceptance-evidence-policy.md",
+      "category": "evaluation"
+    },
+    {
+      "title": "Upstream restic tests and independent-host restore",
+      "body": "Seven unchanged upstream tests passed; two exact synthetic snapshots restored with a separately supplied key. Native outputs, independent artifact checks and the initial failed attempt are retained.",
+      "path": "blueprints/convergence-practice/offhost-restore/README.md",
+      "category": "evaluation"
+    },
+    {
+      "title": "Unchanged upstream Dagu retry results",
+      "body": "Selected official retry tests passed with all 3,261 source files unchanged. Their result is separate from the later guest launch failure and pending reboot qualification.",
+      "path": "evidence/receipts/native-dagu-retry-tests-20260920.json",
       "category": "evaluation"
     },
     {

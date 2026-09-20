@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "scope": "Declared public display projections of the seven independently audited original GitHub job reports. Originals remain retained privately and in the original GitHub artifact. This is sanitization, not a test rerun.",
+  "rules": [
+    "Replace the GitHub runner home prefix with $CI_HOME.",
+    "Render the upstream UI route segment home as $UPSTREAM_HOME_ROUTE in the __tests__ and index.tsx path families. These are repository route paths, not private home directories; the conservative publication filter also matches them.",
+    "Replace synthetic upstream test UUID identities with stable $UPSTREAM_TEST_ID_NN placeholders per file, preserving repetitions. Test results and non-path source hashes are unchanged."
+  ],
+  "raw_artifact_zip_sha256": "d0fab2d0434f65b645cff114aa6db07cca774bd1e42d6909c2c5b94f67457109",
+  "files": [
+    {
+      "file": "archive-verification.txt",
+      "raw_sha256": "eb0f037a1556a451ad8ce70b7f37b0875799180d9585c69be742e48c70b91429",
+      "raw_bytes": 73,
+      "public_sha256": "005e773ac9a057c055e275f624ccba78e3a4a36cc17325ce41ea68bb53d0b9a2",
+      "public_bytes": 69,
+      "changed": true,
+      "ci_home_replacements": 1,
+      "upstream_route_replacements": 0,
+      "synthetic_uuid_occurrences": 0,
+      "synthetic_uuid_identities": 0
+    },
+    {
+      "file": "exit-code.txt",
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "raw_bytes": 2,
+      "public_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "public_bytes": 2,
+      "changed": false,
+      "ci_home_replacements": 0,
+      "upstream_route_replacements": 0,
+      "synthetic_uuid_occurrences": 0,
+      "synthetic_uuid_identities": 0
+    },
+    {
+      "file": "go-version.txt",
+      "raw_sha256": "76227025cc0bc2be7067aa45d11e09cacfd49c58f498f4c2e4f6a9872a607bf9",
+      "raw_bytes": 32,
+      "public_sha256": "76227025cc0bc2be7067aa45d11e09cacfd49c58f498f4c2e4f6a9872a607bf9",
+      "public_bytes": 32,
+      "changed": false,
+      "ci_home_replacements": 0,
+      "upstream_route_replacements": 0,
+      "synthetic_uuid_occurrences": 0,
+      "synthetic_uuid_identities": 0
+    },
+    {
+      "file": "native-command.txt",
+      "raw_sha256": "70fe2d9b972da0abd201b3bd0080c522788383be3504192f3f0dae2c94d8c9be",
+      "raw_bytes": 78,
+      "public_sha256": "70fe2d9b972da0abd201b3bd0080c522788383be3504192f3f0dae2c94d8c9be",
+      "public_bytes": 78,
+      "changed": false,
+      "ci_home_replacements": 0,
+      "upstream_route_replacements": 0,
+      "synthetic_uuid_occurrences": 0,
+      "synthetic_uuid_identities": 0
+    },
+    {
+      "file": "source-after.json",
+      "raw_sha256": "19971cd08178383e63dadc9e4bac3a45b34c0a2afec74e56586be0d935d51012",
+      "raw_bytes": 385936,
+      "public_sha256": "426613b1e08ac79e7cf8465c550e5138879262d8a63ae13a141885d51ad6eb18",
+      "public_bytes": 385968,
+      "changed": true,
+      "ci_home_replacements": 0,
+      "upstream_route_replacements": 2,
+      "synthetic_uuid_occurrences": 0,
+      "synthetic_uuid_identities": 0
+    },
+    {
+      "file": "source-before.json",
+      "raw_sha256": "19971cd08178383e63dadc9e4bac3a45b34c0a2afec74e56586be0d935d51012",
+      "raw_bytes": 385936,
+      "public_sha256": "426613b1e08ac79e7cf8465c550e5138879262d8a63ae13a141885d51ad6eb18",
+      "public_bytes": 385968,
+      "changed": true,
+      "ci_home_replacements": 0,
+      "upstream_route_replacements": 2,
+      "synthetic_uuid_occurrences": 0,
+      "synthetic_uuid_identities": 0
+    },
+    {
+      "file": "upstream-tests.txt",
+      "raw_sha256": "6f69ab98891f4870c8f4adc2a6073279ab07348369305f0cb8f4bdac0dd2c0d3",
+      "raw_bytes": 112221,
+      "public_sha256": "de8e1f5be73015e656cda6efe5a562fe355d3b00ebade85f5f35f6391b70ccb9",
+      "public_bytes": 108001,
+      "changed": true,
+      "ci_home_replacements": 279,
+      "upstream_route_replacements": 0,
+      "synthetic_uuid_occurrences": 194,
+      "synthetic_uuid_identities": 15
+    }
+  ]
+}

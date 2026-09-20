@@ -1,5 +1,18 @@
 # Synthetic independent-host restore
 
+The [accepted hosted result](../../../evidence/receipts/native-offhost-restic-20260920.json)
+records run35537533416 on September20. Seven unchanged upstream tests and nine
+subtests passed without skips. Native `check --read-data` checked two snapshots
+and four packs without errors; both exact `restore --verify` operations returned
+exit0 and verified six files each. The invalid-password case returned exit12
+without restored files. An independent reviewer fetched the GitHub artifact and
+matched all24 reports, executed source pins, unchanged ciphertext and both complete
+path/type/size/hash/mode manifests against the frozen oracle. The
+[retained native outputs](../../../evidence/artifacts/native-offhost-restore-20260920/receipt.json)
+remain separate from the [upstream Go test outputs](../../../evidence/artifacts/native-offhost-restore-20260920/upstream-tests.json).
+This establishes the synthetic transfer boundary only; application queries,
+lost-key/account recovery and production disaster recovery remain unqualified.
+
 The manual-only workflow first runs **seven unchanged upstream restic tests**,
 then attempts an independent-host restore of the separately retained synthetic
 repository. [Upstream source selection](upstream-source.json) pins restic0.19.1

@@ -4,6 +4,43 @@
   "scope": "Capability-specific general FOUNDATION selection; original pins, full receipt claims and per-component lifecycle stages remain canonical. Shared research and financial examples are not blanket adoption.",
   "decisions": [
     {
+      "id": "synthetic-offhost-restic-restore",
+      "capability": "Restore exact synthetic encrypted snapshots on an independent hosted runner",
+      "capability_key": "synthetic-offhost-restic-restore",
+      "checked_at": "2026-09-20",
+      "layer_ids": ["recovery-portability"],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use the frozen synthetic ciphertext and exact snapshot IDs with the separately supplied fixture password.",
+      "component_ids": ["restic"],
+      "candidate": null,
+      "evidence_ids": ["native-offhost-restic-20260920"],
+      "evidence_scope": "A fresh GitHub-hosted runner passed seven unchanged upstream tests, rejected the wrong password without restoring files, checked all repository data and restored both exact synthetic snapshots with complete path/type/byte/hash/POSIX-mode equality. Ciphertext remained unchanged and temporary runtime/password files were removed.",
+      "limitations": [
+        "Synthetic file recovery only; ai-memory/Qdrant application-state recovery and post-restore queries remain unqualified off-host.",
+        "Separate ciphertext and password delivery share one GitHub administrative account; account-loss and lost-password recovery remain unqualified.",
+        "No reboot, production disaster recovery, whole-stack recovery or provider-saving claim.",
+        "The seven upstream tests are a selected subset; the transfer fixture and complete-file oracle are local integration checks.",
+        "UID/GID, timestamps, ACL/xattrs, sparse files, links, Windows filesystems and long-term retention remain unqualified."
+      ],
+      "source_paths": [
+        "blueprints/convergence-practice/offhost-restore/README.md",
+        "blueprints/convergence-practice/offhost-restore/upstream-source.json",
+        "blueprints/convergence-practice/offhost-restore/hosted-plan.json",
+        "evidence/receipts/native-offhost-restic-20260920.json"
+      ],
+      "next_gap": "Qualify actual application-state off-host recovery with post-restore queries and key availability for the selected target's recovery requirements.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Restic recovery acceptance covers the exact synthetic snapshots, independently hosted destination, separately supplied password and observed byte/POSIX-mode oracle.",
+        "unknown": "Application usability, account-loss recovery, reboot and production disaster recovery remain unestablished.",
+        "stage_refs": [
+          {"component_id": "restic", "stage": "recovery", "status": "accepted_within_scope"}
+        ]
+      },
+      "supersedes": []
+    },
+    {
       "id": "native-source-tasks",
       "capability": "Use native client tools to retrieve exact project evidence",
       "capability_key": "native-source-tasks",
@@ -1474,9 +1511,10 @@
       "candidate": null,
       "evidence_ids": [
         "native-dagu-job-recovery-20260920",
-        "wsl-transport-recovery-20260920"
+        "wsl-transport-recovery-20260920",
+        "native-dagu-retry-tests-20260920"
       ],
-      "evidence_scope": "Native cancellation/retry retained one checkpoint on Mac and WSL; separate SSH-client termination left the same job running to completion.",
+      "evidence_scope": "Native cancellation/retry retained one checkpoint on Mac and WSL; separate SSH-client termination left the same job running to completion. Selected unchanged official Dagu retry tests also passed on a fresh hosted runner; the later guest launch failed before boot.",
       "limitations": [
         "Controlled transport interruption is not a real network outage or host reboot.",
         "This does not establish remote model cancellation or distributed exactly-once effects."

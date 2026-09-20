@@ -2,6 +2,38 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "native-offhost-restic-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "restic"
+      ],
+      "claim": "A fresh GitHub-hosted runner passed seven unchanged upstream restic tests, then checked and restored two exact synthetic snapshots using a password delivered separately from the published ciphertext; independent review reconciled the returned outputs, file manifests and platform record.",
+      "limitations": [
+        "Synthetic byte/POSIX-mode recovery only, not ai-memory/Qdrant application-state recovery, reboot, production disaster recovery, lost-password recovery or provider savings.",
+        "The ciphertext and separate protected secret share a GitHub administrative account; account-loss recovery and independent trust domains are not established.",
+        "The seven selected upstream tests are a focused subset, not the entire upstream suite. Our transfer fixture and complete-file oracle are explicitly local integration checks.",
+        "UID/GID restoration, timestamps, ACL/xattrs, sparse files, links, Windows filesystems and long-term storage availability were not qualified.",
+        "Interface inventory is unavailable; distinct native network/mount namespaces and frozen read-only bindings are the observed isolation properties.",
+        "Two restore banners replace the source username with $SOURCE_USER; their original raw hashes cannot be recomputed from the sanitized public text. Other declared stream hashes were independently checked."
+      ],
+      "path": "evidence/receipts/native-offhost-restic-20260920.json"
+    },
+    {
+      "id": "native-dagu-retry-tests-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "dagu"
+      ],
+      "claim": "The unchanged official Dagu retry tests passed on a fresh hosted runner with the exact source archive and required Go toolchain; independent review reconciled all source and artifact hashes and the platform job.",
+      "limitations": [
+        "Selected upstream retry tests only, not the entire Dagu test suite, a production workload or actual guest reboot recovery.",
+        "The same workflow's later guest job failed before boot because our QEMU launcher placed the serial property on the wrong option. Overall workflow failure is retained separately from this successful upstream test job.",
+        "No broker/provider operations or token savings were measured.",
+        "The public reports are explicitly projected: CI home paths, two upstream UI-route path families and synthetic test UUIDs are replaced with placeholders. Independent source/artifact hashes below refer to the untouched original download; publication.json records both raw and public hashes."
+      ],
+      "path": "evidence/receipts/native-dagu-retry-tests-20260920.json"
+    },
+    {
       "id": "native-token-stack-final-20260920",
       "kind": "native_model_e2e",
       "component_ids": [
@@ -3452,8 +3484,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "045e50230b37a538dc0e2d6e1bca8c88cc4b0bde87763a26f3fe71f5f17c498e",
-      "bytes": 397286
+      "sha256": "224150d482666eaa03ca17b7a04b10eb0eb321249701e88e97328f74f5404168",
+      "bytes": 398064
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -5052,8 +5084,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "41c0fb242912f283890fcc2cafd82cef16be5791b088367292342a795fe99b9a",
-      "bytes": 3703447
+      "sha256": "4f2574a446b80f7dc9aa02bf617be8d12d123e0f10e953344a0733417bd3a78b",
+      "bytes": 3719230
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5062,8 +5094,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "d904b68ae4e7f52e77ffdfb131054748c10c00c0602ec22f8839ea98b85ffe56",
-      "bytes": 30559
+      "sha256": "85ad673ffe908d678a9fa2804946206aae4f7a25eecfb81d99eacbd12ff9584c",
+      "bytes": 31324
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -5567,8 +5599,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 74811,
-      "sha256": "a8c97d8b2cc1f99a3d5f5b0e0165680131bd287c5b632812be1697b3ddc3eced"
+      "bytes": 74905,
+      "sha256": "d52b9a5b500170fd25aae1b08a6457131df4d70423e75a9ff6c35a7470584093"
     },
     {
       "path": "observability/README.md",
@@ -6052,18 +6084,18 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "ba563618533a3bdfd4be96eff48691f8d8a736b3443187ee21910888efaac038",
+      "sha256": "794f9321b426b54e6db27c35dfc8fd0e4ae5c75fbf99d21062679ccacddcdf42",
       "bytes": 6788
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "b060fab3bc669bd0fbc0033b88926a5e8e6b327dbac2c2bd7550fe8aad51cb96",
-      "bytes": 96428
+      "sha256": "1a0b80c4a9abeac9e3376abfd22a992928c20cb2afbc3ecea74d8ff8cf5f4690",
+      "bytes": 99332
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "7e7a3b091b6e10d56b4c67526be3eac9c3a78210082ae7a373886e9db4cf55e6",
-      "bytes": 16695
+      "sha256": "239010ccc9abc258c3eb0344f482cd6afc3e46e21226cdfdc8b1867986c0731f",
+      "bytes": 17112
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -6422,8 +6454,8 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/README.md",
-      "sha256": "968da7dd77e3a6fa86821d1fea063b168e366fbdcdde7e0e2780d9617309ac8d",
-      "bytes": 8230
+      "sha256": "1ae8ed8e115c0e5b976ba1ebd2489e5ed9caee979ec78f1a062a63376965f499",
+      "bytes": 9260
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/contract_probe.py",
@@ -6502,8 +6534,8 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/README.md",
-      "sha256": "d1cb0dc51a5ba32d478287ac2f10d1edf3011cceb1848cf54d0562495990c26d",
-      "bytes": 5379
+      "sha256": "af1ed044e58e6ff69ff18e40dd8e764f5216db827a093449a352c488dc302e11",
+      "bytes": 5852
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/guest.py",
@@ -6547,8 +6579,8 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/run.py",
-      "sha256": "1f14f31bbbecda1a955c2988c5e2e9591ab825a881d67cfcf97c8596cce6338d",
-      "bytes": 22396
+      "sha256": "c12a6726fe4b02b76ef9406b2386295237f6f9ff58b03bf9c104b2c9a6eb5094",
+      "bytes": 23185
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/setup.sh",
@@ -6557,8 +6589,8 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/source-review.md",
-      "sha256": "158c982983449487d8a502157e47d0ab27331cb907d187fb2b4ba39244304f76",
-      "bytes": 6311
+      "sha256": "c8b49ffecb8182793468440fdc229bb227608cd7a92bdb7ec6ab1552bed24bd7",
+      "bytes": 7554
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/upstream-tests.sh",
@@ -6567,8 +6599,8 @@
     },
     {
       "path": "tests/test_service_reboot.py",
-      "sha256": "07c57ed8e5d229b45253de079944d1d4a79e64c58ee398263a1e7c5c3c8e144a",
-      "bytes": 9464
+      "sha256": "a8151f6d5b1ce0a228bb391df24afae05f3fec7b627abbf86f6cada4dfc61864",
+      "bytes": 11295
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/attempt-1/hosted-plan.json",
@@ -6609,6 +6641,236 @@
       "path": "blueprints/convergence-practice/offhost-restore/upstream_tests.py",
       "sha256": "2a27ea638d96f583b24af2518afbaceab49fe548e70c5d2fa4a6c01eafc98574",
       "bytes": 6157
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-1/cleanup.json",
+      "sha256": "6aadee9cb7005d261df5f0337cc289190378cb5f3d2f49a264428452acd17b75",
+      "bytes": 111
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-1/failure.json",
+      "sha256": "73b50daf4a8c2af882327b842436890ecf2b52ad0418e2f8976d06fdf69659be",
+      "bytes": 125
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-1/freeze.json",
+      "sha256": "d1cfbc2e08e97837e79ec8f1b97449c39770e47dfcb70d4e642c1e8e0d58ab96",
+      "bytes": 4216
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-1/plan.json",
+      "sha256": "f535beb53ef4046a02b39cd85a146d9f3136ad2e9b2e1b57390352133f2871f3",
+      "bytes": 4467
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-1/qemu-version.stdout",
+      "sha256": "8f79ffd97970d85d6833a0ccc87f5d6e7182f8f52101c741dfa2fb6374670b18",
+      "bytes": 132
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-1/qemu.command.json",
+      "sha256": "093287099fb0381cf957f4a62089fd1354702ee7d623f7dfae04d1b2a41f23b4",
+      "bytes": 820
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-1/qemu.stderr",
+      "sha256": "13b1412ae0843f24e34e18d679872e84897256b205a470ec71e7fb4bf8d8d5f0",
+      "bytes": 182
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/attempt-1/qemu.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/launcher-repair.json",
+      "sha256": "7bf7e8d3299512b4838774b384a79684c89cb8687539723c7005cae3d6c52e69",
+      "bytes": 1544
+    },
+    {
+      "path": "blueprints/convergence-practice/service-reboot/prior-attempts.json",
+      "sha256": "0bfcdc42253469864bb414f5c7d93b755e90384a3d2f99dc8766fd076f4311af",
+      "bytes": 3024
+    },
+    {
+      "path": "evidence/artifacts/native-dagu-retry-20260920/archive-verification.txt",
+      "sha256": "005e773ac9a057c055e275f624ccba78e3a4a36cc17325ce41ea68bb53d0b9a2",
+      "bytes": 69
+    },
+    {
+      "path": "evidence/artifacts/native-dagu-retry-20260920/exit-code.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-dagu-retry-20260920/github-run.json",
+      "sha256": "8f8c367de935a13102a1dc4c4dd3483a8f9bf81d2d0bd9e70e5c8d3ea3b020cf",
+      "bytes": 4003
+    },
+    {
+      "path": "evidence/artifacts/native-dagu-retry-20260920/go-version.txt",
+      "sha256": "76227025cc0bc2be7067aa45d11e09cacfd49c58f498f4c2e4f6a9872a607bf9",
+      "bytes": 32
+    },
+    {
+      "path": "evidence/artifacts/native-dagu-retry-20260920/native-command.txt",
+      "sha256": "70fe2d9b972da0abd201b3bd0080c522788383be3504192f3f0dae2c94d8c9be",
+      "bytes": 78
+    },
+    {
+      "path": "evidence/artifacts/native-dagu-retry-20260920/source-after.json",
+      "sha256": "426613b1e08ac79e7cf8465c550e5138879262d8a63ae13a141885d51ad6eb18",
+      "bytes": 385968
+    },
+    {
+      "path": "evidence/artifacts/native-dagu-retry-20260920/source-before.json",
+      "sha256": "426613b1e08ac79e7cf8465c550e5138879262d8a63ae13a141885d51ad6eb18",
+      "bytes": 385968
+    },
+    {
+      "path": "evidence/artifacts/native-dagu-retry-20260920/upstream-tests.txt",
+      "sha256": "de8e1f5be73015e656cda6efe5a562fe355d3b00ebade85f5f35f6391b70ccb9",
+      "bytes": 108001
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/apt-install.txt",
+      "sha256": "a6c4531deeac98a594145620966040fe8ffbb0bc44bf258d9a556af8ebebf597",
+      "bytes": 1685
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/apt-update.txt",
+      "sha256": "11cba60602f25b292e9279fccb43bbf9965127ae6f4851e1d06371aeda11fc84",
+      "bytes": 3195
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/bubblewrap-version.txt",
+      "sha256": "3a0618bed56bc5ced74eea5965def37047e2b879a25ceb85bbc964efbe00489e",
+      "bytes": 17
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/github-run.json",
+      "sha256": "989bf65ad82829514536ea609c9514c34b63b1bd2ac91f6f5af0edc3f58af3be",
+      "bytes": 3513
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/install-summary.json",
+      "sha256": "ee23e1088318d46e1cd77e8ce06379e40efb285871c57be2210e371e8fced682",
+      "bytes": 201
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/install.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/installation.json",
+      "sha256": "d95e1ea8eb99b11097d433fbd583f4b3e38671700fc457aa5f5b631ed76ef346",
+      "bytes": 6937
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/namespace-contract.json",
+      "sha256": "f2e72b6b89ff3d2ebdff37f3f00aed75e50da7482574f45e39df856ec8ec0e05",
+      "bytes": 2009
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/receipt.json",
+      "sha256": "b09ea3586df3b6ae599486983447e6360c6fb5143fbea77bade487e8a2e91bab",
+      "bytes": 13385
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/restored-1.json",
+      "sha256": "72bba97f54f1baefb1f3179e4823976d2074a653987e52c200052e64d98ddfb6",
+      "bytes": 1623
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/restored-2.json",
+      "sha256": "252b94638ee49bded6de21d11dc6cf8b7689548041ad2416dfb26aeb6ae78c56",
+      "bytes": 1621
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/secret-cleanup.json",
+      "sha256": "f13c688d5e19ff5fc4c0476048a92ee7ff5008d40eebde07e7d5615402fdea1b",
+      "bytes": 177
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/upstream-clean-after.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/upstream-clean-after.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/upstream-clean-before.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/upstream-clean-before.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/upstream-commit.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/upstream-commit.stdout",
+      "sha256": "ac2e51985cfdc42047bbe7e8538cbb8980d9b6307380dc5de2da9c66bb32426e",
+      "bytes": 41
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/upstream-go-tests.stderr",
+      "sha256": "cd93b84ae62124ce4f7a351ffd1313900c2ac1739b6f8f165221f2167b41439b",
+      "bytes": 4810
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/upstream-go-tests.stdout",
+      "sha256": "f58451394703d872a30501141c3a9412e907a9d68e73e144ef9c2965f87ab495",
+      "bytes": 38286
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/upstream-go-version.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/upstream-go-version.stdout",
+      "sha256": "a08991d861bf7c5f227a77fca116cc77d9f618e9682140c86702325c33c5bb43",
+      "bytes": 33
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/upstream-modules-verify.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/upstream-modules-verify.stdout",
+      "sha256": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-restore-20260920/upstream-tests.json",
+      "sha256": "1d1283c1cd11d7383ef56e41e4335eb16c6a9ba6e0fe2ced5a41d2dae013b96c",
+      "bytes": 7554
+    },
+    {
+      "path": "evidence/receipts/native-dagu-retry-tests-20260920.json",
+      "sha256": "192bdbbc1432cce601ffbbb3c2dc5e4aa510f2bfb64852a83fa2d2216b9e6ffc",
+      "bytes": 3279
+    },
+    {
+      "path": "evidence/receipts/native-offhost-restic-20260920.json",
+      "sha256": "19b260f8c293499bb34fb053a4733f40905b215a37f63c344bf0c8b68f723d35",
+      "bytes": 5216
+    },
+    {
+      "path": "evidence/artifacts/native-dagu-retry-20260920/publication.json",
+      "sha256": "b2a4734fa1c64dc17958dd5ce9132eefe2d3118f326e321751173ceb258e0216",
+      "bytes": 4041
     }
   ],
   "convergence_records": [

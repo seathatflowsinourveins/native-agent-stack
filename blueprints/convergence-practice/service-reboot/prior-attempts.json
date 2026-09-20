@@ -1,0 +1,58 @@
+{
+  "attempts": [
+    {
+      "workflow_run_id": 35537534779,
+      "status": "failed-before-guest-boot",
+      "failure": "QEMU8.2.2 rejected serial as a qcow2 block-backend option. No boot, checkpoint, reboot or recovery was observed.",
+      "upstream_retry_tests": "passed in the separate prerequisite job; unchanged source and test command must be reused",
+      "raw_artifact": "native-service-reboot-evidence from workflow run35537534779",
+      "retained_artifacts": {
+        "freeze.json": {
+          "raw_sha256": "d1cfbc2e08e97837e79ec8f1b97449c39770e47dfcb70d4e642c1e8e0d58ab96",
+          "published_sha256": "d1cfbc2e08e97837e79ec8f1b97449c39770e47dfcb70d4e642c1e8e0d58ab96",
+          "normalized_owned_runner_path": false
+        },
+        "qemu.command.json": {
+          "raw_sha256": "b210853b963ef3b1eb53ab80cb064f55496b8e098e991aa93c5fa30d13490646",
+          "published_sha256": "093287099fb0381cf957f4a62089fd1354702ee7d623f7dfae04d1b2a41f23b4",
+          "normalized_owned_runner_path": true
+        },
+        "qemu.stderr": {
+          "raw_sha256": "dd19046dce214f4df2ea9e0a3b20ca9b5d7810e22f368596b04814dea6732adc",
+          "published_sha256": "13b1412ae0843f24e34e18d679872e84897256b205a470ec71e7fb4bf8d8d5f0",
+          "normalized_owned_runner_path": true
+        },
+        "qemu.stdout": {
+          "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "published_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "normalized_owned_runner_path": false
+        },
+        "qemu-version.stdout": {
+          "raw_sha256": "8f79ffd97970d85d6833a0ccc87f5d6e7182f8f52101c741dfa2fb6374670b18",
+          "published_sha256": "8f79ffd97970d85d6833a0ccc87f5d6e7182f8f52101c741dfa2fb6374670b18",
+          "normalized_owned_runner_path": false
+        },
+        "failure.json": {
+          "raw_sha256": "73b50daf4a8c2af882327b842436890ecf2b52ad0418e2f8976d06fdf69659be",
+          "published_sha256": "73b50daf4a8c2af882327b842436890ecf2b52ad0418e2f8976d06fdf69659be",
+          "normalized_owned_runner_path": false
+        },
+        "cleanup.json": {
+          "raw_sha256": "6aadee9cb7005d261df5f0337cc289190378cb5f3d2f49a264428452acd17b75",
+          "published_sha256": "6aadee9cb7005d261df5f0337cc289190378cb5f3d2f49a264428452acd17b75",
+          "normalized_owned_runner_path": false
+        }
+      },
+      "original_plan_sha256": "f535beb53ef4046a02b39cd85a146d9f3136ad2e9b2e1b57390352133f2871f3",
+      "cleanup": {
+        "errors": [],
+        "owned_disks_removed": true,
+        "owned_qemu_retired": true,
+        "private_key_removed": true
+      },
+      "recovery": "Move serial to the native virtio-blk-pci device while preserving the same qcow2 disk and disk identifier. No Dagu, guest, oracle, timer, isolation or acceptance change.",
+      "fixture_origin_commit": "e22839253a19b3bfd5dabba39ac7f9a8d3695bb0",
+      "workflow_head_commit": "3745f0ad5519a34c5ca095bd4389485943ab5a1c"
+    }
+  ]
+}
