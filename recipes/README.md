@@ -118,16 +118,18 @@ Back up the affected settings privately first; preserve unrelated hooks and plug
 
 Context Mode's upstream `start.mjs` can maintain its own dependencies/cache-heal hooks and check the npm registry. Native installation is not a promise of offline-only startup. Keep native plugin version/provenance receipts and review changes before upgrading.
 
-RTK 0.49.0 supplies a supported Claude hook and explicit Codex instructions. Preview before application:
+RTK 0.49.0 supplies a supported Claude hook and explicit Codex instructions. Install global awareness once in each intended client profile, preserving its existing native home:
 
 ```sh
-rtk init --global --dry-run
-rtk init --global
-rtk init --codex --dry-run
-rtk init --codex
+rtk init --global --auto-patch --no-trust-filters
+rtk init --global --codex
+rtk init --global --show
+rtk init --global --codex --show
 ```
 
-The Codex form at this pin writes instructions, not an automatic command-rewriting hook. The prior automatic candidate did not establish reliable runtime rewriting and is not an active recipe. For raw-sensitive Git/history operations, use explicit commands or RTK's supported exclusions rather than treating compressed output as a complete record. Inspect generated hook changes alongside existing Context Mode hooks.
+Run the Codex form separately under each intended `CODEX_HOME`; an inherited Desktop home must not be mistaken for the native CLI home. The installer writes `RTK.md` and its global instruction reference. Claude's command installs awareness and preserves an existing matching hook; `--no-trust-filters` avoids expanding trusted project filters during this setup. Fresh sessions consume these instructions. Setup is not a prerequisite to repeat at every startup.
+
+The Codex form at this pin writes instructions, not an automatic command-rewriting hook; do not combine `--codex` with `--auto-patch`. The prior automatic candidate did not establish reliable runtime rewriting and is not an active recipe. For raw-sensitive Git/history operations, use explicit commands or RTK's supported exclusions rather than treating compressed output as a complete record. Inspect generated hook changes alongside existing Context Mode hooks. Verify the result with one useful native task and its actual tool output.
 
 ## Native project MCP
 

@@ -2691,8 +2691,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "184bed029c2768d3729d0ff137aea0c71684d6c7b3273c94f7b40e99082958f5",
-      "bytes": 13581
+      "sha256": "dd0aa8faed8b99d19713cc05467a28523d335e987f783ce704e09696d4c41228",
+      "bytes": 14368
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -3131,8 +3131,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "21f393cc918c23d733c360762d6c8fe99d9f075d2c3e0eef3a58920e0baa3d74",
-      "bytes": 44049
+      "sha256": "f675d3b4726b1ab6dbebeb61fda90150934499b78b4ee5afc554c423fcccfee4",
+      "bytes": 44747
     },
     {
       "path": "scripts/adoption_status.py",

@@ -12,6 +12,18 @@ alternative installations retain separate scope.
 
 ## Default practice
 
+Carry out authorized work directly. Keep the plan and verification proportional
+to the change; reuse passing evidence when its inputs and scope still match.
+Do not turn a bounded fix or setup into repeated intake, planning approvals,
+catalog audits or restarts. An optional component is activated when the task needs
+it. Repair a failed connection individually while continuing independent work.
+
+RTK global awareness belongs in each actual native client home. Use the
+[upstream installation recipe](../recipes/README.md#native-context-mode-and-hooks)
+once per profile, then prove use through returned native task results. Stable
+Codex uses explicit RTK commands; native Claude supports Bash rewriting. An
+installed executable without its instruction reference is incomplete awareness.
+
 1. Retrieve what the current decision needs: exact code with rg/Serena,
    structural patterns with ast-grep, conceptual code with SocratiCode, selected
    Markdown with scoped QMD, and durable decisions with scoped ai-memory.
