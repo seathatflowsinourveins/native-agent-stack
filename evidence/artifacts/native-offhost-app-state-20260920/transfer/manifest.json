@@ -1,0 +1,32 @@
+[
+  {
+    "path": "config",
+    "bytes": 155,
+    "sha256": "9c723e103211e2b2903899413f7f8ae79f872445164b07b8fc3ecff0b4160e01"
+  },
+  {
+    "path": "data/3b/3bb132093be303dddc00dedf029d18b07c44e11c220327d6d979742a1ed03ac3",
+    "bytes": 1319,
+    "sha256": "3bb132093be303dddc00dedf029d18b07c44e11c220327d6d979742a1ed03ac3"
+  },
+  {
+    "path": "data/f3/f3ba0e45929ae270ec6e2c3fe0ca50266a6deec0f924c451e17bb462b2224c29",
+    "bytes": 49435,
+    "sha256": "f3ba0e45929ae270ec6e2c3fe0ca50266a6deec0f924c451e17bb462b2224c29"
+  },
+  {
+    "path": "index/978d04342eba8946ea05f8c2d87f0095e1b6c5019e6f29cf4ec631ea25be24c6",
+    "bytes": 507,
+    "sha256": "978d04342eba8946ea05f8c2d87f0095e1b6c5019e6f29cf4ec631ea25be24c6"
+  },
+  {
+    "path": "keys/b79b9104d8a8bed368bff28ac0b9d5873891878457ce7e0dc17a157d295ce6f2",
+    "bytes": 463,
+    "sha256": "b79b9104d8a8bed368bff28ac0b9d5873891878457ce7e0dc17a157d295ce6f2"
+  },
+  {
+    "path": "snapshots/0fd4395da35e8ebde5335c0985e349cab7f81f6491c49e102dffbeb87d791134",
+    "bytes": 397,
+    "sha256": "0fd4395da35e8ebde5335c0985e349cab7f81f6491c49e102dffbeb87d791134"
+  }
+]

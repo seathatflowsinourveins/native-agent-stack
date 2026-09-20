@@ -1,0 +1,4 @@
+time=2026-09-20T22:08:43.303Z level=INFO msg="Dag-run retry initiated" dag=reboot run-id=native-service-reboot-fixture step=finalize file=/var/lib/service-reboot/dagu-home/logs/reboot/dag-run_20260920_220634Z_native-service-reboot-fixture/dag-run_20260920.220634.941.native-s.log
+time=2026-09-20T22:08:43.667Z level=INFO msg="DAG run retry started" dag=reboot run-id=native-service-reboot-fixture worker-id=local attempt-id=187bd0 retry-target-attempt-id=e7fa21
+time=2026-09-20T22:08:43.695Z level=INFO msg="Step started" dag=reboot run-id=native-service-reboot-fixture worker-id=local attempt-id=187bd0 step=finalize
+time=2026-09-20T22:08:45.921Z level=INFO msg="DAG run finished" dag=reboot run-id=native-service-reboot-fixture worker-id=local attempt-id=187bd0 status=succeeded started-at=2026-09-20T22:08:43Z finished-at=2026-09-20T22:08:45Z

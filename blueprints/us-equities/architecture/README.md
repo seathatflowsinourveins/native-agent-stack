@@ -23,14 +23,14 @@ record what this wave actually examined. A catalog entry is not an installation.
 
 | Role | Responsibility | Artifact / acceptance |
 | --- | --- | --- |
-| User / product owner | Choose objectives, acceptable risk, capital assumptions, account/data entitlements and operating budget | A numeric research specification and explicit approval for broker-connected progression |
+| User / product owner | Choose objectives, acceptable risk, capital assumptions, account/data entitlements and operating budget | A numeric research specification; paper E2E already authorized under the [paper policy](../../../docs/paper-lane-policy.md) |
 | Coordinator | Select the smallest architecture that meets those requirements; maintain versions, evidence and gates | This blueprint, catalog decisions, immutable experiment and acceptance manifests |
 | Research workers | Inspect bounded source packets, propose hypotheses and alternatives, report contradictions | Source-linked proposals; no broker credentials or unrestricted order tools |
 | Data worker | Verify availability time, feed, adjustments, universe membership, corporate actions and ingestion completeness | Versioned raw snapshots plus reproducible Parquet/DuckDB transforms and quality reports |
 | Strategy / simulation worker | Implement reviewed hypotheses and run reproducible sensitivity and held-out evaluation | Code/data/config hashes, full trial ledger, engine outputs, costs and execution assumptions |
 | Independent reviewer | Challenge leakage, multiple testing, execution realism, source quality and unsupported claims | An adjudicated review; model agreement does not prove correctness |
 | Operations worker | Reproduce selected environments, observe jobs, rehearse recovery and detect drift | Native receipts, independent restore evidence, failure and alert drills |
-| Deterministic execution service (future) | Enforce numeric risk, one writer per account, journal and reconcile orders | Broker-disconnected fault tests, then separately authorized paper acceptance |
+| Deterministic execution service (future) | Enforce numeric risk, one writer per account, journal and reconcile orders | Broker-disconnected fault tests, then measured broker-specific paper acceptance under the standing authorization |
 
 Workers are task roles, not a requirement for seven permanent model processes.
 The current coordinator dispatches at most three useful independent workers.
@@ -65,8 +65,8 @@ flowchart LR
   C[Retained LEAN comparison] --> B
   B --> E[Held-out evaluation and trial ledger]
   E -. acceptance gates .-> X[Deterministic risk and order service]
-  X -. separate acceptance and authorization .-> I[IBKR paper]
-  X -. separate acceptance and authorization .-> A[Alpaca paper]
+  X -. broker-specific readiness and acceptance .-> I[IBKR paper]
+  X -. broker-specific readiness and acceptance .-> A[Alpaca paper]
   E --> L[Reviewed lessons]
   L --> M
 ```
@@ -144,10 +144,11 @@ changed tools; it is not automatically granted broker access in research workers
 ## Promotion contract
 
 1. **Research specification:** propose an explicit universe, holding horizon,
-   data/feed, strategy class and numeric risk/capacity assumptions. User choices
-   about capital and acceptable risk remain required before broker progression.
-   Provisional research specifications may be drafted and labeled; missing values
-   must never silently become live defaults.
+   data/feed, strategy class and numeric risk/capacity assumptions. The coordinator
+   freezes bounded paper capital and risk limits using the user's objectives and
+   existing configuration; unresolved material inputs are concrete decisions,
+   not a renewed permission request. Provisional assumptions remain labeled, and
+   missing values must never silently become execution defaults.
 2. **Data acceptance:** immutable raw identity/hash, event and available-at time,
    entitlement, corporate actions, delistings, universe history, pagination and
    adjustment policy. Retain missing/stale data and failed ingestion evidence.
@@ -159,10 +160,14 @@ changed tools; it is not automatically granted broker access in research workers
    restart, partial fills, stale data, numeric limit breaches, rate exhaustion,
    reconciliation, cancellation and kill-switch tests. A stable client ID alone
    does not make retries safe; query/reconcile uncertain outcomes first.
-5. **Paper acceptance:** separately authorized account/feed and adapter, long
-   enough operational observation for the selected strategy, ledger reconciliation
-   and recovery/alert drills. Predeclare numeric criteria; do not invent a generic
-   fixed duration or profitability threshold.
+5. **Paper acceptance:** after the current foundation work, use the already
+   authorized [paper lane](../../../docs/paper-lane-policy.md) with a verified
+   native paper account, feed and adapter. Predeclare strategy-specific numeric
+   performance and operational criteria, then measure returns, costs, drawdown,
+   fill/slippage behavior, ledger reconciliation and recovery/alert drills over
+   the necessary observation window. Do not invent a generic fixed duration or
+   profitability threshold, lower criteria after observing results, or require
+   another human approval. Live credentials/configuration are not prerequisites.
 6. **Future live decision:** separate user authorization, actual account/risk and
    operating readiness. No automatic promotion from memory, model agreement,
    backtest ranking or a paper result.
@@ -172,8 +177,9 @@ feedback, model-review corrections and reproducible experiments. Keep durable
 facts reviewable and shared across Codex/Claude. Upstream ai-memory offers
 `[auto_improve] require_approval = true` and
 `[auto_improve.scheduler] enabled = false`; this wave does not claim to enable or
-change that pipeline. Trading policy promotion is always a separate controlled
-decision.
+change that pipeline. Trading policy promotion requires a recorded technical
+and evidence review. Paper work uses the standing authorization; any future live
+progression remains a separate user decision.
 
 ## Platforms and hosting
 

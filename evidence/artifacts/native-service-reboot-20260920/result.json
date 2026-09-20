@@ -1,0 +1,13 @@
+{
+  "automatic_completion_before_postboot_ssh": true,
+  "checkpoint_execution_count": 1,
+  "checkpoint_tests": 12,
+  "final_tests": 12,
+  "local_effect_count": 1,
+  "model_calls": 0,
+  "provider_usage": "not_applicable",
+  "same_native_run_id": true,
+  "scope": "one orderly owned Ubuntu guest kernel reboot",
+  "status": "passed",
+  "token_savings_claim": false
+}

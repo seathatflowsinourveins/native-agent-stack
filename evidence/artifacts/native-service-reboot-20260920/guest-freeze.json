@@ -1,0 +1,30 @@
+{
+  "config_sha256": "a2651229d74dd660c8f98f884292ecb8e405ea6ab3bc363ad4985d4d1eb4a087",
+  "identity": {
+    "boot_id": "synthetic-id-c9c94a20053e6e98",
+    "disk_token": "e5d2f8f802d329b33731da6509d486b8ccff545357d7fe0dd6c5bf0b84d5f747",
+    "filesystem_uuid": "synthetic-id-b1cde6acdb113a29",
+    "machine_id_sha256": "3ef3a3ed8950f9b70f2348a630510d2cffe3b52d36c208d96d6d33dbe6fb88c9",
+    "run_id": "native-service-reboot-fixture"
+  },
+  "kernel_release": "6.8.0-139-generic",
+  "os_release": "PRETTY_NAME=\"Ubuntu 24.04.5 LTS\"\nNAME=\"Ubuntu\"\nVERSION_ID=\"24.04\"\nVERSION=\"24.04.5 LTS (Noble Numbat)\"\nVERSION_CODENAME=noble\nID=ubuntu\nID_LIKE=debian\nHOME_URL=\"https://www.ubuntu.com/\"\nSUPPORT_URL=\"https://help.ubuntu.com/\"\nBUG_REPORT_URL=\"https://bugs.launchpad.net/ubuntu/\"\nPRIVACY_POLICY_URL=\"https://www.ubuntu.com/legal/terms-and-policies/privacy-policy\"\nUBUNTU_CODENAME=noble\nLOGO=ubuntu-logo\n",
+  "python_sha256": "e50d468e8b0adfb05733f5b87b3cff34829c4a8c1aea50c865aa8bdfe4bb150f",
+  "python_version": "3.12.3",
+  "source_hashes": {
+    "dagu": "20de7ae94e16999ff997db0386dced9504db37c87de333837fd15b4892b98bd7",
+    "disk-token": "d6d18c4442ff54f1eff8b33109e6b93b5101aa770e142f55679513c24d486378",
+    "fixture.py": "fccbfe64bc2ed4793010daa3a1b9b2d8ebb83ff1d51a4db37daa4b6d0b7300d7",
+    "guest.py": "609186c1a5651166c8654d0f8d9c2b57a1caabefffacd3bb4efe719bb8c17d93",
+    "native-reboot-observer.service": "9627403934945a860ebe9a025239fa43e5da3764a7f724dc0cc0bc103c24c463",
+    "native-reboot.service": "3f79504f7812dc2fbc38cbc29dd862fcb245a1eb48097d9eb614f22f43a6620f",
+    "native-reboot.timer": "3deb371b58abed60210f673405f3f56b34f349ee0fc7dd0d08abb91a0a11379c",
+    "observer.py": "02a2fb86741c7739046e42626d2b47eda63eb5fabf2b8db31d5f8f0a83e1d65c",
+    "plan.json": "f535beb53ef4046a02b39cd85a146d9f3136ad2e9b2e1b57390352133f2871f3",
+    "planner.py": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef",
+    "run.py": "48a22bb48ec067f92e60e1b3d96dfb2678eba83f4d4e2517d214fb34087bd875",
+    "setup.sh": "662da3b254f3cfdf93cce61c96dadfbd0885661cf0e1fc50c408785f60f1e893",
+    "test_planner.py": "ee6c07d845bb60545786b2e7507f6b3836c46e005d5ce2b9b60b616e325e0937"
+  },
+  "workflow_sha256": "60d3c42031c69ee508750a7ccc0e5e3c4ab14504b0edfbbfc287dd3bf26048c4"
+}

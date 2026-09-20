@@ -8,16 +8,22 @@
       "capability": "Restore exact synthetic encrypted snapshots on an independent hosted runner",
       "capability_key": "synthetic-offhost-restic-restore",
       "checked_at": "2026-09-20",
-      "layer_ids": ["recovery-portability"],
+      "layer_ids": [
+        "recovery-portability"
+      ],
       "selection": "conditional",
       "review_status": "accepted_within_scope",
       "activation": "Use the frozen synthetic ciphertext and exact snapshot IDs with the separately supplied fixture password.",
-      "component_ids": ["restic"],
+      "component_ids": [
+        "restic"
+      ],
       "candidate": null,
-      "evidence_ids": ["native-offhost-restic-20260920"],
+      "evidence_ids": [
+        "native-offhost-restic-20260920"
+      ],
       "evidence_scope": "A fresh GitHub-hosted runner passed seven unchanged upstream tests, rejected the wrong password without restoring files, checked all repository data and restored both exact synthetic snapshots with complete path/type/byte/hash/POSIX-mode equality. Ciphertext remained unchanged and temporary runtime/password files were removed.",
       "limitations": [
-        "Synthetic file recovery only; ai-memory/Qdrant application-state recovery and post-restore queries remain unqualified off-host.",
+        "This receipt covers synthetic file recovery only. The separate synthetic-offhost-application-restore capability qualifies selected ai-memory/Qdrant off-host queries.",
         "Separate ciphertext and password delivery share one GitHub administrative account; account-loss and lost-password recovery remain unqualified.",
         "No reboot, production disaster recovery, whole-stack recovery or provider-saving claim.",
         "The seven upstream tests are a selected subset; the transfer fixture and complete-file oracle are local integration checks.",
@@ -29,13 +35,17 @@
         "blueprints/convergence-practice/offhost-restore/hosted-plan.json",
         "evidence/receipts/native-offhost-restic-20260920.json"
       ],
-      "next_gap": "Qualify actual application-state off-host recovery with post-restore queries and key availability for the selected target's recovery requirements.",
+      "next_gap": "Reuse the separate synthetic-offhost-application-restore acceptance for matching inputs; qualify production activation, native-client rebinding and lost-account/key recovery separately.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
         "scope": "Restic recovery acceptance covers the exact synthetic snapshots, independently hosted destination, separately supplied password and observed byte/POSIX-mode oracle.",
-        "unknown": "Application usability, account-loss recovery, reboot and production disaster recovery remain unestablished.",
+        "unknown": "This dated capability retains its original boundary. Separate synthetic-offhost-application-restore evidence qualifies selected application queries; production activation, client rebinding and lost-account/key recovery remain outside it.",
         "stage_refs": [
-          {"component_id": "restic", "stage": "recovery", "status": "accepted_within_scope"}
+          {
+            "component_id": "restic",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          }
         ]
       },
       "supersedes": []
@@ -931,11 +941,11 @@
         "adoption/lifecycle.md",
         "blueprints/convergence-practice/wsl-memory-maintenance/README.md"
       ],
-      "next_gap": "Establish independent-host/key recovery and the target production activation separately.",
+      "next_gap": "Reuse the separate synthetic-offhost-application-restore acceptance for matching inputs; qualify production activation, native-client rebinding and lost-account/key recovery separately.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
         "scope": "Only the listed canonical stages and their original host/operation scopes apply. Scoped native retrieval, lifecycle negatives, migration, restart, upstream backup and empty-target restore have distinct accepted receipts.",
-        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Establish independent-host/key recovery and the target production activation separately.",
+        "unknown": "This dated capability retains its original boundary. Separate synthetic-offhost-application-restore evidence qualifies selected application queries; production activation, client rebinding and lost-account/key recovery remain outside it.",
         "stage_refs": [
           {
             "component_id": "ai-memory",
@@ -1514,7 +1524,7 @@
         "wsl-transport-recovery-20260920",
         "native-dagu-retry-tests-20260920"
       ],
-      "evidence_scope": "Native cancellation/retry retained one checkpoint on Mac and WSL; separate SSH-client termination left the same job running to completion. Selected unchanged official Dagu retry tests also passed on a fresh hosted runner; the later guest launch failed before boot.",
+      "evidence_scope": "Native cancellation/retry retained one checkpoint on Mac and WSL; separate SSH-client termination left the same job running to completion. Selected unchanged official Dagu retry tests passed on fresh hosted runners. The additional owned-guest-scheduled-reboot decision qualifies the later orderly reboot without overriding retained failed attempts.",
       "limitations": [
         "Controlled transport interruption is not a real network outage or host reboot.",
         "This does not establish remote model cancellation or distributed exactly-once effects."
@@ -1523,11 +1533,11 @@
         "blueprints/convergence-practice/job-recovery/README.md",
         "blueprints/convergence-practice/wsl-transport-recovery/README.md"
       ],
-      "next_gap": "Qualify scheduled-service restart/reboot and unfinished worker effect reconciliation.",
+      "next_gap": "Reuse the separate accepted orderly guest reboot scope; qualify changed deployment boundaries and application effects independently.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
         "scope": "Only the listed canonical stages and their original host/operation scopes apply. Native cancellation/retry retained one checkpoint on Mac and WSL; separate SSH-client termination left the same job running to completion.",
-        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Qualify scheduled-service restart/reboot and unfinished worker effect reconciliation.",
+        "unknown": "This dated transport/cancellation scope is separate from the accepted owned-guest-scheduled-reboot capability; changed deployment boundaries and application effects require their own evidence.",
         "stage_refs": [
           {
             "component_id": "dagu",
@@ -1841,11 +1851,11 @@
         "adoption/lifecycle.md",
         "blueprints/convergence-practice/wsl-restore/README.md"
       ],
-      "next_gap": "Run independent off-host recovery with a separately accessible key and real post-restore application queries.",
+      "next_gap": "Reuse the separate synthetic-offhost-application-restore acceptance for matching inputs; qualify production activation, native-client rebinding and lost-account/key recovery separately.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
         "scope": "Only the listed canonical stages and their original host/operation scopes apply. Selected public bytes, native memory/FTS state and Qdrant snapshot/query results survived same-host backup/restore; synthetic wrong-key/corrupt-copy refusals were retained.",
-        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Run independent off-host recovery with a separately accessible key and real post-restore application queries.",
+        "unknown": "This dated capability retains its original boundary. Separate synthetic-offhost-application-restore evidence qualifies selected application queries; production activation, client rebinding and lost-account/key recovery remain outside it.",
         "stage_refs": [
           {
             "component_id": "restic",
@@ -2283,6 +2293,221 @@
           {
             "component_id": "systemd",
             "stage": "use",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "owned-guest-scheduled-reboot",
+      "capability": "Resume one scheduled native workflow after an orderly owned guest reboot",
+      "capability_key": "owned-guest-scheduled-reboot",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "scheduling-supervision",
+        "recovery-portability"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use the frozen owned-guest recipe with explicit linger, a bounded native timer and independent pre-login serial observation.",
+      "component_ids": [
+        "dagu",
+        "systemd"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-service-reboot-20260920"
+      ],
+      "evidence_scope": "A signed disposable Ubuntu guest automatically resumed the same native Dagu run after an orderly kernel reboot, preserved its checkpoint and produced one local effect. A dedicated read-only serial observer and independent journal review confirmed completion before postboot SSH; owned cleanup passed.",
+      "limitations": [
+        "One orderly disposable guest reboot with a synthetic workload; not a physical PC, power loss, production disaster recovery, provider recovery or broker acceptance.",
+        "The unchanged official Dagu retry tests are a selected upstream subset. The project planner, its original 12-test oracle and the guest experiment are local synthetic integration coverage.",
+        "Source, disk and process continuity cover this owned guest only; no distributed exactly-once or arbitrary external side-effect guarantee.",
+        "Public text projections replace owned home prefixes and synthetic UUIDs and normalize CRLF. Original artifact/stream hashes and explicit projection rules are retained; projected bytes are not labelled raw-byte-identical.",
+        "The full auth-free guest archive contains three hidden bookkeeping files omitted by loose-file artifact upload. Independent inspection used the intact archive.",
+        "Both prior failed attempts remain failures; retrospective successful workload records did not override their missing acceptance evidence.",
+        "No model was called and no provider or lifetime token-saving measurement was made."
+      ],
+      "source_paths": [
+        "blueprints/convergence-practice/service-reboot/README.md",
+        "blueprints/convergence-practice/service-reboot/source-review.md",
+        "evidence/receipts/native-service-reboot-20260920.json"
+      ],
+      "next_gap": "Qualify the actual deployment and application effects when adopting beyond this orderly synthetic guest boundary.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "One independently observed orderly guest reboot with automatic user-manager timer activation, native same-run retry, durable checkpoint and one local effect.",
+        "unknown": "Physical host, power-loss, provider, broker and production-workload recovery remain outside this receipt.",
+        "stage_refs": [
+          {
+            "component_id": "dagu",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "dagu",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "dagu",
+            "stage": "restart",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "dagu",
+            "stage": "cleanup",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "dagu",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "systemd",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "systemd",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "systemd",
+            "stage": "restart",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "systemd",
+            "stage": "cleanup",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "systemd",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "synthetic-offhost-application-restore",
+      "capability": "Restore selected native memory and vector state on a fresh hosted destination",
+      "capability_key": "synthetic-offhost-application-restore",
+      "checked_at": "2026-09-20",
+      "layer_ids": [
+        "recovery-portability",
+        "durable-memory",
+        "semantic-rag"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use exact independently reviewed synthetic snapshots, an empty owned target and separately delivered fixture credentials; collect evidence from the intended deployment before extending scope.",
+      "component_ids": [
+        "ai-memory",
+        "qdrant",
+        "restic"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-offhost-app-state-20260920"
+      ],
+      "evidence_scope": "Two fresh hosted jobs passed native ai-memory and Qdrant backup, exact encrypted transfer and empty-target restore with actual scoped memory queries and complete Qdrant state/query equality. Independent review reconciled raw command outputs, artifact identities and cleanup.",
+      "limitations": [
+        "New synthetic state only; no existing private application archive or production data was transferred.",
+        "Selected unchanged upstream tests passed (10 ai-memory and 4 Qdrant); the cross-host driver, observation oracle and composed restore checks are local integration coverage.",
+        "Source and destination are different hosted boot identities within one GitHub administrative domain; lost-account/password recovery and independent trust-domain availability remain unqualified.",
+        "Snapshots are sequential, not an atomic cross-application backup; native-client rebinding, physical-host or power-loss recovery and whole-stack acceptance are not established.",
+        "Actual destination MCP responses and Qdrant API responses were independently reviewed. Destination SQLite equality remains the runner composition assertion; archive SQLite integrity was separately checked.",
+        "No model calls or provider/lifetime token-saving measurement occurred."
+      ],
+      "source_paths": [
+        "blueprints/convergence-practice/offhost-app-state/README.md",
+        "evidence/receipts/native-offhost-app-state-20260920.json"
+      ],
+      "next_gap": "Qualify the actual deployment, native-client rebinding and application consistency requirements only when adopting beyond the accepted synthetic boundary.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Two fresh hosted jobs passed native ai-memory and Qdrant backup, exact encrypted transfer and empty-target restore with actual scoped memory queries and complete Qdrant state/query equality. Independent review reconciled raw command outputs, artifact identities and cleanup.",
+        "unknown": "Production state, lost-account/key recovery, cross-application atomicity, client rebinding and physical-host disaster recovery remain outside this receipt.",
+        "stage_refs": [
+          {
+            "component_id": "ai-memory",
+            "stage": "install",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "ai-memory",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "ai-memory",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "ai-memory",
+            "stage": "cleanup",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "ai-memory",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "qdrant",
+            "stage": "install",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "qdrant",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "qdrant",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "qdrant",
+            "stage": "cleanup",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "qdrant",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "restic",
+            "stage": "install",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "restic",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "restic",
+            "stage": "persistence",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "restic",
+            "stage": "cleanup",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "restic",
+            "stage": "recovery",
             "status": "accepted_within_scope"
           }
         ]

@@ -76,7 +76,7 @@
       "purpose": "Retrieve conceptual code using the selected project index and local embeddings.",
       "selection": "SocratiCode with Qdrant and the accepted local vLLM embedding runtime.",
       "activation": "Activate only the selected project and models; do not index unrelated folders or change the accepted runtime for release novelty.",
-      "lifecycle_scope": "Native source retrieval and add/change/delete persistence passed; a newer GPU runtime startup failed and remains failed.",
+      "lifecycle_scope": "Native source retrieval and add/change/delete persistence passed; a newer GPU runtime startup failed and remains failed. Separate synthetic Qdrant off-host full-state restore and exact native queries passed.",
       "next_gap": "Retain the accepted environment and collect changed-runtime/GPU acceptance only when a concrete need warrants it."
     },
     {
@@ -85,8 +85,8 @@
       "purpose": "Preserve scoped decisions, approved durable knowledge and recoverable handoffs across clients.",
       "selection": "One ai-memory store as cross-harness memory of record.",
       "activation": "Retrieve relevant history when needed; durable writes require explicit intent and recalled text never authorizes actions.",
-      "lifecycle_scope": "Synthetic migration, scope, restart, backup and empty-target restore passed; capture is bounded, not a full transcript.",
-      "next_gap": "Establish independent-host/key recovery and the target host production activation separately."
+      "lifecycle_scope": "Synthetic migration, scope, restart, backup and empty-target restore passed; capture is bounded, not a full transcript. Separate synthetic off-host native restore and real scoped MCP queries passed.",
+      "next_gap": "Qualify intended production activation and native-client rebinding; lost-account/key recovery remains separate."
     },
     {
       "id": "web-research",
@@ -130,8 +130,8 @@
       "purpose": "Schedule owned work, bound process lifetime and resume unfinished steps deliberately.",
       "selection": "Dagu for selected workflows and Linux user-manager supervision for owned process trees.",
       "activation": "Use explicit task/service ownership, bounded retries and independent state/effect checks.",
-      "lifecycle_scope": "Local descendant termination, native child cgroup crash cleanup and Dagu cancel/retry/SSH continuation passed. Full service reboot and provider cancellation remain unknown.",
-      "next_gap": "Qualify the selected owned scheduled service after reboot on an available target host."
+      "lifecycle_scope": "Local descendant termination, native child cgroup crash cleanup, Dagu cancel/retry/SSH continuation and one independently observed orderly guest service reboot passed within their retained scopes.",
+      "next_gap": "Qualify changed deployment boundaries and external provider or application effects when needed."
     },
     {
       "id": "hosting-services",
@@ -148,8 +148,8 @@
       "purpose": "Retain pinned inputs and prove usable restore, continuity and cleanup at the intended boundary.",
       "selection": "Owned lifecycle recipes, Restic, native application backups and native session resume.",
       "activation": "Use exact snapshots and empty restore targets; keep keys/account sign-ins private and separate from the checkout.",
-      "lifecycle_scope": "Same-host application restores, synthetic independent-host Restic recovery with a separately supplied password, and individual session/job continuations passed. Whole-stack independent-host disaster recovery has not.",
-      "next_gap": "Qualify affected application-state queries after off-host restore and the selected scheduled service after reboot."
+      "lifecycle_scope": "Selected same-host and synthetic independent-host application restores, native session/job continuations and one orderly guest scheduled-service reboot passed. Source pins, native outputs and independent observations retain separate scopes.",
+      "next_gap": "Reuse matching accepted recipes; qualify actual production data, client rebinding, atomicity or a physical recovery target when required by a project."
     },
     {
       "id": "observation-inference",
@@ -229,9 +229,9 @@
     {
       "id": "offhost-keys-and-service-reboot",
       "priority": 3,
-      "status": "partial",
-      "scope": "Synthetic independent-host Restic recovery passed with separately supplied fixture credentials. The second guest attempt automatically completed the native workload after reboot, but its required live serial observation failed; full scheduled-service acceptance and off-host application queries remain unqualified. Both failed attempts are retained.",
-      "next_action": "Qualify the reviewed dedicated-serial observer correction, then native memory and Qdrant off-host queries at the selected adoption boundary.",
+      "status": "accepted_within_scope",
+      "scope": "Synthetic independent-host Restic transfer and native ai-memory/Qdrant restore/query acceptance, plus one independently observed orderly guest scheduled-service reboot, passed. Physical-host disaster recovery, production data, client rebinding, atomicity and lost-account/key recovery remain outside these receipts.",
+      "next_action": "Reuse the accepted scoped recipes without rerunning unchanged experiments; collect deployment-specific acceptance when extending the boundary.",
       "source_paths": [
         "adoption/lifecycle.md",
         "blueprints/convergence-practice/wsl-restore/README.md",
@@ -239,14 +239,11 @@
         "blueprints/convergence-practice/offhost-restore/README.md",
         "evidence/receipts/native-offhost-restic-20260920.json",
         "blueprints/convergence-practice/service-reboot/README.md",
-        "blueprints/convergence-practice/offhost-app-state/README.md"
+        "blueprints/convergence-practice/offhost-app-state/README.md",
+        "evidence/receipts/native-service-reboot-20260920.json",
+        "evidence/receipts/native-offhost-app-state-20260920.json"
       ]
     }
   ],
-  "open_gates": [
-    {
-      "id": "offhost-keys-and-service-reboot",
-      "gap_id": "offhost-keys-and-service-reboot"
-    }
-  ]
+  "open_gates": []
 }

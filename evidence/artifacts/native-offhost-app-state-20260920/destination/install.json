@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "phase": "install",
+  "status": "passed",
+  "commands": [
+    {
+      "id": "memory-download",
+      "argv": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--max-time",
+        "120",
+        "--output",
+        "$OWNED_RUN/tools/memory.tar.gz",
+        "https://github.com/akitaonrails/ai-memory/releases/download/v2.3.2/ai-memory-linux-x86_64.tar.gz"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:28.003220+00:00",
+      "timeout_seconds": 130,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:28.558028+00:00",
+      "seconds": 0.554829,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-download.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-download.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "memory-version",
+      "argv": [
+        "$OWNED_RUN/tools/ai-memory",
+        "--version"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:28.955880+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:28.958785+00:00",
+      "seconds": 0.002889,
+      "stdout": {
+        "raw_sha256": "233cf1641a43da34100fc56a0d1a90c2c086cccb53425efdf8a6247ca1c689a4",
+        "raw_bytes": 16,
+        "public_path": "memory-version.stdout",
+        "public_sha256": "233cf1641a43da34100fc56a0d1a90c2c086cccb53425efdf8a6247ca1c689a4",
+        "public_bytes": 16,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-version.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "qdrant-download",
+      "argv": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--max-time",
+        "120",
+        "--output",
+        "$OWNED_RUN/tools/qdrant.tar.gz",
+        "https://github.com/qdrant/qdrant/releases/download/v1.19.1/qdrant-x86_64-unknown-linux-gnu.tar.gz"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:28.959593+00:00",
+      "timeout_seconds": 130,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:29.483753+00:00",
+      "seconds": 0.524177,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-download.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-download.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "qdrant-version",
+      "argv": [
+        "$OWNED_RUN/tools/qdrant",
+        "--version"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:30.220841+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:30.224234+00:00",
+      "seconds": 0.003373,
+      "stdout": {
+        "raw_sha256": "214295b22d2d525fae20e55f19eb6c016fe20ec4863a531f204e6e849124071e",
+        "raw_bytes": 14,
+        "public_path": "qdrant-version.stdout",
+        "public_sha256": "214295b22d2d525fae20e55f19eb6c016fe20ec4863a531f204e6e849124071e",
+        "public_bytes": 14,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-version.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "memory-sidecar",
+      "argv": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--max-time",
+        "60",
+        "--output",
+        "$OWNED_RUN/tools/memory.tar.gz.sha256",
+        "https://github.com/akitaonrails/ai-memory/releases/download/v2.3.2/ai-memory-linux-x86_64.tar.gz.sha256"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:30.225167+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:30.464143+00:00",
+      "seconds": 0.238993,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-sidecar.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-sidecar.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "restic-install",
+      "argv": [
+        "/opt/hostedtoolcache/Python/3.13.15/x64/bin/python3",
+        "$CHECKOUT/blueprints/convergence-practice/wsl-restore/install.py",
+        "--destination",
+        "$OWNED_RUN/tools/restic"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:30.465212+00:00",
+      "timeout_seconds": 300,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:33.090456+00:00",
+      "seconds": 2.625255,
+      "stdout": {
+        "raw_sha256": "ee23e1088318d46e1cd77e8ce06379e40efb285871c57be2210e371e8fced682",
+        "raw_bytes": 201,
+        "public_path": "restic-install.stdout",
+        "public_sha256": "ee23e1088318d46e1cd77e8ce06379e40efb285871c57be2210e371e8fced682",
+        "public_bytes": 201,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "restic-install.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    }
+  ],
+  "started_at_utc": "2026-09-20T22:24:28.002684+00:00",
+  "provenance_type": "local-integration",
+  "plan_sha256": "ba247c289d3f542491de15fddf6dd46de1822399b9f6967a5c44c0d8b3d24ffe",
+  "cleanup": [],
+  "limitations": [
+    "Synthetic application usability only; no private user database, production recovery, client rebinding, reboot or whole-stack claim.",
+    "Exact snapshots created by the source job are frozen before destination execution; this does not retroactively qualify old private app-state archives.",
+    "Separate jobs and distinct boot identities support fresh-host separation; no independent administrative trust domain or account-loss recovery claim.",
+    "Sequential app snapshots are not one cross-application atomic transaction.",
+    "Selected source tests are distinct from the composed cross-host fixture and from actual destination acceptance.",
+    "Native applications run with owned paths and filtered environments on disposable runners; no general OS filesystem sandbox claim.",
+    "No token-saving claim; provider usage is not measured."
+  ],
+  "finished_at_utc": "2026-09-20T22:24:33.117546+00:00"
+}

@@ -543,7 +543,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1525,7 +1525,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -1978,6 +1978,45 @@
         "Native usage views overlap; initial SIGKILL has no terminal record. Complete parent/child/retry usage, billing and savings remain unknown."
       ],
       "path": "evidence/receipts/native-worker-cgroup-20260920.json"
+    },
+    {
+      "id": "native-service-reboot-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "dagu",
+        "systemd"
+      ],
+      "claim": "A signed disposable Ubuntu guest automatically resumed the same native Dagu run after an orderly kernel reboot, preserved its checkpoint and produced one local effect. A dedicated read-only serial observer and independent journal review confirmed completion before postboot SSH; owned cleanup passed.",
+      "limitations": [
+        "One orderly disposable guest reboot with a synthetic workload; not a physical PC, power loss, production disaster recovery, provider recovery or broker acceptance.",
+        "The unchanged official Dagu retry tests are a selected upstream subset. The project planner, its original 12-test oracle and the guest experiment are local synthetic integration coverage.",
+        "Source, disk and process continuity cover this owned guest only; no distributed exactly-once or arbitrary external side-effect guarantee.",
+        "Public text projections replace owned home prefixes and synthetic UUIDs and normalize CRLF. Original artifact/stream hashes and explicit projection rules are retained; projected bytes are not labelled raw-byte-identical.",
+        "The full auth-free guest archive contains three hidden bookkeeping files omitted by loose-file artifact upload. Independent inspection used the intact archive.",
+        "Both prior failed attempts remain failures; retrospective successful workload records did not override their missing acceptance evidence.",
+        "No model was called and no provider or lifetime token-saving measurement was made."
+      ],
+      "path": "evidence/receipts/native-service-reboot-20260920.json"
+    },
+    {
+      "id": "native-offhost-app-state-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory",
+        "qdrant",
+        "restic"
+      ],
+      "claim": "Accepted within scope: freshly created synthetic ai-memory 2.3.2 and Qdrant 1.19.1 application state was natively backed up, transferred in an exact Restic 0.19.1 snapshot to a distinct GitHub-hosted job, restored into empty native targets, and queried through native MCP and Qdrant APIs. Ten unchanged ai-memory tests and four unchanged Qdrant snapshot cases passed first.",
+      "limitations": [
+        "Newly generated public synthetic application state only; no private user database, old backup recovery or production disaster recovery.",
+        "Sequential native application snapshots do not establish an atomic cross-application transaction.",
+        "Separate runner jobs/boot identities share the GitHub administrative domain; no independent provider/account-loss acceptance.",
+        "The local integration composes native upstream commands and public fixtures; it is not an official upstream end-to-end scenario or the entire upstream test suite.",
+        "Qdrant release-target adaptation ran selected unchanged tests, not its full source-build CI.",
+        "No native client rebinding, whole-stack recovery, reboot/guest boot, external alert or unattended production hosting acceptance.",
+        "No model/provider/broker calls or causal token/cost savings measurement."
+      ],
+      "path": "evidence/receipts/native-offhost-app-state-20260920.json"
     }
   ],
   "files": [
@@ -2018,8 +2057,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "0d805ccc085506e8c17913022f21fb66443e1b19cb78ecc9b9d3345e7b7b8015",
-      "bytes": 9506
+      "sha256": "d19bebd6e47f480c19e1324a69a128b28e80f397c0d13106bdb902ef170dfac8",
+      "bytes": 9828
     },
     {
       "path": "CLAUDE.md",
@@ -2048,13 +2087,13 @@
     },
     {
       "path": "adoption/lifecycle.md",
-      "sha256": "bb5e00a86aa25a414728c6f5a505492dc1a201b00c00045dd1f55b6670bced93",
-      "bytes": 15462
+      "sha256": "e131798c7ed4d8b1d488e21d00b68ca9a987eec8370849455745ee2105e5d61b",
+      "bytes": 16102
     },
     {
       "path": "adoption/manifest.json",
-      "bytes": 14868,
-      "sha256": "ba6087d3d6dbe6d6f34a9c7f0de2b3cea00d87fba8bcd25b0fda2954067cf69f"
+      "bytes": 14823,
+      "sha256": "55d2fb168a56cde20cf20b26dd8e70af8dd0a0b265229497b30f209db7bf454c"
     },
     {
       "path": "adoption/paired/README.md",
@@ -3484,8 +3523,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "224150d482666eaa03ca17b7a04b10eb0eb321249701e88e97328f74f5404168",
-      "bytes": 398064
+      "sha256": "ee8284a2919b276fc9093503df515a489d73352d50c43b4ce2ba563fe67be2ff",
+      "bytes": 409000
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -3529,8 +3568,8 @@
     },
     {
       "path": "blueprints/us-equities/architecture/README.md",
-      "sha256": "0eef5b253a2753f81eb88b998b887acf42e6cc92de28d863319895d25b4d3f56",
-      "bytes": 16417
+      "sha256": "707a152bd800b87bed9374952e428b5844abfdb1432f0d373dfb96b1d9388db7",
+      "bytes": 17055
     },
     {
       "path": "blueprints/us-equities/architecture/alpaca-probe.json",
@@ -3644,8 +3683,8 @@
     },
     {
       "path": "blueprints/us-equities/catalyst-experiment/README.md",
-      "sha256": "c5841ca17e1e2ddb5b35982590755813a294db64b2605a727eff90a2d3aca8e0",
-      "bytes": 9405
+      "sha256": "f94eaaf3fa4fade1883f668217bd02db3d08e88afc11205f895fad85506c2327",
+      "bytes": 10096
     },
     {
       "path": "blueprints/us-equities/catalyst-experiment/availability.sql",
@@ -4104,8 +4143,8 @@
     },
     {
       "path": "blueprints/us-equities/harness-contract.json",
-      "sha256": "731b37b3e674ec4c6b45bdd59a7c0d6392b4d33d8ef682f15f9826277facd09b",
-      "bytes": 4357
+      "sha256": "fd56edc4738c0f202733d278dd2b4da0403717a9ef90edf8f2ab80f37cf470c4",
+      "bytes": 4636
     },
     {
       "path": "blueprints/us-equities/historical-simulation/HistoricalSimulationAlgorithm.cs",
@@ -4829,8 +4868,8 @@
     },
     {
       "path": "catalogs/us-equities/architecture/trading.json",
-      "sha256": "26dd4e0882823e3537922fa495e46dd518ad2b627a6db41962e7fa09d63ecedf",
-      "bytes": 69055
+      "sha256": "e28cfd404ab8992ae3fd2a785e8978908d1b2b2a86e7292bea4ff51335fa2f0c",
+      "bytes": 69562
     },
     {
       "path": "catalogs/us-equities/authenticated-data-review.json",
@@ -5084,8 +5123,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "4d6c3a41959c7fd49b29ff69b9e57d8d8fc6c89e7f8b9aaa0c6c81b9ffc30775",
-      "bytes": 3722454
+      "sha256": "b91fd33d1ea6edefefe49b6dcf4e6e245b0f8379adda21b58bbfb08de2f43bc4",
+      "bytes": 3763327
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5094,7 +5133,7 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "bd6f64626084130eb6febc533d5ddf4e1dc7decb6f20270faadd6a0cc7a7e8eb",
+      "sha256": "dc58c1cb0b9119aa1386eb2fa2866daf49b88b1119c888fcae3a206b57242dbc",
       "bytes": 31611
     },
     {
@@ -5599,8 +5638,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 74905,
-      "sha256": "d52b9a5b500170fd25aae1b08a6457131df4d70423e75a9ff6c35a7470584093"
+      "bytes": 75124,
+      "sha256": "813bd9df11708f8faadf85ee4cd4060a53272991212a8e815d87992476c906a5"
     },
     {
       "path": "observability/README.md",
@@ -6084,18 +6123,18 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "447a12067bad9d8841c0f56a4a18e90599e6b2442ee756ad865d703c1050fe9e",
-      "bytes": 7743
+      "sha256": "2e463b51a2813f4cb71805ecafa1cd728b8a1daed89929d7ca297940653152ed",
+      "bytes": 8142
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "1a0b80c4a9abeac9e3376abfd22a992928c20cb2afbc3ecea74d8ff8cf5f4690",
-      "bytes": 99332
+      "sha256": "c63b2357cba6f5ac8e21c2e4b6e60a30541a098ed38a367e356fc901d89128d9",
+      "bytes": 109907
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "cc3ea65967a3960f36cfa3fbd2719b07eaaf432dd07045ff1644cf030cc62f49",
-      "bytes": 17821
+      "sha256": "52d2fee1481659e01eb774db3aeef943d38cf510f93ff54d0af156a7f14a6c43",
+      "bytes": 18101
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -6104,8 +6143,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "730277a0af25a31339e971d8dbeea6b701555aad9ba6e7f6ee7ed5197e9dd203",
-      "bytes": 6608
+      "sha256": "6ed3941360da4b963ee4afcc620336d2c11192171735fc70ae5e71e5ebe8f637",
+      "bytes": 7137
     },
     {
       "path": "evidence/receipts/native-harness-defaults-20260920.json",
@@ -6439,8 +6478,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/acceptance-plan.md",
-      "sha256": "311e97e678d10dd7399182a4ed300be473f245a5f9c2b63d3eefb740960587c4",
-      "bytes": 18463
+      "sha256": "7cb12b7cb96cc1dacceb426782297cbf1cbdb95aa2d32e87f42f4a8e4eb0c831",
+      "bytes": 19333
     },
     {
       "path": "evidence/receipts/native-worker-cgroup-20260920.json",
@@ -6454,8 +6493,8 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/README.md",
-      "sha256": "1ae8ed8e115c0e5b976ba1ebd2489e5ed9caee979ec78f1a062a63376965f499",
-      "bytes": 9260
+      "sha256": "9b99ef4765d2d12689b5f8e29f54c043c52c73106fe205a8c198641c7bfa6780",
+      "bytes": 9573
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/contract_probe.py",
@@ -6464,8 +6503,8 @@
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/hosted-plan.json",
-      "sha256": "e60f2990b229a5b98f98031d04e0356f1e00f57c4fa6f10957223a2c188057d1",
-      "bytes": 5452
+      "sha256": "55e405c965943c29dacd71027e68eaf0594f42a840d562102a0a7f145c301a41",
+      "bytes": 5714
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/input.json",
@@ -6534,8 +6573,8 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/README.md",
-      "sha256": "93c411197a21bba2708a940a407fda9ce57e927ee0a9d2c8cbc21ed9ab69668d",
-      "bytes": 6975
+      "sha256": "bd9b9e8963b1f7f8e917e483812194d6905c8e61da34afd43f5019acf9340ad0",
+      "bytes": 7518
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/guest.py",
@@ -6984,8 +7023,8 @@
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/attempt-2/publication.json",
-      "sha256": "83e71fea7295d6c6fcc7a86922132c0f4026c995460f4f68c22d2e2d9ba8f951",
-      "bytes": 8885
+      "sha256": "502d53294cd71c604e9ec1aff4c0e3d274c4fae68913d10487a4ba66e4e0ea1f",
+      "bytes": 9283
     },
     {
       "path": "blueprints/convergence-practice/service-reboot/attempt-2/qemu-block-device-help.stdout",
@@ -7013,6 +7052,326 @@
       "bytes": 2199
     },
     {
+      "path": ".github/workflows/native-offhost-app-state.yml",
+      "sha256": "76a49ffe92288eb5e5c337523797770e2474b23c6e0b58a4fc5e80a5ce7acd70",
+      "bytes": 9025
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/README.md",
+      "sha256": "49b4704fa43f0fc067196fcc9e565fd9a165b964701dd95897f493346398fc4e",
+      "bytes": 8538
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/memory-oracle.json",
+      "sha256": "440331d2a2bdaa9c5dcb2cf53b21efe865a1c01140fe4347afa9f95756efc1dd",
+      "bytes": 2429
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/network.py",
+      "sha256": "6c160ec7dd152aa18e450582908006113da4f87dc0570c1df0744d0198b88212",
+      "bytes": 925
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/plan.json",
+      "sha256": "631addc156b6d966d06b80cca850eaebb1f0b975bc3cb80b43c3c8268a3214bd",
+      "bytes": 7010
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/qdrant-oracle.json",
+      "sha256": "e16f7490d75900a5fa74fbba82c3223c50952945797f831c82c8a0bf5a9366c9",
+      "bytes": 3971
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/run.py",
+      "sha256": "d5eddb06d7fc86218b98e11e84b70edd7ee7f72cdc31caeab454112bd1b2b950",
+      "bytes": 43926
+    },
+    {
+      "path": "blueprints/convergence-practice/offhost-app-state/upstream.json",
+      "sha256": "c65bf28411850891ef91607902d279391dc9464a74f93074920e8d846d13aa71",
+      "bytes": 10004
+    },
+    {
+      "path": "tests/test_offhost_app_state.py",
+      "sha256": "a763c8ed4d707bbe447a4af97c7545faabd75866f5ffea320d232285a9a0162c",
+      "bytes": 9730
+    },
+    {
+      "path": "docs/paper-lane-policy.md",
+      "sha256": "a9fef28df97bf6318119b0d2e55e502d47301ec07ea217106f3886402a43b77a",
+      "bytes": 3337
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/cleanup.json",
+      "sha256": "6aadee9cb7005d261df5f0337cc289190378cb5f3d2f49a264428452acd17b75",
+      "bytes": 111
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/freeze.json",
+      "sha256": "5a542522c5fdbd1bc6ae493d957475978fadec9be8f267b8a920f47802e8cdae",
+      "bytes": 4645
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-after.json",
+      "sha256": "bb05b2666bf5bb1c6e25db5a88b7db4b7bb30b12caec1ded951936cc8cd19311",
+      "bytes": 678
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-archive.command.json",
+      "sha256": "2b0be0a3401a39477d2d6c4306dd96c02d2de19fade2b57b23cdd3a1a7d113d0",
+      "bytes": 719
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-archive.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-archive.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-before.json",
+      "sha256": "967a56ebdb74875873f524a33514d6d0d1b3f868ff4612b4a0634525f3c35e43",
+      "bytes": 551
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-boots.command.json",
+      "sha256": "fc9c2eb7e1823d30a7ba3e730d01eefb60259a38e21c07177daec230e5c1b733",
+      "bytes": 682
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-boots.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-boots.stdout",
+      "sha256": "480782af78667044a10f43c5f8a4d8a8289451c0c4ce0b7a54fa1b54d7f7806b",
+      "bytes": 262
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-checkpoint-started.json",
+      "sha256": "b2845c6042555a2d116bbea41631666e3eed78a03a8b94615d1fe00c5f70a837",
+      "bytes": 27
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-checkpoint-tests.log",
+      "sha256": "df15cb585b6e1a59d76ff7988b8ea36054ec45b9bd6788349d370ef90ec2ea33",
+      "bytes": 1177
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-checkpoint.json",
+      "sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+      "bytes": 238
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-completed.json",
+      "sha256": "382717ea740e3d3dbb68f704b2581baa6f8d4b6292c83328a06d2ec44a435376",
+      "bytes": 133
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-config.yaml",
+      "sha256": "a2651229d74dd660c8f98f884292ecb8e405ea6ab3bc363ad4985d4d1eb4a087",
+      "bytes": 21
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-final-tests.log",
+      "sha256": "d753ed2aaee4f758a087b5965887e88756e8052e65aba6294bb4bffcea73a4d4",
+      "bytes": 1177
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-freeze.json",
+      "sha256": "f1dbd54a7a9da58dd33ede0ce99490e5d6eafda4f0af1c73811e3f51039bfb1e",
+      "bytes": 2310
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-after.command.json",
+      "sha256": "86d1b9ba35cf7ddb7dcd6aa269cb8812968176c93f5442dd8ac010b1bcad3707",
+      "bytes": 443
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-after.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-after.stdout",
+      "sha256": "1a197b5688539275a385aeda2b91bf68c7dff911a746c05078c548b81ce63b73",
+      "bytes": 239
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-before.command.json",
+      "sha256": "acb954137aa0fc60bd497f755f00d753a0645fb5143d78c1c4cfa8af0fd00487",
+      "bytes": 443
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-before.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-before.stdout",
+      "sha256": "80fa5bd8b1db5be3e0a22d21faf68c3831e8d658fb9547c03612d156cd76d963",
+      "bytes": 195
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-interrupted.command.json",
+      "sha256": "609db8ca7a518d7ea7863b0c887b6cac2d1995d45ecd0e1f7ed90d8e6da2e63b",
+      "bytes": 443
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-interrupted.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-history-interrupted.stdout",
+      "sha256": "c1b8f0a70c36e719203ed7d4ad17e438728d50805cd6401f86cd13f9e3af7ea0",
+      "bytes": 238
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-reboot.command.json",
+      "sha256": "797fc8657868a280e2d85a66c456d88c09a43983905b51e877067f5bcf004bba",
+      "bytes": 664
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-reboot.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-reboot.stderr",
+      "sha256": "ac52b274fe282b80412edf14920d068ed97684ba3162ab4b80961024b24ff1c1",
+      "bytes": 85
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-reboot.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-reboot.yaml",
+      "sha256": "60d3c42031c69ee508750a7ccc0e5e3c4ab14504b0edfbbfc287dd3bf26048c4",
+      "bytes": 341
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-retry.command.json",
+      "sha256": "9154cb8be7c68cbc645163387defb18b2a703e9bcbd0a0cc8faf441693636da0",
+      "bytes": 487
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-retry.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-retry.stderr",
+      "sha256": "9e3b89e4190c9deaaf475d50e84b3edbfc7a85a9f799a70b1f68e20f28013ff1",
+      "bytes": 846
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-retry.stdout",
+      "sha256": "a0fd978a879707016fbda983e613aed32e09f71d445f0166367a0894ab935592",
+      "bytes": 507
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-version.stdout",
+      "sha256": "7ee203ac73fca7d93c699ceefabb5bb5cdea2e02213de22ceea56908ff0945c5",
+      "bytes": 7
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/host-observations.json",
+      "sha256": "00ec1d1796c68d734394f4cba65e1d1de31849223979af214dd50d950e23fb9a",
+      "bytes": 360
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/journal-excerpts.json",
+      "sha256": "9b7d23c1e25ccb910fe9ea0877a0ea27fb603ca7a4cbcfd10c500e2e405fc7b4",
+      "bytes": 6907
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/publication.json",
+      "sha256": "4b3fb16befaf2e68a694da096223cb205d2667ee32da1a3afb9a11f04c792101",
+      "bytes": 17110
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/qemu-block-device-help.stdout",
+      "sha256": "e61701bf289d8fc9755dad2bdfaa2317b9a86f5e6cf0a3cb18674d370f3c380e",
+      "bytes": 3823
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/qemu-version.stdout",
+      "sha256": "8f79ffd97970d85d6833a0ccc87f5d6e7182f8f52101c741dfa2fb6374670b18",
+      "bytes": 132
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/qemu.command.json",
+      "sha256": "95046d5ca76fb90db1291570942d7bb3d2fa229134257b9aa2b4dbffbd41aee6",
+      "bytes": 1117
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/result.json",
+      "sha256": "9baa16ea628d1f4844ecbec8f3ded2c87e49d05bbaa256f322074b34a44aaf2f",
+      "bytes": 365
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/serial.log",
+      "sha256": "e97d86327f0b4791596f7e17541e790b1659f735cd93e265d4dd9932127db7c1",
+      "bytes": 427
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/ubuntu-signature.command.json",
+      "sha256": "bf32f92dae935029d3825069b5182a95111c03ac93aa66d3d3b36a79a30ff110",
+      "bytes": 429
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/ubuntu-signature.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/ubuntu-signature.stderr",
+      "sha256": "33e46ef560a389fee1665eb5274962415c84b0f9c1b84ae40e8483ea877b8cae",
+      "bytes": 207
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/ubuntu-signature.stdout",
+      "sha256": "30a2ca1dcd976d0f0a609e19ba34641ee8f231e0c61e7a66a9a9918761c266d7",
+      "bytes": 372
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/upstream-archive-verification.txt",
+      "sha256": "441a83667300a77189ef664a9d0c8a9a2fa7bcb9da51e6a756d1c4ee62bd8835",
+      "bytes": 73
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/upstream-exit-code.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/upstream-go-version.txt",
+      "sha256": "76227025cc0bc2be7067aa45d11e09cacfd49c58f498f4c2e4f6a9872a607bf9",
+      "bytes": 32
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/upstream-native-command.txt",
+      "sha256": "70fe2d9b972da0abd201b3bd0080c522788383be3504192f3f0dae2c94d8c9be",
+      "bytes": 78
+    },
+    {
+      "path": "evidence/artifacts/native-service-reboot-20260920/upstream-upstream-tests.txt",
+      "sha256": "c975dcb643e18efd96e4a34efecf2670f88f03834a1a4e3dd00ee081a5a85f21",
+      "bytes": 110896
+    },
+    {
+      "path": "evidence/receipts/native-service-reboot-20260920.json",
+      "sha256": "7f13f5bfe6072465d09aa725d766fb880eb865f6c0452902a41cf7f5b446a0d0",
+      "bytes": 5495
+    },
+    {
       "path": ".github/dependabot.yml",
       "sha256": "d2f1900108fff96b1d677f0c5fb62a9513e89a122aac08d3eb50350bc372aa05",
       "bytes": 350
@@ -7029,8 +7388,8 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "5ee2c5a1a3549320460cf28a39183a3ce672bd2ba24c66c1d85e8adc3f1249bf",
-      "bytes": 13048
+      "sha256": "af0a4c01ac520d8671ca22780fd3f9f6a3dbfd46186caedbf0eb155cbd053345",
+      "bytes": 13358
     },
     {
       "path": "docs/research-task-acceptance.md",
@@ -7058,49 +7417,389 @@
       "bytes": 14270
     },
     {
-      "path": ".github/workflows/native-offhost-app-state.yml",
-      "sha256": "76a49ffe92288eb5e5c337523797770e2474b23c6e0b58a4fc5e80a5ce7acd70",
-      "bytes": 9025
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/README.md",
+      "sha256": "45dad03bde9ec39c8dea1c454825d03ef83f2fdb8cb02663b7db313b969abda4",
+      "bytes": 7181
     },
     {
-      "path": "blueprints/convergence-practice/offhost-app-state/README.md",
-      "sha256": "11782066b26c31ce20e1ab355d28f1b7da6536a75741bf06b19658d8909a81a7",
-      "bytes": 7331
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/cleanup.json",
+      "sha256": "37f1e64c699b0d7b390b7be6432edeae2a58139cb539031455a6ea011dcede2c",
+      "bytes": 1455
     },
     {
-      "path": "blueprints/convergence-practice/offhost-app-state/memory-oracle.json",
-      "sha256": "440331d2a2bdaa9c5dcb2cf53b21efe865a1c01140fe4347afa9f95756efc1dd",
-      "bytes": 2429
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-aliases.response",
+      "sha256": "99fa4349d2563de4b727a04bf729bd29c64a29d7fbcba258250477597e1e190d",
+      "bytes": 133
     },
     {
-      "path": "blueprints/convergence-practice/offhost-app-state/network.py",
-      "sha256": "6c160ec7dd152aa18e450582908006113da4f87dc0570c1df0744d0198b88212",
-      "bytes": 925
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-berlin-alias.response",
+      "sha256": "1236cd26442da49b5ce1f9c487ce6391fd2e1e6c92bc75587e47de6eed7eb5da",
+      "bytes": 395
     },
     {
-      "path": "blueprints/convergence-practice/offhost-app-state/plan.json",
-      "sha256": "ba247c289d3f542491de15fddf6dd46de1822399b9f6967a5c44c0d8b3d24ffe",
-      "bytes": 7010
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-berlin.response",
+      "sha256": "c1fabdacab45fa7fc623b3c2416b149dbe94fee8c21bc3f0a2606c44468a4d3a",
+      "bytes": 395
     },
     {
-      "path": "blueprints/convergence-practice/offhost-app-state/qdrant-oracle.json",
-      "sha256": "e16f7490d75900a5fa74fbba82c3223c50952945797f831c82c8a0bf5a9366c9",
-      "bytes": 3971
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-collection.response",
+      "sha256": "757c916e21cd165a08dac8b01c7b0cc53616a4cb6d668ad4f45811ecc14b14c2",
+      "bytes": 964
     },
     {
-      "path": "blueprints/convergence-practice/offhost-app-state/run.py",
-      "sha256": "d5eddb06d7fc86218b98e11e84b70edd7ee7f72cdc31caeab454112bd1b2b950",
-      "bytes": 43926
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-collections.response",
+      "sha256": "828e466664b571c5b8d1e0a8fdd4fb6bcb9b2a93e942f8ce53b0d3e6d9195b37",
+      "bytes": 87
     },
     {
-      "path": "blueprints/convergence-practice/offhost-app-state/upstream.json",
-      "sha256": "c65bf28411850891ef91607902d279391dc9464a74f93074920e8d846d13aa71",
-      "bytes": 10004
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-dense-alias.response",
+      "sha256": "e614410331e290ee9b71a5381487b980bb81974e3d16c076f44942e898f5cff3",
+      "bytes": 873
     },
     {
-      "path": "tests/test_offhost_app_state.py",
-      "sha256": "a763c8ed4d707bbe447a4af97c7545faabd75866f5ffea320d232285a9a0162c",
-      "bytes": 9730
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-dense.response",
+      "sha256": "8bc2ac79ae3130a439f0c7f3cde082563bee3839a5170d359b23dfb2062434ad",
+      "bytes": 873
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-scroll-0.response",
+      "sha256": "bda3dc3c2d30773585bab3a3b7a0050e320902097f24e317972ca2e6e191f90b",
+      "bytes": 429
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-scroll-1.response",
+      "sha256": "3b761673ce1b70ef9ed591947eb5666f6078cefbbdd9aa6eb60b291d9dc61a8c",
+      "bytes": 341
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-scroll-2.response",
+      "sha256": "5e8dcdf8c35bb451133808f80d5c397e3c2dd53c587a8021c294016f33dff123",
+      "bytes": 277
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-sparse-alias.response",
+      "sha256": "e310b58a929b973a1ff3ee25d83cf8f6bf97b6a3da2cdc7eb9d2e69310738830",
+      "bytes": 166
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-sparse.response",
+      "sha256": "079a86d93e201a0b2ebc4a3e814f5d4f4b0a8ecf28d49de9c2f2ebf6572c8402",
+      "bytes": 166
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/destination.json",
+      "sha256": "80827035553f700f064609e5e126a00e27631976da1fe81c59f2c54090f45269",
+      "bytes": 24070
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/exact-snapshot-restore.stdout",
+      "sha256": "f1ed7520d197b8e674aaaea30321a52ac475d1d7277de115bae39a80bcca36db",
+      "bytes": 354
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/install.json",
+      "sha256": "b5e8627f06c0fd9ad2407a441e647d3f1111c6998e45b22505b5984a18c11880",
+      "bytes": 10340
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/memory-query-facts.json",
+      "sha256": "db753997796c6d3edc01c79230213a5f1a235be4c743a0c81dd6069956be0c5a",
+      "bytes": 9159
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/memory-version.stdout",
+      "sha256": "233cf1641a43da34100fc56a0d1a90c2c086cccb53425efdf8a6247ca1c689a4",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/native-memory-restore.stderr",
+      "sha256": "7042237da9aea260eda84a0a520dc6542e3454abf581dc1c2b553266a6a6b57c",
+      "bytes": 1039
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/native-memory-restore.stdout",
+      "sha256": "f67facff84cedb82d903852ae302a2fd49ec6c0c9d966679f1257905d3d3f6d1",
+      "bytes": 94
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/qdrant-version.stdout",
+      "sha256": "214295b22d2d525fae20e55f19eb6c016fe20ec4863a531f204e6e849124071e",
+      "bytes": 14
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/received-repository-check.stdout",
+      "sha256": "519b580db41d7223cc5c81b17ffc8b4f36d9e8260b5e391afe97cef15bcdbb14",
+      "bytes": 157
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/restic-installation.json",
+      "sha256": "e5942494dbec8639ef6179472dbd177dc30267c8904c3319e8b1608b153fc74e",
+      "bytes": 6936
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/seal.json",
+      "sha256": "edac5343c3f714387c724e09d07261d55e21574fe14027c40967bb2dc5434f0d",
+      "bytes": 11445
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/destination/wrong-password-restore.stderr",
+      "sha256": "5350d639b7c6932a5cb55c8d6efee0eee512cf3ba361449e550be42e98fee4da",
+      "bytes": 38
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/projection-manifest.json",
+      "sha256": "bccc180d120c8eddab3e567477c278c35dca23d9d5e8703b5af08fc1e1cf5af3",
+      "bytes": 40060
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/selected-commands.json",
+      "sha256": "1c9e43d61aadbabcf7a1ab629b2fe41b4c2bc2c21d7a9ef5281810b88f93ae94",
+      "bytes": 8641
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/cleanup.json",
+      "sha256": "f8b58f2452e4e9cc38902d6fa89bd6ea5b77609f524ae38ac14b504c1efba8f9",
+      "bytes": 1455
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/install.json",
+      "sha256": "f099911b6fb45518d689d276b5ea010278ce1e7c270c2b7ad3e1a980ebf68206",
+      "bytes": 10340
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/memory-upstream-backup.stdout",
+      "sha256": "f355a556eacb8fb4f5052dbf1e21cdb097c577ca83b79cececbee4085ea260f6",
+      "bytes": 443
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/memory-upstream-restore.stdout",
+      "sha256": "a08bdc7dec44f8ff3582dbb551f99ac67994540b4ce313166cffd51611d85dc7",
+      "bytes": 639
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/memory-version.stdout",
+      "sha256": "233cf1641a43da34100fc56a0d1a90c2c086cccb53425efdf8a6247ca1c689a4",
+      "bytes": 16
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/native-app-backup.stdout",
+      "sha256": "7686bbbe95d6c52a6a625a0124a3c37315ed4fa99ec5c06532081a96310004e0",
+      "bytes": 467
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/native-app-full-check.stdout",
+      "sha256": "519b580db41d7223cc5c81b17ffc8b4f36d9e8260b5e391afe97cef15bcdbb14",
+      "bytes": 157
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/qdrant-native-snapshot-create.response",
+      "sha256": "48122d38679f24086e55048c87b848275187eafffd3d40ea56871c09366afd85",
+      "bytes": 227
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/qdrant-tests.json",
+      "sha256": "f3e68b693ce2b9093984a008728720b34be3cfb8dd182713244fda7912c88d96",
+      "bytes": 6279
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/qdrant-upstream-tests.stdout",
+      "sha256": "f6f8013375e4392898c7e2446809c70c06b9001f3aed59c8d865dff268426663",
+      "bytes": 998
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/qdrant-upstream.xml",
+      "sha256": "fb6371c7c69da9c0830c9644eea18f4a2947be320cdf7616237a82eaea04b253",
+      "bytes": 670
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/qdrant-version.stdout",
+      "sha256": "214295b22d2d525fae20e55f19eb6c016fe20ec4863a531f204e6e849124071e",
+      "bytes": 14
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/restic-installation.json",
+      "sha256": "7d7bba4751a87fc17ab8f7caafea6af8f80b413253baaf0f6ec0f75d5fd06e2b",
+      "bytes": 6937
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/rust-version.stdout",
+      "sha256": "f4d034f5660bb49f22bfcba3f3445be67e25b704c193ff421b53863b4faee148",
+      "bytes": 36
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/seal.json",
+      "sha256": "7a681b1a53898965d04a47759ef1d24125980c7c984952b250df551a787a8f0d",
+      "bytes": 11443
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-aliases.response",
+      "sha256": "bc20c37e3e1e351f6d71aad1d86572f6573853f897b31631cbadb1dcd76cec5b",
+      "bytes": 133
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-berlin-alias.response",
+      "sha256": "7914b7806bd24ee65a493654091d7c0a91a1626b2e12c23a106b79b9dbeab312",
+      "bytes": 395
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-berlin.response",
+      "sha256": "a0f3c256db75559ef5bbc3b48516602d5f3f4b82952564c84181337d2c9338a1",
+      "bytes": 395
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-collection.response",
+      "sha256": "84aca11311b4e94432f91d79c56c4643607842ae629eb8226d16e39c223eb9f3",
+      "bytes": 964
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-collections.response",
+      "sha256": "62636107652d8b2b2a53623e58574e09bee4e39734b6a03ef6593cd334524288",
+      "bytes": 87
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-dense-alias.response",
+      "sha256": "b9b1e9c43bb3b4689ed477443d5d0590c3ba493c8151cfc6d5c6ad3f9489d0a9",
+      "bytes": 873
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-dense.response",
+      "sha256": "b4ebf2ae5cd320c6652a4a5daf7bfc3a6bd9188d243ac47b68afa1ef42f63310",
+      "bytes": 873
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-scroll-0.response",
+      "sha256": "57a34666ae27d24146fed2649b5653d6fd19259a200535598ac66d39b36eddc1",
+      "bytes": 429
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-scroll-1.response",
+      "sha256": "102b6b0b21dfe57ecc40f9570d1a26cd95b692005aec70266e1575e724a5f928",
+      "bytes": 342
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-scroll-2.response",
+      "sha256": "a51ea66dbdb1390547a5eda67722df9cd657a10b0c05dbaa0feb51536b778e51",
+      "bytes": 277
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-sparse-alias.response",
+      "sha256": "34b7889331c73ee5b105649bd846bc93babcee5dc0eed3cc8aaa3c806d1513c1",
+      "bytes": 166
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-after-sparse.response",
+      "sha256": "24c59be870f08988c0bf60e9f64e684d8d54d573f9929e32e8e0f0a9e7495d4d",
+      "bytes": 166
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-alias-create.response",
+      "sha256": "50966c84fa052ab0f510119d3f676bca5a8488d30b74e02c2aa2019d75c2467f",
+      "bytes": 48
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-aliases.response",
+      "sha256": "75315d0aca6e635a096555a667bc93de731b8d401e849c2b43df2acefd223b99",
+      "bytes": 133
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-berlin-alias.response",
+      "sha256": "c47a3dc7208fb260fbdcc8256ad5729e282d6ebe940ce068274448de885d7e96",
+      "bytes": 394
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-berlin.response",
+      "sha256": "f3a548a59ed434de3ba22aac92dca02500006ef20ba077df26e03522d0c82694",
+      "bytes": 395
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-collection.response",
+      "sha256": "3b47ba5fd41ff809e2effb81e3051a61a79fcf1d37dee549688778f1e4d6619d",
+      "bytes": 964
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-collections.response",
+      "sha256": "0470b5d0e574589e9b84cff680718c042c765473b6a7a85734370bdd4f40847d",
+      "bytes": 87
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-dense-alias.response",
+      "sha256": "904625cb004cd2891fbae5c83e57e86f0ec5a601df3a126dfed675d1e9393c98",
+      "bytes": 873
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-dense.response",
+      "sha256": "07fdeec496963f51cc5e8c2c60978af5634f4cd4904b173090e419b15002bfb2",
+      "bytes": 873
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-index-city.response",
+      "sha256": "0dac4f96db76bf1ecd7f35be11a43198a490a88785e3fd8c641db142341d8244",
+      "bytes": 83
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-index-price.response",
+      "sha256": "c8f3157ae150368998b8e2a6d9944827207cf914bed99bb0dc7dd68d7b5be8df",
+      "bytes": 83
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-scroll-0.response",
+      "sha256": "ab7de2ca5325a301c53202be8e3b3272f6af50d5bdc3a7288c5e8f6fead0c64b",
+      "bytes": 429
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-scroll-1.response",
+      "sha256": "8732896e40c1c0c971ced3bee674577ed35b2f5fd965b60506350f57c55ae092",
+      "bytes": 342
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-scroll-2.response",
+      "sha256": "0a54e7e04acbf81e697b1f408ad0db508d00d27d5b7c27b6eef36eb0c23509d5",
+      "bytes": 277
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-sparse-alias.response",
+      "sha256": "1463d077c204fd52a52f269c46b993b105ffc076d150fe1d6307c522306a7329",
+      "bytes": 166
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source-sparse.response",
+      "sha256": "0fdbfe5c1b3d93f9b3cd9b4dc6bd0fa01f1ee9cba2de7f09a92ee2b1a5ab6464",
+      "bytes": 166
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/source.json",
+      "sha256": "08e0f0e19f08bfbdec1463c206e5421929b04a2b5413689be89ceb75cc5b85ef",
+      "bytes": 47003
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/upstream-private-network-interfaces.stdout",
+      "sha256": "f9684fc248a6a175c6a7370f407cb4acf85fe5ed6558c1204260656b8860584a",
+      "bytes": 257
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/upstream.json",
+      "sha256": "fc40f64bae4b00cc8e9715cc47deedeeccfb56598d7c1251e7be2fe06704fec0",
+      "bytes": 32163
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/source/uv-version.stdout",
+      "sha256": "2f2df388eb4b5b1646471309defdcd48e0b340eff2b49f3bfb014590e9365162",
+      "bytes": 10
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/transfer/manifest.json",
+      "sha256": "80dc7b8af5cb01df8f7159ef6ec1ee09d7b0f9c61b8ed9f2f7d5cc245ba5490f",
+      "bytes": 1113
+    },
+    {
+      "path": "evidence/artifacts/native-offhost-app-state-20260920/transfer/source.json",
+      "sha256": "f4bf08003d7d1ee2e39fc13b1defa624c85e6449f71d4cc0fc9de591d84512ee",
+      "bytes": 8947
+    },
+    {
+      "path": "evidence/receipts/native-offhost-app-state-20260920.json",
+      "sha256": "7bdebe374142fd65dd02960a028c86b0d376f066194412467d9e452cf8ed355c",
+      "bytes": 12548
     },
     {
       "path": ".github/workflows/action-compatibility.yml",
@@ -7121,6 +7820,11 @@
       "path": "docs/automation-upgrade-evidence.json",
       "sha256": "afe31d3eec6b14f69721a810f8719d3326154c9f2e2fadedeb5e292bb92ca7df",
       "bytes": 10044
+    },
+    {
+      "path": "tests/test_active_recovery_plans.py",
+      "sha256": "316a457f792412232b899d874297f7cc05c36a8b4a0ce8a4ef58e6bc37603a1c",
+      "bytes": 1238
     }
   ],
   "convergence_records": [

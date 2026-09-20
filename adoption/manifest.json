@@ -340,9 +340,7 @@
       "observability/grand-dashboard/README.md",
       "blueprints/us-equities/catalyst-convergence/README.md"
     ],
-    "next_action_refs": [
-      "offhost-keys-and-service-reboot"
-    ],
+    "next_action_refs": [],
     "public_state_is_reference_only": true,
     "trading_next_action_refs": [
       "research-specification",

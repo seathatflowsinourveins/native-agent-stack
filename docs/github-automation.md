@@ -74,6 +74,10 @@ local/hosted behavior, then refresh hashes for the reviewed files. Combine relat
 bot proposals in one review branch when they touch the shared evidence registry;
 retain their commits and close the original proposals after the replacement
 merges. Record the replacement PR and old failures in the manifest/task record.
+Check the active default trial plan's frozen-source bindings after a workflow
+edit; update only the prospective plan and preserve historical plans and receipts
+at their original revisions. The local active-plan checks invoke the actual
+manual-run source guards; they do not execute or certify native recovery.
 Do not blindly regenerate all file hashes or rewrite historical runtime receipts.
 
 Primary references: [Dependabot options](https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference),

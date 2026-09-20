@@ -1,0 +1,11 @@
+
+running 6 tests
+test commands::restore::tests::restore_rejects_unexpected_or_unsafe_paths ... ok
+test commands::restore::tests::restore_rejects_link_entries ... ok
+test commands::restore::tests::validate_restore_entry_still_rejects_gnu_sparse_at_an_unexpected_path ... ok
+test commands::restore::tests::validate_restore_entry_accepts_gnu_sparse_for_the_sqlite_path ... ok
+test commands::restore::tests::restore_accepts_expected_backup_paths ... ok
+test commands::restore::tests::restore_round_trips_a_real_gnu_sparse_sqlite_snapshot ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 933 filtered out; finished in 0.03s
+

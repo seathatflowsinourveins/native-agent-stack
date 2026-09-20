@@ -1,0 +1,263 @@
+{
+  "schema_version": 1,
+  "id": "native-offhost-app-state-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "ai-memory",
+    "qdrant",
+    "restic"
+  ],
+  "claim": "Accepted within scope: freshly created synthetic ai-memory 2.3.2 and Qdrant 1.19.1 application state was natively backed up, transferred in an exact Restic 0.19.1 snapshot to a distinct GitHub-hosted job, restored into empty native targets, and queried through native MCP and Qdrant APIs. Ten unchanged ai-memory tests and four unchanged Qdrant snapshot cases passed first.",
+  "status": "accepted_within_scope",
+  "recorded_at": "2026-09-20",
+  "accepted_run": {
+    "id": 35541091430,
+    "attempt": 1,
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35541091430",
+    "head_sha": "2e7b4624b85a828be11752238e2806efa420ba3c",
+    "event": "workflow_dispatch",
+    "source_identity": {
+      "run_id": "35541091430",
+      "run_attempt": "1",
+      "head_sha": "2e7b4624b85a828be11752238e2806efa420ba3c",
+      "job": "source",
+      "runner_environment": "github-hosted",
+      "boot_id_sha256": "691610a311bfee15519b65d252265c4f83dfb551a377b6ec12e6bd1de5f318eb"
+    },
+    "destination_identity": {
+      "run_id": "35541091430",
+      "run_attempt": "1",
+      "head_sha": "2e7b4624b85a828be11752238e2806efa420ba3c",
+      "job": "destination",
+      "runner_environment": "github-hosted",
+      "boot_id_sha256": "3fe8501ee3eac19330a037c970e35ca0e55b8b193c09641e7d10f56bac2a7687"
+    },
+    "distinct_boot_identities": true,
+    "conclusion": "success"
+  },
+  "workflow": ".github/workflows/native-offhost-app-state.yml",
+  "frozen_plan": {
+    "path": "blueprints/convergence-practice/offhost-app-state/plan.json",
+    "sha256": "ba247c289d3f542491de15fddf6dd46de1822399b9f6967a5c44c0d8b3d24ffe",
+    "source_count": 12,
+    "all_source_hashes_matched": true
+  },
+  "provenance": {
+    "upstream_source": "blueprints/convergence-practice/offhost-app-state/upstream.json",
+    "source_sha256": "c65bf28411850891ef91607902d279391dc9464a74f93074920e8d846d13aa71",
+    "unchanged_upstream_tests": "Selected source files were hash-bound to their pinned revisions; their original test bodies were executed unchanged. Qdrant tests targeted the verified release binary rather than reproducing all upstream CI.",
+    "local_integration": "Two-job native backup/transfer/restore orchestration and post-restore cross-application assertions are this repository's synthetic integration check, not an official upstream cross-host test.",
+    "memory_oracle": "blueprints/convergence-practice/offhost-app-state/memory-oracle.json",
+    "qdrant_oracle": "blueprints/convergence-practice/offhost-app-state/qdrant-oracle.json"
+  },
+  "upstream_test_results": {
+    "ai_memory": {
+      "version": "2.3.2",
+      "source_commit": "353841d91618d20b110b208de284a74d0b960379",
+      "backup_cases": 4,
+      "restore_cases": 6,
+      "passed": 10,
+      "failed": 0,
+      "ignored_or_semantic_skips": 0,
+      "real_gnu_sparse_round_trip_exercised": true,
+      "stdout": [
+        "evidence/artifacts/native-offhost-app-state-20260920/source/memory-upstream-backup.stdout",
+        "evidence/artifacts/native-offhost-app-state-20260920/source/memory-upstream-restore.stdout"
+      ]
+    },
+    "qdrant": {
+      "version": "1.19.1",
+      "source_commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de",
+      "test_names": [
+        "test_collection_snapshot_operations",
+        "test_full_snapshot_operations"
+      ],
+      "on_disk_vectors": [
+        false,
+        true
+      ],
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "Collection create/list/download/recovery/checksum paths and full snapshot create/list/delete; upstream full-snapshot test alone does not test full restore/query.",
+      "stdout": "evidence/artifacts/native-offhost-app-state-20260920/source/qdrant-upstream-tests.stdout",
+      "junit": "evidence/artifacts/native-offhost-app-state-20260920/source/qdrant-upstream.xml",
+      "helper_network_boundary": {
+        "distinct_parent_namespace": true,
+        "interfaces": [
+          "lo"
+        ],
+        "scope": "The unchanged test helper binds all interfaces inside a separate namespace containing only loopback; not an assertion that the upstream helper itself binds only loopback."
+      }
+    }
+  },
+  "native_binaries": {
+    "memory": {
+      "version": "2.3.2",
+      "archive_sha256": "23e8be6c2cac6b8f8387d0e75192cc12d38044eee42016781f728aa9adaef6fc",
+      "binary_sha256": "93eeb2994343f8d5427328650d3fc2ec85250332e2308c163d27169d8b5cfed0"
+    },
+    "qdrant": {
+      "version": "1.19.1",
+      "archive_sha256": "eef986e769d4d3e806dd2d546e1b4ecdd416211e54d34b4ed764fac7c58e1085",
+      "binary_sha256": "f1823c24376c4a5f2f665d42dc2f52fe4e537e7c2b070b8ae7da575d83327e3a"
+    },
+    "restic": {
+      "version": "0.19.1",
+      "binary_sha256": "20d4142678d0d95ec11a4759def1b73fd9190abc9ca19e4b62d067c0b387e639"
+    }
+  },
+  "native_commands": "evidence/artifacts/native-offhost-app-state-20260920/selected-commands.json",
+  "transfer": {
+    "snapshot_id": "0fd4395da35e8ebde5335c0985e349cab7f81f6491c49e102dffbeb87d791134",
+    "source_facts": "evidence/artifacts/native-offhost-app-state-20260920/transfer/source.json",
+    "source_facts_sha256": "f4bf08003d7d1ee2e39fc13b1defa624c85e6449f71d4cc0fc9de591d84512ee",
+    "ciphertext_manifest": "evidence/artifacts/native-offhost-app-state-20260920/transfer/manifest.json",
+    "manifest_sha256": "80dc7b8af5cb01df8f7159ef6ec1ee09d7b0f9c61b8ed9f2f7d5cc245ba5490f",
+    "envelope_sha256": "9dadb39f78bc647c97b7a0c8911ee214cb1494635d1b45409ed1d831524cfc1e",
+    "repository_objects": 6,
+    "native_archives": [
+      {
+        "name": "memory.tar.gz",
+        "bytes": 44941,
+        "sha256": "7880de6795f6b02da5f78c86815e238a9cda814c62013aecafe917b096f1003c"
+      },
+      {
+        "name": "qdrant.snapshot",
+        "bytes": 171520,
+        "sha256": "c4b6423cd66b3c7089ecb0ecb823a2ee785b504a43e58c23fde4dd749ee78f02"
+      }
+    ],
+    "check_read_data_exit": 0,
+    "wrong_password_restore_exit": 12,
+    "wrong_password_return": "Fatal: wrong password or no key found",
+    "wrong_password_files_created": 0,
+    "exact_snapshot_restore_exit": 0,
+    "restic_verified_files": 2,
+    "exact_archive_hashes_matched": true,
+    "input_ciphertext_unchanged": true,
+    "key_separation": "The same fixture-only repository Actions secret was delivered separately to each fresh job. No key was bundled in the artifact. Source memory admin authentication was temporary and excluded from selected public reports and proof selection.",
+    "storage_separation_limit": "Distinct hosted source/destination jobs and boot identities; both remain within the same GitHub repository/administrative domain."
+  },
+  "native_application_results": {
+    "ai_memory": {
+      "restore_exit": 0,
+      "destination_tool_calls": 14,
+      "exact_page_bodies": 3,
+      "own_scope_search_hits": 3,
+      "cross_scope_empty_searches": 3,
+      "cross_scope_read_refusals": 3,
+      "stale_term_empty_searches": 1,
+      "memory_status_calls": 1,
+      "evidence": "evidence/artifacts/native-offhost-app-state-20260920/destination/memory-query-facts.json",
+      "archive_sqlite": {
+        "integrity": "ok",
+        "forbidden_population": {
+          "sessions": 0,
+          "observations": 0,
+          "workstream_events": 0,
+          "workstream_native_sessions": 0,
+          "page_embeddings": 0
+        },
+        "v62_present": true,
+        "missing_page_windows": 0,
+        "page_versions": 4
+      },
+      "observation_boundary": "Reviewer independently inspected the restored source archive SQLite and actual destination MCP output. Destination SQLite equality is the runner's composed assertion; no independent second live destination database query is claimed."
+    },
+    "qdrant": {
+      "restore_flag": "--storage-snapshot",
+      "point_count": 10,
+      "full_points_vectors_payloads_config_schema_aliases_match": true,
+      "source_after_snapshot_matches": true,
+      "dense_ids": [
+        8,
+        3,
+        6,
+        7,
+        5,
+        2,
+        4,
+        1
+      ],
+      "berlin_filter_ids": [
+        3,
+        2,
+        1
+      ],
+      "sparse_ids": [
+        9
+      ],
+      "sparse_scores": [
+        0.5
+      ],
+      "real_collection_and_alias_queries_match": true,
+      "evidence": [
+        "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-collection.response",
+        "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-aliases.response",
+        "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-dense.response",
+        "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-berlin.response",
+        "evidence/artifacts/native-offhost-app-state-20260920/destination/destination-sparse.response"
+      ]
+    }
+  },
+  "cleanup": {
+    "source": "evidence/artifacts/native-offhost-app-state-20260920/source/cleanup.json",
+    "destination": "evidence/artifacts/native-offhost-app-state-20260920/destination/cleanup.json",
+    "native_processes_exited": true,
+    "qdrant_listeners_closed": true,
+    "temporary_passwords_and_owned_runtime_removed": true,
+    "prior_unencrypted_raw_evidence_removed": true,
+    "encrypted_proof_and_reports_retained": true
+  },
+  "independent_review": {
+    "status": "passed_within_scope",
+    "method": "Independent reviewer downloaded and verified the three Actions artifact ZIP digests; restored both encrypted raw-proof repositories and the exact application transfer with native Restic; checked frozen sources, original command streams, native query results and cleanup.",
+    "verified_frozen_sources": 12,
+    "verified_raw_public_stream_associations": 144,
+    "reviewer_reran_upstream_tests_or_services": false,
+    "destination_evidence": "Actual native MCP responses and Qdrant native API outputs, reconciled to source and frozen expectations; source archive SQLite was separately inspected.",
+    "artifact_zip_digests": [
+      {
+        "name": "source-reports-and-encrypted-proof",
+        "artifact_id": 10614737557,
+        "sha256": "fbb8e5c75a8b1a3992b33d60a5dcfa9e202be384bd7d540cc56897b0aae3d6e7"
+      },
+      {
+        "name": "destination-reports-and-encrypted-proof",
+        "artifact_id": 10614712681,
+        "sha256": "a09defb3499610e18709cba901fe3a811fe8c062831cb48ac0573919107db9c1"
+      },
+      {
+        "name": "frozen-synthetic-app-transfer",
+        "artifact_id": 10613774343,
+        "sha256": "137d9d53d9e23166ea29cd868fb92022579cc025bc4fe79279ec56367ddf698c"
+      }
+    ]
+  },
+  "publication": {
+    "artifact_readme": "evidence/artifacts/native-offhost-app-state-20260920/README.md",
+    "projection_manifest": "evidence/artifacts/native-offhost-app-state-20260920/projection-manifest.json",
+    "projection_manifest_sha256": "bccc180d120c8eddab3e567477c278c35dca23d9d5e8703b5af08fc1e1cf5af3",
+    "excluded": [
+      "Encrypted proof blobs",
+      "Restic repository envelope",
+      "Full native backup archives or databases",
+      "Private synthetic password path/value and administrative bearer",
+      "Complete build logs and incidental service streams"
+    ],
+    "hash_scope": "The projection manifest distinguishes hosted report bytes from committed projection bytes. Command-record raw hashes are original native bytes; their hosted public hashes are sanitized report bytes."
+  },
+  "limitations": [
+    "Newly generated public synthetic application state only; no private user database, old backup recovery or production disaster recovery.",
+    "Sequential native application snapshots do not establish an atomic cross-application transaction.",
+    "Separate runner jobs/boot identities share the GitHub administrative domain; no independent provider/account-loss acceptance.",
+    "The local integration composes native upstream commands and public fixtures; it is not an official upstream end-to-end scenario or the entire upstream test suite.",
+    "Qdrant release-target adaptation ran selected unchanged tests, not its full source-build CI.",
+    "No native client rebinding, whole-stack recovery, reboot/guest boot, external alert or unattended production hosting acceptance.",
+    "No model/provider/broker calls or causal token/cost savings measurement."
+  ],
+  "provider_calls": 0,
+  "native_lifetime_tokens_saved": null,
+  "exact_causal_lifetime_provider_tokens_saved": null
+}

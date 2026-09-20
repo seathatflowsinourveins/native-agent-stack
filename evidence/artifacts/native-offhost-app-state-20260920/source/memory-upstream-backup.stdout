@@ -1,0 +1,9 @@
+
+running 4 tests
+test integration::admin_backup::backup_empty_store_still_succeeds ... ok
+test integration::admin_backup::backup_returns_application_gzip_content_type ... ok
+test integration::admin_backup::backup_body_is_valid_gzip_and_contains_seeded_page ... ok
+test integration::admin_backup::backup_does_not_dereference_wiki_symlinks ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 439 filtered out; finished in 0.45s
+

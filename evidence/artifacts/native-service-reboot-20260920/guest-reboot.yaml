@@ -1,0 +1,10 @@
+type: graph
+timeout_sec: 90
+max_active_runs: 1
+working_dir: /var/lib/service-reboot
+steps:
+  - id: checkpoint
+    run: /usr/bin/python3 -B /opt/service-reboot/fixture.py checkpoint /var/lib/service-reboot
+  - id: finalize
+    depends: [checkpoint]
+    run: /usr/bin/python3 -B /opt/service-reboot/fixture.py finalize /var/lib/service-reboot

@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "phase": "seal",
+  "status": "passed",
+  "commands": [
+    {
+      "id": "proof-repository-init",
+      "argv": [
+        "$OWNED_RUN/tools/restic/restic",
+        "--no-cache",
+        "--no-lock",
+        "--repo",
+        "$OWNED_RUN/proof-repository",
+        "--password-file",
+        "$FIXTURE_PASSWORD_FILE",
+        "init",
+        "--json"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:36.099997+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:39.293341+00:00",
+      "seconds": 3.193351,
+      "stdout": {
+        "raw_sha256": "48de7cc115f7ea39a77be08c81d0d154165725b0b2ec17d752705a997496b2af",
+        "raw_bytes": 168,
+        "public_path": "proof-repository-init.stdout",
+        "public_sha256": "5be31f84eaebed4b4bebcee8865ae2ff835ae68c4f6a9e7f1ee955fa1829f0e0",
+        "public_bytes": 146,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "proof-repository-init.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "proof-repository-neutral-key",
+      "argv": [
+        "$OWNED_RUN/tools/restic/restic",
+        "--no-cache",
+        "--no-lock",
+        "--repo",
+        "$OWNED_RUN/proof-repository",
+        "--password-file",
+        "$FIXTURE_PASSWORD_FILE",
+        "key",
+        "add",
+        "--host",
+        "synthetic-offhost-app",
+        "--user",
+        "synthetic",
+        "--new-password-file",
+        "$FIXTURE_PASSWORD_FILE"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:39.294204+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:43.836813+00:00",
+      "seconds": 4.542628,
+      "stdout": {
+        "raw_sha256": "e36d44cfe9ee0658138ef43133c18770672242df2a137a9c131e1298ab9a2c80",
+        "raw_bytes": 87,
+        "public_path": "proof-repository-neutral-key.stdout",
+        "public_sha256": "e36d44cfe9ee0658138ef43133c18770672242df2a137a9c131e1298ab9a2c80",
+        "public_bytes": 87,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "proof-repository-neutral-key.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "proof-repository-verify-key",
+      "argv": [
+        "$OWNED_RUN/tools/restic/restic",
+        "--no-cache",
+        "--no-lock",
+        "--repo",
+        "$OWNED_RUN/proof-repository",
+        "--password-file",
+        "$FIXTURE_PASSWORD_FILE",
+        "--key-hint",
+        "a714b3d0f45c8323940fa8f631bb9a9934fbde0f268206ef05d705d67e308fbb",
+        "snapshots",
+        "--json"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:43.837741+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:44.346457+00:00",
+      "seconds": 0.508733,
+      "stdout": {
+        "raw_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "raw_bytes": 3,
+        "public_path": "proof-repository-verify-key.stdout",
+        "public_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+        "public_bytes": 3,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "proof-repository-verify-key.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "proof-repository-remove-initial-key",
+      "argv": [
+        "$OWNED_RUN/tools/restic/restic",
+        "--no-cache",
+        "--no-lock",
+        "--repo",
+        "$OWNED_RUN/proof-repository",
+        "--password-file",
+        "$FIXTURE_PASSWORD_FILE",
+        "--key-hint",
+        "a714b3d0f45c8323940fa8f631bb9a9934fbde0f268206ef05d705d67e308fbb",
+        "key",
+        "remove",
+        "38f2744019d4fcdabbb6168ee265a1c6d86ea2dc6b6f0e0d4498dd84e286348e"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:44.347407+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:45.095065+00:00",
+      "seconds": 0.747675,
+      "stdout": {
+        "raw_sha256": "f7f1ca26d24122205fde00731f4afa92f9ecced09ceba4aa619762a5802264b4",
+        "raw_bytes": 77,
+        "public_path": "proof-repository-remove-initial-key.stdout",
+        "public_sha256": "f7f1ca26d24122205fde00731f4afa92f9ecced09ceba4aa619762a5802264b4",
+        "public_bytes": 77,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "proof-repository-remove-initial-key.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "encrypt-native-proof",
+      "argv": [
+        "$OWNED_RUN/tools/restic/restic",
+        "--no-cache",
+        "--no-lock",
+        "--repo",
+        "$OWNED_RUN/proof-repository",
+        "--password-file",
+        "$FIXTURE_PASSWORD_FILE",
+        "backup",
+        "--host",
+        "synthetic-offhost-app",
+        "--json",
+        "$OWNED_RUN/proof-input"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:45.096147+00:00",
+      "timeout_seconds": 180,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:46.108692+00:00",
+      "seconds": 1.012561,
+      "stdout": {
+        "raw_sha256": "d7b081df33eb2d9c1be9408a5ef668285fa65566f915cb924bee8b75c0728671",
+        "raw_bytes": 703,
+        "public_path": "encrypt-native-proof.stdout",
+        "public_sha256": "d7b081df33eb2d9c1be9408a5ef668285fa65566f915cb924bee8b75c0728671",
+        "public_bytes": 703,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "encrypt-native-proof.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "check-encrypted-proof",
+      "argv": [
+        "$OWNED_RUN/tools/restic/restic",
+        "--no-cache",
+        "--no-lock",
+        "--repo",
+        "$OWNED_RUN/proof-repository",
+        "--password-file",
+        "$FIXTURE_PASSWORD_FILE",
+        "check",
+        "--read-data"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:24:46.109726+00:00",
+      "timeout_seconds": 180,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:24:46.623149+00:00",
+      "seconds": 0.513439,
+      "stdout": {
+        "raw_sha256": "519b580db41d7223cc5c81b17ffc8b4f36d9e8260b5e391afe97cef15bcdbb14",
+        "raw_bytes": 157,
+        "public_path": "check-encrypted-proof.stdout",
+        "public_sha256": "519b580db41d7223cc5c81b17ffc8b4f36d9e8260b5e391afe97cef15bcdbb14",
+        "public_bytes": 157,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "check-encrypted-proof.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    }
+  ],
+  "started_at_utc": "2026-09-20T22:24:36.010072+00:00",
+  "provenance_type": "local-integration",
+  "plan_sha256": "ba247c289d3f542491de15fddf6dd46de1822399b9f6967a5c44c0d8b3d24ffe",
+  "cleanup": [],
+  "limitations": [
+    "Synthetic application usability only; no private user database, production recovery, client rebinding, reboot or whole-stack claim.",
+    "Exact snapshots created by the source job are frozen before destination execution; this does not retroactively qualify old private app-state archives.",
+    "Separate jobs and distinct boot identities support fresh-host separation; no independent administrative trust domain or account-loss recovery claim.",
+    "Sequential app snapshots are not one cross-application atomic transaction.",
+    "Selected source tests are distinct from the composed cross-host fixture and from actual destination acceptance.",
+    "Native applications run with owned paths and filtered environments on disposable runners; no general OS filesystem sandbox claim.",
+    "No token-saving claim; provider usage is not measured."
+  ],
+  "encrypted_proof": {
+    "manifest_sha256": "56a14bac499da9a717b7451f73cccb33ea640f7c88bcc66c896d61f81111caa4",
+    "envelope_sha256": "fc08ed2caaab0b9a03ed495395f56df2a2e54825c626085d78e55620f0bdbdb2"
+  },
+  "finished_at_utc": "2026-09-20T22:24:46.630061+00:00"
+}

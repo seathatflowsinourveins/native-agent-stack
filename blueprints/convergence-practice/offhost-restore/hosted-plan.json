@@ -8,7 +8,8 @@
     "Probe asserts the whole /home mount is absent, avoiding a personal-looking runner path in public source.",
     "Preserve failed hosted run35536387838. Separate negative-key file from commands/<label> directories; regression uses actual initialization and exact unchanged ciphertext.",
     "Run seven selected unchanged pinned upstream restic tests with upstream-selected Go1.25.10, separately typed source-built upstream evidence; private-key transfer fixture remains local acceptance.",
-    "Record attempted command, scoped cwd, timestamps, duration and launch errors before propagating missing/denied executable failures; correct official CI line reference to149-153."
+    "Record attempted command, scoped cwd, timestamps, duration and launch errors before propagating missing/denied executable failures; correct official CI line reference to149-153.",
+    "Refresh only the prospective workflow binding after PR26 native-output tee logging and PR31 independently qualified Action pins. Accepted run35537533416 retains its original execution revision and hosted-plan digest; no new recovery execution is claimed."
   ],
   "changed_sources_since_preparation": [
     {
@@ -29,7 +30,7 @@
     {
       "path": ".github/workflows/native-offhost-restore.yml",
       "preparation_sha256": "24a495d0d66e50f30b3a87d8b18efe2d6db282811637af6aba97a5ca2b3dd569",
-      "hosted_sha256": "a9c7c95034206b338a7a4a5dd5f8731d51a24c9e3a75f0faad46fc787a4e8eca"
+      "hosted_sha256": "91ecb7bdc3bcc139e9b2574c1bbe164ada48c9e31971a4920f4d41d37fcedf03"
     }
   ],
   "frozen_sources": [
@@ -87,7 +88,7 @@
     },
     {
       "path": ".github/workflows/native-offhost-restore.yml",
-      "sha256": "a9c7c95034206b338a7a4a5dd5f8731d51a24c9e3a75f0faad46fc787a4e8eca"
+      "sha256": "91ecb7bdc3bcc139e9b2574c1bbe164ada48c9e31971a4920f4d41d37fcedf03"
     },
     {
       "path": "blueprints/convergence-practice/offhost-restore/upstream_tests.py",

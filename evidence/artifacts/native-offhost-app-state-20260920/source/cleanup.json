@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "phase": "cleanup",
+  "status": "passed",
+  "commands": [],
+  "started_at_utc": "2026-09-20T22:24:16.618253+00:00",
+  "provenance_type": "local-integration",
+  "plan_sha256": "ba247c289d3f542491de15fddf6dd46de1822399b9f6967a5c44c0d8b3d24ffe",
+  "cleanup": [],
+  "limitations": [
+    "Synthetic application usability only; no private user database, production recovery, client rebinding, reboot or whole-stack claim.",
+    "Exact snapshots created by the source job are frozen before destination execution; this does not retroactively qualify old private app-state archives.",
+    "Separate jobs and distinct boot identities support fresh-host separation; no independent administrative trust domain or account-loss recovery claim.",
+    "Sequential app snapshots are not one cross-application atomic transaction.",
+    "Selected source tests are distinct from the composed cross-host fixture and from actual destination acceptance.",
+    "Native applications run with owned paths and filtered environments on disposable runners; no general OS filesystem sandbox claim.",
+    "No token-saving claim; provider usage is not measured."
+  ],
+  "checks": {
+    "private_password_removed": true,
+    "owned_runtime_removed": true,
+    "scope": "This job-owned prefix; encrypted proof and reports intentionally retained.",
+    "prior_unencrypted_raw_evidence_removed": true
+  },
+  "finished_at_utc": "2026-09-20T22:24:18.266630+00:00"
+}

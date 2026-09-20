@@ -1,0 +1,24 @@
+{
+  "disk_after": [
+    2049,
+    8937727
+  ],
+  "disk_before": [
+    2049,
+    8937727
+  ],
+  "events": {
+    "after_observed": 397.308576603,
+    "before_observed": 267.236965705,
+    "postboot_ssh_started": 397.308578597,
+    "reboot_requested": 267.236967548
+  },
+  "qemu_after": [
+    3150,
+    "11533"
+  ],
+  "qemu_before": [
+    3150,
+    "11533"
+  ]
+}

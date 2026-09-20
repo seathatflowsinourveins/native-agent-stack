@@ -1,0 +1,1 @@
+go test -count=1 -run '^TestRetryCommand($|_)' -timeout 12m -v ./internal/cmd

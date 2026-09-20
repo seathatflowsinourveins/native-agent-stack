@@ -1,0 +1,13 @@
+{
+  "boot_id": "synthetic-id-c7afcc7ae422da92",
+  "checkpoint_sha256": "59cb2038939b9cd2840eeaed6618634cad75ffe0f9a3b689a44f420f7847a1d0",
+  "claim_sha256": "b2845c6042555a2d116bbea41631666e3eed78a03a8b94615d1fe00c5f70a837",
+  "completed_sha256": "382717ea740e3d3dbb68f704b2581baa6f8d4b6292c83328a06d2ec44a435376",
+  "disk_token": "e5d2f8f802d329b33731da6509d486b8ccff545357d7fe0dd6c5bf0b84d5f747",
+  "effect_count": 1,
+  "filesystem_uuid": "synthetic-id-b1cde6acdb113a29",
+  "interrupted_status": "aborted",
+  "machine_id_sha256": "3ef3a3ed8950f9b70f2348a630510d2cffe3b52d36c208d96d6d33dbe6fb88c9",
+  "native_status": "succeeded",
+  "run_id": "native-service-reboot-fixture"
+}

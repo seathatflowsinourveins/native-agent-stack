@@ -1,0 +1,744 @@
+{
+  "schema_version": 1,
+  "phase": "upstream",
+  "status": "passed",
+  "commands": [
+    {
+      "id": "memory-git-init",
+      "argv": [
+        "git",
+        "init",
+        "--quiet",
+        "$OWNED_RUN/upstream-memory"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:15:42.568544+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:15:42.572061+00:00",
+      "seconds": 0.003516,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-git-init.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-git-init.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "memory-git-remote",
+      "argv": [
+        "git",
+        "remote",
+        "add",
+        "origin",
+        "https://github.com/akitaonrails/ai-memory.git"
+      ],
+      "cwd": "$OWNED_RUN/upstream-memory",
+      "started_at_utc": "2026-09-20T22:15:42.573026+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:15:42.574820+00:00",
+      "seconds": 0.001793,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-git-remote.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-git-remote.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "memory-git-fetch",
+      "argv": [
+        "git",
+        "fetch",
+        "--quiet",
+        "--depth",
+        "1",
+        "origin",
+        "353841d91618d20b110b208de284a74d0b960379"
+      ],
+      "cwd": "$OWNED_RUN/upstream-memory",
+      "started_at_utc": "2026-09-20T22:15:42.575889+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:15:43.336458+00:00",
+      "seconds": 0.760585,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-git-fetch.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-git-fetch.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "memory-git-checkout",
+      "argv": [
+        "git",
+        "checkout",
+        "--quiet",
+        "--detach",
+        "FETCH_HEAD"
+      ],
+      "cwd": "$OWNED_RUN/upstream-memory",
+      "started_at_utc": "2026-09-20T22:15:43.337906+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:15:43.424759+00:00",
+      "seconds": 0.08686,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-git-checkout.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-git-checkout.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "memory-git-head",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "$OWNED_RUN/upstream-memory",
+      "started_at_utc": "2026-09-20T22:15:43.426097+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:15:43.427690+00:00",
+      "seconds": 0.001592,
+      "stdout": {
+        "raw_sha256": "8226a33c226ef0434f92cd6414bd9e60e9b5fc4a42b3177ac483985aefe9ef9f",
+        "raw_bytes": 41,
+        "public_path": "memory-git-head.stdout",
+        "public_sha256": "8226a33c226ef0434f92cd6414bd9e60e9b5fc4a42b3177ac483985aefe9ef9f",
+        "public_bytes": 41,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-git-head.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "qdrant-git-init",
+      "argv": [
+        "git",
+        "init",
+        "--quiet",
+        "$OWNED_RUN/upstream-qdrant"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:15:43.429606+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:15:43.432643+00:00",
+      "seconds": 0.003036,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-git-init.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-git-init.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "qdrant-git-remote",
+      "argv": [
+        "git",
+        "remote",
+        "add",
+        "origin",
+        "https://github.com/qdrant/qdrant.git"
+      ],
+      "cwd": "$OWNED_RUN/upstream-qdrant",
+      "started_at_utc": "2026-09-20T22:15:43.433982+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:15:43.435720+00:00",
+      "seconds": 0.001737,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-git-remote.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-git-remote.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "qdrant-git-fetch",
+      "argv": [
+        "git",
+        "fetch",
+        "--quiet",
+        "--depth",
+        "1",
+        "origin",
+        "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de"
+      ],
+      "cwd": "$OWNED_RUN/upstream-qdrant",
+      "started_at_utc": "2026-09-20T22:15:43.437098+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:15:44.712269+00:00",
+      "seconds": 1.275184,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-git-fetch.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-git-fetch.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "qdrant-git-checkout",
+      "argv": [
+        "git",
+        "checkout",
+        "--quiet",
+        "--detach",
+        "FETCH_HEAD"
+      ],
+      "cwd": "$OWNED_RUN/upstream-qdrant",
+      "started_at_utc": "2026-09-20T22:15:44.713942+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:15:45.869134+00:00",
+      "seconds": 1.155201,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-git-checkout.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-git-checkout.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "qdrant-git-head",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "$OWNED_RUN/upstream-qdrant",
+      "started_at_utc": "2026-09-20T22:15:45.870814+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:15:45.872389+00:00",
+      "seconds": 0.001574,
+      "stdout": {
+        "raw_sha256": "3fa7d852cf7b6280cb6f08f15fe33ab57f01e14324aa0e07d225d3a3a1b53d35",
+        "raw_bytes": 41,
+        "public_path": "qdrant-git-head.stdout",
+        "public_sha256": "3fa7d852cf7b6280cb6f08f15fe33ab57f01e14324aa0e07d225d3a3a1b53d35",
+        "public_bytes": 41,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-git-head.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "gnu-tar-prerequisite",
+      "argv": [
+        "tar",
+        "--version"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:15:45.875901+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:15:45.877269+00:00",
+      "seconds": 0.001367,
+      "stdout": {
+        "raw_sha256": "b112e5578260c103cafae7150e33b8fe1b5d0720a158d88be5ea8f6d9d26f478",
+        "raw_bytes": 313,
+        "public_path": "gnu-tar-prerequisite.stdout",
+        "public_sha256": "b112e5578260c103cafae7150e33b8fe1b5d0720a158d88be5ea8f6d9d26f478",
+        "public_bytes": 313,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "gnu-tar-prerequisite.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "gzip-prerequisite",
+      "argv": [
+        "gzip",
+        "--version"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:15:45.878968+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:15:45.879683+00:00",
+      "seconds": 0.000714,
+      "stdout": {
+        "raw_sha256": "6306841e5a220e1e2d85228651946ef2522dbd4512efcc4f15ef8a585b2f85eb",
+        "raw_bytes": 330,
+        "public_path": "gzip-prerequisite.stdout",
+        "public_sha256": "6306841e5a220e1e2d85228651946ef2522dbd4512efcc4f15ef8a585b2f85eb",
+        "public_bytes": 330,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "gzip-prerequisite.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "rust-version",
+      "argv": [
+        "rustc",
+        "--version"
+      ],
+      "cwd": "$OWNED_RUN/upstream-memory",
+      "started_at_utc": "2026-09-20T22:15:45.881461+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:15:45.892665+00:00",
+      "seconds": 0.011212,
+      "stdout": {
+        "raw_sha256": "f4d034f5660bb49f22bfcba3f3445be67e25b704c193ff421b53863b4faee148",
+        "raw_bytes": 36,
+        "public_path": "rust-version.stdout",
+        "public_sha256": "f4d034f5660bb49f22bfcba3f3445be67e25b704c193ff421b53863b4faee148",
+        "public_bytes": 36,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "rust-version.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "memory-upstream-backup",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "ai-memory-mcp",
+        "--lib",
+        "integration::admin_backup::",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "$OWNED_RUN/upstream-memory",
+      "started_at_utc": "2026-09-20T22:15:45.894699+00:00",
+      "timeout_seconds": 1500,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:20:42.949592+00:00",
+      "seconds": 297.054904,
+      "stdout": {
+        "raw_sha256": "f355a556eacb8fb4f5052dbf1e21cdb097c577ca83b79cececbee4085ea260f6",
+        "raw_bytes": 443,
+        "public_path": "memory-upstream-backup.stdout",
+        "public_sha256": "f355a556eacb8fb4f5052dbf1e21cdb097c577ca83b79cececbee4085ea260f6",
+        "public_bytes": 443,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "5487d0fe9581a064ae17aa15ca1d3d8da7d2ae29851cb8d77745f55d1fca6541",
+        "raw_bytes": 20800,
+        "public_path": "memory-upstream-backup.stderr",
+        "public_sha256": "ee19b864e94ef8ea96841e190434a9dbf23027ba29e167f735831f9fef9bd890",
+        "public_bytes": 20646,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "memory-upstream-restore",
+      "argv": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "ai-memory-cli",
+        "--lib",
+        "commands::restore::tests::",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "$OWNED_RUN/upstream-memory",
+      "started_at_utc": "2026-09-20T22:20:42.953806+00:00",
+      "timeout_seconds": 1500,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:23:46.898811+00:00",
+      "seconds": 183.945013,
+      "stdout": {
+        "raw_sha256": "a08bdc7dec44f8ff3582dbb551f99ac67994540b4ce313166cffd51611d85dc7",
+        "raw_bytes": 639,
+        "public_path": "memory-upstream-restore.stdout",
+        "public_sha256": "a08bdc7dec44f8ff3582dbb551f99ac67994540b4ce313166cffd51611d85dc7",
+        "public_bytes": 639,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "f6cd85814ec9300ada085790f1b9483039a82cb7ba8390bc9d73385f252b424c",
+        "raw_bytes": 6097,
+        "public_path": "memory-upstream-restore.stderr",
+        "public_sha256": "b295f2d8745f648bf781e757168dd41d1a231f60fb66ce9cdff6b6da9b749067",
+        "public_bytes": 5877,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "uv-version",
+      "argv": [
+        "uv",
+        "--version"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:23:46.901677+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:23:46.906107+00:00",
+      "seconds": 0.004431,
+      "stdout": {
+        "raw_sha256": "2f2df388eb4b5b1646471309defdcd48e0b340eff2b49f3bfb014590e9365162",
+        "raw_bytes": 10,
+        "public_path": "uv-version.stdout",
+        "public_sha256": "2f2df388eb4b5b1646471309defdcd48e0b340eff2b49f3bfb014590e9365162",
+        "public_bytes": 10,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "uv-version.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "qdrant-lock-check",
+      "argv": [
+        "uv",
+        "--project",
+        "$OWNED_RUN/upstream-qdrant/tests",
+        "lock",
+        "--check"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:23:46.908176+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:23:47.135428+00:00",
+      "seconds": 0.227263,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-lock-check.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "ee8125e138f8ca3d72684fb8ff1c14ea9b74f956479faa44a79f4723901a69f9",
+        "raw_bytes": 121,
+        "public_path": "qdrant-lock-check.stderr",
+        "public_sha256": "ee8125e138f8ca3d72684fb8ff1c14ea9b74f956479faa44a79f4723901a69f9",
+        "public_bytes": 121,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "qdrant-dependencies",
+      "argv": [
+        "uv",
+        "--project",
+        "$OWNED_RUN/upstream-qdrant/tests",
+        "sync",
+        "--frozen"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:23:47.137824+00:00",
+      "timeout_seconds": 300,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:23:48.028527+00:00",
+      "seconds": 0.890713,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-dependencies.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "6dfad73dbd969ee4d9af0eb1e7a0da16dc8754d428d5f5d3df8820e8802e100c",
+        "raw_bytes": 2450,
+        "public_path": "qdrant-dependencies.stderr",
+        "public_sha256": "6dfad73dbd969ee4d9af0eb1e7a0da16dc8754d428d5f5d3df8820e8802e100c",
+        "public_bytes": 2450,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "qdrant-private-network-tests",
+      "argv": [
+        "sudo",
+        "--non-interactive",
+        "/usr/bin/env",
+        "-i",
+        "PATH=$OWNED_RUN/python-tools/bin:/opt/hostedtoolcache/Python/3.13.15/x64/bin:/opt/hostedtoolcache/Python/3.13.15/x64:/snap/bin:$RUNNER_HOME/.local/bin:/opt/pipx_bin:$RUNNER_HOME/.cargo/bin:$RUNNER_HOME/.config/composer/vendor/bin:/usr/local/.ghcup/bin:$RUNNER_HOME/.dotnet/tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin",
+        "HOME=$OWNED_RUN/home",
+        "LANG=C.UTF-8",
+        "PARENT_NETWORK_NAMESPACE=net:[4026531833]",
+        "unshare",
+        "--net",
+        "--",
+        "$OWNED_RUN/python-tools/bin/python3",
+        "$CHECKOUT/blueprints/convergence-practice/offhost-app-state/network.py",
+        "1001",
+        "1001",
+        "$OWNED_RUN/python-tools/bin/python3",
+        "$CHECKOUT/blueprints/convergence-practice/offhost-app-state/run.py",
+        "qdrant-tests",
+        "--root",
+        "$OWNED_RUN"
+      ],
+      "cwd": "$OWNED_RUN",
+      "started_at_utc": "2026-09-20T22:23:48.031202+00:00",
+      "timeout_seconds": 330,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:23:55.407663+00:00",
+      "seconds": 7.376467,
+      "stdout": {
+        "raw_sha256": "e6e05ac7394a1ca54cfc8007215a854d8695338193406c5bfee89b2497f79de0",
+        "raw_bytes": 46,
+        "public_path": "qdrant-private-network-tests.stdout",
+        "public_sha256": "e6e05ac7394a1ca54cfc8007215a854d8695338193406c5bfee89b2497f79de0",
+        "public_bytes": 46,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-private-network-tests.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "memory-source-unchanged",
+      "argv": [
+        "git",
+        "diff",
+        "--exit-code"
+      ],
+      "cwd": "$OWNED_RUN/upstream-memory",
+      "started_at_utc": "2026-09-20T22:23:55.410393+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:23:55.458844+00:00",
+      "seconds": 0.048505,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-source-unchanged.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "memory-source-unchanged.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    },
+    {
+      "id": "qdrant-source-unchanged",
+      "argv": [
+        "git",
+        "diff",
+        "--exit-code"
+      ],
+      "cwd": "$OWNED_RUN/upstream-qdrant",
+      "started_at_utc": "2026-09-20T22:23:55.461692+00:00",
+      "timeout_seconds": 120,
+      "launched": true,
+      "exit_code": 0,
+      "timed_out": false,
+      "finished_at_utc": "2026-09-20T22:23:55.496648+00:00",
+      "seconds": 0.034965,
+      "stdout": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-source-unchanged.stdout",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      },
+      "stderr": {
+        "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "raw_bytes": 0,
+        "public_path": "qdrant-source-unchanged.stderr",
+        "public_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "public_bytes": 0,
+        "sanitization": "Owned root, checkout, runner home/hostname/username and known fixture-secret substitution; exact original streams retained only in encrypted proof."
+      }
+    }
+  ],
+  "started_at_utc": "2026-09-20T22:15:42.567546+00:00",
+  "provenance_type": "upstream-unmodified-selected-tests",
+  "plan_sha256": "ba247c289d3f542491de15fddf6dd46de1822399b9f6967a5c44c0d8b3d24ffe",
+  "cleanup": [],
+  "limitations": [
+    "Synthetic application usability only; no private user database, production recovery, client rebinding, reboot or whole-stack claim.",
+    "Exact snapshots created by the source job are frozen before destination execution; this does not retroactively qualify old private app-state archives.",
+    "Separate jobs and distinct boot identities support fresh-host separation; no independent administrative trust domain or account-loss recovery claim.",
+    "Sequential app snapshots are not one cross-application atomic transaction.",
+    "Selected source tests are distinct from the composed cross-host fixture and from actual destination acceptance.",
+    "Native applications run with owned paths and filtered environments on disposable runners; no general OS filesystem sandbox claim.",
+    "No token-saving claim; provider usage is not measured."
+  ],
+  "accepted_upstream_cases": {
+    "memory": 10,
+    "qdrant": 4
+  },
+  "finished_at_utc": "2026-09-20T22:23:55.499262+00:00"
+}
