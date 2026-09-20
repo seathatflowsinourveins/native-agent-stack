@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "id": "upstream-native-tools-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20T05:11:29.429Z",
+  "component_ids": [
+    "beads",
+    "skills-ref",
+    "otel-tui"
+  ],
+  "claim": "Three supplemental upstream tools installed on the source Linux/WSL host: Beads persisted task claims and dependency transitions, skills-ref validated and rendered a selected skill, and otel-tui ingested and displayed one synthetic loopback trace.",
+  "limitations": [
+    "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host.",
+    "Bounded native CLI/TUI acceptance on Linux/WSL; no new native Codex or Claude provider task was run for these additions.",
+    "Beads used one owned Git fixture with embedded Dolt, explicit task scope, skipped agent-instruction generation and skipped hooks. It does not replace ai-memory.",
+    "skills-ref is upstream's reference/demo implementation; successful portable-format validation does not certify production client extensions or tool semantics.",
+    "otel-tui received one synthetic local trace; no production or native-provider telemetry session was evaluated and no persistent exporter was installed.",
+    "None of these three tools exposes a verified cumulative token-savings counter. Exact causal lifetime provider savings remain null.",
+    "Public command forms substitute portable variables for private host paths; private raw operation logs are not published."
+  ],
+  "data": {
+    "components": [
+      {
+        "component_id": "beads",
+        "repository": "https://github.com/gastownhall/beads",
+        "version": "1.3.0",
+        "source_commit": "f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
+        "installation": "Official @beads/bd@1.3.0 npm package and its upstream release postinstall; verified installed binary matches checksum-verified release archive.",
+        "archive_sha256": "2f92b904ecf35b607e44dc5c39229173af69c54f1183e8d709f1773540cdcf3b",
+        "binary_sha256": "fb387d28410390eb9f0ef81f242a0c789c632f0024f58fe6a8b02d3f06ea20ef",
+        "version_output": "bd version 1.3.0 (f45b249ce: HEAD@f45b249ce6b4)",
+        "native_operations": 23,
+        "bd_operations": 22,
+        "assertions_passed": 10,
+        "issues_created_and_closed": 3,
+        "checks": [
+          "Empty initial ready queue",
+          "Created task appears ready",
+          "Claim persists across processes",
+          "Closed task leaves ready queue",
+          "Closed status persists across processes",
+          "Dependency excludes dependent from ready queue",
+          "Closing predecessor unblocks dependent",
+          "Final ready queue is empty",
+          "All three issues persist as closed",
+          "Fixture agent instruction files absent"
+        ],
+        "failed_e2e_assertions": 0,
+        "project_adoption": {
+          "status": "Selected project queue initialized after fixture acceptance",
+          "init_command": "BEADS_DIR=\"$PROJECT_ROOT/.beads\" bd init --stealth --skip-agents --skip-hooks --non-interactive --prefix work",
+          "init_exit_code": 0,
+          "ready_exit_code": 0,
+          "initial_ready_queue": [],
+          "agent_instructions_and_hooks_preserved": true,
+          "native_git_exclusion_updated": true
+        },
+        "native_lifetime_token_savings": null,
+        "retained_setup_events": [
+          "npm initially withheld the package postinstall; supported per-package approval and rebuild completed.",
+          "Optional Context Mode file inspection refused the installed package because the tool's configured root was the plugin directory; no access controls changed."
+        ]
+      },
+      {
+        "component_id": "skills-ref",
+        "repository": "https://github.com/agentskills/agentskills",
+        "version": "0.1.0",
+        "source_commit": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+        "lockfile_sha256": "c2d1b9a8638e81f763f04928e8107741886160b6bda2b8cb9784336bebeec94a",
+        "installation": "Official source checkout and uv sync --locked in skills-ref.",
+        "checks": [
+          {
+            "command": "skills-ref validate \"$SKILL_DIRECTORY\"",
+            "exit_code": 0,
+            "result": "Valid skill"
+          },
+          {
+            "command": "skills-ref read-properties \"$SKILL_DIRECTORY\"",
+            "exit_code": 0,
+            "result": "Expected task-checkpoint name and complete description"
+          },
+          {
+            "command": "skills-ref to-prompt \"$SKILL_DIRECTORY\"",
+            "exit_code": 0,
+            "result": "Complete available_skills XML with expected name, description and location"
+          }
+        ],
+        "native_lifetime_token_savings": null
+      },
+      {
+        "component_id": "otel-tui",
+        "repository": "https://github.com/ymtdzzz/otel-tui",
+        "version": "0.7.5",
+        "source_commit": "3b25779a083469b732e3c628b4a412ee05cf9948",
+        "installation": "Official Linux x86_64 release archive verified against upstream checksum file.",
+        "archive_sha256": "dd10bfa12b6713a2d51d7a094644ff61a2467856fc93d3acecfe741a124ca896",
+        "binary_sha256": "634d8b78848d513b047cf640972d364cbaeea37189c1951768a1aab3f66a36ca",
+        "checks": [
+          {
+            "name": "release checksum",
+            "passed": true
+          },
+          {
+            "name": "version",
+            "passed": true,
+            "result": "otel-tui version 0.7.5"
+          },
+          {
+            "name": "loopback receiver",
+            "passed": true,
+            "command": "otel-tui --host 127.0.0.1 --grpc 24317 --http 24318"
+          },
+          {
+            "name": "OTLP HTTP ingestion",
+            "passed": true,
+            "http_status": 200,
+            "result": {
+              "partialSuccess": {}
+            }
+          },
+          {
+            "name": "native TUI rendered trace",
+            "passed": true,
+            "service": "native-upstream-acceptance",
+            "span_count": 1,
+            "latency": "10ms"
+          },
+          {
+            "name": "owned process shutdown",
+            "passed": true,
+            "exit_code": 0
+          }
+        ],
+        "retained_failures": [
+          {
+            "operation": "initial curl invocation",
+            "result": "Context Mode hook redirected the operation before any HTTP request; corrected with its JavaScript fetch."
+          }
+        ],
+        "native_lifetime_token_savings": null
+      }
+    ],
+    "exact_causal_lifetime_provider_tokens_saved": null
+  },
+  "host_scope": {
+    "profile": "source-host-linux-wsl",
+    "platform": "Linux/WSL",
+    "identity": "Private source-host identity omitted",
+    "import_limit": "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
+  }
+}

@@ -7,7 +7,7 @@ per-repository token-saving value.
 
 **Dated decision catalog: September 20, 2026.** The north star is native, token-efficient research → reproducible backtesting → Alpaca paper automation. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
 
-The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **505 repository identities**, including all 342 public stars and 163 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 1,051 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
+The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **505 repository identities**, including all 342 public stars and 163 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 1,054 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
 
 The newest [security-identity review](security-identity-review.md) examines Alpaca,
 Zipline, Qlib, NautilusTrader, LEAN and WRDS. It separates engine identity/lifetime

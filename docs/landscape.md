@@ -30,12 +30,21 @@ The timestamp-bearing GitHub star refresh found 337 repositories. WeKnora and Te
 
 - **WeKnora 0.8.0:** document warehouse, maintained Wiki and nine remote connectors with scheduled sync. No local folder watcher was established. Add it for a real document corpus/UI/connector requirement; SocratiCode already covers local code updates.
 - **Tech Leads Club agent-skills:** selective skill source with MIT code and separately licensed CC-BY 4.0 maintainer skill content. Existing selected upstream skills suffice without another bulk catalog.
-- **Dagu 2.16.6 / Beads:** durable workflows or dependency queues when the work requires them. A normal native agent session is not evidence of a persistent job system.
-- **otel-tui 0.7.5:** useful for an actual OTLP producer and tracing investigation; no global telemetry exporter was added.
+- **Dagu 2.16.6 / Beads 1.3.0:** use for tasks that need durable workflows or dependency queues. The September 20 Beads installation passed a scoped native lifecycle, claim persistence and dependency blocking/unblocking; it skips extra agent instructions/hooks and leaves ai-memory responsible for durable knowledge.
+- **otel-tui 0.7.5:** now installed from the checksum-verified upstream release. Its native TUI received and displayed a synthetic loopback trace, then closed; production/native-provider telemetry and a persistent exporter were not part of that acceptance.
+- **Agent Skills skills-ref 0.1.0:** installed from the official pinned source with `uv sync --locked`; validation, properties and prompt metadata passed on a selected skill. Upstream calls this a reference/demo implementation; it does not certify native client extension semantics.
+- **ai-memory 2.3.2 maintenance:** native version, running executable, supported status, scoped search and configured direct MCP passed after an upstream backup and checksum-verified release replacement. Existing client hooks/routing remain intact; previous provider-task receipts retain their original version.
 - **Hindsight, EverOS, MemPalace, OpenViking, Cognee, Claude-mem, Mem0, Graphiti and LightRAG:** different archive, consolidation, resource-memory or graph designs. Many require extra models/accounts/databases. They remain explicit alternatives, not simultaneous default capture layers.
 - **Syft 1.52.0 / OSV-Scanner 2.6.0:** current supply-chain candidates for a project with dependency/package artifacts. This publication has stdlib validation and upstream recipes, not a vendored runtime environment. No vulnerability-free certification is inferred from its secret scan.
 
 The full candidate manifest includes native prospective commands and their prerequisites. They are marked unexecuted where appropriate.
+
+The [supplemental native receipt](../evidence/receipts/upstream-native-tools-20260920.json)
+and [memory maintenance receipt](../evidence/receipts/native-ai-memory-maintenance-20260920.json)
+record the September 20 additions on their source Linux/WSL host separately from
+the earlier landscape review. Importing these receipts does not qualify macOS,
+VelaNext or another host. No lifetime token-savings counter or universal ranking
+is inferred from adoption.
 
 ## Recent models and runtime compatibility
 

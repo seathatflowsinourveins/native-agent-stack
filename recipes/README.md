@@ -66,7 +66,7 @@ Commands assume the selected upstream executable is on the current shell's PATH.
 | `affaan-m/ECC` · `dd6ee538aee0f548d4a6b520118f875431fd749e` | `git clone https://github.com/affaan-m/ECC.git "$STACK_HOME/tools/ECC"`, then `git -C "$STACK_HOME/tools/ECC" checkout --detach dd6ee538aee0f548d4a6b520118f875431fd749e` | Optional reference: read only `skills/search-first/SKILL.md` or `skills/iterative-retrieval/SKILL.md` when useful. `git rev-parse HEAD` verifies the source pin, not a runtime. Do not install the whole catalog. |
 | `agent-browser` · `0.38.1` | `npm install --global --prefix "$STACK_HOME/tools/agent-browser-0.38.1" agent-browser@0.38.1`; upstream `agent-browser install` downloads its browser; `--with-deps` additionally installs OS dependencies | [Browser workflow](#browser-workflow). Official skill content: `agent-browser skills get core`; load on demand. |
 | `agentsview` · `0.43.0` | Official [kenn-io/agentsview v0.43.0](https://github.com/kenn-io/agentsview/releases/tag/v0.43.0) archive; select the host asset through `gh release view v0.43.0 --repo kenn-io/agentsview --json assets`, then the archive procedure | [History workflow](#history-and-usage). Explicit authorized archive scope is required; a blank archive is not evidence of zero historical usage. |
-| `ai-memory` · `2.3.1` | Official [akitaonrails/ai-memory v2.3.1](https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.1) archive; `gh release view v2.3.1 --repo akitaonrails/ai-memory --json assets`; retain its native hooks and packaging files | [Memory setup and workflow](#project-memory). Native scoped page write/search/read, with no embedding or LLM provider. |
+| `ai-memory` · `2.3.2` | Official [akitaonrails/ai-memory v2.3.2](https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2) archive; `gh release view v2.3.2 --repo akitaonrails/ai-memory --json assets`; retain its native hooks and packaging files | [Memory setup and workflow](#project-memory). Back up existing data privately before replacing a running version; native status/search and direct MCP passed for this update. Earlier model receipts retain their original scope. |
 | `ast-grep` · `0.45.3` | `npm install --global --prefix "$STACK_HOME/tools/ast-grep-0.45.3" @ast-grep/cli@0.45.3` | `ast-grep run --lang javascript --pattern 'function $NAME($$$ARGS) { $$$BODY }' --json=compact --stdin < evidence/artifacts/usage-report.source.txt`. `--stdin` is intentional because this JavaScript fixture has a `.txt` suffix. |
 | `ccusage` · `20.0.23` | `npm install --global --prefix "$STACK_HOME/tools/ccusage-20.0.23" ccusage@20.0.23` | [History and usage](#history-and-usage). Read existing logs; never manufacture provider usage by replaying a receipt. |
 | `claude-code` · `2.1.278` | Download the [official native installer](https://code.claude.com/docs/en/setup) with `curl -fsSL https://claude.ai/install.sh -o "$STACK_HOME/downloads/claude-install.sh"`; inspect it, then `bash "$STACK_HOME/downloads/claude-install.sh" 2.1.278` | `claude --version` verifies installation. A real [native client pass](#native-client-acceptance) requires the user's normal signed-in account. Native auto-update can subsequently change this installed version. |
@@ -250,6 +250,101 @@ ai-memory read-page --workspace local --project native-agent-stack \
 ```
 
 Static HTTP clients pass `workspace` and `project` together on every scoped MCP call. Namespace selection is not user authorization, and a shared mutable active-project pointer is not safe scope isolation. Session-aware upstream clients may derive scope natively; do not assume every bridge supports it.
+
+## Supplemental native task and inspection tools
+
+The September 20 additions use upstream programs in the same native shell for
+Codex and Claude. Install once in the selected prefix and keep its executable
+directory on each client's PATH. Use these tools when their task applies; startup
+does not require another installation or acceptance campaign. The
+[dated receipt](../evidence/receipts/upstream-native-tools-20260920.json) records
+the tested scope and retained failures on the source Linux/WSL host. These
+portable recipes do not establish installation or acceptance on macOS, VelaNext
+or another host; a selected host needs its own relevant check. These tools have
+no verified cumulative token-savings counters.
+
+### Beads task dependencies
+
+Install the upstream npm package in an owned prefix:
+
+```sh
+npm install --prefix "$STACK_HOME/tools/beads-1.3.0" @beads/bd@1.3.0
+"$STACK_HOME/tools/beads-1.3.0/node_modules/.bin/bd" version
+```
+
+The package's postinstall downloads the upstream release. If the package manager
+reports that it withheld that specific script, inspect the upstream package and
+use its supported per-package approval before
+`npm rebuild @beads/bd --foreground-scripts` in the prefix. Do not disable script
+protection globally.
+The tested release archive `beads_1.3.0_linux_amd64.tar.gz` has SHA-256
+`2f92b904ecf35b607e44dc5c39229173af69c54f1183e8d709f1773540cdcf3b`.
+
+For a selected project that needs persistent dependency and claim state, set
+`BEADS_DIR` to its owned task directory and run from that project's Git root:
+
+```sh
+export BEADS_DIR="$PROJECT_ROOT/.beads"
+bd init --stealth --skip-agents --skip-hooks --non-interactive --prefix work
+bd create "Complete the selected task" --type task --json
+bd ready --json
+bd update "$RETURNED_TASK_ID" --claim --json
+bd show "$RETURNED_TASK_ID" --json
+bd close "$RETURNED_TASK_ID" --reason "Acceptance recorded" --json
+```
+
+Use actual returned IDs. `bd dep add "$DEPENDENT_ID" "$PREDECESSOR_ID" --json`
+keeps the dependent out of `bd ready` until its predecessor closes. The tested
+initialization uses embedded Dolt and changes only the selected task directory
+and Git exclusion state; it skips generated agent instructions and hooks.
+ai-memory remains the shared durable knowledge and handoff layer.
+
+### Agent Skills reference validator
+
+Install the official source and its locked environment:
+
+```sh
+git clone https://github.com/agentskills/agentskills.git "$STACK_HOME/tools/agentskills"
+git -C "$STACK_HOME/tools/agentskills" checkout --detach 69ef37e9424c0a7ea9dd2293b559e43ec8176379
+cd "$STACK_HOME/tools/agentskills/skills-ref"
+uv sync --locked
+uv run skills-ref validate "$SKILL_DIRECTORY"
+uv run skills-ref read-properties "$SKILL_DIRECTORY"
+uv run skills-ref to-prompt "$SKILL_DIRECTORY"
+```
+
+The pin packages skills-ref 0.1.0. Upstream labels this a reference/demo
+implementation. Its portable-format validation does not certify native Codex or
+Claude extensions, loaded-tool behavior, or production client semantics. Use it
+on the skill being edited, alongside that client's own validation where needed.
+
+### otel-tui telemetry inspection
+
+Download the official v0.7.5 Linux asset and checksum file:
+
+```sh
+gh release download v0.7.5 --repo ymtdzzz/otel-tui \
+  -p otel-tui_Linux_x86_64.tar.gz -p otel-tui_0.7.5_checksums.txt \
+  --dir "$STACK_HOME/downloads/otel-tui-0.7.5"
+```
+
+Verify the matching checksum using the archive procedure above, then install
+the extracted `otel-tui` in the owned native prefix. The tested archive SHA-256
+is `dd10bfa12b6713a2d51d7a094644ff61a2467856fc93d3acecfe741a124ca896`.
+`otel-tui --version` reports the pin.
+
+For a deliberate local diagnostic session, choose unused loopback ports:
+
+```sh
+otel-tui --host 127.0.0.1 --grpc 14317 --http 14318
+```
+
+Configure only the selected producer to send OTLP to that endpoint. For an
+existing compatible export, use
+`otel-tui --host 127.0.0.1 --from-json-file "$OTEL_JSON"`.
+Close the owned session after inspection. This is an on-demand
+viewer; it does not replace the existing collector/backends or install global
+client telemetry settings.
 
 ## Retained Context Mode
 

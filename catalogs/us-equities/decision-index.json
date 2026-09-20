@@ -164,10 +164,10 @@
     "repositories": 505,
     "public_star_repositories": 342,
     "beyond_public_stars": 163,
-    "references": 1052,
+    "references": 1055,
     "repositories_by_record_type": {
       "catalog_card": 147,
-      "component_record": 54,
+      "component_record": 57,
       "legacy_candidate": 19,
       "public_star": 342,
       "research_supplement": 103,
@@ -482,6 +482,7 @@
       "aliases": [],
       "public_star": true,
       "record_types": [
+        "component_record",
         "legacy_candidate",
         "public_star",
         "star_review"
@@ -505,7 +506,13 @@
           "kind": "legacy_candidate",
           "path": "manifests/candidates.json",
           "pointer": "/candidates/14",
-          "decision": "Demo-only portable-format linter; native client extensions differ. Existing official Codex quick_validate helper already passed for selected task-checkpoint skills."
+          "decision": "On-demand reference/demo portable-format linting, properties and prompt metadata; does not certify production native client extensions."
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/55",
+          "id": "skills-ref"
         }
       ]
     },
@@ -4462,6 +4469,7 @@
       "aliases": [],
       "public_star": true,
       "record_types": [
+        "component_record",
         "legacy_candidate",
         "public_star",
         "star_review"
@@ -4485,7 +4493,13 @@
           "kind": "legacy_candidate",
           "path": "manifests/candidates.json",
           "pointer": "/candidates/12",
-          "decision": "conditional backlog tool; defer installation until durable dependency/claimable-task queue is a real requirement"
+          "decision": "Use for selected-project persistent task dependencies and claims; ai-memory remains durable knowledge. Initialization skips agent instructions and hooks."
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/54",
+          "id": "beads"
         }
       ]
     },
@@ -12957,6 +12971,7 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
+        "component_record",
         "legacy_candidate"
       ],
       "references": [
@@ -12964,7 +12979,13 @@
           "kind": "legacy_candidate",
           "path": "manifests/candidates.json",
           "pointer": "/candidates/18",
-          "decision": "Conditional: use a deliberate local instrumented session or deterministic workflow when runtime latency/events are being diagnosed; no persistent exporter proposed."
+          "decision": "Use for explicit local telemetry diagnosis; no persistent exporter or provider-session claim."
+        },
+        {
+          "kind": "component_record",
+          "path": "manifests/stack.json",
+          "pointer": "/components/56",
+          "id": "otel-tui"
         }
       ]
     },

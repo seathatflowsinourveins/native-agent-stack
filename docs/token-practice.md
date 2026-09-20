@@ -3,13 +3,14 @@
 Recorded September 20, 2026. Read this guide on demand when selecting a context
 lane, interpreting native counters, or designing a measured comparison.
 
-The dated token-practice review covered **52 component records** and **504
-repository identities: 342 public stars and 162 beyond stars, with 1,037 typed
-references**. Later additions appear in the [current explorer](ecosystem/index.html).
-The earlier audit and full-catalog TOON receipt retain the 502-repository
-input that was actually measured. These are bounded catalog counts, not universal SOTA, 52 successful
-E2E runs, or savings from every repository. Supporting runtimes and historical
-alternative installations retain separate scope.
+The current catalog has **57 component records** and **505 repository identities:
+342 public stars and 163 beyond stars, with 1,055 typed references**. The dated
+token-practice review retains its **52-component** scope and its then-current
+504-repository, 1,037-reference catalog. The earlier audit and full-catalog TOON
+receipt retain the 502-repository input actually measured. These counts do not
+establish a universal ranking, successful full-stack runs for every component,
+or savings from every repository. Supporting runtimes and historical alternative
+installations retain separate scope.
 
 ## Default practice
 
@@ -174,6 +175,43 @@ entries are not implied executable deployments. Preserve failed quality gates
 when importing new matched-task or retrieval evaluations.
 
 ## Coverage and future acceptance
+
+### Supplemental native adoption on September 20
+
+The [supplemental receipt](../evidence/receipts/upstream-native-tools-20260920.json)
+adds three upstream tools installed on the recorded source Linux/WSL host to the
+current catalog. Importing this receipt does not qualify macOS, VelaNext or another
+host. Beads 1.3.0 completed
+23 native operations and ten checks, including persistent claims, dependency
+blocking/unblocking and closing all three fixture issues. skills-ref 0.1.0 at
+commit `69ef37e9424c0a7ea9dd2293b559e43ec8176379` validated a selected skill,
+returned its expected properties and rendered its complete prompt metadata.
+otel-tui 0.7.5 accepted one OTLP trace over loopback HTTP and displayed its service,
+single span and 10 ms latency; its owned process then closed successfully.
+
+Use the [upstream native recipes](../recipes/README.md#supplemental-native-task-and-inspection-tools)
+from either client's ordinary native shell. Beads is available for tasks that
+need a persistent dependency queue; initialize only the selected project with
+agent-instruction and hook generation skipped. skills-ref is explicitly a
+reference/demo validator and does not certify native client extensions. otel-tui
+is an on-demand local viewer with no persistent producer configuration implied.
+The three tools do not expose verified lifetime token-savings counters; their
+installation and functional results are not evidence of provider savings.
+
+The separate [ai-memory 2.3.2 maintenance receipt](../evidence/receipts/native-ai-memory-maintenance-20260920.json)
+records an official checksum-verified update on that source Linux/WSL host after
+a private upstream backup. It does not upgrade or qualify another runtime.
+The running service executable, supported native status, scoped search and direct
+MCP status passed. Existing hooks, client configuration and project scope were
+preserved. Earlier model-task and 52-component study receipts remain unchanged;
+these additions did not repeat provider trials or rewrite historical baselines.
+
+The selected zizmor 1.30.1 analyzer also gained a [native Linux follow-up](../evidence/receipts/native-linux-zizmor-20260920.json):
+official isolated `uv tool install`, zero findings on the current workflows,
+expected exit 14 and three findings on an inert unsafe fixture, and two native
+acceptance tests with no skips. Its earlier Mac/CI receipts remain dated. This
+closes command availability on the recorded source Linux/WSL host without adding
+a component or savings claim. Other hosts retain their separately dated evidence.
 
 The [coverage receipt](../evidence/receipts/token-practice-coverage-20260920.json)
 preserves all 52 classifications and 70 captured operations: 66 expected process

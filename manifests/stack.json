@@ -80,7 +80,7 @@
     {
       "id": "ai-memory",
       "repository": "https://github.com/akitaonrails/ai-memory",
-      "version": "2.3.1",
+      "version": "2.3.2",
       "license": "MIT",
       "profile": "core",
       "role": "Shared scoped Markdown decisions and automatic heuristic cross-client handoffs",
@@ -96,13 +96,15 @@
         "native-observability-followup",
         "ai-memory-native-state-recovery-20260919",
         "native-memory-lifecycle-20260919",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "native-ai-memory-maintenance-20260920"
       ],
       "upstream_sources": [
-        "https://github.com/akitaonrails/ai-memory"
+        "https://github.com/akitaonrails/ai-memory",
+        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2"
       ],
-      "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
+      "source_pin": "353841d91618d20b110b208de284a74d0b960379",
+      "freshness": "Official 2.3.2 release and supported native status/search/direct MCP checked 2026-09-20. Older native-model receipts retain their original version and scope. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import."
     },
     {
       "id": "ast-grep",
@@ -620,9 +622,9 @@
         "component-history",
         "desktop-cli-workflows",
         "qmd-bm25-retrieval-20260919",
-        "native-research-efficiency-20260920",
         "token-practice-artifacts-20260920",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "native-research-efficiency-20260920"
       ],
       "upstream_sources": [
         "https://github.com/tobi/qmd/releases/tag/v2.8.3"
@@ -1038,9 +1040,9 @@
         "native-exact-nanosecond-replay-20260919",
         "sec-catalyst-dataset-native-20260920",
         "native-security-identity-20260920",
+        "token-practice-coverage-20260920",
         "native-lifecycle-sample-20260920",
-        "synthetic-catalyst-contract-20260920",
-        "token-practice-coverage-20260920"
+        "synthetic-catalyst-contract-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1249,9 +1251,9 @@
         "native-edgartools-catalyst-20260919",
         "native-sec-access-resolution-20260919",
         "sec-catalyst-dataset-native-20260920",
-        "native-lifecycle-sample-20260920",
         "token-practice-artifacts-20260920",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "native-lifecycle-sample-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1268,17 +1270,18 @@
       "profile": "supporting",
       "role": "Offline GitHub workflow security analysis with failing fixtures",
       "commands": [
-        "python3 -m unittest -v tests.test_workflow_security"
+        "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\""
       ],
       "evidence_ids": [
-        "native-ci-security-20260920"
+        "native-ci-security-20260920",
+        "native-linux-zizmor-20260920"
       ],
       "upstream_sources": [
         "https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1",
         "https://pypi.org/pypi/zizmor/1.30.1/json"
       ],
       "source_pin": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
-      "freshness": "Release and wheel reviewed2026-09-20; Mac native acceptance scoped to offline regular persona."
+      "freshness": "Native Linux isolated-tool installation and accepted/rejected offline fixtures verified 2026-09-20; earlier Mac and CI receipts retain their separate host scopes."
     },
     {
       "id": "llama-cpp",
@@ -1299,6 +1302,69 @@
         "https://github.com/ggml-org/llama.cpp/blob/59657a613ab0fa4ab327d6c790123dff30bfbd67/tools/server/README.md"
       ],
       "freshness": "Pinned September20 trial after archive digest/attestation/license checks and one actual task. Prerelease chosen for official Linux CUDA artifacts; no native-agent default replacement."
+    },
+    {
+      "id": "beads",
+      "repository": "https://github.com/gastownhall/beads",
+      "version": "1.3.0",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Selected-project persistent task claims and dependency queue",
+      "commands": [
+        "bd ready --json",
+        "bd show \"$RETURNED_TASK_ID\" --json"
+      ],
+      "source_pin": "f45b249ce6b40ba62aecc03949e6371e8f7c79d8",
+      "upstream_sources": [
+        "https://github.com/gastownhall/beads/releases/tag/v1.3.0",
+        "https://github.com/gastownhall/beads/blob/v1.3.0/docs/getting-started/installation.md"
+      ],
+      "evidence_ids": [
+        "upstream-native-tools-20260920"
+      ],
+      "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import."
+    },
+    {
+      "id": "skills-ref",
+      "repository": "https://github.com/agentskills/agentskills",
+      "version": "0.1.0",
+      "license": "Apache-2.0",
+      "profile": "supporting",
+      "role": "On-demand portable Agent Skills reference/demo validation",
+      "commands": [
+        "skills-ref validate \"$SKILL_DIRECTORY\"",
+        "skills-ref read-properties \"$SKILL_DIRECTORY\"",
+        "skills-ref to-prompt \"$SKILL_DIRECTORY\""
+      ],
+      "source_pin": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+      "upstream_sources": [
+        "https://github.com/agentskills/agentskills/tree/69ef37e9424c0a7ea9dd2293b559e43ec8176379/skills-ref"
+      ],
+      "command_scope": "Reference/demo validation of selected portable skill metadata; not production native-client extension semantics.",
+      "evidence_ids": [
+        "upstream-native-tools-20260920"
+      ],
+      "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import."
+    },
+    {
+      "id": "otel-tui",
+      "repository": "https://github.com/ymtdzzz/otel-tui",
+      "version": "0.7.5",
+      "license": "Apache-2.0",
+      "profile": "supporting",
+      "role": "On-demand local OTLP receiver and terminal trace inspection",
+      "commands": [
+        "otel-tui --host 127.0.0.1 --grpc 14317 --http 14318"
+      ],
+      "source_pin": "3b25779a083469b732e3c628b4a412ee05cf9948",
+      "upstream_sources": [
+        "https://github.com/ymtdzzz/otel-tui/releases/tag/v0.7.5"
+      ],
+      "command_scope": "Choose unused loopback ports for an owned diagnostic session and close it afterward; synthetic trace acceptance only.",
+      "evidence_ids": [
+        "upstream-native-tools-20260920"
+      ],
+      "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import."
     }
   ],
   "profiles": [
@@ -1350,7 +1416,10 @@
         "pandas",
         "skfolio",
         "edgartools",
-        "zizmor"
+        "zizmor",
+        "beads",
+        "skills-ref",
+        "otel-tui"
       ]
     },
     {

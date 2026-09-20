@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "id": "native-linux-zizmor-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20T05:21:28.874Z",
+  "component_ids": [
+    "zizmor"
+  ],
+  "claim": "zizmor 1.30.1 installed in an isolated tool environment on the source Linux/WSL host; offline repository workflow scan returned zero findings, while an inert unsafe fixture returned the expected diagnostics and exit code.",
+  "limitations": [
+    "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host.",
+    "Offline regular-persona static analysis only; no online credential-backed checks or workflow execution.",
+    "The official uv package-index installation was used. The installed binary was separately hashed; no independent downloaded wheel archive verification was performed in this host follow-up.",
+    "Earlier Mac and disposable GitHub CI acceptance receipts retain their original host scope.",
+    "No provider task was run and zizmor supplies no verified lifetime token-savings counter."
+  ],
+  "data": {
+    "repository": "https://github.com/zizmorcore/zizmor",
+    "version": "1.30.1",
+    "install_command": "uv tool install zizmor==1.30.1",
+    "install_exit_code": 0,
+    "installed_packages": [
+      "zizmor==1.30.1"
+    ],
+    "binary_sha256": "9be5ac955a59e43a111152ee2e0315d3863866a8df4a15a9be7aaa94af72d74a",
+    "native_version": "zizmor 1.30.1",
+    "upstream_sources": [
+      "https://docs.zizmor.sh/installation/",
+      "https://pypi.org/pypi/zizmor/1.30.1/json"
+    ],
+    "portable_native_scan": "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\"",
+    "checks": [
+      {
+        "name": "published workflow directory",
+        "exit_code": 0,
+        "findings": 0
+      },
+      {
+        "name": "inert unsafe fixture",
+        "exit_code": 14,
+        "findings": 3,
+        "identifiers": [
+          "artipacked",
+          "template-injection",
+          "unpinned-uses"
+        ],
+        "fixture_unchanged": true
+      },
+      {
+        "name": "exact native workflow acceptance tests",
+        "command": "python3 -m unittest discover -s tests -p test_workflow_security.py -v",
+        "passed": 2,
+        "skipped": 0
+      }
+    ],
+    "client_config_preserved": true,
+    "other_tool_environments_preserved": true,
+    "native_lifetime_token_savings": null,
+    "exact_causal_lifetime_provider_tokens_saved": null
+  },
+  "host_scope": {
+    "profile": "source-host-linux-wsl",
+    "platform": "Linux/WSL",
+    "identity": "Private source-host identity omitted",
+    "import_limit": "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
+  }
+}
