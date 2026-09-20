@@ -1,16 +1,17 @@
 # Token practice and measured native results
 
+For a new PC or a separate local ledger, use the [portable upstream counter collector](../tools/token-report/README.md). It produces local JSON/HTML reports, retains failed refreshes and never adds overlapping lifetime snapshots.
+
 Recorded September 20, 2026. Read this guide on demand when selecting a context
 lane, interpreting native counters, or designing a measured comparison.
 
-The current catalog has **57 component records** and **505 repository identities:
-342 public stars and 163 beyond stars, with 1,055 typed references**. The dated
-token-practice review retains its **52-component** scope and its then-current
-504-repository, 1,037-reference catalog. The earlier audit and full-catalog TOON
-receipt retain the 502-repository input actually measured. These counts do not
-establish a universal ranking, successful full-stack runs for every component,
-or savings from every repository. Supporting runtimes and historical alternative
-installations retain separate scope.
+The current selection has **58 component records**. The broader catalog has
+**505 repository identities: 342 public stars and 163 beyond stars, with 1,057
+typed references**. The earlier audit retains its 52-component scope, and the
+full-catalog TOON receipt retains the 502-repository input actually measured.
+These are bounded catalog counts, not a universal ranking, 58 successful full
+E2E runs, or savings from every repository. Supporting runtimes and historical
+alternative installations retain separate scope.
 
 ## Default practice
 
@@ -166,8 +167,10 @@ configured; current Codex practice uses explicit RTK commands. A stale trust ent
 for an absent hook file does not activate it. Per-client hook inventories should
 respect disabled-hook flags and retain unobserved lifecycle paths.
 
-Only RTK, Context Mode and Headroom expose verified native savings-history
-reports in the selected stack. TOON has per-conversion statistics; usage and
+RTK, Context Mode, Headroom and the newly adopted jCodeMunch expose native savings-history
+estimates with different retention and counting rules. jCodeMunch includes repeated
+reads and uses bytes/4; its schema estimate is payload size, not per-request savings.
+TOON has per-conversion statistics; usage and
 telemetry tools report consumption or state. Keep every catalog repository's
 adoption and baseline availability explicit, with unknown values left null.
 Run role-specific acceptance where applicable; guidance and research catalog
@@ -176,12 +179,26 @@ when importing new matched-task or retrieval evaluations.
 
 ## Coverage and future acceptance
 
+The [58-component saturation matrix](token-native-saturation.md) links each
+selected role to installation, integration, functional and lifecycle evidence.
+The focus wave added exact jCodeMunch retrieval, direct upstream Headroom MCP,
+both-native-client project-file/symbol acceptance and explicit sandbox network
+allow/deny fixtures. The [native client receipt](../evidence/receipts/native-token-focus-clients-20260920.json)
+records 101,605 consumed Codex tokens and 151,528 consumed Claude tokens, with
+cache/reasoning subset rules retained. They are acceptance costs, not savings.
+
+jCodeMunch's complete search/source sequence used 861 tokens versus a 5,476-token
+whole file, but exceeded an existing 601-token focused extraction. Headroom's
+direct summary used 19,714 versus 36,625 tokens with exact original recovery
+available; its separate guarded log fixture used 191 versus 26,529 tokens.
+Keep these accepted artifact comparisons and native repeated-use estimates
+separate from all lifetime provider claims. The [upstream recipes](../recipes/README.md)
+show actual install, registration, retrieval and stats commands for future PCs.
+
 ### Supplemental native adoption on September 20
 
 The [supplemental receipt](../evidence/receipts/upstream-native-tools-20260920.json)
-adds three upstream tools installed on the recorded source Linux/WSL host to the
-current catalog. Importing this receipt does not qualify macOS, VelaNext or another
-host. Beads 1.3.0 completed
+adds three installed upstream tools to the current catalog. Beads 1.3.0 completed
 23 native operations and ten checks, including persistent claims, dependency
 blocking/unblocking and closing all three fixture issues. skills-ref 0.1.0 at
 commit `69ef37e9424c0a7ea9dd2293b559e43ec8176379` validated a selected skill,
@@ -199,8 +216,7 @@ The three tools do not expose verified lifetime token-savings counters; their
 installation and functional results are not evidence of provider savings.
 
 The separate [ai-memory 2.3.2 maintenance receipt](../evidence/receipts/native-ai-memory-maintenance-20260920.json)
-records an official checksum-verified update on that source Linux/WSL host after
-a private upstream backup. It does not upgrade or qualify another runtime.
+records an official checksum-verified update after a private upstream backup.
 The running service executable, supported native status, scoped search and direct
 MCP status passed. Existing hooks, client configuration and project scope were
 preserved. Earlier model-task and 52-component study receipts remain unchanged;
@@ -210,8 +226,7 @@ The selected zizmor 1.30.1 analyzer also gained a [native Linux follow-up](../ev
 official isolated `uv tool install`, zero findings on the current workflows,
 expected exit 14 and three findings on an inert unsafe fixture, and two native
 acceptance tests with no skips. Its earlier Mac/CI receipts remain dated. This
-closes command availability on the recorded source Linux/WSL host without adding
-a component or savings claim. Other hosts retain their separately dated evidence.
+closes local command availability without adding a component or savings claim.
 
 The [coverage receipt](../evidence/receipts/token-practice-coverage-20260920.json)
 preserves all 52 classifications and 70 captured operations: 66 expected process

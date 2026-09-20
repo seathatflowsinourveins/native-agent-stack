@@ -860,92 +860,6 @@
       "path": "blueprints/us-equities/identity-readiness/native-receipt.json"
     },
     {
-      "id": "native-lifecycle-sample-20260920",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "edgartools",
-        "duckdb"
-      ],
-      "claim": "Six HTTP200 public documents support three distinct lifecycle claims. Native offline EdgarTools parsing and DuckDB preserve source anchors and exact observation cutoffs:0 historical,0 before first observation,1 at first and3 at last; historical replay remains0. Original availability, permanent identity and historical universe eligibility remain unestablished.",
-      "limitations": [
-        "Three hand-selected cases and six source documents only; not complete historical coverage or an outcome-selected mover dataset.",
-        "Retrospective publisher claims are distinct from when this runtime observed the document. Local available_ns equals observed_ns; original provider revisions and historical as-known eligibility remain unknown.",
-        "Distinct company-stock and ETF documentary scopes support ordered META ticker reuse; no permanent identity crosswalk, continuous ownership intervals or cause of the prior quarantined zero-activity bar.",
-        "Twitter suspension and a Form25 notification do not establish a precise legal delisting instant. Native SEC acceptance text is timezone-naive; its timezone and UTC instant remain unknown.",
-        "Custom bounded transport/qualification adapters call installed upstream APIs. This receipt is not an upstream project benchmark or general filing parser acceptance.",
-        "No new Alpaca requests, broker orders, account resets, paid resources, price/outcome scan or empirical strategy result. Native provider comparison is a separate receipt."
-      ],
-      "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json"
-    },
-    {
-      "id": "synthetic-catalyst-contract-20260920",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "duckdb"
-      ],
-      "claim": "Native DuckDB1.5.5 executed an exact BIGINT availability query on five synthetic observations in a network-disabled process. Thirteen focused standard-library tests exercise threshold, label, timing, units, interval and inspection-registry failures. No empirical trading experiment or new LEAN/skfolio run.",
-      "limitations": [
-        "Protocol thresholds are exploratory choices, not fitted or proven optimal.",
-        "Full feature construction, historical universe/availability, matched controls, fills, cash/corporate-action/margin accounting, statistical inference and promotion are future work.",
-        "The chronological2025reserved calendar requires a complete case-specific inspection registry and is not asserted globally unseen.",
-        "Synthetic labels are independent arithmetic fixtures, not market outcomes or simulated P&L.",
-        "No provider calls, broker orders, new model turn or net token-savings measurement."
-      ],
-      "path": "blueprints/us-equities/catalyst-experiment/receipt.json"
-    },
-    {
-      "id": "native-research-efficiency-20260920",
-      "kind": "native_model_e2e",
-      "component_ids": [
-        "codex",
-        "claude-code",
-        "qmd"
-      ],
-      "claim": "Eight fresh native answer invocations yielded four within-provider task comparisons. All eight semantic grades pass; six answers meet the shared structural and word protocol. Numeric differences are observed sample differences only.",
-      "limitations": [
-        "Only two fixed tasks per provider; no confidence intervals, provider ranking, causal attribution or general savings claim.",
-        "Full corpus is eight selected public project documents, not a comprehensive repository or autonomous research workload.",
-        "Prompts use identical questions/instructions and verbatim common source IDs; different document context lengths are the intended treatment.",
-        "QMD lexical selection was fixed before answers; task B focused omits the separate retrieval-evaluation document, and rubric deductions remain recorded.",
-        "Native default context, system policy, hooks and provider caches are uncontrolled; fresh sessions do not imply cold caches.",
-        "The two Claude full-context answers fail the word protocol, so their numeric differences are not clean protocol-passing matched comparisons.",
-        "Codex task B focused score is 9.5 versus full 10 despite both clearing the predeclared threshold.",
-        "Codex zero-tools enforcement is requested/audited with read-only and deny-all settings, weaker than hard prevention of every MCP call.",
-        "Local supervision does not prove provider-side cancellation; no run timed out.",
-        "This session uses these hosted research worker invocations; it does not establish token savings for the enclosing Desktop conversation or whole ecosystem."
-      ],
-      "path": "blueprints/us-equities/research-efficiency/native-receipt.json"
-    },
-    {
-      "id": "native-ci-security-20260920",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "zizmor"
-      ],
-      "claim": "Native zizmor1.30.1 on macOS accepts the published workflow under offline regular analysis and rejects an inert unsafe fixture with three findings; two executable regression checks pass.",
-      "limitations": [
-        "Offline regular analysis is scoped static evidence, not absence of every vulnerability or signature verification.",
-        "Mac binary and the checksum-locked Linux CI wheel are distinct artifacts; new runner execution is established by its own CI result.",
-        "The unsafe fixture was analyzed but never executed. No model calls, broker actions or savings measurement."
-      ],
-      "path": "blueprints/convergence-practice/ci-security/receipt.json"
-    },
-    {
-      "id": "native-claude-child-patch-20260920",
-      "kind": "native_model_e2e",
-      "component_ids": [
-        "claude-code"
-      ],
-      "claim": "Native Claude Code2.1.278 on Ubuntu24.04 WSL2 used Opus5 through Max for one foreground isolated child repair. Only planner.py changed; all12 frozen visible tests pass independently after8 seed failures.",
-      "limitations": [
-        "One synthetic visible-oracle fixture, not a held-out benchmark, real application or GPU acceptance.",
-        "Ultracode was requested; observed native delegation does not establish dynamic-workflow selection or an OS sandbox.",
-        "Three native usage views retain different scopes; native retries and whole Desktop usage are unknown. No matched model baseline or savings claim.",
-        "Local supervision completed without timeout; provider cancellation, crash recovery and full-host backup were not tested."
-      ],
-      "path": "blueprints/convergence-practice/native-worker/receipt.json"
-    },
-    {
       "id": "token-practice-artifacts-20260920",
       "kind": "artifact_measurement",
       "component_ids": [
@@ -1119,62 +1033,90 @@
       "path": "evidence/receipts/token-practice-gap-followup-20260920.json"
     },
     {
-      "id": "native-dagu-job-recovery-20260920",
+      "id": "native-lifecycle-sample-20260920",
       "kind": "native_cli_e2e",
       "component_ids": [
-        "dagu"
+        "edgartools",
+        "duckdb"
       ],
-      "claim": "Native Dagu2.16.6 cancelled and retried only an unfinished final step on Mac and WSL, retaining one unchanged checkpoint and passing the12test oracle before and after.",
+      "claim": "Six HTTP200 public documents support three distinct lifecycle claims. Native offline EdgarTools parsing and DuckDB preserve source anchors and exact observation cutoffs:0 historical,0 before first observation,1 at first and3 at last; historical replay remains0. Original availability, permanent identity and historical universe eligibility remain unestablished.",
       "limitations": [
-        "Deterministic synthetic job recovery only; no model/provider interruption, host reboot or independent-host restore qualification.",
-        "Initial native schema failure and earlier Mac success are retained; no savings comparison."
+        "Three hand-selected cases and six source documents only; not complete historical coverage or an outcome-selected mover dataset.",
+        "Retrospective publisher claims are distinct from when this runtime observed the document. Local available_ns equals observed_ns; original provider revisions and historical as-known eligibility remain unknown.",
+        "Distinct company-stock and ETF documentary scopes support ordered META ticker reuse; no permanent identity crosswalk, continuous ownership intervals or cause of the prior quarantined zero-activity bar.",
+        "Twitter suspension and a Form25 notification do not establish a precise legal delisting instant. Native SEC acceptance text is timezone-naive; its timezone and UTC instant remain unknown.",
+        "Custom bounded transport/qualification adapters call installed upstream APIs. This receipt is not an upstream project benchmark or general filing parser acceptance.",
+        "No new Alpaca requests, broker orders, account resets, paid resources, price/outcome scan or empirical strategy result. Native provider comparison is a separate receipt."
       ],
-      "path": "evidence/receipts/native-dagu-job-recovery-20260920.json"
+      "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json"
     },
     {
-      "id": "native-codex-session-recovery-20260920",
+      "id": "synthetic-catalyst-contract-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "duckdb"
+      ],
+      "claim": "Native DuckDB1.5.5 executed an exact BIGINT availability query on five synthetic observations in a network-disabled process. Thirteen focused standard-library tests exercise threshold, label, timing, units, interval and inspection-registry failures. No empirical trading experiment or new LEAN/skfolio run.",
+      "limitations": [
+        "Protocol thresholds are exploratory choices, not fitted or proven optimal.",
+        "Full feature construction, historical universe/availability, matched controls, fills, cash/corporate-action/margin accounting, statistical inference and promotion are future work.",
+        "The chronological2025reserved calendar requires a complete case-specific inspection registry and is not asserted globally unseen.",
+        "Synthetic labels are independent arithmetic fixtures, not market outcomes or simulated P&L.",
+        "No provider calls, broker orders, new model turn or net token-savings measurement."
+      ],
+      "path": "blueprints/us-equities/catalyst-experiment/receipt.json"
+    },
+    {
+      "id": "native-research-efficiency-20260920",
       "kind": "native_model_e2e",
       "component_ids": [
-        "codex"
+        "codex",
+        "claude-code",
+        "qmd"
       ],
-      "claim": "Native Codex on Mac interrupted an owned pending dynamic tool, reconnected through a new app-server and resumed the same native thread/session to finalize an unchanged single checkpoint.",
+      "claim": "Eight fresh native answer invocations yielded four within-provider task comparisons. All eight semantic grades pass; six answers meet the shared structural and word protocol. Numeric differences are observed sample differences only.",
       "limitations": [
-        "One synthetic two-turn fixture on the installed Mac bundled alpha; no general distributed exactly-once guarantee.",
-        "No arbitrary shell/MCP descendant, provider cancellation, power loss or independent-host restore test.",
-        "Native cumulative token categories counted once; retries, billing and enclosing coordinator usage unknown; no savings claim."
+        "Only two fixed tasks per provider; no confidence intervals, provider ranking, causal attribution or general savings claim.",
+        "Full corpus is eight selected public project documents, not a comprehensive repository or autonomous research workload.",
+        "Prompts use identical questions/instructions and verbatim common source IDs; different document context lengths are the intended treatment.",
+        "QMD lexical selection was fixed before answers; task B focused omits the separate retrieval-evaluation document, and rubric deductions remain recorded.",
+        "Native default context, system policy, hooks and provider caches are uncontrolled; fresh sessions do not imply cold caches.",
+        "The two Claude full-context answers fail the word protocol, so their numeric differences are not clean protocol-passing matched comparisons.",
+        "Codex task B focused score is 9.5 versus full 10 despite both clearing the predeclared threshold.",
+        "Codex zero-tools enforcement is requested/audited with read-only and deny-all settings, weaker than hard prevention of every MCP call.",
+        "Local supervision does not prove provider-side cancellation; no run timed out.",
+        "This session uses these hosted research worker invocations; it does not establish token savings for the enclosing Desktop conversation or whole ecosystem."
       ],
-      "path": "evidence/receipts/native-codex-session-recovery-20260920.json"
+      "path": "blueprints/us-equities/research-efficiency/native-receipt.json"
     },
     {
-      "id": "native-gpu-patch-20260920",
-      "kind": "native_model_e2e",
+      "id": "native-ci-security-20260920",
+      "kind": "native_cli_e2e",
       "component_ids": [
-        "llama-cpp"
+        "zizmor"
       ],
-      "claim": "One pinned Qwen3.8-27B Q4_K_M local CUDA partial-offload repair passed independent source review and all12 original planner tests on WSL RTX4090.",
+      "claim": "Native zizmor1.30.1 on macOS accepts the published workflow under offline regular analysis and rejects an inert unsafe fixture with three findings; two executable regression checks pass.",
       "limitations": [
-        "One visible fixture, one trial, configured32GPUlayers; exact layer placement count unavailable at native log verbosity.",
-        "Generation took179.191seconds near the180second cap. This is not an interactive default or frontier-model comparison.",
-        "Minimum whole-device sampled freeVRAM8223MiB includes other allocations; not an isolated process-peak benchmark.",
-        "Native model and archives were downloaded and hash-verified; archive attestations verified. CUDA licensing reviewed for local use, not redistribution.",
-        "No host recovery, concurrent serving, provider billing or whole-task savings qualification."
+        "Offline regular analysis is scoped static evidence, not absence of every vulnerability or signature verification.",
+        "Mac binary and the checksum-locked Linux CI wheel are distinct artifacts; new runner execution is established by its own CI result.",
+        "The unsafe fixture was analyzed but never executed. No model calls, broker actions or savings measurement."
       ],
-      "path": "evidence/receipts/native-gpu-patch-20260920.json"
+      "path": "blueprints/convergence-practice/ci-security/receipt.json"
     },
     {
-      "id": "native-claude-session-recovery-20260920",
+      "id": "native-claude-child-patch-20260920",
       "kind": "native_model_e2e",
       "component_ids": [
         "claude-code"
       ],
-      "claim": "One native Claude Opus5 session on WSL was interrupted during an owned pending Bash wait and resumed under the same native session ID to finalize one unchanged checkpoint.",
+      "claim": "Native Claude Code2.1.278 on Ubuntu24.04 WSL2 used Opus5 through Max for one foreground isolated child repair. Only planner.py changed; all12 frozen visible tests pass independently after8 seed failures.",
       "limitations": [
-        "One synthetic task with explicit Opus5/Ultracode; no general model, child-agent or cross-host guarantee.",
-        "Native SIGINT and owned-process retirement do not prove remote provider cancellation or billing cessation.",
-        "The two terminal usage views reconcile to30441tokens; resumed cumulative modelUsage is not an additional total. Native retries, billing and enclosing coordinator/reviewer usage remain unknown.",
-        "The executed runner is frozen separately from later private-log boundary and cleanup hardening; no new model attempt was run for those fixes."
+        "One synthetic visible-oracle fixture, not a held-out benchmark, real application or GPU acceptance.",
+        "Ultracode was requested; observed native delegation does not establish dynamic-workflow selection or an OS sandbox.",
+        "Three native usage views retain different scopes; native retries and whole Desktop usage are unknown. No matched model baseline or savings claim.",
+        "Local supervision completed without timeout; provider cancellation, crash recovery and full-host backup were not tested."
       ],
-      "path": "evidence/receipts/native-claude-session-recovery-20260920.json"
+      "path": "blueprints/convergence-practice/native-worker/receipt.json"
     },
     {
       "id": "upstream-native-tools-20260920",
@@ -1246,6 +1188,168 @@
         "identity": "Private source-host identity omitted",
         "import_limit": "Recorded source-host Linux/WSL execution only; importing this receipt does not qualify installation or behavior on macOS, VelaNext or another host."
       }
+    },
+    {
+      "id": "native-dagu-job-recovery-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "dagu"
+      ],
+      "claim": "Native Dagu2.16.6 cancelled and retried only an unfinished final step on Mac and WSL, retaining one unchanged checkpoint and passing the12test oracle before and after.",
+      "limitations": [
+        "Deterministic synthetic job recovery only; no model/provider interruption, host reboot or independent-host restore qualification.",
+        "Initial native schema failure and earlier Mac success are retained; no savings comparison."
+      ],
+      "path": "evidence/receipts/native-dagu-job-recovery-20260920.json"
+    },
+    {
+      "id": "native-codex-session-recovery-20260920",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Native Codex on Mac interrupted an owned pending dynamic tool, reconnected through a new app-server and resumed the same native thread/session to finalize an unchanged single checkpoint.",
+      "limitations": [
+        "One synthetic two-turn fixture on the installed Mac bundled alpha; no general distributed exactly-once guarantee.",
+        "No arbitrary shell/MCP descendant, provider cancellation, power loss or independent-host restore test.",
+        "Native cumulative token categories counted once; retries, billing and enclosing coordinator usage unknown; no savings claim."
+      ],
+      "path": "evidence/receipts/native-codex-session-recovery-20260920.json"
+    },
+    {
+      "id": "native-gpu-patch-20260920",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "llama-cpp"
+      ],
+      "claim": "One pinned Qwen3.8-27B Q4_K_M local CUDA partial-offload repair passed independent source review and all12 original planner tests on WSL RTX4090.",
+      "limitations": [
+        "One visible fixture, one trial, configured32GPUlayers; exact layer placement count unavailable at native log verbosity.",
+        "Generation took179.191seconds near the180second cap. This is not an interactive default or frontier-model comparison.",
+        "Minimum whole-device sampled freeVRAM8223MiB includes other allocations; not an isolated process-peak benchmark.",
+        "Native model and archives were downloaded and hash-verified; archive attestations verified. CUDA licensing reviewed for local use, not redistribution.",
+        "No host recovery, concurrent serving, provider billing or whole-task savings qualification."
+      ],
+      "path": "evidence/receipts/native-gpu-patch-20260920.json"
+    },
+    {
+      "id": "native-claude-session-recovery-20260920",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "One native Claude Opus5 session on WSL was interrupted during an owned pending Bash wait and resumed under the same native session ID to finalize one unchanged checkpoint.",
+      "limitations": [
+        "One synthetic task with explicit Opus5/Ultracode; no general model, child-agent or cross-host guarantee.",
+        "Native SIGINT and owned-process retirement do not prove remote provider cancellation or billing cessation.",
+        "The two terminal usage views reconcile to30441tokens; resumed cumulative modelUsage is not an additional total. Native retries, billing and enclosing coordinator/reviewer usage remain unknown.",
+        "The executed runner is frozen separately from later private-log boundary and cleanup hardening; no new model attempt was run for those fixes."
+      ],
+      "path": "evidence/receipts/native-claude-session-recovery-20260920.json"
+    },
+    {
+      "id": "token-native-retained-functional-20260920",
+      "path": "evidence/receipts/token-native-retained-functional-20260920.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "context-hub",
+        "headroom",
+        "mcp-inspector",
+        "promptfoo",
+        "worktrunk"
+      ],
+      "claim": "Previously executed native functional operations are now linked to selected components: Context Hub search/retrieval, Inspector stdio arithmetic, deterministic promptfoo evaluation, Worktrunk disposable worktree lifecycle and a local guard using upstream Headroom APIs.",
+      "limitations": [
+        "Retrospective publication of retained September 20 evidence; these operations were not rerun by this documentation update.",
+        "The source summary and private raw operation captures were retained and reviewed on the original host. Their public hashes bind the source but do not let CI reproduce unpublished raw data.",
+        "Headroom was exercised through a local guarded adapter to upstream APIs, not a direct upstream compression CLI or provider proxy; no native client configuration changed.",
+        "Inspector launched the pinned npm Context Mode CLI for arithmetic only. It does not certify the complete client plugin, hooks, project-file scope or current desktop connection.",
+        "promptfoo used a local echo provider with two assertions and zero model tokens, not an external model evaluation. Worktrunk operated only in a disposable repository with hooks disabled.",
+        "Context Hub candidate output grew by 85 tokens for the retained query. These per-artifact comparisons are not cumulative or causal provider savings; exact lifetime provider savings remain null."
+      ]
+    },
+    {
+      "id": "native-jcodemunch-20260920",
+      "path": "evidence/receipts/native-jcodemunch-20260920.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "jcodemunch-mcp"
+      ],
+      "claim": "Official jCodeMunch 1.108.319 installed and a deliberately scoped local code index returned the exact requested function; the complete search-plus-source response was measured against both whole-file and existing focused-source baselines.",
+      "limitations": [
+        "Single bounded code-reading task, not a native provider A/B trial.",
+        "Whole-file comparison is beneficial; focused existing source extraction is cheaper for this known symbol, shown separately.",
+        "Lifetime upstream estimate includes repeat validation calls and must not be deduplicated into causal lifetime provider savings.",
+        "receipt CLI explicitly scanned only an empty owned transcript directory; no historical client transcript traversal.",
+        "No client hooks, paid models, cloud keys, watchers or automatic index expansion enabled.",
+        "Upstream dual-use license retained; this acceptance does not establish eligibility for commercial deployment.",
+        "Native client registration and later provider task acceptance are separate evidence; these direct MCP operations do not establish both-client task acceptance."
+      ]
+    },
+    {
+      "id": "native-headroom-mcp-20260920",
+      "path": "evidence/receipts/native-headroom-mcp-20260920.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "headroom"
+      ],
+      "claim": "Official Headroom 0.37.0 MCP extra installed in an isolated Python 3.13 tool environment; direct compression, exact retrieval and scoped native statistics passed on owned synthetic artifacts while the prior exact-recovery guard remained available.",
+      "limitations": [
+        "Owned synthetic acceptance artifacts demonstrate artifact reduction, not lifetime production or provider-token savings",
+        "MCP summary is not a lossless replacement of the original; its exact full retrieval consumes the original token count",
+        "Upstream Headroom CLI has no compress subcommand; on-demand compression/retrieval is exposed through MCP or SDK",
+        "No automatic agent-traffic interception was configured",
+        "Global native upstream savings ledger remains0; isolated fixture ledger is not merged into it",
+        "No new provider task or automatic native-client traffic interception is established by this direct MCP fixture."
+      ]
+    },
+    {
+      "id": "native-token-focus-clients-20260920",
+      "path": "evidence/receipts/native-token-focus-clients-20260920.json",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "context-mode",
+        "jcodemunch-mcp"
+      ],
+      "claim": "One bounded task in each signed-in native client successfully read a project document through Context Mode and retrieved the exact selected implementation through jCodeMunch; all six selected MCP calls completed.",
+      "limitations": [
+        "Existing Desktop process retains its original loaded MCP connection; fresh native Codex verifies corrected project scope.",
+        "Only selected MCP actions exercised; lifecycle compaction and interactive HUD are separate.",
+        "Native usage includes prompts, tool schemas, cache reads and reasoning; it is consumed usage, not avoided lifetime tokens.",
+        "This is functional integration acceptance with normal configured clients, not a randomized or matched token-savings A/B comparison.",
+        "Raw private prompts, client streams, account identifiers and host paths are not published."
+      ]
+    },
+    {
+      "id": "native-sandbox-network-20260920",
+      "path": "evidence/receipts/native-sandbox-network-20260920.json",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "sandbox-runtime"
+      ],
+      "claim": "Native sandbox-runtime 0.0.77 allowed one configured loopback HTTP request and blocked both explicit-deny and empty-allowlist requests before they reached the owned fixture server.",
+      "limitations": [
+        "HTTP proxy path tested on this Linux/WSL host",
+        "Immediate client startup can race the upstream local proxy; the tested command uses bounded connection-refused retries",
+        "Does not establish TLS, SOCKS, DNS rebinding, IPv6, remote-host, or general sandbox-escape coverage",
+        "Bounded local proxy-policy acceptance, not a full security certification or proof that every native client command is sandboxed."
+      ]
+    },
+    {
+      "id": "native-claude-hud-interactive-20260920",
+      "path": "evidence/receipts/native-claude-hud-interactive-20260920.json",
+      "kind": "compatibility_attempt",
+      "component_ids": [
+        "claude-hud"
+      ],
+      "claim": "A bounded real native Claude terminal launch reached onboarding before the conversation UI, so configured interactive HUD rendering remains unverified despite existing native authentication.",
+      "limitations": [
+        "The earlier synthetic HUD renderer acceptance remains valid only for its fixture; it is not live interactive rendering.",
+        "No model prompt, login route, account action, permission override, model change or statusLine change was used to bypass onboarding.",
+        "This is an unresolved interactive boundary, not an installation failure or a successful live HUD claim."
+      ]
     }
   ],
   "files": [
@@ -1258,6 +1362,11 @@
       "path": ".github/requirements-ci.lock",
       "sha256": "e475964596b4439d069891ef3f194efe7f8eea9fe1c9478d944001644fcab083",
       "bytes": 283
+    },
+    {
+      "path": ".github/workflows/token-report.yml",
+      "sha256": "17a3f226fd2e91e398f9e634679d509029b65d3d4f2d1441be9bf41a079b5097",
+      "bytes": 509
     },
     {
       "path": ".github/workflows/validate.yml",
@@ -1276,8 +1385,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "10523a601aac0bbd01180a73ab2b7650f289b25b78f2f07034bcbd8172ed634f",
-      "bytes": 6482
+      "sha256": "f4d8a40d0031a2f0bdf3d860174cb8f8e491c3a13780aa942a8c60a5f6bd99bf",
+      "bytes": 7483
     },
     {
       "path": "CLAUDE.md",
@@ -1291,8 +1400,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "278b23a607ddc7ee28acc1a47c46152906bc3875cb954807b9e68a8022cca372",
-      "bytes": 15156
+      "sha256": "57ce132cb40dc856a7656cd090c00a493a5430ded6af2304086d83e2613177cf",
+      "bytes": 15656
     },
     {
       "path": "adoption/README.md",
@@ -1306,8 +1415,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "d05874a6bf679bc0e6e7d2ccfeb38eb8e2ab6bac27f4cbb7af3546e1445d746f",
-      "bytes": 12023
+      "sha256": "07231d533d9b34c0f234ed7cd0ac014f8bb1d901eb472bfb244b80d2ab2a9f3a",
+      "bytes": 12652
     },
     {
       "path": "adoption/paired/README.md",
@@ -1858,6 +1967,11 @@
       "path": "blueprints/convergence-practice/validation.json",
       "sha256": "2781bc66707fad526ae0798546cc4b6738f03964d6e4702dabd94f9f4172cf9d",
       "bytes": 2009
+    },
+    {
+      "path": "blueprints/token-native-focus/saturation-audit.json",
+      "sha256": "bd8ee6a6d86b6adef89964ca10e63f93ae00d4f9265eff45acab4547ad871ce8",
+      "bytes": 180593
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -3146,7 +3260,7 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "sha256": "63097f101b52ccae8225e945d7595ecc68ce4a44838765f318a392670b17d3fc",
+      "sha256": "90583e29464de7ec2907b67a8ab5c9f588b8bcc582c2bc93b17fb2009bf5df3b",
       "bytes": 12889
     },
     {
@@ -3291,8 +3405,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "a4769138c738693fffc1ef56019d5fc0706a19bcd5f97d93a2f778ce594b998c",
-      "bytes": 383461
+      "sha256": "bc67e1517607afc1da19018b1b8b38289f36e16c4df7790fa6de1e30ee7d640b",
+      "bytes": 384150
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -3451,8 +3565,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "3e9f0f4bc013ac98018461283e30c8ac2b82bb0c9e9d746a5c325786492ba19a",
-      "bytes": 1595659
+      "sha256": "3935eec60f3962d17a7ff1b327c06914d28e23cec6a974d78411b05bdfb0bf6d",
+      "bytes": 1616475
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -3461,8 +3575,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "7655b69067d3fcd3d89fcc1809cedee38f2824e67b5a7b47daf475fe336e75db",
-      "bytes": 16475
+      "sha256": "b56662904a00857948d1650bf66f650068a899059bf3af0b1ed071ae39b18d54",
+      "bytes": 16770
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -3491,8 +3605,8 @@
     },
     {
       "path": "docs/landscape.md",
-      "sha256": "fad537af3298a7e4ff7f5388e458b3c8bb59673fc8c433dfc00e7c4669f2ab4a",
-      "bytes": 8259
+      "sha256": "b089e3876b24ef32ee806ddf057c6712a8ceb9cbc069add3b6b9976e9db6a312",
+      "bytes": 9038
     },
     {
       "path": "docs/stack.md",
@@ -3500,9 +3614,14 @@
       "bytes": 7667
     },
     {
+      "path": "docs/token-native-saturation.md",
+      "sha256": "81f3ea585b30c047c7166db174d555c912e71f13d85cd63ba28c1bfe1071d1bb",
+      "bytes": 10225
+    },
+    {
       "path": "docs/token-practice.md",
-      "sha256": "ffbd2f8d4f5af47adf3735752ef27724b6ff86b48a6d25ca25b1cb41c20dd602",
-      "bytes": 17272
+      "sha256": "ee7d55ebc9ce08855110ae7be923ae08d1c20b3643d4c2120a71cc6ed35112e3",
+      "bytes": 18446
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -3580,6 +3699,16 @@
       "bytes": 1298
     },
     {
+      "path": "evidence/receipts/native-ai-memory-maintenance-20260920.json",
+      "sha256": "05173d379f777d26fa4264e759a89783e6508e0391e191943d9cfc7027431569",
+      "bytes": 3712
+    },
+    {
+      "path": "evidence/receipts/native-claude-hud-interactive-20260920.json",
+      "sha256": "8df52f91877e20e0aa0672f463260e193e5ca33f730439a3d21286100a50853f",
+      "bytes": 1574
+    },
+    {
       "path": "evidence/receipts/native-claude-session-recovery-20260920.json",
       "sha256": "235b9f5c1c83d39da77c83a0c344d8fb0a13b7a6349d5729efa8491eeb75da1a",
       "bytes": 1199
@@ -3610,6 +3739,21 @@
       "bytes": 1176
     },
     {
+      "path": "evidence/receipts/native-headroom-mcp-20260920.json",
+      "sha256": "28e71ba00f3306aff103f52f2f82fb711e2e1ef95d35cf718b0afe72ed144b2a",
+      "bytes": 2727
+    },
+    {
+      "path": "evidence/receipts/native-jcodemunch-20260920.json",
+      "sha256": "2cfc81a26a8f126541a186a7f07c0bcb9cb903f64138d46d1f0029c26e8db83c",
+      "bytes": 5491
+    },
+    {
+      "path": "evidence/receipts/native-linux-zizmor-20260920.json",
+      "sha256": "f8ee45ad6267f67d62fd00d991bbfcf83f84fdedad5ea5780a58ee741c50dde4",
+      "bytes": 2954
+    },
+    {
       "path": "evidence/receipts/native-memory.json",
       "sha256": "25ceb9a940c2c3783215dfe23134cb1d701b64ea27ba3d32b636070a13e50d26",
       "bytes": 4126
@@ -3620,6 +3764,16 @@
       "bytes": 5070
     },
     {
+      "path": "evidence/receipts/native-sandbox-network-20260920.json",
+      "sha256": "e934457a442f01bcf564fa1e37777f35e6a64eff0455c572efb382a6c652dd4b",
+      "bytes": 2504
+    },
+    {
+      "path": "evidence/receipts/native-token-focus-clients-20260920.json",
+      "sha256": "bd101c71255fcee84fb2181604c101f3c2ade4e64a9801959071feaca89c2ee4",
+      "bytes": 3004
+    },
+    {
       "path": "evidence/receipts/portable-cli-artifacts.json",
       "sha256": "b7395ccdce92a201eed15851b1d71a8b1fca198d267c66e24ffedf3575b43a1d",
       "bytes": 3799
@@ -3628,6 +3782,11 @@
       "path": "evidence/receipts/runtime-tools.json",
       "sha256": "67b25345616bf4ff12abb62439b69f4f38d9589ca94134fd455ef61ea0e24540",
       "bytes": 1840
+    },
+    {
+      "path": "evidence/receipts/token-native-retained-functional-20260920.json",
+      "sha256": "3d68bc99234035207d7b6b9b5a7161b53c9bf7ffd73366250f7ce65f9d183b91",
+      "bytes": 17135
     },
     {
       "path": "evidence/receipts/token-practice-artifacts-20260920.json",
@@ -3658,6 +3817,11 @@
       "path": "evidence/receipts/token-practice-native-pairs-20260920.json",
       "sha256": "6c6edfde2da2c1292d36222372b62b2614b980337b72b399984a3a4b368cd37c",
       "bytes": 6386
+    },
+    {
+      "path": "evidence/receipts/upstream-native-tools-20260920.json",
+      "sha256": "71f6a397542e18f8f0b204f356a00b9be0bc8aed8c8c6258d60d6545ad67dffd",
+      "bytes": 6948
     },
     {
       "path": "evidence/receipts/vllm-compatibility.json",
@@ -3771,8 +3935,8 @@
     },
     {
       "path": "manifests/candidates.json",
-      "sha256": "9cbbaa0bc6e96f60e530aa3a51019005a028a1a796cecb41eb542dd588008e22",
-      "bytes": 24351
+      "sha256": "5b214b52322b6aaf3d6d63c28f2bded9f478534723ce5070454e739d8743b6e9",
+      "bytes": 25490
     },
     {
       "path": "manifests/landscape.json",
@@ -3781,8 +3945,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "758d2829271162617275865f829eeb5fade638edf5c9a1389e11241d82c44ab6",
-      "bytes": 59050
+      "sha256": "045ffd4c3ed23d09103720129d73a7df3deda42c83193f7747fe251139d6494d",
+      "bytes": 61151
     },
     {
       "path": "observability/README.md",
@@ -3961,8 +4125,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "2158e5bac36a5b840f4d70f39d59a33bd49abd6c5b383c729160b960ddd62179",
-      "bytes": 48961
+      "sha256": "2474ed161f1de3f64cf73b77f8de49f65603394e37ffc6d98b4b4eed8dcb259d",
+      "bytes": 55773
     },
     {
       "path": "scripts/adoption_status.py",
@@ -4185,19 +4349,29 @@
       "bytes": 2582
     },
     {
-      "path": "evidence/receipts/upstream-native-tools-20260920.json",
-      "sha256": "71f6a397542e18f8f0b204f356a00b9be0bc8aed8c8c6258d60d6545ad67dffd",
-      "bytes": 6948
+      "path": "tools/token-report/README.md",
+      "sha256": "241185a835ca94ffe1037bae45e4ae92378d9d84259b495900991d30715a280c",
+      "bytes": 7368
     },
     {
-      "path": "evidence/receipts/native-ai-memory-maintenance-20260920.json",
-      "sha256": "05173d379f777d26fa4264e759a89783e6508e0391e191943d9cfc7027431569",
-      "bytes": 3712
+      "path": "tools/token-report/config.example.json",
+      "sha256": "981efac20ee51b1ebda06592e88d9c395852a5159a114c009af9daedd5c2b196",
+      "bytes": 513
     },
     {
-      "path": "evidence/receipts/native-linux-zizmor-20260920.json",
-      "sha256": "f8ee45ad6267f67d62fd00d991bbfcf83f84fdedad5ea5780a58ee741c50dde4",
-      "bytes": 2954
+      "path": "tools/token-report/test_token_manifest.py",
+      "sha256": "7efbe16646ebb37ad07674c067fc242f99bdb4011dc1e8b07bfba454864ac07d",
+      "bytes": 24602
+    },
+    {
+      "path": "tools/token-report/token_manifest.html.in",
+      "sha256": "f626779ccd5b4d27f401257e8ed33e2055bdd837e16588d4a646784436d18030",
+      "bytes": 10213
+    },
+    {
+      "path": "tools/token-report/token_manifest.py",
+      "sha256": "d3135c1a37a348e6a9a717ec4074974971e6f634d834efe7f8b28eb863092923",
+      "bytes": 44852
     }
   ]
 }

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-20",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "73186541090c4a23b098642fada5c9183cc2bed3",
+  "source_revision": "9e236061bd199760527cef184497149b03531232",
   "layers": [
     {
       "id": "agents",
@@ -194,8 +194,14 @@
   ],
   "guides": [
     {
+      "title": "Capture this PC's lifetime evidence",
+      "body": "Upstream counter commands, private cumulative snapshots, exact artifact comparisons and a portable JSON/HTML manifest.",
+      "path": "tools/token-report/README.md",
+      "category": "adoption"
+    },
+    {
       "title": "Start on a new host",
-      "body": "Profiles, native sign-in and acceptance gates.",
+      "body": "Selected profiles, native sign-in and useful acceptance checks.",
       "path": "adoption/README.md",
       "category": "adoption"
     },

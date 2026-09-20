@@ -1,8 +1,15 @@
 # Repository work
 
+Carry authorized setup, fixes, checks and documentation through useful completion.
+Use a short internal plan; do not add intake, brainstorming or separate planning
+approval to bounded work. Reuse passing evidence when its inputs still match and
+run only checks needed for a concrete gap. Recorded limitations are context, not
+automatic new approval steps. Stop only for necessary native sign-in, operating
+system consent or an unresolved material decision, and continue independent work.
+
 For a new machine or resumed ecosystem task, read `adoption/manifest.json` and
 `adoption/update.md` first; follow only the selected profile's native recipes.
-Component pins remain in `manifests/stack.json`; current open gates remain in
+Component pins remain in `manifests/stack.json`; recorded limitations remain in
 `catalogs/us-equities/convergence-review.json`. Historical receipts are reference
 evidence, never a new host's passed status. Keep host paths and native sign-ins
 private, and use the nonmutating `scripts/adoption_status.py` for prerequisites.
@@ -13,6 +20,15 @@ Read docs/token-practice.md on demand for the selected context lane, native
 counter scopes and measured comparisons. Do not rerun the full audit or model
 trials at startup. Never sum cumulative snapshots, overlapping artifact reductions
 or provider/cache subset counters.
+
+For a new host's lifetime JSON/HTML manifest, use `tools/token-report/README.md`.
+Its native counter snapshots are separate from exact artifact comparisons and
+provider consumption. Keep its private state outside the checkout.
+
+For a concrete native tool gap, consult docs/token-native-saturation.md and its
+component matrix; reuse matching acceptance and run only the missing check.
+The complete repository research catalog is not an instruction to install every
+alternative or start every optional service.
 
 Use upstream executables and supported integration formats. Keep client accounts, model routes, native caching and tool discovery intact. Load detailed guides only for the current task. Run the repository validation command before committing changed evidence or manifests. Do not fetch private state or authentication stores.
 

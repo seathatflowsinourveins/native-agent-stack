@@ -79,14 +79,14 @@ Commands assume the selected upstream executable is on the current shell's PATH.
 | `davila7/claude-code-templates` · `c840d6f626be7ba418da60aeb0f2080413562451` | `git clone https://github.com/davila7/claude-code-templates.git "$STACK_HOME/tools/claude-code-templates"`, then `git -C "$STACK_HOME/tools/claude-code-templates" checkout --detach c840d6f626be7ba418da60aeb0f2080413562451` | Optional reference: read `cli-tool/components/skills/productivity/concise-planning/SKILL.md` for a matching task. No all-agent pack installation or runtime E2E is implied. |
 | `difftastic` · `0.71.0` | Official [Wilfred/difftastic 0.71.0](https://github.com/Wilfred/difftastic/releases/tag/0.71.0), archive/hash above | `difft --exit-code --color never fixtures/before.py fixtures/after.py`. Exit **1** means differences with this flag; inspect the diff rather than treating it as a failed installation. |
 | `gitleaks` · `8.30.1` | Official [gitleaks/gitleaks v8.30.1](https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1), archive/hash above | `gitleaks git --redact=100 --no-banner --no-color --report-format json --report-path "$STACK_HOME/output/gitleaks.json" "$PROJECT_ROOT"`. Exit 0 means no matches in the scanned scope; distinguish detection from operational errors. |
-| `headroom` · `0.37.0` | `uv venv "$STACK_HOME/tools/headroom-0.37.0"`; `uv pip install --python "$STACK_HOME/tools/headroom-0.37.0/bin/python" headroom-ai==0.37.0` | Supporting, optional offline library: `"$STACK_HOME/tools/headroom-0.37.0/bin/python" -c 'from importlib.metadata import version; print(version("headroom-ai"))'` verifies installation only. No portable compression E2E is claimed here; retain original artifacts and validate content preservation before adopting a transform. No proxy, provider rerouting or ML extras. |
+| `headroom` · `0.37.0` | `uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'` | [Upstream MCP compression and retrieval](#headroom-native-compression-and-recovery). The earlier local exact-recovery guard remains separate; no automatic agent-traffic interception. |
 | `huggingface-hub-native` · `1.32.0` | `uv tool install huggingface-hub==1.32.0` | `hf --version`; [revision-pinned model download](#local-semantic-code-search). Authentication, if needed, uses native `hf auth login`; never publish credentials. |
 | `markitdown` · `0.1.7` | `uv tool install markitdown==0.1.7` | `markitdown fixtures/greeting.html -o "$STACK_HOME/output/greeting.md"`; inspect the greeting in the result. This uses the base HTML converter; PDF/Office extras are separate decisions. |
 | `mcp-inspector` · `2.7.0` | `npm install --global --prefix "$STACK_HOME/tools/mcp-inspector-2.7.0" @modelcontextprotocol/inspector@2.7.0` | `mcp-inspector --cli --config "$PROJECT_ROOT/.mcp.json" --server socraticode --method tools/list --format json --stored-auth-only --cwd "$PROJECT_ROOT"`. Handshake/schema discovery only; follow with a selected tool call for functionality. |
 | `mcporter` · `0.13.13` | `npm install --global --prefix "$STACK_HOME/tools/mcporter-0.13.13" mcporter@0.13.13` | `mcporter --config "$MCPORTER_CONFIG" list socraticode --brief --no-oauth`, then [local semantic search](#local-semantic-code-search) or [Context Mode](#retained-context-mode). Node >=24 is required. |
 | `openresearch` · `0.2.4` | Official [alphaXiv/OpenResearch v0.2.4](https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.4), asset `openresearch-cli-x86_64-unknown-linux-musl.tar.xz`; archive procedure | `orx --no-telemetry discover keyword 'agent memory' --published-after 2026-06-21 --published-before 2026-09-19 --limit 3`; retrieve only a selected result with `orx --no-telemetry paper "$PAPER_ID" --full`. Public literature access, not a model-quality ranking. |
 | `playwright-cli` · `0.1.21` | `npm install --global --prefix "$STACK_HOME/tools/playwright-cli-0.1.21" @playwright/cli@0.1.21`; bundled Playwright `1.64.0-alpha-1789764292000` | Optional alternative to agent-browser. `playwright-cli --help` checks installation only; consult its native skill for the chosen browser workflow. Historical installation evidence is Windows-scoped, not a claimed Linux browser E2E. |
-| `promptfoo` · `0.123.1` | `npm install --global --prefix "$STACK_HOME/tools/promptfoo-0.123.1" promptfoo@0.123.1` | Optional: `PROMPTFOO_DISABLE_TELEMETRY=1 promptfoo --help` is help only. Run `promptfoo eval -c "$EVAL_CONFIG"` only after reviewing its providers, dataset and costs; no default paid evaluation is supplied. |
+| `promptfoo` · `0.123.1` | `npm install --global --prefix "$STACK_HOME/tools/promptfoo-0.123.1" promptfoo@0.123.1` | `PROMPTFOO_DISABLE_TELEMETRY=1 promptfoo eval --config "$EVAL_CONFIG" --no-cache --no-table --no-progress-bar --no-share --no-write --output "$EVAL_RESULT"`. The retained native fixture used a local echo provider and passed two exact assertions with zero model tokens. Select the intended provider/data explicitly; no paid default is supplied. |
 | `qdrant` · `1.19.1` | Official [qdrant/qdrant v1.19.1](https://github.com/qdrant/qdrant/releases/tag/v1.19.1), archive/hash above; retain Apache-2.0 license | `qdrant --config-path "$QDRANT_CONFIG" --disable-telemetry`; [loopback service and RAG](#local-semantic-code-search). Persistent data paths are separate from the versioned binary. |
 | `qmd` · `2.8.3` | `npm install --global --prefix "$STACK_HOME/tools/qmd-2.8.3" @tobilu/qmd@2.8.3` | [Document workflow](#documents-and-selected-artifacts). BM25 `search` uses no model weights; native dependencies can still occupy substantial disk. `query`/`embed` are separate model-enabled choices. |
 | `repomix` · `1.18.0` | `npm install --global --prefix "$STACK_HOME/tools/repomix-1.18.0" repomix@1.18.0` | `repomix "$PROJECT_ROOT" --include 'fixtures/before.py,fixtures/after.py' --style xml --parsable-style --compress --token-count-encoding o200k_base --output "$STACK_HOME/output/selected-code.xml"`. Explicit two-file artifact; compression omits details, so read originals before editing. |
@@ -98,7 +98,7 @@ Commands assume the selected upstream executable is on the current shell's PATH.
 | `socraticode` · `1.14.0` | `npm install --global --prefix "$STACK_HOME/tools/socraticode-1.14.0" --ignore-scripts socraticode@1.14.0` | [Local semantic code search](#local-semantic-code-search). Source `2218f25153d0f3f4a76ee240a5643dbc873e80be`; AGPL-3.0-only with upstream commercial alternative. This profile uses external local services, not Docker or a cloud key. |
 | `toon` · `4.1.1` | `npm install --global --prefix "$STACK_HOME/tools/toon-4.1.1" @toon-format/cli@4.1.1` | `toon fixtures/records.json --stats -o "$STACK_HOME/output/records.toon"`; `toon "$STACK_HOME/output/records.toon" --decode --strict -o "$STACK_HOME/output/records.recovered.json"`. Compare decoded JSON values to the original, including numeric precision. Token estimates are not provider billing. |
 | `vllm` · `0.25.0` | `uv venv --python 3.13 "$STACK_HOME/tools/vllm-0.25.0"`; `uv pip install --python "$STACK_HOME/tools/vllm-0.25.0/bin/python" vllm==0.25.0` | [Pinned local GPU embedding service](#local-semantic-code-search). Latest observed 0.29.0 resolved and installed but failed GPU startup under WSL with unavailable UVA; 0.25.0 was restored and real search passed. Do not label 0.25.0 latest or 0.29.0 ready. |
-| `worktrunk` · `0.78.0` | Official [max-sixty/worktrunk v0.78.0](https://github.com/max-sixty/worktrunk/releases/tag/v0.78.0); `gh release view v0.78.0 --repo max-sixty/worktrunk --json assets`, then selected host archive procedure | Optional: `wt list` inside this clone inventories real worktrees. Create branches/worktrees only for an actual independent writing task; no invented parallel workload. |
+| `worktrunk` · `0.78.0` | Official [max-sixty/worktrunk v0.78.0](https://github.com/max-sixty/worktrunk/releases/tag/v0.78.0); `gh release view v0.78.0 --repo max-sixty/worktrunk --json assets`, then selected host archive procedure | `wt list --format json`; for an actual owned writing task, `wt switch --create "$BRANCH" --base "$BASE_REF" --no-cd --no-hooks --format json`. The retained disposable lifecycle verified selection and `wt remove "$BRANCH" --foreground --no-hooks --format json`, leaving only the original worktree. |
 
 ## Native context mode and hooks
 
@@ -346,7 +346,126 @@ Close the owned session after inspection. This is an on-demand
 viewer; it does not replace the existing collector/backends or install global
 client telemetry settings.
 
+## Focused jCodeMunch retrieval
+
+Install the pinned upstream server with `uv tool install jcodemunch-mcp==1.108.319`.
+The retained upstream license is **Dual-Use License 1.1**; the bounded local
+acceptance does not establish eligibility for commercial deployment. Keep its
+default six-tool `counter` surface. The following upstream registration commands
+are for the intended native CLI profile; preserve its existing configuration home:
+
+```sh
+codex mcp add jcodemunch \
+  --env "CODE_INDEX_PATH=$HOME/.code-index" --env JCODEMUNCH_SHARE_SAVINGS=0 \
+  -- jcodemunch-mcp
+claude mcp add jcodemunch --scope local --transport stdio \
+  --env "CODE_INDEX_PATH=$HOME/.code-index" --env JCODEMUNCH_SHARE_SAVINGS=0 \
+  -- jcodemunch-mcp
+```
+
+The tested Codex adoption stored the equivalent server entry in the selected
+project's `.codex/config.toml`; the CLI command above adds it to the chosen native
+CLI configuration. Claude's `local` scope applies to the current project.
+Register once. Use only explicitly selected code directories, with AI/paid
+summaries, savings sharing, watchers, cross-repository defaults and external
+context providers disabled. Do not index conversations, credentials or every
+project merely because the server is available.
+
+The upstream default index root is intentional: in this release, source retrieval
+records its estimate there even when a custom index root was requested. Reading
+stats from a different root can therefore show a misleading zero. Keep the
+existing default ledger; the native estimate includes repeated reads.
+
+The six-tool surface exposes actions through `order`. Select actual local scope
+and returned repository/symbol IDs for these tool arguments:
+
+```json
+{"action":"index_folder","args":{"path":"/absolute/selected/project/src","use_ai_summaries":false,"extra_ignore_patterns":["*.json","*.jsonl","*.md","*.html","*.txt","**/__pycache__/**"],"follow_symlinks":false,"context_providers":false},"allow_state_change":true}
+```
+
+```json
+{"action":"search_symbols","args":{"repo":"RETURNED_REPOSITORY_ID","query":"requested_function","kind":"function","max_results":1}}
+```
+
+```json
+{"action":"get_symbol_source","args":{"repo":"RETURNED_REPOSITORY_ID","symbol_id":"RETURNED_SYMBOL_ID"}}
+```
+
+Read the actual upstream report without importing a historical receipt:
+
+```sh
+mcporter call --stdio jcodemunch-mcp \
+  --env "CODE_INDEX_PATH=$HOME/.code-index" --env JCODEMUNCH_SHARE_SAVINGS=0 \
+  --name jcodemunch --tool order \
+  --args '{"action":"get_session_stats","args":{}}' --output json --no-oauth
+```
+
+The [direct receipt](../evidence/receipts/native-jcodemunch-20260920.json) verifies
+exact source fidelity. Complete search-plus-source responses used 861 tokens
+against a 5,476-token whole file, saving 4,615 artifact tokens; an already-known
+601-token function extraction was 260 tokens cheaper than the MCP sequence.
+Index-plus-retrieval used 1,332 tokens. Choose the useful lane for the task rather
+than sending known exact code through another retrieval layer. The native
+bytes/4 ledger and advertised schema-size estimates are separate heuristics.
+
+## Headroom native compression and recovery
+
+Install once with the upstream MCP extra:
+
+```sh
+uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'
+headroom mcp serve --proxy-url http://127.0.0.1:1
+```
+
+The tested direct MCP fixture used that unreachable loopback proxy address and
+the server's local compression path. Within one live MCP session, call
+`headroom_compress` with `{"content":"selected content"}`, then
+`headroom_retrieve` with the returned `hash`; `headroom_stats` accepts `{}`.
+Verify exact original-content recovery and required failure details before
+using a summary. There is no upstream `headroom compress` CLI subcommand.
+
+The [receipt](../evidence/receipts/native-headroom-mcp-20260920.json) records
+36,625 compact-JSON baseline tokens versus a 19,714-token summary, with exact
+full retrieval and the critical failure retained. Retrieving the complete
+original consumes its original content again. A separate local guarded request
+used 26,529 versus 191 tokens with exact run-expansion recovery. These are owned
+synthetic fixtures, not production traffic or provider savings.
+
+`headroom savings --json` returns the real selected ledger. Its global ledger
+remained zero; an explicitly isolated fixture ledger reported one call and
+36,719 estimated saved tokens. Never merge that fixture result into the global
+total. The upstream report's hard maximum window is 30 days. Keep the existing
+guard lane and original artifacts; no automatic interception or model rerouting
+is part of this recipe.
+
 ## Retained Context Mode
+
+If a Codex plugin's bundled server starts in its cache directory, selected
+project files may be outside that server's root. The tested project-scoped
+repair preserves the enabled plugin and its hooks, disables only that bundled
+server, and registers the installed upstream `context-mode` command with the
+explicit project directory. Replace both absolute paths in the selected
+project's `.codex/config.toml`:
+
+```toml
+[plugins."context-mode@context-mode".mcp_servers.context-mode]
+enabled = false
+
+[mcp_servers.context-mode]
+command = "context-mode"
+cwd = "/absolute/project"
+startup_timeout_sec = 60
+
+[mcp_servers.context-mode.env]
+CONTEXT_MODE_PLATFORM = "codex"
+CONTEXT_MODE_PROJECT_DIR = "/absolute/project"
+```
+
+This uses the supported [bundled MCP server policy](https://developers.openai.com/plugins/build/plugins#bundled-mcp-servers-and-lifecycle-hooks).
+No plugin-cache edits or broader file allowlist are needed. A fresh native
+session reads the configuration; an existing process retains its loaded server
+connection. Both native clients completed the bounded project-file and symbol
+task in the [new client receipt](../evidence/receipts/native-token-focus-clients-20260920.json).
 
 Point the Context Mode entry in the MCPorter example at the actual installed plugin's upstream `start.mjs`, using the intended runtime's configuration home. The path must come from that runtime's plugin inventory. This preserves native startup behavior instead of inserting a replacement server.
 
@@ -440,6 +559,25 @@ env -i HOME="$HOME" PATH="$PATH" srt --settings "$SANDBOX_POLICY" -- sh -c 'prin
 ```
 
 Check exit status **and host files** independently: the allowed write should exist; blocked read/write should fail and leave protected host bytes unchanged. When a path is both read- and write-denied, upstream masking can allow a write to an ephemeral private mount with exit 0 while leaving the host untouched. That is host protection, not command denial. These operations do not prove network isolation or global protection of every client command. Do not pass a normal shell's secret environment into a fixture test.
+
+The later [network fixture](../evidence/receipts/native-sandbox-network-20260920.json)
+separately verified the HTTP proxy path. Three scoped policies used the same
+owned IPv4 loopback server: allow its exact `host:port`, deny that same endpoint
+explicitly, and use an empty allowlist. The allowed request returned the exact
+fixture with exit 0; both denied cases returned proxy HTTP 403 and curl exit 22,
+with no additional request reaching the server. The upstream listener can race
+an immediate client, so the accepted native command uses bounded retries:
+
+```sh
+srt --debug --settings "$SCOPED_SANDBOX_POLICY" curl \
+  --silent --show-error --fail --max-time 10 \
+  --retry 2 --retry-connrefused --retry-delay 1 --noproxy "" \
+  "$OWNED_LOOPBACK_URL"
+```
+
+Record initial connection failures and verify the destination's request count.
+This fixture did not change global policy or enable weaker isolation. It does
+not establish TLS, SOCKS, IPv6, DNS-rebinding, remote-host or escape coverage.
 
 ## Optional Codex for Claude
 

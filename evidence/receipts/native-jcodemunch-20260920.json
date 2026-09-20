@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "id": "native-jcodemunch-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-09-20T05:40:16.082136+00:00",
+  "component_ids": [
+    "jcodemunch-mcp"
+  ],
+  "claim": "Official jCodeMunch 1.108.319 installed and a deliberately scoped local code index returned the exact requested function; the complete search-plus-source response was measured against both whole-file and existing focused-source baselines.",
+  "limitations": [
+    "Single bounded code-reading task, not a native provider A/B trial.",
+    "Whole-file comparison is beneficial; focused existing source extraction is cheaper for this known symbol, shown separately.",
+    "Lifetime upstream estimate includes repeat validation calls and must not be deduplicated into causal lifetime provider savings.",
+    "receipt CLI explicitly scanned only an empty owned transcript directory; no historical client transcript traversal.",
+    "No client hooks, paid models, cloud keys, watchers or automatic index expansion enabled.",
+    "Upstream dual-use license retained; this acceptance does not establish eligibility for commercial deployment.",
+    "Native client registration and later provider task acceptance are separate evidence; these direct MCP operations do not establish both-client task acceptance."
+  ],
+  "data": {
+    "version": "1.108.319",
+    "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+    "upstream_source_commit": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+    "install_exit_code": 0,
+    "installed_packages": 37,
+    "native_mcp_visible_tools": 6,
+    "configuration": {
+      "tool_surface": "counter",
+      "use_ai_summaries": false,
+      "allow_paid_summaries": false,
+      "share_savings": false,
+      "watch": false,
+      "cross_repo_default": false,
+      "context_providers": false
+    },
+    "tokenizer": {
+      "package": "gpt-tokenizer",
+      "version": "3.4.0",
+      "encoding": "o200k_base"
+    },
+    "exact_tokens": {
+      "whole_file": 5476,
+      "focused_function": 601,
+      "complete_search_response": 105,
+      "complete_symbol_response": 756,
+      "complete_retrieval_sequence": 861,
+      "index_plus_retrieval_sequence": 1332
+    },
+    "whole_file_delta": 4615,
+    "whole_file_reduction_percent": 84.28,
+    "focused_function_delta": -260,
+    "measurement_scope": "Complete mcporter raw response envelopes for search_symbols plus get_symbol_source; all result metadata and serialization included. No model reasoning, prompts, resident schemas, or stats-reporting output attributed to retrieval savings. Index-plus-retrieval total additionally reported.",
+    "upstream_lifetime_estimate": {
+      "total_tokens_saved": 19880,
+      "by_tool": {
+        "get_symbol_source": 19880
+      },
+      "basis": "upstream bytes/4 estimates; not exact tokenizer or provider billed tokens",
+      "basis_generation": {
+        "generation": 2,
+        "first_generation": 2,
+        "mixed_basis": false
+      },
+      "includes_repeated_validation_reads": true
+    },
+    "upstream_surface_estimate": {
+      "surface": "counter",
+      "profile": "full",
+      "visible_tools": 6,
+      "catalog_tools": 94,
+      "schema_tokens_visible": 1050,
+      "schema_tokens_catalog": 27782,
+      "schema_tokens_avoided": 26732,
+      "schema_tokens_basis": "one_time_at_full_rate_then_cache_read",
+      "schema_tokens_basis_note": "The tool-schema block is stable across requests, so it is paid at full rate approximately once per cache lifetime and at cache-read rates (~0.1x) thereafter. This count is payload size, NOT a per-request saving; reading it as one overstates the cost impact by roughly an order of magnitude. Measured: benchmarks/codex_surface/.",
+      "heaviest_tools": {
+        "order": 260,
+        "route": 229,
+        "announce_model": 161,
+        "jcodemunch_guide": 147,
+        "menu": 128,
+        "set_tool_tier": 125
+      },
+      "estimator": "bytes/4"
+    },
+    "native_mcp_command_count": 14,
+    "passed": true,
+    "installation_command": "uv tool install jcodemunch-mcp==1.108.319",
+    "native_mcp_command": "jcodemunch-mcp",
+    "native_mcp_env": {
+      "CODE_INDEX_PATH": "$HOME/.code-index",
+      "JCODEMUNCH_SHARE_SAVINGS": "0"
+    },
+    "index": {
+      "scope": "Explicit selected code subdirectory only",
+      "files": 25,
+      "symbols": 290,
+      "languages": {
+        "python": 22,
+        "javascript": 3
+      },
+      "explicit_exclusions": [
+        "*.json",
+        "*.jsonl",
+        "*.md",
+        "*.html",
+        "*.txt",
+        "*.ini",
+        "*.in",
+        "**/__pycache__/**"
+      ]
+    },
+    "source_fidelity": {
+      "byte_exact_function_equal": true,
+      "search_identified_exact_symbol": true,
+      "fixture_and_real_project_source_equal": true,
+      "function_lines": [
+        173,
+        199
+      ]
+    },
+    "source_sha256": "3b3b1465377aaa2c952749fb3c25310a33ceb8969e29bdeee01631c4eba321e6",
+    "symbol_sha256": "da3277537bf59cb63bc0b7bd2b25f86422d8f79679d382147d72863f9dc1dfd5",
+    "custom_root_gap": {
+      "observed_custom_root_lifetime": 0,
+      "default_ledger_after_first_two_symbol_reads": 9940,
+      "cause": "get_symbol_source records savings at the upstream default root while get_session_stats follows a custom root.",
+      "resolution": "Use the upstream default $HOME/.code-index consistently; preserve the existing ledger. No upstream code patch."
+    },
+    "exact_causal_lifetime_provider_tokens_saved": null
+  }
+}

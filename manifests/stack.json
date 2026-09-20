@@ -172,11 +172,12 @@
         "native-paired-adoption-20260919",
         "native-architecture-review-20260919",
         "native-convergence-review-20260919",
-        "native-research-efficiency-20260920",
-        "native-claude-child-patch-20260920",
         "token-practice-native-pairs-20260920",
         "token-practice-coverage-20260920",
-        "native-claude-session-recovery-20260920"
+        "native-research-efficiency-20260920",
+        "native-claude-child-patch-20260920",
+        "native-claude-session-recovery-20260920",
+        "native-token-focus-clients-20260920"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -200,7 +201,8 @@
       "evidence_ids": [
         "component-history",
         "token-practice-coverage-20260920",
-        "token-practice-gap-followup-20260920"
+        "token-practice-gap-followup-20260920",
+        "native-claude-hud-interactive-20260920"
       ],
       "upstream_sources": [
         "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0"
@@ -256,11 +258,12 @@
         "native-paired-adoption-20260919",
         "native-architecture-review-20260919",
         "native-convergence-review-20260919",
-        "native-research-efficiency-20260920",
         "token-practice-native-pairs-20260920",
         "token-practice-coverage-20260920",
         "token-practice-gap-followup-20260920",
-        "native-codex-session-recovery-20260920"
+        "native-research-efficiency-20260920",
+        "native-codex-session-recovery-20260920",
+        "native-token-focus-clients-20260920"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -307,7 +310,8 @@
       ],
       "evidence_ids": [
         "component-history",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "token-native-retained-functional-20260920"
       ],
       "upstream_sources": [
         "https://github.com/andrewyng/context-hub"
@@ -333,7 +337,8 @@
         "desktop-restart-acceptance",
         "token-practice-native-pairs-20260920",
         "token-practice-coverage-20260920",
-        "token-practice-native-counters-20260920"
+        "token-practice-native-counters-20260920",
+        "native-token-focus-clients-20260920"
       ],
       "upstream_sources": [
         "https://github.com/mksglu/context-mode"
@@ -415,21 +420,24 @@
       "version": "0.37.0",
       "license": "Apache-2.0",
       "profile": "supporting",
-      "role": "Optional guarded offline compression of supported artifacts",
+      "role": "On-demand upstream MCP compression/retrieval and separately guarded offline artifact compression",
       "commands": [
-        "python -m pip show headroom-ai"
+        "headroom mcp serve --proxy-url http://127.0.0.1:1",
+        "headroom savings --json"
       ],
       "evidence_ids": [
         "component-history",
         "token-practice-coverage-20260920",
-        "token-practice-native-counters-20260920"
+        "token-practice-native-counters-20260920",
+        "token-native-retained-functional-20260920",
+        "native-headroom-mcp-20260920"
       ],
       "upstream_sources": [
         "https://github.com/chopratejas/headroom"
       ],
       "source_pin": null,
       "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
-      "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
+      "command_scope": "Direct synthetic MCP compression/retrieval passed; global and isolated fixture ledgers remain separate. No automatic provider interception."
     },
     {
       "id": "huggingface-hub-native",
@@ -487,14 +495,15 @@
       ],
       "evidence_ids": [
         "component-history",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "token-native-retained-functional-20260920"
       ],
       "upstream_sources": [
         "https://github.com/modelcontextprotocol/inspector"
       ],
       "source_pin": null,
       "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
-      "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
+      "command_scope": "Direct upstream Inspector stdio call proved arithmetic execution; full plugin hooks and current desktop scope are separate."
     },
     {
       "id": "mcporter",
@@ -575,7 +584,8 @@
       ],
       "evidence_ids": [
         "component-history",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "token-native-retained-functional-20260920"
       ],
       "upstream_sources": [
         "https://github.com/promptfoo/promptfoo"
@@ -691,7 +701,8 @@
       "evidence_ids": [
         "runtime-tools",
         "component-history",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "native-sandbox-network-20260920"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/sandbox-runtime"
@@ -861,7 +872,8 @@
       "evidence_ids": [
         "worktrunk-list",
         "component-history",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "token-native-retained-functional-20260920"
       ],
       "upstream_sources": [
         "https://github.com/max-sixty/worktrunk"
@@ -1270,7 +1282,8 @@
       "profile": "supporting",
       "role": "Offline GitHub workflow security analysis with failing fixtures",
       "commands": [
-        "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\""
+        "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\"",
+        "python3 -m unittest -v tests.test_workflow_security"
       ],
       "evidence_ids": [
         "native-ci-security-20260920",
@@ -1282,26 +1295,6 @@
       ],
       "source_pin": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
       "freshness": "Native Linux isolated-tool installation and accepted/rejected offline fixtures verified 2026-09-20; earlier Mac and CI receipts retain their separate host scopes."
-    },
-    {
-      "id": "llama-cpp",
-      "repository": "https://github.com/ggml-org/llama.cpp",
-      "version": "b11057 (0.4.1-dev)",
-      "license": "MIT; bundled CUDA13.3 libraries retain NVIDIA license",
-      "role": "Trial local text inference with one qualified partial-offload planner repair on WSL RTX4090",
-      "source_pin": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
-      "commands": [
-        "python3 blueprints/convergence-practice/gpu-inference/qualify.py --help"
-      ],
-      "evidence_ids": [
-        "native-gpu-patch-20260920"
-      ],
-      "profile": "optional",
-      "upstream_sources": [
-        "https://github.com/ggml-org/llama.cpp/releases/tag/b11057",
-        "https://github.com/ggml-org/llama.cpp/blob/59657a613ab0fa4ab327d6c790123dff30bfbd67/tools/server/README.md"
-      ],
-      "freshness": "Pinned September20 trial after archive digest/attestation/license checks and one actual task. Prerelease chosen for official Linux CUDA artifacts; no native-agent default replacement."
     },
     {
       "id": "beads",
@@ -1365,6 +1358,54 @@
         "upstream-native-tools-20260920"
       ],
       "freshness": "Upstream installation and bounded native acceptance recorded 2026-09-20; no lifetime savings or new provider-task claim. This September 20 native acceptance is source-host Linux/WSL evidence only; other hosts are not qualified by import."
+    },
+    {
+      "id": "llama-cpp",
+      "repository": "https://github.com/ggml-org/llama.cpp",
+      "version": "b11057 (0.4.1-dev)",
+      "license": "MIT; bundled CUDA13.3 libraries retain NVIDIA license",
+      "role": "Trial local text inference with one qualified partial-offload planner repair on WSL RTX4090",
+      "source_pin": "59657a613ab0fa4ab327d6c790123dff30bfbd67",
+      "commands": [
+        "python3 blueprints/convergence-practice/gpu-inference/qualify.py --help"
+      ],
+      "evidence_ids": [
+        "native-gpu-patch-20260920"
+      ],
+      "profile": "optional",
+      "upstream_sources": [
+        "https://github.com/ggml-org/llama.cpp/releases/tag/b11057",
+        "https://github.com/ggml-org/llama.cpp/blob/59657a613ab0fa4ab327d6c790123dff30bfbd67/tools/server/README.md"
+      ],
+      "freshness": "Pinned September20 trial after archive digest/attestation/license checks and one actual task. Prerelease chosen for official Linux CUDA artifacts; no native-agent default replacement."
+    },
+    {
+      "id": "jcodemunch-mcp",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "version": "1.108.319",
+      "license": "Dual-Use License 1.1; upstream non-commercial/commercial terms retained",
+      "profile": "supporting",
+      "role": "Explicitly scoped code index and exact symbol retrieval through a six-tool MCP surface",
+      "commands": [
+        {
+          "tool": "order",
+          "arguments": {
+            "action": "get_session_stats",
+            "args": {}
+          }
+        }
+      ],
+      "source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "evidence_ids": [
+        "native-jcodemunch-20260920",
+        "native-token-focus-clients-20260920"
+      ],
+      "upstream_sources": [
+        "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/LICENSE"
+      ],
+      "freshness": "Pinned upstream installation, direct artifact acceptance and one bounded task in each native client verified 2026-09-20; no causal provider savings claim.",
+      "command_scope": "Index only selected code; default upstream index root; sharing, AI summaries, watchers, cross-repository defaults and external context providers disabled. See native recipe and receipt for whole-file versus focused-source baselines."
     }
   ],
   "profiles": [
@@ -1419,7 +1460,8 @@
         "zizmor",
         "beads",
         "skills-ref",
-        "otel-tui"
+        "otel-tui",
+        "jcodemunch-mcp"
       ]
     },
     {

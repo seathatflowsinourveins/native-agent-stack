@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "native-token-focus-clients-20260920",
+  "kind": "native_model_e2e",
+  "recorded_at_utc": "2026-09-20T05:42:35.130755+00:00",
+  "component_ids": [
+    "codex",
+    "claude-code",
+    "context-mode",
+    "jcodemunch-mcp"
+  ],
+  "claim": "One bounded task in each signed-in native client successfully read a project document through Context Mode and retrieved the exact selected implementation through jCodeMunch; all six selected MCP calls completed.",
+  "limitations": [
+    "Existing Desktop process retains its original loaded MCP connection; fresh native Codex verifies corrected project scope.",
+    "Only selected MCP actions exercised; lifecycle compaction and interactive HUD are separate.",
+    "Native usage includes prompts, tool schemas, cache reads and reasoning; it is consumed usage, not avoided lifetime tokens.",
+    "This is functional integration acceptance with normal configured clients, not a randomized or matched token-savings A/B comparison.",
+    "Raw private prompts, client streams, account identifiers and host paths are not published."
+  ],
+  "data": {
+    "clients": {
+      "codex": {
+        "passed": true,
+        "mcp_calls": 3,
+        "failed_calls": 0,
+        "selected_calls": [
+          "context-mode.ctx_execute_file",
+          "jcodemunch.order search_symbols",
+          "jcodemunch.order get_symbol_source"
+        ],
+        "usage": {
+          "input_tokens": 101073,
+          "cached_input_tokens": 72960,
+          "output_tokens": 532,
+          "reasoning_output_tokens": 7,
+          "total_consumed_tokens": 101605,
+          "subset_rule": "Cached input is part of input; reasoning is part of output."
+        }
+      },
+      "claude": {
+        "passed": true,
+        "mcp_calls": 3,
+        "failed_calls": 0,
+        "selected_calls": [
+          "context-mode.ctx_execute_file",
+          "jcodemunch.order search_symbols",
+          "jcodemunch.order get_symbol_source"
+        ],
+        "usage": {
+          "input_tokens": 8,
+          "cache_creation_input_tokens": 26535,
+          "cache_read_input_tokens": 123355,
+          "output_tokens": 1630,
+          "thinking_tokens_subset": 342,
+          "total_consumed_tokens": 151528,
+          "subset_rule": "Cache categories are separate input categories; thinking is a subset of output. Do not add per-iteration detail again."
+        }
+      }
+    },
+    "passed": true,
+    "total_mcp_calls": 6,
+    "failed_mcp_calls": 0,
+    "context_mode_fix": {
+      "project_scoped_server": true,
+      "plugin_enabled": true,
+      "bundled_mcp_disabled": true,
+      "plugin_cache_modified": false,
+      "active_old_desktop_process_hot_reloaded": false
+    },
+    "registration": {
+      "codex": "Project-scoped upstream stdio server entry; default index root and sharing disabled.",
+      "claude": "Upstream local-scope stdio registration; default index root and sharing disabled."
+    },
+    "exact_causal_lifetime_provider_tokens_saved": null
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "native-sandbox-network-20260920",
+  "kind": "native_cli_e2e",
+  "recorded_date_utc": "2026-09-20",
+  "component_ids": [
+    "sandbox-runtime"
+  ],
+  "claim": "Native sandbox-runtime 0.0.77 allowed one configured loopback HTTP request and blocked both explicit-deny and empty-allowlist requests before they reached the owned fixture server.",
+  "limitations": [
+    "HTTP proxy path tested on this Linux/WSL host",
+    "Immediate client startup can race the upstream local proxy; the tested command uses bounded connection-refused retries",
+    "Does not establish TLS, SOCKS, DNS rebinding, IPv6, remote-host, or general sandbox-escape coverage",
+    "Bounded local proxy-policy acceptance, not a full security certification or proof that every native client command is sandboxed."
+  ],
+  "data": {
+    "package": "@anthropic-ai/sandbox-runtime",
+    "package_version": "0.0.77",
+    "status": "passed",
+    "startup_behavior": {
+      "immediate_first_request_failed": true,
+      "initial_exit": 7,
+      "cause": "Upstream starts in-sandbox socat listeners in the background without a readiness wait",
+      "bounded_client_retry": "curl --retry 2 --retry-connrefused --retry-delay 1",
+      "upstream_source_modified": false
+    },
+    "assertions": [
+      {
+        "mode": "allowed",
+        "exit_code": 0,
+        "server_requests_before": 0,
+        "server_requests_after": 1,
+        "payload_matches": true,
+        "proxy_403_reported": false
+      },
+      {
+        "mode": "explicit-deny",
+        "exit_code": 22,
+        "server_requests_before": 1,
+        "server_requests_after": 1,
+        "payload_matches": false,
+        "proxy_403_reported": true
+      },
+      {
+        "mode": "default-deny",
+        "exit_code": 22,
+        "server_requests_before": 1,
+        "server_requests_after": 1,
+        "payload_matches": false,
+        "proxy_403_reported": true
+      }
+    ],
+    "server_total_requests": 1,
+    "payload_sha256": "50f1801618e9a0acb8f2d6a5c4f5c867a1067c83d926d6ca267f0cbcfff28c69",
+    "traffic": "temporary IPv4 loopback HTTP only",
+    "provider_credentials_supplied": false,
+    "global_policy_changed": false,
+    "weaker_isolation_enabled": false,
+    "portable_command": "srt --debug --settings \"$SCOPED_SANDBOX_POLICY\" curl --silent --show-error --fail --max-time 10 --retry 2 --retry-connrefused --retry-delay 1 --noproxy \"\" \"$OWNED_LOOPBACK_URL\"",
+    "exact_causal_lifetime_provider_tokens_saved": null
+  }
+}

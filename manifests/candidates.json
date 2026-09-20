@@ -410,6 +410,22 @@
       ],
       "component_id": "otel-tui",
       "native_evidence": "evidence/receipts/upstream-native-tools-20260920.json"
+    },
+    {
+      "repository": "jgravelle/jcodemunch-mcp",
+      "url": "https://github.com/jgravelle/jcodemunch-mcp",
+      "version": "1.108.319",
+      "reviewed_commit": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "license": "Dual-Use License 1.1",
+      "status": "ADOPTED supporting native MCP for explicitly scoped code retrieval; direct functional acceptance passed",
+      "decision": "Use when indexing and symbol discovery avoid an otherwise necessary broad file read. An already known focused source extraction was cheaper in the retained fixture. Historical source-review rejection remains dated; this bounded adoption does not establish commercial deployment eligibility.",
+      "component_id": "jcodemunch-mcp",
+      "native_evidence": "evidence/receipts/native-jcodemunch-20260920.json",
+      "sources": [
+        "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md",
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/LICENSE"
+      ]
     }
   ]
 }
