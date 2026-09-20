@@ -1986,8 +1986,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "be051bfc2c0419e624de2942f2a69b346157306c19cd8b12678fef75b33e2234",
-      "bytes": 9034
+      "sha256": "0d805ccc085506e8c17913022f21fb66443e1b19cb78ecc9b9d3345e7b7b8015",
+      "bytes": 9506
     },
     {
       "path": "CLAUDE.md",
@@ -5052,8 +5052,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "1bcd19649ce6832b47422a6456243316d4574a26799f04cb81820d561b58cfff",
-      "bytes": 3701969
+      "sha256": "37fe361b2cef32710ad3a2c0fd21cbf4ddc5251d83dcdcf4205b2b71bd79a4e3",
+      "bytes": 3703388
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5062,8 +5062,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "ba9fc8e44ad4b89d39f0beaccab20b4234dc671126d39f12908dafddff8905ab",
-      "bytes": 30149
+      "sha256": "16b0cc7a23899691fa405119f1eba62d672fbd44479921ab3b6535b1ddd92ae8",
+      "bytes": 30500
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6047,8 +6047,8 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "da0bdd0bfe99ce19235aa29f3b20a01eac1c38a0edf19804eb5a6550943bbc18",
-      "bytes": 1279
+      "sha256": "7404e514011d172c6a00ffad970b11c0c1b334d7489ed7aa3b5ff6dff6da64f3",
+      "bytes": 1582
     },
     {
       "path": "catalogs/foundation/README.md",
@@ -6072,8 +6072,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "18e77aff133b5dc47506d3d20bff9ea9ea9f8efc4c60eb1e8dbe8cb2b56c64f2",
-      "bytes": 5809
+      "sha256": "43c27b6561c032e6fc6846f7dc225b4b4689d0df3845a412c62e5a630ad896cb",
+      "bytes": 6350
     },
     {
       "path": "evidence/receipts/native-harness-defaults-20260920.json",
@@ -6489,6 +6489,11 @@
       "path": "tests/test_offhost_restore.py",
       "sha256": "77ac24a0d2094856b2d5dfcccafbef49ff7e7f0d5ee90628293e64b076c030a8",
       "bytes": 6340
+    },
+    {
+      "path": "docs/acceptance-evidence-policy.md",
+      "sha256": "cff82f8a59a57f9c51d6d9d18a4d02bdde978f8c4fe928e7a4af219894bed964",
+      "bytes": 4916
     }
   ],
   "convergence_records": [

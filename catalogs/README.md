@@ -7,4 +7,6 @@
 
 Both catalogs reference shared component pins, upstream source reviews and scoped execution receipts. General engineering does not inherit broker prerequisites. Trading work reuses the foundation and adds data, strategy, risk and broker-specific acceptance.
 
+Both follow the [upstream acceptance evidence policy](../docs/acceptance-evidence-policy.md): research and reuse supported upstream skills, examples, tests and automation; retain actual native results and independent observations. Our integration tests and synthetic fixtures remain explicitly scoped.
+
 The broad repository decision union remains at [its existing path](us-equities/decision-index.json) for compatibility; it contains shared research discovery, not just trading adoption. Curated lists and stars are discovery sources. Explicit catalog decisions establish selected capabilities, and execution receipts establish only the workflows they actually measured.

@@ -323,6 +323,12 @@
       "category": "setup"
     },
     {
+      "title": "Upstream practice and acceptance evidence",
+      "body": "Research and reuse upstream skills, tests and automation; retain native outputs and separate observations. Local integration checks and synthetic fixtures carry explicit limits.",
+      "path": "docs/acceptance-evidence-policy.md",
+      "category": "evaluation"
+    },
+    {
       "title": "Tavily upstream CLI and skills",
       "body": "Native install, Search/Extract outputs, eight-skill discovery and explicit Desktop probe limits.",
       "path": "recipes/tavily.md",

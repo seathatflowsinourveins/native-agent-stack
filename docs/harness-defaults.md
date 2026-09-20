@@ -8,6 +8,8 @@ Start with the requested result, current repository state and a concrete accepta
 
 Prefer the installed upstream executable, SDK and supported client integration. Consult current primary documentation before adopting changing interfaces. Discover alternatives through owned/starred repositories, curated lists and research, then record why a candidate closes a gap or improves a comparable workload. Stars, release dates, author benchmarks and installation success do not establish the best workflow.
 
+Research before custom automation. Prefer maintained upstream skills, examples, SDKs and CI patterns that fit the actual task; record the selected source revision and the reason for any remaining glue. Follow the [acceptance evidence policy](acceptance-evidence-policy.md): unchanged upstream tests and native command results are primary evidence, while our own integration checks and synthetic fixtures stay explicitly identified. A generated receipt or locally authored test suite cannot certify itself as upstream end-to-end acceptance.
+
 Keep native sign-ins, model choices, permission settings, caching, deferred tool discovery and compaction unless the task explicitly requires changing them. Keep project indexes, memory, tool state and writable paths scoped. A worktree separates edits; it does not replace process or operating-system isolation. Secrets stay in native private storage and are excluded from command receipts and publication.
 
 ## Use skills, workers and tools deliberately

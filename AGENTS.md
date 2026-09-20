@@ -7,6 +7,13 @@ The two maintained catalogs start at `catalogs/README.md`. Use
 installation, capability-specific evidence, bounded workers, scoped state and
 recoverable lifecycle acceptance. Load only the layer needed by the task.
 
+Research existing upstream skills, examples, SDKs and automation before writing
+custom orchestration. Use supported installation and native test commands from
+the selected upstream revision. Follow `docs/acceptance-evidence-policy.md`:
+distinguish unchanged upstream tests from our integration checks and synthetic
+fixtures; retain actual returned output and independent observation. Do not
+promote locally authored tests or generated summaries into upstream acceptance.
+
 Carry authorized setup, fixes, checks and documentation through useful completion.
 Use a short internal plan; do not add intake, brainstorming or separate planning
 approval to bounded work. Reuse passing evidence when its inputs still match and
