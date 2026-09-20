@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-20T01:15:20Z",
+  "recorded_at_utc": "2026-09-20T02:08:12.691509Z",
   "meaning": "Recorded checkpoint; freshness of emission is separate from source update. Worker states are coordinator checkpoints, not process heartbeats.",
   "lanes": [
     {
@@ -51,8 +51,8 @@
       "kind": "gate",
       "id": "historical-universe",
       "title": "Historical extreme mover universe",
-      "state": "licensed PIT coverage pending",
-      "evidence_ref": "blueprints/us-equities/acceptance-wave/research-protocol.json"
+      "state": "10 observations / 1 quarantined / historical universe pending",
+      "evidence_ref": "blueprints/us-equities/identity-readiness/native-receipt.json"
     },
     {
       "kind": "gate",
@@ -115,25 +115,25 @@
     {
       "kind": "worker",
       "id": "evaluation-worker",
-      "title": "Data source challenge worker",
-      "state": "6 source decisions / 501 identities",
-      "evidence_ref": "catalogs/us-equities/authenticated-data-review.json"
+      "title": "Identity and universe source worker",
+      "state": "six source reviews accepted / catalog502",
+      "evidence_ref": "blueprints/us-equities/identity-readiness/native-receipt.json"
     },
     {
       "kind": "worker",
       "id": "data-worker",
-      "title": "Historical data acquisition worker",
-      "state": "5 HTTP200 pages / verified",
-      "evidence_ref": "blueprints/us-equities/authenticated-data/native-receipt.json"
+      "title": "Symbol mapping and observation worker",
+      "state": "native8 HTTP200 / temporal ledger accepted",
+      "evidence_ref": "blueprints/us-equities/identity-readiness/native-receipt.json"
     },
     {
       "kind": "worker",
       "id": "independent-reviewer",
       "title": "Independent evidence reviewer",
-      "state": "code and native evidence accepted",
-      "evidence_ref": "blueprints/us-equities/authenticated-data/native-receipt.json"
+      "state": "code and private evidence accepted / 18 focused checks",
+      "evidence_ref": "blueprints/us-equities/identity-readiness/native-receipt.json"
     }
   ],
-  "plan_ref": "blueprints/us-equities/authenticated-data/plan.json",
+  "plan_ref": "blueprints/us-equities/identity-readiness/plan.json",
   "stars_ref": "blueprints/us-equities/authenticated-data/public-stars-refresh.json"
 }

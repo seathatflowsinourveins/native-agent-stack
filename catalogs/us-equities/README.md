@@ -2,9 +2,16 @@
 
 **Dated decision catalog: September 20, 2026.** The north star is native, token-efficient research → reproducible backtesting → Alpaca paper automation. This is an examined selection across layers, not a universal final SOTA ranking or a claim that every listed framework runs together.
 
-The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **503 repository identities**, including all 342 public stars and 161 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 1,031 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
+The catalog has **152 baseline repository decision cards covering 147 unique GitHub repositories**, and **20 model entries**. The [combined repository index](repository-index.md) now contains **504 repository identities**, including all 342 public stars and 162 beyond that snapshot. Its [typed decision union](decision-index.json) validates baseline cards, component/candidate records and explicitly registered research supplements together; 1,037 source pointers preserve their different evidence depths. The historical 453-row index remains dated reference material.
 
-The newest [authenticated-data review](authenticated-data-review.md) challenges
+The newest [security-identity review](security-identity-review.md) examines Alpaca,
+Zipline, Qlib, NautilusTrader, LEAN and WRDS. It separates engine identity/lifetime
+representation from historically available source data. WRDS is the sole new
+conditional reference, with licensed access unestablished. See the [native identity
+wave](../../blueprints/us-equities/identity-readiness/README.md) for its bounded
+probe, observation ledger and explicit remaining universe/revision requirements.
+
+The preceding [authenticated-data review](authenticated-data-review.md) challenges
 Massive, Databento, OpenFIGI, ArcticDB, Pandera and OpenBB. It records historical
 identity, revision, availability and licensing limits from pinned source files.
 Only OpenFIGI adds a new reference identity; no additional framework is adopted.

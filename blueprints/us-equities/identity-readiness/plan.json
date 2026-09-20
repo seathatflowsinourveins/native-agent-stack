@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "id": "security-identity-readiness-20260920",
+  "base_commit": "bf99d340f798bf72cc3104619edc482882eb423d",
+  "recorded_date": "2026-09-20",
+  "objective": "Establish a bounded native symbol-mapping and temporal-observation contract before broader historical-universe or mover research.",
+  "scope": {
+    "sessions": [
+      "2022-06-08",
+      "2022-06-09",
+      "2022-06-10"
+    ],
+    "local_interval": "[2022-06-08T00:00:00Z,2022-06-11T00:00:00Z)",
+    "wire_end_inclusive": "2022-06-10T23:59:59.999999999Z",
+    "feed": "sip",
+    "adjustment": "raw",
+    "currency": "USD",
+    "timeframe": "1Day",
+    "sort": "asc",
+    "cases": [
+      {
+        "symbol": "META",
+        "asof": "2022-06-10"
+      },
+      {
+        "symbol": "FB",
+        "asof": "2022-06-08"
+      },
+      {
+        "symbol": "META",
+        "asof": "-"
+      },
+      {
+        "symbol": "FB",
+        "asof": "-"
+      }
+    ],
+    "page_limit": 2,
+    "maximum_pages_per_case": 3,
+    "current_reference": "One native GET for META's current paper-endpoint asset metadata; no bulk asset listing, account request or order.",
+    "maximum_http_attempts": 13,
+    "http_attempts_per_page": 1,
+    "body_cap_bytes": 8388608,
+    "runtime": "Existing Alpaca-py0.44.0 and DuckDB1.5.5; no dependency installation or upgrade.",
+    "broker_orders": false,
+    "account_resets": false,
+    "paid_resources": false
+  },
+  "waves": [
+    {
+      "id": "identity_source_challenge",
+      "state": "six primary source reviews accepted / dated342-star snapshot reused",
+      "purpose": "Review six selected upstream identity/lifetime/universe contracts; reuse the prior complete public-star snapshot with its timestamp."
+    },
+    {
+      "id": "native_mapping_probe",
+      "state": "8 HTTP200 / four terminal chains / original failure retained",
+      "purpose": "Retain exact bounded responses for four mapping cases and one current reference lookup, including partial or refused responses."
+    },
+    {
+      "id": "temporal_observation_ledger",
+      "state": "native DuckDB accepted / 10 observations / 9 qualified / 1 quarantined",
+      "purpose": "Use native DuckDB BIGINT UTC-nanosecond eligibility with source and query scope retained; never backdate today's observations."
+    },
+    {
+      "id": "review_and_publication",
+      "state": "independent review accepted / exact-commit CI follows publication",
+      "purpose": "Independent code/native-evidence review, meaningful checks, dashboard/adoption updates and exact-commit GitHub CI."
+    }
+  ],
+  "acceptance": [
+    "The strict prior AAPL collector and its receipt remain unchanged; reuse its anchored precise parsing and bounded transport where appropriate.",
+    "Symbol-asof identifies which symbol's entity to query; it is not a knowledge-time or original provider revision timestamp.",
+    "Compare mapped labels and unmapped date partitions without hardcoding prices, deduplicating query observations or inferring a permanent identity from equal prices.",
+    "Current asset UUID/status/tradable fields are current observations. Historical validity and original publication/revision times remain unknown unless separately evidenced.",
+    "Keep event time, response observation and conservative availability separate. Store UTC nanoseconds as BIGINT with source text; no microsecond or floating epoch conversion.",
+    "Historical2022 cutoff and just-before-observation must exclude new observations; exact boundary selections and replay must be reproducible from anchored private artifacts.",
+    "Hash plan, imported helper, SDK source, complete response bodies, request scope, derived files and selection SQL; refuse overwrite, tamper and ambiguous identities.",
+    "Source/ledger qualification does not establish eligible or delisted market-wide universe, real-time data entitlement, provider revision completeness, profitable strategy or net token savings."
+  ],
+  "continuation": "Obtain a permitted historical security/universe and revision source before broad catalyst/mover sampling. Preserve original observation timestamps and unknown eligibility; future paper execution still requires numeric risk, journaling and reconciliation.",
+  "results": {
+    "original_http_attempts": 7,
+    "additional_http_attempts": 1,
+    "total_http_attempts": 8,
+    "total_http_200": 8,
+    "complete_query_cases": 4,
+    "query_observations": 10,
+    "qualified_observations": 9,
+    "quarantined_observations": 1,
+    "current_asset_snapshots": 1,
+    "original_capture_exit_code": 1,
+    "original_verify_exit_code": 1,
+    "quality_resume_exit_code": 0,
+    "quality_verify_exit_code": 0,
+    "ledger_materialize_exit_code": 0,
+    "ledger_select_exit_codes": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "original_failure_preserved": true,
+    "receipt": "blueprints/us-equities/identity-readiness/native-receipt.json",
+    "source_review": "catalogs/us-equities/security-identity-review.json",
+    "grand_repository_identities": 502,
+    "typed_decision_references": 1030,
+    "local_tests": 310,
+    "local_test_skips": 0,
+    "all_gaps_closed": false
+  },
+  "recorded_at_utc": "2026-09-20T02:08:12.691509Z"
+}

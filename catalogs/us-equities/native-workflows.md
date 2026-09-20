@@ -49,7 +49,7 @@ savings trial. [Receipt](retrieval-receipt.json),
 [selected source](../../evidence/artifacts/catalog-models.selected.txt),
 [search result](../../evidence/artifacts/catalog-search.json).
 
-## Current model discovery
+## Recorded model discovery
 
 ```bash
 hf models info nvidia/Nemotron-3-Embed-1B-BF16 \
@@ -79,12 +79,15 @@ first-weight and research-paper dates from repository creation/card edits.
 The existing native Codex/Claude tools and hooks have separate earlier receipts.
 The SDK token totals cover only the three recorded SDK turns; they exclude the
 coordinator and catalog-research agents and are not the total cost of this task.
-The original catalog expansion did not rerun Claude or deploy a broker; the subsequent observability acceptance ran bounded native Codex and Claude tasks without broker access. A fresh Desktop
-session discovers newly registered tools; installed CLIs can be used now. New
+The original catalog expansion did not rerun Claude or deploy a broker; the subsequent observability acceptance ran bounded native Codex and Claude tasks without broker access. After registration,
+restart and verify discovery on that host; CLI readiness is host-specific. New
 projects need their own memory/index scope. The existing native Astra SDK worker
-already used Context Mode in this task, but its file-tool override still needs
-normal native MCP approval. Direct `ctx_*` tools are absent from the current
-Desktop catalog; the native MCPorter bridge works.
+already used Context Mode in the recorded task, but its file-tool override needed
+normal native MCP approval. Direct `ctx_*` tools were absent from that original
+Desktop catalog. The later [restart acceptance](../../observability/desktop-restart.md)
+records direct tool discovery; the native MCPorter bridge remains a separately
+scoped option. A historical discovery receipt does not establish another host's
+current tool availability.
 
 ## Verify the published artifacts
 
@@ -109,4 +112,20 @@ The installed Collector is `otelcol-contrib`, built from core and contrib source
 
 ## Source follow-up is separate from runtime acceptance
 
-The [source follow-up receipt](source-followup-receipt.json) records a fresh public-star identity comparison and GitHub stable-release metadata, plus focused source examination. The public set remains 337; two unadopted observability alternatives bring the grand index to 453. No model, service, backup or optional exporter ran for that review. Prospective node_exporter/OpenLIT commands in the cards do not inherit the adopted Collector receipts. The [follow-up decisions](source-followup.md) retain the earlier restic boundary; later [public-file backup](../../blueprints/us-equities/hosting/backup/README.md) and [application-state restore](../../blueprints/us-equities/state-recovery/README.md) passed their scoped native drills. Independent off-host recovery remains pending.
+The [source follow-up receipt](source-followup-receipt.json) records an earlier public-star identity comparison and GitHub stable-release metadata, plus focused source examination. That dated snapshot contained337 public stars and453 combined identities; use the [current typed index](decision-index.json) for subsequent counts. No model, service, backup or optional exporter ran for that review. Prospective node_exporter/OpenLIT commands in the cards do not inherit the adopted Collector receipts. The [follow-up decisions](source-followup.md) retain the earlier restic boundary; later [public-file backup](../../blueprints/us-equities/hosting/backup/README.md) and [application-state restore](../../blueprints/us-equities/state-recovery/README.md) passed their scoped native drills. Independent off-host recovery remains pending.
+
+## Authenticated historical data
+
+The [AAPL acquisition recipe](../../blueprints/us-equities/alpaca-historical/README.md)
+uses native Alpaca-py GET transport and a bounded provenance adapter. Its
+[accepted receipt](../../blueprints/us-equities/authenticated-data/native-receipt.json)
+records25daily bars/3pages and2corporate actions/2pages, allHTTP200. The25raw
+closes match the frozen LEAN reference; missing dividend currency remains explicit.
+The [identity-readiness wave](../../blueprints/us-equities/identity-readiness/README.md)
+records eight HTTP200 responses across the retained original capture and one
+saved-token continuation. Four query chains completed; native DuckDB preserved
+ten distinct query observations, nine locally qualified and one quarantined.
+Historical and just-before-observation cutoffs select zero. Its original failed
+normalization is retained. Current metadata and retrospective data do not establish
+historical universe completeness or strategy merit; the exact commands and source
+anchors are in the wave's [receipt](../../blueprints/us-equities/identity-readiness/native-receipt.json).

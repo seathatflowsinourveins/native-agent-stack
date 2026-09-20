@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-19T22:03:00Z",
+  "recorded_at_utc": "2026-09-20T02:08:12.691509Z",
   "scope": "Linux/WSL x86_64 native Codex/Claude workflow; current evidence-backed selection, not an exhaustive global ranking. Exact native results are dated and host-specific.",
   "source_snapshot_commit": "44750edc",
   "components": [
@@ -951,7 +951,7 @@
       "repository": "https://github.com/duckdb/duckdb",
       "version": "1.5.5",
       "license": "MIT",
-      "role": "Deterministic local SQL/Parquet research data and exact decimal storage",
+      "role": "Native SQL/Parquet research data, exact decimal storage and source-anchored nanosecond observation eligibility with explicit quality flags",
       "source_pin": "d8cdaa33fda8df955cc76ef58a280f68f4cd43fa",
       "commands": [
         "python -c \"import duckdb; print(duckdb.__version__)\"",
@@ -964,7 +964,8 @@
         "native-paired-adoption-20260919",
         "native-point-in-time-contract-20260919",
         "native-exact-nanosecond-replay-20260919",
-        "sec-catalyst-dataset-native-20260920"
+        "sec-catalyst-dataset-native-20260920",
+        "native-security-identity-20260920"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1070,7 +1071,7 @@
       "version": "0.44.0",
       "license": "Apache-2.0",
       "profile": "supporting",
-      "role": "Official Python SDK; offline intent guard and bounded authenticated historical SIP/raw bars and corporate-action acquisition",
+      "role": "Official Python SDK; offline intent guard and bounded native historical bars, corporate actions and symbol-mapping observations with current asset metadata",
       "commands": [
         "python3 blueprints/us-equities/order-contract/order_contract.py < blueprints/us-equities/order-contract/basic-intent.json",
         "bwrap --unshare-net --ro-bind / / --proc /proc --dev /dev --die-with-parent \"$SDK_PYTHON\" blueprints/us-equities/order-contract/sdk_probe.py",
@@ -1078,7 +1079,8 @@
       ],
       "evidence_ids": [
         "alpaca-offline-order-contract-20260919",
-        "native-alpaca-historical-20260920"
+        "native-alpaca-historical-20260920",
+        "native-security-identity-20260920"
       ],
       "upstream_sources": [
         "https://github.com/alpacahq/alpaca-py/tree/v0.44.0",
