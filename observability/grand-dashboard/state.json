@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-20T03:31:24.488598Z",
+  "recorded_at_utc": "2026-09-20T04:30:41.591503+00:00",
   "meaning": "Recorded checkpoint; freshness of emission is separate from source update. Worker states are coordinator checkpoints, not process heartbeats.",
   "lanes": [
     {
@@ -116,6 +116,13 @@
       "title": "Frozen daily and intraday catalyst protocol",
       "state": "synthetic mechanics accepted / empirical merit unknown",
       "evidence_ref": "blueprints/us-equities/catalyst-experiment/receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "convergence-evidence-contract",
+      "title": "Convergence claim integrity",
+      "state": "scoped qualification and matched usage checks enforced",
+      "evidence_ref": "blueprints/convergence-practice/ci-security/experiment.json"
     }
   ],
   "workers": [
@@ -139,6 +146,13 @@
       "title": "Research efficiency worker and reviewers",
       "state": "8 native invocations / blinded grading complete",
       "evidence_ref": "blueprints/us-equities/research-efficiency/native-receipt.json"
+    },
+    {
+      "kind": "worker",
+      "id": "native-engineering-child",
+      "title": "Native Claude engineering child",
+      "state": "one isolated repair accepted / real repository trial next",
+      "evidence_ref": "blueprints/convergence-practice/native-worker/receipt.json"
     }
   ],
   "plan_ref": "blueprints/us-equities/catalyst-convergence/plan.json",

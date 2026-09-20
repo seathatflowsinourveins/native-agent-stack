@@ -8,7 +8,7 @@ download the file to view it locally. The same file can be served by an existing
 static host, but this change does not configure GitHub Pages or paid hosting.
 
 The four views connect a layered ecosystem map, the canonical repository explorer,
-token-efficiency policy, and evidence with dated source provenance. All 504 public
+token-efficiency policy, and evidence with dated source provenance. All 505 public
 index identities and the existing 342-star snapshot are retained. The separate
 current-integrations lane makes newly observed Tavily setup searchable without
 silently enlarging the canonical index or accepted component manifest. Stars and

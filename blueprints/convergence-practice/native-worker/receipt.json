@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "native-claude-child-patch-20260920",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "claude-code"
+  ],
+  "claim": "Native Claude Code2.1.278 on Ubuntu24.04 WSL2 used Opus5 through Max for one foreground isolated child repair. Only planner.py changed; all12 frozen visible tests pass independently after8 seed failures.",
+  "limitations": [
+    "One synthetic visible-oracle fixture, not a held-out benchmark, real application or GPU acceptance.",
+    "Ultracode was requested; observed native delegation does not establish dynamic-workflow selection or an OS sandbox.",
+    "Three native usage views retain different scopes; native retries and whole Desktop usage are unknown. No matched model baseline or savings claim.",
+    "Local supervision completed without timeout; provider cancellation, crash recovery and full-host backup were not tested."
+  ],
+  "recorded_at_utc": "2026-09-20T04:30:41.591503+00:00"
+}

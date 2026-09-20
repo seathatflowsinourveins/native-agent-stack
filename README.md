@@ -16,10 +16,16 @@ executed external retrieval comparison and a reusable acceptance protocol for
 native agent work, recovery and local inference. Research findings remain
 separate from a new host's runtime acceptance.
 
+For general software work, start with the **[convergence architecture](docs/convergence-architecture.md)**.
+It connects compact task contracts, native workers, scoped retrieval, complete
+attempt records and recoverable decisions. The latest wave adds executable
+claim checks, a verified Claude child repair, and pinned workflow-security
+analysis. [Ten-source review and current star delta](catalogs/convergence-practice/architecture-wave/README.md).
+
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
 and an auditable **342-star coverage ledger**. Its combined index includes
-**504 repository identities** across all 342 public stars and 162 beyond them,
+**505 repository identities** across all 342 public stars and 163 beyond them,
 with typed, validated pointers to decisions and evidence. The latest
 [architecture research wave](catalogs/us-equities/architecture/README.md) adds
 source reviews, awesome-list coverage and official Alpaca constraints.

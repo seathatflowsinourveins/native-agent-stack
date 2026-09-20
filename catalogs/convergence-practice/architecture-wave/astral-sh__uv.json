@@ -1,0 +1,158 @@
+{
+  "repository": "astral-sh/uv",
+  "requested_repository": "astral-sh/uv",
+  "checked_at": "2026-09-20T04:10:43.071886+00:00",
+  "source_depth": "pinned_README_license_overview_only",
+  "metadata": {
+    "html_url": "https://github.com/astral-sh/uv",
+    "default_branch": "main",
+    "archived": false,
+    "disabled": false,
+    "pushed_at": "2026-09-20T00:43:09Z",
+    "description": "An extremely fast Python package and project manager, written in Rust.",
+    "license": {
+      "key": "apache-2.0",
+      "name": "Apache License 2.0",
+      "spdx_id": "Apache-2.0",
+      "url": "https://api.github.com/licenses/apache-2.0",
+      "node_id": "MDc6TGljZW5zZTI="
+    }
+  },
+  "default_head": "7b090fba99bc89a6670a23de5368d48d2418a756",
+  "release": {
+    "tag_name": "0.12.17",
+    "published_at": "2026-09-18T18:59:24Z",
+    "html_url": "https://github.com/astral-sh/uv/releases/tag/0.12.17",
+    "prerelease": false,
+    "draft": false
+  },
+  "source_commit": "635500036e1705961315e86447f0fab0a8ddb309",
+  "source_basis": "latest release",
+  "access": [
+    {
+      "endpoint": "https://api.github.com/repos/astral-sh/uv",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/astral-sh/uv/commits/main",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/astral-sh/uv/releases/latest",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/astral-sh/uv/commits/0.12.17",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/astral-sh/uv/readme?ref=635500036e1705961315e86447f0fab0a8ddb309",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/astral-sh/uv/license?ref=635500036e1705961315e86447f0fab0a8ddb309",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/astral-sh/uv/contents/LICENSE-MIT?ref=635500036e1705961315e86447f0fab0a8ddb309",
+      "exit_code": 0
+    }
+  ],
+  "baseline_index_matches": [
+    {
+      "repository": "https://github.com/astral-sh/uv",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "adoption/research.json",
+          "pointer": "/candidates/1",
+          "decision": "required_reuse_existing_native_python_layer"
+        }
+      ]
+    }
+  ],
+  "readme": {
+    "path": "README.md",
+    "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/README.md",
+    "sha256": "57a84a5a635f30e3a26541ebc16ca690944a7750f05713b1af92d3170b58f704",
+    "git_blob_sha": "66caaf9ccc62add8c63de8e71184c9b7677377ad",
+    "bytes": 9859,
+    "matched_excerpts": [
+      {
+        "term": "lockfile",
+        "line": 27,
+        "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/README.md#L27"
+      },
+      {
+        "term": "lockfile",
+        "line": 89,
+        "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/README.md#L89"
+      },
+      {
+        "term": "cache",
+        "line": 18,
+        "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/README.md#L18"
+      },
+      {
+        "term": "cache",
+        "line": 36,
+        "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/README.md#L36"
+      },
+      {
+        "term": "projects",
+        "line": 26,
+        "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/README.md#L26"
+      },
+      {
+        "term": "projects",
+        "line": 27,
+        "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/README.md#L27"
+      },
+      {
+        "term": "workspace",
+        "line": 34,
+        "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/README.md#L34"
+      },
+      {
+        "term": "workspace",
+        "line": 89,
+        "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/README.md#L89"
+      }
+    ]
+  },
+  "license_at_source": {
+    "path": "LICENSE-APACHE",
+    "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/LICENSE-APACHE",
+    "metadata": {
+      "key": "other",
+      "name": "Other",
+      "spdx_id": "NOASSERTION",
+      "url": null,
+      "node_id": "MDc6TGljZW5zZTA="
+    },
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "bytes": 11357
+  },
+  "supplemental_sources": [
+    {
+      "path": "LICENSE-MIT",
+      "url": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/LICENSE-MIT",
+      "sha256": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+      "bytes": 1077
+    }
+  ],
+  "decision": {
+    "disposition": "retain-native",
+    "license_text_classification": "MIT OR Apache-2.0",
+    "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+    "concrete_gap_or_overlap": "Existing exact 0.12.17 route already provides lockfiles and shared dependency cache. A second environment manager would duplicate this layer.",
+    "next_acceptance": "Use project-owned locks and compare source/dependency fingerprints before cross-host runs; retain isolated environments and caches.",
+    "installation_performed": false,
+    "model_calls": 0
+  }
+}

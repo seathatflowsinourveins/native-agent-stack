@@ -1,0 +1,126 @@
+{
+  "repository": "zizmorcore/zizmor",
+  "requested_repository": "zizmorcore/zizmor",
+  "checked_at": "2026-09-20T04:10:43.259941+00:00",
+  "source_depth": "pinned_README_license_overview_only",
+  "metadata": {
+    "html_url": "https://github.com/zizmorcore/zizmor",
+    "default_branch": "main",
+    "archived": false,
+    "disabled": false,
+    "pushed_at": "2026-09-18T06:06:01Z",
+    "description": "Static analysis for GitHub Actions",
+    "license": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    }
+  },
+  "default_head": "e5b9690d7341830c494cdd24f1803623917873d9",
+  "release": {
+    "tag_name": "v1.30.1",
+    "published_at": "2026-09-09T05:34:10Z",
+    "html_url": "https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1",
+    "prerelease": false,
+    "draft": false
+  },
+  "source_commit": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+  "source_basis": "latest release",
+  "access": [
+    {
+      "endpoint": "https://api.github.com/repos/zizmorcore/zizmor",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/zizmorcore/zizmor/commits/main",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/zizmorcore/zizmor/releases/latest",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/zizmorcore/zizmor/commits/v1.30.1",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/zizmorcore/zizmor/readme?ref=99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/zizmorcore/zizmor/license?ref=99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/zizmorcore/zizmor/contents/README.md?ref=99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+      "exit_code": 0
+    }
+  ],
+  "baseline_index_matches": [],
+  "readme": {
+    "path": "README.md",
+    "url": "https://github.com/zizmorcore/zizmor/blob/99a054ed9283c90abdd2d5b9fb5101d27dde9783/README.md",
+    "sha256": "770432131713e73537e4e4752497087cfbc0827c4a056c2de1a9baa179a05848",
+    "git_blob_sha": "cb6b574efe50994a7b9c7902d7958991c0fbd01e",
+    "bytes": 4146,
+    "matched_excerpts": [
+      {
+        "term": "static",
+        "line": 10,
+        "url": "https://github.com/zizmorcore/zizmor/blob/99a054ed9283c90abdd2d5b9fb5101d27dde9783/README.md#L10"
+      },
+      {
+        "term": "Actions",
+        "line": 4,
+        "url": "https://github.com/zizmorcore/zizmor/blob/99a054ed9283c90abdd2d5b9fb5101d27dde9783/README.md#L4"
+      },
+      {
+        "term": "Actions",
+        "line": 12,
+        "url": "https://github.com/zizmorcore/zizmor/blob/99a054ed9283c90abdd2d5b9fb5101d27dde9783/README.md#L12"
+      },
+      {
+        "term": "audit",
+        "line": 21,
+        "url": "https://github.com/zizmorcore/zizmor/blob/99a054ed9283c90abdd2d5b9fb5101d27dde9783/README.md#L21"
+      },
+      {
+        "term": "security",
+        "line": 12,
+        "url": "https://github.com/zizmorcore/zizmor/blob/99a054ed9283c90abdd2d5b9fb5101d27dde9783/README.md#L12"
+      }
+    ]
+  },
+  "license_at_source": {
+    "path": "LICENSE",
+    "url": "https://github.com/zizmorcore/zizmor/blob/99a054ed9283c90abdd2d5b9fb5101d27dde9783/LICENSE",
+    "metadata": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    },
+    "sha256": "a6fd1bd18da7cec8284639d5b0d351b90934317be1b9f9ea94a077621c6f35af",
+    "bytes": 1109
+  },
+  "supplemental_sources": [
+    {
+      "path": "README.md",
+      "url": "https://github.com/zizmorcore/zizmor/blob/99a054ed9283c90abdd2d5b9fb5101d27dde9783/README.md",
+      "sha256": "770432131713e73537e4e4752497087cfbc0827c4a056c2de1a9baa179a05848",
+      "bytes": 4146
+    }
+  ],
+  "decision": {
+    "disposition": "adopt-as-reference",
+    "license_text_classification": "MIT",
+    "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+    "concrete_gap_or_overlap": "Only new identity in this ten-repository public-index comparison. Public CI checks evidence and data joins but does not run CI configuration security analysis; private ecosystem already has this capability.",
+    "next_acceptance": "Port a pinned optional/CI recipe and test a safe workflow plus deliberately unsafe fixture; require findings for injection/unpinned actions and retain false positives. No installation in this review.",
+    "installation_performed": false,
+    "model_calls": 0
+  }
+}

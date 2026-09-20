@@ -1,0 +1,155 @@
+{
+  "repository": "jgravelle/jcodemunch-mcp",
+  "requested_repository": "jgravelle/jcodemunch-mcp",
+  "checked_at": "2026-09-20T04:10:43.035192+00:00",
+  "source_depth": "pinned_README_license_overview_only",
+  "metadata": {
+    "html_url": "https://github.com/jgravelle/jcodemunch-mcp",
+    "default_branch": "main",
+    "archived": false,
+    "disabled": false,
+    "pushed_at": "2026-09-20T04:02:26Z",
+    "description": "Cut AI token costs 95%+ on code exploration. The leading MCP server for precise, symbol-level GitHub code retrieval via tree-sitter AST. Works with Claude Code, Cursor & any MCP client. 313B+ tokens saved.",
+    "license": {
+      "key": "other",
+      "name": "Other",
+      "spdx_id": "NOASSERTION",
+      "url": null,
+      "node_id": "MDc6TGljZW5zZTA="
+    }
+  },
+  "default_head": "5c97b0f0725e7decc90ddd61d8c4c09c7bd055c0",
+  "release": {
+    "tag_name": "v1.108.319",
+    "published_at": "2026-09-16T14:04:32Z",
+    "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+    "prerelease": false,
+    "draft": false
+  },
+  "source_commit": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+  "source_basis": "latest release",
+  "access": [
+    {
+      "endpoint": "https://api.github.com/repos/jgravelle/jcodemunch-mcp",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/jgravelle/jcodemunch-mcp/commits/main",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/jgravelle/jcodemunch-mcp/releases/latest",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/jgravelle/jcodemunch-mcp/commits/v1.108.319",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/jgravelle/jcodemunch-mcp/readme?ref=8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/jgravelle/jcodemunch-mcp/license?ref=8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "exit_code": 0
+    }
+  ],
+  "baseline_index_matches": [
+    {
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "aliases": [],
+      "public_star": true,
+      "record_types": [
+        "public_star",
+        "star_review"
+      ],
+      "references": [
+        {
+          "kind": "public_star",
+          "path": "catalogs/us-equities/coverage.json",
+          "pointer": "/stars/141",
+          "disposition": "no_catalog_card"
+        },
+        {
+          "kind": "star_review",
+          "path": "catalogs/us-equities/star-audit.json",
+          "pointer": "/entries/153",
+          "decision": "obsolete_or_ineligible",
+          "review_level": "source_review",
+          "review_depth": "readme_license_overview"
+        }
+      ]
+    }
+  ],
+  "readme": {
+    "path": "README.md",
+    "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md",
+    "sha256": "8388d31c6e30f7fb298abf262faebe08d563c982d63721f996f27f962f8b2405",
+    "git_blob_sha": "36204d47c06e60f655c1d396f85493a102a880ca",
+    "bytes": 26987,
+    "matched_excerpts": [
+      {
+        "term": "license",
+        "line": 15,
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L15"
+      },
+      {
+        "term": "license",
+        "line": 23,
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L23"
+      },
+      {
+        "term": "symbol",
+        "line": 32,
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L32"
+      },
+      {
+        "term": "symbol",
+        "line": 36,
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L36"
+      },
+      {
+        "term": "retriev",
+        "line": 3,
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L3"
+      },
+      {
+        "term": "retriev",
+        "line": 32,
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L32"
+      },
+      {
+        "term": "token",
+        "line": 3,
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L3"
+      },
+      {
+        "term": "token",
+        "line": 6,
+        "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L6"
+      }
+    ]
+  },
+  "license_at_source": {
+    "path": "LICENSE",
+    "url": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/LICENSE",
+    "metadata": {
+      "key": "other",
+      "name": "Other",
+      "spdx_id": "NOASSERTION",
+      "url": null,
+      "node_id": "MDc6TGljZW5zZTA="
+    },
+    "sha256": "66ed60bbc2a646e4bf7cde22a636b1a7ddeef514bb95b3b88af1e944457d6f38",
+    "bytes": 4384
+  },
+  "decision": {
+    "disposition": "retain-rejection",
+    "license_text_classification": "Dual-Use License 1.1",
+    "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+    "concrete_gap_or_overlap": "Current release still overlaps accepted code retrieval; non-commercial/commercial terms remain an unresolved boundary for the trading ecosystem. Publisher token-savings claims are not local evidence.",
+    "next_acceptance": "Do not install or add duplicate server; reopen only after scope/license and a precision gap are explicitly resolved.",
+    "installation_performed": false,
+    "model_calls": 0
+  }
+}

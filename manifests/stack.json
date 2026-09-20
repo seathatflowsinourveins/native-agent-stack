@@ -160,7 +160,8 @@
         "native-paired-adoption-20260919",
         "native-architecture-review-20260919",
         "native-convergence-review-20260919",
-        "native-research-efficiency-20260920"
+        "native-research-efficiency-20260920",
+        "native-claude-child-patch-20260920"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -1177,6 +1178,26 @@
         "https://pypi.org/project/edgartools/5.58.0/"
       ],
       "freshness": "Contact-corrected native request returned HTTP200 on2026-09-19 and selected371indexrows. Separate42-package Linux/WSL environment; dependency wheels are not hash-locked. See follow-up receipt for raw-source and temporal-gate scope."
+    },
+    {
+      "id": "zizmor",
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "version": "1.30.1",
+      "license": "MIT",
+      "profile": "supporting",
+      "role": "Offline GitHub workflow security analysis with failing fixtures",
+      "commands": [
+        "python3 -m unittest -v tests.test_workflow_security"
+      ],
+      "evidence_ids": [
+        "native-ci-security-20260920"
+      ],
+      "upstream_sources": [
+        "https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1",
+        "https://pypi.org/pypi/zizmor/1.30.1/json"
+      ],
+      "source_pin": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+      "freshness": "Release and wheel reviewed2026-09-20; Mac native acceptance scoped to offline regular persona."
     }
   ],
   "profiles": [
@@ -1227,7 +1248,8 @@
         "systemd",
         "pandas",
         "skfolio",
-        "edgartools"
+        "edgartools",
+        "zizmor"
       ]
     },
     {

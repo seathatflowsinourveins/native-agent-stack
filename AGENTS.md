@@ -13,6 +13,11 @@ Use upstream executables and supported integration formats. Keep client accounts
 
 One coordinator integrates. Writing workers need separate worktrees and bounded file ownership. Evidence belongs in compact sanitized receipts; no raw conversations, tokens, personal paths or machine-specific active client configuration.
 
+For general engineering and ecosystem changes, start with
+`docs/convergence-architecture.md`. New convergence claims use
+`scripts/validate_convergence.py` with a scoped experiment record. Preserve failed
+attempts and unknown usage; the checker verifies declared consistency, not truth.
+
 The north star is US-equities research/backtesting followed by Alpaca paper.
 Read `catalogs/us-equities/README.md` for selection and `blueprints/us-equities/north-star.md`
 for boundaries; load only the layer needed for the current task. The native

@@ -1,0 +1,138 @@
+{
+  "repository": "sigstore/cosign",
+  "requested_repository": "sigstore/cosign",
+  "checked_at": "2026-09-20T04:10:43.394776+00:00",
+  "source_depth": "pinned_README_license_overview_only",
+  "metadata": {
+    "html_url": "https://github.com/sigstore/cosign",
+    "default_branch": "main",
+    "archived": false,
+    "disabled": false,
+    "pushed_at": "2026-09-18T20:34:09Z",
+    "description": "Code signing and transparency for containers and binaries",
+    "license": {
+      "key": "apache-2.0",
+      "name": "Apache License 2.0",
+      "spdx_id": "Apache-2.0",
+      "url": "https://api.github.com/licenses/apache-2.0",
+      "node_id": "MDc6TGljZW5zZTI="
+    }
+  },
+  "default_head": "0c66ecdff337f647bbcb0259efe61a81e33a76e8",
+  "release": {
+    "tag_name": "v3.1.3",
+    "published_at": "2026-08-06T01:09:23Z",
+    "html_url": "https://github.com/sigstore/cosign/releases/tag/v3.1.3",
+    "prerelease": false,
+    "draft": false
+  },
+  "source_commit": "11926fa5bbbbde47e88fc006b625a17769b743b2",
+  "source_basis": "latest release",
+  "access": [
+    {
+      "endpoint": "https://api.github.com/repos/sigstore/cosign",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/sigstore/cosign/commits/main",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/sigstore/cosign/releases/latest",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/sigstore/cosign/commits/v3.1.3",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/sigstore/cosign/readme?ref=11926fa5bbbbde47e88fc006b625a17769b743b2",
+      "exit_code": 0
+    },
+    {
+      "endpoint": "https://api.github.com/repos/sigstore/cosign/license?ref=11926fa5bbbbde47e88fc006b625a17769b743b2",
+      "exit_code": 0
+    }
+  ],
+  "baseline_index_matches": [
+    {
+      "repository": "https://github.com/sigstore/cosign",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "catalog_card"
+      ],
+      "references": [
+        {
+          "kind": "catalog_card",
+          "path": "catalogs/us-equities/agents-operations.json",
+          "pointer": "/entries/36",
+          "id": "cosign",
+          "decision": "conditional",
+          "evidence_level": "source_review"
+        }
+      ]
+    }
+  ],
+  "readme": {
+    "path": "README.md",
+    "url": "https://github.com/sigstore/cosign/blob/11926fa5bbbbde47e88fc006b625a17769b743b2/README.md",
+    "sha256": "b7adc8494040172cdd057fc1cc73126fab0ae2421b4014cbdf4da0ba8176d017",
+    "git_blob_sha": "263924dfec9d5a6779fd692184654755d3f3caa6",
+    "bytes": 34433,
+    "matched_excerpts": [
+      {
+        "term": "verify",
+        "line": 81,
+        "url": "https://github.com/sigstore/cosign/blob/11926fa5bbbbde47e88fc006b625a17769b743b2/README.md#L81"
+      },
+      {
+        "term": "verify",
+        "line": 115,
+        "url": "https://github.com/sigstore/cosign/blob/11926fa5bbbbde47e88fc006b625a17769b743b2/README.md#L115"
+      },
+      {
+        "term": "sign",
+        "line": 2,
+        "url": "https://github.com/sigstore/cosign/blob/11926fa5bbbbde47e88fc006b625a17769b743b2/README.md#L2"
+      },
+      {
+        "term": "sign",
+        "line": 5,
+        "url": "https://github.com/sigstore/cosign/blob/11926fa5bbbbde47e88fc006b625a17769b743b2/README.md#L5"
+      },
+      {
+        "term": "bundle",
+        "line": 153,
+        "url": "https://github.com/sigstore/cosign/blob/11926fa5bbbbde47e88fc006b625a17769b743b2/README.md#L153"
+      },
+      {
+        "term": "bundle",
+        "line": 155,
+        "url": "https://github.com/sigstore/cosign/blob/11926fa5bbbbde47e88fc006b625a17769b743b2/README.md#L155"
+      }
+    ]
+  },
+  "license_at_source": {
+    "path": "LICENSE",
+    "url": "https://github.com/sigstore/cosign/blob/11926fa5bbbbde47e88fc006b625a17769b743b2/LICENSE",
+    "metadata": {
+      "key": "other",
+      "name": "Other",
+      "spdx_id": "NOASSERTION",
+      "url": null,
+      "node_id": "MDc6TGljZW5zZTA="
+    },
+    "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "bytes": 11357
+  },
+  "decision": {
+    "disposition": "retain-reference-close-gap",
+    "license_text_classification": "Apache-2.0",
+    "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+    "concrete_gap_or_overlap": "Existing catalog candidate can verify publisher identity and signed bundles. Existing public Syft receipt explicitly records signature_verified:false; checksum agreement alone leaves this boundary open.",
+    "next_acceptance": "Verify one upstream signed artifact/bundle against expected issuer and identity, then require tampered-artifact and wrong-identity rejection. No signing/publishing or installation implied.",
+    "installation_performed": false,
+    "model_calls": 0
+  }
+}

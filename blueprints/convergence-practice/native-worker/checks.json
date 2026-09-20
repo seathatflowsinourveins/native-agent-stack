@@ -1,0 +1,32 @@
+{
+  "child_count": 1,
+  "spawn_depths": [
+    1
+  ],
+  "roles": [
+    "ecosystem-worker"
+  ],
+  "backgrounded": [
+    false
+  ],
+  "parent_clean": true,
+  "child_base": "5699a1c8026796f8350d5549f62aa012ee5c6332",
+  "changed_paths": [
+    "planner.py"
+  ],
+  "unchanged_oracles": {
+    "TASK.md": true,
+    "test_planner.py": true
+  },
+  "independent_test_exit": 0,
+  "tests": 12,
+  "test_pass": true,
+  "cli_terminal_success": true,
+  "parent_turns": 4,
+  "timeout": false,
+  "outer_exit": 0,
+  "elapsed_seconds": 81.192,
+  "observed_models": [
+    "claude-opus-5"
+  ]
+}

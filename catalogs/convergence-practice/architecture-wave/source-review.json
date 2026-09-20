@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "kind": "bounded_discovery_convergence_review",
+  "checked_at": "2026-09-20T04:12:51.649654+00:00",
+  "public_base": "327d9badff0ad09ec0c1266e70b4ad361743c77f",
+  "scope": "Ten pinned README/license/overview reviews, not ten deep code audits. Native CI execution is recorded separately; stars and list positions do not confer adoption.",
+  "star_delta_file": "public-star-delta.json",
+  "reviewed_repositories": [
+    {
+      "repository": "UKGovernmentBEIS/inspect_ai",
+      "evidence_file": "UKGovernmentBEIS__inspect_ai.json",
+      "source_commit": "ec4dfc6953784dc45b79de3147530c89868c6e26",
+      "release": null,
+      "decision": {
+        "disposition": "retain-reference",
+        "license_text_classification": "MIT",
+        "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+        "concrete_gap_or_overlap": "Existing evaluation candidate can standardize task/scorer/log receipts; missing acceptance is resumability and bounded failure behavior, not another framework identity.",
+        "next_acceptance": "One mock-model task with deterministic scoring, bounded concurrency/retries, retained failure log, interruption and resume; no provider request.",
+        "installation_performed": false,
+        "model_calls": 0
+      },
+      "readme": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/README.md",
+      "license": "https://github.com/UKGovernmentBEIS/inspect_ai/blob/ec4dfc6953784dc45b79de3147530c89868c6e26/LICENSE",
+      "archived": false,
+      "pushed_at": "2026-09-19T13:21:18Z",
+      "present_in_baseline": true
+    },
+    {
+      "repository": "astral-sh/uv",
+      "evidence_file": "astral-sh__uv.json",
+      "source_commit": "635500036e1705961315e86447f0fab0a8ddb309",
+      "release": {
+        "tag_name": "0.12.17",
+        "published_at": "2026-09-18T18:59:24Z",
+        "html_url": "https://github.com/astral-sh/uv/releases/tag/0.12.17",
+        "prerelease": false,
+        "draft": false
+      },
+      "decision": {
+        "disposition": "retain-native",
+        "license_text_classification": "MIT OR Apache-2.0",
+        "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+        "concrete_gap_or_overlap": "Existing exact 0.12.17 route already provides lockfiles and shared dependency cache. A second environment manager would duplicate this layer.",
+        "next_acceptance": "Use project-owned locks and compare source/dependency fingerprints before cross-host runs; retain isolated environments and caches.",
+        "installation_performed": false,
+        "model_calls": 0
+      },
+      "readme": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/README.md",
+      "license": "https://github.com/astral-sh/uv/blob/635500036e1705961315e86447f0fab0a8ddb309/LICENSE-APACHE",
+      "archived": false,
+      "pushed_at": "2026-09-20T00:43:09Z",
+      "present_in_baseline": true
+    },
+    {
+      "repository": "dagucloud/dagu",
+      "evidence_file": "dagucloud__dagu.json",
+      "source_commit": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "release": {
+        "tag_name": "v2.16.6",
+        "published_at": "2026-09-14T14:45:57Z",
+        "html_url": "https://github.com/dagucloud/dagu/releases/tag/v2.16.6",
+        "prerelease": false,
+        "draft": false
+      },
+      "decision": {
+        "disposition": "retain-existing-workflow",
+        "license_text_classification": "GPL-3.0",
+        "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+        "concrete_gap_or_overlap": "Existing adopted workflow engine already has persisted run state and workers. Remaining public gate concerns actual workload interruption/recovery and unattended host availability.",
+        "next_acceptance": "Reuse one real bounded workflow and prove restart/cancellation on the intended host; do not introduce another scheduler.",
+        "installation_performed": false,
+        "model_calls": 0
+      },
+      "readme": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+      "license": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/LICENSE",
+      "archived": false,
+      "pushed_at": "2026-09-19T16:09:43Z",
+      "present_in_baseline": true
+    },
+    {
+      "repository": "eyuansu62/agent-retrieval-bench",
+      "evidence_file": "eyuansu62__agent-retrieval-bench.json",
+      "source_commit": "b487f3866cc13dd971819cb902517a6a50282404",
+      "release": {
+        "tag_name": "v0.2.1",
+        "published_at": "2026-07-26T01:08:48Z",
+        "html_url": "https://github.com/eyuansu62/agent-retrieval-bench/releases/tag/v0.2.1",
+        "prerelease": false,
+        "draft": false
+      },
+      "decision": {
+        "disposition": "retain-reference",
+        "license_text_classification": "MIT",
+        "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+        "concrete_gap_or_overlap": "Existing exact-release trace2code replay measures file retrieval; root-cause file ranking does not establish edits or lower total provider cost.",
+        "next_acceptance": "Add separate held-out patch/test acceptance after retrieval; preserve all_files and corpus/source pins.",
+        "installation_performed": false,
+        "model_calls": 0
+      },
+      "readme": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/README.md",
+      "license": "https://github.com/eyuansu62/agent-retrieval-bench/blob/b487f3866cc13dd971819cb902517a6a50282404/LICENSE",
+      "archived": false,
+      "pushed_at": "2026-08-04T04:01:12Z",
+      "present_in_baseline": true
+    },
+    {
+      "repository": "harbor-framework/harbor",
+      "evidence_file": "harbor-framework__harbor.json",
+      "source_commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "release": {
+        "tag_name": "v0.23.0",
+        "published_at": "2026-09-12T04:55:17Z",
+        "html_url": "https://github.com/harbor-framework/harbor/releases/tag/v0.23.0",
+        "prerelease": false,
+        "draft": false
+      },
+      "decision": {
+        "disposition": "defer-install",
+        "license_text_classification": "Apache-2.0",
+        "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+        "concrete_gap_or_overlap": "Existing source-reviewed comparator packages runnable agent tasks and deterministic verification. It adds Docker or a cloud environment before a selected benchmark needs it.",
+        "next_acceptance": "Revisit only for a named container task; use oracle-only packaging test first and preserve cleanup evidence.",
+        "installation_performed": false,
+        "model_calls": 0
+      },
+      "readme": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md",
+      "license": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/LICENSE",
+      "archived": false,
+      "pushed_at": "2026-09-19T18:59:40Z",
+      "present_in_baseline": true
+    },
+    {
+      "repository": "jaywcjlove/awesome-mac",
+      "evidence_file": "jaywcjlove__awesome-mac.json",
+      "source_commit": "31718871dfbac3cc17139b3958759f5a3e47675c",
+      "release": {
+        "tag_name": "v2.1.0",
+        "published_at": "2026-03-30T16:52:39Z",
+        "html_url": "https://github.com/jaywcjlove/awesome-mac/releases/tag/v2.1.0",
+        "prerelease": false,
+        "draft": false
+      },
+      "decision": {
+        "disposition": "retain-discovery",
+        "license_text_classification": "CC0-1.0",
+        "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+        "concrete_gap_or_overlap": "Current list supplies Mac terminal/container/launcher leads. Existing Mac terminal and Apple container plus remote Linux already cover those roles; no demonstrated gap supports a second app layer.",
+        "next_acceptance": "Read only the selected category and verify each actual publisher before any separate adoption.",
+        "installation_performed": false,
+        "model_calls": 0
+      },
+      "readme": "https://github.com/jaywcjlove/awesome-mac/blob/31718871dfbac3cc17139b3958759f5a3e47675c/README.md",
+      "license": "https://github.com/jaywcjlove/awesome-mac/blob/31718871dfbac3cc17139b3958759f5a3e47675c/LICENSE",
+      "archived": false,
+      "pushed_at": "2026-09-17T08:01:12Z",
+      "present_in_baseline": true
+    },
+    {
+      "repository": "jgravelle/jcodemunch-mcp",
+      "evidence_file": "jgravelle__jcodemunch-mcp.json",
+      "source_commit": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "release": {
+        "tag_name": "v1.108.319",
+        "published_at": "2026-09-16T14:04:32Z",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "prerelease": false,
+        "draft": false
+      },
+      "decision": {
+        "disposition": "retain-rejection",
+        "license_text_classification": "Dual-Use License 1.1",
+        "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+        "concrete_gap_or_overlap": "Current release still overlaps accepted code retrieval; non-commercial/commercial terms remain an unresolved boundary for the trading ecosystem. Publisher token-savings claims are not local evidence.",
+        "next_acceptance": "Do not install or add duplicate server; reopen only after scope/license and a precision gap are explicitly resolved.",
+        "installation_performed": false,
+        "model_calls": 0
+      },
+      "readme": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md",
+      "license": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/LICENSE",
+      "archived": false,
+      "pushed_at": "2026-09-20T04:02:26Z",
+      "present_in_baseline": true
+    },
+    {
+      "repository": "sigstore/cosign",
+      "evidence_file": "sigstore__cosign.json",
+      "source_commit": "11926fa5bbbbde47e88fc006b625a17769b743b2",
+      "release": {
+        "tag_name": "v3.1.3",
+        "published_at": "2026-08-06T01:09:23Z",
+        "html_url": "https://github.com/sigstore/cosign/releases/tag/v3.1.3",
+        "prerelease": false,
+        "draft": false
+      },
+      "decision": {
+        "disposition": "retain-reference-close-gap",
+        "license_text_classification": "Apache-2.0",
+        "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+        "concrete_gap_or_overlap": "Existing catalog candidate can verify publisher identity and signed bundles. Existing public Syft receipt explicitly records signature_verified:false; checksum agreement alone leaves this boundary open.",
+        "next_acceptance": "Verify one upstream signed artifact/bundle against expected issuer and identity, then require tampered-artifact and wrong-identity rejection. No signing/publishing or installation implied.",
+        "installation_performed": false,
+        "model_calls": 0
+      },
+      "readme": "https://github.com/sigstore/cosign/blob/11926fa5bbbbde47e88fc006b625a17769b743b2/README.md",
+      "license": "https://github.com/sigstore/cosign/blob/11926fa5bbbbde47e88fc006b625a17769b743b2/LICENSE",
+      "archived": false,
+      "pushed_at": "2026-09-18T20:34:09Z",
+      "present_in_baseline": true
+    },
+    {
+      "repository": "tobi/qmd",
+      "evidence_file": "tobi__qmd.json",
+      "source_commit": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "release": {
+        "tag_name": "v2.8.3",
+        "published_at": "2026-08-16T22:30:34Z",
+        "html_url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+        "prerelease": false,
+        "draft": false
+      },
+      "decision": {
+        "disposition": "retain-current-route",
+        "license_text_classification": "MIT",
+        "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+        "concrete_gap_or_overlap": "Existing on-device BM25/vector/reranking route addresses explicit document collections. Public open gate still records weak held-out retrieval; another MCP index would not close it.",
+        "next_acceptance": "Freeze new judgments and compare existing lexical/hybrid query shaping on the same collection with quality and usage reported separately.",
+        "installation_performed": false,
+        "model_calls": 0
+      },
+      "readme": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md",
+      "license": "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/LICENSE",
+      "archived": false,
+      "pushed_at": "2026-09-09T20:51:56Z",
+      "present_in_baseline": true
+    },
+    {
+      "repository": "zizmorcore/zizmor",
+      "evidence_file": "zizmorcore__zizmor.json",
+      "source_commit": "99a054ed9283c90abdd2d5b9fb5101d27dde9783",
+      "release": {
+        "tag_name": "v1.30.1",
+        "published_at": "2026-09-09T05:34:10Z",
+        "html_url": "https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1",
+        "prerelease": false,
+        "draft": false
+      },
+      "decision": {
+        "disposition": "adopt-as-reference",
+        "license_text_classification": "MIT",
+        "classification_scope": "Observed source license declaration; not dependency/license/legal approval",
+        "concrete_gap_or_overlap": "Only new identity in this ten-repository public-index comparison. Public CI checks evidence and data joins but does not run CI configuration security analysis; private ecosystem already has this capability.",
+        "next_acceptance": "Port a pinned optional/CI recipe and test a safe workflow plus deliberately unsafe fixture; require findings for injection/unpinned actions and retain false positives. No installation in this review.",
+        "installation_performed": false,
+        "model_calls": 0
+      },
+      "readme": "https://github.com/zizmorcore/zizmor/blob/99a054ed9283c90abdd2d5b9fb5101d27dde9783/README.md",
+      "license": "https://github.com/zizmorcore/zizmor/blob/99a054ed9283c90abdd2d5b9fb5101d27dde9783/LICENSE",
+      "archived": false,
+      "pushed_at": "2026-09-18T06:06:01Z",
+      "present_in_baseline": false
+    }
+  ],
+  "new_public_index_identities": [
+    "zizmorcore/zizmor"
+  ],
+  "access_limits": [
+    "Inspect GitHub releases/latest returned HTTP404; recorded source HEAD ec4dfc6953784dc45b79de3147530c89868c6e26 rather than inventing a release. No package version was fetched.",
+    "Some GitHub license classifiers return NOASSERTION although selected license source declares MIT or Apache2.0; metadata and source classifications remain separate.",
+    "Awesome-mac release v2.1.0 is older than its default branch; current discovery source is pinned default HEAD31718871dfbac3cc17139b3958759f5a3e47675c.",
+    "All ten currently report archived=false; activity alone does not prove quality, compatibility, safe installation or best-in-class status.",
+    "This is one bounded selection pass, not exhaustive star source review or universal SOTA ranking."
+  ],
+  "native_followup": "blueprints/convergence-practice/ci-security/receipt.json"
+}
