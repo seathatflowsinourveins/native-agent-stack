@@ -4,6 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest import mock
@@ -21,6 +22,34 @@ def module(name, path):
 
 DRIVER = module('service_reboot_driver', HERE / 'run.py')
 FIXTURE = module('service_reboot_original_fixture', HERE.parent / 'job-recovery/fixture.py')
+
+
+class LauncherArgumentsTests(unittest.TestCase):
+    def test_serial_is_on_native_device_with_same_persistent_disk(self):
+        # Regression against QEMU8.2.2 virtio-blk.c's serial device property and
+        # its virtio-blk-test.c separate if=none/id backend pattern.
+        private = Path('/owned/private')
+        args = DRIVER.qemu_arguments(private / 'persistent.qcow2', private, Path('/owned/serial.log'), 2222)
+        drives = [args[i + 1] for i, value in enumerate(args) if value == '-drive']
+        devices = [args[i + 1] for i, value in enumerate(args) if value == '-device']
+        disk = next(value for value in drives if 'persistent.qcow2' in value)
+        self.assertIn('file=/owned/private/persistent.qcow2', disk)
+        self.assertIn('if=none,id=service-reboot-disk', disk)
+        self.assertNotIn('serial=', disk)
+        self.assertIn('virtio-blk-pci,drive=service-reboot-disk,serial=native-reboot-disk', devices)
+        self.assertIn('user,id=net0,restrict=on,hostfwd=tcp:127.0.0.1:2222-:22', args)
+        self.assertEqual(sum('readonly=on' in value for value in drives), 2)
+        self.assertNotIn('-snapshot', args)
+
+    def test_missing_native_device_property_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'serial'):
+            DRIVER.verify_block_device_help('virtio-blk-pci options:\n  drive=<str>\n')
+
+    @unittest.skipUnless(shutil.which('qemu-system-x86_64'), 'QEMU unavailable locally; hosted preflight is mandatory')
+    def test_native_device_help_exposes_backend_and_serial_without_boot(self):
+        result = subprocess.run(['qemu-system-x86_64', '-device', 'virtio-blk-pci,help'],
+                                capture_output=True, text=True, timeout=10, check=True)
+        DRIVER.verify_block_device_help(result.stdout + result.stderr)
 
 
 class ServiceRebootTests(unittest.TestCase):

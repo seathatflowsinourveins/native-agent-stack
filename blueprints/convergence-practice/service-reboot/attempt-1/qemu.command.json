@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "qemu-system-x86_64",
+    "-machine",
+    "accel=tcg",
+    "-m",
+    "2048",
+    "-smp",
+    "2",
+    "-display",
+    "none",
+    "-monitor",
+    "none",
+    "-serial",
+    "file:<owned-run-root>/reports/serial.log",
+    "-drive",
+    "file=<owned-run-root>/private/persistent.qcow2,format=qcow2,if=virtio,serial=native-reboot-disk",
+    "-drive",
+    "file=<owned-run-root>/private/seed.iso,format=raw,media=cdrom,readonly=on",
+    "-drive",
+    "file=<owned-run-root>/private/payload.iso,format=raw,media=cdrom,readonly=on",
+    "-netdev",
+    "user,id=net0,restrict=on,hostfwd=tcp:127.0.0.1:51337-:22",
+    "-device",
+    "virtio-net-pci,netdev=net0",
+    "-no-shutdown"
+  ],
+  "ended_utc": "2026-09-20T21:08:36.563425+00:00",
+  "exit_code": 1,
+  "started_utc": "2026-09-20T21:08:36.257780+00:00"
+}

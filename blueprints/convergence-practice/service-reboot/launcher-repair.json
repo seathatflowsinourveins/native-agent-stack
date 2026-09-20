@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-20",
+  "repair_of_workflow_run": 35537534779,
+  "scope": "QEMU backend/device option correction only",
+  "source_basis": [
+    "https://github.com/qemu/qemu/blob/v8.2.2/hw/block/virtio-blk.c",
+    "https://github.com/qemu/qemu/blob/v8.2.2/tests/qtest/virtio-blk-test.c",
+    "https://www.qemu.org/docs/master/system/invocation.html"
+  ],
+  "unchanged": [
+    "original guest recovery protocol and plan",
+    "Dagu2.16.6 release binary and upstream source/test command",
+    "original synthetic12-test oracle",
+    "same persistent disk, stable virtual disk serial and all isolation/acceptance requirements",
+    "existing upstream-test workflow prerequisite"
+  ],
+  "checks": [
+    {
+      "command": "python3 -m unittest tests.test_service_reboot -v",
+      "outcome": "20 passed, 1 skipped",
+      "skipped": "QEMU is unavailable on this local host; native help validation is mandatory in the hosted driver before launch."
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "outcome": "passed:68components/890hashedfiles/4profiles/98receipts"
+    },
+    {
+      "command": "git diff --check",
+      "outcome": "passed"
+    }
+  ],
+  "modified_runtime_sha256": "c12a6726fe4b02b76ef9406b2386295237f6f9ff58b03bf9c104b2c9a6eb5094",
+  "supplementary_test_sha256": "a8151f6d5b1ce0a228bb391df24afae05f3fec7b627abbf86f6cada4dfc61864",
+  "local_native_vm_or_install_performed": false,
+  "corrected_guest_trial": "pending coordinator publication and dispatch",
+  "original_failure_retained": "prior-attempts.json"
+}

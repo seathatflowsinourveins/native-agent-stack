@@ -1,0 +1,1 @@
+qemu-system-x86_64: -drive file=<owned-run-root>/private/persistent.qcow2,format=qcow2,if=virtio,serial=native-reboot-disk: Block format 'qcow2' does not support the option 'serial'

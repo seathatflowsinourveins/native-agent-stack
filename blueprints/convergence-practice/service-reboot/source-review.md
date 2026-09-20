@@ -70,3 +70,23 @@ rejection; fabricated records in those tests are not native execution evidence.
 
 All sources and original logs remain inspectable. Local green checks do not
 promote the protocol into an accepted reboot capability.
+
+## First native launcher correction
+
+Workflow run `35537534779` executed the unchanged upstream Dagu retry tests
+successfully. Its separate guest job failed before boot with QEMU8.2.2 rejecting
+the disk's `serial` backend option. The retained [first attempt](prior-attempts.json)
+includes original hashes and a path-normalized launcher/error; the raw artifact
+remains available from that workflow. The original plan is unchanged.
+
+The correction follows the matching
+[QEMU8.2.2 virtio-blk device property](https://github.com/qemu/qemu/blob/v8.2.2/hw/block/virtio-blk.c)
+(`DEFINE_PROP_STRING` for `serial`) and the separate `-drive if=none,id=...`
+backend pattern in upstream
+[virtio-blk-test.c](https://github.com/qemu/qemu/blob/v8.2.2/tests/qtest/virtio-blk-test.c).
+The named qcow2 backend is connected by `drive=service-reboot-disk` to an explicit
+`virtio-blk-pci` device, which carries `serial=native-reboot-disk`.
+Native `qemu-system-x86_64 -device virtio-blk-pci,help` must expose both `drive`
+and `serial` before launching the guest. This help command does not boot a guest.
+The local argument regression is supplementary synthetic integration coverage;
+actual boot/reboot/recovery remains the unchanged native acceptance requirement.
