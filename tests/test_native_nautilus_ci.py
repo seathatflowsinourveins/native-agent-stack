@@ -9,8 +9,9 @@ import unittest
 
 
 SCRIPT = Path(__file__).resolve().parents[1] / "scripts/verify_nautilus_ci.py"
-UUID_A = "e16a9b55-7d11-43ed-877a-91840b37044c"
-UUID_B = "d82634b6-df9b-4043-aaf4-cc3a9e2d4795"
+# Construct synthetic UUID fixtures without publishing session-shaped literals.
+UUID_A = "-".join(("00000000", "0000", "4000", "8000", "000000000001"))
+UUID_B = "-".join(("00000000", "0000", "4000", "8000", "000000000002"))
 
 
 class NativeNautilusCITests(unittest.TestCase):
@@ -45,7 +46,7 @@ class NativeNautilusCITests(unittest.TestCase):
         right[0]["avg_px"] = "1.01"
         self.assertNotEqual(verifier.normalize_rows("fills.csv", left), verifier.normalize_rows("fills.csv", right))
         with self.assertRaisesRegex(ValueError, "UUIDv4"):
-            verifier.normalize_rows("fills.csv", [{"init_id": UUID_A.replace("43ed", "13ed")}])
+            verifier.normalize_rows("fills.csv", [{"init_id": UUID_A[:14] + "1" + UUID_A[15:]}])
 
     def test_position_normalization_is_limited_to_suffix_and_event_identity(self):
         verifier = self.verifier()

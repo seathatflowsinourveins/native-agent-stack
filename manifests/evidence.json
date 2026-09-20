@@ -1870,6 +1870,21 @@
         "Previously reported101 focused tests are coordinator evidence, not rerun during UI review."
       ],
       "path": "evidence/receipts/foundation-catalog-ui-20260920.json"
+    },
+    {
+      "id": "native-worker-containment-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "systemd",
+        "claude-code"
+      ],
+      "claim": "The existing native user manager contained an owned TERM-ignoring setsid descendant after only MainPID was killed. One changed native child trial under that wrapper stopped before checkpoint because its extra-prefixed command was refused; combined native child containment/resume remains unaccepted.",
+      "limitations": [
+        "Deterministic cgroup proof is not successful native child crash/resume acceptance.",
+        "Earlier same-child continuation still required explicit direct descendant cleanup.",
+        "No host/user-manager restart, provider cancellation, billing cessation, off-host restoration or distributed exactly-once acceptance."
+      ],
+      "path": "evidence/receipts/native-worker-containment-20260920.json"
     }
   ],
   "files": [
@@ -4976,8 +4991,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "e3d9b75f5e9a5ca9663d4da76af2720b4548e959438eeb86533bffcb6b5a1e66",
-      "bytes": 3674501
+      "sha256": "ba8c675d0ce95774bdeb8355e0691d6f193701200dc3a5d940106f739dbe9d78",
+      "bytes": 3678693
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5961,8 +5976,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/README.md",
-      "sha256": "3964bd06d2d02ebaece22c4477687e4bcdd382640793cad80c9c244bc0d0082f",
-      "bytes": 3060
+      "sha256": "fd137e146862d6768e6ce505de4036d832320fc63f8edcc6d86c69d20d92ccc5",
+      "bytes": 3719
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/observe_quickstart.py",
@@ -5976,18 +5991,18 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "dedf89d8fcc08f3799dffbf2ec1f897444bc53e613342dd2f61bb69b842d88f1",
+      "sha256": "42cfade7909b10c695fbce98b1dcc4b649d7edc5abcc80aeee0d71c41486e7ff",
       "bytes": 6138
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "783749d8731da4d224b5b06ae9b6b0cfaca6bd377fa2a948d4860496671645b0",
-      "bytes": 94711
+      "sha256": "413e2fbc5d053a28219793b434f7a34ea65f8d23c36e4260c35ed1dd6bab7080",
+      "bytes": 95291
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "aa50f172f3e43a19f37c1a5d3992d70e23892c4cc73f68744351532417741ae3",
-      "bytes": 16446
+      "sha256": "109fb499ad315343f41472e678f6a7865fafd622ed5f870297d657f19abac7bc",
+      "bytes": 16724
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -5996,8 +6011,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "2c58de3932af889a2b6061f6f64bdb3a844595a2473c5a49c5cbd337845652f8",
-      "bytes": 4767
+      "sha256": "3b5640d34e1adb414a13e61b7f6425289c33bef8731dcfb6debd18a03533510f",
+      "bytes": 5285
     },
     {
       "path": "evidence/receipts/native-harness-defaults-20260920.json",
@@ -6021,8 +6036,8 @@
     },
     {
       "path": "blueprints/convergence-practice/worker-recovery/README.md",
-      "sha256": "99f260cae8012236e3fb4cc6f2ba8e4e3c34515e95d1366770fb96511a3937a9",
-      "bytes": 5717
+      "sha256": "79cc97216a288268e4956823b26722a5dff00ac842163fc7460eed53d5e1c872",
+      "bytes": 9530
     },
     {
       "path": "blueprints/convergence-practice/worker-recovery/accepted/actions.jsonl",
@@ -6096,8 +6111,8 @@
     },
     {
       "path": "blueprints/convergence-practice/worker-recovery/run.py",
-      "sha256": "8287b3eb6bd184938aa22855da8a939ea4c92d9ec73c41cfc5d37ea18aa1e1b0",
-      "bytes": 11813
+      "sha256": "a1d2fd6033bc49cae83e024bd23504fa0afc9fdc0011ca0323735472b5aa672d",
+      "bytes": 15128
     },
     {
       "path": "blueprints/convergence-practice/worker-recovery/source-review.json",
@@ -6121,8 +6136,83 @@
     },
     {
       "path": "tests/test_worker_recovery.py",
-      "sha256": "0bad9d361a0ae33b1783d48505206f328c290ed5616a0cebf96a1ee8d55fffc4",
-      "bytes": 5206
+      "sha256": "61fade1a8307e0ab5d955bd32227bccbd8c863df819d49c1359b901e94fd93ca",
+      "bytes": 6867
+    },
+    {
+      "path": ".github/workflows/native-foundation-e2e.yml",
+      "sha256": "050094f4c5ed715fb26441f663d758a121cde1ea68f6017bde3f65f1fa566387",
+      "bytes": 7291
+    },
+    {
+      "path": "scripts/verify_nautilus_ci.py",
+      "sha256": "0a0c9d329f064fee88e59fea42ef2a2159de19d24347d024634dc082c38d1dcb",
+      "bytes": 8601
+    },
+    {
+      "path": "tests/test_native_nautilus_ci.py",
+      "sha256": "a42d461aa1f6c3b463b94f3b49ee57f4a19849be4c0c7d0b5c17fcb38892d5c8",
+      "bytes": 5695
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/containment-independent-audit.json",
+      "sha256": "62f4b5736be44dc16923c18d492072e19b6c8a43edac40fe92e023985178981a",
+      "bytes": 1797
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/containment-receipt.json",
+      "sha256": "4141303516edb45b65eb789728a4e4df1c0032e6b6f2bfae037ec825ece92e0d",
+      "bytes": 6047
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/containment_audit.py",
+      "sha256": "8304c68846244dad596278dbf6ddaf530491d12bb6e950df3b0282be4e694f58",
+      "bytes": 6579
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/containment_probe.py",
+      "sha256": "3d4897e5bca29d3f4d1ce6fa642f9b469e4b914296d141cc8bfcdae23bf68b0e",
+      "bytes": 4424
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/executed-systemd-runner.py.txt",
+      "sha256": "a79887b79f719b520292177dffe8153d28cce67e8ec6a5cba884ebd58aaf91ad",
+      "bytes": 14574
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/executed-systemd-service.py.txt",
+      "sha256": "88b2922a5c415238c0abf06fb4e6fd3f13b98c884e1ee113802e9a85e0b3dae5",
+      "bytes": 3429
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/executed-systemd-test-oracle.py.txt",
+      "sha256": "009730174a3ced99e5902edd555ff00c85c25497df807a3bd01ef264db886ca8",
+      "bytes": 6364
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/service.py",
+      "sha256": "88b2922a5c415238c0abf06fb4e6fd3f13b98c884e1ee113802e9a85e0b3dae5",
+      "bytes": 3429
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/systemd-freeze.json",
+      "sha256": "d247e895f5636ef5370a509ad108e5a36b1357d16638d6ce619d35959f815211",
+      "bytes": 759
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/systemd-plan.json",
+      "sha256": "5e8e69cea6fbc3d802a8e8ccbb6af724f828fb868b9850d8896f86381ab3a5da",
+      "bytes": 2112
+    },
+    {
+      "path": "blueprints/convergence-practice/worker-recovery/systemd-recorder-outcome.json",
+      "sha256": "89e55706eb4393b5987573c10c878341c348b25f95b50c1df610480343ea5950",
+      "bytes": 1691
+    },
+    {
+      "path": "evidence/receipts/native-worker-containment-20260920.json",
+      "sha256": "82cf764c6dc67dec6d55b2ee36d41ef2fb1ff6e786751d352c3504b7a376c30f",
+      "bytes": 2238
     }
   ],
   "convergence_records": [

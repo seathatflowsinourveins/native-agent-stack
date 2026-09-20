@@ -6,7 +6,7 @@ Start with the layer needed for the task in [manifest.json](manifest.json), then
 read its scoped capability decision in [decisions.json](decisions.json). A default
 is a selected way to do a task, not permission to install or activate every tool.
 
-The catalog references 61 selected components through 41 capability decisions. It cites 66 relevant registered
+The catalog references 61 selected components through 41 capability decisions. It cites 67 relevant registered
 receipts from the current 88-receipt inventory. These are coverage counts, not a
 score of complete installation, execution or lifecycle acceptance.
 

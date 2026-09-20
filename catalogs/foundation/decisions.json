@@ -1428,14 +1428,16 @@
       ],
       "candidate": null,
       "evidence_ids": [
-        "native-worker-supervision-20260919"
+        "native-worker-supervision-20260919",
+        "native-worker-containment-20260920"
       ],
-      "evidence_scope": "The Linux user manager terminated a TERM-ignoring parent and descendants, retained timeout failure, and accepted a separate fresh run.",
+      "evidence_scope": "The Linux user manager terminated a TERM-ignoring parent and descendants, retained timeout failure, and accepted a separate fresh run. A separate upstream user-service fixture also contained a TERM-ignoring setsid descendant after MainPID crash; the combined native child trial was refused before effects and remains unaccepted.",
       "limitations": [
         "Local process termination does not prove remote provider cancellation, spending caps or exactly-once effects."
       ],
       "source_paths": [
-        "blueprints/us-equities/worker-supervision/README.md"
+        "blueprints/us-equities/worker-supervision/README.md",
+        "blueprints/convergence-practice/worker-recovery/README.md"
       ],
       "next_gap": "Test worker cancellation and reconcile external effects before any relaunch.",
       "lifecycle": {
@@ -2203,7 +2205,8 @@
       ],
       "candidate": null,
       "evidence_ids": [
-        "native-worker-recovery-20260920"
+        "native-worker-recovery-20260920",
+        "native-worker-containment-20260920"
       ],
       "evidence_scope": "One native background child retained its identity through TaskStop/SendMessage cancellation and same-parent continuation after abrupt runtime failure, producing one final local effect from an unchanged checkpoint after explicit supervisor cleanup.",
       "limitations": [
@@ -2213,12 +2216,13 @@
         "The updated runner parser is regression-tested offline; the one native attempt executed the separately retained source.",
         "Automatic native crash descendant containment: the crash wait survived and needed supervisor SIGKILL.",
         "Exact requested tool-only behavior: the child attempted an extra read-only ls/git-status command, which was refused.",
-        "Remote provider cancellation, billing cessation, independent child-process isolation, off-host recovery, power-loss durability and distributed exactly-once effects."
+        "Remote provider cancellation, billing cessation, independent child-process isolation, off-host recovery, power-loss durability and distributed exactly-once effects.",
+        "The cgroup follow-up contained its deterministic detached fixture, but its native child prepended a refused command before checkpoint. No combined native result is accepted."
       ],
       "source_paths": [
         "blueprints/convergence-practice/worker-recovery/README.md"
       ],
-      "next_gap": "Contain abrupt-runtime descendants through supported supervision; independent-host and provider-side effects remain separate.",
+      "next_gap": "Resolve the frozen child command-contract mismatch before another changed native cgroup qualification; retain existing permissions, failed attempt and effect oracle.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
         "scope": "Existing native-use stage is retained; this new child-continuation receipt explicitly needs supervisor cleanup.",
