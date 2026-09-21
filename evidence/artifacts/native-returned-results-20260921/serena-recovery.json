@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "kind": "public-safe-native-dashboard-recovery",
+  "projection_label": "Selected metadata only; original native responses remain private and are bound by hashes. No home paths, private page/request/transcript bodies, IDs or credentials are published.",
+  "recorded_at": "2026-09-21T04:29:02.581306+00:00",
+  "observation": {
+    "current_dashboard_url": "http://127.0.0.1:24285/dashboard/index.html",
+    "native_html_title": "Serena Dashboard",
+    "http_result_bytes": 18247,
+    "active_project": "agent-lab",
+    "context": "codex",
+    "active_tools": 24,
+    "available_tools": 29,
+    "languages": [
+      "bash",
+      "python",
+      "typescript"
+    ],
+    "modes": [
+      "editing",
+      "interactive"
+    ],
+    "returned_serena_version": "2.0.0.dev0",
+    "tool_statistics_entries": 0,
+    "parent_mcp_result_sha256": "ddd5aac15f5b615ee6bf17dd775e9af77828b54ca196faa4b984dac7c3d564be",
+    "coordinator_native_browser_title": "Serena Dashboard",
+    "no_restart_or_configuration_change": true
+  },
+  "cause_and_candidate": {
+    "observed": "The fresh Codex and Claude child calls returned port 24284, and both child processes completed successfully before the later HTTP probe. No listener remained on 24284 during this investigation. Existing current MCP instances listen on other dynamically chosen ports; the parent MCP call now returns 24285, which serves the native UI and current project configuration.",
+    "upstream_mechanism": "The installed Serena dashboard picks the first free port beginning at BASE_PORT, starts a daemon thread in its owning MCP process, then stores and returns that instance URL. It does not define a persistent global dashboard URL.",
+    "supported_conclusion": "The child-returned URL was instance-scoped and stale after child completion. Reuse the current parent instance URL returned by its native open_dashboard tool; an additional server or restart is unnecessary.",
+    "uncertain_boundary": "The retained evidence does not establish why the original request timed out instead of receiving an immediate connection refusal. No bind-race claim is made.",
+    "minimal_supported_action": "Open the URL returned by the current parent MCP open_dashboard call: http://127.0.0.1:24285/dashboard/index.html. Re-read the returned URL after that owning MCP process changes."
+  },
+  "boundary": "Current native Serena project configuration is usable; returned tool statistics are empty and are not invented activity. This recovery does not erase the earlier failed 24284 observation or promise 24285 remains valid after its owning MCP process exits.",
+  "child_lifecycle_evidence": [
+    {
+      "native_client": "codex",
+      "started_at": "2026-09-21T04:01:05.720571+00:00",
+      "completed_at": "2026-09-21T04:01:51.260566+00:00",
+      "exit_code": 0,
+      "returned_url": "http://127.0.0.1:24284/dashboard/index.html",
+      "returned_result_sha256": "9ea4207b47ffcb6c651964b1bea24b3192faf83c55fddd5ec37cbe7218d68078",
+      "launch_receipt_sha256": "1c7859482873a5400b34cb928f37280a538e797043730b1bf6d7287839589a63"
+    },
+    {
+      "native_client": "claude",
+      "started_at": "2026-09-21T04:02:03.373377+00:00",
+      "completed_at": "2026-09-21T04:02:40.457209+00:00",
+      "exit_code": 0,
+      "returned_url": "http://127.0.0.1:24284/dashboard/index.html",
+      "returned_result_sha256": "6d124bb503f3a755bf3db7d4ba7ec3364d86846df3f8adaeab301d3789623020",
+      "launch_receipt_sha256": "ac0eb08c5a450fc244fa93f7fb67d18456ce7e72088468573433e1d47276a6c8"
+    }
+  ],
+  "parent_native_tool": {
+    "tool": "mcp__serena__open_dashboard",
+    "arguments": {},
+    "original_result_sha256": "ddd5aac15f5b615ee6bf17dd775e9af77828b54ca196faa4b984dac7c3d564be",
+    "result_url": "http://127.0.0.1:24285/dashboard/index.html"
+  },
+  "native_results": [
+    {
+      "name": "serena-live-24285",
+      "started_at": "2026-09-21T04:26:00.940253+00:00",
+      "ended_at": "2026-09-21T04:26:00.948386+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout_bytes": 18247,
+      "stderr_bytes": 0,
+      "stdout_sha256": "1aae39de57a95cbc8ba2a234296921552e563c9092880b1f40cd381d3670be02",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "argv_sha256": "fee1adcef703d76368564cc3f3d3f0bb3b0e8c7f5c523d6e4ee805576db73141"
+    },
+    {
+      "name": "serena-live-24285-get_config_overview",
+      "started_at": "2026-09-21T04:26:31.678209+00:00",
+      "ended_at": "2026-09-21T04:26:31.684653+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout_bytes": 9000,
+      "stderr_bytes": 0,
+      "stdout_sha256": "5daf79e0745d24be17a33c7b204f674029107802e5369126fc124558961b12bc",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "argv_sha256": "a93b8ae3b53d52d2eeb28c8f09e26b7991a86ff61a7bca9f83a80e62be00e761"
+    },
+    {
+      "name": "serena-live-24285-get_tool_stats",
+      "started_at": "2026-09-21T04:26:31.684819+00:00",
+      "ended_at": "2026-09-21T04:26:31.689359+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout_bytes": 13,
+      "stderr_bytes": 0,
+      "stdout_sha256": "14dfecaf03347079be97818e5d1b5e39da9a28054f250c3dd8aef28dd2995789",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "argv_sha256": "2720176b15ce81fac19bb3c674daa03ae43a2a5b98bd5e117bca369e520e8d34"
+    },
+    {
+      "name": "serena-installed-start-help",
+      "started_at": "2026-09-21T04:26:31.689472+00:00",
+      "ended_at": "2026-09-21T04:26:32.153500+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout_bytes": 3960,
+      "stderr_bytes": 0,
+      "stdout_sha256": "03a23cedf4fd398869015692ddf82721a6f150e4d0ceb95edb94b7a95999b3c5",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "argv_sha256": "c096d6cfca73f2cd52b90fa46d9e713d1b0b1abb44589f1547d7b146f881cd56"
+    },
+    {
+      "name": "serena-current-listener",
+      "started_at": "2026-09-21T04:28:42.864367+00:00",
+      "ended_at": "2026-09-21T04:28:42.877629+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout_bytes": 160,
+      "stderr_bytes": 0,
+      "stdout_sha256": "73ad2f37cdb509627c72f6c4001bb68f30e3a042cf7ae225ff631652a5e79ead",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "argv_sha256": "01a1930798ca6f90178326dc413543663006160d3f541aada2bbadcfa352572e"
+    }
+  ],
+  "upstream_source_pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+  "upstream_source_evidence": [
+    {
+      "official_url": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/dashboard.py#L819",
+      "file": "dashboard.py",
+      "line_start": 819,
+      "line_end": 850,
+      "source_file_sha256": "2598dc87ff7a6f718df9692242475cc1f8a63a1769a41204b1d940392af4ade1",
+      "excerpt_sha256": "56f705561699e8267ae906b3056885bcdaec5e1ced91b952f0d6d7ca50ff7d3e",
+      "excerpt": "    @staticmethod\n    def _find_first_free_port(start_port: int, host: str) -> int:\n        port = start_port\n        while port <= 65535:\n            try:\n                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:\n                    sock.bind((host, port))\n                    return port\n            except OSError:\n                port += 1\n\n        raise RuntimeError(f\"No free ports found starting from {start_port}\")\n\n    def run(self, port: int) -> int:\n        \"\"\"\n        Runs the dashboard on the given host and port and returns the port number.\n        \"\"\"\n        # patch flask.cli.show_server to avoid printing the server info\n        from flask import cli\n\n        # ty cannot model reassigning a third-party module's function attribute (it rejects any\n        # replacement, even one with an identical signature), so the monkeypatch is suppressed here\n        cli.show_server_banner = lambda *args, **kwargs: None  # ty: ignore[invalid-assignment]\n        self._app.run(host=self._host, port=port, debug=False, use_reloader=False, threaded=True)\n        return port\n\n    def run_in_thread(self) -> tuple[threading.Thread, int]:\n        port = self._find_first_free_port(self.BASE_PORT, self._host)\n        log.info(\"Starting dashboard (listen_address=%s, port=%d)\", self._host, port)\n        thread = threading.Thread(target=lambda: self.run(port=port), daemon=True)\n        thread.start()\n        return thread, port\n"
+    },
+    {
+      "official_url": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/agent.py#L732",
+      "file": "agent.py",
+      "line_start": 732,
+      "line_end": 744,
+      "source_file_sha256": "550aa482c3942eced34589cacefc64f47505489524c8fccbc9fdf5f3d212a28e",
+      "excerpt_sha256": "c2ca28df17850dcc79aad27ef280e9eccc8cf61120c1512344e2aefb2bd96f5d",
+      "excerpt": "        # start the dashboard backend thread and the dashboard frontend manager (if enabled).\n        # This should be the last thing to happen in the initialization since the dashboard\n        # may access various parts of the agent\n        if dashboard_api:\n            dashboard_thread, port = dashboard_api.run_in_thread()\n            self._dashboard_manager = DashboardManager(\n                port,\n                self.serena_config.web_dashboard_listen_address,\n                self.serena_config.web_dashboard_open_on_launch,\n                self._active_project,\n                mode_str=self.serena_config.web_dashboard_interface,\n            )\n            log.info(\"Serena web dashboard started at %s\", self._dashboard_manager.url)\n"
+    },
+    {
+      "official_url": "https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/agent.py#L945",
+      "file": "agent.py",
+      "line_start": 945,
+      "line_end": 959,
+      "source_file_sha256": "550aa482c3942eced34589cacefc64f47505489524c8fccbc9fdf5f3d212a28e",
+      "excerpt_sha256": "373bc687d011e6623c499f6637fb2648defb845da266a7d8c815c07f3c709bbb",
+      "excerpt": "    def open_dashboard(self) -> bool:\n        \"\"\"\n        Opens the Serena dashboard (for on-demand usage as triggered by the user, e.g. via a tool)\n\n        :return: True if the dashboard was opened, False if it could not be opened\n        \"\"\"\n        if self._dashboard_manager is None:\n            raise Exception(\"Dashboard is not running.\")\n\n        if not system_has_usable_display():\n            log.warning(\"Not opening the Serena web dashboard because no usable display was detected.\")\n            return False\n\n        self._dashboard_manager.open_dashboard_in_browser()\n        return True\n"
+    }
+  ],
+  "preserved_failed_record": "dashboard-serena",
+  "mutations": {
+    "service_restarts": 0,
+    "configuration_changes": 0,
+    "model_or_account_changes": 0,
+    "synthetic_tool_activity": 0
+  }
+}

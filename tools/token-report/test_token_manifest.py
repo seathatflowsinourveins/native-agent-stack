@@ -1,5 +1,7 @@
 """Accounting invariants; offline and independent of native authentication."""
 from contextlib import closing, contextmanager
+import base64
+import copy
 import importlib.util
 import json
 from pathlib import Path
@@ -35,13 +37,32 @@ class LedgerContract(unittest.TestCase):
                 self.assertEqual(row["baseline_status"],"No matched token baseline")
         self.assertNotIn("__DATA__",Path(config["output_html"]).read_text())
 
+    def test_explicit_counter_scopes_reuse_existing_ledger_groups(self):
+        from unittest.mock import patch
+        config=self.portable_config()
+        config.update(rtk="selected-rtk",headroom="selected-headroom",counter_scopes={
+            "rtk_global":"Linux / all retained projects","rtk_project":"Linux / project "+str(self.root),
+            "headroom":"Linux / native last 30 days"})
+        def returned(argv,cwd,root,label):
+            return {"argv":argv,"exit_code":0,"stdout_text":'{"summary":{"total_saved":40},"lifetime":{"tokens_saved":0}}',
+                    "stderr_text":"","completed_at":m.now()}
+        with patch.object(m,"capture",side_effect=returned):
+            self.assertEqual(m.refresh(config)["issues"],[])
+            self.assertEqual(m.refresh(config)["issues"],[])
+        rows=json.loads(Path(config["output_json"]).read_text())["native"]
+        self.assertEqual({r["scope"] for r in rows},set(config["counter_scopes"].values()))
+        self.assertEqual(len(rows),3)
+        self.assertTrue(all(r["snapshot_count"]==2 for r in rows))
+
     def test_relative_config_paths_resolve_beside_config_not_current_directory(self):
         path=self.root/"config.json"
-        path.write_text(json.dumps({"state_dir":"state","project":".","context_roots":[{"name":"Chosen","path":"stats"}]}))
+        path.write_text(json.dumps({"state_dir":"state","project":".","context_roots":[{"name":"Chosen","path":"stats"}],"returned_results_json":"evidence.json","html_template":"local.html.in"}))
         config=m.load_config(path)
         self.assertEqual(config["state_dir"],str(self.root/"state"))
         self.assertEqual(config["context_roots"][0]["path"],str(self.root/"stats"))
         self.assertEqual(config["output_json"],str(self.root/"state/manifest.json"))
+        self.assertEqual(config["returned_results_json"],str(self.root/"evidence.json"))
+        self.assertEqual(config["html_template"],str(self.root/"local.html.in"))
 
     def test_symlink_config_paths_resolve_beside_target(self):
         target=self.root/"configuration";target.mkdir()
@@ -149,6 +170,133 @@ class LedgerContract(unittest.TestCase):
             stream.write_text('changed bytes')
             with self.assertRaisesRegex(ValueError,'Evidence changed'):
                 m.capture_choice_source(source,root,'changed')
+
+    def returned_manifest(self,raw=b"complete native result\n"):
+        stream=self.root/"upstream.bin";stream.write_bytes(raw)
+        payload={"schema_version":1,"captured_at":"2026-09-20T01:00:00Z","scope":"Selected native observations only",
+                 "records":[{"id":"codex-run","component_ids":["codex"],"runtime":"Native Codex",
+                   "kind":"native_client","command":["codex","exec","--json"],
+                   "started_at":"2026-09-19T01:00:00Z","completed_at":"2026-09-19T01:01:00Z",
+                   "status":"failed","observation":{"exit_code":1},"boundary":"Functional run; no savings claim",
+                   "attachments":[dict(m.artifact(stream),label="Native stdout",path=stream.name)]}]}
+        source=self.root/"returned.json";source.write_text(json.dumps(payload))
+        return source,payload,stream
+
+    def test_returned_results_preserve_exact_original_bytes_and_source_dates(self):
+        raw="Unicode λ result\r\n".encode()
+        source,payload,stream=self.returned_manifest(raw)
+        result=m.capture_returned_results(source,self.root,"returned-results")
+        imported=result["result"]["records"][0];item=imported["attachments"][0]
+        stream.write_bytes(b"changed upstream")
+        source.write_text('{}')
+        self.assertEqual(Path(result["artifact"]["path"]).read_text(),json.dumps(payload))
+        self.assertEqual(result["result"]["captured_at"],payload["captured_at"])
+        self.assertEqual(imported["started_at"],payload["records"][0]["started_at"])
+        self.assertEqual(imported["completed_at"],payload["records"][0]["completed_at"])
+        self.assertEqual(imported["status"],"failed")
+        self.assertEqual(item["origin"],str(stream))
+        self.assertEqual(Path(item["path"]).parent,self.root/"returned-results-artifacts")
+        self.assertEqual(Path(item["path"]).read_bytes(),raw)
+        self.assertEqual(base64.b64decode(item["content_base64"]),raw)
+        self.assertEqual(item["sha256"],m.digest(raw))
+        self.assertEqual(item["text"],raw.decode())
+        self.assertTrue(result["imported_at"])
+
+    def test_returned_results_binary_download_is_lossless_without_a_fabricated_preview(self):
+        raw=b"\x00\xff\xfe\x80\r\n"
+        source,payload,_=self.returned_manifest(raw)
+        payload["records"][0]["attachments"][0].update(text="untrusted preview",content_base64="not the source",mime_type="application/octet-stream")
+        source.write_text(json.dumps(payload))
+        result=m.capture_returned_results(source,self.root,"returned-results")
+        item=result["result"]["records"][0]["attachments"][0]
+        self.assertNotIn("text",item)
+        self.assertEqual(base64.b64decode(item["content_base64"]),raw)
+        self.assertEqual(item["bytes"],len(raw))
+
+    def test_returned_results_reject_missing_changed_and_oversized_sources(self):
+        for defect in ("missing","changed","oversized_actual","oversized_declared"):
+            with self.subTest(defect=defect):
+                source,payload,stream=self.returned_manifest()
+                run=self.root/defect;run.mkdir()
+                if defect=="missing":stream.unlink()
+                elif defect=="changed":stream.write_bytes(b"wrong")
+                elif defect=="oversized_actual":stream.write_bytes(b"x"*(m.RETURNED_RESULTS_FILE_LIMIT+1))
+                else:
+                    payload["records"][0]["attachments"][0]["bytes"]=m.RETURNED_RESULTS_FILE_LIMIT+1
+                    source.write_text(json.dumps(payload))
+                original=source.read_bytes()
+                with self.assertRaises(ValueError):
+                    m.capture_returned_results(source,run,"returned-results")
+                self.assertEqual((run/"returned-results.json").read_bytes(),original)
+                self.assertFalse((run/"returned-results-artifacts").exists())
+
+    def test_returned_results_validate_schema_and_duplicate_identities(self):
+        source,valid,_=self.returned_manifest()
+        cases=[]
+        for key,value in (("schema_version",True),("captured_at",None),("scope",[]),("records",{})):
+            payload=copy.deepcopy(valid);payload[key]=value;cases.append(payload)
+        for key,value in (("component_ids","codex"),("command",{"tool":"ctx_stats"}),
+                          ("started_at",False),("status",True),("observation",[]),("attachments",{})):
+            payload=copy.deepcopy(valid);payload["records"][0][key]=value;cases.append(payload)
+        payload=copy.deepcopy(valid);payload["records"].append(copy.deepcopy(payload["records"][0]));cases.append(payload)
+        payload=copy.deepcopy(valid);attachments=payload["records"][0]["attachments"];attachments.append(copy.deepcopy(attachments[0]));cases.append(payload)
+        for key,value in (("bytes",True),("sha256","bad"),("mime_type",{})):
+            payload=copy.deepcopy(valid);payload["records"][0]["attachments"][0][key]=value;cases.append(payload)
+        for number,payload in enumerate(cases):
+            with self.subTest(number=number):
+                source.write_text(json.dumps(payload));run=self.root/str(number);run.mkdir()
+                with self.assertRaisesRegex(ValueError,"Returned results:"):
+                    m.capture_returned_results(source,run,"returned-results")
+                self.assertFalse((run/"returned-results-artifacts").exists())
+
+    def test_returned_results_enforce_total_limit_and_preserve_malformed_json(self):
+        from unittest.mock import patch
+        source,payload,stream=self.returned_manifest(b"1234")
+        second=copy.deepcopy(payload["records"][0]["attachments"][0]);second["label"]="Other selected result"
+        payload["records"][0]["attachments"].append(second);source.write_text(json.dumps(payload))
+        with patch.object(m,"RETURNED_RESULTS_TOTAL_LIMIT",7):
+            with self.assertRaisesRegex(ValueError,"16 MiB"):
+                m.capture_returned_results(source,self.root,"over-total")
+        self.assertFalse((self.root/"returned-results-artifacts").exists())
+        source.write_bytes(b'{"records":not json}')
+        with self.assertRaises(ValueError):
+            m.capture_returned_results(source,self.root,"malformed")
+        self.assertEqual((self.root/"malformed.json").read_bytes(),source.read_bytes())
+
+    def test_returned_results_import_has_no_execution_and_no_previous_success_fallback(self):
+        from unittest.mock import patch
+        source,payload,stream=self.returned_manifest(b'</script><script>alert("untrusted")</script>')
+        payload["records"][0]["command"]={"tool":"ctx_stats","arguments":{"value":"$(touch unrequested)"}}
+        payload["records"][0]["unselected_path"]="/file/which/must/not/be/read"
+        source.write_text(json.dumps(payload))
+        config=self.portable_config();config["returned_results_json"]=str(source)
+        with patch.object(m,"capture",side_effect=AssertionError("Native command executed")), \
+             patch.object(m.subprocess,"run",side_effect=AssertionError("Subprocess executed")):
+            result=m.refresh(config)
+            self.assertEqual(result["issues"],[])
+            data=json.loads(Path(config["output_json"]).read_text())
+            item=data["additional_evidence"]["returned_results"]["result"]["records"][0]["attachments"][0]
+            rendered=Path(config["output_html"]).read_text()
+            self.assertNotIn('</script><script>alert("untrusted")</script>',rendered)
+            self.assertEqual(item["text"],stream.read_text())
+            self.assertEqual(base64.b64decode(item["content_base64"]),stream.read_bytes())
+            stream.write_bytes(b"altered")
+            failed=m.refresh(config)
+        self.assertTrue(any("returned-results: Returned results: evidence changed" in issue for issue in failed["issues"]))
+        data=json.loads(Path(config["output_json"]).read_text())
+        self.assertNotIn("returned_results",data["additional_evidence"])
+        self.assertEqual((Path(failed["capture"])/"returned-results.json").read_bytes(),source.read_bytes())
+
+    def test_returned_results_accept_empty_selection_and_argv_object(self):
+        source,payload,_=self.returned_manifest()
+        payload["records"][0]["command"]={"argv":["curl","--version"]}
+        payload["records"][0].update(started_at=None,completed_at=None,attachments=[])
+        source.write_text(json.dumps(payload))
+        result=m.capture_returned_results(source,self.root,"empty-attachments")
+        self.assertEqual(result["result"]["records"][0]["attachments"],[])
+        self.assertFalse((self.root/"returned-results-artifacts").exists())
+        payload["records"]=[];source.write_text(json.dumps(payload))
+        self.assertEqual(m.capture_returned_results(source,self.root,"empty-records")["result"]["records"],[])
 
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory()
@@ -275,6 +423,23 @@ class LedgerContract(unittest.TestCase):
             self.assertNotIn("__DATA__",content)
             self.assertEqual(json.loads(content.split('>')[1].split('</script')[0]),{"verified":True})
         self.assertIn("__DATA__",template.read_text())
+    def test_selected_template_uses_reporter_sidecar_only_when_requested(self):
+        from unittest.mock import patch
+        template=self.root/"selected.html.in"
+        template.write_text('<script id="data" type="application/json">__DATA__</script><script>__RETURNED_RESULTS_JS__</script>')
+        sidecar=self.root/"returned_results.js";sidecar.write_text('window.returnedResultsLoaded = true;')
+        config={"html_template":str(template),"output_json":str(self.root/"report.json"),"output_html":str(self.root/"report.html")}
+        with patch.object(m,"__file__",str(self.root/"token_manifest.py")), \
+             patch.object(m,"template_path",side_effect=AssertionError("Configured template ignored")):
+            m.render_reports(config,{"text":"</script><script>bad()</script>"})
+            rendered=Path(config["output_html"]).read_text()
+            self.assertIn(sidecar.read_text(),rendered)
+            self.assertNotIn("__RETURNED_RESULTS_JS__",rendered)
+            self.assertNotIn("</script><script>bad()",rendered)
+            with self.assertRaisesRegex(ValueError,"script source"):
+                m.render_reports(dict(config,output_aliases=[str(sidecar)]),{})
+        self.assertIn("__RETURNED_RESULTS_JS__",template.read_text())
+        self.assertEqual(sidecar.read_text(),'window.returnedResultsLoaded = true;')
     def test_render_targets_cannot_overwrite_template_or_json(self):
         from unittest.mock import patch
         template=self.root/"template.html.in";template.write_text('__DATA__')

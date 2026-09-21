@@ -48,7 +48,8 @@
         "native-observability",
         "native-observability-followup",
         "token-practice-artifacts-20260920",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1"
@@ -71,7 +72,8 @@
         "token-practice-coverage-20260920",
         "token-practice-gap-followup-20260920",
         "current-session-observation-20260920",
-        "native-dashboard-data-20260921"
+        "native-dashboard-data-20260921",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0"
@@ -106,7 +108,8 @@
         "current-session-observation-20260920",
         "foundation-native-20260920",
         "native-offhost-app-state-20260920",
-        "native-dashboard-data-20260921"
+        "native-dashboard-data-20260921",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory",
@@ -195,7 +198,8 @@
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
         "native-worker-cgroup-20260920",
-        "foundation-closure-20260921"
+        "foundation-closure-20260921",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -286,7 +290,8 @@
         "native-token-focus-clients-20260920",
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
-        "foundation-closure-20260921"
+        "foundation-closure-20260921",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -368,7 +373,8 @@
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
         "foundation-closure-20260921",
-        "native-dashboard-data-20260921"
+        "native-dashboard-data-20260921",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/mksglu/context-mode"
@@ -467,7 +473,8 @@
         "current-session-observation-20260920",
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
-        "native-dashboard-data-20260921"
+        "native-dashboard-data-20260921",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/chopratejas/headroom"
@@ -624,7 +631,8 @@
         "component-history",
         "token-practice-coverage-20260920",
         "token-native-retained-functional-20260920",
-        "native-dashboard-data-20260921"
+        "native-dashboard-data-20260921",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/promptfoo/promptfoo"
@@ -651,7 +659,8 @@
         "token-practice-coverage-20260920",
         "foundation-native-20260920",
         "native-offhost-app-state-20260920",
-        "native-dashboard-data-20260921"
+        "native-dashboard-data-20260921",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/qdrant/qdrant"
@@ -680,7 +689,8 @@
         "native-research-efficiency-20260920",
         "foundation-native-20260920",
         "native-catalog-retrieval-20260920",
-        "native-dashboard-data-20260921"
+        "native-dashboard-data-20260921",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/tobi/qmd/releases/tag/v2.8.3"
@@ -734,7 +744,8 @@
         "current-session-observation-20260920",
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
-        "native-dashboard-data-20260921"
+        "native-dashboard-data-20260921",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0"
@@ -787,7 +798,8 @@
         "token-practice-coverage-20260920",
         "current-session-observation-20260920",
         "foundation-native-20260920",
-        "native-dashboard-data-20260921"
+        "native-dashboard-data-20260921",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/oraios/serena"
@@ -863,7 +875,8 @@
         "token-practice-coverage-20260920",
         "current-session-observation-20260920",
         "foundation-native-20260920",
-        "native-dashboard-data-20260921"
+        "native-dashboard-data-20260921",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/giancarloerra/SocratiCode"
@@ -998,7 +1011,8 @@
         "token-practice-coverage-20260920",
         "current-session-observation-20260920",
         "native-token-stack-final-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-returned-results-20260921"
       ],
       "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
       "upstream_sources": [
@@ -1030,7 +1044,8 @@
         "current-session-observation-20260920",
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
-        "native-dashboard-data-20260921"
+        "native-dashboard-data-20260921",
+        "native-returned-results-20260921"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [
@@ -1057,7 +1072,8 @@
         "native-simulation-research-dashboard-20260919",
         "token-practice-coverage-20260920",
         "current-session-observation-20260920",
-        "native-dashboard-data-20260921"
+        "native-dashboard-data-20260921",
+        "native-returned-results-20260921"
       ],
       "source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
       "upstream_sources": [
@@ -1102,7 +1118,8 @@
         "native-observability",
         "desktop-restart-acceptance",
         "token-practice-coverage-20260920",
-        "current-session-observation-20260920"
+        "current-session-observation-20260920",
+        "native-returned-results-20260921"
       ],
       "source_pin": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
       "upstream_sources": [
@@ -1188,7 +1205,8 @@
         "native-dagu-job-recovery-20260920",
         "wsl-transport-recovery-20260920",
         "native-dagu-retry-tests-20260920",
-        "native-service-reboot-20260920"
+        "native-service-reboot-20260920",
+        "native-returned-results-20260921"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1492,7 +1510,8 @@
         "current-session-observation-20260920",
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
-        "native-dashboard-data-20260921"
+        "native-dashboard-data-20260921",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
@@ -1676,7 +1695,8 @@
         "omniroute api compression post-api-compression-preview --body @preview.json"
       ],
       "evidence_ids": [
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-returned-results-20260921"
       ],
       "upstream_sources": [
         "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",

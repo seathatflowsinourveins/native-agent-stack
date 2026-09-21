@@ -13,8 +13,9 @@
 <h1>Token practice.<br>Results with boundaries.</h1>
 <p>Upstream counters, exact artifact comparisons and provider studies remain separate. This report does not calculate a combined lifetime saving.</p>
 <p id="stamp" class="muted small"></p>
-<nav><a href="#counters">Counters</a><a href="#comparisons">Comparisons</a><a href="#commands">Upstream output</a><a href="#catalog">Catalog</a><a href="#practice">Refresh</a></nav>
+<nav><a href="#native">Attached native runs</a><a href="#counters">Counters</a><a href="#comparisons">Comparisons</a><a href="#commands">Upstream output</a><a href="#catalog">Catalog</a><a href="#practice">Refresh</a></nav>
 <div id="issues"></div>
+<section id="native"><div id="current-native-results"></div></section>
 <section id="counters"><h2>Native counters</h2><div id="native-cards" class="cards"></div>
 <p class="note">Project and session views can overlap cumulative totals. Refreshes append observations; they do not add previous snapshots together. A failed refresh keeps the last successful value visibly separate.</p>
 <details><summary>Counter history and exact evidence</summary><div id="native-history"></div></details>
@@ -59,4 +60,5 @@ $('configuration').innerHTML=pre({configuration:D.configuration,scope:D.scope,da
 $('catalog-search').oninput=renderCatalog;renderCatalog();
 $('export').onclick=()=>{const u=URL.createObjectURL(new Blob([JSON.stringify(D,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download='native-token-manifest.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);};
 </script>
+<script>__RETURNED_RESULTS_JS__</script>
 </body></html>

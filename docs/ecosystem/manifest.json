@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-21",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "9faeb859cae8f46fabaa9ba1ee4a80e897978ba6",
+  "source_revision": "88d3363e8ab8fe5c70998d61daf9f89f182bd618",
   "layers": [
     {
       "id": "agents",
@@ -310,6 +310,12 @@
     }
   ],
   "guides": [
+    {
+      "title": "Download actual Codex, Claude and dashboard results",
+      "body": "Fresh native client tool returns, separately measured RTK output and estimates, useful dashboard filters, and exact-byte attachments verified before display. Provider usage and per-task attribution remain explicit.",
+      "path": "docs/native-returned-results.md",
+      "category": "evaluation"
+    },
     {
       "title": "Native foundation qualification: installation, tokens and recovery",
       "body": "Repeated Claude retrieval, native writing workers and graceful recovery, plus a clean Ubuntu userspace installation replay. Observed costs, process deviations and remaining boundaries are retained.",

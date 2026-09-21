@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "id": "native-returned-results-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "codex",
+    "claude-code",
+    "rtk",
+    "context-mode",
+    "qmd",
+    "serena",
+    "ai-memory",
+    "socraticode",
+    "qdrant",
+    "agentsview",
+    "grafana",
+    "loki",
+    "prometheus",
+    "dagu",
+    "ntfy",
+    "omniroute",
+    "agent-browser",
+    "promptfoo",
+    "headroom",
+    "jcodemunch-mcp"
+  ],
+  "recorded_at_utc": "2026-09-21T04:23:39.592718+00:00",
+  "claim": "Fresh native Codex and Claude each returned five selected upstream tool results in this Desktop turn. Independent stream reconciliation verified all ten calls, returned bytes, provider usage and RTK measurements. Thirteen adopted dashboard views exposed useful scoped data; a subsequent direct Desktop Serena invocation exposed its current live dashboard. The local report embeds verified downloadable results and preserves the expired child URL failure alongside recovery.",
+  "limitations": [
+    "Selected current-host native CLI/MCP/API/browser integration checks, not all upstream test suites, every selected component running this session, physical reboot, or another-PC acceptance.",
+    "The native Codex and Claude executions are child sessions launched in this Desktop turn. Their usage excludes this coordinator and other workers; actual input/cache/output counts are not causal provider savings.",
+    "Each RTK artifact comparison removes 359 tokens (537 to 178, o200k_base), preserving six commit identities while omitting other metadata. Each native RTK counter separately increases by 17 estimated tokens. These measures must not be added.",
+    "Context Mode returned reports have session-age/model labels that do not establish exclusive attribution to these short native children. Its direct Desktop result and retained store estimates have separate scopes. Estimates and illustrative prices are not provider bills.",
+    "Serena URLs belong to individual MCP processes. The expired child URL failed; the current Desktop connection returned a different working URL with active project/configuration data. Usage statistics were empty. No stable port, persistence beyond the owning process, restart or new installation is claimed.",
+    "Memory page count includes collapsed system pages; QMD intentionally has no embedded vectors. Archives, graph and Promptfoo reports are retained snapshots, not new model evaluations or automatic ingestion.",
+    "OmniRoute counts apply only to traffic through that gateway. Claude telemetry has historical range series but no instant series at observation. No new inference, workflow runs, or notifications were created to populate dashboards.",
+    "Local browser/report checks validate this integration. Reporter unit tests and repository tests are local checks, not unchanged upstream end-to-end tests.",
+    "Public attachments contain explicit safe projections and selected exact safe outputs, with private-original hash bindings. Full session streams, prompts, personal paths and private application content remain local."
+  ],
+  "artifact_directory": "evidence/artifacts/native-returned-results-20260921",
+  "native_clients": {
+    "exit_codes": [
+      0,
+      0
+    ],
+    "selected_calls_per_client": 5,
+    "rtk_native_estimated_delta_per_client": 17,
+    "exact_artifact_tokens_before": 537,
+    "exact_artifact_tokens_after": 178,
+    "exact_artifact_reduction_percent": 66.85288640595903,
+    "retained_commit_identities": 6,
+    "claude_successful_hook_responses": 29,
+    "timing_policy": "Capture interval timestamps include surrounding probes; invocation elapsed_seconds is a separate timer."
+  },
+  "report_capture": {
+    "captured_at": "2026-09-21T04:30:00.045518+00:00",
+    "records": 19,
+    "attachments": 35,
+    "native_scope_count": 7,
+    "unique_historical_comparisons": 46,
+    "issues": [],
+    "counter_policy": "Separate retained stores/windows; overlapping scopes are not summed."
+  },
+  "native_retained_estimates": [
+    {
+      "tool": "context-mode",
+      "scope": "Desktop WSL",
+      "saved": 2346752,
+      "boundary": "Latest persisted upstream file in this runtime root, not a sum of sessions. Lifetime = retained event count × 256; session = kept-out bytes ÷ 4. Not avoided provider usage."
+    },
+    {
+      "tool": "context-mode",
+      "scope": "Native Claude",
+      "saved": 154112,
+      "boundary": "Latest persisted upstream file in this runtime root, not a sum of sessions. Lifetime = retained event count × 256; session = kept-out bytes ÷ 4. Not avoided provider usage."
+    },
+    {
+      "tool": "context-mode",
+      "scope": "Native Codex",
+      "saved": 102400,
+      "boundary": "Latest persisted upstream file in this runtime root, not a sum of sessions. Lifetime = retained event count × 256; session = kept-out bytes ÷ 4. Not avoided provider usage."
+    },
+    {
+      "tool": "headroom",
+      "scope": "Linux / native last 30 days",
+      "saved": 0,
+      "boundary": "Upstream field named lifetime is capped at 30 days in version 0.37.0; local offline guards do not append native events."
+    },
+    {
+      "tool": "jcodemunch",
+      "scope": "Linux / upstream default index",
+      "saved": 59640,
+      "boundary": "Persistent upstream retrieval estimate, including validation calls. Whole-file counterfactual; not measured provider savings. Custom index-root accounting has an upstream gap in 1.108.319; the default root is used. Schema-size estimates are separate and never added."
+    },
+    {
+      "tool": "rtk",
+      "scope": "Linux / all retained projects",
+      "saved": 5394,
+      "boundary": "Native retained-history estimate. Global includes project counters; retention depends on the selected installation."
+    },
+    {
+      "tool": "rtk",
+      "scope": "Linux / project <selected-project>",
+      "saved": 2243,
+      "boundary": "Native estimates for this working directory only; already included in global."
+    }
+  ],
+  "browser_verification": {
+    "records_visible": 19,
+    "downloadable_attachments": 35,
+    "bundle_attachment_hashes_verified": 35,
+    "selected_rtk_download_bytes": 629,
+    "selected_rtk_download_sha256": "cf1e7a76ceac94b9a2313ca03ddeaa0c6b654d6e8cabbaed7e68e9af9b7b24d4",
+    "codex_filter_passed": true,
+    "claude_filter_passed": true,
+    "page_errors": 0,
+    "initial_attempt": "A download requested while its disclosure was closed timed out; opening the disclosure then downloading succeeded.",
+    "serena_active_project": "agent-lab",
+    "serena_active_tools": 24,
+    "serena_usage_statistics_entries": 0
+  },
+  "validation": {
+    "reporter_unit_tests": 50,
+    "repository_tests": 686,
+    "repository_skips": 41,
+    "local_integration_checks": true,
+    "upstream_suite_claim": false,
+    "independent_review": "Independent read-only review reconciled loader/rendering/docs, all ten native client calls, provider usage, all 35 final deployed attachment hashes, browser-downloaded results, 20 client and 45 dashboard public-source bindings, and the current Serena recovery outputs/source excerpts. Public collection identifier normalized after review; no remaining supported finding."
+  },
+  "retained_failures": [
+    "Initial assembly assumed dashboard records were an object rather than an array; no new report published. Corrected adapter and completed native refresh with zero issues.",
+    "Dashboard projection retains failed browser-environment, route/selector and Serena attempts alongside recovered observations.",
+    "The first PR validation found four lifecycle receipt lists patched under the wrong component. Unique component-anchored corrections restored equality with the canonical stack; focused lifecycle tests passed before the final full checks."
+  ],
+  "references": [
+    "https://learn.chatgpt.com/docs/non-interactive-mode",
+    "https://code.claude.com/docs/en/headless",
+    "docs/native-returned-results.md",
+    "docs/native-dashboard-data.md"
+  ],
+  "public_artifacts": [
+    {
+      "path": "evidence/artifacts/native-returned-results-20260921/native-clients.json",
+      "bytes": 16646,
+      "sha256": "3865e9e49fcbfa9289ca49312912f6952e75dfbf0b0781a208fc9f2128be4e2a"
+    },
+    {
+      "path": "evidence/artifacts/native-returned-results-20260921/dashboards.json",
+      "bytes": 68055,
+      "sha256": "ef9c5cfa22750f520bb55f4c8392e4fea3d0449cc49c2dd1feeedaf49f6a4000"
+    },
+    {
+      "path": "evidence/artifacts/native-returned-results-20260921/serena-recovery.json",
+      "bytes": 11000,
+      "sha256": "5197d3138e181667eb3c100bb60c7c021d473accd572b3c33985a2c4287c2096"
+    }
+  ]
+}
