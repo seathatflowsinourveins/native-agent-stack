@@ -1,0 +1,4 @@
+# Preserve upstream transcript/installer bytes, including CR progress and spaces.
+# Authored documentation and receipts retain normal whitespace checks.
+02-bootstrap-rootmapped.log -whitespace
+claude-install.sh.txt -whitespace

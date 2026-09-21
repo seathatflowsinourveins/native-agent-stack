@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "id": "portable-userspace-install-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "rtk",
+    "qmd",
+    "repomix",
+    "toon",
+    "codex",
+    "claude-code"
+  ],
+  "recorded_at_utc": "2026-09-21",
+  "claim": "Selected native clients, token tools and two ECC skills installed in a fresh official Ubuntu Base userspace on the existing WSL kernel; local fixture checks, bounded repeat-installation and rollback checks passed.",
+  "evidence_class": "clean_userspace_installation_and_local_integration",
+  "base_commit": "3cabcdfd0c3b489867364d9582df8f356586d219",
+  "limitations": [
+    "Fresh root filesystem on the existing WSL kernel, not a booted VM, new PC or independent kernel.",
+    "No native signed-in model inference, skill invocation, provider-token savings or full ecosystem E2E was tested.",
+    "Token assertions are the repository's unchanged local fixture checks, not the upstream projects' complete test suites.",
+    "Networking was shared for upstream downloads; this is not a newly qualified security-isolation boundary.",
+    "Node archive matched HTTPS publisher checksums; its detached signature was not separately verified.",
+    "Top-level npm packages were version pinned; transitive dependencies resolved at installation time.",
+    "Only the named subset was installed. Scoped MCP services, RAG models, persistent memory, terminal interaction and broker integrations need their own host qualification.",
+    "Skill repeat installation intentionally returned existing-destination refusal; filesystem linkage does not establish runtime discovery.",
+    "Home paths in three public client/skill logs are normalized to /home/example; no credential values were captured."
+  ],
+  "environment": {
+    "os_userspace": "Ubuntu Base 24.04.5 LTS amd64",
+    "kernel": "6.18.33.2-microsoft-standard-WSL2 x86_64",
+    "isolation": "Installed bubblewrap user, mount, PID, IPC and UTS namespaces; owned writable rootfs; no host home, auth stores, project or caches mounted.",
+    "external_mounts": [
+      "read-only /etc/resolv.conf",
+      "owned results directory at /results"
+    ],
+    "environment_policy": "env -i allowlist: unchanged HOME string, explicit PATH, LANG=C.UTF-8, TERM=dumb. Bootstrap omitted HOME; first failed token attempt additionally supplied TAR_OPTIONS=--no-same-owner. No CODEX_HOME/provider credentials forwarded.",
+    "home_environment_value_changed": false,
+    "home_path_in_new_filesystem": "The unchanged HOME pathname resolves to a fresh directory inside the owned rootfs, not the host home.",
+    "source_delivery": "git archive of base_commit extracted into isolated /source",
+    "uid_mapping": "UID0 only for OS/bootstrap installation; passing token checks and repeats/skills/rollback under UID1000.",
+    "namespace_command_shape": "env -i HOME=\"$HOME\" PATH=/home/example/.local/bin:/practice/native/bin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin LANG=C.UTF-8 TERM=dumb /usr/bin/bwrap --unshare-user --uid 1000 --gid 1000 --unshare-pid --unshare-ipc --unshare-uts --die-with-parent --bind <owned-stage>/rootfs / --proc /proc --dev /dev --ro-bind /etc/resolv.conf /etc/resolv.conf --bind <owned-stage>/results /results --chdir /source <upstream-command>",
+    "bootstrap_packages": "ca-certificates curl git python3 xz-utils libatomic1; full resolved OS package versions in 04-node-bootstrap-rootmapped.log",
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "python": "3.12.3",
+    "git": "2.43.0"
+  },
+  "sources": {
+    "ubuntu": {
+      "url": "https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release/ubuntu-base-24.04.5-base-amd64.tar.gz",
+      "sha256": "e77b6f10c2590cef872b33ee9f635a0e3fd1f57fb074c0e52b5c7f56147a0c86",
+      "signature_verified": true,
+      "signing_fingerprint": "843938DF228D22F7B3742BC0D94AA3F0EFE21092"
+    },
+    "node": {
+      "url": "https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz",
+      "sha256": "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6",
+      "publisher_checksum_verified": true,
+      "detached_signature_verified": false
+    },
+    "claude": {
+      "installer_url": "https://claude.ai/install.sh",
+      "version": "2.1.278",
+      "installed_binary_sha256": "5c4735937844e84f8a93306e841a5b0e12252909b07870f789b190468da147ab",
+      "manifest_url": "https://downloads.claude.ai/claude-code-releases/2.1.278/manifest.json",
+      "signature_verified": true,
+      "signing_fingerprint": "31DDDE24DDFAB679F42D7BD2BAA929FF1A7ECACE"
+    },
+    "codex": {
+      "package": "@openai/codex@0.155.1",
+      "registry": "https://registry.npmjs.org"
+    },
+    "ecc": {
+      "repository": "https://github.com/affaan-m/ECC",
+      "commit": "2b6e839771e53096d8451a213d40dc64ec8acac0",
+      "skills": {
+        "search-first": "d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733",
+        "iterative-retrieval": "b453b16d3e36174b8487c05ab807d0321a66c2d058812b2ae129d82824183725"
+      }
+    },
+    "skill_installer": {
+      "repository": "https://github.com/openai/skills",
+      "commit": "49f948faa9258a0c61caceaf225e179651397431",
+      "files": {
+        "skills/.system/skill-installer/scripts/install-skill-from-github.py": "0fbbd36e8ea294442c0bd48d6f610a2e8656216bfef5c322f1dcf448ef2f09f1",
+        "skills/.system/skill-installer/scripts/github_utils.py": "61c1bbe2ae217433b4b6f9f09f21aca4df52c12598068343ade719f706e4859b"
+      }
+    },
+    "unchanged_local_fixture": {
+      "path": "scripts/native_token_ci.py",
+      "sha256": "f1bb054a244160a4c8fc1674ff658aa67d6a3f9dc9e79b86b30e32794c5d0983",
+      "manifest_sha256": "31a7051ac8b71f3fa0355d349bb2bd8987a1a83de862d9bc946b9796e978b7fd"
+    }
+  },
+  "results": {
+    "token_tools": {
+      "pins": {
+        "rtk": "0.49.0",
+        "qmd": "2.8.3",
+        "repomix": "1.18.0",
+        "toon": "4.1.1"
+      },
+      "status": "passed",
+      "native_commands": 41,
+      "semantic_checks": 14,
+      "failures": 0,
+      "receipt": "token-clean-install-unprivileged/receipt.json",
+      "scratch_removed": true
+    },
+    "native_clients": {
+      "codex_install_version": "passed",
+      "codex_repeat_install": "passed",
+      "codex_signed_out_exit": 1,
+      "claude_install_version": "passed",
+      "claude_repeat_binary_hash_unchanged": true,
+      "claude_signed_out_exit": 1,
+      "credential_files_absent": true,
+      "model_calls": 0
+    },
+    "skills": {
+      "selective_install": "passed",
+      "exact_source_hashes_match": true,
+      "repeated_install_exit": 1,
+      "repeat_result": "existing destination refused without altering either skill hash",
+      "claude_symlinks_resolve": true,
+      "native_model_invocation": "not run"
+    },
+    "rollback": {
+      "token_runner_owned_scratch_removed": true,
+      "codex_uninstall_and_repeated_uninstall": "passed",
+      "claude_native_paths_removed": true,
+      "ecc_skill_directories_and_symlinks_removed": true,
+      "credentials_absent_after_rollback": true,
+      "whole_owned_staging_directory_absent": true
+    }
+  },
+  "attempts": [
+    {
+      "log": "01-bootstrap.log",
+      "exit_code": 100,
+      "result": "failed: apt could not switch to _apt in single-UID namespace"
+    },
+    {
+      "log": "02-bootstrap-rootmapped.log",
+      "exit_code": 0,
+      "result": "passed with per-command APT::Sandbox::User=root; warnings retained"
+    },
+    {
+      "log": "03-node-bootstrap.log",
+      "exit_code": 2,
+      "result": "failed: tar could not restore upstream UID1001 ownership"
+    },
+    {
+      "log": "04-node-bootstrap-rootmapped.log",
+      "exit_code": 0,
+      "result": "passed with --no-same-owner; versions and installed OS package inventory retained"
+    },
+    {
+      "log": "05-token-clean-install.log",
+      "exit_code": 1,
+      "result": "RTK extraction failed under root mapping; other components completed; failed receipt retained"
+    },
+    {
+      "log": "06-codex-install.log",
+      "exit_code": 1,
+      "result": "install/version passed; final auth-status exit1 expected while signed out"
+    },
+    {
+      "log": "07-claude-install.log",
+      "exit_code": 1,
+      "result": "install/version passed; final auth-status exit1 expected while signed out"
+    },
+    {
+      "log": "08-token-clean-unprivileged.log",
+      "exit_code": 0,
+      "result": "unchanged four-tool runner passed as UID1000"
+    },
+    {
+      "log": "09-client-repeat.log",
+      "exit_code": 0,
+      "result": "both repeat installations and expected signed-out exits explicitly checked"
+    },
+    {
+      "log": "10-ecc-selective-install.log",
+      "exit_code": 0,
+      "result": "both source hashes, repeat refusal and links checked"
+    },
+    {
+      "log": "11-claude-signature.log",
+      "exit_code": 0,
+      "result": "publisher manifest signature verified"
+    },
+    {
+      "log": "12-uninstall.log",
+      "exit_code": 0,
+      "result": "native clients and skill rollback; absent credentials asserted"
+    },
+    {
+      "log": "13-teardown.log",
+      "exit_code": 0,
+      "result": "owned staging directory absent after retaining evidence"
+    }
+  ],
+  "artifact_directory": "evidence/artifacts/portable-userspace-install-20260921",
+  "artifact_sha256": {
+    "00-ubuntu-signature.log": "3b839d751147b0f0765b038ccc589e3c2111056c01cf1a320630c22ee9635765",
+    "01-bootstrap.log": "0f22a6fd9bb59a4e0a2b778cccc4608759650679ad20271274af20c7119144ed",
+    "02-bootstrap-rootmapped.log": "fb440c7f0676ce88b1cfabc4d1790d9c13349bbebb01d18eaacceb133a50c0c3",
+    "03-node-bootstrap.log": "7d8f52c0e5aaa2336bf9fd870c2e230aaab13acf2fe44c481a2632d783a165ca",
+    "04-node-bootstrap-rootmapped.log": "0a075cd79673b6ef3da927dad4a9d1a48f220a268bfea3ef88f475df4a5d9608",
+    "05-token-clean-install.log": "83122d9921e887dbd3d41bec63d83e021540ff8b9012e3181b02801fc3d6cc53",
+    "06-codex-install.log": "1ebc2e6946cb19c78638ca952ca00c2ec01ea72f0d0c7c2ed57d7bb138b2d425",
+    "07-claude-install.log": "d5bf86978e29740b506e72847f65c70984df65b4f56c0040c895a40de196cc55",
+    "08-token-clean-unprivileged.log": "90737201ea9ca176762f13b2acc9a8ecc3815b175bb91b7f8acb5924c19852f4",
+    "09-client-repeat.log": "a1ffabee92d1bb989314a41d03b78875c804149e7994068d5747b0a0cd68b19b",
+    "10-ecc-selective-install.log": "ec33432970b5b20fbbe5bc7276619526489c75f7952794885f815a9d13c49b19",
+    "11-claude-signature.log": "b4a3961bf0e7eb5d27f7a849fae10babe0c93e65e2c449ff45d50ebc73df4318",
+    "12-uninstall.log": "ebc9ce0bb8d524e5a68a4b878ce23cf7daf03c93af10b8bd1914e6d4e6f33f7b",
+    "13-teardown.log": "86a3f5875b6b626ea8014b3e8010250f14f7d18656dfc4ab2de9e244a68b7f52",
+    "SHA256SUMS": "30f23cec3a46679bcf21dbe0c0a0ab51440e9b2f5ac69b3ae1d4a7a71c0ffc69",
+    "SHA256SUMS.gpg": "5164e25bab9ff0467fc83415c8f759bb79cbd4e0264b9a11f49ff1e6a10a4c1f",
+    "claude-code.asc": "bd70a5e4a268002704024ceba7f8446024114e94f3f0bdd11c23a9e592be81c6",
+    "claude-install.sh.txt": "3a68d3406cf674e17bed1733a4dcf37805e2e47d87417700007d7e1aa766a944",
+    "claude-manifest.json": "d1bf63d94621d6aa6fb84297b235ddb8f5aaadc9252cef8020d170ef661b2f28",
+    "claude-manifest.json.sig": "09ef2ff6521e6909d194283c87d19ec954b72f32657cbdb1eb05b0d28f179da3",
+    "node-SHASUMS256.txt": "f410428039e2c922a14058df067a4482691c9304a5c01a75847f9f3f2d3307f6",
+    "token-clean-install/qmd-input.md": "6fd148f20e3aeac8e835cd8509090aa02d2d0fa7818453776fbc62124f82e32a",
+    "token-clean-install/receipt.json": "159f08ca0b2a8d80dfc596e70cbab9bc937247c100aa23f18e78bfcaa712504e",
+    "token-clean-install/records.recovered.json": "fbb7def43d291ae3f375cd83c04f367a993044fea454e6851fc499dccd4cec34",
+    "token-clean-install/records.toon": "9446df1ab35a750ac3bccc1777934ce0f979bad805e4efa3b21c7fbbe7a505e3",
+    "token-clean-install/repomix-originals.xml": "a860736a54fbdac8e9babf486ad87180cca6c490f946f76e4a2dad2482f45cd6",
+    "token-clean-install/repomix-structure.xml": "7c8e37eb454f14dc58f308ed94957aace08cb2505aff26dbf428e04cecdbc2f7",
+    "token-clean-install-unprivileged/qmd-input.md": "6fd148f20e3aeac8e835cd8509090aa02d2d0fa7818453776fbc62124f82e32a",
+    "token-clean-install-unprivileged/receipt.json": "0014e229cca1dd936199889b2aba54b9734fa54843dd8ad8d1470c11b588f855",
+    "token-clean-install-unprivileged/records.recovered.json": "fbb7def43d291ae3f375cd83c04f367a993044fea454e6851fc499dccd4cec34",
+    "token-clean-install-unprivileged/records.toon": "9446df1ab35a750ac3bccc1777934ce0f979bad805e4efa3b21c7fbbe7a505e3",
+    "token-clean-install-unprivileged/repomix-originals.xml": "a860736a54fbdac8e9babf486ad87180cca6c490f946f76e4a2dad2482f45cd6",
+    "token-clean-install-unprivileged/repomix-structure.xml": "7c8e37eb454f14dc58f308ed94957aace08cb2505aff26dbf428e04cecdbc2f7"
+  }
+}

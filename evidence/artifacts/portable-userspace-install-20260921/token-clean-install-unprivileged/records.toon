@@ -1,0 +1,3 @@
+items[2]{name,enabled,count}:
+  alpha,true,2
+  beta,false,3

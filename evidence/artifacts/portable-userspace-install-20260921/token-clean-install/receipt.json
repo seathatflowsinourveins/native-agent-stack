@@ -1,0 +1,688 @@
+{
+  "schema_version": 1,
+  "kind": "native_cli_e2e",
+  "captured_at": "2026-09-21T03:01:18.341739+00:00",
+  "pins": {
+    "rtk": "0.49.0",
+    "qmd": "2.8.3",
+    "repomix": "1.18.0",
+    "toon": "4.1.1"
+  },
+  "status": "failed",
+  "commands": [
+    {
+      "label": "download-rtk-x86_64-unknown-linux-musl.tar.gz",
+      "argv": [
+        "curl",
+        "--disable",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--location",
+        "--output",
+        "<WORK>/install/rtk/rtk-x86_64-unknown-linux-musl.tar.gz",
+        "https://github.com/rtk-ai/rtk/releases/download/v0.49.0/rtk-x86_64-unknown-linux-musl.tar.gz"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.282,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "download-checksums.txt",
+      "argv": [
+        "curl",
+        "--disable",
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--location",
+        "--output",
+        "<WORK>/install/rtk/checksums.txt",
+        "https://github.com/rtk-ai/rtk/releases/download/v0.49.0/checksums.txt"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.084,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-publisher-checksum",
+      "argv": [
+        "sha256sum",
+        "--check",
+        "--ignore-missing",
+        "checksums.txt"
+      ],
+      "cwd": "<WORK>/install/rtk",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.003,
+      "stdout_raw_sha256": "dd9378eeefcb494bd4becdafa151a3c4f247bc1ced286c7a2a8a9cf3bdcabd2e",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "rtk-x86_64-unknown-linux-musl.tar.gz: OK\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-archive-members",
+      "argv": [
+        "tar",
+        "-tf",
+        "rtk-x86_64-unknown-linux-musl.tar.gz"
+      ],
+      "cwd": "<WORK>/install/rtk",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.049,
+      "stdout_raw_sha256": "9804f062bef8c3b58e915ee0b1f28698c7561fefea62c2538feb0607c47a6fcd",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "rtk\n",
+      "stderr": ""
+    },
+    {
+      "label": "rtk-extract",
+      "argv": [
+        "tar",
+        "-xf",
+        "rtk-x86_64-unknown-linux-musl.tar.gz"
+      ],
+      "cwd": "<WORK>/install/rtk",
+      "exit_code": 2,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.049,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "4c1c1219367d727a5c159b408e1611b14e5ee06da9cd61c374236d2ad38bf855",
+      "stdout": "",
+      "stderr": "tar: rtk: Cannot change ownership to uid 1001, gid 1001: Invalid argument\ntar: Exiting with failure status due to previous errors\n"
+    },
+    {
+      "label": "install-qmd",
+      "argv": [
+        "npm",
+        "install",
+        "--global",
+        "--prefix",
+        "<WORK>/install/qmd",
+        "--registry=https://registry.npmjs.org",
+        "--no-audit",
+        "--no-fund",
+        "@tobilu/qmd@2.8.3"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 7.742,
+      "stdout_raw_sha256": "5f70dc2877ac39a6f272b1f1c00119605b8c16f4fa68500f483489ba29240068",
+      "stderr_raw_sha256": "6c568304577ad31627a2ee0d73fa13e945f54e64282f3d10dc2d62ad0cae6173",
+      "stdout": "\nadded 159 packages in 8s\n",
+      "stderr": "npm warn install-scripts 6 packages have install scripts not yet covered by allowScripts:\nnpm warn install-scripts   node-llama-cpp@3.20.0 (postinstall: node ./dist/cli/cli.js postinstall)\nnpm warn install-scripts   tree-sitter-go@0.25.0 (install: node-gyp-build)\nnpm warn install-scripts   tree-sitter-python@0.25.0 (install: node-gyp-build)\nnpm warn install-scripts   tree-sitter-rust@0.24.0 (install: node-gyp-build)\nnpm warn install-scripts   tree-sitter-typescript@0.23.2 (install: node-gyp-build)\nnpm warn install-scripts   tree-sitter-javascript@0.23.1 (install: node-gyp-build)\nnpm warn install-scripts\nnpm warn install-scripts Run `npm install -g --allow-scripts=node-llama-cpp,tree-sitter-go,tree-sitter-python,tree-sitter-rust,tree-sitter-typescript,tree-sitter-javascript` to allow these scripts once, or `npm config set allow-scripts=node-llama-cpp,tree-sitter-go,tree-sitter-python,tree-sitter-rust,tree-sitter-typescript,tree-sitter-javascript --location=user` to allow them for all global installs.\n"
+    },
+    {
+      "label": "installed-metadata-qmd",
+      "argv": [
+        "npm",
+        "list",
+        "--global",
+        "--prefix",
+        "<WORK>/install/qmd",
+        "--depth=0",
+        "--json"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.209,
+      "stdout_raw_sha256": "ce8e8e202665015d752cf5c961015c8ee3ab2ad9bd74ce6450dcc6c6db24b99a",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "{\n  \"name\": \"lib\",\n  \"dependencies\": {\n    \"@tobilu/qmd\": {\n      \"version\": \"2.8.3\",\n      \"overridden\": false\n    }\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "label": "version-qmd",
+      "argv": [
+        "<TOOL:qmd>",
+        "--version"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.083,
+      "stdout_raw_sha256": "f2fde0f2ce1957393ab2348fc31dae60a39e4684689ae9e95845a0ee5d8396ab",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "qmd 2.8.3 (facd35e)\n",
+      "stderr": ""
+    },
+    {
+      "label": "qmd-collection-add",
+      "argv": [
+        "<TOOL:qmd>",
+        "--index",
+        "native-ci-docs",
+        "collection",
+        "add",
+        "<WORK>/docs-fixture",
+        "--name",
+        "native-ci-docs",
+        "--mask",
+        "*.md"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.113,
+      "stdout_raw_sha256": "8a86e33d7de01ced4a92a9c7d54c07d3d0066770028d4b55d3d1bba2ebfe552b",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "Creating collection 'native-ci-docs'...\nCollection: <WORK>/docs-fixture (*.md)\n\nIndexed: 1 new, 0 updated, 0 unchanged, 0 removed\n\nRun 'qmd embed' to update embeddings (1 unique hashes need vectors)\n\u2713 Collection 'native-ci-docs' created successfully\n",
+      "stderr": ""
+    },
+    {
+      "label": "qmd-bm25-search",
+      "argv": [
+        "<TOOL:qmd>",
+        "--index",
+        "native-ci-docs",
+        "search",
+        "Nemotron",
+        "-c",
+        "native-ci-docs",
+        "-n",
+        "1",
+        "--json"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.093,
+      "stdout_raw_sha256": "8c63520ad00e1ec98a59ae8d40260edb5509e7828f045a1ba551a0046c72bd6a",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "[\n  {\n    \"docid\": \"#27680c\",\n    \"score\": 0,\n    \"file\": \"qmd://native-ci-docs/rag-note.md?index=native-ci-docs\",\n    \"line\": 3,\n    \"title\": \"Automatic local code RAG\",\n    \"snippet\": \"@@ -2,3 @@ (1 before, 0 after)\\n\\nSocratiCode watches a deliberately indexed project. Qdrant persists its vectors and code payloads. The local Nemotron embedding service uses query: and passage: prefixes. QMD retrieves Markdown documents separately. File watching runs while the native MCP process is alive, with upstream incremen...\"\n  }\n]\n",
+      "stderr": ""
+    },
+    {
+      "label": "qmd-get-fresh-process",
+      "argv": [
+        "<TOOL:qmd>",
+        "--index",
+        "native-ci-docs",
+        "get",
+        "qmd://native-ci-docs/rag-note.md?index=native-ci-docs",
+        "--no-line-numbers"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.087,
+      "stdout_raw_sha256": "13945ee79aca610fea4380728116d824c858c75dbcabbc8f0e56945a9948bb2d",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "qmd://native-ci-docs/rag-note.md  #27680c\n---\n\n# Automatic local code RAG\n\nSocratiCode watches a deliberately indexed project. Qdrant persists its vectors and code payloads. The local Nemotron embedding service uses query: and passage: prefixes. QMD retrieves Markdown documents separately. File watching runs while the native MCP process is alive, with upstream incremental catch-up on reopening.\n\n",
+      "stderr": ""
+    },
+    {
+      "label": "qmd-update",
+      "argv": [
+        "<TOOL:qmd>",
+        "--index",
+        "native-ci-docs",
+        "update"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.105,
+      "stdout_raw_sha256": "e711689a6884bd37bc32e3b9130adc0e732c3f968e68c604d464d6066dc8c5c1",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "Updating 1 collection(s)...\n\n[1/1] native-ci-docs (*.md)\nCollection: <WORK>/docs-fixture (*.md)\n\nIndexed: 0 new, 1 updated, 0 unchanged, 0 removed\nCleaned up 1 orphaned content hash(es)\n\n\u2713 All collections updated.\n\nRun 'qmd embed' to update embeddings (1 unique hashes need vectors)\n",
+      "stderr": ""
+    },
+    {
+      "label": "qmd-search-updated-document",
+      "argv": [
+        "<TOOL:qmd>",
+        "--index",
+        "native-ci-docs",
+        "search",
+        "Amberquartz",
+        "-c",
+        "native-ci-docs",
+        "-n",
+        "1",
+        "--json"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.095,
+      "stdout_raw_sha256": "6254ecd34d017f4f5942b2e9649775f60eab9176a1c2a4fcdcd6c94355c3f489",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "[\n  {\n    \"docid\": \"#6fd148\",\n    \"score\": 0,\n    \"file\": \"qmd://native-ci-docs/rag-note.md?index=native-ci-docs\",\n    \"line\": 5,\n    \"title\": \"Automatic local code RAG\",\n    \"snippet\": \"@@ -4,3 @@ (3 before, 0 after)\\n\\nAmberquartz persistence marker: 19.\\n\"\n  }\n]\n",
+      "stderr": ""
+    },
+    {
+      "label": "qmd-get-updated-fresh-process",
+      "argv": [
+        "<TOOL:qmd>",
+        "--index",
+        "native-ci-docs",
+        "get",
+        "qmd://native-ci-docs/rag-note.md?index=native-ci-docs",
+        "--no-line-numbers"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.091,
+      "stdout_raw_sha256": "484ff66450dcadf536e79d07f18a77b5d3403e5729b8f2a5b574ee5ffe8ee897",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "qmd://native-ci-docs/rag-note.md  #6fd148\n---\n\n# Automatic local code RAG\n\nSocratiCode watches a deliberately indexed project. Qdrant persists its vectors and code payloads. The local Nemotron embedding service uses query: and passage: prefixes. QMD retrieves Markdown documents separately. File watching runs while the native MCP process is alive, with upstream incremental catch-up on reopening.\n\nAmberquartz persistence marker: 19.\n\n",
+      "stderr": ""
+    },
+    {
+      "label": "qmd-status",
+      "argv": [
+        "<TOOL:qmd>",
+        "--index",
+        "native-ci-docs",
+        "status"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.147,
+      "stdout_raw_sha256": "5f6bf8e665f2a50a3c2cb84ea1fdde76f73dc05382a8e25a9987aec4fb923794",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "QMD Status\n\nIndex: <WORK>/cache/qmd/native-ci-docs.sqlite\nSize:  120.0 KB\n\nDocuments\n  Total:    1 files indexed\n  Vectors:  0 embedded\n  Pending:  1 need embedding (run 'qmd embed')\n  Updated:  0s ago\n\nAST Chunking\n  Status:   active\n  Languages: typescript, tsx, javascript, python, go, rust\n\nCollections\n  native-ci-docs (qmd://native-ci-docs/)\n    Pattern:  *.md\n    Files:    1 (updated 0s ago)\n\nExamples\n  # List files in a collection\n  qmd ls native-ci-docs\n  # Get a document\n  qmd get qmd://native-ci-docs/path/to/file.md\n  # Search within a collection\n  qmd search \"query\" -c native-ci-docs\n\nModels\n  Embedding:   https://huggingface.co/ggml-org/embeddinggemma-300M-GGUF\n  Reranking:   https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF\n  Generation:  https://huggingface.co/tobil/qmd-query-expansion-1.7B-gguf\n\nTips\n  Add context to collections for better search results: native-ci-docs\n    qmd context add qmd://<name>/ \"What this collection contains\"\n    qmd context add qmd://<name>/meeting-notes \"Weekly team meeting notes\"\n",
+      "stderr": ""
+    },
+    {
+      "label": "qmd-remove-owned-collection",
+      "argv": [
+        "<TOOL:qmd>",
+        "--index",
+        "native-ci-docs",
+        "collection",
+        "remove",
+        "native-ci-docs"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.104,
+      "stdout_raw_sha256": "46c006d3201d5642a1b995509bf724008780965b5b7601a897d095c6734aa2f6",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "\u2713 Removed collection 'native-ci-docs'\n  Deleted 1 documents\n  Cleaned up 1 orphaned content hashes\n",
+      "stderr": ""
+    },
+    {
+      "label": "install-repomix",
+      "argv": [
+        "npm",
+        "install",
+        "--global",
+        "--prefix",
+        "<WORK>/install/repomix",
+        "--registry=https://registry.npmjs.org",
+        "--no-audit",
+        "--no-fund",
+        "repomix@1.18.0"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 3.068,
+      "stdout_raw_sha256": "12b91eea27baebe566781f8e4ccdc6c74e3d08c243915e18a6a7e0b240fe09a2",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "\nadded 171 packages in 6s\n",
+      "stderr": ""
+    },
+    {
+      "label": "installed-metadata-repomix",
+      "argv": [
+        "npm",
+        "list",
+        "--global",
+        "--prefix",
+        "<WORK>/install/repomix",
+        "--depth=0",
+        "--json"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.216,
+      "stdout_raw_sha256": "e19701f06a2966015b4726d24b96d279a3c39fb81b0541d1551d73f0acae4dee",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "{\n  \"name\": \"lib\",\n  \"dependencies\": {\n    \"repomix\": {\n      \"version\": \"1.18.0\",\n      \"overridden\": false\n    }\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "label": "version-repomix",
+      "argv": [
+        "<TOOL:repomix>",
+        "--version"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.035,
+      "stdout_raw_sha256": "04d659518a1793d5396007fcabdc9211a8c1db8406bf4e0fa8069171fdb06518",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "1.18.0\n",
+      "stderr": ""
+    },
+    {
+      "label": "repomix-selected-originals",
+      "argv": [
+        "<TOOL:repomix>",
+        "<WORK>/pack-fixture",
+        "--config",
+        "<WORK>/repomix.config.json",
+        "--include",
+        "before.py,after.py",
+        "--style",
+        "xml",
+        "--parsable-style",
+        "--token-count-encoding",
+        "o200k_base",
+        "--no-file-summary",
+        "--no-directory-structure",
+        "--output",
+        "<WORK>/selected.xml"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.285,
+      "stdout_raw_sha256": "ec79a1837eb1afaa06e25e0cc6020bd36fef303cbbd0d7415d9e9ac82d760324",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "\n\ud83d\udce6 Repomix v1.18.0\n\n\r\u001b[K\u001b[?25l\u280b Initializing...\n\r\u001b[K\u001b[1A\r\u001b[K\u001b[?25l\u2819 Processing file... (2/2) before.py\n\r\u001b[K\u001b[1A\r\u001b[K\u001b[?25l\u2839 Generating output...\n\r\u001b[K\u001b[1A\r\u001b[K\u001b[?25l\u2838 Generating output...\n\r\u001b[K\u001b[1A\r\u001b[K\u001b[?25l\u2714 Packing completed successfully!\n\u001b[?25h\n\ud83d\udcc8 Top 5 Files by Token Count:\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1.  after.py (15 tokens, 53 chars, 18.5%)\n2.  before.py (12 tokens, 47 chars, 14.8%)\n\n\ud83d\udd0e Security Check:\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\u2714 No suspicious files detected.\n\n\n\ud83d\udcca Pack Summary:\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  Total Files: 2 files\n Total Tokens: 81 tokens\n  Total Chars: 289 chars\n       Output: selected.xml\n     Security: \u2714 No suspicious files detected\n\n\ud83c\udf89 All Done!\nYour repository has been successfully packed.\n\n\ud83d\udca1 Repomix is now available in your browser! Try it at https://repomix.com\n",
+      "stderr": ""
+    },
+    {
+      "label": "repomix-selected-structure",
+      "argv": [
+        "<TOOL:repomix>",
+        "<WORK>/pack-fixture",
+        "--config",
+        "<WORK>/repomix.config.json",
+        "--include",
+        "before.py,after.py",
+        "--style",
+        "xml",
+        "--parsable-style",
+        "--token-count-encoding",
+        "o200k_base",
+        "--no-file-summary",
+        "--no-directory-structure",
+        "--compress",
+        "--output",
+        "<WORK>/selected-compressed.xml"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.232,
+      "stdout_raw_sha256": "2a14acf295a4d741809f3de5cd38381fdf21b271786ee626074961097e547262",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "\n\ud83d\udce6 Repomix v1.18.0\n\n\r\u001b[K\u001b[?25l\u280b Initializing...\n\r\u001b[K\u001b[1A\r\u001b[K\u001b[?25l\u2819 Processing files...\n\r\u001b[K\u001b[1A\r\u001b[K\u001b[?25l\u2839 Generating output...\n\r\u001b[K\u001b[1A\r\u001b[K\u001b[?25l\u2838 Calculating metrics... (2/2) before.py\n\r\u001b[K\u001b[1A\r\u001b[K\u001b[?25l\u2714 Packing completed successfully!\n\u001b[?25h\n\ud83d\udcc8 Top 5 Files by Token Count:\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n1.  after.py (4 tokens, 18 chars, 8.3%)\n2.  before.py (4 tokens, 18 chars, 8.3%)\n\n\ud83d\udd0e Security Check:\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\u2714 No suspicious files detected.\n\n\n\ud83d\udcca Pack Summary:\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  Total Files: 2 files\n Total Tokens: 48 tokens\n  Total Chars: 195 chars\n       Output: selected-compressed.xml\n     Security: \u2714 No suspicious files detected\n\n\ud83c\udf89 All Done!\nYour repository has been successfully packed.\n\n\ud83d\udca1 Repomix is now available in your browser! Try it at https://repomix.com\n",
+      "stderr": ""
+    },
+    {
+      "label": "install-toon",
+      "argv": [
+        "npm",
+        "install",
+        "--global",
+        "--prefix",
+        "<WORK>/install/toon",
+        "--registry=https://registry.npmjs.org",
+        "--no-audit",
+        "--no-fund",
+        "@toon-format/cli@4.1.1"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.56,
+      "stdout_raw_sha256": "c26d54343023ab5232dacc28e410340e0de5603af1c74debc87a0a664a4b1908",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "\nadded 1 package in 528ms\n",
+      "stderr": ""
+    },
+    {
+      "label": "installed-metadata-toon",
+      "argv": [
+        "npm",
+        "list",
+        "--global",
+        "--prefix",
+        "<WORK>/install/toon",
+        "--depth=0",
+        "--json"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.125,
+      "stdout_raw_sha256": "37677141ec0f85760dc87272f9106ca91362dddbce01440884fee587248b738a",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "{\n  \"name\": \"lib\",\n  \"dependencies\": {\n    \"@toon-format/cli\": {\n      \"version\": \"4.1.1\",\n      \"overridden\": false\n    }\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "label": "version-toon",
+      "argv": [
+        "<TOOL:toon>",
+        "--version"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.025,
+      "stdout_raw_sha256": "9737915fce5e934ea348658fccb82a4c532157d2161bb032a240c2837b8f66cb",
+      "stderr_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout": "4.1.1\n",
+      "stderr": ""
+    },
+    {
+      "label": "toon-encode-statistics",
+      "argv": [
+        "<TOOL:toon>",
+        "<WORK>/records.json",
+        "--stats",
+        "-o",
+        "<WORK>/records.toon"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.031,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "a4a0a88db9a02da139a8db2b20f81bb65ffe0a90e486b4b042ac297ab209b392",
+      "stdout": "",
+      "stderr": "\u2714 Encoded `records.json` \u2192 `records.toon`\n\u25cf Token estimates: ~33 (JSON) \u2192 ~21 (TOON)\n\u2714 Saved ~12 tokens (-36.4%)\n"
+    },
+    {
+      "label": "toon-strict-decode",
+      "argv": [
+        "<TOOL:toon>",
+        "<WORK>/records.toon",
+        "--decode",
+        "--strict",
+        "-o",
+        "<WORK>/recovered.json"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 0,
+      "expected_exit": "zero",
+      "timed_out": false,
+      "elapsed_seconds": 0.034,
+      "stdout_raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_raw_sha256": "ebdf2c7a715936855b04ae496be0f5e4603b37df6d15a8898110c7521055c164",
+      "stdout": "",
+      "stderr": "\u2714 Decoded `records.toon` \u2192 `recovered.json`\n"
+    },
+    {
+      "label": "toon-rejects-truncated-array",
+      "argv": [
+        "<TOOL:toon>",
+        "<WORK>/malformed.toon",
+        "--decode",
+        "--strict"
+      ],
+      "cwd": "<WORK>",
+      "exit_code": 1,
+      "expected_exit": "nonzero",
+      "timed_out": false,
+      "elapsed_seconds": 0.026,
+      "stdout_raw_sha256": "5e91308bd1a06e2d6b1dd4517b412f89c6e2195b108f7b7b4f228cdc18214069",
+      "stderr_raw_sha256": "f66e2d3a5d3d78129ba4d4b13a2d3e4628d75611acb5f4e88b716bb122fcfd33",
+      "stdout": "{\n  \"items\": [\n    {\n      \"name\": \"alpha\",\n      \"count\": 1\n    }",
+      "stderr": "\u2716 Failed to decode TOON at line 2: Expected 2 tabular rows, but got 1\n\n  2 |   alpha,1\n        ^\n"
+    }
+  ],
+  "checks": [
+    {
+      "label": "qmd-returned-fixture-uri",
+      "passed": true
+    },
+    {
+      "label": "qmd-reopened-exact-document-content",
+      "passed": true
+    },
+    {
+      "label": "qmd-updated-search-source",
+      "passed": true
+    },
+    {
+      "label": "qmd-update-content-fidelity",
+      "passed": true
+    },
+    {
+      "label": "qmd-no-model-files",
+      "passed": true
+    },
+    {
+      "label": "repomix-source-fidelity-and-selection",
+      "passed": true
+    },
+    {
+      "label": "repomix-structural-output-only",
+      "passed": true
+    },
+    {
+      "label": "toon-exact-json-value-roundtrip",
+      "passed": true
+    }
+  ],
+  "failures": [
+    {
+      "component": "rtk",
+      "error": "rtk-extract: unexpected exit 2"
+    }
+  ],
+  "artifacts": {
+    "qmd-input.md": {
+      "raw_sha256": "6fd148f20e3aeac8e835cd8509090aa02d2d0fa7818453776fbc62124f82e32a",
+      "retained_sha256": "6fd148f20e3aeac8e835cd8509090aa02d2d0fa7818453776fbc62124f82e32a"
+    },
+    "repomix-originals.xml": {
+      "raw_sha256": "a860736a54fbdac8e9babf486ad87180cca6c490f946f76e4a2dad2482f45cd6",
+      "retained_sha256": "a860736a54fbdac8e9babf486ad87180cca6c490f946f76e4a2dad2482f45cd6"
+    },
+    "repomix-structure.xml": {
+      "raw_sha256": "7c8e37eb454f14dc58f308ed94957aace08cb2505aff26dbf428e04cecdbc2f7",
+      "retained_sha256": "7c8e37eb454f14dc58f308ed94957aace08cb2505aff26dbf428e04cecdbc2f7"
+    },
+    "records.toon": {
+      "raw_sha256": "9446df1ab35a750ac3bccc1777934ce0f979bad805e4efa3b21c7fbbe7a505e3",
+      "retained_sha256": "9446df1ab35a750ac3bccc1777934ce0f979bad805e4efa3b21c7fbbe7a505e3"
+    },
+    "records.recovered.json": {
+      "raw_sha256": "fbb7def43d291ae3f375cd83c04f367a993044fea454e6851fc499dccd4cec34",
+      "retained_sha256": "fbb7def43d291ae3f375cd83c04f367a993044fea454e6851fc499dccd4cec34"
+    }
+  },
+  "scope": "Fresh Linux fixture state; selected upstream CLIs, no native model task",
+  "limits": [
+    "Not a new-PC, native Codex/Claude, GPU or provider acceptance",
+    "Top-level package pins; npm transitive ranges resolve at installation",
+    "RTK counters are fixture-local estimates, not provider savings",
+    "No token-saving requirement: fidelity may need the larger representation",
+    "Retained text replaces local paths; raw byte hashes precede sanitization"
+  ],
+  "environment": {
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8",
+    "TZ": "UTC",
+    "TERM": "dumb",
+    "CI": "true",
+    "NO_COLOR": "1",
+    "GIT_CONFIG_NOSYSTEM": "1",
+    "GIT_CONFIG_GLOBAL": "/dev/null",
+    "GIT_CONFIG_SYSTEM": "/dev/null",
+    "XDG_CONFIG_HOME": "<WORK>/config",
+    "XDG_CACHE_HOME": "<WORK>/cache",
+    "XDG_DATA_HOME": "<WORK>/data",
+    "XDG_STATE_HOME": "<WORK>/state",
+    "TMPDIR": "<WORK>/tmp",
+    "RTK_DB_PATH": "<WORK>/data/rtk/history.db",
+    "RTK_TELEMETRY_DISABLED": "1",
+    "QMD_CONFIG_DIR": "<WORK>/config/qmd",
+    "QMD_FORCE_CPU": "1",
+    "INDEX_PATH": "<WORK>/cache/qmd/native-ci-docs.sqlite",
+    "NODE_LLAMA_CPP_SKIP_DOWNLOAD": "true",
+    "NPM_CONFIG_CACHE": "<WORK>/npm-cache",
+    "NPM_CONFIG_USERCONFIG": "<WORK>/empty.npmrc",
+    "NPM_CONFIG_GLOBALCONFIG": "<WORK>/empty-global.npmrc"
+  },
+  "native_home_preserved": true,
+  "source_sha256": {
+    "scripts/native_token_ci.py": "f1bb054a244160a4c8fc1674ff658aa67d6a3f9dc9e79b86b30e32794c5d0983",
+    ".github/workflows/native-token-e2e.yml": "d98bbefddb1bed7f0d282ffc08195bef52f8dab4772d1caf8ec6c0bad149b75f",
+    "manifests/stack.json": "31a7051ac8b71f3fa0355d349bb2bd8987a1a83de862d9bc946b9796e978b7fd",
+    "fixtures/rag-note.md": "27680cf43a65121fc1affbde0dba8021ea21180bb8db0a9c0f80a09b831257cc",
+    "fixtures/records.json": "3e0f391db878cd7d0a644a251cc43d2a99efe9271f3bc617ade4df8b0cb6e85c",
+    "fixtures/before.py": "6724464b3eb5cc16b761ca03ef2c278c28d1e8cd4af7788b449beda3b205fb60",
+    "fixtures/after.py": "7808434453a0975ee01a5eae460e8866b78f9b3a8401f93f2b905b1f3a778e54"
+  },
+  "installation": "fresh-upstream-prefix",
+  "rtk_archive_sha256": "7278231dfd7e6a730a4ab7f847b195bcf02289c2d57622b0dab75a6411100c8f",
+  "cleanup": {
+    "owned_temporary_directory_absent": true,
+    "retained_output_exists": true
+  },
+  "execution_completed": true
+}

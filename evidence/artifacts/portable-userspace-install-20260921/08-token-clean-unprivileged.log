@@ -1,0 +1,1 @@
+{"status": "passed", "commands": 41, "checks": 14, "failures": [], "cleanup": {"owned_temporary_directory_absent": true, "retained_output_exists": true}}

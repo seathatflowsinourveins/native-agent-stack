@@ -1,0 +1,37 @@
+3a68d3406cf674e17bed1733a4dcf37805e2e47d87417700007d7e1aa766a944  claude-install.sh
+Setting up Claude Code...
+
+Checking installation status...
+Installing Claude Code native build 2.1.278...
+Setting up launcher and shell integration...
+⚠ Setup notes:
+  ● Native installation exists but ~/.local/bin is not in your PATH. Run:
+
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> your shell config file && source your shell config file
+
+✔ Claude Code successfully installed!
+
+  Version: 2.1.278
+
+  Location: ~/.local/bin/claude
+
+
+  Next: Run claude --help to get started
+
+⚠ Setup notes:
+  ● Native installation exists but ~/.local/bin is not in your PATH. Run:
+
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> your shell config file && source your shell config file
+
+
+✅ Installation complete!
+
+2.1.278 (Claude Code)
+{
+  "loggedIn": false,
+  "authMethod": "none",
+  "apiProvider": "firstParty",
+  "analyticsDisabled": false,
+  "projectsDirectory": "/home/example/.claude/projects",
+  "configDirectory": "/home/example/.claude"
+}
