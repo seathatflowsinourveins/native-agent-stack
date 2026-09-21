@@ -83,6 +83,13 @@ The dashboard gains separate Workflow recovery and selective-context entries;
 older research, child-process and trading records keep their original scopes.
 Dashboard freshness establishes publication, not task acceptance.
 
+A [live observation repair](../observability/grand-dashboard/capacity-recovery-20260921.json)
+closed the inventory-capacity failure found during this review. The existing
+systemd timer published all 81 combined local entries after the bounded limit
+increased from 80 to 128; an independent Loki query returned the complete same
+generation. Duplicate/oversized inventories still fail before publication. This
+is actual progress-timer execution, separate from the daily maintenance heartbeat.
+
 ## Remaining boundaries
 
 Native Workflow hard crash, physical-host reboot, remote provider cancellation
