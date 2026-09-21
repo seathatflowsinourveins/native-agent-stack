@@ -221,7 +221,13 @@ def build_calendar(con, daily_path):
           AND s.raw_h IS NOT NULL AND s.raw_l IS NOT NULL
           AND s.all_c IS NOT NULL AND s.all_o IS NOT NULL
           AND s.all_h IS NOT NULL AND s.all_l IS NOT NULL
-          AND s.raw_c > 0 AND s.all_c > 0""")
+          -- Every one of these feeds a division: all_o is the entry price, all_c the exit and
+          -- the return denominators, raw_c the dollar-volume and the price floor, all_h/all_l
+          -- the range10 numerator. A zero here yields inf (DuckDB does not null x/0.0 here),
+          -- and one inf poisons avg() for every group containing the row, so such a row is
+          -- quarantined into unusable_field_rows instead.
+          AND s.raw_c > 0 AND s.all_c > 0 AND s.raw_o > 0 AND s.all_o > 0
+          AND s.all_h > 0 AND s.all_l > 0""")
     paired = con.execute("SELECT count(*) FROM src WHERE in_raw AND in_all").fetchone()[0]
     kept = con.execute("SELECT count(*) FROM bars").fetchone()[0]
     off_calendar = con.execute("""
@@ -325,11 +331,27 @@ def build_decisions(con, settings, asset_rows):
                count(*) FILTER (WHERE name_unknown) AS name_unknown_rows
         FROM candidates""").fetchall()[0]
 
+    # The counters above are independent filters over the same rows and therefore overlap, so
+    # they cannot be subtracted from candidate_rows. This second pass applies the same gates in
+    # a fixed precedence and counts each row exactly once, so that
+    #   candidate_rows - sum(excluded_stepwise) = eligible_base_rows
+    # reconciles exactly.
+    valid_med20 = "n20 = 20 AND med20 IS NOT NULL AND med20 > 0"
+    stepwise = con.execute(f"""
+        SELECT count(*) FILTER (WHERE excluded_suffix) AS g1,
+               count(*) FILTER (WHERE NOT excluded_suffix AND insufficient_history) AS g2,
+               count(*) FILTER (WHERE NOT excluded_suffix AND NOT insufficient_history
+                                AND has_gap) AS g3,
+               count(*) FILTER (WHERE NOT excluded_suffix AND NOT insufficient_history
+                                AND NOT has_gap AND NOT ({valid_med20})) AS g4
+        FROM candidates""").fetchall()[0]
+
     con.execute(f"""
         CREATE OR REPLACE VIEW eligible_base AS
         SELECT * FROM candidates
         WHERE NOT excluded_suffix AND NOT insufficient_history AND NOT has_gap
-          AND n20 = 20 AND med20 IS NOT NULL AND med20 > 0""")
+          AND {valid_med20}""")
+    eligible_base_rows = int(con.execute("SELECT count(*) FROM eligible_base").fetchone()[0])
 
     signals = f"""
         (all_c > high60 AND dv >= 2 * med20 AND clv >= 0.75) AS s1,
@@ -361,12 +383,36 @@ def build_decisions(con, settings, asset_rows):
         FROM eligible_base
         WHERE raw_c >= {settings['micro_min_raw_close_usd']}
           AND med20 >= {settings['micro_med20_min_usd']}""")
-    counts = con.execute("""
+    # The two liquidity/price floors are the largest drop in the run; counted per universe so
+    # eligible_base_rows - below_price_floor - below_med20_floor = that universe's decisions.
+    floors = []
+    universes = (("main", settings["min_raw_close_usd"], settings["med20_min_usd"]),
+                 ("micro", settings["micro_min_raw_close_usd"], settings["micro_med20_min_usd"]))
+    for universe, price_floor, med_floor in universes:
+        row = con.execute(f"""
+            SELECT count(*) FILTER (WHERE raw_c < {price_floor}) AS below_price,
+                   count(*) FILTER (WHERE raw_c >= {price_floor} AND med20 < {med_floor})
+                       AS below_med20,
+                   count(*) FILTER (WHERE raw_c >= {price_floor} AND med20 >= {med_floor})
+                       AS kept
+            FROM eligible_base""").fetchall()[0]
+        floors.append({"universe": universe, "eligible_base_rows": eligible_base_rows,
+                       "min_raw_close_usd": price_floor, "median_dollar_volume_min_usd": med_floor,
+                       "excluded_below_price_floor": int(row[0]),
+                       "excluded_below_med20_floor": int(row[1]),
+                       "decisions": int(row[2])})
+
+    # micro is a pure minimum-floor lane, so every main decision is also a micro decision. The
+    # overlap is reported per segment so a reader can deflate the lane's descriptive figures.
+    also_main = (f"(universe = 'micro' AND raw_c >= {settings['min_raw_close_usd']}"
+                 f" AND med20 >= {settings['med20_min_usd']})")
+    counts = con.execute(f"""
         SELECT universe, segment, count(*) AS decisions,
                count(*) FILTER (WHERE s4_has_gap) AS s4_non_contiguous,
                count(*) FILTER (WHERE s4_insufficient_history) AS s4_insufficient_history,
                count(*) FILTER (WHERE name_unknown) AS name_unknown,
-               count(*) FILTER (WHERE ambiguous_suffix_flag) AS ambiguous_suffix_flagged
+               count(*) FILTER (WHERE ambiguous_suffix_flag) AS ambiguous_suffix_flagged,
+               count(*) FILTER (WHERE {also_main}) AS micro_also_in_main
         FROM decisions GROUP BY ALL ORDER BY universe, segment""").fetchall()
     return {
         "candidate_rows": int(gates[0]),
@@ -375,10 +421,19 @@ def build_decisions(con, settings, asset_rows):
         "excluded_symbol_suffix": int(gates[3]),
         "ambiguous_suffix_flagged_rows": int(gates[4]),
         "name_unknown_rows": int(gates[5]),
+        "excluded_stepwise": [
+            {"gate": "symbol_suffix", "rows": int(stepwise[0])},
+            {"gate": "insufficient_history", "rows": int(stepwise[1])},
+            {"gate": "non_contiguous_60_bar_window", "rows": int(stepwise[2])},
+            {"gate": "med20_window_incomplete_or_zero", "rows": int(stepwise[3])},
+        ],
+        "eligible_base_rows": eligible_base_rows,
+        "universe_floors": floors,
         "decisions_by_universe_segment": [
             {"universe": r[0], "segment": r[1], "decisions": int(r[2]),
              "s4_non_contiguous": int(r[3]), "s4_insufficient_history": int(r[4]),
-             "name_unknown": int(r[5]), "ambiguous_suffix_flagged": int(r[6])} for r in counts],
+             "name_unknown": int(r[5]), "ambiguous_suffix_flagged": int(r[6]),
+             "micro_also_in_main": int(r[7])} for r in counts],
     }
 
 
@@ -421,8 +476,11 @@ def build_events(con, settings):
             ASOF LEFT JOIN bars bx ON bx.symbol = e.symbol AND e.exit_date >= bx.session_date
         ), flagged AS (
             SELECT *,
-                   CASE WHEN exit_date IS NULL THEN 'horizon_incomplete'
-                        WHEN entry_px IS NULL THEN 'no_entry'
+                   -- Protocol outcome precedence: no_entry first. Whether the symbol had a bar
+                   -- on session t+1 is a fact about t+1 alone, so the same decision must not be
+                   -- labelled no_entry at H1 and horizon_incomplete at H5/H20.
+                   CASE WHEN entry_px IS NULL THEN 'no_entry'
+                        WHEN exit_date IS NULL THEN 'horizon_incomplete'
                         WHEN exit_px IS NULL THEN 'no_exit_bar'
                         ELSE 'scored' END AS outcome,
                    cost_bps / 10000.0 AS c
@@ -563,11 +621,20 @@ def bootstrap_group(values, block, settings, key):
     alpha_b = 0.05 / TRIALS
     lo95, hi95 = np.quantile(means, [0.025, 0.975])
     lob, hib = np.quantile(means, [alpha_b / 2, 1 - alpha_b / 2])
+    dates = int(values.shape[0])
+    # With at most `block` entry dates every circular resample is one full pass over the series,
+    # so all resampled means equal the sample mean and the interval collapses to a point. That
+    # is an artefact of the block length, not a measured bound, so it is flagged and the bounds
+    # are withheld rather than published as a zero-width confidence interval.
+    degenerate = dates <= block
+    interval = {"ci95_lo": number(lo95), "ci95_hi": number(hi95),
+                "ci_bonf_lo": number(lob), "ci_bonf_hi": number(hib)}
+    if degenerate:
+        interval = dict.fromkeys(interval)
     return {"resamples": settings["resamples"], "block_entry_dates": block, "seed": settings["seed"],
-            "seed_key": key, "dates": int(values.shape[0]),
+            "seed_key": key, "dates": dates, "degenerate": degenerate,
             "point_estimate": number(values.mean()),
-            "ci95_lo": number(lo95), "ci95_hi": number(hi95),
-            "bonferroni_level": 1 - alpha_b, "ci_bonf_lo": number(lob), "ci_bonf_hi": number(hib)}
+            "bonferroni_level": 1 - alpha_b, **interval}
 
 
 def date_series(con, settings):
@@ -608,11 +675,16 @@ def label_metrics(con):
     rows = con.execute("SELECT * FROM label_stats").fetchall()
     columns = [d[0] for d in con.description]
     records = [dict(zip(columns, row)) for row in rows]
-    base = {(r["lane"], r["selection"], r["segment"]): r
-            for r in records if r["selector"] == "C0_all_eligible"}
+    # The control population is the whole eligible universe of the lane and segment: C0 with
+    # selection='all_events', for every selection. Keying the reference on the record's own
+    # selection would measure a top_20 signal against C0's independently ranked 20 names, which
+    # is not a superset of the signal's own top 20 and lets recall exceed 1. This matches the
+    # excess convention in date_series, which pins the same C0 all_events reference.
+    base = {(r["lane"], r["segment"]): r for r in records
+            if r["selector"] == "C0_all_eligible" and r["selection"] == "all_events"}
     out = []
     for record in records:
-        reference = base.get((record["lane"], record["selection"], record["segment"]))
+        reference = base.get((record["lane"], record["segment"]))
         for label in LABELS:
             labelled = int(record[f"labelled_{label}"])
             hits = int(record[f"hits_{label}"])
@@ -708,9 +780,19 @@ def evaluate_promotion(groups, protocol):
             excess = {seg: value(primary, seg, "date_clustered_mean_excess") for seg in SCORED_SEGMENTS}
             positive = all(e is not None and e > 0 for e in excess.values())
             bounds = {}
+            degenerate = {}
             for seg in ("validation", "reserved"):
                 boot = value(primary, seg, "bootstrap_excess")
-                bounds[seg] = None if boot is None else boot["ci_bonf_lo"]
+                # A group with no more entry dates than the block length has no resampling
+                # variation at all, so its bound is not evidence and can never satisfy this
+                # requirement.
+                short = bool(boot is not None
+                             and (boot.get("degenerate")
+                                  or (boot.get("dates") is not None
+                                      and boot.get("block_entry_dates") is not None
+                                      and boot["dates"] <= boot["block_entry_dates"])))
+                degenerate[seg] = short
+                bounds[seg] = None if boot is None or short else boot["ci_bonf_lo"]
             excess_ok = positive and all(b is not None and b > 0 for b in bounds.values())
             stress = {seg: value(primary, seg, "stress_mean_net") for seg in ("validation", "reserved")}
             stress_ok = all(s is not None and s >= 0 for s in stress.values())
@@ -727,7 +809,8 @@ def evaluate_promotion(groups, protocol):
                                     "entry_dates": value(primary, seg, "scored_entry_dates")}
                               for seg in SCORED_SEGMENTS}},
                 {"requirement": requirements[1], "status": "pass" if excess_ok else "fail",
-                 "observed": {"date_clustered_mean_excess": excess, "bonferroni_lower_bound": bounds}},
+                 "observed": {"date_clustered_mean_excess": excess, "bonferroni_lower_bound": bounds,
+                              "degenerate_excess_bootstrap": degenerate}},
                 {"requirement": requirements[2], "status": "pass" if stress_ok else "fail",
                  "observed": {"stress_mean_net": stress}},
                 {"requirement": requirements[3], "status": "pass" if lane_ok else "fail",
@@ -844,7 +927,13 @@ def run(args):
             "duckdb_version": duckdb.__version__,
             "numpy_version": np.__version__,
             "elapsed_s": round(time.time() - started, 3),
-            "events_parquet": os.path.abspath(args.events_out),
+            # Identity of the private artifact without its location: the absolute path names the
+            # host account and directory layout and this JSON is the publishable half of the run.
+            "events_parquet": {
+                "basename": os.path.basename(args.events_out),
+                "sha256": sha256_file(args.events_out),
+                "rows": events["events_written"],
+            },
             "events_scope": args.events_scope,
         },
         "dataset": dataset,
@@ -869,6 +958,37 @@ def run(args):
                                             " range10 at u reads bars u-9..u, so S4's deepest bar"
                                             " is t-130"},
             "descriptive_microcap_lane": protocol["eligibility"]["descriptive_microcap_lane"]["promotion"],
+            "descriptive_microcap_scope":
+                "this lane applies only the minimum floors (raw close >= "
+                f"{settings['micro_min_raw_close_usd']:,.0f} USD, med20 >= "
+                f"{settings['micro_med20_min_usd']:,.0f} USD) with no upper bound, so it is the"
+                " unrestricted $1/$2M universe and a strict superset of the main universe, not a"
+                " microcap subset: every main decision also appears here at a flat"
+                f" {settings['micro_cost_bps']:g} bps per side. eligibility_gates"
+                ".decisions_by_universe_segment.micro_also_in_main reports, per segment, how many"
+                " of this lane's decisions are also main-universe decisions; read its base rates"
+                " and lifts as describing that whole universe",
+            "outcome_precedence":
+                "no_entry (no bar on session t+1) is decided before horizon_incomplete (t+h beyond"
+                " the calendar), so one decision carries the same outcome at H1, H5 and H20;"
+                " then no_exit_bar, then scored with the exit_stale / terminated_early flags",
+            "eligibility_reconciliation":
+                "eligibility_gates.excluded_* are independent, overlapping counts over the same"
+                " candidate rows; excluded_stepwise applies the same gates in a fixed precedence"
+                " so candidate_rows minus its rows equals eligible_base_rows, and"
+                " universe_floors gives each universe's price and med20 rejections so"
+                " eligible_base_rows minus them equals that universe's decisions",
+            "unusable_rows":
+                "a contract row is quarantined into dataset.unusable_field_rows when any of"
+                " raw_o/raw_h/raw_l/raw_c/raw_v or all_o/all_h/all_l/all_c is null, or when any"
+                " of raw_o/raw_c/all_o/all_h/all_l/all_c is not strictly positive: each feeds a"
+                " division, and a zero would yield inf rather than null",
+            "label_reference":
+                "precision is within the selected group; base_rate_c0, lift and recall are always"
+                " measured against C0_all_eligible with selection='all_events' on the same lane"
+                " and segment - the all-eligible control population - for every selection,"
+                " including top_20, so recall is a share of that population's hits and cannot"
+                " exceed 1",
             "lane_membership": "a symbol with no current asset-master name stays in both instrument"
                                " lanes and is counted as name_unknown; disagreeing duplicate names"
                                " are counted as name_conflict and treated the same way",
@@ -878,6 +998,20 @@ def run(args):
                       " lane, horizon and entry date",
             "bootstrap": "circular moving-block bootstrap over the ordered entry dates that carry at"
                          " least one scored event; block length from the protocol",
+            "bootstrap_blocks":
+                "a block is that many CONSECUTIVE ENTRY DATES OF THE GROUP'S OWN SERIES, not"
+                " consecutive calendar sessions: the series holds only the dates on which that"
+                " selector had at least one scored event, so for a sparse signal one block spans"
+                " more calendar sessions than its length and the clustering it removes is"
+                " correspondingly wider. A group whose series is no longer than the block is"
+                " reported with degenerate=true and no interval, because every resample is then"
+                " one full circular pass over the same values",
+            "bootstrap_monte_carlo":
+                f"ci_bonf_lo is the {(0.05 / TRIALS) / 2:.6f} empirical quantile of"
+                f" {settings['resamples']} resampled means, so it is interpolated from about"
+                f" {settings['resamples'] * (0.05 / TRIALS) / 2:.1f} draws in that tail. The bound"
+                " therefore carries high Monte-Carlo variance - a different seed can move it"
+                " materially at the same data - and is a coarse screen, not a precise threshold",
             "bonferroni_family": TRIALS,
             "spy_reference": "gross SPY all_open[t+1] to all_close[t+h], no cost applied",
             "warmup": "decisions in the warmup segment are counted but never scored",
@@ -899,8 +1033,11 @@ def run(args):
         json.dump(body, handle, indent=1, sort_keys=True)
     os.replace(temporary, args.out)
     if ledger:
+        # The private ledger keeps the absolute location the public results deliberately omit.
         ledger.write(event="evaluate_complete", results_sha256=body_hash,
                      metrics=len(groups), events_written=events["events_written"],
+                     events_parquet=os.path.abspath(args.events_out),
+                     events_parquet_sha256=body["run"]["events_parquet"]["sha256"],
                      elapsed_s=body["run"]["elapsed_s"])
     print(f"metrics={len(groups)} events={events['event_rows']} written={events['events_written']} "
           f"sessions={dataset['calendar_sessions']} elapsed_s={body['run']['elapsed_s']}", flush=True)

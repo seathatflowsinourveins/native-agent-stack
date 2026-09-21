@@ -15,17 +15,31 @@ import shutil
 import tempfile
 import unittest
 
-import duckdb
-import numpy as np
-
 REPO = Path(__file__).resolve().parents[1]
 BLUEPRINT = REPO / "blueprints/us-equities/broad-universe"
-SPEC = importlib.util.spec_from_file_location("evaluate", BLUEPRINT / "evaluate.py")
-m = importlib.util.module_from_spec(SPEC)
-SPEC.loader.exec_module(m)
-
 PROTOCOL_PATH = str(BLUEPRINT / "protocol.json")
-PROTOCOL, SETTINGS = m.load_protocol(PROTOCOL_PATH)
+
+# evaluate.py itself imports duckdb and numpy at module scope, so the module under test can only
+# be loaded where they exist. The repository's default `python3 -m unittest` discovery runs
+# without those optional SDK dependencies, so every case here skips with a reason instead of
+# failing collection with ModuleNotFoundError.
+try:
+    import duckdb
+    import numpy as np
+except ImportError as exc:  # pragma: no cover - exercised only in the bare CI environment
+    duckdb = None
+    np = None
+    m = None
+    PROTOCOL = SETTINGS = None
+    MISSING = f"requires the pinned research runtime (duckdb, numpy): {exc}"
+else:
+    MISSING = None
+    SPEC = importlib.util.spec_from_file_location("evaluate", BLUEPRINT / "evaluate.py")
+    m = importlib.util.module_from_spec(SPEC)
+    SPEC.loader.exec_module(m)
+    PROTOCOL, SETTINGS = m.load_protocol(PROTOCOL_PATH)
+
+requires_runtime = unittest.skipUnless(m is not None, MISSING or "")
 
 # A synthetic calendar of weekly Mondays. Session order is what the protocol counts, so a
 # weekly spacing keeps fixtures small while still landing decisions in each named segment.
@@ -107,6 +121,7 @@ class Fixture:
         shutil.rmtree(self.dir, ignore_errors=True)
 
 
+@requires_runtime
 class EvaluatorCase(unittest.TestCase):
     def build(self, rows, names=(), stats=False):
         fixture = Fixture(rows, names=names, stats=stats)
@@ -140,6 +155,7 @@ def lookahead_rows(scale=1.0):
     return rows
 
 
+@requires_runtime
 class NoLookAhead(EvaluatorCase):
     def features(self, fixture):
         return fixture.dicts(
@@ -196,6 +212,7 @@ def exit_rows(count=200):
     return rows
 
 
+@requires_runtime
 class EntryAndExit(EvaluatorCase):
     def test_entry_is_the_next_session_open_and_exits_land_on_t_plus_h(self):
         fixture = self.build(exit_rows())
@@ -231,10 +248,13 @@ def outcome_rows():
             rows.append(bar("STL", i, ac=300.0 if i == T_OUT + 4 else 100.0))
         if i <= T_OUT + 3:  # series terminates three sessions after the decision
             rows.append(bar("TRM", i, ac=80.0 if i == T_OUT + 3 else 100.0))
+        if i != T_INC + 1:  # no entry bar, and H5/H20 also run past the end of the calendar
+            rows.append(bar("NEI", i))
         rows.append(bar("INC", i))
     return rows
 
 
+@requires_runtime
 class Outcomes(EvaluatorCase):
     def setUp(self):
         self.fixture = self.build(outcome_rows())
@@ -282,6 +302,21 @@ class Outcomes(EvaluatorCase):
             self.assertIsNone(got[horizon]["net"])
             self.assertIsNone(got[horizon]["stress_net"])
 
+    def test_no_entry_outranks_horizon_incomplete_for_one_decision(self):
+        # NEI has no bar on session t+1 and its H5/H20 exits also fall past the calendar's end.
+        # entry_px IS NULL is a fact about t+1 alone, so all three horizons must agree; keying
+        # the outcome on the horizon first reported no_entry at H1 and horizon_incomplete at
+        # H5/H20 for the same decision and understated no-fills near the end of the dataset.
+        got = self.events("NEI", T_INC)
+        self.assertEqual(sorted(got), ["H1", "H20", "H5"])
+        for horizon, row in got.items():
+            self.assertIsNone(row["entry_px"], horizon)
+            self.assertEqual(row["outcome"], "no_entry", horizon)
+            self.assertIsNone(row["net"], horizon)
+            self.assertIsNone(row["stress_net"], horizon)
+        # The horizon_incomplete counter still covers the decision that does have an entry bar.
+        self.assertEqual(self.events("INC", T_INC)["H20"]["outcome"], "horizon_incomplete")
+
 
 # -------------------------------------------------- (4) cost tiers and net return formula
 
@@ -301,6 +336,7 @@ def cost_rows(count=200):
     return rows
 
 
+@requires_runtime
 class CostsAndReturns(EvaluatorCase):
     def setUp(self):
         self.fixture = self.build(cost_rows())
@@ -343,6 +379,7 @@ def gap_rows(count=200):
     return rows
 
 
+@requires_runtime
 class Contiguity(EvaluatorCase):
     def test_a_missing_session_blocks_decisions_until_the_window_clears(self):
         fixture = self.build(gap_rows())
@@ -388,6 +425,7 @@ def quarantine_rows(count=200):
     return rows
 
 
+@requires_runtime
 class Quarantine(EvaluatorCase):
     def test_rows_present_in_only_one_series_are_counted_and_never_used(self):
         fixture = self.build(quarantine_rows())
@@ -422,6 +460,7 @@ def split_rows(count=200):
     return rows
 
 
+@requires_runtime
 class SplitSession(EvaluatorCase):
     def test_a_two_for_one_split_creates_no_false_mover(self):
         fixture = self.build(split_rows())
@@ -452,6 +491,7 @@ class SplitSession(EvaluatorCase):
 # ----------------------------------------------------------------- (8) C1 hash determinism
 
 
+@requires_runtime
 class HashControl(EvaluatorCase):
     def test_c1_matches_the_protocol_hash_rule_for_every_decision(self):
         fixture = self.build(exit_rows())
@@ -484,6 +524,7 @@ def top_rows(count=200):
     return rows
 
 
+@requires_runtime
 class TopSelection(EvaluatorCase):
     def test_top_20_ranks_by_dv_over_med20_then_symbol_ascending(self):
         fixture = self.build(top_rows(), stats=True)
@@ -523,6 +564,7 @@ def segment_rows():
     return rows
 
 
+@requires_runtime
 class Segments(EvaluatorCase):
     def test_segments_follow_the_decision_session_and_warmup_is_never_scored(self):
         fixture = self.build(segment_rows(), stats=True)
@@ -560,6 +602,7 @@ def label_rows(count=200):
     return rows
 
 
+@requires_runtime
 class LabelArithmetic(EvaluatorCase):
     def setUp(self):
         self.fixture = self.build(label_rows(), stats=True)
@@ -591,6 +634,7 @@ class LabelArithmetic(EvaluatorCase):
         self.assertAlmostEqual(signal["hits"] / control["hits"], 1.0)                 # recall
 
 
+@requires_runtime
 class LabelFormulas(unittest.TestCase):
     """Precision, base rate, lift and recall arithmetic on hand-written counts."""
 
@@ -622,10 +666,44 @@ class LabelFormulas(unittest.TestCase):
         self.assertIsNone(unlabelled["recall"])
         self.assertIsNone(unlabelled["lift"])
 
+    def test_top_20_is_measured_against_the_all_events_control_population(self):
+        # C0's own top 20 is ranked independently of a signal's top 20 and is not a superset of
+        # it, so keying the reference on the record's own selection let recall exceed 1 and
+        # inflated the lift purely by shrinking the denominator population.
+        con = duckdb.connect()
+        self.addCleanup(con.close)
+        columns = ", ".join(f"labelled_{label} BIGINT, hits_{label} BIGINT" for label in m.LABELS)
+        con.execute("CREATE TABLE label_stats (lane VARCHAR, selection VARCHAR, selector VARCHAR,"
+                    f" segment VARCHAR, decisions BIGINT, {columns})")
+        zeros = [0, 0] * (len(m.LABELS) - 1)
+        rows = [["L", "all_events", "C0_all_eligible", "validation", 500, 300, 30],
+                ["L", "all_events", "S1_momentum_breakout", "validation", 50, 40, 12],
+                ["L", "top_20", "C0_all_eligible", "validation", 20, 20, 1],
+                ["L", "top_20", "S1_momentum_breakout", "validation", 20, 20, 3]]
+        for row in rows:
+            con.execute("INSERT INTO label_stats VALUES (?, ?, ?, ?, ?"
+                        + ", ?" * (2 * len(m.LABELS)) + ")", row + zeros)
+        got = {(r["selection"], r["selector"], r["label"]): r for r in m.label_metrics(con)}
+        top = got[("top_20", "S1_momentum_breakout", "up_mover_1d")]
+        self.assertAlmostEqual(top["precision"], 0.15)          # 3 / 20, within the selection
+        self.assertEqual((top["c0_labelled"], top["c0_hits"]), (300, 30))  # C0 all_events, not 20/1
+        self.assertAlmostEqual(top["base_rate_c0"], 0.10)
+        self.assertAlmostEqual(top["lift"], 1.5)                # was 3.0 against C0's own top 20
+        self.assertAlmostEqual(top["recall"], 0.10)             # was 3.0, which is impossible
+        self.assertLessEqual(top["recall"], 1.0)
+        # The control's own top_20 row is a subset of the control population, never the whole one.
+        control_top = got[("top_20", "C0_all_eligible", "up_mover_1d")]
+        self.assertAlmostEqual(control_top["recall"], 1 / 30)
+        self.assertAlmostEqual(control_top["base_rate_c0"], 0.10)
+        # all_events rows are unchanged by the reference fix.
+        self.assertAlmostEqual(got[("all_events", "S1_momentum_breakout", "up_mover_1d")]["recall"],
+                               0.40)
+
 
 # ------------------------------------------------------------- (12) bootstrap determinism
 
 
+@requires_runtime
 class Bootstrap(unittest.TestCase):
     def test_same_seed_and_key_give_identical_bounds(self):
         values = np.linspace(-0.02, 0.03, 120)
@@ -654,6 +732,23 @@ class Bootstrap(unittest.TestCase):
         self.assertTrue(np.allclose(means, values.mean()))
         self.assertIsNone(m.block_bootstrap_means(np.array([]), 5, 10, rng))
 
+    def test_a_series_no_longer_than_the_block_is_flagged_and_withholds_bounds(self):
+        # Every resample of such a series is the same full circular pass, so the interval
+        # collapses to a point. Publishing that zero-width interval as ci95/ci_bonf read as
+        # certainty about a positive excess for any rarely-firing signal.
+        values = np.linspace(0.001, 0.007, 20)
+        got = m.bootstrap_group(values, 20, SETTINGS, "lane|all_events|S3|H20|validation")
+        self.assertTrue(got["degenerate"])
+        self.assertEqual((got["dates"], got["block_entry_dates"]), (20, 20))
+        self.assertAlmostEqual(got["point_estimate"], float(values.mean()))
+        for field in ("ci95_lo", "ci95_hi", "ci_bonf_lo", "ci_bonf_hi"):
+            self.assertIsNone(got[field], field)
+        # One more entry date than the block and the resampling is informative again.
+        longer = m.bootstrap_group(np.linspace(0.001, 0.007, 21), 20, SETTINGS,
+                                   "lane|all_events|S3|H20|validation")
+        self.assertFalse(longer["degenerate"])
+        self.assertLess(longer["ci95_lo"], longer["ci95_hi"])
+
 
 # --------------------------------------------------- (13) promotion can never be all-pass
 
@@ -674,6 +769,7 @@ def perfect_groups():
     return groups
 
 
+@requires_runtime
 class Promotion(unittest.TestCase):
     def test_the_identity_gate_stays_open_so_nothing_auto_promotes(self):
         report = m.evaluate_promotion(perfect_groups(), PROTOCOL)
@@ -694,10 +790,143 @@ class Promotion(unittest.TestCase):
                              ["fail", "fail", "fail", "fail", "open"])
             self.assertEqual(entry["status"], "not_established")
 
+    def test_a_degenerate_bootstrap_cannot_pass_the_excess_requirement(self):
+        for boot in ({"dates": 20, "block_entry_dates": 20, "degenerate": True,
+                      "ci_bonf_lo": None, "ci_bonf_hi": None},
+                     # A bound carried without the flag is still not evidence when the series
+                     # is no longer than the block.
+                     {"dates": 20, "block_entry_dates": 20, "ci_bonf_lo": 0.005,
+                      "ci_bonf_hi": 0.03}):
+            groups = perfect_groups()
+            for group in groups:
+                if group["segment"] == "validation":
+                    group["bootstrap_excess"] = dict(boot)
+            report = m.evaluate_promotion(groups, PROTOCOL)
+            for entry in report:
+                excess = entry["checks"][1]
+                self.assertEqual(excess["status"], "fail", boot)
+                self.assertTrue(excess["observed"]["degenerate_excess_bootstrap"]["validation"])
+                self.assertFalse(excess["observed"]["degenerate_excess_bootstrap"]["reserved"])
+                self.assertIsNone(excess["observed"]["bonferroni_lower_bound"]["validation"])
+
+
+# ------------------------------------ (14) zero prices are quarantined, never divided by
+
+T_ZERO = 150
+
+
+def zero_open_rows(count=200):
+    """ZER carries a zero adjusted open on its entry session; every other field is normal."""
+    rows = spy(count)
+    for i in range(count):
+        rows.append(bar("ZER", i, ao=0.0 if i == T_ZERO + 1 else None))
+        rows.append(bar("OKY", i))
+    return rows
+
+
+@requires_runtime
+class ZeroPriceQuarantine(EvaluatorCase):
+    def test_a_zero_adjusted_open_is_quarantined_instead_of_poisoning_every_mean(self):
+        fixture = self.build(zero_open_rows(), stats=True)
+        # DuckDB returns +inf for 110.0 / 0.0, and one inf makes avg() inf for every group that
+        # contains the event - including the C0 control for the whole segment - which number()
+        # then published as null with no counter explaining the absence.
+        self.assertEqual(fixture.dataset["unusable_field_rows"], 1)
+        self.assertEqual(fixture.one(
+            "SELECT count(*) FROM bars WHERE symbol = 'ZER' AND cal_idx = ?", T_ZERO + 1)[0], 0)
+        got = {r["horizon"]: r for r in fixture.dicts(
+            "SELECT horizon, outcome, entry_px, net FROM ev WHERE symbol = 'ZER'"
+            " AND universe = 'main' AND session_date = ?", CAL[T_ZERO])}
+        for horizon, row in got.items():
+            self.assertEqual(row["outcome"], "no_entry", horizon)
+            self.assertIsNone(row["entry_px"], horizon)
+            self.assertIsNone(row["net"], horizon)
+        means = [r[0] for r in fixture.rows(
+            "SELECT mean_net FROM group_stats WHERE mean_net IS NOT NULL")]
+        self.assertGreater(len(means), 0)
+        self.assertTrue(all(np.isfinite(v) for v in means))
+        # The quarantined session is a hole in the series, so contiguity takes over from there.
+        self.assertTrue(fixture.one(
+            "SELECT has_gap FROM candidates WHERE symbol = 'ZER' AND cal_idx = ?", T_ZERO + 2)[0])
+        self.assertFalse(fixture.one(
+            "SELECT has_gap FROM candidates WHERE symbol = 'OKY' AND cal_idx = ?", T_ZERO + 2)[0])
+
+
+# ------------------------------- (15) eligibility reconciliation and the microcap overlap
+
+GATE_HOLE = 120
+
+
+def gate_rows(count=200):
+    rows = spy(count)
+    for i in range(count):
+        rows.append(bar("BIG", i, c=100.0, v=1_000_000.0))      # main and micro
+        rows.append(bar("SML", i, c=2.0, v=1_500_000.0))        # micro only: below the $5 floor
+        rows.append(bar("THN", i, c=100.0, v=100.0))            # neither: med20 is $10k
+        rows.append(bar("ZVL", i, c=100.0, v=0.0))              # med20 = 0: invalid, not a floor
+        rows.append(bar("ZZZ.WS", i, c=100.0, v=1_000_000.0))   # excluded symbol suffix
+        if i != GATE_HOLE:
+            rows.append(bar("HOL", i, c=100.0, v=1_000_000.0))  # one missing session
+    return rows
+
+
+@requires_runtime
+class EligibilityReconciliation(EvaluatorCase):
+    def setUp(self):
+        self.fixture = self.build(gate_rows())
+        self.gates = self.fixture.gates
+
+    def test_candidate_rows_reconcile_to_the_decision_counts(self):
+        # The headline $5 / $20M floors were the largest drop in the run and appeared in no
+        # counter, so a reader could not tell the liquidity filter from failed history.
+        stepwise = self.gates["excluded_stepwise"]
+        self.assertEqual([g["gate"] for g in stepwise],
+                         ["symbol_suffix", "insufficient_history",
+                          "non_contiguous_60_bar_window", "med20_window_incomplete_or_zero"])
+        for gate in stepwise:
+            self.assertGreater(gate["rows"], 0, gate["gate"])
+        self.assertEqual(self.gates["candidate_rows"] - sum(g["rows"] for g in stepwise),
+                         self.gates["eligible_base_rows"])
+        for entry in self.gates["universe_floors"]:
+            self.assertEqual(entry["eligible_base_rows"], self.gates["eligible_base_rows"])
+            self.assertEqual(entry["eligible_base_rows"] - entry["excluded_below_price_floor"]
+                             - entry["excluded_below_med20_floor"], entry["decisions"])
+            self.assertEqual(entry["decisions"], self.fixture.one(
+                "SELECT count(*) FROM decisions WHERE universe = ?", entry["universe"])[0])
+        self.assertEqual(sum(r["decisions"] for r in self.gates["decisions_by_universe_segment"]),
+                         sum(e["decisions"] for e in self.gates["universe_floors"]))
+
+    def test_the_price_floor_rejection_is_counted_where_it_happens(self):
+        main = next(e for e in self.gates["universe_floors"] if e["universe"] == "main")
+        micro = next(e for e in self.gates["universe_floors"] if e["universe"] == "micro")
+        self.assertEqual(main["min_raw_close_usd"], SETTINGS["min_raw_close_usd"])
+        self.assertEqual(micro["min_raw_close_usd"], SETTINGS["micro_min_raw_close_usd"])
+        sml = self.fixture.one("SELECT count(*) FROM eligible_base WHERE symbol = 'SML'")[0]
+        self.assertGreater(sml, 0)
+        self.assertGreaterEqual(main["excluded_below_price_floor"], sml)
+        self.assertEqual(micro["excluded_below_price_floor"], 0)   # $2 clears the $1 floor
+        self.assertEqual(self.fixture.one(
+            "SELECT count(*) FROM decisions WHERE symbol = 'SML' AND universe = 'main'")[0], 0)
+        self.assertEqual(self.fixture.one(
+            "SELECT count(*) FROM decisions WHERE symbol = 'SML' AND universe = 'micro'")[0], sml)
+
+    def test_the_microcap_lane_reports_its_overlap_with_the_main_universe(self):
+        # The lane applies only minimum floors, so it is a strict superset of the main universe
+        # and its published base rates describe that whole universe, not a microcap subset.
+        rows = self.gates["decisions_by_universe_segment"]
+        main_total = sum(r["decisions"] for r in rows if r["universe"] == "main")
+        overlap = sum(r["micro_also_in_main"] for r in rows if r["universe"] == "micro")
+        self.assertGreater(main_total, 0)
+        self.assertEqual(overlap, main_total)
+        self.assertTrue(all(r["micro_also_in_main"] == 0 for r in rows if r["universe"] == "main"))
+        for row in rows:
+            self.assertLessEqual(row["micro_also_in_main"], row["decisions"])
+
 
 # --------------------------------------------------------- end-to-end CLI and artifacts
 
 
+@requires_runtime
 class EndToEnd(unittest.TestCase):
     def setUp(self):
         self.dir = tempfile.mkdtemp(prefix="bue-e2e-")
@@ -760,6 +989,35 @@ class EndToEnd(unittest.TestCase):
         body = self.run_cli()
         self.assertEqual(len(body["inspection_log"]), 2)
         self.assertNotEqual(body["inspection_log"][0]["results_sha256"], "")
+
+    def test_results_identify_the_private_events_file_without_its_path(self):
+        body = self.run_cli()
+        events = body["run"]["events_parquet"]
+        self.assertEqual(events["basename"], os.path.basename(self.events))
+        self.assertEqual(events["sha256"], m.sha256_file(self.events))
+        self.assertEqual(events["rows"], body["event_construction"]["events_written"])
+        # The public artifact must not carry the host's username or directory layout.
+        blob = json.dumps(body)
+        self.assertNotIn(self.dir, blob)
+        self.assertNotIn(os.path.abspath(self.events), blob)
+        self.assertNotIn(os.path.dirname(os.path.abspath(self.events)), blob)
+
+    def test_published_label_metrics_measure_the_all_eligible_control(self):
+        body = self.run_cli()
+        by_key = {(r["lane"], r["selection"], r["selector"], r["segment"], r["label"]): r
+                  for r in body["label_metrics"]}
+        self.assertTrue([r for r in body["label_metrics"] if r["selection"] == "top_20"])
+        for row in body["label_metrics"]:
+            if row["recall"] is not None:
+                self.assertLessEqual(row["recall"], 1.0, row)
+            control = by_key[(row["lane"], "all_events", "C0_all_eligible", row["segment"],
+                              row["label"])]
+            self.assertEqual((row["c0_labelled"], row["c0_hits"]),
+                             (control["labelled"], control["hits"]), row)
+        for key in ("label_reference", "bootstrap_blocks", "bootstrap_monte_carlo",
+                    "descriptive_microcap_scope", "outcome_precedence",
+                    "eligibility_reconciliation", "unusable_rows"):
+            self.assertIn(key, body["conventions"])
 
     def test_selected_scope_writes_only_control_and_signal_events(self):
         body = self.run_cli(events_scope="selected")
