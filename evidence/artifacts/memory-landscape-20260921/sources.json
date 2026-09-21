@@ -1,0 +1,132 @@
+{
+  "checked_at": "2026-09-21",
+  "evidence_class": "primary-source research, not installation or benchmark",
+  "repositories": [
+    {
+      "repo": "akitaonrails/ai-memory",
+      "captured_at": "2026-09-21T14:32:21.207270+00:00",
+      "revision": "1fe32bc2be32490ebf614c86eb9ab45718dcceb1",
+      "committed_at": "2026-09-20T18:53:09Z",
+      "archived": false,
+      "license": "MIT",
+      "readme": {
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/1fe32bc2be32490ebf614c86eb9ab45718dcceb1/README.md",
+        "bytes": 23159,
+        "sha256": "1d0a918f3dc0c8234aff97b75e78d6ac4143cac9ad9127e77fb0fca2077b8eda",
+        "raw_retained_privately": true
+      }
+    },
+    {
+      "repo": "basicmachines-co/basic-memory",
+      "captured_at": "2026-09-21T14:32:21.208287+00:00",
+      "revision": "3bf2d523c0a941f71cb144a5502e7557dd025d69",
+      "committed_at": "2026-09-16T03:43:59Z",
+      "archived": false,
+      "license": "AGPL-3.0",
+      "readme": {
+        "url": "https://raw.githubusercontent.com/basicmachines-co/basic-memory/3bf2d523c0a941f71cb144a5502e7557dd025d69/README.md",
+        "bytes": 24495,
+        "sha256": "f17c69dbb796108638d4da27fc7929aef8f6cd99d2c66ec4b22b01a8ca40dc52",
+        "raw_retained_privately": true
+      }
+    },
+    {
+      "repo": "getzep/graphiti",
+      "captured_at": "2026-09-21T14:32:21.209308+00:00",
+      "revision": "0de2993c5199ebd4c1efcf09ea9984ec4e53e86f",
+      "committed_at": "2026-09-21T01:33:59Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "readme": {
+        "url": "https://raw.githubusercontent.com/getzep/graphiti/0de2993c5199ebd4c1efcf09ea9984ec4e53e86f/README.md",
+        "bytes": 28280,
+        "sha256": "ce1628c02b3c6fd5b59e3e48dc61c958f07824033b4d0b989bb8d433932b6b3f",
+        "raw_retained_privately": true
+      }
+    },
+    {
+      "repo": "mem0ai/mem0",
+      "captured_at": "2026-09-21T14:32:21.210377+00:00",
+      "revision": "a39a802bbc93e85b820078cd3c4dbaf53af25dbe",
+      "committed_at": "2026-09-18T17:49:15Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "readme": {
+        "url": "https://raw.githubusercontent.com/mem0ai/mem0/a39a802bbc93e85b820078cd3c4dbaf53af25dbe/README.md",
+        "bytes": 11914,
+        "sha256": "7509347d34a767a2ef37ceb6cf6c714de9e8d84fe66ad5eea92bbae824a8fbeb",
+        "raw_retained_privately": true
+      }
+    },
+    {
+      "repo": "letta-ai/letta",
+      "captured_at": "2026-09-21T14:32:21.720080+00:00",
+      "revision": "5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a",
+      "committed_at": "2026-09-10T17:59:06Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "readme": {
+        "url": "https://raw.githubusercontent.com/letta-ai/letta/5bcdd177d70fa2b31a754cfcd801e77b2e1ab16a/README.md",
+        "bytes": 1574,
+        "sha256": "1d624e8fd383c1198c8d42da87b055d591a5760e19607692eb46bbbfe2a58f03",
+        "raw_retained_privately": true
+      }
+    },
+    {
+      "repo": "letta-ai/letta-code",
+      "captured_at": "2026-09-21T14:32:21.750327+00:00",
+      "revision": "b69da0ee2aa2afa348e6975055ed804cb127f172",
+      "committed_at": "2026-09-21T04:09:14Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "readme": {
+        "url": "https://raw.githubusercontent.com/letta-ai/letta-code/b69da0ee2aa2afa348e6975055ed804cb127f172/README.md",
+        "bytes": 8895,
+        "sha256": "1fc7d811dee31babd998287de5e04d6fecd4dcfad81fc8bd2fa48b6c41c796a9",
+        "raw_retained_privately": true
+      }
+    },
+    {
+      "repo": "supermemoryai/supermemory",
+      "captured_at": "2026-09-21T14:32:21.755842+00:00",
+      "revision": "57b430b5b6a19106a989651f4cde853c05147682",
+      "committed_at": "2026-09-18T22:01:05Z",
+      "archived": false,
+      "license": "MIT",
+      "readme": {
+        "url": "https://raw.githubusercontent.com/supermemoryai/supermemory/57b430b5b6a19106a989651f4cde853c05147682/README.md",
+        "bytes": 16049,
+        "sha256": "7a8b801a3bc586b5ef494f0cadf682caa6a0a1f84f6850937e33afe9da07ee91",
+        "raw_retained_privately": true
+      }
+    },
+    {
+      "repo": "vectorize-io/hindsight",
+      "captured_at": "2026-09-21T14:32:21.762321+00:00",
+      "revision": "5a784a36d0cfbd359383bd711d8aa8eb4be727ef",
+      "committed_at": "2026-09-21T14:05:46Z",
+      "archived": false,
+      "license": "MIT",
+      "readme": {
+        "url": "https://raw.githubusercontent.com/vectorize-io/hindsight/5a784a36d0cfbd359383bd711d8aa8eb4be727ef/README.md",
+        "bytes": 24869,
+        "sha256": "ae770ac0fe98464ec5360e588b5e29bef6e17877833e4aba9e9ee2323fae4111",
+        "raw_retained_privately": true
+      }
+    },
+    {
+      "repo": "thedotmack/claude-mem",
+      "captured_at": "2026-09-21T14:32:22.126405+00:00",
+      "revision": "4e98d977cc6d9c4fe18c60d4956d948f57e7a1f6",
+      "committed_at": "2026-09-20T18:13:07Z",
+      "archived": false,
+      "license": "Apache-2.0",
+      "readme": {
+        "url": "https://raw.githubusercontent.com/thedotmack/claude-mem/4e98d977cc6d9c4fe18c60d4956d948f57e7a1f6/README.md",
+        "bytes": 18621,
+        "sha256": "1a1f647ee08262462cada110f985740f6d63a1e15d4767646219e670b0e10320",
+        "raw_retained_privately": true
+      }
+    }
+  ]
+}

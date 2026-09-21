@@ -1,0 +1,38 @@
+{
+  "evidence_class": "independent inspection and local integration validation",
+  "upstream_tests": {
+    "revision": "353841d91618d20b110b208de284a74d0b960379",
+    "scheduler": {"passed": 4, "failed": 0, "filtered_out": 221},
+    "assistant_capture": {"passed": 18, "failed": 0, "filtered_out": 290},
+    "providers": "Upstream test providers/fixtures; these test totals are not live LLM results."
+  },
+  "client_observation": {
+    "codex": "After normal native trust of the modified Stop command, a real operational handoff produced a 465-byte stored Stop body exactly equal to its returned answer; consolidation completed on attempt 1.",
+    "claude": "Resumed native source review produced a 2000-byte stored Stop excerpt with a 1995-character common prefix to its returned answer; all observed consolidation generations completed on attempt 1.",
+    "desktop_profile": "Native app-server discovery confirms the persisted Stop hook is trusted. This does not prove hot reload in the already-running Desktop task."
+  },
+  "independent_review": {
+    "reviewer": "Native Claude using original pinned source and read-only state",
+    "outcome": "Three supported wording corrections resolved: hollow-project cleanup remains, cap is 2000 bytes with oversized-input refusal, and upstream defaults are distinguished from host changes.",
+    "retained_failures": ["Initial review hit 12-turn limit.", "First resume invocation had no recognized prompt.", "Successful resumed answer exceeded its requested 300-word limit; original output remains retained."],
+    "claim_boundary": "Review agreement is supplementary; source, raw native output, independent SQLite readback and relevant tests provide acceptance evidence."
+  },
+  "browser_observation": {
+    "upstream_wiki": "Opened and visually inspected the actual native _lint/report.md: six duplicate-title groups were visible, not fabricated dashboard data.",
+    "catalog": "Opened the actual generated setup page, selected Memory landscape and active native maintenance, and visually inspected its embedded guide.",
+    "screenshots": "Native wiki screenshot remains private because it contains project history; catalog screenshot is public."
+  },
+  "durable_decision": {
+    "path": "decisions/native-memory-learning-maintenance.md",
+    "upstream_operation": "memory_write_page with explicit adopted project scope, followed by memory_read_page",
+    "result": "New pinned decision read back with exact body equality. Prior decisions/native-codex-memory-consolidation.md changed only its status line to name the superseding decision, independently read back with exact equality.",
+    "scope": "Deliberate persistence of the accepted setup; not automatic learned output or a quality benchmark. Native IDs and complete private memory bodies are not published."
+  },
+  "local_checks": {
+    "unittest": {"total": 698, "skipped": 41, "failures": 0},
+    "publication": "scripts/validate.py passed after fixing native UUID sanitization and generated HTML hashes.",
+    "catalog": "Foundation schema corrected to include canonical lifecycle references and supersedes; catalog checks pass.",
+    "retained_failures": ["First full suite found missing lifecycle and supersedes fields.", "A targeted invocation named nonexistent tests.test_ecosystem; the correct test file is tests/test_ecosystem_manifest.py."]
+  },
+  "not_claimed": ["New learned writes improved future answers", "Later hourly scheduler tick", "Physical reboot", "Every alternative installed", "Universal SOTA superiority", "Exact memory token savings"]
+}

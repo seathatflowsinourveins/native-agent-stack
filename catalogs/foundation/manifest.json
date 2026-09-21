@@ -85,8 +85,8 @@
       "purpose": "Preserve scoped decisions, approved durable knowledge and recoverable handoffs across clients.",
       "selection": "One ai-memory store as cross-harness memory of record.",
       "activation": "Retrieve relevant history when needed; durable writes require explicit intent and recalled text never authorizes actions.",
-      "lifecycle_scope": "Synthetic migration, scope, restart, backup and empty-target restore passed; capture is bounded, not a full transcript. Separate synthetic off-host native restore and real scoped MCP queries passed.",
-      "next_gap": "Qualify intended production activation and native-client rebinding; lost-account/key recovery remains separate."
+      "lifecycle_scope": "Native scoped retrieval, Codex/Claude session-end consolidation, bounded assistant capture and scheduled learning admission have separate dated evidence. Synthetic migration and off-host empty-target recovery remain separate; capture is not a full transcript.",
+      "next_gap": "Measure retrieval and learned-page quality on representative work; preserve once-per-session learning, all-project scheduler scope and separate lost-account/key recovery limits. See docs/memory-landscape-maintenance.md."
     },
     {
       "id": "web-research",

@@ -1,0 +1,414 @@
+{
+  "method": "Original native JSONL outputs compared with independent read-only SQLite observations and consolidation queue.",
+  "accounting": "Each invocation retains its own reported usage. Cached/reasoning categories may be subsets. No combined savings or full coordinator total.",
+  "attempts": [
+    {
+      "label": "codex-use",
+      "command": {
+        "argv": [
+          "env",
+          "CODEX_HOME=$HOME/.codex",
+          "$HOME/.local/share/codex-ecosystem/bin/codex",
+          "exec",
+          "--json",
+          "--color",
+          "never",
+          "-m",
+          "gpt-5.6-luna",
+          "-c",
+          "model_reasoning_effort=\"medium\"",
+          "-C",
+          "$HOME/code/agent-lab",
+          "-"
+        ],
+        "cwd": "$HOME/code/agent-lab",
+        "started_at": "2026-09-21T14:37:40.901032+00:00",
+        "completed_at": "2026-09-21T14:38:33.917921+00:00",
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": {
+          "sha256": "282b80e65b71bfb17c89646cf8a190c3c1d67e357cd60fc000469c6cee6adb1a",
+          "bytes": 22082,
+          "raw_retained_privately": true
+        },
+        "stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "raw_retained_privately": true
+        }
+      },
+      "returned_final": "Source facts:\n\n- Active memory service: ai-memory 2.3.2 on loopback; consolidation provider is Codex (`gpt-5.6-luna`), though its runtime status is reported as `unknown`.\n- Active embedding provider: local `all-MiniLM-L6-v2`, 384 dimensions; status is `ok`.\n- Embeddings are not missing: 0 latest pages missing or unembeddable, 0 unresolved failures, and 79 embedding rows.\n- Current decision: `decisions/native-codex-memory-consolidation.md` (accepted).\n- Superseded decision: `decisions/shared-project-memory.md`, explicitly marked superseded; it described ai-memory 2.3.1 with embeddings and LLM consolidation disabled.\n\nInference: the current setup has operational local embeddings and a configured native Codex consolidation path, while the LLM’s “unknown” status means the status command does not independently confirm a recent successful call.\n\nThe memory commands do not report exact lifetime token savings.",
+      "usage": {
+        "input_tokens": 193417,
+        "cached_input_tokens": 166144,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1276,
+        "reasoning_output_tokens": 576
+      },
+      "session_id": "private-id-43858f471a5fe9e4",
+      "independently_observed_stops": [],
+      "later_same_session_stop_count": 0,
+      "consolidation_jobs": [
+        {
+          "generation": 15,
+          "state": "completed",
+          "attempts": 1,
+          "last_error": null
+        }
+      ],
+      "consolidation_observation_scope": "Whole native session at publication; resumed invocation generations are not attributed to earlier failed attempts."
+    },
+    {
+      "label": "codex-final-use",
+      "command": {
+        "argv": [
+          "env",
+          "CODEX_HOME=$HOME/.codex",
+          "$HOME/.local/share/codex-ecosystem/bin/codex",
+          "exec",
+          "--json",
+          "--color",
+          "never",
+          "-m",
+          "gpt-5.6-luna",
+          "-c",
+          "model_reasoning_effort=\"medium\"",
+          "-C",
+          "$HOME/code/agent-lab",
+          "-"
+        ],
+        "cwd": "$HOME/code/agent-lab",
+        "started_at": "2026-09-21T14:41:43.997873+00:00",
+        "completed_at": "2026-09-21T14:42:00.345926+00:00",
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": {
+          "sha256": "fb46041964ed2ba91749d834bae42224fe856fe5347f6ca62e17ec1b71f494b8",
+          "bytes": 3754,
+          "raw_retained_privately": true
+        },
+        "stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "raw_retained_privately": true
+        }
+      },
+      "returned_final": "The report found 3 runs in the last 30 days and no terminal learning proposals.\n\nRejected candidates:\n- Insufficient durable evidence: 1\n- Session too short: 1\n- Too few observations: 1\n\nThis does not prove successful learning, meaningful maintenance, token savings, or overall run quality. Provider/LLM errors before staging may be missing; eval success rates and score deltas are not persisted; and terminal rates exclude pending and maintenance/report proposals.",
+      "usage": {
+        "input_tokens": 40550,
+        "cached_input_tokens": 29184,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 293,
+        "reasoning_output_tokens": 82
+      },
+      "session_id": "private-id-d4142fe7a180f6b4",
+      "independently_observed_stops": [
+        {
+          "body": "The report found 3 runs in the last 30 days and no terminal learning proposals.\n\nRejected candidates:\n- Insufficient durable evidence: 1\n- Session too short: 1\n- Too few observations: 1\n\nThis does not prove successful learning, meaningful maintenance, token savings, or overall run quality. Provider/LLM errors before staging may be missing; eval success rates and score deltas are not persisted; and terminal rates exclude pending and maintenance/report proposals.",
+          "bytes": 465,
+          "sha256": "6fc94b48cda9029f9743483fb546bc499458815ea588b289280db5c6ede4f345",
+          "created_at_micros": 1790001719390612,
+          "exact_final_match": true,
+          "common_prefix_characters": 465
+        }
+      ],
+      "later_same_session_stop_count": 0,
+      "consolidation_jobs": [
+        {
+          "generation": 6,
+          "state": "completed",
+          "attempts": 1,
+          "last_error": null
+        }
+      ],
+      "consolidation_observation_scope": "Whole native session at publication; resumed invocation generations are not attributed to earlier failed attempts."
+    },
+    {
+      "label": "claude-review",
+      "command": {
+        "argv": [
+          "env",
+          "CODEX_HOME=$HOME/.codex",
+          "$HOME/.local/share/codex-ecosystem/bin/claude",
+          "-p",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--max-turns",
+          "12",
+          "--permission-prompts",
+          "none"
+        ],
+        "cwd": "$HOME/code/agent-lab",
+        "started_at": "2026-09-21T14:37:40.867483+00:00",
+        "completed_at": "2026-09-21T14:40:26.161971+00:00",
+        "exit_code": 1,
+        "timed_out": false,
+        "stdout": {
+          "sha256": "dc6ae0df2f111e3b601ceb007945513ae56ad43d949be1d81794da4184a22fec",
+          "bytes": 321213,
+          "raw_retained_privately": true
+        },
+        "stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "raw_retained_privately": true
+        }
+      },
+      "returned_final": null,
+      "usage": {
+        "input_tokens": 354,
+        "cache_creation_input_tokens": 66909,
+        "cache_read_input_tokens": 624026,
+        "output_tokens": 9981,
+        "output_tokens_details": {
+          "thinking_tokens": 5502
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 66909,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "iterations": [
+          {
+            "input_tokens": 32,
+            "output_tokens": 462,
+            "cache_read_input_tokens": 75762,
+            "cache_creation_input_tokens": 1251,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 1251
+            },
+            "type": "message",
+            "model": null
+          }
+        ],
+        "speed": "standard"
+      },
+      "native_result": {
+        "subtype": "error_max_turns",
+        "is_error": true,
+        "num_turns": 13,
+        "terminal_reason": "max_turns",
+        "errors": [
+          "Reached maximum number of turns (12)"
+        ]
+      },
+      "session_id": "private-id-93775ebd96e28edd",
+      "independently_observed_stops": [],
+      "later_same_session_stop_count": 1,
+      "consolidation_jobs": [
+        {
+          "generation": 26,
+          "state": "completed",
+          "attempts": 1,
+          "last_error": null
+        },
+        {
+          "generation": 28,
+          "state": "completed",
+          "attempts": 1,
+          "last_error": null
+        },
+        {
+          "generation": 31,
+          "state": "completed",
+          "attempts": 1,
+          "last_error": null
+        }
+      ],
+      "consolidation_observation_scope": "Whole native session at publication; resumed invocation generations are not attributed to earlier failed attempts."
+    },
+    {
+      "label": "claude-review-completion",
+      "command": {
+        "argv": [
+          "env",
+          "CODEX_HOME=$HOME/.codex",
+          "$HOME/.local/share/codex-ecosystem/bin/claude",
+          "-p",
+          "--resume",
+          "private-id-93775ebd96e28edd",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--max-turns",
+          "2",
+          "--permission-prompts",
+          "none",
+          "--tools",
+          "",
+          "Finish the independent review using the original source and evidence you already read. No more tool calls. Give the final findings under 300 words, preserving unknowns. State exact actionable corrections or no actionable findings. The previous attempt stopped at the turn limit; do not treat it as completed review."
+        ],
+        "cwd": "$HOME/code/agent-lab",
+        "started_at": "2026-09-21T14:41:15.680664+00:00",
+        "completed_at": "2026-09-21T14:41:17.286170+00:00",
+        "exit_code": 1,
+        "timed_out": false,
+        "stdout": {
+          "sha256": "ce62e590ae7648be0801efcf6709a22fbc3fb14a720ebec85751f85681edac8b",
+          "bytes": 16300,
+          "raw_retained_privately": true
+        },
+        "stderr": {
+          "sha256": "6a271f39b0ce66253c0a9338484500c1917a37347c3fb6bf490b67f29eff5c76",
+          "bytes": 221,
+          "raw_retained_privately": true
+        }
+      },
+      "returned_final": null,
+      "usage": null,
+      "native_result": {
+        "subtype": null,
+        "is_error": null,
+        "num_turns": null,
+        "terminal_reason": null,
+        "errors": null
+      },
+      "session_id": "private-id-93775ebd96e28edd",
+      "independently_observed_stops": [],
+      "later_same_session_stop_count": 1,
+      "consolidation_jobs": [
+        {
+          "generation": 26,
+          "state": "completed",
+          "attempts": 1,
+          "last_error": null
+        },
+        {
+          "generation": 28,
+          "state": "completed",
+          "attempts": 1,
+          "last_error": null
+        },
+        {
+          "generation": 31,
+          "state": "completed",
+          "attempts": 1,
+          "last_error": null
+        }
+      ],
+      "consolidation_observation_scope": "Whole native session at publication; resumed invocation generations are not attributed to earlier failed attempts."
+    },
+    {
+      "label": "claude-review-resumed",
+      "command": {
+        "argv": [
+          "env",
+          "CODEX_HOME=$HOME/.codex",
+          "$HOME/.local/share/codex-ecosystem/bin/claude",
+          "-p",
+          "--resume",
+          "private-id-93775ebd96e28edd",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--tools",
+          "",
+          "--max-turns",
+          "2",
+          "--permission-prompts",
+          "none"
+        ],
+        "cwd": "$HOME/code/agent-lab",
+        "started_at": "2026-09-21T14:43:14.766806+00:00",
+        "completed_at": "2026-09-21T14:44:31.961815+00:00",
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": {
+          "sha256": "49700e89f4e3d2ce6aa42f025ae88eb27a7840ddd5731c5befe1d4ac1d9dc80d",
+          "bytes": 65049,
+          "raw_retained_privately": true
+        },
+        "stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "raw_retained_privately": true
+        }
+      },
+      "returned_final": "**Review result: claims match source. Three actionable wording corrections, no correctness or privacy defects found.**\n\nConfirmed against upstream `353841d`:\n- **Scope:** every project, `max_sessions_per_tick` per scope (`auto_improve_schedule.rs:138,159-164`; `reader.rs:6679-6680`).\n- **Once per session:** claim needs `ended_at > watermark` and no existing run; claims PK is `session_id` (`store/auto_improve.rs:576-600`, `V22` line 17).\n- **Watermark:** seeded at `MAX(ended_at)` else 0, `DO NOTHING` on conflict (`auto_improve.rs:492-502`). Projection shows 0, so the doc's \"existing sessions eligible\" caveat is right and the upstream \"never auto-reviewed on upgrade\" comment (`auto_improve_schedule.rs:52-53`) does not hold here.\n- **Auto-approval:** `require_approval=false` applies via `approve_auto_improve_proposal` with `WritePage` admission (`auto_improve_schedule.rs:456-478`).\n- **Admission:** two scheduler runs, provider `none`, `session_too_short` and `too_few_observations`, claims 1 ms before runs. `reviewed` increments on preflight skips (`:297`), so the doc's \"reviewed=1 ≠ model call\" is correct.\n- **Cadence:** sleep-after-tick loop, scheduler skipped without an LLM (`serve.rs:1779-1818`).\n\nActionable corrections:\n1. **\"Automatic destructive retention is disabled\"** is too broad. Forget sweep is off (`serve.rs:1565`), but the hollow-project sweep still deletes empty project rows older than 7 days whenever `maintenance.enabled` (`serve.rs:1640-1665`).\n2. **Assistant excerpt cap** is 2,000 bytes, and final messages over 64 KiB are dropped entirely rather than truncated (`assistant_capture.rs:33,38,125,138`). Say \"2,000 bytes; oversized turns yield an empty Stop\".\n3. **Default vs host:** only `forget_sweep_interval_secs=0` (default 86,400) and `embedding_backfill_interval_secs=3600` (default 0) deviate; scheduler, `require_approval=false` and other maintenance values equal upstream defaults (`config.rs:818,913-916,1022-1025`). Label them so.\n\nNote: a preflight-skipped session still gets a run row (`auto_improve_schedule.rs:355-357,403`), which blocks any later scheduler claim. The experience path avoids this (`:380-382`); the per-session path does not.\n\nUnknowns I could not verify without live config: server `capture_assistant=true`, Claude prompt-capture opt-out, \"observation generation\" mechanism, and any scheduler-driven successful model review. Status shows LLM `last_call_at: null` on the current process.\n\nCurrent native status: 61 latest pages, 86 sessions, 40,399 observations, 0 missing embeddings, 0 unresolved embed failures, `capture_mode: allowlist`. Doc baseline was 60/83.",
+      "usage": {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 113739,
+        "cache_read_input_tokens": 0,
+        "output_tokens": 5721,
+        "output_tokens_details": {
+          "thinking_tokens": 4644
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 113739,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "iterations": [
+          {
+            "input_tokens": 2,
+            "output_tokens": 5721,
+            "cache_read_input_tokens": 0,
+            "cache_creation_input_tokens": 113739,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 113739
+            },
+            "type": "message",
+            "model": null
+          }
+        ],
+        "speed": "standard"
+      },
+      "native_result": {
+        "subtype": "success",
+        "is_error": false,
+        "num_turns": 1,
+        "terminal_reason": "completed",
+        "errors": null
+      },
+      "session_id": "private-id-93775ebd96e28edd",
+      "independently_observed_stops": [
+        {
+          "body": "**Review result: claims match source. Three actionable wording corrections, no correctness or privacy defects found.**\n\nConfirmed against upstream `353841d`:\n- **Scope:** every project, `max_sessions_per_tick` per scope (`auto_improve_schedule.rs:138,159-164`; `reader.rs:6679-6680`).\n- **Once per session:** claim needs `ended_at > watermark` and no existing run; claims PK is `session_id` (`store/auto_improve.rs:576-600`, `V22` line 17).\n- **Watermark:** seeded at `MAX(ended_at)` else 0, `DO NOTHING` on conflict (`auto_improve.rs:492-502`). Projection shows 0, so the doc's \"existing sessions eligible\" caveat is right and the upstream \"never auto-reviewed on upgrade\" comment (`auto_improve_schedule.rs:52-53`) does not hold here.\n- **Auto-approval:** `require_approval=false` applies via `approve_auto_improve_proposal` with `WritePage` admission (`auto_improve_schedule.rs:456-478`).\n- **Admission:** two scheduler runs, provider `none`, `session_too_short` and `too_few_observations`, claims 1 ms before runs. `reviewed` increments on preflight skips (`:297`), so the doc's \"reviewed=1 ≠ model call\" is correct.\n- **Cadence:** sleep-after-tick loop, scheduler skipped without an LLM (`serve.rs:1779-1818`).\n\nActionable corrections:\n1. **\"Automatic destructive retention is disabled\"** is too broad. Forget sweep is off (`serve.rs:1565`), but the hollow-project sweep still deletes empty project rows older than 7 days whenever `maintenance.enabled` (`serve.rs:1640-1665`).\n2. **Assistant excerpt cap** is 2,000 bytes, and final messages over 64 KiB are dropped entirely rather than truncated (`assistant_capture.rs:33,38,125,138`). Say \"2,000 bytes; oversized turns yield an empty Stop\".\n3. **Default vs host:** only `forget_sweep_interval_secs=0` (default 86,400) and `embedding_backfill_interval_secs=3600` (default 0) deviate; scheduler, `require_approval=false` and other maintenance values equal upstream defaults (`config.rs:818,913-916,1022-1025`). Label them so.\n\nNote: a prefli…",
+          "bytes": 2000,
+          "sha256": "b5fff568f31a000791776321eedcbc6b7f9c4f91433874c924dc0ba6c021e508",
+          "created_at_micros": 1790001871497630,
+          "exact_final_match": false,
+          "common_prefix_characters": 1995
+        }
+      ],
+      "later_same_session_stop_count": 0,
+      "consolidation_jobs": [
+        {
+          "generation": 26,
+          "state": "completed",
+          "attempts": 1,
+          "last_error": null
+        },
+        {
+          "generation": 28,
+          "state": "completed",
+          "attempts": 1,
+          "last_error": null
+        },
+        {
+          "generation": 31,
+          "state": "completed",
+          "attempts": 1,
+          "last_error": null
+        }
+      ],
+      "consolidation_observation_scope": "Whole native session at publication; resumed invocation generations are not attributed to earlier failed attempts."
+    }
+  ]
+}

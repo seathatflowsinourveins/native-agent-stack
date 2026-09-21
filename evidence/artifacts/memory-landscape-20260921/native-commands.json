@@ -1,0 +1,524 @@
+{
+  "sanitization": "Private home paths replaced with named placeholders; native UUIDs replaced with stable SHA256-derived aliases; ANSI removed. Original raw hashes and byte lengths remain distinct.",
+  "commands": {
+    "doctor-before": {
+      "argv": [
+        "$HOME/.local/share/codex-ecosystem/bin/ai-memory",
+        "doctor",
+        "--workspace",
+        "agent-lab",
+        "--project",
+        "agent-lab",
+        "--json"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:23:14.224786+00:00",
+      "completed_at": "2026-09-21T14:23:14.940680+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "34d335759236b03b6b2aa98779772154d0d71f4cb1ba91df981708009a127156",
+        "bytes": 429,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "{\n  \"workspace\": \"agent-lab\",\n  \"project\": \"agent-lab\",\n  \"server\": \"http://127.0.0.1:49374\",\n  \"since_days\": 30,\n  \"rows\": [\n    {\n      \"agent\": \"claude-code\",\n      \"local_total\": 34,\n      \"local_recent\": 34,\n      \"captured\": 41,\n      \"uncaptured\": false\n    },\n    {\n      \"agent\": \"codex\",\n      \"local_total\": 76,\n      \"local_recent\": 76,\n      \"captured\": 42,\n      \"uncaptured\": false\n    }\n  ],\n  \"uncaptured\": []\n}\n"
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      }
+    },
+    "status-before": {
+      "argv": [
+        "$HOME/.local/share/codex-ecosystem/bin/ai-memory",
+        "status",
+        "--json"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:23:14.297157+00:00",
+      "completed_at": "2026-09-21T14:23:14.312852+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "b691844f35acc412989d389895604c76449c62c531685c0eedb17b5e1f4a3a0b",
+        "bytes": 2287,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "{\n  \"version\": \"2.3.2\",\n  \"data_dir\": \"$HOME/.local/share/ai-memory\",\n  \"bind\": \"127.0.0.1:49374\",\n  \"db_path\": \"$HOME/.local/share/ai-memory/db/memory.sqlite\",\n  \"counts\": {\n    \"pages_latest\": 60,\n    \"pages_all\": 177,\n    \"sessions\": 83,\n    \"observations\": 39851\n  },\n  \"derived\": {\n    \"pages_rows\": 177,\n    \"pages_fts_rows\": 177,\n    \"observations_rows\": 39851,\n    \"observations_fts_rows\": 39851,\n    \"latest_pages_missing_embeddings\": 0,\n    \"latest_pages_unembeddable\": 0,\n    \"typed_links_from_latest_pages\": [\n      [\n        \"fixes\",\n        2\n      ]\n    ],\n    \"embed_failures_unresolved\": 0,\n    \"embed_failures_recovered\": 0,\n    \"embedding_rows\": 78,\n    \"embedding_triples\": [\n      {\n        \"provider\": \"local\",\n        \"model\": \"all-MiniLM-L6-v2\",\n        \"dim\": 384,\n        \"count\": 78\n      }\n    ],\n    \"links_from_latest_pages\": 14,\n    \"unresolved_links_from_latest_pages\": 12,\n    \"stale_links_from_latest_pages\": 0\n  },\n  \"storage\": {\n    \"page_size\": 4096,\n    \"page_count\": 12227,\n    \"freelist_count\": 7,\n    \"database_bytes\": 50081792,\n    \"reclaimable_bytes\": 28672,\n    \"data_dir_free_bytes\": 968792854528\n  },\n  \"providers\": {\n    \"llm\": {\n      \"status\": \"ok\",\n      \"provider\": \"codex\",\n      \"model\": \"gpt-5.6-luna\",\n      \"dim\": null,\n      \"last_call_at\": \"2026-09-21T14:17:01.180067823Z\",\n      \"last_success_at\": \"2026-09-21T14:17:01.180067823Z\",\n      \"last_error_at\": null,\n      \"last_error_status\": null,\n      \"last_error_message\": null,\n      \"retry_hint\": null\n    },\n    \"llm_candidates\": [],\n    \"embedding\": {\n      \"status\": \"ok\",\n      \"provider\": \"local\",\n      \"model\": \"all-MiniLM-L6-v2\",\n      \"dim\": 384,\n      \"last_call_at\": \"2026-09-21T14:17:01.579463161Z\",\n      \"last_success_at\": \"2026-09-21T14:17:01.579463161Z\",\n      \"last_error_at\": null,\n      \"last_error_status\": null,\n      \"last_error_message\": null,\n      \"retry_hint\": null\n    }\n  },\n  \"spool\": {\n    \"pending\": 32,\n    \"oldest_age_ms\": 27139,\n    \"retries_total\": 0\n  },\n  \"capture_mode\": \"allowlist\",\n  \"ingest\": {\n    \"accepted\": 2051,\n    \"dropped_by_policy\": 0,\n    \"shed_saturated\": 0,\n    \"shed_rate_limited\": 0,\n    \"last_persisted_ms\": 1790000594310\n  },\n  \"client\": {\n    \"server_url\": \"http://127.0.0.1:49374\",\n    \"auth\": false\n  }\n}\n"
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      }
+    },
+    "curator-before": {
+      "argv": [
+        "$HOME/.local/share/codex-ecosystem/bin/ai-memory",
+        "curator",
+        "--workspace",
+        "agent-lab",
+        "--project",
+        "agent-lab",
+        "--dry-run",
+        "--json"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:24:22.785610+00:00",
+      "completed_at": "2026-09-21T14:24:22.799720+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "67132c4fde975d97d81c1873af07ccc2a8e1bc33716deefcb6c9873d32df2968",
+        "bytes": 3961,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "{\n  \"workspace\": \"agent-lab\",\n  \"project\": \"agent-lab\",\n  \"generated_at\": \"2026-09-21T14:24:22.796148904Z\",\n  \"dry_run\": true,\n  \"summary\": \"6 conservative curator finding(s).\",\n  \"params\": {\n    \"max_findings_per_kind\": 25,\n    \"current_focus_stale_days\": 7.0,\n    \"other_slot_stale_days\": 30.0,\n    \"decay_params\": {\n      \"lambda\": 0.02,\n      \"sigma\": 0.6,\n      \"mu\": 0.04,\n      \"salience_default\": 1.0,\n      \"cold_threshold\": 0.2,\n      \"hard_delete_after_days\": 180\n    }\n  },\n  \"findings\": [\n    {\n      \"kind\": \"duplicate_title\",\n      \"severity\": \"info\",\n      \"message\": \"2 pages share the normalized title 'review this untrusted numerical source packet as a research-only artifact. use …'\",\n      \"pages\": [\n        \"sessions/private-id-be1cf260fa99698c.md\",\n        \"sessions/private-id-f3747ff896983d2b.md\"\n      ],\n      \"detail\": {\n        \"normalized_title\": \"review this untrusted numerical source packet as a research-only artifact. use …\"\n      }\n    },\n    {\n      \"kind\": \"duplicate_title\",\n      \"severity\": \"info\",\n      \"message\": \"3 pages share the normalized title 'read only $HOME/codex-ecosystem/state/observability-e2e-20260919/native/f…'\",\n      \"pages\": [\n        \"sessions/private-id-11b4cf6c65d16d80.md\",\n        \"sessions/private-id-eb7acca9c562763d.md\",\n        \"sessions/private-id-84237957d57d379f.md\"\n      ],\n      \"detail\": {\n        \"normalized_title\": \"read only $HOME/codex-ecosystem/state/observability-e2e-20260919/native/f…\"\n      }\n    },\n    {\n      \"kind\": \"duplicate_title\",\n      \"severity\": \"info\",\n      \"message\": \"4 pages share the normalized title '# overview'\",\n      \"pages\": [\n        \"sessions/private-id-17fa3ce6ff57a827.md\",\n        \"sessions/private-id-36d8b33a08facc04.md\",\n        \"sessions/private-id-d10000e508bdf39d.md\",\n        \"sessions/private-id-eaa622babd054232.md\"\n      ],\n      \"detail\": {\n        \"normalized_title\": \"# overview\"\n      }\n    },\n    {\n      \"kind\": \"duplicate_title\",\n      \"severity\": \"info\",\n      \"message\": \"4 pages share the normalized title 'answer the research question using only the supplied untrusted public source do…'\",\n      \"pages\": [\n        \"sessions/private-id-7bd0293e796ba084.md\",\n        \"sessions/private-id-52dee590159a670e.md\",\n        \"sessions/private-id-5b9993cf1918924d.md\",\n        \"sessions/private-id-6207b5505ae98360.md\"\n      ],\n      \"detail\": {\n        \"normalized_title\": \"answer the research question using only the supplied untrusted public source do…\"\n      }\n    },\n    {\n      \"kind\": \"duplicate_title\",\n      \"severity\": \"info\",\n      \"message\": \"6 pages share the normalized title 'tool non-file'\",\n      \"pages\": [\n        \"sessions/private-id-9d3c36bf4c01f1d9.md\",\n        \"sessions/private-id-35f30df0b454ce89.md\",\n        \"sessions/private-id-68b1058ae0953ee7.md\",\n        \"sessions/private-id-a6a4c6ff87442d4c.md\",\n        \"sessions/private-id-52c9d045f5242e1b.md\",\n        \"sessions/private-id-e661a75809019fde.md\"\n      ],\n      \"detail\": {\n        \"normalized_title\": \"tool non-file\"\n      }\n    },\n    {\n      \"kind\": \"duplicate_title\",\n      \"severity\": \"info\",\n      \"message\": \"8 pages share the normalized title 'tool unknown'\",\n      \"pages\": [\n        \"sessions/private-id-966d9e2d9d4203fe.md\",\n        \"sessions/private-id-22aea22d2eb93073.md\",\n        \"sessions/private-id-1f03955ca2defb74.md\",\n        \"sessions/private-id-38024bf1b2c90fef.md\",\n        \"sessions/private-id-c4a46263f8f22501.md\",\n        \"sessions/private-id-0c5c51b334d6e4c8.md\",\n        \"sessions/private-id-e56303c84ae134aa.md\",\n        \"sessions/private-id-a0d567190d80d96f.md\"\n      ],\n      \"detail\": {\n        \"normalized_title\": \"tool unknown\"\n      }\n    }\n  ]\n}\n"
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      }
+    },
+    "manual-learning": {
+      "argv": [
+        "$HOME/.local/share/codex-ecosystem/bin/ai-memory",
+        "auto-improve",
+        "--workspace",
+        "agent-lab",
+        "--project",
+        "agent-lab",
+        "--session-id",
+        "private-id-07c4678f7a9d9f01",
+        "--json"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:29:11.230857+00:00",
+      "completed_at": "2026-09-21T14:29:21.143109+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "cf79284b46e0466e8752ac9c95b4d1e837895d7fcb4338d3fb58db22547a362c",
+        "bytes": 390,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "{\n  \"run_id\": \"private-id-84be4aad2a2737c8\",\n  \"approval_required\": false,\n  \"approval_policy\": \"auto_approve\",\n  \"session_id\": \"private-id-07c4678f7a9d9f01\",\n  \"summary\": \"review completed; no validated proposals\",\n  \"warnings\": [\n    \"auto-improve truncated 3 observation bodies to 1500 chars\"\n  ],\n  \"rejected_candidates_count\": 1,\n  \"proposals\": [],\n  \"skipped\": []\n}\n"
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      }
+    },
+    "native-lint-report": {
+      "argv": [
+        "$HOME/.local/share/codex-ecosystem/bin/ai-memory",
+        "lint",
+        "--workspace",
+        "agent-lab",
+        "--project",
+        "agent-lab",
+        "--no-llm"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:33:52.774266+00:00",
+      "completed_at": "2026-09-21T14:33:53.199081+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "956f715b1a263da9b4345bfcc721a674a02316e7036930f33bdeb16cb1619701",
+        "bytes": 2926,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "{\n  \"findings\": [\n    {\n      \"kind\": \"duplicate\",\n      \"severity\": \"warning\",\n      \"message\": \"Multiple pages share title \\\"review this untrusted numerical source packet as a research-only artifact. use …\\\"\",\n      \"pages\": [\n        \"sessions/private-id-be1cf260fa99698c.md\",\n        \"sessions/private-id-f3747ff896983d2b.md\"\n      ],\n      \"detail\": null\n    },\n    {\n      \"kind\": \"duplicate\",\n      \"severity\": \"warning\",\n      \"message\": \"Multiple pages share title \\\"tool unknown\\\"\",\n      \"pages\": [\n        \"sessions/private-id-22aea22d2eb93073.md\",\n        \"sessions/private-id-c4a46263f8f22501.md\",\n        \"sessions/private-id-1f03955ca2defb74.md\",\n        \"sessions/private-id-a0d567190d80d96f.md\",\n        \"sessions/private-id-38024bf1b2c90fef.md\",\n        \"sessions/private-id-966d9e2d9d4203fe.md\",\n        \"sessions/private-id-e56303c84ae134aa.md\",\n        \"sessions/private-id-0c5c51b334d6e4c8.md\"\n      ],\n      \"detail\": null\n    },\n    {\n      \"kind\": \"duplicate\",\n      \"severity\": \"warning\",\n      \"message\": \"Multiple pages share title \\\"# overview\\\"\",\n      \"pages\": [\n        \"sessions/private-id-17fa3ce6ff57a827.md\",\n        \"sessions/private-id-36d8b33a08facc04.md\",\n        \"sessions/private-id-d10000e508bdf39d.md\",\n        \"sessions/private-id-eaa622babd054232.md\"\n      ],\n      \"detail\": null\n    },\n    {\n      \"kind\": \"duplicate\",\n      \"severity\": \"warning\",\n      \"message\": \"Multiple pages share title \\\"read only $HOME/codex-ecosystem/state/observability-e2e-20260919/native/f…\\\"\",\n      \"pages\": [\n        \"sessions/private-id-11b4cf6c65d16d80.md\",\n        \"sessions/private-id-eb7acca9c562763d.md\",\n        \"sessions/private-id-84237957d57d379f.md\"\n      ],\n      \"detail\": null\n    },\n    {\n      \"kind\": \"duplicate\",\n      \"severity\": \"warning\",\n      \"message\": \"Multiple pages share title \\\"tool non-file\\\"\",\n      \"pages\": [\n        \"sessions/private-id-e661a75809019fde.md\",\n        \"sessions/private-id-52c9d045f5242e1b.md\",\n        \"sessions/private-id-68b1058ae0953ee7.md\",\n        \"sessions/private-id-a6a4c6ff87442d4c.md\",\n        \"sessions/private-id-35f30df0b454ce89.md\",\n        \"sessions/private-id-9d3c36bf4c01f1d9.md\"\n      ],\n      \"detail\": null\n    },\n    {\n      \"kind\": \"duplicate\",\n      \"severity\": \"warning\",\n      \"message\": \"Multiple pages share title \\\"answer the research question using only the supplied untrusted public source do…\\\"\",\n      \"pages\": [\n        \"sessions/private-id-7bd0293e796ba084.md\",\n        \"sessions/private-id-52dee590159a670e.md\",\n        \"sessions/private-id-5b9993cf1918924d.md\",\n        \"sessions/private-id-6207b5505ae98360.md\"\n      ],\n      \"detail\": null\n    }\n  ]\n}\n"
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      }
+    },
+    "auto-improve-report-before": {
+      "argv": [
+        "$HOME/.local/share/codex-ecosystem/bin/ai-memory",
+        "auto-improve-report",
+        "--workspace",
+        "agent-lab",
+        "--project",
+        "agent-lab",
+        "--json"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:23:14.256168+00:00",
+      "completed_at": "2026-09-21T14:23:14.270617+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "33e316976607aff4dbf8743a6e4916d67ea0917ba71c1f5eb7b5648cfa0c6d30",
+        "bytes": 1366,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "{\n  \"workspace\": \"agent-lab\",\n  \"project\": \"agent-lab\",\n  \"generated_at\": \"2026-09-21T14:23:14.268250844Z\",\n  \"since_created_at\": 1787408594268250,\n  \"summary\": \"0 run(s), no terminal learning proposals in the last 30 day(s).\",\n  \"params\": {\n    \"since_days\": 30,\n    \"top_limit\": 10\n  },\n  \"aggregate\": {\n    \"run_count\": 0,\n    \"runs_with_learning_proposals\": 0,\n    \"proposals_by_status\": [],\n    \"proposals_by_operation\": [],\n    \"proposals_by_edit_mode\": [],\n    \"proposals_by_kind\": [],\n    \"maintenance_proposals_by_kind\": [],\n    \"top_targets\": [],\n    \"rejections_by_reason\": [],\n    \"repeated_rejection_fingerprints\": [],\n    \"rejected_targets\": []\n  },\n  \"terminal_rates\": {\n    \"denominator\": 0,\n    \"approved_rate\": 0.0,\n    \"rejected_rate\": 0.0,\n    \"conflict_rate\": 0.0,\n    \"failed_rate\": 0.0\n  },\n  \"findings\": [\n    {\n      \"kind\": \"no_terminal_learning_proposals\",\n      \"severity\": \"info\",\n      \"message\": \"No terminal learning proposals in the selected window.\"\n    }\n  ],\n  \"blind_spots\": [\n    \"Provider/LLM errors before a run is staged may not appear in proposal or rejection counts.\",\n    \"Eval-gate rejection reasons are counted, but eval success rates and score deltas are not persisted in this schema.\",\n    \"Terminal rates use learning proposals only; pending and maintenance/report proposals are excluded from the denominator.\"\n  ]\n}\n"
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      }
+    },
+    "auto-improve-report-after": {
+      "argv": [
+        "$HOME/.local/share/codex-ecosystem/bin/ai-memory",
+        "auto-improve-report",
+        "--workspace",
+        "agent-lab",
+        "--project",
+        "agent-lab",
+        "--json"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:33:53.799722+00:00",
+      "completed_at": "2026-09-21T14:33:53.811218+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "8b35089b9d722e01ed7bb7134bc99ddfb5af1567181d2471f168d457ca6c0a44",
+        "bytes": 2003,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "{\n  \"workspace\": \"agent-lab\",\n  \"project\": \"agent-lab\",\n  \"generated_at\": \"2026-09-21T14:33:53.809586447Z\",\n  \"since_created_at\": 1787409233809586,\n  \"summary\": \"3 run(s), no terminal learning proposals in the last 30 day(s).\",\n  \"params\": {\n    \"since_days\": 30,\n    \"top_limit\": 10\n  },\n  \"aggregate\": {\n    \"run_count\": 3,\n    \"runs_with_learning_proposals\": 0,\n    \"proposals_by_status\": [],\n    \"proposals_by_operation\": [],\n    \"proposals_by_edit_mode\": [],\n    \"proposals_by_kind\": [],\n    \"maintenance_proposals_by_kind\": [],\n    \"top_targets\": [],\n    \"rejections_by_reason\": [\n      {\n        \"key\": \"insufficient_durable_evidence\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"session_too_short\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"too_few_observations\",\n        \"count\": 1\n      }\n    ],\n    \"repeated_rejection_fingerprints\": [],\n    \"rejected_targets\": [\n      {\n        \"key\": \"2 observations below configured minimum 8\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"8s below configured minimum 120s\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"The consolidated page contains the request and tool-call metadata, but the tool outcomes are marked unknown and the substantive results are absent or truncated.\",\n        \"count\": 1\n      }\n    ]\n  },\n  \"terminal_rates\": {\n    \"denominator\": 0,\n    \"approved_rate\": 0.0,\n    \"rejected_rate\": 0.0,\n    \"conflict_rate\": 0.0,\n    \"failed_rate\": 0.0\n  },\n  \"findings\": [\n    {\n      \"kind\": \"no_terminal_learning_proposals\",\n      \"severity\": \"info\",\n      \"message\": \"No terminal learning proposals in the selected window.\"\n    }\n  ],\n  \"blind_spots\": [\n    \"Provider/LLM errors before a run is staged may not appear in proposal or rejection counts.\",\n    \"Eval-gate rejection reasons are counted, but eval success rates and score deltas are not persisted in this schema.\",\n    \"Terminal rates use learning proposals only; pending and maintenance/report proposals are excluded from the denominator.\"\n  ]\n}\n"
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      }
+    },
+    "scheduler-tests": {
+      "argv": [
+        "env",
+        "CARGO_HOME=$HOME/codex-ecosystem/state/memory-landscape-20260921/cargo",
+        "RUSTUP_HOME=$HOME/codex-ecosystem/state/memory-landscape-20260921/rustup",
+        "$HOME/codex-ecosystem/state/memory-landscape-20260921/cargo/bin/cargo",
+        "test",
+        "--locked",
+        "-p",
+        "ai-memory-consolidate",
+        "auto_improve_schedule::tests",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "$HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory",
+      "started_at": "2026-09-21T14:31:44.507770+00:00",
+      "completed_at": "2026-09-21T14:32:49.456087+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "75664d5969c31a930587c78b8985a1ed5a6d3a8f501fea4af5dbd9c0e04883a7",
+        "bytes": 520,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "\nrunning 4 tests\ntest auto_improve_schedule::tests::experience_pass_stays_quiet_below_the_cadence_floor ... ok\ntest auto_improve_schedule::tests::auto_improve_scheduler_startup_init_preserves_first_interval_sessions ... ok\ntest auto_improve_schedule::tests::a_scheduled_run_reports_a_collision_in_its_outcome_and_its_log ... ok\ntest auto_improve_schedule::tests::experience_pass_is_cadence_gated_and_stages_pending ... ok\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 221 filtered out; finished in 0.33s\n\n"
+      },
+      "stderr": {
+        "sha256": "5b0ea35e9d3e892d1383b58517e25a65097b0fdd050283e83d0f32bcae285040",
+        "bytes": 20035,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "info: syncing channel updates for 1.95-x86_64-unknown-linux-gnu\ninfo: latest update on 2026-04-16 for version 1.95.0 (59807616e 2026-04-14)\ninfo: downloading 5 components\nwarn: the missing active toolchain `1.95-x86_64-unknown-linux-gnu` has been auto-installed\nwarn: this might cause rustup commands to take longer time to finish than expected\ninfo: you may opt out with `RUSTUP_AUTO_INSTALL=0` or `rustup set auto-install disable`\n    Updating crates.io index\n Downloading crates ...\n  Downloaded dyn-clone v1.0.20\n  Downloaded dirs-sys v0.4.1\n  Downloaded cpufeatures v0.2.17\n  Downloaded cfg_aliases v0.2.1\n  Downloaded ident_case v1.0.1\n  Downloaded ipnet v2.12.0\n  Downloaded jobserver v0.1.34\n  Downloaded inotify-sys v0.1.5\n  Downloaded idna_adapter v1.2.2\n  Downloaded macro_rules_attribute-proc_macro v0.2.3\n  Downloaded block-buffer v0.10.4\n  Downloaded bit-set v0.8.0\n  Downloaded crypto-common v0.1.7\n  Downloaded cfg-if v1.0.4\n  Downloaded darling_macro v0.20.11\n  Downloaded castaway v0.2.4\n  Downloaded itoa v1.0.18\n  Downloaded lru-slab v0.1.2\n  Downloaded dirs v5.0.1\n  Downloaded lazy_static v1.5.0\n  Downloaded dyn-stack-macros v0.1.3\n  Downloaded atomic-waker v1.1.2\n  Downloaded potential_utf v0.1.5\n  Downloaded percent-encoding v2.3.2\n  Downloaded futures-core v0.3.32\n  Downloaded powerfmt v0.2.0\n  Downloaded openssl-probe v0.2.1\n  Downloaded gemm-c32 v0.19.0\n  Downloaded form_urlencoded v1.2.2\n  Downloaded equivalent v1.0.2\n  Downloaded fallible-streaming-iterator v0.1.9\n  Downloaded errno v0.3.14\n  Downloaded reborrow v0.5.5\n  Downloaded gemm-c64 v0.19.0\n  Downloaded pulp-wasm-simd-flag v0.1.1\n  Downloaded rayon-cond v0.4.0\n  Downloaded num-conv v0.2.2\n  Downloaded generic-array v0.14.7\n  Downloaded gemm-f64 v0.19.0\n  Downloaded fnv v1.0.7\n  Downloaded file-id v0.2.3\n  Downloaded rustc-hash v2.1.2\n  Downloaded monostate v0.1.18\n  Downloaded http-body v1.0.1\n  Downloaded refinery-macros v0.8.16\n  Downloaded ref-cast-impl v1.0.25\n  Downloaded same-file v1.0.6\n  Downloaded async-trait v0.1.89\n  Downloaded fs2 v0.4.3\n  Downloaded rand_chacha v0.9.0\n  Downloaded macro_rules_attribute v0.2.3\n  Downloaded http-body-util v0.1.3\n  Downloaded gemm-f16 v0.19.0\n  Downloaded find-msvc-tools v0.1.9\n  Downloaded seq-macro v0.3.6\n  Downloaded blake2 v0.10.6\n  Downloaded refinery v0.8.16\n  Downloaded lock_api v0.4.14\n  Downloaded litemap v0.8.2\n  Downloaded sha1_smol v1.0.1\n  Downloaded safetensors v0.8.0\n  Downloaded icu_properties v2.2.0\n  Downloaded float8 v0.7.0\n  Downloaded signal-hook-registry v1.4.8\n  Downloaded base64 v0.22.1\n  Downloaded subtle v2.6.1\n  Downloaded static_assertions v1.1.0\n  Downloaded candle-nn v0.11.0\n  Downloaded base64 v0.13.1\n  Downloaded refinery-core v0.8.16\n  Downloaded time-core v0.1.8\n  Downloaded rustls-pki-types v1.14.1\n  Downloaded flate2 v1.1.9\n  Downloaded time-macros v0.2.27\n  Downloaded cc v1.2.62\n  Downloaded thread_local v1.1.9\n  Downloaded schemars v1.2.1\n  Downloaded tinystr v0.8.3\n  Downloaded tempfile v3.27.0\n  Downloaded serde_json v1.0.150\n  Downloaded tower-service v0.3.3\n  Downloaded try-lock v0.2.5\n  Downloaded toml_write v0.1.2\n  Downloaded toml v0.8.23\n  Downloaded tracing-serde v0.2.0\n  Downloaded rayon-core v1.13.0\n  Downloaded utf8_iter v1.0.4\n  Downloaded tracing-core v0.1.36\n  Downloaded icu_collections v2.2.0\n  Downloaded yoke v0.8.2\n  Downloaded xattr v1.6.1\n  Downloaded writeable v0.6.3\n  Downloaded want v0.3.1\n  Downloaded walkdir v2.5.0\n  Downloaded uuid v1.23.1\n  Downloaded thiserror v2.0.18\n  Downloaded syn v2.0.117\n  Downloaded tower-layer v0.3.3\n  Downloaded time v0.3.47\n  Downloaded unicode-normalization-alignments v0.1.12\n  Downloaded tower v0.5.3\n  Downloaded tower-http v0.6.11\n  Downloaded tokenizers v0.22.2\n  Downloaded tracing-subscriber v0.3.23\n  Downloaded toml_datetime v0.6.11\n  Downloaded idna v1.1.0\n  Downloaded tracing v0.1.44\n  Downloaded zerofrom-derive v0.1.7\n  Downloaded zmij v1.0.21\n  Downloaded zerovec-derive v0.11.3\n  Downloaded rayon v1.12.0\n  Downloaded icu_properties_data v2.2.0\n  Downloaded tokio v1.52.3\n  Downloaded unicode-segmentation v1.13.3\n  Downloaded winnow v0.7.15\n  Downloaded url v2.5.8\n  Downloaded unicode_categories v0.1.1\n  Downloaded quinn-proto v0.11.15\n  Downloaded tokio-util v0.7.18\n  Downloaded syn v3.0.4\n  Downloaded regex v1.12.3\n  Downloaded itertools v0.14.0\n  Downloaded zerotrie v0.2.4\n  Downloaded rustix v1.1.4\n  Downloaded rustls v0.23.45\n  Downloaded zip v8.6.0\n  Downloaded zerocopy-derive v0.8.48\n  Downloaded regex-syntax v0.8.10\n  Downloaded zerovec v0.11.6\n  Downloaded zeroize v1.8.2\n  Downloaded rusqlite v0.32.1\n  Downloaded reqwest v0.12.28\n  Downloaded libm v0.2.16\n  Downloaded zerofrom v0.1.8\n  Downloaded vcpkg v0.2.15\n  Downloaded regex-automata v0.4.14\n  Downloaded zerocopy v0.8.48\n  Downloaded onig_sys v69.9.3\n  Downloaded yoke-derive v0.8.2\n  Downloaded version_check v0.9.5\n  Downloaded jiff v0.2.24\n  Downloaded pulp v0.22.3\n  Downloaded tokio-rustls v0.26.4\n  Downloaded nom v7.1.3\n  Downloaded tinyvec v1.11.0\n  Downloaded libc v0.2.186\n  Downloaded raw-cpuid v11.6.0\n  Downloaded libz-sys v1.1.28\n  Downloaded mio v1.2.0\n  Downloaded typenum v1.20.0\n  Downloaded typed-path v0.12.3\n  Downloaded toml_edit v0.22.27\n  Downloaded tokio-macros v2.7.0\n  Downloaded tar v0.4.46\n  Downloaded spm_precompiled v0.1.4\n  Downloaded rustls-webpki v0.103.15\n  Downloaded memchr v2.8.0\n  Downloaded thiserror-impl v2.0.18\n  Downloaded thiserror-impl v1.0.69\n  Downloaded serde v1.0.228\n  Downloaded rand v0.9.4\n  Downloaded minimal-lexical v0.2.1\n  Downloaded thiserror v1.0.69\n  Downloaded socket2 v0.6.3\n  Downloaded sharded-slab v0.1.7\n  Downloaded unsafe-libyaml v0.2.11\n  Downloaded tinyvec_macros v0.1.1\n  Downloaded smallvec v1.15.1\n  Downloaded quinn v0.11.9\n  Downloaded untrusted v0.9.0\n  Downloaded unicode-ident v1.0.24\n  Downloaded tracing-log v0.2.0\n  Downloaded tracing-attributes v0.1.31\n  Downloaded jiff-static v0.2.24\n  Downloaded rand_distr v0.5.1\n  Downloaded miniz_oxide v0.8.9\n  Downloaded slab v0.4.12\n  Downloaded simd-adler32 v0.3.9\n  Downloaded proc-macro2 v1.0.106\n  Downloaded icu_normalizer_data v2.2.0\n  Downloaded icu_normalizer v2.2.0\n  Downloaded icu_locale_core v2.2.0\n  Downloaded candle-transformers v0.11.0\n  Downloaded ring v0.17.14\n  Downloaded candle-core v0.11.0\n  Downloaded serde_core v1.0.228\n  Downloaded git2 v0.21.0\n  Downloaded esaxx-rs v0.1.10\n  Downloaded num-traits v0.2.19\n  Downloaded hyper v1.9.0\n  Downloaded hashbrown v0.17.1\n  Downloaded hashbrown v0.16.1\n  Downloaded hashbrown v0.14.5\n  Downloaded futures-util v0.3.32\n  Downloaded fancy-regex v0.18.0\n  Downloaded aho-corasick v1.1.4\n  Downloaded synstructure v0.13.2\n  Downloaded sync_wrapper v1.0.2\n  Downloaded sha2 v0.10.9\n  Downloaded schemars_derive v1.2.1\n  Downloaded indexmap v2.14.0\n  Downloaded libgit2-sys v0.18.4+1.9.3\n  Downloaded log v0.4.29\n  Downloaded icu_provider v2.2.0\n  Downloaded hyper-util v0.1.20\n  Downloaded http v1.4.0\n  Downloaded rand_core v0.6.4\n  Downloaded notify v8.2.0\n  Downloaded fancy-regex v0.14.0\n  Downloaded serde_yaml v0.9.34+deprecated\n  Downloaded serde_derive v1.0.228\n  Downloaded getrandom v0.4.2\n  Downloaded getrandom v0.3.4\n  Downloaded darling_core v0.20.11\n  Downloaded compact_str v0.9.1\n  Downloaded bytes v1.11.1\n  Downloaded strsim v0.11.1\n  Downloaded stable_deref_trait v1.2.1\n  Downloaded siphasher v1.0.3\n  Downloaded serde_derive_internals v0.29.1\n  Downloaded ryu v1.0.23\n  Downloaded half v2.7.1\n  Downloaded anyhow v1.0.103\n  Downloaded allocator-api2 v0.2.21\n  Downloaded shlex v1.3.0\n  Downloaded parking_lot v0.12.5\n  Downloaded once_cell v1.21.4\n  Downloaded num-complex v0.4.6\n  Downloaded bytemuck v1.25.0\n  Downloaded either v1.16.0\n  Downloaded serde_urlencoded v0.7.1\n  Downloaded serde_spanned v0.6.9\n  Downloaded serde_plain v1.0.2\n  Downloaded rustversion v1.0.22\n  Downloaded quinn-udp v0.5.14\n  Downloaded parking_lot_core v0.9.12\n  Downloaded memmap2 v0.9.11\n  Downloaded httparse v1.10.1\n  Downloaded getrandom v0.2.17\n  Downloaded gemm-common v0.19.0\n  Downloaded gemm v0.19.0\n  Downloaded futures-channel v0.3.32\n  Downloaded crossbeam-epoch v0.9.20\n  Downloaded quote v1.0.45\n  Downloaded password-hash v0.5.0\n  Downloaded onig v6.5.3\n  Downloaded notify-types v2.1.0\n  Downloaded dyn-stack v0.13.2\n  Downloaded crossbeam-utils v0.8.21\n  Downloaded bitflags v2.11.1\n  Downloaded ahash v0.8.12\n  Downloaded secrecy v0.10.3\n  Downloaded scopeguard v1.2.0\n  Downloaded rustls-native-certs v0.8.4\n  Downloaded ref-cast v1.0.25\n  Downloaded rand_core v0.9.5\n  Downloaded ppv-lite86 v0.2.21\n  Downloaded linux-raw-sys v0.12.1\n  Downloaded pkg-config v0.3.33\n  Downloaded pin-project-lite v0.2.17\n  Downloaded pastey v0.2.3\n  Downloaded paste v1.0.15\n  Downloaded nu-ansi-term v0.50.3\n  Downloaded notify-debouncer-full v0.6.0\n  Downloaded hyper-rustls v0.27.9\n  Downloaded hashlink v0.9.1\n  Downloaded foldhash v0.2.0\n  Downloaded derive_builder v0.20.2\n  Downloaded darling v0.20.11\n  Downloaded crc32fast v1.5.0\n  Downloaded filetime v0.2.29\n  Downloaded bit-vec v0.8.0\n  Downloaded argon2 v0.5.3\n  Downloaded fastrand v2.4.1\n  Downloaded fallible-iterator v0.3.0\n  Downloaded derive_builder_macro v0.20.2\n  Downloaded derive_builder_core v0.20.2\n  Downloaded deranged v0.5.8\n  Downloaded dary_heap v0.3.9\n  Downloaded crossbeam-deque v0.8.6\n  Downloaded bytemuck_derive v1.12.0\n  Downloaded base64ct v1.8.3\n  Downloaded autocfg v1.5.0\n  Downloaded adler2 v2.0.1\n  Downloaded inotify v0.11.1\n  Downloaded futures-io v0.3.32\n  Downloaded digest v0.10.7\n  Downloaded byteorder v1.5.0\n  Downloaded heck v0.5.0\n  Downloaded gemm-f32 v0.19.0\n  Downloaded option-ext v0.2.0\n  Downloaded matchers v0.2.0\n  Downloaded futures-task v0.3.32\n  Downloaded futures-sink v0.3.32\n  Downloaded futures-macro v0.3.32\n  Downloaded num_cpus v1.17.0\n  Downloaded monostate-impl v0.1.18\n  Downloaded displaydoc v0.2.5\n  Downloaded libsqlite3-sys v0.30.1\n   Compiling proc-macro2 v1.0.106\n   Compiling quote v1.0.45\n   Compiling unicode-ident v1.0.24\n   Compiling libc v0.2.186\n   Compiling cfg-if v1.0.4\n   Compiling serde_core v1.0.228\n   Compiling find-msvc-tools v0.1.9\n   Compiling once_cell v1.21.4\n   Compiling version_check v0.9.5\n   Compiling shlex v1.3.0\n   Compiling bitflags v2.11.1\n   Compiling serde v1.0.228\n   Compiling itoa v1.0.18\n   Compiling zerocopy v0.8.48\n   Compiling getrandom v0.3.4\n   Compiling smallvec v1.15.1\n   Compiling memchr v2.8.0\n   Compiling stable_deref_trait v1.2.1\n   Compiling pkg-config v0.3.33\n   Compiling log v0.4.29\n   Compiling writeable v0.6.3\n   Compiling litemap v0.8.2\n   Compiling equivalent v1.0.2\n   Compiling utf8_iter v1.0.4\n   Compiling regex-syntax v0.8.10\n   Compiling libm v0.2.16\n   Compiling hashbrown v0.17.1\n   Compiling autocfg v1.5.0\n   Compiling crossbeam-utils v0.8.21\n   Compiling icu_properties_data v2.2.0\n   Compiling crossbeam-epoch v0.9.20\n   Compiling icu_normalizer_data v2.2.0\n   Compiling pin-project-lite v0.2.17\n   Compiling rayon-core v1.13.0\n   Compiling either v1.16.0\n   Compiling paste v1.0.15\n   Compiling zmij v1.0.21\n   Compiling parking_lot_core v0.9.12\n   Compiling bytes v1.11.1\n   Compiling vcpkg v0.2.15\n   Compiling serde_json v1.0.150\n   Compiling scopeguard v1.2.0\n   Compiling raw-cpuid v11.6.0\n   Compiling pulp-wasm-simd-flag v0.1.1\n   Compiling dyn-stack-macros v0.1.3\n   Compiling reborrow v0.5.5\n   Compiling futures-core v0.3.32\n   Compiling lock_api v0.4.14\n   Compiling aho-corasick v1.1.4\n   Compiling tracing-core v0.1.36\n   Compiling strsim v0.11.1\n   Compiling fnv v1.0.7\n   Compiling seq-macro v0.3.6\n   Compiling getrandom v0.4.2\n   Compiling indexmap v2.14.0\n   Compiling pulp v0.22.3\n   Compiling ahash v0.8.12\n   Compiling percent-encoding v2.3.2\n   Compiling ident_case v1.0.1\n   Compiling subtle v2.6.1\n   Compiling generic-array v0.14.7\n   Compiling rustix v1.1.4\n   Compiling syn v2.0.117\n   Compiling syn v3.0.4\n   Compiling crossbeam-deque v0.8.6\n   Compiling num-traits v0.2.19\n   Compiling linux-raw-sys v0.12.1\n   Compiling ryu v1.0.23\n   Compiling typenum v1.20.0\n   Compiling rustversion v1.0.22\n   Compiling zeroize v1.8.2\n   Compiling thiserror v2.0.18\n   Compiling http v1.4.0\n   Compiling form_urlencoded v1.2.2\n   Compiling crc32fast v1.5.0\n   Compiling same-file v1.0.6\n   Compiling bit-vec v0.8.0\n   Compiling walkdir v2.5.0\n   Compiling rustls-pki-types v1.14.1\n   Compiling bit-set v0.8.0\n   Compiling rayon v1.12.0\n   Compiling jobserver v0.1.34\n   Compiling mio v1.2.0\n   Compiling errno v0.3.14\n   Compiling signal-hook-registry v1.4.8\n   Compiling rand_core v0.9.5\n   Compiling socket2 v0.6.3\n   Compiling regex-automata v0.4.14\n   Compiling getrandom v0.2.17\n   Compiling cc v1.2.62\n   Compiling parking_lot v0.12.5\n   Compiling http-body v1.0.1\n   Compiling thiserror v1.0.69\n   Compiling minimal-lexical v0.2.1\n   Compiling powerfmt v0.2.0\n   Compiling httparse v1.10.1\n   Compiling untrusted v0.9.0\n   Compiling slab v0.4.12\n   Compiling esaxx-rs v0.1.10\n   Compiling futures-task v0.3.32\n   Compiling block-buffer v0.10.4\n   Compiling crypto-common v0.1.7\n   Compiling nom v7.1.3\n   Compiling deranged v0.5.8\n   Compiling itertools v0.14.0\n   Compiling base64 v0.13.1\n   Compiling try-lock v0.2.5\n   Compiling macro_rules_attribute-proc_macro v0.2.3\n   Compiling ref-cast v1.0.25\n   Compiling pastey v0.2.3\n   Compiling num-conv v0.2.2\n   Compiling rustls v0.23.45\n   Compiling unicode-segmentation v1.13.3\n   Compiling foldhash v0.2.0\n   Compiling fastrand v2.4.1\n   Compiling allocator-api2 v0.2.21\n   Compiling tower-service v0.3.3\n   Compiling static_assertions v1.1.0\n   Compiling time-core v0.1.8\n   Compiling tempfile v3.27.0\n   Compiling want v0.3.1\n   Compiling hashbrown v0.16.1\n   Compiling digest v0.10.7\n   Compiling futures-channel v0.3.32\n   Compiling unicode-normalization-alignments v0.1.12\n   Compiling atomic-waker v1.1.2\n   Compiling castaway v0.2.4\n   Compiling winnow v0.7.15\n   Compiling time v0.3.47\n   Compiling unicode_categories v0.1.1\n   Compiling typed-path v0.12.3\n   Compiling base64 v0.22.1\n   Compiling toml_write v0.1.2\n   Compiling siphasher v1.0.3\n   Compiling memmap2 v0.9.11\n   Compiling num_cpus v1.17.0\n   Compiling sync_wrapper v1.0.2\n   Compiling fallible-iterator v0.3.0\n   Compiling tower-layer v0.3.3\n   Compiling dyn-clone v1.0.20\n   Compiling openssl-probe v0.2.1\n   Compiling cpufeatures v0.2.17\n   Compiling anyhow v1.0.103\n   Compiling fallible-streaming-iterator v0.1.9\n   Compiling rayon-cond v0.4.0\n   Compiling sha1_smol v1.0.1\n   Compiling macro_rules_attribute v0.2.3\n   Compiling ipnet v2.12.0\n   Compiling byteorder v1.5.0\n   Compiling uuid v1.23.1\n   Compiling rustls-native-certs v0.8.4\n   Compiling jiff v0.2.24\n   Compiling rand_core v0.6.4\n   Compiling inotify-sys v0.1.5\n   Compiling futures-sink v0.3.32\n   Compiling heck v0.5.0\n   Compiling base64ct v1.8.3\n   Compiling inotify v0.11.1\n   Compiling sha2 v0.10.9\n   Compiling blake2 v0.10.6\n   Compiling http-body-util v0.1.3\n   Compiling password-hash v0.5.0\n   Compiling zip v8.6.0\n   Compiling notify-types v2.1.0\n   Compiling synstructure v0.13.2\n   Compiling darling_core v0.20.11\n   Compiling regex v1.12.3\n   Compiling fancy-regex v0.14.0\n   Compiling serde_derive_internals v0.29.1\n   Compiling fancy-regex v0.18.0\n   Compiling simd-adler32 v0.3.9\n   Compiling option-ext v0.2.0\n   Compiling adler2 v2.0.1\n   Compiling notify v8.2.0\n   Compiling dirs-sys v0.4.1\n   Compiling miniz_oxide v0.8.9\n   Compiling argon2 v0.5.3\n   Compiling xattr v1.6.1\n   Compiling fs2 v0.4.3\n   Compiling filetime v0.2.29\n   Compiling lazy_static v1.5.0\n   Compiling unsafe-libyaml v0.2.11\n   Compiling file-id v0.2.3\n   Compiling sharded-slab v0.1.7\n   Compiling notify-debouncer-full v0.6.0\n   Compiling tar v0.4.46\n   Compiling flate2 v1.1.9\n   Compiling dirs v5.0.1\n   Compiling matchers v0.2.0\n   Compiling tracing-log v0.2.0\n   Compiling thread_local v1.1.9\n   Compiling nu-ansi-term v0.50.3\n   Compiling ai-memory-test-support v2.3.2 ($HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory/crates/ai-memory-test-support)\n   Compiling ring v0.17.14\n   Compiling onig_sys v69.9.3\n   Compiling libsqlite3-sys v0.30.1\n   Compiling libz-sys v1.1.28\n   Compiling libgit2-sys v0.18.4+1.9.3\n   Compiling bytemuck_derive v1.12.0\n   Compiling zerofrom-derive v0.1.7\n   Compiling yoke-derive v0.8.2\n   Compiling serde_derive v1.0.228\n   Compiling zerovec-derive v0.11.3\n   Compiling displaydoc v0.2.5\n   Compiling zerocopy-derive v0.8.48\n   Compiling tokio-macros v2.7.0\n   Compiling darling_macro v0.20.11\n   Compiling tracing-attributes v0.1.31\n   Compiling thiserror-impl v2.0.18\n   Compiling futures-macro v0.3.32\n   Compiling monostate-impl v0.1.18\n   Compiling async-trait v0.1.89\n   Compiling thiserror-impl v1.0.69\n   Compiling ref-cast-impl v1.0.25\n   Compiling schemars_derive v1.2.1\n   Compiling bytemuck v1.25.0\n   Compiling monostate v0.1.18\n   Compiling num-complex v0.4.6\n   Compiling dyn-stack v0.13.2\n   Compiling darling v0.20.11\n   Compiling derive_builder_core v0.20.2\n   Compiling tokio v1.52.3\n   Compiling futures-util v0.3.32\n   Compiling rustls-webpki v0.103.15\n   Compiling derive_builder_macro v0.20.2\n   Compiling tracing v0.1.44\n   Compiling derive_builder v0.20.2\n   Compiling zerofrom v0.1.8\n   Compiling yoke v0.8.2\n   Compiling zerovec v0.11.6\n   Compiling zerotrie v0.2.4\n   Compiling onig v6.5.3\n   Compiling tinystr v0.8.3\n   Compiling potential_utf v0.1.5\n   Compiling icu_locale_core v2.2.0\n   Compiling icu_collections v2.2.0\n   Compiling spm_precompiled v0.1.4\n   Compiling serde_spanned v0.6.9\n   Compiling compact_str v0.9.1\n   Compiling toml_datetime v0.6.11\n   Compiling dary_heap v0.3.9\n   Compiling safetensors v0.8.0\n   Compiling schemars v1.2.1\n   Compiling serde_urlencoded v0.7.1\n   Compiling serde_plain v1.0.2\n   Compiling secrecy v0.10.3\n   Compiling tracing-serde v0.2.0\n   Compiling serde_yaml v0.9.34+deprecated\n   Compiling toml_edit v0.22.27\n   Compiling tracing-subscriber v0.3.23\n   Compiling icu_provider v2.2.0\n   Compiling icu_normalizer v2.2.0\n   Compiling icu_properties v2.2.0\n   Compiling hyper v1.9.0\n   Compiling tower v0.5.3\n   Compiling ai-memory-core v2.3.2 ($HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory/crates/ai-memory-core)\n   Compiling tokio-util v0.7.18\n   Compiling ppv-lite86 v0.2.21\n   Compiling idna_adapter v1.2.2\n   Compiling tokio-rustls v0.26.4\n   Compiling hyper-util v0.1.20\n   Compiling idna v1.1.0\n   Compiling hashbrown v0.14.5\n   Compiling toml v0.8.23\n   Compiling rand_chacha v0.9.0\n   Compiling rand v0.9.4\n   Compiling url v2.5.8\n   Compiling hashlink v0.9.1\n   Compiling hyper-rustls v0.27.9\n   Compiling rand_distr v0.5.1\n   Compiling tokenizers v0.22.2\n   Compiling tower-http v0.6.11\n   Compiling refinery-core v0.8.16\n   Compiling reqwest v0.12.28\n   Compiling half v2.7.1\n   Compiling gemm-common v0.19.0\n   Compiling float8 v0.7.0\n   Compiling gemm-f32 v0.19.0\n   Compiling gemm-c32 v0.19.0\n   Compiling gemm-c64 v0.19.0\n   Compiling gemm-f64 v0.19.0\n   Compiling refinery-macros v0.8.16\n   Compiling gemm-f16 v0.19.0\n   Compiling gemm v0.19.0\n   Compiling candle-core v0.11.0\n   Compiling git2 v0.21.0\n   Compiling rusqlite v0.32.1\n   Compiling refinery v0.8.16\n   Compiling ai-memory-store v2.3.2 ($HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory/crates/ai-memory-store)\n   Compiling candle-nn v0.11.0\n   Compiling candle-transformers v0.11.0\n   Compiling ai-memory-llm v2.3.2 ($HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory/crates/ai-memory-llm)\n   Compiling ai-memory-wiki v2.3.2 ($HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory/crates/ai-memory-wiki)\n   Compiling ai-memory-consolidate v2.3.2 ($HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory/crates/ai-memory-consolidate)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 57.21s\n     Running unittests src/lib.rs (target/debug/deps/ai_memory_consolidate-574a8b350309e55b)\n"
+      }
+    },
+    "assistant-capture-tests": {
+      "argv": [
+        "env",
+        "CARGO_HOME=$HOME/codex-ecosystem/state/memory-landscape-20260921/cargo",
+        "RUSTUP_HOME=$HOME/codex-ecosystem/state/memory-landscape-20260921/rustup",
+        "$HOME/codex-ecosystem/state/memory-landscape-20260921/cargo/bin/cargo",
+        "test",
+        "--locked",
+        "-p",
+        "ai-memory-hooks",
+        "capture_assistant",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "$HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory",
+      "started_at": "2026-09-21T14:37:42.463056+00:00",
+      "completed_at": "2026-09-21T14:38:20.612853+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "2bdad6698d95e9c6d527bb70ca3e1a3f6320e4a05ebe0213a3f0f7d531ab317c",
+        "bytes": 115,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "\nrunning 0 tests\n\ntest result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 308 filtered out; finished in 0.00s\n\n"
+      },
+      "stderr": {
+        "sha256": "26f24e3c8a3cc713aff27aa5aaed044f779bc93a4b7606576bd420064602e2d5",
+        "bytes": 2796,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": " Downloading crates ...\n  Downloaded serde_path_to_error v0.1.20\n  Downloaded mime v0.3.17\n  Downloaded axum-core v0.5.6\n  Downloaded httpdate v1.0.3\n  Downloaded matchit v0.8.4\n  Downloaded axum v0.8.9\n   Compiling serde_core v1.0.228\n   Compiling serde_json v1.0.150\n   Compiling tracing-core v0.1.36\n   Compiling mio v1.2.0\n   Compiling httpdate v1.0.3\n   Compiling mime v0.3.17\n   Compiling matchit v0.8.4\n   Compiling git2 v0.21.0\n   Compiling tokio v1.52.3\n   Compiling notify v8.2.0\n   Compiling tracing v0.1.44\n   Compiling axum-core v0.5.6\n   Compiling notify-debouncer-full v0.6.0\n   Compiling serde v1.0.228\n   Compiling hashbrown v0.16.1\n   Compiling monostate v0.1.18\n   Compiling uuid v1.23.1\n   Compiling jiff v0.2.24\n   Compiling serde_path_to_error v0.1.20\n   Compiling ahash v0.8.12\n   Compiling toml_datetime v0.6.11\n   Compiling dary_heap v0.3.9\n   Compiling spm_precompiled v0.1.4\n   Compiling compact_str v0.9.1\n   Compiling serde_spanned v0.6.9\n   Compiling serde_urlencoded v0.7.1\n   Compiling serde_plain v1.0.2\n   Compiling secrecy v0.10.3\n   Compiling serde_yaml v0.9.34+deprecated\n   Compiling hashbrown v0.14.5\n   Compiling toml_edit v0.22.27\n   Compiling safetensors v0.8.0\n   Compiling schemars v1.2.1\n   Compiling tokenizers v0.22.2\n   Compiling hashlink v0.9.1\n   Compiling rusqlite v0.32.1\n   Compiling toml v0.8.23\n   Compiling hyper v1.9.0\n   Compiling tower v0.5.3\n   Compiling tokio-rustls v0.26.4\n   Compiling tokio-util v0.7.18\n   Compiling refinery-core v0.8.16\n   Compiling tower-http v0.6.11\n   Compiling refinery v0.8.16\n   Compiling ai-memory-core v2.3.2 ($HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory/crates/ai-memory-core)\n   Compiling hyper-util v0.1.20\n   Compiling hyper-rustls v0.27.9\n   Compiling axum v0.8.9\n   Compiling reqwest v0.12.28\n   Compiling candle-core v0.11.0\n   Compiling ai-memory-store v2.3.2 ($HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory/crates/ai-memory-store)\n   Compiling candle-nn v0.11.0\n   Compiling candle-transformers v0.11.0\n   Compiling ai-memory-llm v2.3.2 ($HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory/crates/ai-memory-llm)\n   Compiling ai-memory-wiki v2.3.2 ($HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory/crates/ai-memory-wiki)\n   Compiling ai-memory-consolidate v2.3.2 ($HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory/crates/ai-memory-consolidate)\n   Compiling ai-memory-hooks v2.3.2 ($HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory/crates/ai-memory-hooks)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 38.05s\n     Running unittests src/lib.rs (target/debug/deps/ai_memory_hooks-475701038f8eea4d)\n"
+      }
+    },
+    "assistant-capture-tests-corrected": {
+      "argv": [
+        "env",
+        "CARGO_HOME=$HOME/codex-ecosystem/state/memory-landscape-20260921/cargo",
+        "RUSTUP_HOME=$HOME/codex-ecosystem/state/memory-landscape-20260921/rustup",
+        "$HOME/codex-ecosystem/state/memory-landscape-20260921/cargo/bin/cargo",
+        "test",
+        "--locked",
+        "-p",
+        "ai-memory-hooks",
+        "assistant_capture",
+        "--",
+        "--nocapture"
+      ],
+      "cwd": "$HOME/codex-ecosystem/state/memory-landscape-20260921/upstream-ai-memory",
+      "started_at": "2026-09-21T14:39:48.965242+00:00",
+      "completed_at": "2026-09-21T14:39:49.430664+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "39d637ae09aaa9a609541a246fa445171b01b18d5d4d0b14b19ea2026ebefc23",
+        "bytes": 1623,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "\nrunning 18 tests\ntest assistant_capture::tests::backstop_ignores_non_stop_event ... ok\ntest assistant_capture::tests::backstop_rejects_forged_empty_and_bad_version ... ok\ntest assistant_capture::tests::client_transform_ignores_non_candidate_agent_event ... ok\ntest assistant_capture::tests::client_transform_strips_but_omits_protocol_for_empty_or_oversized ... ok\ntest assistant_capture::tests::closed_table_fields_are_all_stripped ... ok\ntest assistant_capture::tests::strip_is_noop_when_absent_or_not_object ... ok\ntest assistant_capture::tests::strip_removes_field_and_reports_change ... ok\ntest assistant_capture::tests::only_claude_and_codex_stop_are_capture_candidates ... ok\ntest assistant_capture::tests::backstop_caps_oversized_excerpt_server_side ... ok\ntest assistant_capture::tests::client_transform_scrubs_before_truncating ... ok\ntest assistant_capture::tests::client_transform_splices_sanitized_capped_excerpt ... ok\ntest assistant_capture::tests::client_transform_captures_codex_stop ... ok\ntest assistant_capture::tests::client_transform_truncates_multibyte_within_cap ... ok\ntest assistant_capture::tests::backstop_populates_body_when_all_gates_pass ... ok\ntest assistant_capture::tests::backstop_drops_when_server_off_or_flag_absent ... ok\ntest router::tests::privacy_protocol_and_assistant_capture_sentinels_never_reach_storage_or_reviewer ... ok\ntest router::tests::assistant_capture_stays_empty_when_server_disabled ... ok\ntest router::tests::assistant_capture_round_trips_when_both_opt_ins_on ... ok\n\ntest result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 290 filtered out; finished in 0.27s\n\n"
+      },
+      "stderr": {
+        "sha256": "5c8337bb356dfb95855e20615bd3e8ae275872deadf9c991d01216e2287ebaf8",
+        "bytes": 160,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.16s\n     Running unittests src/lib.rs (target/debug/deps/ai_memory_hooks-475701038f8eea4d)\n"
+      }
+    },
+    "hook-install-claude": {
+      "argv": [
+        "$HOME/.local/share/codex-ecosystem/bin/ai-memory",
+        "install-hooks",
+        "--agent",
+        "claude-code",
+        "--capture-assistant",
+        "--capture-mode",
+        "allowlist",
+        "--config-file",
+        "$HOME/.claude/settings.json",
+        "--server-url",
+        "http://127.0.0.1:49374",
+        "--apply"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:35:14.017239+00:00",
+      "completed_at": "2026-09-21T14:35:14.041055+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "566da87911e68ed8583a22adec386f7b0fa3c57ae95f6682e96b5d59ba1d163c",
+        "bytes": 171,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "capture mode: allowlist\n  repositories without a .ai-memory.toml marker emit no lifecycle events\n✓ updated $HOME/.claude/settings.json (backup written next to it)\n"
+      },
+      "stderr": {
+        "sha256": "e8522a598e7a9acbcd46429b083f23a85a0d0048de8689ed6119c649580fe008",
+        "bytes": 211,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "[ai-memory] capture-policy capability v1 enforced by this selected integration; re-run --apply to refresh existing installs.\n✓ staged 18 hook script(s) → $HOME/.local/share/ai-memory/hooks/claude-code\n"
+      }
+    },
+    "hook-install-codex": {
+      "argv": [
+        "$HOME/.local/share/codex-ecosystem/bin/ai-memory",
+        "install-hooks",
+        "--agent",
+        "codex",
+        "--capture-assistant",
+        "--capture-mode",
+        "allowlist",
+        "--config-file",
+        "$HOME/.codex/hooks.json",
+        "--server-url",
+        "http://127.0.0.1:49374",
+        "--apply"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:35:14.664636+00:00",
+      "completed_at": "2026-09-21T14:35:14.685220+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "d534ced6f9406001810da8896ee5fdb65e90edef0bd12b25aa89291cdf371ac4",
+        "bytes": 495,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "capture mode: allowlist\n  repositories without a .ai-memory.toml marker emit no lifecycle events\n✓ updated $HOME/.codex/hooks.json (backup written next to it)\n\nCodex requires explicit trust for new hooks. Next time you start `codex`:\n  → the TUI will surface 'Hooks need review' for each new event\n  → choose 'Trust all and continue' (or trust individually)\nTo bypass the prompt for automated installs, start with\n`codex --dangerously-bypass-hook-trust` (review hook scripts first).\n"
+      },
+      "stderr": {
+        "sha256": "f6363e06e96c24048e2467ae4e494073481e7b15243a09b3e229f2446d953a4a",
+        "bytes": 205,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "[ai-memory] capture-policy capability v1 enforced by this selected integration; re-run --apply to refresh existing installs.\n✓ staged 14 hook script(s) → $HOME/.local/share/ai-memory/hooks/codex\n"
+      }
+    },
+    "hook-install-desktop": {
+      "argv": [
+        "$HOME/.local/share/codex-ecosystem/bin/ai-memory",
+        "install-hooks",
+        "--agent",
+        "codex",
+        "--capture-assistant",
+        "--capture-mode",
+        "allowlist",
+        "--config-file",
+        "$DESKTOP_HOME_PARENT/.codex/hooks.json",
+        "--server-url",
+        "http://127.0.0.1:49374",
+        "--apply"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:35:15.315983+00:00",
+      "completed_at": "2026-09-21T14:35:15.341471+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "268a65b6698980df7d68184399ff6d55304ef4b7e5ef29e0e02d5803bb244015",
+        "bytes": 502,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "capture mode: allowlist\n  repositories without a .ai-memory.toml marker emit no lifecycle events\n✓ updated $DESKTOP_HOME_PARENT/.codex/hooks.json (backup written next to it)\n\nCodex requires explicit trust for new hooks. Next time you start `codex`:\n  → the TUI will surface 'Hooks need review' for each new event\n  → choose 'Trust all and continue' (or trust individually)\nTo bypass the prompt for automated installs, start with\n`codex --dangerously-bypass-hook-trust` (review hook scripts first).\n"
+      },
+      "stderr": {
+        "sha256": "f6363e06e96c24048e2467ae4e494073481e7b15243a09b3e229f2446d953a4a",
+        "bytes": 205,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "[ai-memory] capture-policy capability v1 enforced by this selected integration; re-run --apply to refresh existing installs.\n✓ staged 14 hook script(s) → $HOME/.local/share/ai-memory/hooks/codex\n"
+      }
+    },
+    "service-restart-qualification": {
+      "argv": [
+        "systemctl",
+        "--user",
+        "restart",
+        "ai-memory.service"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:30:47.113904+00:00",
+      "completed_at": "2026-09-21T14:30:47.175164+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      }
+    },
+    "service-restart-hourly": {
+      "argv": [
+        "systemctl",
+        "--user",
+        "restart",
+        "ai-memory.service"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:33:17.006155+00:00",
+      "completed_at": "2026-09-21T14:33:17.086735+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      }
+    },
+    "service-restart-summary": {
+      "argv": [
+        "systemctl",
+        "--user",
+        "restart",
+        "ai-memory.service"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:35:13.326902+00:00",
+      "completed_at": "2026-09-21T14:35:13.380600+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      }
+    },
+    "scheduler-final": {
+      "argv": [
+        "journalctl",
+        "--user",
+        "-u",
+        "ai-memory.service",
+        "--since",
+        "2026-09-21 14:30:45 UTC",
+        "--no-pager",
+        "-o",
+        "cat"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:33:52.194110+00:00",
+      "completed_at": "2026-09-21T14:33:52.197947+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "9a6f51f716f2866613789692581a5dfc1656fafc4ef1971fc57b838971f325d4",
+        "bytes": 10848,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "Stopping ai-memory.service - ai-memory MCP server (user service)...\n2026-09-21T14:30:47.118467Z  INFO ai_memory_cli::commands::serve: shutdown signal received; draining signal=\"SIGTERM\"\nStopped ai-memory.service - ai-memory MCP server (user service).\nai-memory.service: Consumed 21.037s CPU time, 269.8M memory peak, 0B memory swap peak.\nStarted ai-memory.service - ai-memory MCP server (user service).\n2026-09-21T14:30:47.185745Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:49374 data_dir=$HOME/.local/share/ai-memory bind=127.0.0.1:49374\n2026-09-21T14:30:47.185954Z  INFO ai_memory_cli::commands::serve: single-instance serve lock held lock=$HOME/.local/share/ai-memory/.serve.lock\n2026-09-21T14:30:47.191854Z ERROR refinery_core::traits::divergent: applied migration V62__page_ingestion_windows is different than filesystem one V62__page_ingestion_windows\n2026-09-21T14:30:47.191892Z  INFO refinery_core::traits: current version: 64\n2026-09-21T14:30:47.191901Z  INFO refinery_core::traits::sync: no migrations to apply\n2026-09-21T14:30:47.191913Z  INFO refinery_core::traits::sync: preparing to apply 0 migrations: Map {\n    iter: Iter(\n        [],\n    ),\n}\n2026-09-21T14:30:47.763174Z  INFO ai_memory_cli::commands::serve: embedder enabled provider=\"local\" model=\"all-MiniLM-L6-v2\" dim=384\n2026-09-21T14:30:47.765581Z  INFO ai_memory_cli::commands::serve: starting wiki watcher root=$HOME/.local/share/ai-memory/wiki workspace=agent-lab project=agent-lab\n2026-09-21T14:30:47.769869Z  INFO ai_memory_cli::commands::serve: active-project isolation mode mode=PerActor session_ttl_secs=3600 max_entries=4096\n2026-09-21T14:30:47.776420Z  INFO ai_memory_cli::commands::serve: memory_consolidate + PreCompact LLM checkpointing enabled provider=\"codex\" model=\"gpt-5.6-luna\" max_input_tokens=100000 max_output_tokens=32000\n2026-09-21T14:30:47.776976Z  INFO ai_memory_cli::commands::serve: auto-improve scheduler startup scope initialization completed scopes=1 errors=0\n2026-09-21T14:30:47.777021Z  INFO ai_memory_cli::commands::serve: scheduled maintenance started jobs=5\n2026-09-21T14:30:47.777337Z  INFO ai_memory_cli::commands::serve: seeded active-project fallback from the last recorded activity workspace=\"agent-lab\" project=\"agent-lab\"\n2026-09-21T14:30:47.777369Z  INFO ai_memory_cli::commands::serve: durable SessionEnd consolidation worker started max_attempts=5\n2026-09-21T14:30:47.777385Z  INFO ai_memory_cli::commands::serve: HTTP Host-header allowlist allowed_hosts=[\"localhost\", \"127.0.0.1\", \"::1\"]\n2026-09-21T14:30:47.777408Z  INFO ai_memory_cli::commands::serve: MCP Streamable HTTP transport mode stateful=false\n2026-09-21T14:30:47.778432Z  INFO ai_memory_web::mount: read-only wiki browser mounted mount=\"/web\" base_href=\"/web/\"\n2026-09-21T14:30:47.779420Z  INFO ai_memory_cli::commands::serve: MCP HTTP server ready (POST /mcp, POST /hook, Ctrl-C to stop) local_addr=127.0.0.1:49374 auth=false body_limit_mb=10\n2026-09-21T14:31:17.792465Z  INFO ai_memory_wiki::watcher: reconciliation pass complete indexed=60 skipped_orphans=0 skipped_purged_sessions=0\n2026-09-21T14:31:47.786728Z  INFO ai_memory_wiki::watcher: reconciliation pass complete indexed=60 skipped_orphans=0 skipped_purged_sessions=0\n2026-09-21T14:31:47.788108Z  INFO ai_memory_consolidate::auto_improve_schedule: scheduled auto-improve completed workspace=agent-lab project=agent-lab session_id=private-id-a5d7e4e4a5cf4fae run_id=private-id-7b13e15b1efc22ec proposals=0 approved=0 pending=0 conflicts=0 skipped=0\n2026-09-21T14:31:47.788136Z  INFO ai_memory_cli::commands::serve: scheduled auto-improve tick completed scopes=1 scopes_with_candidates=1 reviewed=1 skipped=0 errors=0 elapsed_ms=10\n2026-09-21T14:32:17.784464Z  INFO ai_memory_wiki::watcher: reconciliation pass complete indexed=60 skipped_orphans=0 skipped_purged_sessions=0\n2026-09-21T14:32:47.791718Z  INFO ai_memory_consolidate::auto_improve_schedule: scheduled auto-improve completed workspace=agent-lab project=agent-lab session_id=private-id-396abb3a366aa92c run_id=private-id-5b7d0dfb63da6f04 proposals=0 approved=0 pending=0 conflicts=0 skipped=0\n2026-09-21T14:32:47.791751Z  INFO ai_memory_cli::commands::serve: scheduled auto-improve tick completed scopes=1 scopes_with_candidates=1 reviewed=1 skipped=0 errors=0 elapsed_ms=2\n2026-09-21T14:32:47.797614Z  INFO ai_memory_wiki::watcher: reconciliation pass complete indexed=60 skipped_orphans=0 skipped_purged_sessions=0\nStopping ai-memory.service - ai-memory MCP server (user service)...\n2026-09-21T14:33:17.028024Z  INFO ai_memory_cli::commands::serve: shutdown signal received; draining signal=\"SIGTERM\"\nStopped ai-memory.service - ai-memory MCP server (user service).\nStarted ai-memory.service - ai-memory MCP server (user service).\n2026-09-21T14:33:17.094454Z  INFO ai_memory_cli: ai-memory starting version=\"2.3.2\" server_url=http://127.0.0.1:49374 data_dir=$HOME/.local/share/ai-memory bind=127.0.0.1:49374\n2026-09-21T14:33:17.094592Z  INFO ai_memory_cli::commands::serve: single-instance serve lock held lock=$HOME/.local/share/ai-memory/.serve.lock\n2026-09-21T14:33:17.097523Z ERROR refinery_core::traits::divergent: applied migration V62__page_ingestion_windows is different than filesystem one V62__page_ingestion_windows\n2026-09-21T14:33:17.097543Z  INFO refinery_core::traits: current version: 64\n2026-09-21T14:33:17.097549Z  INFO refinery_core::traits::sync: no migrations to apply\n2026-09-21T14:33:17.097551Z  INFO refinery_core::traits::sync: preparing to apply 0 migrations: Map {\n    iter: Iter(\n        [],\n    ),\n}\n2026-09-21T14:33:17.305006Z  INFO ai_memory_cli::commands::serve: embedder enabled provider=\"local\" model=\"all-MiniLM-L6-v2\" dim=384\n2026-09-21T14:33:17.320071Z  INFO ai_memory_cli::commands::serve: starting wiki watcher root=$HOME/.local/share/ai-memory/wiki workspace=agent-lab project=agent-lab\n2026-09-21T14:33:17.324436Z  INFO ai_memory_cli::commands::serve: active-project isolation mode mode=PerActor session_ttl_secs=3600 max_entries=4096\n2026-09-21T14:33:17.329911Z  INFO ai_memory_cli::commands::serve: memory_consolidate + PreCompact LLM checkpointing enabled provider=\"codex\" model=\"gpt-5.6-luna\" max_input_tokens=100000 max_output_tokens=32000\n2026-09-21T14:33:17.330285Z  INFO ai_memory_cli::commands::serve: auto-improve scheduler startup scope initialization completed scopes=1 errors=0\n2026-09-21T14:33:17.330304Z  INFO ai_memory_cli::commands::serve: scheduled maintenance started jobs=5\n2026-09-21T14:33:17.332132Z  INFO ai_memory_cli::commands::serve: seeded active-project fallback from the last recorded activity workspace=\"agent-lab\" project=\"agent-lab\"\n2026-09-21T14:33:17.332152Z  INFO ai_memory_cli::commands::serve: durable SessionEnd consolidation worker started max_attempts=5\n2026-09-21T14:33:17.332161Z  INFO ai_memory_cli::commands::serve: HTTP Host-header allowlist allowed_hosts=[\"localhost\", \"127.0.0.1\", \"::1\"]\n2026-09-21T14:33:17.332166Z  INFO ai_memory_cli::commands::serve: MCP Streamable HTTP transport mode stateful=false\n2026-09-21T14:33:17.332583Z  INFO ai_memory_web::mount: read-only wiki browser mounted mount=\"/web\" base_href=\"/web/\"\n2026-09-21T14:33:17.333414Z  INFO ai_memory_cli::commands::serve: MCP HTTP server ready (POST /mcp, POST /hook, Ctrl-C to stop) local_addr=127.0.0.1:49374 auth=false body_limit_mb=10\n2026-09-21T14:33:47.337091Z  INFO ai_memory_wiki::watcher: reconciliation pass complete indexed=60 skipped_orphans=0 skipped_purged_sessions=0\n"
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      }
+    },
+    "status-final": {
+      "argv": [
+        "$HOME/.local/share/codex-ecosystem/bin/ai-memory",
+        "status",
+        "--json"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T14:45:41.405005+00:00",
+      "completed_at": "2026-09-21T14:45:41.418199+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "81a7a10f7cf1567de35e2460aacb9c23d745ca2bc6b80a360fcc3cebadf266f4",
+        "bytes": 2288,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": "{\n  \"version\": \"2.3.2\",\n  \"data_dir\": \"$HOME/.local/share/ai-memory\",\n  \"bind\": \"127.0.0.1:49374\",\n  \"db_path\": \"$HOME/.local/share/ai-memory/db/memory.sqlite\",\n  \"counts\": {\n    \"pages_latest\": 63,\n    \"pages_all\": 189,\n    \"sessions\": 87,\n    \"observations\": 40816\n  },\n  \"derived\": {\n    \"pages_rows\": 189,\n    \"pages_fts_rows\": 189,\n    \"observations_rows\": 40816,\n    \"observations_fts_rows\": 40816,\n    \"latest_pages_missing_embeddings\": 0,\n    \"latest_pages_unembeddable\": 0,\n    \"typed_links_from_latest_pages\": [\n      [\n        \"fixes\",\n        2\n      ]\n    ],\n    \"embed_failures_unresolved\": 0,\n    \"embed_failures_recovered\": 0,\n    \"embedding_rows\": 90,\n    \"embedding_triples\": [\n      {\n        \"provider\": \"local\",\n        \"model\": \"all-MiniLM-L6-v2\",\n        \"dim\": 384,\n        \"count\": 90\n      }\n    ],\n    \"links_from_latest_pages\": 20,\n    \"unresolved_links_from_latest_pages\": 18,\n    \"stale_links_from_latest_pages\": 0\n  },\n  \"storage\": {\n    \"page_size\": 4096,\n    \"page_count\": 12643,\n    \"freelist_count\": 29,\n    \"database_bytes\": 51785728,\n    \"reclaimable_bytes\": 118784,\n    \"data_dir_free_bytes\": 965181636608\n  },\n  \"providers\": {\n    \"llm\": {\n      \"status\": \"ok\",\n      \"provider\": \"codex\",\n      \"model\": \"gpt-5.6-luna\",\n      \"dim\": null,\n      \"last_call_at\": \"2026-09-21T14:44:57.822639924Z\",\n      \"last_success_at\": \"2026-09-21T14:44:57.822639924Z\",\n      \"last_error_at\": null,\n      \"last_error_status\": null,\n      \"last_error_message\": null,\n      \"retry_hint\": null\n    },\n    \"llm_candidates\": [],\n    \"embedding\": {\n      \"status\": \"ok\",\n      \"provider\": \"local\",\n      \"model\": \"all-MiniLM-L6-v2\",\n      \"dim\": 384,\n      \"last_call_at\": \"2026-09-21T14:44:58.234472539Z\",\n      \"last_success_at\": \"2026-09-21T14:44:58.234472539Z\",\n      \"last_error_at\": null,\n      \"last_error_status\": null,\n      \"last_error_message\": null,\n      \"retry_hint\": null\n    }\n  },\n  \"spool\": {\n    \"pending\": 15,\n    \"oldest_age_ms\": 13675,\n    \"retries_total\": 0\n  },\n  \"capture_mode\": \"allowlist\",\n  \"ingest\": {\n    \"accepted\": 572,\n    \"dropped_by_policy\": 0,\n    \"shed_saturated\": 0,\n    \"shed_rate_limited\": 0,\n    \"last_persisted_ms\": 1790001924331\n  },\n  \"client\": {\n    \"server_url\": \"http://127.0.0.1:49374\",\n    \"auth\": false\n  }\n}\n"
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "raw_retained_privately": true,
+        "returned_text_sanitized": ""
+      }
+    }
+  }
+}
