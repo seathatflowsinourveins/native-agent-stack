@@ -3074,8 +3074,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "3aba86df8e31d7b18a3ce15aff0eaefb638b737e777eac8c07b0528d27cd7654",
-      "bytes": 10415
+      "sha256": "b41db891b63e31169d73735e1dae1e9c00fd70b45b2f457a1743d3ce614a68e5",
+      "bytes": 11211
     },
     {
       "path": "adoption/host-state.example.json",
@@ -6120,8 +6120,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "bde33005b536bf5d36df695be7357735baa6e3ab6db0d3d161464340673b8182",
-      "bytes": 6629575
+      "sha256": "bc47831138ae9a4d3c01793b620eb8cba95bc0a4696546a9033c4d64696ab595",
+      "bytes": 6630383
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6820,8 +6820,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "24d943c6fbc047491ff743c6717cc3bad4b8cebed5c2970e78dee69e952565eb",
-      "bytes": 11297
+      "sha256": "f612a10aa9394fc68e1d6180dde7737653104ada16c911eef105f23e760f5ae2",
+      "bytes": 11841
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -6875,8 +6875,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "6decac3f2b0a9e752ecfe662c1e32e8790efb8cd60965eeeb103c2388886084a",
-      "bytes": 9430
+      "sha256": "539e2df0def93dea2412e61eb7890ac8073fc288ac5ed46334271c461fe9eb9d",
+      "bytes": 12338
     },
     {
       "path": "tests/test_alpaca_capabilities.py",
@@ -9262,6 +9262,11 @@
       "path": "evidence/artifacts/memory-landscape-20260921/qualification.json",
       "sha256": "5d6e728caefcaf9a43ec2a738ac75147c232b89b3c0475164225fafbab82dff9",
       "bytes": 3568
+    },
+    {
+      "path": "evidence/artifacts/native-claude-coop-20260921/loki-discovery.json",
+      "sha256": "b272572b57b6cfa63cf4679341e4d35a793fb27b2ed3ceb856b798417927f2ca",
+      "bytes": 10460
     }
   ],
   "convergence_records": [
