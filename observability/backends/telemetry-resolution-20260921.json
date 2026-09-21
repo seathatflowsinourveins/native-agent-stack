@@ -1,0 +1,356 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-21T13:40:05.471Z",
+  "scope": "Native invocation usage, rendered telemetry, upstream template checks and local ntfy deployment. No fabricated production events.",
+  "source": {
+    "repository": "https://github.com/binwiederhier/ntfy",
+    "tag": "v2.28.0",
+    "commit": "10cb6506f836dbb00bb77e3b52669f6ace37f555",
+    "files": [
+      {
+        "path": "server/server_template.go",
+        "sha256": "6c4ff3e2778fba9932dae9529993a19b73dab2e4194329fc4fd1d595e39233d5"
+      },
+      {
+        "path": "server/templates/alertmanager.yml",
+        "sha256": "54d2d0d25c936edbacd214f37ecbb89b09e4e7eb7a0524801e845269d7305fb7"
+      },
+      {
+        "path": "server/server_test.go",
+        "sha256": "c0d032f596e4493d531324b03e14a2c4c444e715fdad9ce47eed24bf8dc6d4a9"
+      },
+      {
+        "path": "server/testdata/webhook_alertmanager_firing.json",
+        "sha256": "f3846b63e11bc85f5e39c033a6064c83e2fcdf79b279c260eada955b4b2aaa38"
+      },
+      {
+        "path": "server/testdata/webhook_grafana_resolved.json",
+        "sha256": "2011755488b8f180904f2b1096b0e23c157c36c0d30cbfdcf8885a20c0bc05c4"
+      },
+      {
+        "path": "cmd/serve_unix.go",
+        "sha256": "514253fdc598afdeea6f02a32d447f8d75e639e9d6b7b6ad6be0923432edc772"
+      },
+      {
+        "path": "Makefile",
+        "sha256": "c0738aa7531992804f07000ac65898caed6ab34f33239d44a6da27304516e5f5"
+      }
+    ]
+  },
+  "claude": {
+    "version": "2.1.278",
+    "account_route": "Existing first-party subscription; no credentials copied.",
+    "model": "claude-fable-5-1",
+    "num_turns": 2,
+    "duration_ms": 12001,
+    "provider_usage": {
+      "input": 34,
+      "cacheCreation": 16402,
+      "cacheRead": 14959,
+      "output": 787
+    },
+    "prometheus_returned": {
+      "cacheCreation": 16402,
+      "cacheRead": 14959,
+      "input": 34,
+      "output": 787
+    },
+    "per_type_exact_match": true,
+    "normal_hooks_captured_completed_session": true,
+    "configuration_changed": false
+  },
+  "ntfy": {
+    "version": "2.28.0",
+    "method": "Supported template-dir override, existing Alertmanager webhook unchanged",
+    "template_sha256": "718d709ce0e1748f2d9b255cba9292b5bdca286a5ead64f5ace2b9d3af49211b",
+    "unchanged_upstream_tests_passed": 2,
+    "local_renderer_replay_cases_passed": 3,
+    "original_source_test_failure": "Missing generated static embed assets; upstream make cli-deps-static-sites resolved it.",
+    "service_restart": "exit0, active",
+    "health": {
+      "healthy": true
+    },
+    "retained_messages": 24,
+    "retained_message_output_bytes_unchanged": true,
+    "manual_notifications_published": 0,
+    "production_post_deployment_webhook_observed": false
+  },
+  "returned_commands": [
+    {
+      "argv_portable": [
+        "env",
+        "GOTOOLCHAIN=local",
+        "$PRIVATE_EVIDENCE/go/bin/go",
+        "test",
+        "./server",
+        "-run",
+        "^TestServer_MessageTemplate_(TemplateFileNewlines|FromNamedTemplate_GitHubIssueOpened_OverrideConfigTemplate)$",
+        "-count=1"
+      ],
+      "paths_substituted": true,
+      "started_at": "2026-09-21T13:32:29.985089+00:00",
+      "completed_at": "2026-09-21T13:33:00.466534+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "ntfy-upstream-template-tests-ready.stdout",
+        "bytes": 37,
+        "sha256": "3ad006fe66783f66994950e8aeb145d77bae9895e486706a8b6983ff8d850a6a"
+      },
+      "stderr": {
+        "path": "ntfy-upstream-template-tests-ready.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv_portable": [
+        "systemctl",
+        "--user",
+        "restart",
+        "ecosystem-ntfy.service"
+      ],
+      "paths_substituted": true,
+      "started_at": "2026-09-21T13:35:00.171934+00:00",
+      "completed_at": "2026-09-21T13:35:00.221256+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "ntfy-restart.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "ntfy-restart.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv_portable": [
+        "env",
+        "GOTOOLCHAIN=local",
+        "ECOSYSTEM_TEMPLATE_PATH=$STACK_REPO/observability/backends/templates/ecosystem-ntfy-alertmanager.yml.example",
+        "ECOSYSTEM_ALERT_PAYLOAD=$PRIVATE_EVIDENCE/observed-alert-replay.json",
+        "ECOSYSTEM_RENDERED_OUTPUT=$PRIVATE_EVIDENCE/rendered-template-replay.json",
+        "$PRIVATE_EVIDENCE/go/bin/go",
+        "test",
+        "./server",
+        "-run",
+        "^TestEcosystemLocalTemplateReplay$",
+        "-v",
+        "-count=1"
+      ],
+      "paths_substituted": true,
+      "started_at": "2026-09-21T13:34:00.575707+00:00",
+      "completed_at": "2026-09-21T13:34:03.571987+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "ntfy-local-template-replay.stdout",
+        "bytes": 596,
+        "sha256": "badf1f46a41dfb2fa17cf0533973600c3906028f2d45470fef20767c362a8d37"
+      },
+      "stderr": {
+        "path": "ntfy-local-template-replay.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv_portable": [
+        "python3",
+        "-c",
+        "import urllib.request,sys;sys.stdout.buffer.write(urllib.request.urlopen(\"http://127.0.0.1:18080/v1/health\",timeout=20).read())"
+      ],
+      "paths_substituted": true,
+      "started_at": "2026-09-21T13:35:59.335744+00:00",
+      "completed_at": "2026-09-21T13:35:59.381155+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "ntfy-status.stdout",
+        "bytes": 17,
+        "sha256": "0a98974220d589e9faa1ec7f77d0b9f124b69fb7a05a93ca97157165d4a94c87"
+      },
+      "stderr": {
+        "path": "ntfy-status.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv_portable": [
+        "python3",
+        "observability/backends/configure.py",
+        "--tools-root",
+        "$TOOLS_ROOT",
+        "--config-root",
+        "$PRIVATE_EVIDENCE/portable/config",
+        "--data-root",
+        "$PRIVATE_EVIDENCE/portable/data",
+        "--unit-root",
+        "$PRIVATE_EVIDENCE/portable/units"
+      ],
+      "paths_substituted": true,
+      "started_at": "2026-09-21T13:35:58.272482+00:00",
+      "completed_at": "2026-09-21T13:35:58.298215+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "portable-config-render.stdout",
+        "bytes": 105,
+        "sha256": "cd4f4056e1b4d5daffd39edc06e0cda24c8733644f908f6aa334eb46fab6e499"
+      },
+      "stderr": {
+        "path": "portable-config-render.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv_portable": [
+        "python3",
+        "-c",
+        "import urllib.request,urllib.parse,sys;sys.stdout.buffer.write(urllib.request.urlopen(\"http://127.0.0.1:19090/api/v1/query?\"+urllib.parse.urlencode({\"query\":\"sum by (type) (ecosystem_claude_code_token_usage_tokens_total)\"}),timeout=20).read())"
+      ],
+      "paths_substituted": true,
+      "started_at": "2026-09-21T13:29:09.468933+00:00",
+      "completed_at": "2026-09-21T13:29:09.514663+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "claude-after-series.stdout",
+        "bytes": 314,
+        "sha256": "9780343fb9494c955a712192b79bf81514951118a5a431d29b1493bb527525d0"
+      },
+      "stderr": {
+        "path": "claude-after-series.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv_portable": [
+        "make",
+        "cli-deps-static-sites"
+      ],
+      "paths_substituted": true,
+      "started_at": "2026-09-21T13:32:29.417064+00:00",
+      "completed_at": "2026-09-21T13:32:29.424329+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "ntfy-upstream-static-assets.stdout",
+        "bytes": 83,
+        "sha256": "f0eb4324b2e84524b689e4c7d914bc3e308e79e53f872d00c487c54a06b538a6"
+      },
+      "stderr": {
+        "path": "ntfy-upstream-static-assets.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv_portable": [
+        "systemctl",
+        "--user",
+        "is-active",
+        "ecosystem-ntfy.service"
+      ],
+      "paths_substituted": true,
+      "started_at": "2026-09-21T13:35:00.784094+00:00",
+      "completed_at": "2026-09-21T13:35:00.799041+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "ntfy-service-state.stdout",
+        "bytes": 7,
+        "sha256": "45df5ad5e0ecfa54d3226343e0e6857337494ba6e32f189d1174070665d8c659"
+      },
+      "stderr": {
+        "path": "ntfy-service-state.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv_portable": [
+        "timeout",
+        "--signal=TERM",
+        "--kill-after=10s",
+        "180s",
+        "claude",
+        "-p",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--max-turns",
+        "3",
+        "--tools",
+        "Bash",
+        "--allowedTools",
+        "Bash(ai-memory status --json)",
+        "--strict-mcp-config",
+        "--mcp-config",
+        "{\"mcpServers\":{}}",
+        "--",
+        "Perform one read-only verification of this actual agent-lab memory service: run exactly ai-memory status --json using Bash. Return a concise status summary containing embedding model, dimensions, embedded rows, missing latest page embeddings, unresolved failures and LLM enabled/disabled, preserving unknown fields as unknown. Do not edit files, change settings, write memory, invoke other workers, or make other commands. This is a real native telemetry acceptance task, not a simulated result."
+      ],
+      "paths_substituted": true,
+      "started_at": "2026-09-21T13:28:26.895935+00:00",
+      "completed_at": "2026-09-21T13:28:39.979827+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "claude-native-status-corrected.stdout",
+        "bytes": 34666,
+        "sha256": "4493bfdaa8c7bbb06fd8361b54cc047536e14d9f8a36caefc9e8569ead446b8b"
+      },
+      "stderr": {
+        "path": "claude-native-status-corrected.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "argv_portable": [
+        "$TOOLS_ROOT/ecosystem-alertmanager-0.34.1/amtool",
+        "check-config",
+        "$OBSERVABILITY_CONFIG/ecosystem-alertmanager.yml"
+      ],
+      "paths_substituted": true,
+      "started_at": "2026-09-21T13:35:58.819311+00:00",
+      "completed_at": "2026-09-21T13:35:58.826208+00:00",
+      "exit_code": 0,
+      "stdout": {
+        "path": "amtool-config-check.stdout",
+        "bytes": 174,
+        "sha256": "d33b7500862c2d15185223867447e151efe5e21408295b85718af9a2c65c3a7a"
+      },
+      "stderr": {
+        "path": "amtool-config-check.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "repository_integrity": {
+    "initial_failure_retained": "repository-validate.command.json",
+    "corrected_hash_bindings_check": "repository-validate-bound.command.json",
+    "corrected_exit_code": 0,
+    "corrected_stdout_sha256": "31b89208ef675e4ebfde927857dc6ed737e4f4bf00dcecd6e944a3408e826416",
+    "scope": "Integrity and scope validation only; upstream and native behavior checks recorded separately."
+  },
+  "screenshots": [
+    {
+      "path": "claude-panel.png",
+      "bytes": 53185,
+      "sha256": "845cde50368112a011d3f50b2e15291f5ad42d724c1eae9499a3b4a7a9146ff9"
+    }
+  ],
+  "limitations": [
+    "Counters before the task already contained another Claude process; exact per-task native usage matches after snapshot, not a before/after sum.",
+    "No alerts or notification messages published manually. No alert silenced.",
+    "Template check directly invoked upstream renderer offline; its three cases are local integration, separately from two unchanged upstream tests.",
+    "Actual gateway resolution message preceded format deployment. Historical text unchanged; next production webhook not observed.",
+    "No Claude settings or account changes. Fresh native invocation, not retrospective export."
+  ],
+  "verification_sources": [
+    "https://code.claude.com/docs/en/monitoring-usage",
+    "https://docs.ntfy.sh/publish/#custom-templates",
+    "https://github.com/binwiederhier/ntfy/blob/v2.28.0/server/server_template.go",
+    "https://github.com/binwiederhier/ntfy/blob/v2.28.0/cmd/serve_unix.go"
+  ]
+}

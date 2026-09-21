@@ -1,0 +1,494 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-21T13:53:01.595023+00:00",
+  "scope": "Resolve concrete gaps from the rendered dashboard review with supported upstream commands and independently inspected observations.",
+  "memory": {
+    "classification": "Native provider/client/session operations; read-only queue and rendered UI observations",
+    "ai_memory_revision": "353841d91618d20b110b208de284a74d0b960379",
+    "provider": "codex",
+    "model": "gpt-5.6-luna",
+    "reasoning_effort": "medium",
+    "plain_provider_usage": {
+      "input": 9,
+      "output": 5
+    },
+    "structured_provider_usage": null,
+    "consolidation_usage": null,
+    "manual_single_page": {
+      "completed": true,
+      "source_agent": "claude-code",
+      "readback_verified": true
+    },
+    "automatic_session_end": [
+      {
+        "client": "claude-code",
+        "observations": 5,
+        "generation": 5,
+        "state": "completed",
+        "attempts": 1,
+        "readback_verified": true
+      },
+      {
+        "client": "codex",
+        "observations": 10,
+        "generation": 10,
+        "state": "completed",
+        "attempts": 1,
+        "readback_verified": true
+      }
+    ],
+    "provider_config": {
+      "session_end": true,
+      "precompact_enabled_with_provider": true,
+      "auto_improvement_scheduler": false,
+      "historical_backfill": false
+    },
+    "pending_jobs_before_activation": 0,
+    "embedding": {
+      "provider": "local",
+      "model": "all-MiniLM-L6-v2",
+      "dimensions": 384
+    },
+    "ui": {
+      "current_decision_inspected": true,
+      "compiled_session_inspected": true,
+      "grafana_llm": "ok",
+      "grafana_embedding_status": "ok",
+      "grafana_missing": 0,
+      "grafana_failures": 0
+    },
+    "decision_repair": "Created successor pinned ADR; changed only original Status line, preserving historical substance.",
+    "usage_boundary": "Native client/provider usage is consumption. Consolidation usage is unreported. No lifetime savings or whole-task savings established.",
+    "native_client_usage": {
+      "claude": {
+        "input_tokens": 34,
+        "cache_creation_input_tokens": 12115,
+        "cache_read_input_tokens": 21205,
+        "output_tokens": 773
+      },
+      "codex": {
+        "input_tokens": 122500,
+        "cached_input_tokens": 99072,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 4333,
+        "reasoning_output_tokens": 3935
+      }
+    },
+    "boundaries": [
+      "Fresh PreCompact event not forced.",
+      "Active Desktop session has not ended.",
+      "Read-only wiki/global FTS are upstream behavior.",
+      "Local MiniLM remains the compatible memory embedding profile."
+    ],
+    "retained_private_bindings": [
+      {
+        "file": "memory/automatic-consolidated-readback.json",
+        "bytes": 2093,
+        "sha256": "019f922daf214a93e097e7e84156192c651f9b6004c78abfa5e5278c1c0f0b26"
+      },
+      {
+        "file": "memory/automatic-queue-completed.json",
+        "bytes": 1040,
+        "sha256": "2c82f22936315cb006763bb313f241faa9e8b1d6febfa5eedbba0ad87b3657ce"
+      },
+      {
+        "file": "memory/automatic-queue-completed.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/automatic-queue-completed.stdout",
+        "bytes": 46,
+        "sha256": "2f1ee5f6782ab11ce7c2d8dd2dc20c0e22a7cba59f19c2a92a35796e26c20c18"
+      },
+      {
+        "file": "memory/automatic-queue-observation.json",
+        "bytes": 1290,
+        "sha256": "bb37efe66b7837050767b44c8a796fd52c92b5706fb684608df72d8745410978"
+      },
+      {
+        "file": "memory/automatic-queue-observation.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/automatic-queue-observation.stdout",
+        "bytes": 298,
+        "sha256": "7782328c061014a478610cc044ce3d60332e36b6d89fdc3f241323b546103826"
+      },
+      {
+        "file": "memory/claude-automatic-session.json",
+        "bytes": 1264,
+        "sha256": "399f6d5446ded9cc7ca98574852cc3a6617d1d0c125cb42ac5543b87c879770b"
+      },
+      {
+        "file": "memory/claude-automatic-session.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/claude-automatic-session.stdout",
+        "bytes": 41522,
+        "sha256": "9dfdf11dcb39dd9823d45bf36f9349f29ea535a261f451d293a7dfdd4fe1b2b9"
+      },
+      {
+        "file": "memory/codex-automatic-queue.json",
+        "bytes": 1264,
+        "sha256": "50f94c34acceb9f5ec509f1c591a14b3798da3a7bf3cdf6e84aebd9ec4293c8f"
+      },
+      {
+        "file": "memory/codex-automatic-queue.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/codex-automatic-queue.stdout",
+        "bytes": 295,
+        "sha256": "44e44d078655a5463fbf593da3dc60290dcb897b71444e0e27a69724c8f6349d"
+      },
+      {
+        "file": "memory/codex-automatic-readback.json",
+        "bytes": 1553,
+        "sha256": "bb9e5d8e37fd232a6b8f7e6e0bb98dbb2200622d40e198be9835b99cbe7cb0bf"
+      },
+      {
+        "file": "memory/codex-automatic-session.json",
+        "bytes": 1140,
+        "sha256": "ac2fc5b48be26fe08c7290adbf2181444be96cf0c80709b6b6fa5898b486761a"
+      },
+      {
+        "file": "memory/codex-automatic-session.stderr",
+        "bytes": 721,
+        "sha256": "3cddf23cfc3aa45dfd9155b01356a7dd3d396416ceeb851f8a67d14f073097f3"
+      },
+      {
+        "file": "memory/codex-automatic-session.stdout",
+        "bytes": 12080,
+        "sha256": "1f2464c1c85d1d11f5d5ea48b8023de99eaf8db06fc7dbbddcfd476b1ce7456d"
+      },
+      {
+        "file": "memory/codex-capture-completion.json",
+        "bytes": 236,
+        "sha256": "a6da7fb7a7381b5d2d5232ff40744f606ed1da737513126ab3901c6cb187a3e6"
+      },
+      {
+        "file": "memory/codex-mcp-file-store-persisted.json",
+        "bytes": 771,
+        "sha256": "f89c84824f9d0771e76cba7fef40e7590896ac0894610c007a481db0c27025fb"
+      },
+      {
+        "file": "memory/codex-mcp-file-store-persisted.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/codex-mcp-file-store-persisted.stdout",
+        "bytes": 9817,
+        "sha256": "9a2e1bb41b961d9b529a3f002629198741b8776c5f9c84ea3d70a434fbc3ce5d"
+      },
+      {
+        "file": "memory/codex-mcp-file-store.json",
+        "bytes": 805,
+        "sha256": "960cc1b2ba92fa34b459606a7f853b0521da6f4f2cb4bc9c7257414070ac3247"
+      },
+      {
+        "file": "memory/codex-mcp-file-store.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/codex-mcp-file-store.stdout",
+        "bytes": 9817,
+        "sha256": "934cff4e33bce6109786e6da6c0339465c3701deebcab3b505645bde6576db1f"
+      },
+      {
+        "file": "memory/consolidate-plan.json",
+        "bytes": 281,
+        "sha256": "7ab13d191043ea447ed650c246a4956e232ec3332794c2a05c2f8ae1d7015da4"
+      },
+      {
+        "file": "memory/consolidate-result.json",
+        "bytes": 1796,
+        "sha256": "501344e187cc9d40c1eb36f101ffd632dc9985e40d3592c5b4dc132ef8210f60"
+      },
+      {
+        "file": "memory/consolidated-readback.json",
+        "bytes": 2204,
+        "sha256": "2a5a48b8d4c2fc0947d0fad6ac45643bbb3b6758aacc847ec3fdd340510cc0da"
+      },
+      {
+        "file": "memory/consolidated-session-full.png",
+        "bytes": 149438,
+        "sha256": "6c3d8028231f9f0554d3a887a1157e2cf7d4b6891b014bcdcfdc7e7c22a69fb3"
+      },
+      {
+        "file": "memory/consolidated-session.png",
+        "bytes": 105945,
+        "sha256": "1402cbc7f3b00cf06c8aa5293b293c10e8df5b2b7fca305568b18a9419828595"
+      },
+      {
+        "file": "memory/consolidation-queue-before.json",
+        "bytes": 927,
+        "sha256": "263105a4bd6a556c8e3a07e60b3640dfd00ac72a8689f5fdd98e91816865699f"
+      },
+      {
+        "file": "memory/consolidation-queue-before.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/consolidation-queue-before.stdout",
+        "bytes": 3,
+        "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+      },
+      {
+        "file": "memory/current-memory-decision.png",
+        "bytes": 188803,
+        "sha256": "bd93f8f4c4c7b15420e27782e7def191ace4b6272474487c53878aa78d12ab19"
+      },
+      {
+        "file": "memory/decision-before.json",
+        "bytes": 1210,
+        "sha256": "a4c861e0510ce4df6e045e4aeca4c5419ae38e8ae83b2f422c922c478dec2456"
+      },
+      {
+        "file": "memory/decision-successor-write.json",
+        "bytes": 2303,
+        "sha256": "9b002c59e06806cc929f74e0830834f37967337ba9bd16b1c7f8170842f03531"
+      },
+      {
+        "file": "memory/decision-superseded-write.json",
+        "bytes": 1304,
+        "sha256": "530771896f6f7e221e1edf6390ab5b334f9f56ad8098363805ac419c2860e05f"
+      },
+      {
+        "file": "memory/grafana-memory-active-final.png",
+        "bytes": 47947,
+        "sha256": "40d1f91e749b643107016e686e7a60e45ea454a35c5ab926c79888ae64538f15"
+      },
+      {
+        "file": "memory/grafana-memory-active-ready.png",
+        "bytes": 49929,
+        "sha256": "34c90ce45da6406cd7c4b26ef30f3a152c21c5263107104a1c46f69d203b1213"
+      },
+      {
+        "file": "memory/grafana-memory-active.png",
+        "bytes": 3424,
+        "sha256": "7aa7618e0274253e64e03cb8a886fb69f75e31a0022b7dacb20359671afe20f3"
+      },
+      {
+        "file": "memory/llm-native-plain.json",
+        "bytes": 912,
+        "sha256": "787aadbe11c18bda12039bf0530ab3602df3457c3f3f5ecefeb5bafe35e4dfbb"
+      },
+      {
+        "file": "memory/llm-native-plain.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/llm-native-plain.stdout",
+        "bytes": 57,
+        "sha256": "9109535ed434d52e7b7d5f852af1a645c59cc2d0522e7336a2c0647edf2bc71d"
+      },
+      {
+        "file": "memory/llm-native-structured.json",
+        "bytes": 950,
+        "sha256": "c31d58120123581126a83102ad8ebdfa8402a61a96630cb2f93551d634ff0b4b"
+      },
+      {
+        "file": "memory/llm-native-structured.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/llm-native-structured.stdout",
+        "bytes": 62,
+        "sha256": "d7184cca5368e48c9dbec78760c6a587eb01f7c22518a7a68c332401de130818"
+      },
+      {
+        "file": "memory/memory-automatic-after.json",
+        "bytes": 688,
+        "sha256": "023db366848839b0c509afb33b694ccccea68d2a62b832ce95799661c96eaaf1"
+      },
+      {
+        "file": "memory/memory-automatic-after.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/memory-automatic-after.stdout",
+        "bytes": 1122,
+        "sha256": "143ae0c3f631df1a5f4258dd07c8762d02212e0f7295da635d701778e439a3ca"
+      },
+      {
+        "file": "memory/memory-automatic-ready.json",
+        "bytes": 688,
+        "sha256": "610d2f6186d9fed2ddea933726ef60ec33f7b1cc43347b0a28a56612274c14d4"
+      },
+      {
+        "file": "memory/memory-automatic-ready.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/memory-automatic-ready.stdout",
+        "bytes": 1077,
+        "sha256": "f2791c9b450af94e654e41e01f4bffec0bde14c881ef6190ef78db88e17cb114"
+      },
+      {
+        "file": "memory/memory-before-backup.json",
+        "bytes": 800,
+        "sha256": "df2ddd587e4b1f191089b399e41566c50f319bba8fb31c47474f41769b9bb16f"
+      },
+      {
+        "file": "memory/memory-before-backup.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/memory-before-backup.stdout",
+        "bytes": 130,
+        "sha256": "311332d60350e6e31853d4c330398036146fe31ff48e83edd6093443fd04bc96"
+      },
+      {
+        "file": "memory/memory-decision-open.json",
+        "bytes": 835,
+        "sha256": "286485bb5eecffcf73af9594353bceed33ed920f06d4ff003135ca8f2a53510b"
+      },
+      {
+        "file": "memory/memory-decision-open.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/memory-decision-open.stdout",
+        "bytes": 172,
+        "sha256": "9268b3af6230ec6548aff91b3eedcef128fb3c0082aac7911559071c9263f3e5"
+      },
+      {
+        "file": "memory/memory-final-status.json",
+        "bytes": 696,
+        "sha256": "7bccee1ddb3b762fcff1af1b42a23d1c50d79e7bebbb33ed24e568cb829b6c9b"
+      },
+      {
+        "file": "memory/memory-final-status.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/memory-final-status.stdout",
+        "bytes": 2236,
+        "sha256": "a7e5f199e4a738b1ff2213779ea0601528451babda123cc6829e739f85db4960"
+      },
+      {
+        "file": "memory/memory-provider-status-after.json",
+        "bytes": 700,
+        "sha256": "e8fe680960338c61c75f8c1276410f7457bcfabbf2fd053e80264915ffb8a5d8"
+      },
+      {
+        "file": "memory/memory-provider-status-after.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/memory-provider-status-after.stdout",
+        "bytes": 1125,
+        "sha256": "6acfad0f1c89bba9e0697c40b0bd4d52534dce02eced331937397d9a105eac32"
+      },
+      {
+        "file": "memory/memory-provider-status-ready.json",
+        "bytes": 700,
+        "sha256": "715389fd9d5a8d7828ea204f25c538b85909d6a650704c1b8c2a354379fe325c"
+      },
+      {
+        "file": "memory/memory-provider-status-ready.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/memory-provider-status-ready.stdout",
+        "bytes": 1070,
+        "sha256": "feeb599ae98d5852eb7b772d5f5370f972bed516cd24af9f5098fe1ab5cdb11d"
+      },
+      {
+        "file": "memory/memory-provider-status.json",
+        "bytes": 687,
+        "sha256": "5d0561eb6a357277a7345ac02e03c25d154cb96a6e8153249b30131d07e5ccc5"
+      },
+      {
+        "file": "memory/memory-provider-status.stderr",
+        "bytes": 702,
+        "sha256": "cc43e8e0f798a26e83a4216f6b57a410553bc755f39ac60060efd1ff794e4dbe"
+      },
+      {
+        "file": "memory/memory-provider-status.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/memory-ui-open.json",
+        "bytes": 825,
+        "sha256": "986294a78e158a74c67d8829d399df5d400ebf84303e78d498ace8777de1bc31"
+      },
+      {
+        "file": "memory/memory-ui-open.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "memory/memory-ui-open.stdout",
+        "bytes": 158,
+        "sha256": "2df66ddef9d323f4f8e98828b2050092c725eaa9815b2fd56a924871ccc93ae2"
+      }
+    ]
+  },
+  "operations": {
+    "selected_archive_sources": 3,
+    "identities_before_after": [
+      17,
+      17
+    ],
+    "messages_before_after": [
+      3193,
+      3697
+    ],
+    "unselected_rows_unchanged": true,
+    "native_desktop_passwordless": true,
+    "ready_upstreams": 1,
+    "readiness_http": 200,
+    "native_ui_views_inspected": [
+      "Models",
+      "Analytics"
+    ],
+    "debug_port_closed_after": true,
+    "historical_gateway_usage": {
+      "requests": 15,
+      "input_tokens": 1861,
+      "output_tokens": 82,
+      "estimated_saved_usd": 0
+    },
+    "retained_reports": [
+      {
+        "file": "operations/report.json",
+        "bytes": 17697,
+        "sha256": "1e1e283752e329b7d79d71058ce8ec02af9b073010f46bd56c9a8770cb1db838"
+      },
+      {
+        "file": "operations/native-desktop-followup.json",
+        "bytes": 18206,
+        "sha256": "cee9cea8d9b2ae886aea1a3207074691c850a63162937e175d975c7ff02573bd"
+      }
+    ]
+  },
+  "telemetry_receipt": "observability/backends/telemetry-resolution-20260921.json",
+  "promptfoo_receipt": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json",
+  "classification": "Real native operations plus explicitly identified local configuration/integration checks; no fabricated provider responses or production alerts.",
+  "limits": [
+    "No universal SOTA or completed-foundation claim.",
+    "Next genuine post-deployment ntfy webhook remains unobserved.",
+    "Promptfoo script usage is unreported; vLLM counters are a model-scoped window.",
+    "Installed native client results do not certify another PC."
+  ]
+}
+

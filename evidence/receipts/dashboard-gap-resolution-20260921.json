@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "dashboard-gap-resolution-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "ai-memory",
+    "codex",
+    "claude-code",
+    "agentsview",
+    "grafana",
+    "prometheus",
+    "alertmanager",
+    "ntfy",
+    "promptfoo",
+    "vllm"
+  ],
+  "recorded_at_utc": "2026-09-21T13:54:04.805Z",
+  "claim": "Resolved concrete native dashboard gaps: automatic Claude and Codex memory consolidation, scoped archive refresh, passwordless gateway desktop access, current Claude telemetry, native ntfy template formatting and published NVIDIA retrieval example execution.",
+  "limitations": [
+    "Bounded current-host native operations and local integration checks; not universal SOTA or complete-foundation certification.",
+    "Fresh PreCompact event and active Desktop session end remain unforced.",
+    "Next genuine post-deployment ntfy webhook remains unobserved; native renderer replay and deployed template are verified separately.",
+    "Promptfoo ranks all four published pairs; local source-derived assertion, not MTEB or held-out quality evaluation. Direct script usage and consolidation usage remain unknown.",
+    "Native consumed/cache counters and model-scoped observation windows are not lifetime savings.",
+    "Read-only memory wiki/global browser FTS and compatible MiniLM profile remain upstream boundaries."
+  ],
+  "artifact_directory": "evidence/artifacts/dashboard-gap-resolution-20260921",
+  "validation": {
+    "native_memory": "Plain/structured provider checks and manual single-page consolidation passed. Both real native client SessionEnd jobs completed on attempt1 with persisted source attribution.",
+    "native_operations": "3selected archives refreshed; same17identities;3193to3697messages. Existing gateway native desktop bridge authenticated; readiness200/1upstream; temporary debugging closed.",
+    "upstream_tests": "ntfy2unchanged tests passed after upstreamstaticassetpreparation. NVIDIApublishedexample returned4/4pairedtopdocuments through officialPromptfooexecprovider.",
+    "local_integration": "3ntfyactualrenderer cases passed; noproductionmessagefabricated. LocalPromptfoorankassertion and browserinspection passed.",
+    "independent_review": "No actionable findings remain. Reviewer verified74 private bindings, public privacy, both completed native-client jobs and readable Grafana; telemetry output-equality wording corrected.",
+    "publication_validation": "Passed:68components,1315hash-listed files,4profiles,118receipts; generated explorer current;5observability tests passed. Structural/integration checks, separate from native execution.",
+    "local_viewer": "8inspected screenshot cards; all8images decoded and53selected returned-output downloads answeredHTTP200."
+  },
+  "references": [
+    "docs/dashboard-gap-resolution.md",
+    "docs/native-memory-consolidation.md",
+    "docs/native-dashboard-operations-resolution.md",
+    "docs/native-telemetry-resolution.md",
+    "docs/promptfoo-upstream-retrieval.md",
+    "observability/backends/telemetry-resolution-20260921.json",
+    "evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json"
+  ],
+  "public_artifacts": [
+    {
+      "path": "evidence/artifacts/dashboard-gap-resolution-20260921/resolution.json",
+      "bytes": 17280,
+      "sha256": "b5904a44daa4545c77dde645aeb47370e53a34e6252ebd0bbfe1a0b8a4a5bfe8"
+    }
+  ]
+}

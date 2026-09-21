@@ -31,6 +31,9 @@ def main():
         if name=='ecosystem-dashboard.json': parent/= 'ecosystem-grafana-dashboards'
         elif name=='ecosystem-grafana-datasources.yml': parent/= 'ecosystem-grafana-provisioning/datasources'
         elif name=='ecosystem-grafana-dashboards.yml': parent/= 'ecosystem-grafana-provisioning/dashboards'
+        elif name=='ecosystem-ntfy-alertmanager.yml':
+            parent/= 'ecosystem-ntfy-templates'
+            name='alertmanager.yml'
         parent.mkdir(parents=True,exist_ok=True)
         (parent/name).write_text(text)
     fixture=a.config_root/'acceptance-targets.json'
