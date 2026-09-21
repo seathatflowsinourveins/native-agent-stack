@@ -500,6 +500,20 @@ class SafetyTests(unittest.TestCase):
             with self.assertRaises(s.SafetyError):
                 s.decimal(bad)
 
+    def test_future_quote_tolerance_is_consistent_for_held_risk(self):
+        allowed = self.quote(at=self.now + 0.2)
+        self.reserve(quote=allowed)
+        self.fill()
+        self.ledger.mark_to_market([allowed], self.now)
+        self.reserve("buy-2", quote=allowed)
+        self.validate("buy-2", quote=allowed)
+        rejected = self.quote(at=self.now + 0.251)
+        for action in [lambda: self.ledger.mark_to_market([rejected], self.now),
+                       lambda: self.reserve("buy-3", quote=rejected),
+                       lambda: self.validate("buy-2", quote=rejected)]:
+            with self.assertRaisesRegex(s.SafetyError, "quote_not_fresh"):
+                action()
+
 
 if __name__ == "__main__":
     unittest.main()

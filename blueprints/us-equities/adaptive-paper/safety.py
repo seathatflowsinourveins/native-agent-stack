@@ -439,7 +439,7 @@ class Ledger:
                 # Existing positions must also have fresh marks before increasing risk.
                 for held in self._positions():
                     mark = self.db.execute("SELECT at FROM marks WHERE symbol=?", (held,)).fetchone()
-                    if mark is None or not 0 <= now - mark[0] <= self.limits.quote_max_age_seconds:
+                    if mark is None or not -0.25 <= now - mark[0] <= self.limits.quote_max_age_seconds:
                         raise SafetyError("held_position_mark_stale")
                 equity = self.limits.capital_usd + state.realized_pnl_usd + state.unrealized_pnl_usd
                 if state.gross_exposure_usd + qty * price > min(self.limits.max_gross_exposure_usd, equity):
@@ -492,7 +492,7 @@ class Ledger:
                     raise SafetyError(state.halted_reason)
                 for symbol in self._positions():
                     mark = self.db.execute("SELECT at FROM marks WHERE symbol=?", (symbol,)).fetchone()
-                    if mark is None or not 0 <= now - mark[0] <= self.limits.quote_max_age_seconds:
+                    if mark is None or not -0.25 <= now - mark[0] <= self.limits.quote_max_age_seconds:
                         raise SafetyError("held_position_mark_stale")
                 equity = self.limits.capital_usd + state.realized_pnl_usd + state.unrealized_pnl_usd
                 if state.gross_exposure_usd > min(self.limits.max_gross_exposure_usd, equity):
@@ -640,7 +640,7 @@ class Ledger:
             state = self._refresh_risk()
             for symbol in self._positions():
                 mark = self.db.execute("SELECT at FROM marks WHERE symbol=?", (symbol,)).fetchone()
-                if mark is None or not 0 <= now - mark[0] <= self.limits.quote_max_age_seconds:
+                if mark is None or not -0.25 <= now - mark[0] <= self.limits.quote_max_age_seconds:
                     raise SafetyError("held_position_mark_stale")
             return state
 
