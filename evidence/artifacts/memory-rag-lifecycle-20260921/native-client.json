@@ -1,0 +1,127 @@
+{
+  "recorded_at_utc": "2026-09-21T15:27:56.861626+00:00",
+  "evidence_class": "native Claude execution and independent read-only persisted-state observation",
+  "command": {
+    "argv": [
+      "env",
+      "-u",
+      "CLAUDE_CONFIG_DIR",
+      "CODEX_HOME=$HOME/.codex",
+      "timeout",
+      "--signal=TERM",
+      "--kill-after=10s",
+      "180s",
+      "$HOME/.local/share/codex-ecosystem/bin/claude",
+      "-p",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--include-hook-events",
+      "--max-turns",
+      "6"
+    ],
+    "cwd": "$HOME/code/agent-lab",
+    "started_at": "2026-09-21T15:10:26.168398+00:00",
+    "completed_at": "2026-09-21T15:10:42.817313+00:00",
+    "exit_code": 0,
+    "timed_out": false,
+    "stdout": {
+      "sha256": "6650bf23e42882052412cc965684fed2d6907a2a5287d60a3a59fb91b2e781e0",
+      "bytes": 50742
+    },
+    "stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  },
+  "raw_stream_sha256": "6650bf23e42882052412cc965684fed2d6907a2a5287d60a3a59fb91b2e781e0",
+  "actual_model": "claude-fable-5-1",
+  "native_tools": [
+    {
+      "name": "mcp__ai-memory__memory_read_page",
+      "arguments": {
+        "path": "decisions/native-memory-learning-maintenance.md",
+        "workspace": "agent-lab",
+        "project": "agent-lab"
+      }
+    },
+    {
+      "name": "mcp__socraticode__codebase_search",
+      "arguments": {
+        "projectPath": "$HOME/code/agent-lab",
+        "query": "collect native Linux and Desktop usage separately without double counting provider tokens",
+        "limit": 1
+      }
+    }
+  ],
+  "returned_tool_results": [
+    [
+      {
+        "type": "text",
+        "text": "{\n  \"path\": \"decisions/native-memory-learning-maintenance.md\",\n  \"title\": \"Native memory learning and bounded outcome capture\",\n  \"body\": \"# Native memory learning and bounded outcome capture\\n\\n**Status:** accepted\\n\\n## Context\\nThe earlier [[decisions/native-codex-memory-consolidation]] qualified local embeddings and native Codex consolidation but kept scheduled learning disabled. The September 21, 2026 source review and native qualification now support activating the existing upstream maintenance path.\\n\\n## Decision\\nRetain ai-memory 2.3.2 as the shared agent-lab/agent-lab memory of record, with the existing local 384-dimensional MiniLM embeddings, native Codex gpt-5.6-luna provider and medium effort. Preserve repository-allowlisted capture and disabled historical backfill. Enable the upstream hourly learning scheduler with one eligible session per project per tick and a ten-minute age minimum. The scheduler includes every database project; this deployment currently has one adopted scope.\\n\\nEnable sanitized assistant Stop excerpts in native Claude, native Codex and the Desktop WSL hook profile. Both server and client opt-ins are configured. Native Codex trust was applied through the normal hooks interface. Claude's pre-existing prompt-capture opt-out remains unchanged. Excerpts are capped at 2,000 bytes; oversized final messages above 64 KiB are dropped.\\n\\nUse daily rule-based lint and hourly local embedding backfill. Scheduled page/observation forgetting is disabled; upstream hollow-project cleanup still runs. Retain session-end consolidation.\\n\\n## Consequences\\nActual Codex and Claude answers were captured and independently read back; native consolidation completed. Two accelerated scheduler ticks each skipped an ineligible historical session without a model call. A separate manual review rejected insufficient durable evidence and applied no proposal. This establishes working capture and maintenance paths, not improved future answer quality or measured token savings. Final hourly cadence is configured; a later hourly tick, physical reboot and hot reload of an already-running Desktop task remain unproved. Learning claims are once per native session, including admission skips.\\n\\nBasic Memory, Graphiti, Mem0, Hindsight, Claude-mem, Letta/Letta Code and Supermemory remain workload-specific alternatives, not additional automatic capture stores. The portable selection, source pins, commands and returned evidence are in https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/memory-landscape-maintenance.md.\\n\",\n  \"frontmatter\": {\n    \"tags\": [\n      \"memory\",\n      \"native-maintenance\"\n    ],\n    \"pinned\": true,\n    \"tier\": \"semantic\",\n    \"type\": \"Decision\",\n    \"generated\": {\n      \"by\": \"process:ai-memory/2.3.2\",\n      \"at\": \"2026-09-21T14:58:56Z\"\n    }\n  }\n}"
+      }
+    ],
+    [
+      {
+        "type": "text",
+        "text": "Search results for \"collect native Linux and Desktop usage separately without double counting provider tokens\" (1 matches):\n\n--- tools/ecosystem/linux-usage-report.cjs (lines 128-150) [javascript] score: 0.6000 ---\nif (require.main === module) {\n  try {\n    const options = {};\n    const args=process.argv.slice(2);\n    for(let i=0;i<args.length;i++) {\n      const key={'--scope':'scope','--desktop-home':'desktopHome','--bundle':'bundleRoot','--output':'output'}[args[i]];\n      if(key) {if(!args[i+1] || args[i+1].startsWith('--')) throw new Error(args[i]+' requires a value.');options[key]=args[++i];}\n      else if(!['--check','--json','--help'].includes(args[i])) throw new Error('Unknown option: '+args[i]);\n    }\n    if(args.includes('--help')) {\n      console.log('Usage: ecosystem-usage [--scope native|desktop|all] [--desktop-home /absolute/home] [--output /path/report.json] [--json] [--check]\\nDefault scope is native. --bundle /path/ecosystem resolves the installation manifest when running this source copy. No model calls or cost estimates.');\n    } else if (args.includes('--check')) {\n      sourcesFor(options.scope || 'native',options);\n      const installed=installation(options.bundleRoot); const parser=installed.npm.find(x=>x.name==='ccusage');\n      if (!fs.statSync(path.join(parser.prefix,parser.entry)).isFile()) throw new Error('Missing usage parser.');\n      console.log('Linux usage parser is available; no model call or log collection performed.');\n    } else {\n      const r=collect(options); console.log(args.includes('--json') ? JSON.stringify(r,null,2) : 'Updated '+r.scope+' usage snapshot. Available parsers: '+r.reports.filter(x=>x.available).map(x=>x.agent).join(', '));\n      if(!r.complete) process.exitCode=1;\n    }\n  } catch(error) {console.error(error.message);process.exitCode=1;}\n}\nmodule.exports={collect,counters,installation,nativeEnvironment,sourcesFor,runParser,overlaps};\n"
+      }
+    ]
+  ],
+  "returned_final": "Both native calls returned results.\n\n- **Memory page:** `decisions/native-memory-learning-maintenance.md` (workspace agent-lab, project agent-lab). Hourly learning is configured: the page records the upstream hourly learning scheduler enabled with one eligible session per project per tick and a ten-minute age minimum, plus hourly embedding backfill. The page itself notes a later real hourly tick remains unproved.\n- **Code result:** `tools/ecosystem/linux-usage-report.cjs`, lines 128-150, score 0.60.\n- That source is the CLI entrypoint that parses scope, desktop-home, bundle and output options and either checks that the ccusage parser is installed or runs the usage collector and prints or writes the snapshot, exiting nonzero when collection is incomplete.",
+  "subtype": "success",
+  "is_error": false,
+  "turns": 4,
+  "usage": {
+    "input_tokens": 66,
+    "cache_creation_input_tokens": 35588,
+    "cache_read_input_tokens": 105974,
+    "output_tokens": 788,
+    "output_tokens_details": {
+      "thinking_tokens": 126
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 35588,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 32,
+        "output_tokens": 268,
+        "cache_read_input_tokens": 47018,
+        "cache_creation_input_tokens": 2202,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 2202
+        },
+        "type": "message",
+        "model": null
+      }
+    ],
+    "speed": "standard"
+  },
+  "independent_readback": {
+    "session_exists": true,
+    "observation_count": 9,
+    "stop_count": 1,
+    "final_bytes": 764,
+    "final_sha256": "e11e188b8c1b1dce6d91843dd81dd5765965879aa4f185f2606a314081fbaf4d",
+    "exact_stored_final_match": true,
+    "consolidation_jobs": [
+      {
+        "generation": 9,
+        "state": "completed",
+        "attempts": 1,
+        "has_error": 0
+      }
+    ]
+  },
+  "retained_observation_error": "Initial TEXT UUID lookup returned zero; source defines 16-byte BLOB IDs. Correct typed readback resolved it. This was not a runtime capture failure.",
+  "scope": "Fresh native Claude result; current Codex task uses direct native MCP. No complete Desktop provider usage or savings inferred."
+}
