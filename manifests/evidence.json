@@ -2,6 +2,26 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "hf-memory-models-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory",
+        "socraticode",
+        "vllm",
+        "grafana"
+      ],
+      "claim": "Verified the installed current Nemotron3Embed1B HF revision, executed NVIDIA's exact native retrieval example and supported OpenAI-compatible route, exposed model identities in Grafana and opened the official model/benchmark dashboards. MiniLM compatibility and stronger unqualified candidates remain explicit.",
+      "limitations": [
+        "Current deployed code-RAG model and upstream example acceptance, not universalSOTA or a rerun of public benchmarks.",
+        "Nemotron8B and EmbeddingGemma are candidates, not installed models. No paid HF endpoint or cloud worker was deployed.",
+        "ai-memory retains its older symmetric MiniLM compatibility profile. Source review found the generic MCP query call bypasses task-specific query encoding in both inspected revisions.",
+        "Four upstream examples establish bounded integration. Production retrieval/latency comparison, long-context qualification and exact token savings are not established.",
+        "Native HF warnings are preserved:33additional local metadata files for Nemotron and27uninstalled remote files for MiniLM. No strict full-directory mirror claim.",
+        "HF model cards and raw vector/browser outputs remain private; public projections preserve source pins and hashes while excluding host paths and generated browser identifiers."
+      ],
+      "path": "evidence/receipts/hf-memory-models-20260921.json"
+    },
+    {
       "id": "native-memory-rag-alignment-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2317,14 +2337,44 @@
   ],
   "files": [
     {
+      "path": "docs/hf-memory-model-qualification.md",
+      "sha256": "beb6b7b165fce95ce5f501b39ab226089bb3aa5d73a46d2f21d8083ae47756e5",
+      "bytes": 7017
+    },
+    {
+      "path": "evidence/artifacts/hf-memory-models-20260921/ai-memory-compatibility.md",
+      "sha256": "30c499caf46ea4117bcb4548f84891888c876e052c2ff3f72b81e25bf88fb18e",
+      "bytes": 7273
+    },
+    {
+      "path": "evidence/artifacts/hf-memory-models-20260921/dashboard-observations.json",
+      "sha256": "1b466860042e9e837d97243dcef0c71e536a13a662833adf46c385395695ffe0",
+      "bytes": 3060
+    },
+    {
+      "path": "evidence/artifacts/hf-memory-models-20260921/model-manifest.json",
+      "sha256": "5f0691636f0b1591c3bbddd3d7318cb95168c9249c59f956f0f8df758a193a88",
+      "bytes": 23714
+    },
+    {
+      "path": "evidence/artifacts/hf-memory-models-20260921/native-results.json",
+      "sha256": "01263899ad06977b5fc855f9667f2c29bdffd13d2036705485b24bb7095c5e50",
+      "bytes": 17286
+    },
+    {
+      "path": "evidence/receipts/hf-memory-models-20260921.json",
+      "sha256": "aed4f45ee65ac469ad7ecabf2ed7e1c2bcb028d0a6011f7f81dffdd4a00a17aa",
+      "bytes": 3678
+    },
+    {
       "path": "evidence/artifacts/native-memory-rag-alignment-20260921/report-delivery.json",
       "sha256": "df5576077b40a19e5eeff1863e30251a2f7fb378aa526caad953d54f8425f15a",
       "bytes": 939
     },
     {
       "path": "docs/memory-rag-native-practice.md",
-      "sha256": "9a22a09ee522e95c272036323e348fbcd16c296f93e11af4a9cbcaf568cd1241",
-      "bytes": 7927
+      "sha256": "d43adcfd2ab1c77d588cc0698d7a82fdc95b2f4d36a183f13c94cbe2a3579a20",
+      "bytes": 8231
     },
     {
       "path": "evidence/artifacts/native-memory-rag-alignment-20260921/dashboard-observations.json",
@@ -2738,8 +2788,8 @@
     },
     {
       "path": "observability/native-data/render.py",
-      "sha256": "e9f9cd70e52c5c7ee73c544c1f891cfbac3393f70674dd2f69211bed471425a3",
-      "bytes": 9165
+      "sha256": "629ec4c4a43bea2f3a08e87c8a38af82bbeda1f47823d21ff9e5fefa3298882b",
+      "bytes": 9697
     },
     {
       "path": "observability/native-data/snapshot.py",
@@ -4349,8 +4399,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "84e8fd252fa63e28865f9f0fcd14d28135620b7f86327f15c58b5016c0f708b9",
-      "bytes": 419840
+      "sha256": "bbc7f8b41035356abc5f6461226d64ef4c4a75e3f853f769962e02bd5e89cf41",
+      "bytes": 420564
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -5949,8 +5999,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "a7bdb1143ae9c105d7413b1aba56335317cf086a0a80bb5e0a424e0d731d459f",
-      "bytes": 4084698
+      "sha256": "9327480ddc02064fa44f50589f1668600314f9d3cf8fe1c2e3999588c9f3b31b",
+      "bytes": 4098213
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5959,8 +6009,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "372e44e90bc8ce7af78590d9735dc0fafa975bd9f2b11dfe44243a223a5a6209",
-      "bytes": 33242
+      "sha256": "086bc8dcc964c34b7833e30867130da362302f6881eeea1f384f386d89c3e132",
+      "bytes": 33632
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6464,8 +6514,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 77577,
-      "sha256": "d2243e7c93514e5eb18d48ce9e7aca65d692a4e8e282b44b2f70c3c45ea01c44"
+      "bytes": 78280,
+      "sha256": "6267ff7a901a21f6aba59d7817ad2f5cbc47e3fa4722887f1a93347957966929"
     },
     {
       "path": "observability/README.md",

@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "hf-memory-models-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "ai-memory",
+    "socraticode",
+    "vllm",
+    "grafana"
+  ],
+  "recorded_at_utc": "2026-09-21T05:40:19.022869+00:00",
+  "claim": "Verified the installed current Nemotron3Embed1B HF revision, executed NVIDIA's exact native retrieval example and supported OpenAI-compatible route, exposed model identities in Grafana and opened the official model/benchmark dashboards. MiniLM compatibility and stronger unqualified candidates remain explicit.",
+  "limitations": [
+    "Current deployed code-RAG model and upstream example acceptance, not universalSOTA or a rerun of public benchmarks.",
+    "Nemotron8B and EmbeddingGemma are candidates, not installed models. No paid HF endpoint or cloud worker was deployed.",
+    "ai-memory retains its older symmetric MiniLM compatibility profile. Source review found the generic MCP query call bypasses task-specific query encoding in both inspected revisions.",
+    "Four upstream examples establish bounded integration. Production retrieval/latency comparison, long-context qualification and exact token savings are not established.",
+    "Native HF warnings are preserved:33additional local metadata files for Nemotron and27uninstalled remote files for MiniLM. No strict full-directory mirror claim.",
+    "HF model cards and raw vector/browser outputs remain private; public projections preserve source pins and hashes while excluding host paths and generated browser identifiers."
+  ],
+  "artifact_directory": "evidence/artifacts/hf-memory-models-20260921",
+  "results": {
+    "hf_version": "1.32.0",
+    "nemotron_files_checked": 15,
+    "minilm_required_files_checked": 3,
+    "native_example_expected_top_documents": 4,
+    "v1_vectors": 8,
+    "v1_dimensions": 2048,
+    "v1_input_tokens_consumed": 336,
+    "local_context_tokens": 4096,
+    "memory_model_replaced": false
+  },
+  "validation": {
+    "adapter_tests": "24 passed; local presentation/metadata checks, separate from upstream model examples.",
+    "independent_review": "No actionable findings remain. Reviewer verified56retained bindings and all4public artifact hashes, source/example provenance, request/response bytes, model-file warning inventory, timestamp limits, compatibility code and useful MTEB/Grafana observations. Public privacy checks found no private-path, session-ID or credential disclosure.",
+    "project_suite": "python3 -m unittest: 693 tests completed,41skipped,652passed. Separate from the executed upstream model example."
+  },
+  "references": [
+    "docs/hf-memory-model-qualification.md",
+    "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16/blob/c0c9fea93ea424587517f2c59e20db9f1d6bf615/README.md",
+    "https://leaderboard.mteb.org/models/nvidia/Nemotron-3-Embed-1B-BF16"
+  ],
+  "public_artifacts": [
+    {
+      "path": "evidence/artifacts/hf-memory-models-20260921/model-manifest.json",
+      "bytes": 23714,
+      "sha256": "5f0691636f0b1591c3bbddd3d7318cb95168c9249c59f956f0f8df758a193a88"
+    },
+    {
+      "path": "evidence/artifacts/hf-memory-models-20260921/ai-memory-compatibility.md",
+      "bytes": 7273,
+      "sha256": "30c499caf46ea4117bcb4548f84891888c876e052c2ff3f72b81e25bf88fb18e"
+    },
+    {
+      "path": "evidence/artifacts/hf-memory-models-20260921/native-results.json",
+      "bytes": 17286,
+      "sha256": "01263899ad06977b5fc855f9667f2c29bdffd13d2036705485b24bb7095c5e50"
+    },
+    {
+      "path": "evidence/artifacts/hf-memory-models-20260921/dashboard-observations.json",
+      "bytes": 3060,
+      "sha256": "1b466860042e9e837d97243dcef0c71e536a13a662833adf46c385395695ffe0"
+    }
+  ]
+}

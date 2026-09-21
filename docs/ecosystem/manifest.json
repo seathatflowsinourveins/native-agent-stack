@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-21",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "a1296132aef30d6efae302aac702beb9fb661e34",
+  "source_revision": "bc6ea86bd289c9da05899698c0648f9755867ee2",
   "layers": [
     {
       "id": "agents",
@@ -310,6 +310,12 @@
     }
   ],
   "guides": [
+    {
+      "title": "Current HF models: native results and upstream dashboards",
+      "body": "Pinned Nemotron3Embed1B files and exact NVIDIA example verified. Model identities, native context limits, published benchmark scopes and the upstream memory-model compatibility gap remain explicit.",
+      "path": "docs/hf-memory-model-qualification.md",
+      "category": "evaluation"
+    },
     {
       "title": "Qualified memory and RAG: native commands and dashboards",
       "body": "Local semantic memory with upstream model pins, isolated backup restore, repaired code-index scope and native graph export. Current Grafana/Loki observations expose embedding mode and coverage; availability and tested behavior stay distinct.",

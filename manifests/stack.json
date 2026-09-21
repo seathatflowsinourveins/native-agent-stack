@@ -110,7 +110,8 @@
         "native-offhost-app-state-20260920",
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
-        "native-memory-rag-alignment-20260921"
+        "native-memory-rag-alignment-20260921",
+        "hf-memory-models-20260921"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory",
@@ -880,7 +881,8 @@
         "foundation-native-20260920",
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
-        "native-memory-rag-alignment-20260921"
+        "native-memory-rag-alignment-20260921",
+        "hf-memory-models-20260921"
       ],
       "upstream_sources": [
         "https://github.com/giancarloerra/SocratiCode"
@@ -932,7 +934,8 @@
         "component-history",
         "token-practice-coverage-20260920",
         "foundation-native-20260920",
-        "native-memory-rag-alignment-20260921"
+        "native-memory-rag-alignment-20260921",
+        "hf-memory-models-20260921"
       ],
       "upstream_sources": [
         "https://github.com/vllm-project/vllm"
@@ -1080,7 +1083,8 @@
         "current-session-observation-20260920",
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
-        "native-memory-rag-alignment-20260921"
+        "native-memory-rag-alignment-20260921",
+        "hf-memory-models-20260921"
       ],
       "source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
       "upstream_sources": [
@@ -1878,7 +1882,8 @@
       "document_prefix": "passage: ",
       "dimensions": 2048,
       "evidence_ids": [
-        "native-rag"
+        "native-rag",
+        "hf-memory-models-20260921"
       ]
     },
     {
@@ -1892,6 +1897,19 @@
       "file_sha256": "c600de0300ae8a0eb3a6c0b8b5561b8b96f16bd2c863c2a66c42de29d391a747",
       "evidence_ids": [
         "native-gpu-patch-20260920"
+      ]
+    },
+    {
+      "id": "sentence-transformers/all-MiniLM-L6-v2",
+      "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+      "license": "Apache-2.0",
+      "runtime": "ai-memory",
+      "dimensions": 384,
+      "role": "Supported symmetric memory baseline, not latest SOTA",
+      "distribution": "Three files pinned by upstream ai-memory loader; other repository formats are not installed",
+      "evidence_ids": [
+        "native-memory-rag-alignment-20260921",
+        "hf-memory-models-20260921"
       ]
     }
   ],

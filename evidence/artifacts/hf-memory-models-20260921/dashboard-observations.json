@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-21T05:40:19.022869+00:00",
+  "browser": {
+    "hf_model": {
+      "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+      "observation": "{\"title\":\"nvidia/Nemotron-3-Embed-1B-BF16 · Hugging Face\",\"url\":\"https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16\",\"hasModelCard\":true,\"hasInference\":true,\"hasModel\":true,\"hasVllm\":true}",
+      "raw_binding": {
+        "file": "hf-browser.json",
+        "bytes": 212,
+        "sha256": "2cdbd19e08b50dbfd15a3509ca84a80b569e97f9f47bc9d3e9e221d78858a608",
+        "captured_file_mtime_utc": "2026-09-21T05:26:06.577080+00:00"
+      }
+    },
+    "mteb_model": {
+      "url": "https://leaderboard.mteb.org/models/nvidia/Nemotron-3-Embed-1B-BF16",
+      "observed": [
+        "Model identity and HF reference",
+        "1.1Bparameters,2048dimensions,32768model-cardtokens",
+        "Released2026-07-16",
+        "20benchmarkrows and DownloadCSV control",
+        "Task-specific ranks; no universal first-place claim"
+      ],
+      "raw_binding": {
+        "file": "mteb-model-browser.txt",
+        "bytes": 2144,
+        "sha256": "bfab42f61f8a703bb728c1d3ff49739e9b6eccee11247bb5f3f350dc1df6c2ce",
+        "captured_file_mtime_utc": "2026-09-21T05:30:33.411248+00:00"
+      },
+      "boundary": "Model page rendered useful tables. CSV control was present, not downloaded; scores/ranks have different benchmark scopes."
+    },
+    "mteb_space": {
+      "url": "https://huggingface.co/spaces/mteb/leaderboard",
+      "observed": "HF Space shell reports running and embeds the upstream application; usable model-table qualification is the separate model page above.",
+      "raw_binding": {
+        "file": "leaderboard-browser.json",
+        "bytes": 589,
+        "sha256": "4cb9c67735ccf8132f16577248abb646ed854d0988527dd45db92d24d917ddf5",
+        "captured_file_mtime_utc": "2026-09-21T05:28:15.632381+00:00"
+      },
+      "privacy": "Only selected public observations retained; third-party iframe tracking identifiers omitted."
+    },
+    "grafana": {
+      "url": "http://127.0.0.1:13000/d/native-foundation-data",
+      "observed": [
+        "Memory embedding model column",
+        "all-MiniLM-L6-v2",
+        "Memory dimensions384",
+        "Separate nativevLLMmodel series and upstream model/MTEB links"
+      ],
+      "raw_binding": {
+        "file": "grafana-model-browser.json",
+        "bytes": 4984,
+        "sha256": "72158f9649252a4a7ed57a1e86345a9bb68dcc997fc135ee8cd3bdbf2febbfe4",
+        "captured_file_mtime_utc": "2026-09-21T05:32:17.173637+00:00"
+      },
+      "provisioned_dashboard_binding": {
+        "file": "grafana-provisioned.json",
+        "bytes": 13319,
+        "sha256": "e0eef60cc31892debc89b7a8e5a36911acb1ca8474c6d4a943a15a8d62452fe1",
+        "captured_file_mtime_utc": "2026-09-21T05:34:26.432960+00:00"
+      },
+      "boundary": "Local integration over native metadata, not an HF-hosted inference service or prebuilt official component dashboard. Counts can advance after capture."
+    }
+  }
+}

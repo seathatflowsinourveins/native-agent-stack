@@ -1,0 +1,478 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-21T05:40:19.022869+00:00",
+  "scope": "Native command results with local derived observations identified separately. Exact bytes are retained privately; public paths are normalized.",
+  "commands": [
+    {
+      "argv": [
+        "hf",
+        "version",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "started_at": null,
+      "completed_at": null,
+      "timestamp_basis": "Invocation timing was not retained. Each raw binding supplies its output-file modification time as capture evidence, not process completion time.",
+      "returned": {
+        "version": "1.32.0"
+      },
+      "raw_returns": [
+        {
+          "file": "hf-version.json",
+          "bytes": 22,
+          "sha256": "742de6ee6b4f7ad7d922d996e1b7786e89e372d82100bdbe88ae81dfdd0bef26",
+          "captured_file_mtime_utc": "2026-09-21T05:25:10.779703+00:00"
+        }
+      ],
+      "scope": "Installed upstream CLI identity."
+    },
+    {
+      "argv": [
+        "hf",
+        "models",
+        "info",
+        "nvidia/Nemotron-3-Embed-1B-BF16",
+        "--revision",
+        "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+        "--expand",
+        "sha,createdAt,lastModified,config,cardData,model-index",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "started_at": null,
+      "completed_at": null,
+      "timestamp_basis": "Invocation timing was not retained. Each raw binding supplies its output-file modification time as capture evidence, not process completion time.",
+      "returned": {
+        "id": "nvidia/Nemotron-3-Embed-1B-BF16",
+        "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615"
+      },
+      "raw_returns": [
+        {
+          "file": "nemotron-info.json",
+          "bytes": 950,
+          "sha256": "3b13805838340f05e244dba0cdf042a780234ae7ea53af5411d40cb17b27c23f",
+          "captured_file_mtime_utc": "2026-09-21T05:25:12.900356+00:00"
+        },
+        {
+          "file": "nemotron-info.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "captured_file_mtime_utc": "2026-09-21T05:25:12.650657+00:00"
+        }
+      ],
+      "scope": "Pinned model identity; complete native metadata retained privately."
+    },
+    {
+      "argv": [
+        "hf",
+        "cache",
+        "verify",
+        "nvidia/Nemotron-3-Embed-1B-BF16",
+        "--revision",
+        "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+        "--local-dir",
+        "<nemotron-model-directory>",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "started_at": null,
+      "completed_at": null,
+      "timestamp_basis": "Invocation timing was not retained. Each raw binding supplies its output-file modification time as capture evidence, not process completion time.",
+      "returned": {
+        "stdout": {
+          "repo_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+          "repo_type": "model",
+          "checked": 15,
+          "path": "<nemotron-model-directory>"
+        },
+        "stderr": "Warning: 33 local file(s) do not exist on the remote repo. Use --fail-on-extra-files for details.\n"
+      },
+      "raw_returns": [
+        {
+          "file": "nemotron-verify.json",
+          "bytes": 171,
+          "sha256": "cfc1aefa71aad18891948ce593d8c5a15dda4ac977a6dae32147f79b24fdb913",
+          "captured_file_mtime_utc": "2026-09-21T05:25:12.997254+00:00"
+        },
+        {
+          "file": "nemotron-verify.stderr",
+          "bytes": 98,
+          "sha256": "d6d9ea17522dde96a5239f5f56d4e2d3c2cc96f4dd4a9e85a25ceb2483ac86d9",
+          "captured_file_mtime_utc": "2026-09-21T05:25:12.997254+00:00"
+        }
+      ],
+      "scope": "15 upstream model files verified; additional HF local-download metadata is retained, not silently removed."
+    },
+    {
+      "argv": [
+        "hf",
+        "models",
+        "list",
+        "nvidia/Nemotron-3-Embed-1B-BF16",
+        "--revision",
+        "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+        "--recursive",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "started_at": null,
+      "completed_at": null,
+      "timestamp_basis": "Invocation timing was not retained. Each raw binding supplies its output-file modification time as capture evidence, not process completion time.",
+      "returned": {
+        "remote_files": 15
+      },
+      "raw_returns": [
+        {
+          "file": "nemotron-repo-files.json",
+          "bytes": 10997,
+          "sha256": "db57eb13a9b74124c0fab9560069f673748c16bd30c9d403a1f48ce7d0c0ac2f",
+          "captured_file_mtime_utc": "2026-09-21T05:32:42.639870+00:00"
+        },
+        {
+          "file": "nemotron-repo-files.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "captured_file_mtime_utc": "2026-09-21T05:32:42.315060+00:00"
+        }
+      ],
+      "scope": "Upstream file tree used for an independent read-only inventory comparison."
+    },
+    {
+      "argv": [
+        "hf",
+        "cache",
+        "verify",
+        "sentence-transformers/all-MiniLM-L6-v2",
+        "--revision",
+        "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+        "--local-dir",
+        "<memory-model-directory>",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "started_at": null,
+      "completed_at": null,
+      "timestamp_basis": "Invocation timing was not retained. Each raw binding supplies its output-file modification time as capture evidence, not process completion time.",
+      "returned": {
+        "stdout": {
+          "repo_id": "sentence-transformers/all-MiniLM-L6-v2",
+          "repo_type": "model",
+          "checked": 3,
+          "path": "<memory-model-directory>"
+        },
+        "stderr": "Warning: 27 remote file(s) are missing locally. Use --fail-on-missing-files for details.\n"
+      },
+      "raw_returns": [
+        {
+          "file": "minilm-verify.json",
+          "bytes": 160,
+          "sha256": "e7088827cfefd07a0e32d97a65e0ad4552a2aa1e38d6a3ad5e17651c2daac9bd",
+          "captured_file_mtime_utc": "2026-09-21T05:32:16.216037+00:00"
+        },
+        {
+          "file": "minilm-verify.stderr",
+          "bytes": 89,
+          "sha256": "c49c67a5c8637a7e4d3f4220ace8dfacd8b36482d4af2ab274df0dda1c05ecc5",
+          "captured_file_mtime_utc": "2026-09-21T05:32:16.216037+00:00"
+        }
+      ],
+      "scope": "Three files required by the native ai-memory loader. The other27HF repository files are not installed; this is not whole-repository parity."
+    },
+    {
+      "argv": [
+        "hf",
+        "download",
+        "nvidia/Nemotron-3-Embed-1B-BF16",
+        "README.md",
+        "--revision",
+        "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+        "--local-dir",
+        "<private-evidence>/root/model-card",
+        "--format",
+        "json"
+      ],
+      "exit_code": 0,
+      "started_at": null,
+      "completed_at": null,
+      "timestamp_basis": "Invocation timing was not retained. Each raw binding supplies its output-file modification time as capture evidence, not process completion time.",
+      "returned": {
+        "path": "<private-evidence>/root/model-card/README.md"
+      },
+      "raw_returns": [
+        {
+          "file": "card-download.json",
+          "bytes": 98,
+          "sha256": "f84f07e452517580f29a374032774d42332b31cd78fb451dce20abdb7e75811a",
+          "captured_file_mtime_utc": "2026-09-21T05:25:44.080569+00:00"
+        },
+        {
+          "file": "card-download.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "captured_file_mtime_utc": "2026-09-21T05:25:43.833284+00:00"
+        }
+      ],
+      "scope": "Upstream model-card source downloaded at an immutable revision."
+    },
+    {
+      "argv": [
+        "<vllm-runtime>/bin/python",
+        "<private-evidence>/root/upstream-example.py"
+      ],
+      "exit_code": 0,
+      "started_at": null,
+      "completed_at": null,
+      "timestamp_basis": "Invocation timing was not retained. Each raw binding supplies its output-file modification time as capture evidence, not process completion time.",
+      "returned": "Similarity scores:\n          d[0]      d[1]      d[2]      d[3]\nq[0]    0.8113    0.0253    0.0003   -0.0311\nq[1]    0.0448    0.6471   -0.0514    0.0383\nq[2]   -0.0099   -0.0410    0.6472    0.1007\nq[3]   -0.0220    0.0216    0.1207    0.7691\n",
+      "raw_returns": [
+        {
+          "file": "upstream-example.stdout",
+          "bytes": 244,
+          "sha256": "5b2caeb73ed5cb4dc2a085c78b511415906199e73365630792721caf9f4de1cb",
+          "captured_file_mtime_utc": "2026-09-21T05:28:15.909356+00:00"
+        },
+        {
+          "file": "upstream-example.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "captured_file_mtime_utc": "2026-09-21T05:28:14.247507+00:00"
+        }
+      ],
+      "scope": "Exact first Python example under Recommended Retrieval Endpoint; only the local URL changed. Public upstream example data, not a fabricated local benchmark."
+    },
+    {
+      "argv": [
+        "curl",
+        "--silent",
+        "--show-error",
+        "--fail-with-body",
+        "-H",
+        "Content-Type: application/json",
+        "--data-binary",
+        "@<private-evidence>/root/v1-request.json",
+        "http://127.0.0.1:8231/v1/embeddings",
+        "-o",
+        "<private-evidence>/root/v1-returned.json"
+      ],
+      "exit_code": 0,
+      "started_at": null,
+      "completed_at": null,
+      "timestamp_basis": "Invocation timing was not retained. Each raw binding supplies its output-file modification time as capture evidence, not process completion time.",
+      "returned": {
+        "model": "nvidia/Nemotron-3-Embed-1B-BF16",
+        "vectors": 8,
+        "dimensions": [
+          2048
+        ],
+        "usage": {
+          "prompt_tokens": 336,
+          "total_tokens": 336,
+          "completion_tokens": 0,
+          "prompt_tokens_details": null
+        }
+      },
+      "raw_returns": [
+        {
+          "file": "v1-returned.json",
+          "bytes": 349978,
+          "sha256": "3b269d16d5548e0aa08bacab919b13d049f4d5de53ee93fe71c64ff3b56ba399",
+          "captured_file_mtime_utc": "2026-09-21T05:29:00.750561+00:00"
+        },
+        {
+          "file": "v1-request.json",
+          "bytes": 1733,
+          "sha256": "14e643158548850b4b1e113ea08ebe7eba4f298b1ba7a8206b6080e50409f49e",
+          "captured_file_mtime_utc": "2026-09-21T05:29:00.078630+00:00"
+        }
+      ],
+      "scope": "Existing OpenAI-compatible route using the same upstream query/document inputs with explicit prefixes; raw returned vectors retained privately."
+    },
+    {
+      "argv": [
+        "curl",
+        "--silent",
+        "--show-error",
+        "--fail-with-body",
+        "http://127.0.0.1:8231/v1/models"
+      ],
+      "exit_code": 0,
+      "started_at": null,
+      "completed_at": null,
+      "timestamp_basis": "Invocation timing was not retained. Each raw binding supplies its output-file modification time as capture evidence, not process completion time.",
+      "returned": {
+        "id": "nvidia/Nemotron-3-Embed-1B-BF16",
+        "max_model_len": 4096
+      },
+      "raw_returns": [
+        {
+          "file": "live-models.json",
+          "bytes": 540,
+          "sha256": "5537c425000fc361586427535f3ea63981a52df186660fb393a97489e8fe102f",
+          "captured_file_mtime_utc": "2026-09-21T05:25:13.400799+00:00"
+        }
+      ],
+      "scope": "Actual live model identity/context limit; host paths and permission IDs omitted from public projection."
+    }
+  ],
+  "source_example": {
+    "model": "nvidia/Nemotron-3-Embed-1B-BF16",
+    "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+    "source": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16/blob/c0c9fea93ea424587517f2c59e20db9f1d6bf615/README.md",
+    "source_sha256": "6e811480c966ca54fca9a5cbd0e5ae60df15244bfc70bb9db155c2b92fa23f8e",
+    "extraction": "First Python block under Recommended Retrieval Endpoint",
+    "only_adaptation": "Local service URL localhost:8000 to127.0.0.1:8231",
+    "original_code_sha256": "09df5e6a97308b18b576f6ab29e8c652ee67a81b5ecc9390f00219edc8d3aa32",
+    "executed_code_sha256": "c4b486325725ae865f00a0b67e254795b3390ba14002e9589b46270565864d1f"
+  },
+  "native_example_stdout": "Similarity scores:\n          d[0]      d[1]      d[2]      d[3]\nq[0]    0.8113    0.0253    0.0003   -0.0311\nq[1]    0.0448    0.6471   -0.0514    0.0383\nq[2]   -0.0099   -0.0410    0.6472    0.1007\nq[3]   -0.0220    0.0216    0.1207    0.7691\n",
+  "derived_observations": {
+    "model_files": {
+      "remote_files": 15,
+      "missing": [],
+      "extra_count": 33,
+      "all_extras_under_hf_cache": true,
+      "extra_paths": [
+        ".cache/huggingface/.gitignore",
+        ".cache/huggingface/CACHEDIR.TAG",
+        ".cache/huggingface/download/.gitattributes.lock",
+        ".cache/huggingface/download/.gitattributes.metadata",
+        ".cache/huggingface/download/1_Pooling/config.json.lock",
+        ".cache/huggingface/download/1_Pooling/config.json.metadata",
+        ".cache/huggingface/download/CONTRIBUTING.md.lock",
+        ".cache/huggingface/download/CONTRIBUTING.md.metadata",
+        ".cache/huggingface/download/LICENSE.lock",
+        ".cache/huggingface/download/LICENSE.metadata",
+        ".cache/huggingface/download/NOTICE.lock",
+        ".cache/huggingface/download/NOTICE.metadata",
+        ".cache/huggingface/download/README.md.lock",
+        ".cache/huggingface/download/README.md.metadata",
+        ".cache/huggingface/download/THIRD_PARTY_NOTICES.md.lock",
+        ".cache/huggingface/download/THIRD_PARTY_NOTICES.md.metadata",
+        ".cache/huggingface/download/config.json.lock",
+        ".cache/huggingface/download/config.json.metadata",
+        ".cache/huggingface/download/config_sentence_transformers.json.lock",
+        ".cache/huggingface/download/config_sentence_transformers.json.metadata",
+        ".cache/huggingface/download/model.safetensors.index.json.lock",
+        ".cache/huggingface/download/model.safetensors.index.json.metadata",
+        ".cache/huggingface/download/model.safetensors.lock",
+        ".cache/huggingface/download/model.safetensors.metadata",
+        ".cache/huggingface/download/modules.json.lock",
+        ".cache/huggingface/download/modules.json.metadata",
+        ".cache/huggingface/download/sentence_bert_config.json.lock",
+        ".cache/huggingface/download/sentence_bert_config.json.metadata",
+        ".cache/huggingface/download/tokenizer.json.lock",
+        ".cache/huggingface/download/tokenizer.json.metadata",
+        ".cache/huggingface/download/tokenizer_config.json.lock",
+        ".cache/huggingface/download/tokenizer_config.json.metadata",
+        ".cache/huggingface/trees/c0c9fea93ea424587517f2c59e20db9f1d6bf615.json"
+      ],
+      "method": "HF native repo file list versus read-only recursive local file inventory."
+    },
+    "vector_checks": {
+      "returned_vectors": 8,
+      "dimensions": [
+        2048
+      ],
+      "norm_min": 0.9999999680654899,
+      "norm_max": 1.0000000493321577,
+      "v1_similarity_scores": [
+        [
+          0.8113279814564557,
+          0.02489003480705127,
+          0.00019997723511898486,
+          -0.031068549008906182
+        ],
+        [
+          0.04476626107339537,
+          0.646996948736746,
+          -0.0514039654146353,
+          0.03852663422938081
+        ],
+        [
+          -0.01012341741276499,
+          -0.04081714804528918,
+          0.6468966060582303,
+          0.10006751165858838
+        ],
+        [
+          -0.021970613232840764,
+          0.021666765536839855,
+          0.12090650655218807,
+          0.7686631649738568
+        ]
+      ],
+      "v2_printed_scores": [
+        [
+          0.8113,
+          0.0253,
+          0.0003,
+          -0.0311
+        ],
+        [
+          0.0448,
+          0.6471,
+          -0.0514,
+          0.0383
+        ],
+        [
+          -0.0099,
+          -0.041,
+          0.6472,
+          0.1007
+        ],
+        [
+          -0.022,
+          0.0216,
+          0.1207,
+          0.7691
+        ]
+      ],
+      "reference_printed_scores": [
+        [
+          0.8109,
+          0.0252,
+          0.0001,
+          -0.0314
+        ],
+        [
+          0.0448,
+          0.647,
+          -0.0516,
+          0.0387
+        ],
+        [
+          -0.0103,
+          -0.04,
+          0.647,
+          0.1
+        ],
+        [
+          -0.0223,
+          0.0217,
+          0.1199,
+          0.7693
+        ]
+      ],
+      "v1_top_documents": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "v2_top_documents": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "max_absolute_v2_to_rounded_reference": 0.0010000000000000009,
+      "max_absolute_v1_to_rounded_v2": 0.0006324883414116217,
+      "boundary": "Calculated from real returned vectors and rounded native output. No arbitrary numerical pass threshold; all four queries retain the intended first-ranked documents. No full RTEB/MTEB rerun or production quality/latency benchmark."
+    }
+  }
+}
