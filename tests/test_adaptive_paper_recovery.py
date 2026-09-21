@@ -103,6 +103,15 @@ class FakePort:
             raise SafetyError("fake_budget_exhausted")
         self.submissions.append(payload)
         self.adopted[intent.client_id] = payload
+        if self.mode == "local_not_sent":
+            class LocalRefusal(RuntimeError):
+                definitive_rejection = True
+                not_sent = True
+            raise LocalRefusal("prevented before HTTP")
+        if self.mode == "http_definitive_refusal":
+            class BrokerRefusal(RuntimeError):
+                definitive_rejection = True
+            raise BrokerRefusal("HTTP response received; order absent")
         if self.mode == "ambiguous_submit":
             raise TimeoutError("provider secret must not escape")
         qty, price = Decimal(payload["qty"]), Decimal(payload["limit_price"])
@@ -244,6 +253,26 @@ class RecoveryTests(unittest.TestCase):
         self.assertEqual(result["unresolved_orders"][0]["status"], "reserved")
         self.assertTrue(result["unresolved_orders"][0]["submit_attempted"])
         self.assertNotIn("secret", str(result))
+
+    def test_explicit_pre_wire_refusal_can_release_pending_intent(self):
+        self.original_buy()
+        self.port.mode = "local_not_sent"
+        result = self.recover()
+        self.assertEqual(result["errors"], ["LocalRefusal"])
+        self.assertEqual(self.ledger.intents()[-1].status, "not_sent")
+        self.assertTrue(self.ledger.intents()[-1].submit_attempted)
+        self.assertEqual(result["unresolved_orders"], [])
+        self.assertFalse(result["flat"])
+
+    def test_http_definitive_refusal_is_not_mislabeled_as_never_sent(self):
+        self.original_buy()
+        self.port.mode = "http_definitive_refusal"
+        result = self.recover()
+        self.assertEqual(result["errors"], ["BrokerRefusal"])
+        self.assertEqual(self.ledger.intents()[-1].status, "reserved")
+        self.assertTrue(self.ledger.intents()[-1].submit_attempted)
+        self.assertEqual(len(result["unresolved_orders"]), 1)
+        self.assertFalse(result["flat"])
 
     def test_unfilled_exit_is_canceled_and_not_blindly_repriced(self):
         self.original_buy()

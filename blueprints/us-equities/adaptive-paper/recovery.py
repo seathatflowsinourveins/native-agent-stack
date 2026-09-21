@@ -167,7 +167,10 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                 confirmation = await bounded(port.submit(payload))
                 order(confirmation)
             except Exception as exc:
-                if getattr(exc, "definitive_rejection", False) is True:
+                # A broker HTTP refusal is still an attempted request. Only an
+                # explicit pre-wire guarantee permits the not_sent transition.
+                # The controller records broker_refused via its distinct contract.
+                if getattr(exc, "not_sent", False) is True:
                     intent = next((i for i in ledger.intents() if i.client_id == client_id), None)
                     if intent and intent.status == "reserved" and not intent.filled_qty and intent.broker_id is None:
                         ledger.mark_not_sent(client_id, "recovery_definitive_refusal")

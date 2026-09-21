@@ -14,8 +14,10 @@ journal to new entries and renews only its cleanup window. Prior request budgets
 fills, costs, loss limits and order identities remain intact.
 
 The module retires a reservation only when the durable journal proves that no
-request was attempted, or when the transport explicitly proves a definitive
-refusal. A missing lookup, timeout or ambiguous response never proves that an
+request was attempted, or when the transport explicitly provides `not_sent=True`
+for a request prevented before HTTP. `definitive_rejection=True` alone does not
+prove this: an actual HTTP refusal belongs to the controller's separate
+`broker_refused` contract. A missing lookup, timeout or ambiguous response never proves that an
 order was absent. Attempted orders are adopted by their original client IDs and
 reconciled before any new exit. Unknown orders, unmatched positions and cash
 differences stop recovery. It never uses account-wide cancellation or liquidation.
@@ -86,3 +88,8 @@ test source SHA-256:
 module: a personal path in the integrated native-adapter README and a possible
 local session identifier in the transport tests. The coordinator owns those
 publication fixes; this failed check is not reported as passed.
+
+A subsequent review tightened the refusal contract above. Two regression tests
+distinguish an explicit local `not_sent` guarantee from an actual HTTP refusal
+without that guarantee. The prior source hashes and 18-test receipt describe the
+earlier version; the revised 20-test local suite passes separately.
