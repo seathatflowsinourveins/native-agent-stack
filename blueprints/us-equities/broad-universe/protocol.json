@@ -80,6 +80,10 @@
     "no_entry": "No bar on session t+1 means no fill. The event is kept with outcome no_entry and excluded from return means but counted.",
     "horizons": {"H1": "exit all_close[t+1]", "H5": "exit all_close[t+5]", "H20": "exit all_close[t+20]"},
     "terminated_early": "If the series ends before the exit session, exit at the last available close and flag terminated_early. Stress applies a further -50% to that exit because delisting returns are unknown.",
+    "exit_stale": "If the symbol has no bar on the exit session but trades later, exit at its most recent close at or before the exit session and flag exit_stale.",
+    "horizon_incomplete": "If the dataset calendar does not yet contain the exit session the event is counted as horizon_incomplete and excluded; it is never scored as zero.",
+    "net_return": "exit / entry * (1 - c) / (1 + c) - 1, with c the per-side cost in decimal from the med20 tier at t; stress uses 3c.",
+    "window_contiguity": "A window of k prior bars is valid only when those bars are calendar-contiguous (calendar index difference equals k). Eligibility uses k=60; each signal also requires contiguity over its own longest window. Invalid decisions are flagged has_gap, excluded and counted.",
     "per_side_cost_bps": {"med20_ge_100m": 5, "med20_ge_50m": 10, "otherwise": 20},
     "stress_cost_multiplier": 3,
     "fees": "Commission-free broker assumed; regulatory fees under 1 bp are inside the tiers.",
@@ -114,6 +118,13 @@
     "trial_policy": "Exactly 5 signals x 3 horizons x 2 selections x 2 instrument lanes, all predeclared, plus 2 controls and the descriptive microcap lane. No parameter search. Every variant and segment is reported. Any later variant needs a new protocol version and may not reuse the reserved segment as untouched.",
     "freeze": "This file and evaluate.py are committed before evaluate.py reads real bars. The commit hash is recorded in the results."
   },
+  "amendments": [
+    {
+      "at": "2026-09-21T22:05Z",
+      "before_any_real_evaluation": true,
+      "change": "Spelled out exit_stale, horizon_incomplete, the net-return formula and window contiguity. These are mechanical clarifications handed to the evaluator author together with the original freeze; no threshold, signal, horizon, cost, segment or promotion rule changed, and no historical return had been computed."
+    }
+  ],
   "inspection_registry": {
     "before_freeze": [
       "Coordinator saw on 2026-09-21: META and AMD SIP daily bars for 2026-09-14..2026-09-21, the provider movers/most-actives screens for 2026-09-21, three AMD bars from January 2016, FB/META/TWTR bar counts for 2022 windows. No historical signal or return statistic was computed.",
