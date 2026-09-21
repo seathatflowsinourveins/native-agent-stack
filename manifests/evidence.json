@@ -2,6 +2,45 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "native-returned-results-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "rtk",
+        "context-mode",
+        "qmd",
+        "serena",
+        "ai-memory",
+        "socraticode",
+        "qdrant",
+        "agentsview",
+        "grafana",
+        "loki",
+        "prometheus",
+        "dagu",
+        "ntfy",
+        "omniroute",
+        "agent-browser",
+        "promptfoo",
+        "headroom",
+        "jcodemunch-mcp"
+      ],
+      "claim": "Fresh native Codex and Claude each returned five selected upstream tool results in this Desktop turn. Independent stream reconciliation verified all ten calls, returned bytes, provider usage and RTK measurements. Thirteen adopted dashboard views exposed useful scoped data; the local report now embeds verified downloadable results and keeps unavailable Serena explicit.",
+      "limitations": [
+        "Selected current-host native CLI/MCP/API/browser integration checks, not all upstream test suites, every selected component running this session, physical reboot, or another-PC acceptance.",
+        "The native Codex and Claude executions are child sessions launched in this Desktop turn. Their usage excludes this coordinator and other workers; actual input/cache/output counts are not causal provider savings.",
+        "Each RTK artifact comparison removes 359 tokens (537 to 178, o200k_base), preserving six commit identities while omitting other metadata. Each native RTK counter separately increases by 17 estimated tokens. These measures must not be added.",
+        "Context Mode returned reports have session-age/model labels that do not establish exclusive attribution to these short native children. Its direct Desktop result and retained store estimates have separate scopes. Estimates and illustrative prices are not provider bills.",
+        "Serena returned a native dashboard URL in both child runs, but a later direct page request timed out. Persistent dashboard availability is not accepted.",
+        "Memory page count includes collapsed system pages; QMD intentionally has no embedded vectors. Archives, graph and Promptfoo reports are retained snapshots, not new model evaluations or automatic ingestion.",
+        "OmniRoute counts apply only to traffic through that gateway. Claude telemetry has historical range series but no instant series at observation. No new inference, workflow runs, or notifications were created to populate dashboards.",
+        "Local browser/report checks validate this integration. Reporter unit tests and repository tests are local checks, not unchanged upstream end-to-end tests.",
+        "Public attachments contain explicit safe projections and selected exact safe outputs, with private-original hash bindings. Full session streams, prompts, personal paths and private application content remain local."
+      ],
+      "path": "evidence/receipts/native-returned-results-20260921.json"
+    },
+    {
       "id": "native-workflow-writing-comparison-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2254,6 +2293,36 @@
   ],
   "files": [
     {
+      "path": "docs/native-returned-results.md",
+      "sha256": "e2be146922c33cfb50b737d4d4dd491e1120a24b7a99c37a0bcc207756780baf",
+      "bytes": 4473
+    },
+    {
+      "path": "evidence/artifacts/native-returned-results-20260921/dashboards.json",
+      "sha256": "ef9c5cfa22750f520bb55f4c8392e4fea3d0449cc49c2dd1feeedaf49f6a4000",
+      "bytes": 68055
+    },
+    {
+      "path": "evidence/artifacts/native-returned-results-20260921/native-clients.json",
+      "sha256": "3865e9e49fcbfa9289ca49312912f6952e75dfbf0b0781a208fc9f2128be4e2a",
+      "bytes": 16646
+    },
+    {
+      "path": "evidence/receipts/native-returned-results-20260921.json",
+      "sha256": "425386d08ebc513e6f395d9296f73b9b0e4b6ff1e789604d439d80f912443406",
+      "bytes": 7769
+    },
+    {
+      "path": "tools/token-report/returned_results.js",
+      "sha256": "885850d7319fa44360ad668f9bc27b517040a3e03f1758f062f6fb2de691463c",
+      "bytes": 6212
+    },
+    {
+      "path": "tools/token-report/token_manifest.full.html.in",
+      "sha256": "7be2d96285cb69a6d9587a8a1bd011ddb7e1bce60aecfa856a8b62b5da0d65aa",
+      "bytes": 39777
+    },
+    {
       "path": "docs/native-foundation-resolution-20260921.md",
       "sha256": "8e607b0bf200ab6f7f237893e863f855707bac23192c3b733c32714be53385e3",
       "bytes": 7434
@@ -2500,8 +2569,8 @@
     },
     {
       "path": "docs/native-dashboard-data.md",
-      "sha256": "2e24646398d925223671840ee0fc21ebd3cc88a4c8169d9901c46629b20cfac9",
-      "bytes": 17100
+      "sha256": "6f92606f1b26a4a4a59ab5068c195cc1609402a15ed72789f1a2a5173ed4c5be",
+      "bytes": 17698
     },
     {
       "path": "evidence/artifacts/native-dashboard-data-20260921/agentsview-selected-sync.json",
@@ -4216,8 +4285,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "8f29f2d10c2032f9f148cb8d130ef0a5537f042e2a97f8fe38dd9461e8d77ad8",
-      "bytes": 414519
+      "sha256": "e5a0d48addb72a57c182fb7d4f3408ea1305229752299b69b50656d91169e613",
+      "bytes": 418419
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -5816,8 +5885,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "0c35394c91dfa61d5935f3ffa421eceeea78b22e5b7a6f784449b93a4c1cbd4a",
-      "bytes": 3939481
+      "sha256": "28a9da9f9619e719452ff3aeff7a2cb64b2525526cd16cf658c2763b097844b3",
+      "bytes": 4048325
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5826,8 +5895,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "fdfa6f1ca31fbc71fdac9448747682f68cabac6340407f875f9d715e2a9a756b",
-      "bytes": 32417
+      "sha256": "a20204ace007b143fadeb4d4ed187c4f21c5c1984eb76450348de63db048c8f2",
+      "bytes": 32812
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6331,8 +6400,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 76361,
-      "sha256": "13538cbb68fda14b9f89dfed2baa3e0150e1dbc27fceb2e23d94365b217c9911"
+      "bytes": 77241,
+      "sha256": "96aafb39e24da532ec9bef62dc8f196f05168e9aa36a1242a79f4ad179b9233e"
     },
     {
       "path": "observability/README.md",
@@ -6776,8 +6845,8 @@
     },
     {
       "path": "tools/token-report/README.md",
-      "sha256": "241185a835ca94ffe1037bae45e4ae92378d9d84259b495900991d30715a280c",
-      "bytes": 7368
+      "sha256": "6452f20f3198c62639d74bca7120e86ba19d859d16e6cacb76a16f0b8e62175f",
+      "bytes": 10004
     },
     {
       "path": "tools/token-report/config.example.json",
@@ -6786,18 +6855,18 @@
     },
     {
       "path": "tools/token-report/test_token_manifest.py",
-      "sha256": "d96e96ffd60c29419c28eb8c2c93ef37cc9148f3d8c4283f116d42e8d519288f",
-      "bytes": 29827
+      "sha256": "1283656ec58d2095b7915887c0d005e83dcf206dc275907cd20ed5a80507da91",
+      "bytes": 41324
     },
     {
       "path": "tools/token-report/token_manifest.html.in",
-      "sha256": "f626779ccd5b4d27f401257e8ed33e2055bdd837e16588d4a646784436d18030",
-      "bytes": 10213
+      "sha256": "f7bfb09f19acc7512d89a1495a39155d0ceffcf3244a02177f54d3a6f59fc07f",
+      "bytes": 10367
     },
     {
       "path": "tools/token-report/token_manifest.py",
-      "sha256": "8c32a6832b53baddfe895b0e5dd14319d955a4ac4e55b842e0e9fc2e91900b38",
-      "bytes": 45037
+      "sha256": "7b1c0511e9a56f587392309330e447bb190e5c819950892997a44065f2714e33",
+      "bytes": 50793
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/README.md",

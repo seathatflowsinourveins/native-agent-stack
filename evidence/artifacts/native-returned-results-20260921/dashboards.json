@@ -1,0 +1,1469 @@
+{
+  "schema_version": 1,
+  "kind": "public-safe-projection-of-private-native-returned-results",
+  "generated_at": "2026-09-21T04:20:34.758926+00:00",
+  "projection_label": "Selected factual metadata and raw-source hashes only. This file intentionally omits page, transcript, notification and request bodies, private IDs, home paths, account names and credentials. It is not a replacement for the privately retained originals.",
+  "scope": {
+    "unique_adopted_ui_views": 13,
+    "qmd_inventory": 1,
+    "optional_serena_probe": 1,
+    "records": 15,
+    "native_command_receipts": 177,
+    "no_new_inference_requests": true,
+    "no_new_workflow_runs": true,
+    "no_new_notifications": true,
+    "no_service_or_database_configuration_changes": true,
+    "owned_browsers_closed": true
+  },
+  "views": [
+    {
+      "id": "dashboard-ai-memory",
+      "title": "ai-memory scoped wiki",
+      "components": [
+        "ai-memory"
+      ],
+      "status": "observed",
+      "ui": "http://127.0.0.1:49374/web/w/agent-lab/agent-lab",
+      "official_upstream_source": "https://github.com/akitaonrails/ai-memory/blob/v2.3.2/docs/usage.md#browse-the-wiki-in-a-browser",
+      "native_command_template": "ai-memory --data-dir <configured-store> status --json; GET /web/w/<workspace>/<project>",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:04:02.277187+00:00",
+      "completed_at": "2026-09-21T04:16:48.949212+00:00",
+      "observation": {
+        "database_counts": {
+          "pages_latest": 52,
+          "pages_all": 150,
+          "sessions": 72,
+          "observations": 32781
+        },
+        "project_url_scope": "agent-lab/agent-lab",
+        "project_search_performed": true,
+        "embedding_rows": 0,
+        "project_page_link_targets_including_collapsed_system_pages": 52,
+        "visible_non_system_page_entries": 1,
+        "search_results": 1,
+        "article_rendered_characters": 863,
+        "search_and_article_bodies_published": false
+      },
+      "boundary": "CLI status counts the entire configured database; the selected project page and search are a narrower scope. Bodies are private. No memory was written.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "f380f50cec25479f6a582d4f708599d2133a41109e81843cc44e733e6c8813a4",
+          "stdout_basename": "memory-status.stdout",
+          "stdout_bytes": 1981,
+          "stdout_sha256": "8a06d7a08851859a72a1d4c80e48bddcb9141ff8ba7d7d50a89a3c476ee653da",
+          "stderr_bytes": 183,
+          "stderr_sha256": "7e8d4d28effccf2bd7dae53b21cde357faf1d884fe5afa476ea946672fd5e7a8",
+          "started_at": "2026-09-21T04:04:02.277187+00:00",
+          "completed_at": "2026-09-21T04:04:02.285013+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "d1fcdf20c815394b90a4f25bac83fefecbf5a4d566bf887ac70f09414da4df43",
+          "stdout_basename": "memory-native-page.stdout",
+          "stdout_bytes": 23768,
+          "stdout_sha256": "9407fff5b813418d56bd8b18b12e6f8eb29f339cbfb98306de48e595cb5749f1",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:12:32.927233+00:00",
+          "completed_at": "2026-09-21T04:12:32.932357+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "7e039123782dbbbf7602c336249ad827d95b25d1a713b9edf29e56af71a5d07a",
+          "stdout_basename": "memory-search-ui.stdout",
+          "stdout_bytes": 6091,
+          "stdout_sha256": "23e8aaf81453176b5f027e43bd6e6d0e328b68e3acc4ab60076b4adf21156dae",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:16:48.931602+00:00",
+          "completed_at": "2026-09-21T04:16:48.949212+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "63b38b6490cb5120593a3c665a56c9eb8c6de8b845a0bae56151eafafa59158a",
+          "stdout_basename": "memory-search-settled-ui.stdout",
+          "stdout_bytes": 874,
+          "stdout_sha256": "65ed0a9e81fe89a0112612b1c418933c9317235f788a586ac4935aefcbb5ec1a",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:17:59.402796+00:00",
+          "completed_at": "2026-09-21T04:17:59.406871+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "edd20f0521581c212b099b493ebdcfb66fb6ac8275a59e8a21625ebfac2b19ee",
+          "stdout_basename": "memory-article-ui.stdout",
+          "stdout_bytes": 1484,
+          "stdout_sha256": "28005f051e424457f68da3210ca13f4aa137396373a17dd8527b8be3f84d74ff",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:17:59.436870+00:00",
+          "completed_at": "2026-09-21T04:17:59.441297+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "1527cf112d4d79559d9d407a0270247cf31a8859752462244f43d9fcb140d011",
+          "stdout_basename": "memory-article-native.stdout",
+          "stdout_bytes": 5383,
+          "stdout_sha256": "35c2b82b340e3fd5e47613a8e0098c1d6ff08718b06fce043b793f9cfb516f34",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:17:59.441450+00:00",
+          "completed_at": "2026-09-21T04:17:59.446955+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        }
+      ]
+    },
+    {
+      "id": "dashboard-socraticode",
+      "title": "SocratiCode interactive graph",
+      "components": [
+        "socraticode"
+      ],
+      "status": "observed",
+      "ui": "http://127.0.0.1:17500/socraticode-graph.html",
+      "official_upstream_source": "https://github.com/giancarloerra/SocratiCode",
+      "native_command_template": "GET /socraticode-graph.html (existing upstream-generated artifact)",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:01:25.244189+00:00",
+      "completed_at": "2026-09-21T04:12:32.941098+00:00",
+      "observation": {
+        "files": 222,
+        "rendered_edges": 41,
+        "symbols": 2405,
+        "calls": 4638,
+        "rendered_canvases": 3,
+        "artifact_matches_installed": true
+      },
+      "boundary": "Upstream-generated interactive snapshot; no new generation, semantic search, embedding request or model inference in this probe. Existing native semantic query evidence is reused, not re-executed.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "31b876916f46a0e741a12906f6d44cc159876649032634130cc322625ba6a6c9",
+          "stdout_basename": "graph-native-artifact.stdout",
+          "stdout_bytes": 3075902,
+          "stdout_sha256": "44aa783c118258d8e60a9230686f5700f1a3b737377a3ae8d2eefd329badc3a7",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:12:32.926143+00:00",
+          "completed_at": "2026-09-21T04:12:32.941098+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "fc549b327a24ba415e0a02ccb3338a62b98c3c7cd5e6ef93aecd86d2ec0f14db",
+          "stdout_basename": "graph-ui.stdout",
+          "stdout_bytes": 650,
+          "stdout_sha256": "98f5c6e75ae7dbae4a48ed518997d09d4dbcd497c8974b1943038090873854c5",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:01:25.244189+00:00",
+          "completed_at": "2026-09-21T04:01:25.246873+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        }
+      ]
+    },
+    {
+      "id": "dashboard-qdrant",
+      "title": "Qdrant collections",
+      "components": [
+        "qdrant",
+        "qdrant-web-ui"
+      ],
+      "status": "observed",
+      "ui": "http://127.0.0.1:16333/dashboard#/collections",
+      "official_upstream_source": "https://api.qdrant.tech/api-reference/collections/get-collection",
+      "native_command_template": "GET /collections; GET /collections/<selected-collection>",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:00:39.715089+00:00",
+      "completed_at": "2026-09-21T04:13:13.437386+00:00",
+      "observation": {
+        "collections": 5,
+        "selected_collection": "<configured-collection>",
+        "selected_points": 7431,
+        "status": "green",
+        "optimizer_status": "ok",
+        "visible_count_matches": true
+      },
+      "boundary": "Native points count is not the sum of dense and sparse representations. Existing collections were observed without changing data.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "fad429d89955423ae63ae98356421886887fe32c03f99d073b5b56901468f141",
+          "stdout_basename": "qdrant-collections.stdout",
+          "stdout_bytes": 237,
+          "stdout_sha256": "4f90d4be456613181b464cd3a9a06f8a8cfc279fb920235caab5b5109f27d59e",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:00:39.715089+00:00",
+          "completed_at": "2026-09-21T04:00:39.722418+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "3e493a7480c2ae55892051423a7771eaea9195866f0d5789e7abfa8094ea63cf",
+          "stdout_basename": "qdrant-selected.stdout",
+          "stdout_bytes": 1098,
+          "stdout_sha256": "2f4de340ec3d532ee1fa1ff400201371b8d12eba6232ba742239fe901ef137f5",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:04:02.277390+00:00",
+          "completed_at": "2026-09-21T04:04:02.282301+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "26f8341e96a9d256e7ccd72ea1f65779b46851b94f004327a36623e3f86ad4d1",
+          "stdout_basename": "final-qdrant-ui.stdout",
+          "stdout_bytes": 3066,
+          "stdout_sha256": "ffeb90da4ecd1d7a4bbffdc7d765639e349acfaf2de45e56980ee4e4196d1f05",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:13:13.433063+00:00",
+          "completed_at": "2026-09-21T04:13:13.437386+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        }
+      ]
+    },
+    {
+      "id": "dashboard-token-report",
+      "title": "Full token savings report",
+      "components": [
+        "rtk",
+        "context-mode",
+        "jcodemunch",
+        "headroom",
+        "token-report"
+      ],
+      "status": "observed",
+      "ui": "http://127.0.0.1:17500/token-savings.html#native",
+      "official_upstream_source": "https://github.com/rtk-ai/rtk",
+      "native_command_template": "rtk gain --format json; rtk gain --project --format json; read existing scoped token-report JSON",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:00:39.724565+00:00",
+      "completed_at": "2026-09-21T04:12:32.941754+00:00",
+      "observation": {
+        "report_generated_at": "2026-09-21T03:49:38.239745+00:00",
+        "native_meter_rows": 7,
+        "meters": [
+          {
+            "tool": "context-mode",
+            "scope": "Desktop WSL",
+            "report_observed_at": "2026-09-21T03:49:32.006770+00:00",
+            "success": true,
+            "estimated_saved": 2346752,
+            "session_estimated_saved": 0,
+            "boundary": "Latest persisted upstream file in this runtime root, not a sum of sessions. Lifetime = retained event count \u00d7 256; session = kept-out bytes \u00f7 4. Not avoided provider usage."
+          },
+          {
+            "tool": "context-mode",
+            "scope": "Native Claude",
+            "report_observed_at": "2026-09-21T03:49:31.989103+00:00",
+            "success": true,
+            "estimated_saved": 150528,
+            "session_estimated_saved": 0,
+            "boundary": "Latest persisted upstream file in this runtime root, not a sum of sessions. Lifetime = retained event count \u00d7 256; session = kept-out bytes \u00f7 4. Not avoided provider usage."
+          },
+          {
+            "tool": "context-mode",
+            "scope": "Native Codex",
+            "report_observed_at": "2026-09-21T03:49:31.985157+00:00",
+            "success": true,
+            "estimated_saved": 96256,
+            "session_estimated_saved": 722045,
+            "boundary": "Latest persisted upstream file in this runtime root, not a sum of sessions. Lifetime = retained event count \u00d7 256; session = kept-out bytes \u00f7 4. Not avoided provider usage."
+          },
+          {
+            "tool": "headroom",
+            "scope": "Linux / native last 30 days",
+            "report_observed_at": "2026-09-21T03:49:31.034688+00:00",
+            "success": true,
+            "estimated_saved": 0,
+            "session_estimated_saved": null,
+            "boundary": "Upstream field named lifetime is capped at 30 days in version 0.37.0; local offline guards do not append native events."
+          },
+          {
+            "tool": "jcodemunch",
+            "scope": "Linux / upstream default index",
+            "report_observed_at": "2026-09-21T03:49:31.804208+00:00",
+            "success": true,
+            "estimated_saved": 59640,
+            "session_estimated_saved": null,
+            "boundary": "Persistent upstream retrieval estimate, including validation calls. Whole-file counterfactual; not measured provider savings. Custom index-root accounting has an upstream gap in 1.108.319; the default root is used. Schema-size estimates are separate and never added."
+          },
+          {
+            "tool": "rtk",
+            "scope": "Linux / all retained projects",
+            "report_observed_at": "2026-09-21T03:49:30.791037+00:00",
+            "success": true,
+            "estimated_saved": 5360,
+            "session_estimated_saved": null,
+            "boundary": "Native estimates; configured history retention 90 days. Global includes project counters."
+          },
+          {
+            "tool": "rtk",
+            "scope": "Linux / project <private-local-path>",
+            "report_observed_at": "2026-09-21T03:49:30.796635+00:00",
+            "success": true,
+            "estimated_saved": 2209,
+            "session_estimated_saved": null,
+            "boundary": "Native estimates for this working directory only; already included in global."
+          }
+        ],
+        "current_rtk_global": {
+          "summary": {
+            "total_commands": 301,
+            "total_input": 741933,
+            "total_output": 736742,
+            "total_saved": 5360,
+            "avg_savings_pct": 0.7224372012028041,
+            "total_time_ms": 129958,
+            "avg_time_ms": 431
+          }
+        },
+        "current_rtk_project": {
+          "summary": {
+            "total_commands": 28,
+            "total_input": 13981,
+            "total_output": 11772,
+            "total_saved": 2209,
+            "avg_savings_pct": 15.800014305128387,
+            "total_time_ms": 543,
+            "avg_time_ms": 19
+          }
+        },
+        "rendered_table_rows": 72
+      },
+      "boundary": "The HTML is a generated local report. Native estimates overlap and are not additive. Fresh RTK is separate from persisted source-meter timestamps; no causal provider savings are claimed.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "0b3d1961b086b267f6f4c64eda239a2a123c2c0d462256eabdade2053d538fe6",
+          "stdout_basename": "native-report-file.stdout",
+          "stdout_bytes": 4391655,
+          "stdout_sha256": "f335f74aff2a0951a2bafdedd86c990aa9ea334262faf4916a4cce6aea4d6234",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:04:02.282456+00:00",
+          "completed_at": "2026-09-21T04:04:02.292446+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "5e7691287a8140da9d43b59aac7c22fdb2193a8f9a1313a4d174390601ed4d2f",
+          "stdout_basename": "rtk-global.stdout",
+          "stdout_bytes": 225,
+          "stdout_sha256": "f5a34e501946a2939b38014b4123fdf5bd0a19ee6f52361efb2b8cc77597add4",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:00:39.724565+00:00",
+          "completed_at": "2026-09-21T04:00:39.727362+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "815e54cb18281eb399d283aa715e32a080edb37cfa6e197a07b204c56e191f13",
+          "stdout_basename": "rtk-project.stdout",
+          "stdout_bytes": 218,
+          "stdout_sha256": "4489523d52d8b88f274742dd25252812d5b3383ad94ef8e50939263a7b2f6096",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:00:39.727477+00:00",
+          "completed_at": "2026-09-21T04:00:39.729712+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "9de906809ecf0f60778c29a8c483e215988536641ed4d846b8503e39e27d9996",
+          "stdout_basename": "token-native-artifact.stdout",
+          "stdout_bytes": 3402331,
+          "stdout_sha256": "e75cbb01945eb82aeec7533c812dcd7e5f5943888669229db8ba0a5c032c99f2",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:12:32.926750+00:00",
+          "completed_at": "2026-09-21T04:12:32.941754+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "c7a1f04adf74bab66813dfe970dbb4f6398837e0bb847a456ac185afe47b2112",
+          "stdout_basename": "tokens-ui.stdout",
+          "stdout_bytes": 18205,
+          "stdout_sha256": "e1c36dcd866380283cc13ff5c1618e71ffa46e20552e1fb472b4bef3cf6a6e88",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:01:25.770354+00:00",
+          "completed_at": "2026-09-21T04:01:25.775095+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        }
+      ]
+    },
+    {
+      "id": "dashboard-foundation",
+      "title": "Foundation Grafana inventory",
+      "components": [
+        "grafana",
+        "loki",
+        "native-data"
+      ],
+      "status": "observed",
+      "ui": "http://127.0.0.1:13000/d/native-foundation-data",
+      "official_upstream_source": "https://grafana.com/docs/loki/latest/reference/loki-http-api/",
+      "native_command_template": "GET /api/dashboards/uid/native-foundation-data; Grafana Loki datasource query using provisioned panel expressions",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:00:39.722579+00:00",
+      "completed_at": "2026-09-21T04:13:14.941462+00:00",
+      "observation": {
+        "memory_inventory_rows": 3,
+        "token_scope_rows": 7,
+        "memory_inventory": [
+          {
+            "entity_id": "ai-memory",
+            "title": "ai-memory: entire configured database",
+            "state": "ok",
+            "value": "52",
+            "unit": "pages",
+            "source_updated_at": "2026-09-21T04:10:35.616228+00:00",
+            "source_command": "ai-memory --data-dir <configured-db> status --json",
+            "boundary": "Database-wide counts. CLI status has no workspace/project selector; configured project labels do not filter these counts."
+          },
+          {
+            "entity_id": "qdrant",
+            "title": "Qdrant: configured collection",
+            "state": "ok",
+            "value": "7431",
+            "unit": "points",
+            "source_updated_at": "2026-09-21T04:10:35.761610+00:00",
+            "source_command": "GET /collections/<allowlisted-collection>",
+            "boundary": "Native points_count for one explicitly selected collection; vector representations are not added together."
+          },
+          {
+            "entity_id": "qmd",
+            "title": "QMD: configured collection",
+            "state": "ok",
+            "value": "68",
+            "unit": "files",
+            "source_updated_at": "2026-09-21T04:10:35.748529+00:00",
+            "source_command": "qmd --index <configured-index> status",
+            "boundary": "Selected collection files; vector and total counts apply to its entire index. Zero vectors can be intentional BM25 operation."
+          }
+        ],
+        "token_scopes": [
+          {
+            "entity_id": "rtk-project",
+            "title": "RTK: configured project",
+            "state": "ok",
+            "value": "2243",
+            "unit": "estimated_tokens",
+            "source_updated_at": "2026-09-21T04:10:35.600928+00:00",
+            "source_command": "rtk gain --project --format json",
+            "boundary": "Explicit working directory; subset of global retained history, not provider usage."
+          },
+          {
+            "entity_id": "headroom",
+            "title": "Headroom: retained 30 days",
+            "state": "ok",
+            "value": "0",
+            "unit": "estimated_tokens",
+            "source_updated_at": "2026-09-21T03:49:31.034688+00:00",
+            "source_command": "existing token report: native.latest",
+            "boundary": "Latest native report capture; retained tool estimate, overlapping with other counters, not avoided provider usage."
+          },
+          {
+            "entity_id": "jcodemunch",
+            "title": "jCodeMunch: default index",
+            "state": "ok",
+            "value": "59640",
+            "unit": "estimated_tokens",
+            "source_updated_at": "2026-09-21T03:49:31.804208+00:00",
+            "source_command": "existing token report: native.latest",
+            "boundary": "Latest native report capture; retained tool estimate, overlapping with other counters, not avoided provider usage."
+          },
+          {
+            "entity_id": "context-mode-desktop-wsl",
+            "title": "Context Mode: Desktop WSL",
+            "state": "stale",
+            "value": "2346752",
+            "unit": "estimated_tokens",
+            "source_updated_at": "2026-09-20T17:05:34.932000+00:00",
+            "source_command": "existing token report: native.latest",
+            "boundary": "One runtime snapshot: retained estimate = event count x 256; session estimate = kept-out bytes / 4. Different bases, not additive or provider savings. Retention can decrease counters."
+          },
+          {
+            "entity_id": "context-mode-native-claude",
+            "title": "Context Mode: native Claude",
+            "state": "ok",
+            "value": "150528",
+            "unit": "estimated_tokens",
+            "source_updated_at": "2026-09-21T03:49:29.476000+00:00",
+            "source_command": "existing token report: native.latest",
+            "boundary": "One runtime snapshot: retained estimate = event count x 256; session estimate = kept-out bytes / 4. Different bases, not additive or provider savings. Retention can decrease counters."
+          },
+          {
+            "entity_id": "context-mode-native-codex",
+            "title": "Context Mode: native Codex",
+            "state": "ok",
+            "value": "96256",
+            "unit": "estimated_tokens",
+            "source_updated_at": "2026-09-21T03:49:30.548000+00:00",
+            "source_command": "existing token report: native.latest",
+            "boundary": "One runtime snapshot: retained estimate = event count x 256; session estimate = kept-out bytes / 4. Different bases, not additive or provider savings. Retention can decrease counters."
+          },
+          {
+            "entity_id": "rtk-global",
+            "title": "RTK: all retained projects",
+            "state": "ok",
+            "value": "5394",
+            "unit": "estimated_tokens",
+            "source_updated_at": "2026-09-21T04:10:35.597030+00:00",
+            "source_command": "rtk gain --format json",
+            "boundary": "Retained RTK history, including this project; overlaps project and context counters; not provider usage."
+          }
+        ],
+        "rendered_memory_table_matches": true
+      },
+      "boundary": "Locally provisioned integration panels over upstream APIs, not a component-vendor prebuilt dashboard. Delivery time does not establish freshness of persisted counters.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "747a458fdd2ded9078c2ae6a72514a1730a9191945c819c396e8415b53f899bb",
+          "stdout_basename": "grafana-foundation.stdout",
+          "stdout_bytes": 11274,
+          "stdout_sha256": "a6d2036819745f75663e0f9ac12c38ff887f2ea3d478b0aff7ce8a3ef84bf54c",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:00:39.722579+00:00",
+          "completed_at": "2026-09-21T04:00:39.733558+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "a3f9f28328829fab632846d350c0e47b9d4cb304f30e37c3529ba263d8468ba4",
+          "stdout_basename": "grafana-foundation-panel-6-api.stdout",
+          "stdout_bytes": 5894,
+          "stdout_sha256": "f58a4ef0729545cd1de5a13602ee57276f5cb7e57ff52bab20c04c36b8932316",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:12:32.933749+00:00",
+          "completed_at": "2026-09-21T04:12:32.946638+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "3b1aa09f9c4a4fa49c9c55d94498fad3acb39bf01ff4d3783d0118e7d21e126c",
+          "stdout_basename": "grafana-foundation-panel-5-api.stdout",
+          "stdout_bytes": 9386,
+          "stdout_sha256": "61fb186111b80c872f53ae5a2515c4a468a42876ba9338de9e2bf4fc14ff4d24",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:12:32.932865+00:00",
+          "completed_at": "2026-09-21T04:12:32.946880+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "c4dc6877e84865356e4a47d842a75080b064c8302490bfff5fdcd59997c7a557",
+          "stdout_basename": "final-foundation-ui.stdout",
+          "stdout_bytes": 6320,
+          "stdout_sha256": "2f15767599da137df50f950c0531402bd087d0caf7fa41ba7c1ffdc62bdc313d",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:13:14.839160+00:00",
+          "completed_at": "2026-09-21T04:13:14.941462+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        }
+      ]
+    },
+    {
+      "id": "dashboard-agentsview",
+      "title": "Selected native conversation archive",
+      "components": [
+        "agentsview"
+      ],
+      "status": "observed",
+      "ui": "http://127.0.0.1:17384/",
+      "official_upstream_source": "https://github.com/kenn-io/agentsview/tree/v0.43.0",
+      "native_command_template": "GET /api/v1/sessions?limit=100&include_one_shot=true&automated_scope=all; read-only selected archive row metadata",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:04:02.277749+00:00",
+      "completed_at": "2026-09-21T04:13:12.454026+00:00",
+      "observation": {
+        "stored_rows": 17,
+        "default_api_rows": 4,
+        "api_top_level_rows_with_single_turns": 14,
+        "subagent_rows": 3,
+        "selected_native_snapshots": [
+          {
+            "agent": "codex",
+            "message_count": 2249,
+            "user_message_count": 31,
+            "started_at": "2026-09-20T05:04:45.07Z",
+            "ended_at": "2026-09-21T02:30:21.884Z",
+            "created_at": "2026-09-21T02:30:22.570Z"
+          },
+          {
+            "agent": "claude",
+            "message_count": 19,
+            "user_message_count": 3,
+            "started_at": "2026-09-21T02:00:36.505Z",
+            "ended_at": "2026-09-21T02:13:29.691Z",
+            "created_at": "2026-09-21T02:30:39.315Z"
+          },
+          {
+            "agent": "claude",
+            "message_count": 6,
+            "user_message_count": 1,
+            "started_at": "2026-09-21T02:03:54.352Z",
+            "ended_at": "2026-09-21T02:07:51.418Z",
+            "created_at": "2026-09-21T02:30:39.725Z"
+          }
+        ],
+        "selected_rendered_characters": [
+          6051,
+          7610,
+          5796
+        ]
+      },
+      "boundary": "The default API excludes single-turn sessions. include_one_shot=true&automated_scope=all exposes 14 top-level sessions; 3 subagents remain in the 17-row archive. Three selected imports are dated snapshots, not continuous live ingestion. No sync was run.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "bde51c6b69ce131c7d0f25a856db5379019fe5f3b974bd064b838d38565cfb2d",
+          "stdout_basename": "archive-api-v1.stdout",
+          "stdout_bytes": 5679,
+          "stdout_sha256": "6b5767895c8a751e88cd48b86aa00fd853569666d528fab217b4b0a695843a91",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:04:02.277749+00:00",
+          "completed_at": "2026-09-21T04:04:02.286028+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "be0b11aea92d181d192cb3cdd730fbba6899b259bfdeece372b6e1e82fa984da",
+          "stdout_basename": "archive-full-api.stdout",
+          "stdout_bytes": 20836,
+          "stdout_sha256": "f9f90c2439bb7f1c11b6cae1c636da893ccf029d3368282305dfc120b898f4b0",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:10:17.825438+00:00",
+          "completed_at": "2026-09-21T04:10:17.830540+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "f696fea16ca5461e7216f4f11ccb5ea94a06b85924824a1464ae39443ecc601a",
+          "stdout_basename": "final-archive-all-ui.stdout",
+          "stdout_bytes": 13289,
+          "stdout_sha256": "021a1e4c63876c1ec323e155e7ea34454477e7852862002a06630fac87ead936",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:10:17.830674+00:00",
+          "completed_at": "2026-09-21T04:10:17.836911+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "d0a24d8331060ae68c5087f2a928152c846cda65a4c3def2a0195e830eee5f50",
+          "stdout_basename": "archive-selected-1-ui.stdout",
+          "stdout_bytes": 11511,
+          "stdout_sha256": "19a9aabb77e802fd5db477f58ddfc0affaf1189f1998e15c8d0907dbece9b8d7",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:11:53.650248+00:00",
+          "completed_at": "2026-09-21T04:11:53.654744+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "1e6fa65cbafa4f499cffb1158fe1abb225ba9ad99ad252b65c80ef3147e52e58",
+          "stdout_basename": "archive-selected-2-ui.stdout",
+          "stdout_bytes": 13045,
+          "stdout_sha256": "775a2300c384285fa64acc0785a48958786d12ccf0defbd02e3cbfd5ac63734f",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:12:21.978716+00:00",
+          "completed_at": "2026-09-21T04:12:21.986622+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "81fd53bb5cff4ad7be06cf7bce735694158bb878dece100fdc58e2e872a082a1",
+          "stdout_basename": "archive-selected-3-settled-ui.stdout",
+          "stdout_bytes": 6286,
+          "stdout_sha256": "eac3b3083730a2447cfff31a2a559b6ae783d76a76db8b016c413c3a5556c315",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:13:12.449675+00:00",
+          "completed_at": "2026-09-21T04:13:12.454026+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        }
+      ]
+    },
+    {
+      "id": "dashboard-dagu",
+      "title": "Dagu retained run history",
+      "components": [
+        "dagu"
+      ],
+      "status": "observed",
+      "ui": "http://127.0.0.1:18525/dag-runs",
+      "official_upstream_source": "https://github.com/dagucloud/dagu/tree/v2.16.6",
+      "native_command_template": "GET /api/v1/dag-runs?remoteNode=local&fromDate=<30-day-start>&limit=100&workspace=all",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:05:22.996719+00:00",
+      "completed_at": "2026-09-21T04:07:08.301063+00:00",
+      "observation": {
+        "returned_runs": 9,
+        "succeeded": 6,
+        "failed": 2,
+        "cancelled": 1,
+        "equity_ready_present": true,
+        "date_filter": "Last 30 days",
+        "today_default_empty": true
+      },
+      "boundary": "These are stored historical runs, including intentional failure/cancellation acceptance runs. Definitions are not executions. No workflow was started. The Today default hides the older records.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "1f08a232d216a2c5143668d7ad6e7bfe1a377b5348c26d144cb114be9dc4ab62",
+          "stdout_basename": "dagu-history-api.stdout",
+          "stdout_bytes": 2731,
+          "stdout_sha256": "38f10b00f7adb8db8949ca6a1dd7f83ef1753ccce38850e9572137108951fda8",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:07:08.296232+00:00",
+          "completed_at": "2026-09-21T04:07:08.301063+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "67f5987d14e2e249ea870f561307568e73d755bf8696f5e7a2bbcf448d099519",
+          "stdout_basename": "dagu-history-ui.stdout",
+          "stdout_bytes": 3983,
+          "stdout_sha256": "4b2048aca68f81edb09a3e219a8c70587f6c59bc4e271c417b1cfcc78531d09c",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:05:22.996719+00:00",
+          "completed_at": "2026-09-21T04:05:22.999697+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        }
+      ]
+    },
+    {
+      "id": "dashboard-ntfy",
+      "title": "ntfy retained topic",
+      "components": [
+        "ntfy"
+      ],
+      "status": "observed",
+      "ui": "http://127.0.0.1:18080/ecosystem-alerts",
+      "official_upstream_source": "https://docs.ntfy.sh/subscribe/api/",
+      "native_command_template": "GET /ecosystem-alerts/json?poll=1&since=all",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:00:39.716028+00:00",
+      "completed_at": "2026-09-21T04:02:11.303500+00:00",
+      "observation": {
+        "retained_messages": 21,
+        "event_types": {
+          "message": 21
+        },
+        "earliest_timestamp": 1789827009,
+        "latest_timestamp": 1789961596,
+        "topic": "ecosystem-alerts"
+      },
+      "boundary": "Existing retained notifications only. Message bodies are private; no artificial notification was sent.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "e47a64056607d748592b536b326e2a0b6daa2613cdb9c79b52cd44a5ae5d25e4",
+          "stdout_basename": "ntfy-messages.stdout",
+          "stdout_bytes": 16085,
+          "stdout_sha256": "8f8c292114b593612ded367af2a9fbd1b15959b43a15fa73f9cb877c252b5769",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:00:39.716028+00:00",
+          "completed_at": "2026-09-21T04:00:39.724138+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "bc6238821fca834cfe8dec5fb3321d64b0f4b36c65aac0f6c57f12f1023c2466",
+          "stdout_basename": "ntfy-ui.stdout",
+          "stdout_bytes": 24348,
+          "stdout_sha256": "780d0239342eec4bd1aeeb306ea77a6de5d1ecba6646108f524360441ac66eea",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:02:11.276611+00:00",
+          "completed_at": "2026-09-21T04:02:11.303500+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        }
+      ]
+    },
+    {
+      "id": "dashboard-omniroute",
+      "title": "OmniRoute usage analytics",
+      "components": [
+        "omniroute"
+      ],
+      "status": "observed",
+      "ui": "http://127.0.0.1:20128/dashboard/analytics",
+      "official_upstream_source": "https://github.com/diegosouzapw/OmniRoute/tree/v3.8.50",
+      "native_command_template": "GET /api/usage/analytics?range=30d",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:08:59.906096+00:00",
+      "completed_at": "2026-09-21T04:09:38.549926+00:00",
+      "observation": {
+        "range": "30d",
+        "summary": {
+          "totalRequests": 31,
+          "promptTokens": 55857,
+          "completionTokens": 1863,
+          "totalTokens": 57720,
+          "successfulRequests": 28,
+          "successRatePct": 90.32,
+          "avgLatencyMs": 1987,
+          "totalCost": 0,
+          "firstRequest": "2026-09-18T21:01:24.591Z",
+          "lastRequest": "2026-09-20T15:44:55.903Z"
+        },
+        "native_ui_requests_match": true,
+        "native_ui_tokens_match": true,
+        "old_usage_route_redirects_to_logs": true
+      },
+      "boundary": "Only traffic through this gateway is counted. Direct Codex/Claude activity is separate. Zero cost/savings fields are returned counters, not a causal savings claim. Use /dashboard/analytics; the older /dashboard/usage redirects to logs. No provider call was made.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "f4f584112ffa88c2eccfa6b0a027e42f73742fb64f03f857109c768dbd4a5b86",
+          "stdout_basename": "final-omni-analytics-api.stdout",
+          "stdout_bytes": 4289,
+          "stdout_sha256": "a78ad7fc9bb9743cc3689bb01d07105dc152d28673454c2aa778e849230d2d45",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:09:38.537088+00:00",
+          "completed_at": "2026-09-21T04:09:38.549926+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "d579bc62e6dae2c290dc24f15a77f58ca880838c57c082dde36d4464c70712bb",
+          "stdout_basename": "final-omni-analytics-ui.stdout",
+          "stdout_bytes": 7175,
+          "stdout_sha256": "f01772b6d45f3a99ad51ff9c7721689e70a5f40b1241c3418851371c8461147c",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:08:59.906096+00:00",
+          "completed_at": "2026-09-21T04:08:59.910276+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        }
+      ]
+    },
+    {
+      "id": "dashboard-agent-browser",
+      "title": "agent-browser active session",
+      "components": [
+        "agent-browser"
+      ],
+      "status": "observed",
+      "ui": "http://127.0.0.1:4848/",
+      "official_upstream_source": "https://github.com/vercel-labs/agent-browser",
+      "native_command_template": "agent-browser session list; owned named-session dashboard observation",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:07:09.394472+00:00",
+      "completed_at": "2026-09-21T04:07:09.416386+00:00",
+      "observation": {
+        "owned_session_visible": true,
+        "active_sessions_at_capture": 1,
+        "connected_stream": true,
+        "initial_context_subprocess_runtime_dir": null,
+        "owned_session_closed_at_completion": true
+      },
+      "boundary": "The first context-tool subprocess lacked native XDG_RUNTIME_DIR and produced an empty dashboard view. Re-running from native desktop exec restored the shared native runtime and showed the owned session. The owned browser is closed at completion.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "396031805b9b5dd11e70be73dcbcdcc7e794aa579f37a0524c4438d4c390694a",
+          "stdout_basename": "final-browser-native-sessions.stdout",
+          "stdout_bytes": 58,
+          "stdout_sha256": "deaa642882be8c5f2092334c46c9289508046564ec623e383ec1c96100e5109f",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:07:09.414935+00:00",
+          "completed_at": "2026-09-21T04:07:09.416386+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "01c585aa6bb4c5d4827d3eb0cded306751cebf6431bb9e94fcc0f7bb138c3b6f",
+          "stdout_basename": "final-browser-ui.stdout",
+          "stdout_bytes": 717,
+          "stdout_sha256": "1d29200db5bffd9412bbeee21e7e3af13075048cb7d1cc47e15a52ec3921d062",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:07:09.394472+00:00",
+          "completed_at": "2026-09-21T04:07:09.414786+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        }
+      ]
+    },
+    {
+      "id": "dashboard-promptfoo",
+      "title": "Promptfoo retained local echo export",
+      "components": [
+        "promptfoo"
+      ],
+      "status": "observed",
+      "ui": "http://127.0.0.1:17500/promptfoo.html",
+      "official_upstream_source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/src/util/output.ts",
+      "native_command_template": "GET /promptfoo.html (retained native HTML export)",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:03:38.380394+00:00",
+      "completed_at": "2026-09-21T04:12:32.932736+00:00",
+      "observation": {
+        "rendered_table_rows": 3,
+        "retained_passing_assertions": 2,
+        "artifact_matches_installed": true,
+        "upstream_version": "0.123.1",
+        "new_evaluation_calls": 0
+      },
+      "boundary": "Official HTML export of an existing two-assertion local echo fixture. This is neither a new model evaluation nor model-quality evidence; no default database changes.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "bb8064dcdec855cada5a364c4651c2744631594e98728b333751120cf1c90079",
+          "stdout_basename": "promptfoo-native-artifact.stdout",
+          "stdout_bytes": 44311,
+          "stdout_sha256": "072260edaf43bc5e4738169169ee184a04220f93351f8ddb2aa87635c705c3d8",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:12:32.926423+00:00",
+          "completed_at": "2026-09-21T04:12:32.932736+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "59c3d21d5374b74f8953a65e6f39884c94e8001b38d1bc574f7a9a1cb8439f10",
+          "stdout_basename": "promptfoo-ui.stdout",
+          "stdout_bytes": 1394,
+          "stdout_sha256": "21d9e4c9dd4785b0113cdf467110e6efd2879d9e3ef7091bccfa1627b44705dd",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:03:38.380394+00:00",
+          "completed_at": "2026-09-21T04:03:38.383930+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        }
+      ]
+    },
+    {
+      "id": "dashboard-provider-telemetry",
+      "title": "Native provider and host telemetry",
+      "components": [
+        "grafana",
+        "prometheus",
+        "opentelemetry"
+      ],
+      "status": "observed",
+      "ui": "http://127.0.0.1:13000/d/ecosystem-native",
+      "official_upstream_source": "https://prometheus.io/docs/prometheus/latest/querying/api/",
+      "native_command_template": "Prometheus /api/v1/query and /api/v1/query_range for provisioned typed Codex/Claude metric expressions",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:09:38.550079+00:00",
+      "completed_at": "2026-09-21T04:14:12.352075+00:00",
+      "observation": {
+        "codex_current_series": {
+          "cache_write_input": [
+            1789963778.556,
+            "0"
+          ],
+          "cached_input": [
+            1789963778.556,
+            "134631168"
+          ],
+          "input": [
+            1789963778.556,
+            "140520258"
+          ],
+          "output": [
+            1789963778.556,
+            "576960"
+          ],
+          "reasoning_output": [
+            1789963778.556,
+            "184872"
+          ],
+          "total": [
+            1789963778.556,
+            "129874334"
+          ]
+        },
+        "claude_instant_series_count": 0,
+        "claude_last_hour_series": {
+          "cacheCreation": {
+            "points": 26,
+            "last_returned": [
+              1789963692,
+              "5017"
+            ]
+          },
+          "cacheRead": {
+            "points": 26,
+            "last_returned": [
+              1789963692,
+              "131525"
+            ]
+          },
+          "input": {
+            "points": 26,
+            "last_returned": [
+              1789963692,
+              "96"
+            ]
+          },
+          "output": {
+            "points": 26,
+            "last_returned": [
+              1789963692,
+              "854"
+            ]
+          }
+        },
+        "ui_historical_claude_legend_present": true
+      },
+      "boundary": "Typed exported counters, not savings. Claude has no instant series at capture, while the last-hour range retains four historical series. Neither absence nor an old series is current zero usage; exported coverage is bounded.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "09f28dc87003547b0c0862f96726d0fffb67056146509b59c0b9c14af1f53ab8",
+          "stdout_basename": "codex-provider-api.stdout",
+          "stdout_bytes": 505,
+          "stdout_sha256": "baa4fde33b43beda7bcebb5d214ddca6eb963634c0255c6c3dc2b264e12270b8",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:09:38.550079+00:00",
+          "completed_at": "2026-09-21T04:09:38.558113+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "e2d49d7a9c3ee279b4025d1102546f3f55fc75dd8f1a43e1b03b5ff420e82898",
+          "stdout_basename": "claude-provider-api.stdout",
+          "stdout_bytes": 63,
+          "stdout_sha256": "664b0f4a552599ac59d91a24f7e6ea8c7a4499ad237fb76aa25c33d8c25f6ec2",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:09:38.558249+00:00",
+          "completed_at": "2026-09-21T04:09:38.564239+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "b2abf3383d234958c5a239cf86d1d776408512f83fea35d161e27b62c9e83fc1",
+          "stdout_basename": "claude-provider-range-api.stdout",
+          "stdout_bytes": 2379,
+          "stdout_sha256": "015c1e4deb0fa476c8605ef3b2485ec34f6066d94e83a5a436a5e30b07da7905",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:14:12.345526+00:00",
+          "completed_at": "2026-09-21T04:14:12.352075+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "bdcc1df9ae367cb6fa4f9953eb49a997caa3db30b22fb02634e2ef9f75b0171a",
+          "stdout_basename": "final-telemetry-ui.stdout",
+          "stdout_bytes": 2574,
+          "stdout_sha256": "61fcd7f240774c63c36230a6bfb79a3b86f888b85e2f1b847954f277f5feb327",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:13:15.797735+00:00",
+          "completed_at": "2026-09-21T04:13:15.803202+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        }
+      ]
+    },
+    {
+      "id": "dashboard-research",
+      "title": "Research checkpoints Grafana",
+      "components": [
+        "grafana",
+        "loki",
+        "dagu"
+      ],
+      "status": "observed",
+      "ui": "http://127.0.0.1:13000/d/research-grand",
+      "official_upstream_source": "https://grafana.com/docs/loki/latest/reference/loki-http-api/",
+      "native_command_template": "GET /api/dashboards/uid/research-grand; Grafana Loki datasource query using native workflow panel expression",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:00:39.724366+00:00",
+      "completed_at": "2026-09-21T04:12:32.955349+00:00",
+      "observation": {
+        "native_workflow_rows": 3,
+        "workflow_fields": [
+          {
+            "title": "Research pair / last 10 runs within 30 days",
+            "state": "observed / bounded local history",
+            "history_count": "2",
+            "succeeded_count": "2",
+            "source_updated_at": "2026-09-19T21:59:00+00:00"
+          },
+          {
+            "title": "Research pair / recent entry 1",
+            "state": "succeeded",
+            "history_count": null,
+            "succeeded_count": null,
+            "source_updated_at": "2026-09-19T21:59:00+00:00"
+          },
+          {
+            "title": "Research pair / recent entry 2",
+            "state": "succeeded",
+            "history_count": null,
+            "succeeded_count": null,
+            "source_updated_at": "2026-09-19T19:41:50+00:00"
+          }
+        ],
+        "ui_retained_research_pair_runs": 2,
+        "ui_missing_sdk_usage_marked_no_data": true
+      },
+      "boundary": "Dated coordinator checkpoints, recorded experiments and bounded native workflow history. Fresh emission is not proof of new research; SDK no-data remains unknown.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "57660a04d7565eafe194d2dedd69c23f3415081b236db81518920bb8a53cb110",
+          "stdout_basename": "grafana-research.stdout",
+          "stdout_bytes": 18188,
+          "stdout_sha256": "221dbbd5d838f7313140650824b935ef0e16eae91b9c6e633be180850336b6b9",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:00:39.724366+00:00",
+          "completed_at": "2026-09-21T04:00:39.733388+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "98b268512bb7d0e908a2f459c89942def6eb8ff4aa4fc956f35a11ed726a1873",
+          "stdout_basename": "grafana-research-panel-15-api.stdout",
+          "stdout_bytes": 5286,
+          "stdout_sha256": "60601df4a8ae7c97b31f4aaf7aa08ee3ea922e1d9bb29a06984eb7238f418b8b",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:12:32.942007+00:00",
+          "completed_at": "2026-09-21T04:12:32.955349+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        },
+        {
+          "command_metadata_sha256": "a5b9fee2f774726bf1327fda0eb1eeece30b34a8145e403d002375463857e5d7",
+          "stdout_basename": "research-ui-settled.stdout",
+          "stdout_bytes": 3540,
+          "stdout_sha256": "e2add5cd6397fc372d05ecbe42ca0a4b8ac234f38a419c08ded72ed5f05f57db",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:04:28.116713+00:00",
+          "completed_at": "2026-09-21T04:04:28.120875+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        }
+      ]
+    },
+    {
+      "id": "dashboard-qmd",
+      "title": "QMD scoped document inventory",
+      "components": [
+        "qmd"
+      ],
+      "status": "observed",
+      "ui": "http://127.0.0.1:13000/d/native-foundation-data",
+      "official_upstream_source": "https://github.com/tobi/qmd",
+      "native_command_template": "qmd --index agent-lab-docs status",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:00:39.729826+00:00",
+      "completed_at": "2026-09-21T04:00:39.858517+00:00",
+      "observation": {
+        "index": "agent-lab-docs",
+        "collection": "agent-lab-docs",
+        "documents": 68,
+        "embedded_vectors": 0,
+        "foundation_ui_same_file_count": true
+      },
+      "boundary": "Native scoped lexical/BM25 lane with zero embedding vectors by design. No new embedding or index mutation. Existing retrieved document/query evidence was reused.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "dcbcfdfe7737996e27ddee34239af05b5961fc27664927f3744a252392ae5ab1",
+          "stdout_basename": "qmd-status.stdout",
+          "stdout_bytes": 1062,
+          "stdout_sha256": "58b0905746bfe119e78d729c44390709bd78dd2c0a51366e66c1d81c091296a8",
+          "stderr_bytes": 0,
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "started_at": "2026-09-21T04:00:39.729826+00:00",
+          "completed_at": "2026-09-21T04:00:39.858517+00:00",
+          "exit_code": 0,
+          "timed_out": false
+        }
+      ]
+    },
+    {
+      "id": "dashboard-serena",
+      "title": "Serena direct dashboard check",
+      "components": [
+        "serena"
+      ],
+      "status": "unavailable",
+      "ui": "http://127.0.0.1:24284/dashboard/index.html",
+      "official_upstream_source": "https://github.com/oraios/serena",
+      "native_command_template": "GET http://127.0.0.1:24284/dashboard/index.html",
+      "command_template_notice": "Public template with explicit scope placeholders; exact original argv is private and linked by command-metadata hash.",
+      "started_at": "2026-09-21T04:14:12.352213+00:00",
+      "completed_at": "2026-09-21T04:14:21.361477+00:00",
+      "observation": {
+        "http_exit_code": 28,
+        "response_bytes": 0,
+        "live_dashboard_confirmed": false
+      },
+      "boundary": "Direct loopback check after the child run. An unavailable endpoint is not a dashboard success; no process was restarted and no server setting changed.",
+      "source_results": [
+        {
+          "command_metadata_sha256": "7824e67abcdfc897c6b7102d3c691f2cbffdaf7f2b1e32dc6702bdfaa4104d12",
+          "stdout_basename": "serena-native-page.stdout",
+          "stdout_bytes": 0,
+          "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "stderr_bytes": 57,
+          "stderr_sha256": "5e06bdd3b415e2e0e0d88a7809a59357850893358749d697c00285d8977a739e",
+          "started_at": "2026-09-21T04:14:12.352213+00:00",
+          "completed_at": "2026-09-21T04:14:21.361477+00:00",
+          "exit_code": 28,
+          "timed_out": false
+        }
+      ]
+    }
+  ],
+  "limitations_and_recovered_attempts": [
+    {
+      "issue": "Initial subprocess environment",
+      "observation": "Context-tool subprocess lacked native runtime and user-bus variables. Initial browser dashboard appeared empty and service query failed. Owned subprocess browser was closed; native desktop runtime showed the owned active session and successful service metadata."
+    },
+    {
+      "issue": "HTTP 200 SPA fallbacks",
+      "observation": "The initial archive /api/sessions and Dagu /api/v2/dag-runs guesses returned HTML. They were rejected as data evidence. Actual browser-discovered v1 APIs were used."
+    },
+    {
+      "issue": "Asynchronous page loading",
+      "observation": "Some early DOM reads preceded data loading, and readiness checks used labels unavailable during transitions. Settled observations and matching returned APIs are recorded; failed attempts retained."
+    },
+    {
+      "issue": "Archive default filters",
+      "observation": "17 stored rows are preserved. Default list returns4; including single-turn sessions returns14 top-level rows, with3 subagent rows separate. All three requested selected snapshots were observed."
+    },
+    {
+      "issue": "Dagu date scope",
+      "observation": "Today shows no runs. Last30days shows9 stored runs, including6success,2failed,1cancelled."
+    },
+    {
+      "issue": "Gateway route",
+      "observation": "/dashboard/usage redirects to logs. /dashboard/analytics displays the matching30-day native summary."
+    },
+    {
+      "issue": "Provider telemetry freshness",
+      "observation": "The instant Claude query has0series; the preceding1-hour range has4historical series. Historical display is not current activity or current zero."
+    },
+    {
+      "issue": "Serena optional URL",
+      "observation": "DirectHTTP request timed out after10seconds; browser access also failed. Marked unavailable; no restart or configuration change."
+    }
+  ],
+  "failed_attempts": [
+    {
+      "attempt": "archive-selected-1-ready",
+      "exit_code": 1,
+      "timed_out": false,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 33,
+      "stderr_sha256": "2bc37e1e973308cb8fe28ceee86da2a8132a834af061c29f2493e6d52977e34e",
+      "started_at": "2026-09-21T04:11:25.452816+00:00",
+      "completed_at": "2026-09-21T04:11:53.650105+00:00"
+    },
+    {
+      "attempt": "units-active-args",
+      "exit_code": 1,
+      "timed_out": false,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 42,
+      "stderr_sha256": "746707a49085d66703eb45f2baea0df38a88bab7346195ece161e8e14ef2a3d1",
+      "started_at": "2026-09-21T04:05:23.003104+00:00",
+      "completed_at": "2026-09-21T04:05:23.004942+00:00"
+    },
+    {
+      "attempt": "serena-ui-open",
+      "exit_code": 1,
+      "timed_out": false,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 41,
+      "stderr_sha256": "765520eed64670c3be0351c7a9eeb0b984699f6840c8fe51c6de1ee3367aef77",
+      "started_at": "2026-09-21T04:14:21.361630+00:00",
+      "completed_at": "2026-09-21T04:14:54.581426+00:00"
+    },
+    {
+      "attempt": "archive-selected-2-ready",
+      "exit_code": 1,
+      "timed_out": false,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 33,
+      "stderr_sha256": "2bc37e1e973308cb8fe28ceee86da2a8132a834af061c29f2493e6d52977e34e",
+      "started_at": "2026-09-21T04:11:53.738490+00:00",
+      "completed_at": "2026-09-21T04:12:21.978574+00:00"
+    },
+    {
+      "attempt": "dagu-date-options",
+      "exit_code": 1,
+      "timed_out": false,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 108,
+      "stderr_sha256": "631f767cac763fecd09c9fa87e91241f4bfd7b2704e4491561e8a19853e27402",
+      "started_at": "2026-09-21T04:04:28.313919+00:00",
+      "completed_at": "2026-09-21T04:04:28.319289+00:00"
+    },
+    {
+      "attempt": "final-omni-home-ready",
+      "exit_code": 1,
+      "timed_out": false,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 33,
+      "stderr_sha256": "2bc37e1e973308cb8fe28ceee86da2a8132a834af061c29f2493e6d52977e34e",
+      "started_at": "2026-09-21T04:07:26.826551+00:00",
+      "completed_at": "2026-09-21T04:07:54.612595+00:00"
+    },
+    {
+      "attempt": "browser-dashboard-api",
+      "exit_code": 22,
+      "timed_out": false,
+      "stdout_bytes": 82,
+      "stdout_sha256": "2fe2b7bea7f61fa111a09897ff05d52a704b0ca2be5d16b35adacf6b4268e00b",
+      "stderr_bytes": 49,
+      "stderr_sha256": "e85a8cbf6458f846675a9fd218c04399e808ed1f6629e19c4dd964125cd967c9",
+      "started_at": "2026-09-21T04:04:02.279278+00:00",
+      "completed_at": "2026-09-21T04:04:02.282886+00:00"
+    },
+    {
+      "attempt": "serena-ui",
+      "exit_code": 1,
+      "timed_out": false,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 44,
+      "stderr_sha256": "8e84a0325d3e84cd11356ffea188e265fcb43ebaeee73627aa9fe9db98199c2c",
+      "started_at": "2026-09-21T04:15:27.692153+00:00",
+      "completed_at": "2026-09-21T04:16:00.869050+00:00"
+    },
+    {
+      "attempt": "final-omni-analytics-ready",
+      "exit_code": 1,
+      "timed_out": false,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 33,
+      "stderr_sha256": "2bc37e1e973308cb8fe28ceee86da2a8132a834af061c29f2493e6d52977e34e",
+      "started_at": "2026-09-21T04:08:32.326774+00:00",
+      "completed_at": "2026-09-21T04:08:59.905959+00:00"
+    },
+    {
+      "attempt": "serena-native-page",
+      "exit_code": 28,
+      "timed_out": false,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 57,
+      "stderr_sha256": "5e06bdd3b415e2e0e0d88a7809a59357850893358749d697c00285d8977a739e",
+      "started_at": "2026-09-21T04:14:12.352213+00:00",
+      "completed_at": "2026-09-21T04:14:21.361477+00:00"
+    },
+    {
+      "attempt": "dagu-ui-wait",
+      "exit_code": 1,
+      "timed_out": false,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 33,
+      "stderr_sha256": "2bc37e1e973308cb8fe28ceee86da2a8132a834af061c29f2493e6d52977e34e",
+      "started_at": "2026-09-21T04:01:45.955725+00:00",
+      "completed_at": "2026-09-21T04:02:11.012562+00:00"
+    },
+    {
+      "attempt": "omni-usage-stats-api",
+      "exit_code": 22,
+      "timed_out": false,
+      "stdout_bytes": 32,
+      "stdout_sha256": "6c104184f2ab617ed87e4cfc47510278c2dcaa25aa580e1a158c3c8b5318ca75",
+      "stderr_bytes": 49,
+      "stderr_sha256": "0fb219efe96c7b0a4962325763ebbe3324456de8ca7b7d1e71142d92a6d8eab2",
+      "started_at": "2026-09-21T04:07:08.335695+00:00",
+      "completed_at": "2026-09-21T04:07:08.414935+00:00"
+    },
+    {
+      "attempt": "omni-usage-api",
+      "exit_code": 22,
+      "timed_out": false,
+      "stdout_bytes": 115,
+      "stdout_sha256": "e75e0a7742e6d13b74e928430b56b1c17a3c2248569018abe4bd80a6b3c1cb71",
+      "stderr_bytes": 49,
+      "stderr_sha256": "0fb219efe96c7b0a4962325763ebbe3324456de8ca7b7d1e71142d92a6d8eab2",
+      "started_at": "2026-09-21T04:07:08.305546+00:00",
+      "completed_at": "2026-09-21T04:07:08.335543+00:00"
+    },
+    {
+      "attempt": "serena-ui-ready",
+      "exit_code": 1,
+      "timed_out": false,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 44,
+      "stderr_sha256": "8e84a0325d3e84cd11356ffea188e265fcb43ebaeee73627aa9fe9db98199c2c",
+      "started_at": "2026-09-21T04:14:54.581609+00:00",
+      "completed_at": "2026-09-21T04:15:27.692011+00:00"
+    },
+    {
+      "attempt": "browser-ui-wait",
+      "exit_code": 1,
+      "timed_out": false,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 33,
+      "stderr_sha256": "2bc37e1e973308cb8fe28ceee86da2a8132a834af061c29f2493e6d52977e34e",
+      "started_at": "2026-09-21T04:03:10.380775+00:00",
+      "completed_at": "2026-09-21T04:03:38.339348+00:00"
+    },
+    {
+      "attempt": "serena-ui-snapshot",
+      "exit_code": 1,
+      "timed_out": false,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 38,
+      "stderr_sha256": "8a9a302a8b7baa3ceee43ede7f2c6e3686bce2c08846a8406c4e1db2a3c691dd",
+      "started_at": "2026-09-21T04:16:00.869220+00:00",
+      "completed_at": "2026-09-21T04:16:34.041787+00:00"
+    },
+    {
+      "attempt": "omniroute-ui",
+      "exit_code": 1,
+      "timed_out": false,
+      "stdout_bytes": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 110,
+      "stderr_sha256": "6bb9780744b721e59faf948246caf83439767d6d71ea527b9472f8825a888e64",
+      "started_at": "2026-09-21T04:02:11.734056+00:00",
+      "completed_at": "2026-09-21T04:02:11.859536+00:00"
+    }
+  ]
+}

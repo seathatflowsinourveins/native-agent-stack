@@ -1,0 +1,359 @@
+{
+  "schema_version": 1,
+  "projection_type": "Public-safe projection of retained native results; not original full streams. Original source artifact hashes and byte counts permit private reconciliation.",
+  "captured_date": "2026-09-21",
+  "records": [
+    {
+      "runtime": "native-codex",
+      "model": "gpt-6-astra",
+      "cli_version": "0.155.1",
+      "exit_code": 0,
+      "task_scope": "One fresh native child task, separate from the Desktop session; existing account, model and permission defaults preserved.",
+      "timing": {
+        "capture_started_at": "2026-09-21T04:01:05.720571+00:00",
+        "native_invocation_finished_at": "2026-09-21T04:01:51.260566+00:00",
+        "native_invocation_elapsed_seconds": 39.856,
+        "capture_start_to_native_exit_seconds": 45.539995,
+        "native_returned_duration_ms": null,
+        "labels": "Invocation elapsed measures the timed native command only. Capture interval starts before Git baseline and RTK-before observations, and ends at native command completion; after-counter collection is outside that interval."
+      },
+      "selected_checks": {
+        "rtk": {
+          "command": "rtk git log -6",
+          "projection_type": "Exact returned stdout field copied unchanged from native client tool result; not a reconstructed rerun.",
+          "returned_text": "44750ed feat: add native automatic code RAG and runtime layers (2 days ago) <seathatflowsinourveins>\nc3ef73f docs: align memory coverage with successful Claude login (2 days ago) <seathatflowsinourveins>\n0b21a91 feat: add native shared memory and research retrieval (2 days ago) <seathatflowsinourveins>\nc366d19 docs: refresh recent models and native ecosystem versions (2 days ago) <seathatflowsinourveins>\nba4b8c5 docs: publish full native stack evidence and memory RAG audit (2 days ago) <seathatflowsinourveins>\n8b91b72 docs: record successful native login and measured output reduction (2 days ago) <seathatflowsinourveins>\n",
+          "returned_sha256": "cf1e7a76ceac94b9a2313ca03ddeaa0c6b654d6e8cabbaed7e68e9af9b7b24d4"
+        },
+        "qmd": {
+          "command": "qmd --index agent-lab-docs search \"token guide\" -c agent-lab-docs --json -n 3",
+          "projection_type": "Match-count-only projection; document snippets omitted.",
+          "match_count": 3
+        },
+        "context_mode_file": {
+          "tool": "ctx_execute_file",
+          "projection_type": "Exact heading lines selected from actual returned text; source path, echoed code and remaining text omitted.",
+          "returned_heading_lines": "## Daily selection\n## jCodeMunch: selected code retrieval\n## Context Mode project scope\n## Guarded Headroom\n## Evidence and lifecycle"
+        },
+        "context_mode_statistics": {
+          "tool": "ctx_stats",
+          "returned": true,
+          "certified_child_token_savings": null,
+          "boundary": "Original report contains a one-hour session age, broad aggregate figures and Opus 4.7 cost labels inconsistent with these short configured-model runs. Retained as upstream output, not certified child or provider savings."
+        },
+        "serena": {
+          "tool": "open_dashboard",
+          "returned": true,
+          "returned_dashboard_url": "http://127.0.0.1:24284/dashboard/index.html",
+          "native_message": "Automatic opening unavailable; URL returned.",
+          "boundary": "The result confirms fresh-client dashboard activation; endpoint lifetime after child exit is not established."
+        }
+      },
+      "rtk_native_estimate": {
+        "scope": "Project cumulative counter snapshots around this invocation; upstream estimates.",
+        "before": {
+          "total_commands": 28,
+          "total_input": 13981,
+          "total_output": 11772,
+          "total_saved": 2209
+        },
+        "after": {
+          "total_commands": 29,
+          "total_input": 14155,
+          "total_output": 11929,
+          "total_saved": 2226
+        },
+        "delta": {
+          "total_commands": 1,
+          "total_input": 174,
+          "total_output": 157,
+          "total_saved": 17
+        }
+      },
+      "exact_retained_artifact_comparison": {
+        "tokenizer": "gpt-tokenizer 3.4.0",
+        "encoding": "o200k_base",
+        "raw_git_log_tokens": 537,
+        "actual_returned_rtk_tokens": 178,
+        "tokens_removed": 359,
+        "percent_smaller": 66.85288640595903,
+        "same_head_before_after": true,
+        "raw_commit_count": 6,
+        "all_six_short_commit_ids_preserved": true,
+        "head": "44750edc1d67ffd7a8ca96be69f5180531976bb9",
+        "boundary": "Comparison of retained artifacts only. RTK omits/reformats commit metadata; this is not lossless compression or measured provider-token/billing savings."
+      },
+      "native_provider_counters": {
+        "input_tokens": 156394,
+        "cached_input_tokens": 118784,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 969,
+        "reasoning_output_tokens": 205
+      },
+      "provider_counter_boundary": "Cached input is a subset of input; reasoning output is a subset of output. No native cost returned.",
+      "native_cost": {
+        "returned_cost_usd": null,
+        "basis": "No cost returned by native Codex stream."
+      },
+      "hook_observation": {
+        "source": "exact native rollout matched with scoped Context Mode database groups",
+        "boundary": "No direct native hook event stream. Startup rule rows were excluded from post-tool evidence. Shared ctx-server attribution is insufficient to certify exclusive child usage."
+      },
+      "warnings": [
+        "Three upstream MCP OAuth/keyring warnings were retained; all selected checks returned successfully."
+      ],
+      "source_artifacts": [
+        {
+          "artifact": "stream.jsonl",
+          "bytes": 55321,
+          "sha256": "939595195be59b8e11f2bf43c6022d96604d10c470303d7accd136bbfd0ff61e"
+        },
+        {
+          "artifact": "stderr.txt",
+          "bytes": 682,
+          "sha256": "31ccd7002aaf5f07ce993ec469e739663c35282026472314f30448c5ed06400c"
+        },
+        {
+          "artifact": "selected-command-results.json",
+          "bytes": 9352,
+          "sha256": "93c0493a0c56862dc52c69ce7393170b8b4aae77f2f0511d9a8395186a9d1380"
+        },
+        {
+          "artifact": "rtk-git-log.returned.txt",
+          "bytes": 629,
+          "sha256": "cf1e7a76ceac94b9a2313ca03ddeaa0c6b654d6e8cabbaed7e68e9af9b7b24d4"
+        },
+        {
+          "artifact": "git-log-raw.stdout",
+          "bytes": 1456,
+          "sha256": "85d55265414d6c3507c1284edb550e27c04fab67ff5e12c21b88af2c7c7bd6d3"
+        },
+        {
+          "artifact": "ctx_execute_file.returned.txt",
+          "bytes": 873,
+          "sha256": "6367bd9ec2e60d67c6663947c02ab987c0b708236eb0c22ef858d248b7e31f60"
+        },
+        {
+          "artifact": "ctx_stats.returned.txt",
+          "bytes": 3175,
+          "sha256": "2692dcea85820974dc5f5a763e6e514d947f9a692142de2ea929b57241b2e3f6"
+        },
+        {
+          "artifact": "provider-usage.json",
+          "bytes": 426,
+          "sha256": "aa45f8d621f28b09b3a293d6f4f948dec6d544edef2b55abeb31f4bc1e1bcde7"
+        },
+        {
+          "artifact": "launch-receipt.json",
+          "bytes": 2209,
+          "sha256": "1c7859482873a5400b34cb928f37280a538e797043730b1bf6d7287839589a63"
+        },
+        {
+          "artifact": "tokenized-artifact-comparison.json",
+          "bytes": 1003,
+          "sha256": "5982c6e097996b98283238d9ebef05210ee25065e22ced97095877f25b444a6f"
+        }
+      ]
+    },
+    {
+      "runtime": "native-claude",
+      "model": "claude-fable-5-1",
+      "cli_version": "2.1.278",
+      "exit_code": 0,
+      "task_scope": "One fresh native child task, separate from the Desktop session; existing account, model and permission defaults preserved.",
+      "timing": {
+        "capture_started_at": "2026-09-21T04:02:03.373377+00:00",
+        "native_invocation_finished_at": "2026-09-21T04:02:40.457209+00:00",
+        "native_invocation_elapsed_seconds": 34.221,
+        "capture_start_to_native_exit_seconds": 37.083832,
+        "native_returned_duration_ms": 32621,
+        "labels": "Invocation elapsed measures the timed native command only. Capture interval starts before Git baseline and RTK-before observations, and ends at native command completion; after-counter collection is outside that interval."
+      },
+      "selected_checks": {
+        "rtk": {
+          "command": "rtk git log -6",
+          "projection_type": "Exact returned stdout field copied unchanged from native client tool result; not a reconstructed rerun.",
+          "returned_text": "44750ed feat: add native automatic code RAG and runtime layers (2 days ago) <seathatflowsinourveins>\nc3ef73f docs: align memory coverage with successful Claude login (2 days ago) <seathatflowsinourveins>\n0b21a91 feat: add native shared memory and research retrieval (2 days ago) <seathatflowsinourveins>\nc366d19 docs: refresh recent models and native ecosystem versions (2 days ago) <seathatflowsinourveins>\nba4b8c5 docs: publish full native stack evidence and memory RAG audit (2 days ago) <seathatflowsinourveins>\n8b91b72 docs: record successful native login and measured output reduction (2 days ago) <seathatflowsinourveins>",
+          "returned_sha256": "7e24534228e799c12d6503a1741dc55759ad46177bd020e84706e6e93ed69659"
+        },
+        "qmd": {
+          "command": "qmd --index agent-lab-docs search \"token guide\" -c agent-lab-docs --json -n 3",
+          "projection_type": "Match-count-only projection; document snippets omitted.",
+          "match_count": 3
+        },
+        "context_mode_file": {
+          "tool": "ctx_execute_file",
+          "projection_type": "Exact heading lines selected from actual returned text; source path, echoed code and remaining text omitted.",
+          "returned_heading_lines": "## Daily selection\n## jCodeMunch: selected code retrieval\n## Context Mode project scope\n## Guarded Headroom\n## Evidence and lifecycle"
+        },
+        "context_mode_statistics": {
+          "tool": "ctx_stats",
+          "returned": true,
+          "certified_child_token_savings": null,
+          "boundary": "Original report contains a one-hour session age, broad aggregate figures and Opus 4.7 cost labels inconsistent with these short configured-model runs. Retained as upstream output, not certified child or provider savings."
+        },
+        "serena": {
+          "tool": "open_dashboard",
+          "returned": true,
+          "returned_dashboard_url": "http://127.0.0.1:24284/dashboard/index.html",
+          "native_message": "Native tool reported browser opened.",
+          "boundary": "The result confirms fresh-client dashboard activation; endpoint lifetime after child exit is not established."
+        }
+      },
+      "rtk_native_estimate": {
+        "scope": "Project cumulative counter snapshots around this invocation; upstream estimates.",
+        "before": {
+          "total_commands": 29,
+          "total_input": 14155,
+          "total_output": 11929,
+          "total_saved": 2226
+        },
+        "after": {
+          "total_commands": 30,
+          "total_input": 14329,
+          "total_output": 12086,
+          "total_saved": 2243
+        },
+        "delta": {
+          "total_commands": 1,
+          "total_input": 174,
+          "total_output": 157,
+          "total_saved": 17
+        }
+      },
+      "exact_retained_artifact_comparison": {
+        "tokenizer": "gpt-tokenizer 3.4.0",
+        "encoding": "o200k_base",
+        "raw_git_log_tokens": 537,
+        "actual_returned_rtk_tokens": 178,
+        "tokens_removed": 359,
+        "percent_smaller": 66.85288640595903,
+        "same_head_before_after": true,
+        "raw_commit_count": 6,
+        "all_six_short_commit_ids_preserved": true,
+        "head": "44750edc1d67ffd7a8ca96be69f5180531976bb9",
+        "boundary": "Comparison of retained artifacts only. RTK omits/reformats commit metadata; this is not lossless compression or measured provider-token/billing savings."
+      },
+      "native_provider_counters": {
+        "input_tokens": 194,
+        "cache_creation_input_tokens": 48110,
+        "cache_read_input_tokens": 252437,
+        "output_tokens": 2182,
+        "thinking_tokens": 934
+      },
+      "provider_counter_boundary": "Input, cache creation and cache reads are separate native counters; thinking tokens are included in output. Do not add nested cache-duration details again.",
+      "native_cost": {
+        "returned_cost_usd": 1.13634925,
+        "basis": "Native modelUsage costBasis=list; API-equivalent list-price estimate, not Max subscription billing."
+      },
+      "hook_observation": {
+        "source": "native stream hook_response events",
+        "responses": 29,
+        "events": {
+          "SessionStart": 4,
+          "UserPromptSubmit": 1,
+          "PreToolUse": 12,
+          "PostToolUse": 9,
+          "Stop": 3
+        },
+        "all_exit_codes_zero": true,
+        "precompact_observed": false
+      },
+      "warnings": [],
+      "source_artifacts": [
+        {
+          "artifact": "stream.jsonl",
+          "bytes": 105763,
+          "sha256": "e0c5370a97d74a2ee965cd38bb9de9ece1a9231b9ed13a73d30a704d87e12a9f"
+        },
+        {
+          "artifact": "stderr.txt",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "artifact": "selected-command-results.json",
+          "bytes": 11924,
+          "sha256": "48487156fa87b9a8709685fc79159027edec8b5908abc304bab974f43abf80eb"
+        },
+        {
+          "artifact": "rtk-git-log.returned.txt",
+          "bytes": 628,
+          "sha256": "7e24534228e799c12d6503a1741dc55759ad46177bd020e84706e6e93ed69659"
+        },
+        {
+          "artifact": "git-log-raw.stdout",
+          "bytes": 1456,
+          "sha256": "85d55265414d6c3507c1284edb550e27c04fab67ff5e12c21b88af2c7c7bd6d3"
+        },
+        {
+          "artifact": "ctx_execute_file.returned.txt",
+          "bytes": 873,
+          "sha256": "6367bd9ec2e60d67c6663947c02ab987c0b708236eb0c22ef858d248b7e31f60"
+        },
+        {
+          "artifact": "ctx_stats.returned.txt",
+          "bytes": 3051,
+          "sha256": "3edaaee9bb94f93b8007fa5fe6fa6a10cd595a560c4acad0e1495633482139c9"
+        },
+        {
+          "artifact": "provider-usage.json",
+          "bytes": 1824,
+          "sha256": "a0fd66fbebedec5b9bd6bc205c606bb975eafb60305ad6487b4e02b162543c53"
+        },
+        {
+          "artifact": "launch-receipt.json",
+          "bytes": 2052,
+          "sha256": "ac0eb08c5a450fc244fa93f7fb67d18456ce7e72088468573433e1d47276a6c8"
+        },
+        {
+          "artifact": "tokenized-artifact-comparison.json",
+          "bytes": 1005,
+          "sha256": "25c132869a0f87ff8919170b268a38627de1f2bb0084e935feeaf4f5e51cd696"
+        }
+      ]
+    }
+  ],
+  "upstream_references": [
+    {
+      "component": "Codex",
+      "url": "https://github.com/openai/codex",
+      "reference_type": "official upstream repository"
+    },
+    {
+      "component": "Claude Code",
+      "url": "https://code.claude.com/docs/en/headless",
+      "reference_type": "official native programmatic mode documentation"
+    },
+    {
+      "component": "RTK",
+      "url": "https://github.com/rtk-ai/rtk",
+      "reference_type": "upstream repository"
+    },
+    {
+      "component": "QMD",
+      "url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+      "reference_type": "installed release"
+    },
+    {
+      "component": "Context Mode",
+      "url": "https://github.com/mksglu/context-mode/tree/589d8214d56740a28b5f7bf63167743d586b0b40",
+      "reference_type": "retained source pin for installed 1.0.169"
+    },
+    {
+      "component": "Serena",
+      "url": "https://github.com/oraios/serena/tree/c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "reference_type": "installed source pin"
+    },
+    {
+      "component": "gpt-tokenizer",
+      "url": "https://github.com/niieani/gpt-tokenizer",
+      "reference_type": "upstream repository; installed package 3.4.0 with o200k_base"
+    }
+  ],
+  "limits": [
+    "Exactly one sequential native invocation per client; no model, permission or account changes and no retries.",
+    "No matched unfiltered provider run; provider savings and actual subscription charges are unknown.",
+    "Project cumulative snapshots must not be summed into lifetime savings, and the two runs are not independent benchmark replications.",
+    "Raw native streams, prompts, local paths and session identifiers are excluded from this projection."
+  ]
+}

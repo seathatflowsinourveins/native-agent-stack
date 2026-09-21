@@ -311,6 +311,12 @@
   ],
   "guides": [
     {
+      "title": "Download actual Codex, Claude and dashboard results",
+      "body": "Fresh native client tool returns, separately measured RTK output and estimates, useful dashboard filters, and exact-byte attachments verified before display. Provider usage and per-task attribution remain explicit.",
+      "path": "docs/native-returned-results.md",
+      "category": "evaluation"
+    },
+    {
       "title": "Native foundation qualification: installation, tokens and recovery",
       "body": "Repeated Claude retrieval, native writing workers and graceful recovery, plus a clean Ubuntu userspace installation replay. Observed costs, process deviations and remaining boundaries are retained.",
       "path": "docs/native-foundation-resolution-20260921.md",

@@ -143,6 +143,60 @@ Native failures return a nonzero reporter exit while still writing the report;
 the last good observation remains separate. Keep local config, raw reports and
 the ledger private. Publish only a separately reviewed sanitized receipt.
 
+## Attach actual native runs and dashboard results
+
+Add `returned_results_json` to the private configuration to select one explicit
+evidence manifest. The native commands run separately; importing this manifest
+does not execute commands, browse dashboards or repeat provider work.
+
+```json
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-21T00:00:00Z",
+  "scope": "Example schema only; replace with actual selected observations",
+  "records": [
+    {
+      "id": "chosen-native-operation",
+      "runtime": "Selected native client",
+      "component_ids": ["rtk"],
+      "kind": "upstream native operation",
+      "command": {"argv": ["rtk", "gain", "--format", "json"]},
+      "started_at": null,
+      "completed_at": null,
+      "status": "not executed in this example",
+      "observation": "Supply the actual returned result and observation",
+      "boundary": "No execution or savings is established by this schema example",
+      "attachments": []
+    }
+  ]
+}
+```
+
+Each selected attachment requires `label`, `path`, `bytes` and `sha256`, with an
+optional `mime_type`. Relative file paths resolve beside this evidence manifest.
+Tool invocations can use `command: {"tool": "name", "arguments": {}}` instead of
+argv. Preserve execution dates, failures, original stream hashes and the scope of
+any selected projection. Select safe returned outputs; do not attach authentication
+stores or unrestricted transcripts. Public receipts require a separate review.
+
+The loader checks each complete file against its declared size and SHA-256, copies
+it into the private capture, and embeds exact base64 bytes with a UTF-8 preview
+when possible. Limits are 2 MiB per attachment and 16 MiB total. Missing, modified
+or malformed sources produce a visible issue without substituting old success.
+The source manifest remains retained for diagnosis.
+
+Both templates expose these records and real browser downloads. Full JSON export
+contains the same attachments. The optional full local view is selected with
+`html_template` pointing to `token_manifest.full.html.in`; keep the adjacent
+`returned_results.js` with the reporter. The smaller portable template remains the
+default. This presentation is local integration code, not an upstream dashboard.
+
+For an existing ledger, optional `counter_scopes` keys `rtk_global`, `rtk_project`
+and `headroom` preserve its original scope strings when upgrading the reporter.
+Explicit `inspect_project_history` and `inspect_hook_history` preserve previously
+chosen inspection behavior; a fresh configuration defaults them off. Refreshing
+the report must not create renamed duplicates of existing counters.
+
 ## Verify the bundle
 
 ```sh

@@ -17,15 +17,23 @@ Another PC must configure its own paths, scope, services and native accounts.
 | Current native inventory | [Foundation Grafana](http://127.0.0.1:13000/d/native-foundation-data) | Selected read-only native commands plus current Qdrant/vLLM metrics; failed observations are unknown |
 | This Codex conversation | [Selected archive](http://127.0.0.1:17384/) | One explicitly refreshed Codex snapshot; select the local session in the archive. The active conversation can advance afterward |
 | Two recent native Claude sessions | [Selected archive](http://127.0.0.1:17384/) | Two explicitly selected agent-lab files; local identifiers remain private, and these are not asserted to be this Codex task |
-| Actual workflow runs | [Dagu history](http://127.0.0.1:18525/dag-runs) | Stored run history, including the existing equity-research-evidence run; bundled definitions are not executions |
+| Actual workflow runs | [Dagu history](http://127.0.0.1:18525/dag-runs) | Select Last 30 days to see retained runs; Today can legitimately be empty. Bundled definitions are not executions |
 | Actual local notifications | [ntfy topic](http://127.0.0.1:18080/ecosystem-alerts) | Retained messages in the configured topic; the root page is not the topic feed |
-| Optional gateway usage | [OmniRoute usage](http://127.0.0.1:20128/dashboard/usage) | Recorded traffic through this gateway only; direct Codex/Claude traffic is separate |
+| Optional gateway usage | [OmniRoute analytics](http://127.0.0.1:20128/dashboard/analytics) | Recorded traffic through this gateway only; the former usage route redirects to logs. Direct Codex/Claude traffic is separate |
 | Browser operations | [agent-browser](http://127.0.0.1:4848/) | Active browser sessions and streams; empty when no browser session is active |
 | Evaluation result | [Promptfoo report](http://127.0.0.1:17500/promptfoo.html) | Official HTML export of two passing retained local echo assertions; no model-quality or new evaluation claim |
 | Provider and host telemetry | [Native telemetry](http://127.0.0.1:13000/d/ecosystem-native) | Typed exported counters and host metrics, not estimated savings |
 | Research checkpoints | [Research Grafana](http://127.0.0.1:13000/d/research-grand) | Dated coordinator checkpoints, recorded experiment results and bounded native workflow history |
 
 ## What changed after the HTTP-only checks
+
+The [attached native results guide](native-returned-results.md) explains how to
+download exact returned text and verified bytes from the token report. The
+current-turn Codex/Claude child runs are separate from the historical archives.
+AgentsView's default list excludes single-turn sessions: use its supported
+filters to include those sessions and all automation scopes. Its native API
+supports `include_one_shot=true&automated_scope=all`; top-level rows and child
+agent rows are separate counts. Changing a filter does not refresh the archive.
 
 The earlier [access receipt](../evidence/receipts/native-dashboard-access-20260921.json)
 verified transport and browser access. It did not establish that every page showed
