@@ -100,6 +100,39 @@ class NewsNormalization(unittest.TestCase):
             self.assertNotIn("quote_fresh", item)
             self.assertIn("quote_unavailable", item["limitations"])
 
+    def test_tiny_denominator_and_fractional_share_volume_are_quarantined(self):
+        raw = snapshot()
+        raw["latestTrade"]["p"] = "1000000000000000"
+        raw["prevDailyBar"]["c"] = "0.000000000000000001"
+        raw["dailyBar"]["v"] = "1000000000000000"
+        raw["prevDailyBar"]["v"] = "0.000000000000000001"
+        raw["latestQuote"]["bp"] = "0.00000001"
+        item = m.normalize_snapshot("SPY", raw, m.iso(OBSERVED))
+        self.assertEqual(item["source_sha256"], m.digest(raw))
+        self.assertNotIn("change_from_prior_close_pct", item)
+        self.assertNotIn("partial_day_to_prior_full_day_volume_ratio", item)
+        self.assertNotIn("quote_fresh", item)
+        self.assertIn("prior_close_comparison_unavailable", item["limitations"])
+        self.assertIn("volume_comparison_unavailable", item["limitations"])
+
+    def test_extreme_valid_components_retained_but_outlier_ratios_flagged(self):
+        raw = snapshot()
+        raw["latestTrade"]["p"] = "1000"
+        raw["prevDailyBar"]["c"] = "0.01"
+        raw["dailyBar"]["v"] = "1000000"
+        raw["prevDailyBar"]["v"] = "1"
+        item = m.normalize_snapshot("SPY", raw, m.iso(OBSERVED))
+        self.assertEqual(item["last_trade_price"], "1000")
+        self.assertEqual(item["prior_close"], "0.01")
+        self.assertEqual(item["current_bar_volume"], "1000000")
+        self.assertEqual(item["previous_bar_volume"], "1")
+        self.assertEqual(item["source_sha256"], m.digest(raw))
+        self.assertNotIn("change_from_prior_close_pct", item)
+        self.assertNotIn("partial_day_to_prior_full_day_volume_ratio", item)
+        self.assertIn("price_change_outlier_requires_source_review", item["limitations"])
+        self.assertIn("volume_ratio_outlier_requires_source_review", item["limitations"])
+        self.assertFalse(item["engine_eligible"])
+
     def test_env_file_only_parses_selected_literals(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "fixture.env"

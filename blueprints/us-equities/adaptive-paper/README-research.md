@@ -85,6 +85,11 @@ flagged and do not erase usable news. The volume ratio is explicitly **not**
 time-normalized relative volume or consolidated-market activity. News window
 time and newly observed market context are separate; this is not a historical
 price replay. No return attribution or pre-positioning claim is made.
+Stock-price context requires at least $0.0001 and equity bar volumes must be
+nonnegative integers. Absolute price changes above 10,000% or volume ratios above
+1,000 are flagged for source review instead of displayed as ordinary ratios.
+These are display-quality bounds, not claims that an extreme move is impossible:
+valid component prices/volumes and the source hash remain in the limited context.
 
 ## Existing SEC and advisory layers to extend
 

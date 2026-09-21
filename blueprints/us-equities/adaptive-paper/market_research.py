@@ -75,6 +75,20 @@ def fixed(value):
     return value.rstrip("0").rstrip(".") if "." in value else value
 
 
+def stock_price(value):
+    value = decimal(value, positive=True)
+    if value < Decimal("0.0001"):
+        raise ResearchError("stock_price_below_supported_floor")
+    return value
+
+
+def stock_volume(value, *, positive=False):
+    value = decimal(value, positive=positive)
+    if value < 0 or value != value.to_integral_value():
+        raise ResearchError("equity_volume_must_be_nonnegative_integer")
+    return value
+
+
 def _safe_url(value):
     if value is None:
         return None
@@ -184,7 +198,7 @@ def normalize_snapshot(symbol, raw, observed_at, *, quote_max_age_seconds=10):
     result = {"symbol": symbol, "feed": "iex", "observed_at": observed_at,
               "source_sha256": digest(raw), "engine_eligible": False, "limitations": []}
     try:
-        bid, ask = decimal(quote["bp"], positive=True), decimal(quote["ap"], positive=True)
+        bid, ask = stock_price(quote["bp"]), stock_price(quote["ap"])
         quote_at = utc(quote["t"])
         if bid > ask or quote_at > utc(observed_at) + timedelta(milliseconds=250):
             raise ResearchError("invalid_quote")
@@ -197,23 +211,33 @@ def normalize_snapshot(symbol, raw, observed_at, *, quote_max_age_seconds=10):
     except (ResearchError, KeyError, TypeError):
         result["limitations"].append("quote_unavailable")
     try:
-        price, prior = decimal(trade["p"], positive=True), decimal(previous["c"], positive=True)
+        price, prior = stock_price(trade["p"]), stock_price(previous["c"])
         trade_at, prior_at = utc(trade["t"]), utc(previous["t"])
         if trade_at > utc(observed_at) + timedelta(milliseconds=250) or prior_at >= trade_at:
             raise ResearchError("invalid_market_chronology")
         result.update(last_trade_price=fixed(price), last_trade_at=iso(trade_at),
-                      previous_bar_at=iso(prior_at), prior_close=fixed(prior),
-                      change_from_prior_close_pct=fixed((price / prior - 1) * 100))
+                      previous_bar_at=iso(prior_at), prior_close=fixed(prior))
+        change = (price / prior - 1) * 100
+        if abs(change) <= 10000:
+            result["change_from_prior_close_pct"] = fixed(change)
+        else:
+            result["limitations"].append("price_change_outlier_requires_source_review")
+            result["price_change_display_status"] = "outside_10000_percent_display_bound"
     except (ResearchError, KeyError, TypeError):
         result["limitations"].append("prior_close_comparison_unavailable")
     try:
-        volume, previous_volume = decimal(current["v"]), decimal(previous["v"], positive=True)
+        volume, previous_volume = stock_volume(current["v"]), stock_volume(previous["v"], positive=True)
         current_at, previous_at = utc(current["t"]), utc(previous["t"])
         if volume < 0 or not previous_at < current_at <= utc(observed_at):
             raise ResearchError("invalid_volume_chronology")
         result.update(current_bar_at=iso(current_at), current_bar_volume=fixed(volume),
-                      previous_bar_volume=fixed(previous_volume),
-                      partial_day_to_prior_full_day_volume_ratio=fixed(volume / previous_volume))
+                      previous_bar_volume=fixed(previous_volume))
+        volume_ratio = volume / previous_volume
+        if volume_ratio <= 1000:
+            result["partial_day_to_prior_full_day_volume_ratio"] = fixed(volume_ratio)
+        else:
+            result["limitations"].append("volume_ratio_outlier_requires_source_review")
+            result["volume_ratio_display_status"] = "outside_1000_times_display_bound"
         result["limitations"].append("volume_ratio_not_time_normalized_or_consolidated_market_rvol")
     except (ResearchError, KeyError, TypeError):
         result["limitations"].append("volume_comparison_unavailable")
