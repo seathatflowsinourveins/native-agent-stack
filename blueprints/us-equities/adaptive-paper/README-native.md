@@ -93,17 +93,21 @@ omitted required `DataClientFactory`/`ExecutionClientFactory` inheritance, and a
 test used the old cancellation object argument instead of v2's `ClientOrderId`.
 Both were corrected against original upstream source before the passing run.
 
-The final 2026-09-21 run also passed all seven checks in 1.411 seconds inside a
+The final 2026-09-21 run also passed all seven checks in 1.386 seconds inside a
 fresh `bwrap --unshare-all --clearenv` namespace with only the native runtime,
 repository and system libraries mounted: no network interface other than
 loopback and no credential stores. Raw stdout/stderr are retained privately at
-`/home/seath/codex-ecosystem/state/adaptive-paper-native-20260921/native-tests.*`.
+`/home/seath/codex-ecosystem/state/adaptive-paper-native-20260921/native-tests-start-order.*`.
 The test stderr SHA-256 is
-`95ee593884b898debaa5443e3461428fea6adac44b4949bfa06a3439a6dfc7f0`;
+`4561f78cce2993cde3458c842f454ed10b1919e5ef0b1d835eed3665dc1eaf33`;
 stdout is empty. Tested adapter SHA-256:
-`fca679ef6c545d5c028f38fe685f7d66aa3ab7ede17336d268fb0350c4f8ccd6`.
+`d95fc8aab6a77adc6d6431d7cbe4566a673afa547b09b4512d1fbaa1f6839206`.
 Test source SHA-256:
-`b4e86c0fada0ce4916ed9ccdadf5932f0a707f28ef0cf7caf70e47859c3fe205`.
+`92b09a1aadba25266cb143dd7c421f3d7fcd9a77135ad5c7da6266cf11a4610d`.
+The execution client's first snapshot now explicitly waits for the shared port's
+start, which binds the owner loop used by real transport REST callbacks. The
+dirty-startup regression exercises execution connection independently of data
+connection to catch reliance on incidental task ordering.
 
 `python3 scripts/validate.py` passed (68 components, 1,396 hashed files, 4
 profiles, 125 receipts); `python3 scripts/validate_catalogs.py` passed and

@@ -33,6 +33,8 @@ class FakePort:
         self.stopped += 1
 
     async def snapshot(self):
+        if not self.started:
+            raise RuntimeError("snapshot_requires_bound_owner_loop")
         return {"account": {"cash": str(self.cash), "buying_power": str(self.cash), "equity": "10000"},
                 "orders": list(self.active.values()), "positions": [] if self.qty == 0 else
                 [{"symbol": "SPY", "qty": str(self.qty), "avg_entry_price": "100.01"}]}
@@ -182,6 +184,7 @@ class NativeIntegration(unittest.TestCase):
         ):
             port = FakePort()
             async def dirty_snapshot():
+                self.assertEqual(port.started, 1, "execution must bind the port before its first REST snapshot")
                 return {**snapshot, "account": {"cash": "10000", "equity": "10000", "buying_power": "10000"}}
             port.snapshot = dirty_snapshot
             session = ADAPTER.build_node(port, [{"symbol": "SPY"}], [])
@@ -189,6 +192,7 @@ class NativeIntegration(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "startup_requires"):
                     asyncio.run(session.execution._connect())
             finally:
+                asyncio.run(session.stop_port())
                 session.node.dispose()
             self.assertEqual(port.submissions, [])
 

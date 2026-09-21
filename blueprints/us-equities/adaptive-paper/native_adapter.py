@@ -186,6 +186,10 @@ class AlpacaExecutionClient(ExecutionClient):
         session.execution = self
 
     async def _connect(self):
+        # The port binds its REST callbacks to the owner loop during start.
+        # Strategies remain stopped until this snapshot and native reconciliation
+        # succeed; do not rely on data-client connection scheduling for ordering.
+        await self.session.start()
         snapshot = await self.session.port.snapshot()
         self._validate_snapshot(snapshot)
         if any(dec(row["qty"], signed=True) != 0 for row in snapshot["positions"]):
@@ -196,7 +200,6 @@ class AlpacaExecutionClient(ExecutionClient):
         # This new session deliberately does not adopt an old strategy's ledger.
         self.session.snapshot_state = {**snapshot, "orders": [], "positions": []}
         self._account(snapshot["account"])
-        await self.session.start()
 
     async def _disconnect(self):
         await self.session.stop_port()
