@@ -123,7 +123,8 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
                 # The durable HTTP budget marks attempted *before* any POST. No
                 # attempted request is ever retired based on a missing lookup.
                 ledger.mark_not_sent(intent.client_id, "recovery_proven_never_attempted")
-        port.adopt_intents([_payload(i) for i in ledger.intents() if i.status != "not_sent"])
+        port.adopt_intents([_payload(i) for i in ledger.intents()
+                            if i.status not in {"not_sent", "broker_refused"}])
         await bounded(port.start(quote, order))
         await observe_snapshot()  # Unknown exposure/absent attempted IDs stop here.
         outstanding = {i.client_id for i in ledger.unresolved()}

@@ -92,4 +92,7 @@ publication fixes; this failed check is not reported as passed.
 A subsequent review tightened the refusal contract above. Two regression tests
 distinguish an explicit local `not_sent` guarantee from an actual HTTP refusal
 without that guarantee. The prior source hashes and 18-test receipt describe the
-earlier version; the revised 20-test local suite passes separately.
+earlier version. The revised 21-test local suite also verifies that retained
+`broker_refused` records are excluded from transport adoption and cannot trigger
+an absent-ID lookup that blocks another owned residual's exit. This requires the
+separate safety contract from `b8e2e212b3e2874948c05541b7c3a0b6ee5ab116`.

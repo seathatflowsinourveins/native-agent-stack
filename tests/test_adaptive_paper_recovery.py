@@ -21,7 +21,8 @@ def proof(ledger, snapshot, baseline):
     actual = {r["client_order_id"] for r in snapshot["orders"]}
     if actual - known.keys():
         raise SafetyError("external_order_detected")
-    if any(i.submit_attempted and i.status != "not_sent" and i.client_id not in actual for i in known.values()):
+    if any(i.submit_attempted and i.status not in {"not_sent", "broker_refused"}
+           and i.client_id not in actual for i in known.values()):
         raise SafetyError("submitted_intent_absent")
     if {p["symbol"]: Decimal(p["qty"]) for p in snapshot["positions"]} != {s: p.qty for s, p in ledger.positions().items()}:
         raise SafetyError("position_mismatch")
@@ -215,6 +216,24 @@ class RecoveryTests(unittest.TestCase):
         self.assertEqual(result["status"], "passed")
         self.assertEqual(self.ledger.intents()[0].status, "not_sent")
         self.assertEqual(self.port.adopted, {})
+
+    def test_retained_broker_refusal_does_not_block_owned_residual_exit(self):
+        self.original_buy(observed=True)
+        self.original_buy("0", "new", cid="http-refused")
+        del self.port.rows["http-refused"]
+        self.ledger.mark_broker_refused("http-refused", 403)
+        original_snapshot = self.port.snapshot
+        async def checked_snapshot():
+            self.assertNotIn("http-refused", self.port.adopted,
+                             "a local terminal refusal must never trigger missing-ID broker lookup")
+            return await original_snapshot()
+        self.port.snapshot = checked_snapshot
+        result = self.recover()
+        self.assertEqual(result["status"], "passed")
+        self.assertTrue(result["flat"])
+        self.assertEqual(len(self.port.submissions), 1)
+        self.assertEqual(self.port.submissions[0]["side"], "sell")
+        self.assertEqual(self.ledger.intents()[1].status, "broker_refused")
 
     def test_external_position_stops_without_liquidating_owned_or_external(self):
         self.original_buy()
