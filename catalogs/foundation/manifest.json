@@ -40,7 +40,7 @@
       "purpose": "Delegate bounded independent work with an actual base, owned paths and independent acceptance.",
       "selection": "Native workers first; Beads only when a dependency-aware queue helps.",
       "activation": "One coordinator integrates; each writing worker uses its own worktree and concise task contract.",
-      "lifecycle_scope": "Native child repair and a same-child cancellation/crash/resume fixture passed; an owned systemd cgroup automatically removed the pending descendant and continuation produced one final effect.",
+      "lifecycle_scope": "Native child repair and a same-child cancellation/crash/resume fixture passed; an owned systemd cgroup automatically removed the pending descendant and continuation produced one final effect. Separately, native Workflow selected-child stop, failed/null result preservation, replay and graceful same-session exit/resume/integration are qualified in native-workflow-graceful-recovery-20260921; hard-crash semantics are not transferred between these fixtures.",
       "next_gap": "Qualify changed task effects, independent hosts and provider cancellation separately from the accepted same-host fixture."
     },
     {
@@ -148,7 +148,7 @@
       "purpose": "Retain pinned inputs and prove usable restore, continuity and cleanup at the intended boundary.",
       "selection": "Owned lifecycle recipes, Restic, native application backups and native session resume.",
       "activation": "Use exact snapshots and empty restore targets; keep keys/account sign-ins private and separate from the checkout.",
-      "lifecycle_scope": "Selected same-host and synthetic independent-host application restores, native session/job continuations and one orderly guest scheduled-service reboot passed. Source pins, native outputs and independent observations retain separate scopes.",
+      "lifecycle_scope": "Selected same-host and synthetic independent-host application restores, native session/job continuations and one orderly guest scheduled-service reboot passed. Source pins, native outputs and independent observations retain separate scopes. Native Workflow graceful recovery has its own accepted local fixture and unresolved usage reconciliation; see docs/native-workflow-writing-recovery-20260921.md.",
       "next_gap": "Reuse matching accepted recipes; qualify actual production data, client rebinding, atomicity or a physical recovery target when required by a project."
     },
     {

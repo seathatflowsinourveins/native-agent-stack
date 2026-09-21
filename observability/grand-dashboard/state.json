@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-21T15:58:00Z",
-  "meaning": "Recorded checkpoint; Alpaca paper and native AAPL diagnostic updated September21 after measured execution and independent review. Other rows retain linked receipt dates. Emitter freshness is separate from source update; worker states are checkpoints, not process heartbeats.",
+  "recorded_at_utc": "2026-09-21T15:58:18Z",
+  "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
       "kind": "lane",
@@ -144,6 +144,27 @@
       "title": "Convergence claim integrity",
       "state": "scoped qualification and matched usage checks enforced",
       "evidence_ref": "blueprints/convergence-practice/ci-security/experiment.json"
+    },
+    {
+      "kind": "gate",
+      "id": "foundation-convergence",
+      "title": "Current native foundation convergence",
+      "state": "six stable versions retained / Claude research returned and source claims adjudicated",
+      "evidence_ref": "evidence/receipts/foundation-convergence-20260921.json"
+    },
+    {
+      "kind": "gate",
+      "id": "native-workflow-recovery",
+      "title": "Native Workflow graceful recovery",
+      "state": "graceful stop replay resume accepted / hard crash and accounting unqualified",
+      "evidence_ref": "evidence/receipts/native-workflow-graceful-recovery-20260921.json"
+    },
+    {
+      "kind": "gate",
+      "id": "selective-context-policy",
+      "title": "Claude selective-context policy pilot",
+      "state": "six amended attempts accepted / zero Context Mode calls / no causal saving established",
+      "evidence_ref": "evidence/receipts/claude-selective-context-pilot-20260921.json"
     }
   ],
   "workers": [

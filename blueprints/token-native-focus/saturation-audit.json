@@ -639,6 +639,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "alpaca-paper-e2e-20260921",
+            "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -1103,6 +1108,11 @@
           {
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "alpaca-paper-e2e-20260921",
+            "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -6589,6 +6599,11 @@
           {
             "id": "native-nautilus-ci-20260920",
             "path": "evidence/receipts/native-nautilus-ci-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "nautilus-equity-replay-20260921",
+            "path": "evidence/receipts/nautilus-equity-replay-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
