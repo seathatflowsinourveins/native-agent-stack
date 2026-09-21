@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Bounded native Workflow writing comparison and actual selected-child failure/graceful coordinator exit/resume were not established by source review or read-only worker completion.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.278",
+      "revision": "bf7d404e26a5fb6167d21b46c93a2bf6c22ab274"
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "revision": "3cabcdfd0c3b489867364d9582df8f356586d219"
+    }
+  ],
+  "discovery_provenance": [
+    "Existing native Workflow guide and current official workflow/scheduled-task references.",
+    "Reused unchanged existing invoice pilot and corrected seven-case independent oracle."
+  ],
+  "license_and_compatibility": "Existing local synthetic Python fixture and existing absolute pytest executable; native Claude 2.1.278 subscription, existing permissions and account; bounded owned worktrees on Linux/WSL.",
+  "baseline_and_candidate": {
+    "baseline": "Single native Opus/high invoice repair; no delegation.",
+    "candidate": "Native Fable/Ultracode Workflow with Sonnet/medium writer and Opus/high reviewer, plus separate native recovery qualification."
+  },
+  "frozen_inputs": {
+    "base_revision": "3cabcdfd0c3b489867364d9582df8f356586d219",
+    "tasks": [
+      "invoice-writing",
+      "workflow-recovery"
+    ],
+    "roles": [
+      "native-coordinator"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/frozen-inputs.json",
+        "sha256": "d4702db37bfe222b7a9eb5dc05fd9f15496b845f836b78c93e36d889207aa867"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/frozen-inputs.json",
+        "sha256": "d4702db37bfe222b7a9eb5dc05fd9f15496b845f836b78c93e36d889207aa867"
+      },
+      {
+        "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/protocol-amendment.json",
+        "sha256": "45eec7ce59c3591573fbbb360047177348879cd1755f8ed0c5fab7dcf1c5988f"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/hidden-oracle.py.txt",
+        "sha256": "d0e795d443651e6d4e9323419a5f5f35b6b77eee4cb31d1af38d4d00def01f7b"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Unchanged visible/hidden oracles, original helper and streaming semantics, immutable files and user sentinels; actual native stop/replay, preserved accepted edits and local effect counts. Pilot procedural violations remain failures.",
+    "usage_rule": "Retain all native attempts, failed/repeated review and correction; use final cumulative modelUsage once; reconcile unique persisted responses separately; unknown coverage stays unknown."
+  },
+  "runtime_and_platform": {
+    "platform": "Linux WSL2 x86_64",
+    "tools": [
+      {
+        "name": "claude-code",
+        "version": "2.1.278"
+      },
+      {
+        "name": "coordinator",
+        "version": "claude-fable-5-1 / ultracode"
+      },
+      {
+        "name": "worker-models",
+        "version": "claude-sonnet-5 / medium; claude-opus-5 / high"
+      }
+    ],
+    "isolation": "Owned disposable Git worktrees with explicit task scope; inherited native tools/permissions, not OS confinement. Maximum three native workers configured; actual workers sequential."
+  },
+  "commands": [
+    "claude -p --model opus --effort high --max-turns 20 --output-format stream-json --verbose --include-hook-events --permission-prompts none",
+    "claude -p --model fable --effort ultracode --max-turns 20 --settings examples/claude-native/ultracode.settings.json --add-dir OWNED_WORKER OWNED_ARTIFACTS --output-format stream-json --verbose --include-hook-events --permission-prompts none",
+    "Native /workflow-authoring; Workflow; /workflows selected reviewer x; Workflow resumeFromRunId; /exit Exit and stop tasks; claude --resume OWNED_SESSION -p with native Workflow replay"
+  ],
+  "observations": [
+    {
+      "id": "invoice-single-a1",
+      "task": "invoice-writing",
+      "role": "native-coordinator",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "model_task_execution",
+      "scope": "One ordered native invoice-repair pilot with unchanged visible and hidden oracles.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/comparison.json",
+          "sha256": "81059fb93fa5adfeaa253932ee717045a5e155494251c47e084d7237ef236d8b"
+        },
+        {
+          "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/independent-review.json",
+          "sha256": "25333a28eebfb0a01d14075bc237ca042cf17802cd36a330cff73d3a933e97fb"
+        }
+      ],
+      "usage": {
+        "uncached_input": 12,
+        "cache_creation": 23905,
+        "cache_read": 168340,
+        "output": 2524,
+        "reasoning_in_output": 309,
+        "total": 194781,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "invoice-workflow-b1",
+      "task": "invoice-writing",
+      "role": "native-coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "model_task_execution",
+      "scope": "One ordered native invoice-repair pilot with unchanged visible and hidden oracles.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/comparison.json",
+          "sha256": "81059fb93fa5adfeaa253932ee717045a5e155494251c47e084d7237ef236d8b"
+        },
+        {
+          "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/independent-review.json",
+          "sha256": "25333a28eebfb0a01d14075bc237ca042cf17802cd36a330cff73d3a933e97fb"
+        }
+      ],
+      "usage": {
+        "uncached_input": 280,
+        "cache_creation": 104799,
+        "cache_read": 626126,
+        "output": 22303,
+        "reasoning_in_output": 10077,
+        "total": 753508,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "workflow-graceful-recovery-r1",
+      "task": "workflow-recovery",
+      "role": "native-coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "recovery_execution",
+      "scope": "Native Claude 2.1.278 same-session graceful Workflow recovery on one disposable invoice fixture in Linux/WSL.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/recovery.json",
+          "sha256": "4deb70202e71185dd56bc277cb3b4da9a818e38b7661faf8c829d613d7d7a81d"
+        },
+        {
+          "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/independent-review.json",
+          "sha256": "25333a28eebfb0a01d14075bc237ca042cf17802cd36a330cff73d3a933e97fb"
+        }
+      ],
+      "usage": {
+        "uncached_input": 1960,
+        "cache_creation": 247052,
+        "cache_read": 1866544,
+        "output": 28140,
+        "reasoning_in_output": 15844,
+        "total": 2143696,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "invoice-single-a1",
+      "reason": "Code accepted, but native test pipelines did not preserve pytest exit status; independent unpiped verification passed."
+    },
+    {
+      "run_id": "invoice-workflow-b1",
+      "reason": "Code accepted; required authoring reference not loaded; native test pipelines and saved-session reads violated literal procedure; one structured-output error recovered and retained."
+    }
+  ],
+  "limitations": [
+    "One ordered synthetic task, no counterbalanced inference or universal model ranking.",
+    "Graceful native exit/resume and owned-process cleanup tested, not hard crash, host reboot or provider cancellation.",
+    "Recovery message reconstruction differs from final native cumulative totals by205701; unexplained, complete reconciliation false.",
+    "Local probe is not an external-service exactly-once guarantee; original and operator-replaced sentinels have separate acceptance boundaries.",
+    "No scheduler registration mutation, scheduled fire or scheduler restart qualification.",
+    "Raw native transcripts and machine-specific paths remain private; frozen manifest and unchanged hidden oracle are published."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "Native Claude 2.1.278 same-session graceful Workflow recovery on one disposable invoice fixture in Linux/WSL.",
+    "qualification_run_ids": [
+      "workflow-graceful-recovery-r1"
+    ]
+  },
+  "rollback": "Stop only the owned native coordinator/tasks; keep private accepted worktrees and raw evidence. Do not signal unrelated sessions or alter account/settings/schedulers.",
+  "next_decision_changing_test": "A representative larger task or independently scoped hard-crash/external-effect recovery contract; no automatic rerun of this pair.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

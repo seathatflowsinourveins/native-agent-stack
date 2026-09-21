@@ -1,0 +1,20 @@
+{
+  "before_any_model_dispatch": true,
+  "original_frozen_inputs_retained": true,
+  "reason": "Coordinator narrowed the pilot to a first pair; extra replications require an unresolved measurement question. Prior setup/account overhead must remain explicit.",
+  "initial_dispatch_order": [
+    "single-a1",
+    "workflow-b1"
+  ],
+  "prepared_not_authorized_for_automatic_dispatch": [
+    "workflow-b2",
+    "single-a2"
+  ],
+  "recovery_expected_native_invocations": 2,
+  "recovery_additional_invocations_only_for_concrete_failed_worker_condition": 2,
+  "native_test_executable": "Existing absolute Python executable; exact private invocation retained.",
+  "model_slot": "Serialized with native_run_audit; no independent concurrent native provider sessions",
+  "quota_policy": "Stop new dispatch on quota; retain failure; no unchanged retries.",
+  "private_original_sha256": "3677b09062ae2e0548b237cb1c09b7722ef3ff538e246460ced7ceab87968267",
+  "publication_note": "Only the host executable path is redacted; this amendment preceded any native model dispatch."
+}

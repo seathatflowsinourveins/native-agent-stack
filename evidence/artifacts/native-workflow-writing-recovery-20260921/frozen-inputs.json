@@ -1,0 +1,53 @@
+{
+  "source_base": "b373f030bb95138e84bb97bc67cf1fa7874a75be",
+  "planned_order": [
+    "single-a1",
+    "workflow-b1",
+    "workflow-b2",
+    "single-a2"
+  ],
+  "fixture_sources": {
+    "invoice.py": "3b904dd6d7aa15beac22b680115cd88540127c35791bf6842c061e90aa0b65a7",
+    "AGENTS.md": "e298d063cb9cf10aef104adff4dabfe86de7d59c99273ffd0a612838983b4f3c",
+    "unrelated.txt": "0a76775f0d88980f394244429cd20dcfec4e468068253fafa7269c2516f4cfde",
+    "receipt.py": "9cba2212fe6532931aaaa31e0b1de9b551673c93265c09e5c11cc417a6e3da46",
+    "pytest.ini": "b160d82f7811555051f8966d8e02750a985227c1d022208c784e606946f2eada",
+    ".gitignore": "824fecc6b311e473557b6ea28fafef4640b639b8ee969792ce3a563dd4fba85c",
+    "CLAUDE.md": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
+    "tests/test_invoice.py": "2e36181629958e571db9a9fbb460f58cde8a83ae705cb7d5e2e72c3ba4f5255e"
+  },
+  "hidden_oracle_sha256": "d0e795d443651e6d4e9323419a5f5f35b6b77eee4cb31d1af38d4d00def01f7b",
+  "sentinels": {
+    "single-a1": {
+      "unrelated.txt": "6b4fa03a7c111f1105cc49c5da8897c0b80b0eb392f9f73911535308d88d950c",
+      "user-note.txt": "3b4cc2f6baf1388e7e34b111d7bd5788b9078d9a77ab323d95c30389a20ad590"
+    },
+    "workflow-b1": {
+      "unrelated.txt": "ea13cf7c1d7564cb865a96c76f164ebc01d7bc8a58937218c6970af28b4e207b",
+      "user-note.txt": "91588e4b9b96eca3934fde7209bb7a466f3071e53bb9258c28ed1f35e57bb329"
+    },
+    "workflow-b2": {
+      "unrelated.txt": "dd05278f3b8754809c298dab501b7b8249ca4a2c4e67c7af935fa338d5c1ffa3",
+      "user-note.txt": "ec112ae8453f3dda31a2407290f429d02173c965d3d16e0c8589a4c6e481eb45"
+    },
+    "single-a2": {
+      "unrelated.txt": "4c335c2d6922c280f1a09c09468443b7538d9cc7c4f1110b07b90c96b4d780bb",
+      "user-note.txt": "864158b24fb76afe72b41c8073aa72fd08cd299192e2dc055f46a9b78af90d60"
+    },
+    "workflow-b1-impl": {
+      "unrelated.txt": "21861b6a9dbc53a7305c75f1a05d4653fb47901c1c591d55130abc635df83270",
+      "user-note.txt": "5ead1974d502c3cfbd2b21d5719fc96ee2c665131feec94a84c075e3dab89855"
+    },
+    "workflow-b2-impl": {
+      "unrelated.txt": "468faf29e9fbc328f438939c667edbe20a1b5d348e68d39434a79ea9dd0880d0",
+      "user-note.txt": "19d171d80ab1ab86504cef5cafef65c07c2aca99fd566b750b8fc4af26fc3e98"
+    }
+  },
+  "prompts": {
+    "single-a1": "77303d4e97d0605f15c432188319e4a1df372a51457bdec126d625f7bd9d1942",
+    "workflow-b1": "e52631d07f22a67928791112357bc8b4dc1272449ecb3ce9e1b65d642fdc28c1",
+    "workflow-b2": "ffb38ee9380c167e1c9d09fef405dbdec54bad90ab167e6c10c53a5b5276e5e0",
+    "single-a2": "77303d4e97d0605f15c432188319e4a1df372a51457bdec126d625f7bd9d1942"
+  },
+  "boundary": "Local synthetic integration fixture; same task repeated in fresh sessions, not a general benchmark or provider bill."
+}
