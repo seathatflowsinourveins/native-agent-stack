@@ -6842,8 +6842,8 @@
     },
     {
       "path": "observability/grand-dashboard/render.py",
-      "sha256": "f74f18deb9a125d7291286b5a9554579caa97dfc79cf0174a113614731f7a0ec",
-      "bytes": 8112
+      "sha256": "100539749fe53e337c351680cc76c9f322c2e30032f623c811f0c09939614d82",
+      "bytes": 8129
     },
     {
       "path": "observability/grand-dashboard/state.json",
