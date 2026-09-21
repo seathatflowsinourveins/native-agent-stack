@@ -401,8 +401,12 @@ def compute_history_features(path, previous_regular_session):
             SELECT *,
                 CASE WHEN COUNT(*) OVER w10 = {RANGE10_BARS}
                      THEN (MAX(all_h) OVER w10 - MIN(all_l) OVER w10) / NULLIF(all_c, 0) END AS range10_row,
-                cal_idx - LAG(cal_idx, {ELIGIBILITY_LOOKBACK_BARS}) OVER w AS span60,
-                cal_idx - LAG(cal_idx, {S4_LOOKBACK_BARS}) OVER w AS span130
+                -- These rows are session t-1 (the last history bar); the scanned bar is t. The
+                -- protocol window of k prior bars is therefore rows r-(k-1)..r, and it is
+                -- contiguous when their calendar span plus one equals k. Lagging by k here
+                -- would demand k+1 history bars and reject a symbol with exactly k.
+                cal_idx - LAG(cal_idx, {ELIGIBILITY_LOOKBACK_BARS - 1}) OVER w + 1 AS span60,
+                cal_idx - LAG(cal_idx, {S4_LOOKBACK_BARS - 1}) OVER w + 1 AS span130
             FROM base
             WINDOW w   AS (PARTITION BY symbol ORDER BY session_date),
                    w10 AS (PARTITION BY symbol ORDER BY session_date ROWS BETWEEN {RANGE10_BARS - 1} PRECEDING AND CURRENT ROW)
@@ -421,8 +425,10 @@ def compute_history_features(path, previous_regular_session):
             WINDOW w   AS (PARTITION BY symbol ORDER BY session_date),
                    w20 AS (PARTITION BY symbol ORDER BY session_date ROWS BETWEEN 19 PRECEDING AND CURRENT ROW),
                    w60 AS (PARTITION BY symbol ORDER BY session_date ROWS BETWEEN 59 PRECEDING AND CURRENT ROW),
+                   -- Protocol: range10 over u in [t-121, t-2]. Anchored at row r = t-1 that is
+                   -- rows r-120..r-1, not the evaluator's t-anchored 121..2 PRECEDING frame.
                    wp  AS (PARTITION BY symbol ORDER BY session_date
-                           ROWS BETWEEN {RANGE10_P20_OBS + 1} PRECEDING AND 2 PRECEDING)
+                           ROWS BETWEEN {RANGE10_P20_OBS} PRECEDING AND 1 PRECEDING)
         )
         SELECT symbol, session_date, all_c AS prev_close, prior_bars, med20, high60, high20, prev5_close,
                range10_row, range10_p20, span60, span130

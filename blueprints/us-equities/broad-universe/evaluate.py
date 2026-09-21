@@ -479,7 +479,10 @@ def build_events(con, settings):
                    -- Protocol outcome precedence: no_entry first. Whether the symbol had a bar
                    -- on session t+1 is a fact about t+1 alone, so the same decision must not be
                    -- labelled no_entry at H1 and horizon_incomplete at H5/H20.
-                   CASE WHEN entry_px IS NULL THEN 'no_entry'
+                   -- A decision on the dataset's last session has no observed t+1 at all: that is
+                   -- an incomplete horizon, not a symbol that failed to trade.
+                   CASE WHEN entry_date IS NULL THEN 'horizon_incomplete'
+                        WHEN entry_px IS NULL THEN 'no_entry'
                         WHEN exit_date IS NULL THEN 'horizon_incomplete'
                         WHEN exit_px IS NULL THEN 'no_exit_bar'
                         ELSE 'scored' END AS outcome,

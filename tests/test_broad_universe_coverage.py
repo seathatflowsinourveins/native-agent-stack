@@ -485,6 +485,21 @@ class IdentityComponentTests(unittest.TestCase):
         self.assertEqual(con.execute("SELECT count(*) FROM joined WHERE symbol <> 'CCC'").fetchone()[0], 0)
         self.assertEqual(con.execute("SELECT count(*) FROM joined").fetchone()[0], 25)
 
+    def test_staggered_rename_chain_keeps_every_session_exactly_once(self):
+        # AAA/BBB share sessions 0-24, BBB/CCC share 25-49 and CCC has no bars for 0-24.
+        # Collapsing onto CCC used to delete both predecessors' whole spans: 50 sessions -> 25.
+        rows = self._shared(["AAA", "BBB"], start_day=0, count=25)
+        rows += self._shared(["BBB", "CCC"], start_day=25, count=25, price=200.0)
+        con = self._con(rows)
+        report = coverage.dedupe_identity(con, {("AAA", "BBB"), ("BBB", "CCC")})
+        self.assertEqual({item["kept"] for item in report["detail"]}, {"CCC"})
+        per_session = con.execute("SELECT session_date, count(*) FROM joined GROUP BY 1").fetchall()
+        self.assertEqual(len(per_session), 50)
+        self.assertEqual({n for _, n in per_session}, {1})
+        self.assertEqual(con.execute("SELECT count(*) FROM joined WHERE symbol='AAA'").fetchone()[0], 0)
+        self.assertEqual(con.execute("SELECT count(*) FROM joined WHERE symbol='BBB'").fetchone()[0], 25)
+        self.assertEqual(con.execute("SELECT count(*) FROM joined WHERE symbol='CCC'").fetchone()[0], 25)
+
     def test_three_way_duplicate_without_rename_records_is_reported_unresolved(self):
         rows = self._shared(["AAA", "MMM", "ZZZ"])
         con = self._con(rows)
@@ -807,6 +822,18 @@ class AttemptScopedEvidenceTests(unittest.TestCase):
             self.assertEqual(section["row_totals"]["ledger_totals"]["raw"], 15)
             self.assertTrue(section["row_totals"]["match"])
             self.assertEqual(section["pagination_proof"]["violations"], [])
+
+    def test_pages_of_an_earlier_completed_attempt_are_superseded(self):
+        # Two COMPLETED attempts (9 then 15 bars): page totals used to report 24 effective
+        # bars beside a 15-bar batch total, with nothing classified as superseded.
+        def page(run_id, bars):
+            return {"event": "page", "adjustment": "raw", "batch": "b00007", "page": 0, "run_id": run_id,
+                    "bars": bars, "bytes": 10, "next_page_token_present": False}
+        batch_events = [{"event": "batch_complete", "adjustment": "raw", "batch": 7, "series": "b", "run_id": r}
+                        for r in ("r1", "r2")]
+        checked, superseded = coverage.partition_attempts([page("r1", 9), page("r2", 15)], batch_events)
+        self.assertEqual(sum(e["bars"] for items in checked.values() for e in items), 15)
+        self.assertEqual(sum(e["bars"] for items in superseded.values() for e in items), 9)
 
     def test_two_completions_for_one_batch_do_not_double_count(self):
         import duckdb

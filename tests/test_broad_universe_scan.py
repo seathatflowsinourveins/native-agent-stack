@@ -574,6 +574,59 @@ class HistoryEligibilityAndSignals(unittest.TestCase):
         self.assertNotIn("S4_contraction_breakout", signals["flags"])
         self.assertNotIn("S4_contraction_breakout", signals["flags_evaluated"])
 
+    def test_exactly_sixty_contiguous_prior_bars_are_eligible(self):
+        # The history's last row is session t-1. Lagging by 60 there demanded 61 bars, so a
+        # symbol meeting the frozen protocol with exactly 60 prior bars was rejected as has_gap.
+        rows = self._flat_history("SIXTY", 60, close=20.0, volume=2_000_000.0)
+        self._write_history(rows + self._spy_calendar(60))
+        last = max(r[1] for r in rows)
+        hist, status = m.compute_history_features(self.path, last)
+        self.assertEqual(hist["SIXTY"]["prior_bars"], 60)
+        self.assertEqual(hist["SIXTY"]["span60"], 60)
+        obs = {"raw_close": 21.0, "raw_open": 20.5, "raw_high": 21.5, "raw_low": 20.4, "raw_volume": 2_000_000.0,
+               "observation_class": "today_session"}
+        elig = m.compute_eligibility("SIXTY", obs, {"name": "Sixty Inc"}, hist["SIXTY"], status)
+        self.assertEqual(elig["eligibility_status"], "computed")
+        self.assertTrue(elig["eligible"])
+
+    def test_exactly_130_prior_bars_make_s4_evaluable(self):
+        rows = self._flat_history("ONE30", 130, close=20.0, volume=2_000_000.0, start="2026-01-01")
+        self._write_history(rows + self._spy_calendar(130, start="2026-01-01"))
+        hist, _ = m.compute_history_features(self.path, max(r[1] for r in rows))
+        self.assertEqual(hist["ONE30"]["span130"], 130)
+        self.assertIsNotNone(hist["ONE30"]["range10_p20"])
+
+    def test_range10_p20_window_is_t_minus_121_to_t_minus_2(self):
+        # Hand computation from the protocol: with the last history row r = t-1, range10_p20 is
+        # the 20th percentile (linear interpolation) of range10[u] for u in r-120..r-1, where
+        # range10[u] = (max high - min low over u-9..u) / close[u]. A frame shifted by one row
+        # (r-121..r-2) reads a different set because the amplitudes below rise strictly.
+        n = 140
+        base = datetime.fromisoformat("2026-01-01")
+        dates = [(base + timedelta(days=i)).date().isoformat() for i in range(n)]
+        amp = [1.0 + 0.01 * i for i in range(n)]  # strictly rising, so every window has its own p20
+        rows = [("TRND", d, 100.0, 100.0 + a, 100.0 - a, 100.0, 2e6, 1000, 100.0,
+                 100.0, 100.0 + a, 100.0 - a, 100.0, 2e6, True, True) for d, a in zip(dates, amp)]
+        self._write_history(rows + self._spy_calendar(n, start="2026-01-01"))
+        hist, _ = m.compute_history_features(self.path, dates[-1])
+
+        def range10(u):
+            window = amp[u - 9:u + 1]
+            return (2 * max(window)) / 100.0
+
+        def p20(values):
+            ordered = sorted(values)
+            pos = (len(ordered) - 1) * 0.2
+            lo = int(pos)
+            return ordered[lo] + (ordered[lo + 1] - ordered[lo]) * (pos - lo)
+
+        r = n - 1
+        expected = p20([range10(u) for u in range(r - 120, r)])
+        shifted = p20([range10(u) for u in range(r - 121, r - 1)])
+        self.assertNotAlmostEqual(expected, shifted, places=9)
+        self.assertAlmostEqual(hist["TRND"]["range10_p20"], expected, places=12)
+        self.assertAlmostEqual(hist["TRND"]["range10"], range10(r), places=12)
+
     def test_s4_fires_with_full_130_bar_contiguous_window(self):
         # Positive control: with a genuinely complete, contiguous 135-bar window (>=130 needed for
         # span130, >=121 for the 120-observation range10_p20 gate), S4 must be evaluable.

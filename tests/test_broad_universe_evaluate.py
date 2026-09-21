@@ -317,6 +317,15 @@ class Outcomes(EvaluatorCase):
         # The horizon_incomplete counter still covers the decision that does have an entry bar.
         self.assertEqual(self.events("INC", T_INC)["H20"]["outcome"], "horizon_incomplete")
 
+    def test_a_decision_on_the_last_session_is_incomplete_not_a_no_fill(self):
+        # The calendar ends at N_OUT - 1, so session t+1 was never observed for anyone. INC
+        # traded every observed session; calling this no_entry would inflate the no-fill count.
+        got = self.events("INC", N_OUT - 1)
+        self.assertEqual(sorted(got), ["H1", "H20", "H5"])
+        for horizon, row in got.items():
+            self.assertEqual(row["outcome"], "horizon_incomplete", horizon)
+            self.assertIsNone(row["net"], horizon)
+
 
 # -------------------------------------------------- (4) cost tiers and net return formula
 

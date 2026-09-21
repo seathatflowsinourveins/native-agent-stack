@@ -282,9 +282,11 @@ def dedupe_identity(con, rename_pairs, active_symbols=frozenset(), rename_stats=
     new_symbol); price continuity after the shared span; active asset-master status; then
     the lexicographic fallback, which is reported with identity_unresolved=true.
 
-    For each non-survivor, ALL of its rows inside its shared span with the component are
-    removed - not only the byte-identical ones - so no sparse phantom series is left
-    behind; the rows that were not byte-identical are reported as residue."""
+    For each non-survivor, its rows inside a shared span are removed - not only the
+    byte-identical ones, so no sparse phantom series is left behind - but ONLY on sessions
+    where a higher-ranked member it is paired with has a row. A survivor that lacks bars
+    for an early part of a rename chain therefore never erases that history; it stays, once,
+    under the latest-trading predecessor. Non-identical removed rows are reported as residue."""
     con.execute("""
         CREATE OR REPLACE TEMP TABLE dup_rows AS
         SELECT a.symbol AS sym_a, b.symbol AS sym_b, a.session_date
@@ -374,7 +376,17 @@ def dedupe_identity(con, rename_pairs, active_symbols=frozenset(), rename_stats=
         if keep is None:
             keep, rule = min(members), "lexicographic_fallback"
 
-        for drop in members:
+        # Preference order inside the component: the survivor, then the members that trade
+        # latest. A row is removed only where a higher-ranked member it is paired with has
+        # a row on that session, so a chain A->B->C whose survivor C has no bars for A/B's
+        # early span keeps exactly one copy of that span (under B) instead of losing it.
+        last_seen = dict(con.execute(f"""
+            SELECT symbol, max(session_date) FROM identity_snapshot
+            WHERE symbol IN ({','.join('?' * len(members))}) GROUP BY 1
+        """, members).fetchall())
+        ranked = [keep] + sorted((m for m in members if m != keep),
+                                 key=lambda m: (-(last_seen[m].toordinal() if last_seen.get(m) else 0), m))
+        for rank, drop in enumerate(ranked):
             if drop == keep:
                 continue
             others = sorted(member_set - {drop})
@@ -397,14 +409,24 @@ def dedupe_identity(con, rename_pairs, active_symbols=frozenset(), rename_stats=
                                    "left untouched")
                 partial.append(entry)
                 continue
-            removed = con.execute(
-                "DELETE FROM joined WHERE symbol = ? AND session_date BETWEEN ? AND ?",
-                [drop, first_shared, last_shared]).fetchone()
+            higher = ranked[:rank]
+            higher_marks = ",".join("?" * len(higher))
+            removed = con.execute(f"""
+                DELETE FROM joined WHERE symbol = ? AND EXISTS (
+                    SELECT 1 FROM (
+                        SELECT CASE WHEN sym_a = ? THEN sym_b ELSE sym_a END AS other,
+                               min(session_date) AS first, max(session_date) AS last
+                        FROM qualified_dup WHERE sym_a = ? OR sym_b = ? GROUP BY 1
+                    ) p JOIN identity_snapshot s ON s.symbol = p.other
+                    WHERE p.other IN ({higher_marks}) AND s.session_date = joined.session_date
+                      AND joined.session_date BETWEEN p.first AND p.last)
+            """, [drop, drop, drop, drop] + higher).fetchone()
             rows_removed = removed[0] if removed else 0
             entry["rows_removed"] = rows_removed
             # Zero-volume halts and all-series-only rows are never byte-identical, so they
             # used to survive as a sparse phantom series under the dropped ticker.
             entry["residue_rows_removed"] = max(0, rows_removed - identical)
+            entry["rows_retained_without_survivor_row"] = max(0, span_rows - rows_removed)
             if entry["identity_unresolved"]:
                 unresolved += 1
             report.append(entry)
@@ -526,10 +548,12 @@ def partition_attempts(page_events, batch_events=()):
     groups = defaultdict(list)
     for event in page_events:
         groups[(event["adjustment"], event["batch"], event.get("run_id"))].append(event)
-    completing = defaultdict(set)
+    # Ledger order is append order, so the last batch_complete per batch is the attempt
+    # whose CSV is on disk; an earlier COMPLETED attempt is superseded just like a failed one.
+    completing = {}
     for event in batch_events:
         if event.get("event") == "batch_complete":
-            completing[(event["adjustment"], _batch_label(event))].add(event.get("run_id"))
+            completing[(event["adjustment"], _batch_label(event))] = {event.get("run_id")}
     checked, superseded = {}, {}
     for key, items in groups.items():
         adjustment, label, run_id = key
