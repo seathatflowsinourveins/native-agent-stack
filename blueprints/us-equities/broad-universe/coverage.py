@@ -69,21 +69,30 @@ def read_plan(dataset_dir):
 # --------------------------------------------------------------------------- materialize
 
 
-def check_ledger_complete(plan, events):
-    """True/reasons: every planned batch is complete for every adjustment and the
-    latest run_complete event reports zero failures."""
+def check_ledger_complete(plan, events, supplement_plan=None):
+    """True/reasons: every planned batch of the main series ('b') and, when present,
+    the supplement series ('s') is complete for every adjustment, and the latest
+    run_complete of each series reports zero failures."""
     reasons = []
-    complete = {(e["adjustment"], e["batch"]) for e in events if e.get("event") == "batch_complete"}
-    for adjustment in plan["adjustments"]:
-        for index in range(plan["batches"]):
-            if (adjustment, index) not in complete:
-                reasons.append(f"missing batch_complete adjustment={adjustment} batch={index}")
-    runs = [e for e in events if e.get("event") == "run_complete"]
-    if not runs:
-        reasons.append("no run_complete event in ledger")
-    elif runs[-1].get("failed", 1) != 0:
-        reasons.append(f"latest run_complete reports failed={runs[-1].get('failed')}")
+    complete = {(e.get("series", "b"), e["adjustment"], e["batch"])
+                for e in events if e.get("event") == "batch_complete"}
+    plans = [("b", plan)] + ([("s", supplement_plan)] if supplement_plan else [])
+    for series, item in plans:
+        for adjustment in item["adjustments"]:
+            for index in range(item["batches"]):
+                if (series, adjustment, index) not in complete:
+                    reasons.append(f"missing batch_complete series={series} adjustment={adjustment} batch={index}")
+        runs = [e for e in events if e.get("event") == "run_complete" and e.get("series", "b") == series]
+        if not runs:
+            reasons.append(f"no run_complete event for series={series}")
+        elif runs[-1].get("failed", 1) != 0:
+            reasons.append(f"latest run_complete series={series} reports failed={runs[-1].get('failed')}")
     return not reasons, reasons
+
+
+def read_supplement_plan(dataset_dir):
+    path = os.path.join(dataset_dir, "plan-supplement.json")
+    return read_json(path) if os.path.exists(path) else None
 
 
 def detect_duplicate_rows(con, table):
@@ -106,7 +115,99 @@ def load_bars_view(con, dataset_dir, adjustment, view_name, prefix):
     """)
 
 
-def materialize(dataset_dir):
+DUPLICATE_SERIES_MIN_SESSIONS = 20
+CONTINUITY_RATIO = 1.5
+
+
+def load_rename_pairs(corporate_actions_dir):
+    """(old_symbol, new_symbol) pairs from retained name_change/unit_split pages."""
+    pairs = set()
+    if not corporate_actions_dir:
+        return pairs
+    import glob as _glob
+    for path in _glob.glob(os.path.join(corporate_actions_dir, "pages", "*", "*.json.gz")):
+        with gzip.open(path, "rb") as handle:
+            body = json.loads(handle.read())
+        actions = body.get("corporate_actions") or {}
+        for kind in ("name_changes", "unit_splits"):
+            for item in actions.get(kind, []):
+                if item.get("old_symbol") and item.get("new_symbol") and item["old_symbol"] != item["new_symbol"]:
+                    pairs.add((item["old_symbol"], item["new_symbol"]))
+    return pairs
+
+
+def dedupe_identity(con, rename_pairs, active_symbols=frozenset()):
+    """Remove bars served twice under two tickers (the provider answers an old ticker
+    with its successor's history). Table `joined` is edited in place; returns a report.
+
+    A pair is a duplicate series when >= DUPLICATE_SERIES_MIN_SESSIONS sessions carry
+    identical raw OHLCV (volume > 0) under both symbols. The kept symbol is decided, in
+    order, by: a retained rename record; price continuity after the shared span (the
+    successor keeps trading near the last shared close, a reused ticker does not); an
+    active asset-master status; then the lexicographically smaller symbol. Only rows
+    identical under both symbols are removed from the dropped symbol."""
+    con.execute(f"""
+        CREATE OR REPLACE TEMP TABLE dup_rows AS
+        SELECT a.symbol AS sym_a, b.symbol AS sym_b, a.session_date
+        FROM joined a JOIN joined b
+          ON a.session_date = b.session_date AND a.symbol < b.symbol
+         AND a.raw_o = b.raw_o AND a.raw_h = b.raw_h AND a.raw_l = b.raw_l
+         AND a.raw_c = b.raw_c AND a.raw_v = b.raw_v
+        WHERE a.raw_v > 0
+    """)
+    pairs = con.execute(f"""
+        SELECT sym_a, sym_b, count(*) AS n, min(session_date), max(session_date)
+        FROM dup_rows GROUP BY 1, 2 HAVING count(*) >= {DUPLICATE_SERIES_MIN_SESSIONS} ORDER BY 1, 2
+    """).fetchall()
+    report = []
+    for sym_a, sym_b, shared, first, last in pairs:
+        last_close = con.execute(
+            "SELECT raw_c FROM joined WHERE symbol = ? AND session_date = ?", [sym_a, last]).fetchone()[0]
+
+        def continues(symbol):
+            row = con.execute(
+                "SELECT raw_c FROM joined WHERE symbol = ? AND session_date > ? AND raw_c IS NOT NULL "
+                "ORDER BY session_date LIMIT 1", [symbol, last]).fetchone()
+            if not row or not last_close:
+                return None
+            ratio = row[0] / last_close
+            return 1 / CONTINUITY_RATIO <= ratio <= CONTINUITY_RATIO
+
+        rule = None
+        keep = None
+        if (sym_a, sym_b) in rename_pairs and (sym_b, sym_a) not in rename_pairs:
+            keep, rule = sym_b, "rename_record"
+        elif (sym_b, sym_a) in rename_pairs and (sym_a, sym_b) not in rename_pairs:
+            keep, rule = sym_a, "rename_record"
+        if keep is None:
+            cont_a, cont_b = continues(sym_a), continues(sym_b)
+            if cont_a and not cont_b:
+                keep, rule = sym_a, "price_continuity"
+            elif cont_b and not cont_a:
+                keep, rule = sym_b, "price_continuity"
+        if keep is None:
+            in_a, in_b = sym_a in active_symbols, sym_b in active_symbols
+            if in_a != in_b:
+                keep, rule = (sym_a if in_a else sym_b), "active_status"
+        if keep is None:
+            keep, rule = min(sym_a, sym_b), "lexicographic_fallback"
+        drop = sym_b if keep == sym_a else sym_a
+        removed = con.execute("""
+            DELETE FROM joined WHERE symbol = ? AND session_date IN (
+                SELECT session_date FROM dup_rows WHERE sym_a = ? AND sym_b = ?)
+        """, [drop, sym_a, sym_b]).fetchone()
+        report.append({"kept": keep, "dropped": drop, "rule": rule, "identical_sessions": shared,
+                       "first": str(first), "last": str(last),
+                       "rows_removed": removed[0] if removed else None})
+    rules = defaultdict(int)
+    for item in report:
+        rules[item["rule"]] += 1
+    return {"min_identical_sessions": DUPLICATE_SERIES_MIN_SESSIONS, "pairs": len(report),
+            "rows_removed": sum(item["rows_removed"] or 0 for item in report),
+            "by_rule": dict(rules), "detail": report}
+
+
+def materialize(dataset_dir, corporate_actions_dir=None, asset_files=()):
     """Build daily.parquet. Returns (ok, detail-dict)."""
     out_path = os.path.join(dataset_dir, "daily.parquet")
     if os.path.exists(out_path):
@@ -120,34 +221,43 @@ def materialize(dataset_dir):
         return False, {"reason": "duplicate (symbol, session_date) rows detected",
                         "raw_duplicates": len(dup_raw), "all_duplicates": len(dup_all),
                         "raw_examples": dup_raw[:20], "all_examples": dup_all[:20]}
-    con.execute(f"""
-        COPY (
-            SELECT
-                coalesce(r.symbol, a.symbol) AS symbol,
-                coalesce(r.session_date, a.session_date) AS session_date,
-                r.raw_o, r.raw_h, r.raw_l, r.raw_c, r.raw_v, r.raw_n, r.raw_vw,
-                a.all_o, a.all_h, a.all_l, a.all_c, a.all_v,
-                (r.symbol IS NOT NULL) AS in_raw,
-                (a.symbol IS NOT NULL) AS in_all
-            FROM raw_bars r
-            FULL OUTER JOIN all_bars a
-              ON r.symbol = a.symbol AND r.session_date = a.session_date
-        ) TO '{out_path}' (FORMAT PARQUET, COMPRESSION ZSTD)
+    con.execute("""
+        CREATE TABLE joined AS
+        SELECT
+            coalesce(r.symbol, a.symbol) AS symbol,
+            coalesce(r.session_date, a.session_date) AS session_date,
+            r.raw_o, r.raw_h, r.raw_l, r.raw_c, r.raw_v, r.raw_n, r.raw_vw,
+            a.all_o, a.all_h, a.all_l, a.all_c, a.all_v,
+            (r.symbol IS NOT NULL) AS in_raw,
+            (a.symbol IS NOT NULL) AS in_all
+        FROM raw_bars r
+        FULL OUTER JOIN all_bars a
+          ON r.symbol = a.symbol AND r.session_date = a.session_date
     """)
+    rows_before = con.execute("SELECT count(*) FROM joined").fetchone()[0]
+    active = set()
+    for path in asset_files:
+        active |= {a["symbol"] for a in read_json(path) if a.get("status") == "active"}
+    dedup = dedupe_identity(con, load_rename_pairs(corporate_actions_dir), frozenset(active))
+    con.execute(f"COPY (SELECT * FROM joined ORDER BY symbol, session_date) "
+                f"TO '{out_path}' (FORMAT PARQUET, COMPRESSION ZSTD)")
     rows = con.execute(f"SELECT count(*) FROM read_parquet('{out_path}')").fetchone()[0]
-    return True, {"rows": rows, "path": out_path}
+    with open(os.path.join(dataset_dir, "identity-dedup.json"), "w", encoding="utf-8") as handle:
+        json.dump(dedup, handle, indent=1)
+    return True, {"rows": rows, "rows_before_identity_dedup": rows_before, "path": out_path,
+                  "identity_dedup": {k: v for k, v in dedup.items() if k != "detail"}}
 
 
 def cmd_materialize(args):
     plan = read_plan(args.dataset)
     events = read_ledger_events(args.dataset)
-    ok, reasons = check_ledger_complete(plan, events)
+    ok, reasons = check_ledger_complete(plan, events, read_supplement_plan(args.dataset))
     if not ok:
         print("REFUSED: ledger incomplete", file=sys.stderr)
         for reason in reasons:
             print(f"  - {reason}", file=sys.stderr)
         return 1
-    ok, detail = materialize(args.dataset)
+    ok, detail = materialize(args.dataset, args.corporate_actions, args.assets or ())
     if not ok:
         print(f"REFUSED: {detail['reason']}", file=sys.stderr)
         print(json.dumps(detail, indent=1, default=str), file=sys.stderr)
@@ -514,6 +624,34 @@ LIMITATIONS = [
 ]
 
 
+def build_supplement_section(con, dataset_dir, supplement_plan, identities):
+    """Symbols the asset-master list omitted but corporate actions referenced."""
+    if not supplement_plan:
+        return {"present": False}
+    requested = read_json(os.path.join(dataset_dir, "supplement-symbols.json"))
+    rows = con.execute("""
+        SELECT symbol, min(session_date), max(session_date), count(*) FROM daily
+        WHERE in_raw OR in_all GROUP BY symbol
+    """).fetchall()
+    in_supplement = set(requested) - set(identities)
+    last_hist, bars = Counter(), 0
+    with_bars = 0
+    for symbol, _first, last, count in rows:
+        if symbol in in_supplement:
+            with_bars += 1
+            bars += count
+            last_hist[last.year] += 1
+    return {"present": True, "source": "symbols referenced by retained corporate-action pages, minus renamed-away "
+                                       "old tickers whose history is served under the successor",
+            "requested_symbols": len(in_supplement), "symbols_with_bars": with_bars,
+            "rows_after_identity_dedup": bars,
+            "last_bar_year_histogram": {str(y): c for y, c in sorted(last_hist.items())},
+            "plan": {k: supplement_plan.get(k) for k in ("created_at", "start", "end", "feed", "batches", "symbols_sha256")},
+            "meaning": "The provider asset list under-enumerates delisted names (TWTR is served by the bars API but "
+                       "absent from /v2/assets?status=inactive). Corporate-action coverage is thin before 2020, so "
+                       "names delisted in 2016-2019 without a retained action remain undiscoverable."}
+
+
 def cmd_build(args):
     plan = read_plan(args.dataset)
     events = read_ledger_events(args.dataset)
@@ -544,6 +682,9 @@ def cmd_build(args):
         "calendar": calendar_section,
         "quality_flags": build_quality_section(con),
         "identity": build_identity_section(identities_doc, plan, probe_doc, reproduced),
+        "identity_dedup": (read_json(os.path.join(args.dataset, "identity-dedup.json"))
+                           if os.path.exists(os.path.join(args.dataset, "identity-dedup.json")) else None),
+        "supplement": build_supplement_section(con, args.dataset, read_supplement_plan(args.dataset), identities),
         "requested_names": build_requested_names_section(con, gap_by_symbol),
         "eligible_universe": build_eligible_universe_section(con),
         "entitlements": build_entitlements_section(probe_doc, live_probe_doc),
@@ -659,6 +800,9 @@ def main():
 
     p_materialize = sub.add_parser("materialize")
     p_materialize.add_argument("--dataset", required=True)
+    p_materialize.add_argument("--corporate-actions", default=None,
+                               help="retained corporate-action directory; rename records decide duplicate series")
+    p_materialize.add_argument("--assets", nargs="*", default=None, help="asset-master JSON files (active status tie-break)")
     p_materialize.set_defaults(func=cmd_materialize)
 
     p_build = sub.add_parser("build")

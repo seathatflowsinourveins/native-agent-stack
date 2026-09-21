@@ -324,5 +324,87 @@ class CorporateActionsPaginationTests(unittest.TestCase):
             corporate_actions.fetch_page(session, headers, {"start": "2022-01-01"})
 
 
+
+class SupplementLedgerTests(unittest.TestCase):
+    PLAN = {"adjustments": ["raw"], "batches": 1}
+
+    def test_supplement_series_must_be_complete_too(self):
+        events = [{"event": "batch_complete", "adjustment": "raw", "batch": 0},
+                  {"event": "run_complete", "failed": 0}]
+        self.assertTrue(coverage.check_ledger_complete(self.PLAN, events)[0])
+        ok, reasons = coverage.check_ledger_complete(self.PLAN, events, {"adjustments": ["raw"], "batches": 1})
+        self.assertFalse(ok)
+        self.assertTrue(any("series=s" in r for r in reasons))
+        events += [{"event": "batch_complete", "series": "s", "adjustment": "raw", "batch": 0},
+                   {"event": "run_complete", "series": "s", "failed": 0}]
+        self.assertTrue(coverage.check_ledger_complete(self.PLAN, events, {"adjustments": ["raw"], "batches": 1})[0])
+
+    def test_main_batch_does_not_satisfy_supplement_batch(self):
+        events = [{"event": "batch_complete", "adjustment": "raw", "batch": 0},
+                  {"event": "run_complete", "failed": 0},
+                  {"event": "run_complete", "series": "s", "failed": 0}]
+        self.assertFalse(coverage.check_ledger_complete(self.PLAN, events, {"adjustments": ["raw"], "batches": 1})[0])
+
+
+class IdentityDedupTests(unittest.TestCase):
+    """The provider serves an old ticker with its successor's history; exactly the
+    identical rows must leave the old ticker and nothing else may move."""
+
+    def _con(self, rows):
+        import duckdb
+        con = duckdb.connect()
+        con.execute("CREATE TABLE joined (symbol VARCHAR, session_date DATE, raw_o DOUBLE, raw_h DOUBLE, "
+                    "raw_l DOUBLE, raw_c DOUBLE, raw_v DOUBLE)")
+        con.executemany("INSERT INTO joined VALUES (?, ?, ?, ?, ?, ?, ?)", rows)
+        return con
+
+    @staticmethod
+    def _series(symbol, start_day, count, price, volume=1000.0):
+        from datetime import date, timedelta
+        return [(symbol, date(2022, 1, 1) + timedelta(days=start_day + i), price + i, price + i + 1,
+                 price + i - 1, price + i + 0.5, volume + i) for i in range(count)]
+
+    def test_rename_record_keeps_successor_and_reused_ticker_keeps_its_own_rows(self):
+        shared = self._series("NEW", 0, 25, 100.0)
+        rows = shared + [("OLD",) + r[1:] for r in shared]
+        rows += self._series("NEW", 25, 5, 125.0)            # successor keeps trading
+        rows += self._series("OLD", 40, 5, 20.0)             # ticker reused by another asset
+        con = self._con(rows)
+        report = coverage.dedupe_identity(con, {("OLD", "NEW")})
+        self.assertEqual(report["pairs"], 1)
+        self.assertEqual(report["detail"][0]["kept"], "NEW")
+        self.assertEqual(report["detail"][0]["rule"], "rename_record")
+        self.assertEqual(report["rows_removed"], 25)
+        self.assertEqual(con.execute("SELECT count(*) FROM joined WHERE symbol='OLD'").fetchone()[0], 5)
+        self.assertEqual(con.execute("SELECT count(*) FROM joined WHERE symbol='NEW'").fetchone()[0], 30)
+
+    def test_price_continuity_decides_without_a_rename_record(self):
+        shared = self._series("AAA", 0, 25, 100.0)
+        rows = shared + [("ZZZ",) + r[1:] for r in shared]
+        rows += self._series("ZZZ", 25, 5, 126.0)            # ZZZ continues near the last shared close
+        rows += self._series("AAA", 60, 5, 9.0)              # AAA later reused far from that close
+        report = coverage.dedupe_identity(self._con(rows), set())
+        self.assertEqual((report["detail"][0]["kept"], report["detail"][0]["rule"]), ("ZZZ", "price_continuity"))
+
+    def test_active_status_then_lexicographic_fallback(self):
+        shared = self._series("BBB", 0, 25, 50.0)
+        rows = shared + [("CCC",) + r[1:] for r in shared]
+        report = coverage.dedupe_identity(self._con(list(rows)), set(), frozenset({"CCC"}))
+        self.assertEqual((report["detail"][0]["kept"], report["detail"][0]["rule"]), ("CCC", "active_status"))
+        report = coverage.dedupe_identity(self._con(list(rows)), set())
+        self.assertEqual((report["detail"][0]["kept"], report["detail"][0]["rule"]), ("BBB", "lexicographic_fallback"))
+
+    def test_short_coincidence_and_zero_volume_rows_are_not_duplicates(self):
+        shared = self._series("DDD", 0, 19, 30.0)             # one session short of the threshold
+        rows = shared + [("EEE",) + r[1:] for r in shared]
+        flat = self._series("FFF", 0, 30, 10.0, volume=0.0)
+        flat = [r[:6] + (0.0,) for r in flat]
+        rows += flat + [("GGG",) + r[1:] for r in flat]
+        con = self._con(rows)
+        report = coverage.dedupe_identity(con, set())
+        self.assertEqual(report["pairs"], 0)
+        self.assertEqual(con.execute("SELECT count(*) FROM joined").fetchone()[0], len(rows))
+
+
 if __name__ == "__main__":
     unittest.main()
