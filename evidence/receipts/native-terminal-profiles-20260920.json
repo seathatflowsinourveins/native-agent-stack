@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "native-terminal-profiles-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": ["codex", "claude-code", "qdrant", "vllm"],
+  "recorded_at_utc": "2026-09-21T00:23:57Z",
+  "claim": "Windows Terminal's native profile commands returned exit 0 and launched distinct interactive native Claude and Codex processes in the intended project. The matching Codex profile was added with previous settings preserved; existing Qdrant and embedding services were active.",
+  "limitations": [
+    "Launch and process observation only; no new model task, sign-in, interactive context/usage/compaction or HUD acceptance.",
+    "The existing local ecosystem launchers select native scope; they are not upstream client binaries. Their diagnostic --check mode does not execute a model task.",
+    "The service active result is a process-state observation, not a rerun of retrieval, embedding quality, recovery or full-stack E2E.",
+    "The catalog reuses prior acceptance at base 97ee23e. No new package installation, lifecycle recertification or provider savings is claimed.",
+    "No Windows UI screenshot or dropdown interaction was captured. Returned native launch commands and observed child processes are the evidence."
+  ],
+  "command_capture_method": "Direct exec-tool returns transcribed without changing argv, exit or output; the native ps output is separately retained byte-for-byte.",
+  "commands": [
+    {"argv": ["wt.exe", "-w", "0", "new-tab", "-p", "Claude Code (Ubuntu)"], "exit_code": 0, "output": ""},
+    {"argv": ["wt.exe", "-w", "0", "new-tab", "-p", "Codex (Ubuntu)"], "exit_code": 0, "output": ""},
+    {"argv": ["ecosystem-codex", "--check", "--project", "$PROJECT"], "exit_code": 0, "output": "Native Linux codex launcher ready; project $PROJECT. No sign-in or model call performed.\n", "projection": "Actual project path replaced by $PROJECT."},
+    {"argv": ["ecosystem-claude", "--check", "--project", "$PROJECT"], "exit_code": 0, "output": "Native Linux claude launcher ready; project $PROJECT. No sign-in or model call performed.\n", "projection": "Actual project path replaced by $PROJECT."},
+    {"argv": ["systemctl", "--user", "is-active", "qdrant-agent-lab.service", "nemotron-embed-agent-lab.service"], "exit_code": 0, "output": "active\nactive\n"},
+    {"argv": ["ps", "-p", "2696599,2697591", "-o", "pid,ppid,tty,comm"], "exit_code": 0, "output_file": "evidence/artifacts/native-terminal-profiles-20260920/native-processes.txt"}
+  ],
+  "process_observation": {
+    "method": "Read only /proc executable, cwd, argument-mode flags and stdin target; no transcript or authentication-store inspection.",
+    "same_intended_project": true,
+    "claude": {"pid": 2696599, "versioned_executable": "claude-2.1.278/claude", "headless": false, "tty": "/dev/pts/3"},
+    "codex": {"pid": 2697591, "versioned_executable": "codex-package-0.155.1/bin/codex", "headless": false, "tty": "/dev/pts/4"}
+  },
+  "settings_observation": {
+    "backup_retained_privately": true,
+    "new_profile": "Codex (Ubuntu)",
+    "new_profile_count": 1,
+    "all_previous_settings_equal_after_removing_new_profile": true,
+    "existing_default_preserved": true
+  },
+  "independent_review": {
+    "public_process_file_matches_private_bytes": true,
+    "public_process_file_sha256": "0669f843035324a6a4578fdc56189f794187442efefc35e5d8125e043828da6a",
+    "native_process_identity_confirmed": true,
+    "settings_preservation_confirmed": true,
+    "resolved_local_links_and_anchors": 60,
+    "layer_rows_match_canonical_selection": 16,
+    "scope": "Read-only process, settings, source and link audit; launch exits remain the coordinator's direct tool returns."
+  },
+  "upstream_reference": "https://learn.microsoft.com/en-us/windows/terminal/command-line-arguments",
+  "prior_native_acceptance": "evidence/receipts/native-claude-profile-20260920.json",
+  "next_interactive_steps": ["Complete native sign-in if the client requests it.", "Use /context all, /mcp and /usage in Claude; retain actual output before changing their acceptance.", "Exercise /compact only for a useful task with required facts checked afterward."],
+  "model_task_requests": 0,
+  "provider_tokens_saved": null
+}
