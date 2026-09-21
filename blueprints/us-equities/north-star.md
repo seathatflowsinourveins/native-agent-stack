@@ -7,7 +7,8 @@ execution boundary need their own acceptance. LEAN remains an accepted historica
 comparison engine; its results do not establish Nautilus or broker parity.
 The [trading catalog](../../catalogs/us-equities/README.md) is separate from the
 general [native harness foundation](../../catalogs/foundation/README.md).
-This is not a deployed broker service or a validated profitable strategy.
+The bounded Alpaca paper smoke trial has ended; no continuous broker service or
+validated profitable strategy is established.
 
 The [September 21 foundation convergence](../../docs/full-stack-convergence.md)
 adds current Astra/Fable native retrieval results, populated upstream dashboards,
@@ -19,9 +20,11 @@ their original model/task boundary.
 The current [architecture and next-role contract](architecture/README.md) records
 the latest research wave, official Alpaca limits, native SDK compatibility gap,
 simulation realism requirements and platform-specific acceptance. The
-[execution acceptance plan](engine-nautilus/acceptance-plan.md) binds the next
-equity replay to retained SPY inputs and defines offline failure and separate
-broker paper gates; those planned stages have not run.
+[execution acceptance plan](engine-nautilus/acceptance-plan.md) preserves the
+unexecuted SPY/LEAN comparison and the broader broker gates. The separately
+completed [September 21 AAPL diagnostic and Alpaca paper smoke](paper-e2e-20260921/README.md)
+have their own inputs, receipts and limits; they do not close that SPY comparison
+or establish native in-flight fault recovery, IBKR acceptance or strategy merit.
 
 ## A coherent default
 
@@ -35,10 +38,10 @@ broker paper gates; those planned stages have not run.
 | Optional research orchestration | DeerFlow stable 2.0 reference; pinned development backend/ACP exploration | Embedded native ACP inference proved; full planner/UI hosting pending |
 | Market/filing ingestion | Alpaca SDK plus SEC-sourced filings; alternative commercial feeds only with entitlement | Bounded authenticated AAPL SIP bars/actions and FB/META identity observations accepted; current Elite routing/throughput and a point-in-time market-wide corpus remain unverified |
 | Research data | Immutable raw snapshots, Parquet and DuckDB; exchange calendars | Native sample-event pipeline proved |
-| Engine | Selected NautilusTrader 2.0.0rc5; retain LEAN as the historical comparison | Unchanged synthetic EUR/USD replay accepted locally and on fresh hosted Linux; retained SPY equity parity remains open |
-| Broker adapters | Native Nautilus IBKR adapter; Alpaca through a separately validated deterministic adapter | Upstream Nautilus integration list has no Alpaca adapter; socket/API availability is not broker execution acceptance |
+| Engine | Selected NautilusTrader 2.0.0rc5; retain LEAN as the historical comparison | Synthetic EUR/USD replay and a separate native 15-bar AAPL diagnostic accepted within their scopes; retained SPY/LEAN parity and realistic liquidity remain open |
+| Broker adapters | Native Nautilus IBKR adapter; Alpaca through a separately validated deterministic adapter | One Alpaca SPY paper roundtrip and completed-trial recovery accepted; native in-flight faults and IBKR remain open. Upstream Nautilus has no Alpaca adapter |
 | Strategy research | Simple lagged baselines, then selected Qlib/statistical/portfolio tools | Catalogued; no strategy accepted or performance asserted |
-| Execution state | Separate deterministic order writer, durable journal and broker reconciliation | Design requirement, not implemented |
+| Execution state | Separate deterministic order writer, durable journal and broker reconciliation | Bounded Alpaca runner implemented; 27 local synthetic lifecycle tests, native full-fill reconciliation and completed-trial recovery passed. Streaming reconciliation and broader native fault acceptance remain open |
 | Hosting | On-demand native research and Dagu history service now; dedicated identity for paper later | No new cloud account or standing trading service |
 | Operations | Private receipts/usage, Gitleaks, SDK Syft inventory, native metrics/logs and Restic/application recovery | Selected local scope accepted; off-host recovery, external alerts and unattended hosting remain open |
 
@@ -58,10 +61,10 @@ flowchart TB
     proposal --> review[Versioned strategy review + held-out evaluation]
     review --> replay[Nautilus deterministic replay / LEAN comparison]
     replay --> acceptance[Broker-specific paper acceptance requirements]
-    acceptance -. pending .-> execution[One deterministic order writer]
+    acceptance -->|bounded Alpaca smoke| execution[One deterministic order writer]
     execution <--> journal[Durable intents / orders / fills / reconciliation]
-    execution <--> ibkr[IBKR paper / native TWS or Gateway]
-    execution <--> alpaca[Alpaca paper / separate adapter]
+    execution -. acceptance pending .-> ibkr[IBKR paper / native TWS or Gateway]
+    execution <--> alpaca[Alpaca paper / finite smoke only]
     risk[Independent numeric risk checks + kill switch] -. required .-> execution
     observe[Health / lag / fills / recovery / model usage] -. required .-> execution
 ```
@@ -106,10 +109,15 @@ benchmarks and a no-trade case. LLM sentiment, RL rewards, forecast error and a
 backtest Sharpe alone do not demonstrate deployable alpha. See the
 [strategy/engine catalog](../../catalogs/us-equities/engines-strategies.md).
 
-The [Nautilus receipt](engine-nautilus/README.md) establishes synthetic engine
-repeatability only. The [six retained SPY scenarios](historical-simulation/README.md)
-provide the next comparison fixture, with explicit cash/dividend and margin-model
-limits. Neither is a catalyst-strategy or broker acceptance.
+The initial [Nautilus receipt](engine-nautilus/README.md) establishes synthetic
+engine repeatability. The later [AAPL diagnostic receipt](engine-nautilus/equity-replay/receipt.json)
+records 15 retained daily bars and five closed roundtrips in each of two scenarios:
+baseline -$133.40 and fee/slippage -$144.40, with independently reconciled cash and
+PnL. These are retrospective same-close diagnostics with synthetic liquidity;
+corporate-action dates were excluded. The [six retained SPY scenarios](historical-simulation/README.md)
+remain the separate, unexecuted Nautilus comparison, with explicit cash/dividend
+and margin-model limits. Neither simulation establishes a catalyst strategy or
+broker acceptance.
 
 The earlier completed LEAN sample proves an engine/data path: 3,943 data points and three
 simulated orders. Its 2013 sample is not a contemporary strategy evaluation.
@@ -125,6 +133,15 @@ Nautilus' native IBKR socket adapter requires a signed-in TWS or IB Gateway,
 selected market-data permissions and a distinct client ID. Its presence does not
 qualify account access, paper orders, reconnect reconciliation or the Alpaca route.
 
+On September 21, the separate [Alpaca paper receipt](paper-e2e-20260921/paper-receipt.json)
+recorded one SPY bought at $770.70 and sold at $770.62, two actual submissions
+and full fills. A fresh read-only process reconciled the -$0.08 cash change,
+zero positions and zero open orders. A new recovery process adopted the completed
+identities with zero additional writes. Five unchanged upstream read-only SDK
+tests also passed against the paper endpoint. This is a finite operational smoke
+trial; native partial fills, cancellation, rejection, disconnect and in-flight
+crash/restart behavior were not exercised. IBKR acceptance remains separate.
+
 Alpaca Elite advertises **1,000 API calls per minute**, not a guaranteed trade or
 fill rate. Trading requests and historical market-data throughput are different
 limits. Current Algo Trader Plus documentation lists 10,000 historical calls per
@@ -133,15 +150,19 @@ entitlement still matter. The existing historical-data GET receipts do not prove
 Elite activation or every data entitlement. [Elite terms](https://alpaca.markets/elite),
 [market-data plans](https://docs.alpaca.markets/us/docs/about-market-data-api).
 
-The future paper service needs explicit numeric limits, an allowed universe,
-session/extended-hours policy and data-feed entitlement. Maintain one order writer
-per account/strategy scope. Persist intent and a stable client order ID before
-submission, then query/reconcile after ambiguous responses instead of blindly
-retrying. Reconcile streaming events against broker snapshots on reconnect and
-startup; account for partial fills, replacements, cancellations and reserved
-buying power. These are design requirements derived from the broker's
-[order lifecycle](https://docs.alpaca.markets/us/docs/orders-at-alpaca), not a
-claimed implementation in this repository.
+The [bounded Alpaca runner](alpaca-paper/README.md) implements a durable journal,
+stable client order identities, one writer, numeric guards and a kill switch for
+its frozen smoke scope. Its 27 local synthetic lifecycle tests cover selected
+ambiguous-submit, duplicate/restart, partial-fill/cancel and risk failures; they
+are separate from the observed full fills and completed-trial recovery.
+
+A continuous paper service still needs independently qualified limits, universe,
+session/extended-hours policy and feed entitlement. Preserve one writer and
+durable intent before submission; query/reconcile ambiguous responses instead of
+blindly retrying. Native streaming reconciliation against broker snapshots on
+reconnect/startup, partial fills, replacements, cancellations and reserved buying
+power remain broader acceptance requirements under the broker's
+[order lifecycle](https://docs.alpaca.markets/us/docs/orders-at-alpaca).
 
 Reject stale/missing prices, invalid quantities and exposure breaches before an
 order reaches the adapter. Keep kill-switch and recovery behavior independent of

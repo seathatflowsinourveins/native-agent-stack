@@ -1,13 +1,30 @@
 # Equity replay and separate broker acceptance plan
 
-Planned September 20, 2026; **none of the stages below has executed**. The
+Planned September 20, 2026; execution status reconciled September 21. **The frozen
+SPY/LEAN comparison in sections 1–3 remains unexecuted.** Separate AAPL diagnostic
+and bounded Alpaca paper results now exist. The
 [current target](../../../catalogs/us-equities/runtime-target.json) selects
 NautilusTrader **2.0.0rc5**, source
 `1b0a49d2792a9432a3aca3fcb617ce7a630d905e`, native IBKR integration and a separate
-Alpaca execution adapter. The [local and hosted acceptance](README.md) establishes
-unchanged synthetic EUR/USD quickstart repeatability only. It does not establish
-US-equity conversion, corporate actions, strategy quality, broker connectivity or
-paper orders. LEAN results remain independent dated evidence.
+Alpaca execution adapter. The earlier [local and hosted acceptance](README.md)
+establishes unchanged synthetic EUR/USD quickstart repeatability; the later
+results below extend only their named scopes. LEAN results remain independent
+dated evidence.
+
+| Scope | Observed status as of September 21, 2026 |
+| --- | --- |
+| Frozen SPY comparison, sections 1–3 | Planned, not executed; mappings, all six scenarios and numeric oracle below remain unchanged |
+| Separate [AAPL diagnostic replay](equity-replay/receipt.json) | Native Nautilus 2.0.0rc5 replayed 15 retained bars in baseline and fee/slippage scenarios, five closed roundtrips each; independently reconciled PnL was -$133.40 and -$144.40 respectively |
+| Bounded [Alpaca lifecycle implementation](../alpaca-paper/README.md) | Durable journal, deterministic writer and numeric guards implemented; 27 local synthetic lifecycle tests passed within their recorded scope |
+| [Alpaca paper smoke](../paper-e2e-20260921/paper-receipt.json) | One SPY long-to-flat roundtrip, two actual submissions/full fills, -$0.08 cash-matched gross PnL, zero final positions/open orders; a fresh completed-trial recovery added zero writes |
+| Broader native acceptance | SPY/LEAN parity, native in-flight faults, streaming reconciliation, IBKR, strategy merit and continuous service remain open |
+
+The AAPL run uses retrospective same-close decisions and synthetic fill liquidity;
+known corporate-action dates were excluded. It does not implement the SPY
+converter or oracle below. The paper smoke observed full fills and recovery of an
+already completed trial, not uncertain in-flight order recovery. Reuse these
+dated receipts without presenting them as a new host's acceptance or a passed
+broader broker suite.
 
 The user has explicitly authorized broker-specific paper E2E after the current
 foundation work, including bounded paper orders needed for acceptance. Follow the
@@ -147,11 +164,19 @@ still proves no alpha or broker behavior.
 
 ## 4. Offline broker-state failures
 
-Before either paper adapter submits, implement one durable intent/order/fill journal
-and deterministic risk checks per account scope. Exercise each adapter's boundary
-with fake transport and injected clock/failures, no credentials or network.
-Broker-specific ID/status mappings are explicit fixtures. These are **required
-outcomes, not observed results**; no new fault runner is delivered by this plan.
+The [bounded Alpaca runner](../alpaca-paper/README.md) now implements a durable
+journal and deterministic risk checks; its September 21 source review records
+27 passing local synthetic lifecycle tests. Its native paper receipt covers full
+fills and completed-trial recovery only. That evidence neither qualifies IBKR nor
+establishes native fault behavior.
+
+The matrix below remains the broader per-adapter acceptance contract, not a claim
+that every case has run. Require one durable intent/order/fill journal and
+deterministic risk checks per account scope. Exercise each boundary with fake
+transport and injected clock/failures, no credentials or network; keep
+broker-specific ID/status mappings explicit. Record which cases a later suite
+covers rather than promoting the bounded smoke or its test count into full
+acceptance.
 
 | Deterministic case | Required result |
 | --- | --- |
@@ -170,8 +195,8 @@ Freeze numeric test limits and call budgets before execution. Each case retains
 journal-before/after, injected sequence, transport calls, positions/cash and
 expected-versus-actual assertions. Zero duplicate economic effects and zero
 unexplained differences are mandatory; red/skipped cases block that adapter's
-paper gate. Existing offline Alpaca guards accept only their own
-[recorded scope](../acceptance-wave/README.md), not this new suite.
+broader paper gate. Earlier offline Alpaca guards accept only their own
+[recorded scope](../acceptance-wave/README.md), not this full matrix.
 
 ## 5. IBKR paper procedure
 
@@ -220,12 +245,20 @@ the SPY fixture. The operator/reviewer must record actual pass/fail/blocked outc
 Alpaca uses a **separate adapter**, not an upstream Nautilus plugin. Retain
 `alpaca-py==0.44.0` read-only ingestion and its dated
 [AAPL acquisition](../authenticated-data/README.md) and
-[FB/META observations](../identity-readiness/README.md). A read-only account request
-was previously recorded too. That historical authentication does not establish
-current native paper configuration or trading/data entitlements. Verify the
-selected paper account and feed directly; optional Elite features are required
-only for cases that use them. Live credentials have not been provided and are not
-a paper prerequisite. No credential store is read by this plan.
+[FB/META observations](../identity-readiness/README.md). The September 21
+[readiness receipt](../paper-e2e-20260921/readiness.json) records fresh paper
+account, SPY asset, session and IEX quote checks plus five unchanged upstream SDK
+read-only tests. The subsequent [paper receipt](../paper-e2e-20260921/paper-receipt.json)
+records the finite full-fill roundtrip and completed-trial recovery described
+above. It used a configured 120 requests/minute budget against an observed paper
+limit of 200, without establishing Elite entitlement.
+
+The procedure below retains the broader acceptance requirements; its native
+in-flight fault and streaming cases remain open. Recheck the selected paper
+account and feed before future execution; dated authentication does not establish
+another run's readiness. Optional Elite features are required only for cases that
+use them. Live credentials have not been provided and are not a paper prerequisite.
+No credential store is read by this plan.
 
 1. Use the selected private paper configuration and the SDK's
    `TradingClient(..., paper=True)` boundary. Verify paper endpoint/account with
