@@ -158,6 +158,11 @@
       "functional_evidence": {
         "public_receipts": [
           {
+            "id": "claude-foundation-finalization-20260921",
+            "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
+            "kind": "native_model_e2e"
+          },
+          {
             "id": "native-cli-gaps",
             "path": "evidence/receipts/native-cli-gaps.json",
             "kind": "native_model_e2e"
@@ -644,6 +649,11 @@
             "id": "alpaca-paper-e2e-20260921",
             "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "adaptive-paper-practice-20260921",
+            "path": "evidence/receipts/adaptive-paper-practice-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -981,6 +991,11 @@
       "functional_evidence": {
         "public_receipts": [
           {
+            "id": "claude-foundation-finalization-20260921",
+            "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
+            "kind": "native_model_e2e"
+          },
+          {
             "id": "native-workflow-writing-comparison-20260921",
             "path": "evidence/receipts/native-workflow-writing-comparison-20260921.json",
             "kind": "native_cli_e2e"
@@ -989,6 +1004,11 @@
             "id": "native-workflow-graceful-recovery-20260921",
             "path": "evidence/receipts/native-workflow-graceful-recovery-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-foundation-finalization-20260921",
+            "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
+            "kind": "native_model_e2e"
           },
           {
             "id": "portable-userspace-install-20260921",
@@ -1119,6 +1139,11 @@
             "id": "foundation-rd-20260921",
             "path": "evidence/receipts/foundation-rd-20260921.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "adaptive-paper-practice-20260921",
+            "path": "evidence/receipts/adaptive-paper-practice-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1341,6 +1366,11 @@
       "functional_evidence": {
         "public_receipts": [
           {
+            "id": "claude-foundation-finalization-20260921",
+            "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
+            "kind": "native_model_e2e"
+          },
+          {
             "id": "portable-userspace-install-20260921",
             "path": "evidence/receipts/portable-userspace-install-20260921.json",
             "kind": "native_cli_e2e"
@@ -1464,6 +1494,11 @@
             "id": "foundation-rd-20260921",
             "path": "evidence/receipts/foundation-rd-20260921.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "adaptive-paper-practice-20260921",
+            "path": "evidence/receipts/adaptive-paper-practice-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -6624,6 +6659,11 @@
           {
             "id": "nautilus-equity-replay-20260921",
             "path": "evidence/receipts/nautilus-equity-replay-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "adaptive-paper-practice-20260921",
+            "path": "evidence/receipts/adaptive-paper-practice-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
