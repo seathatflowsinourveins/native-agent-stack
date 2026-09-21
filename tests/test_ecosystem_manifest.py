@@ -364,6 +364,88 @@ class EcosystemManifestTests(unittest.TestCase):
         self.assertIn("Use and restore only owned state", guide["text"])
         self.assertIn("/blob/main/adoption/lifecycle.md", guide["url"])
 
+    def returned_fixture(self, identifier="full-stack-convergence-20260922", kind="native_cli_e2e"):
+        path = "evidence/receipts/" + identifier + ".json"
+        artifact_path = "evidence/artifacts/selected/returned.txt"
+        returned = 'search --native\nexit=0\n</script><img src="https://invalid.example/private">\n'
+        self.write(artifact_path, returned)
+        artifact = {"path": artifact_path, "bytes": len(returned.encode()),
+                    "sha256": hashlib.sha256(returned.encode()).hexdigest()}
+        self.evidence["receipts"].append({"id": identifier, "path": path, "kind": kind,
+            "claim": "One selected operation returned", "component_ids": ["search"],
+            "limitations": ["Not all selected tools or another host"]})
+        self.write(path, {"id": identifier, "recorded_at_utc": "2026-09-22T01:02:03Z",
+            "claim": "One selected operation returned", "public_artifacts": [artifact],
+            "private_log": "/not-an-imported-file/private.log"})
+        self.save()
+        return identifier, path, artifact
+
+    def test_future_dated_public_result_is_joined_and_exact_bytes_are_embedded(self):
+        identifier, path, artifact = self.returned_fixture()
+        page, _ = self.build()
+        data = json.loads(page.data)
+        component = data["setup"]["components"][0]
+        self.assertEqual(component["returned_receipt_ids"], [identifier])
+        result = next(row for row in data["efficiency"]["receipts"] if row["id"] == identifier)
+        self.assertEqual(result["kind"], "native_cli_e2e")
+        self.assertEqual(result["component_ids"], ["search"])
+        self.assertEqual(result["artifacts"][0]["text"], (self.root / artifact["path"]).read_text())
+        self.assertIn("/blob/main/" + path, result["url"])
+        self.assertIn("/blob/main/" + artifact["path"], result["artifacts"][0]["url"])
+        self.assertIn(artifact["path"], [row["path"] for row in data["inputs"]])
+        self.assertNotIn("/not-an-imported-file/private.log", [row["path"] for row in data["inputs"]])
+        self.assertEqual(page.external_assets, [])
+        self.assertEqual(len(page.scripts), 2)
+        self.assertEqual(component["current_host_acceptance"], "Unknown on this browser's host")
+
+    def test_family_name_does_not_promote_inventory_or_unrelated_receipts(self):
+        for identifier, kind in [("native-returned-results-20260922", "historical_inventory"),
+                                 ("unreviewed-bundle-20260922", "native_cli_e2e")]:
+            with self.subTest(identifier=identifier):
+                self.returned_fixture(identifier, kind)
+                page, _ = self.build()
+                data = json.loads(page.data)
+                self.assertNotIn(identifier, [row["id"] for row in data["efficiency"]["receipts"]])
+                self.assertNotIn(identifier, data["setup"]["components"][0]["returned_receipt_ids"])
+
+    def test_returned_artifact_tampering_and_nonpublic_paths_fail(self):
+        _, path, artifact = self.returned_fixture()
+        self.write(artifact["path"], "changed returned bytes")
+        self.assertIn("hash or size mismatch", self.run_generator("--write").stdout)
+        self.write(path, {"id": "full-stack-convergence-20260922",
+                          "public_artifacts": [{**artifact, "path": "recipes/search.md"}]})
+        self.assertIn("public evidence/artifacts", self.run_generator("--write").stdout)
+
+    def test_returned_receipt_requires_canonical_component_and_confined_artifact(self):
+        _, path, artifact = self.returned_fixture()
+        self.evidence["receipts"][-1]["component_ids"] = ["unknown-alias"]
+        self.save()
+        self.assertIn("canonical selected components", self.run_generator("--write").stdout)
+        self.evidence["receipts"][-1]["component_ids"] = ["search"]
+        self.save()
+        link_path = "evidence/artifacts/selected/link.txt"
+        (self.root / link_path).symlink_to(self.root / artifact["path"])
+        self.write(path, {"id": "full-stack-convergence-20260922",
+                          "public_artifacts": [{**artifact, "path": link_path}]})
+        self.assertNotEqual(self.run_generator("--write").returncode, 0)
+
+    def test_public_png_is_embedded_with_exact_hash_and_unknown_tools_keep_a_gap(self):
+        import base64
+        identifier, path, _ = self.returned_fixture()
+        png = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jfYQAAAAASUVORK5CYII=")
+        image_path = "evidence/artifacts/selected/dashboard.png"
+        (self.root / image_path).write_bytes(png)
+        self.write(path, {"id": identifier, "public_artifacts": [{"path": image_path,
+            "bytes": len(png), "sha256": hashlib.sha256(png).hexdigest()}]})
+        page, _ = self.build()
+        row = next(row for row in json.loads(page.data)["efficiency"]["receipts"] if row["id"] == identifier)
+        self.assertEqual(row["artifacts"][0]["mime_type"], "image/png")
+        self.assertEqual(base64.b64decode(row["artifacts"][0]["content_base64"]), png)
+        self.evidence["receipts"].pop()
+        self.save()
+        page, _ = self.build()
+        self.assertEqual(json.loads(page.data)["setup"]["components"][0]["returned_receipt_ids"], [])
+
 
     def test_topic_list_preserves_missing_counters_and_negative_baseline(self):
         row = {"component_id": "search", "group": "core", "purpose": "Find exact source",

@@ -35,6 +35,19 @@ TOKEN_RECEIPTS = (
     "native-headroom-mcp-20260920", "token-practice-catalog-toon-20260920",
     "native-token-focus-clients-20260920",
 )
+# Explicit publication families, with dates supplied by the evidence registry.
+# A matching name alone never qualifies execution: native families also require
+# an execution evidence kind and canonical selected component identities.
+TOKEN_RECEIPT_FAMILIES = {
+    "token-practice-confirmation", "native-token-clean-prefix",
+    "current-session-observation", "native-token-stack-final", "foundation-native",
+}
+RETURNED_RECEIPT_FAMILIES = {
+    "native-returned-results", "native-memory-rag-alignment", "hf-memory-models",
+    "native-dashboard-data", "native-dashboard-access", "full-stack-convergence",
+}
+PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
+PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024
 NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json",
                     "docs/harness-defaults.md", "catalogs/README.md"}
 EXECUTION_KINDS = {"native_cli_e2e", "native_model_e2e"}
@@ -188,6 +201,7 @@ def build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url):
 
 def build_data(root):
     documents, inputs = {}, {}
+    current_public_paths = set()
 
     def track(path):
         raw = safe_file(root, path).read_bytes()
@@ -219,7 +233,7 @@ def build_data(root):
         # This packet is newer than the immutable base; its own new pages resolve
         # at the public branch after publication, with exact input hashes retained.
         new_catalog = path.startswith("catalogs/foundation/") or path in config.get("grand_catalogs", {}).values()
-        revision = "main" if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog else config["source_revision"]
+        revision = "main" if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog or path in current_public_paths else config["source_revision"]
         return f'{config["repository_url"]}/blob/{revision}/{quote(path, safe="/")}'
 
     index, stack, evidence, stars, review = (read(path) for path in (INDEX, STACK, EVIDENCE, STARS, REVIEW))
@@ -227,6 +241,23 @@ def build_data(root):
     require(len(star_map) == stars["count"], "public-star count or duplicate identity mismatch")
     receipts_by_id = {row["id"]: row for row in evidence["receipts"]}
     require(len(receipts_by_id) == len(evidence["receipts"]), "duplicate evidence receipt identity")
+    receipt_ids = set(TOKEN_RECEIPTS)
+    returned_receipt_ids = set()
+    selected_ids = {component["id"] for component in stack["components"]}
+    for identifier, receipt in receipts_by_id.items():
+        family, _, date = identifier.rpartition("-")
+        if not re.fullmatch(r"[0-9]{8}", date):
+            continue
+        if family in TOKEN_RECEIPT_FAMILIES:
+            receipt_ids.add(identifier)
+        if family in RETURNED_RECEIPT_FAMILIES and receipt.get("kind") in EXECUTION_KINDS:
+            require(bool(receipt.get("component_ids")) and
+                    set(receipt["component_ids"]).issubset(selected_ids),
+                    "returned receipt needs canonical selected components")
+            receipt_ids.add(identifier)
+            returned_receipt_ids.add(identifier)
+    current_public_paths.update(receipts_by_id[identifier]["path"] for identifier in receipt_ids
+                                if identifier in receipts_by_id and identifier not in TOKEN_RECEIPTS)
     output, seen = [], set()
     for record in index["records"]:
         key = repository_key(record["repository"])
@@ -387,18 +418,44 @@ def build_data(root):
                          "profiles": [p["id"] for p in profiles if identifier in p["component_ids"]],
                          "recipe_path": adoption["recipe_map"][identifier],
                          "audit_status": status, "audit": audit, "receipts": repository["receipts"],
+                         "returned_receipt_ids": sorted(receipt_id for receipt_id in returned_receipt_ids
+                             if identifier in receipts_by_id[receipt_id]["component_ids"]),
                          "current_host_acceptance": "Unknown on this browser's host"})
     token_receipts = []
-    receipt_ids = list(TOKEN_RECEIPTS)
-    for receipt_id in ("token-practice-confirmation-20260920", "native-token-clean-prefix-20260920", "current-session-observation-20260920", "native-token-stack-final-20260920", "foundation-native-20260920"):
-        if receipt_id in receipts_by_id:
-            receipt_ids.append(receipt_id)
-    for receipt_id in receipt_ids:
+    artifact_bytes = 0
+    for receipt_id in sorted(receipt_ids):
         require(receipt_id in receipts_by_id, "required token receipt is unregistered")
         receipt = receipts_by_id[receipt_id]
         detail = read(receipt["path"])
         require(detail.get("id") == receipt_id, "token receipt identity differs from registration")
-        token_receipts.append({"id": receipt_id, "url": file_url(receipt["path"]), "record": detail})
+        artifacts = []
+        # Only files explicitly designated public by a selected execution receipt
+        # are embedded. References and raw/private log paths are never traversed.
+        if receipt_id in returned_receipt_ids:
+            for declaration in detail.get("public_artifacts", []):
+                path = declaration.get("path", "")
+                require(path.startswith("evidence/artifacts/"), "returned artifact must be in public evidence/artifacts")
+                target = safe_file(root, path)
+                require(target.stat().st_size <= PUBLIC_ARTIFACT_LIMIT, "returned artifact exceeds size limit")
+                raw = target.read_bytes()
+                require(type(declaration.get("bytes")) is int and declaration["bytes"] == len(raw)
+                        and declaration.get("sha256") == digest(raw), "returned artifact hash or size mismatch")
+                artifact_bytes += len(raw)
+                require(artifact_bytes <= PUBLIC_BUNDLE_LIMIT, "returned artifact bundle exceeds size limit")
+                require(target.suffix.lower() in {".json", ".md", ".txt", ".png"}, "unsupported public returned artifact type")
+                artifact = {"path": path, "bytes": len(raw), "sha256": digest(raw)}
+                if target.suffix.lower() == ".png":
+                    require(raw.startswith(b"\x89PNG\r\n\x1a\n"), "returned screenshot must be PNG")
+                    artifact.update(mime_type="image/png", content_base64=base64.b64encode(raw).decode("ascii"))
+                else:
+                    artifact.update(mime_type="text/plain", text=raw.decode("utf-8"))
+                track(path)
+                current_public_paths.add(path)
+                artifact["url"] = file_url(path)
+                artifacts.append(artifact)
+        token_receipts.append({"id": receipt_id, "url": file_url(receipt["path"]), "record": detail,
+                               "kind": receipt["kind"], "component_ids": receipt.get("component_ids", []),
+                               "artifacts": artifacts, "returned_results": receipt_id in returned_receipt_ids})
     selection_policy = []
     for entry in config.get("selection_policy", []):
         item = dict(entry)
