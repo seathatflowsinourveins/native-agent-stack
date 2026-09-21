@@ -1,0 +1,1124 @@
+{
+  "schema_version": 1,
+  "id": "claude-selective-context-pilot-20260921",
+  "kind": "native_model_e2e",
+  "recorded_at_utc": "2026-09-21T03:14:48.791962+00:00",
+  "component_ids": [
+    "claude-code",
+    "context-mode"
+  ],
+  "claim": "Six amended native Claude coding attempts passed shared visible, held-out and scope checks. All three selective-policy attempts chose native computation; observed aggregate usage was 2.42% higher than the native policy, without a Context Mode treatment. One earlier rejected integration attempt remains in campaign task totals.",
+  "limitations": [
+    "Synthetic local integration pilot on one accepted coding fixture; not an upstream benchmark, whole-stack savings rate or universal model comparison.",
+    "Three AB/BA/AB pairs partly counterbalance order; native cache warmth is uncontrolled and models have no fixed seed. No Context Mode calls occurred, so the tool's causal token or latency effect is unidentified.",
+    "Hooks are disabled equally per invocation and a strict Context Mode-only MCP configuration is used. This controlled pilot is not normal-hook full-stack E2E.",
+    "Usage means final native-reported cumulative modelUsage counted once per fresh task. Ordinary input, cache creation, cache reads and output are disjoint here; thinking is included in output.",
+    "Coordinator, independent review, acceptance execution, reporting and any unreported provider requests are outside these task usage totals. Wall time covers the native subprocess only.",
+    "Native list-price cost estimates are preserved in original usage fields; subscription billing and money saved are unknown.",
+    "Private raw transcripts, session identifiers, commands and local paths are not published. Artifact hashes bind retained evidence but are not independent provider attestation.",
+    "Initial protocol failed its workflow/scope contract despite passing product and final file-scope checks; that attempt is excluded only from amended quality-equivalent pairs and retained in all-attempt totals."
+  ],
+  "data": {
+    "base_catalog_revision": "3cabcdfd0c3b489867364d9582df8f356586d219",
+    "fixture_revision": "c0bb7561a9c88a98ceaa06d6fcc153f35f55dd69",
+    "source_hashes": {
+      ".gitignore": "a51104264729e7b362ea8c739de0ada29ba6e4f6047580ec3a3fd330ad20fd47",
+      "AGENTS.md": "901f7b0a02521066a33b9e82cffe30a00e8d3ead74effe9a54dd31a0657898f7",
+      "CLAUDE.md": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
+      "README.md": "82f36ae579fdf22615a456c9445b0c0aed683e869ba5be4b017db09bb7d3f545",
+      "diagnostics/worker.jsonl": "7346d11882ed3cfc4e20dc4207746c2b1f699ebf6e1b2ba2a931c0a587664543",
+      "pytest.ini": "b160d82f7811555051f8966d8e02750a985227c1d022208c784e606946f2eada",
+      "retry_policy.py": "3538599a9828bd937dc4ea7d73c1928493126a30cb531db2fd5788da84e14fef",
+      "tests/test_retry.py": "2e88e48882e8275045b7932352ec02e3b5e81aa637f116d8d0d8add14ac35338",
+      "worker.py": "94af80a0e8edfd1f68eb6464d621a7b22d04929f431f967c61414abdd1e2c575"
+    },
+    "task_sha256": "7993ad37ad5a3867f62dc7db61b16d4937bbc101efec318690325fd1c5d63b2d",
+    "held_out_oracle_sha256": "ad9376a7a5eb0d209e61dd58aca04334e4d5875bbdfabbb2adf066817414e29c",
+    "diagnostic_records": 25000,
+    "diagnostic_bytes": 5445636,
+    "versions": {
+      "claude": "2.1.278 (Claude Code)",
+      "node": "v24.21.0"
+    },
+    "context_mode_version": "1.0.169",
+    "context_mode_entry_sha256": "7f5211b390353bd22d22ada5b8d6f9c3d597ff5fa08b3dda94ea2a08e0208cec",
+    "runner_sha256": "99ff086d05f32c44be0468d164a3a8ccc790f91dbefc09252e8445e6fc23455e",
+    "adapter_sha256": "06981d4d15f8f7ddc94067bb8414b1fc951acc949a28f968f22a719e43880b78",
+    "original_protocol_sha256": "84fa6db7261081d1bd9961d6bee5950a006c5b5e1e0c582ebe17eab5ff6a1f3f",
+    "amendment_sha256": "0982ead036a5dc13a02038a6d318d4ed673e9f545345eacee4a2def71b18a709",
+    "command_template": [
+      "claude",
+      "-p",
+      "<retained trial prompt>",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--strict-mcp-config",
+      "--mcp-config",
+      "<per-trial scoped MCP config>",
+      "--settings",
+      "{\"disableAllHooks\": true}",
+      "--model",
+      "opus[1m]",
+      "--effort",
+      "high",
+      "--session-id",
+      "<fresh session UUID>",
+      "--max-turns",
+      "20"
+    ],
+    "controls": {
+      "all_six_metadata_fields_match": true,
+      "matched_metadata_fields": [
+        "fixture_revision",
+        "tool_names",
+        "mcp_servers",
+        "plugin_names",
+        "permission_mode",
+        "models_observed",
+        "efforts_observed",
+        "init_model"
+      ],
+      "visible_tool_names": [
+        "Task",
+        "Bash",
+        "CronCreate",
+        "CronDelete",
+        "CronList",
+        "DesignSync",
+        "Edit",
+        "EnterWorktree",
+        "ExitWorktree",
+        "ListAgents",
+        "ListMcpResourcesTool",
+        "Monitor",
+        "NotebookEdit",
+        "PushNotification",
+        "Read",
+        "ReadMcpResourceDirTool",
+        "ReadMcpResourceTool",
+        "RemoteTrigger",
+        "ReportFindings",
+        "ScheduleWakeup",
+        "SendMessage",
+        "Skill",
+        "TaskStop",
+        "ToolSearch",
+        "WebFetch",
+        "WebSearch",
+        "Workflow",
+        "Write",
+        "mcp__context_mode__ctx_batch_execute",
+        "mcp__context_mode__ctx_doctor",
+        "mcp__context_mode__ctx_execute",
+        "mcp__context_mode__ctx_execute_file",
+        "mcp__context_mode__ctx_fetch_and_index",
+        "mcp__context_mode__ctx_index",
+        "mcp__context_mode__ctx_insight",
+        "mcp__context_mode__ctx_purge",
+        "mcp__context_mode__ctx_search",
+        "mcp__context_mode__ctx_stats",
+        "mcp__context_mode__ctx_upgrade"
+      ],
+      "mcp_servers": [
+        {
+          "name": "context_mode",
+          "status": "connected",
+          "source": "dynamic"
+        }
+      ],
+      "plugins": [
+        "context-mode",
+        "claude-hud",
+        "codex"
+      ],
+      "permission_mode_preserved": "bypassPermissions",
+      "model_requested": "opus[1m]",
+      "effort_requested": "high",
+      "subscription_readiness": {
+        "loggedIn": true,
+        "authMethod": "claude.ai",
+        "apiProvider": "firstParty",
+        "subscriptionType": "max"
+      },
+      "per_invocation_settings": {
+        "disableAllHooks": true
+      },
+      "global_settings_and_instructions_unchanged_all_attempts": true,
+      "policy_prompts": {
+        "native": "\nRetrieval policy for this trial: use focused native file reads and native local computation for this task, including the large diagnostic capture. Do not use Context Mode tools. Keep small source inspection, edits and raw pytest tests native. Return only compact evidence; do not dump the log.\n",
+        "selective": "\nRetrieval policy for this trial: use focused native file reads for small source files and native editing and raw pytest tests. Select Context Mode only when computing a compact diagnostic summary from the large log meaningfully avoids returning raw data; ctx_execute_file provides FILE_CONTENT. A focused native computation is also permitted if adequate. Do not force a Context Mode call for small inputs, reread already available evidence, or query stats for this task. Return only compact evidence; do not dump the log.\n"
+      },
+      "amendment": "Before dispatching the frozen amended six, replace pytest -q in every task prompt with the already-installed absolute pytest path; verify the baseline through a login shell. Clarify no runtime search, package-manager use, parent reads or /tmp writes. Exact amended prompts retained privately.",
+      "absolute_test_command_preflight": "3 failed, 8 passed; expected exit 1, verified before amended native calls",
+      "dispatch": "One native task at a time; each frozen amended arm ran once. No unchanged retries after failure; no rate limits observed."
+    },
+    "acceptance": {
+      "visible_tests": 11,
+      "held_out_behavior_checks": 9,
+      "held_out_incident_summary": {
+        "response_count": 24,
+        "early_retry_count": 13,
+        "worst_shortfall_ms": 3210,
+        "affected_trace_ids": "Exact sorted thirteen identifiers checked against the unchanged oracle"
+      },
+      "allowed_final_changes": [
+        "retry_policy.py",
+        "incident-summary.json"
+      ],
+      "six_amended_attempts_fully_accepted": true,
+      "independent_review": {
+        "reviewer_role": "Separate coordinator-assigned audit worker",
+        "actions": [
+          "Read original source and held-out oracle",
+          "Inspect all six actual solution diffs",
+          "Rerun all six visible suites: 11/11 each",
+          "Rerun all six held-out oracles: nine boundary cases plus log analysis each",
+          "Verify all immutable fixture files match the frozen source and only the two allowed final files change"
+        ],
+        "findings": [],
+        "context_mode_nonuse_confirmed": true
+      }
+    },
+    "protocol_amendment": {
+      "retained_rejected_attempt": "p1-native",
+      "frozen_amended_order": [
+        "r1-native",
+        "r1-selective",
+        "r2-selective",
+        "r2-native",
+        "r3-native",
+        "r3-selective"
+      ],
+      "all_amended_arms_run_once": true,
+      "failed_arm_rule": "A failing arm invalidates its pair; do not replace failures until six pass."
+    },
+    "trials": [
+      {
+        "label": "p1-native",
+        "variant": "native",
+        "started_at": "2026-09-21T03:00:12.060090+00:00",
+        "wall_seconds": 54.413,
+        "exit_code": 0,
+        "agent_success": true,
+        "rate_limit_detected": false,
+        "models_observed": [
+          "claude-opus-5"
+        ],
+        "efforts_observed": [
+          "high"
+        ],
+        "init_model": "claude-opus-5[1m]",
+        "final_usage": {
+          "input_tokens": 38,
+          "cache_creation_input_tokens": 40097,
+          "cache_read_input_tokens": 564859,
+          "output_tokens": 7387,
+          "output_tokens_details": {
+            "thinking_tokens": 968
+          },
+          "server_tool_use": {
+            "web_search_requests": 0,
+            "web_fetch_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 40097,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "inference_geo": "not_available",
+          "iterations": [
+            {
+              "input_tokens": 2,
+              "output_tokens": 762,
+              "cache_read_input_tokens": 39850,
+              "cache_creation_input_tokens": 247,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 0,
+                "ephemeral_1h_input_tokens": 247
+              },
+              "type": "message"
+            }
+          ],
+          "speed": "standard"
+        },
+        "final_model_usage": {
+          "claude-opus-5[1m]": {
+            "inputTokens": 38,
+            "outputTokens": 7387,
+            "cacheReadInputTokens": 564859,
+            "cacheCreationInputTokens": 40097,
+            "webSearchRequests": 0,
+            "costUSD": 0.8682644999999999,
+            "contextWindow": 1000000,
+            "maxOutputTokens": 64000,
+            "thinkingTokens": 968,
+            "canonicalModel": "claude-opus-5",
+            "provider": "firstParty",
+            "costBasis": "list"
+          }
+        },
+        "model_usage_totals": {
+          "inputTokens": 38,
+          "cacheCreationInputTokens": 40097,
+          "cacheReadInputTokens": 564859,
+          "outputTokens": 7387,
+          "thinkingTokens": 968,
+          "totalTokens": 612381
+        },
+        "native_duration_ms": 53369,
+        "api_duration_ms": 39714,
+        "native_turns": 19,
+        "api_retries_observed": 0,
+        "harness_retries": 0,
+        "visible_acceptance": true,
+        "hidden_acceptance": true,
+        "changed_files": [
+          "retry_policy.py",
+          "incident-summary.json"
+        ],
+        "workflow_checks": {
+          "standalone_initial_failure": false,
+          "standalone_final_pass": false,
+          "no_delegation": true
+        },
+        "full_acceptance": false,
+        "settings_unchanged": true,
+        "global_instructions_unchanged": true,
+        "included_in_amended_pairs": false,
+        "observed_context_mode_calls": 0,
+        "final_fixture_file_scope_passed": true,
+        "tool_call_count": 18,
+        "actual_tool_names": [
+          "Bash"
+        ],
+        "persisted_unique_response_count": 19,
+        "persisted_usage_reconciles": true,
+        "native_session_sha256": "f2263b83e4bf101bb385ee206a1f0c9b7b3f9d217ac30765c73b57f1b2439045",
+        "artifact_sha256": {
+          "command.json": "a23d73d452410b9afeeb60760c26a5c0ffb8642018cdf08fc1b1f8c2ebc64662",
+          "prompt.txt": "1f37e15830096f63a3ddc13224ab13b750869bce923d110a52382c128d664d70",
+          "mcp.json": "8be06b8aaafedb22df73a8a56296fa7018a95c8251e27abe14721b8c812c0756",
+          "stream.jsonl": "d934fb91729b357d9a69430ffee16b856135aea6a76ed852fe0dc23939bf5db9",
+          "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "report.json": "7a62c01cc5fe58709afd0d0e0152bef39f2988845f5af5f62f31d8ce72465aee",
+          "solution.diff": "193503aa43f11541d941688c61039ad908f14c1610d25323d516a9bd038657e9",
+          "acceptance.log": "6b257b6ffdbe11349169e8a00715d94d699cdbcde6bca4774fa36ef8d0e53c0f"
+        },
+        "billed_cost_usd": null,
+        "workflow_scope_passed": false,
+        "rejection_reason": "Native shell lost prepended test PATH; searched parent/runtime paths, invoked offline cached pytest and wrote a temporary summary outside the fixture. Product and final fixture scope passed, but standalone test workflow and execution scope failed. Retained in all-attempt totals; not an amended comparison arm."
+      },
+      {
+        "label": "r1-native",
+        "variant": "native",
+        "started_at": "2026-09-21T03:03:08.716429+00:00",
+        "wall_seconds": 30.368,
+        "exit_code": 0,
+        "agent_success": true,
+        "rate_limit_detected": false,
+        "models_observed": [
+          "claude-opus-5"
+        ],
+        "efforts_observed": [
+          "high"
+        ],
+        "init_model": "claude-opus-5[1m]",
+        "final_usage": {
+          "input_tokens": 22,
+          "cache_creation_input_tokens": 23351,
+          "cache_read_input_tokens": 323227,
+          "output_tokens": 5447,
+          "output_tokens_details": {
+            "thinking_tokens": 922
+          },
+          "server_tool_use": {
+            "web_search_requests": 0,
+            "web_fetch_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 23351,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "inference_geo": "not_available",
+          "iterations": [
+            {
+              "input_tokens": 2,
+              "output_tokens": 822,
+              "cache_read_input_tokens": 35906,
+              "cache_creation_input_tokens": 231,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 0,
+                "ephemeral_1h_input_tokens": 231
+              },
+              "type": "message"
+            }
+          ],
+          "speed": "standard"
+        },
+        "final_model_usage": {
+          "claude-opus-5[1m]": {
+            "inputTokens": 22,
+            "outputTokens": 5447,
+            "cacheReadInputTokens": 323227,
+            "cacheCreationInputTokens": 23351,
+            "webSearchRequests": 0,
+            "costUSD": 0.5314085000000001,
+            "contextWindow": 1000000,
+            "maxOutputTokens": 64000,
+            "thinkingTokens": 922,
+            "canonicalModel": "claude-opus-5",
+            "provider": "firstParty",
+            "costBasis": "list"
+          }
+        },
+        "model_usage_totals": {
+          "inputTokens": 22,
+          "cacheCreationInputTokens": 23351,
+          "cacheReadInputTokens": 323227,
+          "outputTokens": 5447,
+          "thinkingTokens": 922,
+          "totalTokens": 352047
+        },
+        "native_duration_ms": 29436,
+        "api_duration_ms": 28877,
+        "native_turns": 11,
+        "api_retries_observed": 0,
+        "harness_retries": 0,
+        "visible_acceptance": true,
+        "hidden_acceptance": true,
+        "changed_files": [
+          "retry_policy.py",
+          "incident-summary.json"
+        ],
+        "workflow_checks": {
+          "standalone_initial_failure": true,
+          "standalone_final_pass": true,
+          "no_delegation": true
+        },
+        "full_acceptance": true,
+        "settings_unchanged": true,
+        "global_instructions_unchanged": true,
+        "included_in_amended_pairs": true,
+        "observed_context_mode_calls": 0,
+        "final_fixture_file_scope_passed": true,
+        "tool_call_count": 10,
+        "actual_tool_names": [
+          "Bash"
+        ],
+        "persisted_unique_response_count": 11,
+        "persisted_usage_reconciles": true,
+        "native_session_sha256": "c79f034806b1a2ec549a63935260f290b81b60176be2d871b06ce0a2f47b7e77",
+        "artifact_sha256": {
+          "command.json": "78528fd4d9b5c34f8be23b148036d2398003afff20792c045ee9629460f00e7e",
+          "prompt.txt": "baf9a212b80a6af40050c9e322481f345d4ebe57c86ad3d02bff8ee8aa88ad39",
+          "mcp.json": "a918c2a04ec4cc62e9005e2cf6ff4acc3467458f70e3165f1633dac6319b124a",
+          "stream.jsonl": "a86db9202c3edc5a7ccba45322eeef398fbc322cc07772a73c63aa87ecb4f45c",
+          "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "report.json": "eb8fca27a92f0ca2c166577f8e1e50f024e43404816c541c94c82daa16242896",
+          "solution.diff": "c54efc36171d260c98e0673f127a35586ca1b37a9191a538a24fc85d6f148e18",
+          "acceptance.log": "6b257b6ffdbe11349169e8a00715d94d699cdbcde6bca4774fa36ef8d0e53c0f"
+        },
+        "billed_cost_usd": null,
+        "workflow_scope_passed": true
+      },
+      {
+        "label": "r1-selective",
+        "variant": "selective",
+        "started_at": "2026-09-21T03:03:47.410498+00:00",
+        "wall_seconds": 29.265,
+        "exit_code": 0,
+        "agent_success": true,
+        "rate_limit_detected": false,
+        "models_observed": [
+          "claude-opus-5"
+        ],
+        "efforts_observed": [
+          "high"
+        ],
+        "init_model": "claude-opus-5[1m]",
+        "final_usage": {
+          "input_tokens": 22,
+          "cache_creation_input_tokens": 22699,
+          "cache_read_input_tokens": 320849,
+          "output_tokens": 5241,
+          "output_tokens_details": {
+            "thinking_tokens": 1343
+          },
+          "server_tool_use": {
+            "web_search_requests": 0,
+            "web_fetch_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 22699,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "inference_geo": "not_available",
+          "iterations": [
+            {
+              "input_tokens": 2,
+              "output_tokens": 584,
+              "cache_read_input_tokens": 34420,
+              "cache_creation_input_tokens": 1065,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 0,
+                "ephemeral_1h_input_tokens": 1065
+              },
+              "type": "message"
+            }
+          ],
+          "speed": "standard"
+        },
+        "final_model_usage": {
+          "claude-opus-5[1m]": {
+            "inputTokens": 22,
+            "outputTokens": 5241,
+            "cacheReadInputTokens": 320849,
+            "cacheCreationInputTokens": 22699,
+            "webSearchRequests": 0,
+            "costUSD": 0.5185495,
+            "contextWindow": 1000000,
+            "maxOutputTokens": 64000,
+            "thinkingTokens": 1343,
+            "canonicalModel": "claude-opus-5",
+            "provider": "firstParty",
+            "costBasis": "list"
+          }
+        },
+        "model_usage_totals": {
+          "inputTokens": 22,
+          "cacheCreationInputTokens": 22699,
+          "cacheReadInputTokens": 320849,
+          "outputTokens": 5241,
+          "thinkingTokens": 1343,
+          "totalTokens": 348811
+        },
+        "native_duration_ms": 28353,
+        "api_duration_ms": 27722,
+        "native_turns": 11,
+        "api_retries_observed": 0,
+        "harness_retries": 0,
+        "visible_acceptance": true,
+        "hidden_acceptance": true,
+        "changed_files": [
+          "retry_policy.py",
+          "incident-summary.json"
+        ],
+        "workflow_checks": {
+          "standalone_initial_failure": true,
+          "standalone_final_pass": true,
+          "no_delegation": true
+        },
+        "full_acceptance": true,
+        "settings_unchanged": true,
+        "global_instructions_unchanged": true,
+        "included_in_amended_pairs": true,
+        "observed_context_mode_calls": 0,
+        "final_fixture_file_scope_passed": true,
+        "tool_call_count": 10,
+        "actual_tool_names": [
+          "Bash",
+          "Edit"
+        ],
+        "persisted_unique_response_count": 11,
+        "persisted_usage_reconciles": true,
+        "native_session_sha256": "be737e878cea9df35fe3613331e71ea924b42a34a57c604098bfe8b2b760719d",
+        "artifact_sha256": {
+          "command.json": "b58a7301e91164a60340e85c1d1d81ba0483fe78d410c77b4cb0412af5a38895",
+          "prompt.txt": "eae670ba658ba9c8199f60d279b5084cdb592e1e8d624ba806191bca31f8eff8",
+          "mcp.json": "7aa34ba2e6512c6b7f627ddbea115a5869cf4d49d628ba4f980b3af47348e180",
+          "stream.jsonl": "353bbe32a3707e3670fa8df77d00930cde46b4ad20f7fc4614748964066b7edf",
+          "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "report.json": "debb275cf1493c474689c21bb33e26c519476bf45f14d935d80a67c9ec66275d",
+          "solution.diff": "8a471da54284109b10421c5a7a2d9be17777638154248a8ed9a602d6d3e5fda3",
+          "acceptance.log": "6b257b6ffdbe11349169e8a00715d94d699cdbcde6bca4774fa36ef8d0e53c0f"
+        },
+        "billed_cost_usd": null,
+        "workflow_scope_passed": true
+      },
+      {
+        "label": "r2-selective",
+        "variant": "selective",
+        "started_at": "2026-09-21T03:04:35.105175+00:00",
+        "wall_seconds": 23.755,
+        "exit_code": 0,
+        "agent_success": true,
+        "rate_limit_detected": false,
+        "models_observed": [
+          "claude-opus-5"
+        ],
+        "efforts_observed": [
+          "high"
+        ],
+        "init_model": "claude-opus-5[1m]",
+        "final_usage": {
+          "input_tokens": 22,
+          "cache_creation_input_tokens": 21954,
+          "cache_read_input_tokens": 316231,
+          "output_tokens": 4484,
+          "output_tokens_details": {
+            "thinking_tokens": 537
+          },
+          "server_tool_use": {
+            "web_search_requests": 0,
+            "web_fetch_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 21954,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "inference_geo": "not_available",
+          "iterations": [
+            {
+              "input_tokens": 2,
+              "output_tokens": 735,
+              "cache_read_input_tokens": 34085,
+              "cache_creation_input_tokens": 655,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 0,
+                "ephemeral_1h_input_tokens": 655
+              },
+              "type": "message"
+            }
+          ],
+          "speed": "standard"
+        },
+        "final_model_usage": {
+          "claude-opus-5[1m]": {
+            "inputTokens": 22,
+            "outputTokens": 4484,
+            "cacheReadInputTokens": 316231,
+            "cacheCreationInputTokens": 21954,
+            "webSearchRequests": 0,
+            "costUSD": 0.48986550000000006,
+            "contextWindow": 1000000,
+            "maxOutputTokens": 64000,
+            "thinkingTokens": 537,
+            "canonicalModel": "claude-opus-5",
+            "provider": "firstParty",
+            "costBasis": "list"
+          }
+        },
+        "model_usage_totals": {
+          "inputTokens": 22,
+          "cacheCreationInputTokens": 21954,
+          "cacheReadInputTokens": 316231,
+          "outputTokens": 4484,
+          "thinkingTokens": 537,
+          "totalTokens": 342691
+        },
+        "native_duration_ms": 22791,
+        "api_duration_ms": 22343,
+        "native_turns": 11,
+        "api_retries_observed": 0,
+        "harness_retries": 0,
+        "visible_acceptance": true,
+        "hidden_acceptance": true,
+        "changed_files": [
+          "retry_policy.py",
+          "incident-summary.json"
+        ],
+        "workflow_checks": {
+          "standalone_initial_failure": true,
+          "standalone_final_pass": true,
+          "no_delegation": true
+        },
+        "full_acceptance": true,
+        "settings_unchanged": true,
+        "global_instructions_unchanged": true,
+        "included_in_amended_pairs": true,
+        "observed_context_mode_calls": 0,
+        "final_fixture_file_scope_passed": true,
+        "tool_call_count": 10,
+        "actual_tool_names": [
+          "Bash"
+        ],
+        "persisted_unique_response_count": 11,
+        "persisted_usage_reconciles": true,
+        "native_session_sha256": "30aa69937ee1ee2055cfd8afc9db43df11f87c5d3eb920bcd461bcaea6927b9b",
+        "artifact_sha256": {
+          "command.json": "0977067cc2e4b520b3429fbc6fcd9e949440f36ce2b67b92be66c29d72395a01",
+          "prompt.txt": "eae670ba658ba9c8199f60d279b5084cdb592e1e8d624ba806191bca31f8eff8",
+          "mcp.json": "56f318b741af887312050bcab81a06df606d7c13d83aa0f7b8645215e801f377",
+          "stream.jsonl": "881a47f3bb4579893aed54ce281a9a84397de01811716390d5b448f8aa7a5c2e",
+          "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "report.json": "3b4327abb7da969a52545253754ce9c4b17fb6331f188fd99c0934abec4615a2",
+          "solution.diff": "6a967c6a8c81b00e8a892eb1f96c39ef8631d75a14bc47c13be5a3fa3a6fcbc2",
+          "acceptance.log": "6b257b6ffdbe11349169e8a00715d94d699cdbcde6bca4774fa36ef8d0e53c0f"
+        },
+        "billed_cost_usd": null,
+        "workflow_scope_passed": true
+      },
+      {
+        "label": "r2-native",
+        "variant": "native",
+        "started_at": "2026-09-21T03:05:10.089485+00:00",
+        "wall_seconds": 31.419,
+        "exit_code": 0,
+        "agent_success": true,
+        "rate_limit_detected": false,
+        "models_observed": [
+          "claude-opus-5"
+        ],
+        "efforts_observed": [
+          "high"
+        ],
+        "init_model": "claude-opus-5[1m]",
+        "final_usage": {
+          "input_tokens": 20,
+          "cache_creation_input_tokens": 21951,
+          "cache_read_input_tokens": 285084,
+          "output_tokens": 4897,
+          "output_tokens_details": {
+            "thinking_tokens": 414
+          },
+          "server_tool_use": {
+            "web_search_requests": 0,
+            "web_fetch_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 21951,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "inference_geo": "not_available",
+          "iterations": [
+            {
+              "input_tokens": 2,
+              "output_tokens": 848,
+              "cache_read_input_tokens": 34492,
+              "cache_creation_input_tokens": 245,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 0,
+                "ephemeral_1h_input_tokens": 245
+              },
+              "type": "message"
+            }
+          ],
+          "speed": "standard"
+        },
+        "final_model_usage": {
+          "claude-opus-5[1m]": {
+            "inputTokens": 20,
+            "outputTokens": 4897,
+            "cacheReadInputTokens": 285084,
+            "cacheCreationInputTokens": 21951,
+            "webSearchRequests": 0,
+            "costUSD": 0.4845769999999999,
+            "contextWindow": 1000000,
+            "maxOutputTokens": 64000,
+            "thinkingTokens": 414,
+            "canonicalModel": "claude-opus-5",
+            "provider": "firstParty",
+            "costBasis": "list"
+          }
+        },
+        "model_usage_totals": {
+          "inputTokens": 20,
+          "cacheCreationInputTokens": 21951,
+          "cacheReadInputTokens": 285084,
+          "outputTokens": 4897,
+          "thinkingTokens": 414,
+          "totalTokens": 311952
+        },
+        "native_duration_ms": 30453,
+        "api_duration_ms": 29956,
+        "native_turns": 10,
+        "api_retries_observed": 0,
+        "harness_retries": 0,
+        "visible_acceptance": true,
+        "hidden_acceptance": true,
+        "changed_files": [
+          "retry_policy.py",
+          "incident-summary.json"
+        ],
+        "workflow_checks": {
+          "standalone_initial_failure": true,
+          "standalone_final_pass": true,
+          "no_delegation": true
+        },
+        "full_acceptance": true,
+        "settings_unchanged": true,
+        "global_instructions_unchanged": true,
+        "included_in_amended_pairs": true,
+        "observed_context_mode_calls": 0,
+        "final_fixture_file_scope_passed": true,
+        "tool_call_count": 9,
+        "actual_tool_names": [
+          "Bash"
+        ],
+        "persisted_unique_response_count": 10,
+        "persisted_usage_reconciles": true,
+        "native_session_sha256": "2566bf65b37e0ed1ffcd15d6968d2719058319f7a5b02bb972a30aeecd9d4cc4",
+        "artifact_sha256": {
+          "command.json": "9db3ee6c10e9e42703eb3844e58dcb663f3e048d943c43b65267b33de9623add",
+          "prompt.txt": "baf9a212b80a6af40050c9e322481f345d4ebe57c86ad3d02bff8ee8aa88ad39",
+          "mcp.json": "597ee8aa631524aa1b5c0c9fcfb561168d37ead1d6995077d388f2649e84c810",
+          "stream.jsonl": "321cd3fd02cb7e1ca1b972e8fa6b486a36f0e35f6c4bcc02b42ef266c434ecdf",
+          "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "report.json": "7f8f6c1bcbdb4866a1f7fd8e10b1431c1fa1f23e5b463904782640590b9756d9",
+          "solution.diff": "0a026b0a0e98ece908e446f9c0659f160376e08363a888e388d2b0350f5cfcb4",
+          "acceptance.log": "6b257b6ffdbe11349169e8a00715d94d699cdbcde6bca4774fa36ef8d0e53c0f"
+        },
+        "billed_cost_usd": null,
+        "workflow_scope_passed": true
+      },
+      {
+        "label": "r3-native",
+        "variant": "native",
+        "started_at": "2026-09-21T03:05:48.461716+00:00",
+        "wall_seconds": 26.319,
+        "exit_code": 0,
+        "agent_success": true,
+        "rate_limit_detected": false,
+        "models_observed": [
+          "claude-opus-5"
+        ],
+        "efforts_observed": [
+          "high"
+        ],
+        "init_model": "claude-opus-5[1m]",
+        "final_usage": {
+          "input_tokens": 18,
+          "cache_creation_input_tokens": 23171,
+          "cache_read_input_tokens": 255233,
+          "output_tokens": 5072,
+          "output_tokens_details": {
+            "thinking_tokens": 1011
+          },
+          "server_tool_use": {
+            "web_search_requests": 0,
+            "web_fetch_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 23171,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "inference_geo": "not_available",
+          "iterations": [
+            {
+              "input_tokens": 2,
+              "output_tokens": 610,
+              "cache_read_input_tokens": 34803,
+              "cache_creation_input_tokens": 1154,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 0,
+                "ephemeral_1h_input_tokens": 1154
+              },
+              "type": "message"
+            }
+          ],
+          "speed": "standard"
+        },
+        "final_model_usage": {
+          "claude-opus-5[1m]": {
+            "inputTokens": 18,
+            "outputTokens": 5072,
+            "cacheReadInputTokens": 255233,
+            "cacheCreationInputTokens": 23171,
+            "webSearchRequests": 0,
+            "costUSD": 0.48621649999999994,
+            "contextWindow": 1000000,
+            "maxOutputTokens": 64000,
+            "thinkingTokens": 1011,
+            "canonicalModel": "claude-opus-5",
+            "provider": "firstParty",
+            "costBasis": "list"
+          }
+        },
+        "model_usage_totals": {
+          "inputTokens": 18,
+          "cacheCreationInputTokens": 23171,
+          "cacheReadInputTokens": 255233,
+          "outputTokens": 5072,
+          "thinkingTokens": 1011,
+          "totalTokens": 283494
+        },
+        "native_duration_ms": 25423,
+        "api_duration_ms": 24837,
+        "native_turns": 9,
+        "api_retries_observed": 0,
+        "harness_retries": 0,
+        "visible_acceptance": true,
+        "hidden_acceptance": true,
+        "changed_files": [
+          "retry_policy.py",
+          "incident-summary.json"
+        ],
+        "workflow_checks": {
+          "standalone_initial_failure": true,
+          "standalone_final_pass": true,
+          "no_delegation": true
+        },
+        "full_acceptance": true,
+        "settings_unchanged": true,
+        "global_instructions_unchanged": true,
+        "included_in_amended_pairs": true,
+        "observed_context_mode_calls": 0,
+        "final_fixture_file_scope_passed": true,
+        "tool_call_count": 8,
+        "actual_tool_names": [
+          "Bash"
+        ],
+        "persisted_unique_response_count": 9,
+        "persisted_usage_reconciles": true,
+        "native_session_sha256": "5bb370df74379f7a5ff6b2801db4b173e390feebd6f8494046d7addbe780e2c3",
+        "artifact_sha256": {
+          "command.json": "c2a4c0685777d18b0e1a417695ecfd18662b369e4b6cda055a5605d4b979c347",
+          "prompt.txt": "baf9a212b80a6af40050c9e322481f345d4ebe57c86ad3d02bff8ee8aa88ad39",
+          "mcp.json": "263273a33223d15cefdf6cba31ffbf5a4e84aec86df676620de189d546ac772c",
+          "stream.jsonl": "c4e8f798ad1947bd9b8d48a30c7aa1ce5add618ccdc2dd4ebf9584117355a273",
+          "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "report.json": "c3029de2f1c02a2e670941c37be6382e383ad0f3fb0320c87de1e49455dde040",
+          "solution.diff": "d06b4856732fc55cd4285681c531aea0165a069b1cde6b6b56cb54a441461222",
+          "acceptance.log": "6b257b6ffdbe11349169e8a00715d94d699cdbcde6bca4774fa36ef8d0e53c0f"
+        },
+        "billed_cost_usd": null,
+        "workflow_scope_passed": true
+      },
+      {
+        "label": "r3-selective",
+        "variant": "selective",
+        "started_at": "2026-09-21T03:06:53.555360+00:00",
+        "wall_seconds": 26.162,
+        "exit_code": 0,
+        "agent_success": true,
+        "rate_limit_detected": false,
+        "models_observed": [
+          "claude-opus-5"
+        ],
+        "efforts_observed": [
+          "high"
+        ],
+        "init_model": "claude-opus-5[1m]",
+        "final_usage": {
+          "input_tokens": 18,
+          "cache_creation_input_tokens": 22071,
+          "cache_read_input_tokens": 252597,
+          "output_tokens": 4192,
+          "output_tokens_details": {
+            "thinking_tokens": 530
+          },
+          "server_tool_use": {
+            "web_search_requests": 0,
+            "web_fetch_requests": 0
+          },
+          "service_tier": "standard",
+          "cache_creation": {
+            "ephemeral_1h_input_tokens": 22071,
+            "ephemeral_5m_input_tokens": 0
+          },
+          "inference_geo": "not_available",
+          "iterations": [
+            {
+              "input_tokens": 2,
+              "output_tokens": 717,
+              "cache_read_input_tokens": 33716,
+              "cache_creation_input_tokens": 1141,
+              "cache_creation": {
+                "ephemeral_5m_input_tokens": 0,
+                "ephemeral_1h_input_tokens": 1141
+              },
+              "type": "message"
+            }
+          ],
+          "speed": "standard"
+        },
+        "final_model_usage": {
+          "claude-opus-5[1m]": {
+            "inputTokens": 18,
+            "outputTokens": 4192,
+            "cacheReadInputTokens": 252597,
+            "cacheCreationInputTokens": 22071,
+            "webSearchRequests": 0,
+            "costUSD": 0.45189850000000004,
+            "contextWindow": 1000000,
+            "maxOutputTokens": 64000,
+            "thinkingTokens": 530,
+            "canonicalModel": "claude-opus-5",
+            "provider": "firstParty",
+            "costBasis": "list"
+          }
+        },
+        "model_usage_totals": {
+          "inputTokens": 18,
+          "cacheCreationInputTokens": 22071,
+          "cacheReadInputTokens": 252597,
+          "outputTokens": 4192,
+          "thinkingTokens": 530,
+          "totalTokens": 278878
+        },
+        "native_duration_ms": 25189,
+        "api_duration_ms": 24581,
+        "native_turns": 9,
+        "api_retries_observed": 0,
+        "harness_retries": 0,
+        "visible_acceptance": true,
+        "hidden_acceptance": true,
+        "changed_files": [
+          "retry_policy.py",
+          "incident-summary.json"
+        ],
+        "workflow_checks": {
+          "standalone_initial_failure": true,
+          "standalone_final_pass": true,
+          "no_delegation": true
+        },
+        "full_acceptance": true,
+        "settings_unchanged": true,
+        "global_instructions_unchanged": true,
+        "included_in_amended_pairs": true,
+        "observed_context_mode_calls": 0,
+        "final_fixture_file_scope_passed": true,
+        "tool_call_count": 8,
+        "actual_tool_names": [
+          "Bash"
+        ],
+        "persisted_unique_response_count": 9,
+        "persisted_usage_reconciles": true,
+        "native_session_sha256": "0c2abcdecdd2a648dad21a624be29e7274f6e4d8b5bd19eb5c6d0f6d96955a52",
+        "artifact_sha256": {
+          "command.json": "55cf1a0f2b74aef26b5a4c1f58559f1cdc173ac09d75eec9d70717f27161f49e",
+          "prompt.txt": "eae670ba658ba9c8199f60d279b5084cdb592e1e8d624ba806191bca31f8eff8",
+          "mcp.json": "47f81d5437d0796805fea39df5eb8c4507d4d14a991a56a7945b2a2cec2e20c2",
+          "stream.jsonl": "62497aa60262746d0769238ef1b2aabba23ddc2dfc57cd4796b6dfb8e5f13760",
+          "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "report.json": "b856d9fdb390a69e5e5b9c381abed29caf2e1402f2539be7179b1b6fc18c6fe9",
+          "solution.diff": "93f56914704ef4425e08bece7a4829e19c90981d54f1fd332a0dbe2b41cf94c2",
+          "acceptance.log": "6b257b6ffdbe11349169e8a00715d94d699cdbcde6bca4774fa36ef8d0e53c0f"
+        },
+        "billed_cost_usd": null,
+        "workflow_scope_passed": true
+      }
+    ],
+    "pairs": [
+      {
+        "pair": 1,
+        "order": [
+          "native",
+          "selective"
+        ],
+        "native_total_tokens": 352047,
+        "selective_total_tokens": 348811,
+        "selective_minus_native_tokens": -3236,
+        "selective_change_percent": -0.9191954483350195,
+        "both_fully_accepted": true,
+        "context_mode_effect_identified": false
+      },
+      {
+        "pair": 2,
+        "order": [
+          "selective",
+          "native"
+        ],
+        "native_total_tokens": 311952,
+        "selective_total_tokens": 342691,
+        "selective_minus_native_tokens": 30739,
+        "selective_change_percent": 9.853759552751695,
+        "both_fully_accepted": true,
+        "context_mode_effect_identified": false
+      },
+      {
+        "pair": 3,
+        "order": [
+          "native",
+          "selective"
+        ],
+        "native_total_tokens": 283494,
+        "selective_total_tokens": 278878,
+        "selective_minus_native_tokens": -4616,
+        "selective_change_percent": -1.628253155269599,
+        "both_fully_accepted": true,
+        "context_mode_effect_identified": false
+      }
+    ],
+    "aggregate": {
+      "native_policy": {
+        "attempts": 3,
+        "usage_categories": {
+          "inputTokens": 60,
+          "cacheCreationInputTokens": 68473,
+          "cacheReadInputTokens": 863544,
+          "outputTokens": 15416,
+          "thinkingTokens": 2347,
+          "totalTokens": 947493
+        },
+        "wall_seconds": 88.106
+      },
+      "selective_policy": {
+        "attempts": 3,
+        "usage_categories": {
+          "inputTokens": 62,
+          "cacheCreationInputTokens": 66724,
+          "cacheReadInputTokens": 889677,
+          "outputTokens": 13917,
+          "thinkingTokens": 2410,
+          "totalTokens": 970380
+        },
+        "wall_seconds": 79.182
+      },
+      "selective_minus_native_tokens": 22887,
+      "selective_change_percent": 2.415532357494987,
+      "amended_comparison": {
+        "attempts": 6,
+        "usage_categories": {
+          "inputTokens": 122,
+          "cacheCreationInputTokens": 135197,
+          "cacheReadInputTokens": 1753221,
+          "outputTokens": 29333,
+          "thinkingTokens": 4757,
+          "totalTokens": 1917873
+        },
+        "wall_seconds": 167.288
+      },
+      "rejected_initial_attempt": {
+        "attempts": 1,
+        "usage_categories": {
+          "inputTokens": 38,
+          "cacheCreationInputTokens": 40097,
+          "cacheReadInputTokens": 564859,
+          "outputTokens": 7387,
+          "thinkingTokens": 968,
+          "totalTokens": 612381
+        },
+        "wall_seconds": 54.413
+      },
+      "all_task_attempts": {
+        "attempts": 7,
+        "usage_categories": {
+          "inputTokens": 160,
+          "cacheCreationInputTokens": 175294,
+          "cacheReadInputTokens": 2318080,
+          "outputTokens": 36720,
+          "thinkingTokens": 5725,
+          "totalTokens": 2530254
+        },
+        "wall_seconds": 221.701
+      }
+    },
+    "routing_decision": {
+      "global_defaults_changed": false,
+      "recommendation": "Keep focused native reads/computation for a known bounded task; retain optional Context Mode selection when an actual retrieval need justifies it. Do not mandate it on input size alone.",
+      "causal_savings_claim": null,
+      "prior_claude_pair_replaced": false
+    }
+  },
+  "provenance": {
+    "source_label": "retained_private_native_trial_reports_and_streams",
+    "report_hash_order": [
+      "p1-native",
+      "r1-native",
+      "r1-selective",
+      "r2-selective",
+      "r2-native",
+      "r3-native",
+      "r3-selective"
+    ],
+    "ordered_report_hashes_sha256": "a31ca011434ed290b83c843a30414bc80b771e1e3c53ef8a15f70128555b2352",
+    "publication_method": "Explicit sanitized fields: public tool/model identities, task outcomes, native usage, policy text and artifact hashes; private local paths, session IDs, raw commands and transcripts omitted."
+  }
+}
