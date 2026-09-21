@@ -4629,8 +4629,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "a11ddb18d880e00a90c94de683bff59e4676f0bcca0586cc21f31fad8da9f3ad",
-      "bytes": 427397
+      "bytes": 428122,
+      "sha256": "663dde53579bb6bd049b1e9344be50cca6b0485b409ab30015d032ae8273d68f"
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -6229,8 +6229,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 7076724,
-      "sha256": "3c85ff05e3986baeffef15dc472784d38e77cbe947f8eed9296ff9934c4ea095"
+      "bytes": 7077193,
+      "sha256": "e7f18bdd505e620cc5dc10cab6b696c2e99785052694cafef829ddd0613384b9"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
