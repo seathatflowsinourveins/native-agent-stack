@@ -2099,6 +2099,25 @@
         "No model/provider/broker calls or causal token/cost savings measurement."
       ],
       "path": "evidence/receipts/native-offhost-app-state-20260920.json"
+    },
+    {
+      "id": "native-ultracode-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code",
+        "context-mode"
+      ],
+      "claim": "Claude Code 2.1.278 executed a Fable 5.1/xhigh native Workflow with Sonnet 5/medium and Opus 5/high workers returning results. The same coordinator resumed at high effort and completed a native same-host message round trip, source verification and one-shot idle notification with a separate Sonnet session. Native agent and restored workflow dashboards rendered the completed work.",
+      "limitations": [
+        "Read-only task contracts are not OS isolation; no writing-worker, mid-run cancellation, cross-host or reboot qualification.",
+        "Initial worker classifications were inaccurate and corrected after independent source review; both worker outputs exceeded their requested word contracts and one schema retry occurred.",
+        "Native worker identity was observed in child messages; choices are not a comparative quality or token-cost benchmark.",
+        "Same-host messaging and idle notification only; permission-mismatch behavior, delivery failures, retries and persistent scheduling were not tested.",
+        "Updated maintenance configuration is not proof of its next timed execution; no new recurring Claude loop was created.",
+        "Two native success events share cumulative model usage; no causal savings or exhaustive provider-accounting claim.",
+        "Native PTY rendering and process observations were recorded by the coordinator; message and workflow traces received independent read-only audit. Private raw logs and identifiers remain outside Git."
+      ],
+      "path": "evidence/receipts/native-ultracode-20260921.json"
     }
   ],
   "files": [
@@ -2189,13 +2208,13 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "3156579ed4d7096f4477e84f1b82d8c89c5d5b0eb45c10f5686ce1468d812d0f",
-      "bytes": 2802
+      "sha256": "652ed9d13c40597619762313663d18a1ef206d467886932bbd2944ceda47c252",
+      "bytes": 3616
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "820617e7686bfea92a8ed2b312653509a0b032b8e988da195a43c40bc52fe7bd",
-      "bytes": 14202
+      "sha256": "b55760f8e4e39a7956065744aff9fde62ff75c5d52819a9229c8f1a2511f9ec4",
+      "bytes": 14573
     },
     {
       "path": ".gitattributes",
@@ -6320,8 +6339,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "507abf1c7539e6e710b5e3937c98777511d74e9fd05901e71d8a96c78330d258",
-      "bytes": 7841
+      "sha256": "f5cc7d311fa7300ff15d8e18edf7ba48900e3cdd26ce4d405a88b35c1d10787a",
+      "bytes": 8547
     },
     {
       "path": "evidence/receipts/native-harness-defaults-20260920.json",
@@ -8047,6 +8066,26 @@
       "path": "evidence/artifacts/foundation-closure-20260921/validation.json",
       "sha256": "5de3e90f647cccb3d7be8bcd8ea6b7a6a062685353286573d2b04f1b08384a9b",
       "bytes": 1569
+    },
+    {
+      "path": "recipes/claude-native-ultracode.md",
+      "sha256": "44d092e97f3d0c11db970b2d67154c0c6c9e52df59684134f666e599afa26bc8",
+      "bytes": 6818
+    },
+    {
+      "path": "docs/native-ultracode-20260921.md",
+      "sha256": "ae736d942522a60133196d2749177598de9f38952b7b1fe8eb2b870b4d1a4a44",
+      "bytes": 8052
+    },
+    {
+      "path": "examples/claude-native/ultracode.settings.json",
+      "sha256": "1f43a382696b0a9c056d069c5808e97f3215bd97d7c7fd60b588bc3681bc4435",
+      "bytes": 66
+    },
+    {
+      "path": "evidence/receipts/native-ultracode-20260921.json",
+      "sha256": "3e5b244a542065b7f121a5fae898868445f8ca3d25f7e1e5ba53918d6519be68",
+      "bytes": 3244
     }
   ],
   "convergence_records": [

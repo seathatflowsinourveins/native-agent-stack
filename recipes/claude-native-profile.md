@@ -5,6 +5,12 @@ foundation. It combines the native client, task-scoped instructions, selected
 upstream skills, existing context tools and bounded workers. It does not require
 another scheduler, gateway, SDK or complete plugin bundle at session startup.
 
+The [September 21 native Ultracode qualification](../docs/native-ultracode-20260921.md)
+extends this baseline with Fable-led Workflow execution, task-matched models,
+background-session messaging and native dashboards. Use its
+[dedicated profile](claude-native-ultracode.md) for substantial parallel tasks;
+the dated profile below remains evidence for the earlier setup.
+
 The [community candidate review](../docs/community-native-practice.md) records
 source revisions, merits and exclusions. The [foundation catalog](../catalogs/foundation/manifest.json)
 retains all sixteen layers and their actual acceptance boundaries. Installation,
