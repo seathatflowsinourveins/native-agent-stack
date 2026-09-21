@@ -5,6 +5,11 @@ code retrieval and their upstream interfaces. Installed ai-memory 2.3.2,
 SocratiCode 1.14.0, QMD 2.8.3 and Qdrant 1.19.1 matched their published releases
 at review time. This is a dated, tested selection, not a universal ranking.
 
+The [current Hugging Face model qualification](hf-memory-model-qualification.md)
+distinguishes the July 2026 Nemotron code-RAG model from MiniLM's compatibility
+role, reproduces NVIDIA's native retrieval example and records the upstream
+query-method gap that limits asymmetric memory-model replacement.
+
 The [native qualification receipt](../evidence/receipts/native-memory-rag-alignment-20260921.json)
 binds the returned commands, model checksums, isolated restore, retrieval repair
 and independent dashboard observations. Download unchanged private command

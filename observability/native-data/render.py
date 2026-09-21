@@ -37,6 +37,9 @@ def dashboard():
             '[Code graph snapshot](http://127.0.0.1:17500/socraticode-graph.html) · '
             '[Full token report](http://127.0.0.1:17500/token-savings.html) · '
             '[Session archive](http://127.0.0.1:17384/)\n\n'
+            '[Selected RAG model](https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16) · '
+            '[Upstream MTEB model dashboard](https://leaderboard.mteb.org/models/nvidia/Nemotron-3-Embed-1B-BF16) · '
+            '[Model qualification](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/hf-memory-model-qualification.md)\n\n'
             '[Dagu run history](http://127.0.0.1:18525/dag-runs) · '
             '[Notifications](http://127.0.0.1:18080/ecosystem-alerts) · '
             '[Promptfoo local fixture](http://127.0.0.1:17500/promptfoo.html) · '
@@ -75,6 +78,8 @@ def dashboard():
             'boundary': 'Scope / limits',
             'embedding_status': 'Embedding status',
             'embedding_provider': 'Embedding provider',
+            'embedding_model': 'Memory embedding model',
+            'embedding_dimensions': 'Memory dimensions',
             'embedding_rows': 'Embedding rows',
             'latest_pages_missing_embeddings': 'Latest pages missing vectors',
             'embed_failures_unresolved': 'Unresolved embedding failures',
@@ -94,7 +99,8 @@ def dashboard():
           ['title', 'state', 'estimated_saved', 'session_estimated_saved', 'source_updated_at',
            'kind', 'boundary', 'source_command'])
     table(6, 'memory', 'Memory and retrieval · actual scoped inventory', 23, 11,
-          ['title', 'state', 'value', 'unit', 'embedding_status', 'embedding_provider',
+          ['title', 'state', 'value', 'unit', 'embedding_model', 'embedding_dimensions',
+           'embedding_status', 'embedding_provider',
            'embedding_rows', 'latest_pages_missing_embeddings', 'embed_failures_unresolved',
            'llm_status', 'source_updated_at', 'boundary', 'source_command'])
     add(7, 'Native Qdrant vectors · keep dense and sparse separate', 'timeseries', 0, 34, 12, 8,

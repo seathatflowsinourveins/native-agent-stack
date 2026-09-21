@@ -1,0 +1,647 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-21T05:40:19.022869+00:00",
+  "selection_scope": "Current memory and code-RAG model choices. Published results are not local benchmark reruns; candidate does not mean installed.",
+  "models": [
+    {
+      "role": "currently installed code-RAG embedder; retain as qualified live default pending root E2E",
+      "release_date": "2026-07-16",
+      "dimensions": 2048,
+      "model_max_tokens": 32768,
+      "format": {
+        "query_prefix": "query: ",
+        "document_prefix": "passage: ",
+        "pooling": "attention-masked average",
+        "normalization": "L2; re-normalize after dimensional slicing"
+      },
+      "upstream_runtime": "Current pinned card explicitly recommends vllm==0.25.0 for BF16 /v2/embed. /v2/embed input_type query/document or /v1/embeddings manually prefixed input. This validates a runtime version, not every local setting.",
+      "author_reported_benchmarks": {
+        "metric": "average NDCG@10, percentage scale",
+        "RTEB_16_public_tasks": 72.38,
+        "ViDoRe_V3_text": 57.74,
+        "MMTEB_retrieval": 71.04
+      },
+      "ai_memory_native_compatibility": "Not a drop-in: ai-memory generic OpenAI embedder does not supply the distinct query/document prefixes. No claim that changing endpoint/model alone is correct.",
+      "model_id": "nvidia/Nemotron-3-Embed-1B-BF16",
+      "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+      "hub_created_at": "2026-07-14T07:32:18+00:00",
+      "hub_last_modified": "2026-08-27T23:53:03+00:00",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 1140918272
+        },
+        "total": 1140918272
+      },
+      "source_url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16/blob/c0c9fea93ea424587517f2c59e20db9f1d6bf615/README.md",
+      "pinned_card_file": "cards/nemotron1b/README.md",
+      "pinned_card_sha256": "6e811480c966ca54fca9a5cbd0e5ae60df15244bfc70bb9db155c2b92fa23f8e",
+      "hf_models_card_body_matches_pinned_README": true,
+      "native_info_file": "nemotron1b-info.stdout",
+      "native_card_file": "nemotron1b-card.stdout"
+    },
+    {
+      "role": "quality challenger; not installed or benchmarked by this research",
+      "release_date": "2026-07-16",
+      "dimensions": 4096,
+      "model_max_tokens": 32768,
+      "format": {
+        "query_prefix": "query: ",
+        "document_prefix": "passage: ",
+        "pooling": "attention-masked average",
+        "normalization": "L2; re-normalize after dimensional slicing"
+      },
+      "upstream_runtime": "Current pinned card explicitly recommends vllm==0.25.0 for BF16 /v2/embed. Same input formatting boundary as 1B.",
+      "author_reported_benchmarks": {
+        "metric": "average NDCG@10, percentage scale",
+        "RTEB_16_public_tasks": 78.46,
+        "ViDoRe_V3_text": 60.6,
+        "MMTEB_retrieval": 75.45
+      },
+      "ai_memory_native_compatibility": "Not a drop-in: same asymmetric prompt requirement as 1B.",
+      "capacity_inference": {
+        "basis": "HF safetensors parameter count multiplied by two BF16 bytes; excludes all runtime overhead",
+        "weight_bytes": 15905366016,
+        "weight_GiB": 14.813026428222656,
+        "interpretation": "RTX5090 Laptop 24463MiB reported by coordinator may fit weights; available VRAM does not prove32k operation, concurrent serving, latency or task-quality improvement. No8B serving trial in this research."
+      },
+      "model_id": "nvidia/Nemotron-3-Embed-8B-BF16",
+      "revision": "d1f2f25730bbd775b99b29185134bc86653bf2d1",
+      "hub_created_at": "2026-07-14T07:38:49+00:00",
+      "hub_last_modified": "2026-08-28T15:59:43+00:00",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "BF16": 7952683008
+        },
+        "total": 7952683008
+      },
+      "source_url": "https://huggingface.co/nvidia/Nemotron-3-Embed-8B-BF16/blob/d1f2f25730bbd775b99b29185134bc86653bf2d1/README.md",
+      "pinned_card_file": "cards/nemotron8b/README.md",
+      "pinned_card_sha256": "242e2ec0874c87ecd31558a8ef7b29e5a0e28a830f117132886290add30c1300",
+      "hf_models_card_body_matches_pinned_README": true,
+      "native_info_file": "nemotron8b-info.stdout",
+      "native_card_file": "nemotron8b-card.stdout"
+    },
+    {
+      "role": "currently installed ai-memory upstream local compatibility baseline; not latest SOTA",
+      "release_date": null,
+      "release_note": "Hub created_at is recorded separately; it is not asserted to be the original release date.",
+      "dimensions": 384,
+      "model_max_tokens": null,
+      "upstream_sentence_transformers_default_max_wordpieces": 256,
+      "format": {
+        "query_prefix": null,
+        "document_prefix": null,
+        "pooling": "attention-masked mean",
+        "normalization": "L2"
+      },
+      "upstream_runtime": "ai-memory v2.3.2 hardcodes this model for its local Candle path and uses MAX_TOKENS512. The HF SentenceTransformers card instead documents default truncation256wordpieces; do not conflate these limits or infer a512-token quality benchmark.",
+      "author_reported_benchmarks": null,
+      "ai_memory_native_compatibility": "Supported native local path with384D output. Semantic activation is a separate runtime result from this research.",
+      "model_id": "sentence-transformers/all-MiniLM-L6-v2",
+      "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+      "hub_created_at": "2022-03-02T23:29:05+00:00",
+      "hub_last_modified": "2026-06-01T06:29:13+00:00",
+      "gated": false,
+      "safetensors": {
+        "parameters": {
+          "I64": 512,
+          "F32": 22713216
+        },
+        "total": 22713728
+      },
+      "source_url": "https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/blob/1110a243fdf4706b3f48f1d95db1a4f5529b4d41/README.md",
+      "pinned_card_file": "cards/minilm/README.md",
+      "pinned_card_sha256": "dcd602d2fd35c203a247304a06fec6654a12f7941b739f9221a064fe8dc3b7f0",
+      "hf_models_card_body_matches_pinned_README": true,
+      "native_info_file": "minilm-info.stdout",
+      "native_card_file": "minilm-card.stdout"
+    },
+    {
+      "role": "modern small/on-device alternative; not adopted because retrieval formatting is asymmetric and model/config access is gated",
+      "release_date": null,
+      "release_note": "2025 paper/model family; Hub timestamps retained without relabeling as release dates.",
+      "dimensions": 768,
+      "model_max_tokens": 2048,
+      "format": {
+        "query_prefix": "task: search result | query: ",
+        "document_prefix": "title: none | text: ",
+        "code_query_prefix": "task: code retrieval | query: ",
+        "pooling": "Use official SentenceTransformers pipeline; gated pooling/module configuration was not retrieved successfully",
+        "normalization": "Re-normalize after Matryoshka slicing; card supports768/512/256/128 dimensions"
+      },
+      "upstream_runtime": "Official card uses SentenceTransformers. Activations do not supportfloat16; usefloat32 or bfloat16. This is not a native ai-memory Candle replacement.",
+      "author_reported_benchmarks": {
+        "MTEB_multilingual_v2_mean_task_768d": 61.15,
+        "MTEB_English_v2_mean_task_768d": 69.67,
+        "MTEB_code_v1_mean_task_768d": 68.76
+      },
+      "ai_memory_native_compatibility": "Not symmetric retrieval: explicit query/document task prompts differ. Nativehfdownload of gated module/pooling/prompt configuration failed; raw stderr retained.",
+      "model_id": "google/embeddinggemma-300m",
+      "revision": "57c266a740f537b4dc058e1b0cda161fd15afa75",
+      "hub_created_at": "2025-07-17T19:53:55+00:00",
+      "hub_last_modified": "2025-09-25T15:11:17+00:00",
+      "gated": "manual",
+      "safetensors": {
+        "parameters": {
+          "F32": 302863104
+        },
+        "total": 302863104
+      },
+      "source_url": "https://huggingface.co/google/embeddinggemma-300m/blob/57c266a740f537b4dc058e1b0cda161fd15afa75/README.md",
+      "pinned_card_file": "cards/embeddinggemma/README.md",
+      "pinned_card_sha256": "e53702f564878ea87085742fe3f485872bef81317086e9ffe37125a81809772a",
+      "hf_models_card_body_matches_pinned_README": true,
+      "native_info_file": "embeddinggemma-info.stdout",
+      "native_card_file": "embeddinggemma-card.stdout"
+    }
+  ],
+  "benchmark_comparability": "Nemotron1B and8B numbers are comparable within the same author-reported RTEB16/ViDoRe text/MMTEB retrieval table. EmbeddingGemma MTEB aggregate task means have different datasets and aggregation, so its61.15 must not be compared numerically with Nemotron71.04 retrieval as a shared leaderboard. MiniLM card supplies no matching current table. July16 #1 claims are dated release claims; current live rank was not independently obtained.",
+  "research_binding": {
+    "file": "model-research.json",
+    "bytes": 24765,
+    "sha256": "bbbf3b1bde4ebc7cf4eca2497b8fd44bbffe06f6c12a014cbe1bcdd3078068ab",
+    "captured_file_mtime_utc": "2026-09-21T05:29:29.185540+00:00"
+  },
+  "native_research_commands": [
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/akitaonrails/ai-memory/contents/crates/ai-memory-llm/src/embedding.rs?ref=v2.3.2",
+        "-H",
+        "Accept:application/vnd.github.raw+json"
+      ],
+      "started_at": "2026-09-21T05:27:32.984413+00:00",
+      "finished_at": "2026-09-21T05:27:33.367107+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "ai-memory-embedding-source.stdout",
+          "bytes": 18033,
+          "sha256": "78c24d99b22d5c5e95f9b3c7cfda3645de381fdc6be1ad781b86ad60b5c487b2"
+        },
+        "stderr": {
+          "file": "ai-memory-embedding-source.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "ai-memory-embedding-source.command.json"
+    },
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/akitaonrails/ai-memory/contents/crates/ai-memory-llm/src/local.rs?ref=v2.3.2",
+        "-H",
+        "Accept:application/vnd.github.raw+json"
+      ],
+      "started_at": "2026-09-21T05:27:32.058836+00:00",
+      "finished_at": "2026-09-21T05:27:32.392979+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "ai-memory-local-source.stdout",
+          "bytes": 15441,
+          "sha256": "f4ec01f93b382c859e404618629d5f8f3de06c4ceab31b0d040674d9d0654a17"
+        },
+        "stderr": {
+          "file": "ai-memory-local-source.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "ai-memory-local-source.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "models",
+        "card",
+        "google/embeddinggemma-300m",
+        "--text"
+      ],
+      "started_at": "2026-09-21T05:24:59.693708+00:00",
+      "finished_at": "2026-09-21T05:24:59.994206+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "embeddinggemma-card.stdout",
+          "bytes": 18130,
+          "sha256": "61afb90c37501607f39399a71394e50a9d04ef285558dbfa9f793aacc6ac43c1"
+        },
+        "stderr": {
+          "file": "embeddinggemma-card.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "embeddinggemma-card.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "models",
+        "info",
+        "google/embeddinggemma-300m",
+        "--format",
+        "json"
+      ],
+      "started_at": "2026-09-21T05:24:58.824618+00:00",
+      "finished_at": "2026-09-21T05:24:59.116134+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "embeddinggemma-info.stdout",
+          "bytes": 5606,
+          "sha256": "c49369f56e9eee7283e93ea02304f6eba101e8bf533e12b50280b053a8757e40"
+        },
+        "stderr": {
+          "file": "embeddinggemma-info.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "embeddinggemma-info.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "download",
+        "google/embeddinggemma-300m",
+        "README.md",
+        "--revision",
+        "57c266a740f537b4dc058e1b0cda161fd15afa75",
+        "--local-dir",
+        "<private-evidence>/research/cards/embeddinggemma",
+        "--format",
+        "json"
+      ],
+      "started_at": "2026-09-21T05:26:29.007892+00:00",
+      "finished_at": "2026-09-21T05:26:29.234884+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "embeddinggemma-pinned-doc.stdout",
+          "bytes": 112,
+          "sha256": "08724a5e16bc74843b984d56d9bfee89558119243c0bad8adbe28dcc9436e622"
+        },
+        "stderr": {
+          "file": "embeddinggemma-pinned-doc.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "embeddinggemma-pinned-doc.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "download",
+        "google/embeddinggemma-300m",
+        "modules.json",
+        "1_Pooling/config.json",
+        "config_sentence_transformers.json",
+        "--revision",
+        "57c266a740f537b4dc058e1b0cda161fd15afa75",
+        "--local-dir",
+        "<private-evidence>/research/cards/embeddinggemma",
+        "--format",
+        "json"
+      ],
+      "started_at": "2026-09-21T05:27:53.110978+00:00",
+      "finished_at": "2026-09-21T05:27:53.510537+00:00",
+      "exit_code": 1,
+      "files": {
+        "stdout": {
+          "file": "embeddinggemma-pooling.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "file": "embeddinggemma-pooling.stderr",
+          "bytes": 122,
+          "sha256": "cd350788e864cb8075bcec477b47dcd31258fb9ebfaf3c09d9558058f1f6d741"
+        }
+      },
+      "record_file": "embeddinggemma-pooling.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "models",
+        "card",
+        "sentence-transformers/all-MiniLM-L6-v2",
+        "--text"
+      ],
+      "started_at": "2026-09-21T05:24:59.611170+00:00",
+      "finished_at": "2026-09-21T05:24:59.944634+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "minilm-card.stdout",
+          "bytes": 9824,
+          "sha256": "ff92849044330886589272c83ba8c4d9334f416d314c3605bd0dcc8f7db2ee32"
+        },
+        "stderr": {
+          "file": "minilm-card.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "minilm-card.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "models",
+        "info",
+        "sentence-transformers/all-MiniLM-L6-v2",
+        "--format",
+        "json"
+      ],
+      "started_at": "2026-09-21T05:24:58.772821+00:00",
+      "finished_at": "2026-09-21T05:24:59.040742+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "minilm-info.stdout",
+          "bytes": 7293,
+          "sha256": "bd25a572187483afa1eae4f866a9b16f200cbb5b8ba56df59a320697baf74e13"
+        },
+        "stderr": {
+          "file": "minilm-info.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "minilm-info.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "download",
+        "sentence-transformers/all-MiniLM-L6-v2",
+        "README.md",
+        "--revision",
+        "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+        "--local-dir",
+        "<private-evidence>/research/cards/minilm",
+        "--format",
+        "json"
+      ],
+      "started_at": "2026-09-21T05:26:28.950518+00:00",
+      "finished_at": "2026-09-21T05:26:29.204483+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "minilm-pinned-doc.stdout",
+          "bytes": 104,
+          "sha256": "95bec71b641e0a7c8736099ecbdbf825878387e775f30ae48f4320939fce6857"
+        },
+        "stderr": {
+          "file": "minilm-pinned-doc.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "minilm-pinned-doc.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "spaces",
+        "info",
+        "mteb/leaderboard",
+        "--format",
+        "json"
+      ],
+      "started_at": "2026-09-21T05:26:10.444902+00:00",
+      "finished_at": "2026-09-21T05:26:10.682738+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "mteb-space-info.stdout",
+          "bytes": 31575,
+          "sha256": "06aeba060340cc542d60f87d2282b46183154cb5d13577489f968c0d2a78d095"
+        },
+        "stderr": {
+          "file": "mteb-space-info.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "mteb-space-info.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "models",
+        "card",
+        "nvidia/Nemotron-3-Embed-1B-BF16",
+        "--text"
+      ],
+      "started_at": "2026-09-21T05:24:59.574642+00:00",
+      "finished_at": "2026-09-21T05:24:59.865061+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "nemotron1b-card.stdout",
+          "bytes": 35710,
+          "sha256": "b80c729354dbd883cc67069525991479fdc7d305d149a9ed5c2eb1d9e945ad0f"
+        },
+        "stderr": {
+          "file": "nemotron1b-card.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "nemotron1b-card.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "models",
+        "info",
+        "nvidia/Nemotron-3-Embed-1B-BF16",
+        "--format",
+        "json"
+      ],
+      "started_at": "2026-09-21T05:24:58.724293+00:00",
+      "finished_at": "2026-09-21T05:24:58.999589+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "nemotron1b-info.stdout",
+          "bytes": 2705,
+          "sha256": "77be3cc19b4c82de195dd88e4320b2a9296f938bee06334fda6d4a847c3a920c"
+        },
+        "stderr": {
+          "file": "nemotron1b-info.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "nemotron1b-info.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "download",
+        "nvidia/Nemotron-3-Embed-1B-BF16",
+        "README.md",
+        "--revision",
+        "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+        "--local-dir",
+        "<private-evidence>/research/cards/nemotron1b",
+        "--format",
+        "json"
+      ],
+      "started_at": "2026-09-21T05:26:28.902357+00:00",
+      "finished_at": "2026-09-21T05:26:29.160575+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "nemotron1b-pinned-doc.stdout",
+          "bytes": 108,
+          "sha256": "541161962c99cde0e4d0140735d3d2818accfa5b681ce9a88ae9d503f2ef6d23"
+        },
+        "stderr": {
+          "file": "nemotron1b-pinned-doc.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "nemotron1b-pinned-doc.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "models",
+        "card",
+        "nvidia/Nemotron-3-Embed-8B-BF16",
+        "--text"
+      ],
+      "started_at": "2026-09-21T05:24:59.598847+00:00",
+      "finished_at": "2026-09-21T05:24:59.913435+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "nemotron8b-card.stdout",
+          "bytes": 35511,
+          "sha256": "3a8e48c24acc618f3105499104a9337f9ff002a0a204db760f10335be9a77edb"
+        },
+        "stderr": {
+          "file": "nemotron8b-card.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "nemotron8b-card.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "models",
+        "info",
+        "nvidia/Nemotron-3-Embed-8B-BF16",
+        "--format",
+        "json"
+      ],
+      "started_at": "2026-09-21T05:24:58.748880+00:00",
+      "finished_at": "2026-09-21T05:24:59.024973+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "nemotron8b-info.stdout",
+          "bytes": 2777,
+          "sha256": "e2244452f37307a4da3ef1e5ec02cd3b6072f9111b47a683f30867bad3e35b07"
+        },
+        "stderr": {
+          "file": "nemotron8b-info.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "nemotron8b-info.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "download",
+        "nvidia/Nemotron-3-Embed-8B-BF16",
+        "README.md",
+        "--revision",
+        "d1f2f25730bbd775b99b29185134bc86653bf2d1",
+        "--local-dir",
+        "<private-evidence>/research/cards/nemotron8b",
+        "--format",
+        "json"
+      ],
+      "started_at": "2026-09-21T05:26:28.890257+00:00",
+      "finished_at": "2026-09-21T05:26:29.160464+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "nemotron8b-pinned-doc.stdout",
+          "bytes": 108,
+          "sha256": "3d05ec329e936045c54c79d3a2ba54bfc45cf2c27ce5377234941ae51e65b763"
+        },
+        "stderr": {
+          "file": "nemotron8b-pinned-doc.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "nemotron8b-pinned-doc.command.json"
+    },
+    {
+      "argv": [
+        "hf",
+        "models",
+        "list",
+        "--pipeline-tag",
+        "sentence-similarity",
+        "--sort",
+        "trending_score",
+        "--limit",
+        "10",
+        "--format",
+        "json"
+      ],
+      "started_at": "2026-09-21T05:24:36.529783+00:00",
+      "finished_at": "2026-09-21T05:24:36.805265+00:00",
+      "exit_code": 0,
+      "files": {
+        "stdout": {
+          "file": "recent-embeddings.stdout",
+          "bytes": 7952,
+          "sha256": "3a1db9554511b3e94314d1f24d92b402d68c6f18cfe91b6e63f17b85528dfeba"
+        },
+        "stderr": {
+          "file": "recent-embeddings.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "record_file": "recent-embeddings.command.json"
+    }
+  ],
+  "dashboard": {
+    "model_url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+    "benchmark_url": "https://huggingface.co/spaces/mteb/leaderboard",
+    "space_revision": "7ebd6d1e2b819e3884ae08e32aa99215b0f26362",
+    "space_stage": "RUNNING",
+    "host": "https://mteb-leaderboard.hf.space",
+    "independent_runtime_or_browser_E2E": "Coordinator-owned; not established by metadata retrieval alone."
+  },
+  "limitations": [
+    "No new benchmark dataset evaluated here.",
+    "Published author results are not local measurements.",
+    "Nativehfmodelslist discovery ranking is not a model-quality ranking.",
+    "Four selected candidates do not establish exhaustive landscape saturation.",
+    "EmbeddingGemma gated configuration failure is retained and was not bypassed."
+  ]
+}

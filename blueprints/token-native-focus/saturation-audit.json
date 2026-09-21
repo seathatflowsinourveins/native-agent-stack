@@ -429,6 +429,11 @@
             "id": "native-memory-rag-alignment-20260921",
             "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "hf-memory-models-20260921",
+            "path": "evidence/receipts/hf-memory-models-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2437,6 +2442,11 @@
           {
             "id": "native-memory-rag-alignment-20260921",
             "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "hf-memory-models-20260921",
+            "path": "evidence/receipts/hf-memory-models-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -5735,6 +5745,11 @@
             "id": "native-memory-rag-alignment-20260921",
             "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "hf-memory-models-20260921",
+            "path": "evidence/receipts/hf-memory-models-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6127,6 +6142,11 @@
           {
             "id": "native-memory-rag-alignment-20260921",
             "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "hf-memory-models-20260921",
+            "path": "evidence/receipts/hf-memory-models-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
