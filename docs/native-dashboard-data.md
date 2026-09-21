@@ -62,6 +62,14 @@ local adapter tests are separate from the upstream projects' own test suites.
 
 ## Memory and RAG: upstream commands
 
+The [current memory/RAG qualification](memory-rag-native-practice.md) enables
+upstream local semantic memory, repairs code-index scope and refreshes the
+unchanged upstream graph. The memory panel shows embedding mode, stored rows,
+missing latest-page vectors and unresolved failures. Stored vectors can include
+superseded page versions; compare coverage with latest pages instead of assuming
+the two totals must match. Browser wiki search remains FTS5; semantic recall uses
+MCP. LLM consolidation remains disabled.
+
 ai-memory 2.3.2 bundles its UI. Keep the existing server's store, scope, authentication
 and loopback address; preserve its full command and add the supported `--enable-web`
 flag if absent. Check the active service override, not only the base unit.

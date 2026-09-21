@@ -424,6 +424,11 @@
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-memory-rag-alignment-20260921",
+            "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2428,6 +2433,11 @@
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-memory-rag-alignment-20260921",
+            "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3228,6 +3238,11 @@
           {
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-memory-rag-alignment-20260921",
+            "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -4565,6 +4580,11 @@
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-memory-rag-alignment-20260921",
+            "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4719,6 +4739,11 @@
           {
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-memory-rag-alignment-20260921",
+            "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -5705,6 +5730,11 @@
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-memory-rag-alignment-20260921",
+            "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6093,6 +6123,11 @@
             "id": "foundation-native-20260920",
             "kind": "native_cli_e2e",
             "path": "evidence/receipts/foundation-native-20260920.json"
+          },
+          {
+            "id": "native-memory-rag-alignment-20260921",
+            "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [

@@ -311,6 +311,12 @@
   ],
   "guides": [
     {
+      "title": "Qualified memory and RAG: native commands and dashboards",
+      "body": "Local semantic memory with upstream model pins, isolated backup restore, repaired code-index scope and native graph export. Current Grafana/Loki observations expose embedding mode and coverage; availability and tested behavior stay distinct.",
+      "path": "docs/memory-rag-native-practice.md",
+      "category": "evaluation"
+    },
+    {
       "title": "Download actual Codex, Claude and dashboard results",
       "body": "Fresh native client tool returns, separately measured RTK output and estimates, useful dashboard filters, and exact-byte attachments verified before display. Provider usage and per-task attribution remain explicit.",
       "path": "docs/native-returned-results.md",

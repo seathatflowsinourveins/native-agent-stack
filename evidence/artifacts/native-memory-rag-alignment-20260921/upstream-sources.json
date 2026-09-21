@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-21T04:45:35Z",
+  "scope": "Pre-activation read-only release/source research. Current semantic mode is established by the later native command returns.",
+  "release_checks": [
+    {
+      "component": "ai-memory",
+      "installed": "2.3.2",
+      "latest": "v2.3.2",
+      "published_at": "2026-09-20T02:34:33Z",
+      "api": "https://api.github.com/repos/akitaonrails/ai-memory/releases/latest",
+      "response_sha256": "a029e866efa8e05d9cb1f9cb6e4a6ada342ae779cbafb7154e71e0ee8428f1aa"
+    },
+    {
+      "component": "socraticode",
+      "installed_manifest": "1.14.0",
+      "latest": "v1.14.0",
+      "published_at": "2026-09-16T14:26:47Z",
+      "api": "https://api.github.com/repos/giancarloerra/SocratiCode/releases/latest",
+      "response_sha256": "491c75712a3ce721463e63a4edd40db105bff11d5791c52d4c1f3054a0c6ae4c"
+    },
+    {
+      "component": "qmd",
+      "installed": "2.8.3 (facd35e)",
+      "latest": "v2.8.3",
+      "published_at": "2026-08-16T22:30:34Z",
+      "api": "https://api.github.com/repos/tobi/qmd/releases/latest",
+      "response_sha256": "da288fa90d1dcc04ca9ea47566182aa73be1e66c1a542e9cee3446e8785f0014"
+    },
+    {
+      "component": "qdrant",
+      "installed_manifest": "1.19.1",
+      "latest": "v1.19.1",
+      "published_at": "2026-09-04T07:59:14Z",
+      "api": "https://api.github.com/repos/qdrant/qdrant/releases/latest",
+      "response_sha256": "4f9da63ddc2b1ff4753d1c6e93b7a9f193c5eed0a61a99dcb92c816aa0090ca0"
+    },
+    {
+      "component": "vllm",
+      "installed_manifest": "0.25.0",
+      "latest": "v0.29.0",
+      "published_at": "2026-09-09T08:54:49Z",
+      "api": "https://api.github.com/repos/vllm-project/vllm/releases/latest",
+      "response_sha256": "1038c7f09dac5e507f16c92f5accc5e4a322c6f0a2ed5e49c3882d0ed0e15a9d",
+      "decision": "Preserve publisher-qualified 0.25.0 on this WSL host. Existing vllm-compatibility receipt retains successful 0.29.0 install followed by GPU runtime error UVA is not available and verified rollback; no new retry warranted merely by newer version."
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.3.2/README.md",
+      "sha256": "1d0a918f3dc0c8234aff97b75e78d6ac4143cac9ad9127e77fb0fca2077b8eda"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.3.2/docs/usage.md",
+      "sha256": "77a9917f6cc55aa1f8e876b722ee56f002cf322d6101f4f07a3c825ee8fed125"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.3.2/docs/frontend-api.md",
+      "sha256": "042df77fe34dfcb972e1c568b75ce3467b13cf16cbfa0475ec5caf028452d0b3"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.3.2/docs/llm-providers.md",
+      "sha256": "f53dcce90ca9424fb083507a0302fba02490e21dac161345dc78d34ece8fc098"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.3.2/docs/local-embeddings.md",
+      "sha256": "467e15f7f4fb746bc42176ab056f97c8349af4e84192e55b01ed201de1a73eaf"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.3.2/docs/ARCHITECTURE.md",
+      "sha256": "08da89d68834850ca59605cda2db8738be195181d423d2e82cc69aea6f88bf2f"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.3.2/crates/ai-memory-llm/src/embedding.rs",
+      "sha256": "78c24d99b22d5c5e95f9b3c7cfda3645de381fdc6be1ad781b86ad60b5c487b2"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.3.2/crates/ai-memory-llm/src/local.rs",
+      "sha256": "f4ec01f93b382c859e404618629d5f8f3de06c4ceab31b0d040674d9d0654a17"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.3.2/crates/ai-memory-cli/src/commands/embed.rs",
+      "sha256": "daac6cbe9d770306e49d68e4479817b4ece30b37b8023c8824772b3cb9a8cc27"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.3.2/crates/ai-memory-consolidate/src/embed.rs",
+      "sha256": "e7f5640b30740c8463422690cb16102da54a6248d3fc6d456960e9b436402d2a"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/v2.3.2/crates/ai-memory-llm/tests/suite/openai_compat_embedder.rs",
+      "sha256": "414e5ff263b7a733423cd7316f6f019e875bbe0fe345c6847661af458ef9126a"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/giancarloerra/SocratiCode/v1.14.0/README.md",
+      "sha256": "280f3c7b8415953c00885f489cb59bab10d6e3bc8637a32f7196165cc4cb700d"
+    },
+    {
+      "url": "https://github.com/tobi/qmd/tree/v2.8.3",
+      "evidence": "Official supported search/vsearch/query modes and latest release inspected."
+    },
+    {
+      "url": "https://qdrant.tech/documentation/web-ui/",
+      "evidence": "Official collection/REST console/snapshot dashboard capabilities inspected."
+    },
+    {
+      "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
+      "evidence": "NVIDIA model card explicitly requires query: / passage: prefixes for retrieval and documents2048-dimensional vectors."
+    }
+  ],
+  "research_binding": {
+    "file": "alignment.json",
+    "bytes": 11009,
+    "sha256": "d22a1118f2c770518699e3cf7ec9907bb6cb6e6075225a00896d50b326b6f26d",
+    "captured_file_mtime_utc": "2026-09-21T04:47:49.924488+00:00"
+  },
+  "model_pins": [
+    {
+      "file": "config.json",
+      "bytes": 612,
+      "sha256": "953f9c0d463486b10a6871cc2fd59f223b2c70184f49815e7efbcab5d8908b41",
+      "captured_file_mtime_utc": "2026-09-21T04:50:06.370922+00:00"
+    },
+    {
+      "file": "model.safetensors",
+      "bytes": 90868376,
+      "sha256": "53aa51172d142c89d9012cce15ae4d6cc0ca6895895114379cacb4fab128d9db",
+      "captured_file_mtime_utc": "2026-09-21T04:50:06.216903+00:00"
+    },
+    {
+      "file": "tokenizer.json",
+      "bytes": 466247,
+      "sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037",
+      "captured_file_mtime_utc": "2026-09-21T04:50:06.323531+00:00"
+    }
+  ],
+  "model_pin_source": "https://github.com/akitaonrails/ai-memory/blob/v2.3.2/crates/ai-memory-llm/src/local.rs"
+}

@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "id": "native-memory-rag-alignment-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "ai-memory",
+    "socraticode",
+    "qdrant",
+    "qmd",
+    "vllm",
+    "grafana",
+    "loki"
+  ],
+  "recorded_at_utc": "2026-09-21T05:11:53.658443+00:00",
+  "claim": "Activated upstream local semantic memory with verified model pins and isolated backup restore; corrected native code retrieval scope, regenerated the upstream graph, and observed current memory/RAG metadata through native Loki and Grafana.",
+  "limitations": [
+    "Dated installed/native qualification, not universal SOTA superiority or execution of every upstream test suite.",
+    "One semantic-memory query and one code-search relevance repair; no broad retrieval benchmark, provider-billed token savings or fresh Claude semantic run.",
+    "Browser wiki search remains FTS5. LLM consolidation remains disabled. 52 latest pages include one ordinary decision and 51 System pages, not 52 curated decisions.",
+    "Embedding rows can retain superseded versions: initial native status reported52, later observation54, while latest-page count52 and missing-vector count0 persisted.",
+    "Graph generation is explicit and its snapshot does not refresh with the index watcher. Search/layout/impact/PNG controls and Qdrant snapshot restore/ANN benchmarks were not functionally qualified here.",
+    "vLLM0.25.0 remains the verified WSL-compatible embedding runtime; current0.29.0 is not adopted after the retained GPU compatibility failure.",
+    "Local adapter regression tests and SQLite comparisons are integration evidence, separate from upstream project tests. Private raw pages, database files, identifiers and credentials are not published."
+  ],
+  "artifact_directory": "evidence/artifacts/native-memory-rag-alignment-20260921",
+  "results": {
+    "ai_memory": {
+      "version": "2.3.2",
+      "model": "all-MiniLM-L6-v2",
+      "dimensions": 384,
+      "startup_embedded": 52,
+      "startup_failed": 0,
+      "idempotent_embedded": 0,
+      "idempotent_skipped": 52,
+      "latest_pages_missing_embeddings": 0,
+      "llm_status": "disabled",
+      "restore_latest_pages_equal_to_backup": 52
+    },
+    "code_rag": {
+      "before_points": 7431,
+      "after_points": 196,
+      "excluded_paths": 0,
+      "first_result_actual_source": true
+    },
+    "graph": {
+      "files": 26,
+      "file_edges": 3,
+      "symbols": 254,
+      "calls": 318,
+      "built_at": "2026-09-21T04:47:15.503Z"
+    },
+    "observation": {
+      "loki_http_status": 204,
+      "native_loki_query_status": "success",
+      "memory_rows": 3,
+      "existing_timer_reused": true
+    }
+  },
+  "references": [
+    "docs/memory-rag-native-practice.md",
+    "recipes/README.md#project-memory",
+    "https://github.com/akitaonrails/ai-memory/blob/v2.3.2/docs/local-embeddings.md",
+    "https://github.com/giancarloerra/SocratiCode/blob/v1.14.0/README.md#ignore-rules"
+  ],
+  "validation": {
+    "project_suite": "python3 -m unittest: 693 tests completed, 41 skipped, no failures (652 executed and passed). Local integration/regression suite, not upstream component test suites.",
+    "catalog_checks": "validate.py, validate_catalogs.py, validate_foundation.py and validate_convergence.py --all-recorded passed. Generated HTML is rebuilt and checked against the committed inputs.",
+    "local_adapter_regressions": "24 tests passed; local adapter contracts, not upstream tests",
+    "independent_review": "No actionable findings remain. Reviewer verified41 retained bindings, all3 initial public artifact hashes, upstream model pins,52restored page bodies against backup, native Loki/browser observations and public privacy. Additional report-delivery artifact is a coordinator-observed browser integrity check.",
+    "report_delivery": {
+      "checks": 24,
+      "attachments": 60,
+      "matched_hashes": 60,
+      "native_memory_status_download_matches": true
+    }
+  },
+  "public_artifacts": [
+    {
+      "path": "evidence/artifacts/native-memory-rag-alignment-20260921/selected-commands.json",
+      "bytes": 28313,
+      "sha256": "b8a1e8fc9492b491fe3297dbf79728e3cb628d396e1d8f597aaca92e65629b3a"
+    },
+    {
+      "path": "evidence/artifacts/native-memory-rag-alignment-20260921/upstream-sources.json",
+      "bytes": 6158,
+      "sha256": "9353212af1a02853600e0e2cc3f9a5d9a9adf02f0fb3e196abe15a2cd7e39e54"
+    },
+    {
+      "path": "evidence/artifacts/native-memory-rag-alignment-20260921/dashboard-observations.json",
+      "bytes": 10310,
+      "sha256": "dbedf036532ddc33c4485981cd5e24ff1867d1a624e0b3fef6cde4b9a02e204f"
+    },
+    {
+      "path": "evidence/artifacts/native-memory-rag-alignment-20260921/report-delivery.json",
+      "bytes": 939,
+      "sha256": "df5576077b40a19e5eeff1863e30251a2f7fb378aa526caad953d54f8425f15a"
+    }
+  ],
+  "retained_failures": [
+    "Native restore initially refused while the owned server ran; isolated restore passed after service stop. Early embed attempts failed before reload/readiness; successful returns are retained separately.",
+    "Report bundle assembly initially lacked required command/timestamp fields; the collector reported errors and preserved failures. Corrected bundle refresh returned zero issues.",
+    "Initial project suite found a receipt mapped to ECC instead of vLLM; corrected the component-specific mapping and all4 focused lifecycle tests passed."
+  ]
+}
