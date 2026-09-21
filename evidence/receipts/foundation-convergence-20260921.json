@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "id": "foundation-convergence-20260921",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "codex",
+    "claude-code",
+    "context-mode",
+    "rtk",
+    "headroom",
+    "toon"
+  ],
+  "recorded_at_utc": "2026-09-21T15:58:18Z",
+  "claim": "Actual native Claude two-worker source research, independent stable-release/installed-byte observations, and current foundation checkpoint reconciliation. Accepted pins retained; SDK remains conditional; failed/inconclusive source queries and narrative corrections retained.",
+  "limitations": [
+    "Source review is not new installation, SDK execution or recertification of unchanged foundation layers.",
+    "One read-only native Workflow used Fable, Sonnet/medium and Opus/high, observed in native records. No matched savings baseline; Opus cumulative/persisted output differs by 315 tokens.",
+    "Two cumulative result events overlap; count final modelUsage once. Codex coordination, independent reviewers and publication are outside that usage.",
+    "Existing local writing/recovery and selective-context fixture evidence is reused unchanged, with its failures and boundaries.",
+    "No new scheduled trigger, restart or physical reboot was observed; lifetime and session savings remain null."
+  ],
+  "references": [
+    {
+      "repository": "anthropics/claude-code",
+      "revision": "v2.1.278",
+      "url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.278"
+    },
+    {
+      "repository": "affaan-m/ECC",
+      "revision": "2b6e839771e53096d8451a213d40dc64ec8acac0",
+      "url": "https://github.com/affaan-m/ECC/tree/2b6e839771e53096d8451a213d40dc64ec8acac0"
+    },
+    {
+      "repository": "shanraisshan/claude-code-best-practice",
+      "revision": "5372d67bc098b25c4a4c875bc20d57e3c375ba2b",
+      "url": "https://github.com/shanraisshan/claude-code-best-practice/tree/5372d67bc098b25c4a4c875bc20d57e3c375ba2b"
+    },
+    {
+      "repository": "anthropics/claude-agent-sdk-python",
+      "revision": "e9af0778559032afca55ac200608c24f18af86ca",
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/tree/e9af0778559032afca55ac200608c24f18af86ca"
+    }
+  ],
+  "artifact_directory": "evidence/artifacts/foundation-convergence-20260921",
+  "public_artifacts": [
+    {
+      "path": "evidence/artifacts/foundation-convergence-20260921/claude-cooperation.json",
+      "bytes": 69922,
+      "sha256": "4c5b553b01c5880ae2f558d56572707026660e581daf0db6e4820db9e96f4a1e"
+    },
+    {
+      "path": "evidence/artifacts/foundation-convergence-20260921/independent-sources.json",
+      "bytes": 11571,
+      "sha256": "29c16e0a54ae5ffc0fa6902b05908144e6f7d703c08d118fac7b23438401590e"
+    },
+    {
+      "path": "evidence/artifacts/foundation-convergence-20260921/review-adjudication.md",
+      "bytes": 5742,
+      "sha256": "123b5b8ac7051d4f23864ae99d973e0c515a72303aaf11af4780d50d9bc0851c"
+    },
+    {
+      "path": "evidence/artifacts/foundation-convergence-20260921/token-upstream-review.json",
+      "bytes": 18988,
+      "sha256": "2dda73055c30c71009d107f85fd8d053928f9ac7373d059d23dcc09eb18074d4"
+    },
+    {
+      "path": "evidence/artifacts/foundation-convergence-20260921/validation-attempts.json",
+      "bytes": 2864,
+      "sha256": "db94b9e7a61580494d5720a08bbe1fb87757b924c4aa43329d506ce0c0fe4ef7"
+    },
+    {
+      "path": "evidence/artifacts/foundation-convergence-20260921/verification.json",
+      "bytes": 7711,
+      "sha256": "fd79df125a92bad2f793a4bf720e7574beea77e30e0cdd954d3526c805c69316"
+    }
+  ],
+  "exact_saved_tokens": {
+    "session": null,
+    "lifetime": null
+  }
+}

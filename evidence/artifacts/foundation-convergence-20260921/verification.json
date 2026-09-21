@@ -1,0 +1,80 @@
+{
+  "evidence_class": "local integration verification and rendered UI observation",
+  "checks": [
+    {
+      "command": "python3 scripts/validate.py",
+      "result": {
+        "chunk_id": "ab1339",
+        "wall_time_seconds": 0.000013596,
+        "exit_code": 0,
+        "original_token_count": 41,
+        "output": "{\"components\": 68, \"hashed_files\": 1376, \"profiles\": 4, \"receipts\": 122, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n"
+      }
+    },
+    {
+      "command": "python3 scripts/validate_catalogs.py",
+      "result": {
+        "chunk_id": "f6b53e",
+        "wall_time_seconds": 0.104295083,
+        "exit_code": 0,
+        "original_token_count": 70,
+        "output": "{\"beyond_star_catalog_repositories\": 105, \"models\": 20, \"public_stars\": 342, \"repository_entries\": 152, \"starred_catalog_repositories\": 42, \"unique_catalog_repositories\": 147}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun.\n"
+      }
+    },
+    {
+      "command": "python3 scripts/validate_foundation.py --json",
+      "result": {
+        "chunk_id": "b2f8ab",
+        "wall_time_seconds": 0.027406807,
+        "exit_code": 0,
+        "original_token_count": 51,
+        "output": "{\n  \"ok\": true,\n  \"counts\": {\n    \"layers\": 16,\n    \"decisions\": 46,\n    \"foundation_components\": 61,\n    \"domain_components\": 7,\n    \"evidence_receipts\": 81,\n    \"candidates\": 0\n  },\n  \"errors\": []\n}\n"
+      }
+    },
+    {
+      "command": "python3 -m unittest tests.test_foundation_catalog tests.test_ecosystem_manifest tests.test_grand_dashboard",
+      "result": {
+        "chunk_id": "1426b3",
+        "wall_time_seconds": 0.000008397,
+        "exit_code": 0,
+        "original_token_count": 58,
+        "output": "..........................................................\n----------------------------------------------------------------------\nRan 64 tests in 6.085s\n\nOK\nInstalled dashboard and two units; service activation remains explicit.\n"
+      }
+    }
+  ],
+  "browser": {
+    "failed_attempt": {
+      "chunk_id": "166361",
+      "wall_time_seconds": 0.90223727,
+      "exit_code": 1,
+      "original_token_count": 91,
+      "output": "✓ Native stack — ecosystem manifest\n  file://<owned-repository>/docs/ecosystem/index.html#setup\n(no interactive elements)\n✗ No element found: getByRole('button', { name: 'Current foundation convergence and Claude results' }). Verify the selector, role, or name is correct and the element exists in the DOM.\n"
+    },
+    "successful_run_initial_output": {
+      "chunk_id": "dcffc1",
+      "wall_time_seconds": 1.001203571,
+      "session_id": 6959,
+      "original_token_count": 888,
+      "output": "✓ Native stack — ecosystem manifest\n  file://<owned-repository>/docs/ecosystem/index.html#setup\n- link \"Skip to content\" [ref=e1]\n- link \"Native stack overview\" [ref=e2]\n- tab \"01Ecosystem map\" [ref=e3]\n- tab \"Foundation\" [ref=e4]\n- tab \"Trading\" [ref=e5]\n- tab \"02Repository explorer\" [ref=e6]\n- tab \"03Selected stack & setup\" [selected, ref=e7]\n- tab \"04Token efficiency\" [ref=e8]\n- tab \"05Evidence & sources\" [ref=e9]\n- heading \"Set up the right layers.\" [level=2, ref=e10]\n- button \"New-PC setup\" [ref=e17]\n- button \"Resume and update\" [ref=e18]\n- button \"Capture this PC's lifetime results\" [ref=e19]\n- button \"Lifecycle checks and recovery\" [ref=e20]\n- button \"Recorded session: live tools and observation\" [ref=e21]\n- button \"Final token-efficiency list and client results\" [ref=e22]\n- button \"Codex session handbook and new-PC setup\" [ref=e23]\n- button \"Claude terminal and native practice\" [ref=e24]\n- button \"Persistent Claude workflows and returned evidence\" [ref=e25]\n- button \"Community choices across 16 layers\" [ref=e26]\n- button \"Short Claude instruction example\" [ref=e27]\n- button \"16-layer installation map\" [ref=e28]\n- button \"Memory landscape and active native maintenance\" [ref=e29]\n- button \"Native memory and RAG lifecycle\" [ref=e30]\n- button \"Current foundation convergence and Claude results\" [ref=e31]\n- heading \"Native clients, context and lexical memory foundation\" [level=3, ref=e32]\n- button \"Show 7 components\" [ref=e33]\n- heading \"Local deterministic research and native SDK workers\" [level=3, ref=e34]\n- button \"Show 10 components\" [ref=e35]\n- heading \"Local native telemetry backends\" [level=3, ref=e36]\n- button \"Show 6 components\" [ref=e37]\n- heading \"Optional explicit project semantic RAG\" [level=3, ref=e38]\n- button \"Show 4 components\" [ref=e39]\n- heading \"Selected application-state recovery\" [level=3, ref=e40]\n- button \"Show 3 components\" [ref=e41]\n- heading \"Optional pinned Nautilus engine with separate broker boundaries\" [level=3, ref=e42]\n- button \"Show 2 components\" [ref=e43]\n- heading \"The complete selected manifest.\" [level=2, ref=e11]\n- searchbox \"Find a selected component\" [ref=e12]\n- combobox \"Layer\" [expanded=false, ref=e13]: All layers\n  - option \"All layers\" [selected, ref=e44]\n  - option \"Native agents\" [ref=e45]\n  - option \"Skills & playbooks\" [ref=e46]\n  - option \"Code & document retrieval\" [ref=e47]\n  - option \"Explicit scoped memory\" [ref=e48]\n  - option \"Workers & execution\" [ref=e49]\n  - option \"Evaluation & evidence\" [ref=e50]\n  - option \"Research & data\" [ref=e51]\n  - option \"Operations & local inference\" [ref=e52]\n  - option \"Applications & APIs\" [ref=e53]\n  - option \"Beyond the current stack\" [ref=e54]\n- combobox \"Adoption profile\" [expanded=false, ref=e14]: All selected components\n  - option \"All selected components\" [selected, ref=e55]\n  - option \"Outside the named profiles\" [ref=e56]\n  - option \"Native clients, context and lexical memory foundation\" [ref=e57]\n  - option \"Local deterministic research and native SDK workers\" [ref=e58]\n  - option \"Local native telemetry backends\" [ref=e59]\n  - option \"Optional explicit project semantic RAG\" [ref=e60]\n  - option \"Selected application-state recovery\" [ref=e61]\n  - option \"Optional pinned Nautilus engine with separate broker boundaries\" [ref=e62]\n- button \"Reset filters\" [ref=e15]\n- link \"Open the public repository ↗\" [ref=e16]\n✓ Done\n✓ Screenshot saved to <user-home>/codex-ecosystem/state/foundation-convergence-20260921/catalog-convergence.png\n"
+    },
+    "completion": {
+      "exit_code": 0,
+      "returned_output": "✓ Browser closed\n"
+    },
+    "resolution": "The same --allow-file-access launch option must be supplied across operations in the named native browser session. Omitting it reopened about:blank. Repeating it preserved the page; the named current-foundation button opened its real embedded guide.",
+    "screenshot_sha256": "a625d52d7af294e7442b18dc060c0e5d7d4ceb10fdf763417a220a35798ff501",
+    "screenshot_retention": "Private retained native screenshot; inspected visually by coordinator. Current guide heading, source link and rendered body visible; no fabricated dashboard data.",
+    "scope": "Rendered owned checkout; publication checkpoint later requires native timer observation."
+  },
+  "independent_review": {
+    "role": "read-only Codex reviewer",
+    "outcome": "Accepted with limits; no remaining substantive findings",
+    "findings_resolved": [
+      "Stale recovery priorities",
+      "Encoded project paths and native identifiers in public excerpts",
+      "Native-recorded worker effort",
+      "315-token output discrepancy"
+    ],
+    "limits": "Source and artifact review, not a new provider or universal lifecycle trial."
+  }
+}

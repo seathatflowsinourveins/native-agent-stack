@@ -871,7 +871,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1853,7 +1853,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -2477,6 +2477,27 @@
         "vLLM intentionally retains its compatible pin; the newest release has a recorded host failure."
       ],
       "path": "evidence/receipts/memory-landscape-lifecycle-20260921.json"
+    },
+    {
+      "id": "foundation-convergence-20260921",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "context-mode",
+        "rtk",
+        "headroom",
+        "toon"
+      ],
+      "claim": "Actual native Claude two-worker source research, independent stable-release/installed-byte observations, and current foundation checkpoint reconciliation. Accepted pins retained; SDK remains conditional; failed/inconclusive source queries and narrative corrections retained.",
+      "limitations": [
+        "Source review is not new installation, SDK execution or recertification of unchanged foundation layers.",
+        "One read-only native Workflow used Fable, Sonnet/medium and Opus/high, observed in native records. No matched savings baseline; Opus cumulative/persisted output differs by 315 tokens.",
+        "Two cumulative result events overlap; count final modelUsage once. Codex coordination, independent reviewers and publication are outside that usage.",
+        "Existing local writing/recovery and selective-context fixture evidence is reused unchanged, with its failures and boundaries.",
+        "No new scheduled trigger, restart or physical reboot was observed; lifetime and session savings remain null."
+      ],
+      "path": "evidence/receipts/foundation-convergence-20260921.json"
     }
   ],
   "files": [
@@ -6143,8 +6164,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 6877380,
-      "sha256": "1284f69582bee60c6b6986cf0dfe04af057234f1ac6e27339251299970485bcb"
+      "bytes": 7040274,
+      "sha256": "e457ee701053afb4704d9121ee8d7c1a4889ee64e0ef7d2c755e82c3ebb4f2e8"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6153,8 +6174,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "bytes": 36867,
-      "sha256": "b2b64e2bf10c3f0ef2410e169ce5e2e4f6254c913002f906f9b7ffe8e54e04b2"
+      "bytes": 37232,
+      "sha256": "d5f717d1150ecc1650e4bd6ac9689119fcb18e70da35228f8a4e5b5bc378586b"
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6173,8 +6194,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "bytes": 81062,
-      "sha256": "0b90510142e2b9260cb2172435f89b2d3e778d4e40dad79f517569b453ddcb89"
+      "bytes": 81257,
+      "sha256": "ae377b3d76d0615f2b548002d3e47af97d952432395ddaa40c4cd1c3d7ca7c31"
     },
     {
       "path": "docs/evidence.md",
@@ -6658,8 +6679,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 80115,
-      "sha256": "bedb24ff6b92ebfe951805530e6e23e5d2562ea0e0452359b6054d905c7cda33"
+      "bytes": 80543,
+      "sha256": "480a75a9556c676383c00f9d6163d53f4e14ffc332d430fa35b68b07f2694f66"
     },
     {
       "path": "observability/README.md",
@@ -6818,8 +6839,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "bytes": 6364,
-      "sha256": "fe89bc893b2ed62099e964f94234c77452853cf102bae2701f58afc78a1a7bc5"
+      "bytes": 7360,
+      "sha256": "bbeff91e9a4d2aa124c397fd33f37635b08b043ea8c9ae3f0c9e8f5cc0656354"
     },
     {
       "path": "observability/receipt.json",
@@ -6848,8 +6869,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "bytes": 34191,
-      "sha256": "c70fc2badfc91c2c3db94435dc9261725934693af9c07fbd255811556544e798"
+      "bytes": 34303,
+      "sha256": "81893fa42c34e51f0d59da570f9dba7cdc6d46213ed5a97f3999a750f73044b3"
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -7148,13 +7169,13 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "bytes": 113117,
-      "sha256": "a91f35507f0593faa3adefeb7c44f63d651d56787bd6f384a656ca37810eba13"
+      "bytes": 116569,
+      "sha256": "709d3e8ec1d037f0f6bfa5a391aaa10449b0a943b044abbc1e04916e089ce174"
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "b544b57c9c3e4694387d7b511c57fe6e3b899f5a76d867c7fce0ec8b0551f76f",
-      "bytes": 18270
+      "bytes": 18696,
+      "sha256": "aff21f912690c504fc138b856c789ca38af0649131591aab44118be53bda5959"
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -8898,8 +8919,8 @@
     },
     {
       "path": "docs/native-ultracode-20260921.md",
-      "sha256": "ae736d942522a60133196d2749177598de9f38952b7b1fe8eb2b870b4d1a4a44",
-      "bytes": 8052
+      "bytes": 8349,
+      "sha256": "4c6973bf8f623d40ff542b9a6eaef378e9dcff08744f0fdcc8d413581db91bdf"
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",
@@ -9340,6 +9361,46 @@
       "path": "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json",
       "bytes": 9716,
       "sha256": "89f674ad3ab02afb6e70047cfa714f1e0de8625009f3c8b9171d9fb8b7e82267"
+    },
+    {
+      "path": "docs/foundation-convergence-20260921.md",
+      "bytes": 6536,
+      "sha256": "5e6dfd2beebe8e459db79b20c10f59a4515caefc7f13b5087a658a8aed647838"
+    },
+    {
+      "path": "evidence/artifacts/foundation-convergence-20260921/claude-cooperation.json",
+      "bytes": 69922,
+      "sha256": "4c5b553b01c5880ae2f558d56572707026660e581daf0db6e4820db9e96f4a1e"
+    },
+    {
+      "path": "evidence/artifacts/foundation-convergence-20260921/independent-sources.json",
+      "bytes": 11571,
+      "sha256": "29c16e0a54ae5ffc0fa6902b05908144e6f7d703c08d118fac7b23438401590e"
+    },
+    {
+      "path": "evidence/artifacts/foundation-convergence-20260921/review-adjudication.md",
+      "bytes": 5742,
+      "sha256": "123b5b8ac7051d4f23864ae99d973e0c515a72303aaf11af4780d50d9bc0851c"
+    },
+    {
+      "path": "evidence/artifacts/foundation-convergence-20260921/token-upstream-review.json",
+      "bytes": 18988,
+      "sha256": "2dda73055c30c71009d107f85fd8d053928f9ac7373d059d23dcc09eb18074d4"
+    },
+    {
+      "path": "evidence/receipts/foundation-convergence-20260921.json",
+      "bytes": 3611,
+      "sha256": "b919050d032d445de767e9efaf83b23c67cfc36d575b1cb9ecf0ab599b37e34c"
+    },
+    {
+      "path": "evidence/artifacts/foundation-convergence-20260921/validation-attempts.json",
+      "bytes": 2864,
+      "sha256": "db94b9e7a61580494d5720a08bbe1fb87757b924c4aa43329d506ce0c0fe4ef7"
+    },
+    {
+      "path": "evidence/artifacts/foundation-convergence-20260921/verification.json",
+      "bytes": 7711,
+      "sha256": "fd79df125a92bad2f793a4bf720e7574beea77e30e0cdd954d3526c805c69316"
     }
   ],
   "convergence_records": [

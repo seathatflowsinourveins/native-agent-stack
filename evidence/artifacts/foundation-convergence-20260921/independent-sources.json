@@ -1,0 +1,149 @@
+{
+  "evidence_class": "independent source and installed-byte observation; no SDK execution or comparative outcome benchmark",
+  "commands": [
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/anthropics/claude-code/releases/latest",
+        "--jq",
+        "{tag:.tag_name,published:.published_at,url:.html_url}"
+      ],
+      "started_at": "2026-09-21T15:51:11.792462+00:00",
+      "completed_at": "2026-09-21T15:51:12.303714+00:00",
+      "exit_code": 0,
+      "stdout": "{\"published\":\"2026-09-19T03:10:40Z\",\"tag\":\"v2.1.278\",\"url\":\"https://github.com/anthropics/claude-code/releases/tag/v2.1.278\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/affaan-m/ECC/commits?per_page=1",
+        "--jq",
+        ".[0]|{sha,date:.commit.committer.date,url:.html_url}"
+      ],
+      "started_at": "2026-09-21T15:51:12.303728+00:00",
+      "completed_at": "2026-09-21T15:51:12.828394+00:00",
+      "exit_code": 0,
+      "stdout": "{\"date\":\"2026-09-20T19:37:57Z\",\"sha\":\"2b6e839771e53096d8451a213d40dc64ec8acac0\",\"url\":\"https://github.com/affaan-m/ECC/commit/2b6e839771e53096d8451a213d40dc64ec8acac0\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/shanraisshan/claude-code-best-practice/compare/15969ed2471a177d938c889255d2f23f07e4742a...5372d67bc098b25c4a4c875bc20d57e3c375ba2b",
+        "--jq",
+        "{status,ahead_by,behind_by,total_commits,files:[.files[]|{filename,status,patch:(if (.filename|startswith(\"best-practice/\")) then .patch else null end)}] }"
+      ],
+      "started_at": "2026-09-21T15:51:12.828417+00:00",
+      "completed_at": "2026-09-21T15:51:13.633911+00:00",
+      "exit_code": 0,
+      "stdout": "{\"ahead_by\":34,\"behind_by\":0,\"files\":[{\"filename\":\"README.md\",\"patch\":null,\"status\":\"modified\"},{\"filename\":\"best-practice/claude-commands.md\",\"patch\":\"@@ -1,6 +1,6 @@\\n # Commands Best Practice\\n \\n-![Last Updated](https://img.shields.io/badge/Last_Updated-Sep%2018%2C%202026%2011%3A09%20AM%20PKT-white?style=flat\\u0026labelColor=555) ![Version](https://img.shields.io/badge/Claude_Code-v2.1.276-blue?style=flat\\u0026labelColor=555)\\u003cbr\\u003e\\n+![Last Updated](https://img.shields.io/badge/Last_Updated-Sep%2021%2C%202026%2011%3A13%20AM%20PKT-white?style=flat\\u0026labelColor=555) ![Version](https://img.shields.io/badge/Claude_Code-v2.1.278-blue?style=flat\\u0026labelColor=555)\\u003cbr\\u003e\\n [![Implemented](https://img.shields.io/badge/Implemented-2ea44f?style=flat)](../implementation/claude-commands-implementation.md)\\n \\n Claude Code commands — frontmatter fields and official built-in slash commands.\\n@@ -57,7 +57,7 @@ Claude Code commands — frontmatter fields and official built-in slash commands\\n | 10 | `/focus` | ![Config](https://img.shields.io/badge/Config-F39C12?style=flat) | Toggle the focus view, which shows only your last prompt, a one-line tool-call summary with edit diffstats, and the final response. The selection persists across sessions; set `viewMode` in settings to override it. Only available in fullscreen rendering |\\n | 11 | `/import [codex\\\\|gemini\\\\|cursor] [--dry-run] [--yes]` | ![Config](https://img.shields.io/badge/Config-F39C12?style=flat) | Bring configuration from other coding agents on your machine (currently OpenAI Codex, Google Gemini CLI, or Cursor) into Claude Code, including instruction files, MCP servers, commands, subagents, and skills. In non-interactive mode (`-p`), lists what it found and gives you the command that confirms the import. `--dry-run` previews without writing; `--yes` skips the interactive picker. Importing from Cursor requires v2.1.265 or later |\\n | 12 | `/keybindings` | ![Config](https://img.shields.io/badge/Config-F39C12?style=flat) | Open or create your keybindings configuration file |\\n-| 13 | `/output-style [name]` | ![Config](https://img.shields.io/badge/Config-F39C12?style=flat) | List and switch output styles, including over Remote Control and in cloud and other headless sessions |\\n+| 13 | `/output-style [style]` | ![Config](https://img.shields.io/badge/Config-F39C12?style=flat) | List and switch output styles, including over Remote Control and in cloud and other headless sessions |\\n | 14 | `/permissions` | ![Config](https://img.shields.io/badge/Config-F39C12?style=flat) | Manage allow, ask, and deny rules for tool permissions. Opens an interactive dialog where you can view rules by scope, add or remove rules, manage working directories, and use the Auto mode tab to view or edit classifier rules and review recent auto mode denials. Alias: `/allowed-tools` |\\n | 15 | `/powerup` | ![Config](https://img.shields.io/badge/Config-F39C12?style=flat) | Discover Claude Code features through quick interactive lessons with animated demos |\\n | 16 | `/privacy-settings` | ![Config](https://img.shields.io/badge/Config-F39C12?style=flat) | View and update your privacy settings. Only available for Pro and Max plan subscribers |\",\"status\":\"modified\"},{\"filename\":\"best-practice/claude-skills.md\",\"patch\":\"@@ -1,6 +1,6 @@\\n # Skills Best Practice\\n \\n-![Last Updated](https://img.shields.io/badge/Last_Updated-Sep%2018%2C%202026%2010%3A06%20AM%20PKT-white?style=flat\\u0026labelColor=555) ![Version](https://img.shields.io/badge/Claude_Code-v2.1.276-blue?style=flat\\u0026labelColor=555)\\u003cbr\\u003e\\n+![Last Updated](https://img.shields.io/badge/Last_Updated-Sep%2021%2C%202026%2010%3A03%20AM%20PKT-white?style=flat\\u0026labelColor=555) ![Version](https://img.shields.io/badge/Claude_Code-v2.1.278-blue?style=flat\\u0026labelColor=555)\\u003cbr\\u003e\\n [![Implemented](https://img.shields.io/badge/Implemented-2ea44f?style=flat)](../implementation/claude-skills-implementation.md)\\n \\n Claude Code skills — frontmatter fields and official bundled skills.\",\"status\":\"modified\"},{\"filename\":\"best-practice/claude-subagents.md\",\"patch\":\"@@ -1,6 +1,6 @@\\n # Sub-agents Best Practice\\n \\n-![Last Updated](https://img.shields.io/badge/Last_Updated-Sep%2018%2C%202026%2011%3A42%20AM%20PKT-white?style=flat\\u0026labelColor=555) ![Version](https://img.shields.io/badge/Claude_Code-v2.1.276-blue?style=flat\\u0026labelColor=555)\\u003cbr\\u003e\\n+![Last Updated](https://img.shields.io/badge/Last_Updated-Sep%2021%2C%202026%2011%3A36%20AM%20PKT-white?style=flat\\u0026labelColor=555) ![Version](https://img.shields.io/badge/Claude_Code-v2.1.278-blue?style=flat\\u0026labelColor=555)\\u003cbr\\u003e\\n [![Implemented](https://img.shields.io/badge/Implemented-2ea44f?style=flat)](../implementation/claude-subagents-implementation.md)\\n \\n Claude Code subagents — frontmatter fields and official built-in agent types.\",\"status\":\"modified\"},{\"filename\":\"changelog/agent-collections/changelog.md\",\"patch\":null,\"status\":\"modified\"},{\"filename\":\"changelog/best-practice/claude-commands/changelog.md\",\"patch\":null,\"status\":\"modified\"},{\"filename\":\"changelog/best-practice/claude-skills/changelog.md\",\"patch\":null,\"status\":\"modified\"},{\"filename\":\"changelog/best-practice/claude-subagents/changelog.md\",\"patch\":null,\"status\":\"modified\"},{\"filename\":\"changelog/best-practice/concepts/changelog.md\",\"patch\":null,\"status\":\"modified\"},{\"filename\":\"changelog/development-workflows/changelog.md\",\"patch\":null,\"status\":\"modified\"},{\"filename\":\"changelog/skill-collections/changelog.md\",\"patch\":null,\"status\":\"modified\"}],\"status\":\"ahead\",\"total_commits\":34}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/anthropics/claude-agent-sdk-python/releases/latest",
+        "--jq",
+        "{tag:.tag_name,published:.published_at,url:.html_url}"
+      ],
+      "started_at": "2026-09-21T15:51:13.633929+00:00",
+      "completed_at": "2026-09-21T15:51:14.206162+00:00",
+      "exit_code": 0,
+      "stdout": "{\"published\":\"2026-09-18T02:28:01Z\",\"tag\":\"v0.2.156\",\"url\":\"https://github.com/anthropics/claude-agent-sdk-python/releases/tag/v0.2.156\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/anthropics/claude-agent-sdk-typescript/releases/latest",
+        "--jq",
+        "{tag:.tag_name,published:.published_at,url:.html_url}"
+      ],
+      "started_at": "2026-09-21T15:51:14.206183+00:00",
+      "completed_at": "2026-09-21T15:51:14.728720+00:00",
+      "exit_code": 0,
+      "stdout": "{\"published\":\"2026-09-19T03:10:32Z\",\"tag\":\"v0.3.278\",\"url\":\"https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.3.278\"}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/chopratejas/headroom",
+        "--jq",
+        "{full_name,html_url}"
+      ],
+      "started_at": "2026-09-21T15:51:14.728741+00:00",
+      "completed_at": "2026-09-21T15:51:15.497822+00:00",
+      "exit_code": 0,
+      "stdout": "{\"full_name\":\"headroomlabs-ai/headroom\",\"html_url\":\"https://github.com/headroomlabs-ai/headroom\"}\n",
+      "stderr": ""
+    }
+  ],
+  "skill_byte_comparisons": [
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/affaan-m/ECC/contents/skills/search-first/SKILL.md?ref=2b6e839771e53096d8451a213d40dc64ec8acac0",
+        "-H",
+        "Accept: application/vnd.github.raw+json"
+      ],
+      "started_at": "2026-09-21T15:51:15.497857+00:00",
+      "completed_at": "2026-09-21T15:51:16.146148+00:00",
+      "exit_code": 0,
+      "stderr": "",
+      "upstream_stdout_bytes": 8021,
+      "upstream_stdout_sha256": "d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733",
+      "local": [
+        {
+          "path": "<shared-skills-home>/skills/search-first/SKILL.md",
+          "sha256": "d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733",
+          "matches_upstream": true
+        },
+        {
+          "path": "<adopted-project>/.claude/skills/search-first/SKILL.md",
+          "sha256": "d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733",
+          "matches_upstream": true
+        }
+      ]
+    },
+    {
+      "argv": [
+        "gh",
+        "api",
+        "repos/affaan-m/ECC/contents/skills/iterative-retrieval/SKILL.md?ref=2b6e839771e53096d8451a213d40dc64ec8acac0",
+        "-H",
+        "Accept: application/vnd.github.raw+json"
+      ],
+      "started_at": "2026-09-21T15:51:16.146331+00:00",
+      "completed_at": "2026-09-21T15:51:16.572752+00:00",
+      "exit_code": 0,
+      "stderr": "",
+      "upstream_stdout_bytes": 6786,
+      "upstream_stdout_sha256": "b453b16d3e36174b8487c05ab807d0321a66c2d058812b2ae129d82824183725",
+      "local": [
+        {
+          "path": "<shared-skills-home>/skills/iterative-retrieval/SKILL.md",
+          "sha256": "b453b16d3e36174b8487c05ab807d0321a66c2d058812b2ae129d82824183725",
+          "matches_upstream": true
+        },
+        {
+          "path": "<adopted-project>/.claude/skills/iterative-retrieval/SKILL.md",
+          "sha256": "b453b16d3e36174b8487c05ab807d0321a66c2d058812b2ae129d82824183725",
+          "matches_upstream": true
+        }
+      ]
+    }
+  ],
+  "publication": {
+    "sanitization": "Host directory prefixes replaced with descriptive placeholders; long quotation fields from worker source summaries omitted. Retained raw native files stay private; hashes describe those original bytes.",
+    "interpretation": "Original worker narratives are claims for review. See review-adjudication.md for accepted findings and corrections."
+  }
+}

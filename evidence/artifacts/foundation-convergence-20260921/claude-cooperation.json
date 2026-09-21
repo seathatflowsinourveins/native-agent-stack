@@ -1,0 +1,955 @@
+{
+  "evidence_class": "actual native source-research Workflow, separately observed persisted worker transcripts",
+  "command": {
+    "argv": [
+      "<native-tools-home>/bin/claude",
+      "-p",
+      "--model",
+      "fable",
+      "--effort",
+      "ultracode",
+      "--settings",
+      "<canonical-repository>/examples/claude-native/ultracode.settings.json",
+      "--output-format",
+      "stream-json",
+      "--verbose",
+      "--include-hook-events",
+      "--max-turns",
+      "16"
+    ],
+    "cwd": "<adopted-project>",
+    "started_at": "2026-09-21T15:44:16.244799+00:00",
+    "completed_at": "2026-09-21T15:52:03.036388+00:00",
+    "exit_code": 0,
+    "timed_out": false,
+    "claude-prompt.txt": {
+      "bytes": 2789,
+      "sha256": "fc85624b3d63aa6561181bf6b4b8a0d0167758aba259b4ea2102aaa13a4dd7b7"
+    },
+    "claude.stdout": {
+      "bytes": 500071,
+      "sha256": "9808894394dafe82f3193cce3827416a1b6cac2dfd27ec2148c00f78e10dfe64"
+    },
+    "claude.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "prompt": "We are cooperating with native Codex on a bounded evidence-based foundation convergence review. This is real read-only source research, not a synthetic benchmark. Canonical source repository: <canonical-repository> at 86952998d3372dcf26cfc6f94782b4e03d097b8a. Read only the relevant sections of docs/foundation-closure-20260921.md and recipes/claude-native-ultracode.md. Do not edit project files, install software, change settings, send messages, start persistent tasks, or read credentials. Native workflow metadata writes are allowed. You are not alone; other agents own token tools and memory evidence.\n\nUse one native Workflow with exactly two read-only workers; max three concurrent workers, no nested delegation. Assign explicit models/effort: Sonnet medium for maintained community source drift; Opus high for official SDK applicability. Collect their actual results directly, preserve any null/failed/substituted result, and return a compact source-linked conclusion. Do not poll other model sessions. Do not run unrelated diagnostic tools.\n\nWorker A (Sonnet medium): inspect current upstream HEAD and changes since our selected pins for affaan-m/ECC (2b6e839771e53096d8451a213d40dc64ec8acac0) and shanraisshan/claude-code-best-practice (15969ed2471a177d938c889255d2f23f07e4742a). Use gh API/native tools/current official sources. Focus ONLY on native memory/project-scope, skills/context routing, and worker acceptance rules. Identify at most two demonstrated improvements or explicitly retain the pins if no relevant change. Return exact source URLs, observed HEAD, commands/status and concise reason; popularity is not evidence.\n\nWorker B (Opus high): inspect current official Claude Agent SDK Python/TypeScript releases and official documentation for programmatic work using the existing native sign-in/settings. Our installed Claude CLI 2.1.278 already has proven Workflow, native worker recovery, memory and RAG. Determine whether an SDK closes a concrete foundation gap versus native -p, or is a conditional application dependency. Inspect the current SDK settings-source defaults and account/auth limitations from primary docs/source, plus a relevant unchanged upstream example/test that could qualify adoption when needed. No provider experiment or package installation. Return exact source pins/URLs, supported example/test command, and adopt/retain/conditional decision. Registry/release inconsistencies remain explicit.\n\nFinal response: two worker outcomes with actual model/effort if available; precise actionable findings, sources, and limitations. Separate current source review from installed/native E2E. Do not call the whole ecosystem finalized or claim token savings. Keep intermediate bulk output outside the final response.\n",
+  "native_results": [
+    {
+      "duration_api_ms": 543540,
+      "stop_reason": "end_turn",
+      "session_id": "<native-identifier-1>",
+      "total_cost_usd": 3.9991685999999995,
+      "usage": {
+        "input_tokens": 162,
+        "cache_creation_input_tokens": 47895,
+        "cache_read_input_tokens": 266846,
+        "output_tokens": 7631,
+        "output_tokens_details": {
+          "thinking_tokens": 1350
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 47895,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "iterations": [
+          {
+            "input_tokens": 32,
+            "output_tokens": 44,
+            "cache_read_input_tokens": 54830,
+            "cache_creation_input_tokens": 6697,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 6697
+            },
+            "type": "message",
+            "model": null
+          }
+        ],
+        "speed": "standard"
+      },
+      "modelUsage": {
+        "claude-fable-5-1": {
+          "inputTokens": 358,
+          "outputTokens": 14118,
+          "cacheReadInputTokens": 772057,
+          "cacheCreationInputTokens": 69495,
+          "webSearchRequests": 0,
+          "costUSD": 2.29239425,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 1891,
+          "canonicalModel": "claude-fable-5-1",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-sonnet-5": {
+          "inputTokens": 22,
+          "outputTokens": 7890,
+          "cacheReadInputTokens": 421083,
+          "cacheCreationInputTokens": 51869,
+          "webSearchRequests": 0,
+          "costUSD": 0.29283310000000007,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 583,
+          "canonicalModel": "claude-sonnet-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-opus-5[1m]": {
+          "inputTokens": 24,
+          "outputTokens": 23081,
+          "cacheReadInputTokens": 605565,
+          "cacheCreationInputTokens": 79695,
+          "webSearchRequests": 0,
+          "costUSD": 1.37802125,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 3523,
+          "canonicalModel": "claude-opus-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-haiku-4-5-20251001": {
+          "inputTokens": 32175,
+          "outputTokens": 749,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.035919999999999994,
+          "contextWindow": 200000,
+          "maxOutputTokens": 32000,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-haiku-4-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "permission_denials": [],
+      "terminal_reason": "completed",
+      "fast_mode_state": "off",
+      "fast_mode_disabled_reason": "sdk_opt_in_required",
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "is_error": false,
+      "num_turns": 6,
+      "subtype": "success",
+      "api_error_status": null,
+      "result": "The Workflow is running in the background with both workers. I'll wait for the completion notification, then read the journal for actual model metadata and results.",
+      "ttft_ms": 2386,
+      "type": "result",
+      "duration_ms": 100732,
+      "uuid": "<native-identifier-2>",
+      "ttft_stream_ms": 1358,
+      "time_to_request_ms": 124,
+      "first_content_frame_ms": 1359,
+      "queued_turn_count": 0,
+      "result_index": 0
+    },
+    {
+      "duration_api_ms": 543540,
+      "stop_reason": "end_turn",
+      "session_id": "<native-identifier-1>",
+      "total_cost_usd": 3.9991685999999995,
+      "usage": {
+        "input_tokens": 196,
+        "cache_creation_input_tokens": 21600,
+        "cache_read_input_tokens": 505211,
+        "output_tokens": 6487,
+        "output_tokens_details": {
+          "thinking_tokens": 541
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 21600,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "iterations": [
+          {
+            "input_tokens": 32,
+            "output_tokens": 2288,
+            "cache_read_input_tokens": 82631,
+            "cache_creation_input_tokens": 496,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 496
+            },
+            "type": "message",
+            "model": null
+          }
+        ],
+        "speed": "standard"
+      },
+      "modelUsage": {
+        "claude-fable-5-1": {
+          "inputTokens": 358,
+          "outputTokens": 14118,
+          "cacheReadInputTokens": 772057,
+          "cacheCreationInputTokens": 69495,
+          "webSearchRequests": 0,
+          "costUSD": 2.29239425,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 1891,
+          "canonicalModel": "claude-fable-5-1",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-sonnet-5": {
+          "inputTokens": 22,
+          "outputTokens": 7890,
+          "cacheReadInputTokens": 421083,
+          "cacheCreationInputTokens": 51869,
+          "webSearchRequests": 0,
+          "costUSD": 0.29283310000000007,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 583,
+          "canonicalModel": "claude-sonnet-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-opus-5[1m]": {
+          "inputTokens": 24,
+          "outputTokens": 23081,
+          "cacheReadInputTokens": 605565,
+          "cacheCreationInputTokens": 79695,
+          "webSearchRequests": 0,
+          "costUSD": 1.37802125,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 64000,
+          "thinkingTokens": 3523,
+          "canonicalModel": "claude-opus-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        },
+        "claude-haiku-4-5-20251001": {
+          "inputTokens": 32175,
+          "outputTokens": 749,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+          "webSearchRequests": 0,
+          "costUSD": 0.035919999999999994,
+          "contextWindow": 200000,
+          "maxOutputTokens": 32000,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-haiku-4-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "permission_denials": [],
+      "terminal_reason": "completed",
+      "fast_mode_state": "off",
+      "fast_mode_disabled_reason": "sdk_opt_in_required",
+      "origin": {
+        "kind": "task-notification"
+      },
+      "subagent_stats": {
+        "spawned": 0,
+        "requested": {
+          "background": 0,
+          "foreground": 0,
+          "unset": 0
+        },
+        "started_in_background": 0,
+        "max_depth": 0,
+        "spawned_by_subagents": 0,
+        "completed": 0,
+        "failed": 0,
+        "killed": {
+          "parent": 0,
+          "user": 0,
+          "system": 0
+        },
+        "refused": {
+          "depth_limit": 0,
+          "concurrency_limit": 0,
+          "budget": 0
+        },
+        "by_type": {}
+      },
+      "is_error": false,
+      "num_turns": 7,
+      "subtype": "success",
+      "api_error_status": null,
+      "result": "**Conclusion: retain both community pins and keep the Claude Agent SDK conditional.** One Workflow ran with exactly two read-only workers, both returned non-null structured results, and I independently re-ran the load-bearing lookups.\n\n## Worker outcomes\n\n| Worker | Requested | Observed in transcript metadata | Output tokens | Result |\n| --- | --- | --- | --- | --- |\n| A community drift | sonnet / medium | `claude-sonnet-5` / medium | 4,195 | returned, 13 commands, all exit 0 |\n| B SDK applicability | opus / high | `claude-opus-5` / high | 15,681 | returned, 26 commands, one expected 404, one empty fetch |\n\nWorker B self-reported `claude-opus-5[1m]`; the transcript records `claude-opus-5`. Workflow totals: 2 agents, 0 errors, 33 tool uses, 277 s.\n\n## Worker A: community source drift\n\n- **ECC: retain pin.** Upstream HEAD is byte-identical to the pin `2b6e8397` (compare status identical, 0 commits). The installed `search-first` and `iterative-retrieval` skills in both `~/.agents/skills` and the project `.claude/skills` diff clean against the pinned SKILL.md files. I re-confirmed the HEAD SHA.\n- **Shan: retain pin.** HEAD is `5372d67b` (2026-09-21). Since `15969ed2` there are 34 commits touching 11 files; since `bde3f031`, 10 commits touching 9 files. All are README star-table refreshes, version badge bumps 2.1.276 to 2.1.278, daily \"no drift\" changelog appends, and one `/output-style [name]` to `[style]` label fix. Nothing on memory/project scope, skill routing or acceptance rules. I re-confirmed the HEAD and the 11-file list.\n- **Improvements identified: none.** Zero qualifying changes; the worker did not pad to two.\n- **Pin discrepancy to record:** the closure doc pins Shan at `bde3f031`, the saturation audit at `15969ed2`. Both are behind HEAD and neither distance contains relevant content, so the choice does not change any decision.\n- **Limitation:** the seven changelog files were judged from diff stats and commit messages, not line-by-line.\n\n## Worker B: Claude Agent SDK applicability\n\n**Decision: conditional, not a foundation gap.** Sources: [Python SDK at v0.2.156 / e9af0778](https://github.com/anthropics/claude-agent-sdk-python/tree/e9af0778559032afca55ac200608c24f18af86ca), [TypeScript v0.3.278 / 18661edd](https://github.com/anthropics/claude-agent-sdk-typescript/tree/18661edde4498f76ff5599b17ee4ca81d98409b2), [overview](https://code.claude.com/docs/en/agent-sdk/overview), [quickstart](https://code.claude.com/docs/en/agent-sdk/quickstart), [claude-code-features](https://code.claude.com/docs/en/agent-sdk/claude-code-features), [headless](https://code.claude.com/docs/en/headless).\n\n- **Registry/release inconsistency persists.** PyPI serves 0.2.157; the newest GitHub tag is v0.2.156 and `git/ref/tags/v0.2.157` returns 404, so no source SHA exists for the installable artifact. I re-confirmed all three. TypeScript labels agree, but the repo at that tag ships no SDK source, so TypeScript behaviour is doc-only.\n- **Settings-source default changed versus the old caution.** At the pinned source, `setting_sources=None` loads user, project and local settings, matching CLI defaults, and `[]` gives isolation mode. I verified the docstring at `types.py:2243-2251`. An SDK host in this repo would pick up CLAUDE.md, project skills and hooks with no extra configuration. This removes migration friction but also removes the differentiator: same-context is now parity.\n- **Auth is the concrete foundation gap.** The overview states that, unless previously approved, third-party developers may not offer claude.ai login for agents built on the SDK, and the quickstart prescribes an API key or Bedrock/Vertex/Foundry. I re-confirmed the sentence. Personal reuse of the existing native OAuth by a local SDK process is undocumented, not proven impossible. The native CLI's non-bare `-p` documented use of subscription login is the installed path's advantage.\n- **Capability matrix.** Parity on structured output, resume/fork, system prompt, tool allow/deny, MCP config, hooks, subagents, effort/model, budget cap, isolation. Native-only: `--bg` detached sessions, the Workflow tool, and Agent teams, which the features doc says are not configured via SDK options. SDK-only, classified as application features: in-process MCP servers, an in-process permission callback, typed hook callbacks, and pluggable session stores.\n- **Trigger condition.** Adopt only when an application needs in-process tools sharing live state, such as a NautilusTrader engine or broker session exposed as MCP tools, or an in-process permission gate over live risk state, and a native attempt has failed.\n- **Overturning comparison.** Anthropic documenting supported subscription auth for the SDK, or the SDK exposing Workflow or Agent teams options.\n- **Qualification handle, unchanged upstream, not run:** at commit e9af0778 the repo's own CLAUDE.md documents the following. The secondary end-to-end handle is `examples/quick_start.py`, which needs an API key.\n\n```\npython -m pytest tests/test_client.py\npython -m pytest tests/\n```\n\n## Separation of evidence classes\n\n- **Current source review** covers everything above: gh API, registry metadata, primary docs, and one source file read at the pin. No package was installed, no example or test executed, no provider call made.\n- **Installed/native E2E** was not re-exercised here. The only native execution evidence in this session is the Workflow run itself on CLI 2.1.278, plus `claude --help` and `claude agents --help` reads by Worker B. The headless doc claims that `-p` rejects `--bg` and that bare mode skips subscription login were read, not reproduced.\n- Worker B read only `types.py`, not the transport or argv construction, so how options reach the CLI binary is unverified from source.\n- Worker B received no independent review inside the workflow because nested delegation was prohibited; my spot-checks above are the only independent confirmation.\n\nNo project files, settings, memory or credentials were touched. Native workflow metadata was written under the session directory only. Full worker output remains at the task output file and the workflow journal for the other agents to inspect.",
+      "ttft_ms": 2577,
+      "type": "result",
+      "duration_ms": 88874,
+      "uuid": "<native-identifier-3>",
+      "ttft_stream_ms": 1284,
+      "time_to_request_ms": 126,
+      "first_content_frame_ms": 1284,
+      "queued_turn_count": 0,
+      "result_index": 1
+    }
+  ],
+  "workflow_journal": [
+    {
+      "type": "launched"
+    },
+    {
+      "type": "started",
+      "key": "v2:d71a31e4a0683930190d4e40e1d09f36dd0dfe8785b59e74d6de8ab59bab6b2c",
+      "agentId": "a2e70d6ea727807c4",
+      "label": "A:community-drift",
+      "phase": "Community drift"
+    },
+    {
+      "type": "started",
+      "key": "v2:8c69916d1d4d30ad35e09283eb8a15a84f193dffde2cda2fa0cd17bc191f68c4",
+      "agentId": "a425a149bd22a1ab0",
+      "label": "B:sdk-applicability",
+      "phase": "SDK applicability"
+    },
+    {
+      "type": "result",
+      "key": "v2:d71a31e4a0683930190d4e40e1d09f36dd0dfe8785b59e74d6de8ab59bab6b2c",
+      "agentId": "a2e70d6ea727807c4",
+      "result": {
+        "commands": [
+          {
+            "command": "gh api repos/affaan-m/ECC/commits?per_page=1",
+            "status": "success",
+            "note": "HEAD sha 2b6e839771e53096d8451a213d40dc64ec8acac0, date 2026-09-20T19:37:57Z"
+          },
+          {
+            "command": "gh api repos/affaan-m/ECC/compare/2b6e839771e53096d8451a213d40dc64ec8acac0...2b6e839771e53096d8451a213d40dc64ec8acac0",
+            "status": "success",
+            "note": "status=identical, ahead_by=0, behind_by=0, total_commits=0 -- observed HEAD equals selected pin exactly"
+          },
+          {
+            "command": "gh api repos/shanraisshan/claude-code-best-practice/commits?per_page=1",
+            "status": "success",
+            "note": "HEAD sha 5372d67bc098b25c4a4c875bc20d57e3c375ba2b, date 2026-09-21T06:37:27Z"
+          },
+          {
+            "command": "gh api repos/shanraisshan/claude-code-best-practice/compare/15969ed2471a177d938c889255d2f23f07e4742a...5372d67bc098b25c4a4c875bc20d57e3c375ba2b --jq '{ahead_by,behind_by,total_commits,status,files:(.files|length)}'",
+            "status": "success",
+            "note": "ahead_by=34, behind_by=0, total_commits=34, status=ahead, files=11 (pin1 15969ed2471a177d938c889255d2f23f07e4742a)"
+          },
+          {
+            "command": "gh api repos/shanraisshan/claude-code-best-practice/compare/bde3f03174714fff4145d21cfda41ddd2ffffb28...5372d67bc098b25c4a4c875bc20d57e3c375ba2b --jq '{ahead_by,behind_by,total_commits,status,files:(.files|length)}'",
+            "status": "success",
+            "note": "ahead_by=10, behind_by=0, total_commits=10, status=ahead, files=9 (pin2 bde3f03174714fff4145d21cfda41ddd2ffffb28)"
+          },
+          {
+            "command": "gh api repos/shanraisshan/claude-code-best-practice/compare/15969ed2471a177d938c889255d2f23f07e4742a...5372d67bc098b25c4a4c875bc20d57e3c375ba2b --jq '.files[]|{filename,status,changes}'",
+            "status": "success",
+            "note": "11 files: README.md, claude-commands.md, claude-skills.md, claude-subagents.md, and 7 changelog/*.md files"
+          },
+          {
+            "command": "gh api repos/shanraisshan/claude-code-best-practice/compare/15969ed2471a177d938c889255d2f23f07e4742a...5372d67bc098b25c4a4c875bc20d57e3c375ba2b --jq '.files[]|select(.filename==\"best-practice/claude-skills.md\" or .filename==\"best-practice/claude-subagents.md\" or .filename==\"best-practice/claude-commands.md\").patch'",
+            "status": "success",
+            "note": "patches show only version-badge/date bumps (v2.1.276->v2.1.278) plus one arg-name fix /output-style [name]->[style]; no topic-relevant content"
+          },
+          {
+            "command": "gh api repos/shanraisshan/claude-code-best-practice/compare/15969ed2471a177d938c889255d2f23f07e4742a...5372d67bc098b25c4a4c875bc20d57e3c375ba2b --jq '.commits[].commit.message'",
+            "status": "success",
+            "note": "all 34 commit messages are star-count table refreshes and daily 'no drift' changelog appends; none mention memory/scope, skill routing, or review/worktree/test-gate acceptance rules"
+          },
+          {
+            "command": "curl -s https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/search-first/SKILL.md -o /tmp/ecc_search_first.md; curl -s https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/iterative-retrieval/SKILL.md -o /tmp/ecc_iter.md",
+            "status": "success"
+          },
+          {
+            "command": "diff /tmp/ecc_search_first.md <shared-skills-home>/skills/search-first/SKILL.md",
+            "status": "success",
+            "note": "files identical"
+          },
+          {
+            "command": "diff /tmp/ecc_iter.md <shared-skills-home>/skills/iterative-retrieval/SKILL.md",
+            "status": "success",
+            "note": "files identical"
+          },
+          {
+            "command": "diff /tmp/ecc_search_first.md <adopted-project>/.claude/skills/search-first/SKILL.md",
+            "status": "success",
+            "note": "files identical"
+          },
+          {
+            "command": "diff /tmp/ecc_iter.md <adopted-project>/.claude/skills/iterative-retrieval/SKILL.md",
+            "status": "success",
+            "note": "files identical"
+          }
+        ],
+        "repos": [
+          {
+            "name": "affaan-m/ECC",
+            "pins_checked": [
+              "2b6e839771e53096d8451a213d40dc64ec8acac0"
+            ],
+            "observed_head": "2b6e839771e53096d8451a213d40dc64ec8acac0",
+            "head_date": "2026-09-20T19:37:57Z",
+            "relevant_changes": [],
+            "decision": "retain-pin",
+            "reason": "Observed HEAD via gh api repos/affaan-m/ECC/commits?per_page=1 is byte-identical to the selected pin (gh api .../compare/PIN...HEAD returned status=identical, ahead_by=0, total_commits=0). No commits exist since the pin, so nothing changed in any of the three topics (memory/scope, skills/routing, worker acceptance rules) to evaluate.",
+            "commits_since_pin": {
+              "total": 0
+            },
+            "files_changed_since_pin": {
+              "count": 0
+            },
+            "installed_skill_drift": [
+              {
+                "skill": "search-first",
+                "local_path": "<shared-skills-home>/skills/search-first/SKILL.md (and identical copy at <adopted-project>/.claude/skills/search-first/SKILL.md)",
+                "matches_pin": true,
+                "matches_head": true,
+                "note": "diff against https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/search-first/SKILL.md reports files identical (183 lines both sides)"
+              },
+              {
+                "skill": "iterative-retrieval",
+                "local_path": "<shared-skills-home>/skills/iterative-retrieval/SKILL.md (and identical copy at <adopted-project>/.claude/skills/iterative-retrieval/SKILL.md)",
+                "matches_pin": true,
+                "matches_head": true,
+                "note": "diff against https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/iterative-retrieval/SKILL.md reports files identical (212 lines both sides)"
+              }
+            ]
+          },
+          {
+            "name": "shanraisshan/claude-code-best-practice",
+            "pins_checked": [
+              "15969ed2471a177d938c889255d2f23f07e4742a",
+              "bde3f03174714fff4145d21cfda41ddd2ffffb28"
+            ],
+            "observed_head": "5372d67bc098b25c4a4c875bc20d57e3c375ba2b",
+            "head_date": "2026-09-21T06:37:27Z",
+            "relevant_changes": [
+              {
+                "topic": "skills and context routing",
+                "path": "best-practice/claude-skills.md",
+                "url": "https://github.com/shanraisshan/claude-code-best-practice/compare/15969ed2471a177d938c889255d2f23f07e4742a...5372d67bc098b25c4a4c875bc20d57e3c375ba2b",
+                "summary": "Only version-badge/date bump (v2.1.276 -> v2.1.278, timestamp change); no body-content change to skills semantics."
+              },
+              {
+                "topic": "worker acceptance rules",
+                "path": "best-practice/claude-subagents.md",
+                "url": "https://github.com/shanraisshan/claude-code-best-practice/compare/15969ed2471a177d938c889255d2f23f07e4742a...5372d67bc098b25c4a4c875bc20d57e3c375ba2b",
+                "summary": "Only version-badge/date bump; commit messages reference recurring, still-ON-HOLD drift items (omitClaudeMd, experimental field, claude built-in agent) with no resolved content change."
+              },
+              {
+                "topic": "skills and context routing (adjacent, commands)",
+                "path": "best-practice/claude-commands.md",
+                "url": "https://github.com/shanraisshan/claude-code-best-practice/compare/15969ed2471a177d938c889255d2f23f07e4742a...5372d67bc098b25c4a4c875bc20d57e3c375ba2b",
+                "summary": "Trivial arg-name fix: /output-style [name] -> /output-style [style]; not a memory/skills-routing or acceptance-rule change."
+              }
+            ],
+            "decision": "retain-pin",
+            "reason": "34 commits since pin1 (15969ed...) and 10 since pin2 (bde3f03...) touch only README star-count tables, version/date badge bumps across claude-commands.md/claude-skills.md/claude-subagents.md, and their paired changelog files recording routine 'no drift' or 'still ON HOLD, awaiting user approval' findings for v2.1.276->v2.1.278. No commit or file diff in either compare window adds or changes content on native memory/project-scope handling, skills/context-routing mechanics, or worker acceptance rules (review gates, worktrees, test gates, done criteria) beyond the trivial /output-style argument label fix. Nothing here overturns the existing decision to use this repo as reference-only for the independent-review principle."
+          }
+        ],
+        "improvements": [],
+        "limitations": [
+          "The compare API calls (ahead_by 34 and 10) returned full file-list metadata (11 and 9 files respectively) without pagination, and the files.length matched files listed, so no evidence of truncation; if GitHub silently caps the compare files array at 300 this would not surface here, but the observed counts (9-11) are far below any such cap.",
+          "Content patches were inspected in full for the three named best-practice/*.md files and README.md; the 7 changelog/*.md files were only reviewed via their diff stats and the full commit-message list (not individually diffed line-by-line), since commit messages plus the changed-file summary consistently describe routine badge/star/changelog appends with no topic-relevant substantive content flagged.",
+          "Did not fetch or diff any ECC files beyond the two installed-skill SKILL.md files, since ECC's observed HEAD is identical to the pin (0 commits ahead), making further ECC diffing moot for this task's three topics.",
+          "Task explicitly restricted this worker to read-only research; no files were edited, no packages installed, no memory written, and no subagents spawned."
+        ],
+        "worker_identity": {
+          "model_stated": "Sonnet 5 (exact model ID claude-sonnet-5, per system prompt: \"You are powered by the model named Sonnet 5\")",
+          "effort_stated": null
+        }
+      }
+    },
+    {
+      "type": "result",
+      "key": "v2:8c69916d1d4d30ad35e09283eb8a15a84f193dffde2cda2fa0cd17bc191f68c4",
+      "agentId": "a425a149bd22a1ab0",
+      "result": {
+        "worker_identity": {
+          "model_stated": "Opus 5 (1M context) — exact model ID claude-opus-5[1m], as stated in my own system prompt",
+          "effort_stated": null
+        },
+        "commands": [
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-python/releases/latest",
+            "status": "exit 0",
+            "note": "html_url .../releases/tag/v0.2.156; author github-actions[bot]"
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-typescript/releases/latest",
+            "status": "exit 0",
+            "note": "html_url .../releases/tag/v0.3.278; author ashwin-ant"
+          },
+          {
+            "command": "curl -s https://pypi.org/pypi/claude-agent-sdk/json | jq -r .info.version",
+            "status": "exit 0",
+            "note": "0.2.157"
+          },
+          {
+            "command": "npm view @anthropic-ai/claude-agent-sdk version",
+            "status": "exit 0",
+            "note": "0.3.278"
+          },
+          {
+            "command": "claude --version",
+            "status": "exit 0",
+            "note": "2.1.278 (Claude Code)"
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-python/git/ref/tags/v0.2.156 --jq .object",
+            "status": "exit 0",
+            "note": "annotated tag object sha 39645355de8518711c60304c8370b2838d338191, type tag"
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-python/git/ref/tags/v0.2.157 --jq .object",
+            "status": "exit 1 (FAILED)",
+            "note": "verbatim: {\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/git/refs#get-a-reference\",\"status\":\"404\"}gh: Not Found (HTTP 404)"
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-typescript/git/ref/tags/v0.3.278 --jq .object",
+            "status": "exit 0",
+            "note": "commit sha 18661edde4498f76ff5599b17ee4ca81d98409b2, type commit"
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-python/tags --jq '.[0:5][] | \"\\(.name) \\(.commit.sha)\"'",
+            "status": "exit 0",
+            "note": "v0.2.156 e9af0778559032afca55ac200608c24f18af86ca (top tag; no v0.2.157)"
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-typescript/tags --jq '.[0:5][] | \"\\(.name) \\(.commit.sha)\"'",
+            "status": "exit 0",
+            "note": "v0.3.278 18661edde4498f76ff5599b17ee4ca81d98409b2"
+          },
+          {
+            "command": "claude --help",
+            "status": "exit 0",
+            "note": "full flag list read (two passes: head -120, sed -n '120,260p')"
+          },
+          {
+            "command": "claude agents --help",
+            "status": "exit 0",
+            "note": "background agents management: --json, --effort, --model, --mcp-config, --add-dir, --cwd"
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-python/contents/src/claude_agent_sdk/types.py?ref=e9af0778559032afca55ac200608c24f18af86ca --jq .content | base64 -d",
+            "status": "exit 0",
+            "note": "89729 bytes; grepped setting_sources, effort, can_use_tool, hooks, resume, SdkMcpServer, workflow"
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-python/git/trees/e9af0778559032afca55ac200608c24f18af86ca",
+            "status": "exit 0",
+            "note": "top-level: src/, tests/, examples/, e2e-tests/, scripts/, pyproject.toml, CLAUDE.md, CHANGELOG.md"
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-python/contents/examples?ref=e9af077...",
+            "status": "exit 0",
+            "note": "quick_start.py, setting_sources.py, hooks.py, tool_permission_callback.py, mcp_calculator.py, agents.py, streaming_mode.py, plugins/, session_stores/ ..."
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-python/contents/tests?ref=e9af077...",
+            "status": "exit 0",
+            "note": "30 test files incl. test_client.py, test_query.py, test_sessions.py, test_sdk_mcp_integration.py"
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-python/contents/CLAUDE.md?ref=e9af077... | base64 -d | grep pytest",
+            "status": "exit 0",
+            "note": "documented dev commands: 'python -m pytest tests/' and 'python -m pytest tests/test_client.py'"
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-typescript/contents/sdk.d.ts?ref=18661ed... --jq .content | base64 -d",
+            "status": "exit 0 but EMPTY (0 bytes written)",
+            "note": "path does not exist at that ref; recorded as a failed lookup"
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-typescript/git/trees/18661ed...",
+            "status": "exit 0",
+            "note": "repo contains ONLY .claude/, .github/, CHANGELOG.md, LICENSE.md, README.md, examples/, scripts/ — no TypeScript SDK source is published in this repo at the tag"
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-typescript/contents/examples?ref=18661ed...",
+            "status": "exit 0",
+            "note": "only .gitignore and session-stores/ — no runnable quick-start example in-repo"
+          },
+          {
+            "command": "gh api repos/anthropics/claude-agent-sdk-typescript/contents/README.md?ref=18661ed... | grep -i 'ANTHROPIC_API_KEY|npx tsx|settingSources|npm run'",
+            "status": "exit 0, no matches",
+            "note": "TS README at the tag contains none of those strings"
+          },
+          {
+            "command": "WebFetch https://code.claude.com/docs/en/agent-sdk/overview",
+            "status": "ok",
+            "note": "capabilities table + claude.ai login restriction note"
+          },
+          {
+            "command": "WebFetch https://code.claude.com/docs/en/agent-sdk/python",
+            "status": "ok",
+            "note": "setting_sources default sentence"
+          },
+          {
+            "command": "WebFetch https://code.claude.com/docs/en/agent-sdk/typescript",
+            "status": "ok",
+            "note": "settingSources default column = 'All sources'"
+          },
+          {
+            "command": "WebFetch https://code.claude.com/docs/en/agent-sdk/quickstart",
+            "status": "ok",
+            "note": "ANTHROPIC_API_KEY + Bedrock/AWS/Vertex/Foundry env vars; claude.ai login note"
+          },
+          {
+            "command": "WebFetch https://code.claude.com/docs/en/agent-sdk/claude-code-features",
+            "status": "ok",
+            "note": "settingSources default equivalence, what it does not control, Agent teams = CLI feature"
+          },
+          {
+            "command": "WebFetch https://code.claude.com/docs/en/headless",
+            "status": "ok",
+            "note": "claude -p capabilities; '-p rejects --bg'; --bare does not use subscription login"
+          }
+        ],
+        "versions": {
+          "python": {
+            "registry_version": "0.2.157 (PyPI, claude-agent-sdk)",
+            "github_latest_release": "v0.2.156",
+            "tag_sha": "commit e9af0778559032afca55ac200608c24f18af86ca (annotated tag object 39645355de8518711c60304c8370b2838d338191)",
+            "url": "https://github.com/anthropics/claude-agent-sdk-python/tree/e9af0778559032afca55ac200608c24f18af86ca",
+            "inconsistency": "CONFIRMED AND STILL PRESENT (identical to the 2026-09-21 record): PyPI serves 0.2.157 while the newest GitHub release/tag is v0.2.156. `gh api .../git/ref/tags/v0.2.157` returns HTTP 404 Not Found, so there is no git tag or commit SHA behind the registry version. Any source pin must therefore be e9af0778559032afca55ac200608c24f18af86ca (= v0.2.156), which is NOT the artifact `pip install claude-agent-sdk` would fetch today."
+          },
+          "typescript": {
+            "registry_version": "0.3.278 (npm, @anthropic-ai/claude-agent-sdk)",
+            "github_latest_release": "v0.3.278",
+            "tag_sha": "18661edde4498f76ff5599b17ee4ca81d98409b2",
+            "url": "https://github.com/anthropics/claude-agent-sdk-typescript/tree/18661edde4498f76ff5599b17ee4ca81d98409b2",
+            "inconsistency": "Version labels agree (npm 0.3.278 = tag v0.3.278). A different inconsistency: the GitHub repo at that tag contains NO SDK source — the tree is only .claude/, .github/, CHANGELOG.md, LICENSE.md, README.md, examples/ (just .gitignore + session-stores/) and scripts/. TypeScript behaviour cannot be verified from repo source at the pin; only from published docs and the npm tarball. Also note the npm SDK minor/patch 0.3.278 tracks the installed CLI 2.1.278 patch number, but they are different products."
+          }
+        },
+        "settings_sources_default": {
+          "python_default": "setting_sources: list[SettingSource] | None = None — when None, user + project + local are ALL loaded (matches CLI defaults), including CLAUDE.md, ~/.claude settings, project skills, agents/subagents, commands and filesystem hooks.",
+          "typescript_default": "options.settingSources: SettingSource[] — documented Default column reads \"All sources\"; omitting it equals [\"user\", \"project\", \"local\"].",
+          "source_url": "https://github.com/anthropics/claude-agent-sdk-python/blob/e9af0778559032afca55ac200608c24f18af86ca/src/claude_agent_sdk/types.py#L2243-L2253 ; https://code.claude.com/docs/en/agent-sdk/claude-code-features ; https://code.claude.com/docs/en/agent-sdk/python#claudeagentoptions ; https://code.claude.com/docs/en/agent-sdk/typescript",
+          "implication": "THIS OVERTURNS THE OLD REASON FOR CAUTION, IN BOTH DIRECTIONS. The historical 0.1.x behaviour (SDK isolated by default, CLAUDE.md/~/.claude NOT loaded unless opted in) no longer holds at these pins: the SDK now defaults to CLI-equivalent loading, so an SDK host in <adopted-project> would pick up AGENTS.md/CLAUDE.md, ~/.claude settings, project skills and filesystem hooks without extra configuration. (1) The migration friction that previously argued against the SDK is gone. (2) But the differentiator is also gone: 'same context as the CLI' is now parity, not an SDK advantage — the SDK's remaining unique value is isolation-on-demand (settingSources: []) and in-process callbacks, not context loading. (3) Caveat from the same page: settingSources does NOT control managed policy, ~/.claude.json, auto memory at ~/.claude/projects/<project>/memory/, claude.ai MCP connectors, or sandbox credential deny/mask entries — so settingSources: [] is explicitly documented as insufficient for multi-tenant isolation."
+        },
+        "auth_limitations": [
+          {
+            "claim": "The SDK's documented authentication path is an API key; subscription/claude.ai login is not the supported path and offering it is restricted.",
+            "source_url": "https://code.claude.com/docs/en/agent-sdk/overview"
+          },
+          {
+            "claim": "Quickstart repeats the restriction and enumerates the supported credentials: ANTHROPIC_API_KEY or third-party providers.",
+            "source_url": "https://code.claude.com/docs/en/agent-sdk/quickstart"
+          },
+          {
+            "claim": "The restriction is scoped to 'third party developers ... for their products'; personal reuse of an existing native OAuth login by an SDK process is NOT explicitly granted or explicitly forbidden in these docs — it is undocumented. The only sentence that touches OAuth reuse indirectly is the SDK-adjacent claude.ai MCP connector row, which shows a session CAN authenticate with a claude.ai login.",
+            "source_url": "https://code.claude.com/docs/en/agent-sdk/claude-code-features"
+          },
+          {
+            "claim": "For the native CLI the subscription-login behaviour IS documented: a normal (non-bare) `claude -p` run uses the subscription login; only `--bare` forces API-key auth. This is a concrete, documented advantage of the installed native CLI path for a user who signs in natively.",
+            "source_url": "https://code.claude.com/docs/en/headless"
+          },
+          {
+            "claim": "The installed CLI's own help states the same bare-mode auth rule, independently confirming the CLI (not bare) reads native OAuth.",
+            "source_url": "local read-only command `claude --help` on Claude Code 2.1.278 (exit 0)"
+          }
+        ],
+        "capability_matrix": [
+          {
+            "capability": "Structured JSON / newline-delimited stream output",
+            "native_cli": "YES — --output-format text|json|stream-json, plus --json-schema for schema-validated structured_output, --include-partial-messages, --include-hook-events, --forward-subagent-text",
+            "sdk": "YES — typed message objects instead of parsing NDJSON",
+            "classification": "parity",
+            "source_url": "https://code.claude.com/docs/en/headless (Get structured output / Stream responses); `claude --help` exit 0"
+          },
+          {
+            "capability": "Session resume / continue / fork",
+            "native_cli": "YES — -c/--continue, -r/--resume <id|transcript path>, --fork-session, --session-id <uuid>; session lookup is machine-wide since v2.1.223",
+            "sdk": "YES — resume, fork_session, resume_session_at, resume_drops_turn (types.py L2028-2211)",
+            "classification": "parity",
+            "source_url": "https://github.com/anthropics/claude-agent-sdk-python/blob/e9af0778559032afca55ac200608c24f18af86ca/src/claude_agent_sdk/types.py ; https://code.claude.com/docs/en/headless"
+          },
+          {
+            "capability": "Custom / appended system prompt",
+            "native_cli": "YES — --system-prompt, --append-system-prompt, --append-system-prompt-file, --system-prompt-snapshot, --exclude-dynamic-system-prompt-sections",
+            "sdk": "YES — system_prompt option",
+            "classification": "parity",
+            "source_url": "`claude --help` exit 0 ; https://code.claude.com/docs/en/headless"
+          },
+          {
+            "capability": "Tool allow / deny / restrict",
+            "native_cli": "YES — --allowedTools, --disallowedTools, --tools, --permission-mode, --permission-prompts none, --restricted",
+            "sdk": "YES — allowed_tools, disallowed_tools, permission_mode",
+            "classification": "parity",
+            "source_url": "`claude --help` exit 0 ; https://code.claude.com/docs/en/headless (Auto-approve tools)"
+          },
+          {
+            "capability": "MCP configuration (external servers)",
+            "native_cli": "YES — --mcp-config, --strict-mcp-config; system/init reports mcp_servers and mcp_server_errors for CI gating",
+            "sdk": "YES — mcpServers option",
+            "classification": "parity",
+            "source_url": "https://code.claude.com/docs/en/headless (Fail CI when a plugin or MCP server doesn't load)"
+          },
+          {
+            "capability": "Hooks (filesystem, shell/http/mcp_tool/prompt/agent types)",
+            "native_cli": "YES — settings.json hooks run in -p sessions; --include-hook-events streams hook lifecycle",
+            "sdk": "YES — filesystem hooks load via settingSources AND programmatic in-process callbacks",
+            "classification": "parity",
+            "source_url": "https://code.claude.com/docs/en/agent-sdk/claude-code-features (Hooks)"
+          },
+          {
+            "capability": "Subagents",
+            "native_cli": "YES — .claude/agents/, --agent, --agents <json>; nested subagent messages stream with parent_tool_use_id",
+            "sdk": "YES — agents: dict[str, AgentDefinition] (types.py L2237) + allowedTools ['Agent']",
+            "classification": "parity",
+            "source_url": "https://code.claude.com/docs/en/agent-sdk/claude-code-features (Choose the right feature table)"
+          },
+          {
+            "capability": "Effort / model selection",
+            "native_cli": "YES — --effort low|medium|high|xhigh|max, --model, --fallback-model; `claude agents --effort/--model` sets defaults for dispatched background sessions",
+            "sdk": "YES — effort: EffortLevel (types.py L2319-2331, same five literals), model option",
+            "classification": "parity",
+            "source_url": "https://github.com/anthropics/claude-agent-sdk-python/blob/e9af0778559032afca55ac200608c24f18af86ca/src/claude_agent_sdk/types.py#L2319 ; `claude --help` exit 0"
+          },
+          {
+            "capability": "Background / detached worker sessions (--bg, claude agents, attach/logs/stop/rm)",
+            "native_cli": "YES — --bg starts detached and prints an id for `claude attach|logs|stop|rm`; `claude agents --json` lists active sessions for scripting without a TTY. NOTE: --bg is rejected in combination with -p.",
+            "sdk": "NO equivalent detached-session lifecycle; the SDK runs the agent in your own process and you own supervision. `claude -p` does stay open until a background subagent/workflow completes (10-min idle ceiling, CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS).",
+            "classification": "foundation-gap",
+            "source_url": "https://code.claude.com/docs/en/headless (Basic usage: \"Claude Code rejects `--bg`\"; Background tasks at exit); `claude --help`, `claude agents --help` exit 0"
+          },
+          {
+            "capability": "Workflow tool / dynamic workflow orchestration (the project's ultracode profile)",
+            "native_cli": "YES — installed CLI 2.1.278 with workflows enabled and .claude/workflows/ graphs; docs describe dynamic workflows as the Claude Code team's orchestration approach",
+            "sdk": "NOT EXPOSED as an SDK option — grep for 'workflow' in the pinned Python types.py returns ZERO matches. The -p docs mention 'background subagent or workflow' only as CLI runtime behaviour.",
+            "classification": "foundation-gap",
+            "source_url": "grep -n -i workflow on types.py @ e9af0778559032afca55ac200608c24f18af86ca = no matches (exit 0, empty) ; https://code.claude.com/docs/en/headless (Background tasks at exit)"
+          },
+          {
+            "capability": "Agent teams (team lead + teammates, shared task list, inter-agent messaging)",
+            "native_cli": "YES — CLI feature",
+            "sdk": "NO — explicitly documented as not configurable via SDK options",
+            "classification": "foundation-gap",
+            "source_url": "https://code.claude.com/docs/en/agent-sdk/claude-code-features — \"Coordinate multiple Claude Code instances with shared task lists and direct inter-agent messaging | Agent teams | Not directly configured via SDK options. Agent teams are a CLI feature where one session acts as the team lead, coordinating work across independent teammates\""
+          },
+          {
+            "capability": "In-process (SDK) MCP servers — custom tools running inside the host process, no subprocess/stdio",
+            "native_cli": "NO — external MCP servers only, via --mcp-config",
+            "sdk": "YES — McpSdkServerConfig, \"SDK (in-process) MCP server configuration ... Usually produced by ``create_sdk_mcp_server()``\" (types.py L653-655)",
+            "classification": "application-feature",
+            "source_url": "https://github.com/anthropics/claude-agent-sdk-python/blob/e9af0778559032afca55ac200608c24f18af86ca/src/claude_agent_sdk/types.py#L653"
+          },
+          {
+            "capability": "Programmatic permission callback (canUseTool / can_use_tool) answering prompts in host code",
+            "native_cli": "PARTIAL — --permission-prompt-tool (an MCP tool) or --permission-prompts host|none; the CLI needs an out-of-process host",
+            "sdk": "YES — can_use_tool callback in-process, with built-in shadowing warnings when permission_mode/allowed_tools pre-approve calls (types.py L1827-1908)",
+            "classification": "application-feature",
+            "source_url": "https://github.com/anthropics/claude-agent-sdk-python/blob/e9af0778559032afca55ac200608c24f18af86ca/src/claude_agent_sdk/types.py#L1827 ; https://code.claude.com/docs/en/headless (Turn off permission prompts)"
+          },
+          {
+            "capability": "Typed programmatic hook callbacks returning structured decisions in-process",
+            "native_cli": "NO — filesystem hooks are shell/http/mcp_tool/prompt/agent, out-of-process",
+            "sdk": "YES — hooks: dict[HookEvent, list[HookMatcher]] with async callbacks; TypeScript additionally supports SessionStart, SessionEnd, TeammateIdle, TaskCompleted events",
+            "classification": "application-feature",
+            "source_url": "https://code.claude.com/docs/en/agent-sdk/claude-code-features (Hooks; When to use which hook type)"
+          },
+          {
+            "capability": "Pluggable session persistence (custom SessionStore: Redis/S3/Postgres) instead of local ~/.claude JSONL transcripts",
+            "native_cli": "NO — transcripts are local .jsonl files; --no-session-persistence only disables them",
+            "sdk": "YES — SessionStore protocol; repo ships tests/test_example_redis_session_store.py, test_example_s3_session_store.py, test_example_postgres_session_store.py and examples/session_stores/; TS repo's only examples dir is session-stores/",
+            "classification": "application-feature",
+            "source_url": "https://github.com/anthropics/claude-agent-sdk-python/tree/e9af0778559032afca55ac200608c24f18af86ca/examples/session_stores"
+          },
+          {
+            "capability": "Deterministic isolation from host configuration (ignore ~/.claude, CLAUDE.md, project hooks)",
+            "native_cli": "YES — --bare, --safe-mode, --restricted, --setting-sources <user,project,local>, --strict-mcp-config. Docs: \"--bare is the recommended mode for scripted and SDK calls, and will become the default for -p in a future release.\"",
+            "sdk": "YES — settingSources: [] (but documented as insufficient alone: managed policy, ~/.claude.json, auto memory and claude.ai connectors still load)",
+            "classification": "parity",
+            "source_url": "https://code.claude.com/docs/en/headless (Start faster with bare mode) ; https://code.claude.com/docs/en/agent-sdk/claude-code-features (What settingSources does not control)"
+          },
+          {
+            "capability": "Native subscription/OAuth authentication without an API key",
+            "native_cli": "YES (documented) — non-bare -p uses the subscription login; OAuth/keychain read unless --bare",
+            "sdk": "UNDOCUMENTED/RESTRICTED — docs prescribe ANTHROPIC_API_KEY or Bedrock/AWS/Vertex/Foundry; claude.ai login for third-party products is disallowed without prior approval",
+            "classification": "foundation-gap",
+            "source_url": "https://code.claude.com/docs/en/agent-sdk/quickstart ; https://code.claude.com/docs/en/headless"
+          },
+          {
+            "capability": "Cost ceiling / spend control per invocation",
+            "native_cli": "YES — --max-budget-usd (only with --print); --output-format json returns total_cost_usd and per-model breakdown",
+            "sdk": "YES — examples/max_budget_usd.py at the pinned SHA",
+            "classification": "parity",
+            "source_url": "`claude --help` exit 0 ; https://github.com/anthropics/claude-agent-sdk-python/blob/e9af0778559032afca55ac200608c24f18af86ca/examples/max_budget_usd.py"
+          },
+          {
+            "capability": "Language reach (driving the agent loop from a non-Python/TS host)",
+            "native_cli": "YES — any language, subprocess",
+            "sdk": "NO — Python and TypeScript only; docs say \"The SDK is available as a library for Python and TypeScript only. To drive the same agent loop from another language, run the CLI as a subprocess with the -p flag and --output-format json.\"",
+            "classification": "parity",
+            "source_url": "https://code.claude.com/docs/en/agent-sdk/overview"
+          }
+        ],
+        "qualification_handle": {
+          "path": "tests/test_client.py (and the sibling tests/ tree) in anthropics/claude-agent-sdk-python at commit e9af0778559032afca55ac200608c24f18af86ca; secondary handle examples/quick_start.py at the same commit",
+          "url": "https://github.com/anthropics/claude-agent-sdk-python/blob/e9af0778559032afca55ac200608c24f18af86ca/tests/test_client.py",
+          "command": "python -m pytest tests/test_client.py   (whole suite: python -m pytest tests/)",
+          "note": "PRIMARY HANDLE (no model/provider consumption, no invented harness): the command is verbatim from the repo's own CLAUDE.md at the pinned SHA — \"# Run all tests\\npython -m pytest tests/\\n\\n# Run specific test file\\npython -m pytest tests/test_client.py\". Same file also documents `python -m ruff check src/ tests/ scripts/ --fix`, `python -m ruff format src/ tests/ scripts/`, `python -m mypy src/ scripts/`. SECONDARY HANDLE for a real end-to-end check: examples/quick_start.py, described by the repo README as \"See [examples/quick_start.py](examples/quick_start.py) for a complete working example.\"; the published run command for a quickstart script is `uv run agent.py` (uv) or `python agent.py` (pip venv) per https://code.claude.com/docs/en/agent-sdk/quickstart — that one DOES consume model calls and needs ANTHROPIC_API_KEY, so it is a paid-provider check, not a free one. Avoid tests/test_example_*_live.py (require live Redis/S3/Postgres). NOT RUN in this task, per the read-only constraint. No equivalent TypeScript handle exists: the TS repo at v0.3.278 ships no source and its examples/ dir contains only .gitignore and session-stores/."
+        },
+        "decision": "conditional",
+        "trigger_condition": "Adopt the official Claude Agent SDK ONLY when a concrete application (not the agent-lab foundation) needs one of the three things `claude -p` provably cannot do in-process, and the need is demonstrated by a failing native attempt: (a) custom tools that must execute inside the host process with shared in-memory state — e.g. a NautilusTrader engine handle, an open IBKR/Alpaca session or a live position book exposed as MCP tools via create_sdk_mcp_server(), where marshalling through an external MCP subprocess is the blocker; (b) a synchronous programmatic permission gate (can_use_tool) that must approve or deny a trade/order tool call using live in-process risk state, where --permission-prompt-tool's out-of-process MCP round-trip is unacceptable; or (c) durable session persistence outside the local filesystem (SessionStore to Redis/S3/Postgres) because the deployment target has no stable ~/.claude. Additional hard gate: the adopting component must have its own ANTHROPIC_API_KEY or Bedrock/Vertex/Foundry credential, since the SDK's documented auth is API-key-based and this PC signs in natively by subscription OAuth. If that credential is not authorized, adoption is blocked regardless of (a)-(c).",
+        "overturning_comparison": "This decision is overturned by any ONE of: (1) Anthropic documenting supported subscription/OAuth authentication for the Agent SDK (a primary-doc sentence replacing the current \\\"Use the API key authentication methods\\\" note at https://code.claude.com/docs/en/agent-sdk/quickstart) — that removes the auth gap and makes the SDK a drop-in for this natively-signed-in PC; (2) the SDK exposing the Workflow tool / dynamic workflow orchestration or Agent teams as SDK options (i.e. `grep -i workflow` on a future src/claude_agent_sdk/types.py returning matches, or the claude-code-features table dropping \\\"Agent teams ... Not directly configured via SDK options\\\") — that would close the two orchestration foundation gaps; (3) a measured comparison on this machine showing a `claude -p --output-format stream-json` coordinator with bounded `--bg` workers fails or is materially slower/less reliable than an equivalent SDK host for the same agent-lab coordinator+workers+review task, with both runs' wall-clock, token usage and failure counts recorded; (4) the CLI removing or degrading a capability the SDK retains (e.g. --bg/`claude agents` lifecycle, or --permission-prompt-tool). Conversely, evidence that would HARDEN the retain-native position: the documented plan that \\\"--bare is the recommended mode for scripted and SDK calls, and will become the default for -p in a future release\\\" landing, giving the CLI the SDK's isolation story by default.",
+        "reason": "The SDK does NOT close a foundation gap for agent-lab; it is at most a conditional application dependency, and the foundation stays on the installed native CLI 2.1.278. Three independent lines of evidence: (1) CAPABILITY PARITY — every foundation primitive this harness needs is already in `claude --help` at 2.1.278 and documented at /docs/en/headless: structured JSON and stream-json (plus --json-schema structured_output), session resume/continue/fork by id or transcript path, --system-prompt/--append-system-prompt, --allowedTools/--disallowedTools/--tools/--permission-mode/--permission-prompts, --mcp-config/--strict-mcp-config, filesystem hooks with --include-hook-events, subagents via --agent/--agents with parent_tool_use_id stream attribution and --forward-subagent-text, --effort (the same five literals the SDK's EffortLevel defines: low/medium/high/xhigh/max), --model/--fallback-model, --max-budget-usd, and background worker lifecycle via --bg + `claude attach|logs|stop|rm` + `claude agents --json`. (2) THE CLI IS STRICTLY AHEAD ON ORCHESTRATION — `grep -i workflow` over the pinned Python types.py returns zero matches, and the primary docs state Agent teams are \\\"a CLI feature ... Not directly configured via SDK options\\\". The Workflow/ultracode orchestration and team coordination this project already relies on are CLI-only; moving the foundation to the SDK would LOSE capability. Likewise detached `--bg` sessions have no SDK equivalent (and -p explicitly rejects --bg, so the CLI's own detached path is the `claude --bg` + attach/logs lifecycle, not `-p --bg`). (3) AUTH — the SDK's documented credentials are ANTHROPIC_API_KEY or Bedrock/AWS/Vertex/Foundry, and claude.ai login \\\"for their products\\\" is disallowed without prior approval; this user signs in natively by subscription OAuth, which the CLI documents as working for non-bare `-p`. Adopting the SDK for foundation work would convert a working subscription path into a paid-API dependency for no capability gain. WHAT GENUINELY CHANGED SINCE THE 2026-09-21 RECORD: setting_sources/settingSources now defaults to loading user+project+local (CLAUDE.md, ~/.claude, project skills, agents, commands, filesystem hooks) — CLI-equivalent. The old \\\"SDK isolates by default\\\" objection is dead, but so is any claim that the SDK offers better project-context loading; it is now parity. The SDK's real, narrow advantages are all in-process application concerns: in-process MCP servers (McpSdkServerConfig / create_sdk_mcp_server), typed hook callbacks, can_use_tool permission callbacks, and pluggable SessionStore backends — relevant to a future NautilusTrader/broker application host, not to coordinator+workers+review+memory+RAG. PIN HYGIENE: the Python registry/release mismatch from the prior record persists unchanged (PyPI 0.2.157, newest tag v0.2.156, and `git/ref/tags/v0.2.157` 404s), so any future adoption must pin commit e9af0778559032afca55ac200608c24f18af86ca and accept that it is one patch behind the installable wheel.",
+        "limitations": [
+          "NOTHING WAS EXECUTED: per the read-only constraint I installed no package, ran no SDK example or test, and made no provider/model call. Every SDK behavioural claim is from primary docs or from source read at the pinned commit, not from observed execution. The qualification handle (`python -m pytest tests/test_client.py`) is UNRUN.",
+          "TypeScript claims are DOC-ONLY. The anthropics/claude-agent-sdk-typescript repo at v0.3.278 (18661edde4498f76ff5599b17ee4ca81d98409b2) ships no SDK source — the tree is .claude/, .github/, CHANGELOG.md, LICENSE.md, README.md, examples/ (only .gitignore + session-stores/), scripts/. `gh api .../contents/sdk.d.ts?ref=18661ed...` returned an empty body. The TS settingSources default 'All sources' is verified only from https://code.claude.com/docs/en/agent-sdk/typescript, NOT from source at the pin. I did not inspect the npm tarball.",
+          "The Python source I read is types.py ONLY (89729 bytes, one file). I did not read client.py, query.py, transport or the subprocess argv construction, so I did not verify from source how setting_sources / effort / can_use_tool are actually passed to the CLI binary, nor whether the SDK ever passes --bare.",
+          "PERSONAL-USE OAUTH THROUGH THE SDK IS UNRESOLVED, NOT PROVEN IMPOSSIBLE. The quoted restriction is scoped to 'third party developers ... for their products'. Because both SDKs bundle/spawn a Claude Code binary and non-bare CLI reads OAuth, a local SDK process might in practice inherit the native login — but no primary doc states this, and I did not test it or read any credential file. Treat the auth row as 'undocumented/restricted', not as a measured failure.",
+          "The ~/.claude/settings.json and <adopted-project>/.claude/settings.json contents were NOT read (read-only-of-credentials caution plus scope); the project profile facts (ultracode, workflows enabled, CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS=3) are taken from the project instructions in context, which are repository text, i.e. evidence of intent rather than of runtime state.",
+          "The prior-record figures (Python registry 0.2.157 / TS 0.3.278 / GitHub Python 0.2.156) were re-derived independently today and matched exactly — meaning either the record is accurate or no release moved in the interval; I cannot distinguish these, and no new Python release has been cut since.",
+          "I did not fetch /docs/en/cli-reference, /docs/en/agent-sdk/mcp, /docs/en/agent-sdk/permissions, /docs/en/agent-sdk/hosting, /docs/en/agent-sdk/migration-guide or /docs/en/agent-teams. The migration page named in the task brief was not read; settingSources defaults were instead taken from the more specific claude-code-features, python and typescript reference pages plus SDK source.",
+          "`claude -p --help` prints the same output as `claude --help` (no -p-specific help exists); the flag/`-p` combination rules are therefore from the headless doc, not from CLI help. In particular '`-p` rejects --bg' is a doc claim I did not reproduce by running it.",
+          "No independent review of this analysis was obtained (subagent spawning was prohibited by the task's hard rules)."
+        ]
+      }
+    }
+  ],
+  "worker_observations": [
+    {
+      "transcript": {
+        "path": "<native-claude-home>/projects/<adopted-project-session>/<native-identifier-1>/subagents/workflows/wf_99353af6-950/agent-a2e70d6ea727807c4.jsonl",
+        "bytes": 319531,
+        "sha256": "7008efeaf962d17931cda1583f77b6ec84b23649ad10885a71c2e0c08402802a"
+      },
+      "metadata": {
+        "agentType": "workflow-subagent",
+        "description": "A:community-drift",
+        "workflowPhase": "Community drift",
+        "spawnDepth": 1,
+        "requestShape": "foreground",
+        "requestNonInteractive": true,
+        "model": "sonnet"
+      },
+      "returned_models": [
+        "claude-sonnet-5"
+      ],
+      "unique_response_count": 11,
+      "deduplicated_usage": {
+        "input_tokens": 22,
+        "output_tokens": 7890,
+        "cache_read_input_tokens": 421083,
+        "cache_creation_input_tokens": 51869
+      },
+      "tool_calls": {
+        "Bash": 10,
+        "StructuredOutput": 1
+      },
+      "failed_tool_results": [],
+      "native_recorded_efforts": [
+        "medium"
+      ],
+      "assistant_record_count": 20
+    },
+    {
+      "transcript": {
+        "path": "<native-claude-home>/projects/<adopted-project-session>/<native-identifier-1>/subagents/workflows/wf_99353af6-950/agent-a425a149bd22a1ab0.jsonl",
+        "bytes": 539627,
+        "sha256": "de0e0a0a65732e41c928e14583bae4ea6d684fc7eb9f6c8c6e525bc19c86faec"
+      },
+      "metadata": {
+        "agentType": "workflow-subagent",
+        "description": "B:sdk-applicability",
+        "workflowPhase": "SDK applicability",
+        "spawnDepth": 1,
+        "requestShape": "foreground",
+        "requestNonInteractive": true,
+        "model": "opus"
+      },
+      "returned_models": [
+        "claude-opus-5"
+      ],
+      "unique_response_count": 12,
+      "deduplicated_usage": {
+        "input_tokens": 24,
+        "output_tokens": 22766,
+        "cache_read_input_tokens": 605565,
+        "cache_creation_input_tokens": 79695
+      },
+      "tool_calls": {
+        "Bash": 14,
+        "ToolSearch": 1,
+        "WebFetch": 6,
+        "StructuredOutput": 1
+      },
+      "failed_tool_results": [],
+      "native_recorded_efforts": [
+        "high"
+      ],
+      "assistant_record_count": 34
+    }
+  ],
+  "retained_sources": [
+    {
+      "path": "<native-claude-home>/projects/<adopted-project-session>/<native-identifier-1>/subagents/workflows/wf_99353af6-950/journal.jsonl",
+      "bytes": 43618,
+      "sha256": "822a6aa365e080f1c81069c5e9145d947a832c4897d32ab9f582c8d61f637953"
+    },
+    {
+      "path": "<native-claude-home>/projects/<adopted-project-session>/<native-identifier-1>/workflows/scripts/foundation-convergence-recheck-wf_99353af6-950.js",
+      "bytes": 13108,
+      "sha256": "8f260fad02f6087dc9106c1c780fe4bf06e0a3d8739bdad6a4dfab3381028c72"
+    }
+  ],
+  "accounting": {
+    "last_cumulative_model_usage_tokens": 2078181,
+    "native_result_count": 2,
+    "counting_rule": "Count the last cumulative modelUsage once; do not add earlier result events, overlapping usage/worker views or thinking tokens.",
+    "scope": "Native Claude invocation, its two research workers and reported auxiliary model; excludes Codex coordinator, independent reviewers and publication. API-equivalent cost is not subscription billing.",
+    "session_saved_tokens": null,
+    "lifetime_saved_tokens": null,
+    "independent_worker_reconciliation": {
+      "sonnet": "matched",
+      "opus": {
+        "input_and_cache": "matched",
+        "persisted_output_tokens": 22766,
+        "cumulative_output_tokens": 23081,
+        "difference_tokens": 315,
+        "fully_reconciled": false
+      }
+    }
+  },
+  "limits": [
+    "Source research is not SDK installation or SDK behavioral E2E.",
+    "Worker source errors and final narrative overclaims are retained and adjudicated separately.",
+    "Initial coordinator source discovery returned oversized generated HTML; native clipping preserved it privately. No optimal efficiency claim.",
+    "The canonical checkout advanced concurrently; requested base was inspected through git show. No repository edits were authorized to Claude."
+  ],
+  "publication": {
+    "sanitization": "Host directory prefixes replaced; worker quotation fields omitted. Original streams/journals/transcripts remain private with retained hashes. Full prompt snapshots and inherited instructions are not published.",
+    "interpretation": "Native worker narratives are unverified claims until adjudicated in review-adjudication.md. Source research used model inference; no SDK example/test/provider experiment ran."
+  }
+}

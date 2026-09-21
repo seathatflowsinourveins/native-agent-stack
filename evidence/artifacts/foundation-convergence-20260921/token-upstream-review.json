@@ -1,0 +1,332 @@
+{
+  "schema_version": 1,
+  "id": "token-upstream-review-20260921",
+  "scope": "Bounded Context Mode, RTK, Headroom, TOON and native Codex CLI alignment",
+  "canonical_repository": "<canonical-repository>",
+  "base_commit_supplied_by_coordinator": "8695299",
+  "evidence_kind": "original_native_command_receipts_and_separate_derived_findings",
+  "capture_method": "Read-only native subprocesses; stdout and stderr captured separately without RTK filtering. No authentication stores or secrets read or emitted.",
+  "commands": [
+    {
+      "id": "codex-version",
+      "argv": [
+        "codex",
+        "--version"
+      ],
+      "started_at_utc": "2026-09-21T15:46:09.673622+00:00",
+      "finished_at_utc": "2026-09-21T15:46:09.698068+00:00",
+      "exit_code": 0,
+      "stdout": "codex-cli 0.155.1\n",
+      "stderr": ""
+    },
+    {
+      "id": "rtk-version",
+      "argv": [
+        "rtk",
+        "--version"
+      ],
+      "started_at_utc": "2026-09-21T15:46:09.673871+00:00",
+      "finished_at_utc": "2026-09-21T15:46:09.675859+00:00",
+      "exit_code": 0,
+      "stdout": "rtk 0.49.0\n",
+      "stderr": ""
+    },
+    {
+      "id": "headroom-version",
+      "argv": [
+        "headroom",
+        "--version"
+      ],
+      "started_at_utc": "2026-09-21T15:46:09.674583+00:00",
+      "finished_at_utc": "2026-09-21T15:46:09.873116+00:00",
+      "exit_code": 0,
+      "stdout": "headroom, version 0.37.0\n",
+      "stderr": ""
+    },
+    {
+      "id": "toon-version",
+      "argv": [
+        "toon",
+        "--version"
+      ],
+      "started_at_utc": "2026-09-21T15:46:09.674928+00:00",
+      "finished_at_utc": "2026-09-21T15:46:09.707899+00:00",
+      "exit_code": 0,
+      "stdout": "4.1.1\n",
+      "stderr": ""
+    },
+    {
+      "id": "context-mode-installed",
+      "argv": [
+        "python3",
+        "-c",
+        "import json; from pathlib import Path; roots=['<user-home>/.codex','<native-claude-home>','<desktop-codex-home>']; print(json.dumps({r:json.loads((Path(r)/'plugins/cache/context-mode/context-mode/1.0.169/package.json').read_text())['version'] for r in roots}))"
+      ],
+      "started_at_utc": "2026-09-21T15:46:09.675331+00:00",
+      "finished_at_utc": "2026-09-21T15:46:09.698588+00:00",
+      "exit_code": 0,
+      "stdout": "{\"<user-home>/.codex\": \"1.0.169\", \"<native-claude-home>\": \"1.0.169\", \"<desktop-codex-home>\": \"1.0.169\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "openai-codex-latest",
+      "argv": [
+        "gh",
+        "api",
+        "repos/openai/codex/releases/latest",
+        "--jq",
+        "{tag_name,published_at,html_url,target_commitish,prerelease,selected_note_lines:(.body | split(\"\\n\") | map(select(test(\"reasoning summar|retrieval|kept-out|Task sub-agent|recall|stderr|newline|byte-order|sidecar|tool_search|RTK|rtk|lossy|garbling\";\"i\"))) | .[:6])} | @json"
+      ],
+      "started_at_utc": "2026-09-21T15:46:09.675873+00:00",
+      "finished_at_utc": "2026-09-21T15:46:10.378096+00:00",
+      "exit_code": 0,
+      "stdout": "{\"html_url\":\"https://github.com/openai/codex/releases/tag/rust-v0.155.1\",\"prerelease\":false,\"published_at\":\"2026-09-18T20:03:04Z\",\"selected_note_lines\":[\"- New local TUI sessions now leave reasoning summaries disabled by default, fixing request rejection by providers that do not support them. Explicit reasoning-summary settings remain respected. (#46467)\",\"- #46467 Restore none as the TUI reasoning summary default (@celia-oai)\"],\"tag_name\":\"rust-v0.155.1\",\"target_commitish\":\"main\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "mksglu-context-mode-latest",
+      "argv": [
+        "gh",
+        "api",
+        "repos/mksglu/context-mode/releases/latest",
+        "--jq",
+        "{tag_name,published_at,html_url,target_commitish,prerelease,selected_note_lines:(.body | split(\"\\n\") | map(select(test(\"reasoning summar|retrieval|kept-out|Task sub-agent|recall|stderr|newline|byte-order|sidecar|tool_search|RTK|rtk|lossy|garbling\";\"i\"))) | .[:6])} | @json"
+      ],
+      "started_at_utc": "2026-09-21T15:46:09.698115+00:00",
+      "finished_at_utc": "2026-09-21T15:46:10.030889+00:00",
+      "exit_code": 0,
+      "stdout": "{\"html_url\":\"https://github.com/mksglu/context-mode/releases/tag/v1.0.169\",\"prerelease\":false,\"published_at\":\"2026-06-29T18:18:53Z\",\"selected_note_lines\":[\"- The kept-out ratio is reported to one decimal, so a genuine 99.9% window is no longer rounded up to a misleading 100%.\",\"- Retrieval access cost (`bytes_retrieved`) for `ctx_search` / `ctx_fetch_and_index` is now bridged from the MCP server to the forward pipe, so the platform can derive the with/without ratio. Previously the retrieval signal never reached the dashboard.\",\"- \\\"With context-mode\\\" counts retrieval-tool returns only, not sandbox compute output, so the ratio is honest.\",\"- A Task sub-agent's cumulative usage is no longer priced as a single turn, preventing inflated per-event cost from poisoning FinOps aggregates.\"],\"tag_name\":\"v1.0.169\",\"target_commitish\":\"main\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "rtk-ai-rtk-latest",
+      "argv": [
+        "gh",
+        "api",
+        "repos/rtk-ai/rtk/releases/latest",
+        "--jq",
+        "{tag_name,published_at,html_url,target_commitish,prerelease,selected_note_lines:(.body | split(\"\\n\") | map(select(test(\"reasoning summar|retrieval|kept-out|Task sub-agent|recall|stderr|newline|byte-order|sidecar|tool_search|RTK|rtk|lossy|garbling\";\"i\"))) | .[:6])} | @json"
+      ],
+      "started_at_utc": "2026-09-21T15:46:09.698612+00:00",
+      "finished_at_utc": "2026-09-21T15:46:10.009420+00:00",
+      "exit_code": 0,
+      "stdout": "{\"html_url\":\"https://github.com/rtk-ai/rtk/releases/tag/v0.49.0\",\"prerelease\":false,\"published_at\":\"2026-09-11T08:52:38Z\",\"selected_note_lines\":[\"## [0.49.0](https://github.com/rtk-ai/rtk/compare/v0.48.0...v0.49.0) (2026-09-11)\",\"* add rtk sqlfluff lint command with JSON filter (~75% token reduction) ([b605716](https://github.com/rtk-ai/rtk/commit/b605716a9b2eca115dde4cb20a30e377a5fb11aa))\",\"* add rtk sqlfluff lint with JSON filter (~75% token reduction) ([a2d9f01](https://github.com/rtk-ai/rtk/commit/a2d9f01577b23c645ea722c69f8dee8dc4fa52c4))\",\"* **recall:** content-addressed recall store with selectable [retriever] mode ([a533731](https://github.com/rtk-ai/rtk/commit/a53373191d295dc3118a4995e516510faf248338))\",\"* **recall:** name an over-recalled filter, and clear its counters on gain --reset ([ddc2182](https://github.com/rtk-ai/rtk/commit/ddc2182609baefbc6e910d52b4061ca610bb5280))\",\"* **recall:** SQLite recall system ([77ba5c9](https://github.com/rtk-ai/rtk/commit/77ba5c9acac3682bf441e8c2248779e24a8321f2))\"],\"tag_name\":\"v0.49.0\",\"target_commitish\":\"b1c0dc00649c50fbe8930f849c800d4d6ca12091\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "headroomlabs-ai-headroom-latest",
+      "argv": [
+        "gh",
+        "api",
+        "repos/headroomlabs-ai/headroom/releases/latest",
+        "--jq",
+        "{tag_name,published_at,html_url,target_commitish,prerelease,selected_note_lines:(.body | split(\"\\n\") | map(select(test(\"reasoning summar|retrieval|kept-out|Task sub-agent|recall|stderr|newline|byte-order|sidecar|tool_search|RTK|rtk|lossy|garbling\";\"i\"))) | .[:6])} | @json"
+      ],
+      "started_at_utc": "2026-09-21T15:46:09.707930+00:00",
+      "finished_at_utc": "2026-09-21T15:46:10.118633+00:00",
+      "exit_code": 0,
+      "stdout": "{\"html_url\":\"https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0\",\"prerelease\":false,\"published_at\":\"2026-08-27T21:18:26Z\",\"selected_note_lines\":[\"* **compress:** session-aware /v1/compress (sidecar mode) + /v1/usage relay ([#3270](https://github.com/headroomlabs-ai/headroom/issues/3270)) ([4fa8802](https://github.com/headroomlabs-ai/headroom/commit/4fa88026d9ff64092feaa750789a28be3ed0ace8))\",\"* **proxy:** unify proxy and sidecar compression on one session engine ([#3271](https://github.com/headroomlabs-ai/headroom/issues/3271)) ([d12ea50](https://github.com/headroomlabs-ai/headroom/commit/d12ea501222b92f371b5427595c14ec2466a3f39))\",\"* **proxy:** protect file reads from lossy compression on the Responses API path (Copilot view + HEADROOM_PROTECT_READS) ([#3238](https://github.com/headroomlabs-ai/headroom/issues/3238)) ([4408e88](https://github.com/headroomlabs-ai/headroom/commit/4408e881064741a5113be69d631f336ce92631f5))\",\"* **transforms:** stop compression garbling mixed subagent output ([#3286](https://github.com/headroomlabs-ai/headroom/issues/3286)) ([8884d87](https://github.com/headroomlabs-ai/headroom/commit/8884d8737802e61b1c9d8dfe6351f0c435eb42ae))\"],\"tag_name\":\"v0.37.0\",\"target_commitish\":\"32d7ca4577d599b8a5f811ada74cf31504302c9d\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "toon-format-toon-latest",
+      "argv": [
+        "gh",
+        "api",
+        "repos/toon-format/toon/releases/latest",
+        "--jq",
+        "{tag_name,published_at,html_url,target_commitish,prerelease,selected_note_lines:(.body | split(\"\\n\") | map(select(test(\"reasoning summar|retrieval|kept-out|Task sub-agent|recall|stderr|newline|byte-order|sidecar|tool_search|RTK|rtk|lossy|garbling\";\"i\"))) | .[:6])} | @json"
+      ],
+      "started_at_utc": "2026-09-21T15:46:09.873168+00:00",
+      "finished_at_utc": "2026-09-21T15:46:10.262068+00:00",
+      "exit_code": 0,
+      "stdout": "{\"html_url\":\"https://github.com/toon-format/toon/releases/tag/v4.1.1\",\"prerelease\":false,\"published_at\":\"2026-08-05T11:49:55Z\",\"selected_note_lines\":[\"- Write CLI diagnostics to stderr so stdout carries results only &nbsp;-&nbsp; by @johannschopplich [<samp>(46757)</samp>](https://github.com/toon-format/toon/commit/4675789)\",\"- Terminate the last line of file output with a newline &nbsp;-&nbsp; by @johannschopplich [<samp>(c3d7c)</samp>](https://github.com/toon-format/toon/commit/c3d7c2f)\",\"- Reject a raw string whose comment marker follows a byte-order mark &nbsp;-&nbsp; by @johannschopplich [<samp>(bde6e)</samp>](https://github.com/toon-format/toon/commit/bde6eae)\"],\"tag_name\":\"v4.1.1\",\"target_commitish\":\"main\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "openai-codex-commit",
+      "argv": [
+        "gh",
+        "api",
+        "repos/openai/codex/commits/rust-v0.155.1",
+        "--jq",
+        "{sha,html_url} | @json"
+      ],
+      "started_at_utc": "2026-09-21T15:47:10.904226+00:00",
+      "finished_at_utc": "2026-09-21T15:47:11.288789+00:00",
+      "exit_code": 0,
+      "stdout": "{\"html_url\":\"https://github.com/openai/codex/commit/be2951ea34f0d295ed0becf97079f92fa5f6950e\",\"sha\":\"be2951ea34f0d295ed0becf97079f92fa5f6950e\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "mksglu-context-mode-commit",
+      "argv": [
+        "gh",
+        "api",
+        "repos/mksglu/context-mode/commits/v1.0.169",
+        "--jq",
+        "{sha,html_url} | @json"
+      ],
+      "started_at_utc": "2026-09-21T15:47:10.904467+00:00",
+      "finished_at_utc": "2026-09-21T15:47:11.244594+00:00",
+      "exit_code": 0,
+      "stdout": "{\"html_url\":\"https://github.com/mksglu/context-mode/commit/589d8214d56740a28b5f7bf63167743d586b0b40\",\"sha\":\"589d8214d56740a28b5f7bf63167743d586b0b40\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "rtk-ai-rtk-commit",
+      "argv": [
+        "gh",
+        "api",
+        "repos/rtk-ai/rtk/commits/v0.49.0",
+        "--jq",
+        "{sha,html_url} | @json"
+      ],
+      "started_at_utc": "2026-09-21T15:47:10.904820+00:00",
+      "finished_at_utc": "2026-09-21T15:47:11.288351+00:00",
+      "exit_code": 0,
+      "stdout": "{\"html_url\":\"https://github.com/rtk-ai/rtk/commit/b1c0dc00649c50fbe8930f849c800d4d6ca12091\",\"sha\":\"b1c0dc00649c50fbe8930f849c800d4d6ca12091\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "headroomlabs-ai-headroom-commit",
+      "argv": [
+        "gh",
+        "api",
+        "repos/headroomlabs-ai/headroom/commits/v0.37.0",
+        "--jq",
+        "{sha,html_url} | @json"
+      ],
+      "started_at_utc": "2026-09-21T15:47:10.905396+00:00",
+      "finished_at_utc": "2026-09-21T15:47:11.265569+00:00",
+      "exit_code": 0,
+      "stdout": "{\"html_url\":\"https://github.com/headroomlabs-ai/headroom/commit/32d7ca4577d599b8a5f811ada74cf31504302c9d\",\"sha\":\"32d7ca4577d599b8a5f811ada74cf31504302c9d\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "toon-format-toon-commit",
+      "argv": [
+        "gh",
+        "api",
+        "repos/toon-format/toon/commits/v4.1.1",
+        "--jq",
+        "{sha,html_url} | @json"
+      ],
+      "started_at_utc": "2026-09-21T15:47:10.906060+00:00",
+      "finished_at_utc": "2026-09-21T15:47:11.287962+00:00",
+      "exit_code": 0,
+      "stdout": "{\"html_url\":\"https://github.com/toon-format/toon/commit/a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53\",\"sha\":\"a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "openai-codex-latest-prerelease",
+      "argv": [
+        "gh",
+        "api",
+        "repos/openai/codex/releases?per_page=1",
+        "--jq",
+        ".[0] | {tag_name,published_at,html_url,prerelease} | @json"
+      ],
+      "started_at_utc": "2026-09-21T15:47:11.244634+00:00",
+      "finished_at_utc": "2026-09-21T15:47:11.806359+00:00",
+      "exit_code": 0,
+      "stdout": "{\"html_url\":\"https://github.com/openai/codex/releases/tag/rust-v0.156.0-alpha.14\",\"prerelease\":true,\"published_at\":\"2026-09-21T04:09:08Z\",\"tag_name\":\"rust-v0.156.0-alpha.14\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "rtk-ai-rtk-latest-prerelease",
+      "argv": [
+        "gh",
+        "api",
+        "repos/rtk-ai/rtk/releases?per_page=1",
+        "--jq",
+        ".[0] | {tag_name,published_at,html_url,prerelease} | @json"
+      ],
+      "started_at_utc": "2026-09-21T15:47:11.265604+00:00",
+      "finished_at_utc": "2026-09-21T15:47:11.678165+00:00",
+      "exit_code": 0,
+      "stdout": "{\"html_url\":\"https://github.com/rtk-ai/rtk/releases/tag/dev-0.50.0-rc.451\",\"prerelease\":true,\"published_at\":\"2026-09-21T15:06:26Z\",\"tag_name\":\"dev-0.50.0-rc.451\"}\n",
+      "stderr": ""
+    },
+    {
+      "id": "headroom-canonical-repository",
+      "argv": [
+        "gh",
+        "api",
+        "repos/chopratejas/headroom",
+        "--jq",
+        "{full_name,html_url} | @json"
+      ],
+      "started_at_utc": "2026-09-21T15:47:45.504426+00:00",
+      "finished_at_utc": "2026-09-21T15:47:46.114946+00:00",
+      "exit_code": 0,
+      "stdout": "{\"full_name\":\"headroomlabs-ai/headroom\",\"html_url\":\"https://github.com/headroomlabs-ai/headroom\"}\n",
+      "stderr": ""
+    }
+  ],
+  "findings": {
+    "decision": "retain_all_five_installed_stable_versions",
+    "basis": "Each actual installed version matches the current upstream stable release. Newer observed Codex/RTK tags are prereleases; no demonstrated requirement justifies replacing accepted native behavior.",
+    "components": [
+      {
+        "id": "codex",
+        "installed": "0.155.1",
+        "tag": "rust-v0.155.1",
+        "commit": "be2951ea34f0d295ed0becf97079f92fa5f6950e",
+        "finding": "The current stable patch disables default reasoning summaries in new local TUI sessions to avoid rejection by providers without support, while preserving explicit settings. Installed version includes it.",
+        "decision": "retain"
+      },
+      {
+        "id": "context-mode",
+        "installed": "1.0.169",
+        "tag": "v1.0.169",
+        "commit": "589d8214d56740a28b5f7bf63167743d586b0b40",
+        "finding": "The current stable release fixes whole-window reporting, retrieval-access accounting, 99.9-percent display precision and subagent per-turn cost attribution. Installed native Codex, Desktop and Claude packages all match.",
+        "decision": "retain"
+      },
+      {
+        "id": "rtk",
+        "installed": "0.49.0",
+        "tag": "v0.49.0",
+        "commit": "b1c0dc00649c50fbe8930f849c800d4d6ca12091",
+        "finding": "The stable release contains content-addressed/SQLite recall and per-filter recall telemetry. Existing practice already uses recall/raw recovery and explicit Codex commands; prerelease recency does not establish an automatic Codex hook fix.",
+        "decision": "retain"
+      },
+      {
+        "id": "headroom",
+        "installed": "0.37.0",
+        "tag": "v0.37.0",
+        "commit": "32d7ca4577d599b8a5f811ada74cf31504302c9d",
+        "finding": "Stable notes cover session-aware compression, protect file reads against lossy Responses-path compression, and avoid garbling mixed subagent output. Existing guarded artifact and tested native MCP lanes remain separate from provider-proxy adoption. GitHub's current canonical repository is headroomlabs-ai/headroom; older chopratejas link redirects.",
+        "decision": "retain"
+      },
+      {
+        "id": "toon",
+        "installed": "4.1.1",
+        "tag": "v4.1.1",
+        "commit": "a9e6d97eca931379824f3b6a1ba8fbfbda7d3c53",
+        "finding": "Stable CLI fixes preserve stdout for data, put diagnostics on stderr, terminate file output with newline and correct comment/BOM parsing. Existing conditional use and compact-JSON counterexample remain applicable.",
+        "decision": "retain"
+      }
+    ],
+    "concrete_runtime_gap": null,
+    "metadata_followup": "Prefer the canonical Headroom repository URL when next updating the selected source record; this is source-link maintenance, not a missing runtime capability.",
+    "evidence_reused": [
+      "<canonical-repository>/docs/token-practice.md",
+      "<canonical-repository>/docs/token-native-saturation.md",
+      "<canonical-repository>/evidence/receipts/native-token-focus-clients-20260920.json",
+      "<canonical-repository>/evidence/receipts/native-headroom-mcp-20260920.json"
+    ],
+    "limitations": [
+      "This is a dated read-only release/source review, not fresh provider use or a universal tool-quality ranking.",
+      "CLI versions and plugin metadata prove installed versions, not model use.",
+      "The GitHub --jq outputs are exact filtered command outputs, not full raw API responses. selected_note_lines are explicitly selected upstream release text, not all changes.",
+      "An earlier memory-only exploratory Codex compare returned 250 of 497 ahead commits and was diverged; RTK compare returned 220 commits and was diverged. No complete prerelease audit or adoption claim is made.",
+      "No repository, settings, installations, accounts or providers were changed; only this authorized private evidence file was written."
+    ]
+  },
+  "publication": {
+    "sanitization": "Host directory prefixes replaced with descriptive placeholders; long quotation fields from worker source summaries omitted. Retained raw native files stay private; hashes describe those original bytes.",
+    "interpretation": "Original worker narratives are claims for review. See review-adjudication.md for accepted findings and corrections."
+  }
+}

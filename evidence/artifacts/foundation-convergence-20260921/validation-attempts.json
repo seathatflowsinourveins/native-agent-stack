@@ -1,0 +1,34 @@
+{
+  "evidence_class": "retained local validation attempts before correction",
+  "generated_html_default": {
+    "command": "python3 scripts/build_ecosystem.py",
+    "exit_code": 1,
+    "returned_output": "Explorer validation failed: generated HTML is stale or changed; rebuild with --write\n",
+    "resolution": "Used the documented --write mode."
+  },
+  "combined_shell_attempt": {
+    "command": "python3 scripts/validate.py\\npython3 scripts/validate_catalogs.py\\npython3 scripts/build_ecosystem.py --check",
+    "native_tool_result": {
+      "chunk_id": "9a3c30",
+      "wall_time_seconds": 2.675561875,
+      "exit_code": 0,
+      "original_token_count": 154,
+      "output": "Publication validation failed:\ndocs/ecosystem/index.html: contains possible local session identifier\nevidence/artifacts/foundation-convergence-20260921/claude-cooperation.json: contains possible local session identifier\n{\"beyond_star_catalog_repositories\": 105, \"models\": 20, \"public_stars\": 342, \"repository_entries\": 152, \"starred_catalog_repositories\": 42, \"unique_catalog_repositories\": 147}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun.\n{\"bytes\": 7027427, \"sha256\": \"05e2468e9e78bb3b8e87df77437ef8311b1a17ab3f0b7bbe548bb894a7d88a75\", \"status\": \"passed\"}\n"
+    },
+    "limitation": "The enclosing shell exit masked the first command failure. It was not accepted as passing validation; subsequent verification runs each command separately."
+  },
+  "first_unit_attempt": {
+    "command": "python3 -m unittest tests.test_foundation_catalog tests.test_ecosystem tests.test_grand_dashboard",
+    "exit_code": 1,
+    "summary": "32 tests; one failure and seven errors. Nonexistent test_ecosystem module; new decision used a noncanonical lifecycle source; comma characters were rejected by the existing public dashboard metadata format.",
+    "output_scope": "Summary derived from actual returned unittest output; full original output remains in this task's tool history.",
+    "resolution": "Used existing test_ecosystem_manifest module; kept canonical lifecycle references; removed commas from the checkpoint state. No tests or validators were weakened."
+  },
+  "publication_privacy_resolution": "Redacted three native UUID identifiers and encoded project directories from public artifacts; original private hashes retain identity.",
+  "later_verification_artifact_privacy": {
+    "command": "python3 scripts/validate.py",
+    "exit_code": 1,
+    "returned_output": "Publication validation failed:\ndocs/ecosystem/index.html: contains possible personal home path\nevidence/artifacts/foundation-convergence-20260921/verification.json: contains possible personal home path\n",
+    "resolution": "Redacted remaining screenshot output path in the added verification artifact before publication."
+  }
+}
