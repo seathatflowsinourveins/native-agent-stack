@@ -1,5 +1,8 @@
 # Rendered dashboard acceptance — 2026-09-21
 
+Follow-up: [native gap resolution](dashboard-gap-resolution.md) records the
+subsequent fixes. This page preserves the original observed failures and limits.
+
 The installed interfaces were exercised in actual browsers, screenshots were
 inspected, and displayed values were compared with upstream commands or APIs.
 An HTTP 200 alone was not the acceptance condition. These are selected native

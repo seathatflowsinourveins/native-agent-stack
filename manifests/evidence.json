@@ -2,6 +2,32 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "dashboard-gap-resolution-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory",
+        "codex",
+        "claude-code",
+        "agentsview",
+        "grafana",
+        "prometheus",
+        "alertmanager",
+        "ntfy",
+        "promptfoo",
+        "vllm"
+      ],
+      "claim": "Resolved concrete native dashboard gaps: automatic Claude and Codex memory consolidation, scoped archive refresh, passwordless gateway desktop access, current Claude telemetry, native ntfy template formatting and published NVIDIA retrieval example execution.",
+      "limitations": [
+        "Bounded current-host native operations and local integration checks; not universal SOTA or complete-foundation certification.",
+        "Fresh PreCompact event and active Desktop session end remain unforced.",
+        "Next genuine post-deployment ntfy webhook remains unobserved; native renderer replay and deployed template are verified separately.",
+        "Promptfoo ranks all four published pairs; local source-derived assertion, not MTEB or held-out quality evaluation. Direct script usage and consolidation usage remain unknown.",
+        "Native consumed/cache counters and model-scoped observation windows are not lifetime savings.",
+        "Read-only memory wiki/global browser FTS and compatible MiniLM profile remain upstream boundaries."
+      ],
+      "path": "evidence/receipts/dashboard-gap-resolution-20260921.json"
+    },
+    {
       "id": "dashboard-render-e2e-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2367,6 +2393,71 @@
   ],
   "files": [
     {
+      "path": "docs/dashboard-gap-resolution.md",
+      "sha256": "a28617634c8c6fd7bc866810328f7658aa84ea375c571bbc7b8b9365b9cd4602",
+      "bytes": 2962
+    },
+    {
+      "path": "docs/native-dashboard-operations-resolution.md",
+      "sha256": "0c42e73c610bb620b100cfb4cf620066b508c3e06c2e48c4b19900b009998fa9",
+      "bytes": 6086
+    },
+    {
+      "path": "docs/native-memory-consolidation.md",
+      "sha256": "28a5c8494f6f96b02e470454ac81ae7ca2a8c9c8a0d19a302c933044c6f7a70a",
+      "bytes": 6785
+    },
+    {
+      "path": "docs/promptfoo-upstream-retrieval.md",
+      "sha256": "af73fafcc415e7917ed254b18ec38b5207c34592d7291c4a383c052ba38d5f72",
+      "bytes": 5247
+    },
+    {
+      "path": "evidence/artifacts/dashboard-gap-resolution-20260921/resolution.json",
+      "sha256": "b5904a44daa4545c77dde645aeb47370e53a34e6252ebd0bbfe1a0b8a4a5bfe8",
+      "bytes": 17280
+    },
+    {
+      "path": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/native-report-detail-final.png",
+      "sha256": "1e1af0033a7ccd52f00dec0569a2a0d80661e84710bca8a074aa93d1d24523b3",
+      "bytes": 203915
+    },
+    {
+      "path": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/promptfoo-eval.stderr",
+      "sha256": "79a78e527eca6d243092cf8a3830a0baf02472cad501483baa19f51aa1f21117",
+      "bytes": 168
+    },
+    {
+      "path": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/promptfoo-eval.stdout",
+      "sha256": "7f648c4b3677bb818c8b119aec17c4b821c967233132c8e6d4f02b47f8e074d7",
+      "bytes": 2775
+    },
+    {
+      "path": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json",
+      "sha256": "924be14cffd71b505d595b6b1b17ca31cfe35e5c3927d9d83bf5c13bbbb563a2",
+      "bytes": 5115
+    },
+    {
+      "path": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/report.html",
+      "sha256": "01ac2f6b4a28727729ba4a84ca96ced13ff74e2287d848e7b89789d0af11f088",
+      "bytes": 41418
+    },
+    {
+      "path": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/results.public.json",
+      "sha256": "16e5ad1e1590ccef9ed6c73d5ab39f494620bdef7213bb3bcddbf316f99e01b7",
+      "bytes": 10521
+    },
+    {
+      "path": "evidence/receipts/dashboard-gap-resolution-20260921.json",
+      "sha256": "d0c871acf3f0f56959ad1670e744bccd6674a9fa18d1aaacce84dc0de70dfdb3",
+      "bytes": 3390
+    },
+    {
+      "path": "examples/promptfoo-nemotron-upstream/promptfooconfig.yaml",
+      "sha256": "07c64ff592209af4ac973d0cadf3bb69099cbf3ab79f89e5129f182c93a32df2",
+      "bytes": 1940
+    },
+    {
       "path": "observability/backends/templates/ecosystem-ntfy-alertmanager.yml.example",
       "sha256": "718d709ce0e1748f2d9b255cba9292b5bdca286a5ead64f5ace2b9d3af49211b",
       "bytes": 962
@@ -2383,8 +2474,8 @@
     },
     {
       "path": "docs/dashboard-rendered-acceptance.md",
-      "sha256": "82ddca7391ba77b0c7f92a65db67d79221eb13af15aec99be35cad6fca26714f",
-      "bytes": 7513
+      "sha256": "5c4f71b5a8bedccc7dc59fb8e6476313ed1443a0c6b0181039a708684d972e01",
+      "bytes": 7671
     },
     {
       "path": "evidence/artifacts/dashboard-render-e2e-20260921/rendered-observations.json",
@@ -2958,8 +3049,8 @@
     },
     {
       "path": ".gitattributes",
-      "sha256": "a752d7e669e55fea832431991b21d0f92f6d060fb5dd49bceefa9684c3253977",
-      "bytes": 304
+      "sha256": "b3ffd27e5ca28d7fd987dc7c594601e4532660ddfeb4992ae92b3916ecb45e9f",
+      "bytes": 467
     },
     {
       "path": ".github/requirements-ci.lock",
@@ -6059,8 +6150,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "0803e4cbc67f0d57c6ba424c225ff3888c0ba73abcc5e8b77a39292a4031f596",
-      "bytes": 4098851
+      "sha256": "ff5479d779aaf7612ff7994ad8d30548720ba23b7e668580f0e2be1109c19e6d",
+      "bytes": 4099492
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6069,8 +6160,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "4afbabafe4bcb24dde89a30c0aeb2cc50cdcff81e93d536570f8997c1556bd7b",
-      "bytes": 34047
+      "sha256": "cdc4b22034ec5c67373c4bc12b23cffc3a896df3ede956af4db553d81de82242",
+      "bytes": 34470
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",

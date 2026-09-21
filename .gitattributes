@@ -3,3 +3,5 @@
 # Preserve exact delivered tool-output bytes for hashing and token recounts.
 evidence/artifacts/retrieved-code.txt whitespace=-blank-at-eof
 evidence/artifacts/direct-desktop-search.txt whitespace=-blank-at-eof
+# Keep native Promptfoo export bytes unchanged; upstream includes trailing spaces.
+evidence/artifacts/promptfoo-nemotron-upstream-20260921/report.html -whitespace
