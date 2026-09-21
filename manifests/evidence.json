@@ -2,6 +2,28 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "foundation-closure-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "affaan-m/ECC",
+        "context-mode"
+      ],
+      "claim": "Dated community and SDK source recheck retained the native foundation; independent configuration/source review confirmed existing terminal profiles and selected ECC hashes. Authenticated native Claude displayed context, six connected MCP servers, HUD and zero then nonzero usage around a real inherited-tool review. Manual compaction was exercised separately.",
+      "limitations": [
+        "Dated bounded baseline, not exhaustive landscape saturation, comparative superiority or full sixteen-layer lifecycle E2E.",
+        "No new package installation or global account/model/permission change. Unchanged upstream installation and behavior evidence retains its prior scope.",
+        "Source/currentness review is not native SDK acceptance. Existing worker recovery does not qualify another role, SDK, host crash, distributed effects or provider cancellation.",
+        "Manual compaction and selected continuity checks do not establish automatic compaction, every retained fact or general recovery reliability.",
+        "Context and HUD numbers are estimates; usage display includes rounded auxiliary requests. Complete session/provider usage and causal savings remain unknown.",
+        "The named restricted starter reviewer remains conditional; this native review used inherited tools with a no-edit instruction, not OS-enforced read-only access.",
+        "Model reviewers independently inspected bounded files. Supported findings were resolved; agreement and artifact hashes are not substitutes for behavioral acceptance.",
+        "Private native session logs retained outside Git. Public exports normalize paths; screen observations are coordinator records, not all contained in the context export. Windows dropdown interaction was not tested."
+      ],
+      "path": "evidence/receipts/foundation-closure-20260921.json"
+    },
+    {
       "id": "native-quality-defaults-20260920",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2172,8 +2194,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "4fb5c6306a82e09f5d9bbc776839b8b470faa05938e8bfd8aec87d4664f86d64",
-      "bytes": 13654
+      "sha256": "820617e7686bfea92a8ed2b312653509a0b032b8e988da195a43c40bc52fe7bd",
+      "bytes": 14202
     },
     {
       "path": ".gitattributes",
@@ -5278,8 +5300,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "75846b5f38b72448a8deec1c22622149c20916f534a20202ffe6a3138983da6c",
-      "bytes": 3802604
+      "sha256": "13f1650f83bd633e22a09ef43e453b1d8d8bb46775da8cccd5a763e06b8a7478",
+      "bytes": 3819094
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5358,8 +5380,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "6c1e46e47bcf73262efb9629cb20def96c3938cc24d57afa10941f14032faeab",
-      "bytes": 34232
+      "sha256": "9f7d6c21c3c972f7d1aac79dea98d45518c3b7371c77b49aa309eeabc5d49d2b",
+      "bytes": 34523
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -5793,8 +5815,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 75124,
-      "sha256": "813bd9df11708f8faadf85ee4cd4060a53272991212a8e815d87992476c906a5"
+      "bytes": 75280,
+      "sha256": "31a7051ac8b71f3fa0355d349bb2bd8987a1a83de862d9bc946b9796e978b7fd"
     },
     {
       "path": "observability/README.md",
@@ -6718,7 +6740,7 @@
     },
     {
       "path": "docs/acceptance-evidence-policy.md",
-      "sha256": "cff82f8a59a57f9c51d6d9d18a4d02bdde978f8c4fe928e7a4af219894bed964",
+      "sha256": "f2b27f9fb431cbc91fcc399d9105c1ab6aac23767f2d617f319911360cdfa400",
       "bytes": 4916
     },
     {
@@ -7980,6 +8002,51 @@
       "path": "tests/test_active_recovery_plans.py",
       "sha256": "316a457f792412232b899d874297f7cc05c36a8b4a0ce8a4ef58e6bc37603a1c",
       "bytes": 1238
+    },
+    {
+      "path": "evidence/receipts/foundation-closure-20260921.json",
+      "sha256": "e48d1b84a80677621ad8dd3cde34416f2c64a7f8711ee8777f332cc5d12b4b84",
+      "bytes": 3222
+    },
+    {
+      "path": "docs/foundation-closure-20260921.md",
+      "sha256": "2b490d0bcfca6c7300079f36ced0e21ab708fb3f6517f4fc06076d5391b18164",
+      "bytes": 18870
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/review-adjudication.md",
+      "sha256": "360afb1d7bfdd7c88fa43cbb825d49edd8074f12146c2eaa9a7d2eb27691c0ec",
+      "bytes": 2542
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/observations.json",
+      "sha256": "f484e86e4a02cf68d1e69ac0177063330e2ea61203c7d9c4ace700132ccde077",
+      "bytes": 2863
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
+      "sha256": "ff34c3db7e67e4d96e9a1d0d154a0c7e8c01f42eade511302f963ad05a1d2c4c",
+      "bytes": 6271
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/source-observations.json",
+      "sha256": "dde24f90bbe5384364efeac67da81e22b6c3885d221b6849bf2165f9fa2a58f0",
+      "bytes": 2822
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/context-before.txt",
+      "sha256": "d119fb974eb75c2a3601227fbfbb02af7ae6178af6fdc2a3d8f7fc6e302a04f8",
+      "bytes": 11275
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/compaction.json",
+      "sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+      "bytes": 1524
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/validation.json",
+      "sha256": "5de3e90f647cccb3d7be8bcd8ea6b7a6a062685353286573d2b04f1b08384a9b",
+      "bytes": 1569
     }
   ],
   "convergence_records": [

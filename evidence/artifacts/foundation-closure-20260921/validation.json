@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "scope": "Local artifact integrity and publication checks; no upstream behavioral suite or full-stack E2E is inferred.",
+  "checks": [
+    {"command": "python3 scripts/validate.py", "exit_code": 0},
+    {"command": "python3 scripts/validate_foundation.py --json", "exit_code": 0},
+    {"command": "python3 scripts/validate_catalogs.py", "exit_code": 0},
+    {"command": "python3 scripts/build_ecosystem.py --check", "exit_code": 0},
+    {"command": "git diff --check", "exit_code": 0}
+  ],
+  "retained_failure": "The first check after regenerating HTML detected its old evidence hash/size; integrity entries were refreshed, and validation plus exact rebuild check passed.",
+  "secret_scan": {
+    "command": "gitleaks dir . --redact --no-banner",
+    "candidate_exit_code": 1,
+    "base_exit_code": 1,
+    "candidate_findings": 197,
+    "base_findings": 197,
+    "comparison": "Multiset of File, RuleID, redacted Match and redacted Secret has zero additions and zero removals.",
+    "source_line_inspection": "All 197 reported source lines end in a quoted 64-character lowercase hexadecimal manifest value.",
+    "interpretation": "Unchanged SHA-256-shaped metadata matches; not a clean whole-repository scan or broad vulnerability assurance. No ignore rule added."
+  },
+  "native_exit": {"claude_interactive_exit_code": 0, "owned_process_absent": true},
+  "independent_review": "Separate Codex reader verified changed links, source statements, context export and inherited-tool recipe; Claude review and adjudication retained separately."
+}

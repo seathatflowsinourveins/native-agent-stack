@@ -174,21 +174,24 @@ actual output. `/compact` performs model summarization: exercise it when useful
 and verify the next task still has its required facts. Do not treat a headless
 prompt containing `/context` as a zero-cost inspection command.
 
-For an independent file review, the existing native CLI supports this shape:
+For an independent file review, retain inherited tools so the installed hooks
+and the reviewer's available capabilities agree. Use a bounded prompt that
+explicitly prohibits edits, shell commands, delegation and unrelated reads:
 
 ```sh
-claude -p --tools Read,Glob,Grep \
-  --strict-mcp-config --mcp-config '{"mcpServers":{}}' \
-  --output-format stream-json --verbose --include-hook-events \
-  --max-turns 12 --permission-mode dontAsk --permission-prompts none < review-prompt.txt
+claude -p --output-format stream-json --verbose --include-hook-events \
+  --max-turns 12 --permission-prompts none < review-prompt.txt
 ```
 
 Use a trusted checkout and a bounded, explicit file list. Capture stdout/stderr
 privately, preserve a deadline and the returned exit code, and require one
-successful final result plus a grounded report. Verify the actual `system:init`
-tool inventory is `Read`, `Glob` and `Grep`; a requested flag alone is not
-execution evidence. Native hooks may still run;
-the file tool list is not an operating-system sandbox. An SDK is unnecessary
+successful final result plus a grounded report. Inspect the actual `system:init`
+tool inventory and tool calls; a prompt contract is not an operating-system
+sandbox. If enforced read-only access is required, select a separately qualified
+isolation boundary. The older receipt's restricted Read/Glob/Grep invocation is
+historical evidence, not the default for every installed hook combination; see
+[restricted-worker compatibility](../docs/restricted-worker-compatibility.md).
+An SDK is unnecessary
 for a single native review. A launcher must keep its own notices on stderr so
 the upstream JSON/JSONL stream remains parseable whenever a native child runs.
 The local launcher's `--check` mode prints a plain-text diagnostic and starts no
@@ -227,8 +230,12 @@ Another framework or newer release needs a task-relevant reason and evidence.
 Both reviews produced source-grounded findings that were resolved and checked.
 Their different workloads are not a performance comparison. Their usage excludes
 the coordinator, research and other workers. The instruction reduction is not a
-provider saving or a per-session/lifetime counter. Interactive `/context`, `/usage`,
-`/compact` and HUD behavior remain unqualified pending native sign-in.
+provider saving or a per-session/lifetime counter. That review did not exercise
+interactive `/context`, `/usage`, `/compact` or HUD behavior. The
+[subsequent closure review](../docs/foundation-closure-20260921.md) records a fresh
+authenticated session, context/usage views, six connected MCP servers and live
+HUD rendering. Its observations supersede the earlier sign-in/context/usage/HUD
+gap; automatic compaction remains a separate boundary.
 
 Exact commands, returned output, hashes and scope are recorded in
 [the profile receipt](../evidence/receipts/native-claude-profile-20260920.json) and
