@@ -3454,11 +3454,6 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
-          },
-          {
-            "id": "native-returned-results-20260921",
-            "path": "evidence/receipts/native-returned-results-20260921.json",
-            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3598,6 +3593,11 @@
           {
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-returned-results-20260921",
+            "path": "evidence/receipts/native-returned-results-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -3867,12 +3867,7 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
-          },
-          {
-            "id": "native-returned-results-20260921",
-            "path": "evidence/receipts/native-returned-results-20260921.json",
+            "path": "evidence/receipts/foundation-native-20260920.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -4387,8 +4382,13 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-returned-results-20260921",
+            "path": "evidence/receipts/native-returned-results-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [

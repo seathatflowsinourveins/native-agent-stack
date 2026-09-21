@@ -26,13 +26,13 @@
         "headroom",
         "jcodemunch-mcp"
       ],
-      "claim": "Fresh native Codex and Claude each returned five selected upstream tool results in this Desktop turn. Independent stream reconciliation verified all ten calls, returned bytes, provider usage and RTK measurements. Thirteen adopted dashboard views exposed useful scoped data; the local report now embeds verified downloadable results and keeps unavailable Serena explicit.",
+      "claim": "Fresh native Codex and Claude each returned five selected upstream tool results in this Desktop turn. Independent stream reconciliation verified all ten calls, returned bytes, provider usage and RTK measurements. Thirteen adopted dashboard views exposed useful scoped data; a subsequent direct Desktop Serena invocation exposed its current live dashboard. The local report embeds verified downloadable results and preserves the expired child URL failure alongside recovery.",
       "limitations": [
         "Selected current-host native CLI/MCP/API/browser integration checks, not all upstream test suites, every selected component running this session, physical reboot, or another-PC acceptance.",
         "The native Codex and Claude executions are child sessions launched in this Desktop turn. Their usage excludes this coordinator and other workers; actual input/cache/output counts are not causal provider savings.",
         "Each RTK artifact comparison removes 359 tokens (537 to 178, o200k_base), preserving six commit identities while omitting other metadata. Each native RTK counter separately increases by 17 estimated tokens. These measures must not be added.",
         "Context Mode returned reports have session-age/model labels that do not establish exclusive attribution to these short native children. Its direct Desktop result and retained store estimates have separate scopes. Estimates and illustrative prices are not provider bills.",
-        "Serena returned a native dashboard URL in both child runs, but a later direct page request timed out. Persistent dashboard availability is not accepted.",
+        "Serena URLs belong to individual MCP processes. The expired child URL failed; the current Desktop connection returned a different working URL with active project/configuration data. Usage statistics were empty. No stable port, persistence beyond the owning process, restart or new installation is claimed.",
         "Memory page count includes collapsed system pages; QMD intentionally has no embedded vectors. Archives, graph and Promptfoo reports are retained snapshots, not new model evaluations or automatic ingestion.",
         "OmniRoute counts apply only to traffic through that gateway. Claude telemetry has historical range series but no instant series at observation. No new inference, workflow runs, or notifications were created to populate dashboards.",
         "Local browser/report checks validate this integration. Reporter unit tests and repository tests are local checks, not unchanged upstream end-to-end tests.",
@@ -2293,9 +2293,14 @@
   ],
   "files": [
     {
+      "path": "evidence/artifacts/native-returned-results-20260921/serena-recovery.json",
+      "sha256": "5197d3138e181667eb3c100bb60c7c021d473accd572b3c33985a2c4287c2096",
+      "bytes": 11000
+    },
+    {
       "path": "docs/native-returned-results.md",
-      "sha256": "e2be146922c33cfb50b737d4d4dd491e1120a24b7a99c37a0bcc207756780baf",
-      "bytes": 4473
+      "sha256": "8fa7f5915838a2c44534549c451d2a3f34c1761abe5299692ed61bb71a1174a0",
+      "bytes": 4549
     },
     {
       "path": "evidence/artifacts/native-returned-results-20260921/dashboards.json",
@@ -2309,13 +2314,13 @@
     },
     {
       "path": "evidence/receipts/native-returned-results-20260921.json",
-      "sha256": "425386d08ebc513e6f395d9296f73b9b0e4b6ff1e789604d439d80f912443406",
-      "bytes": 7769
+      "sha256": "b5c040b078b614b62de7a2ea32fe9380ee9acc8053ea66b0628c1afa798e5bdc",
+      "bytes": 8592
     },
     {
       "path": "tools/token-report/returned_results.js",
-      "sha256": "885850d7319fa44360ad668f9bc27b517040a3e03f1758f062f6fb2de691463c",
-      "bytes": 6212
+      "sha256": "1d2a14d767b91e1983e5080460201b7da562b2ab86bf6e91631e801e8e4e2c21",
+      "bytes": 6209
     },
     {
       "path": "tools/token-report/token_manifest.full.html.in",
@@ -2569,8 +2574,8 @@
     },
     {
       "path": "docs/native-dashboard-data.md",
-      "sha256": "6f92606f1b26a4a4a59ab5068c195cc1609402a15ed72789f1a2a5173ed4c5be",
-      "bytes": 17698
+      "sha256": "073f44cb56c62396d2a771c6431caadc752b69fb281cf7ec5e3b20a91dcbce43",
+      "bytes": 17937
     },
     {
       "path": "evidence/artifacts/native-dashboard-data-20260921/agentsview-selected-sync.json",
@@ -4285,7 +4290,7 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "e5a0d48addb72a57c182fb7d4f3408ea1305229752299b69b50656d91169e613",
+      "sha256": "20b4394705e495be10f8336ed5806cb317704f2bd7954b5b438a7e14d88a60eb",
       "bytes": 418419
     },
     {
@@ -5885,8 +5890,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "b66152c7bdbf7462403f76adf61f54fdf157420127494da4722d66dd301daeba",
-      "bytes": 4048325
+      "sha256": "783c8cd484a18b2811a6946d69c99f3c8b3753b1e4ea99e0b5a0cb3d77223cd3",
+      "bytes": 4058565
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",

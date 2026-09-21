@@ -26,7 +26,7 @@
   const dashboardLink = record => {
     try {
       const url = new URL(record.url);
-      return ['http:', 'https:'].includes(url.protocol) ? '<a href="' + esc(url.href) + '" target="_blank" rel="noopener noreferrer">Open upstream view</a>' : '';
+      return ['http:', 'https:'].includes(url.protocol) ? '<a href="' + esc(url.href) + '" target="_blank" rel="noopener noreferrer">Open view</a>' : '';
     } catch { return ''; }
   };
   host.innerHTML = '<h2>Attached native runs and dashboard checks</h2>' +
@@ -36,7 +36,7 @@
     '<p><label for="native-runtime-filter">Show results from </label><select id="native-runtime-filter"><option value="">All runtimes and dashboards</option>' +
     runtimes.map(runtime => '<option value="' + esc(runtime) + '">' + esc(runtime) + '</option>').join('') + '</select> · ' + records.length + ' recorded checks</p>' +
     '<p class="note">These are selected native operations executed for this check. Native client children, this Desktop connection, dashboard APIs and browser observations have separate scope. Usage is not savings; old snapshots and synthetic fixtures remain labeled.</p>' +
-    '<div class="tablewrap"><table><thead><tr><th>Selected check</th><th>Observed status</th><th>Upstream view</th></tr></thead><tbody>' +
+    '<div class="tablewrap"><table><thead><tr><th>Selected check</th><th>Observed status</th><th>Dashboard or report</th></tr></thead><tbody>' +
     records.map((record, index) => '<tr data-native-row-runtime="' + esc(record.runtime) + '"><td><button type="button" data-native-jump="' + index + '">' + esc(record.title || record.id) + '</button></td><td>' + esc(record.status) + '</td><td>' + dashboardLink(record) + '</td></tr>').join('') + '</tbody></table></div>' +
     records.map((record, index) => {
       const returned = (record.attachments || []).map(artifact => {

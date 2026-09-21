@@ -13,8 +13,9 @@ and [dashboard observations](../evidence/artifacts/native-returned-results-20260
 Both clients completed the five selected calls. Each RTK result measured 537 to
 178 tokens for the retained Git output; each native counter separately increased
 by 17 estimated saved tokens. Thirteen adopted dashboard views showed useful
-data, with QMD inventory checked separately. Serena returned a URL but its later
-page request timed out; that remaining boundary is explicit in the report.
+data, with QMD inventory checked separately. The native children's Serena URL
+expired; the current Desktop connection subsequently returned its own working
+dashboard. Both the failed URL check and the recovery remain in the report.
 
 ## What executes
 

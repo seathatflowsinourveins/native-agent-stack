@@ -110,12 +110,15 @@ mcporter --config "$PROJECT_MCPORTER_CONFIG" call socraticode.codebase_search \
   --output json --no-oauth
 ```
 
-Serena's saved project launchers now enable its upstream web dashboard while
-keeping automatic browser opening disabled and the listener on loopback. Existing
-MCP processes were preserved. Upstream cannot create the dashboard through
-`open_dashboard` after a server started with it disabled: a normal client/MCP
-reload is required for this capability alone. Discover the actual URL from the
-restarted server; no guessed fixed port is asserted to be live.
+Serena's saved project launchers enable its upstream web dashboard while
+keeping automatic browser opening disabled and the listener on loopback. The
+current Desktop connection's supported `open_dashboard({})` returned a working
+upstream view showing the active project and tools. Its URL differs from the
+short-lived native children's expired URL: the port belongs to a particular MCP
+process. Discover it from the current connection each time; do not reuse a saved
+port or treat a returned URL as proof that a child process remains alive. A
+server originally started with the dashboard disabled still needs a normal MCP
+reload to enable it; no restart was needed for this current connection.
 
 Qdrant exposes actual collection state and counts through its supported API:
 
