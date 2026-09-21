@@ -2,6 +2,39 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "native-dashboard-data-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory",
+        "socraticode",
+        "qmd",
+        "qdrant",
+        "agentsview",
+        "grafana",
+        "loki",
+        "rtk",
+        "context-mode",
+        "headroom",
+        "jcodemunch-mcp",
+        "promptfoo",
+        "serena",
+        "systemd"
+      ],
+      "claim": "Useful native dashboard data was qualified on the current host: existing memory pages/search, semantic code retrieval and generated graph, scoped lexical retrieval, selected native session imports, unchanged Promptfoo fixture HTML, and a populated Grafana home. A naturally triggered native timer published actual metadata to Loki; independent reconciliation matched seven separate savings scopes, three memory inventories and 68 dated coverage records.",
+      "limitations": [
+        "Current-host native command/API/browser integration acceptance, not the upstream projects' full test suites, exhaustive landscape saturation, physical reboot or another-PC acceptance.",
+        "The Grafana panels, metadata adapter, token report and offline guards are local integration code. Component memory, graph, archive and evaluation views are their upstream interfaces or unchanged generated artifacts.",
+        "Native token estimates overlap and use different formulas/windows. Context Mode retained events and session bytes are different bases. Desktop retained counters are stale; causal provider savings and universal per-repository lifetime savings remain unknown.",
+        "ai-memory CLI counters are database-wide; project scope is established separately by native UI/MCP retrieval. QMD intentionally uses BM25 with zero vectors. Qdrant points must not be counted again as dense plus sparse vectors.",
+        "AgentsView contains explicitly imported snapshots of one Codex and two Claude sessions, not continuous ingestion. SocratiCode graph HTML is an explicit snapshot, not a continuously regenerated graph.",
+        "Promptfoo imported and exported two existing passing local echo assertions. No new evaluation or provider/model-quality measurement was made. The initial version inspection timed out; its default-profile byte preservation was not measured.",
+        "Serena's future launch configuration is corrected, but existing MCP processes cannot hot-enable its dashboard. Normal MCP/client reload is required; no current Serena dashboard or forced restart is claimed.",
+        "Raw native streams and private configurations remain local. Public artifacts are labeled metadata projections or exact safe native outputs, with original byte/hash bindings. Exit codes for some earlier service/archive commands are coordinator tool observations.",
+        "Independent review found and resolved malformed receipt metadata handling. Failed-source supersession is covered by local offline guards; a failed live generation was not injected. Reviewer agreement alone is not acceptance evidence."
+      ],
+      "path": "evidence/receipts/native-dashboard-data-20260921.json"
+    },
+    {
       "id": "foundation-closure-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2147,6 +2180,126 @@
   ],
   "files": [
     {
+      "path": "docs/native-dashboard-data.md",
+      "sha256": "2e24646398d925223671840ee0fc21ebd3cc88a4c8169d9901c46629b20cfac9",
+      "bytes": 17100
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/agentsview-selected-sync.json",
+      "sha256": "8617b63c38b20355ed8a1e1640bcb572b802119dae5eeb3f6fdbb4c3428bfe5b",
+      "bytes": 2144
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/grafana-coverage-final-browser.json",
+      "sha256": "d23553de7d98199f7d3141c00daafe15b39ca7452a06642e829feba0098f014e",
+      "bytes": 2458
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/grafana-final-browser.json",
+      "sha256": "590dd966babf932378f7bea24cdc57b0c6c4e7a3503390f4984d4bd93b8c5554",
+      "bytes": 347
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/memory-rag-observation.json",
+      "sha256": "63beade759eff04729f1306e4239820e23f9ff3989655724df6bfde93ffc240f",
+      "bytes": 3928
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/native-html-http.json",
+      "sha256": "dd47eab3cc65e805041de5f907280f5da2d96f38fde49ddf745f055ab9e59737",
+      "bytes": 1364
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/native-snapshot-public.json",
+      "sha256": "b7a70fb762b1d724bdb8de19e33cae345c7901bcd3127e15ce78a86430c58b93",
+      "bytes": 32403
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/native-unit-state.txt",
+      "sha256": "720bc5dd9ca70a6889c4b48818d952ba26581f1ba0cac52544d39224ece65cf4",
+      "bytes": 499
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/promptfoo-browser.json",
+      "sha256": "694b1c2cae9c1b088b038435d48dc945ebe7e095cf0964f1637ceb9ea6d26068",
+      "bytes": 206
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/promptfoo-native-export.json",
+      "sha256": "332d315796c5269931b61f2d65316488b26bca0e998cd4f7fd907174000657cb",
+      "bytes": 4758
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/rtk-global.stdout.json",
+      "sha256": "6239b5e93867f8562bd2eda5834b0e3586b62662988c02232ad32624c3f2ca52",
+      "bytes": 225
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/rtk-project.stdout.json",
+      "sha256": "4489523d52d8b88f274742dd25252812d5b3383ad94ef8e50939263a7b2f6096",
+      "bytes": 218
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/serena-future-startup.json",
+      "sha256": "8b78de8635cf4510d8c26c27a8b00499cd3ffaf66d5bffdf2484ba1584cabebd",
+      "bytes": 2333
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/socraticode-native-command.json",
+      "sha256": "0b365360f4abb6eadc57d6c2c29693fd8be9662387778aad8ca511ee1c6e07da",
+      "bytes": 607
+    },
+    {
+      "path": "evidence/receipts/native-dashboard-data-20260921.json",
+      "sha256": "7ffc895dce40eeff60ec1c2aae10192de0782c8036ebe27325871a775f7759a6",
+      "bytes": 11440
+    },
+    {
+      "path": "observability/native-data/README.md",
+      "sha256": "8865fc66028336769c53c30cad6a559c202265e898fc2b385b447e3ae2fe5e73",
+      "bytes": 7453
+    },
+    {
+      "path": "observability/native-data/config.example.json",
+      "sha256": "b83a79e8bd6659c7840f12d4372deb0951f52a72553559b02df7478392361ba8",
+      "bytes": 664
+    },
+    {
+      "path": "observability/native-data/grafana-home.ini.example",
+      "sha256": "4d6caae721fa62f75dee8d4ee25ae1df6b8a7e4aad7e4cff70be5fbd8b4b1cbb",
+      "bytes": 183
+    },
+    {
+      "path": "observability/native-data/native-data.service.example",
+      "sha256": "adeb07ab0074793957432c4cc0f3cdd954076ea85b785fca23e6b964ae8256a8",
+      "bytes": 287
+    },
+    {
+      "path": "observability/native-data/native-data.timer.example",
+      "sha256": "ec306282555c8c3dbc7669027022aea925aa0dc99c8c6a7118d1b6567ff6fb57",
+      "bytes": 187
+    },
+    {
+      "path": "observability/native-data/native-reports.service.example",
+      "sha256": "6f8db03f857c18ddd553e4bf9b54bbb2807ef62867c599455b4e1acfc9a7bf00",
+      "bytes": 360
+    },
+    {
+      "path": "observability/native-data/render.py",
+      "sha256": "f1ec77eafdf1d0634f69153ee8c9e5a7683cbdfd32cad68c007eab5e62bfc388",
+      "bytes": 8311
+    },
+    {
+      "path": "observability/native-data/snapshot.py",
+      "sha256": "57c27bba6d4394fdbced3cb160d1dafc65167999b1e355c3b0400b0ecfe7b90d",
+      "bytes": 24397
+    },
+    {
+      "path": "tests/test_native_dashboard_data.py",
+      "sha256": "92d611726aa731e1f0ed86cf24d9f0866d664a3c6aa6868b5b6e329d4aae3da5",
+      "bytes": 11361
+    },
+    {
       "path": "evidence/artifacts/native-quality-defaults-20260920/codex-effective.json",
       "sha256": "609255c3478fa016245e1c9657aa7a3b4712e0abcc90b3e3fb4615b74d45fae7",
       "bytes": 387
@@ -2238,8 +2391,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "f88ef15174a3e5fb05b1ff45e8949778edc365bf58c38e4675e6c54e786a8962",
-      "bytes": 14794
+      "sha256": "a6c19c5693716fc88f7d80d2eea47a0bce5fc450e76943f91685b2764933213e",
+      "bytes": 14950
     },
     {
       "path": ".gitattributes",
@@ -3744,8 +3897,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "0b7f16f7c8c78bb7d2b22b66a155b7e1cf1bcaa00388f9a30f9227e18369477b",
-      "bytes": 409045
+      "sha256": "a82fd477b964836b574f5b9139edb7b28391aeb49d874cce2790a8a9f76ec672",
+      "bytes": 412459
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -5344,8 +5497,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "79f7ec66c2b77e3dd9e07c8e7f8faa43b38d5ee158fa0ba91b870cf682802f4b",
-      "bytes": 3822164
+      "sha256": "12491ef6eecd9ad2e7b6ba4b71174df0014a0bd78fa041b8d1f738aaa15731bd",
+      "bytes": 3903663
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5354,8 +5507,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "f9ccd68bf512253ec2e8ce73964f90cb924be958ab8b8c9b0c11cc86cbe94ed9",
-      "bytes": 31611
+      "sha256": "9f98bc533084b4ca3bd9102049b33b451143655094eaba9163bd70b592713a1d",
+      "bytes": 32010
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -5859,8 +6012,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 75280,
-      "sha256": "31a7051ac8b71f3fa0355d349bb2bd8987a1a83de862d9bc946b9796e978b7fd"
+      "bytes": 75868,
+      "sha256": "9710dd623aec8bb70110d89c22d1bdccd1eb81fcb411666225f77ad42b09851a"
     },
     {
       "path": "observability/README.md",
@@ -5904,8 +6057,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-dashboard.json.example",
-      "sha256": "7e5f4366298eba285c71973e82580ee02de3d35d087ffe1f90db6fdffb7c47eb",
-      "bytes": 9851
+      "sha256": "e09c4d5d9148a50b925fa8d5bf63efa990e51c8e3ffd738bdea6496ccfe96518",
+      "bytes": 10027
     },
     {
       "path": "observability/backends/templates/ecosystem-grafana-dashboards.yml.example",
@@ -8119,8 +8272,8 @@
     },
     {
       "path": "docs/native-dashboards.md",
-      "sha256": "b90f6a5308b8b9449cd9ab97458b4d78fba233cc903a8cd42c71a35fba8a4098",
-      "bytes": 10728
+      "sha256": "fe13245c6be4bd942fe85e604f071ffce18be95749ca2fbcdd2825a5b3d0ff80",
+      "bytes": 11062
     },
     {
       "path": "evidence/artifacts/native-dashboard-access-20260921/agentsview-browser-after-restart.json",

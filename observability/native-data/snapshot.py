@@ -285,7 +285,7 @@ def report_rows(report, observed, stale_after, report_mtime):
         native = []
     for (tool, scope), (entity, title) in REPORT_SCOPES.items():
         context = tool == "context-mode"
-        boundary = ("Latest persisted snapshot in one runtime root; overlapping estimates, not all sessions or avoided provider usage. Retention can decrease counters." if context else
+        boundary = ("One runtime snapshot: retained estimate = event count x 256; session estimate = kept-out bytes / 4. Different bases, not additive or provider savings. Retention can decrease counters." if context else
                     "Latest native report capture; retained tool estimate, overlapping with other counters, not avoided provider usage.")
         row = base_row(entity, title, "upstream estimate", "existing token report: native.latest", boundary, observed)
         try:
@@ -329,12 +329,20 @@ def coverage_rows(report, observed):
             continue
         latest = matches[0].get("latest_pass", {})
         status = latest.get("status", "") if isinstance(latest, dict) else ""
-        coverage = "not_executed" if status == "Not executed in this pass" else "recorded_evidence" if isinstance(status, str) and status else "unavailable"
+        coverage = "not_run_in_original_audit" if status == "Not executed in this pass" else "original_audit_has_record" if isinstance(status, str) and status else "unavailable"
         if status == "Evidence unavailable":
             coverage = "unavailable"
+        receipts = matches[0].get("canonical_receipts") or []
+        receipt_ids = {r["id"] for r in receipts if isinstance(r, dict)
+                       and isinstance(r.get("id"), str) and re.fullmatch(r"[a-z0-9][a-z0-9-]{0,127}", r["id"])
+                       and r.get("path") == "evidence/receipts/" + r["id"] + ".json"
+                       and isinstance(r.get("component_ids"), list)
+                       and all(isinstance(component, str) for component in r["component_ids"])
+                       and name in r["component_ids"]} if isinstance(receipts, list) else set()
         row = base_row("coverage-" + name.replace("/", "--"), name, "historical coverage inventory",
-                       "existing token report: coverage_matrix", "Dated recorded status; not a current health check or new qualification.", observed, "coverage")
-        row.update(state="historical", source_unix=source, source_updated_at=utc(source), coverage_status=coverage)
+                       "existing token report: coverage_matrix", "Original audit and canonical receipt count are separate provenance; neither asserts a current pass. Source date is report generation, not native execution. Read receipt scope in the full report.", observed, "coverage")
+        row.update(state="historical", source_unix=source, source_updated_at=utc(source), coverage_status=coverage,
+                   canonical_receipt_count=len(receipt_ids), timestamp_basis="token_report_generated_at")
         rows.append(row)
     return rows
 

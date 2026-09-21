@@ -122,6 +122,23 @@ class NativeDataTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             M.validate_config(c)
 
+    def test_original_audit_and_newer_receipts_have_distinct_meanings(self):
+        report = self.report(10000)
+        receipt = dict(id="native-later", path="evidence/receipts/native-later.json",
+                       component_ids=["agentsview"], claim="PRIVATE CONTENT")
+        report["coverage_matrix"] = [dict(id="agentsview", latest_pass={"status": "Not executed in this pass"},
+                                         canonical_receipts=[receipt, receipt, {"id": "PRIVATE CONTENT"}])]
+        row = M.coverage_rows(report, 10000)[0]
+        self.assertEqual(row["coverage_status"], "not_run_in_original_audit")
+        self.assertEqual(row["canonical_receipt_count"], 1)
+        self.assertEqual(row["timestamp_basis"], "token_report_generated_at")
+        self.assertNotIn("PRIVATE CONTENT", json.dumps(row))
+        for malformed in (7, "agentsview-unrelated", ["agentsview", 7]):
+            report["coverage_matrix"][0]["canonical_receipts"] = [dict(receipt, component_ids=malformed)]
+            self.assertEqual(M.coverage_rows(report, 10000)[0]["canonical_receipt_count"], 0)
+        report["coverage_matrix"][0]["latest_pass"] = {"status": "Failed local check"}
+        self.assertEqual(M.coverage_rows(report, 10000)[0]["coverage_status"], "original_audit_has_record")
+
     def test_http_disables_proxies_and_redirects(self):
         self.assertIsNone(M.NoRedirect().redirect_request(None, None, 302, None, None, "http://example.com"))
         with patch.object(M.urllib.request, "build_opener") as mocked:

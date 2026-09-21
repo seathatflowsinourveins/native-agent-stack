@@ -1,0 +1,48 @@
+{
+  "provenance": "Selected native metadata projection; host paths and private session IDs normalized. Original bytes remain private.",
+  "original": {
+    "bytes": 6425,
+    "sha256": "1ecf934421d5b0baac2a6e552ea9e975a8e95dc0e37290b215fa841834f08c88"
+  },
+  "data": {
+    "observed_at": "2026-09-21T02:47:13.610911+00:00",
+    "source_pin": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+    "changes": [
+      {
+        "path": "<PROJECT>/.codex/config.toml",
+        "before_sha256": "771b110fa08732c68e65fb073ae775268e2f5ade6c9a46915897b1733160b9d5",
+        "after_sha256": "73a3b344acc29a647ddb0d3b3e65e41335d1da1494901a5a43a532ce7588c0f5",
+        "backup": {
+          "path": "<HOME>/codex-ecosystem/state/dashboard-data-20260921/serena-current-session/codex.before.toml",
+          "sha256": "771b110fa08732c68e65fb073ae775268e2f5ade6c9a46915897b1733160b9d5",
+          "bytes": 10402
+        },
+        "only_delta": "serena.args --enable-web-dashboard false -> true",
+        "open_web_dashboard": "false",
+        "all_other_parsed_configuration_preserved": true
+      },
+      {
+        "path": "<PROJECT>/.mcp.json",
+        "before_sha256": "a39328ab616c901a88535baa84c774acf328117cbca87bb575586ed4de7f964d",
+        "after_sha256": "15eed089d0384d7dd59dc6c8bb4bd9e92b786258e1426eee5596a0f5dd902f6a",
+        "backup": {
+          "path": "<HOME>/codex-ecosystem/state/dashboard-data-20260921/serena-current-session/claude.before.json",
+          "sha256": "a39328ab616c901a88535baa84c774acf328117cbca87bb575586ed4de7f964d",
+          "bytes": 1465
+        },
+        "only_delta": "serena.args --enable-web-dashboard false -> true",
+        "open_web_dashboard": "false",
+        "all_other_parsed_configuration_preserved": true
+      }
+    ],
+    "runtime_restart_performed": false,
+    "existing_serena_pids_preserved": true,
+    "live_boundary": "Current instances started with dashboard false stay unchanged. open_dashboard cannot create a backend; next native client/MCP reload is required. No reload performed.",
+    "listen_address": "127.0.0.1",
+    "source_evidence": {
+      "path": "<HOME>/codex-ecosystem/state/dashboard-data-20260921/serena-current-session/installed-source-excerpts.json",
+      "sha256": "9b854fea0dfbcfe925377eccd7eec1d0ec99fbbd31f091e3466b4f7c0006772e",
+      "bytes": 5321
+    }
+  }
+}

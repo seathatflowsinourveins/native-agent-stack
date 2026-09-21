@@ -74,6 +74,9 @@ clamped savings value is preserved even when it differs from net input minus
 output. No estimate is added to another, converted to money, or called avoided
 provider usage. Provider usage belongs in its separately scoped native dashboard.
 Historical coverage is not current health or a new acceptance test.
+Its original audit status and canonical receipt count are separate fields;
+`original_audit_has_record` means a record exists, not that its outcome passed.
+Coverage dates use `token_report_generated_at`, not the native execution date.
 
 `snapshot.json`, exact native stdout/stderr, HTTP response bytes and hashes stay
 in the private state directory with mode `0600`. Command records include argv,

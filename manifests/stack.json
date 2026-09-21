@@ -70,7 +70,8 @@
         "component-history",
         "token-practice-coverage-20260920",
         "token-practice-gap-followup-20260920",
-        "current-session-observation-20260920"
+        "current-session-observation-20260920",
+        "native-dashboard-data-20260921"
       ],
       "upstream_sources": [
         "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0"
@@ -104,7 +105,8 @@
         "wsl-memory-maintenance-20260920",
         "current-session-observation-20260920",
         "foundation-native-20260920",
-        "native-offhost-app-state-20260920"
+        "native-offhost-app-state-20260920",
+        "native-dashboard-data-20260921"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory",
@@ -359,7 +361,8 @@
         "current-session-observation-20260920",
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
-        "foundation-closure-20260921"
+        "foundation-closure-20260921",
+        "native-dashboard-data-20260921"
       ],
       "upstream_sources": [
         "https://github.com/mksglu/context-mode"
@@ -457,7 +460,8 @@
         "native-token-clean-prefix-20260920",
         "current-session-observation-20260920",
         "native-token-stack-final-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-dashboard-data-20260921"
       ],
       "upstream_sources": [
         "https://github.com/chopratejas/headroom"
@@ -613,7 +617,8 @@
       "evidence_ids": [
         "component-history",
         "token-practice-coverage-20260920",
-        "token-native-retained-functional-20260920"
+        "token-native-retained-functional-20260920",
+        "native-dashboard-data-20260921"
       ],
       "upstream_sources": [
         "https://github.com/promptfoo/promptfoo"
@@ -639,7 +644,8 @@
         "qdrant-native-state-recovery-20260919",
         "token-practice-coverage-20260920",
         "foundation-native-20260920",
-        "native-offhost-app-state-20260920"
+        "native-offhost-app-state-20260920",
+        "native-dashboard-data-20260921"
       ],
       "upstream_sources": [
         "https://github.com/qdrant/qdrant"
@@ -666,7 +672,8 @@
         "token-practice-coverage-20260920",
         "native-research-efficiency-20260920",
         "foundation-native-20260920",
-        "native-catalog-retrieval-20260920"
+        "native-catalog-retrieval-20260920",
+        "native-dashboard-data-20260921"
       ],
       "upstream_sources": [
         "https://github.com/tobi/qmd/releases/tag/v2.8.3"
@@ -717,7 +724,8 @@
         "token-practice-confirmation-20260920",
         "current-session-observation-20260920",
         "native-token-stack-final-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-dashboard-data-20260921"
       ],
       "upstream_sources": [
         "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0"
@@ -769,7 +777,8 @@
         "component-history",
         "token-practice-coverage-20260920",
         "current-session-observation-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-dashboard-data-20260921"
       ],
       "upstream_sources": [
         "https://github.com/oraios/serena"
@@ -844,7 +853,8 @@
         "token-practice-artifacts-20260920",
         "token-practice-coverage-20260920",
         "current-session-observation-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-dashboard-data-20260921"
       ],
       "upstream_sources": [
         "https://github.com/giancarloerra/SocratiCode"
@@ -1009,7 +1019,8 @@
         "token-practice-coverage-20260920",
         "current-session-observation-20260920",
         "native-token-stack-final-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-dashboard-data-20260921"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [
@@ -1035,7 +1046,8 @@
         "native-grand-dashboard-20260919",
         "native-simulation-research-dashboard-20260919",
         "token-practice-coverage-20260920",
-        "current-session-observation-20260920"
+        "current-session-observation-20260920",
+        "native-dashboard-data-20260921"
       ],
       "source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
       "upstream_sources": [
@@ -1261,7 +1273,8 @@
         "native-worker-supervision-20260919",
         "token-practice-coverage-20260920",
         "native-worker-cgroup-20260920",
-        "native-service-reboot-20260920"
+        "native-service-reboot-20260920",
+        "native-dashboard-data-20260921"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1468,7 +1481,8 @@
         "native-token-clean-prefix-20260920",
         "current-session-observation-20260920",
         "native-token-stack-final-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-dashboard-data-20260921"
       ],
       "upstream_sources": [
         "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",

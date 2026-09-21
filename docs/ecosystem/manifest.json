@@ -311,6 +311,12 @@
   ],
   "guides": [
     {
+      "title": "Useful native dashboards: memory, retrieval and savings",
+      "body": "Populated upstream interfaces, exact command output bindings, seven separate savings scopes and 68 dated coverage records. Current native observation is separate from old audits, local fixtures and reload boundaries.",
+      "path": "docs/native-dashboard-data.md",
+      "category": "evaluation"
+    },
+    {
       "title": "Two grand catalogs: Foundation and Trading",
       "body": "General native harness capability decisions stay separate from the IBKR, Nautilus and Alpaca domain architecture.",
       "path": "catalogs/README.md",

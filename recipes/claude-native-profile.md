@@ -20,6 +20,8 @@ are separate results.
 Use the [native dashboard access guide](../docs/native-dashboards.md) for the
 installed upstream observation interfaces, passwordless loopback setup and
 actual browser/API results. Hosted Insight enrollment is separate.
+Use the [native data guide](../docs/native-dashboard-data.md) for memory/RAG,
+upstream graph and session views, source dates and separately scoped savings.
 
 ## Native installation and terminal entry
 

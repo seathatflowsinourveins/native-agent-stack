@@ -1,0 +1,118 @@
+{
+  "provenance": "Selected native metadata projection; host paths and private session IDs normalized. Original bytes remain private.",
+  "original": {
+    "bytes": 4314,
+    "sha256": "75e4f3b8bccf5c2c4610d9d402f9c25ab33fb9b8b8431fd86daaaa3296c5fbe6"
+  },
+  "data": {
+    "schema_version": 1,
+    "scope": "Static native HTML export of an existing local echo fixture, not a model-quality benchmark",
+    "upstream_version": "0.123.1",
+    "provider_or_eval_calls_this_task": 0,
+    "network_viewer_started": false,
+    "default_database_used_by_import_export": false,
+    "initial_inspection_limit": "An earlier --version call without explicit profile timed out at 10 seconds; no default-profile before hash was captured, so no blanket byte-preservation claim for that early help/version attempt. All import/export operations explicitly used the fresh owned profile.",
+    "plan_sha256": "480982b68a0e1b15e246f0cce5939f8b5de61c537a2ff670105c564abc02c699",
+    "commands": [
+      {
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/bin/promptfoo",
+          "export",
+          "eval",
+          "--help"
+        ],
+        "cwd": "<HOME>/codex-ecosystem/state/dashboard-data-20260921/promptfoo",
+        "started_at": "2026-09-21T02:51:18.871818+00:00",
+        "timeout_seconds": 60,
+        "exit_code": 0,
+        "timed_out": false,
+        "completed_at": "2026-09-21T02:51:30.164275+00:00",
+        "stdout": {
+          "file": "export-help.stdout",
+          "bytes": 612,
+          "sha256": "fd982d9d0b59038659eaf96b12df0b2858aea8893c6804046489fa63703564e1"
+        },
+        "stderr": {
+          "file": "export-help.stderr",
+          "bytes": 167,
+          "sha256": "f658a0a3bca04a712ebb7f6b09ab1366427709da2e9c3656efd6d164706893ce"
+        }
+      },
+      {
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/bin/promptfoo",
+          "import",
+          "<HOME>/codex-ecosystem/state/token-coverage-refresh-20260920/fresh-e2e/fixtures/promptfoo-local/promptfoo-result.json"
+        ],
+        "cwd": "<HOME>/codex-ecosystem/state/dashboard-data-20260921/promptfoo",
+        "started_at": "2026-09-21T02:51:30.164605+00:00",
+        "timeout_seconds": 60,
+        "exit_code": 0,
+        "timed_out": false,
+        "completed_at": "2026-09-21T02:51:43.693873+00:00",
+        "stdout": {
+          "file": "import.stdout",
+          "bytes": 74,
+          "sha256": "be0d9b22d9199ed2a6fa2a6c053dd304a52e573ab8f8fa447b1c93f81ffe36c5"
+        },
+        "stderr": {
+          "file": "import.stderr",
+          "bytes": 167,
+          "sha256": "06c560fa61c8ad3df390bbb526e1d3c00e4fb3744e6073e13d85dc33627441f4"
+        }
+      },
+      {
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/bin/promptfoo",
+          "export",
+          "eval",
+          "eval-2pS-2026-09-20T04:00:22",
+          "--output",
+          "<HOME>/.local/share/codex-ecosystem/dashboard-artifacts/promptfoo.html"
+        ],
+        "cwd": "<HOME>/codex-ecosystem/state/dashboard-data-20260921/promptfoo",
+        "started_at": "2026-09-21T02:51:43.694247+00:00",
+        "timeout_seconds": 60,
+        "exit_code": 0,
+        "timed_out": false,
+        "completed_at": "2026-09-21T02:51:54.666421+00:00",
+        "stdout": {
+          "file": "html-export.stdout",
+          "bytes": 153,
+          "sha256": "309f8ce1c8dbac634f04b1b8bc9d887a971ff88e7206b17cae6916fdbbdc3e0c"
+        },
+        "stderr": {
+          "file": "html-export.stderr",
+          "bytes": 167,
+          "sha256": "21f4bdebc8f64c73758768c392d55016593482f8f65fc7dda6d7ae1567da1d6d"
+        }
+      }
+    ],
+    "observation": {
+      "result_count": 2,
+      "passes": 2,
+      "failures": 0,
+      "response_output_strings_present_in_html": 2,
+      "html_document": true,
+      "original_source_unchanged": true,
+      "private_import_eval_count": 1
+    },
+    "artifact": {
+      "path": "<HOME>/.local/share/codex-ecosystem/dashboard-artifacts/promptfoo.html",
+      "bytes": 44311,
+      "sha256": "072260edaf43bc5e4738169169ee184a04220f93351f8ddb2aa87635c705c3d8"
+    },
+    "limits": [
+      "No new evaluation, model/provider quality or savings measurement",
+      "No network viewer; HTML generated via upstream renderer",
+      "Fixture-local paths can occur in the unmodified native HTML; keep it in the curated loopback dashboard, not public Git",
+      "Browser rendering not checked by this worker"
+    ],
+    "upstream_refs": [
+      "https://github.com/promptfoo/promptfoo/blob/0.123.1/src/commands/export.ts",
+      "https://github.com/promptfoo/promptfoo/blob/0.123.1/src/util/output.ts",
+      "https://www.promptfoo.dev/docs/usage/command-line/",
+      "https://www.promptfoo.dev/docs/configuration/outputs/"
+    ]
+  }
+}
