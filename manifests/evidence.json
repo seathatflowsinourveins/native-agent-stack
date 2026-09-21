@@ -6853,8 +6853,8 @@
     },
     {
       "path": "observability/grand-dashboard/progress.py",
-      "sha256": "5f3c0908f3cbbdec1c35f37ed9c9f436c59976b30a7ebc01282dccbf8750340c",
-      "bytes": 13478
+      "sha256": "e233469df9de5733bb5151d91606023be8f66dd00152a57536b10cceeac1c5ce",
+      "bytes": 13720
     },
     {
       "path": "observability/grand-dashboard/receipt.json",
@@ -7028,8 +7028,8 @@
     },
     {
       "path": "tests/test_grand_dashboard.py",
-      "sha256": "56fde9bf3570c521701928e848c924c2d1cedb982b1c7c4df67589a0d5697079",
-      "bytes": 10398
+      "sha256": "0b60a4c8bd8443fcb668ee003c5e88a785ce430460ee1a9e872f0ac9cdf22b8c",
+      "bytes": 13225
     },
     {
       "path": "tests/test_historical_comparison.py",
