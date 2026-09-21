@@ -44,4 +44,24 @@ The bundled desktop frontend has an upstream `__FREEAPI_SESSION__` bridge for au
 
 An `agent-browser auth login` success message alone did not establish login: the rendered screenshot exposed this validation error. Its temporary verification vault entry was removed. No account, email address, password or frontend validator was changed to hide the difference.
 
-Use the installed native FreeLLMAPI desktop launcher for the desktop profile. The Windows Computer Use tool could not inspect its window from this WSL task because it rejected the Linux working-directory URI before execution. Consequently, this wave qualifies restored process/readiness and authenticated API behavior, and retains browser sign-in as an observed boundary; it does not claim a newly inspected authenticated desktop dashboard. The existing working service remains available.
+The supported passwordless path is the installed **native desktop opener**, which preserves the recorded profile:
+
+```powershell
+node "$StackRoot\bin\open-component.cjs" FreeLLMAPI
+```
+
+The upstream [single-instance handler](https://github.com/tashfeenahmed/freellmapi/blob/955e9cf6413314d461d8130f695a81b8c5f246fe/desktop/src/main.ts#L61) opens the existing authenticated dashboard on another native launch. Its [window creation](https://github.com/tashfeenahmed/freellmapi/blob/955e9cf6413314d461d8130f695a81b8c5f246fe/desktop/src/window.ts#L18) and [preload](https://github.com/tashfeenahmed/freellmapi/blob/955e9cf6413314d461d8130f695a81b8c5f246fe/desktop/src/preload.ts#L1) supply and refresh the machine-account session automatically. No web-form workaround is necessary.
+
+This native path was then inspected using the installed `agent-browser` Electron workflow. A temporary launch with Electron's loopback debugging flag enabled attachment to the actual desktop renderer:
+
+```sh
+agent-browser skills get electron
+agent-browser --session free-native-inspection \
+  --cdp http://127.0.0.1:19226 snapshot -i
+agent-browser --session free-native-inspection \
+  --cdp http://127.0.0.1:19226 screenshot native-dashboard.png
+```
+
+The personally viewed screenshot showed the authenticated Models page with the existing two local models. The renderer reported `nativeDesktop: true`, `bridgePresent: true`, desktop version `0.11.0`, and zero password inputs. Selecting Analytics showed 15 retained requests and 100% success over seven days. Its native `/api/analytics/summary?range=7d` response independently returned **1,861 input tokens, 82 output tokens, 15 lifetime requests, and zero estimated cost savings**. These are historical gateway records, not new inference or token savings.
+
+The inspection session was closed, the desktop app was restored to its ordinary launch without debugging flags, and readiness again returned HTTP 200 with one ready upstream. The temporary debugging port was confirmed closed. The normal native opener then opened the desktop dashboard for use. The earlier ordinary-browser validation failure and WSL Computer Use limitation remain historical evidence; the authenticated native desktop inspection resolves the practical dashboard-access gap.
