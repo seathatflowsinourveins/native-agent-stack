@@ -82,6 +82,13 @@ class Normalization(unittest.TestCase):
         with self.assertRaises(t.TransportError):
             t.normalize_intent(intent(qty="0.1"), ["SPY"])
 
+    def test_wire_decimals_are_exact_fixed_point_for_risk_parser(self):
+        self.assertEqual(t.decimal_string("1E-9"), "0.000000001")
+        self.assertEqual(t.decimal_string("0.000000000"), "0")
+        self.assertEqual(t.decimal_string("100.010000000"), "100.01")
+        with self.assertRaises(t.TransportError):
+            t.decimal_string("1E1000000")
+
     def test_nonfinite_and_advanced_orders_rejected(self):
         for changes in ({"qty": "NaN"}, {"limit_price": "Infinity"}, {"qty": "0"},
                         {"extended_hours": True}, {"advanced_instructions": {"algorithm": "TWAP"}},
@@ -161,6 +168,23 @@ class HTTPBoundary(unittest.TestCase):
         self.assertTrue(result["open_orders_complete"])
         self.assertEqual(result["orders"], [])
         self.assertEqual([c.args[0] for c in self.budget.call_args_list], ["read"] * 5 + ["data_read"])
+
+    def test_closed_preflight_preserves_clock_with_invalid_and_missing_quotes(self):
+        trading, data = Mock(), Mock()
+        trading.get_account.return_value = {"id": "fixture-account", "cash": "1000", "equity": "1000", "buying_power": "1000"}
+        trading.get_clock.return_value = {"is_open": False, "timestamp": "2026-09-21T21:00:00Z",
+                                         "next_close": "2026-09-22T20:00:00Z", "next_open": "2026-09-22T13:30:00Z"}
+        trading.get_all_positions.return_value = []
+        trading.get.return_value = []
+        trading.get_asset.side_effect = lambda symbol: {"symbol": symbol, "tradable": True}
+        data.get_stock_latest_quote.return_value = {"SPY": {"bp": 0, "ap": 0, "t": "2026-09-21T21:00:00Z"}}
+        with patch.object(t, "_sdk_client", side_effect=[trading, data]):
+            result = t.preflight("fixture-key", "fixture-secret", ["SPY", "QQQ"], before_request=self.budget)
+        self.assertFalse(result["clock"]["is_open"])
+        self.assertEqual(result["quotes"], [])
+        self.assertEqual(result["quote_errors"], {"QQQ": "missing_quote", "SPY": "invalid_quote"})
+        self.assertEqual(result["positions"], [])
+        self.assertEqual(len(result["assets"]), 2)
 
 
 @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")

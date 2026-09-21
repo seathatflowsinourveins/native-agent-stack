@@ -54,7 +54,10 @@ def decimal_string(value, *, positive=False):
         raise TransportError("invalid decimal") from None
     if not number.is_finite() or (positive and number <= 0):
         raise TransportError("invalid decimal")
-    return str(number)
+    if number.adjusted() > 18 or number.as_tuple().exponent < -18:
+        raise TransportError("decimal precision out of bounds")
+    fixed = format(number, "f")
+    return fixed.rstrip("0").rstrip(".") if "." in fixed else fixed
 
 
 def timestamp_ns(value):
@@ -256,12 +259,21 @@ def preflight(api_key, secret_key, symbols, *, before_request, request_observer=
             assets.append({key: asset.get(key) for key in
                            ("symbol", "status", "tradable", "fractionable", "marginable", "shortable")})
         quotes = data.get_stock_latest_quote(StockLatestQuoteRequest(symbol_or_symbols=list(symbols), feed=DataFeed.IEX))
+        normalized_quotes, quote_errors = [], {}
+        for symbol in symbols:
+            if symbol not in quotes:
+                quote_errors[symbol] = "missing_quote"
+                continue
+            try:
+                normalized_quotes.append(normalize_quote(quotes[symbol], symbol))
+            except (TransportError, TypeError, ValueError, AttributeError, KeyError):
+                quote_errors[symbol] = "invalid_quote"
         return {"account": account, "account_identity_sha256": identity,
                 "clock": {"is_open": bool(clock["is_open"]),
                 "timestamp_ns": timestamp_ns(clock["timestamp"]), "next_close_ns": timestamp_ns(clock["next_close"]),
                 "next_open_ns": timestamp_ns(clock["next_open"])},
                 "positions": positions, "orders": orders, "open_orders_complete": len(raw_orders) < 500,
-                "assets": assets, "quotes": [normalize_quote(quotes[symbol], symbol) for symbol in symbols]}
+                "assets": assets, "quotes": normalized_quotes, "quote_errors": quote_errors}
     finally:
         trading._session.close()
         data._session.close()

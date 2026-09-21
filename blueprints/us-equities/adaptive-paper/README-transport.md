@@ -70,6 +70,10 @@ broker state; the caller reconciles concurrent stream observations. Synchronous
 assets and IEX quotes. Its SHA-256 account identity supports a private account
 lock without returning the raw account ID. `open_orders_complete=False` on a
 full 500-order page prevents claiming an empty account from a truncated list.
+Missing or invalid per-symbol quotes are returned as sanitized `quote_errors`
+alongside the valid quotes, preserving clock/account/asset readiness evidence
+after hours. The caller still requires valid fresh benchmark and execution quotes
+before admitting any order; a closed-session report is not paper execution.
 
 ## Upstream constraints and benchmark interpretation
 
