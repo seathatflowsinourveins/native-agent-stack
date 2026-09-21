@@ -20,11 +20,11 @@ import threading
 
 D = Decimal
 ZERO = D(0)
-TERMINAL = frozenset({"filled", "canceled", "expired", "rejected", "not_sent"})
+TERMINAL = frozenset({"filled", "canceled", "expired", "rejected", "not_sent", "broker_refused"})
 RANK = {"reserved": 0, "pending_new": 1, "accepted": 2, "new": 2,
         "accepted_for_bidding": 2, "held": 2, "partially_filled": 3,
         "pending_cancel": 4, "done_for_day": 4,
-        "filled": 5, "canceled": 5, "expired": 5, "rejected": 5, "not_sent": 5}
+        "filled": 5, "canceled": 5, "expired": 5, "rejected": 5, "not_sent": 5, "broker_refused": 5}
 DEFAULT_STOP = Path.home() / ".local/state/native-agent-stack/alpaca-paper/STOP"
 
 
@@ -344,12 +344,12 @@ class Ledger:
         if age < 0 or age >= allowed:
             raise SafetyError("trial_window_ended")
 
-    def _check_quote(self, quote, now):
+    def _check_quote(self, quote, now, *, check_spread=True):
         if not isinstance(quote, Quote):
             raise SafetyError("quote_required")
         if not -0.25 <= now - quote.timestamp <= self.limits.quote_max_age_seconds:
             raise SafetyError("quote_not_fresh")
-        if (quote.ask - quote.bid) * 10000 / ((quote.ask + quote.bid) / 2) > self.limits.max_spread_bps:
+        if check_spread and (quote.ask - quote.bid) * 10000 / ((quote.ask + quote.bid) / 2) > self.limits.max_spread_bps:
             raise SafetyError("quote_spread_exceeds_cap")
 
     def _mark(self, quote):
@@ -417,7 +417,7 @@ class Ledger:
                 if (existing.symbol, existing.side, existing.qty, existing.limit_price) != (symbol, side, qty, price):
                     raise SafetyError("client_id_conflicts_with_durable_intent")
                 return existing
-            self._check_quote(quote, now)
+            self._check_quote(quote, now, check_spread=side == "buy")
             if quote.symbol != symbol:
                 raise SafetyError("quote_symbol_mismatch")
             if market_open is not True or close - now < (self.limits.min_entry_close_seconds if side == "buy" else 1):
@@ -445,14 +445,14 @@ class Ledger:
                 if state.gross_exposure_usd + qty * price > min(self.limits.max_gross_exposure_usd, equity):
                     raise SafetyError("aggregate_exposure_cap_exceeded")
                 exposed = set(self._positions()) | {r[0] for r in self.db.execute(
-                    "SELECT symbol FROM intents WHERE side='buy' AND status NOT IN ('filled','canceled','expired','rejected','not_sent')")}
+                    "SELECT symbol FROM intents WHERE side='buy' AND status NOT IN ('filled','canceled','expired','rejected','not_sent','broker_refused')")}
                 if len(exposed | {symbol}) > self.limits.max_held_symbols:
                     raise SafetyError("held_symbol_cap_reached")
             else:
                 held = self._positions().get(symbol)
                 pending_sell = sum((D(r["qty"]) - D(r["filled_qty"]) for r in self.db.execute(
                     "SELECT qty,filled_qty FROM intents WHERE symbol=? AND side='sell' AND "
-                    "status NOT IN ('filled','canceled','expired','rejected','not_sent')", (symbol,))), ZERO)
+                    "status NOT IN ('filled','canceled','expired','rejected','not_sent','broker_refused')", (symbol,))), ZERO)
                 if held is None or qty > held.qty - pending_sell:
                     raise SafetyError("sell_exceeds_owned_unreserved_position")
             self.db.execute("INSERT INTO intents(client_id,symbol,side,qty,limit_price,status,updated_at) "
@@ -475,7 +475,7 @@ class Ledger:
             intent = _intent(row)
             if intent.status != "reserved" or intent.broker_id is not None or intent.filled_qty:
                 raise SafetyError("pending_intent_already_observed_or_terminal")
-            self._check_quote(quote, now)
+            self._check_quote(quote, now, check_spread=intent.side == "buy")
             if quote.symbol != intent.symbol:
                 raise SafetyError("quote_symbol_mismatch")
             if market_open is not True or close - now < (self.limits.min_entry_close_seconds if intent.side == "buy" else 1):
@@ -529,9 +529,33 @@ class Ledger:
             self._event("intent_not_sent", client_id, reason=reason)
             return True
 
+    def mark_broker_refused(self, client_id, http_status):
+        """Retire a proven HTTP refusal after transport's client-ID absence check.
+
+        Only 401/403/404 plus a subsequent broker client-ID lookup returning 404
+        qualify at the transport seam. Caller owns that evidence; this API never
+        infers refusal from absence alone. Timeout/400/422/429/5xx stay ambiguous.
+        """
+        if type(http_status) is not int or http_status not in (401, 403, 404):
+            raise SafetyError("unsupported_broker_refusal_status")
+        with self._transaction():
+            row = self.db.execute("SELECT * FROM intents WHERE client_id=?", (client_id,)).fetchone()
+            if row is None:
+                raise SafetyError("unknown_client_order_id")
+            intent = _intent(row)
+            if intent.status == "broker_refused":
+                return False
+            if (intent.status != "reserved" or not intent.submit_attempted
+                    or intent.broker_id is not None or intent.filled_qty):
+                raise SafetyError("cannot_mark_order_broker_refused")
+            self.db.execute("UPDATE intents SET status='broker_refused' WHERE client_id=?", (client_id,))
+            self._event("broker_refused", client_id, http_status=http_status,
+                        evidence_required="submission_http_refusal_then_client_id_404")
+            return True
+
     def record_order(self, client_id, broker_id, status, cumulative_qty, average_price, *, timestamp=None):
         if (type(broker_id) is not str or not broker_id or len(broker_id) > 128
-                or type(status) is not str or status not in RANK or status in ("reserved", "not_sent")):
+                or type(status) is not str or status not in RANK or status in ("reserved", "not_sent", "broker_refused")):
             raise SafetyError("invalid_broker_order_identity_or_status")
         filled = decimal(cumulative_qty, zero=True)
         average = decimal(average_price) if filled else None
@@ -543,6 +567,8 @@ class Ledger:
             old = _intent(row)
             if old.status == "not_sent":
                 raise SafetyError("broker_observation_after_definitive_not_sent")
+            if old.status == "broker_refused":
+                raise SafetyError("broker_observation_after_definitive_refusal")
             if old.broker_id not in (None, broker_id):
                 raise SafetyError("broker_order_identity_changed")
             if filled > old.qty or (status == "filled" and filled != old.qty):
@@ -633,7 +659,7 @@ class Ledger:
         now = instant(now)
         values = list(quotes.values()) if isinstance(quotes, dict) else list(quotes)
         for quote in values:
-            self._check_quote(quote, now)
+            self._check_quote(quote, now, check_spread=False)
         with self._transaction(keep_observations_on_refusal=True):
             for quote in values:
                 self._mark(quote)

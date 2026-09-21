@@ -55,6 +55,13 @@ limit-order mechanism guarantees a flat finish.
   that no HTTP request was sent; a timeout or other ambiguous send must remain
   unresolved and be queried by its existing client ID. Observed orders cannot
   be marked not sent, and a later broker observation of such an ID fails closed.
+- `mark_broker_refused(client_id, http_status)` records distinct local terminal
+  status `broker_refused` for an attempted zero-fill order without broker ID.
+  Only HTTP 401/403/404 qualify, and transport must first establish that the
+  subsequent client-ID lookup returned 404. It retains the HTTP status and budget.
+  Timeout, 400, 422, 429 and 5xx remain ambiguous. Neither local terminal status is
+  adopted or looked up as a broker order on restart; any later broker observation
+  of the identity fails closed.
 - `record_order(client_id, broker_id, status, cumulative_qty, average_price, *,
   timestamp=None)` applies owned broker observations and returns whether state
   changed. Cumulative quantity decreases are stale and ignored. Duplicate fills
@@ -70,6 +77,8 @@ limit-order mechanism guarantees a flat finish.
   returns `AccountState`. Update marks from fresh quote observations. Every held
   symbol must have a fresh mark before increasing exposure. Risk refusals retain
   their actual observations and resulting persistent loss halts.
+  Valuation and owned exits permit a wide but valid fresh spread: the bid still
+  represents current liquidation risk. The spread admission cap applies to buys.
 - `intents()`, `unresolved()`, `positions()` and `accounting()` expose durable
   state. Positions map symbol to `Position` with `qty`, `cost_basis_usd`, and
   `average_cost`. `freeze(reason)` stores an irreversible halt for this bounded

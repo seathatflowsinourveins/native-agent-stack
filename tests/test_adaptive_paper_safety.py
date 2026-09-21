@@ -514,6 +514,49 @@ class SafetyTests(unittest.TestCase):
             with self.assertRaisesRegex(s.SafetyError, "quote_not_fresh"):
                 action()
 
+    def test_proven_broker_refusal_has_distinct_status_and_retains_request(self):
+        self.reserve()
+        with self.assertRaisesRegex(s.SafetyError, "cannot_mark_order_broker_refused"):
+            self.ledger.mark_broker_refused("buy-1", 403)
+        self.ledger.request_budget(self.now, "submit", "buy-1")
+        for bad in [400, 422, 429, 500, True, "403"]:
+            with self.assertRaisesRegex(s.SafetyError, "unsupported_broker_refusal"):
+                self.ledger.mark_broker_refused("buy-1", bad)
+        self.assertTrue(self.ledger.mark_broker_refused("buy-1", 403))
+        self.assertFalse(self.ledger.mark_broker_refused("buy-1", 403))
+        self.reopen()
+        intent = self.ledger.intents()[0]
+        self.assertEqual(intent.status, "broker_refused")
+        self.assertTrue(intent.terminal)
+        self.assertTrue(intent.submit_attempted)
+        self.assertIsNone(intent.broker_id)
+        self.assertEqual(self.ledger.unresolved(), [])
+        self.assertEqual(self.ledger.accounting().pending_buy_notional_usd, 0)
+        self.assertEqual(self.ledger.db.execute("SELECT COUNT(*) FROM requests").fetchone()[0], 1)
+        with self.assertRaisesRegex(s.SafetyError, "after_definitive_refusal"):
+            self.fill()
+
+    def test_wide_quote_values_held_loss_but_does_not_block_owned_exit(self):
+        self.reserve()
+        self.fill()
+        wide = self.quote(bid="74", ask="100")
+        state = self.ledger.mark_to_market([wide], self.now)
+        self.assertEqual(state.unrealized_pnl_usd, -26)
+        self.assertEqual(state.gross_loss_usd, 26)
+        self.assertEqual(state.halted_reason, "gross_loss_cap_reached")
+        self.reserve("sell-1", side="sell", price="73.99", quote=wide)
+        self.validate("sell-1", quote=wide)
+
+    def test_nonheld_wide_mark_does_not_halt_but_wide_entry_still_refused(self):
+        wide = self.quote("QQQ", bid="90", ask="100")
+        state = self.ledger.mark_to_market([wide], self.now)
+        self.assertIsNone(state.halted_reason)
+        with self.assertRaisesRegex(s.SafetyError, "quote_spread_exceeds_cap"):
+            self.reserve("buy-QQQ", symbol="QQQ", quote=wide)
+        self.reserve()
+        with self.assertRaisesRegex(s.SafetyError, "quote_spread_exceeds_cap"):
+            self.validate(quote=self.quote(bid="90", ask="100"))
+
 
 if __name__ == "__main__":
     unittest.main()
