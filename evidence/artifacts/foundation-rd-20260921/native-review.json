@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-21T20:12:35.382297+00:00",
+  "evidence_kind": "native_cli_e2e",
+  "scope": "Literal Claude /codex:review to official companion to native Codex, returned review of three changed paper-guard files; no broker execution",
+  "command_argv": [
+    "claude",
+    "-p",
+    "/codex:review --wait --scope branch --base 907485219d8437ee407ec716615b0e3af4e35cc2 --json",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--max-turns",
+    "8"
+  ],
+  "working_directory": "dedicated clean review worktree",
+  "review_head": "1f06fb78eef6324d10995f10f6c290886fd5c81f",
+  "review_base": "907485219d8437ee407ec716615b0e3af4e35cc2",
+  "versions": {
+    "claude_code": "2.1.278",
+    "codex_cli": "0.155.1",
+    "official_companion": "1.0.6"
+  },
+  "upstream": {
+    "repository": "https://github.com/openai/codex-plugin-cc",
+    "source_pin": "db52e28f4d9ded852ab3942cea316258ae4ef346"
+  },
+  "native_settings": {
+    "model": "claude-fable-5-1",
+    "permission_mode": "bypassPermissions",
+    "model_override": null,
+    "permission_override": null,
+    "broker_environment_removed": true
+  },
+  "returned_companion_result": {
+    "review": "Review",
+    "target": {
+      "mode": "branch",
+      "label": "branch diff against 907485219d8437ee407ec716615b0e3af4e35cc2",
+      "baseRef": "907485219d8437ee407ec716615b0e3af4e35cc2",
+      "explicit": true
+    },
+    "codex": {
+      "status": 0,
+      "stderr": "",
+      "stdout": "No actionable regressions were found. All 32 local synthetic Alpaca paper tests passed; native broker execution was not exercised.",
+      "reasoning": []
+    }
+  },
+  "claude_result": {
+    "subtype": "success",
+    "is_error": false,
+    "terminal_reason": "completed",
+    "num_turns": 2,
+    "duration_ms": 106380,
+    "total_cost_usd": 0.53955225,
+    "usage": {
+      "input_tokens": 34,
+      "cache_creation_input_tokens": 25090,
+      "cache_read_input_tokens": 44449,
+      "output_tokens": 526,
+      "output_tokens_details": {
+        "thinking_tokens": 41
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 25090,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "not_available",
+      "iterations": [
+        {
+          "input_tokens": 32,
+          "output_tokens": 276,
+          "cache_read_input_tokens": 34358,
+          "cache_creation_input_tokens": 823,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 823
+          },
+          "type": "message",
+          "model": null
+        }
+      ],
+      "speed": "standard"
+    },
+    "modelUsage": {
+      "claude-fable-5-1": {
+        "inputTokens": 34,
+        "outputTokens": 526,
+        "cacheReadInputTokens": 44449,
+        "cacheCreationInputTokens": 25090,
+        "webSearchRequests": 0,
+        "costUSD": 0.53955225,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000,
+        "thinkingTokens": 41,
+        "canonicalModel": "claude-fable-5-1",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "permission_denials": []
+  },
+  "process_exit_code": 0,
+  "elapsed_monotonic_seconds": 108.423,
+  "codex_usage": null,
+  "codex_model": null,
+  "codex_effort": null,
+  "codex_accounting_limit": "Companion native review result does not expose these values; its review thread is ephemeral in inspected source.",
+  "claude_cost_limit": "Native list-price estimate, not a billing invoice or token-saving comparison.",
+  "independent_observations": {
+    "review_checkout_unchanged": true,
+    "post_session_broker_record_present": false,
+    "post_session_jobs": 0
+  },
+  "original_private_outputs": {
+    "stdout.jsonl": {
+      "sha256": "4097b608e9d873c32fa0bbaa6e6100454bc41cfdcb8ae8a85607af036b960e10",
+      "bytes": 29904
+    },
+    "stderr.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "invocation.json": {
+      "sha256": "5de2ac9948d4c5a0abb0eb3a9d892edd9a475f7a0e5fd9ef414547421502748a",
+      "bytes": 878
+    }
+  },
+  "projection": "Structured allowlist from original native tool result and final Claude result; host paths, local session identifiers and unrelated stream messages omitted. Originals retained privately.",
+  "limits": [
+    "No native broker retest of revised code",
+    "No same-workspace concurrent-session qualification",
+    "No Workflow background polling qualification",
+    "Earlier aborted attempt retained separately; its cause remains unknown",
+    "No causal savings or durable Codex-thread claim"
+  ]
+}
