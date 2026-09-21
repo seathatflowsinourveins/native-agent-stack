@@ -500,6 +500,40 @@ class IdentityComponentTests(unittest.TestCase):
         self.assertEqual(con.execute("SELECT count(*) FROM joined WHERE symbol='BBB'").fetchone()[0], 25)
         self.assertEqual(con.execute("SELECT count(*) FROM joined WHERE symbol='CCC'").fetchone()[0], 25)
 
+    def test_transitive_links_leave_one_row_per_session(self):
+        # AAA~BBB on sessions 0-24, BBB~CCC on 20-44; AAA is later reused (a far-off bar), which
+        # ranks it above BBB. AAA/CCC share only 5 sessions, so they never qualify directly, yet on
+        # sessions 20-24 all three are one security: exactly one row per session may remain.
+        rows = self._shared(["AAA", "BBB"], start_day=0, count=20)
+        rows += self._shared(["AAA", "BBB", "CCC"], start_day=20, count=5, price=120.0)
+        rows += self._shared(["BBB", "CCC"], start_day=25, count=20, price=125.0)
+        rows += self._shared(["CCC"], start_day=45, count=5, price=145.0)      # CCC keeps trading
+        rows += self._shared(["AAA"], start_day=300, count=3, price=7.0)       # ticker reused later
+        con = self._con(rows)
+        coverage.dedupe_identity(con, {("BBB", "CCC")})
+        per_session = dict(con.execute(
+            "SELECT session_date, count(*) FROM joined WHERE session_date < DATE '2022-02-20' GROUP BY 1").fetchall())
+        self.assertEqual(len(per_session), 50)
+        self.assertEqual(set(per_session.values()), {1})
+        self.assertEqual(con.execute("SELECT count(*) FROM joined WHERE symbol='CCC'").fetchone()[0], 30)
+
+    def test_residue_is_counted_among_the_rows_actually_removed(self):
+        # BBB keeps 25 early sessions (its survivor CCC has no bar there) and loses 86 later ones,
+        # one of which is a zero-volume halt that is not byte-identical. Residue must be 1, not 0.
+        # (85 identical of 86 rows keeps the BBB/CCC pair above the 98% span-coverage test.)
+        rows = self._shared(["AAA", "BBB"], start_day=0, count=25)
+        rows += self._shared(["BBB", "CCC"], start_day=25, count=25, price=200.0)
+        halt_day = 50
+        rows += [("BBB",) + _identical(["BBB"], halt_day, 225.0)[0][1:6] + (0.0,),
+                 ("CCC",) + _identical(["CCC"], halt_day, 225.0)[0][1:6] + (5.0,)]
+        rows += self._shared(["BBB", "CCC"], start_day=51, count=60, price=226.0)
+        con = self._con(rows)
+        report = coverage.dedupe_identity(con, {("AAA", "BBB"), ("BBB", "CCC")})
+        bbb = next(item for item in report["detail"] if item["dropped"] == "BBB")
+        self.assertEqual(bbb["rows_removed"], 86)
+        self.assertEqual(bbb["residue_rows_removed"], 1)
+        self.assertEqual(con.execute("SELECT count(*) FROM joined WHERE symbol='BBB'").fetchone()[0], 25)
+
     def test_three_way_duplicate_without_rename_records_is_reported_unresolved(self):
         rows = self._shared(["AAA", "MMM", "ZZZ"])
         con = self._con(rows)

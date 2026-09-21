@@ -377,25 +377,41 @@ def dedupe_identity(con, rename_pairs, active_symbols=frozenset(), rename_stats=
             keep, rule = min(members), "lexicographic_fallback"
 
         # Preference order inside the component: the survivor, then the members that trade
-        # latest. A row is removed only where a higher-ranked member it is paired with has
-        # a row on that session, so a chain A->B->C whose survivor C has no bars for A/B's
-        # early span keeps exactly one copy of that span (under B) instead of losing it.
-        last_seen = dict(con.execute(f"""
-            SELECT symbol, max(session_date) FROM identity_snapshot
-            WHERE symbol IN ({','.join('?' * len(members))}) GROUP BY 1
-        """, members).fetchall())
+        # latest. Winners are resolved PER SESSION through transitive qualified links: on a
+        # session where A~B and B~C are both in force, A, B and C are one security and only
+        # the highest-ranked stays, even if A and C never qualified as a direct pair. A
+        # session the survivor has no bar for keeps exactly one copy under the best-ranked
+        # member that does, so a staggered rename chain never loses history.
+        marks = ",".join("?" * len(members))
+        last_seen = dict(con.execute(
+            f"SELECT symbol, max(session_date) FROM identity_snapshot WHERE symbol IN ({marks}) GROUP BY 1",
+            members).fetchall())
         ranked = [keep] + sorted((m for m in members if m != keep),
                                  key=lambda m: (-(last_seen[m].toordinal() if last_seen.get(m) else 0), m))
-        for rank, drop in enumerate(ranked):
-            if drop == keep:
-                continue
-            others = sorted(member_set - {drop})
-            placeholders = ",".join("?" * len(others))
-            shared_rows = con.execute(f"""
-                SELECT count(DISTINCT session_date), min(session_date), max(session_date) FROM qualified_dup
-                WHERE (sym_a = ? AND sym_b IN ({placeholders})) OR (sym_b = ? AND sym_a IN ({placeholders}))
-            """, [drop] + others + [drop] + others).fetchone()
-            identical, first_shared, last_shared = shared_rows
+        rank_of = {m: i for i, m in enumerate(ranked)}
+        dup_sessions = con.execute(
+            f"SELECT sym_a, sym_b, session_date FROM qualified_dup WHERE sym_a IN ({marks}) AND sym_b IN ({marks})",
+            members + members).fetchall()
+        pair_span, identical_rows = {}, set()
+        for sym_a, sym_b, day in dup_sessions:
+            first, last_day = pair_span.get((sym_a, sym_b), (day, day))
+            pair_span[(sym_a, sym_b)] = (min(first, day), max(last_day, day))
+            identical_rows.update({(sym_a, day), (sym_b, day)})
+        span_first = min(v[0] for v in pair_span.values())
+        span_last = max(v[1] for v in pair_span.values())
+        present = defaultdict(set)
+        for symbol, day in con.execute(
+                f"SELECT symbol, session_date FROM identity_snapshot WHERE symbol IN ({marks}) "
+                "AND session_date BETWEEN ? AND ?", members + [span_first, span_last]).fetchall():
+            present[day].add(symbol)
+
+        entries, protected = {}, set()
+        for drop in ranked[1:]:
+            mine = [(k, v) for k, v in pair_span.items() if drop in k]
+            first_shared = min(v[0] for _, v in mine)
+            last_shared = max(v[1] for _, v in mine)
+            identical = len({day for symbol, day in identical_rows
+                             if symbol == drop and first_shared <= day <= last_shared})
             span_rows = rows_in_span(drop, first_shared, last_shared)
             ratio = identical / span_rows if span_rows else 0.0
             entry = {"kept": keep, "dropped": drop, "rule": rule, "identical_sessions": identical,
@@ -408,25 +424,36 @@ def dedupe_identity(con, rename_pairs, active_symbols=frozenset(), rename_stats=
                 entry["reason"] = ("shared sessions do not cover this symbol's history inside the span; "
                                    "left untouched")
                 partial.append(entry)
+                protected.add(drop)
                 continue
-            higher = ranked[:rank]
-            higher_marks = ",".join("?" * len(higher))
-            removed = con.execute(f"""
-                DELETE FROM joined WHERE symbol = ? AND EXISTS (
-                    SELECT 1 FROM (
-                        SELECT CASE WHEN sym_a = ? THEN sym_b ELSE sym_a END AS other,
-                               min(session_date) AS first, max(session_date) AS last
-                        FROM qualified_dup WHERE sym_a = ? OR sym_b = ? GROUP BY 1
-                    ) p JOIN identity_snapshot s ON s.symbol = p.other
-                    WHERE p.other IN ({higher_marks}) AND s.session_date = joined.session_date
-                      AND joined.session_date BETWEEN p.first AND p.last)
-            """, [drop, drop, drop, drop] + higher).fetchone()
-            rows_removed = removed[0] if removed else 0
-            entry["rows_removed"] = rows_removed
-            # Zero-volume halts and all-series-only rows are never byte-identical, so they
-            # used to survive as a sparse phantom series under the dropped ticker.
-            entry["residue_rows_removed"] = max(0, rows_removed - identical)
-            entry["rows_retained_without_survivor_row"] = max(0, span_rows - rows_removed)
+            entries[drop] = entry
+
+        doomed = defaultdict(list)
+        for day, symbols in present.items():
+            linked = {m: {m} for m in symbols}
+            for (sym_a, sym_b), (first, last_day) in pair_span.items():
+                if sym_a in linked and sym_b in linked and first <= day <= last_day:
+                    merged = linked[sym_a] | linked[sym_b]
+                    for member in merged:
+                        linked[member] = merged
+            for group in {frozenset(v) for v in linked.values() if len(v) > 1}:
+                winner = min(group, key=lambda m: rank_of[m])
+                for member in group:
+                    if member != winner and member not in protected:
+                        doomed[member].append(day)
+
+        for drop, entry in entries.items():
+            days = doomed.get(drop, [])
+            if days:
+                con.execute("CREATE OR REPLACE TEMP TABLE doomed_days (session_date DATE)")
+                con.executemany("INSERT INTO doomed_days VALUES (?)", [(d,) for d in days])
+                con.execute("DELETE FROM joined WHERE symbol = ? AND session_date IN "
+                            "(SELECT session_date FROM doomed_days)", [drop])
+            entry["rows_removed"] = len(days)
+            # Zero-volume halts and all-series-only rows are never byte-identical; count them
+            # among the rows ACTUALLY removed, not across the whole component span.
+            entry["residue_rows_removed"] = sum(1 for d in days if (drop, d) not in identical_rows)
+            entry["rows_retained_without_survivor_row"] = max(0, entry["rows_in_span"] - len(days))
             if entry["identity_unresolved"]:
                 unresolved += 1
             report.append(entry)
