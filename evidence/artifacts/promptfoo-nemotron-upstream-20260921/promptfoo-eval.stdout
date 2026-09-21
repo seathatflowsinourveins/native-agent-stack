@@ -1,0 +1,29 @@
+Cache is disabled.
+Starting evaluation eval-H2V-2026-09-21T13:39:25
+Running 1 test cases (up to 1 at a time)...
+
+[90m┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐[39m
+[90m│[39m[1m[34m [NVIDIA published example via native Python and local vLLM] NVIDIA's four published retrieval queries and documents    [39m[22m[90m│[39m
+[90m│[39m[1m[34m (the upstream script owns the inputs)                                                                                  [39m[22m[90m│[39m
+[90m├────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤[39m
+[90m│[39m [PASS] Similarity scores:                                                                                              [90m│[39m
+[90m│[39m           d[0]      d[1]      d[2]      d[3]                                                                           [90m│[39m
+[90m│[39m q[0]    0.8115    0.0253    0.0004   -0.0310                                                                           [90m│[39m
+[90m│[39m q[1]    0.0447    0.6470   -0.0510    0.0384                                                                           [90m│[39m
+[90m│[39m q[2]   -0.0101   -0.0404    0.6466    0.0998                                                                           [90m│[39m
+[90m│[39m q[3]   -0.0223    0.0219    0.1204    0.7691                                                                           [90m│[39m
+[90m└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘[39m
+✓ Eval complete (ID: eval-H2V-2026-09-21T13:39:25)
+
+» View results: promptfoo view
+» Share with your team: https://promptfoo.app
+» Feedback: https://promptfoo.dev/feedback
+
+
+Results:
+  ✓ 1 passed (100%)
+  0 failed (0%)
+  0 errors (0%)
+Duration: 0s (concurrency: 1)
+
+Writing output to results.json, report.html
