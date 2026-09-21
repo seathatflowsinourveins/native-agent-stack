@@ -56,6 +56,7 @@ RETURNED_RECEIPT_FAMILIES = {
 PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
 PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024
 NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json",
+                    "docs/native-skill-practice-20260921.md",
                     "docs/token-native-saturation.md", "catalogs/us-equities/README.md",
                     "catalogs/us-equities/decision-index.json", "catalogs/us-equities/manifest.json",
                     "docs/claude-upstream-checks.md", "docs/ecosystem/claude-upstream-checks.html",
@@ -332,7 +333,8 @@ def build_data(root):
         # This packet is newer than the immutable base; its own new pages resolve
         # at the public branch after publication, with exact input hashes retained.
         new_catalog = path.startswith(("catalogs/foundation/", "catalogs/landscape/", "docs/landscape-")) or path in config.get("grand_catalogs", {}).values()
-        revision = "main" if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog or path in current_public_paths else config["source_revision"]
+        new_practice = path.startswith(("blueprints/native-skill-practice/", "examples/codex-native/agents/semantic-", "examples/claude-native/agents/semantic-"))
+        revision = "main" if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog or new_practice or path in current_public_paths else config["source_revision"]
         return f'{config["repository_url"]}/blob/{revision}/{quote(path, safe="/")}'
 
     index, stack, evidence, stars, review = (read(path) for path in (INDEX, STACK, EVIDENCE, STARS, REVIEW))
@@ -494,6 +496,8 @@ def build_data(root):
     if config.get("landscape_manifest"):
         guide_paths.extend(["catalogs/landscape/README.md", "docs/landscape-foundation-notes.md",
                             "docs/landscape-domain-notes.md", "docs/landscape-freshness-notes.md"])
+        if landscape_manifest["sources"].get("native_practice"):
+            guide_paths.extend(["docs/native-skill-practice-20260921.md", "blueprints/native-skill-practice/README.md"])
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))
     recipes = []
     for path in documents_to_embed:

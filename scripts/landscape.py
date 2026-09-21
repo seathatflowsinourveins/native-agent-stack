@@ -199,7 +199,29 @@ def build_landscape(root, manifest_path=MANIFEST, *, read=None, track=None, file
               "historical_candidate_cards": sum(len(row["catalog_candidates"]) for row in layers),
               "dispositions": dict(sorted(Counter(candidate["disposition"] for row in layers
                                                     for candidate in row["candidates"]).items()))}
-    return {**manifest, "layers": layers, "counts": counts, "freshness": freshness,
+    practice = None
+    if sources.get("native_practice"):
+        practice = read(sources["native_practice"])
+        require(practice.get("schema_version") == 1 and practice.get("checked_at") == manifest["checked_at"],
+                "native practice schema or date differs from landscape")
+        require(isinstance(practice.get("skills"), list) and practice["skills"], "native practice needs selected skills")
+        names = set()
+        for skill in practice["skills"]:
+            name = nonempty(skill.get("name"), "skill.name")
+            require(name not in names, "duplicate selected skill")
+            names.add(name)
+            require(canonical(identity(skill.get("repository")), aliases) in identities,
+                    "selected skill repository absent from index")
+            require(isinstance(skill.get("source_pin"), str) and re.fullmatch(r"[0-9a-f]{40}", skill["source_pin"]),
+                    "selected skill needs a full source commit")
+            require(isinstance(skill.get("skill_sha256"), str) and re.fullmatch(r"[0-9a-f]{64}", skill["skill_sha256"]),
+                    "selected skill needs its exact content hash")
+            nonempty(skill.get("rationale"), "skill.rationale")
+            require(isinstance(skill.get("limits"), list) and skill["limits"], "selected skill needs limits")
+            skill["sources"] = evidence(skill.get("evidence_refs"), name)
+        practice = {**practice, "url": file_url(sources["native_practice"])}
+        counts["applied_skills"] = len(names)
+    return {**manifest, "layers": layers, "counts": counts, "freshness": freshness, "native_practice": practice,
             "url": file_url(manifest_path), "freshness_url": file_url(sources["freshness_snapshot"])}
 
 

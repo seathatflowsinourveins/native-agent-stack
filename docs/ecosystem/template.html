@@ -396,6 +396,10 @@ function initializeLandscape() {
     const anchor = make("a"); anchor.href=url; anchor.download="native-stack-landscape-"+landscape.checked_at+".json"; anchor.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
   });
   add($("landscape-actions"), exportButton, link("Canonical manifest ↗", landscape.url), link("Current upstream metadata and failures ↗", landscape.freshness_url));
+  if(landscape.native_practice) {
+    add($("landscape-summary"), make("p", "", "Applied skills: " + landscape.native_practice.skills.map(skill=>skill.name).join(", ") + ". Native workers verify source evidence; semantic judgments remain advisory."));
+    add($("landscape-actions"), recipeButton("docs/native-skill-practice-20260921.md", "Skills & native workers"), link("Skill pins and qualification ↗", landscape.native_practice.url));
+  }
   add($("foundation-guides"), landscapeAction("foundation")); add($("trading-guides"), landscapeAction("us-equities"));
   add($("catalog-entry-points"), add(make("article", "catalog-entry"), make("div", "eyebrow", "Evidence for the selection"), make("h2", "", "Choices & alternatives"), make("p", "", "Why each layer is selected, why alternatives remain conditional, and the evidence needed to change the choice."), catalogAction("landscape","Compare the choices →")));
   ["landscape-search","landscape-catalog","landscape-outcome"].forEach(id=>$(id).addEventListener(id.endsWith("search")?"input":"change",renderLandscape));

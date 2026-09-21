@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "purpose": "Source review of advisory TypeSafe judgments; independent verification, no execution authority.",
+  "case_pack_sha256": "7cc28c50afb9842de3d8dc923e80159bf99d0f0e9acd643684a99b61b3ad3a40",
+  "oracle_labels_included": false,
+  "source_roots": {
+    "catalog": "."
+  },
+  "cases": [
+    {
+      "case_id": "C1",
+      "source_ref": "evidence/artifacts/foundation-closure-20260921/compaction.json",
+      "source_excerpt": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established \u2014 they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No \u2014 this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+      "source_excerpt_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+      "claim": "Manual compaction returned successful Context Mode and ai-memory PreCompact hook observations.",
+      "advisory_judgment": {
+        "verdict": "supported",
+        "confidence": 1,
+        "probabilities": {
+          "supported": 1,
+          "insufficient": 0,
+          "contradicted": 0
+        },
+        "model": "jev-1.13.0"
+      },
+      "availability": {
+        "eligible": true,
+        "disposition": "advisory_supported"
+      }
+    },
+    {
+      "case_id": "C2",
+      "source_ref": "evidence/artifacts/foundation-closure-20260921/compaction.json",
+      "source_excerpt": "{\n  \"schema_version\": 1,\n  \"trigger\": \"manual\",\n  \"native_metadata\": {\n    \"preTokens\": 87434,\n    \"postTokens\": 14934,\n    \"cumulativeDroppedTokens\": 72500,\n    \"durationMs\": 42506\n  },\n  \"precompact_hook_observation\": {\n    \"ai-memory_success\": true,\n    \"context-mode_success\": true\n  },\n  \"continuity_responses\": [\n    \"review-contract = foundation-20260921.\\nProvider savings were not established \u2014 they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.\",\n    \"No \u2014 this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work.\"\n  ],\n  \"post_boundary_model_tool_calls\": [],\n  \"oracle\": {\n    \"identifier\": \"foundation-20260921\",\n    \"provider_savings\": \"unknown\",\n    \"broker_acceptance\": \"not established by document review; separate per broker\"\n  },\n  \"limitations\": [\n    \"Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.\",\n    \"Context-size change is not provider savings; compaction consumes inference.\",\n    \"Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained.\"\n  ]\n}\n",
+      "source_excerpt_sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+      "claim": "Automatic compaction preserves every fact.",
+      "advisory_judgment": {
+        "verdict": "insufficient",
+        "confidence": 0.95,
+        "probabilities": {
+          "insufficient": 0.96,
+          "contradicted": 0.04,
+          "supported": 0
+        },
+        "model": "jev-1.13.0"
+      },
+      "availability": {
+        "eligible": true,
+        "disposition": "advisory_insufficient"
+      }
+    },
+    {
+      "case_id": "C3",
+      "source_ref": "docs/native-workflow-writing-recovery-20260921.md",
+      "source_excerpt": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+      "source_excerpt_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+      "claim": "Independent verification accepted both repairs in this small repair comparison.",
+      "advisory_judgment": {
+        "verdict": "supported",
+        "confidence": 1,
+        "probabilities": {
+          "supported": 1,
+          "insufficient": 0,
+          "contradicted": 0
+        },
+        "model": "jev-1.13.0"
+      },
+      "availability": {
+        "eligible": true,
+        "disposition": "advisory_supported"
+      }
+    },
+    {
+      "case_id": "C4",
+      "source_ref": "docs/native-workflow-writing-recovery-20260921.md",
+      "source_excerpt": "# Native Workflow writing and recovery qualification\n\nThe bounded writing pilot produced correct code in both arms. It did **not**\nestablish a fully compliant or superior multi-agent workflow: both arms piped\nnative test output, and the Workflow arm omitted the required authoring skill.\nIndependent unpiped verification accepted both repairs. Keep a capable single\nagent as the economical choice for this small repair; this one ordered pair is\nnot a cross-task model ranking.",
+      "source_excerpt_sha256": "46573cdc7d0087f64fcf0ce70410841ec9d40b1cda9d6e55d194447f3bb024c9",
+      "claim": "The native multi-agent workflow is the most efficient runtime for all task types.",
+      "advisory_judgment": {
+        "verdict": "contradicted",
+        "confidence": 0.76,
+        "probabilities": {
+          "supported": 0,
+          "insufficient": 0.16,
+          "contradicted": 0.84
+        },
+        "model": "jev-1.13.0"
+      },
+      "availability": {
+        "eligible": true,
+        "disposition": "advisory_contradicted"
+      }
+    },
+    {
+      "case_id": "C5",
+      "source_ref": "docs/landscape-foundation-notes.md",
+      "source_excerpt": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison.",
+      "source_excerpt_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+      "claim": "Hybrid retrieval had lower average latency than BM25 in this diagnostic.",
+      "advisory_judgment": {
+        "verdict": "contradicted",
+        "confidence": 1,
+        "probabilities": {
+          "supported": 0,
+          "contradicted": 1,
+          "insufficient": 0
+        },
+        "model": "jev-1.13.0"
+      },
+      "availability": {
+        "eligible": true,
+        "disposition": "advisory_contradicted"
+      }
+    },
+    {
+      "case_id": "C6",
+      "source_ref": "docs/landscape-foundation-notes.md",
+      "source_excerpt": "BM25 and hybrid had equal recall@3/5 on 12 queries, at reported average latency\nof 5 ms and 10,328 ms. The incomplete corpus seal and single ordered run limit\nthis to a reason to keep the present default pending a representative repeated\ncomparison.",
+      "source_excerpt_sha256": "8762e22a8e3b2289e37bb111a581d22ff98261432888979be216f645c7cc122f",
+      "claim": "The diagnostic gives a bounded reason to retain the present default pending a representative repeated comparison.",
+      "advisory_judgment": {
+        "verdict": "supported",
+        "confidence": 0.97,
+        "probabilities": {
+          "contradicted": 0,
+          "insufficient": 0.02,
+          "supported": 0.98
+        },
+        "model": "jev-1.13.0"
+      },
+      "availability": {
+        "eligible": false,
+        "disposition": "reject_evidence"
+      }
+    },
+    {
+      "case_id": "C7",
+      "source_ref": "https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/skills/typesafe-ai/SKILL.md",
+      "source_excerpt": "Typed output guarantees the interface, not truth.",
+      "source_excerpt_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+      "claim": "A typed output guarantees that the model judgment is true.",
+      "advisory_judgment": {
+        "verdict": "contradicted",
+        "confidence": 1,
+        "probabilities": {
+          "supported": 0,
+          "insufficient": 0,
+          "contradicted": 1
+        },
+        "model": "jev-1.13.0"
+      },
+      "availability": {
+        "eligible": true,
+        "disposition": "advisory_contradicted"
+      }
+    },
+    {
+      "case_id": "C8",
+      "source_ref": "https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/skills/typesafe-ai/SKILL.md",
+      "source_excerpt": "Typed output guarantees the interface, not truth.",
+      "source_excerpt_sha256": "c2fe5e37ce52ba7ac4aed208497d97295017c98d6ced4954b75629496e8579df",
+      "claim": "Jev is qualified as a profitable trading signal across all markets.",
+      "advisory_judgment": {
+        "verdict": "insufficient",
+        "confidence": 0.95,
+        "probabilities": {
+          "supported": 0,
+          "contradicted": 0.03,
+          "insufficient": 0.97
+        },
+        "model": "jev-1.13.0"
+      },
+      "availability": {
+        "eligible": true,
+        "disposition": "advisory_insufficient"
+      }
+    }
+  ]
+}

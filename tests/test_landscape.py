@@ -172,6 +172,33 @@ class LandscapeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "selected source pin differs"):
             self.build()
 
+    def test_native_skills_keep_source_pins_limits_and_local_evidence(self):
+        self.manifest["sources"]["native_practice"] = "practice.json"
+        skill = {"name": "semantic-skill", "repository": self.candidate["repository"],
+                 "source_pin": "a" * 40, "skill_sha256": "b" * 64,
+                 "rationale": "Selected scoped skill", "limits": ["No universal ranking"],
+                 "evidence_refs": ["receipt.json"]}
+        practice = {"schema_version": 1, "checked_at": self.manifest["checked_at"], "skills": [skill]}
+        self.write("practice.json", practice)
+        data = self.build()
+        self.assertEqual(data["counts"]["applied_skills"], 1)
+        self.assertEqual(data["native_practice"]["skills"][0]["sources"][0]["path"], "receipt.json")
+        for key, value, message in [("source_pin", "main", "full source commit"),
+                                    ("skill_sha256", "unknown", "content hash"),
+                                    ("repository", "https://github.com/missing/skill", "absent from index"),
+                                    ("limits", [], "needs limits"),
+                                    ("evidence_refs", ["missing.json"], "file missing")]:
+            with self.subTest(key=key):
+                changed = copy.deepcopy(practice)
+                changed["skills"][0][key] = value
+                self.write("practice.json", changed)
+                with self.assertRaisesRegex(ValueError, message):
+                    self.build()
+        practice["skills"].append(copy.deepcopy(skill))
+        self.write("practice.json", practice)
+        with self.assertRaisesRegex(ValueError, "duplicate selected skill"):
+            self.build()
+
     def test_repository_transfers_use_aliases_but_unrelated_substitutions_fail(self):
         self.freshness["components"][0]["selected_repository_url"] = "https://github.com/previous/selected"
         self.write("freshness.json", self.freshness)

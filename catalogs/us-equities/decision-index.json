@@ -123,6 +123,18 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/landscape/native-practice.json",
+      "collection": "/alternatives",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/native-practice.json",
+      "collection": "/skills",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/landscape/upstream-snapshot.json",
       "collection": "/stars/added_reviews",
       "repository_field": "repository",
@@ -293,16 +305,16 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 519,
+    "repositories": 521,
     "public_star_repositories": 342,
-    "beyond_public_stars": 177,
-    "references": 1241,
+    "beyond_public_stars": 179,
+    "references": 1255,
     "repositories_by_record_type": {
       "catalog_card": 147,
       "component_record": 68,
       "legacy_candidate": 20,
       "public_star": 342,
-      "research_supplement": 194,
+      "research_supplement": 199,
       "star_review": 342
     }
   },
@@ -657,6 +669,13 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/1/candidates/1",
           "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/native-practice.json",
+          "pointer": "/alternatives/3",
+          "decision": "retain_existing_reference",
+          "evidence_level": "source_review_and_installed_help_observation"
         },
         {
           "kind": "public_star",
@@ -1675,6 +1694,29 @@
           "path": "manifests/stack.json",
           "pointer": "/components/28",
           "id": "sandbox-runtime"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/anthropics/skills",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/1/candidates/8",
+          "disposition": "overlap"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/native-practice.json",
+          "pointer": "/alternatives/1",
+          "decision": "overlap",
+          "evidence_level": "source_review"
         }
       ]
     },
@@ -9327,9 +9369,34 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/1/candidates/6",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/10/candidates/7",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/native-practice.json",
+          "pointer": "/skills/1",
+          "evidence_level": "source_review_and_bounded_native_helper_execution"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/native-practice.json",
+          "pointer": "/skills/2",
+          "evidence_level": "source_review_and_installation_observation"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -12800,9 +12867,23 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/1/candidates/9",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/native-practice.json",
+          "pointer": "/alternatives/2",
+          "decision": "conditional",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -13045,6 +13126,34 @@
           "path": "catalogs/landscape/foundation.json",
           "pointer": "/layers/14/candidates/4",
           "disposition": "conditional"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/typesafe-ai/skills",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/1/candidates/5",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/10/candidates/6",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/native-practice.json",
+          "pointer": "/skills/0",
+          "evidence_level": "pinned_installation_native_source_review_and_bounded_provider_diagnostic"
         }
       ]
     },
@@ -13503,9 +13612,23 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/1/candidates/7",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/native-practice.json",
+          "pointer": "/alternatives/0",
+          "decision": "conditional",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",

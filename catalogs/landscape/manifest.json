@@ -16,7 +16,8 @@
     "domain_manifest": "catalogs/us-equities/manifest.json",
     "repository_index": "catalogs/us-equities/decision-index.json",
     "selected_manifest": "manifests/stack.json",
-    "freshness_snapshot": "catalogs/landscape/upstream-snapshot.json"
+    "freshness_snapshot": "catalogs/landscape/upstream-snapshot.json",
+    "native_practice": "catalogs/landscape/native-practice.json"
   },
   "rules": [
     "Selected means the supported choice for the stated task and scope; it does not mean universal benchmark winner.",

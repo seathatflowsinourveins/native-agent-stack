@@ -6,9 +6,18 @@
   "selection_policy": "Select the strongest evidenced fit for a concrete gap. Preserve upstream skill bytes and licenses, use one supported installation method per skill, load only the task-relevant procedure and retain current user/project authorization. Awesome lists are discovery indexes, not ranking proof or instructions to install whole packs.",
   "installation_method": {
     "tool": "npx skills",
-    "agents": ["codex", "claude-code"],
-    "global_skills": ["typesafe-ai", "gh-fix-ci", "security-best-practices"],
-    "project_skills": ["typesafe-ai"],
+    "agents": [
+      "codex",
+      "claude-code"
+    ],
+    "global_skills": [
+      "typesafe-ai",
+      "gh-fix-ci",
+      "security-best-practices"
+    ],
+    "project_skills": [
+      "typesafe-ai"
+    ],
     "recorded_commands": [
       "npx --yes skills add typesafe-ai/skills --skill typesafe-ai --agent codex claude-code --global --yes --json",
       "npx --yes skills add typesafe-ai/skills --skill typesafe-ai --agent codex claude-code --copy --yes --json",
@@ -16,7 +25,7 @@
     ],
     "strategy": "Use the supported skills add workflow for the selected repository and named skills. TypeSafe uses this same method at global and adopted-project scopes; do not layer a second manual installer or copy an authentication store. The other two skills are user-level and available to selected projects through native discovery.",
     "observed_state": "The coordinator reported successful global installation for both native agents. Independent read-only inspection found matching global installer registrations for all three and a project TypeSafe registration. All three inspected global SKILL.md hashes matched their pinned upstream files; the project TypeSafe copy matched as well.",
-    "claim_boundary": "Installer records and matching source bytes do not establish loaded native discovery, model behavior or TypeSafe API execution. Those checks remain explicitly pending below. The recorded commands resolve repository sources when run; verify the resulting pin/bytes instead of treating a future run as acceptance of this exact source."
+    "claim_boundary": "Installer records and matching bytes are source identity evidence. Fresh client and bounded worker results are retained separately below; a future installer run resolves sources again and needs its resulting pin/bytes checked."
   },
   "skills": [
     {
@@ -28,25 +37,35 @@
       "license": "MIT",
       "selection": "retain_and_make_explicit",
       "rationale": "Typed semantic judgments fit routing, ranking, extraction and evidence questions that deterministic code cannot answer from syntax alone. The upstream skill keeps known rules, computation and execution in code, asks for representative task evaluation and points to live API/cookbook documentation. It complements the native coding clients rather than replacing their reasoning or account routes.",
-      "evidence_level": "source_review_and_installation_observation",
+      "evidence_level": "pinned_installation_native_source_review_and_bounded_provider_diagnostic",
       "evidence_refs": [
         "https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/skills/typesafe-ai/SKILL.md",
         "https://docs.typesafe.ai/llms.txt",
         "https://docs.typesafe.ai/concepts/how-to-build-with-system-one.md",
-        "https://docs.typesafe.ai/confidence.md"
+        "https://docs.typesafe.ai/confidence.md",
+        "blueprints/native-skill-practice/native-receipt.json",
+        "blueprints/native-skill-practice/typesafe-result.json"
       ],
       "activation": "Load for semantic judgments or a feature that benefits from typed common-sense decisions. Read the current task-relevant API/SDK page and cookbook. The selected native evidence-review workers receive the skill and sanitized advisory packet explicitly; they have no credentials or API authority. The coordinator alone makes any authorized TypeSafe calls, with credentials scoped to that process.",
       "limits": [
         "Typed output guarantees an interface, not truth; confidence is not authority to execute an action.",
         "Do not replace numeric risk, permissions, exact lookups or execution rules with model judgments.",
-        "Installed skill files do not prove valid API authentication, representative quality, cost or latency. Provider and native-worker qualification remain pending in this supplement.",
-        "The current documentation index was retrieved, but this record performs no API request and contains no credentials."
+        "Eight selected catalog claims are a diagnostic, not general qualification: jev-1.13.0 matched 7/8 frozen labels, versus 3/8 weak containment; C4 disagreement is preserved. No matched worker-cost or task-quality superiority is established.",
+        "Eight uncached authorized provider calls returned zero service errors. Credentials stayed in the coordinator process; native workers reviewed a sanitized advisory packet. Claude directly read selected skill sections; Codex loading/source recovery is present in the returned child report, without a raw child trace."
       ],
       "native_verification": {
-        "status": "pending",
-        "required_scope": "Fresh Codex and Claude discovery plus actual worker use; separately qualify the authorized TypeSafe API path with representative positive, negative and uncertain cases.",
-        "expected_observations": ["Selected native clients discover the intended skill without unintended duplicate activation.", "A bounded worker reads the relevant live source and preserves deterministic execution boundaries.", "Any API trial records actual typed responses, errors, latency and usage against frozen task expectations without exposing credentials."],
-        "evidence_refs": []
+        "status": "bounded_path_completed_with_limits",
+        "scope": "Fresh native source-review role invocation in both clients (Claude top-level --agent, Codex coordinator-reported child) and separate eight-case TypeSafe diagnostic.",
+        "observations": [
+          "Claude initialization lists all three skills; direct Read and Grep recovered relevant TypeSafe sections where headless preload was not visible.",
+          "Corrected Linux Codex invocation returned all eight source judgments; the first desktop-configured attempt failed source access and remains retained.",
+          "Both completed reviews keep C4 unqualified and preserve C6 availability rejection. Actual Claude model is claude-fable-5-1; Codex resolved model/effort and Claude effort were not exposed.",
+          "No global runtime/model replacement follows from this bounded check."
+        ],
+        "evidence_refs": [
+          "blueprints/native-skill-practice/native-receipt.json",
+          "blueprints/native-skill-practice/typesafe-result.json"
+        ]
       }
     },
     {
@@ -63,7 +82,8 @@
         "https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/gh-fix-ci/SKILL.md",
         "https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/gh-fix-ci/scripts/inspect_pr_checks.py",
         "docs/github-automation.md",
-        "catalogs/foundation/automation.json"
+        "catalogs/foundation/automation.json",
+        "blueprints/native-skill-practice/native-receipt.json"
       ],
       "activation": "Use when an authorized task asks to inspect or repair failing GitHub Actions PR checks. Existing task authorization takes precedence over the imported skill's repeated approval language; do not insert another planning or permission loop into already authorized work. Preserve native gh sign-in.",
       "limits": [
@@ -78,7 +98,13 @@
         "source_sha256": "9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c",
         "execution": "The unchanged pinned script was inspected, fetched into process memory and executed with Python against the selected native-agent-stack worktree and --pr 55 --json. It used native gh/git read operations; no skill installation or repository edit was performed by this check.",
         "target": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/55",
-        "arguments": ["--repo", "<selected-native-agent-stack-worktree>", "--pr", "55", "--json"],
+        "arguments": [
+          "--repo",
+          "<selected-native-agent-stack-worktree>",
+          "--pr",
+          "55",
+          "--json"
+        ],
         "exit_code": 0,
         "stdout": "PR #55: no failing checks detected.\n",
         "stderr": "",
@@ -86,10 +112,15 @@
         "claim_boundary": "Actual clean-check helper compatibility on the inspected host, not a failing-check repair, a native agent skill invocation or a future PR status guarantee."
       },
       "native_verification": {
-        "status": "pending",
-        "required_scope": "Fresh Codex and Claude discovery and bounded native-worker invocation of the installed skill.",
-        "expected_observations": ["Both clients locate the correct installed SKILL.md and helper.", "The worker preserves upstream failure/exit semantics and current authorization without requesting repeated approval.", "A retained real failing check can later qualify log extraction without rerunning or manufacturing a failing CI job solely for the catalog."],
-        "evidence_refs": []
+        "status": "installed_discovery_and_clean_helper_only",
+        "scope": "Claude initialization lists the skill; first Codex coordinator report lists it. The unchanged native helper completed a clean PR-check inspection. No failing repair was manufactured.",
+        "unqualified": [
+          "Actual native-agent activation of the CI procedure",
+          "Failing-log recovery and repair quality"
+        ],
+        "evidence_refs": [
+          "blueprints/native-skill-practice/native-receipt.json"
+        ]
       }
     },
     {
@@ -107,20 +138,27 @@
         "https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-best-practices/references/python-fastapi-web-server-security.md",
         "https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-best-practices/references/javascript-typescript-nextjs-web-server-security.md",
         "manifests/stack.json",
-        "docs/acceptance-evidence-policy.md"
+        "docs/acceptance-evidence-policy.md",
+        "blueprints/native-skill-practice/native-receipt.json"
       ],
       "activation": "Use for an explicitly requested security review, security guidance or secure-by-default development in a supported language. Load the relevant framework references only after identifying the actual task. Current user scope and existing authorization prevail over generic imported process advice.",
       "limits": [
         "The bundled FastAPI specification names 0.128.x and the Next.js specification names 16.1.x; the reviewed foundation pins are FastAPI 0.141.1 and Next.js 16.3.5. Verify version-dependent advice in current framework sources.",
         "Reference coverage is limited to the documented languages/frameworks. Generic advice must not be promoted to a verified vulnerability without source, deployment context and impact evidence.",
         "The skill is not a full security audit or an instruction to review every ordinary coding task. Local loopback/development conditions must not be mislabeled as production vulnerabilities.",
-        "Installed references do not prove useful native-worker findings or false-positive control; those checks remain pending."
+        "Source identity and fresh client discovery are retained. Useful security findings and false-positive control have not been measured; do not describe this as a completed security review."
       ],
       "native_verification": {
-        "status": "pending",
-        "required_scope": "Fresh native discovery and an explicitly scoped review of a relevant fixture or change with a supported finding and a safe control.",
-        "expected_observations": ["Both clients load the intended skill only for the requested security task.", "The worker names the applicable reference and actual source lines, while preserving the supported framework/version boundary.", "Verification separates a real supported finding from assumptions and does not label the safe control insecure or claim comprehensive audit coverage."],
-        "evidence_refs": []
+        "status": "installed_discovery_only",
+        "scope": "Claude initialization lists the skill; first Codex coordinator report lists it. No security review task was invoked solely to qualify catalog presence.",
+        "unqualified": [
+          "Task-triggered loading in each worker",
+          "A supported security finding and safe control",
+          "Finding quality or false-positive rate"
+        ],
+        "evidence_refs": [
+          "blueprints/native-skill-practice/native-receipt.json"
+        ]
       }
     }
   ],
@@ -129,33 +167,49 @@
       "name": "Vercel focused UI and React guidance",
       "repository": "https://github.com/vercel-labs/agent-skills",
       "source_pin": "063bee94c3f4df8453406c830b0a7df0f2860278",
-      "skill_paths": ["skills/web-design-guidelines/SKILL.md", "skills/react-best-practices/SKILL.md"],
+      "skill_paths": [
+        "skills/web-design-guidelines/SKILL.md",
+        "skills/react-best-practices/SKILL.md"
+      ],
       "decision": "conditional",
       "rationale": "The small UI review skill is a useful future accessibility/interface checklist. It fetches mutable external rules, so a review needs the fetched revision retained. The 70-rule React guide is appropriate for concrete React/Next performance work; the current static catalog dashboard does not demonstrate a need to load that broader guide.",
       "evidence_level": "source_review",
-      "evidence_refs": ["https://github.com/vercel-labs/agent-skills/tree/063bee94c3f4df8453406c830b0a7df0f2860278/skills/web-design-guidelines", "https://github.com/vercel-labs/agent-skills/tree/063bee94c3f4df8453406c830b0a7df0f2860278/skills/react-best-practices"],
+      "evidence_refs": [
+        "https://github.com/vercel-labs/agent-skills/tree/063bee94c3f4df8453406c830b0a7df0f2860278/skills/web-design-guidelines",
+        "https://github.com/vercel-labs/agent-skills/tree/063bee94c3f4df8453406c830b0a7df0f2860278/skills/react-best-practices"
+      ],
       "overturn_when": "A requested UI/accessibility or React-performance review reveals a missing procedure, and a bounded trial produces supported findings beyond existing browser acceptance without unnecessary whole-guide loading."
     },
     {
       "name": "Anthropic web application testing",
       "repository": "https://github.com/anthropics/skills",
       "source_pin": "34040c9c568585f6929bedeaad110ad08f079624",
-      "skill_paths": ["skills/webapp-testing/SKILL.md"],
+      "skill_paths": [
+        "skills/webapp-testing/SKILL.md"
+      ],
       "decision": "overlap",
       "rationale": "Its Playwright interaction and server helper overlap the accepted agent-browser/Playwright lanes. The instruction to always wait for networkidle has not demonstrated an advantage over task-specific readiness checks, so this source review does not justify replacing or duplicating the current browser skill.",
       "evidence_level": "source_review",
-      "evidence_refs": ["https://github.com/anthropics/skills/blob/34040c9c568585f6929bedeaad110ad08f079624/skills/webapp-testing/SKILL.md", "catalogs/foundation/decisions.json"],
+      "evidence_refs": [
+        "https://github.com/anthropics/skills/blob/34040c9c568585f6929bedeaad110ad08f079624/skills/webapp-testing/SKILL.md",
+        "catalogs/foundation/decisions.json"
+      ],
       "overturn_when": "A concrete multi-server lifecycle or browser-testing gap is demonstrated and the upstream helper improves that case against the current lane."
     },
     {
       "name": "Trail of Bits differential review",
       "repository": "https://github.com/trailofbits/skills",
       "source_pin": "32e34f8173796e3566a51aee877dc96bc5191f64",
-      "skill_paths": ["plugins/differential-review/skills/differential-review/SKILL.md"],
+      "skill_paths": [
+        "plugins/differential-review/skills/differential-review/SKILL.md"
+      ],
       "decision": "conditional",
       "rationale": "Git-history, caller-impact and concrete-attack evidence are useful for a substantial security-sensitive diff. Mandatory comprehensive reporting/history phases and the optional namespaced plugin agent are a heavier and differently integrated procedure than the existing bounded independent review; do not import the whole pack as a default.",
       "evidence_level": "source_review",
-      "evidence_refs": ["https://github.com/trailofbits/skills/blob/32e34f8173796e3566a51aee877dc96bc5191f64/plugins/differential-review/skills/differential-review/SKILL.md", "docs/acceptance-evidence-policy.md"],
+      "evidence_refs": [
+        "https://github.com/trailofbits/skills/blob/32e34f8173796e3566a51aee877dc96bc5191f64/plugins/differential-review/skills/differential-review/SKILL.md",
+        "docs/acceptance-evidence-policy.md"
+      ],
       "overturn_when": "A security-sensitive diff requires the deeper procedure and a selected native-compatible trial improves supported findings while keeping report effort and plugin dependencies proportionate."
     },
     {
@@ -166,21 +220,34 @@
       "decision": "retain_existing_reference",
       "rationale": "The already installed skills-ref validator remains useful for portable format checks. The inspected repository tree contains no SKILL.md additions to install, and reference validation does not establish Claude/Codex extension support or native discovery.",
       "evidence_level": "source_review_and_installed_help_observation",
-      "evidence_refs": ["https://github.com/agentskills/agentskills/tree/69ef37e9424c0a7ea9dd2293b559e43ec8176379", "catalogs/foundation/decisions.json"],
+      "evidence_refs": [
+        "https://github.com/agentskills/agentskills/tree/69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+        "catalogs/foundation/decisions.json"
+      ],
       "overturn_when": "A new supported format or client-discovery problem needs a targeted validator update; a new standard revision alone is not evidence of a runtime improvement."
     }
   ],
   "coordinator_owned_qualification": {
-    "status": "pending",
-    "scope": "Opt-in native evidence-review roles inherit model and effort, preserve read-only boundaries, receive sanitized advisory results and do not receive service credentials or call the API. The coordinator's eight-case catalog diagnostic is a bounded qualification target, not a performance benchmark or completed result.",
-    "role_source_refs": ["examples/claude-native/agents/semantic-evidence-reviewer.md", "examples/codex-native/agents/semantic-evidence-reviewer.toml"],
-    "diagnostic_source_refs": ["blueprints/native-skill-practice/catalog-cases.json", "blueprints/native-skill-practice/promptfooconfig.yaml"],
-    "claim_boundary": "These configuration sources are maintained by the coordinator and require integration with this supplement. Configuration presence is not native role discovery, successful worker execution or completed TypeSafe inference."
+    "status": "completed_bounded_diagnostic_and_native_source_review",
+    "scope": "Opt-in roles inherit model/effort, receive sanitized advisory results and have no service credentials or API authority. TypeSafe matched 7/8 frozen cases; both returned native reviews kept C4 unqualified and C6 rejected.",
+    "role_source_refs": [
+      "examples/claude-native/agents/semantic-evidence-reviewer.md",
+      "examples/codex-native/agents/semantic-evidence-reviewer.toml"
+    ],
+    "diagnostic_source_refs": [
+      "blueprints/native-skill-practice/catalog-cases.json",
+      "blueprints/native-skill-practice/promptfooconfig.yaml"
+    ],
+    "claim_boundary": "Claude native Read/Glob/Grep trace is retained privately and summarized publicly. Codex CLI returned a completed child report but no raw child trace or resolved model. Source-review interoperability is observed; universal runtime/model ranking and matched savings are not.",
+    "result_refs": [
+      "blueprints/native-skill-practice/native-receipt.json",
+      "blueprints/native-skill-practice/typesafe-result.json"
+    ]
   },
   "preparation": {
     "worker_model_effort": "inherited",
     "worker_provider_usage": "unavailable",
     "source_review_scope": "Current official repository heads and selected original skill/helper/reference files were inspected. Five native user/project skill roots were checked before selection. No installed skill or client setting was modified by this documentation worker.",
-    "validation_scope": "JSON structure, exact source-pin shape, selected skill identities, local reference existence and staged whitespace are structural checks only. Native client and provider checks are delegated to the coordinator and remain pending until actual returned evidence is recorded."
+    "validation_scope": "Structural source-pin/reference checks, three skills-ref validations and bounded native/provider observations are recorded. Source-review worker used inherited model/effort; its provider usage is unavailable. Independent review and repository checks are recorded in the task record."
   }
 }

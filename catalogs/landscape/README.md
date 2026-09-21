@@ -44,7 +44,8 @@ attempts remain recorded alongside later actual rendering observations.
 
 See [foundation notes](../../docs/landscape-foundation-notes.md),
 [domain notes](../../docs/landscape-domain-notes.md) and
-[freshness notes](../../docs/landscape-freshness-notes.md) for the reasoning and
+[freshness notes](../../docs/landscape-freshness-notes.md), and
+[selected native skill practice](../../docs/native-skill-practice-20260921.md) for the reasoning and
 limits behind the reconciliation.
 
 ## Another PC
