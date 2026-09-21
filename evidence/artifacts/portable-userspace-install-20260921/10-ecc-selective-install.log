@@ -1,0 +1,11 @@
+61c1bbe2ae217433b4b6f9f09f21aca4df52c12598068343ade719f706e4859b  skill-installer/github_utils.py
+0fbbd36e8ea294442c0bd48d6f610a2e8656216bfef5c322f1dcf448ef2f09f1  skill-installer/install-skill-from-github.py
+Installed search-first to /home/example/.agents/skills/search-first
+Installed iterative-retrieval to /home/example/.agents/skills/iterative-retrieval
+b453b16d3e36174b8487c05ab807d0321a66c2d058812b2ae129d82824183725  /home/example/.agents/skills/iterative-retrieval/SKILL.md
+d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733  /home/example/.agents/skills/search-first/SKILL.md
+Error: Destination already exists: /home/example/.agents/skills/search-first
+Expected existing-destination refusal: 1
+b453b16d3e36174b8487c05ab807d0321a66c2d058812b2ae129d82824183725  /home/example/.agents/skills/iterative-retrieval/SKILL.md
+d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733  /home/example/.agents/skills/search-first/SKILL.md
+Claude skill links resolve

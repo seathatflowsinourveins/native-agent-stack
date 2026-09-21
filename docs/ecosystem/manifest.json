@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "snapshot_date": "2026-09-20",
+  "snapshot_date": "2026-09-21",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "abc8cc2c8dfb4d295f55ece3005bc3a8d83cc3ff",
+  "source_revision": "9faeb859cae8f46fabaa9ba1ee4a80e897978ba6",
   "layers": [
     {
       "id": "agents",
@@ -310,6 +310,12 @@
     }
   ],
   "guides": [
+    {
+      "title": "Native foundation qualification: installation, tokens and recovery",
+      "body": "Repeated Claude retrieval, native writing workers and graceful recovery, plus a clean Ubuntu userspace installation replay. Observed costs, process deviations and remaining boundaries are retained.",
+      "path": "docs/native-foundation-resolution-20260921.md",
+      "category": "evaluation"
+    },
     {
       "title": "Useful native dashboards: memory, retrieval and savings",
       "body": "Populated upstream interfaces, exact command output bindings, seven separate savings scopes and 68 dated coverage records. Current native observation is separate from old audits, local fixtures and reload boundaries.",

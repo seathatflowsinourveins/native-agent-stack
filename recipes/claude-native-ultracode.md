@@ -55,6 +55,21 @@ claims independently; preserve schema retries, nulls, failures and model
 substitutions as incomplete results rather than filtering them into a pass.
 
 Use the bundled `/workflow-authoring` skill when writing reusable workflow code.
+For an interactive authoring session, start with the positional prompt
+`claude --model fable --effort ultracode /workflow-authoring` and verify the native
+skill reference was injected. Merely mentioning the skill in a prose task did
+not invoke it in the later writing trial. Define permitted native workflow
+metadata reads separately from owned source writes. Run acceptance commands
+without output pipelines that mask their exit status.
+
+The [writing and recovery qualification](../docs/native-workflow-writing-recovery-20260921.md)
+records a Sonnet implementation, Opus review, selected-worker failure, graceful
+coordinator exit and same-session resume. Both writing arms produced accepted
+code, but the comparison retained process-contract failures and the worker arm
+used more tokens for the small repair. Recovery preserved edits made while
+stopped; its native and persisted usage totals did not fully reconcile. Keep
+these boundaries when selecting this profile.
+
 The native `/workflows` view shows stages, agents, tokens and returned results.
 Save a useful script from that view into the selected project's `.claude/workflows/`
 or the user's workflow directory, then `/reload-skills` when needed. Do not

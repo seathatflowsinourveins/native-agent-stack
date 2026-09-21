@@ -2,6 +2,80 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "native-workflow-writing-comparison-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "A native single-agent writing run and Fable Workflow with Sonnet implementation and Opus review each produced a repair independently accepted by 29 visible and seven held-out checks. Actual model identities, usage, schema retry and scope deviations were retained.",
+      "limitations": [
+        "One ordered local invoice fixture, not a fully compliant benchmark, upstream test suite or general model ranking.",
+        "Both model runs piped test output through tail, masking exit status; independent unpiped acceptance passed. The Workflow run did not invoke the required authoring skill and exceeded its literal read boundary by reading native metadata.",
+        "Single-agent usage was 194781 reported tokens and Workflow usage 753508. The native Workflow coordinator and workers are included; outer Codex preparation and coordination, independent audit and reporting are excluded. Native cache warmth was uncontrolled; these observations do not establish causal savings. Subscription billing is unknown."
+      ],
+      "path": "evidence/receipts/native-workflow-writing-comparison-20260921.json"
+    },
+    {
+      "id": "native-workflow-graceful-recovery-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code"
+      ],
+      "claim": "Native workflow-authoring skill injection, selected reviewer stop, graceful coordinator exit and same-session/run resume were exercised. One implementation start and three reviewer starts were observed across three launches; final owned checkouts passed independent acceptance, preserved intervening user edits and cleaned up owned processes.",
+      "limitations": [
+        "Graceful local exit/resume on a synthetic fixture, not hard-crash, reboot, cross-host delivery, scheduled wake or arbitrary external exactly-once qualification.",
+        "The operator deliberately changed tracked and untracked sentinels while stopped. Initial and final checks cover distinct documented boundaries; the mutation receipt was recorded after execution.",
+        "Recovery native cumulative model usage was 2143696 tokens versus 1937995 retained unique-message tokens, leaving 205701 unexplained. Full accounting reconciliation is not qualified; repeated cumulative events are not summed as new consumption.",
+        "One implementation and one review effect were observed for this local probe. Local fixture checks are not the complete upstream test suite."
+      ],
+      "path": "evidence/receipts/native-workflow-graceful-recovery-20260921.json"
+    },
+    {
+      "id": "portable-userspace-install-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "rtk",
+        "qmd",
+        "repomix",
+        "toon",
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Selected native clients, token tools and two ECC skills installed in a fresh official Ubuntu Base userspace on the existing WSL kernel; local fixture checks, bounded repeat-installation and rollback checks passed.",
+      "limitations": [
+        "Fresh root filesystem on the existing WSL kernel, not a booted VM, new PC or independent kernel.",
+        "No native signed-in model inference, skill invocation, provider-token savings or full ecosystem E2E was tested.",
+        "Token assertions are the repository's unchanged local fixture checks, not the upstream projects' complete test suites.",
+        "Networking was shared for upstream downloads; this is not a newly qualified security-isolation boundary.",
+        "Node archive matched HTTPS publisher checksums; its detached signature was not separately verified.",
+        "Top-level npm packages were version pinned; transitive dependencies resolved at installation time.",
+        "Only the named subset was installed. Scoped MCP services, RAG models, persistent memory, terminal interaction and broker integrations need their own host qualification.",
+        "Skill repeat installation intentionally returned existing-destination refusal; filesystem linkage does not establish runtime discovery.",
+        "Home paths in three public client/skill logs are normalized to /home/example; no credential values were captured."
+      ],
+      "path": "evidence/receipts/portable-userspace-install-20260921.json"
+    },
+    {
+      "id": "claude-selective-context-pilot-20260921",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "context-mode"
+      ],
+      "claim": "Six amended native Claude coding attempts passed shared visible, held-out and scope checks. All three selective-policy attempts chose native computation; observed aggregate usage was 2.42% higher than the native policy, without a Context Mode treatment. One earlier rejected integration attempt remains in campaign task totals.",
+      "limitations": [
+        "Synthetic local integration pilot on one accepted coding fixture; not an upstream benchmark, whole-stack savings rate or universal model comparison.",
+        "Three AB/BA/AB pairs partly counterbalance order; native cache warmth is uncontrolled and models have no fixed seed. No Context Mode calls occurred, so the tool's causal token or latency effect is unidentified.",
+        "Hooks are disabled equally per invocation and a strict Context Mode-only MCP configuration is used. This controlled pilot is not normal-hook full-stack E2E.",
+        "Usage means final native-reported cumulative modelUsage counted once per fresh task. Ordinary input, cache creation, cache reads and output are disjoint here; thinking is included in output.",
+        "Coordinator, independent review, acceptance execution, reporting and any unreported provider requests are outside these task usage totals. Wall time covers the native subprocess only.",
+        "Native list-price cost estimates are preserved in original usage fields; subscription billing and money saved are unknown.",
+        "Private raw transcripts, session identifiers, commands and local paths are not published. Artifact hashes bind retained evidence but are not independent provider attestation.",
+        "Initial protocol failed its workflow/scope contract despite passing product and final file-scope checks; that attempt is excluded only from amended quality-equivalent pairs and retained in all-attempt totals."
+      ],
+      "path": "evidence/receipts/claude-selective-context-pilot-20260921.json"
+    },
+    {
       "id": "native-dashboard-data-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2180,6 +2254,251 @@
   ],
   "files": [
     {
+      "path": "docs/native-foundation-resolution-20260921.md",
+      "sha256": "8e607b0bf200ab6f7f237893e863f855707bac23192c3b733c32714be53385e3",
+      "bytes": 7434
+    },
+    {
+      "path": "docs/native-workflow-writing-recovery-20260921.md",
+      "sha256": "34913f4a9c9818584927ba8fd8d5b8dbaee9da255e19c37e5600ecea82d115e5",
+      "bytes": 12760
+    },
+    {
+      "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/comparison.json",
+      "sha256": "81059fb93fa5adfeaa253932ee717045a5e155494251c47e084d7237ef236d8b",
+      "bytes": 7907
+    },
+    {
+      "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
+      "sha256": "6170fcaab9f2e4ffeff5b7d9dc301dac4488c0555ead6124b400095069fac5a2",
+      "bytes": 9651
+    },
+    {
+      "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/frozen-inputs.json",
+      "sha256": "d4702db37bfe222b7a9eb5dc05fd9f15496b845f836b78c93e36d889207aa867",
+      "bytes": 2760
+    },
+    {
+      "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/hidden-oracle.py.txt",
+      "sha256": "d0e795d443651e6d4e9323419a5f5f35b6b77eee4cb31d1af38d4d00def01f7b",
+      "bytes": 2593
+    },
+    {
+      "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/independent-review.json",
+      "sha256": "25333a28eebfb0a01d14075bc237ca042cf17802cd36a330cff73d3a933e97fb",
+      "bytes": 1656
+    },
+    {
+      "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/protocol-amendment.json",
+      "sha256": "45eec7ce59c3591573fbbb360047177348879cd1755f8ed0c5fab7dcf1c5988f",
+      "bytes": 1061
+    },
+    {
+      "path": "evidence/artifacts/native-workflow-writing-recovery-20260921/recovery.json",
+      "sha256": "4deb70202e71185dd56bc277cb3b4da9a818e38b7661faf8c829d613d7d7a81d",
+      "bytes": 11351
+    },
+    {
+      "path": "evidence/receipts/native-workflow-graceful-recovery-20260921.json",
+      "sha256": "c1d0e5d0431d84b5f4b68decd794b9aba6ee33ad8704baaace7cbfe266fa231f",
+      "bytes": 1992
+    },
+    {
+      "path": "evidence/receipts/native-workflow-writing-comparison-20260921.json",
+      "sha256": "a6c146e545974fd3325c87a5c81bd4de265594fd83bd234757a8da4ac0d3bf58",
+      "bytes": 1852
+    },
+    {
+      "path": "docs/claude-selective-context-pilot-20260921.md",
+      "sha256": "abe3514de5dceb858f59bcbc1abda9cb179c4b2cce614725f693bd1053f83a7a",
+      "bytes": 6705
+    },
+    {
+      "path": "docs/portable-userspace-install-20260921.md",
+      "sha256": "2bab62c10c38469dfe5b7a44aedc9af92d8d12effebc7784d908a5c3df3f4771",
+      "bytes": 8842
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/.gitattributes",
+      "sha256": "8d3518f72a63e406883fd0b17bde174c5787801356a2e423ef246c220e6fdea7",
+      "bytes": 227
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/00-ubuntu-signature.log",
+      "sha256": "3b839d751147b0f0765b038ccc589e3c2111056c01cf1a320630c22ee9635765",
+      "bytes": 220
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/01-bootstrap.log",
+      "sha256": "0f22a6fd9bb59a4e0a2b778cccc4608759650679ad20271274af20c7119144ed",
+      "bytes": 1524
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/02-bootstrap-rootmapped.log",
+      "sha256": "fb440c7f0676ce88b1cfabc4d1790d9c13349bbebb01d18eaacceb133a50c0c3",
+      "bytes": 25166
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/03-node-bootstrap.log",
+      "sha256": "7d8f52c0e5aaa2336bf9fd870c2e230aaab13acf2fe44c481a2632d783a165ca",
+      "bytes": 792977
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/04-node-bootstrap-rootmapped.log",
+      "sha256": "0a075cd79673b6ef3da927dad4a9d1a48f220a268bfea3ef88f475df4a5d9608",
+      "bytes": 4538
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/05-token-clean-install.log",
+      "sha256": "83122d9921e887dbd3d41bec63d83e021540ff8b9012e3181b02801fc3d6cc53",
+      "bytes": 216
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/06-codex-install.log",
+      "sha256": "1ebc2e6946cb19c78638ca952ca00c2ec01ea72f0d0c7c2ed57d7bb138b2d425",
+      "bytes": 265
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/07-claude-install.log",
+      "sha256": "d5bf86978e29740b506e72847f65c70984df65b4f56c0040c895a40de196cc55",
+      "bytes": 1039
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/08-token-clean-unprivileged.log",
+      "sha256": "90737201ea9ca176762f13b2acc9a8ecc3815b175bb91b7f8acb5924c19852f4",
+      "bytes": 154
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/09-client-repeat.log",
+      "sha256": "a1ffabee92d1bb989314a41d03b78875c804149e7994068d5747b0a0cd68b19b",
+      "bytes": 976
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/10-ecc-selective-install.log",
+      "sha256": "ec33432970b5b20fbbe5bc7276619526489c75f7952794885f815a9d13c49b19",
+      "bytes": 986
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/11-claude-signature.log",
+      "sha256": "b4a3961bf0e7eb5d27f7a849fae10babe0c93e65e2c449ff45d50ebc73df4318",
+      "bytes": 217
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/12-uninstall.log",
+      "sha256": "ebc9ce0bb8d524e5a68a4b878ce23cf7daf03c93af10b8bd1914e6d4e6f33f7b",
+      "bytes": 124
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/13-teardown.log",
+      "sha256": "86a3f5875b6b626ea8014b3e8010250f14f7d18656dfc4ab2de9e244a68b7f52",
+      "bytes": 117
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/SHA256SUMS",
+      "sha256": "30f23cec3a46679bcf21dbe0c0a0ab51440e9b2f5ac69b3ae1d4a7a71c0ffc69",
+      "bytes": 1884
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/SHA256SUMS.gpg",
+      "sha256": "5164e25bab9ff0467fc83415c8f759bb79cbd4e0264b9a11f49ff1e6a10a4c1f",
+      "bytes": 833
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/claude-code.asc",
+      "sha256": "bd70a5e4a268002704024ceba7f8446024114e94f3f0bdd11c23a9e592be81c6",
+      "bytes": 1688
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/claude-install.sh.txt",
+      "sha256": "3a68d3406cf674e17bed1733a4dcf37805e2e47d87417700007d7e1aa766a944",
+      "bytes": 9704
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/claude-manifest.json",
+      "sha256": "d1bf63d94621d6aa6fb84297b235ddb8f5aaadc9252cef8020d170ef661b2f28",
+      "bytes": 2161
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/claude-manifest.json.sig",
+      "sha256": "09ef2ff6521e6909d194283c87d19ec954b72f32657cbdb1eb05b0d28f179da3",
+      "bytes": 833
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/node-SHASUMS256.txt",
+      "sha256": "f410428039e2c922a14058df067a4482691c9304a5c01a75847f9f3f2d3307f6",
+      "bytes": 3171
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install-unprivileged/qmd-input.md",
+      "sha256": "6fd148f20e3aeac8e835cd8509090aa02d2d0fa7818453776fbc62124f82e32a",
+      "bytes": 388
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install-unprivileged/receipt.json",
+      "sha256": "0014e229cca1dd936199889b2aba54b9734fa54843dd8ad8d1470c11b588f855",
+      "bytes": 37939
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install-unprivileged/records.recovered.json",
+      "sha256": "fbb7def43d291ae3f375cd83c04f367a993044fea454e6851fc499dccd4cec34",
+      "bytes": 172
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install-unprivileged/records.toon",
+      "sha256": "9446df1ab35a750ac3bccc1777934ce0f979bad805e4efa3b21c7fbbe7a505e3",
+      "bytes": 60
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install-unprivileged/repomix-originals.xml",
+      "sha256": "a860736a54fbdac8e9babf486ad87180cca6c490f946f76e4a2dad2482f45cd6",
+      "bytes": 289
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install-unprivileged/repomix-structure.xml",
+      "sha256": "7c8e37eb454f14dc58f308ed94957aace08cb2505aff26dbf428e04cecdbc2f7",
+      "bytes": 195
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install/qmd-input.md",
+      "sha256": "6fd148f20e3aeac8e835cd8509090aa02d2d0fa7818453776fbc62124f82e32a",
+      "bytes": 388
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install/receipt.json",
+      "sha256": "159f08ca0b2a8d80dfc596e70cbab9bc937247c100aa23f18e78bfcaa712504e",
+      "bytes": 29159
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install/records.recovered.json",
+      "sha256": "fbb7def43d291ae3f375cd83c04f367a993044fea454e6851fc499dccd4cec34",
+      "bytes": 172
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install/records.toon",
+      "sha256": "9446df1ab35a750ac3bccc1777934ce0f979bad805e4efa3b21c7fbbe7a505e3",
+      "bytes": 60
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install/repomix-originals.xml",
+      "sha256": "a860736a54fbdac8e9babf486ad87180cca6c490f946f76e4a2dad2482f45cd6",
+      "bytes": 289
+    },
+    {
+      "path": "evidence/artifacts/portable-userspace-install-20260921/token-clean-install/repomix-structure.xml",
+      "sha256": "7c8e37eb454f14dc58f308ed94957aace08cb2505aff26dbf428e04cecdbc2f7",
+      "bytes": 195
+    },
+    {
+      "path": "evidence/receipts/claude-selective-context-pilot-20260921.json",
+      "sha256": "f071f169b31b8cf53ba407dc89953428a25c5c23455cd4c45407b1bd18883233",
+      "bytes": 43025
+    },
+    {
+      "path": "evidence/receipts/portable-userspace-install-20260921.json",
+      "sha256": "9d138ccc152d7e110b71e957f55d17a4464fbb29862bc9b2050e4e9df8bbc662",
+      "bytes": 12703
+    },
+    {
       "path": "docs/native-dashboard-data.md",
       "sha256": "2e24646398d925223671840ee0fc21ebd3cc88a4c8169d9901c46629b20cfac9",
       "bytes": 17100
@@ -2461,8 +2780,8 @@
     },
     {
       "path": "adoption/lifecycle.md",
-      "sha256": "e131798c7ed4d8b1d488e21d00b68ca9a987eec8370849455745ee2105e5d61b",
-      "bytes": 16102
+      "sha256": "0c84deb26a7fda833dfa766177000fa1ec2e921e89664a966d4e6ade12b9698e",
+      "bytes": 16671
     },
     {
       "path": "adoption/manifest.json",
@@ -3897,8 +4216,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "a82fd477b964836b574f5b9139edb7b28391aeb49d874cce2790a8a9f76ec672",
-      "bytes": 412459
+      "sha256": "8f29f2d10c2032f9f148cb8d130ef0a5537f042e2a97f8fe38dd9461e8d77ad8",
+      "bytes": 414519
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -5497,8 +5816,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "200d6c6f0cd011d5e81fcf51f8fa475407d3a500c04c23cbd132e2eaba30bf0b",
-      "bytes": 3903663
+      "sha256": "0c35394c91dfa61d5935f3ffa421eceeea78b22e5b7a6f784449b93a4c1cbd4a",
+      "bytes": 3939481
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5507,8 +5826,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "7646a91827cd635192ccde9ac9108cd7fdac41bd04895f0dc8cd34f324a0606b",
-      "bytes": 32010
+      "sha256": "fdfa6f1ca31fbc71fdac9448747682f68cabac6340407f875f9d715e2a9a756b",
+      "bytes": 32417
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -5572,8 +5891,8 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "552b6c6044e621261c46578e2e444a3dd020e87703330bd9fc4216c5995ff6da",
-      "bytes": 21008
+      "sha256": "17fbbc8848a283bac9765d7ef5aad3e9d5ef9130de0b8c94b110b0d6c255807f",
+      "bytes": 21646
     },
     {
       "path": "docs/token-session-handbook.md",
@@ -6012,8 +6331,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 75868,
-      "sha256": "9710dd623aec8bb70110d89c22d1bdccd1eb81fcb411666225f77ad42b09851a"
+      "bytes": 76361,
+      "sha256": "13538cbb68fda14b9f89dfed2baa3e0150e1dbc27fceb2e23d94365b217c9911"
     },
     {
       "path": "observability/README.md",
@@ -8247,8 +8566,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "44d092e97f3d0c11db970b2d67154c0c6c9e52df59684134f666e599afa26bc8",
-      "bytes": 6818
+      "sha256": "2288f1b314faa91755fa2a97fd752cba93a958636bbcbd74da58c98191a28fcc",
+      "bytes": 7788
     },
     {
       "path": "docs/native-ultracode-20260921.md",
@@ -8332,6 +8651,7 @@
     }
   ],
   "convergence_records": [
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
     "blueprints/convergence-practice/application-delivery/experiment.json",
     "blueprints/convergence-practice/ci-security/experiment.json",
     "blueprints/convergence-practice/document-ingestion/experiment.json",

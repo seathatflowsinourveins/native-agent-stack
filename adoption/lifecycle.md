@@ -302,3 +302,11 @@ checks the matching dated inputs and runs only a missing or changed applicable
 stage. Record unresolved stages and retained failures. Guidance-only entries
 need no process tests; stateful services require persistence/recovery evidence;
 optional platform-specific tools do not become mandatory on another OS.
+
+The [September 21 clean-userspace qualification](../docs/portable-userspace-install-20260921.md)
+exercised pinned Claude/Codex installation, four token tools and two selected ECC
+skills in a fresh official Ubuntu Base filesystem. It includes repeat-install,
+overwrite-protection, local fixture and rollback results with retained failures.
+That subset runs on the existing WSL kernel; fresh-PC boot, native sign-in,
+terminal interaction and other scoped integrations still require that host's
+own acceptance. Do not replay its receipt as a new machine's passed result.

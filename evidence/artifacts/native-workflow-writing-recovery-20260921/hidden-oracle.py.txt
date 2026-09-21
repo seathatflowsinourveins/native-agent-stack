@@ -1,0 +1,68 @@
+"""Independent deterministic oracle. The runner keeps this outside model worktrees."""
+import importlib.util
+import json
+from pathlib import Path
+import sys
+
+
+def accept(root):
+    root = Path(root)
+    sys.path.insert(0, str(root))
+    spec = importlib.util.spec_from_file_location("invoice", root / "invoice.py")
+    invoice = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(invoice)
+    sys.modules["invoice"] = invoice
+    spec = importlib.util.spec_from_file_location("receipt", root / "receipt.py")
+    receipt = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(receipt)
+    results = []
+
+    class SinglePass:
+        def __init__(self, items):
+            self.items = iter(items)
+            self.iterations = 0
+            self.yields = 0
+
+        def __iter__(self):
+            self.iterations += 1
+            if self.iterations > 1:
+                raise AssertionError("iterated input more than once")
+            return CountingIterator(self)
+
+    class CountingIterator:
+        def __init__(self, owner):
+            self.owner = owner
+
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            value = next(self.owner.items)
+            self.owner.yields += 1
+            return value
+
+    cases = [([], 17), ([(1, 99)], 17), ([(2, 10), (3, 17)], 7),
+             ([(1, 2 ** 60 + 19), (2, 13)], 17), ([], -7),
+             ([(1, 199)], -7), ([(0, 99), (3, 27)], 100)]
+    for index, (items, percent) in enumerate(cases):
+        source = SinglePass(items)
+        amount = sum(quantity * price for quantity, price in items)
+        expected = {"subtotal": amount, "tax": amount * percent // 100,
+                    "total": amount + amount * percent // 100}
+        try:
+            result = invoice.invoice_summary(source, percent)
+            passed = result == expected and source.iterations == 1 and source.yields == len(items)
+            passed &= all(type(value) is int for value in result.values())
+            passed &= invoice.calculate_invoice(items, percent) == expected["total"]
+            rows = [{"quantity": q, "price": p} for q, p in items]
+            passed &= receipt.receipt_totals(rows, percent) == expected
+            results.append({"case": index, "passed": bool(passed)})
+        except Exception as error:
+            results.append({"case": index, "passed": False, "error": type(error).__name__})
+    return results
+
+
+if __name__ == "__main__":
+    results = accept(sys.argv[1])
+    print(json.dumps(results))
+    sys.exit(0 if all(row["passed"] for row in results) else 1)

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-21",
+  "id": "native-workflow-writing-comparison-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "claude-code"
+  ],
+  "claim": "A native single-agent writing run and Fable Workflow with Sonnet implementation and Opus review each produced a repair independently accepted by 29 visible and seven held-out checks. Actual model identities, usage, schema retry and scope deviations were retained.",
+  "limitations": [
+    "One ordered local invoice fixture, not a fully compliant benchmark, upstream test suite or general model ranking.",
+    "Both model runs piped test output through tail, masking exit status; independent unpiped acceptance passed. The Workflow run did not invoke the required authoring skill and exceeded its literal read boundary by reading native metadata.",
+    "Single-agent usage was 194781 reported tokens and Workflow usage 753508. The native Workflow coordinator and workers are included; outer Codex preparation and coordination, independent audit and reporting are excluded. Native cache warmth was uncontrolled; these observations do not establish causal savings. Subscription billing is unknown."
+  ],
+  "artifacts": [
+    "docs/native-workflow-writing-recovery-20260921.md",
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/comparison.json",
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/frozen-inputs.json",
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/independent-review.json"
+  ],
+  "independent_review": {
+    "result": "no_unresolved_material_findings",
+    "scope": "Actual source changes, immutable inputs, unpiped 29 visible and seven hidden checks, model identities and native child usage reconciliation."
+  }
+}

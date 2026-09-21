@@ -311,3 +311,12 @@ Use the existing [update protocol](../adoption/update.md) and native
 [recipes](../recipes/README.md). Append dated sanitized receipts with reciprocal
 component links, then refresh the existing catalog generator and integrity map.
 Do not publish private transcripts, credentials, environment values or host paths.
+
+The [September 21 selective-retrieval pilot](claude-selective-context-pilot-20260921.md)
+adds three counterbalanced native Claude pairs with independently checked code
+acceptance and native usage reconciliation. All selective runs chose native
+computation and made no Context Mode calls. Their aggregate reported tokens were
+2.42% higher; this is not a Context Mode treatment or a causal savings result.
+The rejected setup attempt remains separate and included in campaign totals.
+Keep the existing smallest-sufficient-context policy rather than forcing a tool
+call or promoting this single-fixture observation into a universal default.

@@ -1,0 +1,38 @@
+
+changed 2 packages in 2s
+{
+  "name": "lib",
+  "dependencies": {
+    "@openai/codex": {
+      "version": "0.155.1",
+      "overridden": false
+    }
+  }
+}
+codex-cli 0.155.1
+Not logged in
+Codex expected no-auth exit: 1
+5c4735937844e84f8a93306e841a5b0e12252909b07870f789b190468da147ab  /home/example/.local/share/claude/versions/2.1.278
+
+Checking installation status...
+Setting up launcher and shell integration...
+✔ Claude Code successfully installed!
+
+  Version: 2.1.278
+
+  Location: ~/.local/bin/claude
+
+
+  Next: Run claude --help to get started
+5c4735937844e84f8a93306e841a5b0e12252909b07870f789b190468da147ab  /home/example/.local/share/claude/versions/2.1.278
+2.1.278 (Claude Code)
+{
+  "loggedIn": false,
+  "authMethod": "none",
+  "apiProvider": "firstParty",
+  "analyticsDisabled": false,
+  "projectsDirectory": "/home/example/.claude/projects",
+  "configDirectory": "/home/example/.claude"
+}
+Claude expected no-auth exit: 1
+No native credentials exist in isolated home

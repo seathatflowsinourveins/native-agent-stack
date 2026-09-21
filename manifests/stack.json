@@ -172,6 +172,10 @@
         "claude -p --output-format stream-json --verbose --max-turns 14 < fixtures/native-gap-prompt.txt"
       ],
       "evidence_ids": [
+        "native-workflow-writing-comparison-20260921",
+        "native-workflow-graceful-recovery-20260921",
+        "portable-userspace-install-20260921",
+        "claude-selective-context-pilot-20260921",
         "native-context-memory",
         "native-memory",
         "native-rag",
@@ -261,6 +265,7 @@
         "codex exec -C \"${PROJECT_ROOT}\" --json - < fixtures/native-gap-prompt.txt"
       ],
       "evidence_ids": [
+        "portable-userspace-install-20260921",
         "native-context-memory",
         "native-memory",
         "native-rag",
@@ -348,6 +353,7 @@
         "mcporter --config \"${MCPORTER_CONFIG}\" call context-mode.ctx_doctor --args '{}' --output text --no-oauth"
       ],
       "evidence_ids": [
+        "claude-selective-context-pilot-20260921",
         "native-context-memory",
         "artifact-reductions",
         "component-history",
@@ -664,6 +670,7 @@
         "qmd --index \"${QMD_INDEX}\" search \"automatic local code RAG Nemotron\" -c \"${QMD_COLLECTION}\" -n 2 --json"
       ],
       "evidence_ids": [
+        "portable-userspace-install-20260921",
         "native-cli-gaps",
         "component-history",
         "desktop-cli-workflows",
@@ -692,6 +699,7 @@
         "repomix --include fixtures/records.json,fixtures/example.sh --output \"${OUTPUT_DIR}/repomix.xml\""
       ],
       "evidence_ids": [
+        "portable-userspace-install-20260921",
         "component-history",
         "portable-cli-artifacts",
         "token-practice-artifacts-20260920",
@@ -715,6 +723,7 @@
         "rtk git status"
       ],
       "evidence_ids": [
+        "portable-userspace-install-20260921",
         "native-context-memory",
         "artifact-reductions",
         "component-history",
@@ -874,6 +883,7 @@
         "toon \"${OUTPUT_DIR}/records.toon\" --decode --strict -o \"${OUTPUT_DIR}/recovered.json\""
       ],
       "evidence_ids": [
+        "portable-userspace-install-20260921",
         "component-history",
         "portable-cli-artifacts",
         "token-practice-artifacts-20260920",

@@ -1,0 +1,14 @@
+{
+  "items": [
+    {
+      "name": "alpha",
+      "enabled": true,
+      "count": 2
+    },
+    {
+      "name": "beta",
+      "enabled": false,
+      "count": 3
+    }
+  ]
+}

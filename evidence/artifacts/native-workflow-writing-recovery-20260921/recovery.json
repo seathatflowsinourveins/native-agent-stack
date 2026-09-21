@@ -1,0 +1,277 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-21",
+  "native_cli_version": "2.1.278",
+  "canonical_base": "3cabcdfd0c3b489867364d9582df8f356586d219",
+  "qualification_kind": "Actual native local integration with a disposable synthetic writing fixture and gate/effect probe.",
+  "skill_source_loaded": {
+    "route": "Native /workflow-authoring slash command",
+    "observed": "Persisted native command-name followed by isMeta=true bundled reference before workflow authoring.",
+    "separate_skill_tool_call_required": false
+  },
+  "native_models": {
+    "coordinator": "claude-fable-5-1 / ultracode (xhigh)",
+    "writer": "claude-sonnet-5 / medium",
+    "reviewer": "claude-opus-5 / high"
+  },
+  "worker_failure": {
+    "control": "/workflows; select Review phase, enter its reviewer row, x stop",
+    "selected_agent_failed": true,
+    "native_script_status": "completed",
+    "returned_failed_stage": "review",
+    "returned_review": null,
+    "completed_writer_result_retained": true,
+    "waiting_process_exited": true
+  },
+  "coordinator_interruption": {
+    "control": "Native /exit, option Exit and stop tasks while restarted reviewer waited",
+    "exit_code": 0,
+    "hard_crash_tested": false,
+    "host_reboot_tested": false,
+    "owned_pids_observed_before_exit": 4,
+    "owned_pids_remaining_after_exit": 0,
+    "accepted_invoice_preserved": true
+  },
+  "resume": {
+    "route": "Native claude --resume same session ID, then Workflow scriptPath + resumeFromRunId",
+    "same_session": true,
+    "same_native_run_id": true,
+    "script_status": "completed",
+    "review_failed_stage": null,
+    "review_contains_no_findings": true,
+    "exit_code": 0,
+    "timed_out": false,
+    "elapsed_seconds": 94.89394178800012,
+    "workflow_launches": 3,
+    "implementation_starts": 1,
+    "review_starts": 3,
+    "completed_implementation_reused_from_cache": true,
+    "repeated_review_attempts": [
+      "Selected worker stopped: failed child.",
+      "Reviewer restarted by native replay, then stopped with coordinator exit.",
+      "Reviewer restarted after same-session resume and completed."
+    ],
+    "new_unrelated_user_edits_created_while_stopped": true
+  },
+  "local_effect_probe": {
+    "invocations": {
+      "implementation": 1,
+      "review": 3
+    },
+    "effect_events": {
+      "implementation:created": 1,
+      "review:created": 1
+    },
+    "all_gate_processes_exited": true,
+    "external_exactly_once_proven": false,
+    "scope": "Separate invocation log proves the completed implementation was not rerun; exclusive local files also guard duplicate local effects. No external service, side-effect broker or provider cancellation was tested."
+  },
+  "independent_final_acceptance": {
+    "recovery-coordinator": {
+      "accepted": true,
+      "visible_exit": 0,
+      "visible_passed": 29,
+      "hidden_exit": 0,
+      "hidden_passed": 7,
+      "sentinels_preserved": true,
+      "immutable_sources_preserved": true,
+      "changed_tracked_paths": [
+        "invoice.py",
+        "unrelated.txt"
+      ],
+      "untracked_paths": [
+        "user-note.txt"
+      ]
+    },
+    "recovery-impl": {
+      "accepted": true,
+      "visible_exit": 0,
+      "visible_passed": 29,
+      "hidden_exit": 0,
+      "hidden_passed": 7,
+      "sentinels_preserved": true,
+      "immutable_sources_preserved": true,
+      "changed_tracked_paths": [
+        "invoice.py",
+        "unrelated.txt"
+      ],
+      "untracked_paths": [
+        "user-note.txt"
+      ]
+    }
+  },
+  "sentinel_transition": {
+    "operator_mutation_while_stopped": true,
+    "initial_expected_sha256": {
+      "recovery-coordinator": {
+        "unrelated.txt": "0de185ea165afbd37535ee7fe262e1859c37248a566c139077389e0b18c34943",
+        "user-note.txt": "3ad95c95ca57e464699f037ad9093970de284507e0361f8275cc34e2a45666e5"
+      },
+      "recovery-impl": {
+        "unrelated.txt": "b3c5a0eded53fe2c3d3d79b005813521974dce0f9fac7a0393aff3c35687a386",
+        "user-note.txt": "8b3272dd13347ce21c1b924be089f251ee5326d16046deb70a2c13e4d581281e"
+      }
+    },
+    "initial_implementation_checkpoint_equality": {
+      "unrelated.txt": true,
+      "user-note.txt": true
+    },
+    "after_interrupt_expected_sha256": {
+      "recovery-coordinator": {
+        "unrelated.txt": "c7470f838ddcd961f9b5acb4f2112d5d9cae941c854f8690b839b086149c4b50",
+        "user-note.txt": "c8d62194204d084b42191fd9b1f1bc318491d3be53f89c63979fc0d3cc238f8e"
+      },
+      "recovery-impl": {
+        "unrelated.txt": "ff9482730e17725fed2470e95813c3e46cf86b12e1f46e488286e0a47a964837",
+        "user-note.txt": "a11d8964377f15cf74293706c281be6051c1bd0e6dad7b19bca9cccd5b4c6476"
+      }
+    },
+    "final_actual_sha256": {
+      "recovery-coordinator": {
+        "unrelated.txt": "c7470f838ddcd961f9b5acb4f2112d5d9cae941c854f8690b839b086149c4b50",
+        "user-note.txt": "c8d62194204d084b42191fd9b1f1bc318491d3be53f89c63979fc0d3cc238f8e"
+      },
+      "recovery-impl": {
+        "unrelated.txt": "ff9482730e17725fed2470e95813c3e46cf86b12e1f46e488286e0a47a964837",
+        "user-note.txt": "a11d8964377f15cf74293706c281be6051c1bd0e6dad7b19bca9cccd5b4c6476"
+      }
+    },
+    "boundary": "Original sentinels checked before failure; intentional replacement while coordinator stopped; new sentinels checked after resume. Cross-mutation equality is not expected."
+  },
+  "cleanup": {
+    "remaining_owned_native_cli_processes": [],
+    "unrelated_sessions_signalled": false,
+    "disposable_checkouts_retained_for_audit": true,
+    "scope": "Native owned-process cleanup observed; worktree deletion is not claimed."
+  },
+  "usage": {
+    "native_initial_restored_model_usage": {
+      "claude-fable-5-1": {
+        "inputTokens": 1718,
+        "outputTokens": 13087,
+        "thinkingTokens": 8753,
+        "cacheReadInputTokens": 738211,
+        "cacheCreationInputTokens": 45308,
+        "webSearchRequests": 0,
+        "costUSD": 1.7622427499999997,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      },
+      "claude-sonnet-5": {
+        "inputTokens": 16,
+        "outputTokens": 2886,
+        "thinkingTokens": 1139,
+        "cacheReadInputTokens": 291470,
+        "cacheCreationInputTokens": 44154,
+        "webSearchRequests": 0,
+        "costUSD": 0.19757099999999997,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      },
+      "claude-opus-5[1m]": {
+        "inputTokens": 18,
+        "outputTokens": 5064,
+        "thinkingTokens": 3102,
+        "cacheReadInputTokens": 283576,
+        "cacheCreationInputTokens": 63498,
+        "webSearchRequests": 0,
+        "costUSD": 0.6653404999999999,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      }
+    },
+    "native_final_cumulative_model_usage": {
+      "claude-fable-5-1": {
+        "inputTokens": 1916,
+        "outputTokens": 18268,
+        "thinkingTokens": 11180,
+        "cacheReadInputTokens": 1203388,
+        "cacheCreationInputTokens": 115927,
+        "webSearchRequests": 0,
+        "costUSD": 3.551946999999999,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000,
+        "canonicalModel": "claude-fable-5-1",
+        "provider": "firstParty",
+        "costBasis": "list"
+      },
+      "claude-sonnet-5": {
+        "inputTokens": 16,
+        "outputTokens": 2886,
+        "thinkingTokens": 1139,
+        "cacheReadInputTokens": 291470,
+        "cacheCreationInputTokens": 44154,
+        "webSearchRequests": 0,
+        "costUSD": 0.19757099999999997,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000
+      },
+      "claude-opus-5[1m]": {
+        "inputTokens": 28,
+        "outputTokens": 6986,
+        "thinkingTokens": 3525,
+        "cacheReadInputTokens": 371686,
+        "cacheCreationInputTokens": 86971,
+        "webSearchRequests": 0,
+        "costUSD": 0.9042017499999999,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000,
+        "canonicalModel": "claude-opus-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "native_total_reported_tokens": 2143696,
+    "deduplicated_transcript_tokens_lower_bound": 1937995,
+    "native_minus_deduplicated_transcript": {
+      "claude-fable-5-1": {
+        "input_tokens": 1518,
+        "output_tokens": 89,
+        "cache_read_input_tokens": 202569,
+        "cache_creation_input_tokens": 1278
+      },
+      "claude-opus-5": {
+        "input_tokens": 0,
+        "output_tokens": 247,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0
+      },
+      "claude-sonnet-5": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 0
+      }
+    },
+    "complete_accounting": false,
+    "scope": "Final native cumulative counters restore earlier stopped attempts and include resumed requests/workers. They are counted once, not added to initial totals or transcript/worker sums. Transcript response-ID reconciliation has unexplained positive residuals; therefore no fully reconciled provider-usage or end-to-end savings claim.",
+    "transcript_deduplication": "Per response message.id choose the whole usage snapshot with greatest output_tokens; ties use the later snapshot. Thinking is contained in output."
+  },
+  "all_owned_native_qualification_reported_tokens": 3091985,
+  "all_owned_native_qualification_cli_invocations": 4,
+  "quota_failures_observed": false,
+  "retained_limits": [
+    "One bounded invoice repair; no performance ranking or universal workflow robustness claim.",
+    "Graceful native exit tested; crash, reboot, provider outages and post-compaction replay were not exercised.",
+    "No native scheduler fire, app-restart scheduler delivery, or external exactly-once operation tested.",
+    "Task prompts constrain behavior but inherited bypassPermissions is not OS confinement.",
+    "Native subscription list-price telemetry is not a new invoice. Codex preparation/review/reporting usage is outside these native totals."
+  ],
+  "raw_artifact_sha256": {
+    "initial_terminal": "725224019d3e887222d420c3b056558fa882a748a50b42e9f21944d0812bd0dc",
+    "resume_stream": "fe60e9d49299c59776b477ba1c9b2501e67dfcd78bb2dc4d01e0c848008164c4",
+    "resume_stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "native_journal": "f7c29223a9951f45c30beb6a3aea94c4fdefe9260b08f7282b80f541e85fe84d",
+    "native_main_transcript": "175115dea1eddaa2c5c330cdc639304f1b68312b0e57fdb61b25729907d1adf1",
+    "workflow_script": "702ed852b358d0eacfb01eb411730fac3fdb2a4751fcb85f7fa76c134249284d",
+    "bundled_authoring_reference": "21a07b0a0ae6dd279f1a98e7723e3eb4325489a1a2232cbb7b9c727fadc0e195",
+    "control_events": "74b8e434157deae60fd2bbbf24e126898e33971aabb93d2e5b71b861dd21051d",
+    "checkpoint_helper": "c21bec01287c9f6541fe9d1df1a57d3a104ca7a85c7da2ffd9cdea9f91d2396f",
+    "invocations": "d5e75b6a2f26f29be6eacf560d9ade5c0bc1b60d540b87a1d44a671f05374340",
+    "effects": "13e8a7f6b56e45becf29b9d89118f25a99dac080740c4abba69a7d1730ef7530",
+    "initial_prompt": "273b9f597cb10b3ccad6f840023056b284fd5b5a03c025cde3ddc7e9fff9b8b2",
+    "resume_prompt": "f661239e1213c4550f7b64dc77b0a0b8b6930eae0a98309b76844684ccae21b6",
+    "operator_sentinel_mutation": "5612a6cfa586bfdb3e16d975bc5505791c7d448ecd777b02d66a8bcd8ae39b4b"
+  },
+  "observed_utc": "2026-09-21T03:34:54.309443+00:00"
+}
