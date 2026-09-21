@@ -311,6 +311,12 @@
   ],
   "guides": [
     {
+      "title": "Native foundation qualification: installation, tokens and recovery",
+      "body": "Repeated Claude retrieval, native writing workers and graceful recovery, plus a clean Ubuntu userspace installation replay. Observed costs, process deviations and remaining boundaries are retained.",
+      "path": "docs/native-foundation-resolution-20260921.md",
+      "category": "evaluation"
+    },
+    {
       "title": "Useful native dashboards: memory, retrieval and savings",
       "body": "Populated upstream interfaces, exact command output bindings, seven separate savings scopes and 68 dated coverage records. Current native observation is separate from old audits, local fixtures and reload boundaries.",
       "path": "docs/native-dashboard-data.md",

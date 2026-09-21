@@ -931,6 +931,26 @@
       "functional_evidence": {
         "public_receipts": [
           {
+            "id": "native-workflow-writing-comparison-20260921",
+            "path": "evidence/receipts/native-workflow-writing-comparison-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-workflow-graceful-recovery-20260921",
+            "path": "evidence/receipts/native-workflow-graceful-recovery-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "portable-userspace-install-20260921",
+            "path": "evidence/receipts/portable-userspace-install-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-selective-context-pilot-20260921",
+            "path": "evidence/receipts/claude-selective-context-pilot-20260921.json",
+            "kind": "native_model_e2e"
+          },
+          {
             "id": "native-context-memory",
             "path": "evidence/receipts/native-context-memory.json",
             "kind": "native_model_e2e"
@@ -1251,6 +1271,11 @@
       "functional_evidence": {
         "public_receipts": [
           {
+            "id": "portable-userspace-install-20260921",
+            "path": "evidence/receipts/portable-userspace-install-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
             "id": "native-context-memory",
             "path": "evidence/receipts/native-context-memory.json",
             "kind": "native_model_e2e"
@@ -1560,6 +1585,11 @@
       },
       "functional_evidence": {
         "public_receipts": [
+          {
+            "id": "claude-selective-context-pilot-20260921",
+            "path": "evidence/receipts/claude-selective-context-pilot-20260921.json",
+            "kind": "native_model_e2e"
+          },
           {
             "id": "native-context-memory",
             "path": "evidence/receipts/native-context-memory.json",
@@ -4552,6 +4582,11 @@
       "functional_evidence": {
         "public_receipts": [
           {
+            "id": "portable-userspace-install-20260921",
+            "path": "evidence/receipts/portable-userspace-install-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
             "id": "native-cli-gaps",
             "path": "evidence/receipts/native-cli-gaps.json",
             "kind": "native_model_e2e"
@@ -4729,6 +4764,11 @@
       },
       "functional_evidence": {
         "public_receipts": [
+          {
+            "id": "portable-userspace-install-20260921",
+            "path": "evidence/receipts/portable-userspace-install-20260921.json",
+            "kind": "native_cli_e2e"
+          },
           {
             "id": "component-history",
             "path": "evidence/receipts/component-history.json",
@@ -4954,6 +4994,11 @@
       },
       "functional_evidence": {
         "public_receipts": [
+          {
+            "id": "portable-userspace-install-20260921",
+            "path": "evidence/receipts/portable-userspace-install-20260921.json",
+            "kind": "native_cli_e2e"
+          },
           {
             "id": "native-context-memory",
             "path": "evidence/receipts/native-context-memory.json",
@@ -5814,6 +5859,11 @@
       },
       "functional_evidence": {
         "public_receipts": [
+          {
+            "id": "portable-userspace-install-20260921",
+            "path": "evidence/receipts/portable-userspace-install-20260921.json",
+            "kind": "native_cli_e2e"
+          },
           {
             "id": "component-history",
             "path": "evidence/receipts/component-history.json",

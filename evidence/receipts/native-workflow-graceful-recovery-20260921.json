@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-21",
+  "id": "native-workflow-graceful-recovery-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "claude-code"
+  ],
+  "claim": "Native workflow-authoring skill injection, selected reviewer stop, graceful coordinator exit and same-session/run resume were exercised. One implementation start and three reviewer starts were observed across three launches; final owned checkouts passed independent acceptance, preserved intervening user edits and cleaned up owned processes.",
+  "limitations": [
+    "Graceful local exit/resume on a synthetic fixture, not hard-crash, reboot, cross-host delivery, scheduled wake or arbitrary external exactly-once qualification.",
+    "The operator deliberately changed tracked and untracked sentinels while stopped. Initial and final checks cover distinct documented boundaries; the mutation receipt was recorded after execution.",
+    "Recovery native cumulative model usage was 2143696 tokens versus 1937995 retained unique-message tokens, leaving 205701 unexplained. Full accounting reconciliation is not qualified; repeated cumulative events are not summed as new consumption.",
+    "One implementation and one review effect were observed for this local probe. Local fixture checks are not the complete upstream test suite."
+  ],
+  "artifacts": [
+    "docs/native-workflow-writing-recovery-20260921.md",
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/recovery.json",
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/protocol-amendment.json",
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/independent-review.json"
+  ],
+  "complete_accounting": false,
+  "independent_review": {
+    "result": "no_unresolved_material_findings",
+    "scope": "Native events, skill injection, replay identities, script identity, phase starts/effects, both checkouts' unpiped 29 visible and seven hidden checks, sentinel transition and owned-process cleanup."
+  }
+}
