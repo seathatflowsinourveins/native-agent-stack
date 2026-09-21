@@ -14,6 +14,9 @@ import time
 import urllib.request
 
 MAX_BYTES = 2_000_000
+# Includes catalog checkpoints and up to HISTORY_LIMIT native runs plus summary.
+# The combined foundation/paper inventory has already exceeded the former 80 rows.
+MAX_ENTITIES = 128
 HISTORY_BYTES = 131_072
 HISTORY_LIMIT = 10
 HISTORY_STATUSES = ('not_started', 'running', 'succeeded', 'failed', 'aborted',
@@ -207,8 +210,10 @@ def snapshot(root, dagu_bin=None, dagu_home=None):
     add('summary', 'stars', 'Public stars enumerated', 'identity audit', stars_path, count)
     add('summary', 'snapshot', 'Snapshot marker', 'recorded', 'observability/grand-dashboard/state.json')
     rows.extend(workflow_snapshot(dagu_bin, dagu_home))
-    if len(rows) > 80 or len({r['entity_id'] for r in rows}) != len(rows):
-        raise ValueError('too many or duplicate dashboard entities')
+    if len(rows) > MAX_ENTITIES:
+        raise ValueError('too many dashboard entities')
+    if len({r['entity_id'] for r in rows}) != len(rows):
+        raise ValueError('duplicate dashboard entities')
     return rows
 
 

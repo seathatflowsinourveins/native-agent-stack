@@ -2498,6 +2498,23 @@
         "No new scheduled trigger, restart or physical reboot was observed; lifetime and session savings remain null."
       ],
       "path": "evidence/receipts/foundation-convergence-20260921.json"
+    },
+    {
+      "id": "native-progress-capacity-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "loki",
+        "dagu"
+      ],
+      "claim": "Actual systemd progress timer recovered from an 81-entity capacity rejection and published the complete combined local inventory; independent native Loki readback matched all entities and fields.",
+      "limitations": [
+        "This observed systemd progress timer is distinct from the daily Codex maintenance heartbeat.",
+        "No client restart, service restart or physical reboot was performed or verified.",
+        "Local combined catalog includes concurrent paper checkpoints; this operation did not execute or requalify broker behavior.",
+        "Publication and dashboard health do not establish task acceptance, token savings or current worker process liveness.",
+        "No live provider inference, account change, new dependency or upstream version change for this repair."
+      ],
+      "path": "observability/grand-dashboard/capacity-recovery-20260921.json"
     }
   ],
   "files": [
@@ -6164,8 +6181,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 7026566,
-      "sha256": "a605008f4ffd34749ae94c73fff3721337b1d33d6c55733cf892c1f67d1c5cc4"
+      "bytes": 7027065,
+      "sha256": "679f2c8205c9895cbca6b310edf168d281d01ce14d6b9efec9e3bdf8187a232d"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6799,8 +6816,8 @@
     },
     {
       "path": "observability/grand-dashboard/README.md",
-      "sha256": "ea190abfc8ad4fb99433f3851d998c44ffcb81c6bd6f93f9aea5ae53fc4aa108",
-      "bytes": 6558
+      "sha256": "e01697547a3d8b91b58390cee13a1bfa774967c9011cfee4642a1a9d57785ee6",
+      "bytes": 7544
     },
     {
       "path": "observability/grand-dashboard/acceptance.py",
@@ -6824,8 +6841,8 @@
     },
     {
       "path": "observability/grand-dashboard/progress.py",
-      "sha256": "5f3c0908f3cbbdec1c35f37ed9c9f436c59976b30a7ebc01282dccbf8750340c",
-      "bytes": 13478
+      "sha256": "e233469df9de5733bb5151d91606023be8f66dd00152a57536b10cceeac1c5ce",
+      "bytes": 13720
     },
     {
       "path": "observability/grand-dashboard/receipt.json",
@@ -6999,8 +7016,8 @@
     },
     {
       "path": "tests/test_grand_dashboard.py",
-      "sha256": "56fde9bf3570c521701928e848c924c2d1cedb982b1c7c4df67589a0d5697079",
-      "bytes": 10398
+      "sha256": "0b60a4c8bd8443fcb668ee003c5e88a785ce430460ee1a9e872f0ac9cdf22b8c",
+      "bytes": 13225
     },
     {
       "path": "tests/test_historical_comparison.py",
@@ -9364,8 +9381,8 @@
     },
     {
       "path": "docs/foundation-convergence-20260921.md",
-      "bytes": 6536,
-      "sha256": "5e6dfd2beebe8e459db79b20c10f59a4515caefc7f13b5087a658a8aed647838"
+      "bytes": 7028,
+      "sha256": "2a8fe0a5f1bc9008d322a9199cec5c9750ab0d141c755852bb68cfad2d3a71d3"
     },
     {
       "path": "evidence/artifacts/foundation-convergence-20260921/claude-cooperation.json",
@@ -9401,6 +9418,16 @@
       "path": "evidence/artifacts/foundation-convergence-20260921/verification.json",
       "bytes": 7711,
       "sha256": "fd79df125a92bad2f793a4bf720e7574beea77e30e0cdd954d3526c805c69316"
+    },
+    {
+      "path": "observability/grand-dashboard/capacity-loki-result.json",
+      "bytes": 35316,
+      "sha256": "981dc4ceea934ec87e969f446ca46eaf8589519898a5fc8c97867a73b3ef0585"
+    },
+    {
+      "path": "observability/grand-dashboard/capacity-recovery-20260921.json",
+      "bytes": 8088,
+      "sha256": "7849aecddb04c57c74807bea95f477a4552c189e67dcb3c679f6b4087e8a4f06"
     }
   ],
   "convergence_records": [

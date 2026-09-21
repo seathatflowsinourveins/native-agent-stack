@@ -20,13 +20,61 @@ install_spec.loader.exec_module(installer)
 class GrandDashboardTests(unittest.TestCase):
     def test_snapshot_is_bounded_public_fields(self):
         rows = progress.snapshot(ROOT)
-        self.assertLessEqual(len(rows), 80)
+        self.assertLessEqual(len(rows), progress.MAX_ENTITIES)
         self.assertGreater(sum(r['record_kind'] == 'decision' for r in rows), 0)
         allowed = {'record_kind','entity_id','title','state','evidence_ref','source_updated_at','number'}
         extra = {'equity_usd','drawdown_pct','fees_usd','fill_count','margin_call_count'}
         self.assertTrue(all(set(r) == allowed | (extra if r['record_kind']=='experiment' else set()) for r in rows if r['record_kind']!='workflow'))
         self.assertEqual(progress.workflow_snapshot(), [r for r in rows if r['record_kind']=='workflow'])
         self.assertEqual(1, sum(r['entity_id'] == 'snapshot' for r in rows))
+
+    def test_combined_inventory_accepts_full_history_and_rejects_overflow(self):
+        # Synthetic capacity fixture; actual native publication is separate evidence.
+        history = progress.workflow_rows([
+            dict(name='research-pair', status='succeeded',
+                 startedAt='2026-09-19T21:00:00Z', finishedAt='2026-09-19T21:01:00Z')
+            for _ in range(progress.HISTORY_LIMIT)
+        ])
+        original = progress.read
+        with patch.object(progress, 'workflow_snapshot', return_value=history):
+            base_count = len(progress.snapshot(ROOT))
+            for count in (max(81, base_count), progress.MAX_ENTITIES, progress.MAX_ENTITIES + 1):
+                def grown(root, relative):
+                    data = original(root, relative)
+                    if relative.endswith('/state.json'):
+                        template = data['gates'][0]
+                        data['gates'].extend(
+                            dict(template, id=f'capacity-fixture-{i}')
+                            for i in range(max(0, count - base_count)))
+                    return data
+                with self.subTest(count=count), patch.object(progress, 'read', grown):
+                    if count > progress.MAX_ENTITIES:
+                        with self.assertRaisesRegex(ValueError, '^too many dashboard entities$'):
+                            progress.snapshot(ROOT)
+                        with tempfile.TemporaryDirectory() as d:
+                            cache = Path(d) / 'cache.json'
+                            previous = '{"digest":"previous","sent_ns":1}\n'
+                            cache.write_text(previous)
+                            with patch.object(progress.urllib.request, 'urlopen') as send:
+                                with self.assertRaisesRegex(ValueError, '^too many dashboard entities$'):
+                                    progress.publish(ROOT, cache)
+                                send.assert_not_called()
+                            self.assertEqual(previous, cache.read_text())
+                    else:
+                        rows = progress.snapshot(ROOT)
+                        self.assertEqual(len(rows), max(base_count, count))
+                        self.assertEqual(len(history), sum(r['record_kind'] == 'workflow' for r in rows))
+
+    def test_duplicate_inventory_entities_are_rejected(self):
+        original = progress.read
+        def duplicate(root, relative):
+            data = original(root, relative)
+            if relative.endswith('/state.json'):
+                data['gates'].append(dict(data['gates'][0]))
+            return data
+        with patch.object(progress, 'read', duplicate):
+            with self.assertRaisesRegex(ValueError, '^duplicate dashboard entities$'):
+                progress.snapshot(ROOT)
 
     def test_absolute_and_symlink_evidence_rejected(self):
         original = progress.read

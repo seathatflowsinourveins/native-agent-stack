@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "kind": "native_cli_e2e",
+  "observed_date": "2026-09-21",
+  "scope": "Local integration repair of the catalog emitter using native systemd timer, installed Dagu history and Loki HTTP API; not upstream component recertification.",
+  "implementation": {
+    "max_entities_before": 80,
+    "max_entities_after": 128,
+    "history_limit": 10,
+    "changed_files": [
+      "observability/grand-dashboard/progress.py",
+      "tests/test_grand_dashboard.py"
+    ],
+    "selection": "Retain all validated rows; reject oversized or duplicate inventories without publishing or advancing cache.",
+    "combined_source_base": "53fd13d",
+    "local_fix_commit": "af30ae1"
+  },
+  "failure": {
+    "command": "systemctl --user show ecosystem-research-progress.service -p Result -p ExecMainStatus -p ExecMainStartTimestamp && journalctl --user -u ecosystem-research-progress.service -n 8 --no-pager -o cat",
+    "observation_exit_code": 0,
+    "returned_text": "Result=exit-code\nExecMainStartTimestamp=Mon 2026-09-21 12:23:07 EDT\nExecMainStatus=1\n    rows = snapshot(root, dagu_bin, dagu_home)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$STACK_REPO/observability/grand-dashboard/progress.py\", line 211, in snapshot\n    raise ValueError('too many or duplicate dashboard entities')\nValueError: too many or duplicate dashboard entities\necosystem-research-progress.service: Main process exited, code=exited, status=1/FAILURE\necosystem-research-progress.service: Failed with result 'exit-code'.\nFailed to start ecosystem-research-progress.service - Publish public research progress to local Loki.\n",
+    "cause": "Actual combined source inventory contains 81 unique entities. The former total-generation cap of 80 rejected it after native history was added.",
+    "upstream_failure": false
+  },
+  "recovery": {
+    "operation": "Existing systemd timer executed the modified local emitter; no manual start or restart.",
+    "command": "systemctl --user show ecosystem-research-progress.timer -p ActiveState -p LastTriggerUSec -p NextElapseUSecRealtime && systemctl --user show ecosystem-research-progress.service -p Result -p ExecMainStatus -p ExecMainStartTimestamp && journalctl --user -u ecosystem-research-progress.service -n 4 --no-pager -o cat",
+    "exit_code": 0,
+    "returned_text": "NextElapseUSecRealtime=\nLastTriggerUSec=Mon 2026-09-21 12:24:52 EDT\nActiveState=active\nResult=success\nExecMainStartTimestamp=Mon 2026-09-21 12:24:52 EDT\nExecMainStatus=0\nFailed to start ecosystem-research-progress.service - Publish public research progress to local Loki.\nStarting ecosystem-research-progress.service - Publish public research progress to local Loki...\n{\"status\": \"published\", \"records\": 81, \"sha256\": \"5d281e23f95167043750caf0a69f7e65aca48562c2d44f8848245be40af40080\"}\nFinished ecosystem-research-progress.service - Publish public research progress to local Loki.\n",
+    "observed_timer_trigger_utc": "2026-09-21T16:24:52Z",
+    "published_records": 81,
+    "publication_digest": "5d281e23f95167043750caf0a69f7e65aca48562c2d44f8848245be40af40080"
+  },
+  "independent_observation": {
+    "method": "Read the corresponding complete generation from Loki HTTP query_range; compare every returned entity and field with a fresh local source snapshot including actual native Dagu history.",
+    "http_status": 200,
+    "observed_at_utc": "2026-09-21T16:26:16.399174+00:00",
+    "parameters": {
+      "query": "{service_name=\"agent-stack-progress\"}",
+      "start": "1790007892872305527",
+      "end": "1790007893872305527",
+      "limit": "1000",
+      "direction": "forward"
+    },
+    "returned_count": 81,
+    "unique_count": 81,
+    "record_kinds": {
+      "decision": 36,
+      "experiment": 6,
+      "gate": 20,
+      "lane": 3,
+      "summary": 4,
+      "wave": 4,
+      "worker": 5,
+      "workflow": 3
+    },
+    "missing_ids": [],
+    "unexpected_ids": [],
+    "changed_ids": [],
+    "source_digest_matches_cache": true,
+    "repeat_query_same_timestamped_events": true,
+    "raw_http_body": {
+      "path": "observability/grand-dashboard/capacity-loki-result.json",
+      "bytes": 35316,
+      "sha256": "981dc4ceea934ec87e969f446ca46eaf8589519898a5fc8c97867a73b3ef0585"
+    }
+  },
+  "project_checks": {
+    "command": "python3 -m unittest tests.test_grand_dashboard",
+    "exit_code": 0,
+    "returned_text": "...............\n----------------------------------------------------------------------\nRan 15 tests in 0.154s\n\nOK\nInstalled dashboard and two units; service activation remains explicit.\n",
+    "classification": "Project regression tests, including explicitly synthetic capacity/history fixtures; not unchanged upstream tests.",
+    "coverage": [
+      "Full ten-entry history is preserved alongside source rows above former cap80.",
+      "Exactly128 entries accepted;129 rejected.",
+      "Duplicate entities rejected below cap.",
+      "Overflow makes no HTTP request and preserves previous cache."
+    ]
+  },
+  "independent_review": {
+    "source": "Independent read-only code reviewer",
+    "outcome": "Production fix and boundaries accepted; distinguish above80 full-history fixture from exact81 live inventory.",
+    "remaining_requirement": "Final patch and retained observation review recorded in PR."
+  },
+  "upstream_interfaces": [
+    "https://grafana.com/docs/loki/latest/reference/loki-http-api/",
+    "https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html",
+    "https://github.com/dagucloud/dagu"
+  ],
+  "limits": [
+    "This observed systemd progress timer is distinct from the daily Codex maintenance heartbeat.",
+    "No client restart, service restart or physical reboot was performed or verified.",
+    "Local combined catalog includes concurrent paper checkpoints; this operation did not execute or requalify broker behavior.",
+    "Publication and dashboard health do not establish task acceptance, token savings or current worker process liveness.",
+    "No live provider inference, account change, new dependency or upstream version change for this repair."
+  ],
+  "id": "native-progress-capacity-20260921",
+  "component_ids": [
+    "loki",
+    "dagu"
+  ],
+  "claim": "Actual systemd progress timer recovered from an 81-entity capacity rejection and published the complete combined local inventory; independent native Loki readback matched all entities and fields.",
+  "limitations": [
+    "This observed systemd progress timer is distinct from the daily Codex maintenance heartbeat.",
+    "No client restart, service restart or physical reboot was performed or verified.",
+    "Local combined catalog includes concurrent paper checkpoints; this operation did not execute or requalify broker behavior.",
+    "Publication and dashboard health do not establish task acceptance, token savings or current worker process liveness.",
+    "No live provider inference, account change, new dependency or upstream version change for this repair."
+  ],
+  "publication_checks": [
+    {
+      "command": "python3 scripts/validate.py",
+      "classification": "Local project validation",
+      "exit_code": 0,
+      "output": "{\"components\": 68, \"hashed_files\": 1379, \"profiles\": 4, \"receipts\": 123, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n"
+    },
+    {
+      "command": "python3 -m unittest tests.test_grand_dashboard tests.test_ecosystem_manifest tests.test_stack_lifecycle",
+      "classification": "Local project validation",
+      "exit_code": 0,
+      "output": "....................................................\n----------------------------------------------------------------------\nRan 52 tests in 2.084s\n\nInstalled dashboard and two units; service activation remains explicit.\nOK\n"
+    },
+    {
+      "command": "python3 scripts/build_ecosystem.py --check",
+      "classification": "Local project validation",
+      "exit_code": 0,
+      "output": "{\"bytes\": 7027065, \"sha256\": \"679f2c8205c9895cbca6b310edf168d281d01ce14d6b9efec9e3bdf8187a232d\", \"status\": \"passed\"}\n"
+    }
+  ]
+}
