@@ -65,8 +65,8 @@
     },
     {
       "path": "evidence/artifacts/foundation-convergence-20260921/validation-attempts.json",
-      "bytes": 2864,
-      "sha256": "db94b9e7a61580494d5720a08bbe1fb87757b924c4aa43329d506ce0c0fe4ef7"
+      "bytes": 3690,
+      "sha256": "1282de063bf8508e251893b717ddf0d20b0cd8e2f59daeba40e75c76cfe4733d"
     },
     {
       "path": "evidence/artifacts/foundation-convergence-20260921/verification.json",

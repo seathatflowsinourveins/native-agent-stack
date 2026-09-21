@@ -30,5 +30,13 @@
     "exit_code": 1,
     "returned_output": "Publication validation failed:\ndocs/ecosystem/index.html: contains possible personal home path\nevidence/artifacts/foundation-convergence-20260921/verification.json: contains possible personal home path\n",
     "resolution": "Redacted remaining screenshot output path in the added verification artifact before publication."
+  },
+  "github_full_suite": {
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35623617117",
+    "command": "python3 -m unittest discover -s tests -t .",
+    "observed": "702 tests, six failures, 41 skipped. test_stack_lifecycle found the new source-review receipt in six stack components but absent from their unchanged lifecycle functional-evidence rows.",
+    "resolution": "Keep the source-review receipt in its explicitly scoped returned-results/catalog checkpoint; remove the added functional-receipt links from the six accepted component records. Existing lifecycle acceptance and tests remain unchanged.",
+    "upstream_native_token_tools": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/35623617080",
+    "upstream_native_token_tools_status": "passed"
   }
 }

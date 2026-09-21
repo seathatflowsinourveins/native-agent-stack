@@ -6164,8 +6164,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 7040274,
-      "sha256": "e457ee701053afb4704d9121ee8d7c1a4889ee64e0ef7d2c755e82c3ebb4f2e8"
+      "bytes": 7026566,
+      "sha256": "a605008f4ffd34749ae94c73fff3721337b1d33d6c55733cf892c1f67d1c5cc4"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6679,8 +6679,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 80543,
-      "sha256": "480a75a9556c676383c00f9d6163d53f4e14ffc332d430fa35b68b07f2694f66"
+      "bytes": 80285,
+      "sha256": "d55947196c78b7be93af99ced90b12132d688e80e5de984bd360e7f3663ae892"
     },
     {
       "path": "observability/README.md",
@@ -9390,12 +9390,12 @@
     {
       "path": "evidence/receipts/foundation-convergence-20260921.json",
       "bytes": 3611,
-      "sha256": "b919050d032d445de767e9efaf83b23c67cfc36d575b1cb9ecf0ab599b37e34c"
+      "sha256": "485d4dcf2a6654178e961f358e823e9b5286c3c56d42c69a3f5bd4c5608b2852"
     },
     {
       "path": "evidence/artifacts/foundation-convergence-20260921/validation-attempts.json",
-      "bytes": 2864,
-      "sha256": "db94b9e7a61580494d5720a08bbe1fb87757b924c4aa43329d506ce0c0fe4ef7"
+      "bytes": 3690,
+      "sha256": "1282de063bf8508e251893b717ddf0d20b0cd8e2f59daeba40e75c76cfe4733d"
     },
     {
       "path": "evidence/artifacts/foundation-convergence-20260921/verification.json",

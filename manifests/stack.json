@@ -207,8 +207,7 @@
         "native-worker-cgroup-20260920",
         "foundation-closure-20260921",
         "native-returned-results-20260921",
-        "full-stack-convergence-20260921",
-        "foundation-convergence-20260921"
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -301,8 +300,7 @@
         "foundation-native-20260920",
         "foundation-closure-20260921",
         "native-returned-results-20260921",
-        "full-stack-convergence-20260921",
-        "foundation-convergence-20260921"
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -386,8 +384,7 @@
         "foundation-closure-20260921",
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
-        "full-stack-convergence-20260921",
-        "foundation-convergence-20260921"
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/mksglu/context-mode"
@@ -488,8 +485,7 @@
         "foundation-native-20260920",
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
-        "full-stack-convergence-20260921",
-        "foundation-convergence-20260921"
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/headroomlabs-ai/headroom",
@@ -771,8 +767,7 @@
         "foundation-native-20260920",
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
-        "full-stack-convergence-20260921",
-        "foundation-convergence-20260921"
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0"
@@ -935,8 +930,7 @@
         "token-practice-catalog-toon-20260920",
         "token-practice-native-counters-20260920",
         "foundation-native-20260920",
-        "full-stack-convergence-20260921",
-        "foundation-convergence-20260921"
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/toon-format/toon/releases/tag/v4.1.1"
