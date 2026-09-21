@@ -223,7 +223,7 @@ class SafetyTests(unittest.TestCase):
                         {"quote": self.quote("AAPL")}]:
             with self.assertRaises(s.SafetyError):
                 self.reserve(**changes)
-        for value in [True, 1.0, "NaN", "Infinity", "-1", "1e2", "0", "0.000000001"]:
+        for value in [True, 1.0, "NaN", "Infinity", "-1", "1e2", "0", "0.0000000001"]:
             with self.assertRaises(s.SafetyError):
                 self.reserve(qty=value)
         with self.assertRaises(s.SafetyError):
@@ -483,6 +483,22 @@ class SafetyTests(unittest.TestCase):
             self.validate("sell-1", quote=self.quote(at=self.now - 4))
         with self.assertRaisesRegex(s.SafetyError, "recovery_only_blocks_entry"):
             self.reserve("buy-2")
+
+    def test_nine_decimal_partial_fill_can_recover_exact_residual(self):
+        self.reserve()
+        residual = D("0.123456789")
+        self.fill(qty="0.123456789", status="canceled")
+        self.now += 421
+        self.ledger.begin_recovery(self.now)
+        self.reserve("sell-1", side="sell", qty=residual, price="99.99")
+        self.fill("sell-1", qty=residual, price="100")
+        self.assertEqual(self.ledger.positions(), {})
+        self.assertEqual(self.ledger.accounting().cash_delta_usd, 0)
+        self.assertEqual(s.decimal(D("0.000000001")), D("0.000000001"))
+        self.assertEqual(s.decimal(D("1.000000000000")), 1)
+        for bad in [D("1E-10"), D("1E-1000000"), D("1E1000000"), D("NaN")]:
+            with self.assertRaises(s.SafetyError):
+                s.decimal(bad)
 
 
 if __name__ == "__main__":

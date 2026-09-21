@@ -35,8 +35,21 @@ class SafetyError(RuntimeError):
 def decimal(value, *, zero=False, maximum=D("1000000000")):
     if type(value) not in (str, int, Decimal):
         raise SafetyError("decimal_text_or_integer_required")
-    text = str(value)
-    if not re.fullmatch(r"[0-9]{1,10}(?:\.[0-9]{1,8})?", text):
+    if type(value) is Decimal:
+        if not value.is_finite() or value.is_signed() or value > maximum:
+            raise SafetyError("decimal_out_of_bounds")
+        sign, digits, exponent = value.as_tuple()
+        digits = list(digits)
+        while len(digits) > 1 and digits[-1] == 0 and exponent < 0:
+            digits.pop()
+            exponent += 1
+        if not -9 <= exponent <= 9:
+            raise SafetyError("decimal_precision_exceeded")
+        # Fixed-point formatting must be bounded before expanding exponents.
+        text = format(D((sign, tuple(digits), exponent)), "f")
+    else:
+        text = str(value)
+    if not re.fullmatch(r"[0-9]{1,10}(?:\.[0-9]{1,9})?", text):
         raise SafetyError("invalid_decimal")
     result = D(text)
     if not result.is_finite() or result < 0 or (not zero and result == 0) or result > maximum:

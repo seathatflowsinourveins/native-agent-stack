@@ -26,6 +26,8 @@ limit-order mechanism guarantees a flat finish.
 - `RiskLimits(...)`, `Quote(symbol, bid, ask, timestamp)`, `Intent`, `Position`,
   `AccountState` are dataclasses. Money and quantities use `Decimal`; input decimal
   values are strings, integers, or Decimals, never binary floats or booleans.
+  Fractional quantities retain up to nine decimal places, including exact residual
+  exits; bounded Decimal exponents are formatted without rounding or truncation.
 - `account_lock(account_id, lock_root=None)` and
   `account_lock_fingerprint(fingerprint, lock_root=None)` share the accepted
   `~/.local/state/native-agent-stack/alpaca-paper/locks/<sha256>.lock` namespace.
