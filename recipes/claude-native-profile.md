@@ -44,6 +44,26 @@ already supports Shift+Enter; use the official
 for a demonstrated keyboard/display problem. Shell or tmux customizations are
 not prerequisites.
 
+For the matching Codex entry, add a separate `Codex (Ubuntu)` profile using the
+same distro/project and the installed native `codex` executable. On this host,
+the accepted `ecosystem-codex --project /absolute/project` launcher selects the
+existing native Linux home. Preserve Desktop's separate home and native sign-in.
+Both named profiles are now installed on the recorded host. Open them through
+[Windows Terminal's upstream command interface](https://learn.microsoft.com/en-us/windows/terminal/command-line-arguments):
+
+```sh
+wt.exe -w 0 new-tab -p "Claude Code (Ubuntu)"
+wt.exe -w 0 new-tab -p "Codex (Ubuntu)"
+```
+
+Both commands returned exit 0, and separate interactive Claude 2.1.278 and
+Codex 0.155.1 processes were observed in the intended project on distinct TTYs.
+The [terminal observation](../evidence/receipts/native-terminal-profiles-20260920.json)
+records that narrow result. Opening the client does not complete sign-in or prove
+interactive commands/HUD; use the session's native flow. If `wt.exe` is unavailable
+as a WSL execution alias, Microsoft's documented `cmd.exe /c wt.exe` entry is the
+portable fallback. Do not repeatedly run either command unless another tab is wanted.
+
 ## Small persistent contract; selected upstream skills
 
 Merge the [short instruction example](../examples/claude-native/CLAUDE.md) into

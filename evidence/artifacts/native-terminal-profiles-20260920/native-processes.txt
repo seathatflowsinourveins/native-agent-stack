@@ -1,0 +1,3 @@
+    PID    PPID TT       COMMAND
+2696599 2696592 pts/3    claude
+2697591 2697582 pts/4    codex

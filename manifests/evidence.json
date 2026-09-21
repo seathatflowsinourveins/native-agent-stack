@@ -2,6 +2,25 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "native-terminal-profiles-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "qdrant",
+        "vllm"
+      ],
+      "claim": "Windows Terminal's native profile commands returned exit 0 and launched distinct interactive native Claude and Codex processes in the intended project. The matching Codex profile was added with previous settings preserved; existing Qdrant and embedding services were active.",
+      "limitations": [
+        "Launch and process observation only; no new model task, sign-in, interactive context/usage/compaction or HUD acceptance.",
+        "The existing local ecosystem launchers select native scope; they are not upstream client binaries. Their diagnostic --check mode does not execute a model task.",
+        "The service active result is a process-state observation, not a rerun of retrieval, embedding quality, recovery or full-stack E2E.",
+        "The catalog reuses prior acceptance at base 97ee23e. No new package installation, lifecycle recertification or provider savings is claimed.",
+        "No Windows UI screenshot or dropdown interaction was captured. Returned native launch commands and observed child processes are the evidence."
+      ],
+      "path": "evidence/receipts/native-terminal-profiles-20260920.json"
+    },
+    {
       "id": "native-claude-profile-20260920",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2045,6 +2064,16 @@
   ],
   "files": [
     {
+      "path": "evidence/artifacts/native-terminal-profiles-20260920/native-processes.txt",
+      "sha256": "0669f843035324a6a4578fdc56189f794187442efefc35e5d8125e043828da6a",
+      "bytes": 96
+    },
+    {
+      "path": "evidence/receipts/native-terminal-profiles-20260920.json",
+      "sha256": "b14fc374db90e643aa822fe1b42967ed4238d2a51f4181abab3a3f21738ab068",
+      "bytes": 4205
+    },
+    {
       "path": "catalogs/foundation/community-practice-20260920.json",
       "sha256": "3be2e20d06643032dccf9ce24fdaac369c21afdf705ee9e024ede1cb74c9d056",
       "bytes": 37274
@@ -2116,8 +2145,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "9522e5e76229910091a2ff203f3b68616ca0155eafccef0c3b0a2d6455cbee1f",
-      "bytes": 10132
+      "sha256": "12e1b1addab13fe91780dea475722bfc97fde888d28e2078855234e9c4f8fd46",
+      "bytes": 11330
     },
     {
       "path": ".gitattributes",
@@ -5222,8 +5251,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "a2ae4de1b7ce416fff30ec58855322e951086b9ccae58216983b3b780a4d7a89",
-      "bytes": 3794503
+      "sha256": "11c8b9a975b35a244aba6d72eb5b63df3486ed6b26e912c4f1d75243d868f959",
+      "bytes": 3799437
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5252,8 +5281,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "0e5e6fbef932ca597b14cded5993756ab2c6a2c044604e36d0b1658025d57b2a",
-      "bytes": 76722
+      "sha256": "aa7c24ad84598752b306f49c1f69a624c5604ccc5980d0464e94fe01b0ea9678",
+      "bytes": 76873
     },
     {
       "path": "docs/evidence.md",
@@ -6222,8 +6251,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "289838beeec393687c8ec97a346cf89cafcc0cc7683f520452dc870a36f6ac05",
-      "bytes": 8459
+      "sha256": "fa3d563dd3bb3e46e17bd1951f0b92d09de4640a132c5dac1d456d6e1cb3b9c3",
+      "bytes": 12005
     },
     {
       "path": "catalogs/foundation/decisions.json",

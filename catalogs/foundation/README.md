@@ -15,24 +15,38 @@ explains the selected ECC and Claude practice sources across all sixteen layers.
 Use the [native Claude profile](../../recipes/claude-native-profile.md) for
 terminal entry, small persistent instructions, selected skills and new-PC checks.
 
-| Layer | Purpose |
-| --- | --- |
-| Native clients | Signed-in native coding/research tasks and actual process activation |
-| Instructions and skills | Short project rules and task-specific procedures |
-| Workers | Bounded delegation, owned paths and independent acceptance |
-| Isolation | Worktree ownership and selected enforced OS restrictions |
-| Code navigation | Exact symbols, structural patterns and scoped source retrieval |
-| Document retrieval | Named lexical corpora and supported document ingestion |
-| Semantic RAG | Project-scoped conceptual code retrieval and local embeddings |
-| Durable memory | Approved cross-client decisions, continuity and scoped restore |
-| Web research | Selected browser, literature and current-source operations |
-| Token efficiency | Adequate context representations and honest usage accounting |
-| Quality and evaluation | Behavioral oracles, negative cases and independent review |
-| CI and supply chain | Publication checks, security controls and dependency identity |
-| Scheduling and supervision | Owned process deadlines and checkpointed job continuation |
-| Hosting and services | Typed local applications, databases and selected MCP services |
-| Recovery and portability | Exact restore inputs, session continuity and lifecycle limits |
-| Observation and inference | Bounded telemetry, usage and optional inference trials |
+## Installation map across all sixteen layers
+
+Use each linked recipe's exact upstream commands, platform constraints and returned
+evidence. This map joins the selected implementations; it does not reinstall a
+working tool or turn every landscape alternative into a default. Component pins
+and original results remain in the canonical manifests linked below.
+
+| Layer | Selected implementations | Installation and scoped E2E procedure |
+| --- | --- | --- |
+| Native clients | Codex, Claude Code | [Native client installation](../../recipes/README.md#component-catalog-install-and-check), [terminal profiles](../../recipes/claude-native-profile.md) |
+| Instructions and skills | Native instructions, selected ECC skills, shanraisshan guidance, skills-ref, Tavily skills | [Pinned skills and short defaults](../../recipes/claude-native-profile.md#small-persistent-contract-selected-upstream-skills), [community merits](../../docs/community-native-practice.md) |
+| Workers | Native Codex/Claude workers, official Codex SDK, Worktrunk, Beads, systemd | [Worker contract and native commands](../../blueprints/us-equities/worker-supervision/README.md); only general worker operations are reused here |
+| Isolation | Worktrunk, sandbox-runtime; Apple Container on macOS | [Native tool recipes](../../recipes/README.md), [platform-specific container checks](../../blueprints/convergence-practice/container-storage/README.md) |
+| Code navigation | ast-grep, Serena, jCodeMunch, SocratiCode, codebase-memory, Repomix, MCPorter/Inspector | [Exact symbols and local semantic search](../../docs/foundation-stack.md#local-semantic-code-search-and-exact-symbols), [other native commands](../../recipes/README.md) |
+| Document retrieval | QMD, Context Hub, MarkItDown, Poppler | [Scoped lexical retrieval](../../docs/foundation-stack.md#memory-and-lexical-retrieval), [document ingestion](../../blueprints/convergence-practice/document-ingestion/README.md) |
+| Semantic RAG | SocratiCode, Qdrant, vLLM, Hugging Face Hub/Nemotron | [Selected GPU/runtime installation](../../docs/foundation-stack.md#local-semantic-code-search-and-exact-symbols) |
+| Durable memory | ai-memory, Qdrant, Restic | [Native memory installation](../../docs/foundation-stack.md#memory-and-lexical-retrieval), [application-state restore](../../blueprints/convergence-practice/offhost-app-state/README.md) |
+| Web research | agent-browser, Playwright CLI, OpenResearch, Tavily CLI | [Browser/paper tool recipes](../../recipes/README.md), [Tavily installation and returned results](../../recipes/tavily.md) |
+| Token efficiency | RTK, Context Mode, jCodeMunch, Headroom, QMD, Repomix, TOON, ccusage | [Native token procedures](../../docs/foundation-stack.md#native-token-tools-and-actual-client-acceptance), [measurement boundaries](../../docs/token-practice.md) |
+| Quality and evaluation | promptfoo, Playwright Test, Difftastic, ShellCheck, skills-ref | [Native installations](../../recipes/README.md), [application behavioral checks](../../blueprints/convergence-practice/application-delivery/README.md) |
+| CI and supply chain | GitHub Actions, zizmor, Syft, Gitleaks | [Native CI/security verification](../../blueprints/convergence-practice/ci-security/README.md), [dependency inventory](../../blueprints/us-equities/supply-chain/README.md) |
+| Scheduling and supervision | Dagu, systemd, Beads | [Job supervision](../../blueprints/us-equities/hosting/README.md), [upstream retry and guest reboot](../../blueprints/convergence-practice/service-reboot/README.md) |
+| Hosting and services | FastAPI, Next.js/React, PostgreSQL, MCPorter/Inspector; platform-specific containers | [Native application installation and checks](../../blueprints/convergence-practice/wsl-application/README.md), [application contract](../../blueprints/convergence-practice/application-delivery/README.md) |
+| Recovery and portability | Restic, ai-memory, Qdrant, Dagu, systemd, native session continuation | [Lifecycle operations](../../adoption/lifecycle.md), [off-host application restore](../../blueprints/convergence-practice/offhost-app-state/README.md) |
+| Observation and inference | OpenTelemetry Collector/otel-tui, Prometheus, Grafana, Loki, Alertmanager, ntfy, AgentsView, ccusage; vLLM/llama.cpp | [Observation setup](../../observability/README.md), [native backends](../../observability/backends/README.md), [GPU compatibility evidence](../../blueprints/convergence-practice/gpu-inference/README.md) |
+
+The September 20 selected baseline has 40 accepted capabilities, three partial
+optional capabilities and one source-review capability. Layer coverage overlaps:
+do not add per-layer counts. No required installation gap is declared in the
+current manifest. Interactive Claude sign-in/context/HUD, the outer companion
+plugin, exact-model optional gateway inference, four retained QMD benchmark
+misses and whole-task causal savings keep their explicit evidence boundaries.
 
 Each layer records its purpose, selected approach, activation condition, lifecycle
 scope and next actionable gap. Decisions join actual `component_ids` and
