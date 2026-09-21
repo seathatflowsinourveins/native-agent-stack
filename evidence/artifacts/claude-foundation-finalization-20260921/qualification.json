@@ -1,0 +1,313 @@
+{
+  "schema_version": 1,
+  "recorded_date_utc": "2026-09-21",
+  "scope": "Dated native observations and local integration checks. Original private traces remain on the authoring host; this sanitized summary is not a replacement for original results.",
+  "source_review": {
+    "claude_version": "2.1.278",
+    "native_authentication_observed": true,
+    "bundled_reference": {
+      "command": "/workflow-authoring",
+      "characters": 16966,
+      "sha256": "21a07b0a0ae6dd279f1a98e7723e3eb4325489a1a2232cbb7b9c727fadc0e195"
+    },
+    "official_sources": [
+      "https://code.claude.com/docs/en/workflows",
+      "https://code.claude.com/docs/en/settings-reference"
+    ],
+    "repomix": {
+      "installed_version": "1.18.1",
+      "source_pin": "80b4280a9196feace092fc672dfe2b5fac62ef08",
+      "corrected_release_url": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1"
+    }
+  },
+  "catalog": {
+    "layers": 16,
+    "capabilities": 46,
+    "foundation_components": 61,
+    "stack_components": 68,
+    "accepted_within_recorded_scope": 42,
+    "partial_optional": 3,
+    "source_review": 1,
+    "operator_surfaces": 24
+  },
+  "native_runs": [
+    {
+      "workflow": "review-changes",
+      "run_id": "wf_f2f4a068-db7",
+      "status": "rejected",
+      "accepted": false,
+      "checks_exit_codes": [
+        1,
+        0
+      ],
+      "confirmed_claims": 4,
+      "corrected_claims": 1,
+      "reported_findings": 5,
+      "reported_gaps": 6,
+      "workers_completed": 2,
+      "subagent_tokens": 115860,
+      "tool_calls": 20,
+      "observations": [
+        "Supplied syntax-check filenames resolved against the wrong cwd; exact failure preserved.",
+        "Actual fixture output had 67 PASS lines; inventory summary said 68; reviewer corrected it.",
+        "Supported empty-inventory, blank-check-result and ambiguous source-reporting findings were corrected after independent review."
+      ],
+      "models": [
+        {
+          "role": "inventory",
+          "requested": "sonnet",
+          "resolved": "claude-sonnet-5",
+          "effort": "medium"
+        },
+        {
+          "role": "review",
+          "requested": "opus",
+          "resolved": "claude-opus-5",
+          "effort": "high"
+        }
+      ]
+    },
+    {
+      "workflow": "review-changes",
+      "run_id": "wf_97f7971a-4b4",
+      "status": "rejected",
+      "accepted": false,
+      "checks_exit_codes": [
+        0,
+        0
+      ],
+      "confirmed_claims": 2,
+      "corrected_claims": 3,
+      "reported_findings": 3,
+      "reported_gaps": 5,
+      "workers_completed": 2,
+      "subagent_tokens": 106990,
+      "tool_calls": 23,
+      "script_sha256": "be28099cc813ee50704cd930c770c3220a83c5833a07eff602cb3b69560fbe11",
+      "observations": [
+        "Both requested checks passed. Source-line/status wording errors remained corrected rather than confirmed.",
+        "Raw fixture output had 81 PASS lines; inventory summary said 76; reviewer corrected it.",
+        "Unknown or blank exits remain incomplete, never accepted; this was not adopted as a false-acceptance defect.",
+        "Generic malformed-check diagnostics remain a reporting limitation."
+      ],
+      "models": [
+        {
+          "role": "inventory",
+          "requested": "sonnet",
+          "resolved": "claude-sonnet-5",
+          "effort": "medium"
+        },
+        {
+          "role": "review",
+          "requested": "opus",
+          "resolved": "claude-opus-5",
+          "effort": "high"
+        }
+      ]
+    },
+    {
+      "workflow": "readiness-audit",
+      "run_id": "wf_db03e2b0-863",
+      "status": "incomplete",
+      "confirmed_claims": 8,
+      "unread_sources": [],
+      "missing_sources": [],
+      "evidence_issues": 4,
+      "workers_completed": 3,
+      "subagent_tokens": 97417,
+      "tool_calls": 11,
+      "script_sha256": "e63fc358426929e6359110155469145aa5c45a0a69dbc4a70c8c4a43d6389294",
+      "observations": [
+        "Each reader returned two sources while assigned one. The verifier repeated the two incorrect packet/source pairings.",
+        "The exact-provenance gate rejected the extra sources despite all substantive configuration/version claims being confirmed.",
+        "The integer-or-null source exit schema executed natively; this incomplete return is not successful readiness qualification."
+      ],
+      "models": [
+        {
+          "role": "read:docs-1",
+          "requested": "sonnet",
+          "resolved": "claude-sonnet-5",
+          "effort": "medium"
+        },
+        {
+          "role": "read:commands-2",
+          "requested": "sonnet",
+          "resolved": "claude-sonnet-5",
+          "effort": "medium"
+        },
+        {
+          "role": "verify",
+          "requested": "opus",
+          "resolved": "claude-opus-5",
+          "effort": "high"
+        }
+      ]
+    }
+  ],
+  "structured_output_observations": {
+    "final_invocation": {
+      "workers_completed": 3,
+      "sonnet_structured_output_errors": 1,
+      "retry_succeeded": true,
+      "error": "Command reader wrapped its payload under an input string; required root fields were missing. Its second StructuredOutput call validated.",
+      "verifier_tool_error": "An override grep exited 2 for an absent local settings file; the subsequent existing-file check succeeded.",
+      "independent_inspection": "Returned task, native stream and all three original worker transcripts were inspected. All workers completed on attempt 1; schema retry was not a worker relaunch."
+    },
+    "second_invocation": {
+      "workers_completed": 5,
+      "sonnet_structured_output_errors": 3,
+      "errors": [
+        "inventory missing required root fields",
+        "document reader invalid JSON",
+        "command reader missing required root fields"
+      ],
+      "retries_succeeded": true,
+      "opus_structured_output_errors": 0
+    },
+    "scope": "Structured-output retries occurred within otherwise completed worker calls. Parent prose undercounted retries; original worker tool messages were independently inspected."
+  },
+  "final_readiness": {
+    "workflow": "readiness-audit",
+    "run_id": "wf_b0eba22c-372",
+    "status": "complete",
+    "confirmed_claims": 6,
+    "source_verdicts": 2,
+    "unread_sources": [],
+    "missing_sources": [],
+    "evidence_issues": [],
+    "workers_completed": 3,
+    "subagent_tokens": 93135,
+    "tool_calls": 10,
+    "script_sha256": "59794f395ecda2dcb86e03db06d53fb98bd190dc1cfcbf92629f473dcd4de53e",
+    "observed": {
+      "enableWorkflows": true,
+      "ultracode": true,
+      "workflowSizeGuideline": "small",
+      "node_version": "v24.21.0",
+      "command_exit_code": 0
+    },
+    "models": [
+      {
+        "role": "read:docs-1",
+        "requested": "sonnet",
+        "resolved": "claude-sonnet-5",
+        "effort": "medium",
+        "tokens": 31410,
+        "tool_calls": 2
+      },
+      {
+        "role": "read:commands-2",
+        "requested": "sonnet",
+        "resolved": "claude-sonnet-5",
+        "effort": "medium",
+        "tokens": 31476,
+        "tool_calls": 3
+      },
+      {
+        "role": "verify",
+        "requested": "opus",
+        "resolved": "claude-opus-5[1m]",
+        "effort": "high",
+        "tokens": 30249,
+        "tool_calls": 5
+      }
+    ],
+    "scope": "One actual native run over one document and one command. Demonstrates the valid packet shape and returned coverage, not every native schema rejection path or effective settings loaded by every running client."
+  },
+  "browser_verification": {
+    "tool": "native agent-browser",
+    "desktop_width": 1440,
+    "mobile_width": 390,
+    "rendered_layers": 16,
+    "horizontal_overflow": false,
+    "browser_errors": [],
+    "qdrant_search": {
+      "layers": 4,
+      "capabilities": 6
+    },
+    "workers_filter": {
+      "layers": 1,
+      "capabilities": 8
+    },
+    "observed_local_links_in_layer_cards": 19,
+    "scope": "Actual rendering and interaction of the generated local explorer; dashboard HTTP checks are separately transport-only."
+  },
+  "transport_checks": {
+    "observed_at_utc": "2026-09-21T19:55:56Z",
+    "documented_dashboard_urls": 14,
+    "http_200": 14,
+    "scope": "Independent read-only transport observations; not application E2E or proof of current data freshness."
+  },
+  "accounting": {
+    "scope": "Latest native session cumulative counters must be counted once; multiple result events repeat overlapping values and include authoring and previous attempts. Per-workflow counters are a different overlapping scope. Root coordination, Codex reviewers and unrelated tasks are excluded. No causal savings or subscription bill is inferred.",
+    "exact_saved_tokens": null,
+    "latest_native_session_cumulative_model_counters": {
+      "claude-fable-5-1": {
+        "inputTokens": 640,
+        "outputTokens": 22123,
+        "thinkingTokens": 7325,
+        "cacheReadInputTokens": 2607812,
+        "cacheCreationInputTokens": 239149
+      },
+      "claude-sonnet-5": {
+        "inputTokens": 48,
+        "outputTokens": 15508,
+        "thinkingTokens": 867,
+        "cacheReadInputTokens": 652411,
+        "cacheCreationInputTokens": 216094
+      },
+      "claude-opus-5[1m]": {
+        "inputTokens": 54,
+        "outputTokens": 37583,
+        "thinkingTokens": 15619,
+        "cacheReadInputTokens": 1028490,
+        "cacheCreationInputTokens": 187686
+      }
+    }
+  },
+  "limitations": [
+    "Three optional capabilities retain their earlier partial acceptance; no new-host or physical-PC reboot qualification.",
+    "Application hosting evidence remains fixture-scoped; no paid hosting, public deployment, broker action or new account connection.",
+    "Native review model citation/count transcription errors are retained; the evidence gate was not relaxed to relabel them accepted.",
+    "Portable native roles omit host-specific MCP permissions; tests use stubbed model responses and stay distinct from native execution."
+  ],
+  "local_checks": {
+    "workflow_assertions": {
+      "passed": 91,
+      "failed": 0,
+      "kind": "local integration fixture with stubbed model calls"
+    },
+    "syntax_scripts_passed": 2,
+    "explorer_tests_passed": 39,
+    "scope": "Fixture source-enum/count assertions inspect generated schemas; gate tests exercise local JavaScript. Neither replaces upstream structured-output validator negative tests."
+  },
+  "codex_configuration_audit": {
+    "version": "0.155.1",
+    "authentication": "ChatGPT native sign-in present",
+    "default_model": "gpt-6-astra",
+    "default_effort": "ultra",
+    "project_orchestration": true,
+    "max_concurrent_children": 3,
+    "project_roles": 4,
+    "project_skills": 14,
+    "personal_skills_in_inspected_root": 13,
+    "enabled_project_mcp": [
+      "context-mode",
+      "jcodemunch",
+      "serena",
+      "ai-memory",
+      "socraticode"
+    ],
+    "doctor": {
+      "exit_code": 0,
+      "ok": 19,
+      "warnings": 1,
+      "warning": "History inventory parity: 49 rollout files, 20 database rows, 29 missing rows; no duplicate paths, stale rows, archive mismatches or scan errors."
+    },
+    "scope": "Read-only native CLI/configuration audit. Existing defaults preserved; no new Codex model call or MCP replay; no unsupported database repair.",
+    "official_sources": [
+      "https://learn.chatgpt.com/docs/agent-configuration/subagents#custom-agents",
+      "https://learn.chatgpt.com/docs/config-file/config-advanced#project-config-files-codexconfigtoml"
+    ]
+  }
+}

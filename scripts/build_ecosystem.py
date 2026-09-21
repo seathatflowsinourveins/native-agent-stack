@@ -44,6 +44,7 @@ TOKEN_RECEIPT_FAMILIES = {
     "current-session-observation", "native-token-stack-final", "foundation-native",
 }
 RETURNED_RECEIPT_FAMILIES = {
+    "claude-foundation-finalization",
     "native-returned-results", "native-memory-rag-alignment", "hf-memory-models",
     "native-dashboard-data", "native-dashboard-access", "full-stack-convergence",
     "dashboard-render-e2e", "dashboard-gap-resolution", "memory-landscape", "memory-landscape-lifecycle", "foundation-convergence",
@@ -51,6 +52,7 @@ RETURNED_RECEIPT_FAMILIES = {
 PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
 PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024
 NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json",
+                    "docs/claude-foundation-finalization-20260921.md", "examples/claude-native/workflows/README.md",
                     "recipes/claude-native-ultracode.md", "examples/claude-native/ultracode.settings.json",
                     "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json",
                     "docs/memory-landscape-maintenance.md", "docs/native-memory-rag-lifecycle.md", "docs/foundation-convergence-20260921.md",
@@ -451,7 +453,7 @@ def build_data(root):
         require(set(profile["component_ids"]).issubset(component_ids),
                 "adoption profile references an unknown component")
     guide_paths = list(SETUP_GUIDES)
-    for path in ("docs/foundation-convergence-20260921.md", "docs/native-memory-rag-lifecycle.md", "docs/memory-landscape-maintenance.md", "adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md", "docs/foundation-stack.md", "docs/token-session-handbook.md",
+    for path in ("docs/claude-foundation-finalization-20260921.md", "examples/claude-native/workflows/README.md", "docs/foundation-convergence-20260921.md", "docs/native-memory-rag-lifecycle.md", "docs/memory-landscape-maintenance.md", "adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md", "docs/foundation-stack.md", "docs/token-session-handbook.md",
                  "docs/harness-defaults.md", "catalogs/README.md", "catalogs/foundation/README.md",
                  "docs/community-native-practice.md", "examples/claude-native/CLAUDE.md",
                  "recipes/claude-native-ultracode.md"):
