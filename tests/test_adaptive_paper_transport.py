@@ -20,7 +20,7 @@ try:
 except ImportError:
     HAS_SDK = False
 
-ID = "00000000-0000-0000-0000-000000000001"
+ID = str(__import__("uuid").UUID(int=1))
 
 
 def intent(**changes):
@@ -431,7 +431,7 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
 
     async def test_snapshot_paginates_and_rejects_nonadvancing_page(self):
         page = [order(id=f"00000000-0000-0000-0000-{i:012d}", client_order_id=f"fixture-{i}") for i in range(500)]
-        with patch.object(self.port._client, "get", side_effect=[page, [order(id="00000000-0000-0000-0000-000000000500")]]) as get:
+        with patch.object(self.port._client, "get", side_effect=[page, [order(id=str(__import__("uuid").UUID(int=0x500)))]]) as get:
             result = self.port._pages("all", after=self.port.history_start)
         self.assertEqual(len(result), 501)
         self.assertEqual(get.call_count, 2)

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-21T15:58:18Z",
+  "recorded_at_utc": "2026-09-21T21:05:00Z",
   "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
   "lanes": [
     {
       "kind": "lane",
       "id": "simulation",
       "title": "Historical simulation / backtest",
-      "state": "native AAPL diagnostic / baseline and fee-slippage / strategy merit unqualified",
-      "evidence_ref": "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json"
+      "state": "AAPL diagnostic retained / adaptive native capacity179submits per minute synthetic / merit unqualified",
+      "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
     },
     {
       "kind": "lane",
       "id": "paper",
       "title": "Dedicated Alpaca paper account",
-      "state": "1SPY roundtrip filled / cash -0.08USD / flat / recovery no duplicate writes",
-      "evidence_ref": "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
+      "state": "1SPY smoke retained / adaptive engine wired / new trial waits for regular session / account flat",
+      "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
     },
     {
       "kind": "lane",
@@ -37,8 +37,8 @@
       "kind": "gate",
       "id": "alpaca-paper-rate",
       "title": "Alpaca observed Trading API rate",
-      "state": "observed200requests/min / configured120 / Elite1000unqualified",
-      "evidence_ref": "blueprints/us-equities/paper-e2e-20260921/readiness.json"
+      "state": "observed200REST/min / adaptive submits180 plus management reserve / actual throughput pending",
+      "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
     },
     {
       "kind": "gate",

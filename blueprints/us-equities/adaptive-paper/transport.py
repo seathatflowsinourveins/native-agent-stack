@@ -45,6 +45,7 @@ class RejectedSubmission(TransportError):
 
 class SubmissionNotSent(TransportError):
     definitive_rejection = True
+    not_sent = True
 
 
 def decimal_string(value, *, positive=False):
@@ -109,7 +110,7 @@ def normalize_quote(raw, symbol=None):
 
 def normalize_account(raw):
     result = {key: decimal_string(raw[key]) for key in ("cash", "equity", "buying_power")}
-    for key in ("status", "trading_blocked", "account_blocked", "trade_suspended_by_user",
+    for key in ("status", "currency", "trading_blocked", "account_blocked", "trade_suspended_by_user",
                 "shorting_enabled", "pattern_day_trader"):
         if key in raw:
             result[key] = raw[key]
@@ -675,10 +676,10 @@ class AlpacaPaperTransport:
                 self._assert_matches(found, intent)
                 return found
             if not self._started or self._stopping or (intent["side"] == "buy" and not self.ready):
-                raise TransportError("transport not ready for exposure")
+                raise SubmissionNotSent("transport not ready for exposure")
             result = await self._invoke(self.before_submit, dict(intent))
             if result is False:
-                raise TransportError("intent was not authorized by risk callback")
+                raise SubmissionNotSent("intent was not authorized by risk callback")
             self._intents[key] = dict(intent)
             try:
                 raw = await asyncio.to_thread(self._client.submit_order, request)

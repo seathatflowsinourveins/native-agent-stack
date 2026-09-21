@@ -871,7 +871,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1853,7 +1853,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -2563,6 +2563,24 @@
         "Existing paper and AAPL receipts retain their original source scope; SPY parity, native broker faults, IBKR, strategy quality and continuous operation remain open."
       ],
       "path": "evidence/receipts/foundation-rd-20260921.json"
+    },
+    {
+      "id": "adaptive-paper-practice-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "nautilus-trader",
+        "alpaca-py",
+        "claude-code",
+        "codex"
+      ],
+      "claim": "Five baseline policy families wired through native NautilusTrader and the Alpaca SDK; bounded live research collection and independently reviewed risk/recovery; local synthetic engine capacity measured at 178.7 submissions/minute.",
+      "limitations": [
+        "The new adaptive paper trial did not start because the regular session was closed; prior SPY smoke remains separate evidence.",
+        "Capacity uses immediate synthetic fills, not broker throughput, profitable alpha or market-session strategy validation.",
+        "Observed Trading API limit is 200 requests/minute; entries cap at180 and leverage at1x. Elite1000 is unqualified.",
+        "News is capped and advisory; native broker fault induction, signal parity and continuous operation remain open."
+      ],
+      "path": "evidence/receipts/adaptive-paper-practice-20260921.json"
     }
   ],
   "files": [
@@ -6069,13 +6087,13 @@
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
-      "bytes": 99124,
-      "sha256": "954c3734f5710879b8f888f69ce9bf0741099c482e1699d855ea100f816f1941"
+      "bytes": 99208,
+      "sha256": "97189a2959a2a3b815b0a801cc6a329592d8a035e31c80e6e1c3f822774c26eb"
     },
     {
       "path": "catalogs/us-equities/engines-strategies.md",
-      "bytes": 22139,
-      "sha256": "52335cedc4175b2e2c3f9b133d437e1dde5ed4f4f9d395d270dfe87871e7fef2"
+      "bytes": 22816,
+      "sha256": "6502e766b469181ca7c31fdcb734abe9fae1f018e628e9c0a92b88cc0d2e77d4"
     },
     {
       "path": "catalogs/us-equities/foundation-memory.json",
@@ -6229,8 +6247,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 7077193,
-      "sha256": "e8891ddeddda45cf3f171ae09293b645ae49160e1e563c032fa4a28c231eb2cb"
+      "bytes": 7086656,
+      "sha256": "2ed13ea4f556b6fc2a87c5b586722ce3909deff95a4fd10484cdb23b914b9d63"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6744,8 +6762,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 80666,
-      "sha256": "8c0ea4594ef5ac6f5d256374137f46be0f4df6271a6734ab9cb12656ab796972"
+      "bytes": 80842,
+      "sha256": "61f5ea4f1cbdb6a50848330fad54fa68fee92e130d58fe6c5e41728acaa93cba"
     },
     {
       "path": "observability/README.md",
@@ -6904,8 +6922,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "bytes": 8296,
-      "sha256": "7530faecbdf2e746166d9e0d72354e89304efd2ebf261e939347ebd469f631dc"
+      "bytes": 8340,
+      "sha256": "0644df4c919cb15b87898786821d3ba951ff78e46d12fe650b50d2b31786693b"
     },
     {
       "path": "observability/receipt.json",
@@ -7244,8 +7262,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "bytes": 6990,
-      "sha256": "d04e8929115f6e4b8bccdd1ab51d431d5e78697e056de55177c261483cfea866"
+      "bytes": 8225,
+      "sha256": "ccb4647c37c77bcbc179a6ced010d2b20b5d744ec6edbc194ce1baa7d989d168"
     },
     {
       "path": "docs/harness-defaults.md",
@@ -9591,6 +9609,151 @@
       "path": "recipes/claude-codex-foreground-review.md",
       "bytes": 3219,
       "sha256": "390d1b54f94a28027282408b0453c05221227d5709c49a66a904705b094a8130"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/README-native.md",
+      "bytes": 7446,
+      "sha256": "3b6b418002d2650faaf42178871fb33cd029b4da5679fad66c85e158e93de739"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/README-recovery.md",
+      "bytes": 5944,
+      "sha256": "da778e6e5c32348c2dda908e0d76700913f460ba3b886a674dc8347d3c2ff7e2"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/README-research.md",
+      "bytes": 9198,
+      "sha256": "6b32fd8e222462b52e50ee138a8ca1677481bce70ba635a91071a19380892891"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/README-safety.md",
+      "bytes": 9732,
+      "sha256": "6bea96bac049b380a72543a0eb568380f7188dbcf30db17f545f35496bdecd94"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/README-transport.md",
+      "bytes": 9491,
+      "sha256": "e9223e3c59441083c5751f9f0e24b2051cfa852b613cc13607ad6f54dd37bc76"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/README.md",
+      "bytes": 7987,
+      "sha256": "085d204a3769dc549e8cd3b82c4e132d3010f8d99a0b76032049ff94930a00f6"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/benchmark.py",
+      "bytes": 5798,
+      "sha256": "d2aad24aaaa5bfcbf123e117497a0c53dfbba5fcce82fe985376157c9abddae6"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/config.json",
+      "bytes": 1470,
+      "sha256": "69025be9971ce1adab747f048b093022a93bdedbb1ec5453526fc3cdd1eb73f0"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/evidence-hashes.json",
+      "bytes": 869,
+      "sha256": "a38097f52aa89d7509e848bc244bc796bd6d96ad3314635e4b6f8b7cca6df5bf"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/market_research.py",
+      "bytes": 21464,
+      "sha256": "ea5bbdd1f24b78004c61364bb241822f50c52dcb30d9d0122ea517e2da999d28"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native_adapter.py",
+      "bytes": 21558,
+      "sha256": "c922f08b218155e1bec78db03a6163594a9023e04d670f1b9357a5a1059edfa5"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/native_strategy.py",
+      "bytes": 6683,
+      "sha256": "b0031a39005c6f696efb153b5ab2244dd83256271797cfa8cdef80af98c1af78"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/receipt.json",
+      "bytes": 6059,
+      "sha256": "e81f467b7561ed359bec19b45b530f4d091457f4163a424a597657efd7f8f14e"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/recovery.py",
+      "bytes": 10820,
+      "sha256": "4eb37186e6487ac735591e99a23e7b27ffa66d1fd1318be0fed524d0f1cba4b7"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/requirements.txt",
+      "bytes": 102,
+      "sha256": "518afe4b77f901e87abd3a5d6faa126aa7e211db77eecec80cfe7ef42d82e07a"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/runner.py",
+      "bytes": 26787,
+      "sha256": "000f7e93e596ff56ae576a3c799370dfe232e81d117455ef21bb4195724479ee"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/safety.py",
+      "bytes": 38312,
+      "sha256": "afb9a30da424608f050ecdbd6e65da04f67cc25ce56f0373de8b6e1c8aa53254"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/simulation.py",
+      "bytes": 3856,
+      "sha256": "085e578e9fabe03ccefdc68b4796b9cf5012aca8d832d65107e4b95e0a80621b"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
+      "bytes": 2281,
+      "sha256": "3c6d43a223fedef5bf093417571108a794e5d118961efd199124ac914ecea701"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/strategies.py",
+      "bytes": 13532,
+      "sha256": "16158540d61dfd330042a34c0668ce2ab79a90b3bc8d063d3635e9333513424d"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/transport.py",
+      "bytes": 39811,
+      "sha256": "23585cb9fa3fb5d6f297b18f2717879b80194af39ee707ef5c0a02d4a770b6fd"
+    },
+    {
+      "path": "evidence/receipts/adaptive-paper-practice-20260921.json",
+      "bytes": 1088,
+      "sha256": "6d38bac9e44fdc67cde776ab8d04019b5f8ca0f8624bd01e555b2af279d673ba"
+    },
+    {
+      "path": "tests/test_adaptive_market_research.py",
+      "bytes": 13930,
+      "sha256": "12d34127e38c42750c3f1f98c60fd0df5281a0c4ab75de7d29a0012dad77668b"
+    },
+    {
+      "path": "tests/test_adaptive_paper_native.py",
+      "bytes": 11221,
+      "sha256": "8612ffe4f91e7f52d38fd9b98adbf74b95a115433b6b36bbff57fc24b150e86f"
+    },
+    {
+      "path": "tests/test_adaptive_paper_recovery.py",
+      "bytes": 17576,
+      "sha256": "b315ceb226f684df185b941494ad3a16fcb4720f843ac6f2b99005764913c646"
+    },
+    {
+      "path": "tests/test_adaptive_paper_runner.py",
+      "bytes": 8476,
+      "sha256": "5abec2ee309e89cc391882b0f238a06571b2b1ed972b6f8ec9baf09992b27dcf"
+    },
+    {
+      "path": "tests/test_adaptive_paper_safety.py",
+      "bytes": 29656,
+      "sha256": "ba64c39407bfea0168f47f9a13cc913814c6471eb0706c89b8ad2e87c80cae8b"
+    },
+    {
+      "path": "tests/test_adaptive_paper_strategies.py",
+      "bytes": 6939,
+      "sha256": "95471b4eaccda76309d37934c867ca918dfc39770ba1025404affdb5a5f9d413"
+    },
+    {
+      "path": "tests/test_adaptive_paper_transport.py",
+      "bytes": 25827,
+      "sha256": "d657ffc6a426293b96e145b26f6df604c39f321d51717f48a821e5eb3078aa43"
     }
   ],
   "convergence_records": [

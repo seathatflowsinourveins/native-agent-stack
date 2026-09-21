@@ -1,0 +1,12 @@
+{
+  "scope": "Private raw evidence retained locally; no account identifiers, credentials or provider news republished",
+  "sha256": {
+    "native-capacity-final.json": "185b47b5853a7d292fb6d33468a512726fcb6939ee2344eafbc57c5bdbc137f7",
+    "market-research-final.json": "6b70a63230946ad767b3000365bc1a09f4153a6609bc735c7ad914dc59f91217",
+    "paper-readiness-final.json": "ee398a4739076d76af36c2e6d1ac9f851856fde26fabf61fe5c9173c14575ad2",
+    "claude-integrated-review.json": "d046ba513d669ffcdf253e4853718c9a89d37f30a9ba10d242d79fb4f8f10a7a",
+    "claude-market-review.json": "500e6e684dc94e24bea3b35e50255878c09fad6f927565c0d8f9ddafd2a63817",
+    "claude-policy-review.json": "9815c59d602df3b5060137608137411015de05fe0cf609cb68a7f61cbff80912",
+    "unchanged-upstream-native-adapter-receipt": "b09337271e45ec551b7a2c037d8481f8743922de6556a58c457b5809688af678"
+  }
+}

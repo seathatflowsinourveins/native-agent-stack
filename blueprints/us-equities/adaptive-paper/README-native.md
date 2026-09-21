@@ -97,7 +97,7 @@ The final 2026-09-21 run also passed all seven checks in 1.386 seconds inside a
 fresh `bwrap --unshare-all --clearenv` namespace with only the native runtime,
 repository and system libraries mounted: no network interface other than
 loopback and no credential stores. Raw stdout/stderr are retained privately at
-`/home/seath/codex-ecosystem/state/adaptive-paper-native-20260921/native-tests-start-order.*`.
+the private observation folder `adaptive-paper-native-20260921/native-tests-start-order.*`.
 The test stderr SHA-256 is
 `4561f78cce2993cde3458c842f454ed10b1919e5ef0b1d835eed3665dc1eaf33`;
 stdout is empty. Tested adapter SHA-256:

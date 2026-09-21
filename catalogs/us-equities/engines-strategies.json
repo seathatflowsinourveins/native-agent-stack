@@ -5,6 +5,7 @@
   "snapshot_scope": "September 19 decisions are historical; later native evidence is individually linked. Use the current selection record for installation and the engine destination rather than historical default/alternative labels.",
   "current_selection_record": "catalogs/us-equities/runtime-target.json",
   "reconciliation_record": "docs/foundation-rd-readiness.md",
+  "adaptive_practice_record": "blueprints/us-equities/adaptive-paper/receipt.json",
   "entries": [
     {
       "id": "lean",

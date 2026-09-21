@@ -47,8 +47,9 @@ class BrokerPort(Protocol):
 
 
 class NativeOrderRejected(RuntimeError):
-    """Only use when the transport knows submission was refused before acceptance."""
+    """Only use for a definitive local refusal before any broker HTTP submit."""
     definitive_rejection = True
+    not_sent = True
 
 
 def dec(value, *, signed=False):

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "id": "adaptive-paper-practice-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": ["nautilus-trader", "alpaca-py", "claude-code", "codex"],
+  "claim": "Five baseline policy families wired through native NautilusTrader and the Alpaca SDK; bounded live research collection and independently reviewed risk/recovery; local synthetic engine capacity measured at 178.7 submissions/minute.",
+  "limitations": [
+    "The new adaptive paper trial did not start because the regular session was closed; prior SPY smoke remains separate evidence.",
+    "Capacity uses immediate synthetic fills, not broker throughput, profitable alpha or market-session strategy validation.",
+    "Observed Trading API limit is 200 requests/minute; entries cap at180 and leverage at1x. Elite1000 is unqualified.",
+    "News is capped and advisory; native broker fault induction, signal parity and continuous operation remain open."
+  ],
+  "native_evidence": "blueprints/us-equities/adaptive-paper/receipt.json",
+  "source_review": "blueprints/us-equities/adaptive-paper/README.md"
+}
