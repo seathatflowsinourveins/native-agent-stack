@@ -90,6 +90,17 @@ not invoke it in the later writing trial. Define permitted native workflow
 metadata reads separately from owned source writes. Run acceptance commands
 without output pipelines that mask their exit status.
 
+The portable [saved workflow examples](../examples/claude-native/workflows/README.md)
+now include the deployed review and readiness scripts, their local regression
+checks and the two [native agent definitions](../examples/claude-native/agents/).
+Adopt selected files into a project's existing `.claude/` directories without
+overwriting its instructions, accounts or permissions. A saved script is a
+supported native extension, not an upstream-authored acceptance policy.
+Review acceptance requires exact evidenced claim coverage and all requested
+checks; readiness completion additionally accounts for every requested source.
+An evidenced negative readiness audit can complete while the project remains
+unready. Model agreement alone cannot establish correctness.
+
 The [writing and recovery qualification](../docs/native-workflow-writing-recovery-20260921.md)
 records a Sonnet implementation, Opus review, selected-worker failure, graceful
 coordinator exit and same-session resume. Both writing arms produced accepted

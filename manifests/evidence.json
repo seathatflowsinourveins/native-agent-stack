@@ -2615,6 +2615,24 @@
         "Existing paper and AAPL receipts retain their original source scope; SPY parity, native broker faults, IBKR, strategy quality and continuous operation remain open."
       ],
       "path": "evidence/receipts/foundation-rd-20260921.json"
+    },
+    {
+      "id": "claude-foundation-finalization-20260921",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "agent-browser",
+        "repomix"
+      ],
+      "claim": "Native Claude completed a packet-scoped readiness run after independently reviewed source-gate corrections; earlier rejected and incomplete runs remain visible. Native Codex configuration and sign-in were audited. Portable examples and the sixteen-layer repository/dashboard explorer are separately verified.",
+      "limitations": [
+        "Three optional capabilities retain their earlier partial acceptance; no new-host or physical-PC reboot qualification.",
+        "Application hosting evidence remains fixture-scoped; no paid hosting, public deployment, broker action or new account connection.",
+        "Native review model citation/count transcription errors are retained; the evidence gate was not relaxed to relabel them accepted.",
+        "Portable native roles omit host-specific MCP permissions; tests use stubbed model responses and stay distinct from native execution."
+      ],
+      "path": "evidence/receipts/claude-foundation-finalization-20260921.json"
     }
   ],
   "files": [
@@ -4681,8 +4699,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "bytes": 435263,
-      "sha256": "16884bbcdd8acc40120ecc8e79adcb22b05a66960c9fbc0a4379721a4b8494f8"
+      "bytes": 458151,
+      "sha256": "b19622f2986f1b9c1b9615d59830ec60604b903d5b1cebe1858d13f4252b324e"
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -6281,8 +6299,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 7665922,
-      "sha256": "864e0e426b89f6b6d059e1019b69f106e418a49128b37801995dc3ab1e6359a9"
+      "bytes": 8013135,
+      "sha256": "9f23bb05125abf08582698a3eca9ff98a5ec4ed3d334972b2ec8cefff33f06e5"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6291,8 +6309,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "bytes": 38285,
-      "sha256": "c2c329dd9e988f7f1b7807ca6c62ce49920e8a14cff80dc58ff5a4e27e72d343"
+      "bytes": 38932,
+      "sha256": "bdd813e7afce2cc3e11afb795cc1156f4a05c4bf5a8e5e94118ecda67841ffd7"
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6311,8 +6329,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "bytes": 81951,
-      "sha256": "bdff71624cb220cca4f4e8208ea9b7da9dbdddd4bedec8f2262b4e4135221822"
+      "bytes": 86268,
+      "sha256": "9cd5d11994ae3f67299fa148e990ed3b0005d543d42b4adaf32a0087c9782fc2"
     },
     {
       "path": "docs/evidence.md",
@@ -6796,8 +6814,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 82257,
-      "sha256": "aa6241e62074ae3430da4104558878d798beb8c188958bb4af7d839d731a53f6"
+      "bytes": 82461,
+      "sha256": "7a454a013f7e048feefbbc7e7cbf7e1309286dc7951b48652bb67302439e6b5a"
     },
     {
       "path": "observability/README.md",
@@ -6986,8 +7004,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "bytes": 35445,
-      "sha256": "e85a47ed32ac15d699f88ae038c4a6b612f4a7fa9652bd600e696ae5b9903ec2"
+      "bytes": 40120,
+      "sha256": "e965dd8f59f3879d5f818ab820e2ed9d551ea915e302f07afabc982fa8ab3f28"
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -7096,8 +7114,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "5f5048bd2d038207d480f4fd25b7eb28e7dc9e796bbe1430ba4bebb2daf9f3b7",
-      "bytes": 38009
+      "sha256": "386cb42e21a39607ca68b3cbc66b2396ab4255e845e1e5b75a796cd86aba4793",
+      "bytes": 45979
     },
     {
       "path": "tests/test_execution_realism.py",
@@ -7281,8 +7299,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "fa3d563dd3bb3e46e17bd1951f0b92d09de4640a132c5dac1d456d6e1cb3b9c3",
-      "bytes": 12005
+      "sha256": "fcfdb5aa150988f3a3d96f48f0f5a111d7f04755de40e7a4a402947bb7bf9bb8",
+      "bytes": 12561
     },
     {
       "path": "catalogs/foundation/decisions.json",
@@ -9031,8 +9049,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "51876a958e91fcf82b4d5296b62ab39af96c805e8e33661004baaac393afc3cd",
-      "bytes": 9110
+      "sha256": "3200dca15fe615436fe8973c5d0fb2dbd30f5eff273be1455cbc2da7b111cea2",
+      "bytes": 9875
     },
     {
       "path": "docs/native-ultracode-20260921.md",
@@ -9683,6 +9701,71 @@
       "path": "evidence/receipts/claude-upstream-checks-20260921.json",
       "bytes": 2818,
       "sha256": "db9f8b3eafcbc88072bfe603afcfd53e8c3cac60baeaf75b23ded5956b517ca7"
+    },
+    {
+      "path": "catalogs/foundation/surfaces.json",
+      "sha256": "53965cb8d459e4cc7fe59629f8321e733e94766d115599d198e3622bcceed1f9",
+      "bytes": 18780
+    },
+    {
+      "path": "docs/claude-foundation-finalization-20260921.md",
+      "sha256": "e6c1b96aea4a63dd2ea3d71c0304e8ec32087e892c4ddae54624f0d96116bc85",
+      "bytes": 11161
+    },
+    {
+      "path": "evidence/artifacts/claude-foundation-finalization-20260921/qualification.json",
+      "sha256": "08792220e1f1888ecdc0e2af028d2619b646645be19e5588b0dec55da304ed77",
+      "bytes": 11469
+    },
+    {
+      "path": "evidence/artifacts/claude-foundation-finalization-20260921/workers-desktop.png",
+      "sha256": "b1997d260f314c1802657145701d8fece709690590659b0d7db2752f81771293",
+      "bytes": 112234
+    },
+    {
+      "path": "evidence/artifacts/claude-foundation-finalization-20260921/workers-mobile.png",
+      "sha256": "80c159e5889279a421ffee6458dbba0eb961c77bffc1acf482aebf4a571f2569",
+      "bytes": 69436
+    },
+    {
+      "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
+      "sha256": "7ae1138350835ff33cc9c261d8112553997e64c20b50c298ae84d5de04146134",
+      "bytes": 2073
+    },
+    {
+      "path": "examples/claude-native/agents/evidence-reviewer.md",
+      "sha256": "939ca910e06152a0d273161a43beaddb9d0ce78e0e1451eede8e09680e6e9641",
+      "bytes": 568
+    },
+    {
+      "path": "examples/claude-native/agents/isolated-builder.md",
+      "sha256": "d8f3cd687dfc1c2089b25322ede53844bdd3a4c9cf47a478dcb61f2515b16dab",
+      "bytes": 624
+    },
+    {
+      "path": "examples/claude-native/workflows/README.md",
+      "sha256": "c46e288d676f9f7d78195d411ed2bce943a8fdda14a1b3272a5c84023f20543d",
+      "bytes": 2707
+    },
+    {
+      "path": "examples/claude-native/workflows/check-syntax.mjs",
+      "sha256": "ca62177687420fe22e03d0510a18e4f32b5d150e0156f6651c48367c3da506e1",
+      "bytes": 978
+    },
+    {
+      "path": "examples/claude-native/workflows/readiness-audit.js",
+      "sha256": "59794f395ecda2dcb86e03db06d53fb98bd190dc1cfcbf92629f473dcd4de53e",
+      "bytes": 12738
+    },
+    {
+      "path": "examples/claude-native/workflows/review-changes.js",
+      "sha256": "e3bd599c2355123deab62f5d39abac44ecbe2b04e73b76a9cf08d71a649f925c",
+      "bytes": 10526
+    },
+    {
+      "path": "examples/claude-native/workflows/test-envelope.mjs",
+      "sha256": "d1ecdeea386dcec565ae3a395b16ce00db431991ecabf29b0052e229bb940269",
+      "bytes": 19844
     }
   ],
   "convergence_records": [
