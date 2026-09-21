@@ -295,6 +295,42 @@ class Ledger:
                 self._event("trial_start", at=now)
             return float(self._get("trial_start"))
 
+    def begin_recovery(self, now):
+        """Explicit cleanup invocation; preserve state and permanently stop entries.
+
+        Call only for an explicit bounded recovery run, never to extend an active
+        execution loop automatically. No request, fill or loss history is reset.
+        """
+        now = instant(now)
+        with self._transaction():
+            start = self._get("trial_start")
+            previous = self._get("recovery_start")
+            if start is None:
+                raise SafetyError("trial_not_started")
+            if now < float(start) or (previous is not None and now < float(previous)):
+                raise SafetyError("recovery_clock_moved_backward")
+            self._set("recovery_start", now)
+            self._set("recovery_only", "1")
+            if self._get("halted_reason") is None:
+                self._set("halted_reason", "recovery_only")
+            self._event("recovery_started", at=now, cleanup_seconds=self.limits.cleanup_seconds)
+            return now
+
+    def _check_window(self, side, now):
+        start = self._get("trial_start")
+        if start is None:
+            raise SafetyError("trial_not_started")
+        recovery = self._get("recovery_start")
+        if side == "buy" and self._get("recovery_only"):
+            raise SafetyError("recovery_only_blocks_entry")
+        if side == "sell" and recovery is not None:
+            age, allowed = now - float(recovery), self.limits.cleanup_seconds
+        else:
+            age = now - float(start)
+            allowed = self.limits.trial_seconds + (self.limits.cleanup_seconds if side == "sell" else 0)
+        if age < 0 or age >= allowed:
+            raise SafetyError("trial_window_ended")
+
     def _check_quote(self, quote, now):
         if not isinstance(quote, Quote):
             raise SafetyError("quote_required")
@@ -373,12 +409,7 @@ class Ledger:
                 raise SafetyError("quote_symbol_mismatch")
             if market_open is not True or close - now < (self.limits.min_entry_close_seconds if side == "buy" else 1):
                 raise SafetyError("outside_allowed_session")
-            start = self._get("trial_start")
-            if start is None:
-                raise SafetyError("trial_not_started")
-            age = now - float(start)
-            if age < 0 or age >= self.limits.trial_seconds + (self.limits.cleanup_seconds if side == "sell" else 0):
-                raise SafetyError("trial_window_ended")
+            self._check_window(side, now)
             if qty > self.limits.max_order_qty or qty * price > self.limits.max_order_notional_usd:
                 raise SafetyError("order_size_cap_exceeded")
             if side == "buy" and qty != qty.to_integral_value():
@@ -436,12 +467,7 @@ class Ledger:
                 raise SafetyError("quote_symbol_mismatch")
             if market_open is not True or close - now < (self.limits.min_entry_close_seconds if intent.side == "buy" else 1):
                 raise SafetyError("outside_allowed_session")
-            start = self._get("trial_start")
-            if start is None:
-                raise SafetyError("trial_not_started")
-            age = now - float(start)
-            if age < 0 or age >= self.limits.trial_seconds + (self.limits.cleanup_seconds if intent.side == "sell" else 0):
-                raise SafetyError("trial_window_ended")
+            self._check_window(intent.side, now)
             self._mark(quote)
             state = self._refresh_risk()
             if state.outstanding_orders > self.limits.max_outstanding_orders:

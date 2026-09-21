@@ -33,6 +33,11 @@ limit-order mechanism guarantees a flat finish.
 - `Ledger(db_path, limits=None)` opens the account-scoped SQLite store. Hold the
   account lock for the entire writer lifetime. `start_trial(now)` durably retains
   the first start; calling it again does not reset the trial or cleanup clock.
+- `begin_recovery(now)` starts a separately explicit bounded cleanup invocation.
+  It permanently blocks entries, preserves risk halts, limits, fills, positions
+  and request history, and permits owned-position exits for `cleanup_seconds`
+  from that invocation. Session/quote/quantity bounds still apply. Never call
+  repeatedly inside a loop to extend an active recovery indefinitely.
 - `reserve_intent(client_id, symbol, side, qty, limit_price, *, quote, now,
   market_open, session_close, stop_file=None)` atomically reserves exposure and
   returns an `Intent`. `newly_reserved` is true only once. An exact duplicate
@@ -105,9 +110,11 @@ infer tax-lot accounting or native stream recovery from these local tests.
 The first trial start and limits intentionally cannot be reset through this API.
 A later feature may rotate a completed, reconciled, flat trial while retaining
 the account-wide request history. Deleting or replacing the database is not a
-supported reset. A timed-out trial with unresolved orders/positions requires
-explicit reconciliation and a separately bounded cleanup path; do not manufacture
-a fresh trial to hide the unresolved state.
+supported reset. A timed-out trial requires explicit reconciliation and
+`begin_recovery` for a separately bounded cleanup invocation; do not manufacture
+a fresh trial or reset request history to hide unresolved state. Identify the
+actual recovery adapter: a direct SDK fractional exit does not establish that a
+whole-share native engine adapter supports fractional execution.
 
 Run `python3 -m unittest discover -s tests -p test_adaptive_paper_safety.py -v` for
 the synthetic local failure cases. These checks establish local state invariants,

@@ -445,6 +445,45 @@ class SafetyTests(unittest.TestCase):
         self.fill("sell-1")
         self.assertEqual(self.ledger.positions(), {})
 
+    def test_expired_trial_bounded_recovery_allows_owned_fractional_exit_only(self):
+        self.reserve()
+        self.ledger.request_budget(self.now, "submit", "buy-1")
+        self.fill(qty="0.6", status="canceled")
+        self.now += 421
+        with self.assertRaisesRegex(s.SafetyError, "trial_window"):
+            self.reserve("sell-1", side="sell", qty="0.6", price="99.99")
+        original = self.ledger.accounting()
+        self.ledger.begin_recovery(self.now)
+        self.assertEqual(self.ledger.accounting().cash_delta_usd, original.cash_delta_usd)
+        self.assertEqual(self.ledger.positions()["SPY"].qty, D("0.6"))
+        self.assertEqual(self.ledger.db.execute("SELECT COUNT(*) FROM requests").fetchone()[0], 1)
+        with self.assertRaisesRegex(s.SafetyError, "recovery_only_blocks_entry"):
+            self.reserve("buy-2")
+        self.reserve("sell-1", side="sell", qty="0.6", price="99.99")
+        self.validate("sell-1")
+        self.fill("sell-1", qty="0.6")
+        self.assertEqual(self.ledger.positions(), {})
+
+    def test_recovery_preserves_loss_halt_and_does_not_renew_implicitly(self):
+        self.reserve()
+        self.fill()
+        self.ledger.freeze("gross_loss_cap_reached")
+        self.now += 421
+        self.ledger.begin_recovery(self.now)
+        self.assertEqual(self.ledger.accounting().halted_reason, "gross_loss_cap_reached")
+        self.reopen()
+        self.now += 121
+        with self.assertRaisesRegex(s.SafetyError, "trial_window"):
+            self.reserve("sell-1", side="sell", price="99.99")
+        self.ledger.begin_recovery(self.now)
+        self.reserve("sell-1", side="sell", price="99.99")
+        with self.assertRaisesRegex(s.SafetyError, "outside_allowed_session"):
+            self.validate("sell-1", market_open=False)
+        with self.assertRaisesRegex(s.SafetyError, "quote_not_fresh"):
+            self.validate("sell-1", quote=self.quote(at=self.now - 4))
+        with self.assertRaisesRegex(s.SafetyError, "recovery_only_blocks_entry"):
+            self.reserve("buy-2")
+
 
 if __name__ == "__main__":
     unittest.main()
