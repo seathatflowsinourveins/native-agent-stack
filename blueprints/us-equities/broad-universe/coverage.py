@@ -74,14 +74,25 @@ def check_ledger_complete(plan, events, supplement_plan=None):
     the supplement series ('s') is complete for every adjustment, and the latest
     run_complete of each series reports zero failures."""
     reasons = []
-    complete = {(e.get("series", "b"), e["adjustment"], e["batch"])
-                for e in events if e.get("event") == "batch_complete"}
+    complete = defaultdict(list)
+    for event in events:
+        if event.get("event") == "batch_complete":
+            complete[(event.get("series", "b"), event["adjustment"], event["batch"])].append(event)
     plans = [("b", plan)] + ([("s", supplement_plan)] if supplement_plan else [])
     for series, item in plans:
+        expected_fingerprint = item.get("request_sha256")
         for adjustment in item["adjustments"]:
             for index in range(item["batches"]):
-                if (series, adjustment, index) not in complete:
+                recorded = complete.get((series, adjustment, index))
+                if not recorded:
                     reasons.append(f"missing batch_complete series={series} adjustment={adjustment} batch={index}")
+                    continue
+                # A completion recorded under a different request scope proves nothing about
+                # the bars this plan asks for; a legacy record carries no fingerprint at all.
+                if expected_fingerprint and all(
+                        e.get("request_sha256") not in (None, expected_fingerprint) for e in recorded):
+                    reasons.append(f"batch_complete series={series} adjustment={adjustment} batch={index} "
+                                   "was recorded for a different request scope than plan.request_sha256")
         runs = [e for e in events if e.get("event") == "run_complete" and e.get("series", "b") == series]
         if not runs:
             reasons.append(f"no run_complete event for series={series}")
@@ -116,37 +127,165 @@ def load_bars_view(con, dataset_dir, adjustment, view_name, prefix):
 
 
 DUPLICATE_SERIES_MIN_SESSIONS = 20
+# The identical sessions must cover essentially the whole of the dropped candidate's
+# history inside the shared span. 25 scattered coincidental matches inside 800 genuine
+# sessions are evidence of nothing and must not delete rows from a live security.
+DUPLICATE_SERIES_MIN_SPAN_COVERAGE = 0.98
 CONTINUITY_RATIO = 1.5
+# The corporate-actions API names its types in the singular; older retained envelopes
+# were read with plural keys. Both spellings are accepted and counted separately so a
+# key-name change can never silently produce zero rename evidence.
+RENAME_KINDS = ("name_change", "name_changes", "unit_split", "unit_splits")
 
 
-def load_rename_pairs(corporate_actions_dir):
-    """(old_symbol, new_symbol) pairs from retained name_change/unit_split pages."""
+def load_rename_pairs(corporate_actions_dir, stats=None):
+    """(old_symbol, new_symbol) pairs from retained name_change/unit_split pages.
+
+    `stats`, when given, is filled with how much rename evidence was actually available:
+    silence about an empty result is exactly what made the lexicographic fallback
+    undiagnosable."""
     pairs = set()
+    if stats is not None:
+        stats.update({"rename_evidence": "absent", "rename_pairs_loaded": 0,
+                      "rename_pairs_by_kind": {}, "rename_pages_read": 0,
+                      "rename_kinds_recognized": list(RENAME_KINDS)})
     if not corporate_actions_dir:
         return pairs
     import glob as _glob
-    for path in _glob.glob(os.path.join(corporate_actions_dir, "pages", "*", "*.json.gz")):
+    kinds = Counter()
+    unknown_kinds = Counter()
+    pages = 0
+    for path in sorted(_glob.glob(os.path.join(corporate_actions_dir, "pages", "*", "*.json.gz"))):
         with gzip.open(path, "rb") as handle:
             body = json.loads(handle.read())
+        pages += 1
         actions = body.get("corporate_actions") or {}
-        for kind in ("name_changes", "unit_splits"):
-            for item in actions.get(kind, []):
-                if item.get("old_symbol") and item.get("new_symbol") and item["old_symbol"] != item["new_symbol"]:
-                    pairs.add((item["old_symbol"], item["new_symbol"]))
+        for kind, items in actions.items():
+            if kind not in RENAME_KINDS:
+                unknown_kinds[kind] += len(items or ())
+                continue
+            for item in items or ():
+                old, new = item.get("old_symbol"), item.get("new_symbol")
+                if old and new and old != new:
+                    pairs.add((old, new))
+                    kinds[kind] += 1
+    if stats is not None:
+        stats.update({"rename_evidence": "present", "rename_pairs_loaded": len(pairs),
+                      "rename_pairs_by_kind": dict(sorted(kinds.items())), "rename_pages_read": pages,
+                      "rename_kinds_recognized": list(RENAME_KINDS),
+                      "other_action_kinds_seen": dict(sorted(unknown_kinds.items()))})
     return pairs
 
 
-def dedupe_identity(con, rename_pairs, active_symbols=frozenset()):
+def check_corporate_actions_complete(corporate_actions_dir):
+    """The same completeness gate the bars ledger gets: every planned year collected for
+    the planned types, and a terminal run_complete with zero failures. Rename records are
+    identity evidence, so a partial corporate-actions run must not be used as if complete."""
+    reasons = []
+    plan_path = os.path.join(corporate_actions_dir, "plan.json")
+    ledger_path = os.path.join(corporate_actions_dir, "ledger.jsonl")
+    if not os.path.exists(plan_path):
+        return False, [f"missing {plan_path}"]
+    if not os.path.exists(ledger_path):
+        return False, [f"missing {ledger_path}"]
+    plan = read_json(plan_path)
+    events = []
+    with open(ledger_path, encoding="utf-8") as handle:
+        for line in handle:
+            if line.strip():
+                events.append(json.loads(line))
+    types_key = plan.get("types_key")
+    done = {e["year"] for e in events
+            if e.get("event") == "year_complete" and e.get("types_key") == types_key}
+    try:
+        first_year, last_year = int(str(plan["start"])[:4]), int(str(plan["end"])[:4])
+    except (KeyError, ValueError):
+        return False, ["corporate-actions plan.json lacks a parsable start/end window"]
+    for year in range(first_year, last_year + 1):
+        if year not in done:
+            reasons.append(f"missing year_complete year={year} types_key={types_key}")
+    runs = [e for e in events if e.get("event") == "run_complete" and e.get("types_key") == types_key]
+    if not runs:
+        reasons.append(f"no run_complete event for types_key={types_key}")
+    elif runs[-1].get("failed", 1) != 0:
+        reasons.append(f"latest run_complete reports failed={runs[-1].get('failed')}")
+    return not reasons, reasons
+
+
+def _rename_terminus(members, rename_pairs):
+    """Follow retained old->new rename records inside one duplicate component to the
+    terminal current ticker. A pair recorded in BOTH directions is no evidence and its
+    edge is dropped. Returns the single terminus, or None when the records are absent,
+    branching or cyclic."""
+    member_set = set(members)
+    edges = defaultdict(set)
+    for old, new in rename_pairs:
+        if old in member_set and new in member_set and (new, old) not in rename_pairs:
+            edges[old].add(new)
+    if not edges:
+        return None
+    termini = set()
+    for member in members:
+        seen = {member}
+        current = member
+        while True:
+            following = edges.get(current)
+            if not following:
+                break
+            if len(following) > 1:
+                return None  # branching rename records: ambiguous
+            current = next(iter(following))
+            if current in seen:
+                return None  # cycle: ambiguous
+            seen.add(current)
+        termini.add(current)
+    return termini.pop() if len(termini) == 1 else None
+
+
+def _components(pairs):
+    """Connected components over duplicate pairs (rename chains A->B->C, three-way
+    duplicates), so one survivor is chosen per group instead of pair by pair."""
+    parent = {}
+
+    def find(symbol):
+        parent.setdefault(symbol, symbol)
+        while parent[symbol] != symbol:
+            parent[symbol] = parent[parent[symbol]]
+            symbol = parent[symbol]
+        return symbol
+
+    for sym_a, sym_b in pairs:
+        root_a, root_b = find(sym_a), find(sym_b)
+        if root_a != root_b:
+            parent[root_b] = root_a
+    groups = defaultdict(set)
+    for symbol in parent:
+        groups[find(symbol)].add(symbol)
+    return [sorted(members) for _, members in sorted(groups.items())]
+
+
+def dedupe_identity(con, rename_pairs, active_symbols=frozenset(), rename_stats=None):
     """Remove bars served twice under two tickers (the provider answers an old ticker
     with its successor's history). Table `joined` is edited in place; returns a report.
 
-    A pair is a duplicate series when >= DUPLICATE_SERIES_MIN_SESSIONS sessions carry
-    identical raw OHLCV (volume > 0) under both symbols. The kept symbol is decided, in
-    order, by: a retained rename record; price continuity after the shared span (the
-    successor keeps trading near the last shared close, a reused ticker does not); an
-    active asset-master status; then the lexicographically smaller symbol. Only rows
-    identical under both symbols are removed from the dropped symbol."""
-    con.execute(f"""
+    Everything is decided from an immutable snapshot taken before the first DELETE, so a
+    symbol that a chain already dropped can never make a later lookup fail.
+
+    A pair is a duplicate-series candidate when >= DUPLICATE_SERIES_MIN_SESSIONS sessions
+    carry identical raw OHLCV (volume > 0) under both symbols AND those sessions cover at
+    least DUPLICATE_SERIES_MIN_SPAN_COVERAGE of one side's rows inside the shared span.
+    A pair that clears the session count but not the coverage is reported under
+    partial_overlap_not_deduped and BOTH symbols are left untouched.
+
+    Candidate pairs are grouped into connected components and ONE survivor is chosen per
+    component, in order: retained rename records (chains followed to the terminal
+    new_symbol); price continuity after the shared span; active asset-master status; then
+    the lexicographic fallback, which is reported with identity_unresolved=true.
+
+    For each non-survivor, ALL of its rows inside its shared span with the component are
+    removed - not only the byte-identical ones - so no sparse phantom series is left
+    behind; the rows that were not byte-identical are reported as residue."""
+    con.execute("""
         CREATE OR REPLACE TEMP TABLE dup_rows AS
         SELECT a.symbol AS sym_a, b.symbol AS sym_b, a.session_date
         FROM joined a JOIN joined b
@@ -155,56 +294,136 @@ def dedupe_identity(con, rename_pairs, active_symbols=frozenset()):
          AND a.raw_c = b.raw_c AND a.raw_v = b.raw_v
         WHERE a.raw_v > 0
     """)
-    pairs = con.execute(f"""
+    # Immutable snapshot: every decision below reads this, never the table being edited.
+    con.execute("CREATE OR REPLACE TEMP TABLE identity_snapshot AS "
+                "SELECT symbol, session_date, raw_c FROM joined")
+    candidates = con.execute(f"""
         SELECT sym_a, sym_b, count(*) AS n, min(session_date), max(session_date)
         FROM dup_rows GROUP BY 1, 2 HAVING count(*) >= {DUPLICATE_SERIES_MIN_SESSIONS} ORDER BY 1, 2
     """).fetchall()
+
+    def rows_in_span(symbol, first, last):
+        return con.execute(
+            "SELECT count(*) FROM identity_snapshot WHERE symbol = ? AND session_date BETWEEN ? AND ?",
+            [symbol, first, last]).fetchone()[0]
+
+    qualified = []
+    partial = []
+    for sym_a, sym_b, shared, first, last in candidates:
+        rows_a, rows_b = rows_in_span(sym_a, first, last), rows_in_span(sym_b, first, last)
+        ratio_a = shared / rows_a if rows_a else 0.0
+        ratio_b = shared / rows_b if rows_b else 0.0
+        entry = {"sym_a": sym_a, "sym_b": sym_b, "identical_sessions": shared,
+                 "first": str(first), "last": str(last),
+                 "span_coverage_sym_a": round(ratio_a, 6), "span_coverage_sym_b": round(ratio_b, 6),
+                 "rows_in_span_sym_a": rows_a, "rows_in_span_sym_b": rows_b}
+        if max(ratio_a, ratio_b) >= DUPLICATE_SERIES_MIN_SPAN_COVERAGE:
+            qualified.append((sym_a, sym_b))
+        else:
+            entry["stage"] = "pair"
+            entry["reason"] = ("identical sessions cover neither symbol's history inside the shared span; "
+                               "coincidental matches are not identity evidence")
+            partial.append(entry)
+
+    # Only pairs that cleared BOTH tests are identity evidence; every query below reads
+    # this restriction, so a disqualified coincidence can never widen a deletion span.
+    con.execute("CREATE OR REPLACE TEMP TABLE qualified_pairs (sym_a VARCHAR, sym_b VARCHAR)")
+    if qualified:
+        con.executemany("INSERT INTO qualified_pairs VALUES (?, ?)", qualified)
+    con.execute("""
+        CREATE OR REPLACE TEMP TABLE qualified_dup AS
+        SELECT d.sym_a, d.sym_b, d.session_date FROM dup_rows d
+        JOIN qualified_pairs q ON d.sym_a = q.sym_a AND d.sym_b = q.sym_b
+    """)
+
     report = []
-    for sym_a, sym_b, shared, first, last in pairs:
-        last_close = con.execute(
-            "SELECT raw_c FROM joined WHERE symbol = ? AND session_date = ?", [sym_a, last]).fetchone()[0]
+    unresolved = 0
+    components = _components(qualified)
+    for members in components:
+        member_set = set(members)
+        pair_rows = con.execute(f"""
+            SELECT max(session_date) FROM qualified_dup
+            WHERE sym_a IN ({','.join('?' * len(members))}) AND sym_b IN ({','.join('?' * len(members))})
+        """, members + members).fetchone()
+        last = pair_rows[0]
+        close_row = con.execute(f"""
+            SELECT max(raw_c) FROM identity_snapshot
+            WHERE session_date = ? AND raw_c IS NOT NULL AND symbol IN ({','.join('?' * len(members))})
+        """, [last] + members).fetchone()
+        last_close = close_row[0] if close_row else None
 
         def continues(symbol):
             row = con.execute(
-                "SELECT raw_c FROM joined WHERE symbol = ? AND session_date > ? AND raw_c IS NOT NULL "
-                "ORDER BY session_date LIMIT 1", [symbol, last]).fetchone()
+                "SELECT raw_c FROM identity_snapshot WHERE symbol = ? AND session_date > ? "
+                "AND raw_c IS NOT NULL ORDER BY session_date LIMIT 1", [symbol, last]).fetchone()
             if not row or not last_close:
-                return None
+                return False
             ratio = row[0] / last_close
             return 1 / CONTINUITY_RATIO <= ratio <= CONTINUITY_RATIO
 
-        rule = None
-        keep = None
-        if (sym_a, sym_b) in rename_pairs and (sym_b, sym_a) not in rename_pairs:
-            keep, rule = sym_b, "rename_record"
-        elif (sym_b, sym_a) in rename_pairs and (sym_a, sym_b) not in rename_pairs:
-            keep, rule = sym_a, "rename_record"
+        keep = _rename_terminus(members, rename_pairs)
+        rule = "rename_record" if keep else None
         if keep is None:
-            cont_a, cont_b = continues(sym_a), continues(sym_b)
-            if cont_a and not cont_b:
-                keep, rule = sym_a, "price_continuity"
-            elif cont_b and not cont_a:
-                keep, rule = sym_b, "price_continuity"
+            continuing = [m for m in members if continues(m)]
+            if len(continuing) == 1:
+                keep, rule = continuing[0], "price_continuity"
         if keep is None:
-            in_a, in_b = sym_a in active_symbols, sym_b in active_symbols
-            if in_a != in_b:
-                keep, rule = (sym_a if in_a else sym_b), "active_status"
+            actives = [m for m in members if m in active_symbols]
+            if len(actives) == 1:
+                keep, rule = actives[0], "active_status"
         if keep is None:
-            keep, rule = min(sym_a, sym_b), "lexicographic_fallback"
-        drop = sym_b if keep == sym_a else sym_a
-        removed = con.execute("""
-            DELETE FROM joined WHERE symbol = ? AND session_date IN (
-                SELECT session_date FROM dup_rows WHERE sym_a = ? AND sym_b = ?)
-        """, [drop, sym_a, sym_b]).fetchone()
-        report.append({"kept": keep, "dropped": drop, "rule": rule, "identical_sessions": shared,
-                       "first": str(first), "last": str(last),
-                       "rows_removed": removed[0] if removed else None})
+            keep, rule = min(members), "lexicographic_fallback"
+
+        for drop in members:
+            if drop == keep:
+                continue
+            others = sorted(member_set - {drop})
+            placeholders = ",".join("?" * len(others))
+            shared_rows = con.execute(f"""
+                SELECT count(DISTINCT session_date), min(session_date), max(session_date) FROM qualified_dup
+                WHERE (sym_a = ? AND sym_b IN ({placeholders})) OR (sym_b = ? AND sym_a IN ({placeholders}))
+            """, [drop] + others + [drop] + others).fetchone()
+            identical, first_shared, last_shared = shared_rows
+            span_rows = rows_in_span(drop, first_shared, last_shared)
+            ratio = identical / span_rows if span_rows else 0.0
+            entry = {"kept": keep, "dropped": drop, "rule": rule, "identical_sessions": identical,
+                     "first": str(first_shared), "last": str(last_shared),
+                     "span_coverage": round(ratio, 6), "rows_in_span": span_rows,
+                     "component_size": len(members),
+                     "identity_unresolved": rule == "lexicographic_fallback"}
+            if ratio < DUPLICATE_SERIES_MIN_SPAN_COVERAGE:
+                entry["stage"] = "component"
+                entry["reason"] = ("shared sessions do not cover this symbol's history inside the span; "
+                                   "left untouched")
+                partial.append(entry)
+                continue
+            removed = con.execute(
+                "DELETE FROM joined WHERE symbol = ? AND session_date BETWEEN ? AND ?",
+                [drop, first_shared, last_shared]).fetchone()
+            rows_removed = removed[0] if removed else 0
+            entry["rows_removed"] = rows_removed
+            # Zero-volume halts and all-series-only rows are never byte-identical, so they
+            # used to survive as a sparse phantom series under the dropped ticker.
+            entry["residue_rows_removed"] = max(0, rows_removed - identical)
+            if entry["identity_unresolved"]:
+                unresolved += 1
+            report.append(entry)
+
     rules = defaultdict(int)
     for item in report:
         rules[item["rule"]] += 1
-    return {"min_identical_sessions": DUPLICATE_SERIES_MIN_SESSIONS, "pairs": len(report),
-            "rows_removed": sum(item["rows_removed"] or 0 for item in report),
-            "by_rule": dict(rules), "detail": report}
+    out = {"min_identical_sessions": DUPLICATE_SERIES_MIN_SESSIONS,
+           "min_span_coverage": DUPLICATE_SERIES_MIN_SPAN_COVERAGE,
+           "candidate_pairs": len(candidates), "qualified_pairs": len(qualified),
+           "components": len(components),
+           "pairs": len(report),
+           "rows_removed": sum(item.get("rows_removed") or 0 for item in report),
+           "residue_rows_removed": sum(item.get("residue_rows_removed") or 0 for item in report),
+           "identity_unresolved_pairs": unresolved,
+           "partial_overlap_not_deduped": partial,
+           "by_rule": dict(rules), "detail": report}
+    out.update(rename_stats or {})
+    return out
 
 
 def materialize(dataset_dir, corporate_actions_dir=None, asset_files=()):
@@ -212,6 +431,18 @@ def materialize(dataset_dir, corporate_actions_dir=None, asset_files=()):
     out_path = os.path.join(dataset_dir, "daily.parquet")
     if os.path.exists(out_path):
         return False, {"reason": "daily.parquet already exists; remove it before rematerializing"}
+    rename_stats = {}
+    rename_pairs = load_rename_pairs(corporate_actions_dir, rename_stats)
+    if corporate_actions_dir:
+        ca_ok, ca_reasons = check_corporate_actions_complete(corporate_actions_dir)
+        if not ca_ok:
+            return False, {"reason": "corporate-actions ledger incomplete; its rename records would be "
+                                     "used as identity evidence", "corporate_actions_reasons": ca_reasons}
+        if not rename_pairs:
+            return False, {"reason": "--corporate-actions was given but no rename pair could be loaded from its "
+                                     "retained pages; identity de-duplication would silently fall back to price "
+                                     "continuity and a lexicographic coin-flip",
+                           "rename_evidence": rename_stats}
     con = duckdb.connect()
     load_bars_view(con, dataset_dir, "raw", "raw_bars", "raw")
     load_bars_view(con, dataset_dir, "all", "all_bars", "all")
@@ -238,14 +469,16 @@ def materialize(dataset_dir, corporate_actions_dir=None, asset_files=()):
     active = set()
     for path in asset_files:
         active |= {a["symbol"] for a in read_json(path) if a.get("status") == "active"}
-    dedup = dedupe_identity(con, load_rename_pairs(corporate_actions_dir), frozenset(active))
+    dedup = dedupe_identity(con, rename_pairs, frozenset(active), rename_stats)
     con.execute(f"COPY (SELECT * FROM joined ORDER BY symbol, session_date) "
                 f"TO '{out_path}' (FORMAT PARQUET, COMPRESSION ZSTD)")
     rows = con.execute(f"SELECT count(*) FROM read_parquet('{out_path}')").fetchone()[0]
     with open(os.path.join(dataset_dir, "identity-dedup.json"), "w", encoding="utf-8") as handle:
         json.dump(dedup, handle, indent=1)
+    summary = {k: v for k, v in dedup.items() if k not in ("detail", "partial_overlap_not_deduped")}
+    summary["partial_overlap_not_deduped"] = len(dedup["partial_overlap_not_deduped"])
     return True, {"rows": rows, "rows_before_identity_dedup": rows_before, "path": out_path,
-                  "identity_dedup": {k: v for k, v in dedup.items() if k != "detail"}}
+                  "identity_dedup": summary}
 
 
 def cmd_materialize(args):
@@ -269,24 +502,66 @@ def cmd_materialize(args):
 # --------------------------------------------------------------------------- build: collection
 
 
-def pagination_proof(page_events):
-    """Group page ledger events by (adjustment, batch label); every group's pages
-    must be contiguous from 0 and only the last may have next_page_token_present
-    false."""
+def _batch_label(event):
+    """The page-event batch label a batch event belongs to. Page events carry the label
+    ('b00007', bisect children 'b00007a'); batch events carry the numeric index."""
+    label = event.get("label")
+    if label:
+        return label
+    batch = event.get("batch")
+    if isinstance(batch, int):
+        return f"{event.get('series', 'b')}{batch:05d}"
+    return str(batch)
+
+
+def partition_attempts(page_events, batch_events=()):
+    """Split retained page events into the attempt that produced each batch_complete and
+    the earlier attempts it superseded.
+
+    A batch that failed part way and was re-run leaves both attempts in the append-only
+    ledger. Those earlier pages are retained evidence, not a pagination violation, and
+    their bars must not be counted twice. Events predating run ids form one legacy group
+    and, when no batch_complete information is available, every group is checked as
+    before."""
     groups = defaultdict(list)
     for event in page_events:
-        groups[(event["adjustment"], event["batch"])].append(event)
-    violations = []
+        groups[(event["adjustment"], event["batch"], event.get("run_id"))].append(event)
+    completing = defaultdict(set)
+    for event in batch_events:
+        if event.get("event") == "batch_complete":
+            completing[(event["adjustment"], _batch_label(event))].add(event.get("run_id"))
+    checked, superseded = {}, {}
     for key, items in groups.items():
+        adjustment, label, run_id = key
+        runs = {run for (adj, prefix), values in completing.items() if adj == adjustment
+                and (label == prefix or label.startswith(prefix)) for run in values}
+        if runs and run_id not in runs:
+            superseded[key] = items
+        else:
+            checked[key] = items
+    return checked, superseded
+
+
+def pagination_proof(page_events, batch_events=()):
+    """Group page ledger events by (adjustment, batch label, run id); every checked
+    group's pages must be contiguous from 0 and only the last may have
+    next_page_token_present false. Attempts superseded by a later, completing attempt are
+    reported as such instead of counted as violations."""
+    checked, superseded = partition_attempts(page_events, batch_events)
+    violations = []
+    for key, items in checked.items():
         items = sorted(items, key=lambda e: e["page"])
         pages = [item["page"] for item in items]
         contiguous = pages == list(range(len(items)))
         terminal_ok = bool(items) and not items[-1]["next_page_token_present"] and \
             all(item["next_page_token_present"] for item in items[:-1])
         if not (contiguous and terminal_ok):
-            violations.append({"adjustment": key[0], "batch": key[1], "pages": pages,
+            violations.append({"adjustment": key[0], "batch": key[1], "run_id": key[2], "pages": pages,
                                 "next_page_token_present": [i["next_page_token_present"] for i in items]})
-    return {"symbol_groups_checked": len(groups), "violations": violations}
+    return {"symbol_groups_checked": len(checked), "violations": violations,
+            "superseded_attempts": [{"adjustment": k[0], "batch": k[1], "run_id": k[2],
+                                     "pages": sorted(i["page"] for i in v)}
+                                    for k, v in sorted(superseded.items(), key=lambda kv: str(kv[0]))]}
 
 
 def verify_page_sha256(dataset_dir, page_events, sample_fraction=1.0):
@@ -323,17 +598,33 @@ def build_collection_section(con, dataset_dir, plan, events, page_sample):
     batch_failed = [e for e in events if e.get("event") == "batch_failed"]
     rejected = [e for e in events if e.get("event") == "rejected_symbol"]
 
-    per_adjustment_pages = defaultdict(lambda: {"pages": 0, "bytes": 0, "bars": 0})
-    for event in pages:
+    # Page and bar totals come from the attempt that actually produced each
+    # batch_complete; earlier attempts are retained evidence, reported separately.
+    checked_pages, superseded_pages = partition_attempts(pages, batch_complete)
+    effective_pages = [event for items in checked_pages.values() for event in items]
+    per_adjustment_pages = defaultdict(lambda: {"pages": 0, "bytes": 0, "bars": 0, "superseded_pages": 0})
+    for event in effective_pages:
         entry = per_adjustment_pages[event["adjustment"]]
         entry["pages"] += 1
         entry["bytes"] += event["bytes"]
         entry["bars"] += event["bars"]
-    per_adjustment_batches = defaultdict(lambda: {"complete": 0, "failed": 0, "bars": 0})
+    for items in superseded_pages.values():
+        for event in items:
+            per_adjustment_pages[event["adjustment"]]["superseded_pages"] += 1
+
+    # One batch may hold several batch_complete records across attempts; the last one wins,
+    # so a retried batch is never double-counted against the single CSV it wrote.
+    latest_complete = {}
     for event in batch_complete:
+        latest_complete[(event.get("series", "b"), event["adjustment"], event["batch"])] = event
+    per_adjustment_batches = defaultdict(lambda: {"complete": 0, "failed": 0, "bars": 0, "superseded": 0})
+    for event in latest_complete.values():
         entry = per_adjustment_batches[event["adjustment"]]
         entry["complete"] += 1
         entry["bars"] += event["bars"]
+    for event in batch_complete:
+        if latest_complete.get((event.get("series", "b"), event["adjustment"], event["batch"])) is not event:
+            per_adjustment_batches[event["adjustment"]]["superseded"] += 1
     for event in batch_failed:
         per_adjustment_batches[event["adjustment"]]["failed"] += 1
 
@@ -354,7 +645,7 @@ def build_collection_section(con, dataset_dir, plan, events, page_sample):
         "per_adjustment_pages": dict(per_adjustment_pages),
         "per_adjustment_batches": dict(per_adjustment_batches),
         "rejected_symbols": rejected,
-        "pagination_proof": pagination_proof(pages),
+        "pagination_proof": pagination_proof(pages, batch_complete),
         "page_sha256_reverification": verify_page_sha256(dataset_dir, pages, page_sample),
         "row_totals": {"csv_totals": csv_totals, "ledger_totals": ledger_totals,
                        "match": all(csv_totals[a] == ledger_totals[a] for a in plan["adjustments"])},
@@ -420,7 +711,11 @@ def build_calendar_section(con, gap_by_symbol):
     }, sessions
 
 
-def build_universe_section(con, identities, sessions):
+def build_universe_section(con, identities, sessions, supplement_symbols=frozenset()):
+    """Denominators are reported on one stated basis. `daily` holds the main asset-master
+    list AND the supplement, so a reader is told which count is which, and the
+    survivorship histogram names both classes of known-delisted ticker."""
+    supplement_symbols = set(supplement_symbols) - set(identities)
     have_bars = {r[0] for r in con.execute(
         "SELECT DISTINCT symbol FROM daily WHERE in_raw OR in_all").fetchall()}
     zero_bar = [s for s in identities if s not in have_bars]
@@ -446,17 +741,28 @@ def build_universe_section(con, identities, sessions):
     inactive_symbols = {s for s, v in identities.items() if any(i["status"] == "inactive" for i in v)}
     active_symbols = {s for s, v in identities.items() if any(i["status"] == "active" for i in v)}
     inactive_last_year_hist = Counter()
+    supplement_last_year_hist = Counter()
     session_index = {d: i for i, d in enumerate(sessions)}
     end_idx = len(sessions) - 1
     stale_active = []
     for symbol, fst, lst in first_last:
         if symbol in inactive_symbols:
             inactive_last_year_hist[lst.year] += 1
+        if symbol in supplement_symbols:
+            supplement_last_year_hist[lst.year] += 1
         if symbol in active_symbols and lst in session_index and (end_idx - session_index[lst]) > 5:
             stale_active.append({"symbol": symbol, "last_session": str(lst), "sessions_before_end": end_idx - session_index[lst]})
+    combined_last_year_hist = Counter(inactive_last_year_hist)
+    combined_last_year_hist.update(supplement_last_year_hist)
 
     return {
         "requested_symbols": len(identities),
+        "denominator_basis": "requested_symbols counts the main asset-master list only; the bar counts and "
+                             "histograms below are computed over daily.parquet, which also holds the "
+                             "supplement series. Use the *_combined counts to compare the two.",
+        "requested_symbols_main_list": len(identities),
+        "requested_symbols_supplement": len(supplement_symbols),
+        "requested_symbols_combined": len(set(identities) | supplement_symbols),
         "symbols_with_raw_bar": con.execute("SELECT count(DISTINCT symbol) FROM daily WHERE in_raw").fetchone()[0],
         "symbols_with_all_bar": con.execute("SELECT count(DISTINCT symbol) FROM daily WHERE in_all").fetchone()[0],
         "zero_bar_symbols": len(zero_bar),
@@ -465,6 +771,12 @@ def build_universe_section(con, identities, sessions):
         "last_session_year_histogram": {str(y): c for y, c in sorted(last_hist.items())},
         "symbols_with_bars_per_year": {str(y): c for y, c in sorted(per_year_symbols.items())},
         "inactive_last_bar_year_histogram": {str(y): c for y, c in sorted(inactive_last_year_hist.items())},
+        "supplement_last_bar_year_histogram": {str(y): c for y, c in sorted(supplement_last_year_hist.items())},
+        "known_inactive_or_supplement_last_bar_year_histogram":
+            {str(y): c for y, c in sorted(combined_last_year_hist.items())},
+        "survivorship_measure_basis": "known_inactive_or_supplement_last_bar_year_histogram is the survivorship "
+                                      "measure: asset-master inactive names plus the supplement names the asset "
+                                      "master omits entirely (the class the supplement exists to recover).",
         "active_symbols_stale_gt_5_sessions": {"count": len(stale_active), "examples": stale_active[:50]},
     }
 
@@ -669,6 +981,20 @@ def cmd_build(args):
         "excluded_exchange_assets_match": skipped == plan.get("excluded_exchange_assets"),
     }
 
+    supplement_plan = read_supplement_plan(args.dataset)
+    supplement_path = os.path.join(args.dataset, "supplement-symbols.json")
+    supplement_symbols = set()
+    if supplement_plan and os.path.exists(supplement_path):
+        supplement_symbols = set(read_json(supplement_path)) - set(identities)
+
+    if args.corporate_actions:
+        ca_ok, ca_reasons = check_corporate_actions_complete(args.corporate_actions)
+        if not ca_ok:
+            print("REFUSED: corporate-actions ledger incomplete", file=sys.stderr)
+            for reason in ca_reasons:
+                print(f"  - {reason}", file=sys.stderr)
+            return 1
+
     con = duckdb.connect()
     con.execute(f"CREATE OR REPLACE VIEW daily AS SELECT * FROM read_parquet('{os.path.join(args.dataset, 'daily.parquet')}')")
 
@@ -678,13 +1004,13 @@ def cmd_build(args):
         "schema": "broad-universe-coverage-manifest/1",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "collection": build_collection_section(con, args.dataset, plan, events, args.page_sample),
-        "universe": build_universe_section(con, identities, sessions),
+        "universe": build_universe_section(con, identities, sessions, supplement_symbols),
         "calendar": calendar_section,
         "quality_flags": build_quality_section(con),
         "identity": build_identity_section(identities_doc, plan, probe_doc, reproduced),
         "identity_dedup": (read_json(os.path.join(args.dataset, "identity-dedup.json"))
                            if os.path.exists(os.path.join(args.dataset, "identity-dedup.json")) else None),
-        "supplement": build_supplement_section(con, args.dataset, read_supplement_plan(args.dataset), identities),
+        "supplement": build_supplement_section(con, args.dataset, supplement_plan, identities),
         "requested_names": build_requested_names_section(con, gap_by_symbol),
         "eligible_universe": build_eligible_universe_section(con),
         "entitlements": build_entitlements_section(probe_doc, live_probe_doc),
