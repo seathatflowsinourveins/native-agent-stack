@@ -331,12 +331,34 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
 
     async def test_startup_staggered_quotes_do_not_freeze_before_first_ready(self):
         self.port.symbols = ("SPY", "QQQ")
+        self.port.required_quote_symbols = self.port.symbols
         self.port._ever_ready = False
         task = asyncio.create_task(self.port._watchdog())
         await asyncio.sleep(0.01)
         task.cancel()
         await asyncio.gather(task, return_exceptions=True)
         self.assertNotIn("quote_stale", self.port.health["reasons"])
+
+    async def test_quiet_unrequired_symbol_does_not_halt_benchmark_readiness(self):
+        self.port.symbols = ("SPY", "QQQ")
+        self.port.required_quote_symbols = ("SPY",)
+        self.port._quote_seen["QQQ"] = time.monotonic() - 60
+        self.port._ever_ready = True
+        task = asyncio.create_task(self.port._watchdog())
+        await asyncio.sleep(0.01)
+        task.cancel()
+        await asyncio.gather(task, return_exceptions=True)
+        self.assertTrue(self.port.ready)
+        self.assertNotIn("quote_stale", self.port.health["reasons"])
+
+    async def test_required_benchmark_stale_blocks_entry(self):
+        self.port.required_quote_symbols = ("SPY",)
+        self.port._quote_seen["SPY"] = time.monotonic() - 60
+        self.assertFalse(self.port.ready)
+        with patch.object(self.port._client._session._session, "request") as request:
+            with self.assertRaisesRegex(t.TransportError, "not ready"):
+                await self.port.submit(intent())
+        request.assert_not_called()
 
     async def test_snapshot_paginates_and_rejects_nonadvancing_page(self):
         page = [order(id=f"00000000-0000-0000-0000-{i:012d}", client_order_id=f"fixture-{i}") for i in range(500)]

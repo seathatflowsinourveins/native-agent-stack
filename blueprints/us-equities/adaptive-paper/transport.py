@@ -348,8 +348,12 @@ class AlpacaPaperTransport:
     def __init__(self, api_key, secret_key, symbols, *, before_request, before_submit,
                  sink_observation, queue_size=1024, quote_timeout=5.0, start_timeout=15.0,
                  order_update_timeout=10.0, request_observer=None, history_start=None,
-                 max_snapshot_pages=20):
+                 max_snapshot_pages=20, required_quote_symbols=None):
         self.symbols = _symbols(symbols)
+        self.required_quote_symbols = (self.symbols if required_quote_symbols is None
+                                       else _symbols(required_quote_symbols))
+        if not set(self.required_quote_symbols).issubset(self.symbols):
+            raise TransportError("required quote symbols must be subscribed")
         if min(quote_timeout, start_timeout, order_update_timeout) <= 0 or queue_size < 1:
             raise TransportError("positive finite timeouts and queue size required")
         if any(not __import__("math").isfinite(x) for x in (quote_timeout, start_timeout, order_update_timeout)):
@@ -406,12 +410,13 @@ class AlpacaPaperTransport:
     def health(self):
         with self._state_lock:
             fresh = all(time.monotonic() - self._quote_seen.get(s, float("-inf")) <= self.quote_timeout
-                        for s in self.symbols)
+                        for s in self.required_quote_symbols)
             return {"ready": self._started and not self._stopping and not self._reasons
                     and all(self._auth.values()) and all(self._acks.values()) and fresh,
                     "frozen": bool(self._reasons), "reasons": sorted(self._reasons),
                     "authenticated": dict(self._auth), "subscriptions": dict(self._acks),
-                    "fresh_quotes": fresh, "queue_size": self._events.qsize()}
+                    "fresh_quotes": fresh, "required_quote_symbols": list(self.required_quote_symbols),
+                    "queue_size": self._events.qsize()}
 
     @property
     def ready(self):
@@ -535,7 +540,8 @@ class AlpacaPaperTransport:
                         raise TransportError("unexpected quote symbol")
                     age = (time.time_ns() - quote["ts_ns"]) / 1e9
                     if not -1.0 <= age <= self.quote_timeout:
-                        self.freeze_health("quote_timestamp_stale")
+                        if quote["symbol"] in self.required_quote_symbols:
+                            self.freeze_health("quote_timestamp_stale")
                         continue
                     self._quote_seen[quote["symbol"]] = time.monotonic()
                     self._quote_values[quote["symbol"]] = quote

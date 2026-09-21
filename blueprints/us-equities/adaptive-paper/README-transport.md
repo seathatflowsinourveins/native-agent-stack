@@ -11,7 +11,8 @@ This module does not load environment files or discover credentials.
 ## Contract
 
 Construct `AlpacaPaperTransport(api_key, secret_key, symbols, *, before_request,
-before_submit, sink_observation, request_observer=None, history_start=None)` on
+before_submit, sink_observation, request_observer=None, history_start=None,
+required_quote_symbols=None)` on
 the owning asyncio loop. The three required callbacks may be synchronous or
 asynchronous and run on that same loop. `before_request(kind, client_id=None)`
 must reserve the actual attempt, waiting within the caller's deadline or raising;
@@ -43,8 +44,11 @@ quantity/price. Consumers must deduplicate executions and never manufacture
 individual fills from a cumulative REST snapshot.
 
 `ready` requires successful native authentication, an observed subscription ACK
-from each socket, fresh quotes for every requested symbol, and no frozen health
-condition. `_running` alone is insufficient. One shared IEX connection fans out
+from each socket, fresh quotes for the required benchmark basket, and no frozen
+health condition. The required basket defaults to all subscribed symbols; set
+`required_quote_symbols` explicitly when candidates may be quiet. Every submitted
+symbol still needs a fresh quote at the wire boundary and the caller's stricter
+per-symbol risk check. `_running` alone is insufficient. One shared IEX connection fans out
 quotes; one paper account connection receives order events. Native callbacks
 only enqueue into a bounded queue; the owning loop runs consumer callbacks.
 Reconnect, stale quotes, missing initial order updates, malformed callbacks and
