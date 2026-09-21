@@ -57,6 +57,12 @@ It neither renames the binary nor executes it; executable presence still does no
 establish its version, configuration or service health. Other platforms do not use
 this Linux x86-64 fallback.
 
+The [dated discovery check](../evidence/artifacts/native-claude-coop-20260921/loki-discovery.json)
+retains actual before/after/absent-path reports: the old checker missed the
+installed upstream basename, the corrected checker found it, and omitting its
+directory still failed. These are local integration results, not a new Loki
+service-health or model E2E claim.
+
 For native account readiness, select explicit `NATIVE_CODEX_HOME`, `NATIVE_CODEX_BIN`, `RESEARCH_WORKSPACE` and a new private receipt filename; then use [the worker inspect command](../blueprints/us-equities/workers/README.md). If sign-in is needed:
 
 ```sh
