@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-21",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "bc6ea86bd289c9da05899698c0648f9755867ee2",
+  "source_revision": "dfe48528981b79a35af42260f799a49df9c8feb4",
   "layers": [
     {
       "id": "agents",
@@ -310,6 +310,12 @@
     }
   ],
   "guides": [
+    {
+      "title": "Rendered upstream dashboards: screenshots and returned results",
+      "body": "Thirteen installed interfaces inspected against native commands. Memory wiki limits, repaired Grafana panels, refreshed graph, actual alerts and historical fixtures remain explicit; HTTP success alone is insufficient.",
+      "path": "docs/dashboard-rendered-acceptance.md",
+      "category": "evaluation"
+    },
     {
       "title": "Current HF models: native results and upstream dashboards",
       "body": "Pinned Nemotron3Embed1B files and exact NVIDIA example verified. Model identities, native context limits, published benchmark scopes and the upstream memory-model compatibility gap remain explicit.",

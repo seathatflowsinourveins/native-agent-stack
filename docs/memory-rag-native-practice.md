@@ -27,7 +27,9 @@ returns from the local [full report](http://127.0.0.1:17500/token-savings.html#n
 | Local Markdown | scoped QMD CLI | BM25 retrieval of the selected documentation collection; zero vectors is intentional in this separate lane |
 | Operating status | [foundation Grafana](http://127.0.0.1:13000/d/native-foundation-data) | Local integration panels over native metadata, including memory embedding coverage and provider modes |
 
-The wiki's browser search remains FTS5 even when MCP semantic retrieval is
+The [rendered dashboard review](dashboard-rendered-acceptance.md) supplies later
+screenshots, native command comparisons, a refreshed graph and remaining gaps.
+The wiki's browser search is global FTS5 even when scoped MCP semantic retrieval is
 enabled. The observed wiki contains one ordinary decision and 51 System pages;
 52 pages does not mean 52 curated decisions. Its larger observation count is
 capture history, not consolidated durable knowledge. LLM consolidation remains

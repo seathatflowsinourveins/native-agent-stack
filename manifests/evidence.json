@@ -2,6 +2,36 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "dashboard-render-e2e-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory",
+        "qdrant",
+        "socraticode",
+        "serena",
+        "agentsview",
+        "dagu",
+        "omniroute",
+        "agent-browser",
+        "grafana",
+        "prometheus",
+        "alertmanager",
+        "ntfy",
+        "promptfoo"
+      ],
+      "claim": "Inspected rendered screenshots for13 installed repository interfaces, compared supported native operations, refreshed stale graph, repaired unreadable Grafana memory panels and retained actual limitations.",
+      "limitations": [
+        "ai-memory model-based consolidation remains disabled; native Codex provider is available but not activated by this UI review.",
+        "Bundled ai-memory web search is global FTS, not project-scoped. No richer official admin SPA exists in reviewed release/current-main.",
+        "Old deployment memory marked stale via supported memory_feedback; body not silently rewritten.",
+        "OmniRoute CLI initialized local encryption-key file during read command; no key exposed; coordinator restricted file mode to 0600.",
+        "One wrong System text selector, initial blank ntfy image, recursive browser observation, Dagu preset-only link, Symbols filename no-match and MCP-disabled OmniRoute command retained.",
+        "FreeLLMAPI optional Windows route remains unavailable; no alert suppression.",
+        "Historical Promptfoo fixture is not model-quality evidence. No new jobs, notifications or inference created to populate screens."
+      ],
+      "path": "evidence/receipts/dashboard-render-e2e-20260921.json"
+    },
+    {
       "id": "hf-memory-models-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2337,6 +2367,21 @@
   ],
   "files": [
     {
+      "path": "docs/dashboard-rendered-acceptance.md",
+      "sha256": "82ddca7391ba77b0c7f92a65db67d79221eb13af15aec99be35cad6fca26714f",
+      "bytes": 7513
+    },
+    {
+      "path": "evidence/artifacts/dashboard-render-e2e-20260921/rendered-observations.json",
+      "sha256": "9d443e1005ed9917b1a1c0b0c5f0c8d383583836907171c46cd72ef4a33eee65",
+      "bytes": 27781
+    },
+    {
+      "path": "evidence/receipts/dashboard-render-e2e-20260921.json",
+      "sha256": "15e85ee331ee29c5cff07bb0e73ef48dfb0df93be1d3a845b93728213e5a93a5",
+      "bytes": 2641
+    },
+    {
       "path": "docs/hf-memory-model-qualification.md",
       "sha256": "beb6b7b165fce95ce5f501b39ab226089bb3aa5d73a46d2f21d8083ae47756e5",
       "bytes": 7017
@@ -2373,8 +2418,8 @@
     },
     {
       "path": "docs/memory-rag-native-practice.md",
-      "sha256": "d43adcfd2ab1c77d588cc0698d7a82fdc95b2f4d36a183f13c94cbe2a3579a20",
-      "bytes": 8231
+      "sha256": "691a9f2599429a6b90343c628320ca184bbdb9883059f89110fcae96470867d1",
+      "bytes": 8400
     },
     {
       "path": "evidence/artifacts/native-memory-rag-alignment-20260921/dashboard-observations.json",
@@ -2683,8 +2728,8 @@
     },
     {
       "path": "docs/native-dashboard-data.md",
-      "sha256": "640bb2c71d66043e3e5fcac869f22ab9eb525086a4fa8c193b33f44964138cfe",
-      "bytes": 18453
+      "sha256": "47feadeeb88475d31f4fd0d1ad6f963471d3540eaac5ae4bb61387668f971234",
+      "bytes": 18699
     },
     {
       "path": "evidence/artifacts/native-dashboard-data-20260921/agentsview-selected-sync.json",
@@ -2788,8 +2833,8 @@
     },
     {
       "path": "observability/native-data/render.py",
-      "sha256": "629ec4c4a43bea2f3a08e87c8a38af82bbeda1f47823d21ff9e5fefa3298882b",
-      "bytes": 9697
+      "sha256": "3e29ec76e51620a6d130f8dbe90f108b1429fd2b6d8ec5dfd1a9c83d4d2501e1",
+      "bytes": 11151
     },
     {
       "path": "observability/native-data/snapshot.py",
@@ -2798,8 +2843,8 @@
     },
     {
       "path": "tests/test_native_dashboard_data.py",
-      "sha256": "4cf14a90c84598f71ce4486683b08de8e9f1d10eb5249e7e229bdd90f4465bcf",
-      "bytes": 17763
+      "sha256": "ef502fb8344dda83a9e92c3056b8ffeaeda43d277081337d62da53d42fffe558",
+      "bytes": 18097
     },
     {
       "path": "evidence/artifacts/native-quality-defaults-20260920/codex-effective.json",
@@ -5999,8 +6044,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "9327480ddc02064fa44f50589f1668600314f9d3cf8fe1c2e3999588c9f3b31b",
-      "bytes": 4098213
+      "sha256": "0803e4cbc67f0d57c6ba424c225ff3888c0ba73abcc5e8b77a39292a4031f596",
+      "bytes": 4098851
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6009,8 +6054,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "086bc8dcc964c34b7833e30867130da362302f6881eeea1f384f386d89c3e132",
-      "bytes": 33632
+      "sha256": "4afbabafe4bcb24dde89a30c0aeb2cc50cdcff81e93d536570f8997c1556bd7b",
+      "bytes": 34047
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",

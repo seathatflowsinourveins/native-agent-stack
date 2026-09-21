@@ -143,15 +143,19 @@ class NativeDataTests(unittest.TestCase):
             self.assertEqual(M.memory_metrics(json.dumps(doc))[key + "_status"], "unavailable")
 
     def test_memory_dashboard_shows_native_completeness_and_disabled_llm(self):
-        panel = next(panel for panel in R.dashboard()["panels"] if panel["id"] == 6)
+        panel = next(panel for panel in R.dashboard()["panels"] if panel["id"] == 13)
         fields = next(t for t in panel["transformations"] if t["id"] == "filterFieldsByName")["options"]["include"]["names"]
-        required = {"embedding_status", "embedding_provider", "embedding_rows",
+        required = {"state", "embedding_status", "embedding_provider", "embedding_rows",
                     "latest_pages_missing_embeddings", "embed_failures_unresolved", "llm_status"}
         self.assertTrue(required <= set(fields))
         rename = next(t for t in panel["transformations"] if t["id"] == "organize")["options"]["renameByName"]
         self.assertTrue(required <= rename.keys())
         self.assertEqual(panel["fieldConfig"]["defaults"]["noValue"], "—")
-        self.assertEqual(panel["targets"][0]["expr"], R.latest("memory"))
+        self.assertEqual(panel["targets"][0]["expr"], R.latest("memory", "ai-memory"))
+        failed = M.base_row("ai-memory", "memory inventory", "native inventory", "status --json",
+                            "database-wide", 10000, "memory")
+        visible_failed = {key: value for key, value in failed.items() if key in fields}
+        self.assertEqual(visible_failed, {"state": "unknown"})
 
     def test_qmd_collection_selection_and_bm25_zero(self):
         r = M.qmd_metrics(QMD, "selected-collection")
