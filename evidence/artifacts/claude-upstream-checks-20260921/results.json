@@ -1,0 +1,1794 @@
+{
+  "schema_version": 2,
+  "visibility": "Reviewed public projection: host paths replaced by placeholders; private raw references and local process/session identifiers omitted. Dated source-host evidence.",
+  "generated_at_utc": "2026-09-21T20:54:00.335225+00:00",
+  "host": "linux-wsl",
+  "note": "Each component runs its upstream command natively on this host; results are recorded verbatim (bounded, redacted). Rows carry one of three evidence classes: functional (the command exercises the capability and returns a result), readiness (version, sign-in, import, listing or health endpoint: installation and reachability only), version-help (invocability only). An exit-0 row is NOT a functional E2E unless its class says so; accepted task-specific receipts are linked where they exist. Lifetime figures are each tool's own non-additive estimate, never provider savings. Verdicts are selection verdicts for this profile, not universal SOTA claims.",
+  "components": [
+    {
+      "id": "claude-code",
+      "layer": "native client",
+      "repo": "https://github.com/anthropics/claude-code",
+      "pin": "2.1.278",
+      "verdict": "keep (native account; scoped)",
+      "commands": [
+        {
+          "argv": [
+            "claude",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 8,
+          "stdout_head": "2.1.278 (Claude Code)",
+          "stdout_bytes": 22,
+          "stderr_head": "",
+          "sha256_published_head": "b97880de588e4485c844fe2cf1781991d8d64a3ae8ccad9307ff45392f0fb29f",
+          "full_sha256": "f0d384f3abe85e8cb2f0366465826cc8232426881854235d3ad1150e4a76f689",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "claude",
+            "mcp",
+            "list"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 2231,
+          "stdout_head": "Checking MCP server health…\n\nclaude.ai Claude Docs: https://api.anthropic.com/v1/pages/mcp - ✔ Connected\nplugin:context-mode:context-mode: $STACK_HOME/tools/node-v24.21.0/bin/node $HOME/.claude/plugins/cache/context-mode/context-mode/1.0.169/start.mjs - ✔ Connected\nserena: $STACK_HOME/bin/serena-context start-mcp-server --transport stdio --project-from-cwd --context claude-code --enable-web-dashboard true --open-web-dashboard false --enable-gui-log-window false - ✔ Connected\nai-memory: http://127.0.0.1:49374/mcp (HTTP) - ✔ Connected\nsocraticode: $STACK_HOME/bin/node $STACK_HOME/tools/socraticode-1.14.0/lib/node_modules/socraticode/dist/index.js - ✔ Connected\njcodemunch: $STACK_HOME/bin/jcodemunch-mcp  - ✔ Connected\n\nMCP config diagnostics ",
+          "stdout_bytes": 1303,
+          "stderr_head": "",
+          "sha256_published_head": "0d521280db880a9979f46eafcf5cdfc8e4530c71d46908d4bfbb986a3640f13e",
+          "full_sha256": "b19008795f1028a45891fdec35f19070b0680114768185b6ac214ccfa85c1234",
+          "truncated": true
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": [
+        "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json"
+      ],
+      "prior_observation": null,
+      "ok": true,
+      "original_host_reference_count": 1,
+      "reference_projection": "Matching public references where available; omitted host references do not establish public acceptance."
+    },
+    {
+      "id": "codex-cli",
+      "layer": "native client",
+      "repo": "https://github.com/openai/codex",
+      "pin": "rust-v0.155.1",
+      "verdict": "keep (native account; scoped)",
+      "commands": [
+        {
+          "argv": [
+            "codex",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 7,
+          "stdout_head": "codex-cli 0.155.1",
+          "stdout_bytes": 18,
+          "stderr_head": "",
+          "sha256_published_head": "3591ec6f5ad055685a0c3ef090a0631ac45f6bb43fc3f6d4e69aae02ebfd6346",
+          "full_sha256": "556478dd38e6185a3ceef8e5237286acd48d89da460cdbbc054ce7230b0caced",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "codex",
+            "login",
+            "status"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 24,
+          "stdout_head": "",
+          "stdout_bytes": 0,
+          "stderr_head": "Logged in using ChatGPT",
+          "sha256_published_head": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "full_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "codex",
+            "--help"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 7,
+          "stdout_head": "Codex CLI\n\nIf no subcommand is specified, options will be forwarded to the interactive CLI.\n\nUsage: codex [OPTIONS] [PROMPT]\n       codex [OPTIONS] <COMMAND> [ARGS]\n\nCommands:\n  agents            Browse all agent sessions on the shared local app-server daemon\n  exec              Run Codex non-interactively [aliases: e]\n  review            Run a code review non-interactively\n  login             Manage login\n  logout            Remove stored authentication credentials\n  mcp               Manage external MCP servers for Codex\n  plugin            Manage Codex plugins\n  app-server        [experimental] Run the app server or related tooling\n  remote-control    [experimental] Manage the app-server daemon with remote control enabled\n  completion        Generate shell completion scripts\n  update            Update Codex to the latest version\n  doctor            Diagnose local Codex installation, c",
+          "stdout_bytes": 5668,
+          "stderr_head": "",
+          "sha256_published_head": "5322b32d2bcbd6cb6af1e30f4f57304e797f8dd191903dfb62cab647036029b1",
+          "full_sha256": "46fd93b594f161a1ad45e8f4b2a55f5fa0015b4a52fdc1b35262d456cd3b142b",
+          "truncated": true
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": [],
+      "prior_observation": null,
+      "ok": true,
+      "original_host_reference_count": 1,
+      "reference_projection": "Matching public references where available; omitted host references do not establish public acceptance."
+    },
+    {
+      "id": "codex-plugin-cc",
+      "layer": "cross-family review",
+      "repo": "https://github.com/openai/codex-plugin-cc",
+      "pin": "v1.0.6",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "node",
+            "$HOME/.claude/plugins/cache/openai-codex/codex/1.0.6/scripts/codex-companion.mjs",
+            "setup",
+            "--json"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 271,
+          "stdout_head": "{\n  \"ready\": true,\n  \"node\": {\n    \"available\": true,\n    \"detail\": \"v24.21.0\"\n  },\n  \"npm\": {\n    \"available\": true,\n    \"detail\": \"11.19.0\"\n  },\n  \"codex\": {\n    \"available\": true,\n    \"detail\": \"codex-cli 0.155.1; advanced runtime available\"\n  },\n  \"auth\": {\n    \"available\": true,\n    \"loggedIn\": true,\n    \"detail\": \"ChatGPT login active for <redacted-email>\",\n    \"source\": \"app-server\",\n    \"authMethod\": \"chatgpt\",\n    \"verified\": true,\n    \"requiresOpenaiAuth\": true,\n    \"provider\": null\n  },\n  \"sessionRuntime\": {\n    \"mode\": \"direct\",\n    \"label\": \"direct startup\",\n    \"detail\": \"No shared Codex runtime is active yet. The first review or task command will start one on demand.\",\n    \"endpoint\": null\n  },\n  \"reviewGateEnabled\": false,\n  \"actionsTaken\": [],\n  \"nextSteps\": [\n    \"Optional: run `/codex:setup --enable-review-gate` to require a fresh review before stop.\"\n  ]\n}",
+          "stdout_bytes": 886,
+          "stderr_head": "",
+          "sha256_published_head": "b040cd2eee342928a97d24225dd0a17136fc69d9af87ca58752ff2fe4f74019b",
+          "full_sha256": "d470ca6c72350b79b92e6b7615f63b85246306f82edeaf47e22772b459c00b33",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": [
+        "evidence/artifacts/foundation-rd-20260921/native-review.json"
+      ],
+      "prior_observation": null,
+      "ok": true,
+      "original_host_reference_count": 1,
+      "reference_projection": "Matching public references where available; omitted host references do not establish public acceptance."
+    },
+    {
+      "id": "rtk",
+      "layer": "token efficiency",
+      "repo": "https://github.com/rtk-ai/rtk",
+      "pin": "v0.49.0",
+      "verdict": "keep-but-compare (hook on/off A/B pending)",
+      "commands": [
+        {
+          "argv": [
+            "rtk",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 1,
+          "stdout_head": "rtk 0.49.0",
+          "stdout_bytes": 11,
+          "stderr_head": "",
+          "sha256_published_head": "de2af3ac882efc4701fe318aa4f4bab307df37c856d8eded75f9c448754704b7",
+          "full_sha256": "edaa9940d1075ff9ed8f007410d63b7d9de8fd70f7450b29c9566a01288b1c77",
+          "truncated": false
+        }
+      ],
+      "lifetime_command": {
+        "argv": [
+          "rtk",
+          "gain",
+          "--format",
+          "json"
+        ],
+        "exit": 0,
+        "timed_out": false,
+        "elapsed_ms": 3,
+        "stdout_head": "{\n  \"summary\": {\n    \"total_commands\": 1209,\n    \"total_input\": 14761490,\n    \"total_output\": 11106455,\n    \"total_saved\": 3655435,\n    \"avg_savings_pct\": 24.76331996295767,\n    \"total_time_ms\": 575692,\n    \"avg_time_ms\": 476\n  }\n}",
+        "stdout_bytes": 232,
+        "stderr_head": "",
+        "sha256_published_head": "cad3fba556b301460a8b946330b2a6a145df112dbe068c1691b999ed9eaa823d",
+        "full_sha256": "359c6f764681644b2eed05d51cbb087a61e23f9cd6ff735bd6fa9717edb47e3f",
+        "truncated": false
+      },
+      "lifetime_summary": "RTK retained-history estimate: total_saved 3655435 tokens over 1209 commands (avg 24.76%)",
+      "evidence_class": "functional (lifetime report command returned)",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "context-mode",
+      "layer": "token efficiency",
+      "repo": "https://github.com/mksglu/context-mode",
+      "pin": "1.0.169",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "python3",
+            "-c",
+            "import json;d=json.load(open('$HOME/.claude/plugins/cache/context-mode/context-mode/1.0.169/.claude-plugin/plugin.json'));print(d.get('name'),d.get('version'))"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 15,
+          "stdout_head": "context-mode 1.0.169",
+          "stdout_bytes": 21,
+          "stderr_head": "",
+          "sha256_published_head": "2478b59662ec6c84cf5cf8915bf95bba16483b1ca1fcb35db752197db263263e",
+          "full_sha256": "9cf6d1f64f36441f0755b318b9b60c1578d4d14d516356a81e1c8a70584cec32",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "claude mcp list > $TMP/e2e-mcp.txt 2>/dev/null; grep -i -c 'context-mode.*Connected' $TMP/e2e-mcp.txt"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 1767,
+          "stdout_head": "1",
+          "stdout_bytes": 2,
+          "stderr_head": "",
+          "sha256_published_head": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+          "full_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "truncated": false
+        }
+      ],
+      "lifetime_snapshots": [
+        {
+          "file": "overlapping-runtime-snapshot-1",
+          "tokens_saved_lifetime": 623360,
+          "total_calls": 0,
+          "updated": "2026-09-21T20:54:04.268046+00:00"
+        },
+        {
+          "file": "overlapping-runtime-snapshot-2",
+          "tokens_saved_lifetime": 623360,
+          "total_calls": 0,
+          "updated": "2026-09-21T20:54:01.721519+00:00"
+        },
+        {
+          "file": "overlapping-runtime-snapshot-3",
+          "tokens_saved_lifetime": 623360,
+          "total_calls": 0,
+          "updated": "2026-09-21T20:54:01.469129+00:00"
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": [],
+      "prior_observation": null,
+      "ok": true,
+      "original_host_reference_count": 1,
+      "reference_projection": "Matching public references where available; omitted host references do not establish public acceptance."
+    },
+    {
+      "id": "headroom",
+      "layer": "token efficiency",
+      "repo": "https://github.com/headroomlabs-ai/headroom",
+      "pin": "0.37.0",
+      "verdict": "keep (lossless recovery vs LLMLingua)",
+      "commands": [
+        {
+          "argv": [
+            "headroom",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 151,
+          "stdout_head": "headroom, version 0.37.0",
+          "stdout_bytes": 25,
+          "stderr_head": "",
+          "sha256_published_head": "ee28d6e6789556b67ca29f0cacdeecdaa23cf357d7829f0923e57794b40c2e83",
+          "full_sha256": "c7de8da02118d954bbff5cd74e90f8488d0e945455384b057e495e13125330c2",
+          "truncated": false
+        }
+      ],
+      "lifetime_command": {
+        "argv": [
+          "headroom",
+          "savings",
+          "--json"
+        ],
+        "exit": 0,
+        "timed_out": false,
+        "elapsed_ms": 152,
+        "stdout_head": "{\n  \"schema_version\": 1,\n  \"path\": \"$HOME/.headroom/savings_events.jsonl\",\n  \"top_model\": \"unknown\",\n  \"lifetime\": {\n    \"tokens_saved\": 0,\n    \"tokens_before\": 0,\n    \"cost_usd\": 0.0,\n    \"calls\": 0,\n    \"savings_percent\": 0.0\n  },\n  \"windows\": {\n    \"today\": {\n      \"tokens_saved\": 0,\n      \"tokens_before\": 0,\n      \"cost_usd\": 0.0,\n      \"calls\": 0,\n      \"savings_percent\": 0.0\n    },\n    \"last_7_days\": {\n      \"tokens_saved\": 0,\n      \"tokens_before\": 0,\n      \"cost_usd\": 0.0,\n      \"calls\": 0,\n      \"savings_percent\": 0.0\n    },\n    \"last_30_days\": {\n      \"tokens_saved\": 0,\n      \"tokens_before\": 0,\n      \"cost_usd\": 0.0,\n      \"calls\": 0,\n      \"savings_percent\": 0.0\n    }\n  },\n  \"by_model\": [],\n  \"by_client\": []\n}",
+        "stdout_bytes": 738,
+        "stderr_head": "",
+        "sha256_published_head": "47838e5e19a1a9db27cc652181168b90d14c65f105acf920061ab4b7ba084ea7",
+        "full_sha256": "eafe48c7c8b730861b0d3fa6ddfc0889b3bf8eeed54622936665902e17d6ee46",
+        "truncated": false
+      },
+      "lifetime_summary": "Headroom savings --json: lifetime {\"tokens_saved\": 0, \"tokens_before\": 0, \"cost_usd\": 0.0, \"calls\": 0} | windows.last_30_days {\"tokens_saved\": 0, \"tokens_before\": 0, \"cost_usd\": 0.0, \"calls\": 0}",
+      "evidence_class": "functional (savings report command returned)",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "toon",
+      "layer": "token efficiency",
+      "repo": "https://github.com/toon-format/toon",
+      "pin": "4.1.1",
+      "verdict": "replace-candidate for the catalog artifact class; valid for small tabular fixtures",
+      "commands": [
+        {
+          "argv": [
+            "toon",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 25,
+          "stdout_head": "4.1.1",
+          "stdout_bytes": 6,
+          "stderr_head": "",
+          "sha256_published_head": "da046477e641cdaa83e830d391c3f2ae706d155e11cbd4b61110a9e50e9aa4e2",
+          "full_sha256": "9737915fce5e934ea348658fccb82a4c532157d2161bb032a240c2837b8f66cb",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "printf '{\"items\":[{\"id\":1,\"n\":\"a\"},{\"id\":2,\"n\":\"b\"}]}' > $TMP/toon-e2e.json && toon -e $TMP/toon-e2e.json | toon -d - | python3 -c 'import json,sys;print(json.load(sys.stdin)==json.load(open(\"$TMP/toon-e2e.json\")))'"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 34,
+          "stdout_head": "True",
+          "stdout_bytes": 5,
+          "stderr_head": "",
+          "sha256_published_head": "3cbc87c7681f34db4617feaa2c8801931bc5e42d8d0f560e756dd4cd92885f18",
+          "full_sha256": "a9ac0c3ac83c40e1b4c3416066d63d324ee9f8c144641dfeed72d140b6557245",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "functional (exact JSON round trip)",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "jcodemunch",
+      "layer": "code retrieval",
+      "repo": "https://github.com/jgravelle/jcodemunch-mcp",
+      "pin": "1.108.319",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "jcodemunch-mcp",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 345,
+          "stdout_head": "jcodemunch-mcp 1.108.319",
+          "stdout_bytes": 25,
+          "stderr_head": "",
+          "sha256_published_head": "536b349143c090259e33e1366f0107bb03c0c655667d61efe38ad829f39cb468",
+          "full_sha256": "8c71447a8972acbc63e0b81b8ac2b7e5d8e6ea838038ba7adaa248cf9dcda646",
+          "truncated": false
+        }
+      ],
+      "lifetime_command": {
+        "argv": [
+          "mcporter",
+          "call",
+          "--stdio",
+          "jcodemunch-mcp",
+          "--env",
+          "CODE_INDEX_PATH=$HOME/.code-index",
+          "--env",
+          "JCODEMUNCH_SHARE_SAVINGS=0",
+          "--tool",
+          "order",
+          "--args",
+          "{\"action\":\"get_session_stats\",\"args\":{}}",
+          "--output",
+          "json"
+        ],
+        "exit": 0,
+        "timed_out": false,
+        "elapsed_ms": 644,
+        "stdout_head": "{\n  \"session_tokens_saved\": 0,\n  \"session_calls\": 0,\n  \"session_duration_s\": 0.1,\n  \"session_response_tokens\": 0,\n  \"total_tokens_saved\": 59640,\n  \"total_tokens_saved_basis\": {\n    \"generation\": 2,\n    \"first_generation\": 2,\n    \"mixed_basis\": false\n  },\n  \"lifetime_by_tool\": {\n    \"get_symbol_source\": 59640,\n    \"search_symbols\": 0\n  },\n  \"lifetime_by_tool_since\": \"2026-09-20\",\n  \"lifetime_unattributed\": 0,\n  \"tool_breakdown\": {},\n  \"tool_calls\": {},\n  \"savings_per_call\": 0,\n  \"result_cache\": {\n    \"total_hits\": 0,\n    \"total_misses\": 0,\n    \"hit_rate\": 0,\n    \"cached_entries\": 0\n  },\n  \"latency_per_tool\": {},\n  \"session_cost_avoided\": {\n    \"claude_opus_4_6\": 0,\n    \"claude_sonnet_4_6\": 0,\n    \"claude_haiku_4_5\": 0,\n    \"gpt5_latest\": 0\n  },\n  \"total_cost_avoided\": {\n    \"claude_opus_4_6\": 0.2982,\n    \"claude_sonnet_4_6\": 0.1789,\n    \"claude_haiku_4_5\": 0.0596,\n    \"gpt5_latest\": 0.596",
+        "stdout_bytes": 6257,
+        "stderr_head": "",
+        "sha256_published_head": "042db78647f30163b5c22dae9d8800ae6f5e459994cf3f1dbfe4850aeda0ccff",
+        "full_sha256": "e0d6ad084a4bac3eeec2f6c0402bc946fe7c076a0cb0deeb29685723a463774b",
+        "truncated": true
+      },
+      "lifetime_summary": "jCodeMunch persistent estimate total_tokens_saved 59640",
+      "evidence_class": "functional (MCP stats call returned)",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "repomix",
+      "layer": "repo packing",
+      "repo": "https://github.com/yamadashy/repomix",
+      "pin": "v1.18.1",
+      "verdict": "keep (tree-sitter compress, token budget, secret scan absent in gitingest/code2prompt)",
+      "commands": [
+        {
+          "argv": [
+            "repomix",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 31,
+          "stdout_head": "1.18.1",
+          "stdout_bytes": 7,
+          "stderr_head": "",
+          "sha256_published_head": "65c2443215b084bc8e342bdbaa08976dcbf48bc310ea4d0c0d04252a5de14c73",
+          "full_sha256": "71fc7bd16b1bc9b3681085fb0be8aea0b3a37d90d1685938dc2e8a31bf8c9b94",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "repomix --include tools/ecosystem/e2e_manifest.py --style plain --output $TMP/repomix-e2e.txt --quiet --no-git-sort-by-changes && wc -c < $TMP/repomix-e2e.txt"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 269,
+          "stdout_head": "19101",
+          "stdout_bytes": 6,
+          "stderr_head": "",
+          "sha256_published_head": "c523613877b206aa2994f09b6832bc08db9813622b3c5145c06f4b5b52d04837",
+          "full_sha256": "c5c3d8117c56b9f74e9ab5edaec05d6bbdbb9dc31c38ff1139a42772ba9bc488",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "functional (packed one source file)",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "ccusage",
+      "layer": "usage accounting",
+      "repo": "https://github.com/ccusage/ccusage",
+      "pin": "v20.0.24",
+      "verdict": "keep (scoped)",
+      "commands": [
+        {
+          "argv": [
+            "ccusage",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 27,
+          "stdout_head": "ccusage 20.0.24",
+          "stdout_bytes": 16,
+          "stderr_head": "",
+          "sha256_published_head": "d44bb1d4c86f3583aca1f0cf82e7d7dd590eef5ca0ddba3ec46f1196cd352727",
+          "full_sha256": "72c7c8d6db1e913882d478629eef33e2e3317516342b93c583ed2c10f71a7244",
+          "truncated": false
+        }
+      ],
+      "lifetime_command": {
+        "argv": [
+          "bash",
+          "-o",
+          "pipefail",
+          "-c",
+          "env CODEX_HOME=$HOME/.codex ccusage codex daily --offline --no-cost --json --timezone UTC --config /dev/null | python3 -c 'import json,sys;d=json.load(sys.stdin);r=(d.get(\"daily\") or d.get(\"data\") or []);print(json.dumps({\"days\":len(r),\"today\":[{k:x.get(k) for k in (\"date\",\"inputTokens\",\"outputTokens\",\"totalTokens\")} for x in r if str(x.get(\"date\",\"\")).startswith(\"2026-09-21\")]}))'"
+        ],
+        "exit": 0,
+        "timed_out": false,
+        "elapsed_ms": 53,
+        "stdout_head": "{\"days\": 4, \"today\": [{\"date\": \"2026-09-21\", \"inputTokens\": 980977, \"outputTokens\": 70030, \"totalTokens\": 10277119}]}",
+        "stdout_bytes": 118,
+        "stderr_head": "",
+        "sha256_published_head": "6b92e24d5bec9b31462411bd399928d3b2c17cbed710296cbf7d2bc049fa58d1",
+        "full_sha256": "5840284404533be4c7cc6171647f57d6f1bef538f82dbf753fae1ef956849f7c",
+        "truncated": false
+      },
+      "lifetime_summary": "ccusage offline daily rows (Codex, UTC): {\"days\": 4, \"today\": [{\"date\": \"2026-09-21\", \"inputTokens\": 980977, \"outputTokens\": 70030, \"totalTokens\": 10277119}]}",
+      "evidence_class": "functional (offline usage report returned)",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "qmd",
+      "layer": "document retrieval",
+      "repo": "https://github.com/tobi/qmd",
+      "pin": "v2.8.3",
+      "verdict": "keep (BM25 default; four-lane fixture bench)",
+      "commands": [
+        {
+          "argv": [
+            "qmd",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 88,
+          "stdout_head": "qmd 2.8.3 (facd35e)",
+          "stdout_bytes": 20,
+          "stderr_head": "",
+          "sha256_published_head": "60fe2938ba401008a54fe66822b09447f5b08bb4ea0ae26ed7abecfb3e580058",
+          "full_sha256": "f2fde0f2ce1957393ab2348fc31dae60a39e4684689ae9e95845a0ee5d8396ab",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "qmd",
+            "--index",
+            "native-agent-stack-catalog",
+            "search",
+            "paper lane policy",
+            "-c",
+            "us-equities-foundation",
+            "-n",
+            "2"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 102,
+          "stdout_head": "qmd://us-equities-foundation/alpaca-paper/README.md?index=native-agent-stack-catalog:6 #3a67b2\nTitle: Bounded Alpaca paper order lifecycle\nScore:  70%\n\n@@ -5,4 @@ (4 before, 99 after)\nquantity. It does not select a strategy or establish profitability. The separate\n[paper-lane policy](../../../docs/paper-lane-policy.md) authorizes these bounded\npaper orders without another approval token.\n\n\n\nqmd://us-equities-foundation/architecture/README.md?index=native-agent-stack-catalog:26 #707a15\nTitle: Architecture and next acceptance roles\nScore:  70%\n\n@@ -25,4 @@ (24 before, 192 after)\n| --- | --- | --- |\n| User / product owner | Choose objectives, acceptable risk, capital assumptions, account/data entitlements and operating budget | A numeric research specification; paper E2E already authorized under the [paper policy](../../../docs/paper-lane-policy.md) |\n| Coordinator | Select the smallest arc",
+          "stdout_bytes": 1085,
+          "stderr_head": "",
+          "sha256_published_head": "211712a1c4b2509a431489393f28477eb19f337ebe3577287da4ee009d1ca152",
+          "full_sha256": "0f763cf77dbc9c39e9fe77ac8ed1ddca2967c1bc2b193803b004983d9e7ce864",
+          "truncated": true
+        }
+      ],
+      "evidence_class": "functional (BM25 search returned hits)",
+      "accepted_receipts": [
+        "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json"
+      ],
+      "prior_observation": null,
+      "ok": true,
+      "original_host_reference_count": 1,
+      "reference_projection": "Matching public references where available; omitted host references do not establish public acceptance."
+    },
+    {
+      "id": "serena",
+      "layer": "symbol navigation",
+      "repo": "https://github.com/oraios/serena",
+      "pin": "c6fbd1c",
+      "verdict": "keep (scoped; pin reason to be recorded)",
+      "commands": [
+        {
+          "argv": [
+            "serena-context",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 484,
+          "stdout_head": "Serena 2.0.0.dev0",
+          "stdout_bytes": 18,
+          "stderr_head": "",
+          "sha256_published_head": "5f3228444174811e25c7c181cab54709886386fc01dd1ac137233f58e9b4fa09",
+          "full_sha256": "13abec14b6680dacd84831b99acc41f6c4aaa87b261cd610bb3ad13025a7028b",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "serena-context --help > $TMP/e2e-help.txt 2>&1; rc=$?; sed -n 1p $TMP/e2e-help.txt; exit $rc"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 487,
+          "stdout_head": "Usage: serena [OPTIONS] COMMAND [ARGS]...",
+          "stdout_bytes": 42,
+          "stderr_head": "",
+          "sha256_published_head": "2f882966ac36bc589ef17d30d7786a698aa8d671c914c4615886b9c69e5b658b",
+          "full_sha256": "6564d8ae55f0391bcec558c3697d51d3de42b3b2fa454a53bf304f9b706fe568",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": [],
+      "prior_observation": null,
+      "ok": true,
+      "original_host_reference_count": 1,
+      "reference_projection": "Matching public references where available; omitted host references do not establish public acceptance."
+    },
+    {
+      "id": "socraticode",
+      "layer": "semantic code RAG",
+      "repo": "https://github.com/giancarloerra/SocratiCode",
+      "pin": "1.14.0",
+      "verdict": "keep (local watcher vs WeKnora)",
+      "commands": [
+        {
+          "argv": [
+            "mcporter",
+            "--config",
+            "$ECOSYSTEM_REPO/config/mcporter.json",
+            "call",
+            "socraticode",
+            "codebase_status",
+            "--args",
+            "{\"projectPath\":\"$HOME/code/agent-lab\"}"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 541,
+          "stdout_head": "Project: $HOME/code/agent-lab\nCollection: codebase_72cfa87c5abf\nStatus: green\nIndexed chunks: 261\n\nFile watcher: disabled (SOCRATICODE_WATCHER=off)\n  Warning: another MCP process is watching this project. Set SOCRATICODE_WATCHER=off for every process that uses this checkout.\n\nCode graph: 37 files, 6 edges\n  Last built: 6s ago",
+          "stdout_bytes": 334,
+          "stderr_head": "",
+          "sha256_published_head": "86ce7c9785ba7194e89957e38e0a004403d4db6476a526f215546dda438de4c1",
+          "full_sha256": "2663e3f00c4a1de7fe5d2e3c6e583e06c3114d83b2f871f06ebc0dd184686391",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "mcporter",
+            "--config",
+            "$ECOSYSTEM_REPO/config/mcporter.json",
+            "call",
+            "socraticode",
+            "codebase_search",
+            "--args",
+            "{\"projectPath\":\"$HOME/code/agent-lab\",\"query\":\"offline usage report sources\",\"limit\":2}"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 680,
+          "stdout_head": "Search results for \"offline usage report sources\" (2 matches):\n\n\n⚠ WARNING: File watching is disabled in this process, but another active watcher can still update the shared index.\n  Set SOCRATICODE_WATCHER=off for every MCP process that uses this checkout.\n--- tools/ecosystem/linux-usage-report.cjs (lines 93-112) [javascript] score: 1.0000 ---\n  const scope = options.scope || 'native';\n  const bundleRoot = options.bundleRoot || bundle;\n  const installed = options.installed || installation(bundleRoot);\n  const sources = sourcesFor(scope,options);\n  const coverage = sources.map(source => {\n    const {totals,...result} = source.usage_directories.length ? runParser(installed,source,'session',options.run) : {available:false,error:'No usage directory exists for this source.'};\n    return {...source,...result,...(totals ? {session_view_totals:totals} : {})};\n  });\n  const reports = [...new Set",
+          "stdout_bytes": 4235,
+          "stderr_head": "",
+          "sha256_published_head": "0ed8ceacd2098bc88fe042df039d9276f7a7acae1b4dce994d6a68b70f295775",
+          "full_sha256": "54e0fd81620bddad8351f5d5da6817f303a758ed09fcc979c4f6c3f933790287",
+          "truncated": true
+        }
+      ],
+      "evidence_class": "functional (semantic search returned results)",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "qdrant",
+      "layer": "vector store",
+      "repo": "https://github.com/qdrant/qdrant",
+      "pin": "v1.19.1",
+      "verdict": "keep (by consumer)",
+      "commands": [
+        {
+          "argv": [
+            "qdrant",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 2,
+          "stdout_head": "qdrant 1.19.1",
+          "stdout_bytes": 14,
+          "stderr_head": "",
+          "sha256_published_head": "b2bc4ab788583a7b191ea7493e8da818dd5bc1dd13842ac86144c4693140d510",
+          "full_sha256": "214295b22d2d525fae20e55f19eb6c016fe20ec4863a531f204e6e849124071e",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "curl -sf -m 5 -o /dev/null -w '%{http_code}' http://127.0.0.1:16333/healthz"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 5,
+          "stdout_head": "200",
+          "stdout_bytes": 3,
+          "stderr_head": "",
+          "sha256_published_head": "27badc983df1780b60c2b3fa9d3a19a00e46aac798451f0febdca52920faaddf",
+          "full_sha256": "27badc983df1780b60c2b3fa9d3a19a00e46aac798451f0febdca52920faaddf",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "vllm-nemotron-embed",
+      "layer": "embedding runtime",
+      "repo": "https://github.com/vllm-project/vllm",
+      "pin": "0.25.0 (model-card hold; 0.29.0 unused)",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "vllm",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 4900,
+          "stdout_head": "0.25.0",
+          "stdout_bytes": 7,
+          "stderr_head": "",
+          "sha256_published_head": "e3d551f1b0af9e17eee5c0813d9078f16c853a330487f1cf0cd589bcfea2aae5",
+          "full_sha256": "4b67cac8ce2a6e82a4e11ba210c84b4adfc72db7f4629785f7d3d09d6147795d",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "curl -sf -m 30 http://127.0.0.1:8231/v1/embeddings -H 'Content-Type: application/json' -d '{\"model\":\"nvidia/Nemotron-3-Embed-1B-BF16\",\"input\":\"query: native e2e embedding probe\"}' | python3 -c 'import json,sys,math;d=json.load(sys.stdin);v=d[\"data\"][0][\"embedding\"];print(json.dumps({\"model\":d.get(\"model\"),\"dimensions\":len(v),\"norm\":round(math.sqrt(sum(x*x for x in v)),6),\"prompt_tokens\":d.get(\"usage\",{}).get(\"prompt_tokens\")}))'"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 23,
+          "stdout_head": "{\"model\": \"nvidia/Nemotron-3-Embed-1B-BF16\", \"dimensions\": 2048, \"norm\": 1.0, \"prompt_tokens\": 8}",
+          "stdout_bytes": 98,
+          "stderr_head": "",
+          "sha256_published_head": "a0afdeafee6db9ca6af46d0c2e14e60ec5dae9bcdf9747bdeca8b30c7fa37a5f",
+          "full_sha256": "ad26e920e657f71eb2da550140ddaf40e408d3c0740886af475e431dc60befe9",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "functional (local /v1/embeddings call returned a vector)",
+      "accepted_receipts": null,
+      "prior_observation": "Superseded 2026-09-21: the earlier probe queried :8000 and an `|| echo` fallback turned the failure into exit 0 with the text 'models endpoint not on :8000'; that row was wrongly labelled functional. The configured endpoint is 127.0.0.1:8231 (SocratiCode LMSTUDIO_URL). Earlier results retained in docs/evidence/native-e2e-20260921.superseded-labels.json.",
+      "ok": true
+    },
+    {
+      "id": "ai-memory",
+      "layer": "durable memory",
+      "repo": "https://github.com/akitaonrails/ai-memory",
+      "pin": "v2.3.2",
+      "verdict": "keep-but-compare (memory of record)",
+      "commands": [
+        {
+          "argv": [
+            "ai-memory",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 3,
+          "stdout_head": "ai-memory 2.3.2",
+          "stdout_bytes": 16,
+          "stderr_head": "",
+          "sha256_published_head": "32f19f0fe995a91f0db2cbc3606dc4ea6860db9ac3f30e5702506360fb94e30f",
+          "full_sha256": "233cf1641a43da34100fc56a0d1a90c2c086cccb53425efdf8a6247ca1c689a4",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "ai-memory",
+            "--data-dir",
+            "$HOME/.local/share/ai-memory",
+            "status"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 13,
+          "stdout_head": "ai-memory 2.3.2 (server)\n  server:       http://127.0.0.1:49374\n  data-dir:     $HOME/.local/share/ai-memory\n  db:           $HOME/.local/share/ai-memory/db/memory.sqlite\n  bind:         127.0.0.1:49374\n  pages:        81 (all versions: 242)\n  sessions:     108\n  observations: 49340\n  fts:          pages 242/242; observations 49340/49340\n  embeddings:   143 rows; 0 latest pages missing\n    local/all-MiniLM-L6-v2 dim 384: 143 rows\n  storage:      59.6 MiB on disk, 76.0 KiB reclaimable (0.1%)\n    filesystem free: 895.3 GiB\n  links:        63 latest-page links (unresolved: 58, stale: 0)\n  wiki format:  OKF v0.2 (migrated)\n  spool:\n    pending:    4\n    oldest:     5s\n    retries:    0\n  ingest (server, this process):\n    accepted:   9925\n    dropped:    0 (capture policy)\n    shed:       0 saturated, 0 rate-limited\n    last write: 9s\n  capture mode: allowlist — repositories with",
+          "stdout_bytes": 1130,
+          "stderr_head": "\u001b[2m2026-09-21T20:54:13.900443Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[2mai_memory_cli\u001b[0m\u001b[2m:\u001b[0m ai-memory starting \u001b[3mversion\u001b[0m\u001b[2m=\u001b[0m\"2.3.2\" \u001b[3mserver_url\u001b[0m\u001b[2m=\u001b[0mhttp://127.0.0.1:49374 \u001b[3mdata_dir\u001b[0m\u001b[2m=\u001b[0m$HOME/.local/share/ai-memory \u001b[3mbind\u001b[0m\u001b[2m=\u001b[0m127.0.0.1:49374",
+          "sha256_published_head": "73ee420b1114c774ae50ded90eeb3ac5ee3c2580f7f0d5861461b2d6f6d635ad",
+          "full_sha256": "eac587d6cb51dfa8c9f1bd27aad2ab779738cb2d6fc8582e8dea54168c2ff9b0",
+          "truncated": true
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": [],
+      "prior_observation": null,
+      "ok": true,
+      "original_host_reference_count": 1,
+      "reference_projection": "Matching public references where available; omitted host references do not establish public acceptance."
+    },
+    {
+      "id": "dagu",
+      "layer": "scheduling",
+      "repo": "https://github.com/dagucloud/dagu",
+      "pin": "v2.16.6 (v2.17.0 released 2026-09-21)",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "$STACK_HOME/tools/dagu-2.16.6/dagu",
+            "version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 24,
+          "stdout_head": "2.16.6",
+          "stdout_bytes": 7,
+          "stderr_head": "",
+          "sha256_published_head": "4ad82b3dff7191ef137ae54550211cb3a7a09d33746581db877eccdd36df4707",
+          "full_sha256": "7ee203ac73fca7d93c699ceefabb5bb5cdea2e02213de22ceea56908ff0945c5",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "DAGU_HOME=$STACK_HOME/dagu-equities $STACK_HOME/tools/dagu-2.16.6/dagu status equity-research-evidence"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 26,
+          "stdout_head": "Succeeded - 2026-09-19T08:50:45-04:00\n\ndag: equity-research-evidence (1.0s)\n├─log: $STACK_HOME/dagu-equities/logs/equity-research-evidence/dag-run_20260919_125045Z_evidence-20260919-ready/dag-run_20260919.085045.257.evidence.log\n│\n├─summarize (1.0s) [succeeded]\n│ ├─\"${SDK_ENV}/bin/python\"\n│ │   \"${STACK_REPO}/blueprints/us-equities/data/summarize_backtest.py\"\n│ │   \"${LEAN_EVENTS}\" \"${RESEARCH_OUTPUT}/order-events.parquet\"\n│ │\n│ └─stdout: $STACK_HOME/dagu-equities/logs/equity-research-evidence/dag-run_20260919_125045Z_evidence-20260919-ready/run_20260919_125045Z_f852fd/summarize.20260919.085045.286.evidence.out\n│     {\n│     \"scope\": \"LEAN bundled historical simulation, not broker fills\",\n│     \"events\": 6,\n│     \"distinct_orders\": 3,\n│     \"statuses\": {\n│     \"filled\": 3,\n│     \"submitted\": 3\n│     },\n│     \"calendar\": \"XNYS\",\n│ ",
+          "stdout_bytes": 2472,
+          "stderr_head": "",
+          "sha256_published_head": "8cf328e67cf5d3b73a809e3e392d6bc47a715c897d1bf17629d79efa8c773487",
+          "full_sha256": "92a4b6cc906a9d82c1fd36dccb25fb2497f34e2e3527939e4fba6aa811556e3f",
+          "truncated": true
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": [],
+      "prior_observation": null,
+      "ok": true,
+      "original_host_reference_count": 1,
+      "reference_projection": "Matching public references where available; omitted host references do not establish public acceptance."
+    },
+    {
+      "id": "grafana",
+      "layer": "observability",
+      "repo": "https://github.com/grafana/grafana",
+      "pin": "v13.2.2",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "curl -sf -m 5 http://127.0.0.1:13000/api/health"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 5,
+          "stdout_head": "{\n  \"database\": \"ok\",\n  \"version\": \"13.2.2\",\n  \"commit\": \"1bea008f7e4e858b6824c9e364d608bd4d10b13a\"\n}",
+          "stdout_bytes": 101,
+          "stderr_head": "",
+          "sha256_published_head": "f97817332e827df374b9a23bf990d79e9e24f47d5e11b211562f785fa1944a09",
+          "full_sha256": "f97817332e827df374b9a23bf990d79e9e24f47d5e11b211562f785fa1944a09",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": [
+        "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-72h-20260921.png"
+      ],
+      "prior_observation": null,
+      "ok": true,
+      "original_host_reference_count": 1,
+      "reference_projection": "Matching public references where available; omitted host references do not establish public acceptance."
+    },
+    {
+      "id": "prometheus",
+      "layer": "observability",
+      "repo": "https://github.com/prometheus/prometheus",
+      "pin": "v3.14.0",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "curl -sf -m 5 http://127.0.0.1:19090/-/healthy"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 4,
+          "stdout_head": "Prometheus Server is Healthy.",
+          "stdout_bytes": 30,
+          "stderr_head": "",
+          "sha256_published_head": "72477d804d2fed0a015b19f938d943f9fe355a8446f1223291c1fd748807362e",
+          "full_sha256": "522e2898ab3550ac7870471e6b1d0587e9c70262898c944298ec489fe853ea0f",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": [
+        "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-72h-20260921.png"
+      ],
+      "prior_observation": null,
+      "ok": true,
+      "original_host_reference_count": 1,
+      "reference_projection": "Matching public references where available; omitted host references do not establish public acceptance."
+    },
+    {
+      "id": "loki",
+      "layer": "observability",
+      "repo": "https://github.com/grafana/loki",
+      "pin": "v3.7.8",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "curl -sf -m 5 http://127.0.0.1:13100/ready"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 5,
+          "stdout_head": "ready",
+          "stdout_bytes": 6,
+          "stderr_head": "",
+          "sha256_published_head": "b24d6d33736ecd5604a4b17bc9c6481039fac362bb7df044ef1c10a2bfd21db6",
+          "full_sha256": "ed1a545bb85e55816bbf9566b028b2a0bc456b88f49f6f266c0401048824194b",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "$STACK_HOME/tools/ecosystem-loki-3.7.8/loki-linux-amd64 --version > $TMP/e2e-loki.txt 2>&1; rc=$?; sed -n 1p $TMP/e2e-loki.txt; exit $rc"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 30,
+          "stdout_head": "loki, version 3.7.8 (branch: release-3.7.x, revision: 09e6ce2f)",
+          "stdout_bytes": 64,
+          "stderr_head": "",
+          "sha256_published_head": "d0c463a0803a44ae7c8cea1f86d2108a5a1a649da9da7749283a8f4b84352abc",
+          "full_sha256": "a2fa9d554ce191e6addb95a5ba4db1e4f8fecdff56bb2b1dcf39ca85ab01a90b",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": [
+        "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-72h-20260921.png"
+      ],
+      "prior_observation": null,
+      "ok": true,
+      "original_host_reference_count": 1,
+      "reference_projection": "Matching public references where available; omitted host references do not establish public acceptance."
+    },
+    {
+      "id": "alertmanager",
+      "layer": "observability",
+      "repo": "https://github.com/prometheus/alertmanager",
+      "pin": "v0.34.1",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "curl -sf -m 5 -o /dev/null -w '%{http_code}' http://127.0.0.1:19093/-/healthy"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 5,
+          "stdout_head": "200",
+          "stdout_bytes": 3,
+          "stderr_head": "",
+          "sha256_published_head": "27badc983df1780b60c2b3fa9d3a19a00e46aac798451f0febdca52920faaddf",
+          "full_sha256": "27badc983df1780b60c2b3fa9d3a19a00e46aac798451f0febdca52920faaddf",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "otelcol-contrib",
+      "layer": "observability",
+      "repo": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "pin": "v0.161.0",
+      "verdict": "keep (scoped)",
+      "commands": [
+        {
+          "argv": [
+            "$STACK_HOME/tools/otelcol-contrib-0.161.0/otelcol-contrib",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 63,
+          "stdout_head": "otelcol-contrib version 0.161.0",
+          "stdout_bytes": 32,
+          "stderr_head": "",
+          "sha256_published_head": "75dacf0220209e7bbe6a63cacd96fefc239447012bf25d59d11c702b235e9095",
+          "full_sha256": "fa12a748bcf0b990f7e3eb766fd93016bbd9537452e09defa0e2f9230142ccf1",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "pgrep -f 'otelcol-contrib --config' > /dev/null && echo 'collector process running (systemd)'"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 11,
+          "stdout_head": "collector process running (systemd)",
+          "stdout_bytes": 36,
+          "stderr_head": "",
+          "sha256_published_head": "f501588859939b44936bfd1fa2e3d2dd819364b8f984aab3fedae7b0873942cc",
+          "full_sha256": "7f26aebdcb2ccbd703d9a8512db714c36e166f6b5de982b1b405eb2e48f89246",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "agentsview",
+      "layer": "session archive",
+      "repo": "https://github.com/kenn-io/agentsview",
+      "pin": "v0.43.0 (v0.44.0 released 2026-09-21)",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "agentsview",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 16,
+          "stdout_head": "agentsview v0.43.0 (commit 9be7745ad1906ee24e04eb05bb86c872ef0939a1, built 2026-09-14T02:30:01Z)",
+          "stdout_bytes": 97,
+          "stderr_head": "",
+          "sha256_published_head": "b9ccb6901404f05e7b82217779c769af14126538aa2ed3c3d64259c7167a0cae",
+          "full_sha256": "c9f9dd3f0cec8871bcf63d2084dce942813716b27ba436479894f1bc54bb32f1",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "agentsview --help > $TMP/e2e-help.txt 2>&1; rc=$?; sed -n 1p $TMP/e2e-help.txt; exit $rc"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 18,
+          "stdout_head": "agentsview v0.43.0 - local web viewer for AI agent sessions",
+          "stdout_bytes": 60,
+          "stderr_head": "",
+          "sha256_published_head": "85d7d77c5b0feaa6b91e55d5b42f9c1afb14f212e0e4cbbcb2c1f068046cbeff",
+          "full_sha256": "680fcd0901db36b1de7ed0d5e01596ed4385a1186953d333aca080a10a82fb5b",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "version-help",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "mcporter",
+      "layer": "MCP client",
+      "repo": "https://github.com/openclaw/mcporter",
+      "pin": "0.13.13",
+      "verdict": "keep (scoped)",
+      "commands": [
+        {
+          "argv": [
+            "mcporter",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 60,
+          "stdout_head": "0.13.13",
+          "stdout_bytes": 8,
+          "stderr_head": "",
+          "sha256_published_head": "153d7646aa9f86ff539ad8822b2eb703d3b569326d1a72aa992dd3af6a15f48e",
+          "full_sha256": "4c77c35072c93dfb9b03d3b1fb9f745d74b3c01d5509901f3f20ecea254c4aba",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "mcporter",
+            "--config",
+            "$ECOSYSTEM_REPO/config/mcporter.json",
+            "list"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 435,
+          "stdout_head": "mcporter 0.13.13 — Listing 3 server(s) (per-server timeout: 30s)\n- context-mode (Previous daemon exited unexpectedly; verify retirement of its transports before deliberate recovery. No replacement was launched., 0.0s)\n- ai-memory (23 tools, 0.1s)\n- socraticode (26 tools, 0.2s)\n✔ Listed 3 servers (2 healthy; 1 errors).",
+          "stdout_bytes": 324,
+          "stderr_head": "",
+          "sha256_published_head": "47570d01a7413dd10f080339963346a955ab8e050e0304e556445cbbb69233bb",
+          "full_sha256": "6a051df7b5110c2d0ae8bb08b6434b5f6017d42abaf44362aaa431d32e271c8b",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "markitdown",
+      "layer": "document ingestion",
+      "repo": "https://github.com/microsoft/markitdown",
+      "pin": "0.1.7",
+      "verdict": "keep (scoped)",
+      "commands": [
+        {
+          "argv": [
+            "markitdown",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 208,
+          "stdout_head": "markitdown 0.1.7",
+          "stdout_bytes": 17,
+          "stderr_head": "",
+          "sha256_published_head": "15b610287fb38faeaa8dded872d251526f619925b90ceb0835f8a34c3f78228b",
+          "full_sha256": "a616d88a9607b4cdafde8c0d1b9c92325e56d3b274f40faef9976afbe85e748e",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "markitdown README.md > $TMP/e2e-markitdown.md && wc -c < $TMP/e2e-markitdown.md"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 368,
+          "stdout_head": "2191",
+          "stdout_bytes": 5,
+          "stderr_head": "",
+          "sha256_published_head": "33cc6da30d940c4ffa0caeecac021a427f610fc8c8b8dfaff690adbb70bff7fe",
+          "full_sha256": "9553b8337dfbe653ea68f6744344fc251acc718fcd49f00814cde9a353c555d1",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "functional (converted a Markdown file)",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "openresearch",
+      "layer": "literature discovery",
+      "repo": "https://github.com/alphaXiv/OpenResearch",
+      "pin": "v0.2.7",
+      "verdict": "keep (scoped)",
+      "commands": [
+        {
+          "argv": [
+            "orx",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 3,
+          "stdout_head": "orx 0.2.7",
+          "stdout_bytes": 10,
+          "stderr_head": "",
+          "sha256_published_head": "1e1dc600f3bbd1adb1e5a34369953981448717bb5692f04c5363dbbf255c5a80",
+          "full_sha256": "49123fb1adc2b7c350d5189ec209e4993c6bd35651d82cddedd37db172e5389c",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "orx --help > $TMP/e2e-help.txt 2>&1; rc=$?; sed -n 1p $TMP/e2e-help.txt; exit $rc"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 4,
+          "stdout_head": "OpenResearch CLI",
+          "stdout_bytes": 17,
+          "stderr_head": "",
+          "sha256_published_head": "b9826b8c3b76be025333a877bf8b8eaaf8017bbbc3d7eace474327092a49cc12",
+          "full_sha256": "8960da115619a2ede947e3049fce96e8c890510f88e1b14d4b7103b50942cd1e",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "version-help",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "tavily-cli",
+      "layer": "web research",
+      "repo": "https://github.com/tavily-ai/tavily-cli",
+      "pin": "0.1.8",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "tvly",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 143,
+          "stdout_head": "tavily-cli 0.1.8",
+          "stdout_bytes": 17,
+          "stderr_head": "",
+          "sha256_published_head": "54bcc50241408ddc9e973c3c5fd827433c40a31ef6a49a6b49cd10cae4ff5000",
+          "full_sha256": "c73223cbe97117324b832cfd3511f10dca1401e0d0c0e3dff251669700cbbe34",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "tvly --help > $TMP/e2e-help.txt 2>&1; rc=$?; sed -n 1p $TMP/e2e-help.txt; exit $rc"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 146,
+          "stdout_head": "Usage: tvly [OPTIONS] [COMMAND] [ARGS]...",
+          "stdout_bytes": 42,
+          "stderr_head": "",
+          "sha256_published_head": "026b6fdc7d6fe0415968f83ef1dc91a70ca7ea0b0abb86a05a1f731d05fe9df8",
+          "full_sha256": "2859bebd08f0c347ab52940a51fbba1798c96e7d339fcec5482ff933ed0decd7",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "version-help",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "worktrunk",
+      "layer": "worktrees",
+      "repo": "https://github.com/max-sixty/worktrunk",
+      "pin": "v0.79.0",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "wt",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 3,
+          "stdout_head": "wt v0.79.0",
+          "stdout_bytes": 11,
+          "stderr_head": "",
+          "sha256_published_head": "629fa2a2f6ca6c3883b6edb33291de654e9c00423a85eee93d58a04b6f7ef692",
+          "full_sha256": "9512ab58c08960cc92ea5a7e78533c3552339031950dc49f9674eeb7b15d20a2",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "wt list --format json 2>/dev/null | python3 -c 'import json,sys;print(len(json.load(sys.stdin)))'"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 62,
+          "stdout_head": "4",
+          "stdout_bytes": 2,
+          "stderr_head": "",
+          "sha256_published_head": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+          "full_sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "difftastic",
+      "layer": "review tools",
+      "repo": "https://github.com/Wilfred/difftastic",
+      "pin": "0.71.0",
+      "verdict": "keep (scoped)",
+      "commands": [
+        {
+          "argv": [
+            "difft",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 1,
+          "stdout_head": "Difftastic 0.71.0\n\nRevision:  b7d119e 2026-09-18\nToolchain: 1.85.0\nSystem:    linux x86_64",
+          "stdout_bytes": 92,
+          "stderr_head": "",
+          "sha256_published_head": "254fcce17e405e619b6476eb15d9cc063ff65a33904942efa7e372024d39e1cf",
+          "full_sha256": "e4ab21f4a1cd6bf764172bcf15e51f75246faaca045719e5e95970040358879e",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "difft --display inline tools/ecosystem/e2e-upstream-commands.json tools/ecosystem/e2e_manifest.py > $TMP/e2e-difft.txt; rc=$?; wc -l < $TMP/e2e-difft.txt; exit $rc"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 2824,
+          "stdout_head": "1017",
+          "stdout_bytes": 5,
+          "stderr_head": "",
+          "sha256_published_head": "b0ab628c9e14621846c58b4eb35060ef3885253a457d2d76136716d4850bad45",
+          "full_sha256": "c762ce62ec1cb4e60ab94c0198880b3cc727f62d56271ff65b9025f190f0831e",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "functional (structural diff returned)",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "ast-grep",
+      "layer": "structural search",
+      "repo": "https://github.com/ast-grep/ast-grep",
+      "pin": "0.45.3 (versioned prefix 2026-09-21)",
+      "verdict": "keep (scoped)",
+      "commands": [
+        {
+          "argv": [
+            "ast-grep",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 2,
+          "stdout_head": "ast-grep 0.45.3",
+          "stdout_bytes": 16,
+          "stderr_head": "",
+          "sha256_published_head": "071da56da4ead84ccd3175aa01008d355cb359cd101f06dcd320162365181c14",
+          "full_sha256": "f78c1f163a09571a893a599de4067e8768968e0cdcbfa530cdebc1d98bba7b68",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "ast-grep run -p 'function $A($$$) { $$$ }' -l js $HOME/code/agent-lab/tools/ecosystem/linux-usage-report.cjs | grep -c function"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 5,
+          "stdout_head": "8",
+          "stdout_bytes": 2,
+          "stderr_head": "",
+          "sha256_published_head": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3",
+          "full_sha256": "aa67a169b0bba217aa0aa88a65346920c84c42447c36ba5f7ea65f422c1fe5d8",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "functional (structural search returned matches)",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "gitleaks",
+      "layer": "supply chain",
+      "repo": "https://github.com/gitleaks/gitleaks",
+      "pin": "v8.30.1",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "gitleaks",
+            "version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 173,
+          "stdout_head": "8.30.1",
+          "stdout_bytes": 7,
+          "stderr_head": "",
+          "sha256_published_head": "6cb4df448dc2980b9db0c8a1bea860663262bccf1374c012ca3801daf5a9d4f2",
+          "full_sha256": "c9fd9ccb6682c54b5fcb0363757b6c6873564e7c067f70b3b5581b611528b9f4",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "mkdir -p $TMP/gl-e2e && printf 'no secrets here\\n' > $TMP/gl-e2e/a.txt && gitleaks dir $TMP/gl-e2e --no-banner --redact > $TMP/e2e-gitleaks.txt 2>&1; rc=$?; echo gitleaks_exit=$rc; exit $rc"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 258,
+          "stdout_head": "gitleaks_exit=0",
+          "stdout_bytes": 16,
+          "stderr_head": "",
+          "sha256_published_head": "b63a4f7bbf099dcea5e8b65a6df282c10fac121731cff34efe44abd04c02b954",
+          "full_sha256": "15a15d8d069674a971d4a7648b2d6e6b727f70fc6d9730fe8e44cfd33572fee9",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "functional (directory scan completed)",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "zizmor",
+      "layer": "CI security",
+      "repo": "https://github.com/zizmorcore/zizmor",
+      "pin": "v1.30.1",
+      "verdict": "keep (scoped)",
+      "commands": [
+        {
+          "argv": [
+            "zizmor",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 3,
+          "stdout_head": "zizmor 1.30.1",
+          "stdout_bytes": 14,
+          "stderr_head": "",
+          "sha256_published_head": "47f5040c00e3165455898b7e11fa5d7854be7aa66e94ec474ec8dc66e25e3623",
+          "full_sha256": "8cfc3f0c3c0ae916a8a78253f6057469baa07a95c8bc6fa7a0589bad2bfd3c53",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "zizmor --help > $TMP/e2e-help.txt 2>&1; rc=$?; sed -n 1p $TMP/e2e-help.txt; exit $rc"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 5,
+          "stdout_head": "Static analysis for GitHub Actions",
+          "stdout_bytes": 35,
+          "stderr_head": "",
+          "sha256_published_head": "0f689de014178f2f42149f0b54dfbb03d6f75049e444bc16c594b6d9c2be3ba7",
+          "full_sha256": "5469d0da728635e192de1d4d4afe2a0037d5d878750611679dbfb6bf418d66dc",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "version-help",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "promptfoo",
+      "layer": "evaluation",
+      "repo": "https://github.com/promptfoo/promptfoo",
+      "pin": "0.123.1",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "promptfoo",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 10922,
+          "stdout_head": "0.123.1",
+          "stdout_bytes": 8,
+          "stderr_head": "(node:2212042) ExperimentalWarning: DecompressInterceptor is experimental and subject to change\n(Use `node --trace-warnings ...` to show where the warning was created)",
+          "sha256_published_head": "f31a60908cfa704a39e5b203ab4e194a80344640ced44f1017b91d7834b11109",
+          "full_sha256": "4e664bc68ad7763d07d5cacc4947b0b1f46d5f8e997f97a2b751d1f1dd1d2d2d",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "promptfoo --help > $TMP/e2e-help.txt 2>&1; rc=$?; sed -n 1p $TMP/e2e-help.txt; exit $rc"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 10997,
+          "stdout_head": "(node:2212428) ExperimentalWarning: DecompressInterceptor is experimental and subject to change",
+          "stdout_bytes": 96,
+          "stderr_head": "",
+          "sha256_published_head": "9f40143b055576c798f84c29639d07c3e9c371a40d10e5bb9b0ff0eabba92884",
+          "full_sha256": "3ea4d1ba6eb5a5f316b41ebe4caecfd7ceadef7a6c614d9623185216fb9529cf",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "version-help",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "agent-browser",
+      "layer": "browser automation",
+      "repo": "https://github.com/vercel-labs/agent-browser",
+      "pin": "v0.38.1",
+      "verdict": "keep (scoped)",
+      "commands": [
+        {
+          "argv": [
+            "agent-browser",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 0,
+          "stdout_head": "agent-browser 0.38.1",
+          "stdout_bytes": 21,
+          "stderr_head": "",
+          "sha256_published_head": "a987ce4e095bf20e0eb257ef53fd093ae0ce017efa736f2f35ea10abbfeffbc8",
+          "full_sha256": "f5be7c237dafe7044ac7d4bbe42840028c99c5cf529425bcb30ec470d74b5c63",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "agent-browser",
+            "skills",
+            "list"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 0,
+          "stdout_head": "agentcore                     Run agent-browser on AWS Bedrock AgentCore cloud browsers. Use when...\n  core                          Core agent-browser usage guide. Read this before running any...\n  derive-client                 Reverse-engineer a website's internal API by recording browser...\n  dogfood                       Systematically explore and test a web application to find bugs, UX...\n  electron                      Automate Electron desktop apps (VS Code, Slack, Discord, Figma,...\n  protected-vercel-deployments  Access and test Vercel deployments protected by Vercel...\n  slack                         Interact with Slack workspaces using browser automation. Use when the...\n  vercel-sandbox                Run agent-browser + Chrome inside Vercel Sandbox microVMs for browser...\n  webmcp-gen                    Build and validate experimental WebMCP tools for an existing web...",
+          "stdout_bytes": 898,
+          "stderr_head": "",
+          "sha256_published_head": "5c378365bf7a58f793ca5722c348591efef17a95ca5c45b9507fffdbb5c03cd2",
+          "full_sha256": "03c63627e990ceede97ae12d5938bc6fd37d7c6a30751e926d66dadd2bd8a852",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": [
+        "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-6h-20260921.png",
+        "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-72h-20260921.png"
+      ],
+      "prior_observation": null,
+      "ok": true,
+      "original_host_reference_count": 1,
+      "reference_projection": "Matching public references where available; omitted host references do not establish public acceptance."
+    },
+    {
+      "id": "beads",
+      "layer": "task queue",
+      "repo": "https://github.com/gastownhall/beads",
+      "pin": "v1.3.0",
+      "verdict": "keep-but-compare",
+      "commands": [
+        {
+          "argv": [
+            "bd",
+            "version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 440,
+          "stdout_head": "bd version 1.3.0 (f45b249ce: HEAD@f45b249ce6b4)",
+          "stdout_bytes": 48,
+          "stderr_head": "",
+          "sha256_published_head": "0a6b38286c720979cc81703d6bdbc977b5d332a058fb655ace74c99d0899d740",
+          "full_sha256": "7a2919e9b8f9e670c3bef5e2ef7bef694ff6efb3ea0d90e16b2c1bea90e8cb70",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "bd --help > $TMP/e2e-help.txt 2>&1; rc=$?; sed -n 1p $TMP/e2e-help.txt; exit $rc"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 192,
+          "stdout_head": "Issues chained together like beads. A lightweight issue tracker with first-class dependency support.",
+          "stdout_bytes": 101,
+          "stderr_head": "",
+          "sha256_published_head": "81a6e117783c27b751418399ac4e10aa0bbffbacc33d5022436be77d6b6d0c13",
+          "full_sha256": "a7802ebbda1cc03483cb9940b6e6b1fb95aee87e326d39b4ec7f7435b39c44a0",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "version-help",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    },
+    {
+      "id": "nautilus-trader",
+      "layer": "trading engine",
+      "repo": "https://github.com/nautechsystems/nautilus_trader",
+      "pin": "v2.0.0rc5 (1b0a49d2)",
+      "verdict": "keep (user-selected destination)",
+      "commands": [
+        {
+          "argv": [
+            "$STACK_HOME/tools/nautilus-2.0.0rc5/bin/python",
+            "-c",
+            "import nautilus_trader,numpy,pandas,sys;print(nautilus_trader.__version__,numpy.__version__,pandas.__version__,sys.version.split()[0])"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 239,
+          "stdout_head": "2.0.0rc5 2.5.3 3.0.6 3.12.3",
+          "stdout_bytes": 28,
+          "stderr_head": "",
+          "sha256_published_head": "c5cd17512d623adb4130baaef7bf4c169481b9c75527e4266648482f89b98351",
+          "full_sha256": "7257f3f462517ab855eaec702bd77053f16b9c1c39a35381790feef732270c59",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": [
+        "blueprints/us-equities/engine-nautilus/README.md",
+        "blueprints/us-equities/engine-nautilus/equity-replay/README.md"
+      ],
+      "prior_observation": null,
+      "ok": true,
+      "original_host_reference_count": 2,
+      "reference_projection": "Matching public references where available; omitted host references do not establish public acceptance."
+    },
+    {
+      "id": "lean",
+      "layer": "historical comparison engine",
+      "repo": "https://github.com/QuantConnect/Lean",
+      "pin": "985ef30 (+ remediation)",
+      "verdict": "keep (oracle)",
+      "commands": [
+        {
+          "argv": [
+            "$STACK_HOME/tools/dotnet-equity10/dotnet",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 81,
+          "stdout_head": "10.0.401",
+          "stdout_bytes": 9,
+          "stderr_head": "",
+          "sha256_published_head": "0b8d8d5d06c1d8e9812316ec7dda3ecb4cfdf1b2421ca23bc2e5c01dc59cc59b",
+          "full_sha256": "93c11b5221b72e0032ab2d9f93d28c2c9b7a0bb2557effffcdfef45ab739a0da",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "bash",
+            "-o",
+            "pipefail",
+            "-c",
+            "cd $HOME/code/native-agent-stack-token-practice-review && python3 -m unittest tests.test_historical_simulation -q > $TMP/e2e-lean.txt 2>&1; rc=$?; sed -n '$p' $TMP/e2e-lean.txt; exit $rc"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 38,
+          "stdout_head": "OK",
+          "stdout_bytes": 3,
+          "stderr_head": "",
+          "sha256_published_head": "565339bc4d33d72817b583024112eb7f5cdf3e5eef0252d6ec1b9c9a94e12bb3",
+          "full_sha256": "a12b7cb43c9d9134b5bb1b35e9096b66775d9e92e7611d1cc92b02edd6782a87",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "functional (retained-output unit tests; no engine run)",
+      "accepted_receipts": [
+        "blueprints/us-equities/historical-simulation/receipt.json"
+      ],
+      "prior_observation": null,
+      "ok": true,
+      "original_host_reference_count": 1,
+      "reference_projection": "Matching public references where available; omitted host references do not establish public acceptance."
+    },
+    {
+      "id": "uv",
+      "layer": "python tooling",
+      "repo": "https://github.com/astral-sh/uv",
+      "pin": "0.12.17",
+      "verdict": "keep (scoped)",
+      "commands": [
+        {
+          "argv": [
+            "uv",
+            "--version"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 4,
+          "stdout_head": "uv 0.12.17 (x86_64-unknown-linux-gnu)",
+          "stdout_bytes": 38,
+          "stderr_head": "",
+          "sha256_published_head": "1e4235926194a8db33d6d12ef8dcc929effe0d8d9002f2cb378296782f966718",
+          "full_sha256": "dd643ebda7165a77a7fe3c9f445ec1a2cfebe1bfe0329015937763dce919c33d",
+          "truncated": false
+        },
+        {
+          "argv": [
+            "uv",
+            "tool",
+            "list"
+          ],
+          "exit": 0,
+          "timed_out": false,
+          "elapsed_ms": 6,
+          "stdout_head": "headroom-ai v0.37.0\n- headroom\ntavily-cli v0.1.8\n- tvly\nzizmor v1.30.1\n- zizmor",
+          "stdout_bytes": 80,
+          "stderr_head": "",
+          "sha256_published_head": "ca563165980a355025ccb062705bc5cd5371d01c1910e18e3acdf274f5fe6f6f",
+          "full_sha256": "d9e8b3505d9b63e576c54be7cd9163306489c2608c263b2ab9b089e41c05a688",
+          "truncated": false
+        }
+      ],
+      "evidence_class": "readiness",
+      "accepted_receipts": null,
+      "prior_observation": null,
+      "ok": true
+    }
+  ],
+  "screenshots": [
+    {
+      "label": "Grafana grand dashboard, last 6 hours (SDK panels legitimately empty in range)",
+      "path": "../../evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-6h-20260921.png"
+    },
+    {
+      "label": "Grafana grand dashboard, last 72 hours (SDK reported tokens 186,019; 4 receipts without usage; Loki max_query_lookback is 72 h, so 7-day ranges error)",
+      "path": "../../evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-72h-20260921.png"
+    },
+    {
+      "label": "Native lifetime token manifest page (ecosystem-token-report refresh, 2026-09-21T20:13:19Z)",
+      "path": "../../evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png"
+    }
+  ],
+  "projection_provenance": "evidence/artifacts/claude-upstream-checks-20260921/provenance.json"
+}

@@ -2,24 +2,6 @@
   "schema_version": 1,
   "receipts": [
     {
-      "id": "claude-foundation-finalization-20260921",
-      "kind": "native_model_e2e",
-      "component_ids": [
-        "claude-code",
-        "codex",
-        "agent-browser",
-        "repomix"
-      ],
-      "claim": "Native Claude completed a packet-scoped readiness run after independently reviewed source-gate corrections; earlier rejected and incomplete runs remain visible. Native Codex configuration and sign-in were audited. Portable examples and the sixteen-layer repository/dashboard explorer are separately verified.",
-      "limitations": [
-        "Three optional capabilities retain their earlier partial acceptance; no new-host or physical-PC reboot qualification.",
-        "Application hosting evidence remains fixture-scoped; no paid hosting, public deployment, broker action or new account connection.",
-        "Native review model citation/count transcription errors are retained; the evidence gate was not relaxed to relabel them accepted.",
-        "Portable native roles omit host-specific MCP permissions; tests use stubbed model responses and stay distinct from native execution."
-      ],
-      "path": "evidence/receipts/claude-foundation-finalization-20260921.json"
-    },
-    {
       "id": "dashboard-gap-resolution-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2564,6 +2546,58 @@
       "path": "observability/grand-dashboard/capacity-recovery-20260921.json"
     },
     {
+      "id": "claude-upstream-checks-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "agent-browser",
+        "agentsview",
+        "ai-memory",
+        "alertmanager",
+        "ast-grep",
+        "beads",
+        "ccusage",
+        "claude-code",
+        "codex",
+        "codex-for-claude",
+        "context-mode",
+        "dagu",
+        "difftastic",
+        "gitleaks",
+        "grafana",
+        "headroom",
+        "jcodemunch-mcp",
+        "lean",
+        "loki",
+        "markitdown",
+        "mcporter",
+        "nautilus-trader",
+        "openresearch",
+        "opentelemetry-collector-contrib",
+        "prometheus",
+        "promptfoo",
+        "qdrant",
+        "qmd",
+        "repomix",
+        "rtk",
+        "serena",
+        "socraticode",
+        "tavily-cli",
+        "toon",
+        "vllm",
+        "worktrunk",
+        "zizmor"
+      ],
+      "claim": "Live Claude retained 38 native command rows: 14 bounded functional checks, 18 readiness checks and 6 version/help checks, with corrected failure handling and three native dashboard screenshots.",
+      "limitations": [
+        "38 zero-exit rows are not 38 functional E2Es; each row keeps its narrower evidence class.",
+        "This is dated source-host evidence, not another PC installation or full lifecycle acceptance.",
+        "RTK/Headroom/Context Mode figures overlap or have tool-specific retention; no causal provider savings.",
+        "Complete originals remain private; public excerpts are bounded and sanitized.",
+        "The earlier wrong-port vLLM fallback was wrongly accepted and remains recorded; corrected call tests only the stated embedding request."
+      ],
+      "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
       "id": "foundation-rd-20260921",
       "kind": "native_model_e2e",
       "component_ids": [
@@ -2581,6 +2615,24 @@
         "Existing paper and AAPL receipts retain their original source scope; SPY parity, native broker faults, IBKR, strategy quality and continuous operation remain open."
       ],
       "path": "evidence/receipts/foundation-rd-20260921.json"
+    },
+    {
+      "id": "claude-foundation-finalization-20260921",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "agent-browser",
+        "repomix"
+      ],
+      "claim": "Native Claude completed a packet-scoped readiness run after independently reviewed source-gate corrections; earlier rejected and incomplete runs remain visible. Native Codex configuration and sign-in were audited. Portable examples and the sixteen-layer repository/dashboard explorer are separately verified.",
+      "limitations": [
+        "Three optional capabilities retain their earlier partial acceptance; no new-host or physical-PC reboot qualification.",
+        "Application hosting evidence remains fixture-scoped; no paid hosting, public deployment, broker action or new account connection.",
+        "Native review model citation/count transcription errors are retained; the evidence gate was not relaxed to relabel them accepted.",
+        "Portable native roles omit host-specific MCP permissions; tests use stubbed model responses and stay distinct from native execution."
+      ],
+      "path": "evidence/receipts/claude-foundation-finalization-20260921.json"
     },
     {
       "id": "adaptive-paper-practice-20260921",
@@ -2602,71 +2654,6 @@
     }
   ],
   "files": [
-    {
-      "path": "catalogs/foundation/surfaces.json",
-      "sha256": "53965cb8d459e4cc7fe59629f8321e733e94766d115599d198e3622bcceed1f9",
-      "bytes": 18780
-    },
-    {
-      "path": "docs/claude-foundation-finalization-20260921.md",
-      "sha256": "e6c1b96aea4a63dd2ea3d71c0304e8ec32087e892c4ddae54624f0d96116bc85",
-      "bytes": 11161
-    },
-    {
-      "path": "evidence/artifacts/claude-foundation-finalization-20260921/qualification.json",
-      "sha256": "08792220e1f1888ecdc0e2af028d2619b646645be19e5588b0dec55da304ed77",
-      "bytes": 11469
-    },
-    {
-      "path": "evidence/artifacts/claude-foundation-finalization-20260921/workers-desktop.png",
-      "sha256": "b1997d260f314c1802657145701d8fece709690590659b0d7db2752f81771293",
-      "bytes": 112234
-    },
-    {
-      "path": "evidence/artifacts/claude-foundation-finalization-20260921/workers-mobile.png",
-      "sha256": "80c159e5889279a421ffee6458dbba0eb961c77bffc1acf482aebf4a571f2569",
-      "bytes": 69436
-    },
-    {
-      "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
-      "sha256": "7ae1138350835ff33cc9c261d8112553997e64c20b50c298ae84d5de04146134",
-      "bytes": 2073
-    },
-    {
-      "path": "examples/claude-native/agents/evidence-reviewer.md",
-      "sha256": "939ca910e06152a0d273161a43beaddb9d0ce78e0e1451eede8e09680e6e9641",
-      "bytes": 568
-    },
-    {
-      "path": "examples/claude-native/agents/isolated-builder.md",
-      "sha256": "d8f3cd687dfc1c2089b25322ede53844bdd3a4c9cf47a478dcb61f2515b16dab",
-      "bytes": 624
-    },
-    {
-      "path": "examples/claude-native/workflows/README.md",
-      "sha256": "c46e288d676f9f7d78195d411ed2bce943a8fdda14a1b3272a5c84023f20543d",
-      "bytes": 2707
-    },
-    {
-      "path": "examples/claude-native/workflows/check-syntax.mjs",
-      "sha256": "ca62177687420fe22e03d0510a18e4f32b5d150e0156f6651c48367c3da506e1",
-      "bytes": 978
-    },
-    {
-      "path": "examples/claude-native/workflows/readiness-audit.js",
-      "sha256": "59794f395ecda2dcb86e03db06d53fb98bd190dc1cfcbf92629f473dcd4de53e",
-      "bytes": 12738
-    },
-    {
-      "path": "examples/claude-native/workflows/review-changes.js",
-      "sha256": "e3bd599c2355123deab62f5d39abac44ecbe2b04e73b76a9cf08d71a649f925c",
-      "bytes": 10526
-    },
-    {
-      "path": "examples/claude-native/workflows/test-envelope.mjs",
-      "sha256": "d1ecdeea386dcec565ae3a395b16ce00db431991ecabf29b0052e229bb940269",
-      "bytes": 19844
-    },
     {
       "path": "docs/hf-memory-model-qualification.md",
       "sha256": "beb6b7b165fce95ce5f501b39ab226089bb3aa5d73a46d2f21d8083ae47756e5",
@@ -4730,8 +4717,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "bytes": 429746,
-      "sha256": "7ab394f205e4ebcdfbadaa53b8b5473864e24d545cc9aed8b6c555d5a1d19be4"
+      "bytes": 458931,
+      "sha256": "1a655ddf6deca8016b749e0d23cf56d41be663db0c102c0fb3009e3f397620db"
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -6330,8 +6317,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 7434689,
-      "sha256": "7a6e006269477153d6146463000bd71e590080c2cb4b613753ae1b1351a194a9"
+      "bytes": 8023418,
+      "sha256": "af6ce84cb8127183a6747f31ef247dbb69083a2548dde4bbaf1bef79f21da084"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6340,8 +6327,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "151daac35330ebec55975861d972d8512955e7bd8738a802a7e87bece2ab4e24",
-      "bytes": 38559
+      "bytes": 38932,
+      "sha256": "bdd813e7afce2cc3e11afb795cc1156f4a05c4bf5a8e5e94118ecda67841ffd7"
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6360,8 +6347,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "97570fba6d4bf2d06e811cf6691e1d72fa5c42e9467fd661bae6f3104a52b1d8",
-      "bytes": 85946
+      "bytes": 86268,
+      "sha256": "9cd5d11994ae3f67299fa148e990ed3b0005d543d42b4adaf32a0087c9782fc2"
     },
     {
       "path": "docs/evidence.md",
@@ -6845,8 +6832,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 81046,
-      "sha256": "02567fe213aae27a0c9908260120d3f483436fe2674cc207dee22d6d4925782a"
+      "bytes": 82637,
+      "sha256": "db31fb6354aa21b44491774e85bc86e8552eae76f2b12a133a61716551c504dc"
     },
     {
       "path": "observability/README.md",
@@ -7035,8 +7022,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "94d21356dc9ace6452639c6204b775498451497d67353222801bd7e8d7876322",
-      "bytes": 39451
+      "bytes": 40120,
+      "sha256": "e965dd8f59f3879d5f818ab820e2ed9d551ea915e302f07afabc982fa8ab3f28"
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -9692,6 +9679,111 @@
       "path": "recipes/claude-codex-foreground-review.md",
       "bytes": 3219,
       "sha256": "390d1b54f94a28027282408b0453c05221227d5709c49a66a904705b094a8130"
+    },
+    {
+      "path": "docs/claude-upstream-checks.md",
+      "bytes": 4075,
+      "sha256": "2da453af7ba5129c337237781108291cae8a275b49e6a05e1658c62cbaf5744e"
+    },
+    {
+      "path": "docs/ecosystem/claude-upstream-checks.html",
+      "bytes": 60970,
+      "sha256": "c23e17b871ddbed23388da9ac492b301be13a13506fd227049523222c0a237d6"
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-6h-20260921.png",
+      "bytes": 100755,
+      "sha256": "83ef18609465a76f96881fba06b2f960b92f1d0731f03ba9c65771cd26583b3a"
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-72h-20260921.png",
+      "bytes": 97802,
+      "sha256": "06f1b5d58f057137b0689a7c9d8fcddca9af36a826b6dbe2c567e6e82c89395d"
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/provenance.json",
+      "bytes": 34249,
+      "sha256": "ea3d215168c9f7df2e4568c2562ce445c376e41f1b077a2898030885643b5cb4"
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/results.json",
+      "bytes": 74785,
+      "sha256": "c4a6e247323c9f89303784742b299ffa3cb46cb136ec514169c9a172563caeef"
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
+      "bytes": 85934,
+      "sha256": "787f3d49cedc86489e6e7446810d992bda880071d0bbf22d7c0fef67d8120b2a"
+    },
+    {
+      "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+      "bytes": 2818,
+      "sha256": "db9f8b3eafcbc88072bfe603afcfd53e8c3cac60baeaf75b23ded5956b517ca7"
+    },
+    {
+      "path": "catalogs/foundation/surfaces.json",
+      "sha256": "53965cb8d459e4cc7fe59629f8321e733e94766d115599d198e3622bcceed1f9",
+      "bytes": 18780
+    },
+    {
+      "path": "docs/claude-foundation-finalization-20260921.md",
+      "sha256": "e6c1b96aea4a63dd2ea3d71c0304e8ec32087e892c4ddae54624f0d96116bc85",
+      "bytes": 11161
+    },
+    {
+      "path": "evidence/artifacts/claude-foundation-finalization-20260921/qualification.json",
+      "sha256": "08792220e1f1888ecdc0e2af028d2619b646645be19e5588b0dec55da304ed77",
+      "bytes": 11469
+    },
+    {
+      "path": "evidence/artifacts/claude-foundation-finalization-20260921/workers-desktop.png",
+      "sha256": "b1997d260f314c1802657145701d8fece709690590659b0d7db2752f81771293",
+      "bytes": 112234
+    },
+    {
+      "path": "evidence/artifacts/claude-foundation-finalization-20260921/workers-mobile.png",
+      "sha256": "80c159e5889279a421ffee6458dbba0eb961c77bffc1acf482aebf4a571f2569",
+      "bytes": 69436
+    },
+    {
+      "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
+      "sha256": "7ae1138350835ff33cc9c261d8112553997e64c20b50c298ae84d5de04146134",
+      "bytes": 2073
+    },
+    {
+      "path": "examples/claude-native/agents/evidence-reviewer.md",
+      "sha256": "939ca910e06152a0d273161a43beaddb9d0ce78e0e1451eede8e09680e6e9641",
+      "bytes": 568
+    },
+    {
+      "path": "examples/claude-native/agents/isolated-builder.md",
+      "sha256": "d8f3cd687dfc1c2089b25322ede53844bdd3a4c9cf47a478dcb61f2515b16dab",
+      "bytes": 624
+    },
+    {
+      "path": "examples/claude-native/workflows/README.md",
+      "sha256": "c46e288d676f9f7d78195d411ed2bce943a8fdda14a1b3272a5c84023f20543d",
+      "bytes": 2707
+    },
+    {
+      "path": "examples/claude-native/workflows/check-syntax.mjs",
+      "sha256": "ca62177687420fe22e03d0510a18e4f32b5d150e0156f6651c48367c3da506e1",
+      "bytes": 978
+    },
+    {
+      "path": "examples/claude-native/workflows/readiness-audit.js",
+      "sha256": "59794f395ecda2dcb86e03db06d53fb98bd190dc1cfcbf92629f473dcd4de53e",
+      "bytes": 12738
+    },
+    {
+      "path": "examples/claude-native/workflows/review-changes.js",
+      "sha256": "e3bd599c2355123deab62f5d39abac44ecbe2b04e73b76a9cf08d71a649f925c",
+      "bytes": 10526
+    },
+    {
+      "path": "examples/claude-native/workflows/test-envelope.mjs",
+      "sha256": "d1ecdeea386dcec565ae3a395b16ce00db431991ecabf29b0052e229bb940269",
+      "bytes": 19844
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/README-native.md",
