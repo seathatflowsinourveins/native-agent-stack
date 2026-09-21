@@ -21,7 +21,8 @@
       ],
       "evidence_ids": [
         "component-history",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "foundation-closure-20260921"
       ],
       "upstream_sources": [
         "https://github.com/affaan-m/ECC"
@@ -187,7 +188,8 @@
         "native-token-focus-clients-20260920",
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
-        "native-worker-cgroup-20260920"
+        "native-worker-cgroup-20260920",
+        "foundation-closure-20260921"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -276,7 +278,8 @@
         "native-codex-session-recovery-20260920",
         "native-token-focus-clients-20260920",
         "native-token-stack-final-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "foundation-closure-20260921"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -355,7 +358,8 @@
         "token-practice-confirmation-20260920",
         "current-session-observation-20260920",
         "native-token-stack-final-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "foundation-closure-20260921"
       ],
       "upstream_sources": [
         "https://github.com/mksglu/context-mode"

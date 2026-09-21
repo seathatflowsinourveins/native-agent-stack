@@ -4,6 +4,11 @@ Use the installed tools for the current task; setup is a one-time operation per 
 
 ## Persistent defaults for future sessions
 
+The [September 21 UTC closure review](foundation-closure-20260921.md) records the
+current community/SDK shortlist, selection merits across all sixteen layers,
+and fresh interactive Claude context, usage, MCP and HUD observations. Read it
+for a foundation decision, not as a startup prompt.
+
 On the authoring Linux/WSL host, the native workflow is now saved in client settings, shell startup files and short global instructions. A copied startup prompt is optional. The [persistent-default receipt](../evidence/receipts/native-session-defaults-20260920.json) records the actual changes and acceptance; another PC must resolve its own paths and collect its own evidence.
 
 | Scope | Persistent setting or behavior | Boundary |

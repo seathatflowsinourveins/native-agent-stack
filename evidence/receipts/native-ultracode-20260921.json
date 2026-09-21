@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "native-ultracode-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": ["claude-code", "context-mode"],
+  "claim": "Claude Code 2.1.278 executed a Fable 5.1/xhigh native Workflow with Sonnet 5/medium and Opus 5/high workers returning results. The same coordinator resumed at high effort and completed a native same-host message round trip, source verification and one-shot idle notification with a separate Sonnet session. Native agent and restored workflow dashboards rendered the completed work.",
+  "recorded_date_utc": "2026-09-21",
+  "base_commit": "218457df51b30409677929fc6669b87ab1c98363",
+  "status": "bounded-native-operation-with-corrections",
+  "guide": "docs/native-ultracode-20260921.md",
+  "artifacts": ["recipes/claude-native-ultracode.md", "examples/claude-native/ultracode.settings.json"],
+  "observations": {
+    "native_version": "2.1.278",
+    "coordinator": {"model": "claude-fable-5-1", "workflow_effort": "xhigh", "messaging_effort": "high"},
+    "workflow": {
+      "workers": [{"model": "claude-sonnet-5", "effort": "medium"}, {"model": "claude-opus-5", "effort": "high"}],
+      "completed": 2,
+      "failed_workers": 0,
+      "journal_starts": 2,
+      "journal_results": 2,
+      "overlap_ms": 37751,
+      "successful_hook_responses": 88,
+      "structured_output_retry": 1,
+      "word_contract_met": false,
+      "model_substitution_observed": false
+    },
+    "messaging": {
+      "list_agents_calls": 1,
+      "coordinator_to_worker_messages": 1,
+      "worker_to_coordinator_messages": 1,
+      "recipient_source_read_observed": true,
+      "source_verification_observed": true,
+      "one_shot_idle_notice_observed": true,
+      "unrelated_peer_messages": 0,
+      "repository_edits": 0
+    },
+    "dashboards": {"native_agent_view": "two completed tasks rendered", "native_workflow_history": "one completed run, two agents, both phases complete after resume", "workflow_token_display": "80.3k rounded native display, not complete provider accounting"},
+    "maintenance": {"existing_daily_heartbeat_updated": true, "schedule_preserved": true, "next_timed_execution_observed": false}
+  },
+  "limitations": [
+    "Read-only task contracts are not OS isolation; no writing-worker, mid-run cancellation, cross-host or reboot qualification.",
+    "Initial worker classifications were inaccurate and corrected after independent source review; both worker outputs exceeded their requested word contracts and one schema retry occurred.",
+    "Native worker identity was observed in child messages; choices are not a comparative quality or token-cost benchmark.",
+    "Same-host messaging and idle notification only; permission-mismatch behavior, delivery failures, retries and persistent scheduling were not tested.",
+    "Updated maintenance configuration is not proof of its next timed execution; no new recurring Claude loop was created.",
+    "Two native success events share cumulative model usage; no causal savings or exhaustive provider-accounting claim.",
+    "Native PTY rendering and process observations were recorded by the coordinator; message and workflow traces received independent read-only audit. Private raw logs and identifiers remain outside Git."
+  ]
+}

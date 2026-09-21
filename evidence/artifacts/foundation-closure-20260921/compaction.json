@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "trigger": "manual",
+  "native_metadata": {
+    "preTokens": 87434,
+    "postTokens": 14934,
+    "cumulativeDroppedTokens": 72500,
+    "durationMs": 42506
+  },
+  "precompact_hook_observation": {
+    "ai-memory_success": true,
+    "context-mode_success": true
+  },
+  "continuity_responses": [
+    "review-contract = foundation-20260921.\nProvider savings were not established — they remain unknown; no causal session or lifetime saving is claimed, and compression/cache counters cannot be summed into them.\nBrokers: IBKR paper and Alpaca paper each remain independently qualified and separate from engine/FX replay and authenticated Alpaca data; existing paper authorization persists.",
+    "No — this was a bounded read-only document review of two files and establishes nothing about broker execution; IBKR paper and Alpaca paper acceptance remain separate, independently qualified work."
+  ],
+  "post_boundary_model_tool_calls": [],
+  "oracle": {
+    "identifier": "foundation-20260921",
+    "provider_savings": "unknown",
+    "broker_acceptance": "not established by document review; separate per broker"
+  },
+  "limitations": [
+    "Manual compaction and three selected facts only; automatic compaction and all-fact preservation untested.",
+    "Context-size change is not provider savings; compaction consumes inference.",
+    "Initial broker wording was ambiguous; a follow-up asked whether any broker acceptance was established and returned explicit No. Both responses retained."
+  ]
+}

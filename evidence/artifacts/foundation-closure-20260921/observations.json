@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "checked_date_utc": "2026-09-21",
+  "scope": "Coordinator observations of native interactive Claude, separate from the exported context text and independently audited filesystem state.",
+  "source": "Native claude executable in an exec PTY, selected existing project; no account files copied or permission settings changed.",
+  "native_versions": {"claude": "2.1.278 (Claude Code)", "codex": "codex-cli 0.155.1"},
+  "initial_screen": {"model": "Opus 5 (1M context)", "effort": "xhigh", "plan": "Claude Max"},
+  "mcp_screen": {
+    "command": "/mcp",
+    "servers": [
+      {"name": "serena", "status": "connected", "tools": 21},
+      {"name": "socraticode", "status": "connected", "tools": 26},
+      {"name": "ai-memory", "status": "connected", "tools": 23},
+      {"name": "jcodemunch", "status": "connected", "tools": 6},
+      {"name": "claude.ai Claude Docs", "status": "connected", "tools": 8},
+      {"name": "plugin:context-mode:context-mode", "status": "connected", "tools": 11}
+    ],
+    "warning": "SocratiCode EMBEDDING_QUERY_PREFIX and EMBEDDING_DOCUMENT_PREFIX contain intentional leading/trailing whitespace; retained."
+  },
+  "usage_before": {"command": "/usage", "api_duration": "0", "input": 0, "output": 0, "cache_read": 0, "cache_write": 0},
+  "usage_after_review": {
+    "command": "/usage",
+    "displayed_api_duration": "41s",
+    "displayed_api_equivalent_cost": "$0.81",
+    "displayed_opus": "4 input, 9.4k output, 93.0k cache read, 52.2k cache write",
+    "displayed_auxiliary_haiku": "1.1k input, 12 output, 0 cache read, 0 cache write",
+    "opus_transcript_unique_message_ids": 2,
+    "opus_transcript_usage": {"input_tokens": 4, "output_tokens": 9429, "cache_read_input_tokens": 93038, "cache_creation_input_tokens": 52217},
+    "complete_session_usage": null,
+    "reason": "Auxiliary request exact totals are not reconstructed from the main transcript. Displayed values are rounded; coordinator and other workers are separate."
+  },
+  "hud": {
+    "before_review": "Opus 5 (1M context), project/git branch, Context 0%, Usage 0%",
+    "after_review": "Context 8%, Usage 0%, Read x2",
+    "boundary": "Rendered fields in a native PTY; not every HUD statistic, Windows dropdown interaction, billing reconciliation or an efficiency comparison."
+  },
+  "independent_local_audit": {
+    "terminal_profiles": "Both named Ubuntu profiles exist and resolve to installed native launchers.",
+    "ecc_skill_hashes_match": true,
+    "ecc_discovery_duplicates": false,
+    "plugins": {"context-mode": "1.0.169", "claude-hud": "0.8.0", "codex": "1.0.6"},
+    "account_stores_read": false
+  },
+  "sanitization": "Selected screen observations only; personal paths, account identifiers, unrelated historical usage and full native transcripts omitted. context-before.txt is a separate path-normalized native export."
+}
