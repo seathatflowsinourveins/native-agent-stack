@@ -3097,8 +3097,8 @@
     },
     {
       "path": "adoption/README.md",
-      "sha256": "3aba86df8e31d7b18a3ce15aff0eaefb638b737e777eac8c07b0528d27cd7654",
-      "bytes": 10415
+      "bytes": 11211,
+      "sha256": "b41db891b63e31169d73735e1dae1e9c00fd70b45b2f457a1743d3ce614a68e5"
     },
     {
       "path": "adoption/host-state.example.json",
@@ -6143,8 +6143,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 6865163,
-      "sha256": "a6eeee74ba7e14450d3b9e0c8c0807b8c2ddfd02bac86268138ec66458de7e08"
+      "bytes": 6865971,
+      "sha256": "68e95010de0783687c85f6170719efb4a66011686fc81f7a36c7853db2438404"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6843,8 +6843,8 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "24d943c6fbc047491ff743c6717cc3bad4b8cebed5c2970e78dee69e952565eb",
-      "bytes": 11297
+      "bytes": 11841,
+      "sha256": "f612a10aa9394fc68e1d6180dde7737653104ada16c911eef105f23e760f5ae2"
     },
     {
       "path": "scripts/build_ecosystem.py",
@@ -6898,8 +6898,8 @@
     },
     {
       "path": "tests/test_adoption_status.py",
-      "sha256": "6decac3f2b0a9e752ecfe662c1e32e8790efb8cd60965eeeb103c2388886084a",
-      "bytes": 9430
+      "bytes": 12338,
+      "sha256": "539e2df0def93dea2412e61eb7890ac8073fc288ac5ed46334271c461fe9eb9d"
     },
     {
       "path": "tests/test_alpaca_capabilities.py",
@@ -9330,6 +9330,11 @@
       "path": "evidence/artifacts/memory-rag-lifecycle-20260921/catalog-lifecycle.png",
       "bytes": 118237,
       "sha256": "7e2bce14ded57666c62edd5a7de74a5f7b9f7e2ad7caef8aedd60490bd16d9d3"
+    },
+    {
+      "path": "evidence/artifacts/native-claude-coop-20260921/loki-discovery.json",
+      "bytes": 10460,
+      "sha256": "b272572b57b6cfa63cf4679341e4d35a793fb27b2ed3ceb856b798417927f2ca"
     }
   ],
   "convergence_records": [

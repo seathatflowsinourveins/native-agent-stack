@@ -1,0 +1,303 @@
+{
+  "schema_version": 1,
+  "kind": "local_integration_check",
+  "recorded_at": "2026-09-21T15:08:43.072468+00:00",
+  "scope": "Linux x86-64 prerequisite discovery on the existing host; no service/model execution.",
+  "official_source": "https://grafana.com/docs/loki/latest/setup/install/local/",
+  "command": [
+    "$PYTHON_BIN",
+    "scripts/adoption_status.py",
+    "--profile",
+    "observability",
+    "--json"
+  ],
+  "environment": "Python 3.13.15; process-local PATH containing selected installed observability tool directories; absence case omits only the Loki directory.",
+  "sanitization": "Private absolute working directories, interpreter path, PATH prefixes and raw file paths omitted. The command uses a declared interpreter placeholder. Returned reports contain no personal paths and are retained unchanged.",
+  "runs": [
+    {
+      "id": "baseline",
+      "source_commit": "b8f8cfbf8cb167d7fb73384c9190b4f28b0c22c5",
+      "source_sha256": "24d943c6fbc047491ff743c6717cc3bad4b8cebed5c2970e78dee69e952565eb",
+      "started_at": "2026-09-21T15:08:42.803499+00:00",
+      "completed_at": "2026-09-21T15:08:42.904228+00:00",
+      "exit_code": 2,
+      "stdout_sha256": "eef8765bdae53c1c4a1ffff6480198a5151e44a8b56bb9ef40bb1a85b94a53a8",
+      "stderr_empty": true,
+      "returned_report": {
+        "schema_version": 1,
+        "status": "prerequisites_missing",
+        "platform": {
+          "os": "linux",
+          "architecture": "x86_64",
+          "python": "3.13.15",
+          "supported": true
+        },
+        "manifest": {
+          "status": "valid",
+          "schema_version": 1
+        },
+        "profiles": [
+          {
+            "id": "observability",
+            "commands": [
+              {
+                "name": "otelcol-contrib",
+                "present": true
+              },
+              {
+                "name": "prometheus",
+                "present": true
+              },
+              {
+                "name": "promtool",
+                "present": true
+              },
+              {
+                "name": "loki",
+                "present": false
+              },
+              {
+                "name": "grafana",
+                "present": true
+              },
+              {
+                "name": "alertmanager",
+                "present": true
+              },
+              {
+                "name": "amtool",
+                "present": true
+              },
+              {
+                "name": "ntfy",
+                "present": true
+              }
+            ],
+            "recipes": [
+              {
+                "path": "observability/README.md",
+                "present": true
+              },
+              {
+                "path": "observability/backends/README.md",
+                "present": true
+              },
+              {
+                "path": "observability/grand-dashboard/README.md",
+                "present": true
+              }
+            ],
+            "status": "prerequisites_missing"
+          }
+        ],
+        "errors": [],
+        "runtime_acceptance_verified": false,
+        "limitations": [
+          "Executable presence does not verify its version, installation integrity, activation, or E2E behavior.",
+          "Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.",
+          "Git comparison reports source identity only; changed worktree files are not inspected.",
+          "No credentials, client configuration, environment values, network endpoints, or running processes are inspected."
+        ],
+        "git": {
+          "baseline_commit": "8f1da51757e925d319e2a50f080b02742e7e7168",
+          "current_commit": "b8f8cfbf8cb167d7fb73384c9190b4f28b0c22c5",
+          "comparison": "baseline_differs"
+        }
+      }
+    },
+    {
+      "id": "candidate",
+      "source_commit": "6bd0123a97336c24b3fc6f7c4ab2894579c42e0c",
+      "source_sha256": "f612a10aa9394fc68e1d6180dde7737653104ada16c911eef105f23e760f5ae2",
+      "started_at": "2026-09-21T15:08:42.904431+00:00",
+      "completed_at": "2026-09-21T15:08:42.975236+00:00",
+      "exit_code": 0,
+      "stdout_sha256": "6d11eac6298b6b6f1848cdc5f13d423108f47210eee0f36f2dc41d326bf26912",
+      "stderr_empty": true,
+      "returned_report": {
+        "schema_version": 1,
+        "status": "prerequisites_present",
+        "platform": {
+          "os": "linux",
+          "architecture": "x86_64",
+          "python": "3.13.15",
+          "supported": true
+        },
+        "manifest": {
+          "status": "valid",
+          "schema_version": 1
+        },
+        "profiles": [
+          {
+            "id": "observability",
+            "commands": [
+              {
+                "name": "otelcol-contrib",
+                "present": true
+              },
+              {
+                "name": "prometheus",
+                "present": true
+              },
+              {
+                "name": "promtool",
+                "present": true
+              },
+              {
+                "name": "loki",
+                "present": true
+              },
+              {
+                "name": "grafana",
+                "present": true
+              },
+              {
+                "name": "alertmanager",
+                "present": true
+              },
+              {
+                "name": "amtool",
+                "present": true
+              },
+              {
+                "name": "ntfy",
+                "present": true
+              }
+            ],
+            "recipes": [
+              {
+                "path": "observability/README.md",
+                "present": true
+              },
+              {
+                "path": "observability/backends/README.md",
+                "present": true
+              },
+              {
+                "path": "observability/grand-dashboard/README.md",
+                "present": true
+              }
+            ],
+            "status": "prerequisites_present"
+          }
+        ],
+        "errors": [],
+        "runtime_acceptance_verified": false,
+        "limitations": [
+          "Executable presence does not verify its version, installation integrity, activation, or E2E behavior.",
+          "Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.",
+          "Git comparison reports source identity only; changed worktree files are not inspected.",
+          "No credentials, client configuration, environment values, network endpoints, or running processes are inspected."
+        ],
+        "git": {
+          "baseline_commit": "8f1da51757e925d319e2a50f080b02742e7e7168",
+          "current_commit": "6bd0123a97336c24b3fc6f7c4ab2894579c42e0c",
+          "comparison": "baseline_differs"
+        }
+      }
+    },
+    {
+      "id": "candidate-without-loki",
+      "source_commit": "6bd0123a97336c24b3fc6f7c4ab2894579c42e0c",
+      "source_sha256": "f612a10aa9394fc68e1d6180dde7737653104ada16c911eef105f23e760f5ae2",
+      "started_at": "2026-09-21T15:08:42.975408+00:00",
+      "completed_at": "2026-09-21T15:08:43.072468+00:00",
+      "exit_code": 2,
+      "stdout_sha256": "a7c270f1584b9107cf086fbc670296c421c5f3ea5b41c081415b792309975b1c",
+      "stderr_empty": true,
+      "returned_report": {
+        "schema_version": 1,
+        "status": "prerequisites_missing",
+        "platform": {
+          "os": "linux",
+          "architecture": "x86_64",
+          "python": "3.13.15",
+          "supported": true
+        },
+        "manifest": {
+          "status": "valid",
+          "schema_version": 1
+        },
+        "profiles": [
+          {
+            "id": "observability",
+            "commands": [
+              {
+                "name": "otelcol-contrib",
+                "present": true
+              },
+              {
+                "name": "prometheus",
+                "present": true
+              },
+              {
+                "name": "promtool",
+                "present": true
+              },
+              {
+                "name": "loki",
+                "present": false
+              },
+              {
+                "name": "grafana",
+                "present": true
+              },
+              {
+                "name": "alertmanager",
+                "present": true
+              },
+              {
+                "name": "amtool",
+                "present": true
+              },
+              {
+                "name": "ntfy",
+                "present": true
+              }
+            ],
+            "recipes": [
+              {
+                "path": "observability/README.md",
+                "present": true
+              },
+              {
+                "path": "observability/backends/README.md",
+                "present": true
+              },
+              {
+                "path": "observability/grand-dashboard/README.md",
+                "present": true
+              }
+            ],
+            "status": "prerequisites_missing"
+          }
+        ],
+        "errors": [],
+        "runtime_acceptance_verified": false,
+        "limitations": [
+          "Executable presence does not verify its version, installation integrity, activation, or E2E behavior.",
+          "Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.",
+          "Git comparison reports source identity only; changed worktree files are not inspected.",
+          "No credentials, client configuration, environment values, network endpoints, or running processes are inspected."
+        ],
+        "git": {
+          "baseline_commit": "8f1da51757e925d319e2a50f080b02742e7e7168",
+          "current_commit": "6bd0123a97336c24b3fc6f7c4ab2894579c42e0c",
+          "comparison": "baseline_differs"
+        }
+      }
+    }
+  ],
+  "independent_review": {
+    "patch": "446256f88753dee68a48cb4ccbcdcaf6794cbf6f",
+    "result": "no supported findings",
+    "local_regression_tests_passed": 19,
+    "installed_binary_observation": "Regular executable ELF x86-64; detector does not execute candidates."
+  },
+  "limitations": [
+    "Presence only: runtime_acceptance_verified remains false in all three returned reports.",
+    "Not an upstream test suite or new Loki service-health/E2E trial.",
+    "No model calls, provider savings, global PATH changes, installation or service changes.",
+    "Local absence checks are controlled integration tests, not actual package uninstallations."
+  ]
+}
