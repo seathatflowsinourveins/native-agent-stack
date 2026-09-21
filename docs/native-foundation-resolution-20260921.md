@@ -79,6 +79,9 @@ the repository suite ran 686 tests with 41 skips. These structural checks are
 separate from the native operations above. Initial integration checks caught
 stale generated-page hashes and missing lifecycle receipt references; those
 were synchronized and the affected checks rerun successfully.
+The first hosted validation also caught the new experiment's missing convergence
+index entry. Adding that declaration made all 14 recorded experiments validate;
+the underlying experiment artifacts were unchanged.
 
 On the authoring PC, the populated entry points are:
 

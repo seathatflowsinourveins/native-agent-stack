@@ -2255,8 +2255,8 @@
   "files": [
     {
       "path": "docs/native-foundation-resolution-20260921.md",
-      "sha256": "3ae4942b7ff94935e829c29110a457f2398b348438f4599abfc02ca6e135faf6",
-      "bytes": 7221
+      "sha256": "8e607b0bf200ab6f7f237893e863f855707bac23192c3b733c32714be53385e3",
+      "bytes": 7434
     },
     {
       "path": "docs/native-workflow-writing-recovery-20260921.md",
@@ -8651,6 +8651,7 @@
     }
   ],
   "convergence_records": [
+    "evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json",
     "blueprints/convergence-practice/application-delivery/experiment.json",
     "blueprints/convergence-practice/ci-security/experiment.json",
     "blueprints/convergence-practice/document-ingestion/experiment.json",
