@@ -21,6 +21,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 #token-topic-section{scroll-margin-top:160px}
 .navigation{flex-wrap:wrap;column-gap:22px;row-gap:0}.navigation button:last-child{margin-left:0}
 .catalog-entries,.catalog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:0 0 36px}.catalog-entry,.catalog-layer,.catalog-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:25px;background:var(--white);overflow-wrap:anywhere}.catalog-entry:first-child{background:#e8eddf}.catalog-entry h2{margin:12px 0;font-size:35px}.catalog-entry p,.catalog-layer p,.catalog-card p{font-size:13px;margin:12px 0;color:var(--muted)}.catalog-entry .button{margin-top:15px}.catalog-entry .catalog-count{color:var(--green);font-weight:600}.catalog-layer h3,.catalog-card h3{font-size:20px}.catalog-layer .eyebrow{color:var(--copper);margin-bottom:8px}.catalog-layer .accepted-scope{color:var(--green)}.catalog-gap{border-left:3px solid var(--copper);padding-left:12px;margin:16px 0;font-size:12px}.catalog-gap strong{display:block}.catalog-gap p{margin:5px 0}.catalog-detail{border-top:1px solid var(--line);padding:15px 0 0;margin-top:16px;min-width:0}.catalog-detail p,.catalog-detail li{font-size:12px}.catalog-detail summary,.catalog-detail a{overflow-wrap:anywhere}.catalog-capability{border-top:1px solid var(--line);padding:18px 0 4px}.catalog-capability h4{font-size:15px;margin:0 0 9px}.catalog-capability .badge{font-size:10px}.catalog-sources{display:flex;flex-direction:column;gap:8px;margin:14px 0;font-size:12px}.catalog-facts{display:grid;grid-template-columns:minmax(90px,1fr) minmax(0,2fr);gap:9px 16px;font-size:12px;margin:15px 0}.catalog-facts dt{color:var(--muted)}.catalog-facts dd{margin:0;overflow-wrap:anywhere}.catalog-layer .catalog-detail .catalog-detail{padding-left:12px}.catalog-summary{margin:0 0 22px}.catalog-summary p{font-size:13px;margin-top:10px}.catalog-controls{margin-bottom:20px}.catalog-scope{font-size:12px;color:var(--muted);margin:15px 0 25px}.catalog-empty{padding:30px;border:1px dashed var(--line);border-radius:12px;margin-bottom:30px}.catalog-grid>*{min-width:0}.catalog-card pre{max-width:100%}@media(max-width:800px){.catalog-entries,.catalog-grid{grid-template-columns:1fr}}@media(max-width:670px){.navigation{overflow:visible;column-gap:16px}.catalog-entry,.catalog-layer,.catalog-card{padding:20px}.catalog-facts{grid-template-columns:1fr}.catalog-facts dd{margin-bottom:7px}.catalog-entry h2{font-size:31px}}
+.foundation-repos{padding-left:18px;font-size:12px}.foundation-repos li{margin:9px 0}.foundation-repos code{display:block;font-size:10px;overflow-wrap:anywhere;color:var(--muted)}.foundation-surfaces{margin:20px 0}.foundation-surfaces h4{font-size:14px;margin:0 0 10px}.foundation-surface{border-left:2px solid var(--line);padding-left:12px;margin:16px 0}.foundation-surface h5{font-size:13px;margin:0 0 6px}.foundation-surface p{font-size:12px;margin:8px 0}.foundation-surface .catalog-sources{margin:9px 0}.foundation-surface .native-code{max-width:100%}
 </style>
 </head>
 <body>
@@ -97,7 +98,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <div class="section-head"><div><div class="eyebrow">Awesome lists / deliberate discovery</div><h2>Follow a lead to its source.</h2></div><p>Three pinned list snapshots supplied selected leads. Their full contents were not exhaustively audited; each linked project needs its own primary review.</p></div><div id="awesome-list" class="awesome-list"></div>
 <details class="provenance"><summary id="provenance-summary">Snapshot provenance and input hashes</summary><p class="small muted" id="provenance-note" style="margin-top:14px"></p><div class="table-wrap"><table><thead><tr><th>Public input / scope</th><th>SHA256</th><th>Bytes</th></tr></thead><tbody id="input-table"></tbody></table></div></details>
 </section>
-<footer class="global-footer"><p>One offline file. No external scripts, fonts, analytics, account access or background requests. Links open public sources when you choose. Reference evidence is never authority to install, deploy or trade.</p><a id="repository-link" href="https://github.com/seathatflowsinourveins/native-agent-stack" target="_blank" rel="noopener noreferrer">Open the public repository ↗</a></footer>
+<footer class="global-footer"><p>One offline file. No external scripts, fonts, analytics, account access or background requests. Links open the labeled public source or this PC only when you choose. Reference evidence is never authority to install, deploy or trade.</p><a id="repository-link" href="https://github.com/seathatflowsinourveins/native-agent-stack" target="_blank" rel="noopener noreferrer">Open the public repository ↗</a></footer>
 </main>
 <dialog id="record-dialog" aria-labelledby="record-title"><div class="dialog-head"><h2 id="record-title"></h2><button class="dialog-close" id="close-dialog" aria-label="Close record">×</button></div><div id="record-content" class="dialog-content"></div></dialog>
 <script id="ecosystem-data" type="application/json">@@DATA@@</script>
@@ -205,6 +206,40 @@ function foundationCapability(row) {
   catalogSources(detail, row.lifecycle.sources); catalogSources(detail, row.sources);
   return add(item, detail);
 }
+function foundationSurfaces(card, layer, matches) {
+  const components = [...new Map(matches.flatMap(row => row.components).map(component => [component.id, component])).values()];
+  if(components.length) {
+    add(card, make("h4", "", "Selected component repositories"));
+    const repositories = make("ul", "foundation-repos");
+    components.forEach(component => {
+      const item = make("li");
+      add(item, component.repository ? link(component.id + " ↗", component.repository) : make("strong", "", component.id), make("span", "", " · " + component.version));
+      if(component.source_pin || component.source_commit) add(item, make("code", "", "Pin: " + (component.source_pin || component.source_commit)));
+      add(repositories, item);
+    });
+    add(card, repositories);
+  }
+  if(layer.surfaces?.length) {
+    const section = add(make("div", "foundation-surfaces"), make("h4", "", "Dashboards and native commands"));
+    const labels = {"native-tui": "Native terminal UI", "cli": "Native command", "local-web": "Local web dashboard", "hosted-web": "Hosted upstream web"};
+    layer.surfaces.forEach(surface => {
+      const item = add(make("article", "foundation-surface"), make("h5", "", surface.title), make("span", "badge", labels[surface.kind]), make("p", "", surface.scope));
+      const links = add(make("div", "catalog-sources"), link("Upstream source / dashboard ↗", surface.upstream_url));
+      if(surface.local_url) add(links, link("This PC · " + surface.local_url + " ↗", surface.local_url));
+      add(item, links);
+      if(surface.kind === "local-web") add(item, make("p", "muted", surface.local_url ? "This PC link uses your browser's loopback address. Availability is untested by this page." : "No local endpoint is recorded. Follow the runbook to configure this dashboard."));
+      if(surface.kind === "hosted-web") add(item, make("p", "muted", "Hosted upstream surface; this link does not establish a deployed instance or account access."));
+      if(surface.kind === "native-tui" || surface.kind === "cli") add(item, make("p", "muted", surface.launch ? "No separate web dashboard; use the native command." : "No separate web dashboard; follow the native runbook."));
+      const detail = add(make("details", "catalog-detail"), make("summary", "", surface.launch ? "Launch command and runbook" : "Source and runbook"));
+      if(surface.launch) add(detail, codeBlock(surface.launch));
+      catalogSources(detail, surface.sources); add(item, detail); add(section, item);
+    });
+    add(card, section);
+  }
+  if(layer.runbooks?.length) {
+    add(card, make("h4", "", "Layer runbooks")); catalogSources(card, layer.runbooks);
+  }
+}
 function renderFoundation() {
   if(!data.grand_catalogs) return;
   const foundation = data.grand_catalogs.foundation;
@@ -213,13 +248,15 @@ function renderFoundation() {
   const grid = $("foundation-layers"); grid.replaceChildren(); const shown = new Set();
   foundation.layers.forEach((layer, index) => {
     if(layerFilter && layerFilter !== layer.id) return;
-    const matches = foundation.decisions.filter(row => row.layer_ids.includes(layer.id) && (!status || row.review_status === status) && words.every(word => [layer.title, layer.purpose, row.capability, row.selection, row.activation, row.evidence_scope, row.next_gap, ...row.component_ids].join(" ").toLowerCase().includes(word)));
+    const surfaceTerms = (layer.surfaces || []).flatMap(surface => [surface.id, surface.title, surface.kind, surface.scope, ...surface.component_ids]);
+    const matches = foundation.decisions.filter(row => row.layer_ids.includes(layer.id) && (!status || row.review_status === status) && words.every(word => [layer.title, layer.purpose, row.capability, row.selection, row.activation, row.evidence_scope, row.next_gap, ...row.component_ids, ...row.components.map(component => component.repository), ...surfaceTerms].join(" ").toLowerCase().includes(word)));
     if(!matches.length && (words.length || status)) return;
     matches.forEach(row => shown.add(row.id));
     const card = add(make("article", "catalog-layer"), make("div", "eyebrow", "Layer " + String(index + 1).padStart(2, "0")), make("h3", "", layer.title), make("p", "", layer.purpose));
     add(card, make("p", "", "Selection: " + layer.selection), make("p", "small", "Use when: " + layer.activation));
     const accepted = matches.filter(row => row.review_status === "accepted_within_scope");
     add(card, make("p", "accepted-scope", accepted.length ? "Accepted within scope: " + accepted.map(row => row.capability).join("; ") : "No accepted capability in this view."));
+    foundationSurfaces(card, layer, matches);
     add(card, add(make("div", "catalog-gap"), make("strong", "", "Next gap"), make("p", "", layer.next_gap)));
     const detail = add(make("details", "catalog-detail"), make("summary", "", "Capabilities · " + matches.length), make("p", "small muted", "Lifecycle scope: " + layer.lifecycle_scope));
     matches.forEach(row => add(detail, foundationCapability(row)));
@@ -235,6 +272,7 @@ function renderGrandCatalogs() {
   add(entry, add(make("article", "catalog-entry"), make("div", "eyebrow", "01 / General engineering"), make("h2", "", "Foundation"), make("p", "", "Native harnesses, instructions, skills, workers, context, research and recovery. Choose the layers needed for the task."), make("p", "catalog-count", foundation.counts.layers + " layers · " + foundation.counts.capabilities + " scoped capabilities"), catalogAction("foundation", "Open Foundation →")));
   add(entry, add(make("article", "catalog-entry"), make("div", "eyebrow", "02 / Domain architecture"), make("h2", "", "Trading"), make("p", "", "US-equities research and simulation, with separate engine, data and broker acceptance. Reuses the foundation."), make("p", "catalog-count", trading.broker_boundaries.length + " broker boundaries · " + trading.next_acceptance.length + " next checks"), catalogAction("trading", "Open Trading →")));
   add($("foundation-summary"), make("strong", "", foundation.counts.layers + " layers · " + foundation.counts.capabilities + " capabilities · " + foundation.counts.accepted + " accepted within scope"), make("p", "muted", foundation.scope || "Recorded capability decisions for general engineering."), make("p", "catalog-scope", "Acceptance describes the linked work only. Current-host state is unknown from this offline page."));
+  if(foundation.surface_catalog) add($("foundation-summary"), make("p", "catalog-scope", "Dashboard mapping checked " + foundation.surface_catalog.checked_at + ". " + foundation.surface_catalog.scope), link("Dashboard and command manifest ↗", foundation.surface_catalog.url));
   [["docs/harness-defaults.md", "Harness defaults"], ["catalogs/foundation/README.md", "Foundation guide"], ["catalogs/README.md", "How the catalogs fit"]].forEach(([path, label]) => { if(recipeMap.has(path)) add($("foundation-guides"), recipeButton(path, label)); });
   foundation.layers.forEach(layer => { const option = make("option", "", layer.title); option.value = layer.id; add($("foundation-layer"), option); });
   [$("foundation-search"), $("foundation-layer"), $("foundation-status")].forEach(control => control.addEventListener(control.tagName === "SELECT" ? "change" : "input", renderFoundation));

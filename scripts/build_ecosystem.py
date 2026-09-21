@@ -29,6 +29,7 @@ REVIEW = "catalogs/convergence-practice/source-review.json"
 ADOPTION = "adoption/manifest.json"
 SATURATION = "blueprints/token-native-focus/saturation-audit.json"
 TOKEN_TOPIC = "docs/token-efficiency-stack.json"
+FOUNDATION_SURFACES = "catalogs/foundation/surfaces.json"
 SETUP_GUIDES = ("adoption/README.md", "adoption/update.md", "tools/token-report/README.md")
 TOKEN_RECEIPTS = (
     "token-practice-native-counters-20260920", "native-jcodemunch-20260920",
@@ -90,6 +91,21 @@ def public_url(value):
     return value
 
 
+def loopback_url(value):
+    """A chosen browser link to this PC, never a background health request."""
+    if not isinstance(value, str) or any(ord(c) < 33 for c in value) or "\\" in value:
+        return ""
+    try:
+        parsed = urlsplit(value)
+        if (parsed.scheme not in {"http", "https"}
+                or not re.fullmatch(r"(?:127\.0\.0\.1|\[::1\])(?::[0-9]+)?", parsed.netloc)
+                or parsed.port == 0 or parsed.query or parsed.fragment):
+            return ""
+    except ValueError:
+        return ""
+    return value
+
+
 def repository_key(value):
     require(public_url(value) == value and bool(re.fullmatch(
         r"https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", value)),
@@ -118,7 +134,7 @@ def source_links(value):
     return links
 
 
-def build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url):
+def build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url, root):
     """Join explicit capability decisions; repository execution flags are not acceptance."""
     paths = config.get("grand_catalogs")
     if paths is None:
@@ -195,6 +211,61 @@ def build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url):
         "counts": {"layers": len(layers), "capabilities": len(joined),
                    "accepted": sum(row.get("review_status") == "accepted_within_scope" for row in joined),
                    "components": len({identifier for row in joined for identifier in row["component_ids"]})}}
+    if safe_file(root, FOUNDATION_SURFACES).exists():
+        surface_catalog = read(FOUNDATION_SURFACES)
+        require(surface_catalog.get("schema_version") == 1, "unsupported foundation surface schema")
+        for field in ("checked_at", "scope"):
+            require(isinstance(surface_catalog.get(field), str) and surface_catalog[field].strip(),
+                    "foundation surfaces need " + field)
+        require(isinstance(surface_catalog.get("surfaces"), list)
+                and isinstance(surface_catalog.get("layers"), list), "foundation surfaces need lists")
+
+        def identities(values, label):
+            require(isinstance(values, list) and all(isinstance(value, str) for value in values),
+                    label + " must be a list of identities")
+            require(len(values) == len(set(values)), "duplicate " + label)
+            return set(values)
+
+        surfaces = {}
+        for surface in surface_catalog["surfaces"]:
+            require(isinstance(surface, dict), "foundation surface must be an object")
+            identifier = surface.get("id")
+            require(isinstance(identifier, str) and re.fullmatch(r"[a-z][a-z0-9-]*", identifier),
+                    "invalid foundation surface identity")
+            require(identifier not in surfaces, "duplicate foundation surface")
+            require(surface.get("kind") in {"native-tui", "local-web", "hosted-web", "cli"},
+                    "unknown foundation surface kind")
+            for field in ("title", "scope"):
+                require(isinstance(surface.get(field), str) and surface[field].strip(),
+                        "foundation surface needs " + field)
+            component_ids = identities(surface.get("component_ids"), "surface components")
+            require(component_ids and component_ids.issubset(components),
+                    "foundation surface references an unknown component or has none")
+            require(bool(public_url(surface.get("upstream_url"))),
+                    "foundation surface needs a public HTTPS upstream URL")
+            local = surface.get("local_url")
+            require(local is None or (surface["kind"] == "local-web" and bool(loopback_url(local))),
+                    "foundation surface local URL must be a literal loopback web URL")
+            launch = surface.get("launch")
+            require(launch is None or (isinstance(launch, str) and launch.strip()),
+                    "foundation surface launch must be command text or null")
+            item = {**surface, "sources": sources(surface.get("source_paths", []))}
+            item.pop("source_paths", None)
+            surfaces[identifier] = item
+        joins = surface_catalog["layers"]
+        require(all(isinstance(row, dict) for row in joins), "surface layer must be an object")
+        joined_ids = identities([row.get("layer_id") for row in joins], "surface layer")
+        require(joined_ids == set(layer_ids), "foundation surface layers must exactly match foundation layers")
+        layer_surfaces = {}
+        for row in joins:
+            references = identities(row.get("surface_ids"), "layer surface references")
+            require(references.issubset(surfaces), "foundation layer references an unknown surface")
+            layer_surfaces[row["layer_id"]] = {
+                "surfaces": [surfaces[identifier] for identifier in row["surface_ids"]],
+                "runbooks": sources(row.get("runbook_paths", []))}
+        foundation["layers"] = [{**layer, **layer_surfaces[layer["id"]]} for layer in layers]
+        foundation["surface_catalog"] = {"checked_at": surface_catalog["checked_at"],
+            "scope": surface_catalog["scope"], "url": file_url(FOUNDATION_SURFACES)}
     engine = {**target["engine"], "repository": public_url(target["engine"].get("repository")),
               "sources": source_links(target["engine"].get("sources", []))}
     brokers = [{**row, "sources": source_links(row.get("sources", []))} for row in target["broker_boundaries"]]
@@ -509,7 +580,7 @@ def build_data(root):
                 item["sources"].append({"path": path, "url": file_url(path)})
             topic_rows.append(item)
         token_topic = {**topic_source, "rows": topic_rows, "url": file_url(TOKEN_TOPIC)}
-    grand_catalogs = build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url)
+    grand_catalogs = build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url, root)
     return {"schema_version": 1, "snapshot_date": config["snapshot_date"],
             "repository_url": config["repository_url"], "source_revision": config["source_revision"],
             "stars_observed_at": stars["retrieved_at"], "component_snapshot_at": stamp(stack),

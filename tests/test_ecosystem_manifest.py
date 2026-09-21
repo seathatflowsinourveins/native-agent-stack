@@ -529,6 +529,145 @@ class EcosystemManifestTests(unittest.TestCase):
         self.assertIsNone(data.get("grand_catalogs"))
         self.assertEqual(len(data["repositories"]), 2)
 
+    def surface_fixture(self):
+        """Local integration fixture; no dashboard or upstream execution claim."""
+        self.grand_catalog_fixture()
+        common = {"component_ids": ["search"], "upstream_url": "https://example.org/search",
+                  "scope": "Dated fixture; current host unknown", "local_url": None,
+                  "launch": None, "source_paths": ["recipes/search.md"]}
+        self.surfaces = {"schema_version": 1, "checked_at": "2026-09-21",
+                         "scope": "Reference surfaces only", "surfaces": [
+            {**common, "id": "search-tui", "title": "Search terminal", "kind": "native-tui",
+             "launch": "search tui"},
+            {**common, "id": "search-local", "title": "Search dashboard", "kind": "local-web",
+             "local_url": "http://127.0.0.1:3000/dashboard"},
+            {**common, "id": "search-hosted", "title": "Hosted search", "kind": "hosted-web"},
+            {**common, "id": "search-cli", "title": "Search command", "kind": "cli",
+             "launch": "search --native"}],
+            "layers": [{"layer_id": "retrieval", "surface_ids": ["search-tui", "search-local",
+                        "search-hosted", "search-cli"], "runbook_paths": ["recipes/search.md"]}]}
+        self.save_surfaces()
+
+    def save_surfaces(self):
+        self.write("catalogs/foundation/surfaces.json", self.surfaces)
+
+    def test_surface_manifest_joins_native_local_hosted_and_runbook_sources(self):
+        self.surface_fixture()
+        page, _ = self.build()
+        data = json.loads(page.data)
+        foundation = data["grand_catalogs"]["foundation"]
+        layer = foundation["layers"][0]
+        self.assertEqual([row["id"] for row in layer["surfaces"]],
+                         self.surfaces["layers"][0]["surface_ids"])
+        self.assertEqual(layer["surfaces"][1]["local_url"], "http://127.0.0.1:3000/dashboard")
+        self.assertIsNone(layer["surfaces"][2]["local_url"])
+        self.assertEqual(layer["surfaces"][0]["launch"], "search tui")
+        self.assertEqual(layer["runbooks"][0]["path"], "recipes/search.md")
+        self.assertTrue(layer["surfaces"][0]["sources"][0]["url"].endswith("/recipes/search.md"))
+        self.assertEqual(foundation["surface_catalog"]["scope"], "Reference surfaces only")
+        self.assertEqual(foundation["surface_catalog"]["checked_at"], "2026-09-21")
+        self.assertIn("/blob/main/catalogs/foundation/surfaces.json", foundation["surface_catalog"]["url"])
+        hashes = {row["path"]: row["sha256"] for row in data["inputs"]}
+        path = "catalogs/foundation/surfaces.json"
+        self.assertEqual(hashes[path], hashlib.sha256((self.root / path).read_bytes()).hexdigest())
+        self.surfaces["surfaces"][0]["scope"] = "Changed surface scope"
+        self.save_surfaces()
+        self.assertNotEqual(self.run_generator("--check").returncode, 0)
+
+    def test_surface_layer_coverage_and_references_must_resolve(self):
+        self.surface_fixture()
+        cases = [
+            ("layers", [], "exactly match"),
+            ("layers", self.surfaces["layers"] * 2, "duplicate surface layer"),
+            ("layers", [{"layer_id": "unknown", "surface_ids": []}], "exactly match"),
+            ("layers", [{"layer_id": "retrieval", "surface_ids": ["missing"]}], "unknown surface"),
+            ("layers", [{"layer_id": "retrieval", "surface_ids": ["search-cli", "search-cli"]}], "duplicate"),
+            ("surfaces", self.surfaces["surfaces"] * 2, "duplicate foundation surface"),
+        ]
+        for field, invalid, message in cases:
+            with self.subTest(field=field, message=message):
+                original = self.surfaces[field]
+                self.surfaces[field] = invalid
+                self.save_surfaces()
+                result = self.run_generator("--write")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(message, result.stdout)
+                self.surfaces[field] = original
+
+    def test_surface_components_kinds_and_commands_require_valid_contracts(self):
+        self.surface_fixture()
+        for field, invalid, message in (
+            ("component_ids", ["missing"], "unknown component"),
+            ("component_ids", [], "has none"),
+            ("component_ids", ["search", "search"], "duplicate"),
+            ("kind", "remote-shell", "unknown foundation surface kind"),
+            ("launch", "", "must be command text"),
+            ("launch", {"execute": "search"}, "must be command text"),
+        ):
+            with self.subTest(field=field):
+                row = self.surfaces["surfaces"][0]
+                original = row[field]
+                row[field] = invalid
+                self.save_surfaces()
+                result = self.run_generator("--write")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(message, result.stdout)
+                row[field] = original
+
+    def test_surface_links_reject_unsafe_upstream_and_nonliteral_local_hosts(self):
+        self.surface_fixture()
+        row = self.surfaces["surfaces"][1]
+        cases = [("upstream_url", url) for url in (
+            "javascript:alert(1)", "http://example.org/", "https://user:secret@example.org/",
+            "https://127.0.0.1/", "https://example.org/\nmalformed")]
+        cases += [("local_url", url) for url in (
+            "javascript:alert(1)", "http://localhost:3000/", "http://127.1/", "http://2130706433/",
+            "http://127.0.0.1.example.org/", "http://user:secret@127.0.0.1:3000/",
+            "http://127.0.0.1\\@example.org/", "http://[::1%25eth0]:3000/",
+            "http://127.0.0.1:65536/", "http://127.0.0.1:0/", "http://127.0.0.1:3000/?token=secret",
+            "http://127.0.0.1:3000/#secret", "http://127.0.0.1:3000/\n")]
+        for field, invalid in cases:
+            with self.subTest(field=field, url=invalid):
+                original = row[field]
+                row[field] = invalid
+                self.save_surfaces()
+                self.assertNotEqual(self.run_generator("--write").returncode, 0)
+                row[field] = original
+        row["local_url"] = "https://[::1]:3000/dashboard"
+        self.save_surfaces()
+        page, _ = self.build()
+        self.assertEqual(json.loads(page.data)["grand_catalogs"]["foundation"]["layers"][0]
+                         ["surfaces"][1]["local_url"], row["local_url"])
+        row["kind"] = "hosted-web"
+        self.save_surfaces()
+        self.assertNotEqual(self.run_generator("--write").returncode, 0)
+
+    def test_surface_source_and_runbook_paths_cannot_escape_or_follow_symlinks(self):
+        self.surface_fixture()
+        (self.root / "recipes/linked.md").symlink_to(self.root / "recipes/search.md")
+        for target, field in ((self.surfaces["surfaces"][0], "source_paths"),
+                              (self.surfaces["layers"][0], "runbook_paths")):
+            for path in ("../outside.md", "recipes/linked.md", "https://example.org/source.md"):
+                with self.subTest(field=field, path=path):
+                    original = target[field]
+                    target[field] = [path]
+                    self.save_surfaces()
+                    self.assertNotEqual(self.run_generator("--write").returncode, 0)
+                    target[field] = original
+
+    def test_surface_text_and_commands_are_inert_public_data(self):
+        self.surface_fixture()
+        hostile = '</script><script src="https://invalid.example/steal.js"></script>'
+        row = self.surfaces["surfaces"][0]
+        row.update(title=hostile, scope=hostile, launch=hostile)
+        self.save_surfaces()
+        page, _ = self.build()
+        self.assertEqual(len(page.scripts), 2)
+        self.assertEqual(page.external_assets, [])
+        surface = json.loads(page.data)["grand_catalogs"]["foundation"]["layers"][0]["surfaces"][0]
+        self.assertEqual(surface["title"], hostile)
+        self.assertEqual(surface["launch"], hostile)
+
     def test_foundation_joins_exact_capability_receipts_and_current_component_pin(self):
         self.stack["components"][0]["source_pin"] = "d" * 40
         self.grand_catalog_fixture()
