@@ -201,6 +201,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -305,6 +310,11 @@
           {
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -449,6 +459,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -563,6 +578,11 @@
           {
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -778,6 +798,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -847,6 +872,11 @@
           {
             "id": "upstream-native-tools-20260920",
             "path": "evidence/receipts/upstream-native-tools-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -923,6 +953,11 @@
           {
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -1119,6 +1154,11 @@
             "id": "foundation-rd-20260921",
             "path": "evidence/receipts/foundation-rd-20260921.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1464,6 +1504,11 @@
             "id": "foundation-rd-20260921",
             "path": "evidence/receipts/foundation-rd-20260921.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1542,6 +1587,11 @@
             "id": "foundation-rd-20260921",
             "path": "evidence/receipts/foundation-rd-20260921.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1764,6 +1814,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -1874,6 +1929,11 @@
           {
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -2059,6 +2119,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2404,6 +2469,11 @@
             "id": "velanext-native-quality-tools-20260920",
             "path": "blueprints/convergence-practice/wsl-native-tools/receipt.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2517,6 +2587,11 @@
           {
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -2636,6 +2711,11 @@
           {
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -2978,6 +3058,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "new_native_client_scope": "One bounded task in each native client passed project-file Context Mode reading and exact jCodeMunch symbol retrieval; six MCP calls, no failures. Consumption is separate from savings.",
@@ -3146,6 +3231,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3344,6 +3434,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3417,6 +3512,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -3568,6 +3668,11 @@
           {
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -3898,6 +4003,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4005,6 +4115,11 @@
           {
             "id": "foundation-native-20260920",
             "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -4531,6 +4646,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4608,6 +4728,11 @@
           {
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -4716,6 +4841,11 @@
           {
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -4887,6 +5017,11 @@
             "id": "foundation-rd-20260921",
             "path": "evidence/receipts/foundation-rd-20260921.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5049,6 +5184,11 @@
           {
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -5320,6 +5460,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5506,6 +5651,11 @@
           {
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -5902,6 +6052,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6200,6 +6355,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6310,6 +6470,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6393,6 +6558,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6462,6 +6632,11 @@
             "id": "native-linux-zizmor-20260920",
             "path": "evidence/receipts/native-linux-zizmor-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -6524,6 +6699,11 @@
           {
             "id": "native-tavily-session-20260920",
             "path": "evidence/receipts/native-tavily-session-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -6624,6 +6804,11 @@
           {
             "id": "nautilus-equity-replay-20260921",
             "path": "evidence/receipts/nautilus-equity-replay-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "claude-upstream-checks-20260921",
+            "path": "evidence/receipts/claude-upstream-checks-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],

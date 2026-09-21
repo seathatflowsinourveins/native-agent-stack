@@ -2546,6 +2546,58 @@
       "path": "observability/grand-dashboard/capacity-recovery-20260921.json"
     },
     {
+      "id": "claude-upstream-checks-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "agent-browser",
+        "agentsview",
+        "ai-memory",
+        "alertmanager",
+        "ast-grep",
+        "beads",
+        "ccusage",
+        "claude-code",
+        "codex",
+        "codex-for-claude",
+        "context-mode",
+        "dagu",
+        "difftastic",
+        "gitleaks",
+        "grafana",
+        "headroom",
+        "jcodemunch-mcp",
+        "lean",
+        "loki",
+        "markitdown",
+        "mcporter",
+        "nautilus-trader",
+        "openresearch",
+        "opentelemetry-collector-contrib",
+        "prometheus",
+        "promptfoo",
+        "qdrant",
+        "qmd",
+        "repomix",
+        "rtk",
+        "serena",
+        "socraticode",
+        "tavily-cli",
+        "toon",
+        "vllm",
+        "worktrunk",
+        "zizmor"
+      ],
+      "claim": "Live Claude retained 38 native command rows: 14 bounded functional checks, 18 readiness checks and 6 version/help checks, with corrected failure handling and three native dashboard screenshots.",
+      "limitations": [
+        "38 zero-exit rows are not 38 functional E2Es; each row keeps its narrower evidence class.",
+        "This is dated source-host evidence, not another PC installation or full lifecycle acceptance.",
+        "RTK/Headroom/Context Mode figures overlap or have tool-specific retention; no causal provider savings.",
+        "Complete originals remain private; public excerpts are bounded and sanitized.",
+        "The earlier wrong-port vLLM fallback was wrongly accepted and remains recorded; corrected call tests only the stated embedding request."
+      ],
+      "path": "evidence/receipts/claude-upstream-checks-20260921.json"
+    },
+    {
       "id": "foundation-rd-20260921",
       "kind": "native_model_e2e",
       "component_ids": [
@@ -4629,8 +4681,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "bytes": 428122,
-      "sha256": "663dde53579bb6bd049b1e9344be50cca6b0485b409ab30015d032ae8273d68f"
+      "bytes": 435263,
+      "sha256": "16884bbcdd8acc40120ecc8e79adcb22b05a66960c9fbc0a4379721a4b8494f8"
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -6229,8 +6281,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 7077193,
-      "sha256": "e8891ddeddda45cf3f171ae09293b645ae49160e1e563c032fa4a28c231eb2cb"
+      "bytes": 7665922,
+      "sha256": "864e0e426b89f6b6d059e1019b69f106e418a49128b37801995dc3ab1e6359a9"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6239,8 +6291,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "bytes": 37912,
-      "sha256": "efa00bcc90dc0fdfb5ffb93c4484791f4cfa05e48b8f32ad57c15c3bd6dc2fe9"
+      "bytes": 38285,
+      "sha256": "c2c329dd9e988f7f1b7807ca6c62ce49920e8a14cff80dc58ff5a4e27e72d343"
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6259,8 +6311,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "bytes": 81629,
-      "sha256": "34aad04f25023eea0112cc14ac98353bf9c4c1195311dbe1e76f10c08c05c733"
+      "bytes": 81951,
+      "sha256": "bdff71624cb220cca4f4e8208ea9b7da9dbdddd4bedec8f2262b4e4135221822"
     },
     {
       "path": "docs/evidence.md",
@@ -6744,8 +6796,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 80666,
-      "sha256": "8c0ea4594ef5ac6f5d256374137f46be0f4df6271a6734ab9cb12656ab796972"
+      "bytes": 82257,
+      "sha256": "aa6241e62074ae3430da4104558878d798beb8c188958bb4af7d839d731a53f6"
     },
     {
       "path": "observability/README.md",
@@ -6934,8 +6986,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "bytes": 34776,
-      "sha256": "e4abe10cf51618d79f4c00d7e139a64fb01dc050d18da9ae0e05d0177700e5a3"
+      "bytes": 35445,
+      "sha256": "e85a47ed32ac15d699f88ae038c4a6b612f4a7fa9652bd600e696ae5b9903ec2"
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -9591,6 +9643,46 @@
       "path": "recipes/claude-codex-foreground-review.md",
       "bytes": 3219,
       "sha256": "390d1b54f94a28027282408b0453c05221227d5709c49a66a904705b094a8130"
+    },
+    {
+      "path": "docs/claude-upstream-checks.md",
+      "bytes": 4075,
+      "sha256": "2da453af7ba5129c337237781108291cae8a275b49e6a05e1658c62cbaf5744e"
+    },
+    {
+      "path": "docs/ecosystem/claude-upstream-checks.html",
+      "bytes": 60970,
+      "sha256": "c23e17b871ddbed23388da9ac492b301be13a13506fd227049523222c0a237d6"
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-6h-20260921.png",
+      "bytes": 100755,
+      "sha256": "83ef18609465a76f96881fba06b2f960b92f1d0731f03ba9c65771cd26583b3a"
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-72h-20260921.png",
+      "bytes": 97802,
+      "sha256": "06f1b5d58f057137b0689a7c9d8fcddca9af36a826b6dbe2c567e6e82c89395d"
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/provenance.json",
+      "bytes": 34249,
+      "sha256": "ea3d215168c9f7df2e4568c2562ce445c376e41f1b077a2898030885643b5cb4"
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/results.json",
+      "bytes": 74785,
+      "sha256": "c4a6e247323c9f89303784742b299ffa3cb46cb136ec514169c9a172563caeef"
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
+      "bytes": 85934,
+      "sha256": "787f3d49cedc86489e6e7446810d992bda880071d0bbf22d7c0fef67d8120b2a"
+    },
+    {
+      "path": "evidence/receipts/claude-upstream-checks-20260921.json",
+      "bytes": 2818,
+      "sha256": "db9f8b3eafcbc88072bfe603afcfd53e8c3cac60baeaf75b23ded5956b517ca7"
     }
   ],
   "convergence_records": [

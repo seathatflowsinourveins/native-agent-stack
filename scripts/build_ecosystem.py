@@ -47,10 +47,17 @@ RETURNED_RECEIPT_FAMILIES = {
     "native-dashboard-data", "native-dashboard-access", "full-stack-convergence",
     "dashboard-render-e2e", "dashboard-gap-resolution", "memory-landscape", "memory-landscape-lifecycle", "foundation-convergence",
     "foundation-rd",
+    "claude-upstream-checks",
 }
 PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
 PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024
 NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json",
+                    "docs/claude-upstream-checks.md", "docs/ecosystem/claude-upstream-checks.html",
+                    "evidence/artifacts/claude-upstream-checks-20260921/results.json",
+                    "evidence/artifacts/claude-upstream-checks-20260921/provenance.json",
+                    "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-6h-20260921.png",
+                    "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-72h-20260921.png",
+                    "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
                     "docs/foundation-rd-readiness.md", "recipes/claude-codex-foreground-review.md",
                     "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
                     "evidence/artifacts/foundation-rd-20260921/qmd-bench-output.txt",
@@ -389,7 +396,7 @@ def build_data(root):
                  "docs/harness-defaults.md", "catalogs/README.md", "catalogs/foundation/README.md",
                  "docs/community-native-practice.md", "examples/claude-native/CLAUDE.md",
                  "recipes/claude-native-ultracode.md", "docs/foundation-rd-readiness.md",
-                 "recipes/claude-codex-foreground-review.md"):
+                 "recipes/claude-codex-foreground-review.md", "docs/claude-upstream-checks.md"):
         if (root / path).exists():
             guide_paths.append(path)
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))
