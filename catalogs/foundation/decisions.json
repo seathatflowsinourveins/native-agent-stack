@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-09-20",
+  "checked_at": "2026-09-21",
   "scope": "Capability-specific general FOUNDATION selection; original pins, full receipt claims and per-component lifecycle stages remain canonical. Shared research and financial examples are not blanket adoption.",
   "decisions": [
     {
@@ -2060,7 +2060,7 @@
       "id": "interactive-hud-boundary",
       "capability": "Retain synthetic HUD rendering separately from live activation",
       "capability_key": "interactive-hud-boundary",
-      "checked_at": "2026-09-20",
+      "checked_at": "2026-09-21",
       "layer_ids": [
         "observation-inference"
       ],
@@ -2075,19 +2075,21 @@
         "token-practice-gap-followup-20260920",
         "native-claude-hud-interactive-20260920"
       ],
-      "evidence_scope": "Synthetic renderer passed; the real terminal launch reached onboarding before the conversation HUD appeared.",
+      "evidence_scope": "Historical synthetic rendering passed and the older native attempt reached onboarding. Two current authenticated resumes stopped at the effort overlay; actual HUD rendering remains unverified.",
       "limitations": [
         "Live interactive HUD rendering remains unverified despite existing authentication; a synthetic rendering pass does not replace it."
       ],
       "source_paths": [
         "docs/convergence-architecture.md",
-        "adoption/lifecycle.md"
+        "adoption/lifecycle.md",
+        "docs/full-stack-convergence.md",
+        "evidence/artifacts/full-stack-convergence-20260921/hud-observation.json"
       ],
-      "next_gap": "Observe the real statusline only after the native onboarding condition is resolved.",
+      "next_gap": "Observe the actual statusline after resolving the current terminal/effort-dialog boundary; sign-in and onboarding are no longer the observed blocker.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
-        "scope": "Only the listed canonical stages and their original host/operation scopes apply. Synthetic renderer passed; the real terminal launch reached onboarding before the conversation HUD appeared.",
-        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Observe the real statusline only after the native onboarding condition is resolved.",
+        "scope": "Only the listed canonical stages and their original scopes apply. Current native resumes did not reach the statusline; historical synthetic output does not replace that observation.",
+        "unknown": "Interactive HUD rendering remains unestablished. Observe the actual statusline after resolving the current terminal/effort-dialog boundary; sign-in and onboarding are no longer the observed blocker.",
         "stage_refs": [
           {
             "component_id": "claude-hud",

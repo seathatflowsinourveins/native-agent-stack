@@ -191,6 +191,13 @@ contains the same attachments. The optional full local view is selected with
 `returned_results.js` with the reporter. The smaller portable template remains the
 default. This presentation is local integration code, not an upstream dashboard.
 
+The attached-results view joins every selected component to its observations,
+shows missing coverage, and filters by component and runtime together. Historical
+aliases are normalized for display while downloads retain the original records.
+Coverage counts include failures and dated observations; they are not E2E pass
+counts. Explicit PNG, JPEG and WebP attachments render inline from their verified
+bytes, with lossless downloads; SVG and other files remain download-only.
+
 For an existing ledger, optional `counter_scopes` keys `rtk_global`, `rtk_project`
 and `headroom` preserve its original scope strings when upgrading the reporter.
 Explicit `inspect_project_history` and `inspect_hook_history` preserve previously
@@ -201,6 +208,7 @@ the report must not create renamed duplicates of existing counters.
 
 ```sh
 python3 -m unittest discover -s tools/token-report -p 'test_*.py' -v
+node --test tools/token-report/test_returned_results.cjs
 python3 scripts/validate.py
 ```
 

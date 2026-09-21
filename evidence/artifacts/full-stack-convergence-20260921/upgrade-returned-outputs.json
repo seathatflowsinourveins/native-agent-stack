@@ -1,0 +1,168 @@
+{
+  "scope": "Exact captured command metadata and returned text with private paths replaced. Upstream test subsets and local CLI operations are distinct; these are not reruns.",
+  "commands": [
+    {
+      "label": "ccusage-upstream-node-tests",
+      "command": {
+        "argv": [
+          "env",
+          "TZ=UTC",
+          "node",
+          "--test",
+          "apps/ccusage/src/cli.test.ts",
+          "nix/tools/models-dev-gen/compact.test.ts"
+        ],
+        "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/ccusage-repomix/ccusage-source",
+        "started_at": "2026-09-21T13:34:45.648535+00:00",
+        "exit_code": 0,
+        "finished_at": "2026-09-21T13:34:45.759986+00:00",
+        "elapsed_seconds": 0.111,
+        "stdout_sha256": "37d2985c2b3c4174846a2e9c768c7ab570c394da08f7243e8897be31015cc8a4",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": "▶ resolveCliRuntime\n  ✔ resolves the native package binary for the current supported platform (0.438987ms)\n  ✔ resolves the Windows native package binary with the exe suffix (0.107507ms)\n  ✔ prefers the matching native package binary when it is available (0.437857ms)\n  ✔ fails when the native package binary is unavailable (0.07263ms)\n  ✔ repairs a native binary that was extracted without executable bits (0.215053ms)\n  ✔ does not chmod an already executable native binary (0.072732ms)\n  ✔ does not chmod Windows native binaries (0.087296ms)\n  ✔ treats package bin symlinks as the main module entry point (0.104447ms)\n✔ resolveCliRuntime (2.211505ms)\n▶ createNativeSpawner\n  ✔ forwards every supported launcher signal delivery (0.436045ms)\n  ✔ forwards the supported Windows console signals (0.399196ms)\n  ✔ removes signal listeners after the child exits (0.175654ms)\n  ✔ removes signal listeners after a child error (0.144537ms)\n✔ createNativeSpawner (1.319682ms)\n(node:1076214) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file://${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/ccusage-repomix/ccusage-source/nix/tools/models-dev-gen/compact.test.ts is not specified and it doesn't parse as CommonJS.\nReparsing as ES module because module syntax was detected. This incurs a performance overhead.\nTo eliminate this warning, add \"type\": \"module\" to ${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/ccusage-repomix/ccusage-source/nix/tools/models-dev-gen/package.json.\n(Use `node --trace-warnings ...` to show where the warning was created)\n✔ indexes authoring providers and bare model ids from the catalog keys (1.395936ms)\n✔ trusts the catalog that authored the model (0.091867ms)\n✔ trusts an authoring provider for models it serves without a catalog entry (0.055653ms)\n✔ trusts a first-party provider that renames its authoring namespace (0.051751ms)\n✔ ranks cloud platforms below the author but above resellers (0.078559ms)\n✔ ranks unknown catalogs as resellers (0.061547ms)\n✔ never lets a richer reseller entry replace the authoring catalog (0.08601ms)\n✔ replaces a reseller entry with the authoring catalog (0.09935ms)\n✔ uses a stable source ordering tie-break within one trust tier (0.085818ms)\n✔ recognizes separately priced tiers of a model already carried (0.279259ms)\n✔ marks a tier the author prices itself as exact-only too (0.087849ms)\n✔ recognizes ids that name no particular model (0.10006ms)\n✔ rejects flat-fee catalogs that publish all-zero token costs (0.051638ms)\n✔ accepts chat models whose audio and video inputs are tokenised (0.096204ms)\n✔ rejects duration-priced models however the serving catalog describes them (0.032843ms)\n✔ rejects image-output models a reseller catalog describes as text-only (0.046272ms)\n✔ falls back to the serving catalog for models the authored catalog omits (0.029579ms)\n✔ exports the rules the runtime loader cannot derive from a live response (0.159761ms)\n✔ falls back to the source model id when the catalog id is empty (0.047024ms)\n✔ falls back to the source model id when the catalog id is undefined (0.033291ms)\n✔ uses the catalog id when it is non-empty (0.023082ms)\n✔ formats duplicate pricing key warnings with the skipped source id (0.042046ms)\nℹ tests 34\nℹ suites 2\nℹ pass 34\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 87.645032\n",
+      "stderr": ""
+    },
+    {
+      "label": "repomix-upstream-tests",
+      "command": {
+        "argv": [
+          "npm",
+          "test",
+          "--",
+          "--run",
+          "tests/core/git/gitCommand.test.ts",
+          "tests/core/file/fileManipulate.test.ts",
+          "tests/core/output/flagFullDirectoryStructure.test.ts",
+          "tests/core/file/truncateBase64.test.ts",
+          "tests/shared/sizeParse.test.ts"
+        ],
+        "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/ccusage-repomix/repomix-source",
+        "started_at": "2026-09-21T13:35:12.664095+00:00",
+        "exit_code": 0,
+        "finished_at": "2026-09-21T13:35:13.246273+00:00",
+        "elapsed_seconds": 0.582,
+        "stdout_sha256": "c1cb8128427c937fd5870774d55780ab57b312811a2c0bd2bc1a3f239797afcc",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": "\n> repomix@1.18.1 test\n> vitest --run tests/core/git/gitCommand.test.ts tests/core/file/fileManipulate.test.ts tests/core/output/flagFullDirectoryStructure.test.ts tests/core/file/truncateBase64.test.ts tests/shared/sizeParse.test.ts\n\n\n RUN  v5.0.0 ${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/ccusage-repomix/repomix-source\n\n\n Test Files  5 passed (5)\n      Tests  148 passed (148)\n   Start at  09:35:12\n   Duration  287ms (transform 62%, tests 19%, import 12%, setup 4%, worker 3%)\n\n",
+      "stderr": ""
+    },
+    {
+      "label": "ccusage-promoted-version",
+      "command": {
+        "argv": [
+          "ccusage",
+          "--version"
+        ],
+        "cwd": "${PROJECT_ROOT}",
+        "started_at": "2026-09-21T13:37:08.163150+00:00",
+        "exit_code": 0,
+        "finished_at": "2026-09-21T13:37:08.192986+00:00",
+        "elapsed_seconds": 0.03,
+        "stdout_sha256": "72c7c8d6db1e913882d478629eef33e2e3317516342b93c583ed2c10f71a7244",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": "ccusage 20.0.24\n",
+      "stderr": ""
+    },
+    {
+      "label": "repomix-promoted-version",
+      "command": {
+        "argv": [
+          "repomix",
+          "--version"
+        ],
+        "cwd": "${PROJECT_ROOT}",
+        "started_at": "2026-09-21T13:37:08.198957+00:00",
+        "exit_code": 0,
+        "finished_at": "2026-09-21T13:37:08.237885+00:00",
+        "elapsed_seconds": 0.039,
+        "stdout_sha256": "71fc7bd16b1bc9b3681085fb0be8aea0b3a37d90d1685938dc2e8a31bf8c9b94",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": "1.18.1\n",
+      "stderr": ""
+    },
+    {
+      "label": "ccusage-codex-offline",
+      "command": {
+        "argv": [
+          "env",
+          "CODEX_HOME=${HOME}/.codex,${DESKTOP_HOME}/.codex",
+          "${HOME}/.local/share/codex-ecosystem/tools/node-v24.21.0/bin/node",
+          "${HOME}/.local/share/codex-ecosystem/tools/ccusage-20.0.24/node_modules/ccusage/src/cli.js",
+          "codex",
+          "daily",
+          "--offline",
+          "--no-cost",
+          "--json",
+          "--timezone",
+          "UTC",
+          "--config",
+          "/dev/null"
+        ],
+        "cwd": "${PROJECT_ROOT}",
+        "started_at": "2026-09-21T13:35:13.748723+00:00",
+        "exit_code": 0,
+        "finished_at": "2026-09-21T13:35:15.990267+00:00",
+        "elapsed_seconds": 2.242,
+        "stdout_sha256": "5bceb447ba87c5e7450c2623100173dff774cc2808e4170009260c50b29fffc1",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": "{\n  \"daily\": [\n    {\n      \"cacheCreationTokens\": 0,\n      \"cacheReadTokens\": 223042304,\n      \"date\": \"2026-09-18\",\n      \"inputTokens\": 8104963,\n      \"models\": {\n        \"gpt-6-astra\": {\n          \"cacheCreationTokens\": 0,\n          \"cacheReadTokens\": 223042304,\n          \"inputTokens\": 8104963,\n          \"isFallback\": false,\n          \"outputTokens\": 1001768,\n          \"reasoningOutputTokens\": 258861,\n          \"totalTokens\": 232149035\n        }\n      },\n      \"outputTokens\": 1001768,\n      \"reasoningOutputTokens\": 258861,\n      \"totalTokens\": 232149035\n    },\n    {\n      \"cacheCreationTokens\": 0,\n      \"cacheReadTokens\": 658311424,\n      \"date\": \"2026-09-19\",\n      \"inputTokens\": 31187116,\n      \"models\": {\n        \"gpt-6-astra\": {\n          \"cacheCreationTokens\": 0,\n          \"cacheReadTokens\": 658311424,\n          \"inputTokens\": 31187116,\n          \"isFallback\": false,\n          \"outputTokens\": 3035499,\n          \"reasoningOutputTokens\": 861252,\n          \"totalTokens\": 692534039\n        }\n      },\n      \"outputTokens\": 3035499,\n      \"reasoningOutputTokens\": 861252,\n      \"totalTokens\": 692534039\n    },\n    {\n      \"cacheCreationTokens\": 0,\n      \"cacheReadTokens\": 782810368,\n      \"date\": \"2026-09-20\",\n      \"inputTokens\": 26939075,\n      \"models\": {\n        \"gpt-6-astra\": {\n          \"cacheCreationTokens\": 0,\n          \"cacheReadTokens\": 782810368,\n          \"inputTokens\": 26939075,\n          \"isFallback\": false,\n          \"outputTokens\": 3515188,\n          \"reasoningOutputTokens\": 1078282,\n          \"totalTokens\": 813264631\n        }\n      },\n      \"outputTokens\": 3515188,\n      \"reasoningOutputTokens\": 1078282,\n      \"totalTokens\": 813264631\n    },\n    {\n      \"cacheCreationTokens\": 0,\n      \"cacheReadTokens\": 329414016,\n      \"date\": \"2026-09-21\",\n      \"inputTokens\": 11401362,\n      \"models\": {\n        \"gpt-6-astra\": {\n          \"cacheCreationTokens\": 0,\n          \"cacheReadTokens\": 329414016,\n          \"inputTokens\": 11401362,\n          \"isFallback\": false,\n          \"outputTokens\": 1380681,\n          \"reasoningOutputTokens\": 396071,\n          \"totalTokens\": 342196059\n        }\n      },\n      \"outputTokens\": 1380681,\n      \"reasoningOutputTokens\": 396071,\n      \"totalTokens\": 342196059\n    }\n  ],\n  \"totals\": {\n    \"cacheCreationTokens\": 0,\n    \"cacheReadTokens\": 1993578112,\n    \"inputTokens\": 77632516,\n    \"outputTokens\": 8933136,\n    \"reasoningOutputTokens\": 2594466,\n    \"totalTokens\": 2080143764\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "label": "ccusage-claude-offline",
+      "command": {
+        "argv": [
+          "env",
+          "CLAUDE_CONFIG_DIR=${HOME}/.claude",
+          "${HOME}/.local/share/codex-ecosystem/tools/node-v24.21.0/bin/node",
+          "${HOME}/.local/share/codex-ecosystem/tools/ccusage-20.0.24/node_modules/ccusage/src/cli.js",
+          "claude",
+          "daily",
+          "--offline",
+          "--no-cost",
+          "--json",
+          "--timezone",
+          "UTC",
+          "--config",
+          "/dev/null"
+        ],
+        "cwd": "${PROJECT_ROOT}",
+        "started_at": "2026-09-21T13:35:13.762673+00:00",
+        "exit_code": 0,
+        "finished_at": "2026-09-21T13:35:13.816767+00:00",
+        "elapsed_seconds": 0.054,
+        "stdout_sha256": "115ef69bb5127cdfbee40db347b94ba5d0ad140554e54426ea6e7f96c5ab79d5",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": "{\n  \"daily\": [\n    {\n      \"cacheCreationTokens\": 118584,\n      \"cacheReadTokens\": 1228638,\n      \"date\": \"2026-09-18\",\n      \"inputTokens\": 88,\n      \"modelBreakdowns\": [\n        {\n          \"cacheCreationTokens\": 118584,\n          \"cacheReadTokens\": 1228638,\n          \"inputTokens\": 88,\n          \"modelName\": \"claude-opus-5\",\n          \"outputTokens\": 15527\n        }\n      ],\n      \"modelsUsed\": [\n        \"claude-opus-5\"\n      ],\n      \"outputTokens\": 15527,\n      \"totalTokens\": 1362837\n    },\n    {\n      \"cacheCreationTokens\": 224320,\n      \"cacheReadTokens\": 845396,\n      \"date\": \"2026-09-19\",\n      \"inputTokens\": 64,\n      \"modelBreakdowns\": [\n        {\n          \"cacheCreationTokens\": 224320,\n          \"cacheReadTokens\": 845396,\n          \"inputTokens\": 64,\n          \"modelName\": \"claude-opus-5\",\n          \"outputTokens\": 23393\n        }\n      ],\n      \"modelsUsed\": [\n        \"claude-opus-5\"\n      ],\n      \"outputTokens\": 23393,\n      \"totalTokens\": 1093173\n    },\n    {\n      \"cacheCreationTokens\": 538230,\n      \"cacheReadTokens\": 2581843,\n      \"date\": \"2026-09-20\",\n      \"inputTokens\": 198,\n      \"modelBreakdowns\": [\n        {\n          \"cacheCreationTokens\": 538230,\n          \"cacheReadTokens\": 2581843,\n          \"inputTokens\": 198,\n          \"modelName\": \"claude-opus-5\",\n          \"outputTokens\": 74809\n        }\n      ],\n      \"modelsUsed\": [\n        \"claude-opus-5\"\n      ],\n      \"outputTokens\": 74809,\n      \"totalTokens\": 3195080\n    },\n    {\n      \"cacheCreationTokens\": 1094218,\n      \"cacheReadTokens\": 7871506,\n      \"date\": \"2026-09-21\",\n      \"inputTokens\": 1630,\n      \"modelBreakdowns\": [\n        {\n          \"cacheCreationTokens\": 357750,\n          \"cacheReadTokens\": 2892052,\n          \"inputTokens\": 1324,\n          \"modelName\": \"claude-fable-5-1\",\n          \"outputTokens\": 58643\n        },\n        {\n          \"cacheCreationTokens\": 554187,\n          \"cacheReadTokens\": 4257892,\n          \"inputTokens\": 264,\n          \"modelName\": \"claude-opus-5\",\n          \"outputTokens\": 81785\n        },\n        {\n          \"cacheCreationTokens\": 182281,\n          \"cacheReadTokens\": 721562,\n          \"inputTokens\": 42,\n          \"modelName\": \"claude-sonnet-5\",\n          \"outputTokens\": 9836\n        }\n      ],\n      \"modelsUsed\": [\n        \"claude-fable-5-1\",\n        \"claude-sonnet-5\",\n        \"claude-opus-5\"\n      ],\n      \"outputTokens\": 150264,\n      \"totalTokens\": 9117618\n    }\n  ],\n  \"totals\": {\n    \"cacheCreationTokens\": 1975352,\n    \"cacheReadTokens\": 12527383,\n    \"inputTokens\": 1980,\n    \"outputTokens\": 263993,\n    \"totalTokens\": 14768708\n  }\n}\n",
+      "stderr": ""
+    },
+    {
+      "label": "repomix-scoped-pack",
+      "command": {
+        "argv": [
+          "${HOME}/.local/share/codex-ecosystem/tools/repomix-1.18.1/node_modules/.bin/repomix",
+          ".",
+          "--config",
+          "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/ccusage-repomix/repomix-scoped.config.json",
+          "--output",
+          "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/ccusage-repomix/repomix-scoped-pack.json"
+        ],
+        "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/ccusage-repomix/repomix-source",
+        "started_at": "2026-09-21T13:36:39.550522+00:00",
+        "exit_code": 0,
+        "finished_at": "2026-09-21T13:36:39.857847+00:00",
+        "elapsed_seconds": 0.307,
+        "stdout_sha256": "c431ef7f1f3c472f31a0a7fad1c293768f06c31b05d9811050fab5be25d64bb2",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": "\n📦 Repomix v1.18.1\n\n\r\u001b[K\u001b[?25l⠋ Initializing...\n\r\u001b[K\u001b[1A\r\u001b[K\u001b[?25l⠙ Searching for files...\n\r\u001b[K\u001b[1A\r\u001b[K\u001b[?25l⠹ Processing file... (2/2) tests/core/git/gitCommand.test.ts\n\r\u001b[K\u001b[1A\r\u001b[K\u001b[?25l⠸ Generating output...\n\r\u001b[K\u001b[1A\r\u001b[K\u001b[?25l⠼ Writing output file...\n\r\u001b[K\u001b[1A\r\u001b[K\u001b[?25l✔ Packing completed successfully!\n\u001b[?25h\n📈 Top 5 Files by Token Count:\n──────────────────────────────\n1.  tests/core/git/gitCommand.test.ts (6,949 tokens, 27,386 chars, 60.9%)\n2.  src/core/git/gitCommand.ts (2,610 tokens, 10,418 chars, 22.9%)\n\n🔎 Security Check:\n──────────────────\n✔ No suspicious files detected.\n\n\n📊 Pack Summary:\n────────────────\n  Total Files: 2 files\n Total Tokens: 11,406 tokens\n  Total Chars: 40,781 chars\n       Output: ${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/ccusage-repomix/repomix-scoped-pack.json\n     Security: ✔ No suspicious files detected\n\n🎉 All Done!\nYour repository has been successfully packed.\n\n💡 Repomix is now available in your browser! Try it at https://repomix.com\n",
+      "stderr": ""
+    }
+  ]
+}

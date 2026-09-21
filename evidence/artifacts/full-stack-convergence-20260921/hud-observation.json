@@ -1,0 +1,80 @@
+{
+  "status": "unverified",
+  "scope": "Two bounded actual native terminal resumes; no new model prompt. Existing authentication/onboarding was ready. Neither capture progressed past the effort overlay, so no actual HUD rendering was observed.",
+  "interpretation": "Enter was sent with Keep xhigh highlighted; key delivery does not establish a UI transition. Terminal capability-probe handling is a possible cause, not a verified diagnosis.",
+  "settings": "Native settings, model and effort unchanged; runtime session bookkeeping changed. Owned processes terminated after bounded attempts.",
+  "attempts": [
+    {
+      "argv": [
+        "${HOME}/.local/share/codex-ecosystem/bin/claude",
+        "--resume",
+        "${SESSION_ID}",
+        "--prompt-suggestions",
+        "false"
+      ],
+      "cwd": "${PROJECT_ROOT}",
+      "started_at": "2026-09-21T13:43:05.005543+00:00",
+      "terminal_rows": 42,
+      "terminal_columns": 140,
+      "settings_before_sha256": "ae4f4120cdd4dc617d69fcfdbde2398f0424ab15fb2660f9ea3a710ff92f98fe",
+      "runtime_config_before_sha256": "da4b01129ef34ed040081ee21b290bf8a7538d6a69f43ed68012445afe4db9b2",
+      "sent_input": [
+        {
+          "after_seconds": 22.074,
+          "key": "Ctrl-C"
+        },
+        {
+          "after_seconds": 24.077,
+          "key": "Ctrl-C"
+        }
+      ],
+      "model_prompt_submitted": false,
+      "termination_fallback": "SIGTERM to owned native process",
+      "completed_at": "2026-09-21T13:43:33.812354+00:00",
+      "elapsed_seconds": 28.807,
+      "exit_code": 143,
+      "terminal_bytes": 12345,
+      "terminal_sha256": "a0ec2267b0b699f2b85c3f83db302f9eb0d1733f5ffbcbb1e019ca3242067ddd",
+      "settings_after_sha256": "ae4f4120cdd4dc617d69fcfdbde2398f0424ab15fb2660f9ea3a710ff92f98fe",
+      "runtime_config_after_sha256": "94ca0b3d1e91ac5ef427b1a262167f90c96fa5f40f757f0ce277c9e87648421d"
+    },
+    {
+      "argv": [
+        "${HOME}/.local/share/codex-ecosystem/bin/claude",
+        "--resume",
+        "${SESSION_ID}",
+        "--prompt-suggestions",
+        "false"
+      ],
+      "cwd": "${PROJECT_ROOT}",
+      "started_at": "2026-09-21T13:45:46.923621+00:00",
+      "terminal_rows": 42,
+      "terminal_columns": 140,
+      "settings_before_sha256": "ae4f4120cdd4dc617d69fcfdbde2398f0424ab15fb2660f9ea3a710ff92f98fe",
+      "runtime_config_before_sha256": "94ca0b3d1e91ac5ef427b1a262167f90c96fa5f40f757f0ce277c9e87648421d",
+      "capture_source_sha256": "31930492685980edada05047b9a6071ff1d8ced80f1dd439f7394162b714024c",
+      "sent_input": [
+        {
+          "after_seconds": 1.002,
+          "key": "Enter",
+          "selected_option": "Keep xhigh"
+        },
+        {
+          "after_seconds": 26.053,
+          "key": "Ctrl-D"
+        }
+      ],
+      "model_prompt_submitted": false,
+      "termination_fallback": "SIGTERM to owned native process",
+      "completed_at": "2026-09-21T13:46:17.581894+00:00",
+      "elapsed_seconds": 30.658,
+      "exit_code": 143,
+      "terminal_bytes": 12345,
+      "terminal_sha256": "a0ec2267b0b699f2b85c3f83db302f9eb0d1733f5ffbcbb1e019ca3242067ddd",
+      "settings_after_sha256": "ae4f4120cdd4dc617d69fcfdbde2398f0424ab15fb2660f9ea3a710ff92f98fe",
+      "runtime_config_after_sha256": "95bcc942b5b55600d9642245a20ce2288db849dcacb62de52871b694bbc1955b",
+      "model_unchanged": true,
+      "effort_unchanged": true
+    }
+  ]
+}

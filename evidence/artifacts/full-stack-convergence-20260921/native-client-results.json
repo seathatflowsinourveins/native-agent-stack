@@ -1,0 +1,521 @@
+{
+  "recorded_at_utc": "2026-09-21T13:30:54.406086+00:00",
+  "kind": "actual_native_model_read_only_integration",
+  "upstream_docs": [
+    "https://developers.openai.com/codex/noninteractive",
+    "https://code.claude.com/docs/en/headless"
+  ],
+  "limitations": [
+    "One real read-only task per client; no matched baseline or whole-stack lifecycle proof.",
+    "Native default models, account homes and permissions preserved. Credential stores were not read or copied.",
+    "Provider usage is usage, not provider savings. Cache reads and thinking subsets must not be double-counted.",
+    "Context Mode stats contain inconsistent session narratives and include cumulative unrelated scopes; raw outputs are retained without endorsing their dollar or runtime claims.",
+    "RTK before/after project estimates are shared-project snapshots while multiple agents may be active; they cannot be attributed exclusively to these clients.",
+    "Historical matched fixture baseline has different task/model inputs and is not a comparator for this task.",
+    "Claude costUSD uses list pricing and does not establish subscription billing.",
+    "Native streams contain private session identifiers and local paths. Publish only deliberately sanitized extracts."
+  ],
+  "sanitization": "Full private streams retained with hashes. Home/session paths replaced; memory result content omitted; setup discovery contents omitted. Provider counters preserve native categories.",
+  "clients": {
+    "claude": {
+      "invocation": {
+        "client": "claude",
+        "argv": [
+          "timeout",
+          "--signal=TERM",
+          "--kill-after=10s",
+          "360s",
+          "${HOME}/.local/share/codex-ecosystem/bin/claude",
+          "-p",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--max-turns",
+          "24",
+          "--permission-prompts",
+          "none"
+        ],
+        "cwd": "${PROJECT_ROOT}",
+        "started_at": "2026-09-21T13:26:16.891152+00:00",
+        "environment_adjustments": {
+          "CODEX_HOME": "${HOME}/.codex",
+          "CLAUDE_CONFIG_DIR": "unset for Claude; unchanged for Codex"
+        },
+        "prompt_sha256": "d24422fdb4e599044c6d1f47e12684e9d9a18f1c0cd34359b939350d8ae99824",
+        "model_override": null,
+        "permission_override": null,
+        "finished_at": "2026-09-21T13:27:32.014794+00:00",
+        "elapsed_seconds": 75.123,
+        "exit_code": 0
+      },
+      "stream_sha256": "c5f040649046979b231d966a852fbb6e2b6274c9eac602ac23b3cc798e1ce744",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "model_observed": "claude-fable-5-1",
+      "provider_usage": {
+        "input_tokens": 100,
+        "cache_creation_input_tokens": 45916,
+        "cache_read_input_tokens": 199027,
+        "output_tokens": 5449,
+        "output_tokens_details": {
+          "thinking_tokens": 2742
+        },
+        "server_tool_use": {
+          "web_search_requests": 0,
+          "web_fetch_requests": 0
+        },
+        "service_tier": "standard",
+        "cache_creation": {
+          "ephemeral_1h_input_tokens": 45916,
+          "ephemeral_5m_input_tokens": 0
+        },
+        "inference_geo": "not_available",
+        "iterations": [
+          {
+            "input_tokens": 32,
+            "output_tokens": 2395,
+            "cache_read_input_tokens": 54730,
+            "cache_creation_input_tokens": 1277,
+            "cache_creation": {
+              "ephemeral_5m_input_tokens": 0,
+              "ephemeral_1h_input_tokens": 1277
+            },
+            "type": "message",
+            "model": null
+          }
+        ],
+        "speed": "standard"
+      },
+      "provider_total_tokens": 250492,
+      "tool_count": 11,
+      "is_error": false,
+      "tool_results": [
+        {
+          "tool": "ToolSearch",
+          "status": null,
+          "is_error": false,
+          "exit_code": null,
+          "original_result_sha256": "be8841f45afce786ff69965a250f6841a189a4bf323884f43cbd43fff516d2aa",
+          "result": "Setup/discovery result omitted from public projection; original retained."
+        },
+        {
+          "tool": "Skill",
+          "status": null,
+          "is_error": false,
+          "exit_code": null,
+          "original_result_sha256": "1aa4c04e7fcee85a5b9c1f16f54d1d24f8756e143d18286320a99e4522d4482d",
+          "result": "Setup/discovery result omitted from public projection; original retained."
+        },
+        {
+          "tool": "Bash",
+          "status": null,
+          "is_error": false,
+          "exit_code": null,
+          "original_result_sha256": "8976921cdf6b7ee478d648990e4d11a7cbcf3d0710be44eb6890ad3f95706ff5",
+          "arguments": {
+            "command": "rtk git log -6",
+            "description": "Show last six commits via RTK"
+          },
+          "result": "ecee2a3 Record independent native comparison evidence review (8 hours ago) <seathatflowsinourveins>\nc2f49e2 Record measured evidence triage results and scoped adoption (8 hours ago) <seathatflowsinourveins>\na007a5d Document pilot acceptance and fix assertion YAML quoting (8 hours ago) <seathatflowsinourveins>\ne2d540c Freeze TypeSafe evidence triage pilot and deterministic contract checks (8 hours ago) <seathatflowsinourveins>\nb15a501 Clarify paired research report tool restrictions (8 hours ago) <seathatflowsinourveins>\n3a4b3e0 Clarify live inference and retry accounting (8 hours ago) <seathatflowsinourveins>"
+        },
+        {
+          "tool": "Bash",
+          "status": null,
+          "is_error": false,
+          "exit_code": null,
+          "original_result_sha256": "955547b7e18920a9ec232e3cb23d8f896d7a76053d754ef834e30662299a7d05",
+          "arguments": {
+            "command": "qmd --index agent-lab-docs search 'memory RAG' -c agent-lab-docs -n 3",
+            "description": "QMD BM25 search in agent-lab-docs collection"
+          },
+          "result": "qmd://agent-lab-docs/tasks/2026-09-21-memory-rag-native-alignment.md?index=agent-lab-docs:1 #1226a4\nTitle: Native memory/RAG qualification — 2026-09-21\nScore:  72%\n\n@@ -1,3 @@ (0 before, 43 after)\n# Native memory/RAG qualification — 2026-09-21\n\nThe current host now uses ai-memory 2.3.2 with upstream local MiniLM (384\n\n\nqmd://agent-lab-docs/native-rag-runtime.md?index=agent-lab-docs:1 #48449a\nTitle: Native automatic code RAG and runtime layers\nScore:  68%\n\n@@ -1,3 @@ (0 before, 157 after)\n# Native automatic code RAG and runtime layers\n\nChecked September 19, 2026. **SocratiCode, Qdrant and a local Nemotron embedding service now work together in agent-lab. Both native Codex and Claude completed a real semantic code search. Automatic add/change/delete indexing passed without a manual refresh.** Five adopted repositories bring the primary inventory to **36**, alongside 11 supporting runtimes and six separately scoped Windows entries.\n\n\nqmd://agent-lab-docs/tasks/2026-09-19-publication.md?index=agent-lab-docs:31 #55fd57\nTitle: Task: publish the native ecosystem with portable evidence\nScore:  64%\n\n@@ -30,4 @@ (29 before, 9 after)\n\nThe user's final-list request triggered a bounded coverage review: 14 core, 14 supporting and 8 optional entries. No additional repository was needed for the demonstrated native coding foundation. Semantic QMD, LLM memory consolidation, backfill, live HUD/outer bridge/promptfoo and extra native Codex CLI quota limits remain explicit; no new provider run was made.\n\nReview found two nonsecret session identifiers and a companion task handle glued to prose in component-history. Current receipt r..."
+        },
+        {
+          "tool": "mcp__serena__find_symbol",
+          "status": null,
+          "is_error": false,
+          "exit_code": null,
+          "original_result_sha256": "5f7cb9af8b89ad34c70c8c59d40d108b349cc9b593de51e9f9329174953d5f8d",
+          "arguments": {
+            "name_path_pattern": "fetch",
+            "relative_path": ".devcontainer/bootstrap-linux.sh",
+            "include_body": true
+          },
+          "result": [
+            {
+              "type": "text",
+              "text": "[{\"name_path\": \"fetch\", \"kind\": \"Function\", \"relative_path\": \".devcontainer/bootstrap-linux.sh\", \"body_location\": {\"start_line\": 69, \"end_line\": 80}, \"body\": \"fetch() {\\n  local url=\\\"$1\\\" checksum=\\\"$2\\\" destination=\\\"$3\\\"\\n  if [[ -f \\\"$destination\\\" ]] && printf '%s  %s\\\\n' \\\"$checksum\\\" \\\"$destination\\\" | sha256sum --check --status; then\\n    return\\n  fi\\n  curl --fail --location --show-error --silent --retry 3 --proto '=https' --tlsv1.2 \\\\\\n    \\\"$url\\\" --output \\\"$destination.partial\\\"\\n  printf '%s  %s\\\\n' \\\"$checksum\\\" \\\"$destination.partial\\\" | sha256sum --check --status || {\\n    printf 'Checksum mismatch: %s\\\\n' \\\"$url\\\" >&2; exit 1\\n  }\\n  mv -- \\\"$destination.partial\\\" \\\"$destination\\\"\\n}\"}]"
+            }
+          ]
+        },
+        {
+          "tool": "mcp__ai-memory__memory_query",
+          "status": null,
+          "is_error": false,
+          "exit_code": null,
+          "original_result_sha256": "38fcde81fa701e2cd41b863908c56a3b5a636e7b1fadfc892b4746c452fe3dbd",
+          "arguments": {
+            "query": "native memory RAG scope",
+            "limit": 2,
+            "workspace": "agent-lab",
+            "project": "agent-lab"
+          },
+          "result": "Scoped query returned; private memory hits and bodies omitted from public projection. Complete result retained in private attachment."
+        },
+        {
+          "tool": "mcp__plugin_context-mode_context-mode__ctx_execute_file",
+          "status": null,
+          "is_error": false,
+          "exit_code": null,
+          "original_result_sha256": "41b37cc0eebfa504afe8b7ba830b9a2797eed63c125b8618ba4b2c25109b44c2",
+          "arguments": {
+            "path": "${PROJECT_ROOT}/docs/validation.md",
+            "language": "javascript",
+            "code": "const lines = FILE_CONTENT.split('\\n');\nconst re = /\\b(build|browser|smoke|playwright|application|app\\b|e2e|end-to-end|no product|not configured|unconfigured)/i;\nconsole.log(`total lines: ${lines.length}`);\nlines.forEach((l, i) => { if (re.test(l)) console.log(`${i+1}: ${l.trim().slice(0, 220)}`); });"
+          },
+          "result": [
+            {
+              "type": "text",
+              "text": "path=${PROJECT_ROOT}/docs/validation.md\n```javascript\nconst lines = FILE_CONTENT.split('\\n');\nconst re = /\\b(build|browser|smoke|playwright|application|app\\b|e2e|end-to-end|no product|not configured|unconfigured)/i;\nconsole.log(`total lines: ${lines.length}`);\nlines.forEach((l, i) => { if (re.test(l)) console.log(`${i+1}: ${l.trim().slice(0, 220)}`); });\n```\n\ntotal lines: 14\n3: This starter has no product application, application build or browser smoke test. The checks below validate the ecosystem adapters and isolated coding fixture only.\n11: | Application checks | Not configured | Do not infer application acceptance from these checks |\n"
+            }
+          ]
+        },
+        {
+          "tool": "mcp__serena__find_referencing_symbols",
+          "status": null,
+          "is_error": false,
+          "exit_code": null,
+          "original_result_sha256": "050e94a5377655e3a66846db1c131cf73855193b4958ffaed808147c4c74ed8f",
+          "arguments": {
+            "name_path": "fetch",
+            "relative_path": ".devcontainer/bootstrap-linux.sh"
+          },
+          "result": [
+            {
+              "type": "text",
+              "text": "{\".devcontainer/bootstrap-linux.sh\": {\"Function\": [{\"name_path\": \"install_archive_binary\", \"body_location\": {\"start_line\": 82, \"end_line\": 93}, \"content_around_reference\": \"...  84:  local archive=\\\"$cache_dir/${url##*/}\\\" extract_dir=\\\"$stage_dir/$label\\\"\\n  >  85:  fetch \\\"$url\\\" \\\"$checksum\\\" \\\"$archive\\\"\\n...  86:  mkdir -p \\\"$extract_dir\\\" \\\"$ecosystem_root/tools/$label\\\"\"}], \"File\": [{\"name_path\": \"bootstrap-linux\", \"body_location\": {\"start_line\": 0, \"end_line\": 207}, \"content_around_reference\": \"... 113:codex_checksum='a65b895c6ac1a73629bbe4b864640c86133e94a43b4d67b3103044e1a306d5a2'\\n  > 114:fetch 'https://github.com/openai/codex/releases/download/rust-v0.155.1/codex-package-x86_64-unknown-linux-musl.tar.gz' \\\\\\n... 115:  \\\"$codex_checksum\\\" \\\"$codex_archive\\\"\"}, {\"name_path\": \"bootstrap-linux\", \"body_location\": {\"start_line\": 0, \"end_line\": 207}, \"content_around_reference\": \"... 146:node_archive=\\\"$cache_dir/node-v24.21.0-linux-x64.tar.xz\\\"\\n  > 147:fetch 'https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz' \\\\\\n... 148:  'fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6' \\\"$node_archive\\\"\"}, {\"name_path\": \"bootstrap-linux\", \"body_location\": {\"start_line\": 0, \"end_line\": 207}, \"content_around_reference\": \"... 157:claude_download=\\\"$cache_dir/claude-2.1.278-linux-x64\\\"\\n  > 158:fetch 'https://downloads.claude.ai/claude-code-releases/2.1.278/linux-x64/claude' \\\\\\n... 159:  '5c4735937844e84f8a93306e841a5b0e12252909b07870f789b190468da147ab' \\\"$claude_download\\\"\"}]}}"
+            }
+          ]
+        },
+        {
+          "tool": "Bash",
+          "status": null,
+          "is_error": false,
+          "exit_code": null,
+          "original_result_sha256": "53fdf574ea45caba10b2c14701e84dfed59218261a360bea67c790e6ec384bbf",
+          "arguments": {
+            "command": "qmd get --help",
+            "description": "Show qmd get usage for line-slice syntax"
+          },
+          "result": "qmd — Quick Markdown Search\n\nUsage:\n  qmd <command> [options]\n\nPrimary commands:\n  qmd query <query>             - Hybrid search with auto expansion + reranking (recommended)\n  qmd query 'lex:..\\nvec:...'   - Structured query document (you provide lex/vec/hyde lines)\n  qmd search <query>            - Full-text BM25 keywords (no LLM)\n  qmd vsearch <query>           - Vector similarity only\n  qmd get <file>[:from[:count]] - Show a document (line-numbered; #docid in header)\n  qmd multi-get <pattern>       - Batch fetch via glob or comma-separated list\n  qmd skills list/get/path      - List and retrieve bundled runtime skills\n  qmd skill show/install        - Show or install the QMD skill\n  qmd mcp                       - Start the MCP server (stdio transport for AI agents)\n  qmd bench <fixture.json>      - Run search quality benchmarks against a fixture file\n\nCollections & context:\n  qmd collection add/list/remove/rename/show   - Manage indexed folders\n  qmd context add/list/rm                      - Attach human-written summaries\n  qmd ls [collection[/path]]                   - Inspect indexed files\n\nMaintenance:\n  qmd init                      - Create a project-local .qmd index\n  qmd status                    - View index + collection health\n  qmd update [--pull]           - Re-index collections (optionally git pull first)\n  qmd trust [list|revoke]       - Approve a checked-in .qmd config's hooks/paths/models\n  qmd embed [-f] [-c <name>]    - Generate/refresh vector embeddings\n    --max-docs-per-batch <n>    - Cap docs loaded into memory per embedding batch\n    --max-batch-mb <n>          - Cap UTF-8 MB loaded into memory per embedding batch\n    --timeout <minutes>         - Embed session cap in minutes (0 = no limit; default 30)\n  qmd pull [--refresh] [--progress] - Download embedding/generation/rerank models\n  qmd cleanup [--dry-run]       - Drop inactive docs/orphans, compact FTS, vacuum\n\nQuery syntax (qmd query):\n  QMD queries are either a single expand query (no prefix) or a multi-line\n  document where every line is typed with lex:, vec:, or hyde:. This grammar\n  matches the docs in docs/SYNTAX.md and is enforced in the CLI.\n\n  Grammar:\n    query          = expand_query | query_document ;\n    expand_query   = text | explicit_expand ;\n    explicit_expand= \"expand:\" text ;\n    query_document = [ intent_line ] { typed_line } ;\n    intent_line    = \"intent:\" text newline ;\n    typed_line     = type \":\" text newline ;\n    type           = \"lex\" | \"vec\" | \"hyde\" ;\n    text           = quoted_phrase | plain_text ;\n    quoted_phrase  = '\"' { character } '\"' ;\n    plain_text     = { character } ;\n    newline        = \"\\n\" ;\n\n  Examples:\n    qmd query \"how does auth work\"                # single-line → implicit expand\n    qmd query $'lex: CAP theorem\\nvec: consistency'  # typed query document\n    qmd query $'lex: \"exact matches\" sports -baseball'  # phrase + negation lex search\n    qmd query $'hyde: Hypothetical answer text'       # hyde-only document\n\n  Constraints:\n    - Standalone expand queries cannot mix with typed lines.\n    - Query documents allow only lex:, vec:, or hyde: prefixes.\n    - Each typed line must be single-line text with balanced quotes.\n\nAI agents & integrations:\n  - Run `qmd mcp` to expose the MCP server (stdio) to agents/IDEs.\n  - Run `qmd skills get qmd --full` for version-matched agent instructions.\n  - `qmd skill install` installs the QMD skill into ./.agents/skills/qmd.\n  - Use `qmd skill install --global` for ~/.agents/skills/qmd.\n  - `qmd --skill` is kept as an alias for `qmd skill show`.\n  - Advanced: `qmd mcp --http ...` and `qmd mcp --http --daemon` are optional for custom transports.\n\nGlobal options:\n  --index <name>             - Use a named index (default: index)\n  QMD_EDITOR_URI             - Editor link template for clickable TTY search output\n\nSearch options:\n  -n <num>                   - Max results (default 5, or 20 for --format files|json)\n  --all                      - Return all matches (pair with --min-score)\n  --min-score <num>          - Minimum similarity score\n  --full                     - Output full document instead of snippet\n  -C, --candidate-limit <n>  - Max candidates to rerank (default 40, lower = faster)\n  --no-rerank                - Skip LLM reranking (use RRF scores only, much faster on CPU)\n  --no-gpu                   - Force CPU mode for llama.cpp operations (same as QMD_FORCE_CPU=1)\n  --line-numbers             - Include line numbers (search; get/multi-get are on by default)\n  --no-line-numbers          - Disable line numbers for get/multi-get\n  --full-path                - Show on-disk paths instead of qmd:// + docid (get/multi-get/search/query)\n                                Paths are ./-prefixed when under $PWD, absolute otherwise\n                                Results whose file is gone keep qmd:// + docid and warn on stderr\n  --explain                  - Include retrieval score traces (query, CLI/--format json)\n  --format <kind>            - Output format: cli (default) | json | csv | md | xml | files\n  -c, --collection <name>    - Filter by one or more collections\n\nEmbed/query options:\n  --chunk-strategy <auto|regex> - Chunking mode (default: regex; auto uses AST for code files)\n  --timeout <minutes>          - Embed session cap in minutes (0 = no limit; default 30)\n\nMulti-get options:\n  -l <num>                   - Maximum lines per file\n  --max-bytes <num>          - Skip files larger than N bytes (default 65536)\n  --format <kind>            - Same formats as search\n\nIndex: ${HOME}/.cache/qmd/index.sqlite"
+        },
+        {
+          "tool": "mcp__plugin_context-mode_context-mode__ctx_stats",
+          "status": null,
+          "is_error": false,
+          "exit_code": null,
+          "original_result_sha256": "a59b56cf680d3ae96aad522df6d28a2d4b1b1a482c2b1058d54a91785d6ea43c",
+          "arguments": {},
+          "result": [
+            {
+              "type": "text",
+              "text": "  Across 2 days you ran 80 conversations across 2 AI tools.\n  context-mode kept 2.2 MB out of your context window — about 1.1 MB every single day.\n\n\n  ─── 1. Where you are now ───\n\n  This conversation started 21 Sep 2026 at 09:26 (America/New_York) in ~/code/agent-lab.\n  1 hr alive · still going.\n\n  Without context-mode   20.1 KB  ████████████████████████████████      5.1K tokens\n  With context-mode        657 B  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░       164 tokens\n                          96.8% kept out of context · your AI ran 31× longer before /compact fired\n\n  How that 869 KB built up — 1 days, 1 active:\n\n  sep 20 █─────────────────────────────────────────────────────── sep 20\n\n    sep 20   13 captures  ← peak\n\n  ●  active day      █  peak day      ◆  /compact rescue\n\n\n  ─── 2. What this chat captured (used when you --continue or /resume here) ───\n\n  13 things — files, errors, decisions, agent runs:\n\n    Project rules (CLAUDE.md)      4   ████████████████████████████\n    Data references                2   ██████████████░░░░░░░░░░░░░░\n    External docs indexed          1   ███████░░░░░░░░░░░░░░░░░░░░░\n    Git operations                 1   ███████░░░░░░░░░░░░░░░░░░░░░\n    retrieval                      1   ███████░░░░░░░░░░░░░░░░░░░░░\n    sandbox                        1   ███████░░░░░░░░░░░░░░░░░░░░░\n    session_start                  1   ███████░░░░░░░░░░░░░░░░░░░░░\n    Skills used                    1   ███████░░░░░░░░░░░░░░░░░░░░░\n    Your messages remembered       1   ███████░░░░░░░░░░░░░░░░░░░░░\n\n\n  ─── 3. The scope, getting wider ───\n\n  This chat: 869 KB kept out · 13 captures · started Sep 21, 2026.\n  All your work: 2.2 MB kept out · 636 captures across 22 projects · since Sep 18, 2026.\n\n\n  ─── 4. The bottom line ───\n\n  $1.33 of Opus 4.7 tokens your team didn't burn.\n  context-mode kept 2.2 MB out of context — that's 0 months of Cursor Pro paid for itself.\n\n  Scale across a 10-dev team and that's ~$2,433/year saved.\n\n  (Opus rates shown for context. On cheaper models the dollar number drops; the savings ratio holds.)\n\n\n  ─── 5. What context-mode learned about how you work ───\n\n  No preferences learned yet — context-mode picks them up automatically.\n\n\n  Your AI talks less, remembers more, costs less.\n  Locale en-US · timezone America/New_York · pricing examples for illustration only.\n\n  v1.0.169"
+            }
+          ]
+        },
+        {
+          "tool": "Bash",
+          "status": null,
+          "is_error": false,
+          "exit_code": null,
+          "original_result_sha256": "4f048a18799d830a3a635f6ea5cf218a74282673294805a0e84f902b85cd10cc",
+          "arguments": {
+            "command": "qmd --index agent-lab-docs get 'qmd://agent-lab-docs/tasks/2026-09-21-memory-rag-native-alignment.md:1:30'",
+            "description": "Fetch first 30 lines of the QMD memory/RAG qualification document"
+          },
+          "result": "qmd://agent-lab-docs/tasks/2026-09-21-memory-rag-native-alignment.md  #1226a4\n---\n\n1: # Native memory/RAG qualification — 2026-09-21\n2: \n3: The current host now uses ai-memory 2.3.2 with upstream local MiniLM (384\n4: dimensions). Its native startup embedded 52 latest pages with zero failures;\n5: the scoped repeat embedded zero and skipped all 52 current pages. The current\n6: Desktop MCP semantic query returned the shared-memory decision where the native\n7: CLI text query returned no hits. This is one observed query, not a broad quality\n8: or token-saving benchmark. Browser wiki search remains FTS5; LLM consolidation\n9: is disabled. The latest pages include one ordinary decision and 51 System pages.\n10: \n11: The native backup restored successfully to a separate private directory. An\n12: independent comparison recomputed the bodies of all 52 latest pages and matched\n13: them to the immutable backup. Live capture continues independently afterward.\n14: The expected V62 migration warning follows upstream compatibility logic; no\n15: database history was rewritten.\n16: \n17: The project's `.socraticodeignore` now excludes `/packaging-repo/` and\n18: `/runner-temp/`. The native watcher reconciled the index; `codebase_update`\n19: confirmed it. Qdrant went from 7,431 to 196 points, the complete payload scan had\n20: zero excluded paths, and the same task query ranked the actual implementation\n21: first. The unchanged upstream graph export has 26 files, three file edges,\n22: 254 symbols and 318 calls. Graph regeneration is explicit.\n23: \n24: The existing native-data timer now exposes allowlisted embedding mode, coverage\n25: and failure metadata to Loki/Grafana. Both it and ai-memory are enabled/active.\n26: Native Loki and browser values agreed. At observation time there were 52 latest\n27: pages and 54 retained vectors; superseded page versions explain why these counts\n28: are not interchangeable. QMD remained a separate BM25 documentation index.\n29: \n30: Verification: 652 project tests passed and 41 were skipped; the 24 adapter tests,"
+        }
+      ],
+      "hooks": {
+        "SessionStart": 4,
+        "UserPromptSubmit": 1,
+        "PreToolUse": 20,
+        "PostToolUse": 16,
+        "Stop": 3
+      }
+    },
+    "codex": {
+      "invocation": {
+        "client": "codex",
+        "argv": [
+          "timeout",
+          "--signal=TERM",
+          "--kill-after=10s",
+          "360s",
+          "${HOME}/.local/share/codex-ecosystem/bin/codex",
+          "exec",
+          "-C",
+          "${PROJECT_ROOT}",
+          "--json",
+          "--color",
+          "never",
+          "-o",
+          "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/native-clients/codex-final.txt",
+          "-"
+        ],
+        "cwd": "${PROJECT_ROOT}",
+        "started_at": "2026-09-21T13:26:16.890701+00:00",
+        "environment_adjustments": {
+          "CODEX_HOME": "${HOME}/.codex",
+          "CLAUDE_CONFIG_DIR": "unset for Claude; unchanged for Codex"
+        },
+        "prompt_sha256": "d24422fdb4e599044c6d1f47e12684e9d9a18f1c0cd34359b939350d8ae99824",
+        "model_override": null,
+        "permission_override": null,
+        "finished_at": "2026-09-21T13:28:55.903051+00:00",
+        "elapsed_seconds": 159.012,
+        "exit_code": 0
+      },
+      "stream_sha256": "81a6953c11b1a38fa311ebc29705c2d48507b9cb807386bd46f8c33ec0c00f6b",
+      "stderr_sha256": "e994eceb787689daf0ee1280b417a405a4cad5dd31e5eb1404802172dc5b7407",
+      "model_observed": [
+        "gpt-6-astra"
+      ],
+      "provider_usage": {
+        "input_tokens": 251225,
+        "cached_input_tokens": 214400,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 4110,
+        "reasoning_output_tokens": 1316
+      },
+      "provider_total_tokens": 255335,
+      "tool_count": 11,
+      "is_error": false,
+      "tool_results": [
+        {
+          "tool": "command_execution",
+          "status": "completed",
+          "is_error": null,
+          "exit_code": 0,
+          "original_result_sha256": "99ff4bc8199d875002d776aa82040c83e9e83c386b77bb0c032bb8f7fe4a7173",
+          "result": "Setup/discovery result omitted from public projection; original retained."
+        },
+        {
+          "tool": "command_execution",
+          "status": "completed",
+          "is_error": null,
+          "exit_code": 0,
+          "original_result_sha256": "d5e45c824bcd68117726f226d6cc4a7a2de2a16105173312b582cb2de3fea9fe",
+          "result": "Setup/discovery result omitted from public projection; original retained."
+        },
+        {
+          "tool": "ctx_execute",
+          "status": "completed",
+          "is_error": null,
+          "exit_code": null,
+          "original_result_sha256": "15d874252f97a02d32d764f7365a614b83da96851660c16faa86af7f2e528538",
+          "result": "Setup/discovery result omitted from public projection; original retained."
+        },
+        {
+          "tool": "ctx_execute",
+          "status": "completed",
+          "is_error": null,
+          "exit_code": null,
+          "original_result_sha256": "6af7b351e24c0f6afcee05113b452b19aeb793318211135285d851145b197868",
+          "result": "Setup/discovery result omitted from public projection; original retained."
+        },
+        {
+          "tool": "find_symbol",
+          "status": "completed",
+          "is_error": null,
+          "exit_code": null,
+          "original_result_sha256": "104cbe7113e0585c157b7404730e4715d6482abdf4e67a6436b0b1da5f9735df",
+          "arguments": {
+            "name_path_pattern": "fetch",
+            "relative_path": ".devcontainer/bootstrap-linux.sh",
+            "include_body": true,
+            "max_matches": 1,
+            "max_answer_chars": 10000
+          },
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "[{\"name_path\": \"fetch\", \"kind\": \"Function\", \"relative_path\": \".devcontainer/bootstrap-linux.sh\", \"body_location\": {\"start_line\": 69, \"end_line\": 80}, \"body\": \"fetch() {\\n  local url=\\\"$1\\\" checksum=\\\"$2\\\" destination=\\\"$3\\\"\\n  if [[ -f \\\"$destination\\\" ]] && printf '%s  %s\\\\n' \\\"$checksum\\\" \\\"$destination\\\" | sha256sum --check --status; then\\n    return\\n  fi\\n  curl --fail --location --show-error --silent --retry 3 --proto '=https' --tlsv1.2 \\\\\\n    \\\"$url\\\" --output \\\"$destination.partial\\\"\\n  printf '%s  %s\\\\n' \\\"$checksum\\\" \\\"$destination.partial\\\" | sha256sum --check --status || {\\n    printf 'Checksum mismatch: %s\\\\n' \\\"$url\\\" >&2; exit 1\\n  }\\n  mv -- \\\"$destination.partial\\\" \\\"$destination\\\"\\n}\"}]"
+              }
+            ],
+            "structured_content": {
+              "result": "[{\"name_path\": \"fetch\", \"kind\": \"Function\", \"relative_path\": \".devcontainer/bootstrap-linux.sh\", \"body_location\": {\"start_line\": 69, \"end_line\": 80}, \"body\": \"fetch() {\\n  local url=\\\"$1\\\" checksum=\\\"$2\\\" destination=\\\"$3\\\"\\n  if [[ -f \\\"$destination\\\" ]] && printf '%s  %s\\\\n' \\\"$checksum\\\" \\\"$destination\\\" | sha256sum --check --status; then\\n    return\\n  fi\\n  curl --fail --location --show-error --silent --retry 3 --proto '=https' --tlsv1.2 \\\\\\n    \\\"$url\\\" --output \\\"$destination.partial\\\"\\n  printf '%s  %s\\\\n' \\\"$checksum\\\" \\\"$destination.partial\\\" | sha256sum --check --status || {\\n    printf 'Checksum mismatch: %s\\\\n' \\\"$url\\\" >&2; exit 1\\n  }\\n  mv -- \\\"$destination.partial\\\" \\\"$destination\\\"\\n}\"}]"
+            }
+          }
+        },
+        {
+          "tool": "ctx_execute",
+          "status": "completed",
+          "is_error": null,
+          "exit_code": null,
+          "original_result_sha256": "f671c4763e56f38b9f9ca2a273050bfd40ce17b8fde606b0f9e4a54ad4179587",
+          "arguments": {
+            "language": "javascript",
+            "code": "const {execFileSync}=require('child_process');for(const [name,cmd,args] of [['RTK native log','rtk',['git','log','-6']],['QMD BM25','qmd',['--index','agent-lab-docs','search','memory RAG','-c','agent-lab-docs','-n','3']]]){try{console.log(name+'\\n'+execFileSync(cmd,args,{cwd:'${PROJECT_ROOT}',encoding:'utf8',timeout:30000}));}catch(e){console.log(name+' FAILED: '+e.message+'\\n'+String(e.stdout||'')+'\\n'+String(e.stderr||''));}}",
+            "timeout": 60000
+          },
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "```javascript\nconst {execFileSync}=require('child_process');for(const [name,cmd,args] of [['RTK native log','rtk',['git','log','-6']],['QMD BM25','qmd',['--index','agent-lab-docs','search','memory RAG','-c','agent-lab-docs','-n','3']]]){try{console.log(name+'\\n'+execFileSync(cmd,args,{cwd:'${PROJECT_ROOT}',encoding:'utf8',timeout:30000}));}catch(e){console.log(name+' FAILED: '+e.message+'\\n'+String(e.stdout||'')+'\\n'+String(e.stderr||''));}}\n```\n\nRTK native log\necee2a3 Record independent native comparison evidence review (8 hours ago) <seathatflowsinourveins>\nc2f49e2 Record measured evidence triage results and scoped adoption (8 hours ago) <seathatflowsinourveins>\na007a5d Document pilot acceptance and fix assertion YAML quoting (8 hours ago) <seathatflowsinourveins>\ne2d540c Freeze TypeSafe evidence triage pilot and deterministic contract checks (8 hours ago) <seathatflowsinourveins>\nb15a501 Clarify paired research report tool restrictions (8 hours ago) <seathatflowsinourveins>\n3a4b3e0 Clarify live inference and retry accounting (8 hours ago) <seathatflowsinourveins>\n\nQMD BM25\nqmd://agent-lab-docs/tasks/2026-09-21-memory-rag-native-alignment.md?index=agent-lab-docs:1 #1226a4\nTitle: Native memory/RAG qualification — 2026-09-21\nScore:  72%\n\n@@ -1,3 @@ (0 before, 43 after)\n# Native memory/RAG qualification — 2026-09-21\n\nThe current host now uses ai-memory 2.3.2 with upstream local MiniLM (384\n\n\nqmd://agent-lab-docs/native-rag-runtime.md?index=agent-lab-docs:1 #48449a\nTitle: Native automatic code RAG and runtime layers\nScore:  68%\n\n@@ -1,3 @@ (0 before, 157 after)\n# Native automatic code RAG and runtime layers\n\nChecked September 19, 2026. **SocratiCode, Qdrant and a local Nemotron embedding service now work together in agent-lab. Both native Codex and Claude completed a real semantic code search. Automatic add/change/delete indexing passed without a manual refresh.** Five adopted repositories bring the primary inventory to **36**, alongside 11 supporting runtimes and six separately scoped Windows entries.\n\n\nqmd://agent-lab-docs/tasks/2026-09-19-publication.md?index=agent-lab-docs:31 #55fd57\nTitle: Task: publish the native ecosystem with portable evidence\nScore:  64%\n\n@@ -30,4 @@ (29 before, 9 after)\n\nThe user's final-list request triggered a bounded coverage review: 14 core, 14 supporting and 8 optional entries. No additional repository was needed for the demonstrated native coding foundation. Semantic QMD, LLM memory consolidation, backfill, live HUD/outer bridge/promptfoo and extra native Codex CLI quota limits remain explicit; no new provider run was made.\n\nReview found two nonsecret session identifiers and a companion task handle glued to prose in component-history. Current receipt r...\n\n"
+              }
+            ],
+            "structured_content": null
+          }
+        },
+        {
+          "tool": "memory_query",
+          "status": "completed",
+          "is_error": null,
+          "exit_code": null,
+          "original_result_sha256": "624aef403d47d36e29cd5e07448ea92228692481717bb458fa7af1ee464d5e75",
+          "arguments": {
+            "query": "native memory RAG scope",
+            "limit": 2,
+            "workspace": "agent-lab",
+            "project": "agent-lab"
+          },
+          "result": "Scoped query returned; private memory hits and bodies omitted from public projection. Complete result retained in private attachment."
+        },
+        {
+          "tool": "ctx_execute_file",
+          "status": "completed",
+          "is_error": null,
+          "exit_code": null,
+          "original_result_sha256": "450694c8b5b4b4b62e169509b46592583fa751738f74586b5e6395ba1d7e003e",
+          "arguments": {
+            "path": "${PROJECT_ROOT}/docs/validation.md",
+            "language": "javascript",
+            "code": "const a=FILE_CONTENT.split('\\n');const keep=new Set();for(let i=0;i<a.length;i++)if(/application|browser|smoke|product tests/i.test(a[i]))for(let j=Math.max(0,i-1);j<=Math.min(a.length-1,i+2);j++)keep.add(j);for(const j of [...keep].sort((a,b)=>a-b))console.log((j+1)+': '+a[j]);"
+          },
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "path=${PROJECT_ROOT}/docs/validation.md\n```javascript\nconst a=FILE_CONTENT.split('\\n');const keep=new Set();for(let i=0;i<a.length;i++)if(/application|browser|smoke|product tests/i.test(a[i]))for(let j=Math.max(0,i-1);j<=Math.min(a.length-1,i+2);j++)keep.add(j);for(const j of [...keep].sort((a,b)=>a-b))console.log((j+1)+': '+a[j]);\n```\n\n2: \n3: This starter has no product application, application build or browser smoke test. The checks below validate the ecosystem adapters and isolated coding fixture only.\n4: \n5: | Check | Command | Scope / latest result |\n10: | Coding-pilot runner | See `docs/tasks/native-evaluation.md` | Deterministic evidence gates, visible fixture tests and independent hidden acceptance; real native sessions separately measured |\n11: | Application checks | Not configured | Do not infer application acceptance from these checks |\n12: \n13: Resolve runtimes from `${HOME}/codex-ecosystem/state/runtime-paths.json`; use the separate recorded Desktop runtime inventory when inspecting Desktop hooks. Exact versions, commands, failures, limits and rollback are in `docs/ecosystem-verified.md` and the task records. Do not rerun model trials as a routine environment check.\n"
+              }
+            ],
+            "structured_content": null
+          }
+        },
+        {
+          "tool": "find_referencing_symbols",
+          "status": "completed",
+          "is_error": null,
+          "exit_code": null,
+          "original_result_sha256": "3667a166976fab40e6827139c08c56c761c6a89aad0c83ec7f9d479579bebea2",
+          "arguments": {
+            "name_path": "fetch",
+            "relative_path": ".devcontainer/bootstrap-linux.sh",
+            "max_answer_chars": 12000
+          },
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "{\".devcontainer/bootstrap-linux.sh\": {\"Function\": [{\"name_path\": \"install_archive_binary\", \"body_location\": {\"start_line\": 82, \"end_line\": 93}, \"content_around_reference\": \"...  84:  local archive=\\\"$cache_dir/${url##*/}\\\" extract_dir=\\\"$stage_dir/$label\\\"\\n  >  85:  fetch \\\"$url\\\" \\\"$checksum\\\" \\\"$archive\\\"\\n...  86:  mkdir -p \\\"$extract_dir\\\" \\\"$ecosystem_root/tools/$label\\\"\"}], \"File\": [{\"name_path\": \"bootstrap-linux\", \"body_location\": {\"start_line\": 0, \"end_line\": 207}, \"content_around_reference\": \"... 113:codex_checksum='a65b895c6ac1a73629bbe4b864640c86133e94a43b4d67b3103044e1a306d5a2'\\n  > 114:fetch 'https://github.com/openai/codex/releases/download/rust-v0.155.1/codex-package-x86_64-unknown-linux-musl.tar.gz' \\\\\\n... 115:  \\\"$codex_checksum\\\" \\\"$codex_archive\\\"\"}, {\"name_path\": \"bootstrap-linux\", \"body_location\": {\"start_line\": 0, \"end_line\": 207}, \"content_around_reference\": \"... 146:node_archive=\\\"$cache_dir/node-v24.21.0-linux-x64.tar.xz\\\"\\n  > 147:fetch 'https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz' \\\\\\n... 148:  'fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6' \\\"$node_archive\\\"\"}, {\"name_path\": \"bootstrap-linux\", \"body_location\": {\"start_line\": 0, \"end_line\": 207}, \"content_around_reference\": \"... 157:claude_download=\\\"$cache_dir/claude-2.1.278-linux-x64\\\"\\n  > 158:fetch 'https://downloads.claude.ai/claude-code-releases/2.1.278/linux-x64/claude' \\\\\\n... 159:  '5c4735937844e84f8a93306e841a5b0e12252909b07870f789b190468da147ab' \\\"$claude_download\\\"\"}]}}"
+              }
+            ],
+            "structured_content": {
+              "result": "{\".devcontainer/bootstrap-linux.sh\": {\"Function\": [{\"name_path\": \"install_archive_binary\", \"body_location\": {\"start_line\": 82, \"end_line\": 93}, \"content_around_reference\": \"...  84:  local archive=\\\"$cache_dir/${url##*/}\\\" extract_dir=\\\"$stage_dir/$label\\\"\\n  >  85:  fetch \\\"$url\\\" \\\"$checksum\\\" \\\"$archive\\\"\\n...  86:  mkdir -p \\\"$extract_dir\\\" \\\"$ecosystem_root/tools/$label\\\"\"}], \"File\": [{\"name_path\": \"bootstrap-linux\", \"body_location\": {\"start_line\": 0, \"end_line\": 207}, \"content_around_reference\": \"... 113:codex_checksum='a65b895c6ac1a73629bbe4b864640c86133e94a43b4d67b3103044e1a306d5a2'\\n  > 114:fetch 'https://github.com/openai/codex/releases/download/rust-v0.155.1/codex-package-x86_64-unknown-linux-musl.tar.gz' \\\\\\n... 115:  \\\"$codex_checksum\\\" \\\"$codex_archive\\\"\"}, {\"name_path\": \"bootstrap-linux\", \"body_location\": {\"start_line\": 0, \"end_line\": 207}, \"content_around_reference\": \"... 146:node_archive=\\\"$cache_dir/node-v24.21.0-linux-x64.tar.xz\\\"\\n  > 147:fetch 'https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz' \\\\\\n... 148:  'fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6' \\\"$node_archive\\\"\"}, {\"name_path\": \"bootstrap-linux\", \"body_location\": {\"start_line\": 0, \"end_line\": 207}, \"content_around_reference\": \"... 157:claude_download=\\\"$cache_dir/claude-2.1.278-linux-x64\\\"\\n  > 158:fetch 'https://downloads.claude.ai/claude-code-releases/2.1.278/linux-x64/claude' \\\\\\n... 159:  '5c4735937844e84f8a93306e841a5b0e12252909b07870f789b190468da147ab' \\\"$claude_download\\\"\"}]}}"
+            }
+          }
+        },
+        {
+          "tool": "ctx_execute",
+          "status": "completed",
+          "is_error": null,
+          "exit_code": null,
+          "original_result_sha256": "d6381fa959879361b5cad1a07e01be2a47a5156b4638a4c03e30ca5937d25ffe",
+          "arguments": {
+            "language": "javascript",
+            "code": "const {execFileSync}=require('child_process');try{console.log(execFileSync('qmd',['--index','agent-lab-docs','get','#1226a4','-l','40'],{cwd:'${PROJECT_ROOT}',encoding:'utf8',timeout:30000}));}catch(e){console.log('QMD get FAILED: '+e.message+'\\n'+String(e.stdout||'')+'\\n'+String(e.stderr||''));}",
+            "timeout": 40000
+          },
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "```javascript\nconst {execFileSync}=require('child_process');try{console.log(execFileSync('qmd',['--index','agent-lab-docs','get','#1226a4','-l','40'],{cwd:'${PROJECT_ROOT}',encoding:'utf8',timeout:30000}));}catch(e){console.log('QMD get FAILED: '+e.message+'\\n'+String(e.stdout||'')+'\\n'+String(e.stderr||''));}\n```\n\nqmd://agent-lab-docs/tasks/2026-09-21-memory-rag-native-alignment.md  #1226a4\n---\n\n1: # Native memory/RAG qualification — 2026-09-21\n2: \n3: The current host now uses ai-memory 2.3.2 with upstream local MiniLM (384\n4: dimensions). Its native startup embedded 52 latest pages with zero failures;\n5: the scoped repeat embedded zero and skipped all 52 current pages. The current\n6: Desktop MCP semantic query returned the shared-memory decision where the native\n7: CLI text query returned no hits. This is one observed query, not a broad quality\n8: or token-saving benchmark. Browser wiki search remains FTS5; LLM consolidation\n9: is disabled. The latest pages include one ordinary decision and 51 System pages.\n10: \n11: The native backup restored successfully to a separate private directory. An\n12: independent comparison recomputed the bodies of all 52 latest pages and matched\n13: them to the immutable backup. Live capture continues independently afterward.\n14: The expected V62 migration warning follows upstream compatibility logic; no\n15: database history was rewritten.\n16: \n17: The project's `.socraticodeignore` now excludes `/packaging-repo/` and\n18: `/runner-temp/`. The native watcher reconciled the index; `codebase_update`\n19: confirmed it. Qdrant went from 7,431 to 196 points, the complete payload scan had\n20: zero excluded paths, and the same task query ranked the actual implementation\n21: first. The unchanged upstream graph export has 26 files, three file edges,\n22: 254 symbols and 318 calls. Graph regeneration is explicit.\n23: \n24: The existing native-data timer now exposes allowlisted embedding mode, coverage\n25: and failure metadata to Loki/Grafana. Both it and ai-memory are enabled/active.\n26: Native Loki and browser values agreed. At observation time there were 52 latest\n27: pages and 54 retained vectors; superseded page versions explain why these counts\n28: are not interchangeable. QMD remained a separate BM25 documentation index.\n29: \n30: Verification: 652 project tests passed and 41 were skipped; the 24 adapter tests,\n31: catalog/integrity/convergence checks and generated HTML checks passed.\n32: Independent review findings were resolved. The local report has 24 records and\n33: 60 attachments; every embedded hash passed and a browser-downloaded native\n34: memory status exactly matched its source. No fresh Claude semantic run, broad\n35: retrieval benchmark, extra graph-control qualification or Qdrant recovery claim.\n36: \n37: Portable changes: [PR 40](https://github.com/seathatflowsinourveins/native-agent-stack/pull/40)\n38: merged at `f239c07e05d11bec19e15046b12f52db3b396c61`; all five PR checks passed,\n39: including the native token-tools workflow. The canonical local checkout was\n40: fast-forwarded to that merge.\n\n"
+              }
+            ],
+            "structured_content": null
+          }
+        },
+        {
+          "tool": "ctx_stats",
+          "status": "completed",
+          "is_error": null,
+          "exit_code": null,
+          "original_result_sha256": "cd34696ed404b261a29554f9ef7206c7758cad302404b8ce40ccb178715f4de7",
+          "arguments": {},
+          "result": {
+            "content": [
+              {
+                "type": "text",
+                "text": "  Across 2 days you ran 80 conversations across 2 AI tools.\n  context-mode kept 2.2 MB out of your context window — about 1.1 MB every single day.\n\n\n  ─── 1. Where you are now ───\n\n  This conversation started 21 Sep 2026 at 09:26 (America/New_York) in ~/code/agent-lab.\n  1 hr alive · still going.\n\n  Without context-mode    616 KB  ████████████████████████████████    157.7K tokens\n  With context-mode      24.4 KB  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░      6.3K tokens\n                          96.0% kept out of context · your AI ran 25× longer before /compact fired\n\n  How that 1.7 MB built up — 1 days, 1 active:\n\n  sep 20 █─────────────────────────────────────────────────────── sep 20\n\n    sep 20   36 captures  ← peak\n\n  ●  active day      █  peak day      ◆  /compact rescue\n\n\n  ─── 2. What this chat captured (used when you --continue or /resume here) ───\n\n  36 things — files, errors, decisions, agent runs:\n\n    MCP tools called               8   ████████████████████████████\n    mcp_tool_call                  8   ████████████████████████████\n    sandbox                        8   ████████████████████████████\n    External docs indexed          4   ██████████████░░░░░░░░░░░░░░\n    Project rules (CLAUDE.md)      4   ██████████████░░░░░░░░░░░░░░\n    Constraints you set            1   ████░░░░░░░░░░░░░░░░░░░░░░░░\n    Data references                1   ████░░░░░░░░░░░░░░░░░░░░░░░░\n    Errors caught                  1   ████░░░░░░░░░░░░░░░░░░░░░░░░\n    Your messages remembered       1   ████░░░░░░░░░░░░░░░░░░░░░░░░\n\n\n  ─── 3. The scope, getting wider ───\n\n  This chat: 1.7 MB kept out · 36 captures · started Sep 21, 2026.\n  All your work: 2.2 MB kept out · 438 captures across 5 projects · since Sep 18, 2026.\n\n\n  ─── 4. The bottom line ───\n\n  $9.39 of Opus 4.7 tokens your team didn't burn.\n  context-mode kept 2.2 MB out of context — that's 0 months of Cursor Pro paid for itself.\n\n  Scale across a 10-dev team and that's ~$17,141/year saved.\n\n  (Opus rates shown for context. On cheaper models the dollar number drops; the savings ratio holds.)\n\n\n  ─── 5. What context-mode learned about how you work ───\n\n  No preferences learned yet — context-mode picks them up automatically.\n\n\n  Your AI talks less, remembers more, costs less.\n  Locale en-US · timezone America/New_York · pricing examples for illustration only.\n\n  v1.0.169"
+              }
+            ],
+            "structured_content": null
+          }
+        }
+      ]
+    }
+  },
+  "source_oracle": {
+    "path": "${PROJECT_ROOT}/.devcontainer/bootstrap-linux.sh",
+    "sha256": "1e7f1f11bfb04b3d5ad566145a754d659ccd18ecd817d6c8858bc4b86c2e1a55",
+    "fetch_call_sites": [
+      {
+        "line": 86,
+        "text": "fetch \"$url\" \"$checksum\" \"$archive\""
+      },
+      {
+        "line": 115,
+        "text": "fetch 'https://github.com/openai/codex/releases/download/rust-v0.155.1/codex-package-x86_64-unknown-linux-musl.tar.gz' \\"
+      },
+      {
+        "line": 148,
+        "text": "fetch 'https://nodejs.org/dist/v24.21.0/node-v24.21.0-linux-x64.tar.xz' \\"
+      },
+      {
+        "line": 159,
+        "text": "fetch 'https://downloads.claude.ai/claude-code-releases/2.1.278/linux-x64/claude' \\"
+      }
+    ],
+    "validation_doc_sha256": "e5eac94b42570e08c2b25fee3fc764f8cfd667ddeef5e3221d1bcb5116bf977b",
+    "application_checks_configured": false
+  },
+  "git_status_unchanged": true,
+  "rtk_project_snapshots": {
+    "before": {
+      "summary": {
+        "total_commands": 58,
+        "total_input": 46881,
+        "total_output": 44544,
+        "total_saved": 2337,
+        "avg_savings_pct": 4.984961924873616,
+        "total_time_ms": 27606,
+        "avg_time_ms": 475
+      }
+    },
+    "after": {
+      "summary": {
+        "total_commands": 60,
+        "total_input": 47223,
+        "total_output": 44852,
+        "total_saved": 2371,
+        "avg_savings_pct": 5.020858479977977,
+        "total_time_ms": 27608,
+        "avg_time_ms": 460
+      }
+    }
+  }
+}

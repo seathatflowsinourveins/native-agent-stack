@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-21T14:05:20Z",
+  "safety": "private evidence; no matched values included",
+  "scope": "Independent read-only classification of the retained 204 redacted gitleaks findings and focused scans of current new public projections.",
+  "worktree": "${CATALOG_ROOT}",
+  "source_report": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/validation-initial/gitleaks-redacted.json",
+  "source_report_preserved": true,
+  "classification": {
+    "reported_findings": 204,
+    "rule": "generic-api-key",
+    "credential_tokens_identified": 0,
+    "unclassified_findings": 0,
+    "sha256_digest_occurrences": 199,
+    "non_authentication_fixture_marker_occurrences": 5,
+    "categories": {
+      "upstream_source_file_sha256": 182,
+      "ci_source_file_sha256": 8,
+      "fixture_marker_file_sha256": 4,
+      "neutral_key_manifest_file_sha256": 2,
+      "install_log_sha256": 1,
+      "openapi_document_sha256": 1,
+      "generated_html_copy_of_openapi_sha256": 1,
+      "random_non_authentication_fixture_marker": 5
+    }
+  },
+  "original_source_review": {
+    "method": "Read the matched JSON keys and value shapes without emitting values; inspect original generators and consumers to distinguish checksums from credentials.",
+    "sources": [
+      "blueprints/convergence-practice/service-reboot/run.py",
+      "blueprints/convergence-practice/service-reboot/guest.py",
+      "blueprints/convergence-practice/service-reboot/upstream-tests.sh",
+      "blueprints/convergence-practice/offhost-restore/prepare.py",
+      "scripts/native_token_ci.py"
+    ],
+    "fixture_marker_use": "The owned reboot fixture creates a random disk marker using os.urandom(32).hex(), writes it to disk, and compares it across boots. It is not an authentication credential."
+  },
+  "source_equality": {
+    "method": "For each distinct non-HTML finding file, compare current read_bytes() to stdout bytes from git show HEAD:<relative-path>, run in the worktree.",
+    "files_compared": 17,
+    "all_byte_identical_to_HEAD": true,
+    "changed_finding_files": [],
+    "html_method": "Extract the current generated HTML openapi_sha256 occurrence and compare it in memory to the existing native-dashboard-access source receipt field without emitting either value.",
+    "html_openapi_occurrences": 1,
+    "html_openapi_matches_source_receipt": true
+  },
+  "focused_native_scans": [
+    {
+      "argv": [
+        "${HOME}/.local/share/codex-ecosystem/bin/gitleaks",
+        "dir",
+        "${CATALOG_ROOT}/evidence/artifacts/full-stack-convergence-20260921",
+        "--redact",
+        "--no-banner"
+      ],
+      "cwd": "${CATALOG_ROOT}",
+      "executed_at_utc": null,
+      "exit_code": 0,
+      "returned_no_leaks_message": true,
+      "stdout_bytes": 0,
+      "stderr_bytes": 83
+    },
+    {
+      "argv": [
+        "${HOME}/.local/share/codex-ecosystem/bin/gitleaks",
+        "stdin",
+        "--redact",
+        "--no-banner"
+      ],
+      "cwd": "${CATALOG_ROOT}",
+      "stdin_source": "evidence/receipts/full-stack-convergence-20260921.json",
+      "executed_at_utc": null,
+      "exit_code": 0,
+      "returned_no_leaks_message": true,
+      "stdout_bytes": 0,
+      "stderr_bytes": 79
+    },
+    {
+      "argv": [
+        "${HOME}/.local/share/codex-ecosystem/bin/gitleaks",
+        "stdin",
+        "--redact",
+        "--no-banner"
+      ],
+      "cwd": "${CATALOG_ROOT}",
+      "stdin_source": "docs/full-stack-convergence.md",
+      "executed_at_utc": null,
+      "exit_code": 0,
+      "returned_no_leaks_message": true,
+      "stdout_bytes": 0,
+      "stderr_bytes": 79
+    },
+    {
+      "argv": [
+        "${HOME}/.local/share/codex-ecosystem/bin/gitleaks",
+        "stdin",
+        "--redact",
+        "--no-banner"
+      ],
+      "cwd": "${CATALOG_ROOT}",
+      "stdin_source": "recipes/native-upgrades-20260921.md",
+      "executed_at_utc": null,
+      "exit_code": 0,
+      "returned_no_leaks_message": true,
+      "stdout_bytes": 0,
+      "stderr_bytes": 79
+    }
+  ],
+  "limitations": [
+    "Classifications apply to the retained report and source bytes inspected during this review; zero identified credentials is not a universal absence guarantee.",
+    "Focused scan timestamps were not captured, so they remain null rather than inferred.",
+    "No new scans were run to write this record; no repository code, scanner configuration or ignore rules were changed."
+  ],
+  "later_native_fixture_projection_scan": {
+    "command": [
+      "gitleaks",
+      "dir",
+      "evidence/artifacts/full-stack-convergence-20260921",
+      "--redact",
+      "--no-banner"
+    ],
+    "exit_code": 1,
+    "findings": 2,
+    "classification": "Two SHA-256 source values in native-token-workflow.json matched generic-api-key. Both were independently recomputed from the named current source files and matched; neither is a credential. No allowlist was changed. Earlier zero-result scan predates attachment of this native fixture receipt.",
+    "source_files": [
+      "scripts/native_token_ci.py",
+      ".github/workflows/native-token-e2e.yml"
+    ]
+  }
+}

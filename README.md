@@ -3,9 +3,9 @@
 A current, evidence-backed reference for native **Codex + Claude Code**, with scoped memory, automatic local code RAG, context-efficient retrieval and reproducible upstream workflows.
 
 The [current token practice and measured results](docs/token-practice.md) connect
-58 selected component records to the 505-repository grand catalog, upstream
-installation recipes and scoped native evidence. The latest wave adds jCodeMunch,
-Headroom recovery, fresh Claude/Codex acceptance and sandbox network checks.
+68 selected component records to the 513-repository grand catalog, upstream
+installation recipes and scoped native evidence. The latest wave attaches fresh
+Claude/Codex results, ten dashboard screenshots and four qualified upgrades.
 Earlier 52-component studies retain their original boundaries and mixed results.
 
 For another PC, follow the selected [native recipes](recipes/README.md), then use
@@ -13,7 +13,7 @@ the [portable lifetime report](tools/token-report/README.md) to capture that PC'
 upstream counters into its own JSON/HTML manifest. Historical receipts remain
 reference evidence; the new host collects its own results.
 
-**Snapshot: September 20, 2026.** This repository records a tested selection and its limits. It is not a claim that every available framework is installed or that an independent universal SOTA benchmark has been won.
+**Snapshot: September 21, 2026.** The [full-stack convergence](docs/full-stack-convergence.md) connects 68 selected components and 16 layers to native Claude/Codex results, upstream dashboard screenshots, current release checks and portable recipes. This repository records a tested selection and its limits. It is not a claim that every available framework is installed or that an independent universal SOTA benchmark has been won.
 
 Open the **[offline ecosystem explorer](docs/ecosystem/README.md)** for the full
 layer map, searchable public repository index, native skills and workers, scoped
@@ -36,7 +36,7 @@ analysis. [Ten-source review and current star delta](catalogs/convergence-practi
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
 and an auditable **342-star coverage ledger**. Its combined index includes
-**505 repository identities** across all 342 public stars and 163 beyond them,
+**513 repository identities** across all 342 public stars and 171 beyond them,
 with typed, validated pointers to decisions and evidence. The latest
 [architecture research wave](catalogs/us-equities/architecture/README.md) adds
 source reviews, awesome-list coverage and official Alpaca constraints.
@@ -128,7 +128,7 @@ Each receipt records its host, upstream commands, failures and remaining scope.
 
 ## What is here
 
-- **64 component records** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup, dependency inventory and local observability; adoption scope remains receipt-specific. The [native saturation matrix](docs/token-native-saturation.md) records current role boundaries; the original token study retains its 52-component scope.
+- **68 component records** across native clients, context, retrieval, memory, collaboration, browser work, verification, isolation, usage accounting, research hosting, backtesting, backup, dependency inventory and local observability; adoption scope remains receipt-specific. The [native saturation matrix](docs/token-native-saturation.md) records current role boundaries; the original token study retains its 52-component scope.
 - **19 researched alternatives** with adoption decisions, model requirements and prospective commands.
 - A [six-candidate portability comparison](adoption/research.md), with 41 selected primary source files and a native uv adoption decision.
 - **Four extended catalog layers** covering foundations/memory/RAG, agents/hosting/operations, data, and strategy/engine research; source review remains distinct from native execution.

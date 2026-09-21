@@ -311,15 +311,9 @@
   ],
   "guides": [
     {
-      "title": "Dashboard gap resolution: native memory, telemetry and evaluation",
-      "body": "Actual cross-harness consolidation, scoped archive refresh, gateway recovery, real Claude telemetry and native notification templates. Source-backed retrieval evaluation replaces echo-only evidence; limitations remain explicit.",
-      "path": "docs/dashboard-gap-resolution.md",
-      "category": "evaluation"
-    },
-    {
-      "title": "Rendered upstream dashboards: screenshots and returned results",
-      "body": "Thirteen installed interfaces inspected against native commands. Memory wiki limits, repaired Grafana panels, refreshed graph, actual alerts and historical fixtures remain explicit; HTTP success alone is insufficient.",
-      "path": "docs/dashboard-rendered-acceptance.md",
+      "title": "Full-stack native convergence: commands, screenshots and portable coverage",
+      "body": "68 components, 16 layers, current Claude/Codex returned results, upstream patch qualification and explicitly scoped lifetime evidence. Every selected component has a recipe/evidence join; uncovered execution remains visible.",
+      "path": "docs/full-stack-convergence.md",
       "category": "evaluation"
     },
     {
@@ -513,6 +507,18 @@
       "body": "Scoped native QMD registration, stale-checkout repair and exact-source retrieval for future sessions and PCs.",
       "path": "docs/catalog-retrieval.md",
       "category": "setup"
+    },
+    {
+      "title": "Dashboard gap resolution: native memory, telemetry and evaluation",
+      "body": "Actual cross-harness consolidation, scoped archive refresh, gateway recovery, real Claude telemetry and native notification templates. Source-backed retrieval evaluation replaces echo-only evidence; limitations remain explicit.",
+      "path": "docs/dashboard-gap-resolution.md",
+      "category": "evaluation"
+    },
+    {
+      "title": "Rendered upstream dashboards: screenshots and returned results",
+      "body": "Thirteen installed interfaces inspected against native commands. Memory wiki limits, repaired Grafana panels, refreshed graph, actual alerts and historical fixtures remain explicit; HTTP success alone is insufficient.",
+      "path": "docs/dashboard-rendered-acceptance.md",
+      "category": "evaluation"
     }
   ],
   "highlights": [

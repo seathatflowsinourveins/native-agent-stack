@@ -1,0 +1,890 @@
+{
+  "schema_version": 1,
+  "review": "read-only native dashboard and runtime observation",
+  "observed_date": "2026-09-21",
+  "scope": "Existing agent-lab Linux/WSL runtime; no service configuration changes, restarts, installs, or gateway routing changes",
+  "evidence_class": "native operations plus independent browser observations; not upstream test suites",
+  "native_commands": [
+    {
+      "argv": [
+        "ai-memory",
+        "status",
+        "--json"
+      ],
+      "cwd": "${PROJECT_ROOT}",
+      "started_utc": "2026-09-21T13:31:30.752733+00:00",
+      "finished_utc": "2026-09-21T13:31:30.765432+00:00",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "qmd",
+        "--index",
+        "agent-lab-docs",
+        "status"
+      ],
+      "cwd": "${PROJECT_ROOT}",
+      "started_utc": "2026-09-21T13:31:30.765486+00:00",
+      "finished_utc": "2026-09-21T13:31:30.905057+00:00",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "rtk",
+        "gain",
+        "--format",
+        "json"
+      ],
+      "cwd": "${PROJECT_ROOT}",
+      "started_utc": "2026-09-21T13:31:30.905109+00:00",
+      "finished_utc": "2026-09-21T13:31:30.908483+00:00",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "systemctl",
+        "--user",
+        "show",
+        "ecosystem-native-data.timer",
+        "ecosystem-native-data.service",
+        "--property=Id,ActiveState,SubState,Result,ExecMainStatus,LastTriggerUSec"
+      ],
+      "cwd": "${PROJECT_ROOT}",
+      "started_utc": "2026-09-21T13:31:30.908521+00:00",
+      "finished_utc": "2026-09-21T13:31:30.924987+00:00",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "curl",
+        "--fail-with-body",
+        "--silent",
+        "--show-error",
+        "http://127.0.0.1:8231/v1/models"
+      ],
+      "cwd": "${PROJECT_ROOT}",
+      "started_utc": "2026-09-21T13:31:30.925036+00:00",
+      "finished_utc": "2026-09-21T13:31:30.939944+00:00",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "curl",
+        "--fail-with-body",
+        "--silent",
+        "--show-error",
+        "http://127.0.0.1:16333/collections/codebase_72cfa87c5abf"
+      ],
+      "cwd": "${PROJECT_ROOT}",
+      "started_utc": "2026-09-21T13:31:30.939984+00:00",
+      "finished_utc": "2026-09-21T13:31:30.944669+00:00",
+      "exit_code": 0
+    }
+  ],
+  "browser_commands": [
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "open",
+        "http://127.0.0.1:16333/dashboard#/collections"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "wait",
+        "--text",
+        "codebase_72cfa87c5abf"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "screenshot",
+        "--full",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/dashboards/qdrant-collections-full.png"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "open",
+        "http://127.0.0.1:18525/dag-runs?preset=last30days&dateMode=preset&fromDate=2026-08-22T00%3A00"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "wait",
+        "--text",
+        "9 loaded"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "screenshot",
+        "--full",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/dashboards/dagu-retained-runs-full.png"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "open",
+        "http://127.0.0.1:49374/web/search?q=native"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "eval",
+        "JSON.stringify({url:location.href,searchResults:document.querySelectorAll(\"article\").length,resultLinks:document.querySelectorAll(\"main a\").length,bodyLength:document.body.innerText.length,noResults:/No (results|matches|pages)/.test(document.body.innerText),articleHrefPatterns:Array.from(document.querySelectorAll(\"main a\"),a=>a.getAttribute(\"href\").split(\"/\").slice(0,5).join(\"/\")).slice(0,3)})"
+      ],
+      "exit_code": 0,
+      "selected_result": {
+        "resultLinks": 10,
+        "bodyLength": 3752,
+        "noResults": false
+      },
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "eval",
+        "document.querySelector(\"main a\")?.click()"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "eval",
+        "JSON.stringify({pageType:location.pathname.includes(\"/p/\")?\"wiki_article\":\"other\",mainTextLength:document.querySelector(\"main\")?.innerText.length})"
+      ],
+      "exit_code": 0,
+      "selected_result": {
+        "pageType": "wiki_article",
+        "mainTextLength": 830
+      },
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "open",
+        "http://127.0.0.1:13000/d-solo/native-foundation-data?panelId=13"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "open",
+        "http://127.0.0.1:13000/d-solo/native-foundation-data?panelId=5"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "open",
+        "http://127.0.0.1:17384/"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "set",
+        "viewport",
+        "1280",
+        "420"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "find",
+        "role",
+        "button",
+        "click",
+        "--name",
+        "Close sidebar"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "screenshot",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/dashboards/agentsview-aggregate-safe.png"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "open",
+        "http://127.0.0.1:49374/web"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "screenshot",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/dashboards/ai-memory-projects.png"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "open",
+        "http://127.0.0.1:13000/d/native-foundation-data"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "screenshot",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/dashboards/grafana-native-foundation.png"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "open",
+        "http://127.0.0.1:13000/d-solo/native-foundation-data?panelId=13"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "set",
+        "viewport",
+        "1280",
+        "800"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "screenshot",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/dashboards/grafana-memory-model.png"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "open",
+        "http://127.0.0.1:13000/d-solo/native-foundation-data?panelId=5"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "screenshot",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/dashboards/grafana-token-scopes-before-refresh.png"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "open",
+        "http://127.0.0.1:20128/dashboard/analytics"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "screenshot",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/dashboards/omniroute-usage.png"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "open",
+        "http://127.0.0.1:20128/dashboard/compression"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "screenshot",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/dashboards/omniroute-compression-zero.png"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "set",
+        "viewport",
+        "1440",
+        "1000"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "open",
+        "http://127.0.0.1:17500/socraticode-graph.html"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "screenshot",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/dashboards/socraticode-upstream-graph.png"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-dashboards-20260921",
+        "close"
+      ],
+      "exit_code": 0,
+      "started_utc": null,
+      "finished_utc": null
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "qdrant-collections-full.png",
+      "bytes": 92106,
+      "sha256": "975f13f3eb87e0cbd213b67e2db9a33af9275fab48c2f20e0c9948cdd3c2b866",
+      "captured_utc": "2026-09-21T13:32:40.971483+00:00",
+      "publication": "safe-image"
+    },
+    {
+      "path": "dagu-retained-runs-full.png",
+      "bytes": 133973,
+      "sha256": "d1c2bbf48c99c6e0ec8262dadbdfb568d0fd837df6290366e5fc4899deb2dff4",
+      "captured_utc": "2026-09-21T13:32:41.591482+00:00",
+      "publication": "safe-image"
+    },
+    {
+      "path": "ai-memory-projects.png",
+      "bytes": 57173,
+      "sha256": "1ce6f62686df076595f916b9bbecc8575cdf15dbf81192228cd1a70d1de621d9",
+      "captured_utc": "2026-09-21T13:29:23.019509+00:00",
+      "publication": "safe-image"
+    },
+    {
+      "path": "grafana-native-foundation.png",
+      "bytes": 91423,
+      "sha256": "3b3185e00ae0cb826b2096bf1028a30a7f4c647d30d074b682ea3e6959c1d907",
+      "captured_utc": "2026-09-21T13:27:41.107523+00:00",
+      "publication": "safe-image"
+    },
+    {
+      "path": "grafana-memory-model.png",
+      "bytes": 27557,
+      "sha256": "27163cd1d873b1aeec95a17ae0dfc58c65f77ac9443c0f4624607e9f335a7e9c",
+      "captured_utc": "2026-09-21T13:31:03.419497+00:00",
+      "publication": "safe-image"
+    },
+    {
+      "path": "grafana-token-scopes-1331utc.png",
+      "bytes": 92609,
+      "sha256": "1be8c00f336a56ff36f896a060caaf9224f6a753c7c5ca9af31f71ce11147b9c",
+      "captured_utc": "2026-09-21T13:31:30.055503+00:00",
+      "publication": "safe-image"
+    },
+    {
+      "path": "omniroute-usage.png",
+      "bytes": 92884,
+      "sha256": "8f412255d2f433b3aa0691b5afe8cb2a67845c183b373f567192c6ed9d93c827",
+      "captured_utc": "2026-09-21T13:28:15.891522+00:00",
+      "publication": "safe-image"
+    },
+    {
+      "path": "omniroute-compression-zero.png",
+      "bytes": 88427,
+      "sha256": "d140601fd3d07c230db5fd68dfe65f908f829a4e493677f796c18b6a87ded8ad",
+      "captured_utc": "2026-09-21T13:28:41.059516+00:00",
+      "publication": "safe-image"
+    },
+    {
+      "path": "agentsview-aggregate-safe.png",
+      "bytes": 40878,
+      "sha256": "08007354ff3878d7f60c936334fd9728d2fe3efbdbd76c578be34785667362a6",
+      "captured_utc": "2026-09-21T13:32:08.511495+00:00",
+      "publication": "safe-image"
+    },
+    {
+      "path": "socraticode-upstream-graph.png",
+      "bytes": 67235,
+      "sha256": "9ed796d516c0d11085d67b58f46a117148d8be83e211d7370250cbc9d2ae5923",
+      "captured_utc": "2026-09-21T13:32:07.907495+00:00",
+      "publication": "safe-image"
+    },
+    {
+      "path": "native-returned-results.txt",
+      "bytes": 8715,
+      "sha256": "7a88b77535273cf8fbb4a0c06fb3e1d07ac5ca583cc0a6e3946c1f56a134defe",
+      "captured_utc": "2026-09-21T13:31:31.459503+00:00",
+      "publication": "private-native-transcript"
+    },
+    {
+      "path": "hf-current-verification.txt",
+      "bytes": 2404,
+      "sha256": "3bfb71470dd8b2013bf32822a7ba6ef4439f86fe2c421e2a581d1f627e437140",
+      "captured_utc": "2026-09-21T13:26:44.611529+00:00",
+      "publication": "private-native-transcript"
+    },
+    {
+      "path": "embedding-result-public.json",
+      "bytes": 1453,
+      "sha256": "42a2652dc531748a9ce708b10938a03927c42b4734fc8f50b36cc95dccb2994c",
+      "captured_utc": "2026-09-21T13:37:12.579467+00:00",
+      "publication": "safe-selected-response-projection"
+    }
+  ],
+  "observations": [
+    {
+      "id": "qdrant",
+      "class": "official-upstream-dashboard",
+      "url": "http://127.0.0.1:16333/dashboard#/collections",
+      "upstream": "https://github.com/qdrant/qdrant",
+      "status": "populated",
+      "screenshots": [
+        "qdrant-collections-full.png"
+      ],
+      "result": {
+        "version": "1.19.1",
+        "collections": 5,
+        "collection_status": "all green",
+        "codebase_points": 225,
+        "dense_dimensions": 2048,
+        "sparse_vector": "bm25"
+      },
+      "limits": [
+        "Collection health and stored vectors; not a retrieval-quality benchmark, snapshot restore, or cluster failover test."
+      ]
+    },
+    {
+      "id": "dagu",
+      "class": "official-upstream-dashboard",
+      "url": "http://127.0.0.1:18525/dag-runs?preset=last30days&dateMode=preset&fromDate=2026-08-22T00%3A00",
+      "upstream": "https://github.com/dagu-org/dagu",
+      "status": "populated-retained-history",
+      "screenshots": [
+        "dagu-retained-runs-full.png"
+      ],
+      "result": {
+        "version": "2.16.6",
+        "runs": 9,
+        "succeeded": 6,
+        "failed": 2,
+        "aborted": 1
+      },
+      "limits": [
+        "Today returned zero runs. Last 30 days exposed retained September 19 executions.",
+        "No DAG executed, scheduler enabled, or workflow restarted during this read-only review."
+      ]
+    },
+    {
+      "id": "ai-memory",
+      "class": "official-upstream-dashboard",
+      "url": "http://127.0.0.1:49374/web",
+      "upstream": "https://github.com/akitaonrails/ai-memory",
+      "status": "populated-and-read-navigation-exercised",
+      "screenshots": [
+        "ai-memory-projects.png"
+      ],
+      "result": {
+        "version": "2.3.2",
+        "ui_pages_at_capture": 55,
+        "search": "native",
+        "search_result_links": 10,
+        "opened_article_main_text_characters": 830,
+        "status_observed_utc": "2026-09-21T13:31:30.765432+00:00",
+        "latest_pages": 56,
+        "all_page_versions": 161,
+        "sessions": 80,
+        "observations": 37412,
+        "embedding_rows": 62,
+        "missing_latest_embeddings": 0,
+        "unresolved_embedding_failures": 0,
+        "embedding_model": "all-MiniLM-L6-v2",
+        "embedding_dimensions": 384,
+        "llm": "disabled"
+      },
+      "limits": [
+        "UI page count and later CLI count were observed at different times; active hooks continued ingesting.",
+        "Search Qdrant returned no hits; broader native returned 10. Browser search is FTS5 and is not semantic MCP recall.",
+        "No page body, session text, or query-result screenshot published.",
+        "MiniLM is a baseline, not claimed to be the newest model."
+      ]
+    },
+    {
+      "id": "socraticode",
+      "class": "official-upstream-generated-static-graph",
+      "url": "http://127.0.0.1:17500/socraticode-graph.html",
+      "upstream": "https://github.com/giancarloerra/SocratiCode",
+      "status": "populated-snapshot",
+      "screenshots": [
+        "socraticode-upstream-graph.png"
+      ],
+      "result": {
+        "files": 29,
+        "edges": 5,
+        "symbols": 266,
+        "calls": 323,
+        "http_last_modified": "Mon, 21 Sep 2026 13:01:23 GMT"
+      },
+      "limits": [
+        "Upstream graph served unchanged by local static host; explicitly generated snapshot.",
+        "This read-only wave did not regenerate graph or rerun codebase_search."
+      ]
+    },
+    {
+      "id": "vllm-embedding",
+      "class": "official-upstream-native-api",
+      "url": "http://127.0.0.1:8231/v1/models",
+      "upstream": "https://github.com/vllm-project/vllm",
+      "status": "real-inference-returned",
+      "screenshots": [],
+      "result": {
+        "publisher": "nvidia",
+        "model": "nvidia/Nemotron-3-Embed-1B-BF16",
+        "revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+        "served_max_model_len": 4096,
+        "hf_version": "1.32.0",
+        "hf_files_verified": 15,
+        "hf_local_extra_files_warning": 33,
+        "inference_dimensions": 2048,
+        "inference_values_finite": true,
+        "inference_l2_norm": 0.9999999746521075,
+        "consumed_local_input_tokens": 8
+      },
+      "request": {
+        "method": "POST",
+        "url": "http://127.0.0.1:8231/v1/embeddings",
+        "json": {
+          "model": "nvidia/Nemotron-3-Embed-1B-BF16",
+          "input": [
+            "query: cumulative token savings report native counters"
+          ]
+        }
+      },
+      "limits": [
+        "Local embedding consumed tokens are not native Codex/Claude provider savings.",
+        "No vLLM generation or Ollama/llama-server process observed in this Linux process namespace; Ollama default-port probes timed out.",
+        "HF verification warning for 33 extra local files retained; earlier qualification attributes these to download metadata."
+      ],
+      "public_projected_evidence": "embedding-result-public.json"
+    },
+    {
+      "id": "grafana",
+      "class": "official-upstream-dashboard-with-local-provisioned-panels",
+      "url": "http://127.0.0.1:13000/d/native-foundation-data",
+      "upstream": "https://github.com/grafana/grafana",
+      "status": "populated-live-metadata",
+      "screenshots": [
+        "grafana-native-foundation.png",
+        "grafana-memory-model.png",
+        "grafana-token-scopes-1331utc.png"
+      ],
+      "result": {
+        "version": "13.2.2",
+        "panels": 14,
+        "prometheus_targets_up": 7,
+        "prometheus_targets_total": 7,
+        "observation_timer": "active/waiting",
+        "observation_service_last_result": "success",
+        "observed_global_rtk_saved": 5890,
+        "observed_global_rtk_commands": 348,
+        "observed_project_rtk_saved": 2371,
+        "headroom_retained_saved": 0,
+        "jcodemunch_retained_saved": 59640,
+        "context_native_claude_retained_estimate": 161280,
+        "context_native_codex_retained_estimate": 104704,
+        "context_native_codex_session_estimate": 62420,
+        "context_desktop_retained_estimate": 2346752,
+        "context_desktop_source_utc": "2026-09-20T17:05:34.932000+00:00",
+        "context_desktop_status": "stale"
+      },
+      "limits": [
+        "Local adapter/provisioned panels use native outputs; panel definition is our integration, not a vendor-supplied ecosystem dashboard.",
+        "Each native meter has a separate scope and estimate basis. Never sum these into provider savings.",
+        "Desktop Context Mode source remains stale while newer native Codex/Claude rows show September 21 13:26 UTC.",
+        "Later root refreshes can supersede these timestamps."
+      ]
+    },
+    {
+      "id": "agentsview",
+      "class": "official-upstream-dashboard",
+      "url": "http://127.0.0.1:17384/",
+      "upstream": "https://github.com/kenn-io/agentsview",
+      "status": "populated-scoped-archive",
+      "screenshots": [
+        "agentsview-aggregate-safe.png"
+      ],
+      "result": {
+        "version": "0.43.0",
+        "rows_including_children": 17,
+        "codex_rows": 11,
+        "claude_rows": 6,
+        "messages": 3697,
+        "top_level_rows": 14,
+        "latest_session_start": "2026-09-21T02:03:54.352Z",
+        "latest_session_end": "2026-09-21T13:27:39.904Z"
+      },
+      "api": "http://127.0.0.1:17384/api/v1/sessions?include_one_shot=true&automated_scope=all&include_children=true&limit=200",
+      "limits": [
+        "Scoped imported archive; current UI refresh alone does not refresh native source transcripts.",
+        "Screenshot closes sidebar and uses 1280x420 viewport to exclude session titles.",
+        "Private screenshot with titles retained locally and explicitly excluded from publication."
+      ]
+    },
+    {
+      "id": "omniroute",
+      "class": "official-upstream-dashboard",
+      "url": "http://127.0.0.1:20128/dashboard/analytics",
+      "upstream": "https://github.com/diegosouzapw/OmniRoute",
+      "status": "populated-traffic-compression-disabled",
+      "screenshots": [
+        "omniroute-usage.png",
+        "omniroute-compression-zero.png"
+      ],
+      "result": {
+        "version": "3.8.50",
+        "ui_tokens_display": "57.7K",
+        "requests": 31,
+        "compression_requests": 0,
+        "compression_tokens_saved": 0,
+        "compression_master_switch": "OFF"
+      },
+      "compression_url": "http://127.0.0.1:20128/dashboard/context/caveman",
+      "native_api": "http://127.0.0.1:20128/api/context/analytics",
+      "limits": [
+        "Only traffic routed through this gateway, not all native Codex/Claude use.",
+        "No gateway request created and no master switch changed.",
+        "Accounts and masked keys are below the usage screenshot viewport and not published."
+      ]
+    },
+    {
+      "id": "qmd",
+      "class": "official-upstream-native-cli",
+      "upstream": "https://github.com/tobi/qmd",
+      "status": "populated-bm25-index",
+      "screenshots": [],
+      "result": {
+        "index": "agent-lab-docs",
+        "collection": "agent-lab-docs",
+        "documents": 75,
+        "vectors": 0
+      },
+      "limits": [
+        "BM25 collection intentionally has no downloaded embedding models; status model names describe defaults, not evidence that those models are loaded."
+      ]
+    }
+  ],
+  "private_exclusions": [
+    "agentsview-private-contains-titles.png"
+  ],
+  "unselected_images": [
+    "qdrant-collections.png",
+    "dagu-retained-runs.png",
+    "socraticode-upstream-graph-grid.png"
+  ],
+  "failures_and_recovery": [
+    {
+      "failure": "systemctl --user initially: Failed to connect to bus: No medium found",
+      "recovery": "Set XDG_RUNTIME_DIR=/run/user/$(id -u) only in subprocess; all later native service reads succeeded."
+    },
+    {
+      "failure": "Exploratory incorrect health/usage paths returned 404; plain browser dashboard API request without origin returned 403.",
+      "recovery": "Used documented UI routes, native status command, and URLs learned from the official rendered applications. These errors did not indicate service failure."
+    },
+    {
+      "failure": "Dagu ref e133 became unknown after changing date preset",
+      "recovery": "New snapshot showed preset change had already loaded all 9 retained rows; stable saved URL reproduced these rows."
+    },
+    {
+      "failure": "ai-memory search Qdrant returned no results",
+      "recovery": "Broader native search returned 10 result links and navigation opened an 830-character article."
+    },
+    {
+      "failure": "Default-port Ollama and initial unrelated 18000 probe timed out",
+      "recovery": "Discovered active vLLM 8231 via original runtime documentation and process arguments; native model and real inference succeeded."
+    }
+  ],
+  "recommended_bounded_actions": [
+    "Refresh full token reporter after meaningful trials; preserve Desktop stale counter until its true runtime produces a current native stats result.",
+    "Link Dagu to the retained date window and label historical runs; do not fabricate current executions to populate UI.",
+    "Keep OmniRoute zero-savings boundary until a separate qualified compression trial is intentionally run; retain native Codex/Claude account routing.",
+    "Treat ai-memory MiniLM as the active compatible baseline. Any provider migration requires task-prefix compatibility and representative retrieval qualification.",
+    "Use supported explicit archive refresh for selected Codex and Claude transcripts; archive content and imported lifecycle remain separate from live dashboard refresh."
+  ],
+  "artifact_renames": [
+    {
+      "argv": [
+        "mv",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/dashboards/grafana-token-scopes-before-refresh.png",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/dashboards/grafana-token-scopes-1331utc.png"
+      ],
+      "exit_code": 0,
+      "reason": "Name corrected to actual capture time because upstream reporter refreshed concurrently; image bytes unchanged."
+    }
+  ],
+  "public_projection_files": [
+    "embedding-result-public.json"
+  ],
+  "browser_command_time_policy": "Original per-command wall timestamps were not recorded for browser actions. null means unavailable; screenshot file capture times are separate artifact metadata. Browser command list collects exact executed invocations by observation and is not a single replay script."
+}

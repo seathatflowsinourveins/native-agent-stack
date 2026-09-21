@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "catalog_id": "foundation",
-  "checked_at": "2026-09-20",
+  "checked_at": "2026-09-21",
   "scope": "General native engineering, research, documentation, applications, workers, observation and recovery. FOUNDATION is a capability selection over canonical evidence, separate from the US-equities domain catalog.",
   "limitations": [
     "Historical receipts qualify their named host, input and operation only; this catalog does not run or certify a new host.",

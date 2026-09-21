@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "observed_date": "2026-09-21",
+  "scope": "Two native Linux/WSL release upgrades only; no service restarts, account changes, toolchain installs or model calls.",
+  "status": "qualified-and-promoted-awaiting-independent-coordinator-review",
+  "components": [
+    {
+      "id": "openresearch",
+      "previous_version": "0.2.4",
+      "installed_version": "0.2.7",
+      "upstream_repository": "https://github.com/alphaXiv/OpenResearch",
+      "release_url": "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.7",
+      "source_commit": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+      "release_asset": "openresearch-cli-x86_64-unknown-linux-musl.tar.xz",
+      "release_archive_sha256": "c0f8c7488cc3ff028e6757ee54957911f754ea3cd80e239e12f7a47a88884d63",
+      "installed_binary_sha256": "5645dbc43b8b23fea9a732b657f516704bb9b07f18dd9df2ac73b984749c3618",
+      "installation_method": "Official release archive/checksum pair; sha256sum -c; tar extraction to isolated version prefix; native launcher symlink promoted after qualification.",
+      "operations": [
+        {
+          "kind": "native-upstream-operation",
+          "portable_command": "orx --no-telemetry discover keyword 'retrieval augmented generation memory' --limit 3",
+          "exit_code": 0,
+          "result_count": 3,
+          "paper_ids": [
+            "2606.00610",
+            "2609.05760",
+            "2609.00513"
+          ]
+        },
+        {
+          "kind": "native-upstream-operation",
+          "portable_command": "orx --no-telemetry paper 2609.05760 --full",
+          "exit_code": 0,
+          "paper_title": "RAGMark: A Comprehensive Framework for Benchmarking Retrieval-Augmented Generation Systems",
+          "returned_characters": 69130,
+          "returned_utf8_bytes": 69752,
+          "returned_sha256": "d37c731b9dc825c0552d28ec9f8af00f15f930ce62e0f53fc1f296dd38486bcc",
+          "raw_private_file": "paper-full-native-return-private.json",
+          "convenience_private_file": "paper-full-private.txt",
+          "convenience_copy_note": "Convenience text adds one final newline. Decode and concatenate results[].output in the raw JSON for exact returned text."
+        },
+        {
+          "kind": "unchanged-upstream-test-subset",
+          "source": "ui/tests/markdownTarget.test.mjs",
+          "source_url": "https://github.com/alphaXiv/OpenResearch/blob/24e404ecbe19cb9184ea8177e8e9f90d4f3205b0/ui/tests/markdownTarget.test.mjs",
+          "command": [
+            "node",
+            "--test",
+            "--experimental-strip-types",
+            "tests/markdownTarget.test.mjs"
+          ],
+          "cwd": "$SOURCE_ROOT/openresearch/ui",
+          "node_version": "24.21.0",
+          "exit_code": 0,
+          "passed": 7,
+          "failed": 0,
+          "skipped": 0,
+          "limits": "Only the unchanged selected Markdown target/URL tests. Not the CLI Rust test suite, UI render test, or full harness test."
+        }
+      ],
+      "release_change_scope": "Ten commits since v0.2.4 include harness compatibility/recovery and paper-figure/literature rendering. These release notes do not certify untested harnesses.",
+      "limits": [
+        "Every actual orx operation used --no-telemetry.",
+        "No orx dashboard launched, account login changed, research experiment executed or model run triggered.",
+        "Full Rust suite omitted because cargo and rustc are unavailable on this native PATH; no toolchain installed.",
+        "Paper body stays private; only metadata, size, native returned hash and operational result may be published."
+      ]
+    },
+    {
+      "id": "worktrunk",
+      "previous_version": "0.78.0",
+      "installed_version": "0.79.0",
+      "upstream_repository": "https://github.com/max-sixty/worktrunk",
+      "release_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0",
+      "source_commit": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+      "release_asset": "worktrunk-x86_64-unknown-linux-musl.tar.xz",
+      "release_archive_sha256": "b8c190b1d652370ef9f6b8f4694a2d6831b5b22f4b789f047612aad32764c6cf",
+      "installed_binary_sha256": "7f2ef254669878e14adf3be17846f0965fa67a04e7b80d27e2d047fe1ba2c465",
+      "installation_method": "Official release archive/checksum pair; sha256sum -c; tar extraction to isolated version prefix; native launcher symlink promoted after qualification.",
+      "operations": [
+        {
+          "kind": "native-upstream-commands-on-owned-disposable-fixture",
+          "commands": [
+            "wt --config \"$EVIDENCE_ROOT/worktrunk-test-config.toml\" -C \"$FIXTURE_REPO\" switch --create codex/qualification --base main --no-cd --no-hooks --format json",
+            "wt --config \"$EVIDENCE_ROOT/worktrunk-test-config.toml\" -C \"$FIXTURE_REPO\" list --format json",
+            "wt --config \"$EVIDENCE_ROOT/worktrunk-test-config.toml\" -C \"$FIXTURE_REPO\" remove codex/qualification --foreground --no-hooks --format json"
+          ],
+          "exit_codes": [
+            0,
+            0,
+            0
+          ],
+          "created_branch": true,
+          "listed_worktrees_before_cleanup": 2,
+          "cleanup_branch_outcome": "deleted",
+          "after_cleanup_worktrees": 1,
+          "after_cleanup_branches": [
+            "main"
+          ],
+          "git_status_porcelain": "",
+          "removed_worktree_directory_absent": true
+        },
+        {
+          "kind": "local-regression-comparison-following-upstream-oracle",
+          "command_suffix": "switch codex/qualification --no-cd --no-hooks -x pwd",
+          "baseline_version": "0.78.0",
+          "baseline_observed_cwd": "$FIXTURE_REPO",
+          "candidate_version": "0.79.0",
+          "candidate_observed_cwd": "$FIXTURE_REPO.codex-qualification",
+          "expected_cwd": "$FIXTURE_REPO.codex-qualification",
+          "baseline_exit_code": 0,
+          "candidate_exit_code": 0,
+          "baseline_behavior_passed": false,
+          "candidate_behavior_passed": true,
+          "upstream_test_name": "test_switch_no_cd_execute_runs_in_worktree",
+          "source_file": "tests/integration_tests/switch.rs",
+          "source_file_sha256": "888ca17ea81e36a97c90be2d2f8176957ca0c4afa5211ccc04d72afe644b67d0",
+          "source_url": "https://github.com/max-sixty/worktrunk/blob/5ba6f148e8505c20794f2d8bc706aa4f26335c95/tests/integration_tests/switch.rs#L948",
+          "limits": "The unchanged Rust test source was read, not compiled or executed. This local native comparison uses the same directory oracle and remains a separate evidence class."
+        }
+      ],
+      "limits": [
+        "Rust upstream suite omitted: Cargo and rustc absent on PATH; source requires Rust1.97. No OS/toolchain upgrade.",
+        "Only disposable owned repository touched; no remote attached; hooks disabled; isolated test config.",
+        "No merge, unmerged-branch deletion, interactive picker, shell integration reinstall, provider inference or user repository workflow was qualified.",
+        "Behavior improvement is measured directory correctness; no token-savings claim."
+      ]
+    }
+  ],
+  "promotion": {
+    "changed_launchers": [
+      "$BIN_ROOT/orx",
+      "$BIN_ROOT/wt"
+    ],
+    "current_targets": {
+      "orx": "$TOOLS_ROOT/openresearch-0.2.7/orx",
+      "wt": "$TOOLS_ROOT/worktrunk-0.79.0/wt"
+    },
+    "retained_rollback_targets": {
+      "orx": "$TOOLS_ROOT/openresearch-0.2.4/openresearch-cli-x86_64-unknown-linux-musl/orx",
+      "wt": "$TOOLS_ROOT/worktrunk-0.78.0/wt"
+    },
+    "rollback_commands": [
+      "ln -sfn \"$TOOLS_ROOT/openresearch-0.2.4/openresearch-cli-x86_64-unknown-linux-musl/orx\" \"$BIN_ROOT/orx\"",
+      "ln -sfn \"$TOOLS_ROOT/worktrunk-0.78.0/wt\" \"$BIN_ROOT/wt\""
+    ],
+    "post_promotion_versions": {
+      "orx": "orx 0.2.7",
+      "wt": "wt v0.79.0"
+    },
+    "old_versions_still_runnable": true
+  },
+  "retained_failures": [
+    {
+      "operation": "Initial release-inspection helper attempted rustc --version",
+      "result": "FileNotFoundError: rustc unavailable; release results had already returned successfully.",
+      "handling": "Preserved in releases-selected.txt. Later explicit availability check found both cargo and rustc null; relevant Rust-suite limitations retained."
+    },
+    {
+      "operation": "Worktrunk0.78.0 --no-cd -x pwd comparison",
+      "result": "Exit0 but working directory outside selected worktree.",
+      "handling": "Preserved as baseline behavior failure;0.79.0 returned the required selected directory."
+    }
+  ],
+  "private_exclusions": [
+    "paper-full-native-return-private.json",
+    "paper-full-private.txt",
+    "discovery-return.json"
+  ],
+  "local_transcripts": [
+    "releases-selected.txt",
+    "initial-download-source-commands.json",
+    "source-test-inspection.txt",
+    "candidate-help.txt",
+    "discovery-command-initial.json",
+    "worktrunk-fixture-init.json",
+    "worktrunk-create.json",
+    "worktrunk-lifecycle-before-cleanup.txt",
+    "paper-full-command.json",
+    "worktrunk-cleanup.json",
+    "independent-state-verification.txt",
+    "launcher-promotion.json",
+    "promoted-native-verification.txt",
+    "upstream-release-comparison.txt",
+    "openresearch-upstream-markdown-tests.txt"
+  ],
+  "public_receipt_policy": "This file is a safe selected projection with portable path placeholders. Exact native command strings/argument vectors, returned stdout/stderr, times where recorded and exits are retained in the local transcript files. Do not publish paper bodies or discovery abstracts as upgrade evidence."
+}

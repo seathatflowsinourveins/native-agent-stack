@@ -15,6 +15,7 @@
 header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{scroll-margin-top:155px}.integration-heading{margin:18px 0 15px}.integration-card{background:#e9efe2;border:1px solid #cad7bf;border-radius:12px;padding:22px;margin-bottom:24px;display:grid;grid-template-columns:1.6fr 1fr;gap:25px}.integration-card .eyebrow{color:var(--green);font-size:9px;margin-bottom:9px}.integration-card p{font-size:12px;color:#50604f;margin:9px 0}.integration-card code{font-size:10px;overflow-wrap:anywhere;display:block}.integration-card a{font-size:12px}.integration-card .boundary{border-left:1px solid #c2ceba;padding-left:24px}.integration-card .boundary strong{font-size:12px}.integration-card .boundary p{font-size:11px}@media(max-width:670px){.integration-card{grid-template-columns:1fr;gap:8px}.integration-card .boundary{border-left:0;border-top:1px solid #c2ceba;padding:13px 0 0}}
 .setup-summary{margin-bottom:24px}.setup-guides{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0 28px}.stack-list{margin:20px 0 40px}.stack-entry{border:1px solid var(--line);border-radius:12px;background:var(--white);padding:18px 20px;margin-bottom:12px}.stack-entry>summary{display:flex;justify-content:space-between;gap:18px;align-items:center;font-size:15px;overflow-wrap:anywhere}.stack-entry .stack-role{margin:15px 0;color:var(--muted);font-size:13px}.stack-meta{font-size:11px;font-weight:400;color:var(--muted);text-align:right;overflow-wrap:anywhere}.stack-detail{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}.stack-detail>div{min-width:0}.stack-detail h3{font-size:14px;margin:15px 0 8px}.stack-detail p{font-size:12px;margin:9px 0;overflow-wrap:anywhere}.stack-detail ul{font-size:12px;padding-left:18px}.native-code{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf1e7;padding:14px;border-radius:7px;font:11px/1.6 ui-monospace,monospace;max-height:400px;overflow:auto}.recipe-section{border-top:1px solid var(--line);padding:14px 0}.recipe-section summary{font-size:14px}.recipe-section pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.7 ui-monospace,monospace;background:var(--paper);padding:14px;margin-top:12px}.token-table{font-size:12px}.token-table td{overflow-wrap:anywhere;min-width:80px}.negative{color:var(--copper);font-weight:600}.token-section{margin:30px 0}.token-section>p{font-size:13px;color:var(--muted);margin:13px 0}.token-receipt{border:1px solid var(--line);border-radius:10px;background:var(--white);padding:18px;margin:12px 0}.token-receipt>p{font-size:12px;margin:12px 0}.token-receipt li{font-size:12px;margin:8px 0}.stack-notice{font-size:12px;margin-top:10px;color:var(--copper)}.lifecycle-table td:first-child{text-transform:capitalize}.lifecycle-table td{max-width:260px}.setup-profile{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:20px}.setup-profile h3{font-size:15px;margin-bottom:12px}.setup-profile p{font-size:12px;margin:10px 0}.setup-profile button{margin-top:12px}.selection-card{margin:12px 0;border-left:3px solid var(--green);padding:16px 20px;background:var(--white)}.selection-card h3{font-size:15px}.selection-card p{font-size:12px;margin-top:10px}.selection-card a{font-size:11px;overflow-wrap:anywhere}.setup-head-actions{display:flex;gap:10px;flex-wrap:wrap}.navigation{gap:22px}.stack-heading{display:block;min-width:0}.stack-actions{display:flex;gap:15px;flex-wrap:wrap;margin:16px 0}.stack-actions a{font-size:12px}@media(max-width:670px){.stack-detail{grid-template-columns:1fr}.stack-entry>summary{display:block}.stack-meta{text-align:left;display:block;margin-top:7px}.navigation{gap:16px}.stack-entry{padding:16px}.token-table{min-width:590px}}
 #token-topic .token-table{table-layout:fixed;min-width:960px}
+.returned-screenshot{display:block;max-width:100%;height:auto;margin:15px 0;border:1px solid var(--line);border-radius:8px}.returned-artifact{margin:18px 0}.returned-artifact summary{overflow-wrap:anywhere}.returned-artifact p{overflow-wrap:anywhere;margin:10px 0}
 #token-topic th:nth-child(1){width:15%}#token-topic th:nth-child(2){width:25%}#token-topic th:nth-child(3){width:32%}#token-topic th:nth-child(4){width:28%}
 #token-topic .topic-detail td{padding-top:0;padding-bottom:20px}#token-topic .topic-detail pre{max-width:100%}
 #token-topic-section{scroll-margin-top:160px}
@@ -296,6 +297,51 @@ function showRecipe(path, component = "") {
   $("close-dialog").focus();
 }
 const setup = data.setup;
+const returnedReceipts = new Map(data.efficiency.receipts.map(item => [item.id, item]));
+function receiptButton(id, label = "Open returned commands and artifacts") {
+  const button = make("button", "button secondary small", label);
+  button.dataset.returnedReceipt = id;
+  button.addEventListener("click", () => showReturnedReceipt(id));
+  return button;
+}
+function receiptContent(parent, item) {
+  const receipt = item.record;
+  add(parent, make("p", "small muted", item.kind + " · " + (receipt.recorded_at_utc || receipt.recorded_at || "Dated evidence") + ". Historical source-host evidence; this page performs no native execution."), make("p", "", receipt.claim || "Inspect the returned record below."));
+  listLimits(parent, receipt.limitations);
+  const components = setup.components.filter(row => item.component_ids.includes(row.id));
+  components.forEach(row => add(parent, add(make("p", "small"), link(row.id + " · official upstream repository ↗", row.repository))));
+  add(parent, link("Published receipt ↗", item.url));
+  if(item.returned_results && !item.artifacts.length) add(parent, make("p", "stack-notice", "This receipt has no explicitly attached public artifact files. Its returned record is below; no screenshot or complete raw stream is implied."));
+  item.artifacts.forEach(artifact => {
+    const detail = add(make("details", "returned-artifact"), make("summary", "", artifact.path.split("/").pop() + " · " + artifact.bytes + " bytes"));
+    add(detail, add(make("p", "small"), link("Published artifact ↗", artifact.url)), make("p", "small mono", "SHA-256: " + artifact.sha256));
+    if(artifact.mime_type === "image/png") {
+      const screenshot = make("img", "returned-screenshot");
+      screenshot.src = "data:image/png;base64," + artifact.content_base64;
+      screenshot.alt = "Retained dashboard screenshot: " + artifact.path.split("/").pop();
+      screenshot.loading = "lazy";
+      add(detail, screenshot);
+    } else add(detail, make("pre", "native-code", artifact.text));
+    const download = make("button", "button secondary small", "Download exact artifact");
+    download.addEventListener("click", () => {
+      const bytes = artifact.mime_type === "image/png" ? Uint8Array.from(atob(artifact.content_base64), c => c.charCodeAt(0)) : artifact.text;
+      const url = URL.createObjectURL(new Blob([bytes], {type: artifact.mime_type}));
+      const anchor = make("a"); anchor.href = url; anchor.download = artifact.path.split("/").pop(); anchor.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+    add(detail, download); add(parent, detail);
+  });
+  add(parent, add(make("details", "record-detail"), make("summary", "", "Complete public receipt and command provenance"), codeBlock(receipt)));
+}
+function showReturnedReceipt(id) {
+  const item = returnedReceipts.get(id);
+  if(!item) return;
+  $("record-title").textContent = id;
+  $("record-content").replaceChildren();
+  receiptContent($("record-content"), item);
+  if(!$("record-dialog").open) $("record-dialog").showModal();
+  $("close-dialog").focus();
+}
 add($("setup-summary"), make("strong", "", setup.components.length + " selected components · " + data.counts.repositories + " catalog repositories"), make("p", "small", setup.stack_scope), make("p", "small", "Documented platform: " + setup.supported_platforms.map(p => [p.os, p.architecture, p.python ? "Python " + p.python : ""].filter(Boolean).join(" / ")).join("; ")), make("p", "small", "Recorded acceptance: " + stringify(setup.acceptance_target)), make("p", "small", "Audit: " + setup.audit_date + ". " + setup.audit_scope));
 if(setup.missing_audit_count) add($("setup-summary"), make("p", "stack-notice", setup.missing_audit_count + " current components have no row in the dated lifecycle audit. Their recipes and linked receipts remain available below."));
 [["adoption/README.md", "New-PC setup"], ["adoption/update.md", "Resume and update"], ["tools/token-report/README.md", "Capture this PC's lifetime results"]].forEach(([path, label]) => add($("setup-guides"), recipeButton(path, label)));
@@ -340,6 +386,11 @@ function renderStack() {
     const entry = make("details", "stack-entry");
     add(entry, add(make("summary"), make("span", "stack-heading", row.id), make("span", "stack-meta", row.version + " · " + row.tier)), make("p", "stack-role", row.role), make("p", "small muted", row.layers.map(id => layerNames.get(id)).join(" · ") + " / " + (row.profiles.map(id => profileMap.get(id).label).join(" · ") || "Outside the named profiles")));
     add(entry, add(make("div", "stack-actions"), recipeButton(row.recipe_path, "Read complete native recipe", row.id), link("Upstream repository ↗", row.repository)), make("p", "small muted", row.current_host_acceptance + ". License: " + row.license));
+    if(row.returned_receipt_ids.length) {
+      const results = add(make("div", "stack-actions"), make("strong", "small", "Attached public results:"));
+      row.returned_receipt_ids.forEach(id => add(results, receiptButton(id, id)));
+      add(entry, results);
+    } else add(entry, make("p", "stack-notice", "No attached command/result bundle in the selected native evidence families. Consult the dated receipts below; selection alone does not establish a new native run."));
     const columns = make("div", "stack-detail"), native = make("div"), evidence = make("div");
     labeled(native, "Recorded native commands", row.commands);
     labeled(native, "Command scope", row.command_scope);
@@ -410,9 +461,8 @@ if(!data.efficiency.selection_policy.length) add($("selection-policy"), make("p"
 add($("artifact-baselines"), baselineTable(data.efficiency.comparisons, true));
 data.efficiency.receipts.forEach(item => {
   const receipt = item.record;
-  const block = add(make("details", "token-receipt"), make("summary", "", receipt.id + " · " + (receipt.recorded_at_utc || "Dated receipt")), make("p", "", receipt.claim));
-  listLimits(block, receipt.limitations);
-  add(block, link("Published receipt ↗", item.url), codeBlock(receipt.data || receipt));
+  const block = add(make("details", "token-receipt"), make("summary", "", receipt.id + " · " + (receipt.recorded_at_utc || "Dated receipt") + " · " + item.artifacts.length + " attached files"));
+  receiptContent(block, item);
   add($("token-receipts"), block);
 });
 let limit = 30;

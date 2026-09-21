@@ -33,6 +33,12 @@ row or a different audited version remains visible and never becomes accepted.
 Lifecycle stages, client integration, functional scope and artifact baselines
 retain their source qualifications. Current acceptance on a new PC is unknown.
 
+Each component also links directly to its attached public command/result bundles.
+These open inside the page, with the official component repositories, execution
+scope, returned files, hashes and exact downloads. Components without a selected
+bundle display that coverage gap. Dated acceptance remains separate from running
+all 68 selected components in a particular session.
+
 **Token efficiency** displays the recorded artifact comparisons, including
 negative differences, and the public receipts' sanitized upstream returned fields.
 The optional `selection_policy` in the presentation manifest records each task's
@@ -43,8 +49,26 @@ sums overlapping savings, runs commands or imports private client state.
 For fresh complete upstream stdout/stderr and cumulative observations on another
 PC, use the embedded portable token-report guide. That private per-host report is
 separate from this deterministic public catalog and from Grafana's live monitoring
-dashboard. The optional `token-practice-confirmation-20260920` receipt is embedded
-when registered in `manifests/evidence.json`; its absence is not a zero counter.
+dashboard. Dated counter-confirmation receipts are embedded when registered in
+`manifests/evidence.json`; absence is not a zero counter.
+
+The generator selects explicit receipt families across their registered dates,
+including native returned results, memory/RAG alignment, HF model qualification,
+dashboard data/access and full-stack convergence. Those additional families must
+have an execution evidence kind and canonical selected component identities.
+A matching receipt name or component selection does not establish execution.
+Native-client results and dashboard results remain separately scoped in the
+complete receipt; neither proves the entire stack ran.
+
+Only a selected native receipt's `public_artifacts` are attached offline. Each
+entry must declare a repository-relative `evidence/artifacts/` path, exact byte
+count and SHA-256. UTF-8 JSON, Markdown and text are displayed as escaped text;
+PNG screenshots are embedded as image bytes. Downloads preserve the complete
+artifact. The build rejects changed hashes, symlinks, private/outside paths,
+unsupported formats, files over 2 MiB and bundles over 16 MiB. It never follows
+arbitrary raw-log references. Publication review must establish that the declared
+public files are suitable for sharing; the hash check establishes byte identity.
+Receipts without public attachments say so explicitly.
 
 ## Rebuild and check
 
@@ -82,8 +106,9 @@ update the existing publication hash manifest after regeneration.
 
 Existing source-record links use the recorded immutable public base commit.
 New files in `docs/ecosystem/` did not exist at that base; their links use public
-`main` after publication, as do the new lifecycle guide and confirmation receipt,
-while their exact bytes are embedded or hash-listed.
+`main` after publication, as do the lifecycle guide, selected additional receipt
+families and their public artifacts, while their exact bytes are embedded or
+hash-listed. This prevents new results linking to an older commit that lacks them.
 The page makes this distinction explicit. This does not turn a moving branch
 link into an immutable source pin; upstream review records retain exact commits.
 

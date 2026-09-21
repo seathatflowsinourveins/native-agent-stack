@@ -1,0 +1,1857 @@
+{
+  "recorded_at_utc": "2026-09-21T13:42:02.375459+00:00",
+  "review_scope": "Coordinator-authored public native-client and selected-release projections compared directly with original JSONL/native rollout and original source-review stdout/stderr. Reviewer collected native runs but did not author public projections.",
+  "artifacts": {
+    "native-client-results.json": "f90048738bee9dc9f488687690c4c549e004b74349e056100f52a37ac5ecfa1d",
+    "selected-upstream-releases.json": "f0c1203fcf8028bb28818142c4f8b650fac599cdce41eed877b110662bfde8c5"
+  },
+  "checks": [
+    {
+      "check": "claude: stream hash",
+      "passed": true
+    },
+    {
+      "check": "claude: stderr hash",
+      "passed": true
+    },
+    {
+      "check": "claude: observed model",
+      "passed": true
+    },
+    {
+      "check": "claude: provider usage",
+      "passed": true
+    },
+    {
+      "check": "claude: provider total excludes thinking double-count",
+      "passed": true
+    },
+    {
+      "check": "claude: all returned tool counts",
+      "passed": true
+    },
+    {
+      "check": "claude: original tool result 0 hash",
+      "passed": true
+    },
+    {
+      "check": "claude: original tool result 1 hash",
+      "passed": true
+    },
+    {
+      "check": "claude: original tool result 2 hash",
+      "passed": true
+    },
+    {
+      "check": "claude: original tool result 3 hash",
+      "passed": true
+    },
+    {
+      "check": "claude: original tool result 4 hash",
+      "passed": true
+    },
+    {
+      "check": "claude: original tool result 5 hash",
+      "passed": true
+    },
+    {
+      "check": "claude: private memory bodies explicitly omitted",
+      "passed": true
+    },
+    {
+      "check": "claude: original tool result 6 hash",
+      "passed": true
+    },
+    {
+      "check": "claude: original tool result 7 hash",
+      "passed": true
+    },
+    {
+      "check": "claude: original tool result 8 hash",
+      "passed": true
+    },
+    {
+      "check": "claude: original tool result 9 hash",
+      "passed": true
+    },
+    {
+      "check": "claude: original tool result 10 hash",
+      "passed": true
+    },
+    {
+      "check": "claude: observed exit and timing",
+      "passed": true
+    },
+    {
+      "check": "codex: stream hash",
+      "passed": true
+    },
+    {
+      "check": "codex: stderr hash",
+      "passed": true
+    },
+    {
+      "check": "codex: provider usage",
+      "passed": true
+    },
+    {
+      "check": "codex: provider total excludes cached/reasoning double-count",
+      "passed": true
+    },
+    {
+      "check": "codex: model independently read from native rollout",
+      "passed": true
+    },
+    {
+      "check": "codex: all returned tool counts",
+      "passed": true
+    },
+    {
+      "check": "codex: original tool result 0 hash",
+      "passed": true
+    },
+    {
+      "check": "codex: original tool result 1 hash",
+      "passed": true
+    },
+    {
+      "check": "codex: original tool result 2 hash",
+      "passed": true
+    },
+    {
+      "check": "codex: original tool result 3 hash",
+      "passed": true
+    },
+    {
+      "check": "codex: original tool result 4 hash",
+      "passed": true
+    },
+    {
+      "check": "codex: original tool result 5 hash",
+      "passed": true
+    },
+    {
+      "check": "codex: original tool result 6 hash",
+      "passed": true
+    },
+    {
+      "check": "codex: private memory bodies explicitly omitted",
+      "passed": true
+    },
+    {
+      "check": "codex: original tool result 7 hash",
+      "passed": true
+    },
+    {
+      "check": "codex: original tool result 8 hash",
+      "passed": true
+    },
+    {
+      "check": "codex: original tool result 9 hash",
+      "passed": true
+    },
+    {
+      "check": "codex: original tool result 10 hash",
+      "passed": true
+    },
+    {
+      "check": "codex: observed exit and timing",
+      "passed": true
+    },
+    {
+      "check": "affaan-m/ECC: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "affaan-m/ECC: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "affaan-m/ECC: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "affaan-m/ECC: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "affaan-m/ECC: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "affaan-m/ECC: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "agent-browser: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "agent-browser: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "agent-browser: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "agent-browser: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "agent-browser: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "agent-browser: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "agentsview: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "agentsview: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "agentsview: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "agentsview: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "agentsview: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "agentsview: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "ai-memory: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "ai-memory: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "ai-memory: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "ai-memory: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "ai-memory: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "ai-memory: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "ast-grep: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "ast-grep: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "ast-grep: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "ast-grep: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "ast-grep: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "ast-grep: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "ccusage: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "ccusage: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "ccusage: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "ccusage: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "ccusage: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "ccusage: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "claude-code: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "claude-code: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "claude-code: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "claude-code: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "claude-code: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "claude-code: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "claude-hud: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "claude-hud: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "claude-hud: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "claude-hud: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "claude-hud: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "claude-hud: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "codebase-memory-mcp: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "codebase-memory-mcp: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "codebase-memory-mcp: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "codebase-memory-mcp: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "codebase-memory-mcp: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "codebase-memory-mcp: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "codex: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "codex: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "codex: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "codex: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "codex: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "codex: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "codex-for-claude: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "codex-for-claude: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "codex-for-claude: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "codex-for-claude: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "codex-for-claude: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "codex-for-claude: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "context-hub: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "context-hub: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "context-hub: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "context-hub: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "context-hub: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "context-hub: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "context-mode: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "context-mode: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "context-mode: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "context-mode: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "context-mode: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "context-mode: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "davila7/claude-code-templates: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "davila7/claude-code-templates: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "davila7/claude-code-templates: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "davila7/claude-code-templates: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "davila7/claude-code-templates: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "davila7/claude-code-templates: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "difftastic: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "difftastic: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "difftastic: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "difftastic: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "difftastic: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "difftastic: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "gitleaks: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "gitleaks: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "gitleaks: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "gitleaks: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "gitleaks: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "gitleaks: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "headroom: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "headroom: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "headroom: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "headroom: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "headroom: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "headroom: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "huggingface-hub-native: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "huggingface-hub-native: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "huggingface-hub-native: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "huggingface-hub-native: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "huggingface-hub-native: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "huggingface-hub-native: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "markitdown: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "markitdown: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "markitdown: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "markitdown: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "markitdown: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "markitdown: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "mcp-inspector: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "mcp-inspector: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "mcp-inspector: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "mcp-inspector: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "mcp-inspector: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "mcp-inspector: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "mcporter: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "mcporter: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "mcporter: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "mcporter: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "mcporter: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "mcporter: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "openresearch: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "openresearch: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "openresearch: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "openresearch: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "openresearch: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "openresearch: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "playwright-cli: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "playwright-cli: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "playwright-cli: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "playwright-cli: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "playwright-cli: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "playwright-cli: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "promptfoo: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "promptfoo: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "promptfoo: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "promptfoo: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "promptfoo: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "promptfoo: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "qdrant: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "qdrant: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "qdrant: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "qdrant: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "qdrant: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "qdrant: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "qmd: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "qmd: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "qmd: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "qmd: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "qmd: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "qmd: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "repomix: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "repomix: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "repomix: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "repomix: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "repomix: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "repomix: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "rtk: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "rtk: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "rtk: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "rtk: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "rtk: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "rtk: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "sandbox-runtime: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "sandbox-runtime: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "sandbox-runtime: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "sandbox-runtime: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "sandbox-runtime: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "sandbox-runtime: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "serena: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "serena: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "serena: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "serena: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "serena: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "serena: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "shanraisshan/claude-code-best-practice: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "shanraisshan/claude-code-best-practice: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "shanraisshan/claude-code-best-practice: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "shanraisshan/claude-code-best-practice: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "shanraisshan/claude-code-best-practice: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "shanraisshan/claude-code-best-practice: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "shellcheck: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "shellcheck: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "shellcheck: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "shellcheck: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "shellcheck: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "shellcheck: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "socraticode: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "socraticode: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "socraticode: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "socraticode: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "socraticode: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "socraticode: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "toon: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "toon: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "toon: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "toon: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "toon: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "toon: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "vllm: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "vllm: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "vllm: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "vllm: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "vllm: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "vllm: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "worktrunk: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "worktrunk: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "worktrunk: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "worktrunk: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "worktrunk: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "worktrunk: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "opentelemetry-collector-contrib: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "opentelemetry-collector-contrib: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "opentelemetry-collector-contrib: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "opentelemetry-collector-contrib: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "opentelemetry-collector-contrib: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "opentelemetry-collector-contrib: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "prometheus: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "prometheus: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "prometheus: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "prometheus: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "prometheus: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "prometheus: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "loki: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "loki: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "loki: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "loki: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "loki: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "loki: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "grafana: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "grafana: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "grafana: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "grafana: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "grafana: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "grafana: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "alertmanager: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "alertmanager: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "alertmanager: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "alertmanager: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "alertmanager: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "alertmanager: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "ntfy: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "ntfy: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "ntfy: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "ntfy: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "ntfy: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "ntfy: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "duckdb: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "duckdb: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "duckdb: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "duckdb: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "duckdb: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "duckdb: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "restic: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "restic: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "restic: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "restic: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "restic: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "restic: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "dagu: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "dagu: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "dagu: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "dagu: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "dagu: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "dagu: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "lean: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "lean: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "lean: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "lean: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "lean: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "lean: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "syft: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "syft: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "syft: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "syft: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "syft: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "syft: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "alpaca-py: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "alpaca-py: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "alpaca-py: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "alpaca-py: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "alpaca-py: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "alpaca-py: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "systemd: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "systemd: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "systemd: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "systemd: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "systemd: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "systemd: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "pandas: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "pandas: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "pandas: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "pandas: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "pandas: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "pandas: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "skfolio: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "skfolio: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "skfolio: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "skfolio: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "skfolio: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "skfolio: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "edgartools: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "edgartools: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "edgartools: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "edgartools: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "edgartools: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "edgartools: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "zizmor: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "zizmor: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "zizmor: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "zizmor: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "zizmor: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "zizmor: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "beads: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "beads: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "beads: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "beads: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "beads: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "beads: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "skills-ref: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "skills-ref: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "skills-ref: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "skills-ref: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "skills-ref: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "skills-ref: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "otel-tui: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "otel-tui: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "otel-tui: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "otel-tui: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "otel-tui: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "otel-tui: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "llama-cpp: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "llama-cpp: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "llama-cpp: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "llama-cpp: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "llama-cpp: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "llama-cpp: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "jcodemunch-mcp: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "jcodemunch-mcp: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "jcodemunch-mcp: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "jcodemunch-mcp: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "jcodemunch-mcp: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "jcodemunch-mcp: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "nextjs: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "nextjs: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "nextjs: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "nextjs: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "nextjs: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "nextjs: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "react: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "react: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "react: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "react: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "react: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "react: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "fastapi: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "fastapi: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "fastapi: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "fastapi: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "fastapi: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "fastapi: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "postgresql: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "postgresql: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "postgresql: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "postgresql: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "postgresql: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "postgresql: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "poppler: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "poppler: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "poppler: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "poppler: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "poppler: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "poppler: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "apple-container: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "apple-container: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "apple-container: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "apple-container: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "apple-container: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "apple-container: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "playwright-test: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "playwright-test: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "playwright-test: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "playwright-test: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "playwright-test: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "playwright-test: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "omniroute: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "omniroute: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "omniroute: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "omniroute: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "omniroute: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "omniroute: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "tavily-cli: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "tavily-cli: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "tavily-cli: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "tavily-cli: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "tavily-cli: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "tavily-cli: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "nautilus-trader: original release command exists",
+      "passed": true
+    },
+    {
+      "check": "nautilus-trader: raw stdout matches public returned stdout",
+      "passed": true
+    },
+    {
+      "check": "nautilus-trader: raw stderr matches public returned stderr",
+      "passed": true
+    },
+    {
+      "check": "nautilus-trader: release exit preserved",
+      "passed": true
+    },
+    {
+      "check": "nautilus-trader: stdout hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "nautilus-trader: stderr hash matches original bytes",
+      "passed": true
+    },
+    {
+      "check": "native-client-results.json: no absolute_private_home",
+      "passed": true
+    },
+    {
+      "check": "native-client-results.json: no windows_private_home",
+      "passed": true
+    },
+    {
+      "check": "native-client-results.json: no session_uuid",
+      "passed": true
+    },
+    {
+      "check": "native-client-results.json: no email",
+      "passed": true
+    },
+    {
+      "check": "native-client-results.json: no api_credential_shape",
+      "passed": true
+    },
+    {
+      "check": "native-client-results.json: excludes claude exact private session id",
+      "passed": true
+    },
+    {
+      "check": "native-client-results.json: excludes codex exact private session id",
+      "passed": true
+    },
+    {
+      "check": "selected-upstream-releases.json: no absolute_private_home",
+      "passed": true
+    },
+    {
+      "check": "selected-upstream-releases.json: no windows_private_home",
+      "passed": true
+    },
+    {
+      "check": "selected-upstream-releases.json: no session_uuid",
+      "passed": true
+    },
+    {
+      "check": "selected-upstream-releases.json: no email",
+      "passed": true
+    },
+    {
+      "check": "selected-upstream-releases.json: no api_credential_shape",
+      "passed": true
+    },
+    {
+      "check": "selected-upstream-releases.json: excludes claude exact private session id",
+      "passed": true
+    },
+    {
+      "check": "selected-upstream-releases.json: excludes codex exact private session id",
+      "passed": true
+    }
+  ],
+  "findings": [],
+  "limitations": [
+    "Pattern scans are bounded and do not prove absence of every possible sensitive string.",
+    "Public native output retains declared tool estimates and their inconsistencies; it is not net provider savings.",
+    "Release metadata snapshot pins predate package promotions; final installed pins belong in the separate upgrade receipt.",
+    "Review checks raw correspondence and redaction, not every upstream capability or code path."
+  ]
+}

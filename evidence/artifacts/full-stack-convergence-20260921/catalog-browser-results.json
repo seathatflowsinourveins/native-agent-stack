@@ -1,0 +1,144 @@
+{
+  "scope": "Actual local browser integration; no upstream dashboard execution implied by rendering this HTML.",
+  "download_hash_checks": {
+    "png": {
+      "expected": "08007354ff3878d7f60c936334fd9728d2fe3efbdbd76c578be34785667362a6",
+      "actual": "08007354ff3878d7f60c936334fd9728d2fe3efbdbd76c578be34785667362a6",
+      "equal": true
+    },
+    "json": {
+      "expected": "f90048738bee9dc9f488687690c4c549e004b74349e056100f52a37ac5ecfa1d",
+      "actual": "f90048738bee9dc9f488687690c4c549e004b74349e056100f52a37ac5ecfa1d",
+      "equal": true
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "open",
+        "file://${CATALOG_ROOT}/docs/ecosystem/index.html#setup"
+      ],
+      "started_at": "2026-09-21T14:04:02.226286+00:00",
+      "completed_at": "2026-09-21T14:04:02.237465+00:00",
+      "exit_code": 0,
+      "stdout_text": "✓ Native stack — ecosystem manifest\n  file://${CATALOG_ROOT}/docs/ecosystem/index.html#setup\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "eval",
+        "(async()=>{\n const total=document.querySelectorAll('.stack-entry').length;\n const search=document.getElementById('stack-search');search.value='ccusage';search.dispatchEvent(new Event('input'));\n const matches=document.querySelectorAll('.stack-entry').length;\n const row=document.querySelector('.stack-entry');row.open=true;\n const version=row.textContent.includes('20.0.24');\n row.querySelector('[data-returned-receipt=\"full-stack-convergence-20260921\"]').click();\n const images=[...document.querySelectorAll('#record-content img')];\n for(const img of images){img.closest('details').open=true;img.loading='eager';}\n await Promise.all(images.map(x=>x.decode()));\n const image=images[0].closest('details');image.querySelector('button').id='public-image-download';\n const text=[...document.querySelectorAll('#record-content details.returned-artifact')].find(x=>x.querySelector('summary').textContent.startsWith('native-client-results.json'));\n text.open=true;text.querySelector('button').id='public-text-download';\n const currentLinks=[...document.querySelectorAll('#record-content a')].filter(x=>x.textContent==='Published artifact ↗');\n if(total!==68||matches!==1||!version||images.length!==10||!images.every(x=>x.naturalWidth>0)||!currentLinks.every(x=>x.href.includes('/main/')))throw new Error('public interaction mismatch');\n return JSON.stringify({components:total,filteredMatches:matches,selectedPinVisible:version,decodedImages:images.length,artifactLinks:currentLinks.length,currentMainLinks:true,dialogOpen:document.getElementById('record-dialog').open});\n})()"
+      ],
+      "started_at": "2026-09-21T14:04:02.237907+00:00",
+      "completed_at": "2026-09-21T14:04:02.306518+00:00",
+      "exit_code": 0,
+      "stdout_text": "\"{\\\"components\\\":68,\\\"filteredMatches\\\":1,\\\"selectedPinVisible\\\":true,\\\"decodedImages\\\":10,\\\"artifactLinks\\\":21,\\\"currentMainLinks\\\":true,\\\"dialogOpen\\\":true}\"\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "download",
+        "#public-image-download",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/public-browser/download-image.png"
+      ],
+      "started_at": "2026-09-21T14:04:02.306994+00:00",
+      "completed_at": "2026-09-21T14:04:02.344037+00:00",
+      "exit_code": 0,
+      "stdout_text": "✓ Download saved to ${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/public-browser/download-image.png\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "download",
+        "#public-text-download",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/public-browser/download-native.json"
+      ],
+      "started_at": "2026-09-21T14:04:02.344412+00:00",
+      "completed_at": "2026-09-21T14:04:02.368244+00:00",
+      "exit_code": 0,
+      "stdout_text": "✓ Download saved to ${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/public-browser/download-native.json\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "eval",
+        "document.getElementById('public-image-download').closest('details').scrollIntoView({block:'start'}); 'shown'"
+      ],
+      "started_at": "2026-09-21T14:04:02.368610+00:00",
+      "completed_at": "2026-09-21T14:04:02.371820+00:00",
+      "exit_code": 0,
+      "stdout_text": "\"shown\"\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "screenshot",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/public-browser/public-artifact-preview.png"
+      ],
+      "started_at": "2026-09-21T14:04:02.372104+00:00",
+      "completed_at": "2026-09-21T14:04:02.465399+00:00",
+      "exit_code": 0,
+      "stdout_text": "✓ Screenshot saved to ${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/public-browser/public-artifact-preview.png\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "eval",
+        "document.getElementById('close-dialog').click(); document.getElementById('stack-reset').click(); JSON.stringify({closed:!document.getElementById('record-dialog').open,rows:document.querySelectorAll('.stack-entry').length,overflow:document.documentElement.scrollWidth>innerWidth})"
+      ],
+      "started_at": "2026-09-21T14:04:02.466667+00:00",
+      "completed_at": "2026-09-21T14:04:02.482955+00:00",
+      "exit_code": 0,
+      "stdout_text": "\"{\\\"closed\\\":true,\\\"rows\\\":68,\\\"overflow\\\":false}\"\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "screenshot",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/public-browser/public-manifest.png"
+      ],
+      "started_at": "2026-09-21T14:04:02.483340+00:00",
+      "completed_at": "2026-09-21T14:04:02.525564+00:00",
+      "exit_code": 0,
+      "stdout_text": "✓ Screenshot saved to ${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/public-browser/public-manifest.png\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "errors"
+      ],
+      "started_at": "2026-09-21T14:04:02.525944+00:00",
+      "completed_at": "2026-09-21T14:04:02.528475+00:00",
+      "exit_code": 0,
+      "stdout_text": "",
+      "stderr_text": ""
+    }
+  ]
+}

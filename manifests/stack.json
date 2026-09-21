@@ -49,7 +49,8 @@
         "native-observability-followup",
         "token-practice-artifacts-20260920",
         "token-practice-coverage-20260920",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1"
@@ -73,7 +74,8 @@
         "token-practice-gap-followup-20260920",
         "current-session-observation-20260920",
         "native-dashboard-data-20260921",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0"
@@ -111,7 +113,8 @@
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
         "native-memory-rag-alignment-20260921",
-        "hf-memory-models-20260921"
+        "hf-memory-models-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory",
@@ -145,7 +148,7 @@
     {
       "id": "ccusage",
       "repository": "https://github.com/ccusage/ccusage",
-      "version": "20.0.23",
+      "version": "20.0.24",
       "license": "MIT",
       "profile": "supporting",
       "role": "Read existing native provider usage logs",
@@ -156,12 +159,14 @@
         "component-history",
         "token-practice-coverage-20260920",
         "token-practice-gap-followup-20260920",
-        "current-session-observation-20260920"
+        "current-session-observation-20260920",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
-        "https://github.com/ccusage/ccusage"
+        "https://github.com/ccusage/ccusage",
+        "https://github.com/ccusage/ccusage/releases/tag/v20.0.24"
       ],
-      "source_pin": null,
+      "source_pin": "ecb676cce27cb5dd0090c7804a5cecc35e8ba805",
       "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
       "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
     },
@@ -201,7 +206,8 @@
         "foundation-native-20260920",
         "native-worker-cgroup-20260920",
         "foundation-closure-20260921",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -293,7 +299,8 @@
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
         "foundation-closure-20260921",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -376,7 +383,8 @@
         "foundation-native-20260920",
         "foundation-closure-20260921",
         "native-dashboard-data-20260921",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/mksglu/context-mode"
@@ -476,7 +484,8 @@
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
         "native-dashboard-data-20260921",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/chopratejas/headroom"
@@ -499,7 +508,8 @@
       "evidence_ids": [
         "component-history",
         "native-rag",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/huggingface/huggingface_hub"
@@ -576,7 +586,7 @@
     {
       "id": "openresearch",
       "repository": "https://github.com/alphaXiv/OpenResearch",
-      "version": "0.2.4",
+      "version": "0.2.7",
       "license": "MIT",
       "profile": "supporting",
       "role": "Selected public literature discovery and extracted paper retrieval",
@@ -588,12 +598,14 @@
         "component-history",
         "artifact-reductions",
         "token-practice-coverage-20260920",
-        "token-practice-gap-followup-20260920"
+        "token-practice-gap-followup-20260920",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
-        "https://github.com/alphaXiv/OpenResearch"
+        "https://github.com/alphaXiv/OpenResearch",
+        "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.7"
       ],
-      "source_pin": null,
+      "source_pin": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
       "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
     },
     {
@@ -663,7 +675,8 @@
         "native-offhost-app-state-20260920",
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
-        "native-memory-rag-alignment-20260921"
+        "native-memory-rag-alignment-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/qdrant/qdrant"
@@ -694,7 +707,8 @@
         "native-catalog-retrieval-20260920",
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
-        "native-memory-rag-alignment-20260921"
+        "native-memory-rag-alignment-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/tobi/qmd/releases/tag/v2.8.3"
@@ -705,7 +719,7 @@
     {
       "id": "repomix",
       "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.0",
-      "version": "1.18.0",
+      "version": "1.18.1",
       "license": "MIT",
       "profile": "supporting",
       "role": "Explicit repository packing and structural compression",
@@ -718,12 +732,14 @@
         "portable-cli-artifacts",
         "token-practice-artifacts-20260920",
         "token-practice-coverage-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
-        "https://github.com/yamadashy/repomix/releases/tag/v1.18.0"
+        "https://github.com/yamadashy/repomix/releases/tag/v1.18.0",
+        "https://github.com/yamadashy/repomix/releases/tag/v1.18.1"
       ],
-      "source_pin": null,
+      "source_pin": "80b4280a9196feace092fc672dfe2b5fac62ef08",
       "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json."
     },
     {
@@ -749,7 +765,8 @@
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
         "native-dashboard-data-20260921",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0"
@@ -803,7 +820,8 @@
         "current-session-observation-20260920",
         "foundation-native-20260920",
         "native-dashboard-data-20260921",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/oraios/serena"
@@ -882,7 +900,8 @@
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
         "native-memory-rag-alignment-20260921",
-        "hf-memory-models-20260921"
+        "hf-memory-models-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/giancarloerra/SocratiCode"
@@ -909,7 +928,8 @@
         "token-practice-coverage-20260920",
         "token-practice-catalog-toon-20260920",
         "token-practice-native-counters-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/toon-format/toon/releases/tag/v4.1.1"
@@ -935,7 +955,8 @@
         "token-practice-coverage-20260920",
         "foundation-native-20260920",
         "native-memory-rag-alignment-20260921",
-        "hf-memory-models-20260921"
+        "hf-memory-models-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/vllm-project/vllm"
@@ -946,7 +967,7 @@
     {
       "id": "worktrunk",
       "repository": "https://github.com/max-sixty/worktrunk",
-      "version": "0.78.0",
+      "version": "0.79.0",
       "license": "MIT OR Apache-2.0",
       "profile": "optional",
       "role": "Native Git worktree convenience CLI",
@@ -958,12 +979,14 @@
         "component-history",
         "token-practice-coverage-20260920",
         "token-native-retained-functional-20260920",
-        "velanext-native-quality-tools-20260920"
+        "velanext-native-quality-tools-20260920",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
-        "https://github.com/max-sixty/worktrunk"
+        "https://github.com/max-sixty/worktrunk",
+        "https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0"
       ],
-      "source_pin": null,
+      "source_pin": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
       "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
       "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core."
     },
@@ -1020,7 +1043,8 @@
         "current-session-observation-20260920",
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "full-stack-convergence-20260921"
       ],
       "source_pin": "d7598b7141418fa35be2b5ec5d0fefb634199610",
       "upstream_sources": [
@@ -1054,7 +1078,8 @@
         "foundation-native-20260920",
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
-        "native-memory-rag-alignment-20260921"
+        "native-memory-rag-alignment-20260921",
+        "full-stack-convergence-20260921"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [
@@ -1084,7 +1109,8 @@
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
         "native-memory-rag-alignment-20260921",
-        "hf-memory-models-20260921"
+        "hf-memory-models-20260921",
+        "full-stack-convergence-20260921"
       ],
       "source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
       "upstream_sources": [
@@ -1217,7 +1243,8 @@
         "wsl-transport-recovery-20260920",
         "native-dagu-retry-tests-20260920",
         "native-service-reboot-20260920",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "full-stack-convergence-20260921"
       ],
       "profile": "supporting",
       "upstream_sources": [
@@ -1522,7 +1549,8 @@
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
         "native-dashboard-data-20260921",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
@@ -1707,7 +1735,8 @@
       ],
       "evidence_ids": [
         "foundation-native-20260920",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
         "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",
@@ -1910,6 +1939,15 @@
       "evidence_ids": [
         "native-memory-rag-alignment-20260921",
         "hf-memory-models-20260921"
+      ]
+    },
+    {
+      "id": "claude-fable-5-1",
+      "route": "Native Claude account",
+      "distribution": "Hosted; observed configured default in bounded read-only trial. Historical Opus research remains separate.",
+      "evidence_ids": [
+        "native-ultracode-20260921",
+        "full-stack-convergence-20260921"
       ]
     }
   ],
