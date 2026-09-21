@@ -317,6 +317,12 @@
       "category": "evaluation"
     },
     {
+      "title": "Live Claude: every selected repository, commands, dashboards and selection evidence",
+      "body": "70 rows separate 47 asserted functional checks, 10 readiness, 3 version/help and 10 rows without local execution. 14 reviewed dashboard screenshots, non-additive lifetime figures, per-row selection evidence and the recorded review findings.",
+      "path": "docs/claude-repository-evidence.md",
+      "category": "evaluation"
+    },
+    {
       "title": "Claude-to-Codex review: actual native return",
       "body": "Literal official slash command returned successfully in an isolated checkout. Native output, usage limits, source hashes and lifecycle boundaries retained.",
       "path": "recipes/claude-codex-foreground-review.md",
