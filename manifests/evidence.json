@@ -2367,6 +2367,21 @@
   ],
   "files": [
     {
+      "path": "observability/backends/templates/ecosystem-ntfy-alertmanager.yml.example",
+      "sha256": "718d709ce0e1748f2d9b255cba9292b5bdca286a5ead64f5ace2b9d3af49211b",
+      "bytes": 962
+    },
+    {
+      "path": "docs/native-telemetry-resolution.md",
+      "sha256": "3ba6612f7eb83a47de8ca959eae57efcb36de3e3d8bff0ff4d5a61dc59de55c1",
+      "bytes": 5499
+    },
+    {
+      "path": "observability/backends/telemetry-resolution-20260921.json",
+      "sha256": "34f31ac6272ef39483fbd850bc339997be4d61fd9530a4f986f0e65e5a70cbb3",
+      "bytes": 12942
+    },
+    {
       "path": "docs/dashboard-rendered-acceptance.md",
       "sha256": "82ddca7391ba77b0c7f92a65db67d79221eb13af15aec99be35cad6fca26714f",
       "bytes": 7513
@@ -6579,8 +6594,8 @@
     },
     {
       "path": "observability/backends/configure.py",
-      "sha256": "cecc864da7f472d31021d8b4a69363546136d4ee5ca65dc68ecd315719ba69da",
-      "bytes": 3911
+      "sha256": "d5e3a92337fba097365a061d31ed35457b903d98ef2f3e088b0421420ea90b9e",
+      "bytes": 4049
     },
     {
       "path": "observability/backends/install.py",
@@ -6629,8 +6644,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-ntfy.yml.example",
-      "sha256": "4fa2642cc3b94cd5337e2057018e4501eff79f1f5e541943abaa80839c6ab91d",
-      "bytes": 350
+      "sha256": "f0528202dd0c48c1ac3a0eadf66d4a3e5cd3644b4758884546534411f0e046c8",
+      "bytes": 405
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus-rules.yml.example",

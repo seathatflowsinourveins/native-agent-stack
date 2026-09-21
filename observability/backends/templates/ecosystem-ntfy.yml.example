@@ -9,4 +9,5 @@ visitor-request-limit-burst: 120
 visitor-request-limit-replenish: '5s'
 visitor-message-daily-limit: 1000
 message-size-limit: 16K
+template-dir: '@CONFIG_ROOT@/ecosystem-ntfy-templates'
 log-level: warn
