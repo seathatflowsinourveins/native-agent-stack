@@ -1,5 +1,10 @@
 # Native cross-harness memory consolidation
 
+The later [memory landscape and maintenance qualification](memory-landscape-maintenance.md)
+enables native learning and bounded assistant capture. The setup below records
+the earlier consolidation wave; its disabled learning-scheduler statement is
+historical, not the current default.
+
 The 2026-09-21 gap-resolution run qualified ai-memory 2.3.2's native Codex
 provider against the existing native account. A real completed Claude session
 was compiled by Codex, persisted as a session page, retrieved through MCP and

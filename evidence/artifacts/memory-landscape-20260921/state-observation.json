@@ -1,0 +1,90 @@
+{
+  "observed_at": "2026-09-21T14:47:19.866263+00:00",
+  "method": "read-only SQLite plus selected TOML values and systemd state",
+  "scope_count": 1,
+  "scheduler": {
+    "enabled": true,
+    "interval_secs": 3600,
+    "max_sessions_per_tick": 1,
+    "min_session_age_secs": 600
+  },
+  "require_approval": false,
+  "capture_assistant": true,
+  "consolidate_on_session_end": true,
+  "maintenance": {
+    "enabled": true,
+    "forget_sweep_interval_secs": 0,
+    "lint_interval_secs": 86400,
+    "embedding_backfill_interval_secs": 3600
+  },
+  "scheduler_state": [
+    {
+      "watermark_ended_at": 0,
+      "initialized_at": 1789788028704586,
+      "updated_at": 1790001167790353
+    }
+  ],
+  "claims": [
+    {
+      "session_id": "private-id-a5d7e4e4a5cf4fae",
+      "claimed_at": 1790001107786758
+    },
+    {
+      "session_id": "private-id-396abb3a366aa92c",
+      "claimed_at": 1790001167790353
+    }
+  ],
+  "runs": [
+    {
+      "id": "private-id-84be4aad2a2737c8",
+      "session_id": "private-id-07c4678f7a9d9f01",
+      "provider": "codex",
+      "model": "gpt-5.6-luna",
+      "summary": "review completed; no validated proposals",
+      "warnings_json": "[\"auto-improve truncated 3 observation bodies to 1500 chars\"]",
+      "rejected_candidates_json": "[{\"reason\":\"insufficient_durable_evidence\",\"evidence\":\"The consolidated page contains the request and tool-call metadata, but the tool outcomes are marked unknown and the substantive results are absent or truncated.\",\"target_path\":null,\"kind\":\"note\",\"operation\":\"create_or_update\",\"edit_mode\":\"full_page\"}]",
+      "config_json": "{\"min_observations\":8,\"min_session_duration_secs\":120,\"min_confidence\":0.75,\"max_input_tokens\":24000,\"max_proposals_per_run\":5,\"include_raw_fallback\":false,\"max_patchable_pages\":8,\"max_patchable_body_chars\":8000,\"max_edits_per_proposal\":5,\"max_edit_content_chars\":4000,\"max_changed_chars_per_proposal\":12000,\"max_patch_edits_per_run\":8,\"max_rejection_context\":50,\"rejection_context_days\":180,\"max_final_body_chars\":32000,\"max_rule_page_tokens\":2000,\"max_procedure_page_tokens\":2000,\"eval\":{\"enabled\":false,\"command\":\"\",\"timeout_secs\":120,\"targets\":[\"_rules\",\"procedures\"],\"min_delta\":0.0}}",
+      "created_at": 1790000961139948
+    },
+    {
+      "id": "private-id-7b13e15b1efc22ec",
+      "session_id": "private-id-a5d7e4e4a5cf4fae",
+      "provider": "none",
+      "model": "none",
+      "summary": "session skipped by preflight filters",
+      "warnings_json": "[]",
+      "rejected_candidates_json": "[{\"reason\":\"session_too_short\",\"evidence\":\"8s below configured minimum 120s\",\"target_path\":null,\"kind\":null,\"operation\":null,\"edit_mode\":null}]",
+      "config_json": "{\"trigger\":\"scheduler\",\"min_observations\":8,\"min_session_duration_secs\":120,\"min_confidence\":0.75,\"max_input_tokens\":24000,\"max_proposals_per_run\":5,\"include_raw_fallback\":false,\"max_patchable_pages\":8,\"max_patchable_body_chars\":8000,\"max_edits_per_proposal\":5,\"max_edit_content_chars\":4000,\"max_changed_chars_per_proposal\":12000,\"max_patch_edits_per_run\":8,\"max_rejection_context\":50,\"rejection_context_days\":180,\"max_final_body_chars\":32000,\"max_rule_page_tokens\":2000,\"max_procedure_page_tokens\":2000,\"eval\":{\"enabled\":false,\"command\":\"\",\"timeout_secs\":120,\"targets\":[\"_rules\",\"procedures\"],\"min_delta\":0.0},\"require_approval\":false}",
+      "created_at": 1790001107787881
+    },
+    {
+      "id": "private-id-5b7d0dfb63da6f04",
+      "session_id": "private-id-396abb3a366aa92c",
+      "provider": "none",
+      "model": "none",
+      "summary": "session skipped by preflight filters",
+      "warnings_json": "[]",
+      "rejected_candidates_json": "[{\"reason\":\"too_few_observations\",\"evidence\":\"2 observations below configured minimum 8\",\"target_path\":null,\"kind\":null,\"operation\":null,\"edit_mode\":null}]",
+      "config_json": "{\"trigger\":\"scheduler\",\"min_observations\":8,\"min_session_duration_secs\":120,\"min_confidence\":0.75,\"max_input_tokens\":24000,\"max_proposals_per_run\":5,\"include_raw_fallback\":false,\"max_patchable_pages\":8,\"max_patchable_body_chars\":8000,\"max_edits_per_proposal\":5,\"max_edit_content_chars\":4000,\"max_changed_chars_per_proposal\":12000,\"max_patch_edits_per_run\":8,\"max_rejection_context\":50,\"rejection_context_days\":180,\"max_final_body_chars\":32000,\"max_rule_page_tokens\":2000,\"max_procedure_page_tokens\":2000,\"eval\":{\"enabled\":false,\"command\":\"\",\"timeout_secs\":120,\"targets\":[\"_rules\",\"procedures\"],\"min_delta\":0.0},\"require_approval\":false}",
+      "created_at": 1790001167791510
+    }
+  ],
+  "service": "MainPID=1317864\nExecMainStartTimestamp=Mon 2026-09-21 10:35:13 EDT\nActiveState=active\n",
+  "skill_files": [
+    {
+      "client_root": ".codex",
+      "sha256": "d7cdbc9c8b864d277645ef3061bc2b18697270f549dd031237e66a89344588d3",
+      "stale_disabled_pipeline_claim": false
+    },
+    {
+      "client_root": ".claude",
+      "sha256": "d7cdbc9c8b864d277645ef3061bc2b18697270f549dd031237e66a89344588d3",
+      "stale_disabled_pipeline_claim": false
+    },
+    {
+      "client_root": ".codex",
+      "sha256": "325bf1815e3f61a1aa9076e2a9afff4c1ca162c0b4f8813f223d983207950e38",
+      "stale_disabled_pipeline_claim": false
+    }
+  ]
+}

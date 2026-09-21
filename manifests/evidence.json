@@ -2432,6 +2432,28 @@
         "Older fixed-order provider comparison reduced Codex usage but increased Claude usage. Broad compact JSON outperformed TOON; counterexamples remain visible."
       ],
       "path": "evidence/receipts/full-stack-convergence-20260921.json"
+    },
+    {
+      "id": "memory-landscape-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory",
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Qualified native memory maintenance using nine pinned repository sources, upstream commands and unchanged tests; enabled hourly learning and bounded assistant outcome capture, preserving scope and privacy choices. Independent state inspection and native Claude source review distinguish admission, model review and actual capture.",
+      "limitations": [
+        "Current-host memory maintenance and bounded client capture, not universal SOTA superiority or every memory repository installed.",
+        "Two accelerated scheduler ticks were observed; both preflight-skipped without LLM calls. Final hourly configuration persisted across service restart, but no later hourly tick or physical-PC reboot is claimed.",
+        "Manual learning rejected insufficient durable evidence and applied no proposal. New learned-write quality and future retrieval improvement remain unmeasured.",
+        "All database scopes enter the scheduler, one review per project per tick; current scope count is one. Claims are once per session including preflight-skipped sessions.",
+        "Claude prompt capture remains opted out. Assistant excerpts are sanitized and capped at 2000 bytes, and inputs above 64 KiB are dropped. A current Desktop task hot reload is not established.",
+        "Scheduled page forget sweeps are disabled; upstream hollow-project cleanup remains enabled. Existing and unrelated account/model/scope settings remain unchanged.",
+        "Exact ai-memory lifetime/session saved tokens are not returned by upstream and remain null. Client consumption and upstream context estimates are separate.",
+        "Research workers stopped at account limits. Native Claude review first exceeded its turn limit; an incorrectly formed resume invocation failed; the retained resumed completion then supplied source-backed corrections.",
+        "Initial capture test filter selected zero tests and first Codex task lacked Stop because the modified hook was not yet trusted; corrected tests and real capture were qualified separately."
+      ],
+      "path": "evidence/receipts/memory-landscape-20260921.json"
     }
   ],
   "files": [
@@ -6098,8 +6120,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "5377ef4899c87659b76a2f1e2e71ad002e2aee3900b1b7d02507ddd1c6559832",
-      "bytes": 6302226
+      "sha256": "bde33005b536bf5d36df695be7357735baa6e3ab6db0d3d161464340673b8182",
+      "bytes": 6629575
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6108,8 +6130,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "75ac0fa8d5ef303438402d2f8a52c19211e640953a3de0db2cd051f5bafcfdbb",
-      "bytes": 34897
+      "sha256": "81e078b452e9c6a6911328433101149a1ebaa5e433cb93c4351d047adcc08c19",
+      "bytes": 35290
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6128,8 +6150,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "34d9adb3043ebeab99ebb01ab9c3a47c3692e922d4d56f37d9cfc0a96519aed6",
-      "bytes": 80614
+      "sha256": "25afeb288b2eff9cac58f3054e9aafde22baafa8a5f75d52608477492f9d6c25",
+      "bytes": 80800
     },
     {
       "path": "docs/evidence.md",
@@ -6803,8 +6825,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "28878aaa3b64bf03bcff7d3d1541fa667e9deaae425c7b4fd59311718ba7ce45",
-      "bytes": 33706
+      "sha256": "8b9f857e6e71c4a0a57e10ac27b60bb9988155ec8171befce382a5497000810e",
+      "bytes": 33826
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -7103,13 +7125,13 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "a6e3feea520574881c3ee03a71a8603cf86ba43455a14353e6bb324f6db097f6",
-      "bytes": 110452
+      "sha256": "bb20e548a1febf628fdd0eded7ed5583e2925302d773ef6eee7eb6401d9394b5",
+      "bytes": 113039
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "d8dc87cd75e35fc6a3b7829c0338c185f53b45e1bec7e3e36818e70ec06cb568",
-      "bytes": 18101
+      "sha256": "b544b57c9c3e4694387d7b511c57fe6e3b899f5a76d867c7fce0ec8b0551f76f",
+      "bytes": 18270
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
@@ -9113,8 +9135,8 @@
     },
     {
       "path": "docs/native-memory-consolidation.md",
-      "sha256": "28a5c8494f6f96b02e470454ac81ae7ca2a8c9c8a0d19a302c933044c6f7a70a",
-      "bytes": 6785
+      "sha256": "536756ff9120222df0de28fe88ca918f9309c99c795b6e458278c8c81f6f91e5",
+      "bytes": 7071
     },
     {
       "path": "docs/native-telemetry-resolution.md",
@@ -9195,6 +9217,51 @@
       "path": "evidence/artifacts/full-stack-convergence-20260921/hosted-native-token-workflow.json",
       "bytes": 45722,
       "sha256": "ca173ead0618d0f6f49fc0da36c40d663244c2cb95bf3afc1b9069f5a5d9fe35"
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/native-client-results.json",
+      "sha256": "c4d3a7430fc0ef75eadc6675056345f2216b1643b3fd4eed90fb19326cf830ce",
+      "bytes": 19428
+    },
+    {
+      "path": "docs/memory-landscape-maintenance.md",
+      "sha256": "f12dc952eefb876476c56cf463ede203ad1a254b85d849774ee56a3403e8b819",
+      "bytes": 12385
+    },
+    {
+      "path": "evidence/receipts/memory-landscape-20260921.json",
+      "sha256": "6a31608a721b3561ebf5daf59d0363cda7ef563777f47e3e2f64e16fca24a948",
+      "bytes": 4059
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/state-observation.json",
+      "sha256": "611103b950674d1e9f4230fdbb0f7d2164bebb0f2ca1142c1870ab7fa323baf3",
+      "bytes": 5364
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/hook-trust.json",
+      "sha256": "c3a7b7d5507f2ea09061e6dd75591c5e923afe108d748d1a858b6c5a5fa8f815",
+      "bytes": 19493
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/native-commands.json",
+      "sha256": "499d30398a7152bdfd803d6a4c11f1045f503695b720df332a2c367b240cfcab",
+      "bytes": 68721
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/sources.json",
+      "sha256": "90fc6c4489de1ec4b4c33b13c27c2e3fb84798a78695b6b2d5858cbd280f69fc",
+      "bytes": 5245
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/catalog-memory-guide.png",
+      "sha256": "bca87e44e3375122ac2078115a82d5c69fd574335ca0408394a46cfaeb5c5ab7",
+      "bytes": 125442
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/qualification.json",
+      "sha256": "5d6e728caefcaf9a43ec2a738ac75147c232b89b3c0475164225fafbab82dff9",
+      "bytes": 3568
     }
   ],
   "convergence_records": [

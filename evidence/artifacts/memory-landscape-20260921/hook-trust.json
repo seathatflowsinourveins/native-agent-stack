@@ -1,0 +1,493 @@
+{
+  "method": "Only the changed ai-memory Stop command was reviewed and trusted through native Codex /hooks in each profile; no bypass flag or manual trusted_hash edit.",
+  "native_app_server": {
+    "hook-trust-before": {
+      "command": {
+        "argv": [
+          "python3",
+          "$HOME/code/agent-lab/tools/ecosystem/inspect-codex-hooks.py",
+          "--codex",
+          "$HOME/.local/share/codex-ecosystem/bin/codex",
+          "--codex-home",
+          "$HOME/.codex",
+          "--cwd",
+          "$HOME/code/agent-lab"
+        ],
+        "cwd": "$HOME/code/agent-lab",
+        "started_at": "2026-09-21T14:40:27.979260+00:00",
+        "completed_at": "2026-09-21T14:40:28.207055+00:00",
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": {
+          "sha256": "c37423e27f63f3eac19f065fdf2284e5bad817c45eace3fa9029b5d1c00a6911",
+          "bytes": 7415,
+          "raw_retained_privately": true
+        },
+        "stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "raw_retained_privately": true
+        }
+      },
+      "hooks": [
+        {
+          "event": "preToolUse",
+          "key": "$HOME/.codex/hooks.json:pre_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:2a9b493e71f7e16d4a61d72d728df02fa6b6b8df7601a653c399b36f479d64a8"
+        },
+        {
+          "event": "postToolUse",
+          "key": "$HOME/.codex/hooks.json:post_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:18108baae805cb035c1a90b002291f4ab504364fcab807dd078f8933126e6f9b"
+        },
+        {
+          "event": "preCompact",
+          "key": "$HOME/.codex/hooks.json:pre_compact:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:00dc3791bfd4ae0b46c43cb8ee8a391b6da63e5b7690cebfe1bd59cf8793ad58"
+        },
+        {
+          "event": "sessionStart",
+          "key": "$HOME/.codex/hooks.json:session_start:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:6994cf4fb1fc4534ee5efb35367f0f85b3bcd5fb3e200b0b3fd73c9d337397cc"
+        },
+        {
+          "event": "sessionEnd",
+          "key": "$HOME/.codex/hooks.json:session_end:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:9a190d2120d2c9dd8dcb4adfb956379e2bfc9d74435eaea9262b22a31b5649fd"
+        },
+        {
+          "event": "userPromptSubmit",
+          "key": "$HOME/.codex/hooks.json:user_prompt_submit:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:9cd01164b2e560a27f94a0fedcddcd21306857980f4fee2dd248719244b4a061"
+        },
+        {
+          "event": "stop",
+          "key": "$HOME/.codex/hooks.json:stop:0:0",
+          "enabled": true,
+          "trust_status": "modified",
+          "current_hash": "sha256:0cfffc0558b708e1d401a870834648362335c69221add66766052d5dd92c2f98"
+        },
+        {
+          "event": "preToolUse",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:pre_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:56da0c4249dc7af048f42ae458fb83931926a8af41ec6fab5ae819ff3a8c83ae"
+        },
+        {
+          "event": "postToolUse",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:post_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:0d237345f8d46110d36cd0ef08e79b55fa151a07691dee36d492aa6f64bc0efd"
+        },
+        {
+          "event": "preCompact",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:pre_compact:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:ac1f9e5eb71ca262492150381d8f078b897056fc691f9973fc56d7b1b402e648"
+        },
+        {
+          "event": "sessionStart",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:session_start:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:a6cc6a322d0931bdd68a5969e523cd71e6eedccab4850e8996c8948311173618"
+        },
+        {
+          "event": "userPromptSubmit",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:user_prompt_submit:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:114549c484c131b94782d3424527dd1042d48bc3a8616a11299acdf60b112572"
+        },
+        {
+          "event": "stop",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:stop:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:9205c1763e40c0256ab334e2e96c037c1cdf5b8bfaddba31ed19d93d3388586a"
+        }
+      ]
+    },
+    "hook-trust-after": {
+      "command": {
+        "argv": [
+          "python3",
+          "$HOME/code/agent-lab/tools/ecosystem/inspect-codex-hooks.py",
+          "--codex",
+          "$HOME/.local/share/codex-ecosystem/bin/codex",
+          "--codex-home",
+          "$HOME/.codex",
+          "--cwd",
+          "$HOME/code/agent-lab"
+        ],
+        "cwd": "$HOME/code/agent-lab",
+        "started_at": "2026-09-21T14:44:42.082619+00:00",
+        "completed_at": "2026-09-21T14:44:42.382528+00:00",
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": {
+          "sha256": "179506bdf94775a6475c37cd30aaef7f2a407ca2485695a050444de8a1108d87",
+          "bytes": 7414,
+          "raw_retained_privately": true
+        },
+        "stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "raw_retained_privately": true
+        }
+      },
+      "hooks": [
+        {
+          "event": "preToolUse",
+          "key": "$HOME/.codex/hooks.json:pre_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:2a9b493e71f7e16d4a61d72d728df02fa6b6b8df7601a653c399b36f479d64a8"
+        },
+        {
+          "event": "postToolUse",
+          "key": "$HOME/.codex/hooks.json:post_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:18108baae805cb035c1a90b002291f4ab504364fcab807dd078f8933126e6f9b"
+        },
+        {
+          "event": "preCompact",
+          "key": "$HOME/.codex/hooks.json:pre_compact:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:00dc3791bfd4ae0b46c43cb8ee8a391b6da63e5b7690cebfe1bd59cf8793ad58"
+        },
+        {
+          "event": "sessionStart",
+          "key": "$HOME/.codex/hooks.json:session_start:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:6994cf4fb1fc4534ee5efb35367f0f85b3bcd5fb3e200b0b3fd73c9d337397cc"
+        },
+        {
+          "event": "sessionEnd",
+          "key": "$HOME/.codex/hooks.json:session_end:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:9a190d2120d2c9dd8dcb4adfb956379e2bfc9d74435eaea9262b22a31b5649fd"
+        },
+        {
+          "event": "userPromptSubmit",
+          "key": "$HOME/.codex/hooks.json:user_prompt_submit:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:9cd01164b2e560a27f94a0fedcddcd21306857980f4fee2dd248719244b4a061"
+        },
+        {
+          "event": "stop",
+          "key": "$HOME/.codex/hooks.json:stop:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:0cfffc0558b708e1d401a870834648362335c69221add66766052d5dd92c2f98"
+        },
+        {
+          "event": "preToolUse",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:pre_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:56da0c4249dc7af048f42ae458fb83931926a8af41ec6fab5ae819ff3a8c83ae"
+        },
+        {
+          "event": "postToolUse",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:post_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:0d237345f8d46110d36cd0ef08e79b55fa151a07691dee36d492aa6f64bc0efd"
+        },
+        {
+          "event": "preCompact",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:pre_compact:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:ac1f9e5eb71ca262492150381d8f078b897056fc691f9973fc56d7b1b402e648"
+        },
+        {
+          "event": "sessionStart",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:session_start:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:a6cc6a322d0931bdd68a5969e523cd71e6eedccab4850e8996c8948311173618"
+        },
+        {
+          "event": "userPromptSubmit",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:user_prompt_submit:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:114549c484c131b94782d3424527dd1042d48bc3a8616a11299acdf60b112572"
+        },
+        {
+          "event": "stop",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:stop:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:9205c1763e40c0256ab334e2e96c037c1cdf5b8bfaddba31ed19d93d3388586a"
+        }
+      ]
+    },
+    "hook-trust-desktop-before": {
+      "command": {
+        "argv": [
+          "python3",
+          "$HOME/code/agent-lab/tools/ecosystem/inspect-codex-hooks.py",
+          "--codex",
+          "$HOME/.local/share/codex-ecosystem/bin/codex",
+          "--codex-home",
+          "$DESKTOP_HOME_PARENT/.codex",
+          "--cwd",
+          "$HOME/code/agent-lab"
+        ],
+        "cwd": "$HOME/code/agent-lab",
+        "started_at": "2026-09-21T14:41:17.110458+00:00",
+        "completed_at": "2026-09-21T14:41:17.930572+00:00",
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": {
+          "sha256": "5e8794341639b363c258cbd560781341d0d1f5a4c103498d0c3e660048a7e141",
+          "bytes": 7562,
+          "raw_retained_privately": true
+        },
+        "stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "raw_retained_privately": true
+        }
+      },
+      "hooks": [
+        {
+          "event": "preToolUse",
+          "key": "$DESKTOP_HOME_PARENT/.codex/hooks.json:pre_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:2a9b493e71f7e16d4a61d72d728df02fa6b6b8df7601a653c399b36f479d64a8"
+        },
+        {
+          "event": "postToolUse",
+          "key": "$DESKTOP_HOME_PARENT/.codex/hooks.json:post_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:18108baae805cb035c1a90b002291f4ab504364fcab807dd078f8933126e6f9b"
+        },
+        {
+          "event": "preCompact",
+          "key": "$DESKTOP_HOME_PARENT/.codex/hooks.json:pre_compact:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:00dc3791bfd4ae0b46c43cb8ee8a391b6da63e5b7690cebfe1bd59cf8793ad58"
+        },
+        {
+          "event": "sessionStart",
+          "key": "$DESKTOP_HOME_PARENT/.codex/hooks.json:session_start:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:6994cf4fb1fc4534ee5efb35367f0f85b3bcd5fb3e200b0b3fd73c9d337397cc"
+        },
+        {
+          "event": "sessionEnd",
+          "key": "$DESKTOP_HOME_PARENT/.codex/hooks.json:session_end:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:9a190d2120d2c9dd8dcb4adfb956379e2bfc9d74435eaea9262b22a31b5649fd"
+        },
+        {
+          "event": "userPromptSubmit",
+          "key": "$DESKTOP_HOME_PARENT/.codex/hooks.json:user_prompt_submit:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:9cd01164b2e560a27f94a0fedcddcd21306857980f4fee2dd248719244b4a061"
+        },
+        {
+          "event": "stop",
+          "key": "$DESKTOP_HOME_PARENT/.codex/hooks.json:stop:0:0",
+          "enabled": true,
+          "trust_status": "modified",
+          "current_hash": "sha256:0cfffc0558b708e1d401a870834648362335c69221add66766052d5dd92c2f98"
+        },
+        {
+          "event": "preToolUse",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:pre_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:56da0c4249dc7af048f42ae458fb83931926a8af41ec6fab5ae819ff3a8c83ae"
+        },
+        {
+          "event": "postToolUse",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:post_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:0d237345f8d46110d36cd0ef08e79b55fa151a07691dee36d492aa6f64bc0efd"
+        },
+        {
+          "event": "preCompact",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:pre_compact:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:ac1f9e5eb71ca262492150381d8f078b897056fc691f9973fc56d7b1b402e648"
+        },
+        {
+          "event": "sessionStart",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:session_start:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:a6cc6a322d0931bdd68a5969e523cd71e6eedccab4850e8996c8948311173618"
+        },
+        {
+          "event": "userPromptSubmit",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:user_prompt_submit:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:114549c484c131b94782d3424527dd1042d48bc3a8616a11299acdf60b112572"
+        },
+        {
+          "event": "stop",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:stop:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:9205c1763e40c0256ab334e2e96c037c1cdf5b8bfaddba31ed19d93d3388586a"
+        }
+      ]
+    },
+    "hook-trust-desktop-after": {
+      "command": {
+        "argv": [
+          "python3",
+          "$HOME/code/agent-lab/tools/ecosystem/inspect-codex-hooks.py",
+          "--codex",
+          "$HOME/.local/share/codex-ecosystem/bin/codex",
+          "--codex-home",
+          "$DESKTOP_HOME_PARENT/.codex",
+          "--cwd",
+          "$HOME/code/agent-lab"
+        ],
+        "cwd": "$HOME/code/agent-lab",
+        "started_at": "2026-09-21T14:44:43.089525+00:00",
+        "completed_at": "2026-09-21T14:44:43.891102+00:00",
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": {
+          "sha256": "67cf2521c747860f7eedd624942b019f7e98c31253ef3824febb33c6ca3ec040",
+          "bytes": 7561,
+          "raw_retained_privately": true
+        },
+        "stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "raw_retained_privately": true
+        }
+      },
+      "hooks": [
+        {
+          "event": "preToolUse",
+          "key": "$DESKTOP_HOME_PARENT/.codex/hooks.json:pre_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:2a9b493e71f7e16d4a61d72d728df02fa6b6b8df7601a653c399b36f479d64a8"
+        },
+        {
+          "event": "postToolUse",
+          "key": "$DESKTOP_HOME_PARENT/.codex/hooks.json:post_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:18108baae805cb035c1a90b002291f4ab504364fcab807dd078f8933126e6f9b"
+        },
+        {
+          "event": "preCompact",
+          "key": "$DESKTOP_HOME_PARENT/.codex/hooks.json:pre_compact:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:00dc3791bfd4ae0b46c43cb8ee8a391b6da63e5b7690cebfe1bd59cf8793ad58"
+        },
+        {
+          "event": "sessionStart",
+          "key": "$DESKTOP_HOME_PARENT/.codex/hooks.json:session_start:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:6994cf4fb1fc4534ee5efb35367f0f85b3bcd5fb3e200b0b3fd73c9d337397cc"
+        },
+        {
+          "event": "sessionEnd",
+          "key": "$DESKTOP_HOME_PARENT/.codex/hooks.json:session_end:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:9a190d2120d2c9dd8dcb4adfb956379e2bfc9d74435eaea9262b22a31b5649fd"
+        },
+        {
+          "event": "userPromptSubmit",
+          "key": "$DESKTOP_HOME_PARENT/.codex/hooks.json:user_prompt_submit:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:9cd01164b2e560a27f94a0fedcddcd21306857980f4fee2dd248719244b4a061"
+        },
+        {
+          "event": "stop",
+          "key": "$DESKTOP_HOME_PARENT/.codex/hooks.json:stop:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:0cfffc0558b708e1d401a870834648362335c69221add66766052d5dd92c2f98"
+        },
+        {
+          "event": "preToolUse",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:pre_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:56da0c4249dc7af048f42ae458fb83931926a8af41ec6fab5ae819ff3a8c83ae"
+        },
+        {
+          "event": "postToolUse",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:post_tool_use:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:0d237345f8d46110d36cd0ef08e79b55fa151a07691dee36d492aa6f64bc0efd"
+        },
+        {
+          "event": "preCompact",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:pre_compact:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:ac1f9e5eb71ca262492150381d8f078b897056fc691f9973fc56d7b1b402e648"
+        },
+        {
+          "event": "sessionStart",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:session_start:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:a6cc6a322d0931bdd68a5969e523cd71e6eedccab4850e8996c8948311173618"
+        },
+        {
+          "event": "userPromptSubmit",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:user_prompt_submit:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:114549c484c131b94782d3424527dd1042d48bc3a8616a11299acdf60b112572"
+        },
+        {
+          "event": "stop",
+          "key": "context-mode@context-mode:.codex-plugin/hooks.json:stop:0:0",
+          "enabled": true,
+          "trust_status": "trusted",
+          "current_hash": "sha256:9205c1763e40c0256ab334e2e96c037c1cdf5b8bfaddba31ed19d93d3388586a"
+        }
+      ]
+    }
+  }
+}

@@ -4,6 +4,39 @@
   "scope": "Capability-specific general FOUNDATION selection; original pins, full receipt claims and per-component lifecycle stages remain canonical. Shared research and financial examples are not blanket adoption.",
   "decisions": [
     {
+      "id": "native-memory-learning-maintenance",
+      "capability": "Maintain useful scoped memory across native Codex and Claude",
+      "capability_key": "native-memory-learning-maintenance",
+      "checked_at": "2026-09-21",
+      "layer_ids": ["durable-memory"],
+      "selection": "default",
+      "review_status": "accepted_within_scope",
+      "activation": "Use ai-memory's supported scoped capture, bounded assistant summaries and hourly learning scheduler with the adopted native provider; preserve client prompt-capture choices.",
+      "component_ids": ["ai-memory", "codex", "claude-code"],
+      "candidate": null,
+      "evidence_ids": ["memory-landscape-20260921", "dashboard-gap-resolution-20260921"],
+      "evidence_scope": "Nine current repository sources reviewed; native learning, scheduler admission, unchanged upstream tests and real client outcome capture are recorded separately. Existing code/document/context retrieval remain complementary layers.",
+      "limitations": [
+        "Scheduler covers all store scopes, with a per-project limit and once-per-session claims; current deployment has one adopted project.",
+        "Assistant excerpts are sanitized and capped, not complete transcripts. Claude prompt capture remains opted out.",
+        "Model review rejected insufficient evidence; scheduler admission did not establish learned-write quality. Exact memory lifetime token savings remain unknown.",
+        "Alternative systems are research candidates, not installed or locally benchmarked winners."
+      ],
+      "source_paths": ["docs/memory-landscape-maintenance.md", "docs/native-memory-consolidation.md"],
+      "next_gap": "Evaluate real subsequent learned proposals and representative retrieval quality before changing the accepted memory of record.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Reuse each canonical component's accepted use stage; this maintenance wave adds the separate native operation and capture evidence linked above.",
+        "unknown": "Other stages retain their original boundaries. Future learned-write quality, current Desktop hot reload and physical-PC reboot remain unestablished.",
+        "stage_refs": [
+          {"component_id": "ai-memory", "stage": "use", "status": "accepted_within_scope"},
+          {"component_id": "codex", "stage": "use", "status": "accepted_within_scope"},
+          {"component_id": "claude-code", "stage": "use", "status": "accepted_within_scope"}
+        ]
+      },
+      "supersedes": []
+    },
+    {
       "id": "synthetic-offhost-restic-restore",
       "capability": "Restore exact synthetic encrypted snapshots on an independent hosted runner",
       "capability_key": "synthetic-offhost-restic-restore",

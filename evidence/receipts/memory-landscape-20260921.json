@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "id": "memory-landscape-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "ai-memory",
+    "codex",
+    "claude-code"
+  ],
+  "recorded_at_utc": "2026-09-21T14:59:36.951204+00:00",
+  "claim": "Qualified native memory maintenance using nine pinned repository sources, upstream commands and unchanged tests; enabled hourly learning and bounded assistant outcome capture, preserving scope and privacy choices. Independent state inspection and native Claude source review distinguish admission, model review and actual capture.",
+  "limitations": [
+    "Current-host memory maintenance and bounded client capture, not universal SOTA superiority or every memory repository installed.",
+    "Two accelerated scheduler ticks were observed; both preflight-skipped without LLM calls. Final hourly configuration persisted across service restart, but no later hourly tick or physical-PC reboot is claimed.",
+    "Manual learning rejected insufficient durable evidence and applied no proposal. New learned-write quality and future retrieval improvement remain unmeasured.",
+    "All database scopes enter the scheduler, one review per project per tick; current scope count is one. Claims are once per session including preflight-skipped sessions.",
+    "Claude prompt capture remains opted out. Assistant excerpts are sanitized and capped at 2000 bytes, and inputs above 64 KiB are dropped. A current Desktop task hot reload is not established.",
+    "Scheduled page forget sweeps are disabled; upstream hollow-project cleanup remains enabled. Existing and unrelated account/model/scope settings remain unchanged.",
+    "Exact ai-memory lifetime/session saved tokens are not returned by upstream and remain null. Client consumption and upstream context estimates are separate.",
+    "Research workers stopped at account limits. Native Claude review first exceeded its turn limit; an incorrectly formed resume invocation failed; the retained resumed completion then supplied source-backed corrections.",
+    "Initial capture test filter selected zero tests and first Codex task lacked Stop because the modified hook was not yet trusted; corrected tests and real capture were qualified separately."
+  ],
+  "artifact_directory": "evidence/artifacts/memory-landscape-20260921",
+  "exact_memory_saved_tokens": {
+    "session": null,
+    "lifetime": null
+  },
+  "references": [
+    {
+      "repository": "akitaonrails/ai-memory",
+      "revision": "353841d91618d20b110b208de284a74d0b960379",
+      "url": "https://github.com/akitaonrails/ai-memory/tree/353841d91618d20b110b208de284a74d0b960379"
+    }
+  ],
+  "public_artifacts": [
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/catalog-memory-guide.png",
+      "bytes": 125442,
+      "sha256": "bca87e44e3375122ac2078115a82d5c69fd574335ca0408394a46cfaeb5c5ab7"
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/hook-trust.json",
+      "bytes": 19493,
+      "sha256": "c3a7b7d5507f2ea09061e6dd75591c5e923afe108d748d1a858b6c5a5fa8f815"
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/native-client-results.json",
+      "bytes": 19428,
+      "sha256": "c4d3a7430fc0ef75eadc6675056345f2216b1643b3fd4eed90fb19326cf830ce"
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/native-commands.json",
+      "bytes": 68721,
+      "sha256": "499d30398a7152bdfd803d6a4c11f1045f503695b720df332a2c367b240cfcab"
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/qualification.json",
+      "bytes": 3568,
+      "sha256": "5d6e728caefcaf9a43ec2a738ac75147c232b89b3c0475164225fafbab82dff9"
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/sources.json",
+      "bytes": 5245,
+      "sha256": "90fc6c4489de1ec4b4c33b13c27c2e3fb84798a78695b6b2d5858cbd280f69fc"
+    },
+    {
+      "path": "evidence/artifacts/memory-landscape-20260921/state-observation.json",
+      "bytes": 5364,
+      "sha256": "611103b950674d1e9f4230fdbb0f7d2164bebb0f2ca1142c1870ab7fa323baf3"
+    }
+  ]
+}
