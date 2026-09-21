@@ -311,6 +311,12 @@
   ],
   "guides": [
     {
+      "title": "Live Claude: upstream commands, returns and screenshots",
+      "body": "38 rows distinguish 14 functional calls, 18 readiness checks and 6 version/help checks. Corrected native results, full-output provenance, bounded lifetime figures and three dashboard views.",
+      "path": "docs/claude-upstream-checks.md",
+      "category": "evaluation"
+    },
+    {
       "title": "Claude-to-Codex review: actual native return",
       "body": "Literal official slash command returned successfully in an isolated checkout. Native output, usage limits, source hashes and lifecycle boundaries retained.",
       "path": "recipes/claude-codex-foreground-review.md",

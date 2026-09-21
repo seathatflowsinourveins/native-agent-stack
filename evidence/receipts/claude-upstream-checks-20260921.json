@@ -1,0 +1,85 @@
+{
+  "id": "claude-upstream-checks-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "agent-browser",
+    "agentsview",
+    "ai-memory",
+    "alertmanager",
+    "ast-grep",
+    "beads",
+    "ccusage",
+    "claude-code",
+    "codex",
+    "codex-for-claude",
+    "context-mode",
+    "dagu",
+    "difftastic",
+    "gitleaks",
+    "grafana",
+    "headroom",
+    "jcodemunch-mcp",
+    "lean",
+    "loki",
+    "markitdown",
+    "mcporter",
+    "nautilus-trader",
+    "openresearch",
+    "opentelemetry-collector-contrib",
+    "prometheus",
+    "promptfoo",
+    "qdrant",
+    "qmd",
+    "repomix",
+    "rtk",
+    "serena",
+    "socraticode",
+    "tavily-cli",
+    "toon",
+    "vllm",
+    "worktrunk",
+    "zizmor"
+  ],
+  "claim": "Live Claude retained 38 native command rows: 14 bounded functional checks, 18 readiness checks and 6 version/help checks, with corrected failure handling and three native dashboard screenshots.",
+  "limitations": [
+    "38 zero-exit rows are not 38 functional E2Es; each row keeps its narrower evidence class.",
+    "This is dated source-host evidence, not another PC installation or full lifecycle acceptance.",
+    "RTK/Headroom/Context Mode figures overlap or have tool-specific retention; no causal provider savings.",
+    "Complete originals remain private; public excerpts are bounded and sanitized.",
+    "The earlier wrong-port vLLM fallback was wrongly accepted and remains recorded; corrected call tests only the stated embedding request."
+  ],
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-21T20:54:00.335225+00:00",
+  "artifact_directory": "evidence/artifacts/claude-upstream-checks-20260921",
+  "public_artifacts": [
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-6h-20260921.png",
+      "bytes": 100755,
+      "sha256": "83ef18609465a76f96881fba06b2f960b92f1d0731f03ba9c65771cd26583b3a"
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/grand-dashboard-72h-20260921.png",
+      "bytes": 97802,
+      "sha256": "06f1b5d58f057137b0689a7c9d8fcddca9af36a826b6dbe2c567e6e82c89395d"
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/provenance.json",
+      "bytes": 34249,
+      "sha256": "ea3d215168c9f7df2e4568c2562ce445c376e41f1b077a2898030885643b5cb4"
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/results.json",
+      "bytes": 74785,
+      "sha256": "c4a6e247323c9f89303784742b299ffa3cb46cb136ec514169c9a172563caeef"
+    },
+    {
+      "path": "evidence/artifacts/claude-upstream-checks-20260921/token-savings-manifest-page-20260921.png",
+      "bytes": 85934,
+      "sha256": "787f3d49cedc86489e6e7446810d992bda880071d0bbf22d7c0fef67d8120b2a"
+    }
+  ],
+  "exact_saved_tokens": {
+    "session": null,
+    "lifetime": null
+  }
+}
