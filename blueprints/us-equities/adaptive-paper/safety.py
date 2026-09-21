@@ -248,6 +248,7 @@ class Ledger:
                 CREATE INDEX IF NOT EXISTS requests_time ON requests(at);
                 CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY, kind TEXT NOT NULL,
                     client_id TEXT, payload TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS trials(trial_id TEXT PRIMARY KEY, started_at REAL NOT NULL);
             """)
             frozen = json.dumps(asdict(self.limits), default=str, sort_keys=True)
             with self._transaction():
@@ -327,6 +328,42 @@ class Ledger:
             if self._get("halted_reason") is None:
                 self._set("halted_reason", "recovery_only")
             self._event("recovery_started", at=now, cleanup_seconds=self.limits.cleanup_seconds)
+            return now
+
+    def begin_next_trial(self, now, trial_id):
+        """Start an explicitly requested new bounded trial in the SAME account DB.
+
+        Caller must have stopped admissions, held the writer lock, and observed
+        fresh broker flat/idle cash/position reconciliation before invoking this.
+        Durable risk, fill accounting and request history are never reset.
+        """
+        now = instant(now)
+        if type(trial_id) is not str or not re.fullmatch(r"[a-z0-9-]{1,24}", trial_id):
+            raise SafetyError("invalid_trial_id")
+        with self._transaction():
+            if self.db.execute("SELECT 1 FROM trials WHERE trial_id=?", (trial_id,)).fetchone():
+                raise SafetyError("trial_id_already_used")
+            start = self._get("trial_start")
+            latest_request = self.db.execute("SELECT MAX(at) FROM requests").fetchone()[0]
+            if ((start is not None and now < float(start)) or
+                    (latest_request is not None and now < latest_request)):
+                raise SafetyError("trial_clock_moved_backward")
+            if self._positions() or any(not i.terminal for i in self.intents()):
+                raise SafetyError("next_trial_requires_flat_and_terminal")
+            state = self._state()
+            if state.halted_reason not in (None, "recovery_only"):
+                raise SafetyError("next_trial_cannot_clear_risk_halt")
+            if (state.gross_loss_usd >= self.limits.max_gross_loss_usd or
+                    state.drawdown_usd >= self.limits.max_drawdown_usd):
+                raise SafetyError("next_trial_risk_budget_exhausted")
+            self.db.execute("INSERT INTO trials VALUES (?,?)", (trial_id, now))
+            self._set("trial_start", now)
+            self._set("trial_id", trial_id)
+            self.db.execute("DELETE FROM meta WHERE key IN ('recovery_start','recovery_only')")
+            if state.halted_reason == "recovery_only":
+                self.db.execute("DELETE FROM meta WHERE key='halted_reason'")
+            self._event("next_trial_started", trial_id=trial_id, at=now,
+                        required_external_proof="fresh_broker_flat_idle_and_cash_reconciled")
             return now
 
     def _check_window(self, side, now):

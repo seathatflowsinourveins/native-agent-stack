@@ -557,6 +557,51 @@ class SafetyTests(unittest.TestCase):
         with self.assertRaisesRegex(s.SafetyError, "quote_spread_exceeds_cap"):
             self.validate(quote=self.quote(bid="90", ask="100"))
 
+    def test_next_trial_retains_loss_cash_and_request_budget(self):
+        self.reserve()
+        self.ledger.request_budget(self.now, "submit", "buy-1")
+        self.fill()
+        self.reserve("sell-1", side="sell", price="99", quote=self.quote(bid="99", ask="99.01"))
+        self.ledger.request_budget(self.now, "submit", "sell-1")
+        self.fill("sell-1", price="99")
+        before = self.ledger.accounting()
+        self.now += 1
+        self.ledger.begin_next_trial(self.now, "next-day-2")
+        self.reopen()
+        after = self.ledger.accounting()
+        self.assertEqual(after, before)
+        self.assertEqual(self.ledger.db.execute("SELECT COUNT(*) FROM requests").fetchone()[0], 2)
+        self.assertEqual(self.ledger.start_trial(self.now + 1), self.now)
+        with self.assertRaisesRegex(s.SafetyError, "trial_id_already_used"):
+            self.ledger.begin_next_trial(self.now + 1, "next-day-2")
+        for _ in range(178):
+            self.assertEqual(self.ledger.request_budget(self.now, "submit"), 0)
+        self.assertGreater(self.ledger.request_budget(self.now, "submit"), 0)
+
+    def test_next_trial_refuses_unresolved_position_and_loss_halt(self):
+        self.reserve()
+        with self.assertRaisesRegex(s.SafetyError, "flat_and_terminal"):
+            self.ledger.begin_next_trial(self.now, "next-1")
+        self.fill()
+        with self.assertRaisesRegex(s.SafetyError, "flat_and_terminal"):
+            self.ledger.begin_next_trial(self.now, "next-1")
+        self.reserve("sell-1", side="sell", price="99.99")
+        self.fill("sell-1")
+        self.ledger.freeze("gross_loss_cap_reached")
+        with self.assertRaisesRegex(s.SafetyError, "cannot_clear_risk_halt"):
+            self.ledger.begin_next_trial(self.now, "next-1")
+        self.assertEqual(self.ledger.db.execute("SELECT COUNT(*) FROM trials").fetchone()[0], 0)
+
+    def test_next_trial_clears_only_completed_recovery_only_state(self):
+        self.ledger.begin_recovery(self.now)
+        self.assertEqual(self.ledger.accounting().halted_reason, "recovery_only")
+        self.now += 1
+        self.ledger.begin_next_trial(self.now, "next-1")
+        self.assertIsNone(self.ledger.accounting().halted_reason)
+        self.assertIsNone(self.ledger._get("recovery_start"))
+        self.assertIsNone(self.ledger._get("recovery_only"))
+        self.reserve()
+
 
 if __name__ == "__main__":
     unittest.main()

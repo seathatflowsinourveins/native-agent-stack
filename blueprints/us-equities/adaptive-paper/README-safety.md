@@ -40,6 +40,13 @@ limit-order mechanism guarantees a flat finish.
   and request history, and permits owned-position exits for `cleanup_seconds`
   from that invocation. Session/quote/quantity bounds still apply. Never call
   repeatedly inside a loop to extend an active recovery indefinitely.
+- `begin_next_trial(now, trial_id)` starts an explicitly selected new bounded trial
+  in the same account database. The caller must first observe fresh flat/idle
+  broker state and cash reconciliation with admissions stopped. The ledger also
+  requires every old intent terminal, no position, no risk halt, and a never-used
+  trial ID. It resets only the trial clock and completed `recovery_only` markers;
+  all limits, fills, cash, loss, peak P&L and request history remain intact. Use
+  this API for the first named trial too if first-ID reuse must be prevented.
 - `reserve_intent(client_id, symbol, side, qty, limit_price, *, quote, now,
   market_open, session_close, stop_file=None)` atomically reserves exposure and
   returns an `Intent`. `newly_reserved` is true only once. An exact duplicate
@@ -118,10 +125,10 @@ its weighted-average realized attribution follows applied observations, while
 gross cash flow and total marked P&L remain independently reconcilable. Do not
 infer tax-lot accounting or native stream recovery from these local tests.
 
-The first trial start and limits intentionally cannot be reset through this API.
-A later feature may rotate a completed, reconciled, flat trial while retaining
-the account-wide request history. Deleting or replacing the database is not a
-supported reset. A timed-out trial requires explicit reconciliation and
+The first `start_trial` clock cannot be reset by calling `start_trial` again.
+Only explicit `begin_next_trial` with fresh external proof can rotate a completed,
+flat trial while retaining account-wide history. Deleting or replacing the
+database is not a supported reset. A timed-out trial requires reconciliation and
 `begin_recovery` for a separately bounded cleanup invocation; do not manufacture
 a fresh trial or reset request history to hide unresolved state. Identify the
 actual recovery adapter: a direct SDK fractional exit does not establish that a
