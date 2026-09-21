@@ -1,6 +1,8 @@
 # Useful native dashboards and returned evidence
 
 Start with the authoring PC's [native foundation view](http://127.0.0.1:13000/d/native-foundation-data).
+The [rendered dashboard review](dashboard-rendered-acceptance.md) records actual
+screenshots, command comparisons, presentation repairs and remaining gaps.
 It uses the installed Grafana and Loki with locally provisioned integration panels.
 It is not an official prebuilt dashboard from each component's authors.
 The component interfaces below are their own upstream UIs, generated views or CLIs.
@@ -82,7 +84,8 @@ systemctl --user restart ai-memory.service
 
 `status --json` reports database-wide counters; it does not select a project.
 Use the project-scoped UI or native `memory_status`/`memory_query` MCP calls when
-project-specific observations are needed. The actual project UI search returned
+project-specific observations are needed. The bundled browser search is global
+FTS search; it does not inherit scope from the project page. The actual UI search returned
 existing pages, and opening a result rendered its article. No page body is published
 in the receipt. Official instructions:
 [ai-memory usage](https://github.com/akitaonrails/ai-memory/blob/v2.3.2/docs/usage.md#browse-the-wiki-in-a-browser).

@@ -5,11 +5,12 @@ import json
 from pathlib import Path
 
 
-def latest(kind):
+def latest(kind, entity=None):
     marker = ('{service_name="agent-stack-native-data",record_kind="snapshot"}'
               ' | json | entity_id="snapshot" | unwrap observed_unix | __error__="" [30m]')
+    entity_filter = ' | entity_id="' + entity + '"' if entity else ''
     return ('last_over_time({service_name="agent-stack-native-data",record_kind="' + kind
-            + '"} | json | unwrap observed_unix | __error__="" [30m])'
+            + '"} | json' + entity_filter + ' | unwrap observed_unix | __error__="" [30m])'
             ' == on() group_left() max(last_over_time(' + marker + '))')
 
 
@@ -46,8 +47,10 @@ def dashboard():
             '[Gateway usage](http://127.0.0.1:20128/dashboard/analytics) · '
             '[Native telemetry](/d/ecosystem-native) · [Research](/d/research-grand) · '
             '[Upstream commands and evidence](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/native-dashboard-data.md)\n\n'
-            'Memory browser search uses FTS5; semantic recall uses MCP. '
-            'The System group includes session pages. The code graph is an explicitly refreshed snapshot. '
+            'Memory browser search is global FTS5; project-scoped semantic recall uses MCP. '
+            'Expand System in the read-only wiki to see session pages. '
+            'Dagu defaults to Today; select Last 30 days for retained runs. '
+            'The code graph is an explicitly refreshed snapshot. '
             '[Memory and RAG practice](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/memory-rag-native-practice.md)\n\n'
             '**Accounting:** native savings are estimates. Project counts can be subsets of global counts. '
             'Provider usage and cache reads are separate; never add these into one savings total. '
@@ -57,7 +60,8 @@ def dashboard():
         '1000 * max(last_over_time({service_name="agent-stack-native-data",record_kind="snapshot"}'
         ' | json | unwrap observed_unix | __error__="" [30m]))',
         description='Delivery time only. Each source has its own observation date below. No data after 30 minutes is unknown.',
-        fieldConfig={'defaults': {'unit': 'dateTimeFromNow', 'noValue': 'No recent observation'}, 'overrides': []})
+        fieldConfig={'defaults': {'unit': 'dateTimeFromNow', 'noValue': 'No recent observation',
+                                  'color': {'mode': 'fixed', 'fixedColor': 'text'}}, 'overrides': []})
     add(3, 'Collections in local Qdrant', 'stat', 8, 7, 8, 4,
         'collections_total{job="qdrant"}', source='ecosystem-prometheus',
         fieldConfig={'defaults': {'unit': 'short', 'noValue': 'Unknown'}, 'overrides': []})
@@ -66,9 +70,9 @@ def dashboard():
         description='Native embedding-server gauge. Idle zero does not mean retrieval is unavailable.',
         fieldConfig={'defaults': {'unit': 'short', 'noValue': 'Unknown'}, 'overrides': []})
 
-    def table(pid, kind, title, y, height, fields):
+    def table(pid, kind, title, y, height, fields, entity=None, widths=None):
         rename = {
-            'title': 'Source / scope', 'state': 'Observation state', 'value': 'Native value',
+            'title': 'Source / scope', 'state': 'Observation', 'value': 'Native value',
             'unit': 'Unit', 'kind': 'Measurement', 'estimated_saved': 'Retained native estimate',
             'session_estimated_saved': 'Session byte estimate',
             'source_updated_at': 'Source updated UTC', 'source_command': 'Command / source',
@@ -76,53 +80,66 @@ def dashboard():
             'canonical_receipt_count': 'Canonical receipts (read scope)',
             'timestamp_basis': 'Timestamp meaning',
             'boundary': 'Scope / limits',
-            'embedding_status': 'Embedding status',
-            'embedding_provider': 'Embedding provider',
-            'embedding_model': 'Memory embedding model',
-            'embedding_dimensions': 'Memory dimensions',
-            'embedding_rows': 'Embedding rows',
-            'latest_pages_missing_embeddings': 'Latest pages missing vectors',
-            'embed_failures_unresolved': 'Unresolved embedding failures',
-            'llm_status': 'Memory LLM status',
+            'embedding_status': 'Status',
+            'embedding_provider': 'Provider',
+            'embedding_model': 'Model',
+            'embedding_dimensions': 'Dimensions',
+            'embedding_rows': 'Stored',
+            'latest_pages_missing_embeddings': 'Missing',
+            'embed_failures_unresolved': 'Failures',
+            'llm_status': 'LLM',
         }
-        add(pid, title, 'table', 0, y, 24, height, latest(kind),
+        add(pid, title, 'table', 0, y, 24, height, latest(kind, entity),
             description='Only the latest complete published generation is displayed. Failed sources replace prior successes with unknown. Historical source time is distinct from delivery time.',
             transformations=[{'id': 'labelsToFields', 'options': {'mode': 'columns'}},
                              {'id': 'filterFieldsByName', 'options': {'include': {'names': fields}}},
                              {'id': 'organize', 'options': {'indexByName': {v: i for i, v in enumerate(fields)},
                                                            'renameByName': rename}}],
             options={'showHeader': True, 'cellHeight': 'sm', 'footer': {'show': False}},
-            fieldConfig={'defaults': {'noValue': '—', 'custom': {'align': 'auto', 'wrapText': True,
-                                                               'cellOptions': {'type': 'auto'}}}, 'overrides': []})
+            fieldConfig={'defaults': {'noValue': '—', 'custom': {'align': 'auto', 'wrapText': False,
+                                                               'cellOptions': {'type': 'auto'}}},
+                         'overrides': [{'matcher': {'id': 'byName', 'options': rename.get(name, name)},
+                                        'properties': [{'id': 'custom.width', 'value': width}]}
+                                       for name, width in (widths or {}).items()]})
 
     table(5, 'savings', 'Token-saving estimates · separate native scopes', 11, 12,
           ['title', 'state', 'estimated_saved', 'session_estimated_saved', 'source_updated_at',
            'kind', 'boundary', 'source_command'])
-    table(6, 'memory', 'Memory and retrieval · actual scoped inventory', 23, 11,
-          ['title', 'state', 'value', 'unit', 'embedding_model', 'embedding_dimensions',
-           'embedding_status', 'embedding_provider',
+    table(6, 'memory', 'Memory and retrieval · actual scoped inventory', 23, 7,
+          ['title', 'state', 'value', 'unit', 'source_updated_at'],
+          widths={'title': 290, 'state': 125, 'value': 90, 'unit': 85, 'source_updated_at': 260})
+    table(13, 'memory', 'ai-memory · model and completeness', 30, 7,
+          ['state', 'embedding_model', 'embedding_dimensions', 'embedding_status', 'embedding_provider',
            'embedding_rows', 'latest_pages_missing_embeddings', 'embed_failures_unresolved',
-           'llm_status', 'source_updated_at', 'boundary', 'source_command'])
-    add(7, 'Native Qdrant vectors · keep dense and sparse separate', 'timeseries', 0, 34, 12, 8,
+           'llm_status'], entity='ai-memory',
+          widths={'state': 100, 'embedding_model': 185, 'embedding_dimensions': 90, 'embedding_status': 85,
+                  'embedding_provider': 80, 'embedding_rows': 65, 'latest_pages_missing_embeddings': 75,
+                  'embed_failures_unresolved': 75, 'llm_status': 80})
+    panels[-1]['description'] += (' Stored includes superseded page vectors. Missing means latest pages without '
+                                  'vectors; Failures means unresolved embedding failures. LLM disabled means '
+                                  'automatic model-based consolidation is not configured.')
+    table(14, 'memory', 'Memory and retrieval · source commands and limits', 37, 7,
+          ['title', 'source_command', 'boundary'], widths={'title': 320, 'source_command': 380})
+    add(7, 'Native Qdrant vectors · keep dense and sparse separate', 'timeseries', 0, 44, 12, 8,
         'collection_vectors{job="qdrant"}', source='ecosystem-prometheus',
         description='A point can have both dense and sparse vectors. Do not sum vector series as document or chunk counts.')
-    add(8, 'Native embedding-server completed requests', 'timeseries', 12, 34, 12, 8,
+    add(8, 'Native embedding-server completed requests', 'timeseries', 12, 44, 12, 8,
         'vllm:request_success_total{job="vllm"}', source='ecosystem-prometheus',
         description='Native process counters by completion reason; not token savings or lifetime across restarts.')
-    add(9, 'Codex provider telemetry · typed counters', 'timeseries', 0, 42, 12, 8,
+    add(9, 'Codex provider telemetry · typed counters', 'timeseries', 0, 52, 12, 8,
         'sum by (token_type) (ecosystem_codex_turn_token_usage_sum)', source='ecosystem-prometheus',
         description='Native exported usage; overlapping cache/input/total fields must not be added. Not a counterfactual saving.')
-    add(10, 'Claude provider telemetry · typed counters', 'timeseries', 12, 42, 12, 8,
+    add(10, 'Claude provider telemetry · typed counters', 'timeseries', 12, 52, 12, 8,
         'sum by (type) (ecosystem_claude_code_token_usage_tokens_total)', source='ecosystem-prometheus',
         description='Only native exported samples in the selected range. An inactive client may have no current series; use its archive/report for recorded usage.')
-    table(11, 'coverage', 'All selected repositories · recorded acceptance, not live process status', 50, 18,
+    table(11, 'coverage', 'All selected repositories · recorded acceptance, not live process status', 60, 18,
           ['title', 'coverage_status', 'canonical_receipt_count', 'state', 'source_updated_at', 'timestamp_basis', 'boundary'])
-    add(12, 'Sanitized native client activity', 'logs', 0, 68, 24, 10,
+    add(12, 'Sanitized native client activity', 'logs', 0, 78, 24, 10,
         '{service_name=~"Codex Desktop|codex-app-server|claude-code|codex-sdk-receipt"}',
         options={'showTime': True, 'sortOrder': 'Descending', 'wrapLogMessage': True},
         description='Existing native telemetry; prompt/tool bodies are removed upstream in the collector.')
     return dict(uid='native-foundation-data', title='Native foundation · memory, retrieval and savings',
-                schemaVersion=39, version=3, editable=False, preload=True, timezone='browser', refresh='30s',
+                schemaVersion=39, version=4, editable=False, preload=True, timezone='browser', refresh='30s',
                 time={'from': 'now-6h', 'to': 'now'}, tags=['ecosystem', 'native', 'memory', 'tokens'],
                 panels=panels)
 
