@@ -50,6 +50,8 @@ RETURNED_RECEIPT_FAMILIES = {
 PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
 PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024
 NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json",
+                    "recipes/claude-native-ultracode.md", "examples/claude-native/ultracode.settings.json",
+                    "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json",
                     "docs/memory-landscape-maintenance.md",
                     "docs/harness-defaults.md", "catalogs/README.md", STACK, ADOPTION,
                     "docs/full-stack-convergence.md", "recipes/native-upgrades-20260921.md",
@@ -380,7 +382,8 @@ def build_data(root):
     guide_paths = list(SETUP_GUIDES)
     for path in ("docs/memory-landscape-maintenance.md", "adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md", "docs/foundation-stack.md", "docs/token-session-handbook.md",
                  "docs/harness-defaults.md", "catalogs/README.md", "catalogs/foundation/README.md",
-                 "docs/community-native-practice.md", "examples/claude-native/CLAUDE.md"):
+                 "docs/community-native-practice.md", "examples/claude-native/CLAUDE.md",
+                 "recipes/claude-native-ultracode.md"):
         if (root / path).exists():
             guide_paths.append(path)
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))

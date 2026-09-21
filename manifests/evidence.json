@@ -6120,8 +6120,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "bc47831138ae9a4d3c01793b620eb8cba95bc0a4696546a9033c4d64696ab595",
-      "bytes": 6630383
+      "sha256": "3627ebeb9b8e46c32eac8f99e1a1dcc43f8d48f8b3a17d372176f29136927376",
+      "bytes": 6641792
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6130,8 +6130,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "81e078b452e9c6a6911328433101149a1ebaa5e433cb93c4351d047adcc08c19",
-      "bytes": 35290
+      "sha256": "e538dc5e3ca138b5f3aa114ca78bcb6968ba634d3793387a1583766937f01d35",
+      "bytes": 36547
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6150,8 +6150,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "25afeb288b2eff9cac58f3054e9aafde22baafa8a5f75d52608477492f9d6c25",
-      "bytes": 80800
+      "sha256": "8b9b2a0b3c8e8df13eb57ddac9ee560ffea8afc8a9df928a76e4613841fd36ba",
+      "bytes": 80893
     },
     {
       "path": "docs/evidence.md",
@@ -6825,8 +6825,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "8b9f857e6e71c4a0a57e10ac27b60bb9988155ec8171befce382a5497000810e",
-      "bytes": 33826
+      "sha256": "93f3cc01e0f36879a400b14aa52936af5770336d7bac1b049887377b886dfcde",
+      "bytes": 34083
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -8870,8 +8870,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "2288f1b314faa91755fa2a97fd752cba93a958636bbcbd74da58c98191a28fcc",
-      "bytes": 7788
+      "sha256": "51876a958e91fcf82b4d5296b62ab39af96c805e8e33661004baaac393afc3cd",
+      "bytes": 9110
     },
     {
       "path": "docs/native-ultracode-20260921.md",
@@ -8880,8 +8880,8 @@
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",
-      "sha256": "1f43a382696b0a9c056d069c5808e97f3215bd97d7c7fd60b588bc3681bc4435",
-      "bytes": 66
+      "sha256": "1d35ec9f182a4d3762f772f0ad6991b9b313d03e4e5a1d8e1b33a63d95757d4d",
+      "bytes": 157
     },
     {
       "path": "evidence/receipts/native-ultracode-20260921.json",
@@ -9267,6 +9267,11 @@
       "path": "evidence/artifacts/native-claude-coop-20260921/loki-discovery.json",
       "sha256": "b272572b57b6cfa63cf4679341e4d35a793fb27b2ed3ceb856b798417927f2ca",
       "bytes": 10460
+    },
+    {
+      "path": "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json",
+      "bytes": 9716,
+      "sha256": "89f674ad3ab02afb6e70047cfa714f1e0de8625009f3c8b9171d9fb8b7e82267"
     }
   ],
   "convergence_records": [

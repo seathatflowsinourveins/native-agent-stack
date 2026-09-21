@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "kind": "native_client_observations",
+  "captured_at": "2026-09-21T15:34:27Z",
+  "scope": "Existing Linux/WSL host, installed Claude2.1.278 and Codex companion1.0.6; fresh native probes plus one saved-workflow run. Not another host acceptance.",
+  "method": "Independent parsing of the named native stream-json files; all completed observations retain original file hashes. No model was called by the parser.",
+  "sanitization": "Private absolute paths and native session IDs omitted. Token fields are allowlisted native returned values; API-equivalent dollar estimates, prompts and personal/account fields are excluded.",
+  "configuration": {
+    "enableWorkflows": true,
+    "ultracode": true,
+    "workflowSizeGuideline": "small",
+    "env": {
+      "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "3"
+    }
+  },
+  "settings_reference": "https://code.claude.com/docs/en/settings-reference#ultracode",
+  "native_observations": [
+    {
+      "file": "probe-settings.jsonl",
+      "sha256": "640ecb4e1acf2bb214cdaab027ad71c06ca5d71ac6bb8504b086e7d6111d04bd",
+      "bytes": 9013,
+      "terminal_observed": true,
+      "terminal_count": 1,
+      "coordinator_model": "claude-opus-5[1m]",
+      "workflow_tool_present": true,
+      "subtype": "success",
+      "is_error": false,
+      "num_turns": 1,
+      "usage": {
+        "input_tokens": 2,
+        "output_tokens": 4,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 35007,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        }
+      },
+      "model_usage": {
+        "claude-opus-5[1m]": {
+          "inputTokens": 2,
+          "outputTokens": 4,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 35007,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-opus-5",
+          "provider": "firstParty"
+        }
+      },
+      "effort_observed": false
+    },
+    {
+      "file": "probe-reviewer.jsonl",
+      "sha256": "2a752208bc25de203a70429473c12d6c87393b300c7931e097252324cc03eae4",
+      "bytes": 57305,
+      "terminal_observed": true,
+      "terminal_count": 1,
+      "coordinator_model": "claude-fable-5-1",
+      "workflow_tool_present": true,
+      "subtype": "success",
+      "is_error": false,
+      "num_turns": 2,
+      "usage": {
+        "input_tokens": 34,
+        "output_tokens": 599,
+        "cache_read_input_tokens": 45076,
+        "cache_creation_input_tokens": 46235,
+        "output_tokens_details": {
+          "thinking_tokens": 154
+        }
+      },
+      "model_usage": {
+        "claude-fable-5-1": {
+          "inputTokens": 34,
+          "outputTokens": 599,
+          "cacheReadInputTokens": 45076,
+          "cacheCreationInputTokens": 46235,
+          "thinkingTokens": 154,
+          "canonicalModel": "claude-fable-5-1",
+          "provider": "firstParty"
+        },
+        "claude-opus-5[1m]": {
+          "inputTokens": 4,
+          "outputTokens": 439,
+          "cacheReadInputTokens": 12448,
+          "cacheCreationInputTokens": 15047,
+          "thinkingTokens": 0,
+          "canonicalModel": "claude-opus-5",
+          "provider": "firstParty"
+        }
+      },
+      "effort_observed": false
+    },
+    {
+      "file": "probe-builder.jsonl",
+      "sha256": "b58831a0a4d4ef7232c9bb2120b54013f9d5295d86393c491e8a4d1301bc15e3",
+      "bytes": 68292,
+      "terminal_observed": true,
+      "terminal_count": 1,
+      "coordinator_model": "claude-fable-5-1",
+      "workflow_tool_present": true,
+      "subtype": "success",
+      "is_error": false,
+      "num_turns": 3,
+      "usage": {
+        "input_tokens": 34,
+        "output_tokens": 1400,
+        "cache_read_input_tokens": 59100,
+        "cache_creation_input_tokens": 33729,
+        "output_tokens_details": {
+          "thinking_tokens": 649
+        }
+      },
+      "model_usage": {
+        "claude-sonnet-5": {
+          "inputTokens": 6,
+          "outputTokens": 564,
+          "cacheReadInputTokens": 70751,
+          "cacheCreationInputTokens": 37493,
+          "thinkingTokens": 74,
+          "canonicalModel": "claude-sonnet-5",
+          "provider": "firstParty"
+        },
+        "claude-fable-5-1": {
+          "inputTokens": 34,
+          "outputTokens": 1400,
+          "cacheReadInputTokens": 59100,
+          "cacheCreationInputTokens": 33729,
+          "thinkingTokens": 649,
+          "canonicalModel": "claude-fable-5-1",
+          "provider": "firstParty"
+        }
+      },
+      "effort_observed": false
+    },
+    {
+      "file": "probe-discovery.jsonl",
+      "sha256": "aa5e5353c1bad12bb16f9386cdccc0239b1a5aa8e6971e5a385ec7d54d8dab5d",
+      "bytes": 31562,
+      "terminal_observed": true,
+      "terminal_count": 1,
+      "coordinator_model": "claude-fable-5-1",
+      "workflow_tool_present": true,
+      "subtype": "success",
+      "is_error": false,
+      "num_turns": 2,
+      "usage": {
+        "input_tokens": 34,
+        "output_tokens": 159,
+        "cache_read_input_tokens": 59099,
+        "cache_creation_input_tokens": 32079,
+        "output_tokens_details": {
+          "thinking_tokens": 67
+        }
+      },
+      "model_usage": {
+        "claude-fable-5-1": {
+          "inputTokens": 34,
+          "outputTokens": 159,
+          "cacheReadInputTokens": 59099,
+          "cacheCreationInputTokens": 32079,
+          "thinkingTokens": 67,
+          "canonicalModel": "claude-fable-5-1",
+          "provider": "firstParty"
+        }
+      },
+      "effort_observed": false
+    },
+    {
+      "file": "loader-run.jsonl",
+      "sha256": "96de8695db283a6e11c203fed74d6d7389ba78ec8583d617658c856f73d63552",
+      "bytes": 180398,
+      "terminal_observed": true,
+      "terminal_count": 2,
+      "coordinator_model": "claude-fable-5-1",
+      "workflow_tool_present": true,
+      "subtype": "success",
+      "is_error": false,
+      "num_turns": 3,
+      "usage": {
+        "input_tokens": 68,
+        "output_tokens": 748,
+        "cache_read_input_tokens": 149927,
+        "cache_creation_input_tokens": 5635,
+        "output_tokens_details": {
+          "thinking_tokens": 128
+        }
+      },
+      "model_usage": {
+        "claude-fable-5-1": {
+          "inputTokens": 102,
+          "outputTokens": 1140,
+          "cacheReadInputTokens": 209211,
+          "cacheCreationInputTokens": 38671,
+          "thinkingTokens": 211,
+          "canonicalModel": "claude-fable-5-1",
+          "provider": "firstParty"
+        },
+        "claude-sonnet-5": {
+          "inputTokens": 12,
+          "outputTokens": 8102,
+          "cacheReadInputTokens": 188908,
+          "cacheCreationInputTokens": 44697,
+          "thinkingTokens": 564,
+          "canonicalModel": "claude-sonnet-5",
+          "provider": "firstParty"
+        },
+        "claude-opus-5[1m]": {
+          "inputTokens": 64,
+          "outputTokens": 30214,
+          "cacheReadInputTokens": 1833105,
+          "cacheCreationInputTokens": 83276,
+          "thinkingTokens": 13515,
+          "canonicalModel": "claude-opus-5",
+          "provider": "firstParty"
+        }
+      },
+      "effort_observed": false
+    }
+  ],
+  "native_workflow_verdict": {
+    "workflow": "review-changes",
+    "status": "rejected",
+    "accepted": false,
+    "reported_findings": 7,
+    "interpretation": "The actual native review rejected intermediate source. Subsequent original-source review separated corrected defects, unsupported claims and inventory drift; the native rejection is retained rather than rewritten as a pass."
+  },
+  "cross_client_attempt": {
+    "status": "interrupted",
+    "accepted": false,
+    "native_started_at": "2026-09-21T15:10:16.364Z",
+    "native_aborted_at": "2026-09-21T15:10:42.520Z",
+    "native_abort_reason": "interrupted",
+    "native_duration_ms": 26163,
+    "native_rollout_sha256": "785e5c255daa6fd4ec9339f6785bf1e0dad5c666e58e4b57a784771a6ae25c60",
+    "usage": {
+      "input_tokens": 24171,
+      "cached_input_tokens": 0,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 282,
+      "reasoning_output_tokens": 0,
+      "total_tokens": 24453
+    },
+    "later_companion_status": "cancelled",
+    "later_cancel_record_at": "2026-09-21T15:20:15.745Z",
+    "cancel_interrupt_result": "thread not found",
+    "cancel_turn_interrupt_attempted": true,
+    "cancel_turn_interrupted": false,
+    "companion_record_sha256": "151d1cff9ad79ebdc8e8624b1b83cbba7dbd591dee1661e284b919da349f90d0",
+    "companion_log_sha256": "bcdd65f329c1b5ac645571a3da7b9879d2ca0366c84f09dfc867fa5ffdcda913",
+    "local_bridge_envelope_sha256": "1405d24168739e01b29fa6f2c4f5de9ec0a0d416dde912c35086b58c224e9758",
+    "local_bridge_wait_status_sha256": "5ea1c66fb4140f2216baf684c486cc5343540d6fb734f0b05e11c914b9e04519",
+    "boundary": "A stale running job record did not prove active inference; later cancellation bookkeeping did not stop an already-aborted native turn. Initial interrupt actor/trigger unestablished."
+  },
+  "limits": [
+    "Configuration is opt-in and requests effective xhigh subject to caps; it does not change the stored model/account/permission choices.",
+    "Settings-only probe used project settings exclusively and therefore excluded the user model default; other probes used the existing Fable coordinator.",
+    "Returned usage/modelUsage is not provider billing or measured savings; cumulative snapshots are not summed.",
+    "Stream-json metadata here does not expose effective effort; no effort value is inferred from token usage.",
+    "Saved-workflow discovery and actual review return are established; the later local source fixes are separate integration checks.",
+    "Cross-client review did not complete; do not promote the interrupted attempt to successful Codex-in-Workflow E2E."
+  ]
+}
