@@ -336,6 +336,103 @@ class PaperTests(unittest.TestCase):
             self.runner.submit_once(intent)
         self.assertEqual(self.broker.submits, [])
 
+    def session_guard_fixture(self, side, remaining, *, rate_wait=False, clock_latency=0):
+        """Frozen close and controllable reads; the POST still uses the real Gate."""
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        root = Path(temporary.name)
+        clock = Time()
+        journal = paper.Journal(root / "journal.jsonl")
+        self.addCleanup(journal.close)
+        gate = paper.Gate(self.config, journal, clock.now, clock.sleep)
+        broker = FakeBroker(gate)
+        close = clock.now() + remaining
+
+        def broker_clock():
+            observed = clock.now()
+            clock.sleep(clock_latency)
+            return {"open": True, "at": observed, "close": close}
+
+        broker.clock = broker_clock
+        broker.quote = lambda: {"bid": "770.40", "ask": "770.45", "at": clock.now()}
+        runner = paper.Runner(broker, self.config, journal, gate, root / "STOP")
+        runner.quote()
+        if rate_wait:
+            gate.recent.append(clock.now())
+        intent = runner.intent(side, "fixture-trial", "1", "770.50" if side == "buy" else "770.35")
+        return runner, broker, journal, intent
+
+    def test_entry_and_exit_session_buffers_at_exact_post_boundary(self):
+        for side, minimum in (("buy", 300), ("sell", 60)):
+            for delta in (-0.01, 0, 0.01):
+                with self.subTest(side=side, delta=delta):
+                    # Keep the clock read above its 60-second admission threshold;
+                    # move time after the read to exercise only final POST admission.
+                    runner, broker, journal, intent = self.session_guard_fixture(side, minimum + 1)
+                    runner.gate.sleep(1 - delta)
+                    if delta < 0:
+                        with self.assertRaisesRegex(paper.SafetyError, "session_buffer_exhausted_at_submit"):
+                            runner.submit_once(intent)
+                        self.assertEqual(broker.submits, [])
+                        self.assertFalse(any(e.get("write") for e in journal.events))
+                    else:
+                        runner.submit_once(intent)
+                        self.assertEqual(len(broker.submits), 1)
+
+    def test_entry_and_exit_session_buffers_rechecked_after_rate_wait(self):
+        for side, minimum in (("buy", 300), ("sell", 60)):
+            with self.subTest(side=side):
+                runner, broker, journal, intent = self.session_guard_fixture(side, minimum + 0.25, rate_wait=True)
+                with self.assertRaisesRegex(paper.SafetyError, "session_buffer_exhausted_at_submit"):
+                    runner.submit_once(intent)
+                self.assertEqual(broker.submits, [])
+                self.assertFalse(any(e.get("write") for e in journal.events))
+
+    def test_clock_response_latency_cannot_extend_entry_or_exit_buffer(self):
+        for side, minimum in (("buy", 300), ("sell", 60)):
+            with self.subTest(side=side):
+                runner, broker, journal, intent = self.session_guard_fixture(side, minimum + 0.25, clock_latency=1)
+                with self.assertRaisesRegex(paper.SafetyError, "session_buffer_exhausted_at_submit"):
+                    runner.submit_once(intent)
+                self.assertEqual(broker.submits, [])
+                self.assertFalse(any(e.get("write") for e in journal.events))
+
+    def test_entry_buffer_rechecked_after_lifecycle_reads(self):
+        self.runner.preflight(self.account)
+        close = None
+
+        def fixed_clock():
+            nonlocal close
+            self.gate.before("GET")
+            if close is None:
+                close = self.clock.now() + 300.1
+            return {"open": True, "at": self.clock.now(), "close": close}
+
+        self.broker.clock = fixed_clock
+        original_positions = self.broker.positions
+
+        def delayed_positions():
+            self.clock.sleep(1)
+            return original_positions()
+
+        self.broker.positions = delayed_positions
+        with self.assertRaisesRegex(paper.SafetyError, "session_buffer_exhausted_at_submit"):
+            self.runner.lifecycle("fixture-trial", False)
+        self.assertEqual(self.broker.submits, [])
+
+    def test_submit_requires_retained_clock_and_rejects_backward_time(self):
+        for missing in (False, True):
+            with self.subTest(missing_clock=missing):
+                runner, broker, journal, intent = self.session_guard_fixture("buy", 3600)
+                if missing:
+                    runner.last_clock = None
+                else:
+                    runner.gate.sleep(-0.1)
+                with self.assertRaisesRegex(paper.SafetyError,
+                        "session_clock_required_at_submit" if missing else "clock_moved_backward"):
+                    runner.submit_once(intent)
+                self.assertEqual(broker.submits, [])
+
 
 if __name__ == "__main__":
     unittest.main()
