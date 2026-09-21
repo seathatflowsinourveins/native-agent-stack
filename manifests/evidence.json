@@ -6374,8 +6374,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 8769111,
-      "sha256": "b5133f3020162919d83c20b395781630f1df9e1b24388c9e718839cd4a1f2c3f"
+      "bytes": 8769274,
+      "sha256": "e7e24a8ac75481793ceb4d73f8efcce6205047fbc922e6d58885e97e33805911"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -9844,8 +9844,8 @@
     },
     {
       "path": "docs/claude-repository-evidence.md",
-      "bytes": 5894,
-      "sha256": "c4f1692f86b7a3c88280d470ef6346ec61c6f14f6d2abd92cbcabd889859974d"
+      "bytes": 6056,
+      "sha256": "6415f77ce486bb3ed61a02c3bbdc5ab7900e9db86ba9e362a8cccc0f9d439db2"
     },
     {
       "path": "docs/ecosystem/claude-repository-evidence.html",
@@ -9944,8 +9944,8 @@
     },
     {
       "path": "tests/test_claude_repository_evidence.py",
-      "bytes": 8710,
-      "sha256": "30cd2e82693c45c314c6fa60a1b381c0d8a15aa8b49a7303d3f0fe2e9dfd180f"
+      "bytes": 10269,
+      "sha256": "36e2b158789e765614e5376565727fd7678b9769c8695c617bed4bc45c2d97d6"
     }
   ],
   "convergence_records": [

@@ -9,8 +9,8 @@ counter exists, and the selection evidence recorded for it. It extends the
 
 It covers **70 rows: the 68 selected components plus two supporting rows** (`uv` and
 the TypeSafe skill). **47 rows are functional**: a functional-class command exited 0
-**and** its declared assertion passed. **Ten are readiness** (version, sign-in,
-import, listing, health or a pinned checkout only), **three are version/help only**, and **ten have no
+**and** its declared assertion passed. **10 rows are readiness** (version, sign-in,
+import, listing, health or a pinned checkout only), **3 rows are version/help only**, and **10 rows have no
 local execution evidence** (seven not installed on this host, one macOS-only, one
 removed, one source-only reference). Exit 0 alone is never counted as a functional
 check. One command is retained as failing: `dagu validate` rejects the equity
@@ -54,8 +54,8 @@ seven private views (memory, session archive, notifications, gateway, tool surfa
 stay on the source host. Recorded anomalies remain visible: Dagu's Executions list
 shows no runs while its own API returns nine and the CLI returns two (the per-DAG
 page shows the run); the static SocratiCode graph page is a stale export (29 files
-against 77 in the live graph); Grafana's SDK panels render at 72 hours, Loki's
-lookback.
+against 77 in the live graph); Grafana's SDK stat panels error at ranges beyond Loki's
+72-hour lookback, and a 6-hour error indicator reported earlier was not re-examined.
 
 ## Lifetime figures and selection evidence
 
@@ -67,7 +67,8 @@ Selection evidence is shown per row as a chain (audit, adversarial verifier, sec
 model family) with a comparison tier. Only three rows have a local measurement (QMD,
 TOON and jCodeMunch); 14 rest on a recorded feature comparison, 24 have no comparison,
 four are not contestable (Qdrant is kept because its consumer supports no other
-store), and 25 rows have no audit record. Ten earlier "keep" stamps remain overturned
+store; `uv` is an install mechanism with no audit record), and 25 further rows have no
+audit record, 26 in all. Ten earlier "keep" stamps remain overturned
 to keep-but-compare. The report makes no universal claim about any repository.
 
 ## Review and provenance

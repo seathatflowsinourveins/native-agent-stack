@@ -66,6 +66,23 @@ class ClaudeRepositoryEvidenceTests(unittest.TestCase):
         for brief, row in zip(self.summary["rows"], self.results["components"]):
             self.assertEqual((brief["evidence_class"], brief["sota_verdict"]), (row["evidence_class"], row["sota"]["final_verdict"]))
 
+    def test_narrative_counts_are_bound_to_the_results(self):
+        counts = {}
+        for row in self.results["components"]:
+            counts[row["evidence_class"]] = counts.get(row["evidence_class"], 0) + 1
+        want = (counts["functional"], counts["readiness"], counts["version-help"], counts["none"])
+        guide = (ROOT / "docs/claude-repository-evidence.md").read_text(encoding="utf-8")
+        found = re.search(r"\*\*(\d+) rows are functional\*\*.*?\*\*(\d+) rows are readiness\*\*.*?\*\*(\d+) rows are version/help only\*\*.*?\*\*(\d+) rows have no\s+local execution evidence\*\*", guide, re.S)
+        self.assertIsNotNone(found)
+        self.assertEqual(tuple(int(x) for x in found.groups()), want)
+        body = next(g["body"] for g in load(ROOT / "docs/ecosystem/manifest.json")["guides"] if g.get("path") == "docs/claude-repository-evidence.md")
+        found = re.search(r"(\d+) rows separate (\d+) asserted functional checks, (\d+) readiness, (\d+) version/help and (\d+) rows without local execution", body)
+        self.assertEqual(tuple(int(x) for x in found.groups()), (len(self.results["components"]),) + want)
+        found = re.search(r"(\d+) functional rows whose declared assertion passed, (\d+) readiness rows, (\d+) version/help rows and (\d+) rows without local execution evidence", self.receipt["claim"])
+        self.assertEqual(tuple(int(x) for x in found.groups()), want)
+        unaudited = sum(1 for r in self.results["components"] if not r["sota"]["audited"])
+        self.assertIn(f"{unaudited} in all", guide)
+
     def test_receipt_covers_exactly_the_selected_rows_with_execution_evidence(self):
         covered = sorted({r["catalog_id"] for r in self.results["components"]
                           if r.get("catalog_id") in self.stack and r["evidence_class"] in CLASS_ORDER})
