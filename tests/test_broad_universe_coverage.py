@@ -1,19 +1,30 @@
 """Local integration checks for the broad-universe coverage/corporate-actions
 tooling. Synthetic fixtures only: no network, no credentials, no real dataset.
 Loaded the same way as tests/test_adaptive_market_research.py (importlib spec
-from the blueprint path)."""
+from the blueprint path).
+
+The repository's default CI runs `python3 -m unittest` without duckdb/numpy/requests.
+coverage.py imports duckdb at module scope, so it is loaded only when duckdb is
+present and every test that needs it skips otherwise; corporate_actions.py and
+collect_daily.py are stdlib-only and their checks run everywhere.
+"""
 import csv
 import gzip
 import hashlib
 import importlib.util
 import json
 import os
+import sys
+from datetime import date, timedelta
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 BASE = Path(__file__).resolve().parents[1] / "blueprints/us-equities/broad-universe"
+
+HAS_DUCKDB = importlib.util.find_spec("duckdb") is not None
+NEEDS_DUCKDB = "requires the pinned native research SDK environment (duckdb)"
 
 
 def _load(name):
@@ -23,8 +34,9 @@ def _load(name):
     return module
 
 
-coverage = _load("coverage")
 corporate_actions = _load("corporate_actions")
+collect_daily = _load("collect_daily")
+coverage = _load("coverage") if HAS_DUCKDB else None
 
 
 def write_csv_gz(path, rows):
@@ -35,6 +47,25 @@ def write_csv_gz(path, rows):
         writer.writerows(rows)
 
 
+def write_action_page(directory, year, page, payload):
+    year_dir = os.path.join(directory, "pages", str(year))
+    os.makedirs(year_dir, exist_ok=True)
+    with gzip.open(os.path.join(year_dir, f"p{page:04d}.json.gz"), "wt", encoding="utf-8") as handle:
+        json.dump(payload, handle)
+
+
+def write_actions_ledger(directory, start, end, types_key="tk", failed=0, skip_years=()):
+    with open(os.path.join(directory, "plan.json"), "w", encoding="utf-8") as handle:
+        json.dump({"start": start, "end": end, "types_key": types_key, "types": ["name_change"]}, handle)
+    with open(os.path.join(directory, "ledger.jsonl"), "w", encoding="utf-8") as handle:
+        for year in range(int(start[:4]), int(end[:4]) + 1):
+            if year in skip_years:
+                continue
+            handle.write(json.dumps({"event": "year_complete", "year": year, "types_key": types_key}) + "\n")
+        handle.write(json.dumps({"event": "run_complete", "types_key": types_key, "failed": failed}) + "\n")
+
+
+@unittest.skipUnless(HAS_DUCKDB, NEEDS_DUCKDB)
 class PaginationProofTests(unittest.TestCase):
     def test_contiguous_terminal_page_passes(self):
         events = [
@@ -70,6 +101,7 @@ class PaginationProofTests(unittest.TestCase):
         self.assertEqual(len(result["violations"]), 1)
 
 
+@unittest.skipUnless(HAS_DUCKDB, NEEDS_DUCKDB)
 class ShaReverificationTests(unittest.TestCase):
     def test_matching_sha_verified(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -103,6 +135,7 @@ class ShaReverificationTests(unittest.TestCase):
             self.assertEqual(result["mismatches"][0]["reason"], "missing")
 
 
+@unittest.skipUnless(HAS_DUCKDB, NEEDS_DUCKDB)
 class LedgerCompletenessTests(unittest.TestCase):
     def test_complete_ledger_accepted(self):
         plan = {"adjustments": ["raw", "all"], "batches": 2}
@@ -144,6 +177,7 @@ class LedgerCompletenessTests(unittest.TestCase):
         self.assertFalse(ok)
 
 
+@unittest.skipUnless(HAS_DUCKDB, NEEDS_DUCKDB)
 class MaterializeDatasetTests(unittest.TestCase):
     def _base_dataset(self, tmp, raw_rows, all_rows):
         write_csv_gz(os.path.join(tmp, "bars", "raw", "b00000.csv.gz"), raw_rows)
@@ -204,6 +238,7 @@ class MaterializeDatasetTests(unittest.TestCase):
             self.assertEqual(quality["total_rows"], 3)
 
 
+@unittest.skipUnless(HAS_DUCKDB, NEEDS_DUCKDB)
 class GapCountingTests(unittest.TestCase):
     def test_gap_counted_against_spy_calendar(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -224,6 +259,7 @@ class GapCountingTests(unittest.TestCase):
             self.assertEqual(gaps["SPY"], 0)
 
 
+@unittest.skipUnless(HAS_DUCKDB, NEEDS_DUCKDB)
 class EligibilityPriorSessionsTests(unittest.TestCase):
     def _dataset_with_volume_at_t(self, tmp, volume_at_t):
         # 25 sessions; raw_c is always >= 5. Sessions 0..21 have a fixed dv so
@@ -325,6 +361,7 @@ class CorporateActionsPaginationTests(unittest.TestCase):
 
 
 
+@unittest.skipUnless(HAS_DUCKDB, NEEDS_DUCKDB)
 class SupplementLedgerTests(unittest.TestCase):
     PLAN = {"adjustments": ["raw"], "batches": 1}
 
@@ -346,6 +383,7 @@ class SupplementLedgerTests(unittest.TestCase):
         self.assertFalse(coverage.check_ledger_complete(self.PLAN, events, {"adjustments": ["raw"], "batches": 1})[0])
 
 
+@unittest.skipUnless(HAS_DUCKDB, NEEDS_DUCKDB)
 class IdentityDedupTests(unittest.TestCase):
     """The provider serves an old ticker with its successor's history; exactly the
     identical rows must leave the old ticker and nothing else may move."""
@@ -404,6 +442,503 @@ class IdentityDedupTests(unittest.TestCase):
         report = coverage.dedupe_identity(con, set())
         self.assertEqual(report["pairs"], 0)
         self.assertEqual(con.execute("SELECT count(*) FROM joined").fetchone()[0], len(rows))
+
+
+def _identical(symbols, day, price, volume=1000.0, raw=True):
+    """One session repeated byte-identically under several tickers."""
+    session = date(2022, 1, 1) + timedelta(days=day)
+    if not raw:  # present only in the adjustment=all series: every raw column is NULL
+        return [(symbol, session, None, None, None, None, None) for symbol in symbols]
+    return [(symbol, session, price, price + 1, price - 1, price + 0.5, volume) for symbol in symbols]
+
+
+@unittest.skipUnless(HAS_DUCKDB, NEEDS_DUCKDB)
+class IdentityComponentTests(unittest.TestCase):
+    """Rename chains and three-way duplicates: one survivor per connected component,
+    every decision taken from a snapshot made before the first DELETE."""
+
+    def _con(self, rows):
+        import duckdb
+        con = duckdb.connect()
+        con.execute("CREATE TABLE joined (symbol VARCHAR, session_date DATE, raw_o DOUBLE, raw_h DOUBLE, "
+                    "raw_l DOUBLE, raw_c DOUBLE, raw_v DOUBLE)")
+        con.executemany("INSERT INTO joined VALUES (?, ?, ?, ?, ?, ?, ?)", rows)
+        return con
+
+    def _shared(self, symbols, count=25, start_day=0, price=100.0):
+        rows = []
+        for i in range(count):
+            rows += _identical(symbols, start_day + i, price + i)
+        return rows
+
+    def test_rename_chain_resolves_to_the_terminal_ticker(self):
+        # A -> B -> C: the pair loop used to DELETE A's rows for pair (A,B) and then
+        # dereference the very same rows for pair (A,C), raising TypeError.
+        rows = self._shared(["AAA", "BBB", "CCC"])
+        con = self._con(rows)
+        report = coverage.dedupe_identity(con, {("AAA", "BBB"), ("BBB", "CCC")})
+        self.assertEqual(report["components"], 1)
+        self.assertEqual(report["pairs"], 2)
+        self.assertEqual({item["kept"] for item in report["detail"]}, {"CCC"})
+        self.assertEqual({item["dropped"] for item in report["detail"]}, {"AAA", "BBB"})
+        self.assertEqual({item["rule"] for item in report["detail"]}, {"rename_record"})
+        self.assertEqual(con.execute("SELECT count(*) FROM joined WHERE symbol <> 'CCC'").fetchone()[0], 0)
+        self.assertEqual(con.execute("SELECT count(*) FROM joined").fetchone()[0], 25)
+
+    def test_three_way_duplicate_without_rename_records_is_reported_unresolved(self):
+        rows = self._shared(["AAA", "MMM", "ZZZ"])
+        con = self._con(rows)
+        report = coverage.dedupe_identity(con, set())
+        self.assertEqual(report["pairs"], 2)
+        self.assertEqual({item["kept"] for item in report["detail"]}, {"AAA"})
+        self.assertEqual(report["by_rule"], {"lexicographic_fallback": 2})
+        self.assertEqual(report["identity_unresolved_pairs"], 2)
+        self.assertTrue(all(item["identity_unresolved"] for item in report["detail"]))
+        self.assertEqual(con.execute("SELECT count(DISTINCT symbol) FROM joined").fetchone()[0], 1)
+
+    def test_rename_pair_recorded_in_both_directions_is_not_evidence(self):
+        rows = self._shared(["BBB", "CCC"])
+        report = coverage.dedupe_identity(self._con(rows), {("BBB", "CCC"), ("CCC", "BBB")},
+                                          frozenset({"CCC"}))
+        self.assertEqual(report["detail"][0]["rule"], "active_status")
+        self.assertEqual(report["detail"][0]["kept"], "CCC")
+
+    def test_scattered_coincidental_matches_never_delete_a_live_series(self):
+        # Two distinct securities with 800 overlapping sessions that happen to print the
+        # same round tick on 25 scattered days. 20 identical sessions alone must not
+        # merge them, or 25 holes are punched into a genuine, still-trading series.
+        rows = []
+        for day in range(800):
+            if day % 32 == 0 and day // 32 < 25:
+                rows += _identical(["XAA", "XBB"], day, 10.0)
+            else:
+                rows += _identical(["XAA"], day, 10.0 + day * 0.01)
+                rows += _identical(["XBB"], day, 41.0 + day * 0.01)
+        con = self._con(rows)
+        before = con.execute("SELECT count(*) FROM joined").fetchone()[0]
+        report = coverage.dedupe_identity(con, set())
+        self.assertEqual(report["pairs"], 0)
+        self.assertEqual(report["rows_removed"], 0)
+        self.assertEqual(report["candidate_pairs"], 1)
+        self.assertEqual(report["qualified_pairs"], 0)
+        self.assertEqual(len(report["partial_overlap_not_deduped"]), 1)
+        partial = report["partial_overlap_not_deduped"][0]
+        self.assertEqual((partial["sym_a"], partial["sym_b"]), ("XAA", "XBB"))
+        self.assertLess(partial["span_coverage_sym_a"], 0.1)
+        self.assertEqual(con.execute("SELECT count(*) FROM joined").fetchone()[0], before)
+
+    def test_zero_volume_and_all_only_residue_rows_leave_with_the_dropped_ticker(self):
+        # A halted (volume 0) session and an adjustment=all-only session are never
+        # byte-identical, so the old raw-equal DELETE left OLD behind as a sparse
+        # phantom series spanning NEW's history.
+        rows = self._shared(["OLD", "NEW"], count=100, start_day=0)
+        rows += _identical(["OLD", "NEW"], 100, 50.0, volume=0.0)      # halted session
+        rows += _identical(["OLD", "NEW"], 101, 0.0, raw=False)        # all-series only
+        rows += self._shared(["OLD", "NEW"], count=100, start_day=102, price=300.0)
+        rows += _identical(["NEW"], 400, 500.0)                        # successor keeps trading
+        con = self._con(rows)
+        report = coverage.dedupe_identity(con, {("OLD", "NEW")})
+        detail = report["detail"][0]
+        self.assertEqual((detail["kept"], detail["dropped"], detail["rule"]), ("NEW", "OLD", "rename_record"))
+        self.assertEqual(detail["identical_sessions"], 200)
+        self.assertEqual(detail["rows_removed"], 202)
+        self.assertEqual(detail["residue_rows_removed"], 2)
+        self.assertEqual(report["residue_rows_removed"], 2)
+        self.assertEqual(con.execute("SELECT count(*) FROM joined WHERE symbol = 'OLD'").fetchone()[0], 0)
+        self.assertEqual(con.execute("SELECT count(*) FROM joined WHERE symbol = 'NEW'").fetchone()[0], 203)
+
+
+@unittest.skipUnless(HAS_DUCKDB, NEEDS_DUCKDB)
+class RenameEvidenceTests(unittest.TestCase):
+    def test_singular_and_plural_envelope_keys_are_both_loaded_and_counted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            write_action_page(tmp, 2022, 0, {"corporate_actions": {
+                "name_change": [{"old_symbol": "FB", "new_symbol": "META"}],
+                "unit_splits": [{"old_symbol": "AAU", "new_symbol": "AA"}],
+                "forward_split": [{"symbol": "NVDA", "ex_date": "2022-07-20"}],
+            }})
+            stats = {}
+            pairs = coverage.load_rename_pairs(tmp, stats)
+            self.assertEqual(pairs, {("FB", "META"), ("AAU", "AA")})
+            self.assertEqual(stats["rename_pairs_loaded"], 2)
+            self.assertEqual(stats["rename_pairs_by_kind"], {"name_change": 1, "unit_splits": 1})
+            self.assertEqual(stats["rename_evidence"], "present")
+            self.assertEqual(stats["other_action_kinds_seen"], {"forward_split": 1})
+
+    def test_absent_corporate_actions_is_recorded_as_absent(self):
+        stats = {}
+        self.assertEqual(coverage.load_rename_pairs(None, stats), set())
+        self.assertEqual(stats["rename_evidence"], "absent")
+        self.assertEqual(stats["rename_pairs_loaded"], 0)
+
+    def test_dedupe_report_carries_the_rename_evidence(self):
+        import duckdb
+        con = duckdb.connect()
+        con.execute("CREATE TABLE joined (symbol VARCHAR, session_date DATE, raw_o DOUBLE, raw_h DOUBLE, "
+                    "raw_l DOUBLE, raw_c DOUBLE, raw_v DOUBLE)")
+        report = coverage.dedupe_identity(con, set(), frozenset(), {"rename_evidence": "absent",
+                                                                    "rename_pairs_loaded": 0})
+        self.assertEqual(report["rename_evidence"], "absent")
+        self.assertEqual(report["pairs"], 0)
+
+    def test_materialize_refuses_when_supplied_actions_yield_no_rename_pair(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rows = [("AAA", "2020-01-02T05:00:00Z", 1, 2, 0.5, 1.5, 100, 3, 1.1)]
+            write_csv_gz(os.path.join(tmp, "bars", "raw", "b00000.csv.gz"), rows)
+            write_csv_gz(os.path.join(tmp, "bars", "all", "b00000.csv.gz"), rows)
+            actions = os.path.join(tmp, "actions")
+            os.makedirs(actions)
+            write_action_page(actions, 2020, 0, {"corporate_actions": {"forward_split": [{"symbol": "AAA"}]}})
+            write_actions_ledger(actions, "2020-01-01", "2020-12-31")
+            ok, detail = coverage.materialize(tmp, corporate_actions_dir=actions)
+            self.assertFalse(ok)
+            self.assertIn("no rename pair", detail["reason"])
+            self.assertFalse(os.path.exists(os.path.join(tmp, "daily.parquet")))
+
+    def test_materialize_refuses_an_incomplete_corporate_actions_ledger(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rows = [("AAA", "2020-01-02T05:00:00Z", 1, 2, 0.5, 1.5, 100, 3, 1.1)]
+            write_csv_gz(os.path.join(tmp, "bars", "raw", "b00000.csv.gz"), rows)
+            write_csv_gz(os.path.join(tmp, "bars", "all", "b00000.csv.gz"), rows)
+            actions = os.path.join(tmp, "actions")
+            os.makedirs(actions)
+            write_action_page(actions, 2020, 0, {"corporate_actions": {
+                "name_change": [{"old_symbol": "FB", "new_symbol": "META"}]}})
+            write_actions_ledger(actions, "2020-01-01", "2021-12-31", skip_years=(2021,))
+            ok, detail = coverage.materialize(tmp, corporate_actions_dir=actions)
+            self.assertFalse(ok)
+            self.assertIn("incomplete", detail["reason"])
+            self.assertTrue(any("year=2021" in r for r in detail["corporate_actions_reasons"]))
+
+    def test_corporate_actions_gate_accepts_a_complete_ledger(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            write_actions_ledger(tmp, "2020-01-01", "2021-12-31")
+            ok, reasons = coverage.check_corporate_actions_complete(tmp)
+            self.assertTrue(ok, reasons)
+            write_actions_ledger(tmp, "2020-01-01", "2021-12-31", failed=2)
+            ok, reasons = coverage.check_corporate_actions_complete(tmp)
+            self.assertFalse(ok)
+
+
+class CollectionResumeScopeTests(unittest.TestCase):
+    """A completed batch may only be reused for the SAME request scope: widening --end
+    once produced zero collection calls while plan.json advertised the wider window."""
+
+    def _fixture(self, tmp):
+        env_path = os.path.join(tmp, "env")
+        with open(env_path, "w", encoding="utf-8") as handle:
+            handle.write("APCA_API_KEY_ID=abc123\nAPCA_API_SECRET_KEY=def456\n")
+        assets_path = os.path.join(tmp, "assets.json")
+        with open(assets_path, "w", encoding="utf-8") as handle:
+            json.dump([{"symbol": s, "class": "us_equity", "exchange": "NASDAQ", "status": "active", "id": s}
+                       for s in ("AAA", "BBB", "CCC")], handle)
+        return env_path, assets_path
+
+    def _run(self, tmp, env_path, assets_path, end, out=None, extra=()):
+        out = out or os.path.join(tmp, "out")
+        argv = ["collect_daily.py", "--env-file", env_path, "--assets", assets_path, "--out", out,
+                "--start", "2016-01-01", "--end", end, "--adjustments", "raw", "--batch-size", "2",
+                "--workers", "1", *extra]
+        calls = []
+
+        def fake_run_batch(index, symbols, adjustment, args, headers, out_dir, ledger, prefix="b",
+                           run_id=None, request_sha256=None):
+            calls.append((index, adjustment, tuple(symbols)))
+            ledger.write(event="batch_complete", adjustment=adjustment, batch=index,
+                         label=f"{prefix}{index:05d}", series=prefix, run_id=run_id,
+                         request_sha256=request_sha256, symbols=len(symbols),
+                         symbols_sha256=collect_daily.symbols_digest(symbols), bars=1,
+                         symbols_with_bars=len(symbols))
+            return index, adjustment, True, 1
+
+        with patch.object(collect_daily, "run_batch", fake_run_batch), patch.object(sys, "argv", argv):
+            collect_daily.main()
+        return calls, out
+
+    def test_unchanged_rerun_resumes_with_zero_jobs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            env_path, assets_path = self._fixture(tmp)
+            first, out = self._run(tmp, env_path, assets_path, "2024-12-31")
+            self.assertEqual(len(first), 2)
+            second, _ = self._run(tmp, env_path, assets_path, "2024-12-31", out)
+            self.assertEqual(second, [])
+
+    def test_widened_end_refuses_instead_of_reusing_completions(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            env_path, assets_path = self._fixture(tmp)
+            _, out = self._run(tmp, env_path, assets_path, "2024-12-31")
+            with self.assertRaises(SystemExit) as caught:
+                self._run(tmp, env_path, assets_path, "2026-09-18", out)
+            message = str(caught.exception)
+            self.assertIn("REFUSED", message)
+            self.assertIn("end", message)
+            self.assertIn("new --out", message)
+            # the recorded plan still describes the scope that was actually collected
+            with open(os.path.join(out, "plan.json"), encoding="utf-8") as handle:
+                self.assertEqual(json.load(handle)["end"], "2024-12-31")
+
+    def test_changed_feed_refuses(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            env_path, assets_path = self._fixture(tmp)
+            _, out = self._run(tmp, env_path, assets_path, "2024-12-31")
+            with self.assertRaises(SystemExit) as caught:
+                self._run(tmp, env_path, assets_path, "2024-12-31", out, extra=["--feed", "iex"])
+            self.assertIn("feed", str(caught.exception))
+
+    def test_legacy_completion_without_a_fingerprint_still_resumes(self):
+        plan = {"start": "2016-01-01", "end": "2024-12-31", "feed": "sip", "timeframe": "1Day",
+                "page_limit": 10000, "adjustments": ["raw"], "batch_size": 2, "symbols_sha256": "d" * 64}
+        digest = collect_daily.symbols_digest(["AAA", "BBB"])
+        fingerprint = collect_daily.request_fingerprint(plan)
+        legacy = {"symbols_sha256": digest, "request_sha256": None}
+        self.assertTrue(collect_daily.batch_is_done(legacy, digest, fingerprint))
+        self.assertFalse(collect_daily.batch_is_done(legacy, "other", fingerprint))
+        scoped = {"symbols_sha256": digest, "request_sha256": fingerprint}
+        self.assertTrue(collect_daily.batch_is_done(scoped, digest, fingerprint))
+        self.assertFalse(collect_daily.batch_is_done(scoped, digest, "0" * 64))
+        self.assertFalse(collect_daily.batch_is_done(None, digest, fingerprint))
+
+    def test_scope_fingerprint_moves_with_every_scope_field(self):
+        base = {"start": "2016-01-01", "end": "2024-12-31", "feed": "sip", "timeframe": "1Day",
+                "page_limit": 10000, "adjustments": ["raw"], "batch_size": 2, "symbols_sha256": "d" * 64}
+        for field, value in (("start", "2017-01-01"), ("end", "2026-09-18"), ("feed", "iex"),
+                             ("timeframe", "1Hour"), ("page_limit", 5000), ("adjustments", ["raw", "all"]),
+                             ("batch_size", 50), ("symbols_sha256", "e" * 64)):
+            changed = dict(base, **{field: value})
+            self.assertNotEqual(collect_daily.request_fingerprint(base),
+                                collect_daily.request_fingerprint(changed), field)
+            self.assertEqual([c["field"] for c in collect_daily.scope_conflicts(base, changed)], [field])
+        self.assertEqual(collect_daily.scope_conflicts(base, dict(base, created_at="later")), [])
+
+
+@unittest.skipUnless(HAS_DUCKDB, NEEDS_DUCKDB)
+class LedgerScopeVerificationTests(unittest.TestCase):
+    def test_batch_complete_from_another_scope_is_refused(self):
+        plan = {"adjustments": ["raw"], "batches": 1, "request_sha256": "a" * 64}
+        events = [{"event": "batch_complete", "adjustment": "raw", "batch": 0, "request_sha256": "b" * 64},
+                  {"event": "run_complete", "failed": 0}]
+        ok, reasons = coverage.check_ledger_complete(plan, events)
+        self.assertFalse(ok)
+        self.assertTrue(any("different request scope" in r for r in reasons))
+
+    def test_matching_and_legacy_fingerprints_are_accepted(self):
+        plan = {"adjustments": ["raw"], "batches": 1, "request_sha256": "a" * 64}
+        matching = [{"event": "batch_complete", "adjustment": "raw", "batch": 0, "request_sha256": "a" * 64},
+                    {"event": "run_complete", "failed": 0}]
+        self.assertTrue(coverage.check_ledger_complete(plan, matching)[0])
+        legacy = [{"event": "batch_complete", "adjustment": "raw", "batch": 0},
+                  {"event": "run_complete", "failed": 0}]
+        self.assertTrue(coverage.check_ledger_complete(plan, legacy)[0])
+
+
+@unittest.skipUnless(HAS_DUCKDB, NEEDS_DUCKDB)
+class AttemptScopedEvidenceTests(unittest.TestCase):
+    """A retried batch leaves two attempts in the append-only ledger. The completing
+    attempt is the evidence; the earlier one is superseded, not a violation."""
+
+    def _pages(self, run_id, pages, batch="b00007"):
+        return [{"adjustment": "raw", "batch": batch, "run_id": run_id, "page": p,
+                 "next_page_token_present": p != pages[-1], "bytes": 10, "bars": 5,
+                 "file": collect_daily.page_file_name(batch, run_id, p), "sha256": "0" * 64}
+                for p in pages]
+
+    def test_retried_batch_is_superseded_not_a_violation(self):
+        pages = self._pages("r1", [0, 1]) + self._pages("r2", [0, 1, 2])
+        batches = [{"event": "batch_complete", "adjustment": "raw", "batch": 7, "series": "b",
+                    "label": "b00007", "run_id": "r2", "bars": 15}]
+        result = coverage.pagination_proof(pages, batches)
+        self.assertEqual(result["violations"], [])
+        self.assertEqual(result["symbol_groups_checked"], 1)
+        self.assertEqual(len(result["superseded_attempts"]), 1)
+        self.assertEqual(result["superseded_attempts"][0]["run_id"], "r1")
+        self.assertEqual(result["superseded_attempts"][0]["pages"], [0, 1])
+
+    def test_a_genuine_gap_in_the_completing_attempt_is_still_a_violation(self):
+        pages = self._pages("r1", [0, 1]) + self._pages("r2", [0, 2])
+        batches = [{"event": "batch_complete", "adjustment": "raw", "batch": 7, "series": "b",
+                    "label": "b00007", "run_id": "r2", "bars": 15}]
+        result = coverage.pagination_proof(pages, batches)
+        self.assertEqual(len(result["violations"]), 1)
+        self.assertEqual(result["violations"][0]["run_id"], "r2")
+
+    def test_bisect_children_belong_to_their_parent_batch_attempt(self):
+        pages = self._pages("r1", [0], batch="b00007a") + self._pages("r2", [0], batch="b00007a")
+        batches = [{"event": "batch_complete", "adjustment": "raw", "batch": 7, "series": "b",
+                    "label": "b00007", "run_id": "r2", "bars": 3}]
+        result = coverage.pagination_proof(pages, batches)
+        self.assertEqual(result["violations"], [])
+        self.assertEqual([a["run_id"] for a in result["superseded_attempts"]], ["r1"])
+
+    def test_legacy_events_without_run_ids_are_checked_as_one_group(self):
+        pages = [{"adjustment": "raw", "batch": "b00000", "page": 0, "next_page_token_present": True,
+                  "bytes": 1, "bars": 1},
+                 {"adjustment": "raw", "batch": "b00000", "page": 1, "next_page_token_present": False,
+                  "bytes": 1, "bars": 1}]
+        batches = [{"event": "batch_complete", "adjustment": "raw", "batch": 0, "series": "b", "bars": 2}]
+        result = coverage.pagination_proof(pages, batches)
+        self.assertEqual(result["violations"], [])
+        self.assertEqual(result["superseded_attempts"], [])
+
+    def test_attempt_scoped_page_names_do_not_collide(self):
+        self.assertNotEqual(collect_daily.page_file_name("b00007", "r1", 0),
+                            collect_daily.page_file_name("b00007", "r2", 0))
+        self.assertEqual(collect_daily.page_file_name("b00007", None, 0), "b00007-p0000.json.gz")
+
+    def test_collection_totals_count_the_completing_attempt_only(self):
+        import duckdb
+        with tempfile.TemporaryDirectory() as tmp:
+            write_csv_gz(os.path.join(tmp, "bars", "raw", "b00007.csv.gz"),
+                         [("AAA", "2020-01-02T05:00:00Z", 1, 2, 0.5, 1.5, 100, 3, 1.1)] * 15)
+            events = self._pages("r1", [0, 1]) + self._pages("r2", [0, 1, 2])
+            for event in events:
+                event["event"] = "page"
+            events += [{"event": "batch_failed", "adjustment": "raw", "batch": 7, "series": "b",
+                        "label": "b00007", "run_id": "r1"},
+                       {"event": "batch_complete", "adjustment": "raw", "batch": 7, "series": "b",
+                        "label": "b00007", "run_id": "r2", "bars": 15}]
+            with open(os.path.join(tmp, "ledger.jsonl"), "w", encoding="utf-8") as handle:
+                for event in events:
+                    handle.write(json.dumps(event) + "\n")
+            plan = {"adjustments": ["raw"], "batches": 1}
+            con = duckdb.connect()
+            section = coverage.build_collection_section(con, tmp, plan, events, 1.0)
+            self.assertEqual(section["per_adjustment_pages"]["raw"]["pages"], 3)
+            self.assertEqual(section["per_adjustment_pages"]["raw"]["superseded_pages"], 2)
+            self.assertEqual(section["row_totals"]["ledger_totals"]["raw"], 15)
+            self.assertTrue(section["row_totals"]["match"])
+            self.assertEqual(section["pagination_proof"]["violations"], [])
+
+    def test_two_completions_for_one_batch_do_not_double_count(self):
+        import duckdb
+        with tempfile.TemporaryDirectory() as tmp:
+            write_csv_gz(os.path.join(tmp, "bars", "raw", "b00007.csv.gz"),
+                         [("AAA", "2020-01-02T05:00:00Z", 1, 2, 0.5, 1.5, 100, 3, 1.1)] * 15)
+            events = [{"event": "batch_complete", "adjustment": "raw", "batch": 7, "series": "b",
+                       "label": "b00007", "run_id": "r1", "bars": 9},
+                      {"event": "batch_complete", "adjustment": "raw", "batch": 7, "series": "b",
+                       "label": "b00007", "run_id": "r2", "bars": 15}]
+            with open(os.path.join(tmp, "ledger.jsonl"), "w", encoding="utf-8") as handle:
+                for event in events:
+                    handle.write(json.dumps(event) + "\n")
+            section = coverage.build_collection_section(duckdb.connect(), tmp, {"adjustments": ["raw"],
+                                                                                "batches": 1}, events, 1.0)
+            self.assertEqual(section["per_adjustment_batches"]["raw"]["complete"], 1)
+            self.assertEqual(section["per_adjustment_batches"]["raw"]["superseded"], 1)
+            self.assertEqual(section["row_totals"]["ledger_totals"]["raw"], 15)
+            self.assertTrue(section["row_totals"]["match"])
+
+
+@unittest.skipUnless(HAS_DUCKDB, NEEDS_DUCKDB)
+class UniverseDenominatorTests(unittest.TestCase):
+    """Bar counts are computed over daily.parquet, which holds the supplement too, so the
+    denominators and the survivorship histogram must say which basis they are on."""
+
+    def test_supplement_symbols_are_reported_and_counted_as_known_delisted(self):
+        import duckdb
+        with tempfile.TemporaryDirectory() as tmp:
+            rows = []
+            for day, symbol in ((2, "SPY"), (3, "SPY")):
+                rows.append((symbol, f"2020-01-0{day}T05:00:00Z", 1, 1, 1, 1, 1, 1, 1))
+            rows.append(("AAA", "2020-01-02T05:00:00Z", 1, 1, 1, 1, 1, 1, 1))   # active main-list name
+            rows.append(("DEAD", "2020-01-02T05:00:00Z", 1, 1, 1, 1, 1, 1, 1))  # inactive main-list name
+            rows.append(("TWTR", "2020-01-03T05:00:00Z", 1, 1, 1, 1, 1, 1, 1))  # supplement only
+            write_csv_gz(os.path.join(tmp, "bars", "raw", "b00000.csv.gz"), rows)
+            write_csv_gz(os.path.join(tmp, "bars", "all", "b00000.csv.gz"), rows)
+            ok, detail = coverage.materialize(tmp)
+            self.assertTrue(ok, detail)
+            con = duckdb.connect()
+            con.execute(f"CREATE VIEW daily AS SELECT * FROM read_parquet('{detail['path']}')")
+            identities = {"SPY": [{"status": "active", "exchange": "ARCA"}],
+                          "AAA": [{"status": "active", "exchange": "NASDAQ"}],
+                          "DEAD": [{"status": "inactive", "exchange": "NASDAQ"}]}
+            sessions = [r[0] for r in con.execute(
+                "SELECT DISTINCT session_date FROM daily WHERE symbol='SPY' ORDER BY 1").fetchall()]
+            section = coverage.build_universe_section(con, identities, sessions, {"TWTR"})
+            self.assertEqual(section["requested_symbols_main_list"], 3)
+            self.assertEqual(section["requested_symbols_supplement"], 1)
+            self.assertEqual(section["requested_symbols_combined"], 4)
+            self.assertEqual(section["inactive_last_bar_year_histogram"], {"2020": 1})
+            self.assertEqual(section["supplement_last_bar_year_histogram"], {"2020": 1})
+            self.assertEqual(section["known_inactive_or_supplement_last_bar_year_histogram"], {"2020": 2})
+            # without the supplement the survivorship measure understates by exactly TWTR
+            bare = coverage.build_universe_section(con, identities, sessions)
+            self.assertEqual(bare["known_inactive_or_supplement_last_bar_year_histogram"], {"2020": 1})
+
+
+class CorporateActionsResumeScopeTests(unittest.TestCase):
+    def test_a_narrower_recorded_window_is_not_treated_as_done(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "ledger.jsonl")
+            with open(path, "w", encoding="utf-8") as handle:
+                handle.write(json.dumps({"event": "year_complete", "year": 2026, "types_key": "tk",
+                                         "window_start": "2026-01-01", "window_end": "2026-06-30"}) + "\n")
+            windows = dict((year, (start, end))
+                           for year, start, end in corporate_actions.year_windows("2026-01-01", "2026-09-21"))
+            self.assertEqual(corporate_actions.completed_years(path, "tk", windows), set())
+            same = {2026: ("2026-01-01", "2026-06-30")}
+            self.assertEqual(corporate_actions.completed_years(path, "tk", same), {2026})
+            # legacy records carry no window at all and still resume
+            self.assertEqual(corporate_actions.completed_years(path, "tk"), {2026})
+
+    def test_legacy_year_complete_without_a_window_still_resumes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "ledger.jsonl")
+            with open(path, "w", encoding="utf-8") as handle:
+                handle.write(json.dumps({"event": "year_complete", "year": 2026, "types_key": "tk"}) + "\n")
+            windows = {2026: ("2026-01-01", "2026-09-21")}
+            self.assertEqual(corporate_actions.completed_years(path, "tk", windows), {2026})
+
+    def test_changed_window_refuses_instead_of_rewriting_the_plan(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with open(os.path.join(tmp, "plan.json"), "w", encoding="utf-8") as handle:
+                json.dump({"start": "2016-01-01", "end": "2026-06-30", "types": ["name_change"],
+                           "types_key": "tk", "page_limit": 1000}, handle)
+            plan = {"start": "2016-01-01", "end": "2026-09-21", "types": ["name_change"],
+                    "types_key": "tk", "page_limit": 1000}
+            with open(os.path.join(tmp, "plan.json"), encoding="utf-8") as handle:
+                existing = json.load(handle)
+            conflicts = corporate_actions.scope_conflicts(existing, plan)
+            self.assertEqual([c["field"] for c in conflicts], ["end"])
+            env_path = os.path.join(tmp, "env")
+            with open(env_path, "w", encoding="utf-8") as handle:
+                handle.write("APCA_API_KEY_ID=abc123\nAPCA_API_SECRET_KEY=def456\n")
+            with self.assertRaises(SystemExit) as caught:
+                corporate_actions.collect(env_path, tmp, "2016-01-01", "2026-09-21", False)
+            self.assertIn("REFUSED", str(caught.exception))
+            with open(os.path.join(tmp, "plan.json"), encoding="utf-8") as handle:
+                self.assertEqual(json.load(handle)["end"], "2026-06-30")
+
+
+class CorporateActionsSummaryBasisTests(unittest.TestCase):
+    def test_actions_are_bucketed_by_the_queried_window_not_a_stray_earlier_date(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            write_action_page(tmp, 2020, 0, {"corporate_actions": {"forward_split": [
+                {"ex_date": "2020-01-03", "record_date": "2019-12-30", "payable_date": "2020-01-06"}]}})
+            summary = corporate_actions.summarize_dict(tmp)
+            self.assertEqual(summary["per_type_per_year_counts"]["forward_split"], {"2020": 1})
+            self.assertEqual(summary["date_field_by_type"]["forward_split"]["primary"], "ex_date")
+            self.assertEqual(summary["earliest_by_type"]["forward_split"], "2020-01-03")
+            self.assertEqual(summary["secondary_min_of_all_dates"]["earliest_by_type"]["forward_split"],
+                             "2019-12-30")
+            self.assertIn("request window", summary["year_basis"])
+
+    def test_the_named_date_field_is_reported_per_type(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            write_action_page(tmp, 2021, 0, {"corporate_actions": {
+                "name_change": [{"process_date": "2021-05-04"}],
+                "cash_merger": [{"effective_date": "2021-07-01", "payable_date": "2021-07-09"}],
+            }})
+            summary = corporate_actions.summarize_dict(tmp)
+            self.assertEqual(summary["date_field_by_type"]["name_change"]["primary"], "process_date")
+            self.assertEqual(summary["date_field_by_type"]["cash_merger"]["primary"], "effective_date")
+            self.assertEqual(summary["per_type_per_year_counts"]["name_change"], {"2021": 1})
+
+    def test_an_action_with_no_date_is_still_counted_in_its_window(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            write_action_page(tmp, 2019, 0, {"corporate_actions": {"redemption": [{"symbol": "AAA"}]}})
+            summary = corporate_actions.summarize_dict(tmp)
+            self.assertEqual(summary["per_type_per_year_counts"]["redemption"], {"2019": 1})
+            self.assertNotIn("redemption", summary["date_field_by_type"])
 
 
 if __name__ == "__main__":

@@ -21,6 +21,7 @@ import re
 import sys
 import threading
 import time
+import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 
@@ -82,6 +83,35 @@ def symbols_digest(symbols):
     return hashlib.sha256(",".join(symbols).encode()).hexdigest()
 
 
+# Every field of the request that changes WHICH bars a completed batch contains. A
+# recorded completion may only be reused when all of them are unchanged, so widening
+# --end (or switching --feed) can never be mistaken for work that is already done.
+SCOPE_FIELDS = ("start", "end", "feed", "timeframe", "page_limit", "adjustments", "batch_size", "symbols_sha256")
+
+
+def request_fingerprint(plan):
+    payload = {key: plan.get(key) for key in SCOPE_FIELDS}
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
+
+
+def scope_conflicts(existing_plan, plan):
+    """Scope fields on which a retained plan disagrees with the requested run."""
+    return [{"field": key, "recorded": existing_plan.get(key), "requested": plan.get(key)}
+            for key in SCOPE_FIELDS if existing_plan.get(key) != plan.get(key)]
+
+
+def batch_is_done(record, digest, fingerprint):
+    """A recorded batch_complete may be reused only for the same symbols AND the same
+    request scope. Legacy records carry no fingerprint; the plan-scope refusal in main()
+    already guarantees the scope is unchanged for those, so they still resume."""
+    if not record:
+        return False
+    if record.get("symbols_sha256") != digest:
+        return False
+    recorded = record.get("request_sha256")
+    return recorded is None or recorded == fingerprint
+
+
 class Ledger:
     def __init__(self, path):
         self.path = path
@@ -94,7 +124,11 @@ class Ledger:
                 for line in handle:
                     rec = json.loads(line)
                     if rec.get("event") == "batch_complete":
-                        done[(rec.get("series", "b"), rec["adjustment"], rec["batch"])] = rec["symbols_sha256"]
+                        done[(rec.get("series", "b"), rec["adjustment"], rec["batch"])] = {
+                            "symbols_sha256": rec["symbols_sha256"],
+                            "request_sha256": rec.get("request_sha256"),
+                            "run_id": rec.get("run_id"),
+                        }
         return done
 
     def write(self, **rec):
@@ -136,7 +170,13 @@ def fetch_page(session, headers, params):
     raise RuntimeError("unreachable")
 
 
-def collect_symbols(session, headers, symbols, args, adjustment, label, out, ledger, rows):
+def page_file_name(label, run_id, page):
+    """Attempt-scoped page name: a retried batch never overwrites an earlier attempt's
+    retained page, so both remain verifiable evidence."""
+    return f"{label}-r{run_id}-p{page:04d}.json.gz" if run_id else f"{label}-p{page:04d}.json.gz"
+
+
+def collect_symbols(session, headers, symbols, args, adjustment, label, out, ledger, rows, run_id=None):
     """Page one symbol group to its terminal page. Bisects on a provider 400."""
     params = {"symbols": ",".join(symbols), "timeframe": "1Day", "start": args.start, "end": args.end,
               "limit": PAGE_LIMIT, "adjustment": adjustment, "feed": args.feed, "sort": "asc"}
@@ -153,11 +193,13 @@ def collect_symbols(session, headers, symbols, args, adjustment, label, out, led
                 raise RuntimeError(f"400 after first page: {exc}")
             if len(symbols) == 1:
                 ledger.write(event="rejected_symbol", adjustment=adjustment, batch=label, symbol=symbols[0],
-                             message=str(exc))
+                             run_id=run_id, message=str(exc))
                 return
             half = len(symbols) // 2
-            collect_symbols(session, headers, symbols[:half], args, adjustment, label + "a", out, ledger, rows)
-            collect_symbols(session, headers, symbols[half:], args, adjustment, label + "b", out, ledger, rows)
+            collect_symbols(session, headers, symbols[:half], args, adjustment, label + "a", out, ledger, rows,
+                            run_id)
+            collect_symbols(session, headers, symbols[half:], args, adjustment, label + "b", out, ledger, rows,
+                            run_id)
             return
         body = json.loads(raw)
         bars = body.get("bars") or {}
@@ -168,10 +210,10 @@ def collect_symbols(session, headers, symbols, args, adjustment, label, out, led
                              bar.get("n"), bar.get("vw")))
                 count += 1
         token = body.get("next_page_token")
-        name = f"{label}-p{page:04d}.json.gz"
+        name = page_file_name(label, run_id, page)
         with gzip.open(os.path.join(out, "pages", adjustment, name), "wb", compresslevel=6) as handle:
             handle.write(raw)
-        ledger.write(event="page", adjustment=adjustment, batch=label, page=page, status=status,
+        ledger.write(event="page", adjustment=adjustment, batch=label, run_id=run_id, page=page, status=status,
                      sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw), bars=count,
                      symbols_with_bars=len(bars), next_page_token_present=bool(token), attempts=attempts,
                      elapsed_s=round(time.time() - started, 3), file=name)
@@ -180,16 +222,18 @@ def collect_symbols(session, headers, symbols, args, adjustment, label, out, led
             return
 
 
-def run_batch(index, symbols, adjustment, args, headers, out, ledger, prefix="b"):
+def run_batch(index, symbols, adjustment, args, headers, out, ledger, prefix="b", run_id=None,
+              request_sha256=None):
     import requests
     session = requests.Session()
     session.trust_env = False
     label = f"{prefix}{index:05d}"
     rows = []
     try:
-        collect_symbols(session, headers, symbols, args, adjustment, label, out, ledger, rows)
+        collect_symbols(session, headers, symbols, args, adjustment, label, out, ledger, rows, run_id)
     except Exception as exc:
-        ledger.write(event="batch_failed", adjustment=adjustment, batch=index, series=prefix, error=str(exc)[:300])
+        ledger.write(event="batch_failed", adjustment=adjustment, batch=index, label=label, series=prefix,
+                     run_id=run_id, request_sha256=request_sha256, error=str(exc)[:300])
         return index, adjustment, False, 0
     finally:
         session.close()
@@ -200,7 +244,8 @@ def run_batch(index, symbols, adjustment, args, headers, out, ledger, prefix="b"
         writer.writerow(COLUMNS)
         writer.writerows(rows)
     os.replace(temporary, target)
-    ledger.write(event="batch_complete", adjustment=adjustment, batch=index, series=prefix, symbols=len(symbols),
+    ledger.write(event="batch_complete", adjustment=adjustment, batch=index, label=label, series=prefix,
+                 run_id=run_id, request_sha256=request_sha256, symbols=len(symbols),
                  symbols_sha256=symbols_digest(symbols), bars=len(rows),
                  symbols_with_bars=len({r[0] for r in rows}))
     return index, adjustment, True, len(rows)
@@ -242,6 +287,7 @@ def main():
         os.makedirs(os.path.join(args.out, "bars", adjustment), exist_ok=True)
     ledger = Ledger(os.path.join(args.out, "ledger.jsonl"))
     done = ledger.completed()
+    run_id = uuid.uuid4().hex[:12]
     plan = {"schema": "broad-universe-collection-plan/1", "created_at": utc_now(), "host": HOST, "path": PATH,
             "timeframe": "1Day", "start": args.start, "end": args.end, "feed": args.feed,
             "adjustments": adjustments, "page_limit": PAGE_LIMIT, "batch_size": args.batch_size,
@@ -249,8 +295,23 @@ def main():
             "excluded_exchange_assets": skipped, "symbol_collisions": len(collisions),
             "asof": "provider default (request date)", "asset_files": [os.path.basename(p) for p in args.assets]}
     plan["series"] = series
+    fingerprint = request_fingerprint(plan)
+    plan["request_sha256"] = fingerprint
+    plan["run_id"] = run_id
     plan_name = "plan.json" if series == "b" else "plan-supplement.json"
-    with open(os.path.join(args.out, plan_name), "w", encoding="utf-8") as handle:
+    plan_path = os.path.join(args.out, plan_name)
+    if os.path.exists(plan_path):
+        with open(plan_path, encoding="utf-8") as handle:
+            existing = json.load(handle)
+        conflicts = scope_conflicts(existing, plan)
+        if conflicts:
+            detail = "; ".join(f"{c['field']}: recorded={c['recorded']!r} requested={c['requested']!r}"
+                               for c in conflicts)
+            raise SystemExit(
+                f"REFUSED: {plan_name} in {args.out} was written for a different request scope ({detail}). "
+                "Completed batches of the recorded scope must not be reused for this one: "
+                "collect the new scope into a new --out directory.")
+    with open(plan_path, "w", encoding="utf-8") as handle:
         json.dump(plan, handle, indent=1)
     if series == "b":
         with open(os.path.join(args.out, "symbol-identities.json"), "w", encoding="utf-8") as handle:
@@ -260,13 +321,15 @@ def main():
             json.dump(symbols, handle)
 
     jobs = [(i, g, a) for a in adjustments for i, g in enumerate(groups)
-            if done.get((series, a, i)) != symbols_digest(g)]
-    print(f"symbols={len(symbols)} batches={len(groups)} jobs={len(jobs)} resumed={len(done)}", flush=True)
+            if not batch_is_done(done.get((series, a, i)), symbols_digest(g), fingerprint)]
+    print(f"symbols={len(symbols)} batches={len(groups)} jobs={len(jobs)} resumed={len(done)} "
+          f"run_id={run_id}", flush=True)
     failed = 0
     total = 0
     started = time.time()
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        futures = [pool.submit(run_batch, i, g, a, args, headers, args.out, ledger, series) for i, g, a in jobs]
+        futures = [pool.submit(run_batch, i, g, a, args, headers, args.out, ledger, series, run_id, fingerprint)
+                   for i, g, a in jobs]
         for n, future in enumerate(as_completed(futures), 1):
             _, _, ok, bars = future.result()
             failed += 0 if ok else 1
@@ -274,7 +337,8 @@ def main():
             if n % 20 == 0 or n == len(futures):
                 print(f"jobs={n}/{len(futures)} bars={total} failed={failed} elapsed_s={int(time.time() - started)}",
                       flush=True)
-    ledger.write(event="run_complete", series=series, jobs=len(jobs), failed=failed, bars=total)
+    ledger.write(event="run_complete", series=series, run_id=run_id, request_sha256=fingerprint,
+                 jobs=len(jobs), failed=failed, bars=total)
     return 1 if failed else 0
 
 

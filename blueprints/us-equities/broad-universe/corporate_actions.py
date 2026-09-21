@@ -101,14 +101,33 @@ def count_by_type(body):
     return counts
 
 
-def completed_years(ledger_path, types_key):
+SCOPE_FIELDS = ("start", "end", "types", "types_key", "page_limit")
+
+
+def scope_conflicts(existing_plan, plan):
+    """Scope fields on which a retained corporate-actions plan disagrees with this run."""
+    return [{"field": key, "recorded": existing_plan.get(key), "requested": plan.get(key)}
+            for key in SCOPE_FIELDS if existing_plan.get(key) != plan.get(key)]
+
+
+def completed_years(ledger_path, types_key, windows=None):
+    """Years already collected for these types. When `windows` maps year -> (start, end),
+    a recorded year counts as done only if its recorded window matches exactly, so
+    widening --end inside an already-collected year is re-collected rather than skipped.
+    Legacy records carry no window; collect() refuses a changed plan scope before they
+    are consulted, so an unchanged re-run still resumes."""
     done = set()
     if os.path.exists(ledger_path):
         with open(ledger_path, encoding="utf-8") as handle:
             for line in handle:
                 rec = json.loads(line)
-                if rec.get("event") == "year_complete" and rec.get("types_key") == types_key:
-                    done.add(rec["year"])
+                if rec.get("event") != "year_complete" or rec.get("types_key") != types_key:
+                    continue
+                if windows is not None and rec.get("window_start") is not None:
+                    wanted = windows.get(rec["year"])
+                    if wanted != (rec.get("window_start"), rec.get("window_end")):
+                        continue
+                done.add(rec["year"])
     return done
 
 
@@ -135,33 +154,50 @@ def collect_year(session, headers, year, window_start, window_end, types, out_di
         name = f"p{page:04d}.json.gz"
         with gzip.open(os.path.join(year_dir, name), "wb", compresslevel=6) as handle:
             handle.write(raw)
-        ledger.write(event="page", year=year, types_key=types_key, page=page,
+        ledger.write(event="page", year=year, types_key=types_key, window_start=window_start,
+                     window_end=window_end, page=page,
                      sha256=hashlib.sha256(raw).hexdigest(), bytes=len(raw), items=sum(counts.values()),
                      by_type=dict(counts), next_page_token_present=bool(token), attempts=attempts,
                      elapsed_s=round(time.time() - started, 3), file=name)
         page += 1
         if not token:
             break
-    ledger.write(event="year_complete", year=year, types_key=types_key, pages=page, items=total_items,
-                 by_type=dict(total_by_type))
+    ledger.write(event="year_complete", year=year, types_key=types_key, window_start=window_start,
+                 window_end=window_end, pages=page, items=total_items, by_type=dict(total_by_type))
     return total_items
 
 
 def collect(env_file, out_dir, start, end, include_cash_dividends):
+    types = types_for(include_cash_dividends)
+    types_key = hashlib.sha256(",".join(types).encode()).hexdigest()[:16]
+    plan = {"schema": "broad-universe-corporate-actions-plan/1", "created_at": utc_now(), "host": HOST, "path": PATH,
+            "types": list(types), "types_key": types_key, "start": start, "end": end, "page_limit": PAGE_LIMIT}
+    # The scope refusal comes before credentials and the HTTP client: a run that must not
+    # reuse this directory should stop before it touches either.
+    plan_path = os.path.join(out_dir, "plan.json")
+    if os.path.exists(plan_path):
+        with open(plan_path, encoding="utf-8") as handle:
+            existing = json.load(handle)
+        conflicts = scope_conflicts(existing, plan)
+        if conflicts:
+            detail = "; ".join(f"{c['field']}: recorded={c['recorded']!r} requested={c['requested']!r}"
+                               for c in conflicts)
+            raise SystemExit(
+                f"REFUSED: plan.json in {out_dir} was written for a different request scope ({detail}). "
+                "Completed years of the recorded scope must not be reused for this one: "
+                "collect the new scope into a new --out directory.")
+
     import requests
     collect_daily = _load_collect_daily()
     key, secret = collect_daily.read_credentials(env_file)
     headers = {"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret}
-    types = types_for(include_cash_dividends)
-    types_key = hashlib.sha256(",".join(types).encode()).hexdigest()[:16]
 
     os.makedirs(out_dir, mode=0o700, exist_ok=True)
     ledger = collect_daily.Ledger(os.path.join(out_dir, "ledger.jsonl"))
-    done = completed_years(os.path.join(out_dir, "ledger.jsonl"), types_key)
+    windows = {year: (window_start, window_end) for year, window_start, window_end in year_windows(start, end)}
+    done = completed_years(os.path.join(out_dir, "ledger.jsonl"), types_key, windows)
 
-    plan = {"schema": "broad-universe-corporate-actions-plan/1", "created_at": utc_now(), "host": HOST, "path": PATH,
-            "types": list(types), "types_key": types_key, "start": start, "end": end, "page_limit": PAGE_LIMIT}
-    with open(os.path.join(out_dir, "plan.json"), "w", encoding="utf-8") as handle:
+    with open(plan_path, "w", encoding="utf-8") as handle:
         json.dump(plan, handle, indent=1)
 
     session = requests.Session()
@@ -185,35 +221,77 @@ def collect(env_file, out_dir, start, end, include_cash_dividends):
 
 
 def _date_of(item):
-    """Best-effort event date: the earliest value among any key ending in '_date'."""
+    """Best-effort event date: the earliest value among any key ending in '_date'.
+    Retained only as a secondary attribute: it can fall outside the window that
+    returned the action, so it never decides which year an action is counted in."""
     dates = [v for k, v in item.items() if k.endswith("_date") and isinstance(v, str) and v]
     return min(dates) if dates else None
 
 
+# One named date per action, most specific first. The field actually used is reported
+# per type so a reader never has to guess which date a summary line refers to.
+DATE_FIELD_PREFERENCE = ("ex_date", "effective_date", "process_date", "payable_date", "record_date",
+                         "declaration_date", "due_bill_off_date", "expiration_date", "settlement_date")
+
+
+def selected_date(item):
+    """(field_name, value) for the single date this summary reports, or (None, None)."""
+    for field in DATE_FIELD_PREFERENCE:
+        value = item.get(field)
+        if isinstance(value, str) and value:
+            return field, value
+    others = sorted(k for k, v in item.items() if k.endswith("_date") and isinstance(v, str) and v)
+    if others:
+        return others[0], item[others[0]]
+    return None, None
+
+
+def _window_year(year_dir):
+    name = year_dir.name
+    return name if len(name) == 4 and name.isdigit() else "unknown"
+
+
 def summarize_dict(out_dir):
+    """Counts bucketed by the REQUEST WINDOW year (the page directory the action was
+    returned in), so every year count corresponds to a window that was actually queried."""
     per_type_year = defaultdict(Counter)
-    earliest = {}
-    latest = {}
+    fields_used = defaultdict(Counter)
+    earliest, latest = {}, {}
+    min_earliest, min_latest = {}, {}
     for year_dir in sorted(Path(out_dir, "pages").glob("*")):
         if not year_dir.is_dir():
             continue
+        window_year = _window_year(year_dir)
         for page_file in sorted(year_dir.glob("*.json.gz")):
             with gzip.open(page_file, "rt", encoding="utf-8") as handle:
                 body = json.load(handle)
             for action_type, items in (body.get("corporate_actions") or {}).items():
                 for item in items:
-                    date = _date_of(item)
-                    year = date[:4] if date else "unknown"
-                    per_type_year[action_type][year] += 1
+                    per_type_year[action_type][window_year] += 1
+                    field, date = selected_date(item)
+                    if field:
+                        fields_used[action_type][field] += 1
                     if date:
                         if action_type not in earliest or date < earliest[action_type]:
                             earliest[action_type] = date
                         if action_type not in latest or date > latest[action_type]:
                             latest[action_type] = date
+                    min_date = _date_of(item)
+                    if min_date:
+                        if action_type not in min_earliest or min_date < min_earliest[action_type]:
+                            min_earliest[action_type] = min_date
+                        if action_type not in min_latest or min_date > min_latest[action_type]:
+                            min_latest[action_type] = min_date
     return {
+        "year_basis": "request window (the queried year directory the page was retained in)",
         "per_type_per_year_counts": {t: dict(sorted(c.items())) for t, c in sorted(per_type_year.items())},
+        "date_field_by_type": {t: {"primary": c.most_common(1)[0][0], "counts": dict(sorted(c.items()))}
+                               for t, c in sorted(fields_used.items())},
         "earliest_by_type": earliest,
         "latest_by_type": latest,
+        "secondary_min_of_all_dates": {"note": "earliest key ending in _date on each action; "
+                                               "may fall outside the queried window",
+                                       "earliest_by_type": min_earliest, "latest_by_type": min_latest},
     }
 
 
@@ -223,9 +301,12 @@ def cmd_collect(args):
 
 def cmd_summarize(args):
     summary = summarize_dict(args.dir)
+    print(f"year basis: {summary['year_basis']}")
     for action_type, by_year in summary["per_type_per_year_counts"].items():
         total = sum(by_year.values())
-        print(f"{action_type}: total={total} earliest={summary['earliest_by_type'].get(action_type)} "
+        field = (summary["date_field_by_type"].get(action_type) or {}).get("primary", "none")
+        print(f"{action_type}: total={total} date_field={field} "
+              f"earliest={summary['earliest_by_type'].get(action_type)} "
               f"latest={summary['latest_by_type'].get(action_type)}")
         for year, count in by_year.items():
             print(f"  {year}: {count}")
