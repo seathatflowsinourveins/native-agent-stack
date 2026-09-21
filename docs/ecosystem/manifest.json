@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-21",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "54896e7621bcacd2f4e062645302f3d9db1390d4",
+  "source_revision": "c6d3da8d2a08acbddf2f86527bab885430723059",
   "layers": [
     {
       "id": "agents",
@@ -326,6 +326,12 @@
       "title": "Returned Claude probes and interrupted Codex workflow attempt",
       "body": "Sanitized native outputs retain source hashes, returned models and token fields. The native review rejected intermediate source; the cross-client attempt was interrupted. These observations do not establish provider savings or completed cross-client review.",
       "path": "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json",
+      "category": "evaluation"
+    },
+    {
+      "title": "Native memory and RAG lifecycle",
+      "body": "Actual Codex/Claude retrieval and stored outcomes, current compatible pins, and the existing native monitoring schedule with explicit execution boundaries.",
+      "path": "docs/native-memory-rag-lifecycle.md",
       "category": "evaluation"
     },
     {

@@ -1,0 +1,98 @@
+{
+  "observed_at_utc": "2026-09-21T15:27:56.861626+00:00",
+  "systemd_timer": "Actual native timer/service timestamps and journal returns in native-commands.json; no manual collector invocation in this wave.",
+  "native_snapshot_observed_unix": 1790004400.1615136,
+  "selected_native_rows": [
+    {
+      "schema_version": 1,
+      "record_kind": "memory",
+      "entity_id": "ai-memory",
+      "title": "ai-memory: entire configured database",
+      "state": "ok",
+      "source_updated_at": "2026-09-21T15:26:40.192047+00:00",
+      "source_unix": 1790004400.192047,
+      "observed_unix": 1790004400.1615136,
+      "source_command": "ai-memory --data-dir <configured-db> status --json",
+      "kind": "native inventory",
+      "boundary": "Database-wide counts, not the selected project's inventory. Embedding coverage and provider status do not establish retrieval quality or LLM consolidation. Missing or unreviewed mode fields are unavailable.",
+      "timestamp_basis": "fresh_native_command_capture",
+      "value": 71,
+      "unit": "pages",
+      "pages_latest": 71,
+      "pages_all": 206,
+      "sessions": 97,
+      "observations": 42848,
+      "embedding_status": "ok",
+      "embedding_provider": "local",
+      "embedding_model": "all-MiniLM-L6-v2",
+      "embedding_dimensions": 384,
+      "llm_status": "ok",
+      "embedding_rows": 107,
+      "latest_pages_missing_embeddings": 0,
+      "embed_failures_unresolved": 0
+    },
+    {
+      "schema_version": 1,
+      "record_kind": "memory",
+      "entity_id": "qmd",
+      "title": "QMD: configured collection",
+      "state": "ok",
+      "source_updated_at": "2026-09-21T15:26:40.350064+00:00",
+      "source_unix": 1790004400.350064,
+      "observed_unix": 1790004400.1615136,
+      "source_command": "qmd --index <configured-index> status",
+      "kind": "native inventory",
+      "boundary": "Selected collection files; vector and total counts apply to its entire index. Zero vectors can be intentional BM25 operation.",
+      "timestamp_basis": "fresh_native_command_capture",
+      "value": 81,
+      "unit": "files",
+      "collection_files": 81,
+      "index_files": 81,
+      "index_vectors": 0
+    },
+    {
+      "schema_version": 1,
+      "record_kind": "memory",
+      "entity_id": "qdrant",
+      "title": "Qdrant: configured collection",
+      "state": "ok",
+      "source_updated_at": "2026-09-21T15:26:40.364184+00:00",
+      "source_unix": 1790004400.364184,
+      "observed_unix": 1790004400.1615136,
+      "source_command": "GET /collections/<allowlisted-collection>",
+      "kind": "native inventory",
+      "boundary": "Native points_count for one explicitly selected collection; vector representations are not added together.",
+      "timestamp_basis": "fresh_native_api_capture",
+      "value": 225,
+      "points_count": 225,
+      "unit": "points",
+      "collection_status": "green",
+      "segments_count": 2
+    }
+  ],
+  "loki": {
+    "requested": true,
+    "http_status": 204,
+    "payload_sha256": "e4b185b642c4640c56ffd43674e36983bd19d7ecfcc59249c6222ebba01d2465",
+    "error": null,
+    "response": {
+      "file": "loki-response",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "daily_followup": {
+    "id": "maintain-native-foundation-and-trading-catalogs",
+    "status": "ACTIVE",
+    "schedule": "Existing daily 09:00 schedule retained",
+    "prompt_sha256": "a77f5f2b85ae542eb87317906e4ee81e413e51cc4eae69129ffc09c029296701",
+    "lifecycle_section_present": true,
+    "next_scheduled_execution_observed": null
+  },
+  "boundaries": [
+    "Systemd timer observations are not evidence of a Codex scheduler wake.",
+    "Daily task updated during an interactive request; no new scheduled task execution claimed.",
+    "Inventory/scrape health does not establish correct retrieval, lifecycle completion or recovery.",
+    "Current direct project watcher is active; one-shot bridge intentionally uses snapshot mode."
+  ]
+}

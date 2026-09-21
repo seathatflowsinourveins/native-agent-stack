@@ -352,6 +352,7 @@ if(recipeMap.has("docs/token-session-handbook.md")) add($("setup-guides"), recip
 [["recipes/claude-native-profile.md", "Claude terminal and native practice"], ["recipes/claude-native-ultracode.md", "Persistent Claude workflows and returned evidence"], ["docs/community-native-practice.md", "Community choices across 16 layers"], ["examples/claude-native/CLAUDE.md", "Short Claude instruction example"]].forEach(([path, label]) => { if(recipeMap.has(path)) add($("setup-guides"), recipeButton(path, label)); });
 if(recipeMap.has("catalogs/foundation/README.md")) add($("setup-guides"), recipeButton("catalogs/foundation/README.md", "16-layer installation map"));
 if(recipeMap.has("docs/memory-landscape-maintenance.md")) add($("setup-guides"), recipeButton("docs/memory-landscape-maintenance.md", "Memory landscape and active native maintenance"));
+if(recipeMap.has("docs/native-memory-rag-lifecycle.md")) add($("setup-guides"), recipeButton("docs/native-memory-rag-lifecycle.md", "Native memory and RAG lifecycle"));
 data.layers.forEach(layer => { const option = make("option", "", layer.name); option.value = layer.id; add($("stack-layer"), option); });
 setup.profiles.forEach(profile => {
   const option = make("option", "", profile.label); option.value = profile.id; add($("stack-profile"), option);

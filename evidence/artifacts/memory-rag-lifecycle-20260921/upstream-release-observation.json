@@ -1,0 +1,120 @@
+{
+  "observed_at_utc": "2026-09-21T15:27:56.861626+00:00",
+  "releases": [
+    {
+      "command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/giancarloerra/SocratiCode/releases/latest"
+        ],
+        "cwd": "$HOME/code/agent-lab",
+        "started_at": "2026-09-21T15:14:52.592739+00:00",
+        "completed_at": "2026-09-21T15:14:52.938374+00:00",
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": {
+          "sha256": "491c75712a3ce721463e63a4edd40db105bff11d5791c52d4c1f3054a0c6ae4c",
+          "bytes": 8015
+        },
+        "stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "raw_sha256": "491c75712a3ce721463e63a4edd40db105bff11d5791c52d4c1f3054a0c6ae4c",
+      "tag_name": "v1.14.0",
+      "published_at": "2026-09-16T14:26:47Z",
+      "html_url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.14.0",
+      "target_commitish": "main"
+    },
+    {
+      "command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/qdrant/qdrant/releases/latest"
+        ],
+        "cwd": "$HOME/code/agent-lab",
+        "started_at": "2026-09-21T15:14:52.609978+00:00",
+        "completed_at": "2026-09-21T15:14:52.987430+00:00",
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": {
+          "sha256": "60efdda58116e74401b861802e9335d97dc2b09e3ee2c9eac746f4e946dee38b",
+          "bytes": 19604
+        },
+        "stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "raw_sha256": "60efdda58116e74401b861802e9335d97dc2b09e3ee2c9eac746f4e946dee38b",
+      "tag_name": "v1.19.1",
+      "published_at": "2026-09-04T07:59:14Z",
+      "html_url": "https://github.com/qdrant/qdrant/releases/tag/v1.19.1",
+      "target_commitish": "master"
+    },
+    {
+      "command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/tobi/qmd/releases/latest"
+        ],
+        "cwd": "$HOME/code/agent-lab",
+        "started_at": "2026-09-21T15:14:52.636790+00:00",
+        "completed_at": "2026-09-21T15:14:52.992013+00:00",
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": {
+          "sha256": "da288fa90d1dcc04ca9ea47566182aa73be1e66c1a542e9cee3446e8785f0014",
+          "bytes": 26205
+        },
+        "stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "raw_sha256": "da288fa90d1dcc04ca9ea47566182aa73be1e66c1a542e9cee3446e8785f0014",
+      "tag_name": "v2.8.3",
+      "published_at": "2026-08-16T22:30:34Z",
+      "html_url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+      "target_commitish": "main"
+    },
+    {
+      "command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/vllm-project/vllm/releases/latest"
+        ],
+        "cwd": "$HOME/code/agent-lab",
+        "started_at": "2026-09-21T15:14:52.773165+00:00",
+        "completed_at": "2026-09-21T15:14:53.180078+00:00",
+        "exit_code": 0,
+        "timed_out": false,
+        "stdout": {
+          "sha256": "d04dff8980086e5a34545375db491195a69e99baf9ffea8ee63dd19ef5d72367",
+          "bytes": 51180
+        },
+        "stderr": {
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      "raw_sha256": "d04dff8980086e5a34545375db491195a69e99baf9ffea8ee63dd19ef5d72367",
+      "tag_name": "v0.29.0",
+      "published_at": "2026-09-09T08:54:49Z",
+      "html_url": "https://github.com/vllm-project/vllm/releases/tag/v0.29.0",
+      "target_commitish": "main"
+    }
+  ],
+  "decision": "Retain accepted pins; vLLM 0.29.0 has the previously retained actual host failure. Unreleased SocratiCode fixes are tracked, not silently installed.",
+  "references": [
+    "https://github.com/giancarloerra/SocratiCode/pull/177",
+    "https://github.com/giancarloerra/SocratiCode/pull/179",
+    "https://github.com/vllm-project/vllm/pull/48290",
+    "https://github.com/vllm-project/vllm/releases/tag/v0.25.1"
+  ]
+}

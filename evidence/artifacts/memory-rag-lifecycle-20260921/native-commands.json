@@ -1,0 +1,395 @@
+{
+  "evidence_class": "sanitized original upstream command returns",
+  "sanitization": "Home paths and UUIDs replaced; raw hashes bind the private original streams, not the sanitized text.",
+  "commands": [
+    {
+      "label": "memory-report",
+      "argv": [
+        "ai-memory",
+        "auto-improve-report",
+        "--workspace",
+        "agent-lab",
+        "--project",
+        "agent-lab",
+        "--json"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T15:10:26.081992+00:00",
+      "completed_at": "2026-09-21T15:10:26.101273+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "3461d6d21511c762fc50650b68931a85ac6932ab1c360c5682a7deeee8ec4b60",
+        "bytes": 2003
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "returned_stdout": "{\n  \"workspace\": \"agent-lab\",\n  \"project\": \"agent-lab\",\n  \"generated_at\": \"2026-09-21T15:10:26.098946693Z\",\n  \"since_created_at\": 1787411426098946,\n  \"summary\": \"3 run(s), no terminal learning proposals in the last 30 day(s).\",\n  \"params\": {\n    \"since_days\": 30,\n    \"top_limit\": 10\n  },\n  \"aggregate\": {\n    \"run_count\": 3,\n    \"runs_with_learning_proposals\": 0,\n    \"proposals_by_status\": [],\n    \"proposals_by_operation\": [],\n    \"proposals_by_edit_mode\": [],\n    \"proposals_by_kind\": [],\n    \"maintenance_proposals_by_kind\": [],\n    \"top_targets\": [],\n    \"rejections_by_reason\": [\n      {\n        \"key\": \"insufficient_durable_evidence\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"session_too_short\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"too_few_observations\",\n        \"count\": 1\n      }\n    ],\n    \"repeated_rejection_fingerprints\": [],\n    \"rejected_targets\": [\n      {\n        \"key\": \"2 observations below configured minimum 8\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"8s below configured minimum 120s\",\n        \"count\": 1\n      },\n      {\n        \"key\": \"The consolidated page contains the request and tool-call metadata, but the tool outcomes are marked unknown and the substantive results are absent or truncated.\",\n        \"count\": 1\n      }\n    ]\n  },\n  \"terminal_rates\": {\n    \"denominator\": 0,\n    \"approved_rate\": 0.0,\n    \"rejected_rate\": 0.0,\n    \"conflict_rate\": 0.0,\n    \"failed_rate\": 0.0\n  },\n  \"findings\": [\n    {\n      \"kind\": \"no_terminal_learning_proposals\",\n      \"severity\": \"info\",\n      \"message\": \"No terminal learning proposals in the selected window.\"\n    }\n  ],\n  \"blind_spots\": [\n    \"Provider/LLM errors before a run is staged may not appear in proposal or rejection counts.\",\n    \"Eval-gate rejection reasons are counted, but eval success rates and score deltas are not persisted in this schema.\",\n    \"Terminal rates use learning proposals only; pending and maintenance/report proposals are excluded from the denominator.\"\n  ]\n}\n",
+      "returned_stderr": ""
+    },
+    {
+      "label": "rag-status",
+      "argv": [
+        "mcporter",
+        "--config",
+        "$HOME/codex-ecosystem/config/mcporter.json",
+        "call",
+        "socraticode.codebase_status",
+        "--args",
+        "{\"projectPath\":\"$HOME/code/agent-lab\"}",
+        "--output",
+        "text",
+        "--no-oauth"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T15:10:26.095984+00:00",
+      "completed_at": "2026-09-21T15:10:26.766094+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "85ba296edee7aab46fd4171f2e8056637ce4d4ac6f0f26492e8580dff1c92c0d",
+        "bytes": 335
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "returned_stdout": "Project: $HOME/code/agent-lab\nCollection: codebase_72cfa87c5abf\nStatus: green\nIndexed chunks: 225\n\nFile watcher: disabled (SOCRATICODE_WATCHER=off)\n  Warning: another MCP process is watching this project. Set SOCRATICODE_WATCHER=off for every process that uses this checkout.\n\nCode graph: 34 files, 5 edges\n  Last built: 17s ago\n",
+      "returned_stderr": ""
+    },
+    {
+      "label": "qmd-search",
+      "argv": [
+        "qmd",
+        "--index",
+        "agent-lab-docs",
+        "search",
+        "native RAG",
+        "-c",
+        "agent-lab-docs",
+        "-n",
+        "2",
+        "--json"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T15:10:26.148575+00:00",
+      "completed_at": "2026-09-21T15:10:26.308325+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "00a88b4d24bfcc3e53893aca1a5348663bf589793d8cc3e9ea9a4e42a268dc8e",
+        "bytes": 975
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "returned_stdout": "[\n  {\n    \"docid\": \"#1226a4\",\n    \"score\": 0.72,\n    \"file\": \"qmd://agent-lab-docs/tasks/2026-09-21-memory-rag-native-alignment.md?index=agent-lab-docs\",\n    \"line\": 1,\n    \"title\": \"Native memory/RAG qualification — 2026-09-21\",\n    \"snippet\": \"@@ -1,3 @@ (0 before, 43 after)\\n# Native memory/RAG qualification — 2026-09-21\\n\\nThe current host now uses ai-memory 2.3.2 with upstream local MiniLM (384\"\n  },\n  {\n    \"docid\": \"#48449a\",\n    \"score\": 0.69,\n    \"file\": \"qmd://agent-lab-docs/native-rag-runtime.md?index=agent-lab-docs\",\n    \"line\": 1,\n    \"title\": \"Native automatic code RAG and runtime layers\",\n    \"snippet\": \"@@ -1,3 @@ (0 before, 157 after)\\n# Native automatic code RAG and runtime layers\\n\\nChecked September 19, 2026. **SocratiCode, Qdrant and a local Nemotron embedding service now work together in agent-lab. Both native Codex and Claude completed a real semantic code search. Automatic add/change/delete indexing passed without a manual...\"\n  }\n]\n",
+      "returned_stderr": ""
+    },
+    {
+      "label": "qmd-source",
+      "argv": [
+        "qmd",
+        "--index",
+        "agent-lab-docs",
+        "get",
+        "qmd://agent-lab-docs/tasks/2026-09-21-memory-rag-native-alignment.md"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T15:11:53.373280+00:00",
+      "completed_at": "2026-09-21T15:11:53.486774+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "e0aa763638ea07a5fad6e6fc530a0185884c883e54c75ba9583e1484291f3c33",
+        "bytes": 3294
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "returned_stdout": "qmd://agent-lab-docs/tasks/2026-09-21-memory-rag-native-alignment.md  #1226a4\n---\n\n1: # Native memory/RAG qualification — 2026-09-21\n2: \n3: The current host now uses ai-memory 2.3.2 with upstream local MiniLM (384\n4: dimensions). Its native startup embedded 52 latest pages with zero failures;\n5: the scoped repeat embedded zero and skipped all 52 current pages. The current\n6: Desktop MCP semantic query returned the shared-memory decision where the native\n7: CLI text query returned no hits. This is one observed query, not a broad quality\n8: or token-saving benchmark. Browser wiki search remains FTS5; LLM consolidation\n9: is disabled. The latest pages include one ordinary decision and 51 System pages.\n10: \n11: The native backup restored successfully to a separate private directory. An\n12: independent comparison recomputed the bodies of all 52 latest pages and matched\n13: them to the immutable backup. Live capture continues independently afterward.\n14: The expected V62 migration warning follows upstream compatibility logic; no\n15: database history was rewritten.\n16: \n17: The project's `.socraticodeignore` now excludes `/packaging-repo/` and\n18: `/runner-temp/`. The native watcher reconciled the index; `codebase_update`\n19: confirmed it. Qdrant went from 7,431 to 196 points, the complete payload scan had\n20: zero excluded paths, and the same task query ranked the actual implementation\n21: first. The unchanged upstream graph export has 26 files, three file edges,\n22: 254 symbols and 318 calls. Graph regeneration is explicit.\n23: \n24: The existing native-data timer now exposes allowlisted embedding mode, coverage\n25: and failure metadata to Loki/Grafana. Both it and ai-memory are enabled/active.\n26: Native Loki and browser values agreed. At observation time there were 52 latest\n27: pages and 54 retained vectors; superseded page versions explain why these counts\n28: are not interchangeable. QMD remained a separate BM25 documentation index.\n29: \n30: Verification: 652 project tests passed and 41 were skipped; the 24 adapter tests,\n31: catalog/integrity/convergence checks and generated HTML checks passed.\n32: Independent review findings were resolved. The local report has 24 records and\n33: 60 attachments; every embedded hash passed and a browser-downloaded native\n34: memory status exactly matched its source. No fresh Claude semantic run, broad\n35: retrieval benchmark, extra graph-control qualification or Qdrant recovery claim.\n36: \n37: Portable changes: [PR 40](https://github.com/seathatflowsinourveins/native-agent-stack/pull/40)\n38: merged at `f239c07e05d11bec19e15046b12f52db3b396c61`; all five PR checks passed,\n39: including the native token-tools workflow. The canonical local checkout was\n40: fast-forwarded to that merge.\n41: Use the [native memory/RAG handbook](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/memory-rag-native-practice.md)\n42: and [evidence receipt](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/evidence/receipts/native-memory-rag-alignment-20260921.json).\n43: Exact private command returns are retained under\n44: `$HOME/codex-ecosystem/state/memory-rag-alignment-20260921` and downloaded\n45: from the local report. Raw database/configuration files remain private.\n46: \n",
+      "returned_stderr": ""
+    },
+    {
+      "label": "qmd-update",
+      "argv": [
+        "qmd",
+        "--index",
+        "agent-lab-docs",
+        "update"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T15:19:36.739938+00:00",
+      "completed_at": "2026-09-21T15:19:36.936725+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "a559664a447b8394bd45b29b55a9c68e32864370269b4e4ebbfd1ce65dd5a494",
+        "bytes": 305
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "returned_stdout": "Updating 1 collection(s)...\n\n[1/1] agent-lab-docs (**/*.md)\nCollection: $HOME/code/agent-lab/docs (**/*.md)\n\nIndexed: 3 new, 5 updated, 73 unchanged, 0 removed\nCleaned up 5 orphaned content hash(es)\n\n✓ All collections updated.\n\nRun 'qmd embed' to update embeddings (81 unique hashes need vectors)\n",
+      "returned_stderr": ""
+    },
+    {
+      "label": "qmd-current-search",
+      "argv": [
+        "qmd",
+        "--index",
+        "agent-lab-docs",
+        "search",
+        "Current native memory and RAG",
+        "-c",
+        "agent-lab-docs",
+        "-n",
+        "2",
+        "--json"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T15:19:37.534529+00:00",
+      "completed_at": "2026-09-21T15:19:37.640922+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "618e930892054b9ef533406f79cfafb1ca8ee3de360385a199fae8074b721b72",
+        "bytes": 926
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "returned_stdout": "[\n  {\n    \"docid\": \"#ecee4c\",\n    \"score\": 0.72,\n    \"file\": \"qmd://agent-lab-docs/tasks/2026-09-21-memory-rag-native-alignment.md?index=agent-lab-docs\",\n    \"line\": 4,\n    \"title\": \"Native memory/RAG qualification — 2026-09-21\",\n    \"snippet\": \"@@ -3,4 @@ (2 before, 44 after)\\n> Historical qualification. The LLM-disabled configuration below was superseded\\n> later the same day. See [current native memory and RAG](2026-09-21-memory-rag-lifecycle.md)\\n> for active consolidation, capture and maintenance; retain these original results.\\n\"\n  },\n  {\n    \"docid\": \"#cdb6f4\",\n    \"score\": 0.72,\n    \"file\": \"qmd://agent-lab-docs/tasks/2026-09-21-memory-rag-lifecycle.md?index=agent-lab-docs\",\n    \"line\": 1,\n    \"title\": \"Current native memory and RAG\",\n    \"snippet\": \"@@ -1,3 @@ (0 before, 20 after)\\n# Current native memory and RAG\\n\\nCurrent setup, September 21, 2026: ai-memory 2.3.2 has local embeddings, native\"\n  }\n]\n",
+      "returned_stderr": ""
+    },
+    {
+      "label": "qmd-current-source",
+      "argv": [
+        "qmd",
+        "--index",
+        "agent-lab-docs",
+        "get",
+        "qmd://agent-lab-docs/tasks/2026-09-21-memory-rag-lifecycle.md"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T15:19:38.207386+00:00",
+      "completed_at": "2026-09-21T15:19:38.307231+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "435a4db7f1491140c298bf8474d7b3e5c993f821fc8dac079328cb2cd67723bc",
+        "bytes": 1584
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "returned_stdout": "qmd://agent-lab-docs/tasks/2026-09-21-memory-rag-lifecycle.md  #cdb6f4\n---\n\n1: # Current native memory and RAG\n2: \n3: Current setup, September 21, 2026: ai-memory 2.3.2 has local embeddings, native\n4: Codex consolidation, bounded assistant capture and hourly learning configured.\n5: Earlier notes saying the LLM or scheduler is disabled describe superseded\n6: configurations. The adopted scope remains agent-lab/agent-lab.\n7: \n8: SocratiCode 1.14.0, Qdrant 1.19.1, qualified vLLM 0.25.0/Nemotron, Serena and QMD\n9: remain installed. Both native clients completed real memory and code retrieval.\n10: The new Claude reply was captured exactly and its consolidation completed on\n11: attempt 1. Current native project watchers run automatically; the one-shot\n12: MCPorter reporting profile intentionally disables watching and auto-resume.\n13: \n14: The existing two-minute native-data timer publishes current inventory to Loki.\n15: The existing daily task follow-up now checks scoped retrieval and lifecycle\n16: outcomes; this configuration update is not proof of its next scheduled run.\n17: \n18: Use the canonical [native lifecycle handbook](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/native-memory-rag-lifecycle.md)\n19: and [memory selection guide](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/memory-landscape-maintenance.md).\n20: They contain supported commands, source pins, original-result references and\n21: unknowns. Exact memory savings, broad retrieval quality and physical-PC reboot\n22: remain unestablished.\n23: \n",
+      "returned_stderr": ""
+    },
+    {
+      "label": "service-observation",
+      "argv": [
+        "systemctl",
+        "--user",
+        "show",
+        "ai-memory.service",
+        "qdrant-agent-lab.service",
+        "nemotron-embed-agent-lab.service",
+        "ecosystem-native-data.service",
+        "ecosystem-native-data.timer",
+        "--property=Id",
+        "--property=ActiveState",
+        "--property=UnitFileState",
+        "--property=Result",
+        "--property=LastTriggerUSec",
+        "--property=ActiveEnterTimestamp"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T15:10:51.671404+00:00",
+      "completed_at": "2026-09-21T15:10:51.682079+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "9b6a9c28c8928851b450960e68071d3fc54b898137248a64f6b235dfd207da02",
+        "bytes": 696
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "returned_stdout": "Result=success\nId=ai-memory.service\nActiveState=active\nUnitFileState=enabled\nActiveEnterTimestamp=Mon 2026-09-21 10:35:13 EDT\n\nResult=success\nId=qdrant-agent-lab.service\nActiveState=active\nUnitFileState=enabled\nActiveEnterTimestamp=Sun 2026-09-20 21:42:14 EDT\n\nResult=success\nId=nemotron-embed-agent-lab.service\nActiveState=active\nUnitFileState=enabled\nActiveEnterTimestamp=Sun 2026-09-20 21:07:22 EDT\n\nResult=success\nId=ecosystem-native-data.service\nActiveState=inactive\nUnitFileState=static\nActiveEnterTimestamp=\n\nLastTriggerUSec=Mon 2026-09-21 11:09:52 EDT\nResult=success\nId=ecosystem-native-data.timer\nActiveState=active\nUnitFileState=enabled\nActiveEnterTimestamp=Sun 2026-09-20 22:48:15 EDT\n",
+      "returned_stderr": ""
+    },
+    {
+      "label": "timer-runtime",
+      "argv": [
+        "systemctl",
+        "--user",
+        "show",
+        "ecosystem-native-data.timer",
+        "ecosystem-native-data.service",
+        "--property=Id",
+        "--property=LastTriggerUSec",
+        "--property=Triggers",
+        "--property=TriggeredBy",
+        "--property=Result",
+        "--property=InvocationID",
+        "--property=ExecMainStartTimestamp",
+        "--property=ExecMainExitTimestamp"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T15:13:59.701777+00:00",
+      "completed_at": "2026-09-21T15:13:59.706225+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "30a7b2a00608d383ba097f9b7c4ffa4d4ca19d1031c2933d773a05b5151b4772",
+        "bytes": 434
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "returned_stdout": "LastTriggerUSec=Mon 2026-09-21 11:12:02 EDT\nResult=success\nId=ecosystem-native-data.timer\nTriggers=ecosystem-native-data.service\nTriggeredBy=\nInvocationID=67537ff4dd4b4e93ad3eea675c4b251b\n\nResult=success\nExecMainStartTimestamp=Mon 2026-09-21 11:12:02 EDT\nExecMainExitTimestamp=Mon 2026-09-21 11:12:03 EDT\nId=ecosystem-native-data.service\nTriggers=\nTriggeredBy=ecosystem-native-data.timer\nInvocationID=3f49fe64d67740a09a05dcf74d12dcfb\n",
+      "returned_stderr": ""
+    },
+    {
+      "label": "timer-journal",
+      "argv": [
+        "journalctl",
+        "--user",
+        "-u",
+        "ecosystem-native-data.service",
+        "--since",
+        "2026-09-21 15:09:00 UTC",
+        "--no-pager",
+        "-o",
+        "cat"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T15:14:00.359590+00:00",
+      "completed_at": "2026-09-21T15:14:00.411745+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "8165c7737bf34f0addc48d9c0bd1d1e85cac699492a13a6e052d04e596128937",
+        "bytes": 1066
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "returned_stdout": "Starting ecosystem-native-data.service - Observe selected native memory and token metadata...\n{\"observed_unix\":1790003392.8545527,\"row_count\":78,\"unknown_count\":0,\"stale_count\":5,\"snapshot_sha256\":\"8757ca130079548c48e2337c0829d86d1b7e336a78a2e8d2125af1d1fd4c1b41\",\"snapshot_bytes\":67042,\"loki_http_status\":204,\"publish_requested\":true,\"publish_error\":null,\"payload_sha256\":\"8bf2cf0f4ed90ad5a2b03112427e771110f33ad479e4cd37a62df0f8b56aacc7\"}\nFinished ecosystem-native-data.service - Observe selected native memory and token metadata.\nStarting ecosystem-native-data.service - Observe selected native memory and token metadata...\n{\"observed_unix\":1790003522.8519387,\"row_count\":78,\"unknown_count\":0,\"stale_count\":5,\"snapshot_sha256\":\"1f6d04b1cd2de49684de9f4c63b639551ee411c830a0fbcc63f43c2cb2e0baed\",\"snapshot_bytes\":67043,\"loki_http_status\":204,\"publish_requested\":true,\"publish_error\":null,\"payload_sha256\":\"75f5c1d7f5cccc53efbe6ffce48442fc6734eccee39050cb2215632e3316f4ae\"}\nFinished ecosystem-native-data.service - Observe selected native memory and token metadata.\n",
+      "returned_stderr": ""
+    },
+    {
+      "label": "progress-unit-before",
+      "argv": [
+        "systemctl",
+        "--user",
+        "cat",
+        "ecosystem-research-progress.service"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T15:25:33.123958+00:00",
+      "completed_at": "2026-09-21T15:25:33.138566+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "1c8c679c00a3c6bb51c20c6a1972fbcd48da49c368b8ced36ac571ec54dfb560",
+        "bytes": 654
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "returned_stdout": "# $HOME/.config/systemd/user/ecosystem-research-progress.service\n[Unit]\nDescription=Publish public research progress to local Loki\nAfter=ecosystem-loki.service\n\n[Service]\nType=oneshot\nUMask=0077\nNoNewPrivileges=true\nTimeoutStartSec=20\nExecStart=/usr/bin/python3 $HOME/code/native-agent-stack-publication/observability/grand-dashboard/progress.py --repo $HOME/code/native-agent-stack-publication --cache $HOME/.local/share/codex-ecosystem/observability/grand-dashboard/progress-cache.json --dagu-bin $HOME/.local/share/codex-ecosystem/tools/dagu-2.16.6/dagu --dagu-home $HOME/.local/share/codex-ecosystem/dagu-equities\n",
+      "returned_stderr": ""
+    },
+    {
+      "label": "progress-unit-validate",
+      "argv": [
+        "systemd-analyze",
+        "--user",
+        "verify",
+        "$HOME/.config/systemd/user/ecosystem-research-progress.service"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T15:25:34.790778+00:00",
+      "completed_at": "2026-09-21T15:25:34.826048+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "returned_stdout": "",
+      "returned_stderr": ""
+    },
+    {
+      "label": "progress-unit-after",
+      "argv": [
+        "systemctl",
+        "--user",
+        "cat",
+        "ecosystem-research-progress.service"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T15:25:36.058424+00:00",
+      "completed_at": "2026-09-21T15:25:36.072408+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "24c841d055fcb210117882b35ea941f65a43be11af79a64892b588195354eb05",
+        "bytes": 1208
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "returned_stdout": "# $HOME/.config/systemd/user/ecosystem-research-progress.service\n[Unit]\nDescription=Publish public research progress to local Loki\nAfter=ecosystem-loki.service\n\n[Service]\nType=oneshot\nUMask=0077\nNoNewPrivileges=true\nTimeoutStartSec=20\nExecStart=/usr/bin/python3 $HOME/code/native-agent-stack-publication/observability/grand-dashboard/progress.py --repo $HOME/code/native-agent-stack-publication --cache $HOME/.local/share/codex-ecosystem/observability/grand-dashboard/progress-cache.json --dagu-bin $HOME/.local/share/codex-ecosystem/tools/dagu-2.16.6/dagu --dagu-home $HOME/.local/share/codex-ecosystem/dagu-equities\n\n# $HOME/.config/systemd/user/ecosystem-research-progress.service.d/20-canonical-catalog.conf\n[Service]\nExecStart=\nExecStart=/usr/bin/python3 $HOME/code/native-agent-stack-token-practice-review/observability/grand-dashboard/progress.py --repo $HOME/code/native-agent-stack-token-practice-review --cache $HOME/.local/share/codex-ecosystem/observability/grand-dashboard/progress-cache.json --dagu-bin $HOME/.local/share/codex-ecosystem/tools/dagu-2.16.6/dagu --dagu-home $HOME/.local/share/codex-ecosystem/dagu-equities\n",
+      "returned_stderr": ""
+    },
+    {
+      "label": "progress-effective",
+      "argv": [
+        "systemctl",
+        "--user",
+        "show",
+        "ecosystem-research-progress.service",
+        "--property=Id",
+        "--property=ExecStart",
+        "--property=Result",
+        "--property=ExecMainStatus",
+        "--property=ExecMainStartTimestamp",
+        "--property=ExecMainExitTimestamp"
+      ],
+      "cwd": "$HOME/code/agent-lab",
+      "started_at": "2026-09-21T15:27:55.153583+00:00",
+      "completed_at": "2026-09-21T15:27:55.167813+00:00",
+      "exit_code": 0,
+      "timed_out": false,
+      "stdout": {
+        "sha256": "0e1d285c8907e523ce796170f4ec52536ed6bc7aa7ae27cdcd8e0d3003547438",
+        "bytes": 783
+      },
+      "stderr": {
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      },
+      "returned_stdout": "Result=success\nExecMainStartTimestamp=Mon 2026-09-21 11:27:32 EDT\nExecMainExitTimestamp=Mon 2026-09-21 11:27:32 EDT\nExecMainStatus=0\nExecStart={ path=/usr/bin/python3 ; argv[]=/usr/bin/python3 $HOME/code/native-agent-stack-token-practice-review/observability/grand-dashboard/progress.py --repo $HOME/code/native-agent-stack-token-practice-review --cache $HOME/.local/share/codex-ecosystem/observability/grand-dashboard/progress-cache.json --dagu-bin $HOME/.local/share/codex-ecosystem/tools/dagu-2.16.6/dagu --dagu-home $HOME/.local/share/codex-ecosystem/dagu-equities ; ignore_errors=no ; start_time=[Mon 2026-09-21 11:27:32 EDT] ; stop_time=[Mon 2026-09-21 11:27:32 EDT] ; pid=1521455 ; code=exited ; status=0 }\nId=ecosystem-research-progress.service\n",
+      "returned_stderr": ""
+    }
+  ]
+}

@@ -7,6 +7,10 @@ quality benchmark: the alternatives below are current candidates with different
 strengths, not installed winners. Code RAG, document search and transient context
 remain separate layers.
 
+The follow-up [native memory/RAG lifecycle guide](native-memory-rag-lifecycle.md)
+records fresh cross-client retrieval, stored Claude outcome and consolidation,
+current stable-release checks, and the active monitoring contract.
+
 The adopted project's pinned `decisions/native-memory-learning-maintenance.md`
 records this setup. The older consolidation decision is marked superseded while
 its historical body is preserved; both writes were read back through native MCP.

@@ -45,14 +45,14 @@ TOKEN_RECEIPT_FAMILIES = {
 RETURNED_RECEIPT_FAMILIES = {
     "native-returned-results", "native-memory-rag-alignment", "hf-memory-models",
     "native-dashboard-data", "native-dashboard-access", "full-stack-convergence",
-    "dashboard-render-e2e", "dashboard-gap-resolution", "memory-landscape",
+    "dashboard-render-e2e", "dashboard-gap-resolution", "memory-landscape", "memory-landscape-lifecycle",
 }
 PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
 PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024
 NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json",
                     "recipes/claude-native-ultracode.md", "examples/claude-native/ultracode.settings.json",
                     "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json",
-                    "docs/memory-landscape-maintenance.md",
+                    "docs/memory-landscape-maintenance.md", "docs/native-memory-rag-lifecycle.md",
                     "docs/harness-defaults.md", "catalogs/README.md", STACK, ADOPTION,
                     "docs/full-stack-convergence.md", "recipes/native-upgrades-20260921.md",
                     "docs/token-practice.md", "tools/token-report/README.md", "recipes/README.md",
@@ -380,7 +380,7 @@ def build_data(root):
         require(set(profile["component_ids"]).issubset(component_ids),
                 "adoption profile references an unknown component")
     guide_paths = list(SETUP_GUIDES)
-    for path in ("docs/memory-landscape-maintenance.md", "adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md", "docs/foundation-stack.md", "docs/token-session-handbook.md",
+    for path in ("docs/native-memory-rag-lifecycle.md", "docs/memory-landscape-maintenance.md", "adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md", "docs/foundation-stack.md", "docs/token-session-handbook.md",
                  "docs/harness-defaults.md", "catalogs/README.md", "catalogs/foundation/README.md",
                  "docs/community-native-practice.md", "examples/claude-native/CLAUDE.md",
                  "recipes/claude-native-ultracode.md"):

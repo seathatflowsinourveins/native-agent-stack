@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-20T04:30:41.591503+00:00",
-  "meaning": "Recorded checkpoint; freshness of emission is separate from source update. Worker states are coordinator checkpoints, not process heartbeats.",
+  "recorded_at_utc": "2026-09-21T15:22:28.060Z",
+  "meaning": "Recorded checkpoint; native memory/RAG row updated September 21. Other rows retain their linked receipt dates. Emitter freshness is separate from source update; worker states are coordinator checkpoints, not process heartbeats.",
   "lanes": [
     {
       "kind": "lane",
@@ -26,6 +26,13 @@
     }
   ],
   "gates": [
+    {
+      "kind": "gate",
+      "id": "native-memory-rag",
+      "title": "Native memory and RAG lifecycle",
+      "state": "both-client retrieval and stored Claude outcome verified / daily monitor configured",
+      "evidence_ref": "evidence/receipts/memory-landscape-lifecycle-20260921.json"
+    },
     {
       "kind": "gate",
       "id": "memory-lifecycle",
