@@ -1,4 +1,8 @@
 {
   "enableWorkflows": true,
-  "workflowSizeGuideline": "small"
+  "ultracode": true,
+  "workflowSizeGuideline": "small",
+  "env": {
+    "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "3"
+  }
 }

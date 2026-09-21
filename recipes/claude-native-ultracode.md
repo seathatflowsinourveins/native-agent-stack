@@ -13,22 +13,50 @@ From the adopted project, using this repository's settings example at its real
 location:
 
 ```sh
-CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS=3 claude \
-  --model fable --effort ultracode \
-  --settings /path/to/native-agent-stack/examples/claude-native/ultracode.settings.json
+claude --settings /path/to/native-agent-stack/examples/claude-native/ultracode.settings.json
 ```
 
-Native `fable` resolved to `claude-fable-5-1` on this account. Verify the model
-actually returned on another account/provider. Ultracode sends `xhigh` effort and
-enables workflow orchestration; it is not a provider model name. The `small`
-guideline is advisory; the environment variable provides a per-workflow
-concurrency limit. Neither limits total account usage or independently launched
-sessions. Keep existing sign-in, permission rules, plugins and prompt caching.
+The portable [settings file](../examples/claude-native/ultracode.settings.json):
+
+```json
+{
+  "enableWorkflows": true,
+  "ultracode": true,
+  "workflowSizeGuideline": "small",
+  "env": {
+    "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS": "3"
+  }
+}
+```
+
+The example persists `enableWorkflows`, `ultracode`, the small advisory size and
+the per-workflow concurrency setting of three. It does not select a model,
+account or permission mode. To adopt it as a project default, merge only those
+keys into the existing `.claude/settings.json`; preserve all unrelated settings.
+Project environment settings require workspace trust, and organizational policy
+or feature availability can still restrict the profile.
+
+`ultracode: true` requests effective `xhigh` effort, subject to applicable caps,
+and takes precedence over the stored `effortLevel` setting. Preserving that
+stored value therefore does not mean effective effort is unchanged. An existing
+`CLAUDE_CODE_EFFORT_LEVEL` value other than `xhigh` overrides Ultracode and leaves
+its orchestration inactive. Ultracode is not a provider model name. The `small`
+guideline is advisory; the environment
+variable provides a per-workflow concurrency setting, not a total account or
+cross-session budget. Keep existing sign-in, permissions, plugins and caching.
+
+The dated trial explicitly used `--model fable --effort ultracode`; `fable`
+resolved to `claude-fable-5-1` on that account. Verify the actually returned model
+on another account/provider. The [subsequent native observations](../evidence/artifacts/native-claude-coop-20260921/persistent-profile.json)
+retain fresh-session settings/role discovery and returned usage separately from
+the interrupted cross-client attempt; they are not another PC's acceptance.
 
 Use this profile for substantial parallel work. Routine work stays at ordinary
 effort. Native Ultracode can increase tokens and elapsed time; it is not a general
-token-saving switch. In a `-p` run, pass `--effort ultracode`; the word in a prompt
-does not enable the feature. [Native model configuration](https://code.claude.com/docs/en/model-config),
+token-saving switch. In a `-p` run, load this opted-in settings file or pass
+`--effort ultracode`; the word in a prompt does not enable the feature.
+[Persistent settings](https://code.claude.com/docs/en/settings-reference#ultracode),
+[native model configuration](https://code.claude.com/docs/en/model-config),
 [workflow behavior](https://code.claude.com/docs/en/workflows).
 
 ## Assign models by task and verify the assignment

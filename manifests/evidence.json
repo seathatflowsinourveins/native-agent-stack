@@ -871,7 +871,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1853,7 +1853,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -6143,8 +6143,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 6865971,
-      "sha256": "68e4a810bba6496ce99e6401aece552348cf537860ed4e87e704b810a096968f"
+      "bytes": 6877380,
+      "sha256": "1284f69582bee60c6b6986cf0dfe04af057234f1ac6e27339251299970485bcb"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6153,8 +6153,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "bytes": 35610,
-      "sha256": "2626b1b4ac47abce79481939140f8ae1edbb539b8efa2737865abfe9d234eda6"
+      "bytes": 36867,
+      "sha256": "b2b64e2bf10c3f0ef2410e169ce5e2e4f6254c913002f906f9b7ffe8e54e04b2"
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6173,8 +6173,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "bytes": 80969,
-      "sha256": "732d5ecad64ad8995ffd531ac0bc9db9ce84ee44109bdc62c7bc6dd43d90158c"
+      "bytes": 81062,
+      "sha256": "0b90510142e2b9260cb2172435f89b2d3e778d4e40dad79f517569b453ddcb89"
     },
     {
       "path": "docs/evidence.md",
@@ -6848,8 +6848,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "bytes": 33934,
-      "sha256": "9f4125eff6971c3d03517a2fbd14c1ce3522732815af54fe1b5811d1180729a2"
+      "bytes": 34191,
+      "sha256": "c70fc2badfc91c2c3db94435dc9261725934693af9c07fbd255811556544e798"
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -8893,8 +8893,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "2288f1b314faa91755fa2a97fd752cba93a958636bbcbd74da58c98191a28fcc",
-      "bytes": 7788
+      "sha256": "51876a958e91fcf82b4d5296b62ab39af96c805e8e33661004baaac393afc3cd",
+      "bytes": 9110
     },
     {
       "path": "docs/native-ultracode-20260921.md",
@@ -8903,8 +8903,8 @@
     },
     {
       "path": "examples/claude-native/ultracode.settings.json",
-      "sha256": "1f43a382696b0a9c056d069c5808e97f3215bd97d7c7fd60b588bc3681bc4435",
-      "bytes": 66
+      "sha256": "1d35ec9f182a4d3762f772f0ad6991b9b313d03e4e5a1d8e1b33a63d95757d4d",
+      "bytes": 157
     },
     {
       "path": "evidence/receipts/native-ultracode-20260921.json",
@@ -9335,6 +9335,11 @@
       "path": "evidence/artifacts/native-claude-coop-20260921/loki-discovery.json",
       "bytes": 10460,
       "sha256": "b272572b57b6cfa63cf4679341e4d35a793fb27b2ed3ceb856b798417927f2ca"
+    },
+    {
+      "path": "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json",
+      "bytes": 9716,
+      "sha256": "89f674ad3ab02afb6e70047cfa714f1e0de8625009f3c8b9171d9fb8b7e82267"
     }
   ],
   "convergence_records": [
