@@ -186,6 +186,11 @@
       "path": "evidence/artifacts/full-stack-convergence-20260921/upgrade-returned-outputs.json",
       "bytes": 17118,
       "sha256": "976c73ba79529f4636cabb5866955784230764d323c1c8a74fbe56ad4b616b4c"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/hosted-native-token-workflow.json",
+      "bytes": 45722,
+      "sha256": "ca173ead0618d0f6f49fc0da36c40d663244c2cb95bf3afc1b9069f5a5d9fe35"
     }
   ],
   "upstream_sources": [

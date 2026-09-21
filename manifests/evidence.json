@@ -6098,8 +6098,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "c5a985e01a84d59d9ac2f2c645cb9076b296508d17f40105100e9494ad41c371",
-      "bytes": 6247042
+      "sha256": "5377ef4899c87659b76a2f1e2e71ad002e2aee3900b1b7d02507ddd1c6559832",
+      "bytes": 6302226
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -8933,8 +8933,8 @@
     },
     {
       "path": "docs/full-stack-convergence.md",
-      "bytes": 10303,
-      "sha256": "a2c1a2613fe9dba03e3305866ded7411caa6d3741c39dd693866f719020a1521"
+      "bytes": 10817,
+      "sha256": "0cfb65f54fdcc308e6b97fa3ad9dcfad9d45ae0f20c3388b15970b1df8bc180c"
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/agentsview-aggregate-safe.png",
@@ -9083,8 +9083,8 @@
     },
     {
       "path": "evidence/receipts/full-stack-convergence-20260921.json",
-      "bytes": 10366,
-      "sha256": "4546eb5d6cf1e4e80fdcba360aca74a5970e0e0036e2450d28b53b24f89f055b"
+      "bytes": 10586,
+      "sha256": "8a36d10520c62486b04ab8ccbd28205f6193fdde269d47846155d59ad48b7564"
     },
     {
       "path": "recipes/native-upgrades-20260921.md",
@@ -9190,6 +9190,11 @@
       "path": "observability/backends/templates/ecosystem-ntfy-alertmanager.yml.example",
       "sha256": "718d709ce0e1748f2d9b255cba9292b5bdca286a5ead64f5ace2b9d3af49211b",
       "bytes": 962
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/hosted-native-token-workflow.json",
+      "bytes": 45722,
+      "sha256": "ca173ead0618d0f6f49fc0da36c40d663244c2cb95bf3afc1b9069f5a5d9fe35"
     }
   ],
   "convergence_records": [

@@ -121,6 +121,13 @@ test subsets passed 34, 148 and seven cases respectively. Worktrunk's native
 old/new comparison confirms the corrected child working directory; its Rust
 suite remains unrun.
 
+The [hosted clean-install result](../evidence/artifacts/full-stack-convergence-20260921/hosted-native-token-workflow.json)
+preserves the returned GitHub runner payload from the reviewed implementation:
+41 native commands, 14 checks, fresh upstream prefixes and confirmed temporary
+workspace cleanup. The source hashes still match the published harness/fixtures.
+This runs RTK, QMD, Repomix and TOON on local fixtures; it is distinct from the
+native Claude/Codex model tasks and each vendor's complete test suite.
+
 RTK's shared project estimate changed **2,337 → 2,371**, without exclusive provider
 attribution. Context Mode text mixes retained-history and conversation scopes;
 preserve raw reports and do not derive a precise combined lifetime number.
