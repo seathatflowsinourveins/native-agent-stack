@@ -5999,7 +5999,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "188606c7cc63cdfcf9d02c82de7651e2be8cb33d92c98f0919c2cc6d501fb7c1",
+      "sha256": "9327480ddc02064fa44f50589f1668600314f9d3cf8fe1c2e3999588c9f3b31b",
       "bytes": 4098213
     },
     {
@@ -6009,7 +6009,7 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "e8af66511208cc0882a302d3c893f40a42f4d77f061bf99815678795fe4309dc",
+      "sha256": "086bc8dcc964c34b7833e30867130da362302f6881eeea1f384f386d89c3e132",
       "bytes": 33632
     },
     {
