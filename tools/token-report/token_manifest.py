@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Capture native savings reports; preserve evidence without adding overlapping counters."""
 import argparse
+import base64
 from contextlib import closing
 from datetime import datetime, timezone
 import hashlib
@@ -35,7 +36,7 @@ def template_path():
     return Path(__file__).resolve().with_name("token_manifest.html.in")
 
 def render_reports(config,data):
-    source=template_path().resolve()
+    source=Path(config["html_template"]).resolve() if config.get("html_template") else template_path().resolve()
     outputs=list(dict.fromkeys(Path(p).resolve() for p in [config["output_html"]]+config.get("output_aliases",[])))
     json_path=Path(config["output_json"]).resolve()
     if source in outputs or json_path==source or json_path in outputs:
@@ -43,6 +44,13 @@ def render_reports(config,data):
     template=source.read_text()
     if template.count("__DATA__")!=1:
         raise ValueError("Expected exactly one data placeholder in the .html.in template")
+    if "__RETURNED_RESULTS_JS__" in template:
+        if template.count("__RETURNED_RESULTS_JS__")!=1:
+            raise ValueError("Expected exactly one returned-results script placeholder")
+        sidecar=Path(__file__).resolve().with_name("returned_results.js")
+        if sidecar in outputs or json_path==sidecar:
+            raise ValueError("Rendered output must not overwrite its script source")
+        template=template.replace("__RETURNED_RESULTS_JS__",sidecar.read_text())
     rendered=template.replace("__DATA__",json_script(data))
     write(json_path,json.dumps(data,ensure_ascii=False,indent=2)+"\n")
     for path in outputs:
@@ -243,10 +251,10 @@ def capture_json_source(path,run,label):
     """Retain the exact evidence read once; external receipts remain dated studies."""
     path=Path(path)
     raw=path.read_bytes()
-    payload=json.loads(raw)
     saved=Path(run)/(label+".json")
     saved.write_bytes(raw)
     saved.chmod(0o600)
+    payload=json.loads(raw)
     return dict(origin=str(path),artifact=artifact(saved),result=payload)
 
 def capture_choice_source(path,run,label):
@@ -263,6 +271,80 @@ def capture_choice_source(path,run,label):
     for comparison in captured['result'].get('comparisons',[]):
         for role in ('baseline_artifact','candidate_artifact','selected_artifact'):
             verified(comparison[role])
+    return captured
+
+RETURNED_RESULTS_FILE_LIMIT=2*1024*1024
+RETURNED_RESULTS_TOTAL_LIMIT=16*1024*1024
+
+def capture_returned_results(path,run,label):
+    """Import explicitly selected evidence without executing or discovering commands."""
+    captured=capture_json_source(path,run,label)
+    payload=captured["result"]
+    def require(condition,message):
+        if not condition:
+            raise ValueError("Returned results: "+message)
+    def text(value):
+        return isinstance(value,str) and bool(value.strip())
+    def argv(value):
+        return isinstance(value,list) and bool(value) and all(text(x) for x in value)
+    require(isinstance(payload,dict),"manifest must be an object")
+    require(type(payload.get("schema_version")) is int and payload["schema_version"]==1,"schema_version must be 1")
+    require(text(payload.get("captured_at")) and text(payload.get("scope")),"captured_at and scope are required")
+    require(isinstance(payload.get("records"),list),"records must be an array")
+    ids=set();pending=[];total=0
+    for index,record in enumerate(payload["records"]):
+        require(isinstance(record,dict),"each record must be an object")
+        for key in ("id","runtime","kind","status","boundary"):
+            require(text(record.get(key)),key+" must be a nonempty string")
+        require(record["id"] not in ids,"duplicate record id: "+record["id"])
+        ids.add(record["id"])
+        components=record.get("component_ids")
+        require(isinstance(components,list) and all(text(x) for x in components),"component_ids must be an array of strings")
+        command=record.get("command")
+        valid_command=argv(command) or (isinstance(command,dict) and (
+            argv(command.get("argv")) or (text(command.get("tool")) and isinstance(command.get("arguments"),dict))))
+        require(valid_command,"command must contain argv or a tool with arguments")
+        for key in ("started_at","completed_at"):
+            require(key in record and (record[key] is None or text(record[key])),key+" must be a string or null")
+        require(isinstance(record.get("observation"),(str,dict)),"observation must be a string or object")
+        require(isinstance(record.get("attachments"),list),"attachments must be an array")
+        labels=set()
+        for number,item in enumerate(record["attachments"]):
+            require(isinstance(item,dict),"each attachment must be an object")
+            require(text(item.get("label")) and text(item.get("path")),"attachment label and path are required")
+            require(item["label"] not in labels,"duplicate attachment label: "+item["label"])
+            labels.add(item["label"])
+            require(type(item.get("bytes")) is int and 0<=item["bytes"]<=RETURNED_RESULTS_FILE_LIMIT,"attachment exceeds 2 MiB or has invalid bytes")
+            require(isinstance(item.get("sha256"),str) and re.fullmatch(r"[0-9a-fA-F]{64}",item["sha256"]) is not None,"attachment sha256 is invalid")
+            require("mime_type" not in item or text(item["mime_type"]),"attachment mime_type must be a nonempty string")
+            total+=item["bytes"]
+            require(total<=RETURNED_RESULTS_TOTAL_LIMIT,"attachments exceed 16 MiB in total")
+            original=Path(item["path"])
+            if not original.is_absolute():
+                original=Path(path).resolve().parent/original
+            require(original.is_file(),"attachment is missing or not a regular file: "+str(original))
+            with original.open("rb") as stream:
+                raw=stream.read(RETURNED_RESULTS_FILE_LIMIT+1)
+            require(len(raw)==item["bytes"] and digest(raw)==item["sha256"].lower(),"evidence changed: "+str(original))
+            pending.append((index,number,item,original,raw))
+    destination=Path(run)/"returned-results-artifacts"
+    if pending:
+        destination.mkdir(mode=0o700)
+    for index,number,item,original,raw in pending:
+        saved=destination/f"{index:04d}-{number:04d}.bin"
+        with saved.open("xb") as stream:
+            stream.write(raw)
+        saved.chmod(0o600)
+        item.update(origin=str(original),path=str(saved),sha256=digest(raw),
+                    content_base64=base64.b64encode(raw).decode("ascii"),
+                    mime_type=item.get("mime_type","application/octet-stream"))
+        # Never trust a caller-supplied preview or download instead of source bytes.
+        item.pop("text",None)
+        try:
+            item["text"]=raw.decode("utf-8")
+        except UnicodeDecodeError:
+            pass
+    captured["imported_at"]=now()
     return captured
 
 def claude_rtk_hook_enabled(settings):
@@ -467,7 +549,8 @@ def load_config(path):
     fields=("state_dir","project","publication","catalog_index","stack_manifest","practice_guide",
             "output_html","output_json","tokenizer_module","rtk_database","headroom_events",
             "context_capture","audit_json","gap_summary","hook_evidence","fresh_e2e","native_study",
-            "retrieval_evaluation","native_installation","native_client_acceptance","native_choices")
+            "retrieval_evaluation","native_installation","native_client_acceptance","native_choices",
+            "returned_results_json","html_template")
     def resolve(value):
         expanded=os.path.expandvars(os.path.expanduser(str(value)))
         if re.search(r"\$\{?[A-Za-z_]",expanded):
@@ -532,6 +615,10 @@ def compare_artifacts(config,tool,before,after,boundary):
             "semantic_acceptance":"Not inferred. The operator-supplied boundary must describe the same task and its quality check."}
 
 def refresh(config,context_file=None):
+    scopes=config.get("counter_scopes",{})
+    if not isinstance(scopes,dict) or set(scopes)-{"rtk_global","rtk_project","headroom"} or any(
+            not isinstance(value,str) or not value.strip() for value in scopes.values()):
+        raise ValueError("counter_scopes must map selected counter keys to nonempty scope strings")
     root=Path(config["state_dir"])
     root.mkdir(parents=True,exist_ok=True,mode=0o700)
     run=root/"captures"/(datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S")+"-"+uuid.uuid4().hex[:8])
@@ -540,9 +627,9 @@ def refresh(config,context_file=None):
     issues=[];commands=[]
     try:
         for label,tool,scope,argv,boundary in [
-          ("rtk-global","rtk","Native / all retained projects",[config.get("rtk"),"gain","--format","json"],"Native retained-history estimate. Global includes project counters; retention depends on the selected installation."),
-          ("rtk-project","rtk","Native / project "+config["project"],[config.get("rtk"),"gain","--project","--format","json"],"Native estimates for this working directory only; already included in global."),
-          ("headroom","headroom","Native / last 30 days",[config.get("headroom"),"savings","--json"],"Upstream field named lifetime is capped at 30 days in version 0.37.0; local offline guards do not append native events.")]:
+          ("rtk-global","rtk",scopes.get("rtk_global","Native / all retained projects"),[config.get("rtk"),"gain","--format","json"],"Native retained-history estimate. Global includes project counters; retention depends on the selected installation."),
+          ("rtk-project","rtk",scopes.get("rtk_project","Native / project "+config["project"]),[config.get("rtk"),"gain","--project","--format","json"],"Native estimates for this working directory only; already included in global."),
+          ("headroom","headroom",scopes.get("headroom","Native / last 30 days"),[config.get("headroom"),"savings","--json"],"Upstream field named lifetime is capped at 30 days in version 0.37.0; local offline guards do not append native events.")]:
             if not argv[0]:
                 continue
             r=capture(argv,config["project"],run,label);commands.append(r)
@@ -606,11 +693,11 @@ def refresh(config,context_file=None):
             for component in gaps.get("components",[]):
                 component["operation_ids"]=["gap-"+identifier for identifier in component.get("operation_ids",[])]
         extra={}
-        for label,key in [("hook-evidence","hook_evidence"),("fresh-e2e","fresh_e2e"),("native-study","native_study"),("retrieval-evaluation","retrieval_evaluation"),("native-installation","native_installation"),("native-client-acceptance","native_client_acceptance"),("native-choices","native_choices")]:
+        for label,key in [("hook-evidence","hook_evidence"),("fresh-e2e","fresh_e2e"),("native-study","native_study"),("retrieval-evaluation","retrieval_evaluation"),("native-installation","native_installation"),("native-client-acceptance","native_client_acceptance"),("native-choices","native_choices"),("returned-results","returned_results_json")]:
             if config.get(key):
                 try:
-                    loader=capture_choice_source if key=='native_choices' else capture_json_source
-                    extra[key]=loader(config[key],run,label)
+                    loader=capture_returned_results if key=='returned_results_json' else capture_choice_source if key=='native_choices' else capture_json_source
+                    extra["returned_results" if key=='returned_results_json' else key]=loader(config[key],run,label)
                 except (OSError,ValueError) as exc:
                     issues.append(label+": "+str(exc))
         fresh=extra.get("fresh_e2e",{}).get("result")
