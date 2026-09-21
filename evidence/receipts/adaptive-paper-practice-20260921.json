@@ -7,7 +7,7 @@
   "limitations": [
     "The new adaptive paper trial did not start because the regular session was closed; prior SPY smoke remains separate evidence.",
     "Capacity uses immediate synthetic fills, not broker throughput, profitable alpha or market-session strategy validation.",
-    "Observed Trading API limit is 200 requests/minute; entries cap at180 and leverage at1x. Elite1000 is unqualified.",
+    "Observed Trading API limit is 200 requests/minute; all order submissions share a 180/minute cap and leverage is capped at1x. Elite1000 is unqualified.",
     "News is capped and advisory; native broker fault induction, signal parity and continuous operation remain open."
   ],
   "native_evidence": "blueprints/us-equities/adaptive-paper/receipt.json",

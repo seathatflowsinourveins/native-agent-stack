@@ -2595,7 +2595,7 @@
       "limitations": [
         "The new adaptive paper trial did not start because the regular session was closed; prior SPY smoke remains separate evidence.",
         "Capacity uses immediate synthetic fills, not broker throughput, profitable alpha or market-session strategy validation.",
-        "Observed Trading API limit is 200 requests/minute; entries cap at180 and leverage at1x. Elite1000 is unqualified.",
+        "Observed Trading API limit is 200 requests/minute; all order submissions share a 180/minute cap and leverage is capped at1x. Elite1000 is unqualified.",
         "News is capped and advisory; native broker fault induction, signal parity and continuous operation remain open."
       ],
       "path": "evidence/receipts/adaptive-paper-practice-20260921.json"
@@ -4731,7 +4731,7 @@
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
       "bytes": 429746,
-      "sha256": "86e49c4250f44b788a25ae5eb717d379e3ed2b78c3009df82a9c47ec447e365e"
+      "sha256": "7ab394f205e4ebcdfbadaa53b8b5473864e24d545cc9aed8b6c555d5a1d19be4"
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -6330,8 +6330,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 7434393,
-      "sha256": "659243a4030da04cb3eb2b248fe7a78299fac7dde31b578865ab6c8d1152a4bf"
+      "bytes": 7434689,
+      "sha256": "7a6e006269477153d6146463000bd71e590080c2cb4b613753ae1b1351a194a9"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -9800,8 +9800,8 @@
     },
     {
       "path": "evidence/receipts/adaptive-paper-practice-20260921.json",
-      "bytes": 1088,
-      "sha256": "6d38bac9e44fdc67cde776ab8d04019b5f8ca0f8624bd01e555b2af279d673ba"
+      "bytes": 1125,
+      "sha256": "f8d965b15517bfc7de9bc5f80b7dd328b1f19dff48b4508ac53531819a1c02a8"
     },
     {
       "path": "tests/test_adaptive_market_research.py",

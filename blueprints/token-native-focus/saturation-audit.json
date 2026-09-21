@@ -1006,11 +1006,6 @@
             "kind": "native_cli_e2e"
           },
           {
-            "id": "claude-foundation-finalization-20260921",
-            "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
-            "kind": "native_model_e2e"
-          },
-          {
             "id": "portable-userspace-install-20260921",
             "path": "evidence/receipts/portable-userspace-install-20260921.json",
             "kind": "native_cli_e2e"
@@ -5034,7 +5029,7 @@
     },
     {
       "component_id": "repomix",
-      "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.0",
+      "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
       "version": "1.18.1",
       "profile": "supporting",
       "role": "Explicit repository packing and structural compression",
@@ -5051,6 +5046,11 @@
       },
       "functional_evidence": {
         "public_receipts": [
+          {
+            "id": "claude-foundation-finalization-20260921",
+            "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
+            "kind": "native_model_e2e"
+          },
           {
             "id": "portable-userspace-install-20260921",
             "path": "evidence/receipts/portable-userspace-install-20260921.json",
