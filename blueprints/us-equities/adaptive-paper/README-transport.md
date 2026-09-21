@@ -74,6 +74,9 @@ Missing or invalid per-symbol quotes are returned as sanitized `quote_errors`
 alongside the valid quotes, preserving clock/account/asset readiness evidence
 after hours. The caller still requires valid fresh benchmark and execution quotes
 before admitting any order; a closed-session report is not paper execution.
+The clock includes `received_at_ns`, captured immediately after its GET, so
+later asset requests do not contaminate clock-offset checks. Transport quote
+checks use the same 250 ms future-timestamp tolerance as the safety layer.
 
 ## Upstream constraints and benchmark interpretation
 

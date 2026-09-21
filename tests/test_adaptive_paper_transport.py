@@ -161,12 +161,14 @@ class HTTPBoundary(unittest.TestCase):
         def request(method, url, **kwargs):
             self.assertEqual(method, "GET")
             return response(payloads[t.urlsplit(url).path])
-        with patch("requests.Session.request", side_effect=request):
+        received_at_ns = t.timestamp_ns("2026-09-21T15:00:00.123456789Z")
+        with patch("requests.Session.request", side_effect=request), patch.object(t.time, "time_ns", return_value=received_at_ns):
             result = t.preflight("fixture-key", "fixture-secret", ["SPY"], before_request=self.budget)
         self.assertEqual(len(result["account_identity_sha256"]), 64)
         self.assertNotIn("fixture-account-id", json.dumps(result))
         self.assertTrue(result["open_orders_complete"])
         self.assertEqual(result["orders"], [])
+        self.assertEqual(result["clock"]["received_at_ns"], received_at_ns)
         self.assertEqual([c.args[0] for c in self.budget.call_args_list], ["read"] * 5 + ["data_read"])
 
     def test_closed_preflight_preserves_clock_with_invalid_and_missing_quotes(self):
@@ -272,6 +274,15 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
             with self.assertRaises(t.SubmissionNotSent):
                 await self.port.submit(intent())
         request.assert_not_called()
+
+    async def test_wire_future_quote_tolerance_matches_risk_layer(self):
+        now = time.time_ns()
+        with patch.object(t.time, "time_ns", return_value=now):
+            self.port._quote_values["SPY"]["ts_ns"] = now + 250_000_000
+            self.port._wire_guard(intent())
+            self.port._quote_values["SPY"]["ts_ns"] = now + 251_000_000
+            with self.assertRaises(t.SubmissionNotSent):
+                self.port._wire_guard(intent())
 
     async def test_replayed_id_cannot_change_intent(self):
         self.port.adopt_intents([intent()])

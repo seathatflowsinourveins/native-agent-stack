@@ -246,6 +246,7 @@ def preflight(api_key, secret_key, symbols, *, before_request, request_observer=
         import hashlib
         identity = hashlib.sha256(str(raw_account["id"]).encode()).hexdigest()
         clock = trading.get_clock()
+        clock_received_at_ns = time.time_ns()
         positions = [{"symbol": p["symbol"], "qty": decimal_string(p["qty"]),
                       "avg_entry_price": decimal_string(p["avg_entry_price"])}
                      for p in trading.get_all_positions()]
@@ -270,6 +271,7 @@ def preflight(api_key, secret_key, symbols, *, before_request, request_observer=
                 quote_errors[symbol] = "invalid_quote"
         return {"account": account, "account_identity_sha256": identity,
                 "clock": {"is_open": bool(clock["is_open"]),
+                "received_at_ns": clock_received_at_ns,
                 "timestamp_ns": timestamp_ns(clock["timestamp"]), "next_close_ns": timestamp_ns(clock["next_close"]),
                 "next_open_ns": timestamp_ns(clock["next_open"])},
                 "positions": positions, "orders": orders, "open_orders_complete": len(raw_orders) < 500,
@@ -494,7 +496,7 @@ class AlpacaPaperTransport:
         # Runs after a possibly delayed budget reservation, immediately before POST.
         quote = self._quote_values.get(order.get("symbol"))
         if (self._stopping or not self._started or quote is None
-                or not -1 <= (time.time_ns() - quote["ts_ns"]) / 1e9 <= self.quote_timeout
+                or not -0.25 <= (time.time_ns() - quote["ts_ns"]) / 1e9 <= self.quote_timeout
                 or (order.get("side") == "buy" and not self.ready)):
             raise SubmissionNotSent("quote or stream readiness changed before submission")
 
@@ -551,7 +553,7 @@ class AlpacaPaperTransport:
                     if quote["symbol"] not in self.symbols:
                         raise TransportError("unexpected quote symbol")
                     age = (time.time_ns() - quote["ts_ns"]) / 1e9
-                    if not -1.0 <= age <= self.quote_timeout:
+                    if not -0.25 <= age <= self.quote_timeout:
                         if quote["symbol"] in self.required_quote_symbols:
                             self.freeze_health("quote_timestamp_stale")
                         continue
