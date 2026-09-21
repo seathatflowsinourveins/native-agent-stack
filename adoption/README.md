@@ -51,6 +51,12 @@ A prerequisite report exits 0 when the selected prerequisites are present, 2 whe
 
 Set `PYTHON_BIN` to the selected Python 3.13 interpreter. Dedicated native installations may deliberately be absent from `PATH`; use a session-local `PATH` containing only the selected installation directories when running the report. The accepted Dagu and .NET installs use explicit paths in their recipes. Missing command discovery does not mean those binaries are absent from disk.
 
+For Loki on Linux x86-64, the report checks `loki` first, then the upstream archive's
+`loki-linux-amd64` basename on that same `PATH`, following [Grafana's manual installation](https://grafana.com/docs/loki/latest/setup/install/local/).
+It neither renames the binary nor executes it; executable presence still does not
+establish its version, configuration or service health. Other platforms do not use
+this Linux x86-64 fallback.
+
 For native account readiness, select explicit `NATIVE_CODEX_HOME`, `NATIVE_CODEX_BIN`, `RESEARCH_WORKSPACE` and a new private receipt filename; then use [the worker inspect command](../blueprints/us-equities/workers/README.md). If sign-in is needed:
 
 ```sh

@@ -21,6 +21,9 @@ from urllib.parse import urlsplit
 
 SHA = re.compile(r"[0-9a-f]{40}\Z")
 NAME = re.compile(r"[a-zA-Z0-9][a-zA-Z0-9_.-]*\Z")
+# Grafana's Linux x86-64 archive keeps this basename after extraction:
+# https://grafana.com/docs/loki/latest/setup/install/local/
+COMMAND_ALIASES = {("loki", "linux", "x86_64"): ("loki-linux-amd64",)}
 LIMITATIONS = [
     "Executable presence does not verify its version, installation integrity, activation, or E2E behavior.",
     "Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.",
@@ -141,6 +144,14 @@ def git_revision(root: Path) -> str | None:
     return None
 
 
+def command_present(name: str, host: dict) -> bool:
+    """Check PATH only, preferring the conventional name; never run candidates."""
+    if shutil.which(name) is not None:
+        return True
+    aliases = COMMAND_ALIASES.get((name, host["os"], host["architecture"]), ())
+    return any(shutil.which(alias) is not None for alias in aliases)
+
+
 def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[str] | None = None) -> dict:
     manifest = manifest.absolute()
     root = (root or manifest.parent.parent).resolve()
@@ -169,7 +180,7 @@ def inspect_adoption(manifest: Path, root: Path | None = None, profiles: list[st
                             for item in data["supported_platforms"])
     for identifier in selected:
         profile = by_id[identifier]
-        commands = [{"name": name, "present": shutil.which(name) is not None}
+        commands = [{"name": name, "present": command_present(name, host)}
                     for name in profile["required_commands"]]
         recipes = [{"path": reference, "present": recipe_path(root, reference).is_file()}
                    for reference in profile["recipe_paths"]]

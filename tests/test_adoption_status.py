@@ -4,6 +4,7 @@ import contextlib
 import io
 import json
 from pathlib import Path
+from shutil import which as native_which
 import subprocess
 import tempfile
 import unittest
@@ -62,6 +63,62 @@ class AdoptionStatusTests(unittest.TestCase):
         self.assertEqual(result["status"], "prerequisites_missing")
         self.assertFalse(result["profiles"][0]["commands"][0]["present"])
         self.assertFalse(result["profiles"][0]["recipes"][0]["present"])
+
+    def prepare_loki_check(self):
+        self.manifest["profiles"][0].update(required_commands=["loki"], component_ids=["loki"])
+        self.save()
+        directory = self.root / "bin"
+        directory.mkdir()
+        self.enter.enter_context(patch.dict("os.environ", {"PATH": str(directory)}))
+        self.which.side_effect = native_which
+        return directory
+
+    def test_loki_archive_basename_is_presence_only_without_execution(self):
+        directory = self.prepare_loki_check()
+        marker = self.root / "must-not-run"
+        executable = directory / "loki-linux-amd64"
+        executable.write_text(f"#!/bin/sh\nprintf executed > '{marker}'\n")
+        executable.chmod(0o755)
+        with patch("scripts.adoption_status.subprocess.run") as run:
+            result = self.inspect()
+        self.assertEqual(result["status"], "prerequisites_present")
+        self.assertEqual(result["profiles"][0]["commands"], [{"name": "loki", "present": True}])
+        self.assertFalse(result["runtime_acceptance_verified"])
+        self.assertFalse(marker.exists())
+        self.assertNotIn(str(directory), json.dumps(result))
+        run.assert_not_called()
+
+    def test_conventional_loki_name_is_preferred(self):
+        directory = self.prepare_loki_check()
+        for name in ("loki", "loki-linux-amd64"):
+            executable = directory / name
+            executable.write_text("#!/bin/sh\nexit 1\n")
+            executable.chmod(0o755)
+        self.assertEqual(self.inspect()["status"], "prerequisites_present")
+        self.which.assert_called_once_with("loki")
+
+    def test_loki_archive_for_another_host_is_not_accepted(self):
+        directory = self.prepare_loki_check()
+        executable = directory / "loki-linux-amd64"
+        executable.write_text("#!/bin/sh\nexit 1\n")
+        executable.chmod(0o755)
+        for system, machine in (("Darwin", "x86_64"), ("Windows", "AMD64"), ("Linux", "aarch64")):
+            with self.subTest(system=system, machine=machine), \
+                    patch("scripts.adoption_status.platform.system", return_value=system), \
+                    patch("scripts.adoption_status.platform.machine", return_value=machine):
+                self.assertFalse(self.inspect()["profiles"][0]["commands"][0]["present"])
+
+    def test_loki_missing_or_nonexecutable_archive_is_not_present(self):
+        directory = self.prepare_loki_check()
+        executable = directory / "loki-linux-amd64"
+        for exists in (False, True):
+            with self.subTest(file_exists=exists):
+                if exists:
+                    executable.write_text("not an executable\n")
+                    executable.chmod(0o644)
+                result = self.inspect()
+                self.assertEqual(result["status"], "prerequisites_missing")
+                self.assertFalse(result["profiles"][0]["commands"][0]["present"])
 
     def test_unknown_profile_fails_without_probing_commands(self):
         result = self.inspect(["unknown"])
