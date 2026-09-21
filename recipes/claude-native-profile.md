@@ -17,6 +17,10 @@ retains all sixteen layers and their actual acceptance boundaries. Installation,
 native discovery, task correctness, interactive behavior and measured efficiency
 are separate results.
 
+Use the [native dashboard access guide](../docs/native-dashboards.md) for the
+installed upstream observation interfaces, passwordless loopback setup and
+actual browser/API results. Hosted Insight enrollment is separate.
+
 ## Native installation and terminal entry
 
 Reuse a working native installation. For a new Linux/WSL machine, follow the

@@ -86,7 +86,7 @@
     },
     {
       "id": 4,
-      "title": "HTTP response status (401 expected for Dagu)",
+      "title": "HTTP response status (200 expected for local Dagu)",
       "type": "table",
       "datasource": {
         "uid": "ecosystem-prometheus"
