@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-21",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "9faeb859cae8f46fabaa9ba1ee4a80e897978ba6",
+  "source_revision": "8e40a506b4a1bbc7ac17fafdcaed18fb90bd80c6",
   "layers": [
     {
       "id": "agents",
