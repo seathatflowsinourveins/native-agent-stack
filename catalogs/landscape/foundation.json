@@ -1,0 +1,335 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-21",
+  "scope": "Current foundation choices across all 16 canonical layers. Reasons describe fit for the accepted native workload, not universal superiority. This is a reconciliation of pinned source reviews and retained executions at base fb04bf702ea67b14163405f0ebe132e393ebbd8a; it performs no new installation, model run or comparative benchmark. Selected means retained for its stated role, not mandatory activation in every task. Unqualified and conditional alternatives have not failed a test merely because they are not adopted.",
+  "layers": [
+    {
+      "catalog": "foundation",
+      "layer_id": "native-clients",
+      "title": "Native clients",
+      "requirement": "Run coding and bounded research with existing native accounts, client tools, model choices and resumable sessions.",
+      "current_choice": "Native Codex and Claude Code; application SDKs only for a demonstrated application requirement.",
+      "decision": "retain",
+      "rationale": "Both clients have returned native source-task and continuation evidence and preserve the existing account and tool surfaces. Replacing them with an API framework adds an application-owned runtime without a demonstrated gap in these bounded tasks.",
+      "evidence_refs": ["docs/foundation-closure-20260921.md", "docs/full-stack-convergence.md", "catalogs/foundation/decisions.json"],
+      "limitations": ["The recorded tasks do not establish a comparative model-quality ranking or causal provider savings.", "Same-session continuation does not establish every crash, provider cancellation or cross-host recovery condition."],
+      "overturn_when": "A required structured-event, custom-tool or application state capability is unavailable through the native path and a supported SDK implementation passes the same task, account, effect and recovery checks.",
+      "candidates": [
+        {"name": "Codex", "repository": "https://github.com/openai/codex", "disposition": "selected", "rationale": "Actual native tasks and session recovery exist; retain native account, tools and model selection.", "evidence_kind": "native_execution", "evidence_refs": ["docs/full-stack-convergence.md", "catalogs/foundation/decisions.json"]},
+        {"name": "Claude Code", "repository": "https://github.com/anthropics/claude-code", "disposition": "selected", "rationale": "Native task, interactive usage/HUD and manual compaction observations qualify the current client path within their recorded scope.", "evidence_kind": "native_execution", "evidence_refs": ["docs/foundation-closure-20260921.md"]},
+        {"name": "OpenAI Agents SDK", "repository": "https://github.com/openai/openai-agents-python", "disposition": "conditional", "rationale": "Fits an application-owned API agent; it is not a substitute for the established subscription-backed native Codex account and behavior.", "evidence_kind": "source_review", "evidence_refs": ["docs/foundation-closure-20260921.md", "catalogs/us-equities/agents-operations.json"]},
+        {"name": "Claude Agent SDK", "repository": "https://github.com/anthropics/claude-agent-sdk-python", "disposition": "conditional", "rationale": "Use when application orchestration specifically needs its supported structured interface and authentication route; no current bounded-task replacement need was demonstrated.", "evidence_kind": "source_review", "evidence_refs": ["docs/foundation-closure-20260921.md"]},
+        {"name": "Letta Code", "repository": "https://github.com/letta-ai/letta-code", "disposition": "unqualified", "rationale": "A separate memory-aware coding architecture is credible, but its task quality and migration costs have not been compared against these native clients.", "evidence_kind": "source_review", "evidence_refs": ["docs/memory-landscape-maintenance.md"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "instructions-skills",
+      "title": "Instructions and skills",
+      "requirement": "Give each task concise canonical rules and useful upstream procedures without activating whole instruction or plugin catalogs.",
+      "current_choice": "Selected ECC search-first/iterative-retrieval skills, native project instructions, on-demand references and the optional Agent Skills reference validator.",
+      "decision": "retain",
+      "rationale": "The two selected ECC skills have recorded matching hashes and native discovery. Their bounded roles fit existing practice; importing complete hooks, rules or agent packs creates overlapping policies without measured benefit.",
+      "evidence_refs": ["docs/foundation-closure-20260921.md", "catalogs/foundation/community-practice-20260920.json", "catalogs/foundation/decisions.json"],
+      "limitations": ["The community-practice review records no measured task-quality improvement or provider-cost change.", "Reference format validation does not establish support for every client extension or successful activation."],
+      "overturn_when": "A specific task exposes a missing procedure, and a pinned candidate works in native discovery and task execution with less conflict or better measured results than the current procedure.",
+      "candidates": [
+        {"name": "ECC selected skills", "repository": "https://github.com/affaan-m/ECC", "disposition": "selected", "rationale": "Reuse the two accepted on-demand skills. The whole hooks/rules bundle is not selected, and its older fixed-thinking/model guidance is not imported.", "evidence_kind": "mixed", "evidence_refs": ["docs/foundation-closure-20260921.md", "catalogs/foundation/community-practice-20260920.json"]},
+        {"name": "Agent Skills reference tools", "repository": "https://github.com/agentskills/agentskills", "disposition": "selected", "rationale": "Provides the accepted optional portable format check; it is a reference validator, not the authority for native client-specific extensions.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json"]},
+        {"name": "Shan Claude best practice", "repository": "https://github.com/shanraisshan/claude-code-best-practice", "disposition": "conditional", "rationale": "Useful native-format/worktree/review references; selected embedded examples use older model names and do not justify a wholesale workflow replacement.", "evidence_kind": "source_review", "evidence_refs": ["docs/foundation-closure-20260921.md"]},
+        {"name": "Claude Code Templates", "repository": "https://github.com/davila7/claude-code-templates", "disposition": "conditional", "rationale": "Retain as an on-demand source of a specifically needed template, not an automatic installation of all agents or hooks.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/foundation/decisions.json", "catalogs/foundation/community-practice-20260920.json"]},
+        {"name": "VoltAgent subagent collection", "repository": "https://github.com/voltagent/awesome-claude-code-subagents", "disposition": "overlap", "rationale": "Role discovery is useful, but the existing bounded native workers already cover current work; broad agent imports have no demonstrated advantage.", "evidence_kind": "source_review", "evidence_refs": ["docs/foundation-closure-20260921.md", "catalogs/foundation/community-practice-20260920.json"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "workers",
+      "title": "Workers and task ownership",
+      "requirement": "Delegate bounded independent work, preserve owned edits and actual failed results, and integrate only after relevant review.",
+      "current_choice": "Native Claude/Codex workers with owned Worktrunk worktrees; Beads for a real dependency queue and optional cross-client review when qualified.",
+      "decision": "keep_but_compare",
+      "rationale": "Native writing, review and selected-child recovery have returned evidence without another orchestration runtime. Worktrunk's actual old/new comparison corrected child working-directory behavior. Durable cross-host effects would require a different acceptance boundary.",
+      "evidence_refs": ["docs/full-stack-convergence.md", "docs/foundation-convergence-20260921.md", "docs/foundation-rd-readiness.md", "catalogs/foundation/decisions.json"],
+      "limitations": ["Graceful native Workflow resume is separate from the systemd child-crash fixture; neither transfers every hard-crash guarantee to the other.", "The restricted reviewer tool profile is not the accepted inherited-tool lane. The older companion backend acceptance does not certify every outer plugin invocation."],
+      "overturn_when": "A real task needs durable multi-host state, approval waits or effect recovery beyond native workers, and one challenger passes frozen cancellation, replay, ownership and integration cases.",
+      "candidates": [
+        {"name": "Claude native workers", "repository": "https://github.com/anthropics/claude-code", "disposition": "selected", "rationale": "Owned native children and graceful workflow recovery have actual retained results; use the qualified role/tool configuration.", "evidence_kind": "native_execution", "evidence_refs": ["docs/foundation-convergence-20260921.md", "catalogs/foundation/decisions.json"]},
+        {"name": "Codex native workers", "repository": "https://github.com/openai/codex", "disposition": "selected", "rationale": "Preserves the proven native worker/account path and independent review without adding a router.", "evidence_kind": "native_execution", "evidence_refs": ["docs/full-stack-convergence.md", "docs/foundation-rd-readiness.md"]},
+        {"name": "Worktrunk", "repository": "https://github.com/max-sixty/worktrunk", "disposition": "selected", "rationale": "Accepted disposable worktree lifecycle and a native old/new working-directory fix support owned writing checkouts; the Rust suite was not run in that upgrade wave.", "evidence_kind": "measured_comparison", "evidence_refs": ["docs/full-stack-convergence.md", "docs/token-native-saturation.md"]},
+        {"name": "Beads", "repository": "https://github.com/gastownhall/beads", "disposition": "conditional", "rationale": "The accepted scoped queue helps dependency-aware work; simple tasks do not require a new queue or database.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json"]},
+        {"name": "LangGraph", "repository": "https://github.com/langchain-ai/langgraph", "disposition": "conditional", "rationale": "Explicit application state/checkpoints are valuable when a real branch/review/resume requirement exceeds the bounded native path; that need has not displaced it.", "evidence_kind": "source_review", "evidence_refs": ["docs/foundation-closure-20260921.md", "docs/foundation-rd-readiness.md"]},
+        {"name": "Temporal", "repository": "https://github.com/temporalio/temporal", "disposition": "unqualified", "rationale": "A credible durable multi-host escalation, but no corresponding local task/effect comparison establishes that its operational cost is warranted here.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/hosting-source-review.json", "docs/foundation-rd-readiness.md"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "isolation",
+      "title": "Isolation",
+      "requirement": "Separate edits and apply a real filesystem/network boundary only where the selected task requires enforced restrictions.",
+      "current_choice": "Worktrunk/Git worktrees for edit ownership, sandbox-runtime for qualified Linux restrictions, and platform-specific Apple Container use only on an eligible host.",
+      "decision": "retain",
+      "rationale": "These mechanisms cover different requirements: worktrees separate changes, while accepted sandbox profiles enforce selected access rules. A managed VM or OCI platform adds a separate deployment boundary that the bounded native workload does not currently need.",
+      "evidence_refs": ["catalogs/foundation/decisions.json", "catalogs/us-equities/hosting-source-review.json", "docs/token-native-saturation.md"],
+      "limitations": ["A worktree is not a security sandbox. Ordinary native or Dagu processes are not automatically sandboxed.", "Selected access/network fixtures do not certify hostile workloads, resource limits or unsupported platforms."],
+      "overturn_when": "Untrusted code or a deployment target requires a stronger VM/OCI boundary, and the selected alternative passes workload, network, resource, cleanup and host compatibility checks.",
+      "candidates": [
+        {"name": "Worktrunk", "repository": "https://github.com/max-sixty/worktrunk", "disposition": "selected", "rationale": "Native worktree lifecycle evidence supports separate writing ownership without claiming security isolation.", "evidence_kind": "native_execution", "evidence_refs": ["docs/token-native-saturation.md"]},
+        {"name": "sandbox-runtime", "repository": "https://github.com/anthropics/sandbox-runtime", "disposition": "selected", "rationale": "Retain the small installed native layer with explicit accepted read/write/network profiles before operating another sandbox service.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json", "catalogs/us-equities/hosting-source-review.json"]},
+        {"name": "Apple Container", "repository": "https://github.com/apple/container", "disposition": "conditional", "rationale": "A platform-specific volume/container case is accepted; it is not a portable replacement for the Linux/WSL profile.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json", "docs/token-native-saturation.md"]},
+        {"name": "gVisor", "repository": "https://github.com/google/gvisor", "disposition": "unqualified", "rationale": "A stronger OCI application-kernel boundary is relevant for hostile container code, but needs an OCI workload and separate platform acceptance absent from the current native path.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/hosting-source-review.json"]},
+        {"name": "E2B", "repository": "https://github.com/e2b-dev/E2B", "disposition": "conditional", "rationale": "A separate VM and managed lifecycle can fit untrusted generated research code; no current requirement or comparative acceptance justifies substituting it for local scoped execution.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/agents-operations.json"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "code-navigation",
+      "title": "Code navigation",
+      "requirement": "Retrieve exact source and references for changes with a conceptual or structural index only when it answers the actual question.",
+      "current_choice": "Focused source reads, Serena symbols, ast-grep, scoped codebase-memory and jCodeMunch; SocratiCode handles conceptual search in the semantic layer.",
+      "decision": "retain",
+      "rationale": "The selected lanes have scoped exact-retrieval/native-client evidence and distinct roles. Another code graph is not preferred merely for advertised speed; known source can be cheaper than an indexed round trip.",
+      "evidence_refs": ["catalogs/foundation/decisions.json", "docs/token-native-saturation.md", "catalogs/us-equities/foundation-memory.json"],
+      "limitations": ["Compressed structure and symbol indexes omit implementation details; correctness still requires original source.", "No representative cross-repository or cross-language benchmark establishes a global best code retriever."],
+      "overturn_when": "A sealed task set in the target languages shows a challenger returning more correct source/references at an acceptable total indexing, retrieval and maintenance cost.",
+      "candidates": [
+        {"name": "Serena", "repository": "https://github.com/oraios/serena", "disposition": "selected", "rationale": "Accepted symbol-body/reference retrieval fits exact edits and complements conceptual search.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json"]},
+        {"name": "ast-grep", "repository": "https://github.com/ast-grep/ast-grep", "disposition": "selected", "rationale": "Native structural matching is retained for syntax-shaped questions that exact text search does not express.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json"]},
+        {"name": "codebase-memory-mcp", "repository": "https://github.com/DeusData/codebase-memory-mcp", "disposition": "selected", "rationale": "The accepted scoped static graph covers selected gaps in language-server support; avoid redundant full indexes.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json", "catalogs/us-equities/foundation-memory.json"]},
+        {"name": "jCodeMunch", "repository": "https://github.com/jgravelle/jcodemunch-mcp", "disposition": "selected", "rationale": "Exact indexed retrieval and both-client acceptance support bounded use. Its bytes-avoided estimate is not provider savings.", "evidence_kind": "native_execution", "evidence_refs": ["docs/token-native-saturation.md", "docs/full-stack-convergence.md"]},
+        {"name": "CodeGraph", "repository": "https://github.com/colbymchenry/codegraph", "disposition": "unqualified", "rationale": "A credible local semantic-graph alternative; its speed/completeness claims need a target-language comparison before replacing the accepted symbol and graph lanes.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/star-audit.json"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "document-retrieval",
+      "title": "Documents and ingestion",
+      "requirement": "Find source-grounded Markdown/document content with controlled ingestion and retrieve the original body before relying on a result.",
+      "current_choice": "Scoped QMD BM25; Context Hub for selected developer docs; MarkItDown HTML and Poppler PDF conversion in their accepted scopes.",
+      "decision": "keep_but_compare",
+      "rationale": "QMD's 12-query diagnostic gave BM25 and hybrid equal recall@3/5 with reported average latency of 5 ms versus 10,328 ms. This supports the simple default on that workload. Lightweight accepted conversion precedes a larger OCR/layout platform.",
+      "evidence_refs": ["docs/foundation-rd-readiness.md", "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json", "catalogs/foundation/decisions.json"],
+      "limitations": ["The QMD diagnostic used one ordered run and an incompletely sealed expanded index; it is not a general retrieval ranking.", "HTML/PDF fixtures do not qualify arbitrary Office documents, scans, tables or filing layouts. Context Hub's retained size comparison grew by 85 tokens."],
+      "overturn_when": "A sealed representative corpus/query set shows useful quality gains with acceptable repeated end-to-end latency, or layout/OCR failures justify a separately qualified parser.",
+      "candidates": [
+        {"name": "QMD BM25", "repository": "https://github.com/tobi/qmd", "disposition": "selected", "rationale": "Native search/get works and the retained four-mode diagnostic did not justify hybrid's greater latency. Equal recall in one run does not prove universal dominance.", "evidence_kind": "measured_comparison", "evidence_refs": ["evidence/artifacts/foundation-rd-20260921/qmd-comparison.json", "docs/foundation-rd-readiness.md"]},
+        {"name": "Context Hub", "repository": "https://github.com/andrewyng/context-hub", "disposition": "selected", "rationale": "Retain selected upstream documentation retrieval; the measured artifact grew by 85 tokens, so selection rests on useful content rather than guaranteed compression.", "evidence_kind": "mixed", "evidence_refs": ["docs/token-native-saturation.md", "catalogs/foundation/decisions.json"]},
+        {"name": "MarkItDown", "repository": "https://github.com/microsoft/markitdown", "disposition": "selected", "rationale": "The installed lightweight HTML lane passed its selected conversion; do not infer uninstalled extras or OCR acceptance.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json"]},
+        {"name": "Poppler", "repository": "https://github.com/tsdgeos/poppler_mirror", "disposition": "selected", "rationale": "Retain the separate native PDF fixture evidence without extending it to every scanned or table-heavy document.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json"]},
+        {"name": "Docling", "repository": "https://github.com/docling-project/docling", "disposition": "conditional", "rationale": "Preferred source-reviewed layout candidate when a real filing/layout requirement exceeds lightweight conversion; target-document quality must be measured first.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/foundation-memory.json"]},
+        {"name": "LlamaIndex", "repository": "https://github.com/run-llama/llama_index", "disposition": "conditional", "rationale": "Targeted connectors can close an ingestion gap; a broad dependency bundle is not needed for current scoped Markdown retrieval.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/foundation-memory.json"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "semantic-rag",
+      "title": "Semantic code retrieval",
+      "requirement": "Answer conceptual code questions using a scoped local index and a compatible embedding service, with recoverable state.",
+      "current_choice": "SocratiCode, Qdrant and the accepted vLLM/Nemotron embedding runtime; use exact source navigation after retrieval.",
+      "decision": "keep_but_compare",
+      "rationale": "The existing watcher, actual embedding inference, selected queries and restored state are qualified together. Replacing a working vector store or server has no demonstrated advantage on this project's workload.",
+      "evidence_refs": ["docs/full-stack-convergence.md", "docs/hf-memory-model-qualification.md", "docs/native-memory-rag-lifecycle.md", "catalogs/us-equities/foundation-memory.json"],
+      "limitations": ["Four paired upstream examples first-ranked correctly establish compatibility, not a held-out domain or cross-model benchmark.", "The vLLM compatibility pin is host-specific; the retained newer-version initialization failure is not a failure of other serving repositories."],
+      "overturn_when": "A sealed project/domain retrieval set shows improved source-grounded quality and acceptable latency, memory and lifecycle costs, or a supported target model cannot run in the current service.",
+      "candidates": [
+        {"name": "SocratiCode", "repository": "https://github.com/giancarloerra/SocratiCode", "disposition": "selected", "rationale": "Retain the accepted automatic project index and conceptual query path rather than duplicate it with another graph/search service.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json", "docs/native-memory-rag-lifecycle.md"]},
+        {"name": "Qdrant", "repository": "https://github.com/qdrant/qdrant", "disposition": "selected", "rationale": "The native service is already integrated with this embedder and has scoped query and restore evidence.", "evidence_kind": "native_execution", "evidence_refs": ["docs/native-memory-rag-lifecycle.md", "catalogs/foundation/decisions.json"]},
+        {"name": "vLLM", "repository": "https://github.com/vllm-project/vllm", "disposition": "selected", "rationale": "Retain the working WSL compatibility pin with real 2,048-dimensional Nemotron inference; version 0.29.0's initialization failure is retained separately.", "evidence_kind": "mixed", "evidence_refs": ["docs/full-stack-convergence.md", "docs/token-native-saturation.md"]},
+        {"name": "pgvector", "repository": "https://github.com/pgvector/pgvector", "disposition": "conditional", "rationale": "Useful for an application that already needs PostgreSQL and transactionally joined metadata; it does not currently displace the accepted coding index.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/foundation-memory.json"]},
+        {"name": "LanceDB", "repository": "https://github.com/lancedb/lancedb", "disposition": "unqualified", "rationale": "A credible local columnar-corpus alternative with a different service tradeoff; no representative local comparison establishes a win over Qdrant.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/foundation-memory.json"]},
+        {"name": "Haystack", "repository": "https://github.com/deepset-ai/haystack", "disposition": "conditional", "rationale": "The source-reviewed application RAG pipeline candidate fits explicit financial-document evaluation, not an automatic replacement for conceptual code search.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/foundation-memory.json"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "durable-memory",
+      "title": "Durable memory",
+      "requirement": "Keep scoped decisions, handoffs and useful learning available across native Codex and Claude with inspectable capture, deletion and recovery.",
+      "current_choice": "One ai-memory store as the cross-client memory of record; retain separate code, document and transient-context retrieval layers.",
+      "decision": "keep_but_compare",
+      "rationale": "ai-memory already contains adopted project knowledge and has actual cross-client capture/query, consolidation and recovery evidence. Candidate memory systems offer distinct capabilities, but published scores do not demonstrate better retrieval or learning on this project.",
+      "evidence_refs": ["docs/memory-landscape-maintenance.md", "docs/native-memory-rag-lifecycle.md", "evidence/artifacts/memory-landscape-20260921/sources.json"],
+      "limitations": ["Scheduler admission does not establish learned-write quality; the retained model review rejected insufficient evidence.", "Bounded sanitized assistant excerpts are not complete transcripts, and exact lifetime memory token savings are unknown."],
+      "overturn_when": "An isolated representative corpus and question set shows better source-grounded recall/usefulness and acceptable complete provider use, latency, capture/deletion and restore behavior without ambiguous memory ownership.",
+      "candidates": [
+        {"name": "ai-memory", "repository": "https://github.com/akitaonrails/ai-memory", "disposition": "selected", "rationale": "Retain the adopted shared native lifecycle/store and its qualified maintenance path; do not confuse a successful scheduler launch with useful learned content.", "evidence_kind": "native_execution", "evidence_refs": ["docs/memory-landscape-maintenance.md", "docs/native-memory-rag-lifecycle.md"]},
+        {"name": "Hindsight", "repository": "https://github.com/vectorize-io/hindsight", "disposition": "unqualified", "rationale": "Priority comparison candidate for reflective memory and richer inspection, but its published benchmarks do not measure this project's workload.", "evidence_kind": "source_review", "evidence_refs": ["docs/memory-landscape-maintenance.md", "evidence/artifacts/memory-landscape-20260921/sources.json"]},
+        {"name": "Basic Memory", "repository": "https://github.com/basicmachines-co/basic-memory", "disposition": "conditional", "rationale": "Human-editable collaborative Markdown knowledge may justify this alternative when note editing becomes the main requirement; no current migration need is established.", "evidence_kind": "source_review", "evidence_refs": ["docs/memory-landscape-maintenance.md"]},
+        {"name": "Mem0", "repository": "https://github.com/mem0ai/mem0", "disposition": "conditional", "rationale": "Application personalization APIs are a distinct requirement; qualify identity/provider/storage behavior rather than adding a second coding memory store by default.", "evidence_kind": "source_review", "evidence_refs": ["docs/memory-landscape-maintenance.md"]},
+        {"name": "Graphiti", "repository": "https://github.com/getzep/graphiti", "disposition": "conditional", "rationale": "Temporal entity relationships can justify an application graph; that capability is not evidence that the existing scoped project wiki is inadequate.", "evidence_kind": "source_review", "evidence_refs": ["docs/memory-landscape-maintenance.md"]},
+        {"name": "Claude-mem", "repository": "https://github.com/thedotmack/claude-mem", "disposition": "overlap", "rationale": "Capture/compaction and a worker viewer overlap the current cross-client store; it remains an alternative capture system requiring its own plugin activation and comparison.", "evidence_kind": "source_review", "evidence_refs": ["docs/memory-landscape-maintenance.md"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "web-research",
+      "title": "Web research",
+      "requirement": "Retrieve attributable primary sources and interact with selected pages through bounded native commands without another standing research-agent stack.",
+      "current_choice": "agent-browser, selected Playwright CLI operations, OpenResearch literature retrieval and Tavily CLI search/extract skills.",
+      "decision": "retain",
+      "rationale": "The current browser and retrieval commands have actual bounded results. Alternatives may add bulk ingestion, hosted browser infrastructure or another autonomous research loop, but those capabilities are not currently needed to replace the accepted path.",
+      "evidence_refs": ["catalogs/foundation/decisions.json", "docs/full-stack-convergence.md", "catalogs/us-equities/star-audit.json"],
+      "limitations": ["Accepted public-source retrieval is not an exhaustive research-quality benchmark or a guarantee of citation correctness.", "Optional hosted services, credentials and bulk crawling require task-specific qualification; source-screened alternatives were not runtime tested."],
+      "overturn_when": "A defined source-coverage or ingestion task exceeds the current commands and a candidate improves attributable retrieval completeness, accuracy and total runtime/cost on the same frozen source set.",
+      "candidates": [
+        {"name": "agent-browser", "repository": "https://github.com/vercel-labs/agent-browser", "disposition": "selected", "rationale": "Actual selected page interaction, dashboard rendering and observer evidence support the native browser lane.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json", "docs/dashboard-rendered-acceptance.md"]},
+        {"name": "Playwright CLI", "repository": "https://github.com/microsoft/playwright-cli", "disposition": "selected", "rationale": "Retain accepted selected browser commands; use the lane that fits the task rather than duplicate every operation through multiple wrappers.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json"]},
+        {"name": "OpenResearch", "repository": "https://github.com/alphaXiv/OpenResearch", "disposition": "selected", "rationale": "Bounded public-literature retrieval and retained upgrade checks support this specialist role, not an always-running research agent.", "evidence_kind": "native_execution", "evidence_refs": ["docs/full-stack-convergence.md", "catalogs/foundation/decisions.json"]},
+        {"name": "Tavily CLI", "repository": "https://github.com/tavily-ai/tavily-cli", "disposition": "selected", "rationale": "The upstream CLI and selected skills have native search/extract evidence; retain the explicit service scope and source attribution.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json", "docs/ecosystem/tavily-receipt.json"]},
+        {"name": "Browser Use", "repository": "https://github.com/browser-use/browser-use", "disposition": "overlap", "rationale": "A credible browser-agent alternative; existing native operations already cover the selected workflow and hosted browser/model services add separate choices.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/star-audit.json"]},
+        {"name": "Crawl4AI", "repository": "https://github.com/unclecode/crawl4ai", "disposition": "conditional", "rationale": "Bulk asynchronous Markdown ingestion could justify it when selected-source retrieval no longer suffices; provenance and task coverage remain unqualified.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/star-audit.json"]},
+        {"name": "Firecrawl MCP", "repository": "https://github.com/firecrawl/firecrawl-mcp-server", "disposition": "unqualified", "rationale": "An alternate search/scrape service, but no current same-source quality/cost comparison supports replacing the accepted browser/Tavily path.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/star-audit.json"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "token-efficiency",
+      "title": "Context and usage efficiency",
+      "requirement": "Supply useful task context with recoverable originals and measure artifact reductions separately from provider usage.",
+      "current_choice": "Focused reads and scoped retrieval first; RTK, Context Mode, guarded Headroom, explicit-file Repomix and TOON only for suitable artifacts; ccusage observes native usage.",
+      "decision": "keep_but_compare",
+      "rationale": "Scoped functional results and retained losing comparisons support selective activation. The older fixed-order provider trial reduced Codex usage 11.26% but increased Claude 25.83%; uncontrolled caching and plugin absence prevent causal savings claims.",
+      "evidence_refs": ["docs/full-stack-convergence.md", "docs/token-native-saturation.md", "docs/token-practice.md"],
+      "limitations": ["The current native tasks have no matched baseline; counters, bytes avoided, artifact token counts and provider usage must not be summed.", "TOON expands the full catalog relative to compact JSON; guarded compression must return originals on rejection. Exact whole-PC lifetime savings are unmeasured."],
+      "overturn_when": "A frozen task/artifact and repeated controlled comparison improves answer correctness or retrieval completeness while reducing complete provider use or latency, with successful raw-input recovery.",
+      "candidates": [
+        {"name": "RTK", "repository": "https://github.com/rtk-ai/rtk", "disposition": "selected", "rationale": "Accepted native filtering and clean-prefix fixture checks justify one useful output lane; its estimate is not exclusively attributable provider savings.", "evidence_kind": "mixed", "evidence_refs": ["docs/full-stack-convergence.md", "docs/token-native-saturation.md"]},
+        {"name": "Context Mode", "repository": "https://github.com/mksglu/context-mode", "disposition": "selected", "rationale": "Native bounded processing/retrieval and corrected project scope are accepted. Historical connection failures and mixed counter scopes remain visible.", "evidence_kind": "native_execution", "evidence_refs": ["docs/token-native-saturation.md", "docs/full-stack-convergence.md"]},
+        {"name": "Headroom", "repository": "https://github.com/headroomlabs-ai/headroom", "disposition": "conditional", "rationale": "Retain its accepted guarded API/MCP lane for suitable artifacts, with exact original recovery; its zero native ledger does not establish provider savings or justify a second compressor everywhere.", "evidence_kind": "mixed", "evidence_refs": ["docs/token-native-saturation.md", "docs/full-stack-convergence.md"]},
+        {"name": "Repomix", "repository": "https://github.com/yamadashy/repomix", "disposition": "selected", "rationale": "Accepted explicit-file handoff and upgrade tests support bounded packaging; compressed structure cannot replace original source for correctness.", "evidence_kind": "native_execution", "evidence_refs": ["docs/full-stack-convergence.md", "catalogs/us-equities/foundation-memory.json"]},
+        {"name": "TOON", "repository": "https://github.com/toon-format/toon", "disposition": "measured_tradeoff", "rationale": "Retain for suitable homogeneous data only after same-data comparison; compact JSON remains smaller for the complete catalog, so TOON is not the default serialization everywhere.", "evidence_kind": "measured_comparison", "evidence_refs": ["docs/full-stack-convergence.md", "docs/token-practice.md"]},
+        {"name": "ccusage", "repository": "https://github.com/ccusage/ccusage", "disposition": "selected", "rationale": "Native usage reading and selected upstream upgrade checks supply accounting evidence; observation itself does not save tokens.", "evidence_kind": "native_execution", "evidence_refs": ["docs/full-stack-convergence.md", "catalogs/foundation/decisions.json"]},
+        {"name": "Claude Token Efficient", "repository": "https://github.com/drona23/claude-token-efficient", "disposition": "overlap", "rationale": "A concise-response instruction file overlaps current communication rules; recurring instruction cost and upstream-only benchmarks do not establish additional savings here.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/star-audit.json"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "quality-evaluation",
+      "title": "Quality and evaluation",
+      "requirement": "Verify the changed behavior using relevant upstream/project checks, independent observations and explicit failure-preserving evidence.",
+      "current_choice": "Project/upstream tests, Playwright browser checks, bounded Promptfoo assertions, ShellCheck and Difftastic where applicable.",
+      "decision": "retain",
+      "rationale": "These tools have accepted deterministic or native-example use and address concrete behavior, shell and review questions. A second agent-evaluation or experiment platform is not needed solely for catalog coverage.",
+      "evidence_refs": ["docs/acceptance-evidence-policy.md", "docs/promptfoo-upstream-retrieval.md", "catalogs/foundation/decisions.json"],
+      "limitations": ["Promptfoo's earlier echo fixture and later four-pair upstream example are not held-out model-quality evaluations.", "Local test totals, structural validation and reviewer agreement cannot establish upstream end-to-end behavior."],
+      "overturn_when": "A defined tool-use/extraction or experiment-tracking requirement cannot be expressed adequately in the current test lane and a challenger passes a representative frozen oracle with usable failure inspection.",
+      "candidates": [
+        {"name": "Playwright", "repository": "https://github.com/microsoft/playwright", "disposition": "selected", "rationale": "Actual browser acceptance complements code checks for the selected application and dashboards.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json", "docs/dashboard-rendered-acceptance.md"]},
+        {"name": "Promptfoo", "repository": "https://github.com/promptfoo/promptfoo", "disposition": "selected", "rationale": "The native exec provider and deterministic assertions verified an unchanged upstream retrieval example; retain the small scoped evaluation role without claiming benchmark superiority.", "evidence_kind": "native_execution", "evidence_refs": ["docs/promptfoo-upstream-retrieval.md"]},
+        {"name": "ShellCheck", "repository": "https://github.com/koalaman/shellcheck", "disposition": "selected", "rationale": "Accepted shell checks supply focused static findings; they do not replace executing the changed shell behavior.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json"]},
+        {"name": "Difftastic", "repository": "https://github.com/Wilfred/difftastic", "disposition": "selected", "rationale": "Accepted structural comparison helps inspect relevant edits while preserving source review and behavior checks.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json"]},
+        {"name": "Inspect AI", "repository": "https://github.com/UKGovernmentBEIS/inspect_ai", "disposition": "conditional", "rationale": "A source-reviewed first candidate for a future frozen extraction/tool-use evaluation; its older catalog default label is a proposal, not current native benchmark acceptance.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/agents-operations.json", "docs/acceptance-evidence-policy.md"]},
+        {"name": "MLflow", "repository": "https://github.com/mlflow/mlflow", "disposition": "conditional", "rationale": "A durable experiment registry can fit strategy/feature studies; it does not improve the current bounded assertion suite merely by adding another dashboard.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/agents-operations.json"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "ci-supply-chain",
+      "title": "CI and supply chain",
+      "requirement": "Publish reproducible changes with scoped workflow permissions, pinned dependencies, actual runtime inventory and attributable hosted checks.",
+      "current_choice": "Native GitHub Actions/Dependabot/attestation interfaces with actionlint, zizmor, gitleaks and selected Syft inventory; automation.json owns exact pins and qualification.",
+      "decision": "retain",
+      "rationale": "Retained hosted runs, setup-action upstream verifiers, native workflow scanners and an actual 36-package inventory support the chosen roles. Additional vulnerability tools need database and fix-applicability policies rather than redundant blanket scanning.",
+      "evidence_refs": ["catalogs/foundation/automation.json", "docs/github-automation.md", "docs/automation-upgrade-evidence.json", "catalogs/us-equities/hosting-source-review.json"],
+      "limitations": ["Syntax/security checks do not execute a workflow or prove model-task quality. Syft inventory is not a vulnerability verdict.", "The recorded first Dependabot scans do not establish the scheduled weekly time or every grouped update. Existing automation sources are broader than the repository decision-index union."],
+      "overturn_when": "A specific dependency/update or vulnerability gap is demonstrated and one alternative covers it with pinned database/provenance, manageable findings and no duplicate ownership of the same dependency.",
+      "candidates": [
+        {"name": "actionlint", "repository": "https://github.com/rhysd/actionlint", "disposition": "selected", "rationale": "The selected native workflow syntax/expression/shell checker has verified binary provenance and routine validation evidence; it complements security analysis and does not execute jobs.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/automation.json", "docs/github-automation.md"]},
+        {"name": "GitHub Actions attest", "repository": "https://github.com/actions/attest", "disposition": "selected", "rationale": "The maintained explicit-subject attestation interface has native expected-signer/source/runner verification and original/altered/original checks; it replaces the older attest-build-provenance wrapper.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/automation.json", "docs/catalog-provenance.md"]},
+        {"name": "zizmor", "repository": "https://github.com/zizmorcore/zizmor", "disposition": "selected", "rationale": "Native clean/unsafe controls and selected workflow checks establish the security-analysis role without claiming hosted execution.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json", "docs/github-automation.md"]},
+        {"name": "gitleaks", "repository": "https://github.com/gitleaks/gitleaks", "disposition": "selected", "rationale": "The installed native scanner is accepted for publication checks, with fixture and allowlist boundaries retained.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json", "docs/foundation-closure-20260921.md"]},
+        {"name": "Syft", "repository": "https://github.com/anchore/syft", "disposition": "selected", "rationale": "Actual selected-runtime inventory matched 36 installed Python packages across Syft/CycloneDX outputs; this is stronger than treating the curated catalog as an SBOM.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/us-equities/hosting-source-review.json", "catalogs/foundation/decisions.json"]},
+        {"name": "Dependabot", "repository": "https://github.com/dependabot/dependabot-core", "disposition": "selected", "rationale": "Use GitHub's accepted native Actions updater interface and reviewed returned PRs; this does not adopt a self-hosted dependabot-core service.", "evidence_kind": "native_execution", "evidence_refs": ["docs/github-automation.md", "catalogs/foundation/automation.json"]},
+        {"name": "Trivy", "repository": "https://github.com/aquasecurity/trivy", "disposition": "conditional", "rationale": "Useful when container/IaC/vulnerability checks are the actual gap, after inventory and vulnerability-database freshness policy; no demonstrated need for parallel overlapping scanners.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/hosting-source-review.json"]},
+        {"name": "Grype", "repository": "https://github.com/anchore/grype", "disposition": "unqualified", "rationale": "A credible Syft-paired vulnerability lane, but source recommendation is not an accepted runtime/database/fix-applicability verdict for this foundation.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/agents-operations.json", "docs/acceptance-evidence-policy.md"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "scheduling-supervision",
+      "title": "Scheduling and supervision",
+      "requirement": "Run selected local workflows with visible history, bounded process trees, cancellation and recoverable effects appropriate to the actual workload.",
+      "current_choice": "Dagu for selected local workflows and systemd user-manager supervision; native client workflows remain their own qualified lane.",
+      "decision": "keep_but_compare",
+      "rationale": "Actual Dagu run history, selected resume/cancel cases and owned systemd cleanup provide useful same-host evidence. Temporal/Restate would add persistence and distributed semantics that the current bounded work has not required.",
+      "evidence_refs": ["docs/foundation-convergence-20260921.md", "catalogs/foundation/decisions.json", "catalogs/us-equities/hosting-source-review.json"],
+      "limitations": ["The selected guest reboot is not a physical-PC reboot and does not qualify every schedule or daemon policy.", "Local process cancellation does not prove provider billing cessation, external exactly-once effects or durable cross-host orchestration."],
+      "overturn_when": "Real jobs require host-loss survival, days-long waits or durable cross-host effects, and one challenger passes the declared effect/retry/recovery cases with acceptable operational burden.",
+      "candidates": [
+        {"name": "Dagu", "repository": "https://github.com/dagucloud/dagu", "disposition": "selected", "rationale": "Retain accepted local run history and bounded checkpoint/resume operations; later selected scheduling evidence does not activate arbitrary production schedules.", "evidence_kind": "native_execution", "evidence_refs": ["docs/foundation-convergence-20260921.md", "catalogs/foundation/decisions.json"]},
+        {"name": "systemd", "repository": "https://github.com/systemd/systemd", "disposition": "selected", "rationale": "Owned process-tree cleanup and selected restart/recovery observations support native supervision on the qualified host.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json", "docs/foundation-convergence-20260921.md"]},
+        {"name": "Temporal", "repository": "https://github.com/temporalio/temporal", "disposition": "conditional", "rationale": "Credible escalation for durable jobs beyond host lifetime; persistence, visibility, upgrades and authentication need a real requirement and separate qualification.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/hosting-source-review.json", "docs/foundation-rd-readiness.md"]},
+        {"name": "Restate", "repository": "https://github.com/restatedev/restate", "disposition": "conditional", "rationale": "Durable handlers/replay/timers are useful for cross-process logic; that replay alone would not establish exactly-once external effects and currently duplicates coordination.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/hosting-source-review.json"]},
+        {"name": "Prefect", "repository": "https://github.com/PrefectHQ/prefect", "disposition": "conditional", "rationale": "Could fit a Python-first research pipeline needing schedules/retries, but no workload comparison justifies a second scheduler now.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/agents-operations.json"]},
+        {"name": "Dagster", "repository": "https://github.com/dagster-io/dagster", "disposition": "conditional", "rationale": "Dataset lineage/backfills could justify asset-centric orchestration; launching bounded native workers does not require it.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/agents-operations.json"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "hosting-services",
+      "title": "Application and service hosting",
+      "requirement": "Run the selected local typed application and supporting services reproducibly while keeping accounts, state and deployment scope explicit.",
+      "current_choice": "Locked Next.js/React/FastAPI/PostgreSQL local fixture and loopback services; platform-specific containers or gateway trials only when needed.",
+      "decision": "retain",
+      "rationale": "The four application components have accepted local integration evidence and explicit ownership. A new cloud or container development platform would change account, state, socket and GPU integration without a current deployment requirement.",
+      "evidence_refs": ["catalogs/foundation/decisions.json", "docs/foundation-closure-20260921.md", "adoption/research.json"],
+      "limitations": ["A local fixture and service UI are not production readiness, scalability or paid-hosting acceptance.", "Gateway dashboard/lifecycle evidence is separate from a successful exact-model task; recorded route/provider refusals remain limits."],
+      "overturn_when": "A defined production, remote-team or GPU deployment requirement exceeds the local fixture, and one alternative passes its account, data, networking, rollback and workload-cost acceptance.",
+      "candidates": [
+        {"name": "Next.js", "repository": "https://github.com/vercel/next.js", "disposition": "selected", "rationale": "Retain the locked accepted local application fixture, without inferring production hosting or framework superiority.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json"]},
+        {"name": "React", "repository": "https://github.com/react/react", "disposition": "selected", "rationale": "The selected UI integration is qualified within the same local application fixture.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json"]},
+        {"name": "FastAPI", "repository": "https://github.com/fastapi/fastapi", "disposition": "selected", "rationale": "Retain the accepted typed local API integration instead of changing an already exercised service boundary without a need.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json"]},
+        {"name": "PostgreSQL", "repository": "https://github.com/postgres/postgres", "disposition": "selected", "rationale": "The fixture's actual database integration has scoped acceptance; wider availability/replication behavior remains separate.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json"]},
+        {"name": "Dev Containers CLI", "repository": "https://github.com/devcontainers/cli", "disposition": "conditional", "rationale": "Useful for a selected container development/CI profile, but adds a Docker-compatible host and account/socket/GPU integration absent from current native adoption.", "evidence_kind": "source_review", "evidence_refs": ["adoption/research.json"]},
+        {"name": "BentoML", "repository": "https://github.com/bentoml/BentoML", "disposition": "conditional", "rationale": "Reproducible model-service packaging can replace custom packaging for a real serving deployment; it does not replace the current typed app merely for breadth.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/agents-operations.json"]},
+        {"name": "Modal", "repository": "https://github.com/modal-labs/modal-client", "disposition": "conditional", "rationale": "Sporadic approved GPU batches may fit this cloud alternative once local capacity is exceeded; cost/egress and deployment acceptance remain separate.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/agents-operations.json"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "recovery-portability",
+      "title": "Recovery and portability",
+      "requirement": "Reproduce selected tools and recover actual application state on an explicitly adopted host without copying authentication stores or treating old receipts as new acceptance.",
+      "current_choice": "Owned native install/rollback recipes, existing uv lock-based adoption, Restic and application-native backups, and qualified native session resume.",
+      "decision": "keep_but_compare",
+      "rationale": "Retained clean-prefix installs, independent restores and selected hosted/guest cases support the native recipe approach. A broader environment platform is not justified for reproducing an already locked bounded SDK/tool profile.",
+      "evidence_refs": ["adoption/research.json", "adoption/lifecycle.md", "docs/portable-userspace-install-20260921.md", "docs/foundation-convergence-20260921.md"],
+      "limitations": ["Synthetic off-host/guest cases and a clean hosted runner do not certify the new physical PC, GPU, secrets or all application state.", "Native sign-ins and host-specific acceptance remain necessary; rollback and hash checks alone do not prove a model task or service recovery."],
+      "overturn_when": "A real multi-language/system dependency or state-loss case exceeds the selected recipes, and the proposed environment/backup alternative passes install, restore, resume and cleanup on the target host.",
+      "candidates": [
+        {"name": "Restic", "repository": "https://github.com/restic/restic", "disposition": "selected", "rationale": "Actual scoped file/application restore and independent output checks support reuse; preserve every receipt's same-host, hosted or synthetic boundary.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json", "adoption/lifecycle.md"]},
+        {"name": "Litestream", "repository": "https://github.com/benbjohnson/litestream", "disposition": "conditional", "rationale": "Continuous SQLite replication could close a real recovery-point requirement; the reviewed version adds a source-database lock and a replica operating policy. Native online backup plus Restic already meets the bounded accepted restore need.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/hosting-source-review.json"]},
+        {"name": "uv", "repository": "https://github.com/astral-sh/uv", "disposition": "selected", "rationale": "The existing native Python layer reproduces accepted versions from hash-bearing locks in an isolated environment without a new manager.", "evidence_kind": "mixed", "evidence_refs": ["adoption/research.json", "docs/portable-userspace-install-20260921.md"]},
+        {"name": "mise", "repository": "https://github.com/jdx/mise", "disposition": "conditional", "rationale": "Multi-language tool/version management can help a broader bootstrap; it adds no demonstrated requirement beyond current uv-based adoption.", "evidence_kind": "source_review", "evidence_refs": ["adoption/research.json"]},
+        {"name": "chezmoi", "repository": "https://github.com/twpayne/chezmoi", "disposition": "conditional", "rationale": "Can manage selected non-secret configuration and drift; do not turn it into blanket home-directory or native authentication-store capture.", "evidence_kind": "source_review", "evidence_refs": ["adoption/research.json"]},
+        {"name": "Devbox", "repository": "https://github.com/jetify-com/devbox", "disposition": "unqualified", "rationale": "A Nix-backed environment closure changes the host model and overlaps the accepted native lock; no target-host comparison establishes a benefit.", "evidence_kind": "source_review", "evidence_refs": ["adoption/research.json"]},
+        {"name": "Determinate Nix installer", "repository": "https://github.com/DeterminateSystems/nix-installer", "disposition": "out_of_scope", "rationale": "A privileged system-platform installation is not required for the current native/WSL adoption profile; it remains a separate lane if a Nix requirement is explicitly selected.", "evidence_kind": "requirement_fit", "evidence_refs": ["adoption/research.json"]}
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "observation-inference",
+      "title": "Observation and optional inference",
+      "requirement": "Observe real native usage/service outcomes through one privacy-filtered local pipeline and qualify any optional model route on its actual workload.",
+      "current_choice": "OTel Collector Contrib, Prometheus/Loki/Grafana, Alertmanager/ntfy, scoped AgentsView/otel-tui and the native Claude HUD; inference/gateway trials retain separate qualification.",
+      "decision": "keep_but_compare",
+      "rationale": "Real native histories, current telemetry, rendered dashboards and an observed HUD already answer the selected operational questions. Another hook/trace collection stack would duplicate data processing unless it answers a concrete missing trace or evaluation question.",
+      "evidence_refs": ["docs/native-telemetry-resolution.md", "docs/dashboard-gap-resolution.md", "docs/foundation-closure-20260921.md", "catalogs/us-equities/agents-operations.json"],
+      "limitations": ["Source time differs from scrape time; usage differs from savings. The current interactive HUD evidence does not certify every statistic or automatic compaction.", "Local generation and gateway acceptance are route/workload-specific; catalog presence is not a passed exact-model task."],
+      "overturn_when": "A required trace, evaluation or supported model/hardware workload is unanswerable by the current path, and one alternative passes privacy, fidelity, latency/cost and recovery comparisons without duplicate capture.",
+      "candidates": [
+        {"name": "OTel Collector Contrib", "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib", "disposition": "selected", "rationale": "One native collector supplies the accepted privacy transform and metrics/log outputs for both clients; the core collector is a source dependency, not a second process.", "evidence_kind": "native_execution", "evidence_refs": ["docs/native-telemetry-resolution.md", "catalogs/us-equities/agents-operations.json"]},
+        {"name": "Prometheus", "repository": "https://github.com/prometheus/prometheus", "disposition": "selected", "rationale": "Actual native metrics and rule evaluation are qualified, with process writers kept distinguishable.", "evidence_kind": "native_execution", "evidence_refs": ["docs/native-telemetry-resolution.md", "catalogs/foundation/decisions.json"]},
+        {"name": "Loki", "repository": "https://github.com/grafana/loki", "disposition": "selected", "rationale": "The accepted privacy-filtered log store complements Prometheus without treating raw conversation capture as required telemetry.", "evidence_kind": "native_execution", "evidence_refs": ["docs/native-telemetry-resolution.md"]},
+        {"name": "Grafana", "repository": "https://github.com/grafana/grafana", "disposition": "selected", "rationale": "Rendered panels were checked against actual native service results; this is operational observation, not model-quality evaluation.", "evidence_kind": "native_execution", "evidence_refs": ["docs/dashboard-rendered-acceptance.md", "docs/dashboard-gap-resolution.md"]},
+        {"name": "Alertmanager", "repository": "https://github.com/prometheus/alertmanager", "disposition": "selected", "rationale": "Retained local grouping/routing evidence complements Prometheus rules, within the accepted loopback receiver scope.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json", "catalogs/us-equities/agents-operations.json"]},
+        {"name": "ntfy", "repository": "https://github.com/binwiederhier/ntfy", "disposition": "selected", "rationale": "An inspectable local alert sink and corrected templates serve the current notification chain without implying external messaging setup.", "evidence_kind": "native_execution", "evidence_refs": ["docs/dashboard-gap-resolution.md", "catalogs/foundation/decisions.json"]},
+        {"name": "AgentsView", "repository": "https://github.com/kenn-io/agentsview", "disposition": "selected", "rationale": "Scoped native archive refresh and observation work; titles/bodies remain private and automatic discovery retains its original limits.", "evidence_kind": "native_execution", "evidence_refs": ["docs/dashboard-gap-resolution.md", "docs/token-native-saturation.md"]},
+        {"name": "otel-tui", "repository": "https://github.com/ymtdzzz/otel-tui", "disposition": "selected", "rationale": "Accepted bounded local trace inspection provides a small terminal lane without another standing web analytics service.", "evidence_kind": "native_execution", "evidence_refs": ["catalogs/foundation/decisions.json"]},
+        {"name": "Claude HUD", "repository": "https://github.com/jarrodwatts/claude-hud", "disposition": "selected", "rationale": "Later native interactive evidence observed model/project/context/usage rendering, superseding the older dialog-only observation for that exact scope.", "evidence_kind": "native_execution", "evidence_refs": ["docs/foundation-closure-20260921.md"]},
+        {"name": "OpenLIT", "repository": "https://github.com/openlit/openlit", "disposition": "overlap", "rationale": "Coding-agent instrumentation exists, but adding another hook/trace collector duplicates current collection unless a missing trace question warrants it.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/agents-operations.json"]},
+        {"name": "Phoenix", "repository": "https://github.com/Arize-ai/phoenix", "disposition": "conditional", "rationale": "A first trace-analysis candidate if current receipts become unwieldy; no measured need supports an additional trace UI now.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/agents-operations.json"]},
+        {"name": "SGLang", "repository": "https://github.com/sgl-project/sglang", "disposition": "unqualified", "rationale": "A credible serving alternative when the current engine cannot meet a supported model/hardware workload; no such comparative win is retained for this host.", "evidence_kind": "source_review", "evidence_refs": ["catalogs/us-equities/agents-operations.json"]}
+      ]
+    }
+  ]
+}
