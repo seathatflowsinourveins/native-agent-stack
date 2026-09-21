@@ -70,6 +70,12 @@ def dashboard():
             'canonical_receipt_count': 'Canonical receipts (read scope)',
             'timestamp_basis': 'Timestamp meaning',
             'boundary': 'Scope / limits',
+            'embedding_status': 'Embedding status',
+            'embedding_provider': 'Embedding provider',
+            'embedding_rows': 'Embedding rows',
+            'latest_pages_missing_embeddings': 'Latest pages missing vectors',
+            'embed_failures_unresolved': 'Unresolved embedding failures',
+            'llm_status': 'Memory LLM status',
         }
         add(pid, title, 'table', 0, y, 24, height, latest(kind),
             description='Only the latest complete published generation is displayed. Failed sources replace prior successes with unknown. Historical source time is distinct from delivery time.',
@@ -85,7 +91,9 @@ def dashboard():
           ['title', 'state', 'estimated_saved', 'session_estimated_saved', 'source_updated_at',
            'kind', 'boundary', 'source_command'])
     table(6, 'memory', 'Memory and retrieval · actual scoped inventory', 23, 11,
-          ['title', 'state', 'value', 'unit', 'source_updated_at', 'kind', 'boundary', 'source_command'])
+          ['title', 'state', 'value', 'unit', 'embedding_status', 'embedding_provider',
+           'embedding_rows', 'latest_pages_missing_embeddings', 'embed_failures_unresolved',
+           'llm_status', 'source_updated_at', 'boundary', 'source_command'])
     add(7, 'Native Qdrant vectors · keep dense and sparse separate', 'timeseries', 0, 34, 12, 8,
         'collection_vectors{job="qdrant"}', source='ecosystem-prometheus',
         description='A point can have both dense and sparse vectors. Do not sum vector series as document or chunk counts.')
@@ -105,7 +113,7 @@ def dashboard():
         options={'showTime': True, 'sortOrder': 'Descending', 'wrapLogMessage': True},
         description='Existing native telemetry; prompt/tool bodies are removed upstream in the collector.')
     return dict(uid='native-foundation-data', title='Native foundation · memory, retrieval and savings',
-                schemaVersion=39, version=2, editable=False, preload=True, timezone='browser', refresh='30s',
+                schemaVersion=39, version=3, editable=False, preload=True, timezone='browser', refresh='30s',
                 time={'from': 'now-6h', 'to': 'now'}, tags=['ecosystem', 'native', 'memory', 'tokens'],
                 panels=panels)
 

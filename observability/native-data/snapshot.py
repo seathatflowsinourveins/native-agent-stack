@@ -249,8 +249,40 @@ def rtk_metrics(raw):
 
 
 def memory_metrics(raw):
-    c = strict_json(raw)["counts"]
+    doc = strict_json(raw)
+    c = doc["counts"]
     fields = {key: count(c[key]) for key in ("pages_latest", "pages_all", "sessions", "observations")}
+    # Only reviewed public metadata values may become Loki fields. Never copy a
+    # provider object, endpoint, model identifier supplied by an operator, or
+    # diagnostic string. Older schemas still yield the native inventory counts.
+    def section(parent, key):
+        value = parent.get(key)
+        return value if isinstance(value, dict) else {}
+
+    def choice(value, allowed):
+        return value if isinstance(value, str) and value in allowed else "unavailable"
+
+    def optional_count(value, maximum, minimum=0):
+        try:
+            parsed = count(value)
+            return parsed if minimum <= parsed <= maximum else None
+        except (TypeError, ValueError, OverflowError):
+            return None
+
+    providers = section(doc, "providers")
+    embedding = section(providers, "embedding")
+    llm = section(providers, "llm")
+    derived = section(doc, "derived")
+    fields.update(
+        embedding_status=choice(embedding.get("status"), {"ok", "disabled"}),
+        embedding_provider=choice(embedding.get("provider"), {"local"}),
+        embedding_model=choice(embedding.get("model"), {"all-MiniLM-L6-v2"}),
+        embedding_dimensions=optional_count(embedding.get("dim"), 65536, 1),
+        llm_status=choice(llm.get("status"), {"ok", "disabled"}),
+    )
+    for key in ("embedding_rows", "latest_pages_missing_embeddings", "embed_failures_unresolved"):
+        # Counts remain exactly representable by Grafana's numeric backend.
+        fields[key] = optional_count(derived.get(key), 2 ** 53 - 1)
     return dict(value=fields["pages_latest"], unit="pages", **fields)
 
 
@@ -352,7 +384,7 @@ def collect(config, recorder, observed):
     specs = [
         ("rtk-global", "RTK: all retained projects", "upstream output estimate", [config["rtk"], "gain", "--format", "json"], "rtk gain --format json", rtk_metrics, "savings", "Retained RTK history, including this project; overlaps project and context counters; not provider usage."),
         ("rtk-project", "RTK: configured project", "upstream output estimate", [config["rtk"], "gain", "--project", "--format", "json"], "rtk gain --project --format json", rtk_metrics, "savings", "Explicit working directory; subset of global retained history, not provider usage."),
-        ("ai-memory", "ai-memory: entire configured database", "native inventory", [config["ai_memory"]["binary"], "--data-dir", config["ai_memory"]["data_dir"], "status", "--json"], "ai-memory --data-dir <configured-db> status --json", memory_metrics, "memory", "Database-wide counts. CLI status has no workspace/project selector; configured project labels do not filter these counts."),
+        ("ai-memory", "ai-memory: entire configured database", "native inventory", [config["ai_memory"]["binary"], "--data-dir", config["ai_memory"]["data_dir"], "status", "--json"], "ai-memory --data-dir <configured-db> status --json", memory_metrics, "memory", "Database-wide counts, not the selected project's inventory. Embedding coverage and provider status do not establish retrieval quality or LLM consolidation. Missing or unreviewed mode fields are unavailable."),
         ("qmd", "QMD: configured collection", "native inventory", [config["qmd"]["binary"], "--index", config["qmd"]["index"], "status"], "qmd --index <configured-index> status", lambda raw: qmd_metrics(raw, config["qmd"]["collection"]), "memory", "Selected collection files; vector and total counts apply to its entire index. Zero vectors can be intentional BM25 operation."),
     ]
     for entity, title, kind, argv, command, parser, record_kind, boundary in specs:
