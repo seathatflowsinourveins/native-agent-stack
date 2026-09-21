@@ -272,7 +272,8 @@ def build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url, r
                 "runbooks": sources(row.get("runbook_paths", []))}
         foundation["layers"] = [{**layer, **layer_surfaces[layer["id"]]} for layer in layers]
         foundation["surface_catalog"] = {"checked_at": surface_catalog["checked_at"],
-            "scope": surface_catalog["scope"], "url": file_url(FOUNDATION_SURFACES)}
+            "scope": surface_catalog["scope"], "url": file_url(FOUNDATION_SURFACES),
+            "text": safe_file(root, FOUNDATION_SURFACES).read_text(encoding="utf-8")}
     engine = {**target["engine"], "repository": public_url(target["engine"].get("repository")),
               "sources": source_links(target["engine"].get("sources", []))}
     brokers = [{**row, "sources": source_links(row.get("sources", []))} for row in target["broker_boundaries"]]

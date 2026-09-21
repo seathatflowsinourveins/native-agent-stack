@@ -6312,8 +6312,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "ef422e4ded15bb95462e3d94d99564ffa09113480efc93a727bc8299d044f985",
-      "bytes": 7402898
+      "sha256": "4a84e185b76fbdd20c7ebe87fdb976452cb77936992282b2afe2d51b187937c2",
+      "bytes": 7423818
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6342,8 +6342,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "a84199f2249c27a2cf8ed770cbe410108cfbc2cedaeafe340a45ac015e06e107",
-      "bytes": 85583
+      "sha256": "97570fba6d4bf2d06e811cf6691e1d72fa5c42e9467fd661bae6f3104a52b1d8",
+      "bytes": 85946
     },
     {
       "path": "docs/evidence.md",
@@ -7017,8 +7017,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "b6a4be29179526afda0d31fb161259920039d7c102d1f1277902c3eac4f5ab77",
-      "bytes": 39365
+      "sha256": "94d21356dc9ace6452639c6204b775498451497d67353222801bd7e8d7876322",
+      "bytes": 39451
     },
     {
       "path": "scripts/catalog_decisions.py",

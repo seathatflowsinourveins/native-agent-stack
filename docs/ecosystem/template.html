@@ -272,7 +272,15 @@ function renderGrandCatalogs() {
   add(entry, add(make("article", "catalog-entry"), make("div", "eyebrow", "01 / General engineering"), make("h2", "", "Foundation"), make("p", "", "Native harnesses, instructions, skills, workers, context, research and recovery. Choose the layers needed for the task."), make("p", "catalog-count", foundation.counts.layers + " layers · " + foundation.counts.capabilities + " scoped capabilities"), catalogAction("foundation", "Open Foundation →")));
   add(entry, add(make("article", "catalog-entry"), make("div", "eyebrow", "02 / Domain architecture"), make("h2", "", "Trading"), make("p", "", "US-equities research and simulation, with separate engine, data and broker acceptance. Reuses the foundation."), make("p", "catalog-count", trading.broker_boundaries.length + " broker boundaries · " + trading.next_acceptance.length + " next checks"), catalogAction("trading", "Open Trading →")));
   add($("foundation-summary"), make("strong", "", foundation.counts.layers + " layers · " + foundation.counts.capabilities + " capabilities · " + foundation.counts.accepted + " accepted within scope"), make("p", "muted", foundation.scope || "Recorded capability decisions for general engineering."), make("p", "catalog-scope", "Acceptance describes the linked work only. Current-host state is unknown from this offline page."));
-  if(foundation.surface_catalog) add($("foundation-summary"), make("p", "catalog-scope", "Dashboard mapping checked " + foundation.surface_catalog.checked_at + ". " + foundation.surface_catalog.scope), link("Dashboard and command manifest ↗", foundation.surface_catalog.url));
+  if(foundation.surface_catalog) {
+    const download = make("button", "button secondary small", "Download dashboard manifest");
+    download.addEventListener("click", () => {
+      const url = URL.createObjectURL(new Blob([foundation.surface_catalog.text], {type: "application/json"}));
+      const anchor = make("a"); anchor.href = url; anchor.download = "surfaces.json"; anchor.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+    add($("foundation-summary"), make("p", "catalog-scope", "Dashboard mapping checked " + foundation.surface_catalog.checked_at + ". " + foundation.surface_catalog.scope), download);
+  }
   [["docs/claude-foundation-finalization-20260921.md", "Claude and Codex setup"], ["examples/claude-native/workflows/README.md", "Native workflows"], ["docs/harness-defaults.md", "Harness defaults"], ["catalogs/foundation/README.md", "Foundation guide"], ["catalogs/README.md", "How the catalogs fit"]].forEach(([path, label]) => { if(recipeMap.has(path)) add($("foundation-guides"), recipeButton(path, label)); });
   foundation.layers.forEach(layer => { const option = make("option", "", layer.title); option.value = layer.id; add($("foundation-layer"), option); });
   [$("foundation-search"), $("foundation-layer"), $("foundation-status")].forEach(control => control.addEventListener(control.tagName === "SELECT" ? "change" : "input", renderFoundation));
