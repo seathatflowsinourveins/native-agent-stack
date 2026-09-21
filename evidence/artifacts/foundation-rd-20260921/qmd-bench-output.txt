@@ -1,0 +1,59 @@
+== qmd bench (all modes)
+Query                     Backend  P@k    R@1    R@3    R@5    MRR    F1     ms      
+----------------------------------------------------------------------------------------
+sec-availability          bm25      0.00  0.00  0.00  1.00  0.20  0.00      16ms
+sec-availability          vector    0.00  0.00  0.00  0.00  0.11  0.00    1870ms
+sec-availability          hybrid    0.00  0.00  0.00  0.00  0.11  0.00     106ms
+sec-availability          full      0.00  0.00  0.00  0.00  0.13  0.00   58495ms
+backup-host-loss          bm25      0.00  0.00  0.00  0.00  0.00  0.00       1ms
+backup-host-loss          vector    0.00  0.00  0.00  1.00  0.25  0.00      19ms
+backup-host-loss          hybrid    0.00  0.00  0.00  0.00  0.14  0.00     113ms
+backup-host-loss          full      0.00  0.00  0.00  0.00  0.14  0.00   71774ms
+acp-readonly              bm25      1.00  1.00  1.00  1.00  1.00  1.00       0ms
+acp-readonly              vector    1.00  0.00  1.00  1.00  0.50  1.00      18ms
+acp-readonly              hybrid    1.00  1.00  1.00  1.00  1.00  1.00     100ms
+acp-readonly              full      1.00  1.00  1.00  1.00  1.00  1.00   43842ms
+native-token-subsets      bm25      0.00  0.00  0.00  0.00  0.14  0.00       1ms
+native-token-subsets      vector    0.00  0.00  0.00  0.00  0.14  0.00      17ms
+native-token-subsets      hybrid    0.00  0.00  0.00  1.00  0.20  0.00   72438ms
+native-token-subsets      full      0.00  0.00  0.00  0.00  0.13  0.00   82140ms
+restart-allowance         bm25      1.00  1.00  1.00  1.00  1.00  1.00       0ms
+restart-allowance         vector    1.00  1.00  1.00  1.00  1.00  1.00      16ms
+restart-allowance         hybrid    1.00  1.00  1.00  1.00  1.00  1.00    8664ms
+restart-allowance         full      1.00  1.00  1.00  1.00  1.00  1.00  105663ms
+broker-timeout            bm25      1.00  0.00  1.00  1.00  0.50  1.00      10ms
+broker-timeout            vector    0.00  0.00  0.00  0.00  0.17  0.00      16ms
+broker-timeout            hybrid    0.00  0.00  0.00  1.00  0.25  0.00   11581ms
+broker-timeout            full      1.00  0.00  1.00  1.00  0.50  1.00  107267ms
+alpaca-entitlement        bm25      0.00  0.00  0.00  1.00  0.25  0.00       9ms
+alpaca-entitlement        vector    0.00  0.00  0.00  1.00  0.25  0.00      18ms
+alpaca-entitlement        hybrid    1.00  0.00  1.00  1.00  0.33  1.00    8488ms
+alpaca-entitlement        full      0.00  0.00  0.00  0.00  0.17  0.00   67322ms
+dagu-recovery             bm25      1.00  1.00  1.00  1.00  1.00  1.00       0ms
+dagu-recovery             vector    1.00  1.00  1.00  1.00  1.00  1.00      19ms
+dagu-recovery             hybrid    1.00  1.00  1.00  1.00  1.00  1.00      24ms
+dagu-recovery             full      1.00  1.00  1.00  1.00  1.00  1.00   59551ms
+gateway-parity            bm25      1.00  1.00  1.00  1.00  1.00  1.00       0ms
+gateway-parity            vector    0.00  0.00  0.00  0.00  0.00  0.00      17ms
+gateway-parity            hybrid    1.00  1.00  1.00  1.00  1.00  1.00      21ms
+gateway-parity            full      1.00  1.00  1.00  1.00  1.00  1.00   58896ms
+paper-risk-controls       bm25      1.00  1.00  1.00  1.00  1.00  1.00       9ms
+paper-risk-controls       vector    0.00  0.00  0.00  0.00  0.00  0.00      18ms
+paper-risk-controls       hybrid    1.00  1.00  1.00  1.00  1.00  1.00    6175ms
+paper-risk-controls       full      1.00  1.00  1.00  1.00  1.00  1.00   85873ms
+worker-cancellation       bm25      0.00  0.00  0.00  0.00  0.00  0.00       9ms
+worker-cancellation       vector    0.00  0.00  0.00  0.00  0.00  0.00      16ms
+worker-cancellation       hybrid    0.00  0.00  0.00  0.00  0.00  0.00      21ms
+worker-cancellation       full      0.00  0.00  0.00  0.00  0.00  0.00   63996ms
+savings-scope             bm25      0.00  0.00  0.00  0.00  0.00  0.00       2ms
+savings-scope             vector    0.00  0.00  0.00  0.00  0.17  0.00      17ms
+savings-scope             hybrid    0.00  0.00  0.00  0.00  0.00  0.00   16200ms
+savings-scope             full      0.00  0.00  0.00  0.00  0.17  0.00  106226ms
+Summary:
+----------------------------------------------------------------------
+  bm25     P@k= 0.500 R@1= 0.417 R@3= 0.500 R@5= 0.667 MRR= 0.508 F1= 0.500 Avg=5ms
+  vector   P@k= 0.250 R@1= 0.167 R@3= 0.250 R@5= 0.417 MRR= 0.299 F1= 0.250 Avg=172ms
+  hybrid   P@k= 0.500 R@1= 0.417 R@3= 0.500 R@5= 0.667 MRR= 0.503 F1= 0.500 Avg=10328ms
+  full     P@k= 0.500 R@1= 0.417 R@3= 0.500 R@5= 0.500 MRR= 0.519 F1= 0.500 Avg=75920ms
+bench_exit=0
+2026-09-21T16:04:49Z

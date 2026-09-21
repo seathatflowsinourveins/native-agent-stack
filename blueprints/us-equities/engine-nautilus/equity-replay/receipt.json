@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-21",
+  "classification": "local integration with retained historical data; not an unchanged upstream test or broker execution",
+  "base_commit": "86952998d3372dcf26cfc6f94782b4e03d097b8a",
+  "native_version": "nautilus_trader 2.0.0rc5",
+  "upstream_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+  "upstream_sources": [
+    {"path": "docs/getting_started/quickstart.py", "sha256": "487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53"},
+    {"path": "crates/execution/src/models/fill.rs", "sha256": "60525a83c3e1deee81d9a5f96d4424e825b5a33b5e6e50c4e8947763abc0c30e"},
+    {"path": "crates/execution/src/models/fee.rs", "sha256": "0900cec8c1de0bf167cf99b94451b5c608a261fe13da0646085e04c70c11ce0e"}
+  ],
+  "installed_interface_sha256": {
+    "backtest/__init__.pyi": "85744bbfb88c06cb1e0170726dcc297270e8259f49b21726be11741ee926e369",
+    "execution/__init__.pyi": "a124cb79e64140b38166a872eaca09bd96ff834e43fbd7f962496ab648e3f021",
+    "model/__init__.pyi": "fb2491805ad2331d2c08d0d2f04ed79107195655dc0fce9b8c68cff64b5f92c0",
+    "trading/__init__.pyi": "155a0847fbaf0a47da8682425c76b147ae40e3b0b2f3fc6466cabf46f77378d3"
+  },
+  "input": {
+    "alpaca_receipt_sha256": "a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd",
+    "selected_rows_private_sha256": "adb2a240727bcd0c309c0c0ae34c649387ba23a0eba3da5d99c067d25bb06ad0",
+    "sessions": 15,
+    "start": "2020-08-10",
+    "end": "2020-08-28",
+    "source": "retained authenticated Alpaca AAPL SIP/raw daily bars, observed September 2026",
+    "new_acquisition_requests": 0
+  },
+  "local_source_sha256": {
+    "plan.json": "1e3cefdab959c9ce15e6d9d07ff6135b5720f8792bed06b2e02510dd880dd805",
+    "run.py": "e036aa9354a478fe270258d3d2f2cb42a5c9c072d688b21313e0a89e715d796e",
+    "launch.py": "c28222a977b005de5d6c14d963cb4338482795a3aac169c5a1448b37084dce97",
+    "tests/test_nautilus_equity_replay.py": "5e254b3f118ac09434dee27133c0665788e0b18190889334c39e4470a22fb056"
+  },
+  "native_command_template": {
+    "cwd": "<CHECKOUT>",
+    "argv": ["python3", "blueprints/us-equities/engine-nautilus/equity-replay/launch.py", "--python", "<NAUTILUS_ENV>/bin/python", "--run", "<RETAINED_ALPACA_RUN>", "--out", "<PRIVATE_EVIDENCE>/<RUN_ID>"],
+    "expanded_child_argv": ["/usr/bin/bwrap", "--unshare-all", "--die-with-parent", "--new-session", "--clearenv", "--ro-bind", "/usr", "/usr", "--symlink", "usr/bin", "/bin", "--symlink", "usr/lib", "/lib", "--symlink", "usr/lib64", "/lib64", "--proc", "/proc", "--dev", "/dev", "--tmpfs", "/tmp", "--ro-bind", "<NAUTILUS_ENV>", "<NAUTILUS_ENV>", "--ro-bind", "<CHECKOUT>", "/repo", "--ro-bind", "<RETAINED_ALPACA_RUN>", "/data", "--bind", "<PRIVATE_EVIDENCE>/<RUN_ID>", "/out", "--chdir", "/repo", "--setenv", "LANG", "C.UTF-8", "--setenv", "PATH", "/usr/bin:/bin", "--setenv", "PYTHONDONTWRITEBYTECODE", "1", "--setenv", "OPENBLAS_NUM_THREADS", "1", "--setenv", "OMP_NUM_THREADS", "1", "<NAUTILUS_ENV>/bin/python", "-I", "/repo/blueprints/us-equities/engine-nautilus/equity-replay/run.py", "--run", "/data", "--out", "/out/native"]
+  },
+  "returned_runs": [
+    {
+      "id": "final-1",
+      "started_utc": "2026-09-21T15:53:32.513271+00:00",
+      "finished_utc": "2026-09-21T15:53:32.928643+00:00",
+      "exit_code": 0,
+      "stdout": {"bytes": 2016, "sha256": "63d44a86578026c272c4b32edb38f1b2962c4135d98b51ea0108770568e9ca87"},
+      "stderr": {"bytes": 1140, "sha256": "f969600f63a65edbabef417efbffc781fa4806c11e2f2491fa407ff3564af5bc"}
+    },
+    {
+      "id": "final-2",
+      "started_utc": "2026-09-21T15:53:33.638225+00:00",
+      "finished_utc": "2026-09-21T15:53:34.053060+00:00",
+      "exit_code": 0,
+      "stdout": {"bytes": 2016, "sha256": "e0cb78cc1fe4af07599261f687dc1f5df615dd27bd952663a0e82553900f26b4"},
+      "stderr": {"bytes": 1140, "sha256": "f969600f63a65edbabef417efbffc781fa4806c11e2f2491fa407ff3564af5bc"}
+    }
+  ],
+  "results_per_run": [
+    {
+      "id": "baseline", "processed_bars": 15, "filled_orders": 10, "closed_positions": 5,
+      "fees_usd": "0.00", "realized_pnl_usd": "-133.40", "ending_cash_usd": "99866.60",
+      "open_orders": 0, "open_positions": 0, "cash_transitions_verified": 10, "scheduled_fill_prices_verified": 10,
+      "realized_pnl_reconciled": true, "economic_repeat_sha256": "8f81042abf13c444d7148c723bd6c82d323bd2e30297d4eba358d20988505e57",
+      "final_2_reports_sha256": {
+        "account.csv": "90e64a86776bafeb85d6ee860a00380ed87439b2a2cb86add3a2e3afbd0e4d26",
+        "fills.csv": "3d48453f0f941eec15b44a384dfa8c945553272b3523157fb87f8b83765bd653",
+        "positions.csv": "4f755cc4e183e4b343cf39b1681481cef6d30c8f4a7d223be7f4aeae0e02a4bd"
+      }
+    },
+    {
+      "id": "fee_slippage_stress", "processed_bars": 15, "filled_orders": 10, "closed_positions": 5,
+      "fees_usd": "10.00", "realized_pnl_usd": "-144.40", "ending_cash_usd": "99855.60",
+      "open_orders": 0, "open_positions": 0, "cash_transitions_verified": 10, "scheduled_fill_prices_verified": 10,
+      "realized_pnl_reconciled": true, "economic_repeat_sha256": "2b97563442ef6d12235a85f09e78db960f8a10afb739777e7ab219ebc03e0a04",
+      "final_2_reports_sha256": {
+        "account.csv": "a59552b97963404701614346136f1e3d676d376154d8ea1dfc580bc89e404e4d",
+        "fills.csv": "7eb600fce82bc82991e7225fb893b09be70f4ece21309aa2034fd3dbec88f44f",
+        "positions.csv": "c13c7d5146d2eb0f89f89409a11b3920e8d4a19aec7f2ba21fff51abce1bf842"
+      }
+    }
+  ],
+  "independent_observations": {
+    "coordinator_source_review": "Reviewed runner, launcher and frozen plan. Resolved case naming finding by replacing cost_liquidity_stress with fee_slippage_stress; no other blocking defect reported.",
+    "separate_reviewer": "alpaca_research independently reviewed original source and reran all eight local tests. Verified all local source hashes, both final native exit codes/stdout/stderr hashes/input hashes/loopback-only environment, all final-2 CSV hashes and account CSV repeat. Independently recomputed every CSV cash transition, fee and native closed-position PnL in both scenarios across both final runs; all matched. No supported findings. Reviewer performed no broker calls or native replay rerun.",
+    "separate_csv_method": "Python csv.DictReader + Decimal + ast.literal_eval over native CSV files recomputed all cash transitions and closed-position realized PnL in both final runs; all matched.",
+    "account_csv_repeat": "byte-identical for each scenario",
+    "economic_repeat_fields": ["instrument_id", "side", "quantity", "filled_qty", "avg_px", "commissions", "status", "ts_init", "ts_last", "account total sequence", "position realized_pnl sequence"],
+    "economic_hash_encoding": "SHA256 of json.dumps({fills: selected-field records, cash: account total strings, position_pnl: realized_pnl strings}, sort_keys=True, separators=(',', ':')); generated identities excluded"
+  },
+  "local_tests": {"argv": ["python3", "-m", "unittest", "tests.test_nautilus_equity_replay", "-v"], "exit_code": 0, "tests": 8, "skips": 0, "class": "synthetic admission and report-corruption fixtures"},
+  "repository_checks": [
+    {"argv": ["python3", "scripts/validate.py"], "exit_code": 0, "returned": {"components": 68, "hashed_files": 1368, "profiles": 4, "receipts": 121, "status": "passed"}, "scope": "existing repository integrity and scope; not a new native operation"},
+    {"argv": ["python3", "scripts/validate_catalogs.py"], "exit_code": 0, "scope": "catalog structure and evidence classes"},
+    {"argv": ["git", "diff", "--check"], "exit_code": 0}
+  ],
+  "isolation_observed": {"interfaces": ["lo"], "environment_names": ["LANG", "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "PATH", "PWD", "PYTHONDONTWRITEBYTECODE"], "network_namespace_mandatory": true, "credential_variables": 0},
+  "retained_development_attempts": "attempt-1 passed initial reconciliation; attempts-2/3 passed strengthened per-fill/per-cash oracle before coordinator naming correction. All remain private. A source-search using obsolete v1 test_kit/model-instruments paths failed and was corrected to v2 flat module stubs before coding.",
+  "warnings": ["Four Pandas4Warning messages per run: epoch JSON date formatting is deprecated. No native execution error; pinned pandas 3.0.6."],
+  "limitations": [
+    "Historical values observed in 2026; no point-in-time availability or complete universe claim.",
+    "Current completed daily-bar close fills at a declared 16:00 retrospective event are not a realizable closing-auction strategy; extended-session contributions are not separated.",
+    "OneTickSlippageFillModel supplies unlimited synthetic depth. liquidity_consumption=true does not qualify finite liquidity, partial fills, queue, impact, halts or broker restrictions.",
+    "Known dividend/split dates excluded; broader corporate-action coverage and currency semantics remain open.",
+    "No strategy selection, profitability criterion, live/paper broker operation, SPY/LEAN parity, or capacity benchmark was performed."
+  ],
+  "sanitization": "Published aggregate economics, hashes and portable command placeholders only. Raw provider prices, native fill/position/account reports, expanded host argv and paths remain in owner-only local evidence. No secret values or provider account data accessed."
+}

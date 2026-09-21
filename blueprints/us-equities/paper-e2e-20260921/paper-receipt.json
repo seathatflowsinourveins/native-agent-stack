@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "native_alpaca_paper",
+  "scope": "One bounded operational SPY long-to-flat trial, separate fresh reconciliation and completed-trial recovery",
+  "endpoint": "https://paper-api.alpaca.markets",
+  "result": "passed",
+  "trial": "e2e-20260921",
+  "runner": "blueprints/us-equities/alpaca-paper/paper_runner.py",
+  "runner_sha256": "9e68f1bab334c7e239e32de96565f353bbe58867542da5779717db7c181f8c06",
+  "config": "blueprints/us-equities/alpaca-paper/config.json",
+  "config_sha256": "f861c2c012a303fd32212921b927265750735e5779f60eaf9a623b2d0d784bfe",
+  "tests_sha256": "1de792fe0dee4bd5d1f8880a7421f2205990a4c307776984edf199c54a16cb0d",
+  "sdk_source_matches_retained_receipt": {"alpaca/common/rest.py": "887753b055a4b8e8a07468b4702cfad1fa3aa66ac73427fe0c62971aa3b165c5", "alpaca/trading/client.py": "03f806b3ce6b4fabcc92f9e8eedf5f3ded817b7ec988bc8a854aa9268ea595de"},
+  "commands": ["<qualified-python> blueprints/us-equities/alpaca-paper/paper_runner.py --trial e2e-20260921", "<qualified-python> blueprints/us-equities/alpaca-paper/paper_runner.py --trial e2e-20260921 --execute", "<qualified-python> blueprints/us-equities/alpaca-paper/paper_runner.py --trial e2e-20260921 --recover"],
+  "credentials": "Existing private paper environment, loaded only into authorized process; no credential values or account identifiers retained here",
+  "orders": [
+    {"symbol": "SPY", "side": "buy", "status": "filled", "qty": "1", "filled_qty": "1", "filled_avg_price": "770.70", "submitted_at": "2026-09-21T15:55:05.677261+00:00", "filled_at": "2026-09-21T15:55:06.455780+00:00"},
+    {"symbol": "SPY", "side": "sell", "status": "filled", "qty": "1", "filled_qty": "1", "filled_avg_price": "770.62", "submitted_at": "2026-09-21T15:55:14.905584+00:00", "filled_at": "2026-09-21T15:55:15.174615+00:00"}
+  ],
+  "write_attempts": 2,
+  "realized_gross_pnl_usd": "-0.08",
+  "lifecycle_elapsed_seconds": 13.759,
+  "quote_age_range_seconds": [0.033, 0.225],
+  "observed_gross_unrealized_pnl_usd": ["-0.03", "-0.16", "-0.18"],
+  "fresh_reconciliation": {
+    "observed_at": "2026-09-21T15:56:21.628527+00:00",
+    "scope": "Separate read-only SDK process, five actual paper GET requests",
+    "passed": true,
+    "both_fills_match_runner": true,
+    "positions": 0,
+    "open_orders": 0,
+    "cash_delta_usd": "-0.08",
+    "cash_delta_matches_reported_pnl": true,
+    "account_equity_equals_cash": true,
+    "http_statuses": [200, 200, 200, 200, 200],
+    "observed_requests_per_minute": 200
+  },
+  "completed_trial_recovery": {"result": "passed", "writes_before": 2, "writes_after": 2, "additional_writes": 0, "additional_journaled_gets": 4, "final_flat_and_idle_observed": true, "meaning": "A fresh process adopted the same two completed identities without duplicate submission. This did not inject a broker outage or process crash."},
+  "independent_source_review": {"result": "no unresolved supported high or medium findings", "synthetic_tests_passed": 27, "native_test_elapsed_seconds": 0.897, "resolved_finding": "Preserve known accepted orders through lookup visibility gaps, cancel by known ID, and require terminal confirmation before exit."},
+  "limits": {"configured_requests_per_minute": 120, "observed_account_requests_per_minute": 200, "maximum_order_notional_usd": "1000", "maximum_gross_exposure_usd": "1000", "maximum_write_attempts": 4},
+  "limitations": ["Operational smoke acceptance, not an accepted profitable strategy or continuous service.", "No native partial-fill, cancellation, rejection, disconnect or crash was induced; those paths currently have synthetic test evidence.", "Limit exits can remain unfilled; gross realized-loss limits do not bound fees or unrealized gap loss.", "The fresh cash match is observed for this short trial and is not a general fees model.", "The account exposes 200 API calls/minute; Elite 1000/minute and high-throughput execution are unqualified.", "Native recovery covered an already completed trial, not an uncertain in-flight order.", "IBKR and live trading remain separate."]
+}

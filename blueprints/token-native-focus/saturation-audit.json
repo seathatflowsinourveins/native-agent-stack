@@ -639,6 +639,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "alpaca-paper-e2e-20260921",
+            "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -1104,6 +1109,16 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "alpaca-paper-e2e-20260921",
+            "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "foundation-rd-20260921",
+            "path": "evidence/receipts/foundation-rd-20260921.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1444,6 +1459,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "foundation-rd-20260921",
+            "path": "evidence/receipts/foundation-rd-20260921.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1517,6 +1537,11 @@
             "id": "token-practice-gap-followup-20260920",
             "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "foundation-rd-20260921",
+            "path": "evidence/receipts/foundation-rd-20260921.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -4857,6 +4882,11 @@
             "id": "full-stack-convergence-20260921",
             "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "foundation-rd-20260921",
+            "path": "evidence/receipts/foundation-rd-20260921.json",
+            "kind": "native_model_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6566,7 +6596,7 @@
       "repository": "https://github.com/nautechsystems/nautilus_trader",
       "version": "2.0.0rc5",
       "profile": "optional",
-      "role": "User-selected trading-engine destination; isolated upstream synthetic FX acceptance, separate from equity data and broker adapters",
+      "role": "Selected trading-engine destination; accepted native synthetic FX and retained AAPL diagnostic replay, separate from SPY parity and broker adapters",
       "installation_assessment": "Native installation and selected upstream operation recorded in the referenced receipt",
       "current_host_recertified_by_this_audit": false,
       "native_integration": {
@@ -6589,6 +6619,11 @@
           {
             "id": "native-nautilus-ci-20260920",
             "path": "evidence/receipts/native-nautilus-ci-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "nautilus-equity-replay-20260921",
+            "path": "evidence/receipts/nautilus-equity-replay-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],

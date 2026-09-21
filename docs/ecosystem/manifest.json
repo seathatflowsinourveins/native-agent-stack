@@ -311,6 +311,18 @@
   ],
   "guides": [
     {
+      "title": "Claude-to-Codex review: actual native return",
+      "body": "Literal official slash command returned successfully in an isolated checkout. Native output, usage limits, source hashes and lifecycle boundaries retained.",
+      "path": "recipes/claude-codex-foreground-review.md",
+      "category": "setup"
+    },
+    {
+      "title": "Foundation ready: next north-star R&D acceptance",
+      "body": "Current decisions, retained AAPL/paper results, QMD comparison and exact frozen SPY build contract. Remaining broker, data and continuous-operation gates stay explicit.",
+      "path": "docs/foundation-rd-readiness.md",
+      "category": "evaluation"
+    },
+    {
       "title": "Current foundation convergence: Claude cooperation and source results",
       "body": "Six stable versions checked, real native research workers, independently verified sources, corrected claims and separately recorded recovery/context evidence.",
       "path": "docs/foundation-convergence-20260921.md",

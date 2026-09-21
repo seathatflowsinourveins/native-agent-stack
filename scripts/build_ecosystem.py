@@ -46,10 +46,15 @@ RETURNED_RECEIPT_FAMILIES = {
     "native-returned-results", "native-memory-rag-alignment", "hf-memory-models",
     "native-dashboard-data", "native-dashboard-access", "full-stack-convergence",
     "dashboard-render-e2e", "dashboard-gap-resolution", "memory-landscape", "memory-landscape-lifecycle", "foundation-convergence",
+    "foundation-rd",
 }
 PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
 PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024
 NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json",
+                    "docs/foundation-rd-readiness.md", "recipes/claude-codex-foreground-review.md",
+                    "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+                    "evidence/artifacts/foundation-rd-20260921/qmd-bench-output.txt",
+                    "evidence/artifacts/foundation-rd-20260921/native-review.json",
                     "recipes/claude-native-ultracode.md", "examples/claude-native/ultracode.settings.json",
                     "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json",
                     "docs/memory-landscape-maintenance.md", "docs/native-memory-rag-lifecycle.md", "docs/foundation-convergence-20260921.md",
@@ -383,7 +388,8 @@ def build_data(root):
     for path in ("docs/foundation-convergence-20260921.md", "docs/native-memory-rag-lifecycle.md", "docs/memory-landscape-maintenance.md", "adoption/lifecycle.md", "docs/current-session-observation.md", "docs/token-efficiency-stack.md", "docs/foundation-stack.md", "docs/token-session-handbook.md",
                  "docs/harness-defaults.md", "catalogs/README.md", "catalogs/foundation/README.md",
                  "docs/community-native-practice.md", "examples/claude-native/CLAUDE.md",
-                 "recipes/claude-native-ultracode.md"):
+                 "recipes/claude-native-ultracode.md", "docs/foundation-rd-readiness.md",
+                 "recipes/claude-codex-foreground-review.md"):
         if (root / path).exists():
             guide_paths.append(path)
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))

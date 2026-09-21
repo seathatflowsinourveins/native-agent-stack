@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "engine_version": "2.0.0rc5",
+  "upstream_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+  "alpaca_receipt_sha256": "a59c6ed74e839ca43ee704033e207865ed938a22e4738afce22ec197e91b6bcd",
+  "symbol": "AAPL",
+  "start": "2020-08-10",
+  "end": "2020-08-28",
+  "expected_sessions": 15,
+  "capital_usd": "100000",
+  "quantity": 10,
+  "entry_indices": [0, 3, 6, 9, 12],
+  "exit_indices": [1, 4, 7, 10, 13],
+  "maximum_daily_volume_fraction": "0.0001",
+  "cases": [
+    {"id": "baseline", "commission_per_order_usd": "0", "one_tick_slippage": false, "liquidity_consumption": false},
+    {"id": "fee_slippage_stress", "commission_per_order_usd": "1", "one_tick_slippage": true, "liquidity_consumption": true}
+  ],
+  "acceptance": "Each case: 15 processed bars, 10 filled orders, 5 closed positions, no open orders/positions, exact fill-ledger/cash/realized-PnL reconciliation. Stress fees total $10; model fill differences are observed rather than presumed.",
+  "scope": "Retrospective scheduled diagnostic, not a strategy selection or profitability qualification. Orders use completed daily bar prices on predeclared dates, not a realizable closing-auction strategy. Daily OHLCV does not reconstruct intraday order books or publication times."
+}

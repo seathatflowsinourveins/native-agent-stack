@@ -1,0 +1,49 @@
+{
+  "id": "foundation-rd-20260921",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "claude-code",
+    "codex",
+    "codex-for-claude",
+    "qmd"
+  ],
+  "claim": "Literal native Claude-to-Codex foreground review returned successfully for the final paper clock guard; separately retained native QMD four-mode diagnostic informs the scoped BM25 default.",
+  "limitations": [
+    "The review covers three source files at its recorded commit, not the full catalog or a native broker retest.",
+    "Claude native usage is retained; Codex review usage/model/effort are not exposed by this companion path. No causal or lifetime savings claim.",
+    "QMD used 12 fixed queries, an expanded index without a full corpus seal and one ordered run. Earlier timeout is retained; no general retrieval ranking is established.",
+    "Dedicated review checkout avoids sharing the workspace broker. Same-workspace concurrency and prior aborted background review remain unqualified.",
+    "Existing paper and AAPL receipts retain their original source scope; SPY parity, native broker faults, IBKR, strategy quality and continuous operation remain open."
+  ],
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-21T20:12:35Z",
+  "references": [
+    {
+      "repository": "openai/codex-plugin-cc",
+      "revision": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "url": "https://github.com/openai/codex-plugin-cc/tree/db52e28f4d9ded852ab3942cea316258ae4ef346"
+    }
+  ],
+  "artifact_directory": "evidence/artifacts/foundation-rd-20260921",
+  "public_artifacts": [
+    {
+      "path": "evidence/artifacts/foundation-rd-20260921/native-review.json",
+      "bytes": 4767,
+      "sha256": "e0608d9ee7caacc76910965ef4cb2a673324c5fadb24ed6ed6475a753b7e51d1"
+    },
+    {
+      "path": "evidence/artifacts/foundation-rd-20260921/qmd-bench-output.txt",
+      "bytes": 4548,
+      "sha256": "4e8f9ca28092983f6eca8340029b1cbba34b0fb228a84f36280ead9d340c40ff"
+    },
+    {
+      "path": "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+      "bytes": 3338,
+      "sha256": "0c0216ddb2a4bf29c42eea18126602b4f4fdef6e6bb957759fd1bc31e18c3653"
+    }
+  ],
+  "exact_saved_tokens": {
+    "session": null,
+    "lifetime": null
+  }
+}

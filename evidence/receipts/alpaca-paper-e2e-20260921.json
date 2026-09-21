@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "id": "alpaca-paper-e2e-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "alpaca-py",
+    "claude-code"
+  ],
+  "claim": "Native Claude source review and five unchanged Alpaca SDK read-only tests precede one real paper SPY roundtrip; fresh cash/fill/position reconciliation and completed-trial recovery without extra writes.",
+  "limitations": [
+    "One operational smoke trial, not profitable strategy or continuous trading acceptance.",
+    "Broker fault paths have27synthetic tests; no native crash, cancellation or partial-fill fault was induced.",
+    "Observed paper entitlement200API calls/minute; configured120. Elite1000/minute remains unqualified."
+  ],
+  "native_evidence": "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json",
+  "source_review": "blueprints/us-equities/paper-e2e-20260921/README.md"
+}

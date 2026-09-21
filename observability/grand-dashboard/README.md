@@ -8,10 +8,11 @@ published architecture. Local viewing is passwordless through native Grafana
 anonymous **Viewer** access. Administrative changes retain native sign-in.
 See the [seamless workflow contract](passwordless.md).
 
-Simulation/backtesting is the selected lane. Dedicated paper credentials are
-pending; live trading has no authority. A successful engineering fixture or a
-healthy service does not mark those financial gates complete. Historical results
-are clearly labeled; no fabricated live P&L, position count or fill rate appears.
+Simulation/backtesting and a bounded Alpaca paper trial now have separate
+measured receipts. The [September21 paper roundtrip](../../blueprints/us-equities/paper-e2e-20260921/README.md)
+finished flat and reconciled; continuous operation, native broker faults and
+Elite throughput remain unqualified. Live trading has no authority. Engineering
+fixtures and service health do not establish financial readiness.
 
 ## Native workflow
 
