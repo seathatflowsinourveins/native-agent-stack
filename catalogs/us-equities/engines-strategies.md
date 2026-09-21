@@ -2,9 +2,18 @@
 
 Checked **2026-09-19** for an Alpaca-paper, research-first system. The [structured catalog](engines-strategies.json) records **38 repositories**: 4 defaults, 10 conditional additions, 14 alternatives, 8 watch items and 2 exclusions. These are decisions for this project, not a universal ranking or a claim that a strategy is profitable.
 
-One entry has historical native execution evidence: LEAN's bundled C# backtest. The other 37 have primary-source review, including README/license review and selected API/source inspection; none was installed, connected to a broker, trained or benchmarked for this catalog. A source-reviewed adapter is not an accepted paper-trading integration.
+**Current selection, reconciled September 21:** the [runtime target](runtime-target.json)
+selects NautilusTrader **2.0.0rc5** with native IBKR and a separate Alpaca path;
+LEAN is the retained historical comparator. The installed skfolio **1.2.9**
+acceptance covers its chronological splitter/control study. The earlier engine
+defaults and 1.231.0 source review below are historical, superseded for installation
+by the [dated R&D readiness decision](../../docs/foundation-rd-readiness.md).
+The current target also records bounded AAPL replay and Alpaca paper evidence;
+neither establishes SPY parity, a strategy edge or complete broker recovery.
 
-## The small default stack
+At the original September 19 source review, one entry had native execution evidence: LEAN's bundled C# backtest. The other 37 had primary-source review, including README/license review and selected API/source inspection; none was installed, connected to a broker, trained or benchmarked for that review. Later native acceptance is linked by the current selections above. A source-reviewed adapter is not an accepted paper-trading integration.
+
+## The September 19 default stack (historical)
 
 Retain **LEAN**, add its **official Alpaca brokerage adapter** only after the data and risk gates below, use **alpaca-py** for independent account/order reconciliation, and use **QuantStats** to render an explicitly defined return series. The strategy engine should be the only order writer. A separate read-only observer can compare the engine's journal with broker orders, executions, positions and cash.
 
@@ -18,14 +27,17 @@ The selected [Alpaca adapter factory](https://github.com/QuantConnect/Lean.Broke
 
 ## Engine and broker choices
 
-Versions below are the selected snapshots, not a promise that every dependency resolves together. Each JSON entry contains its repository, license, source URLs, requirements and prospective commands.
+Versions below retain the reviewed snapshots, not current installation instructions
+or a promise that every dependency resolves together. Each JSON entry contains its
+repository, license, source URLs, requirements and prospective commands. Use the
+current runtime target above for the selected engine.
 
 | Catalog ID | Selected version or source | Decision | Reason and boundary |
 | --- | --- | --- | --- |
 | `lean` | `985ef30` | Default | Existing native event-driven backtest proof; security and paper integration still open. |
 | `lean-alpaca` | `1973f61` | Default | Official broker adapter; source/build recipe, no accepted paper session. |
 | `alpaca-py` | 0.44.0 | Default | Official SDK for read-only broker-state observation and market-data interfaces. |
-| `nautilustrader` | 1.231.0 | Alternative | Strong typed event engine with IBKR/Databento paths; no Alpaca adapter in the inspected stable adapter tree. |
+| `nautilustrader` | 1.231.0 historical review | Alternative at that date; superseded | Current selected destination is 2.0.0rc5 in the runtime target; this older source review has no Alpaca adapter in its inspected tree. |
 | `lumibot` | 4.5.91 | Alternative | Direct Python strategy lifecycle and Alpaca broker; unresolved GPL/MIT license metadata conflict. |
 | `vectorbt` | 1.1.0 | Alternative | Array-based research sweeps; recheck selected hypotheses in the event engine. |
 | `backtrader` | 1.9.78.123 | Alternative | Useful for existing research; package and broker integration age require care. |
@@ -50,7 +62,7 @@ Start with a transparent benchmark and unambiguous accounting. Add an optimizer 
 | `quantstats` | 0.0.81 | Default | Return-series report with explicit frequency, benchmark and net-cost accounting. |
 | `pyportfolioopt` | 1.6.0 | Alternative | Covariance/shrinkage and conventional constrained portfolio weights. |
 | `riskfolio-lib` | 7.3.0 | Alternative | Broader risk measures and allocation formulations when required. |
-| `skfolio` | 1.2.8 | Conditional | Portfolio model selection, walk-forward and purged validation interfaces. |
+| `skfolio` | 1.2.9 accepted splitter; 1.2.8 earlier review | Conditional beyond accepted scope | Native chronological splitter/control study is accepted; portfolio optimization and broader validation remain separate. |
 | `cvxportfolio` | 1.5.1 | Conditional | Cost-aware, multi-period allocation research. |
 | `empyrical-reloaded` | 0.5.12 | Conditional | Reusable metrics where a report is insufficient. |
 | `ffn` | 1.2.2 | Alternative | Lightweight price/return analytics, especially alongside `bt`. |
@@ -128,4 +140,4 @@ Do not concatenate the entries into one installer. Respect the selected package'
 
 `version_or_commit` identifies the selected package release, reviewed release tag or source commit. `release_date` is the selected package's registry upload timestamp when applicable, otherwise the GitHub publication timestamp; source-only pins use `null`. Source URLs expose when API/license review used a source snapshot rather than the registry artifact. This is not a universal latest-HEAD audit. Notable version-family mismatches are explicit: LEAN's old GitHub release marker versus its current source pin; FinRL/FinGPT source versus old wheels; current `darts` versus legacy `u8darts`; and package releases that differ from GitHub's latest-release marker.
 
-The source and license declarations are recorded for selection, not a legal compatibility certification. Resolve Lumibot's conflicting metadata and Dexter's missing standalone license file before redistribution. Keep data/model terms separate from code licenses. The current open gaps are point-in-time US data acceptance, QuantConnect adapter entitlement, accepted Alpaca paper integration, deterministic risk/reconciliation implementation and any demonstrated strategy edge.
+The source and license declarations are recorded for selection, not a legal compatibility certification. Resolve Lumibot's conflicting metadata and Dexter's missing standalone license file before redistribution. Keep data/model terms separate from code licenses. At the September 19 review, open gaps included point-in-time US data acceptance, QuantConnect adapter entitlement, Alpaca paper integration, deterministic risk/reconciliation implementation and any demonstrated strategy edge. The later bounded runner and paper smoke close only their recorded scopes; use the current R&D readiness decision for remaining gates.

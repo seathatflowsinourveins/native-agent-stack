@@ -24,6 +24,13 @@ the reviewed code and tests: arbitrary CLI risk overrides are rejected.
 | Transport / trial | 5s connect and 5s read timeout; 180s trial window per invocation |
 | Request / write limits | 120 total HTTP requests per rolling minute; four write attempts over the durable trial |
 
+The final POST guard rechecks the entry/exit session buffer after intervening
+reads and request-rate waits. It advances the last validated broker clock from
+the start of that clock request, conservatively including response latency;
+missing clock state or backward local time blocks submission. This correction
+has offline boundary-test coverage. The dated native paper receipt retains its
+original source hash and does not qualify this later code revision.
+
 The paper account's large balance is not allocated to this trial. The target of
 1,000 trades/minute is not configured or qualified here. HTTP requests and trades
 are different counts; all requests, including reads, share the conservative

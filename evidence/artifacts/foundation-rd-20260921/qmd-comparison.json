@@ -1,0 +1,94 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-21T16:04:49Z",
+  "evidence_kind": "native_cli_benchmark",
+  "qmd_version": "2.8.3",
+  "scope": "One ordered four-mode QMD benchmark, 12 fixed queries, existing expanded local Markdown index",
+  "index": "native-agent-stack-catalog",
+  "fixture_collection": "us-equities-foundation",
+  "fixture": {
+    "path": "blueprints/us-equities/retrieval-evaluation/fixture.json",
+    "sha256": "2cabf12fa5fa2e97cd1c623a3c60243b48939279d5c3e4c39a4eb13df8c99858",
+    "bytes": 8366
+  },
+  "returned_table": {
+    "path": "evidence/artifacts/foundation-rd-20260921/qmd-bench-output.txt",
+    "sha256": "4e8f9ca28092983f6eca8340029b1cbba34b0fb228a84f36280ead9d340c40ff",
+    "bytes": 4548
+  },
+  "original_private_combined_output": {
+    "sha256": "f1257114d8fee9c5c7eba6a76d4780b0f9afb88861572b8d4b91a87a4bcf6feb",
+    "bytes": 6970
+  },
+  "table_projection": "Exact copy of peer-retained derived table: ANSI/progress/blank lines removed from original combined embed/benchmark output. Not complete raw stdout.",
+  "commands": [
+    {
+      "command": "timeout 300 qmd --index native-agent-stack-catalog bench blueprints/us-equities/retrieval-evaluation/fixture.json",
+      "exit_code": 124,
+      "scope": "Earlier incomplete attempt; retained, excluded from completed metrics"
+    },
+    {
+      "command": "qmd --index native-agent-stack-catalog embed",
+      "exit_code": 0
+    },
+    {
+      "command": "qmd --index native-agent-stack-catalog bench blueprints/us-equities/retrieval-evaluation/fixture.json",
+      "exit_code": 0
+    }
+  ],
+  "index_observation": {
+    "documents": 131,
+    "collections": 5,
+    "vectors": 667,
+    "full_corpus_seal": false
+  },
+  "models": [
+    "hf_ggml-org_embeddinggemma-300M-Q8_0.gguf",
+    "hf_ggml-org_qwen3-reranker-0.6b-q8_0.gguf",
+    "hf_tobil_qmd-query-expansion-1.7B-q4_k_m.gguf"
+  ],
+  "reported_metrics": [
+    {
+      "mode": "bm25",
+      "recall_at_1": 0.417,
+      "recall_at_3": 0.5,
+      "recall_at_5": 0.667,
+      "mrr": 0.508,
+      "average_latency_ms": 5
+    },
+    {
+      "mode": "vector",
+      "recall_at_1": 0.167,
+      "recall_at_3": 0.25,
+      "recall_at_5": 0.417,
+      "mrr": 0.299,
+      "average_latency_ms": 172
+    },
+    {
+      "mode": "hybrid",
+      "recall_at_1": 0.417,
+      "recall_at_3": 0.5,
+      "recall_at_5": 0.667,
+      "mrr": 0.503,
+      "average_latency_ms": 10328
+    },
+    {
+      "mode": "full",
+      "recall_at_1": 0.417,
+      "recall_at_3": 0.5,
+      "recall_at_5": 0.5,
+      "mrr": 0.519,
+      "average_latency_ms": 75920
+    }
+  ],
+  "decision": "Retain scoped BM25; equal aggregate BM25/hybrid recall does not offset the reported hybrid latency on this diagnostic.",
+  "overturning_comparison": "A sealed representative corpus and query set with useful retrieval-quality gains and acceptable repeated end-to-end latency.",
+  "limits": [
+    "No full corpus seal; expanded index differs from September19 baseline",
+    "One ordered run, no randomized repeated warm/cold comparison",
+    "Small non-exhaustive gold set; metrics rounded by native CLI",
+    "MRR can count ranks below5 even when recall@5 is zero",
+    "Embedding and model download costs are separate from per-query latency",
+    "No financial-RAG, universal SOTA, model-quality or provider-token-saving claim"
+  ]
+}

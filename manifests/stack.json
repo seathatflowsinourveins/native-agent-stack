@@ -208,7 +208,8 @@
         "foundation-closure-20260921",
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
-        "alpaca-paper-e2e-20260921"
+        "alpaca-paper-e2e-20260921",
+        "foundation-rd-20260921"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -301,7 +302,8 @@
         "foundation-native-20260920",
         "foundation-closure-20260921",
         "native-returned-results-20260921",
-        "full-stack-convergence-20260921"
+        "full-stack-convergence-20260921",
+        "foundation-rd-20260921"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex"
@@ -327,7 +329,8 @@
       "evidence_ids": [
         "component-history",
         "token-practice-coverage-20260920",
-        "token-practice-gap-followup-20260920"
+        "token-practice-gap-followup-20260920",
+        "foundation-rd-20260921"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex-plugin-cc/tree/v1.0.6"
@@ -710,7 +713,8 @@
         "native-dashboard-data-20260921",
         "native-returned-results-20260921",
         "native-memory-rag-alignment-20260921",
-        "full-stack-convergence-20260921"
+        "full-stack-convergence-20260921",
+        "foundation-rd-20260921"
       ],
       "upstream_sources": [
         "https://github.com/tobi/qmd/releases/tag/v2.8.3"
@@ -1781,7 +1785,7 @@
       "version": "2.0.0rc5",
       "license": "LGPL-3.0-only",
       "profile": "optional",
-      "role": "User-selected trading-engine destination; isolated upstream synthetic FX acceptance, separate from equity data and broker adapters",
+      "role": "Selected trading-engine destination; accepted native synthetic FX and retained AAPL diagnostic replay, separate from SPY parity and broker adapters",
       "commands": [
         "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --pre nautilus_trader==2.0.0rc5",
         "\"$NAUTILUS_ENV/bin/python\" \"$UPSTREAM_QUICKSTART\""
@@ -1796,7 +1800,7 @@
         "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc5",
         "https://nautilustrader.io/docs/latest/getting_started/installation/"
       ],
-      "freshness": "Exact requested release candidate installed in isolated native prefix; two offline synthetic upstream runs accepted. No broker connection, equity replay or paper acceptance."
+      "freshness": "Exact requested release candidate in isolated native prefix; upstream synthetic and later AAPL diagnostic replays accepted within their receipts. Frozen SPY parity and native Nautilus broker acceptance remain open; separate Alpaca paper evidence does not qualify the Nautilus adapter."
     }
   ],
   "profiles": [
