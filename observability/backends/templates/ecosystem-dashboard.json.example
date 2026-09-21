@@ -2,7 +2,15 @@
   "uid": "ecosystem-native",
   "title": "Native agent ecosystem",
   "schemaVersion": 39,
-  "version": 7,
+  "version": 8,
+  "links": [
+    {
+      "type": "link",
+      "title": "Memory, RAG and token-saving results",
+      "url": "/d/native-foundation-data",
+      "targetBlank": false
+    }
+  ],
   "editable": false,
   "timezone": "browser",
   "refresh": "15s",

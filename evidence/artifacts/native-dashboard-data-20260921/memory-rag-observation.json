@@ -1,0 +1,104 @@
+{
+  "provenance": "Selected native metadata projection; host paths and private session IDs normalized. Original bytes remain private.",
+  "original": {
+    "bytes": 3518,
+    "sha256": "18755e22b60c9377c9229d2e094e5c0e79bf45976e8e821dd7d8a0a6f641ef54"
+  },
+  "data": {
+    "recorded_at_utc": "2026-09-21T02:39:54.404350+00:00",
+    "kind": "observations from native tool results in this task; no synthetic fixture",
+    "ai_memory": {
+      "version": "2.3.2",
+      "source_commit": "353841d91618d20b110b208de284a74d0b960379",
+      "source_url": "https://github.com/akitaonrails/ai-memory/blob/v2.3.2/docs/usage.md#browse-the-wiki-in-a-browser",
+      "unit": "ai-memory.service",
+      "configuration_change": "append --enable-web only to existing scoped HTTP ExecStart",
+      "restart_exit_code": 0,
+      "daemon_reload_exit_code": 0,
+      "observed_pid_after_restart": 211782,
+      "counts_immediately_before_and_after_restart": {
+        "pages_latest": 50,
+        "pages_all": 140,
+        "sessions": 69,
+        "observations": 30035
+      },
+      "browser_session": "native-memory-ui-check-20260921",
+      "browser_closed": true,
+      "browser_project_url": "http://127.0.0.1:49374/web/w/agent-lab/agent-lab",
+      "browser_project_pages": 50,
+      "browser_search_url": "http://127.0.0.1:49374/web/search?q=token",
+      "browser_search_result_links": 3,
+      "browser_search_result_scopes": [
+        "agent-lab/agent-lab"
+      ],
+      "browser_opened_result_article_characters": 26594,
+      "browser_password_inputs": 0,
+      "auth_settings_modified": false,
+      "embedding_provider": "none",
+      "embedding_status": "disabled",
+      "latest_pages_missing_embeddings": 50,
+      "embedding_rows": 0,
+      "embed_failures_unresolved": 0
+    },
+    "socraticode": {
+      "version": "1.14.0",
+      "scope": "<PROJECT>",
+      "query": "cumulative token savings report native counters",
+      "hit_count": 3,
+      "scores": [
+        0.7,
+        0.5769,
+        0.3733
+      ],
+      "default_cli_exit_code": 0,
+      "native_mcp_watcher_after_bridge_change": "active (watched by another process)",
+      "chunks": 7431,
+      "graph_original": "/tmp/socraticode-graph/72cfa87c5abf.html",
+      "graph_stable": "<PROJECT>/docs/socraticode-graph.html",
+      "graph_sha256": "44aa783c118258d8e60a9230686f5700f1a3b737377a3ae8d2eefd329badc3a7",
+      "graph_files": 222,
+      "graph_rendered_edges": 41,
+      "graph_raw_stats_edges": 43,
+      "graph_symbols": 2405,
+      "graph_calls": 4638,
+      "source_commit": "2218f25153d0f3f4a76ee240a5643dbc873e80be",
+      "top_hit_original_source": {
+        "path": "<PROJECT>/packaging-repo/tools/token-report/token_manifest.py",
+        "bytes": 45037,
+        "sha256": "8c32a6832b53baddfe895b0e5dd14319d955a4ac4e55b842e0e9fc2e91900b38",
+        "lines": [
+          351,
+          376
+        ]
+      }
+    },
+    "qmd": {
+      "version": "2.8.3",
+      "index": "agent-lab-docs",
+      "documents": 66,
+      "embedded": 0,
+      "profile": "intentional BM25 without model downloads",
+      "search_query": "Qdrant",
+      "search_hit_count": 3,
+      "top_score": 0.75,
+      "get_stdout_sha256": "959368243e55aa02ed466b82e1dfb9e82ac47ddefb22436a55e3408b735709fd",
+      "source_commit": "facd35e01359e59d938bc9418e93fb9318addee3"
+    },
+    "qdrant": {
+      "version": "1.19.1",
+      "collection": "codebase_72cfa87c5abf",
+      "points": 7431,
+      "status": "green",
+      "optimizer_status": "ok",
+      "payload_free_scroll_returned": 1,
+      "scroll_time_seconds": 0.007916525
+    },
+    "independent_preservation_review": {
+      "reviewer": "foundation_catalog_builder",
+      "ai_memory_only_added_enable_web": true,
+      "mcporter_only_three_selected_server_settings_changed": true,
+      "supported_regression_findings": [],
+      "review_type": "read-only exact byte and parsed JSON comparison; no service rerun"
+    }
+  }
+}

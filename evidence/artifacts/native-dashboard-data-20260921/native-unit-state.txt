@@ -1,0 +1,22 @@
+Result=success
+ExecMainStartTimestamp=Sun 2026-09-20 23:01:49 EDT
+ExecMainStatus=0
+Id=ecosystem-native-data.service
+ActiveState=inactive
+SubState=dead
+UnitFileState=static
+
+LastTriggerUSec=Sun 2026-09-20 23:01:49 EDT
+Result=success
+Id=ecosystem-native-data.timer
+ActiveState=active
+SubState=waiting
+UnitFileState=enabled
+
+Result=success
+ExecMainStartTimestamp=Sun 2026-09-20 22:31:21 EDT
+ExecMainStatus=0
+Id=ecosystem-native-reports.service
+ActiveState=active
+SubState=running
+UnitFileState=enabled

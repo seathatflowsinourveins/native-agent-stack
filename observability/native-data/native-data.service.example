@@ -1,0 +1,10 @@
+[Unit]
+Description=Observe selected native memory and token metadata
+After=ecosystem-loki.service
+
+[Service]
+Type=oneshot
+UMask=0077
+NoNewPrivileges=true
+TimeoutStartSec=90
+ExecStart=/usr/bin/python3 @REPOSITORY@/observability/native-data/snapshot.py --config @PRIVATE_CONFIG@ --publish

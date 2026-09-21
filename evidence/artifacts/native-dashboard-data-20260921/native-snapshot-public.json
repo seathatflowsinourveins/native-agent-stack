@@ -1,0 +1,839 @@
+{
+  "provenance": "Selected native metadata projection; host paths and private session IDs normalized. Original bytes remain private.",
+  "original": {
+    "bytes": 66557,
+    "sha256": "ab64c236f9ec5ac4a376ad4ae86266a081ce694a3da195d52d06d8d5b4b7b606"
+  },
+  "data": {
+    "schema_version": 1,
+    "observed_unix": 1789959709.809148,
+    "rows": [
+      {
+        "schema_version": 1,
+        "record_kind": "savings",
+        "entity_id": "rtk-global",
+        "title": "RTK: all retained projects",
+        "state": "ok",
+        "source_updated_at": "2026-09-21T03:01:49.811887+00:00",
+        "source_unix": 1789959709.811887,
+        "observed_unix": 1789959709.809148,
+        "source_command": "rtk gain --format json",
+        "kind": "upstream output estimate",
+        "boundary": "Retained RTK history, including this project; overlaps project and context counters; not provider usage.",
+        "timestamp_basis": "fresh_native_command_capture",
+        "value": 4370,
+        "estimated_saved": 4370,
+        "unit": "estimated_tokens",
+        "total_commands": 245,
+        "input_tokens": 736134,
+        "output_tokens": 731933
+      },
+      {
+        "schema_version": 1,
+        "record_kind": "savings",
+        "entity_id": "rtk-project",
+        "title": "RTK: configured project",
+        "state": "ok",
+        "source_updated_at": "2026-09-21T03:01:49.814101+00:00",
+        "source_unix": 1789959709.814101,
+        "observed_unix": 1789959709.809148,
+        "source_command": "rtk gain --project --format json",
+        "kind": "upstream output estimate",
+        "boundary": "Explicit working directory; subset of global retained history, not provider usage.",
+        "timestamp_basis": "fresh_native_command_capture",
+        "value": 2209,
+        "estimated_saved": 2209,
+        "unit": "estimated_tokens",
+        "total_commands": 28,
+        "input_tokens": 13981,
+        "output_tokens": 11772
+      },
+      {
+        "schema_version": 1,
+        "record_kind": "memory",
+        "entity_id": "ai-memory",
+        "title": "ai-memory: entire configured database",
+        "state": "ok",
+        "source_updated_at": "2026-09-21T03:01:49.826571+00:00",
+        "source_unix": 1789959709.826571,
+        "observed_unix": 1789959709.809148,
+        "source_command": "ai-memory --data-dir <configured-db> status --json",
+        "kind": "native inventory",
+        "boundary": "Database-wide counts. CLI status has no workspace/project selector; configured project labels do not filter these counts.",
+        "timestamp_basis": "fresh_native_command_capture",
+        "value": 50,
+        "unit": "pages",
+        "pages_latest": 50,
+        "pages_all": 144,
+        "sessions": 69,
+        "observations": 31129
+      },
+      {
+        "schema_version": 1,
+        "record_kind": "memory",
+        "entity_id": "qmd",
+        "title": "QMD: configured collection",
+        "state": "ok",
+        "source_updated_at": "2026-09-21T03:01:49.950546+00:00",
+        "source_unix": 1789959709.950546,
+        "observed_unix": 1789959709.809148,
+        "source_command": "qmd --index <configured-index> status",
+        "kind": "native inventory",
+        "boundary": "Selected collection files; vector and total counts apply to its entire index. Zero vectors can be intentional BM25 operation.",
+        "timestamp_basis": "fresh_native_command_capture",
+        "value": 67,
+        "unit": "files",
+        "collection_files": 67,
+        "index_files": 67,
+        "index_vectors": 0
+      },
+      {
+        "schema_version": 1,
+        "record_kind": "memory",
+        "entity_id": "qdrant",
+        "title": "Qdrant: configured collection",
+        "state": "ok",
+        "source_updated_at": "2026-09-21T03:01:49.963433+00:00",
+        "source_unix": 1789959709.963433,
+        "observed_unix": 1789959709.809148,
+        "source_command": "GET /collections/<allowlisted-collection>",
+        "kind": "native inventory",
+        "boundary": "Native points_count for one explicitly selected collection; vector representations are not added together.",
+        "timestamp_basis": "fresh_native_api_capture",
+        "value": 7431,
+        "points_count": 7431,
+        "unit": "points",
+        "collection_status": "green",
+        "segments_count": 2
+      },
+      {
+        "schema_version": 1,
+        "record_kind": "savings",
+        "entity_id": "context-mode-native-codex",
+        "title": "Context Mode: native Codex",
+        "state": "ok",
+        "source_updated_at": "2026-09-21T02:39:37.113000+00:00",
+        "source_unix": 1789958377.113,
+        "observed_unix": 1789959709.809148,
+        "source_command": "existing token report: native.latest",
+        "kind": "upstream estimate",
+        "boundary": "One runtime snapshot: retained estimate = event count x 256; session estimate = kept-out bytes / 4. Different bases, not additive or provider savings. Retention can decrease counters.",
+        "timestamp_basis": "native_persisted_updated_at",
+        "value": 96000,
+        "estimated_saved": 96000,
+        "unit": "estimated_tokens",
+        "source_capture_unix": 1789958378.397538,
+        "report_file_unix": 1789958383.6719491,
+        "session_estimated_saved": 141304
+      },
+      {
+        "schema_version": 1,
+        "record_kind": "savings",
+        "entity_id": "context-mode-native-claude",
+        "title": "Context Mode: native Claude",
+        "state": "ok",
+        "source_updated_at": "2026-09-21T02:39:37.572000+00:00",
+        "source_unix": 1789958377.572,
+        "observed_unix": 1789959709.809148,
+        "source_command": "existing token report: native.latest",
+        "kind": "upstream estimate",
+        "boundary": "One runtime snapshot: retained estimate = event count x 256; session estimate = kept-out bytes / 4. Different bases, not additive or provider savings. Retention can decrease counters.",
+        "timestamp_basis": "native_persisted_updated_at",
+        "value": 127744,
+        "estimated_saved": 127744,
+        "unit": "estimated_tokens",
+        "source_capture_unix": 1789958378.401269,
+        "report_file_unix": 1789958383.6719491,
+        "session_estimated_saved": 0
+      },
+      {
+        "schema_version": 1,
+        "record_kind": "savings",
+        "entity_id": "context-mode-desktop-wsl",
+        "title": "Context Mode: Desktop WSL",
+        "state": "stale",
+        "source_updated_at": "2026-09-20T17:05:34.932000+00:00",
+        "source_unix": 1789923934.932,
+        "observed_unix": 1789959709.809148,
+        "source_command": "existing token report: native.latest",
+        "kind": "upstream estimate",
+        "boundary": "One runtime snapshot: retained estimate = event count x 256; session estimate = kept-out bytes / 4. Different bases, not additive or provider savings. Retention can decrease counters.",
+        "timestamp_basis": "native_persisted_updated_at",
+        "value": 2346752,
+        "estimated_saved": 2346752,
+        "unit": "estimated_tokens",
+        "source_capture_unix": 1789958378.409125,
+        "report_file_unix": 1789958383.6719491,
+        "session_estimated_saved": 0
+      },
+      {
+        "schema_version": 1,
+        "record_kind": "savings",
+        "entity_id": "headroom",
+        "title": "Headroom: retained 30 days",
+        "state": "ok",
+        "source_updated_at": "2026-09-21T02:39:37.705028+00:00",
+        "source_unix": 1789958377.705028,
+        "observed_unix": 1789959709.809148,
+        "source_command": "existing token report: native.latest",
+        "kind": "upstream estimate",
+        "boundary": "Latest native report capture; retained tool estimate, overlapping with other counters, not avoided provider usage.",
+        "timestamp_basis": "native_command_capture_in_report",
+        "value": 0,
+        "estimated_saved": 0,
+        "unit": "estimated_tokens",
+        "source_capture_unix": 1789958377.705028,
+        "report_file_unix": 1789958383.6719491
+      },
+      {
+        "schema_version": 1,
+        "record_kind": "savings",
+        "entity_id": "jcodemunch",
+        "title": "jCodeMunch: default index",
+        "state": "ok",
+        "source_updated_at": "2026-09-21T02:39:38.347013+00:00",
+        "source_unix": 1789958378.347013,
+        "observed_unix": 1789959709.809148,
+        "source_command": "existing token report: native.latest",
+        "kind": "upstream estimate",
+        "boundary": "Latest native report capture; retained tool estimate, overlapping with other counters, not avoided provider usage.",
+        "timestamp_basis": "native_command_capture_in_report",
+        "value": 59640,
+        "estimated_saved": 59640,
+        "unit": "estimated_tokens",
+        "source_capture_unix": 1789958378.347013,
+        "report_file_unix": 1789958383.6719491
+      },
+      {
+        "entity_id": "coverage-affaan-m--ECC",
+        "coverage_status": "not_run_in_original_audit",
+        "canonical_receipt_count": 4,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-agent-browser",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 7,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-agentsview",
+        "coverage_status": "not_run_in_original_audit",
+        "canonical_receipt_count": 5,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-ai-memory",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 13,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-ast-grep",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 4,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-ccusage",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 4,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-claude-code",
+        "coverage_status": "not_run_in_original_audit",
+        "canonical_receipt_count": 21,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-claude-hud",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 5,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-codebase-memory-mcp",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 4,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-codex",
+        "coverage_status": "not_run_in_original_audit",
+        "canonical_receipt_count": 21,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-codex-for-claude",
+        "coverage_status": "not_run_in_original_audit",
+        "canonical_receipt_count": 3,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-context-hub",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 3,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-context-mode",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 17,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-davila7--claude-code-templates",
+        "coverage_status": "not_run_in_original_audit",
+        "canonical_receipt_count": 2,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-difftastic",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 3,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-gitleaks",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 3,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-headroom",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 11,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-huggingface-hub-native",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 3,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-markitdown",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 4,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-mcp-inspector",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 3,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-mcporter",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 3,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-openresearch",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 4,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-playwright-cli",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 3,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-promptfoo",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 3,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-qdrant",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 8,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-qmd",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 11,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-repomix",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 7,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-rtk",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 15,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-sandbox-runtime",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 4,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-serena",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 7,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-shanraisshan--claude-code-best-practice",
+        "coverage_status": "not_run_in_original_audit",
+        "canonical_receipt_count": 2,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-shellcheck",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 3,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-socraticode",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 11,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-toon",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 9,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-vllm",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 7,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-worktrunk",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 4,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-opentelemetry-collector-contrib",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 4,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-prometheus",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 6,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-loki",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 5,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-grafana",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 3,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-alertmanager",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 2,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-ntfy",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 3,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-duckdb",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-restic",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 3,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-dagu",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 6,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-lean",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-syft",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 2,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-alpaca-py",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-systemd",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 4,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-pandas",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-skfolio",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-edgartools",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 2,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-zizmor",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-beads",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-skills-ref",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-otel-tui",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 2,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-llama-cpp",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-jcodemunch-mcp",
+        "coverage_status": "original_audit_has_record",
+        "canonical_receipt_count": 9,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-nextjs",
+        "coverage_status": "unavailable",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-react",
+        "coverage_status": "unavailable",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-fastapi",
+        "coverage_status": "unavailable",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-postgresql",
+        "coverage_status": "unavailable",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-poppler",
+        "coverage_status": "unavailable",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-apple-container",
+        "coverage_status": "unavailable",
+        "canonical_receipt_count": 0,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-playwright-test",
+        "coverage_status": "unavailable",
+        "canonical_receipt_count": 1,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-omniroute",
+        "coverage_status": "unavailable",
+        "canonical_receipt_count": 2,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-tavily-cli",
+        "coverage_status": "unavailable",
+        "canonical_receipt_count": 2,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "entity_id": "coverage-nautilus-trader",
+        "coverage_status": "unavailable",
+        "canonical_receipt_count": 2,
+        "source_updated_at": "2026-09-21T02:39:43.574472+00:00",
+        "timestamp_basis": "token_report_generated_at"
+      },
+      {
+        "schema_version": 1,
+        "record_kind": "snapshot",
+        "entity_id": "snapshot",
+        "title": "Native data snapshot",
+        "state": "ok",
+        "source_updated_at": "2026-09-21T03:01:49.809148+00:00",
+        "source_unix": 1789959709.809148,
+        "observed_unix": 1789959709.809148,
+        "source_command": "snapshot.py --config <private-config>",
+        "kind": "collector generation",
+        "boundary": "One generation; failure rows supersede earlier success. No sum across estimates or token scopes.",
+        "row_count": 78,
+        "unknown_count": 0,
+        "stale_count": 1
+      }
+    ],
+    "commands": [
+      {
+        "id": "rtk-global",
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/bin/rtk",
+          "gain",
+          "--format",
+          "json"
+        ],
+        "cwd": "<PROJECT>",
+        "started_at": "2026-09-21T03:01:49.809154+00:00",
+        "exit_code": 0,
+        "error": null,
+        "completed_at": "2026-09-21T03:01:49.811887+00:00",
+        "stdout": {
+          "file": "rtk-global.stdout",
+          "bytes": 225,
+          "sha256": "6239b5e93867f8562bd2eda5834b0e3586b62662988c02232ad32624c3f2ca52"
+        },
+        "stderr": {
+          "file": "rtk-global.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "rtk-project",
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/bin/rtk",
+          "gain",
+          "--project",
+          "--format",
+          "json"
+        ],
+        "cwd": "<PROJECT>",
+        "started_at": "2026-09-21T03:01:49.812146+00:00",
+        "exit_code": 0,
+        "error": null,
+        "completed_at": "2026-09-21T03:01:49.814101+00:00",
+        "stdout": {
+          "file": "rtk-project.stdout",
+          "bytes": 218,
+          "sha256": "4489523d52d8b88f274742dd25252812d5b3383ad94ef8e50939263a7b2f6096"
+        },
+        "stderr": {
+          "file": "rtk-project.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "ai-memory",
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/bin/ai-memory",
+          "--data-dir",
+          "<HOME>/.local/share/ai-memory",
+          "status",
+          "--json"
+        ],
+        "cwd": "<PROJECT>",
+        "started_at": "2026-09-21T03:01:49.814270+00:00",
+        "exit_code": 0,
+        "error": null,
+        "completed_at": "2026-09-21T03:01:49.826571+00:00",
+        "stdout": {
+          "file": "ai-memory.stdout",
+          "bytes": 1980,
+          "sha256": "c57352197e64d792493eb9185e515020dc00c32ce13ff7c2aee16d46dcf3c189"
+        },
+        "stderr": {
+          "file": "ai-memory.stderr",
+          "bytes": 280,
+          "sha256": "9039024cab048b5cbc5293dce9da80921fcd2b286f3dc5f42570044e125d9d5e"
+        }
+      },
+      {
+        "id": "qmd",
+        "argv": [
+          "<HOME>/.local/share/codex-ecosystem/bin/qmd",
+          "--index",
+          "agent-lab-docs",
+          "status"
+        ],
+        "cwd": "<PROJECT>",
+        "started_at": "2026-09-21T03:01:49.826867+00:00",
+        "exit_code": 0,
+        "error": null,
+        "completed_at": "2026-09-21T03:01:49.950546+00:00",
+        "stdout": {
+          "file": "qmd.stdout",
+          "bytes": 1062,
+          "sha256": "59d8bff38e44321916cdfe1022b7dcc4baa21337bc3581d65f779d83eb61c217"
+        },
+        "stderr": {
+          "file": "qmd.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "qdrant",
+        "method": "GET",
+        "url": "http://127.0.0.1:16333/collections/codebase_72cfa87c5abf",
+        "started_at": "2026-09-21T03:01:49.951064+00:00",
+        "http_status": 200,
+        "error": null,
+        "completed_at": "2026-09-21T03:01:49.963433+00:00",
+        "stdout": {
+          "file": "qdrant.stdout",
+          "bytes": 1098,
+          "sha256": "75720d0daf8f3a4f73e07d7026c940791632b60d2724eb7fbad588f2b1b9a91f"
+        },
+        "stderr": {
+          "file": "qdrant.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      {
+        "id": "token-report",
+        "path": "<PROJECT>/docs/token-savings-lifetime-results.json",
+        "error": null,
+        "bytes": 4276192,
+        "sha256": "dd937d0963f6aaec68c4ea382bf0a03325ec7a40ea489eca91bfbcac36a8f3e3",
+        "file_mtime": "2026-09-21T02:39:43.671949+00:00"
+      }
+    ],
+    "loki": {
+      "requested": true,
+      "http_status": 204,
+      "payload_sha256": "e722a3474205709afbacf816dd5692d355e96ec909974a6d698fa3d0a30cc1b7",
+      "error": null,
+      "response": {
+        "file": "loki-response",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  }
+}

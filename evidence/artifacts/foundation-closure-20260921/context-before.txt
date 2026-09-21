@@ -1,0 +1,258 @@
+ ▐▛███▛█   Claude Code v2.1.278
+▝▜██████▀  Opus 5 (1M context) · Claude Max
+  ▝▝ ▝▝    <PROJECT>
+
+  Fable 5.1 writes better code and reports progress on long tasks. Switch anytime with /model.
+
+❯ /context all
+  ⎿  Context Usage
+     ⛀ ⛁ ⛁ ⛁ ⛀ ⛀ ⛁ ⛁ ⛁ ⛀ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   Opus 5 (1M context)
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   claude-opus-5[1m]
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   33.8k/1m tokens (3%)
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   Estimated usage by category
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   ⛁ System prompt: 3.3k tokens (0.3%)
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   ⛁ System tools: 14k tokens (1.4%)
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   ⛁ MCP tools: 609 tokens (0.1%)
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   ⛁ Custom agents: 141 tokens (0.0%)
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝   ⛁ Memory files: 4.5k tokens (0.4%)
+                                               ⛁ Skills: 9.5k tokens (1.0%)
+                                               ⛁ Messages: 1.8k tokens (0.2%)
+                                               ⛶ Free space: 933.2k (93.3%)
+                                               ⛝ Autocompact buffer: 33k tokens (3.3%)
+
+     Auto-compact window: 1m tokens
+
+     MCP tools · /mcp (loaded on-demand)
+
+     Loaded
+     ├ mcp__claude_ai_Claude_Docs__batch: 149 tokens
+     ├ mcp__claude_ai_Claude_Docs__guide: 192 tokens
+     └ mcp__claude_ai_Claude_Docs__update: 268 tokens
+
+     Available
+     ├ mcp__ai-memory__memory_auto_improve
+     ├ mcp__ai-memory__memory_briefing
+     ├ mcp__ai-memory__memory_consolidate
+     ├ mcp__ai-memory__memory_delete_page
+     ├ mcp__ai-memory__memory_explore
+     ├ mcp__ai-memory__memory_feedback
+     ├ mcp__ai-memory__memory_forget_sweep
+     ├ mcp__ai-memory__memory_handoff_accept
+     ├ mcp__ai-memory__memory_handoff_begin
+     ├ mcp__ai-memory__memory_handoff_cancel
+     ├ mcp__ai-memory__memory_handoff_list
+     ├ mcp__ai-memory__memory_install_self_routing
+     ├ mcp__ai-memory__memory_lint
+     ├ mcp__ai-memory__memory_message_cancel
+     ├ mcp__ai-memory__memory_message_list
+     ├ mcp__ai-memory__memory_message_pop
+     ├ mcp__ai-memory__memory_message_send
+     ├ mcp__ai-memory__memory_query
+     ├ mcp__ai-memory__memory_read_page
+     ├ mcp__ai-memory__memory_read_session_observations
+     ├ mcp__ai-memory__memory_recent
+     ├ mcp__ai-memory__memory_status
+     ├ mcp__ai-memory__memory_write_page
+     ├ mcp__claude_ai_Claude_Docs__create
+     ├ mcp__claude_ai_Claude_Docs__delete
+     ├ mcp__claude_ai_Claude_Docs__export
+     ├ mcp__claude_ai_Claude_Docs__query
+     ├ mcp__claude_ai_Claude_Docs__read
+     ├ mcp__jcodemunch__announce_model
+     ├ mcp__jcodemunch__jcodemunch_guide
+     ├ mcp__jcodemunch__menu
+     ├ mcp__jcodemunch__order
+     ├ mcp__jcodemunch__route
+     ├ mcp__jcodemunch__set_tool_tier
+     ├ mcp__plugin_context-mode_context-mode__ctx_batch_execute
+     ├ mcp__plugin_context-mode_context-mode__ctx_doctor
+     ├ mcp__plugin_context-mode_context-mode__ctx_execute
+     ├ mcp__plugin_context-mode_context-mode__ctx_execute_file
+     ├ mcp__plugin_context-mode_context-mode__ctx_fetch_and_index
+     ├ mcp__plugin_context-mode_context-mode__ctx_index
+     ├ mcp__plugin_context-mode_context-mode__ctx_insight
+     ├ mcp__plugin_context-mode_context-mode__ctx_purge
+     ├ mcp__plugin_context-mode_context-mode__ctx_search
+     ├ mcp__plugin_context-mode_context-mode__ctx_stats
+     ├ mcp__plugin_context-mode_context-mode__ctx_upgrade
+     ├ mcp__serena__delete_memory
+     ├ mcp__serena__edit_memory
+     ├ mcp__serena__find_declaration
+     ├ mcp__serena__find_implementations
+     ├ mcp__serena__find_referencing_symbols
+     ├ mcp__serena__find_symbol
+     ├ mcp__serena__get_diagnostics_for_file
+     ├ mcp__serena__get_symbols_overview
+     ├ mcp__serena__initial_instructions
+     ├ mcp__serena__insert_after_symbol
+     ├ mcp__serena__insert_before_symbol
+     ├ mcp__serena__list_memories
+     ├ mcp__serena__onboarding
+     ├ mcp__serena__read_memory
+     ├ mcp__serena__rename_memory
+     ├ mcp__serena__rename_symbol
+     ├ mcp__serena__replace_content
+     ├ mcp__serena__replace_in_files
+     ├ mcp__serena__replace_symbol_body
+     ├ mcp__serena__safe_delete_symbol
+     ├ mcp__serena__write_memory
+     ├ mcp__socraticode__codebase_about
+     ├ mcp__socraticode__codebase_context
+     ├ mcp__socraticode__codebase_context_index
+     ├ mcp__socraticode__codebase_context_remove
+     ├ mcp__socraticode__codebase_context_search
+     ├ mcp__socraticode__codebase_flow
+     ├ mcp__socraticode__codebase_graph_build
+     ├ mcp__socraticode__codebase_graph_circular
+     ├ mcp__socraticode__codebase_graph_query
+     ├ mcp__socraticode__codebase_graph_remove
+     ├ mcp__socraticode__codebase_graph_stats
+     ├ mcp__socraticode__codebase_graph_status
+     ├ mcp__socraticode__codebase_graph_visualize
+     ├ mcp__socraticode__codebase_health
+     ├ mcp__socraticode__codebase_impact
+     ├ mcp__socraticode__codebase_index
+     ├ mcp__socraticode__codebase_list_projects
+     ├ mcp__socraticode__codebase_prune
+     ├ mcp__socraticode__codebase_remove
+     ├ mcp__socraticode__codebase_search
+     ├ mcp__socraticode__codebase_status
+     ├ mcp__socraticode__codebase_stop
+     ├ mcp__socraticode__codebase_symbol
+     ├ mcp__socraticode__codebase_symbols
+     ├ mcp__socraticode__codebase_update
+     └ mcp__socraticode__codebase_watch
+
+     Custom agents · .claude/agents/
+
+     Project
+     ├ isolated-builder: 32 tokens
+     └ evidence-reviewer: 30 tokens
+
+     Plugin
+     └ codex:codex-rescue: 79 tokens
+
+     Memory files · /memory
+     ├ ~/.claude/CLAUDE.md: 897 tokens
+     ├ ~/.claude/RTK.md: 147 tokens
+     ├ CLAUDE.md: 154 tokens
+     ├ AGENTS.md: 3.1k tokens
+     └ RTK.md: 157 tokens
+
+     Skills · /skills
+
+     Project
+     ├ codebase-exploration: ~160 tokens
+     ├ codebase-management: ~140 tokens
+     ├ ai-memory-learning-maintenance: ~120 tokens
+     ├ ai-memory-durable-pages: ~110 tokens
+     ├ ai-memory-messaging: ~110 tokens
+     ├ ai-memory-retrieval: ~100 tokens
+     ├ ai-memory-routing-install: ~100 tokens
+     ├ ai-memory-handoff: ~100 tokens
+     ├ task-checkpoint: ~50 tokens
+     ├ concise-planning: ~40 tokens
+     └ playwright-cli: ~30 tokens
+
+     User
+     ├ hf-cli: ~340 tokens
+     ├ agent-browser: ~310 tokens
+     ├ tavily-crawl: ~180 tokens
+     ├ tavily-search: ~170 tokens
+     ├ tavily-map: ~170 tokens
+     ├ tavily-research: ~170 tokens
+     ├ tavily-extract: ~160 tokens
+     ├ tavily-cli: ~130 tokens
+     ├ tavily-dynamic-search: ~110 tokens
+     ├ tavily-best-practices: ~100 tokens
+     ├ iterative-retrieval: ~70 tokens
+     ├ qmd: ~60 tokens
+     ├ search-first: ~50 tokens
+     └ local-agent-ecosystem: ~50 tokens
+
+     claude.ai sync
+     ├ anthropic-skills:docx: ~350 tokens
+     ├ anthropic-skills:docs: ~330 tokens
+     ├ anthropic-skills:pptx: ~330 tokens
+     ├ anthropic-skills:xlsx: ~320 tokens
+     ├ anthropic-skills:computer-use: ~320 tokens
+     ├ anthropic-skills:built-in-browser: ~290 tokens
+     ├ anthropic-skills:chrome-browser: ~260 tokens
+     ├ anthropic-skills:deep-research: ~200 tokens
+     ├ anthropic-skills:pdf: ~150 tokens
+     ├ anthropic-skills:morning: ~120 tokens
+     ├ anthropic-skills:skill-creator: ~120 tokens
+     └ anthropic-skills:import-memory: ~60 tokens
+
+     Plugin (claude-hud)
+     ├ claude-hud:configure: ~50 tokens
+     └ claude-hud:setup: ~20 tokens
+
+     Plugin (codex)
+     ├ codex:gpt-5-4-prompting: ~60 tokens
+     ├ codex:rescue: ~40 tokens
+     ├ codex:codex-cli-runtime: ~40 tokens
+     ├ codex:setup: ~40 tokens
+     └ codex:codex-result-handling: ~30 tokens
+
+     Plugin (context-mode)
+     ├ context-mode:context-mode: ~330 tokens
+     ├ context-mode:ctx-stats: ~100 tokens
+     ├ context-mode:ctx-insight: ~100 tokens
+     ├ context-mode:ctx-index: ~80 tokens
+     ├ context-mode:ctx-purge: ~70 tokens
+     ├ context-mode:ctx-search: ~60 tokens
+     ├ context-mode:ctx-upgrade: ~60 tokens
+     └ context-mode:ctx-doctor: ~60 tokens
+
+     Built-in
+     ├ dataviz: ~480 tokens
+     ├ claude-api: ~360 tokens
+     ├ code-review: ~280 tokens
+     ├ update-config: ~240 tokens
+     ├ artifact-capabilities: ~220 tokens
+     ├ schedule: ~130 tokens
+     ├ run: ~120 tokens
+     ├ loop: ~120 tokens
+     ├ workflow-authoring: ~80 tokens
+     ├ keybindings-help: ~80 tokens
+     ├ artifact-diagramming: ~70 tokens
+     ├ artifact-design: ~70 tokens
+     ├ fewer-permission-prompts: ~60 tokens
+     ├ simplify: ~60 tokens
+     ├ security-review: ~30 tokens
+     └ init: ~20 tokens
+
+❯ /context
+  ⎿  Context Usage
+     ⛀ ⛁ ⛁ ⛁ ⛀ ⛀ ⛁ ⛁ ⛁ ⛁ ⛁ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   Opus 5 (1M context)
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   claude-opus-5[1m]
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   43.6k/1m tokens (4%)
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   Estimated usage by category
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   ⛁ System prompt: 3.3k tokens (0.3%)
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   ⛁ System tools: 14k tokens (1.4%)
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   ⛁ MCP tools: 609 tokens (0.1%)
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶   ⛁ Custom agents: 141 tokens (0.0%)
+     ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛶ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝ ⛝   ⛁ Memory files: 4.5k tokens (0.4%)
+                                               ⛁ Skills: 9.5k tokens (1.0%)
+                                               ⛁ Messages: 11.6k tokens (1.2%)
+                                               ⛶ Free space: 923.4k (92.3%)
+                                               ⛝ Autocompact buffer: 33k tokens (3.3%)
+
+     Auto-compact window: 1m tokens
+
+     MCP tools · /mcp (loaded on-demand)
+     └ 95 tools · 609 tokens
+
+     Custom agents · .claude/agents/
+     └ 3 agents · 141 tokens
+
+     Memory files · /memory
+     └ 5 files · 4.5k tokens
+
+     Skills · /skills
+     └ 68 skills · 9.5k tokens
+
+     /context all to expand

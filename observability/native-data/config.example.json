@@ -1,0 +1,22 @@
+{
+  "token_report": "/absolute/private/token-savings-lifetime-results.json",
+  "project": "/absolute/project",
+  "rtk": "/absolute/bin/rtk",
+  "ai_memory": {
+    "binary": "/absolute/bin/ai-memory",
+    "data_dir": "/absolute/private/ai-memory",
+    "workspace": "selected-workspace",
+    "project": "selected-project"
+  },
+  "qmd": {
+    "binary": "/absolute/bin/qmd",
+    "index": "selected-index",
+    "collection": "selected-collection"
+  },
+  "qdrant": null,
+  "state_dir": "/absolute/private/native-dashboard-data",
+  "loki_url": "http://127.0.0.1:13100/loki/api/v1/push",
+  "stale_after_seconds": 1800,
+  "command_timeout_seconds": 10,
+  "coverage": true
+}

@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh selected native dashboard data
+
+[Timer]
+OnBootSec=45s
+OnUnitActiveSec=2min
+AccuracySec=10s
+Unit=ecosystem-native-data.service
+
+[Install]
+WantedBy=timers.target

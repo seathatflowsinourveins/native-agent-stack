@@ -1,0 +1,3 @@
+# Merge into the existing configuration only after provisioning and verifying it.
+[dashboards]
+default_home_dashboard_path = @GRAFANA_DASHBOARD_DIRECTORY@/native-foundation-data.json

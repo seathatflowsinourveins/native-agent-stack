@@ -100,6 +100,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "foundation-closure-20260921",
+            "path": "evidence/receipts/foundation-closure-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -276,6 +281,11 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dashboard-data-20260921",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -387,12 +397,17 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
           },
           {
             "id": "native-offhost-app-state-20260920",
             "path": "evidence/receipts/native-offhost-app-state-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dashboard-data-20260921",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -1002,13 +1017,18 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
           },
           {
             "id": "native-worker-cgroup-20260920",
             "path": "evidence/receipts/native-worker-cgroup-20260920.json",
             "kind": "native_model_e2e"
+          },
+          {
+            "id": "foundation-closure-20260921",
+            "path": "evidence/receipts/foundation-closure-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1327,8 +1347,13 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "foundation-closure-20260921",
+            "path": "evidence/receipts/foundation-closure-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1597,8 +1622,18 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "foundation-closure-20260921",
+            "path": "evidence/receipts/foundation-closure-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dashboard-data-20260921",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2318,6 +2353,11 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dashboard-data-20260921",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2420,8 +2460,13 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dashboard-data-20260921",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2741,8 +2786,13 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dashboard-data-20260921",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "new_native_client_scope": "One bounded task in each native client passed project-file Context Mode reading and exact jCodeMunch symbol retrieval; six MCP calls, no failures. Consumption is separate from savings.",
@@ -3087,8 +3137,13 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dashboard-data-20260921",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4302,6 +4357,11 @@
             "id": "token-native-retained-functional-20260920",
             "path": "evidence/receipts/token-native-retained-functional-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dashboard-data-20260921",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4383,12 +4443,17 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
           },
           {
             "id": "native-offhost-app-state-20260920",
             "path": "evidence/receipts/native-offhost-app-state-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dashboard-data-20260921",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -4523,12 +4588,17 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
           },
           {
             "id": "native-catalog-retrieval-20260920",
             "path": "evidence/receipts/native-catalog-retrieval-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dashboard-data-20260921",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -4931,8 +5001,13 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dashboard-data-20260921",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5103,8 +5178,13 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dashboard-data-20260921",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5473,8 +5553,13 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dashboard-data-20260921",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5617,18 +5702,23 @@
             "kind": "native_cli_e2e"
           },
           {
-            "id": "native-worker-cgroup-20260920",
-            "path": "evidence/receipts/native-worker-cgroup-20260920.json",
-            "kind": "native_model_e2e"
-          },
-          {
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
           },
           {
+            "id": "native-worker-cgroup-20260920",
+            "path": "evidence/receipts/native-worker-cgroup-20260920.json",
+            "kind": "native_model_e2e"
+          },
+          {
             "id": "native-service-reboot-20260920",
             "path": "evidence/receipts/native-service-reboot-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "native-dashboard-data-20260921",
+            "path": "evidence/receipts/native-dashboard-data-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],

@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "foundation-closure-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": ["claude-code", "codex", "affaan-m/ECC", "context-mode"],
+  "claim": "Dated community and SDK source recheck retained the native foundation; independent configuration/source review confirmed existing terminal profiles and selected ECC hashes. Authenticated native Claude displayed context, six connected MCP servers, HUD and zero then nonzero usage around a real inherited-tool review. Manual compaction was exercised separately.",
+  "recorded_date_utc": "2026-09-21",
+  "base_commit": "23533cea0631252e43218ce3c73a50caa1c1374d",
+  "status": "bounded-native-observations",
+  "guide": "docs/foundation-closure-20260921.md",
+  "artifacts": [
+    "evidence/artifacts/foundation-closure-20260921/context-before.txt",
+    "evidence/artifacts/foundation-closure-20260921/observations.json",
+    "evidence/artifacts/foundation-closure-20260921/source-observations.json",
+    "evidence/artifacts/foundation-closure-20260921/claude-review.md",
+    "evidence/artifacts/foundation-closure-20260921/compaction.json",
+    "evidence/artifacts/foundation-closure-20260921/validation.json",
+    "evidence/artifacts/foundation-closure-20260921/review-adjudication.md"
+  ],
+  "commands": [
+    {"command": "claude --version", "exit_code": 0, "output": "2.1.278 (Claude Code)"},
+    {"command": "codex --version", "exit_code": 0, "output": "codex-cli 0.155.1"},
+    {"command": "claude", "mode": "interactive PTY in the existing adopted project", "operations": ["/context all", "/context", "/export", "/usage", "/mcp", "bounded independent review", "/usage", "/compact", "no-tool continuity check", "broker-boundary clarification"]},
+    {"command": "ecosystem-token-report refresh", "exit_code": 0, "issues": [], "native_scopes": 7, "unique_comparisons": 46}
+  ],
+  "limitations": [
+    "Dated bounded baseline, not exhaustive landscape saturation, comparative superiority or full sixteen-layer lifecycle E2E.",
+    "No new package installation or global account/model/permission change. Unchanged upstream installation and behavior evidence retains its prior scope.",
+    "Source/currentness review is not native SDK acceptance. Existing worker recovery does not qualify another role, SDK, host crash, distributed effects or provider cancellation.",
+    "Manual compaction and selected continuity checks do not establish automatic compaction, every retained fact or general recovery reliability.",
+    "Context and HUD numbers are estimates; usage display includes rounded auxiliary requests. Complete session/provider usage and causal savings remain unknown.",
+    "The named restricted starter reviewer remains conditional; this native review used inherited tools with a no-edit instruction, not OS-enforced read-only access.",
+    "Model reviewers independently inspected bounded files. Supported findings were resolved; agreement and artifact hashes are not substitutes for behavioral acceptance.",
+    "Private native session logs retained outside Git. Public exports normalize paths; screen observations are coordinator records, not all contained in the context export. Windows dropdown interaction was not tested."
+  ]
+}

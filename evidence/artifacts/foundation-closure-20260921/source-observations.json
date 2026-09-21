@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "checked_date_utc": "2026-09-21",
+  "method": "Independent reader used Python urllib.request GET with 20-25s timeouts against official GitHub/PyPI/npm metadata and opened primary documentation. Date-only retrieval precision; published timestamps are not retrieval timestamps.",
+  "release_method": "GET https://api.github.com/repos/{repository}/releases/latest; source heads separately GET /commits?per_page=1",
+  "github_releases": {
+    "anthropics/claude-code": "v2.1.278",
+    "openai/codex": "rust-v0.155.1",
+    "anthropics/claude-agent-sdk-python": "v0.2.156",
+    "anthropics/claude-agent-sdk-typescript": "v0.3.278",
+    "dagucloud/dagu": "v2.16.6",
+    "temporalio/sdk-python": "1.33.0",
+    "OpenHands/software-agent-sdk": "v1.49.2",
+    "langchain-ai/langgraph": "sdk==0.4.4",
+    "nautechsystems/nautilus_trader": "v1.231.0"
+  },
+  "registry_observations": [
+    {"url": "https://pypi.org/pypi/claude-agent-sdk/json", "version": "0.2.157"},
+    {"url": "https://pypi.org/pypi/langgraph/json", "version": "1.2.11"},
+    {"url": "https://pypi.org/pypi/openhands-sdk/json", "version": "1.49.2"},
+    {"url": "https://pypi.org/pypi/temporalio/json", "version": "1.33.0"},
+    {"url": "https://registry.npmjs.org/@openai%2Fcodex-sdk/latest", "version": "0.155.1"},
+    {"url": "https://registry.npmjs.org/@anthropic-ai%2Fclaude-agent-sdk/latest", "version": "0.3.278"}
+  ],
+  "community_heads": {
+    "affaan-m/ECC": "2b6e839771e53096d8451a213d40dc64ec8acac0",
+    "shanraisshan/claude-code-best-practice": "bde3f03174714fff4145d21cfda41ddd2ffffb28",
+    "hesreallyhim/awesome-claude-code": "1abbc780c889b08fb424d82346dbc8057cb345fd",
+    "VoltAgent/awesome-claude-code-subagents": "ca7a50b7648682c3a9e33dbf0a12c5a4c770cb89",
+    "punkpeye/awesome-mcp-servers": "1e0b27d6240f1c8cdff30927f54566dc4aedbce3",
+    "anthropics/skills": "34040c9c568585f6929bedeaad110ad08f079624"
+  },
+  "coordinator_identity_checks": {
+    "method": "gh api repos/OWNER/REPO --jq '{full_name,html_url,default_branch,archived}'",
+    "exit_codes": [0, 0, 0, 0],
+    "requested_to_canonical": {
+      "gastownhall/beads": "gastownhall/beads",
+      "dagucloud/dagu": "dagucloud/dagu",
+      "anthropic-experimental/sandbox-runtime": "anthropics/sandbox-runtime",
+      "andrewyng/context-hub": "andrewyng/context-hub"
+    }
+  },
+  "limitations": [
+    "Metadata/source review, not installations or execution acceptance. Main report records merits and decisions.",
+    "GitHub latest-release, registry package, source head and accepted installed pin are distinct. LangGraph latest release is a different SDK package; Nautilus stable latest excludes selected 2.0.0rc5.",
+    "Independent reader initially inspected installed manifest pins; coordinator separately ran both native client --version commands."
+  ]
+}

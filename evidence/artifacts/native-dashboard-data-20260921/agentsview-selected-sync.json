@@ -1,0 +1,59 @@
+{
+  "commands": [
+    {
+      "label": "codex-sync",
+      "command": "agentsview session sync <SELECTED_NATIVE_SESSION_FILE> --server http://127.0.0.1:17384",
+      "exit_code": 0,
+      "exit_code_provenance": "Coordinator native exec result, not encoded in stdout",
+      "stdout": {
+        "bytes": 51,
+        "sha256": "5bd3a500c64005f44498b4a195c1ba4a47570a2cb813bee8065f95cf0594c3a6"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "normalized_stdout": "synced: codex:<PRIVATE_SESSION_ID>\n"
+    },
+    {
+      "label": "claude-one-sync",
+      "command": "agentsview session sync <SELECTED_NATIVE_SESSION_FILE> --server http://127.0.0.1:17384",
+      "exit_code": 0,
+      "exit_code_provenance": "Coordinator native exec result, not encoded in stdout",
+      "stdout": {
+        "bytes": 45,
+        "sha256": "c720b696601c112bd021c86009898cad00bce179fc4c57a3df447af035093ca3"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "normalized_stdout": "synced: <PRIVATE_SESSION_ID>\n"
+    },
+    {
+      "label": "claude-two-sync",
+      "command": "agentsview session sync <SELECTED_NATIVE_SESSION_FILE> --server http://127.0.0.1:17384",
+      "exit_code": 0,
+      "exit_code_provenance": "Coordinator native exec result, not encoded in stdout",
+      "stdout": {
+        "bytes": 45,
+        "sha256": "c11041c8e82d362afb3ddb200547b609cef68e21f2dac343164fd31987be7b09"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "normalized_stdout": "synced: <PRIVATE_SESSION_ID>\n"
+    }
+  ],
+  "independent_observation": {
+    "rows_before": 14,
+    "rows_after": 17,
+    "prior_rows_preserved": 14,
+    "deleted": 0,
+    "codex_messages": 2249,
+    "claude_one_messages": 19,
+    "claude_two_messages": 6
+  },
+  "boundary": "API and SQLite metadata checked by coordinator; manually refreshed snapshots, not continuous current-session ingestion."
+}

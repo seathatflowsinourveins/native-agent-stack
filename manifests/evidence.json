@@ -2,29 +2,59 @@
   "schema_version": 1,
   "receipts": [
     {
-      "id": "native-dashboard-access-20260921",
+      "id": "native-dashboard-data-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
-        "dagu",
+        "ai-memory",
+        "socraticode",
+        "qmd",
         "qdrant",
         "agentsview",
         "grafana",
-        "prometheus",
-        "ntfy",
-        "agent-browser",
-        "omniroute"
+        "loki",
+        "rtk",
+        "context-mode",
+        "headroom",
+        "jcodemunch-mcp",
+        "promptfoo",
+        "serena",
+        "systemd"
       ],
-      "claim": "Passwordless loopback dashboard access was qualified with eight direct native HTTP responses and scoped browser checks. Dagu's recurring Basic challenge was removed using upstream auth.mode none; its DAG execution/wiki-write denials remained. The official Qdrant UI was installed and existing collections remained visible. AgentsView now uses a scoped user service. OmniRoute's supported dashboard-login setting was disabled while anonymous gateway requests remained rejected.",
+      "claim": "Useful native dashboard data was qualified on the current host: existing memory pages/search, semantic code retrieval and generated graph, scoped lexical retrieval, selected native session imports, unchanged Promptfoo fixture HTML, and a populated Grafana home. A naturally triggered native timer published actual metadata to Loki; independent reconciliation matched seven separate savings scopes, three memory inventories and 68 dated coverage records.",
       "limitations": [
-        "Current-host dashboard/API integration acceptance, not a complete upstream test suite, provider inference, broker execution, performance comparison, or token-saving benchmark.",
-        "Dagu auth none and OmniRoute requireLogin false permit ordinary local administration. Dagu's DAG permission flags do not make all APIs read-only. Keep these profiles on loopback; remote access needs appropriate upstream authentication.",
-        "Qdrant collection-name equality and green statuses do not establish byte-identical storage. Qdrant's UI exposes the existing management API; it is not a read-only client.",
-        "AgentsView uses the existing explicit archive with no syncing/import. The initial unmanaged process disappeared; exact termination cause is unknown. The supervised replacement was verified after restart, not physical-PC reboot.",
-        "Native agent-browser default sessions rendered the selected pages. A prior allowed-domains profile broke Grafana relative URL resolution; separate late archive navigation timed out while its unmanaged server was absent. Both failures remain retained, and final supervised archive rendering passed.",
-        "Hosted Context Mode Insight was not enrolled, purchased, or connected to local telemetry. Its account authentication remains separate.",
-        "Selected upstream test sources informed permission probes; their Go test suites were identified but not executed in this dashboard configuration wave."
+        "Current-host native command/API/browser integration acceptance, not the upstream projects' full test suites, exhaustive landscape saturation, physical reboot or another-PC acceptance.",
+        "The Grafana panels, metadata adapter, token report and offline guards are local integration code. Component memory, graph, archive and evaluation views are their upstream interfaces or unchanged generated artifacts.",
+        "Native token estimates overlap and use different formulas/windows. Context Mode retained events and session bytes are different bases. Desktop retained counters are stale; causal provider savings and universal per-repository lifetime savings remain unknown.",
+        "ai-memory CLI counters are database-wide; project scope is established separately by native UI/MCP retrieval. QMD intentionally uses BM25 with zero vectors. Qdrant points must not be counted again as dense plus sparse vectors.",
+        "AgentsView contains explicitly imported snapshots of one Codex and two Claude sessions, not continuous ingestion. SocratiCode graph HTML is an explicit snapshot, not a continuously regenerated graph.",
+        "Promptfoo imported and exported two existing passing local echo assertions. No new evaluation or provider/model-quality measurement was made. The initial version inspection timed out; its default-profile byte preservation was not measured.",
+        "Serena's future launch configuration is corrected, but existing MCP processes cannot hot-enable its dashboard. Normal MCP/client reload is required; no current Serena dashboard or forced restart is claimed.",
+        "Raw native streams and private configurations remain local. Public artifacts are labeled metadata projections or exact safe native outputs, with original byte/hash bindings. Exit codes for some earlier service/archive commands are coordinator tool observations.",
+        "Independent review found and resolved malformed receipt metadata handling. Failed-source supersession is covered by local offline guards; a failed live generation was not injected. Reviewer agreement alone is not acceptance evidence."
       ],
-      "path": "evidence/receipts/native-dashboard-access-20260921.json"
+      "path": "evidence/receipts/native-dashboard-data-20260921.json"
+    },
+    {
+      "id": "foundation-closure-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "affaan-m/ECC",
+        "context-mode"
+      ],
+      "claim": "Dated community and SDK source recheck retained the native foundation; independent configuration/source review confirmed existing terminal profiles and selected ECC hashes. Authenticated native Claude displayed context, six connected MCP servers, HUD and zero then nonzero usage around a real inherited-tool review. Manual compaction was exercised separately.",
+      "limitations": [
+        "Dated bounded baseline, not exhaustive landscape saturation, comparative superiority or full sixteen-layer lifecycle E2E.",
+        "No new package installation or global account/model/permission change. Unchanged upstream installation and behavior evidence retains its prior scope.",
+        "Source/currentness review is not native SDK acceptance. Existing worker recovery does not qualify another role, SDK, host crash, distributed effects or provider cancellation.",
+        "Manual compaction and selected continuity checks do not establish automatic compaction, every retained fact or general recovery reliability.",
+        "Context and HUD numbers are estimates; usage display includes rounded auxiliary requests. Complete session/provider usage and causal savings remain unknown.",
+        "The named restricted starter reviewer remains conditional; this native review used inherited tools with a no-edit instruction, not OS-enforced read-only access.",
+        "Model reviewers independently inspected bounded files. Supported findings were resolved; agreement and artifact hashes are not substitutes for behavioral acceptance.",
+        "Private native session logs retained outside Git. Public exports normalize paths; screen observations are coordinator records, not all contained in the context export. Windows dropdown interaction was not tested."
+      ],
+      "path": "evidence/receipts/foundation-closure-20260921.json"
     },
     {
       "id": "native-quality-defaults-20260920",
@@ -2102,73 +2132,172 @@
         "No model/provider/broker calls or causal token/cost savings measurement."
       ],
       "path": "evidence/receipts/native-offhost-app-state-20260920.json"
+    },
+    {
+      "id": "native-ultracode-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code",
+        "context-mode"
+      ],
+      "claim": "Claude Code 2.1.278 executed a Fable 5.1/xhigh native Workflow with Sonnet 5/medium and Opus 5/high workers returning results. The same coordinator resumed at high effort and completed a native same-host message round trip, source verification and one-shot idle notification with a separate Sonnet session. Native agent and restored workflow dashboards rendered the completed work.",
+      "limitations": [
+        "Read-only task contracts are not OS isolation; no writing-worker, mid-run cancellation, cross-host or reboot qualification.",
+        "Initial worker classifications were inaccurate and corrected after independent source review; both worker outputs exceeded their requested word contracts and one schema retry occurred.",
+        "Native worker identity was observed in child messages; choices are not a comparative quality or token-cost benchmark.",
+        "Same-host messaging and idle notification only; permission-mismatch behavior, delivery failures, retries and persistent scheduling were not tested.",
+        "Updated maintenance configuration is not proof of its next timed execution; no new recurring Claude loop was created.",
+        "Two native success events share cumulative model usage; no causal savings or exhaustive provider-accounting claim.",
+        "Native PTY rendering and process observations were recorded by the coordinator; message and workflow traces received independent read-only audit. Private raw logs and identifiers remain outside Git."
+      ],
+      "path": "evidence/receipts/native-ultracode-20260921.json"
+    },
+    {
+      "id": "native-dashboard-access-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "dagu",
+        "qdrant",
+        "agentsview",
+        "grafana",
+        "prometheus",
+        "ntfy",
+        "agent-browser",
+        "omniroute"
+      ],
+      "claim": "Passwordless loopback dashboard access was qualified with eight direct native HTTP responses and scoped browser checks. Dagu's recurring Basic challenge was removed using upstream auth.mode none; its DAG execution/wiki-write denials remained. The official Qdrant UI was installed and existing collections remained visible. AgentsView now uses a scoped user service. OmniRoute's supported dashboard-login setting was disabled while anonymous gateway requests remained rejected.",
+      "limitations": [
+        "Current-host dashboard/API integration acceptance, not a complete upstream test suite, provider inference, broker execution, performance comparison, or token-saving benchmark.",
+        "Dagu auth none and OmniRoute requireLogin false permit ordinary local administration. Dagu's DAG permission flags do not make all APIs read-only. Keep these profiles on loopback; remote access needs appropriate upstream authentication.",
+        "Qdrant collection-name equality and green statuses do not establish byte-identical storage. Qdrant's UI exposes the existing management API; it is not a read-only client.",
+        "AgentsView uses the existing explicit archive with no syncing/import. The initial unmanaged process disappeared; exact termination cause is unknown. The supervised replacement was verified after restart, not physical-PC reboot.",
+        "Native agent-browser default sessions rendered the selected pages. A prior allowed-domains profile broke Grafana relative URL resolution; separate late archive navigation timed out while its unmanaged server was absent. Both failures remain retained, and final supervised archive rendering passed.",
+        "Hosted Context Mode Insight was not enrolled, purchased, or connected to local telemetry. Its account authentication remains separate.",
+        "Selected upstream test sources informed permission probes; their Go test suites were identified but not executed in this dashboard configuration wave."
+      ],
+      "path": "evidence/receipts/native-dashboard-access-20260921.json"
     }
   ],
   "files": [
     {
-      "path": "evidence/artifacts/native-dashboard-access-20260921/agentsview-unit-state.txt",
-      "sha256": "4175f3d667953ac3877064ad30d036b0eb91ae2e217c9065e32f6ed3c540ccc7",
-      "bytes": 90
+      "path": "docs/native-dashboard-data.md",
+      "sha256": "2e24646398d925223671840ee0fc21ebd3cc88a4c8169d9901c46629b20cfac9",
+      "bytes": 17100
     },
     {
-      "path": "docs/native-dashboards.md",
-      "sha256": "b90f6a5308b8b9449cd9ab97458b4d78fba233cc903a8cd42c71a35fba8a4098",
-      "bytes": 10728
+      "path": "evidence/artifacts/native-dashboard-data-20260921/agentsview-selected-sync.json",
+      "sha256": "8617b63c38b20355ed8a1e1640bcb572b802119dae5eeb3f6fdbb4c3428bfe5b",
+      "bytes": 2144
     },
     {
-      "path": "evidence/artifacts/native-dashboard-access-20260921/agentsview-browser-after-restart.json",
-      "sha256": "a369debe91b7dd52d41fc5b9b312c923d9b5f41838543c1937f0143160d83c24",
-      "bytes": 90
+      "path": "evidence/artifacts/native-dashboard-data-20260921/grafana-coverage-final-browser.json",
+      "sha256": "d23553de7d98199f7d3141c00daafe15b39ca7452a06642e829feba0098f014e",
+      "bytes": 2458
     },
     {
-      "path": "evidence/artifacts/native-dashboard-access-20260921/agentsview-browser-supervised.json",
-      "sha256": "a369debe91b7dd52d41fc5b9b312c923d9b5f41838543c1937f0143160d83c24",
-      "bytes": 90
+      "path": "evidence/artifacts/native-dashboard-data-20260921/grafana-final-browser.json",
+      "sha256": "590dd966babf932378f7bea24cdc57b0c6c4e7a3503390f4984d4bd93b8c5554",
+      "bytes": 347
     },
     {
-      "path": "evidence/artifacts/native-dashboard-access-20260921/dagu-browser.json",
-      "sha256": "10c9b64ad92ba94f6eea7cd937dd9165ca2310f28ca9e87680d070407534bb90",
-      "bytes": 89
+      "path": "evidence/artifacts/native-dashboard-data-20260921/memory-rag-observation.json",
+      "sha256": "63beade759eff04729f1306e4239820e23f9ff3989655724df6bfde93ffc240f",
+      "bytes": 3928
     },
     {
-      "path": "evidence/artifacts/native-dashboard-access-20260921/dashboard-http-final.tsv",
-      "sha256": "59665da4174466b1953a7fc210f0de2917c7b33b07ae48923631be9883991c57",
-      "bytes": 314
+      "path": "evidence/artifacts/native-dashboard-data-20260921/native-html-http.json",
+      "sha256": "dd47eab3cc65e805041de5f907280f5da2d96f38fde49ddf745f055ab9e59737",
+      "bytes": 1364
     },
     {
-      "path": "evidence/artifacts/native-dashboard-access-20260921/dashboard-http.tsv",
-      "sha256": "59665da4174466b1953a7fc210f0de2917c7b33b07ae48923631be9883991c57",
-      "bytes": 314
+      "path": "evidence/artifacts/native-dashboard-data-20260921/native-snapshot-public.json",
+      "sha256": "b7a70fb762b1d724bdb8de19e33cae345c7901bcd3127e15ce78a86430c58b93",
+      "bytes": 32403
     },
     {
-      "path": "evidence/artifacts/native-dashboard-access-20260921/grafana-browser.json",
-      "sha256": "4f643bb67718dc220521d9e4588cbbb45e74bc902020660f125090368144e54f",
-      "bytes": 138
+      "path": "evidence/artifacts/native-dashboard-data-20260921/native-unit-state.txt",
+      "sha256": "720bc5dd9ca70a6889c4b48818d952ba26581f1ba0cac52544d39224ece65cf4",
+      "bytes": 499
     },
     {
-      "path": "evidence/artifacts/native-dashboard-access-20260921/omniroute-browser.json",
-      "sha256": "a2affe5409e937e81ac23ce003cd61b4d0547905f8e7d20131ad98bea779fd39",
-      "bytes": 141
+      "path": "evidence/artifacts/native-dashboard-data-20260921/promptfoo-browser.json",
+      "sha256": "694b1c2cae9c1b088b038435d48dc945ebe7e095cf0964f1637ceb9ea6d26068",
+      "bytes": 206
     },
     {
-      "path": "evidence/artifacts/native-dashboard-access-20260921/omniroute-passwordless.json",
-      "sha256": "d1275da768f8b612b3875fbbd5b289f49634bdc51a98286c67e2575c768d3f7b",
-      "bytes": 361
+      "path": "evidence/artifacts/native-dashboard-data-20260921/promptfoo-native-export.json",
+      "sha256": "332d315796c5269931b61f2d65316488b26bca0e998cd4f7fd907174000657cb",
+      "bytes": 4758
     },
     {
-      "path": "evidence/artifacts/native-dashboard-access-20260921/qdrant-browser.json",
-      "sha256": "727c18e6a2fdd8d39bc06e59c8c4bb939a19fe037e5ed9e102d95fc7e3fe9034",
-      "bytes": 109
+      "path": "evidence/artifacts/native-dashboard-data-20260921/rtk-global.stdout.json",
+      "sha256": "6239b5e93867f8562bd2eda5834b0e3586b62662988c02232ad32624c3f2ca52",
+      "bytes": 225
     },
     {
-      "path": "evidence/receipts/native-dashboard-access-20260921.json",
-      "sha256": "e58cf7ec6498f1ca06c6a2d526f5db300d344366dd432aff3827f86d18fc315e",
-      "bytes": 12089
+      "path": "evidence/artifacts/native-dashboard-data-20260921/rtk-project.stdout.json",
+      "sha256": "4489523d52d8b88f274742dd25252812d5b3383ad94ef8e50939263a7b2f6096",
+      "bytes": 218
     },
     {
-      "path": "examples/agentsview-archive.service.example",
-      "sha256": "eb4ce1a6eb14cd739f47b0381e12478d5519d348ad4e06a409eb861d7167f16b",
-      "bytes": 574
+      "path": "evidence/artifacts/native-dashboard-data-20260921/serena-future-startup.json",
+      "sha256": "8b78de8635cf4510d8c26c27a8b00499cd3ffaf66d5bffdf2484ba1584cabebd",
+      "bytes": 2333
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-data-20260921/socraticode-native-command.json",
+      "sha256": "0b365360f4abb6eadc57d6c2c29693fd8be9662387778aad8ca511ee1c6e07da",
+      "bytes": 607
+    },
+    {
+      "path": "evidence/receipts/native-dashboard-data-20260921.json",
+      "sha256": "7ffc895dce40eeff60ec1c2aae10192de0782c8036ebe27325871a775f7759a6",
+      "bytes": 11440
+    },
+    {
+      "path": "observability/native-data/README.md",
+      "sha256": "8865fc66028336769c53c30cad6a559c202265e898fc2b385b447e3ae2fe5e73",
+      "bytes": 7453
+    },
+    {
+      "path": "observability/native-data/config.example.json",
+      "sha256": "b83a79e8bd6659c7840f12d4372deb0951f52a72553559b02df7478392361ba8",
+      "bytes": 664
+    },
+    {
+      "path": "observability/native-data/grafana-home.ini.example",
+      "sha256": "4d6caae721fa62f75dee8d4ee25ae1df6b8a7e4aad7e4cff70be5fbd8b4b1cbb",
+      "bytes": 183
+    },
+    {
+      "path": "observability/native-data/native-data.service.example",
+      "sha256": "adeb07ab0074793957432c4cc0f3cdd954076ea85b785fca23e6b964ae8256a8",
+      "bytes": 287
+    },
+    {
+      "path": "observability/native-data/native-data.timer.example",
+      "sha256": "ec306282555c8c3dbc7669027022aea925aa0dc99c8c6a7118d1b6567ff6fb57",
+      "bytes": 187
+    },
+    {
+      "path": "observability/native-data/native-reports.service.example",
+      "sha256": "6f8db03f857c18ddd553e4bf9b54bbb2807ef62867c599455b4e1acfc9a7bf00",
+      "bytes": 360
+    },
+    {
+      "path": "observability/native-data/render.py",
+      "sha256": "f1ec77eafdf1d0634f69153ee8c9e5a7683cbdfd32cad68c007eab5e62bfc388",
+      "bytes": 8311
+    },
+    {
+      "path": "observability/native-data/snapshot.py",
+      "sha256": "57c27bba6d4394fdbced3cb160d1dafc65167999b1e355c3b0400b0ecfe7b90d",
+      "bytes": 24397
+    },
+    {
+      "path": "tests/test_native_dashboard_data.py",
+      "sha256": "92d611726aa731e1f0ed86cf24d9f0866d664a3c6aa6868b5b6e329d4aae3da5",
+      "bytes": 11361
     },
     {
       "path": "evidence/artifacts/native-quality-defaults-20260920/codex-effective.json",
@@ -2257,13 +2386,13 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "3156579ed4d7096f4477e84f1b82d8c89c5d5b0eb45c10f5686ce1468d812d0f",
-      "bytes": 2802
+      "sha256": "652ed9d13c40597619762313663d18a1ef206d467886932bbd2944ceda47c252",
+      "bytes": 3616
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "de5995729ac76279038fc3ee496e8b6248a7fb07edc2542e4e34596d99369963",
-      "bytes": 13875
+      "sha256": "a6c19c5693716fc88f7d80d2eea47a0bce5fc450e76943f91685b2764933213e",
+      "bytes": 14950
     },
     {
       "path": ".gitattributes",
@@ -3768,8 +3897,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "0b7f16f7c8c78bb7d2b22b66a155b7e1cf1bcaa00388f9a30f9227e18369477b",
-      "bytes": 409045
+      "sha256": "a82fd477b964836b574f5b9139edb7b28391aeb49d874cce2790a8a9f76ec672",
+      "bytes": 412459
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -5368,8 +5497,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "fa4f7449c73d96bccdf929e0ddf8d65edd8a5aeb9051af3ea10c16bf0a75d26a",
-      "bytes": 3803771
+      "sha256": "200d6c6f0cd011d5e81fcf51f8fa475407d3a500c04c23cbd132e2eaba30bf0b",
+      "bytes": 3903663
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5378,8 +5507,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "f9ccd68bf512253ec2e8ce73964f90cb924be958ab8b8c9b0c11cc86cbe94ed9",
-      "bytes": 31611
+      "sha256": "7646a91827cd635192ccde9ac9108cd7fdac41bd04895f0dc8cd34f324a0606b",
+      "bytes": 32010
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -5448,8 +5577,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "6c1e46e47bcf73262efb9629cb20def96c3938cc24d57afa10941f14032faeab",
-      "bytes": 34232
+      "sha256": "9f7d6c21c3c972f7d1aac79dea98d45518c3b7371c77b49aa309eeabc5d49d2b",
+      "bytes": 34523
     },
     {
       "path": "evidence/artifacts/catalog-models.full.txt",
@@ -5883,8 +6012,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 75124,
-      "sha256": "813bd9df11708f8faadf85ee4cd4060a53272991212a8e815d87992476c906a5"
+      "bytes": 75868,
+      "sha256": "9710dd623aec8bb70110d89c22d1bdccd1eb81fcb411666225f77ad42b09851a"
     },
     {
       "path": "observability/README.md",
@@ -5928,8 +6057,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-dashboard.json.example",
-      "sha256": "7e5f4366298eba285c71973e82580ee02de3d35d087ffe1f90db6fdffb7c47eb",
-      "bytes": 9851
+      "sha256": "e09c4d5d9148a50b925fa8d5bf63efa990e51c8e3ffd738bdea6496ccfe96518",
+      "bytes": 10027
     },
     {
       "path": "observability/backends/templates/ecosystem-grafana-dashboards.yml.example",
@@ -6388,8 +6517,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "507abf1c7539e6e710b5e3937c98777511d74e9fd05901e71d8a96c78330d258",
-      "bytes": 7841
+      "sha256": "f5cc7d311fa7300ff15d8e18edf7ba48900e3cdd26ce4d405a88b35c1d10787a",
+      "bytes": 8547
     },
     {
       "path": "evidence/receipts/native-harness-defaults-20260920.json",
@@ -6808,7 +6937,7 @@
     },
     {
       "path": "docs/acceptance-evidence-policy.md",
-      "sha256": "cff82f8a59a57f9c51d6d9d18a4d02bdde978f8c4fe928e7a4af219894bed964",
+      "sha256": "f2b27f9fb431cbc91fcc399d9105c1ab6aac23767f2d617f319911360cdfa400",
       "bytes": 4916
     },
     {
@@ -8070,6 +8199,136 @@
       "path": "tests/test_active_recovery_plans.py",
       "sha256": "316a457f792412232b899d874297f7cc05c36a8b4a0ce8a4ef58e6bc37603a1c",
       "bytes": 1238
+    },
+    {
+      "path": "evidence/receipts/foundation-closure-20260921.json",
+      "sha256": "e48d1b84a80677621ad8dd3cde34416f2c64a7f8711ee8777f332cc5d12b4b84",
+      "bytes": 3222
+    },
+    {
+      "path": "docs/foundation-closure-20260921.md",
+      "sha256": "2b490d0bcfca6c7300079f36ced0e21ab708fb3f6517f4fc06076d5391b18164",
+      "bytes": 18870
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/review-adjudication.md",
+      "sha256": "360afb1d7bfdd7c88fa43cbb825d49edd8074f12146c2eaa9a7d2eb27691c0ec",
+      "bytes": 2542
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/observations.json",
+      "sha256": "f484e86e4a02cf68d1e69ac0177063330e2ea61203c7d9c4ace700132ccde077",
+      "bytes": 2863
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/claude-review.md",
+      "sha256": "ff34c3db7e67e4d96e9a1d0d154a0c7e8c01f42eade511302f963ad05a1d2c4c",
+      "bytes": 6271
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/source-observations.json",
+      "sha256": "dde24f90bbe5384364efeac67da81e22b6c3885d221b6849bf2165f9fa2a58f0",
+      "bytes": 2822
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/context-before.txt",
+      "sha256": "d119fb974eb75c2a3601227fbfbb02af7ae6178af6fdc2a3d8f7fc6e302a04f8",
+      "bytes": 11275
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/compaction.json",
+      "sha256": "85eb14433d6e4b61fbe60670647f61c65ef4db1ce75408b853860f8a4f26ddc3",
+      "bytes": 1524
+    },
+    {
+      "path": "evidence/artifacts/foundation-closure-20260921/validation.json",
+      "sha256": "5de3e90f647cccb3d7be8bcd8ea6b7a6a062685353286573d2b04f1b08384a9b",
+      "bytes": 1569
+    },
+    {
+      "path": "recipes/claude-native-ultracode.md",
+      "sha256": "44d092e97f3d0c11db970b2d67154c0c6c9e52df59684134f666e599afa26bc8",
+      "bytes": 6818
+    },
+    {
+      "path": "docs/native-ultracode-20260921.md",
+      "sha256": "ae736d942522a60133196d2749177598de9f38952b7b1fe8eb2b870b4d1a4a44",
+      "bytes": 8052
+    },
+    {
+      "path": "examples/claude-native/ultracode.settings.json",
+      "sha256": "1f43a382696b0a9c056d069c5808e97f3215bd97d7c7fd60b588bc3681bc4435",
+      "bytes": 66
+    },
+    {
+      "path": "evidence/receipts/native-ultracode-20260921.json",
+      "sha256": "3e5b244a542065b7f121a5fae898868445f8ca3d25f7e1e5ba53918d6519be68",
+      "bytes": 3244
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/agentsview-unit-state.txt",
+      "sha256": "4175f3d667953ac3877064ad30d036b0eb91ae2e217c9065e32f6ed3c540ccc7",
+      "bytes": 90
+    },
+    {
+      "path": "docs/native-dashboards.md",
+      "sha256": "fe13245c6be4bd942fe85e604f071ffce18be95749ca2fbcdd2825a5b3d0ff80",
+      "bytes": 11062
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/agentsview-browser-after-restart.json",
+      "sha256": "a369debe91b7dd52d41fc5b9b312c923d9b5f41838543c1937f0143160d83c24",
+      "bytes": 90
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/agentsview-browser-supervised.json",
+      "sha256": "a369debe91b7dd52d41fc5b9b312c923d9b5f41838543c1937f0143160d83c24",
+      "bytes": 90
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/dagu-browser.json",
+      "sha256": "10c9b64ad92ba94f6eea7cd937dd9165ca2310f28ca9e87680d070407534bb90",
+      "bytes": 89
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/dashboard-http-final.tsv",
+      "sha256": "59665da4174466b1953a7fc210f0de2917c7b33b07ae48923631be9883991c57",
+      "bytes": 314
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/dashboard-http.tsv",
+      "sha256": "59665da4174466b1953a7fc210f0de2917c7b33b07ae48923631be9883991c57",
+      "bytes": 314
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/grafana-browser.json",
+      "sha256": "4f643bb67718dc220521d9e4588cbbb45e74bc902020660f125090368144e54f",
+      "bytes": 138
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/omniroute-browser.json",
+      "sha256": "a2affe5409e937e81ac23ce003cd61b4d0547905f8e7d20131ad98bea779fd39",
+      "bytes": 141
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/omniroute-passwordless.json",
+      "sha256": "d1275da768f8b612b3875fbbd5b289f49634bdc51a98286c67e2575c768d3f7b",
+      "bytes": 361
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/qdrant-browser.json",
+      "sha256": "727c18e6a2fdd8d39bc06e59c8c4bb939a19fe037e5ed9e102d95fc7e3fe9034",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/receipts/native-dashboard-access-20260921.json",
+      "sha256": "e58cf7ec6498f1ca06c6a2d526f5db300d344366dd432aff3827f86d18fc315e",
+      "bytes": 12089
+    },
+    {
+      "path": "examples/agentsview-archive.service.example",
+      "sha256": "eb4ce1a6eb14cd739f47b0381e12478d5519d348ad4e06a409eb861d7167f16b",
+      "bytes": 574
     }
   ],
   "convergence_records": [

@@ -15,7 +15,7 @@ research and comparable implementations when the selected solution has a real
 gap. Keep the source URL, revision, applicability and decision in the affected
 recipe; an impressive repository count is not a reason to install alternatives.
 
-The selected [ECC search-first skill](https://github.com/affaan-m/ECC/blob/dd6ee538aee0f548d4a6b520118f875431fd749e/skills/search-first/SKILL.md)
+The selected [ECC search-first skill](https://github.com/affaan-m/ECC/blob/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/search-first/SKILL.md)
 provides a research-before-implementation procedure. Adopt a suitable upstream
 workflow directly, compose supported integrations, and add only the glue needed
 for a demonstrated gap. Explain that gap instead of presenting local orchestration

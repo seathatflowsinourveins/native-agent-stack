@@ -1,0 +1,19 @@
+{
+  "provenance": "Selected native metadata projection; host paths and private session IDs normalized. Original bytes remain private.",
+  "original": {
+    "bytes": 316,
+    "sha256": "4fb8a92383cfa36943c2b502911d41dd28d7919df6d55f1e28b43c756f610a51"
+  },
+  "data": [
+    "mcporter",
+    "--config",
+    "<HOME>/codex-ecosystem/config/mcporter.json",
+    "call",
+    "socraticode.codebase_search",
+    "--args",
+    "{\"projectPath\": \"<PROJECT>\", \"query\": \"cumulative token savings report native counters\", \"limit\": 3, \"includeLinked\": false}",
+    "--output",
+    "json",
+    "--no-oauth"
+  ]
+}

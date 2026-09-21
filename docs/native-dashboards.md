@@ -4,6 +4,11 @@ Use the installed upstream interfaces for their own data. These local URLs are
 the authoring PC's loopback endpoints; resolve the installation's paths and ports
 on another PC. The catalog is a setup guide, not an upstream telemetry dashboard.
 
+For useful data, start with the [memory/RAG and savings view](native-dashboard-data.md).
+It records actual scoped retrieval, source freshness, official memory and code-graph
+interfaces, selected session refreshes and native counters. The HTTP access checks
+below establish transport only; opening a dashboard is not application E2E.
+
 | Upstream interface | Authoring-host URL | Verified scope |
 | --- | --- | --- |
 | Grafana | http://127.0.0.1:13000/d/ecosystem-native/native-agent-ecosystem | Native Grafana with locally provisioned ecosystem panels; anonymous viewing, no password challenge |

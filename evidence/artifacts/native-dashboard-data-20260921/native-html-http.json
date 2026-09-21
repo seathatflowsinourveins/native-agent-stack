@@ -1,0 +1,44 @@
+{
+  "observer": "Local read-only HTTP byte comparison; generated HTML is upstream output except the local token report.",
+  "observations": [
+    {
+      "url": "http://127.0.0.1:17500/socraticode-graph.html",
+      "http_status": 200,
+      "returned": {
+        "bytes": 3075902,
+        "sha256": "44aa783c118258d8e60a9230686f5700f1a3b737377a3ae8d2eefd329badc3a7"
+      },
+      "source": {
+        "bytes": 3075902,
+        "sha256": "44aa783c118258d8e60a9230686f5700f1a3b737377a3ae8d2eefd329badc3a7"
+      },
+      "exact_bytes_match": true
+    },
+    {
+      "url": "http://127.0.0.1:17500/token-savings.html",
+      "http_status": 200,
+      "returned": {
+        "bytes": 3307146,
+        "sha256": "5b350fdf10c196b0e199574439602210e8fba06a51bb25d746a2e777854e7a17"
+      },
+      "source": {
+        "bytes": 3307146,
+        "sha256": "5b350fdf10c196b0e199574439602210e8fba06a51bb25d746a2e777854e7a17"
+      },
+      "exact_bytes_match": true
+    },
+    {
+      "url": "http://127.0.0.1:17500/promptfoo.html",
+      "http_status": 200,
+      "returned": {
+        "bytes": 44311,
+        "sha256": "072260edaf43bc5e4738169169ee184a04220f93351f8ddb2aa87635c705c3d8"
+      },
+      "source": {
+        "bytes": 44311,
+        "sha256": "072260edaf43bc5e4738169169ee184a04220f93351f8ddb2aa87635c705c3d8"
+      },
+      "exact_bytes_match": true
+    }
+  ]
+}
