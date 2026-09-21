@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "scope": "Independent native Claude review of selected foundation, paper policy, acceptance plan and installed SDK source; no broker requests or credentials",
+  "native_client": "Claude Code",
+  "auth_readiness": {"logged_in": true, "method": "claude.ai", "subscription": "max", "provider": "firstParty"},
+  "resolved_model": "claude-fable-5-1",
+  "model_override": false,
+  "result": "success",
+  "duration_ms": 347619,
+  "reported_num_turns": 52,
+  "usage": {"input_tokens": 290, "cache_creation_input_tokens": 98976, "cache_read_input_tokens": 574570, "output_tokens": 27914, "thinking_tokens_included_in_output": 16320},
+  "findings": [
+    {"id": "B1", "finding": "Executable order state machine and relevant offline failure tests are absent at the reviewed base.", "disposition": "Implement, test and independently inspect before order submission."},
+    {"id": "B2", "finding": "Installed SDK defaults retry POST after 429/504 and have no HTTP timeout.", "disposition": "Explicitly disable retries, enforce finite transport timeouts, paper endpoint and allowed methods; exercise ambiguous submission tests."},
+    {"id": "B3", "finding": "Current execution-disabled account readiness has not been recorded in the reviewed base.", "disposition": "Resolved by concurrent native preflight and five unchanged upstream read-only tests; executor rechecks before orders."},
+    {"id": "B4", "finding": "Numeric trial scope must include timeouts, market-close buffer, quote sanity, terminal status and unresolved-position disposition.", "disposition": "Freeze those values in runner configuration before execution."}
+  ],
+  "additional_supported_corrections": ["Use bounded marketable limits rather than an unbounded market-order notional estimate.", "Reconcile owned buy fills against positions before the exit sell.", "Check server/local clock drift and quote age.", "Do not promise a flat finish when finite write attempts or limit-price protection prevent it; retain failed/attention state.", "Avoid account-wide cancellation or liquidation convenience calls.", "Keep a conservative account equity precondition and request reserve for cleanup."],
+  "reusable_foundation": ["Existing offline intent contract", "Bounded historical SDK transport seam", "Retained installed SDK source hashes", "Existing fsync and flock patterns"],
+  "unrelated_to_initial_paper_smoke": ["IBKR acceptance", "Elite activation", "Advanced instructions", "Nautilus SPY/LEAN replay oracle", "General foundation reinstallation"],
+  "limitations": ["This is a source review of the base and trial plan, not review of the subsequently written runner.", "No broker event, current rule interpretation or throughput test was independently exercised by Claude.", "Native token counters are consumption, not measured savings; cached reads and thinking are not added twice."]
+}

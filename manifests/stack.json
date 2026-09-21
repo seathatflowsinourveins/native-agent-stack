@@ -207,7 +207,8 @@
         "native-worker-cgroup-20260920",
         "foundation-closure-20260921",
         "native-returned-results-20260921",
-        "full-stack-convergence-20260921"
+        "full-stack-convergence-20260921",
+        "alpaca-paper-e2e-20260921"
       ],
       "upstream_sources": [
         "https://github.com/anthropics/claude-code"
@@ -1316,7 +1317,8 @@
         "alpaca-offline-order-contract-20260919",
         "native-alpaca-historical-20260920",
         "native-security-identity-20260920",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "alpaca-paper-e2e-20260921"
       ],
       "upstream_sources": [
         "https://github.com/alpacahq/alpaca-py/tree/v0.44.0",
@@ -1785,7 +1787,8 @@
       ],
       "evidence_ids": [
         "native-nautilus-v2-20260920",
-        "native-nautilus-ci-20260920"
+        "native-nautilus-ci-20260920",
+        "nautilus-equity-replay-20260921"
       ],
       "source_pin": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
       "upstream_sources": [

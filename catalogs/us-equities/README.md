@@ -14,6 +14,12 @@ binds equity replay to retained SPY inputs, an independent economic oracle and
 separate broker fault/paper gates. Earlier research waves below retain their
 original decisions and evidence.
 
+The [September 21 paper and simulation review](paper-practice-20260921.md)
+records current Alpaca account rate evidence, selected official SDK probes and
+the reasons for retaining or comparing the CLI, MCP and simulation alternatives.
+Its bounded operational paper lane uses 120 requests/minute against the observed
+200/minute account limit; Elite's advertised 1,000 is API calls, not fills.
+
 The [current token-practice audit](../../docs/token-practice.md) maps the
 then-selected 52 components to their evidence levels and records ten exact artifact comparisons
 plus four accepted native coding trials. Catalog inclusion does not supply a

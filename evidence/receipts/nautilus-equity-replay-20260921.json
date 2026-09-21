@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "id": "nautilus-equity-replay-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "nautilus-trader"
+  ],
+  "claim": "Native BacktestEngine replays15retained AAPL bars in baseline and fee/slippage scenarios;20fills and10closed roundtrips per combined repetition, independently reconciled cash and realized PnL.",
+  "limitations": [
+    "Retrospective same-close scheduled diagnostic, not executable closing-auction strategy or profitability acceptance.",
+    "Unlimited synthetic fill liquidity; finite order-book liquidity and latency realism remain unqualified.",
+    "SPY/LEAN corporate-action parity and historical universe availability remain separate."
+  ],
+  "native_evidence": "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json",
+  "source_review": "blueprints/us-equities/paper-e2e-20260921/README.md"
+}

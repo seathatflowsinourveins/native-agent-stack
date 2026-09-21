@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-21T15:22:28.060Z",
-  "meaning": "Recorded checkpoint; native memory/RAG row updated September 21. Other rows retain their linked receipt dates. Emitter freshness is separate from source update; worker states are coordinator checkpoints, not process heartbeats.",
+  "recorded_at_utc": "2026-09-21T15:58:00Z",
+  "meaning": "Recorded checkpoint; Alpaca paper and native AAPL diagnostic updated September21 after measured execution and independent review. Other rows retain linked receipt dates. Emitter freshness is separate from source update; worker states are checkpoints, not process heartbeats.",
   "lanes": [
     {
       "kind": "lane",
       "id": "simulation",
       "title": "Historical simulation / backtest",
-      "state": "chronological price-label controls accepted / research continues",
-      "evidence_ref": "blueprints/us-equities/research-evaluation/receipt.json"
+      "state": "native AAPL diagnostic / baseline and fee-slippage / strategy merit unqualified",
+      "evidence_ref": "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json"
     },
     {
       "kind": "lane",
       "id": "paper",
       "title": "Dedicated Alpaca paper account",
-      "state": "first profile authenticated / paper execution deferred",
-      "evidence_ref": "blueprints/us-equities/authenticated-data/plan.json"
+      "state": "1SPY roundtrip filled / cash -0.08USD / flat / recovery no duplicate writes",
+      "evidence_ref": "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
     },
     {
       "kind": "lane",
@@ -26,6 +26,20 @@
     }
   ],
   "gates": [
+    {
+      "kind": "gate",
+      "id": "alpaca-paper-operational",
+      "title": "Alpaca bounded paper lifecycle",
+      "state": "smoke passed / native broker fault and throughput qualification pending",
+      "evidence_ref": "blueprints/us-equities/paper-e2e-20260921/paper-receipt.json"
+    },
+    {
+      "kind": "gate",
+      "id": "alpaca-paper-rate",
+      "title": "Alpaca observed Trading API rate",
+      "state": "observed200requests/min / configured120 / Elite1000unqualified",
+      "evidence_ref": "blueprints/us-equities/paper-e2e-20260921/readiness.json"
+    },
     {
       "kind": "gate",
       "id": "native-memory-rag",
@@ -133,6 +147,13 @@
     }
   ],
   "workers": [
+    {
+      "kind": "worker",
+      "id": "paper-foundation-claude-review",
+      "title": "Native Claude paper foundation review",
+      "state": "completed / supported transport and numeric findings addressed before orders",
+      "evidence_ref": "blueprints/us-equities/paper-e2e-20260921/claude-review.json"
+    },
     {
       "kind": "worker",
       "id": "evaluation-worker",
