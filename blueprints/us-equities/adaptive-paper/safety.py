@@ -20,11 +20,11 @@ import threading
 
 D = Decimal
 ZERO = D(0)
-TERMINAL = frozenset({"filled", "canceled", "expired", "rejected"})
+TERMINAL = frozenset({"filled", "canceled", "expired", "rejected", "not_sent"})
 RANK = {"reserved": 0, "pending_new": 1, "accepted": 2, "new": 2,
         "accepted_for_bidding": 2, "held": 2, "partially_filled": 3,
         "pending_cancel": 4, "done_for_day": 4,
-        "filled": 5, "canceled": 5, "expired": 5, "rejected": 5}
+        "filled": 5, "canceled": 5, "expired": 5, "rejected": 5, "not_sent": 5}
 DEFAULT_STOP = Path.home() / ".local/state/native-agent-stack/alpaca-paper/STOP"
 
 
@@ -401,14 +401,14 @@ class Ledger:
                 if state.gross_exposure_usd + qty * price > min(self.limits.max_gross_exposure_usd, equity):
                     raise SafetyError("aggregate_exposure_cap_exceeded")
                 exposed = set(self._positions()) | {r[0] for r in self.db.execute(
-                    "SELECT symbol FROM intents WHERE side='buy' AND status NOT IN ('filled','canceled','expired','rejected')")}
+                    "SELECT symbol FROM intents WHERE side='buy' AND status NOT IN ('filled','canceled','expired','rejected','not_sent')")}
                 if len(exposed | {symbol}) > self.limits.max_held_symbols:
                     raise SafetyError("held_symbol_cap_reached")
             else:
                 held = self._positions().get(symbol)
                 pending_sell = sum((D(r["qty"]) - D(r["filled_qty"]) for r in self.db.execute(
                     "SELECT qty,filled_qty FROM intents WHERE symbol=? AND side='sell' AND "
-                    "status NOT IN ('filled','canceled','expired','rejected')", (symbol,))), ZERO)
+                    "status NOT IN ('filled','canceled','expired','rejected','not_sent')", (symbol,))), ZERO)
                 if held is None or qty > held.qty - pending_sell:
                     raise SafetyError("sell_exceeds_owned_unreserved_position")
             self.db.execute("INSERT INTO intents(client_id,symbol,side,qty,limit_price,status,updated_at) "
@@ -416,9 +416,83 @@ class Ledger:
             self._event("intent_reserved", client_id, symbol=symbol, side=side, qty=qty, limit_price=price, at=now)
             return _intent(self.db.execute("SELECT * FROM intents WHERE client_id=?", (client_id,)).fetchone(), True)
 
+    def validate_pending(self, client_id, *, quote, now, market_open, session_close, stop_file=None):
+        """Revalidate an existing reservation immediately before the first POST.
+
+        Does not reserve a second position/order or authorize a duplicate send.
+        The caller rechecks after every budget wait and binds the POST to the
+        single durable request_budget submission identity.
+        """
+        now, close = instant(now), instant(session_close)
+        with self._transaction(keep_observations_on_refusal=True):
+            row = self.db.execute("SELECT * FROM intents WHERE client_id=?", (client_id,)).fetchone()
+            if row is None:
+                raise SafetyError("unknown_client_order_id")
+            intent = _intent(row)
+            if intent.status != "reserved" or intent.broker_id is not None or intent.filled_qty:
+                raise SafetyError("pending_intent_already_observed_or_terminal")
+            self._check_quote(quote, now)
+            if quote.symbol != intent.symbol:
+                raise SafetyError("quote_symbol_mismatch")
+            if market_open is not True or close - now < (self.limits.min_entry_close_seconds if intent.side == "buy" else 1):
+                raise SafetyError("outside_allowed_session")
+            start = self._get("trial_start")
+            if start is None:
+                raise SafetyError("trial_not_started")
+            age = now - float(start)
+            if age < 0 or age >= self.limits.trial_seconds + (self.limits.cleanup_seconds if intent.side == "sell" else 0):
+                raise SafetyError("trial_window_ended")
+            self._mark(quote)
+            state = self._refresh_risk()
+            if state.outstanding_orders > self.limits.max_outstanding_orders:
+                raise SafetyError("outstanding_order_cap_reached")
+            if intent.side == "buy":
+                if Path(stop_file or DEFAULT_STOP).exists():
+                    raise SafetyError("stop_blocks_entry")
+                if state.halted_reason:
+                    raise SafetyError(state.halted_reason)
+                for symbol in self._positions():
+                    mark = self.db.execute("SELECT at FROM marks WHERE symbol=?", (symbol,)).fetchone()
+                    if mark is None or not 0 <= now - mark[0] <= self.limits.quote_max_age_seconds:
+                        raise SafetyError("held_position_mark_stale")
+                equity = self.limits.capital_usd + state.realized_pnl_usd + state.unrealized_pnl_usd
+                if state.gross_exposure_usd > min(self.limits.max_gross_exposure_usd, equity):
+                    raise SafetyError("aggregate_exposure_cap_exceeded")
+                if state.held_symbols > self.limits.max_held_symbols:
+                    raise SafetyError("held_symbol_cap_reached")
+            else:
+                position = self._positions().get(intent.symbol)
+                pending = sum((i.remaining_qty for i in self.unresolved()
+                               if i.symbol == intent.symbol and i.side == "sell"), ZERO)
+                if position is None or pending > position.qty:
+                    raise SafetyError("sell_exceeds_owned_unreserved_position")
+            return intent
+
+    def mark_not_sent(self, client_id, reason):
+        """Release ONLY a definitively refused pre-send intent, never ambiguity.
+
+        Transport must know no HTTP request was sent. A reserved request attempt
+        still counts against its budget; this never refunds capacity or fabricates
+        a broker order identity. An ambiguous timeout is not a pre-send refusal.
+        """
+        if type(reason) is not str or not re.fullmatch(r"[a-z][a-z0-9_]{0,79}", reason):
+            raise SafetyError("invalid_not_sent_reason")
+        with self._transaction():
+            row = self.db.execute("SELECT * FROM intents WHERE client_id=?", (client_id,)).fetchone()
+            if row is None:
+                raise SafetyError("unknown_client_order_id")
+            intent = _intent(row)
+            if intent.status == "not_sent":
+                return False
+            if intent.status != "reserved" or intent.broker_id is not None or intent.filled_qty:
+                raise SafetyError("cannot_mark_observed_order_not_sent")
+            self.db.execute("UPDATE intents SET status='not_sent' WHERE client_id=?", (client_id,))
+            self._event("intent_not_sent", client_id, reason=reason)
+            return True
+
     def record_order(self, client_id, broker_id, status, cumulative_qty, average_price, *, timestamp=None):
         if (type(broker_id) is not str or not broker_id or len(broker_id) > 128
-                or type(status) is not str or status not in RANK or status == "reserved"):
+                or type(status) is not str or status not in RANK or status in ("reserved", "not_sent")):
             raise SafetyError("invalid_broker_order_identity_or_status")
         filled = decimal(cumulative_qty, zero=True)
         average = decimal(average_price) if filled else None
@@ -428,6 +502,8 @@ class Ledger:
             if row is None:
                 raise SafetyError("unknown_client_order_id")
             old = _intent(row)
+            if old.status == "not_sent":
+                raise SafetyError("broker_observation_after_definitive_not_sent")
             if old.broker_id not in (None, broker_id):
                 raise SafetyError("broker_order_identity_changed")
             if filled > old.qty or (status == "filled" and filled != old.qty):

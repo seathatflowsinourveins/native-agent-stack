@@ -39,6 +39,15 @@ limit-order mechanism guarantees a flat finish.
   returns the existing identity without authorizing another submission; changed
   duplicate terms fail. Revalidate quote age, STOP, session, time and halt state
   at the final transport boundary after rate-limit waits.
+- `validate_pending(client_id, *, quote, now, market_open, session_close,
+  stop_file=None)` performs that final revalidation without reserving exposure
+  twice. Call it again after any budget wait and immediately before the POST.
+- `mark_not_sent(client_id, reason)` releases a definitively refused pre-send
+  reservation as local terminal status `not_sent`, without inventing a broker ID.
+  It never refunds a reserved request attempt. Call only when transport knows
+  that no HTTP request was sent; a timeout or other ambiguous send must remain
+  unresolved and be queried by its existing client ID. Observed orders cannot
+  be marked not sent, and a later broker observation of such an ID fails closed.
 - `record_order(client_id, broker_id, status, cumulative_qty, average_price, *,
   timestamp=None)` applies owned broker observations and returns whether state
   changed. Cumulative quantity decreases are stale and ignored. Duplicate fills

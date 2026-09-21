@@ -370,6 +370,81 @@ class SafetyTests(unittest.TestCase):
         with self.assertRaisesRegex(s.SafetyError, "gross_loss_cap_reached"):
             self.reserve("buy-2")
 
+    def validate(self, cid="buy-1", **kwargs):
+        args = {"quote": self.quote(), "now": self.now, "market_open": True,
+                "session_close": self.now + 3600, "stop_file": self.root / "STOP"}
+        args.update(kwargs)
+        return self.ledger.validate_pending(cid, **args)
+
+    def test_final_validation_does_not_double_reserve(self):
+        self.reserve()
+        before = self.ledger.accounting()
+        self.validate()
+        self.validate()
+        self.assertEqual(self.ledger.accounting(), before)
+        self.assertEqual(len(self.ledger.intents()), 1)
+
+    def test_final_validation_after_budget_wait_rejects_stale_and_stop(self):
+        self.reserve()
+        quote = self.quote()
+        for _ in range(180):
+            self.ledger.request_budget(self.now, "submit")
+        self.assertEqual(self.ledger.request_budget(self.now, "submit", "buy-1"), 60)
+        self.now += 60
+        with self.assertRaisesRegex(s.SafetyError, "quote_not_fresh"):
+            self.validate(quote=quote)
+        (self.root / "STOP").touch()
+        with self.assertRaisesRegex(s.SafetyError, "stop_blocks_entry"):
+            self.validate()
+
+    def test_final_validation_rechecks_clock_window_and_halt(self):
+        self.reserve()
+        with self.assertRaisesRegex(s.SafetyError, "outside_allowed_session"):
+            self.validate(market_open=False)
+        self.ledger.freeze("stream_gap")
+        with self.assertRaisesRegex(s.SafetyError, "stream_gap"):
+            self.validate()
+        self.now += 300
+        with self.assertRaisesRegex(s.SafetyError, "trial_window_ended"):
+            self.validate()
+
+    def test_definitive_not_sent_releases_risk_without_budget_refund(self):
+        self.reserve()
+        self.ledger.request_budget(self.now, "submit", "buy-1")
+        self.assertTrue(self.ledger.mark_not_sent("buy-1", "quote_not_fresh"))
+        self.assertFalse(self.ledger.mark_not_sent("buy-1", "quote_not_fresh"))
+        self.reopen()
+        intent = self.ledger.intents()[0]
+        self.assertEqual(intent.status, "not_sent")
+        self.assertIsNone(intent.broker_id)
+        self.assertTrue(intent.submit_attempted)
+        self.assertEqual(self.ledger.unresolved(), [])
+        self.assertEqual(self.ledger.accounting().pending_buy_notional_usd, 0)
+        self.assertEqual(self.ledger.db.execute("SELECT COUNT(*) FROM requests").fetchone()[0], 1)
+        with self.assertRaises(s.SafetyError):
+            self.ledger.request_budget(self.now, "submit", "buy-1")
+        with self.assertRaisesRegex(s.SafetyError, "after_definitive_not_sent"):
+            self.fill()
+
+    def test_observed_or_filled_order_cannot_be_called_not_sent(self):
+        self.reserve()
+        self.fill(qty="0", price=None, status="accepted")
+        with self.assertRaisesRegex(s.SafetyError, "cannot_mark_observed"):
+            self.ledger.mark_not_sent("buy-1", "transport_refused")
+        with self.assertRaisesRegex(s.SafetyError, "already_observed_or_terminal"):
+            self.validate()
+
+    def test_pending_exit_remains_allowed_after_halt_and_stop(self):
+        self.reserve()
+        self.fill()
+        self.reserve("sell-1", side="sell", price="99.99")
+        self.ledger.freeze("stream_gap")
+        (self.root / "STOP").touch()
+        self.now += 301
+        self.validate("sell-1")
+        self.fill("sell-1")
+        self.assertEqual(self.ledger.positions(), {})
+
 
 if __name__ == "__main__":
     unittest.main()
