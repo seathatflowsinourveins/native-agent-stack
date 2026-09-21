@@ -14,11 +14,11 @@ It is the existing ECC component, not another repository to install.
 
 Retain the upstream **search-first** and **iterative-retrieval** skills. Exact
 copies already exist in the adopted starter project's Claude and shared skill
-locations. The coordinator separately reported successful installation of these
-two exact files as shared user skills, matching both hashes below, with Claude
-symlinks added and project copies preserved. Native runtime discovery remains
-pending independent review. Installation/discovery results belong in their own
-receipt; this source review did not install or execute a new native task.
+locations. Both exact files are now installed as shared user skills, matching
+the hashes below, with Claude symlinks added and project copies preserved. A
+native Claude review returned both names in its actual initialization skill
+inventory. Installation, discovery and independently checked review results are
+in the [profile receipt](../evidence/receipts/native-claude-profile-20260920.json).
 
 | Selected source at ECC `2b6e839771e53096d8451a213d40dc64ec8acac0` | Bytes | SHA-256 |
 | --- | ---: | --- |

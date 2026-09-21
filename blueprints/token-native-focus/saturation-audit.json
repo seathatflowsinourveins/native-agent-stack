@@ -86,7 +86,7 @@
           }
         ],
         "scope": "Use the selected native recipe only when its task applies.",
-        "recipe_document": "recipes/README.md",
+        "recipe_document": "recipes/claude-native-profile.md",
         "lifecycle_guide": "adoption/lifecycle.md"
       },
       "functional_evidence": {
@@ -910,7 +910,7 @@
           "claude -p --output-format stream-json --verbose --max-turns 14 < fixtures/native-gap-prompt.txt"
         ],
         "scope": "Use the selected native recipe only when its task applies.",
-        "recipe_document": "recipes/README.md",
+        "recipe_document": "recipes/claude-native-profile.md",
         "lifecycle_guide": "adoption/lifecycle.md"
       },
       "functional_evidence": {
@@ -5169,7 +5169,7 @@
           }
         ],
         "scope": "Use the selected native recipe only when its task applies.",
-        "recipe_document": "recipes/README.md",
+        "recipe_document": "recipes/claude-native-profile.md",
         "lifecycle_guide": "adoption/lifecycle.md"
       },
       "functional_evidence": {

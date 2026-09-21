@@ -110,7 +110,7 @@
         ]
       },
       "installation_mechanism": "Supported skill directories or ECC plugin/installer; only two standalone skill directories are selected. Full plugin hooks, rule packs and the evaluation framework are not selected.",
-      "activation_status": "Existing project skill copies matched the selected source. The coordinator separately reported successful global installation of both exact files and native Claude symlinks; runtime discovery remains pending independent/raw review. No skill task-performance trial occurred in this review.",
+      "activation_status": "Existing project skill copies matched the selected source. The coordinator separately reported successful global installation of both exact files and native Claude symlinks; runtime discovery was observed in the subsequent native Claude initialization event. No skill task-performance trial occurred in this review.",
       "limitations": [
         "The plugin manifest is version 2.2.2 and enables its local hooks by default; a full plugin install is broader than the selected change.",
         "verification-loop includes generic 15-minute reruns, an 80% coverage target and raw grep-output examples; these do not override task-scoped validation and secret-output rules.",
@@ -322,7 +322,7 @@
       "bytes": 8021,
       "native_registration": "A SKILL.md inside the selected project or user skill directory; invoke through native skill discovery.",
       "project_deployment_observed": "Existing project Claude and shared copies both matched the selected upstream bytes before global activation. Preserve all project copies and customizations.",
-      "global_activation": "installation_and_exact_source_hash_verified_by_coordinator; native_runtime_discovery_pending_review",
+      "global_activation": "installation_and_exact_source_hash_verified_by_coordinator; native_runtime_discovery_observed_in_claude_init",
       "acceptance_boundary": "File installation and native discovery can be checked separately; retrieval or task-quality improvement requires actual representative work."
     },
     {
@@ -336,7 +336,7 @@
       "bytes": 6786,
       "native_registration": "A SKILL.md inside the selected project or user skill directory; invoke through native skill discovery.",
       "project_deployment_observed": "Existing project Claude and shared copies both matched the selected upstream bytes before global activation. Preserve all project copies and customizations.",
-      "global_activation": "installation_and_exact_source_hash_verified_by_coordinator; native_runtime_discovery_pending_review",
+      "global_activation": "installation_and_exact_source_hash_verified_by_coordinator; native_runtime_discovery_observed_in_claude_init",
       "acceptance_boundary": "File installation and native discovery can be checked separately; retrieval or task-quality improvement requires actual representative work."
     }
   ],
@@ -371,7 +371,7 @@
         "tavily-native-search-extract"
       ],
       "incumbent_decisions_path": "catalogs/foundation/decisions.json",
-      "acceptance_boundary": "The coordinator reports exact global file installation; native runtime discovery remains pending review. Canonical project authority overrides generic repeat checks, fixed coverage thresholds and approval examples."
+      "acceptance_boundary": "The coordinator reports exact global file installation; native runtime discovery was observed in the subsequent native Claude initialization event. Canonical project authority overrides generic repeat checks, fixed coverage thresholds and approval examples."
     },
     {
       "layer_id": "workers",
@@ -687,7 +687,7 @@
     "This review is not a universal ranking, current consensus or proof of state-of-the-art performance.",
     "Community lists are discovery sources. Every newly selected implementation needs its own license/source and task-specific native acceptance.",
     "No model/provider/broker invocation, installation, live configuration edit or new native qualification trial was performed by this review.",
-    "Global file installation and matching hashes were reported by the coordinator; native runtime discovery remains pending review. Existing project deployment, global installation and actual task performance are separate observations.",
+    "Global file installation and matching hashes were reported by the coordinator; native runtime discovery was observed in the subsequent native Claude initialization event. Existing project deployment, global installation and actual task performance are separate observations.",
     "Existing foundation acceptance and open-gap status are unchanged."
   ],
   "native_runs": 0,
@@ -699,7 +699,7 @@
     "scope": "Separate coordinator-owned activation, not execution by this source-review worker.",
     "installation": "Official skill-installer returned success for both selected shared skills; Claude symlinks added.",
     "exact_skill_hashes_match_selected_sources": true,
-    "native_runtime_discovery": "pending_independent_raw_review",
+    "native_runtime_discovery": "observed_search_first_and_iterative_retrieval_in_native_claude_system_init; see native-claude-profile-20260920 receipt",
     "recipe_path_owned_by_coordinator": "recipes/claude-native-profile.md",
     "task_quality_or_cost_improvement_established": false
   }

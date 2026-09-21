@@ -21,6 +21,12 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/foundation/community-practice-20260920.json",
+      "collection": "/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/agents-operations.json",
       "collection": "/entries",
       "repository_field": "repository",
@@ -164,13 +170,13 @@
     "repositories": 513,
     "public_star_repositories": 342,
     "beyond_public_stars": 171,
-    "references": 1067,
+    "references": 1072,
     "repositories_by_record_type": {
       "catalog_card": 147,
       "component_record": 68,
       "legacy_candidate": 20,
       "public_star": 342,
-      "research_supplement": 103,
+      "research_supplement": 108,
       "star_review": 342
     }
   },
@@ -432,9 +438,18 @@
       "record_types": [
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/community-practice-20260920.json",
+          "pointer": "/candidates/0",
+          "id": "ecc",
+          "decision": "adopt",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -5150,9 +5165,18 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/community-practice-20260920.json",
+          "pointer": "/candidates/2",
+          "id": "awesome-claude-code",
+          "decision": "retain",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -9442,9 +9466,18 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/community-practice-20260920.json",
+          "pointer": "/candidates/4",
+          "id": "awesome-mcp-servers",
+          "decision": "retain",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -10326,9 +10359,18 @@
       "record_types": [
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/community-practice-20260920.json",
+          "pointer": "/candidates/1",
+          "id": "claude-best-practice",
+          "decision": "retain",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -12512,9 +12554,18 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/foundation/community-practice-20260920.json",
+          "pointer": "/candidates/3",
+          "id": "awesome-claude-subagents",
+          "decision": "conditional",
+          "evidence_level": "source_review"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",

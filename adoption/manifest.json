@@ -82,13 +82,13 @@
   },
   "recipe_map": {
     "omniroute": "docs/foundation-stack.md",
-    "affaan-m/ECC": "recipes/README.md",
+    "affaan-m/ECC": "recipes/claude-native-profile.md",
     "agent-browser": "recipes/README.md",
     "agentsview": "recipes/README.md",
     "ai-memory": "recipes/README.md",
     "ast-grep": "recipes/README.md",
     "ccusage": "recipes/README.md",
-    "claude-code": "recipes/README.md",
+    "claude-code": "recipes/claude-native-profile.md",
     "claude-hud": "recipes/README.md",
     "codebase-memory-mcp": "recipes/README.md",
     "codex": "recipes/README.md",
@@ -112,7 +112,7 @@
     "rtk": "recipes/README.md",
     "sandbox-runtime": "recipes/README.md",
     "serena": "recipes/README.md",
-    "shanraisshan/claude-code-best-practice": "recipes/README.md",
+    "shanraisshan/claude-code-best-practice": "recipes/claude-native-profile.md",
     "shellcheck": "recipes/README.md",
     "socraticode": "recipes/README.md",
     "toon": "recipes/README.md",
@@ -178,6 +178,7 @@
       ],
       "recipe_paths": [
         "recipes/README.md",
+        "recipes/claude-native-profile.md",
         "adoption/README.md"
       ]
     },

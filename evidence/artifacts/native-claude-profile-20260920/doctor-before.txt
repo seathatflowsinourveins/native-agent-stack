@@ -1,0 +1,28 @@
+Claude Code doctor
+
+Running: native (2.1.278)
+Commit: 809c980662e3
+Platform: linux-x64
+Path: <NATIVE_INSTALL>/tools/claude-2.1.278/claude
+Config install method: unknown
+Search: OK (bundled)
+Auto-updates: disabled (set by env: DISABLE_AUTOUPDATER)
+Auto-update channel: latest
+Last update attempt: none recorded
+Managed settings (remote): not fetched — requires an Enterprise or Team subscription
+Organization policy: not applicable to Pro and Max accounts
+
+Remote Control
+Control this session from claude.ai/code or the Claude mobile app
+
+4 warnings found
+- Native installation exists but ~/.local/bin is not in your PATH
+  Fix: Run: echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc then open a new terminal or run: source ~/.bashrc
+- Running native installation but config install method is 'unknown'
+  Fix: Run claude install to update configuration
+- claude command at <HOME>/.local/bin/claude missing or broken (<HOME>/.local/bin does not exist)
+  Fix: Run claude install to repair the installation.
+- claude command at <HOME>/.local/bin/claude missing or broken
+  Fix: Run claude install to repair the installation.
+
+For a full setup checkup that can also fix issues, run /doctor in a Claude Code session.

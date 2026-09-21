@@ -10,6 +10,11 @@ The catalog references 61 selected components through 44 capability decisions. I
 registered evidence references are listed per capability. These are coverage counts, not a
 score of complete installation, execution or lifecycle acceptance.
 
+The [September 20 community review](../../docs/community-native-practice.md)
+explains the selected ECC and Claude practice sources across all sixteen layers.
+Use the [native Claude profile](../../recipes/claude-native-profile.md) for
+terminal entry, small persistent instructions, selected skills and new-PC checks.
+
 | Layer | Purpose |
 | --- | --- |
 | Native clients | Signed-in native coding/research tasks and actual process activation |

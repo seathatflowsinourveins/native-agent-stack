@@ -1,0 +1,11 @@
+--- launch-linux-agent.cjs.before
++++ launch-linux-agent.cjs.after
+@@ -27,7 +27,7 @@
+     childEnv.OTEL_RESOURCE_ATTRIBUTES=[...retained,'service.instance.id='+randomUUID(),'ecosystem.client.scope=native-'+agent].join(',');
+     const result=spawnSync(executable,nativeArgs,{cwd:project,stdio:'inherit',shell:false,env:childEnv});
+     const status=result.status===null?(result.signal?128+(os.constants.signals[result.signal]||1):1):result.status;
+-    try {collect(); console.log('Local Linux usage snapshot refreshed.');} catch {console.error('Usage snapshot could not refresh; run ecosystem-usage later.');}
++    try {collect(); console.error('Local Linux usage snapshot refreshed.');} catch {console.error('Usage snapshot could not refresh; run ecosystem-usage later.');}
+     if(result.error) console.error('The native agent did not launch: '+result.error.message);
+     process.exitCode=status;
+   }
