@@ -1,0 +1,27 @@
+# Example code-only scope. Adapt to the selected project's actual directories.
+# Documentation is retrieved through its separate, explicitly selected QMD lane.
+docs/
+*.md
+third-party/
+state/
+archive/
+validation/
+node_modules/
+dist/
+build/
+coverage/
+# Independent nested publication checkout and transient runner output.
+/packaging-repo/
+/runner-temp/
+.env
+.env.*
+**/.env
+**/.env.*
+**/secrets/**
+**/credentials/**
+*.pem
+*.key
+*.sqlite
+*.sqlite3
+*.db
+*.jsonl

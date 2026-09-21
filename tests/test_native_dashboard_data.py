@@ -15,6 +15,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("native_dashboard_data", ROOT / "observability/native-data/snapshot.py")
 M = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(M)
+RENDER_SPEC = importlib.util.spec_from_file_location("native_dashboard_render", ROOT / "observability/native-data/render.py")
+R = importlib.util.module_from_spec(RENDER_SPEC)
+RENDER_SPEC.loader.exec_module(R)
 
 # Native schemas observed with RTK 0.49.0 / ai-memory 2.3.2 / QMD 2.8.3.
 # Counts are examples; no private path, provider configuration or corpus text.
@@ -50,6 +53,105 @@ class NativeDataTests(unittest.TestCase):
     def test_native_memory_excludes_provider_configuration(self):
         self.assertEqual(M.memory_metrics(MEMORY)["pages_all"], 140)
         self.assertNotIn("DO_NOT_PUBLISH", json.dumps(M.memory_metrics(MEMORY)))
+
+    def memory_status_with_embedding(self):
+        # Synthetic adapter fixture using the native 2.3.2 status schema. This
+        # verifies projection/privacy, not the model, corpus or retrieval E2E.
+        doc = json.loads(MEMORY)
+        doc["providers"].update(
+            embedding={"status": "ok", "provider": "local", "model": "all-MiniLM-L6-v2", "dim": 384,
+                       "endpoint": "DO_NOT_PUBLISH", "error": "DO_NOT_PUBLISH", "api_key": "DO_NOT_PUBLISH"},
+            llm={"status": "disabled", "model": "DO_NOT_PUBLISH", "endpoint": "DO_NOT_PUBLISH"})
+        doc["derived"] = {"embedding_rows": 50, "latest_pages_missing_embeddings": 0,
+                          "embed_failures_unresolved": 0, "error": "DO_NOT_PUBLISH"}
+        return doc
+
+    def test_memory_embedding_projection_keeps_only_reviewed_metadata(self):
+        result = M.memory_metrics(json.dumps(self.memory_status_with_embedding()))
+        expected = {"embedding_status": "ok", "embedding_provider": "local",
+                    "embedding_model": "all-MiniLM-L6-v2", "embedding_dimensions": 384,
+                    "llm_status": "disabled", "embedding_rows": 50,
+                    "latest_pages_missing_embeddings": 0, "embed_failures_unresolved": 0}
+        self.assertEqual({key: result[key] for key in expected}, expected)
+        self.assertEqual(result["value"], 50)
+        self.assertNotIn("DO_NOT_PUBLISH", json.dumps(result))
+        self.assertNotIn("providers", result)
+        self.assertNotIn("error", result)
+        row = M.base_row("ai-memory", "memory inventory", "native inventory", "status --json",
+                         "database-wide", 10000, "memory")
+        row.update(result)
+        self.assertNotIn("DO_NOT_PUBLISH", json.dumps(M.loki_payload([row], 123)))
+
+    def test_memory_preserves_reported_incomplete_counts(self):
+        doc = self.memory_status_with_embedding()
+        doc["derived"].update(embedding_rows=140, latest_pages_missing_embeddings=3,
+                              embed_failures_unresolved=2)
+        result = M.memory_metrics(json.dumps(doc))
+        self.assertEqual(result["embedding_rows"], 140)
+        self.assertEqual(result["latest_pages_missing_embeddings"], 3)
+        self.assertEqual(result["embed_failures_unresolved"], 2)
+        self.assertEqual(result["value"], 50)
+
+    def test_memory_missing_optional_fields_are_unavailable_not_zero(self):
+        result = M.memory_metrics(MEMORY)
+        for key in ("embedding_status", "embedding_provider", "embedding_model", "llm_status"):
+            self.assertEqual(result[key], "unavailable")
+        for key in ("embedding_dimensions", "embedding_rows", "latest_pages_missing_embeddings", "embed_failures_unresolved"):
+            self.assertIsNone(result[key])
+        self.assertEqual(result["value"], 50)
+
+    def test_memory_rejects_unreviewed_modes_without_dropping_inventory(self):
+        for section, key in (("embedding", "status"), ("embedding", "provider"),
+                             ("embedding", "model"), ("llm", "status")):
+            for value in ("DO_NOT_PUBLISH", {"private": "DO_NOT_PUBLISH"}, ["ok"], None, True):
+                doc = self.memory_status_with_embedding()
+                doc["providers"][section][key] = value
+                with self.subTest(section=section, key=key, value=value):
+                    result = M.memory_metrics(json.dumps(doc))
+                    self.assertEqual(result[section + "_" + key], "unavailable")
+                    self.assertEqual(result["value"], 50)
+                    self.assertNotIn("DO_NOT_PUBLISH", json.dumps(result))
+
+    def test_memory_bounds_optional_numbers_without_fabricated_zero(self):
+        for key in ("embedding_rows", "latest_pages_missing_embeddings", "embed_failures_unresolved"):
+            for value in (-1, 1.5, True, "0", None, {}, 2 ** 53, 10 ** 400):
+                doc = self.memory_status_with_embedding()
+                doc["derived"][key] = value
+                with self.subTest(key=key, value=value):
+                    result = M.memory_metrics(json.dumps(doc))
+                    self.assertIsNone(result[key])
+                    self.assertEqual(result["embedding_status"], "ok")
+                    self.assertEqual(result["value"], 50)
+        for value in (0, -1, 65537, 1.5, True, "384", None):
+            doc = self.memory_status_with_embedding()
+            doc["providers"]["embedding"]["dim"] = value
+            with self.subTest(dimension=value):
+                self.assertIsNone(M.memory_metrics(json.dumps(doc))["embedding_dimensions"])
+
+    def test_memory_malformed_optional_sections_keep_inventory_available(self):
+        for key in ("providers", "derived"):
+            for value in (None, [], "DO_NOT_PUBLISH", 0):
+                doc = self.memory_status_with_embedding()
+                doc[key] = value
+                with self.subTest(key=key, value=value):
+                    result = M.memory_metrics(json.dumps(doc))
+                    self.assertEqual(result["value"], 50)
+                    self.assertNotIn("DO_NOT_PUBLISH", json.dumps(result))
+        for key in ("embedding", "llm"):
+            doc = self.memory_status_with_embedding()
+            doc["providers"][key] = ["DO_NOT_PUBLISH"]
+            self.assertEqual(M.memory_metrics(json.dumps(doc))[key + "_status"], "unavailable")
+
+    def test_memory_dashboard_shows_native_completeness_and_disabled_llm(self):
+        panel = next(panel for panel in R.dashboard()["panels"] if panel["id"] == 6)
+        fields = next(t for t in panel["transformations"] if t["id"] == "filterFieldsByName")["options"]["include"]["names"]
+        required = {"embedding_status", "embedding_provider", "embedding_rows",
+                    "latest_pages_missing_embeddings", "embed_failures_unresolved", "llm_status"}
+        self.assertTrue(required <= set(fields))
+        rename = next(t for t in panel["transformations"] if t["id"] == "organize")["options"]["renameByName"]
+        self.assertTrue(required <= rename.keys())
+        self.assertEqual(panel["fieldConfig"]["defaults"]["noValue"], "—")
+        self.assertEqual(panel["targets"][0]["expr"], R.latest("memory"))
 
     def test_qmd_collection_selection_and_bm25_zero(self):
         r = M.qmd_metrics(QMD, "selected-collection")

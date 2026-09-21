@@ -1,6 +1,10 @@
 # Merge these top-level fields into the default data directory's config.toml.
 # Leave llm_provider and reranker unset; literal llm_provider="none" is invalid.
-embedding_provider = "none"
+# Upstream keyless semantic-memory default: checksum-pinned local MiniLM,
+# 384 dimensions; first start downloads about 87 MiB and embeds existing pages.
+# Use "none" for a deliberately FTS-only profile. This is separate from the
+# SocratiCode/Nemotron code index and does not enable LLM consolidation.
+embedding_provider = "local"
 backfill_on_start = false
 capture_assistant = false
 consolidate_on_session_end = false

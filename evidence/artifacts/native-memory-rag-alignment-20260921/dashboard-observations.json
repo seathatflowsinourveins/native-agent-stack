@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-21T05:11:53.658443+00:00",
+  "local_adapter": "Grafana integration over native metadata; not a prebuilt component-authored dashboard",
+  "native_metadata": {
+    "observed_at": "2026-09-21T05:06:18.916686+00:00",
+    "rows": [
+      {
+        "schema_version": 1,
+        "record_kind": "memory",
+        "entity_id": "ai-memory",
+        "title": "ai-memory: entire configured database",
+        "state": "ok",
+        "source_updated_at": "2026-09-21T05:04:54.905116+00:00",
+        "source_unix": 1789967094.905116,
+        "observed_unix": 1789967094.88876,
+        "source_command": "ai-memory --data-dir <configured-db> status --json",
+        "kind": "native inventory",
+        "boundary": "Database-wide counts, not the selected project's inventory. Embedding coverage and provider status do not establish retrieval quality or LLM consolidation. Missing or unreviewed mode fields are unavailable.",
+        "timestamp_basis": "fresh_native_command_capture",
+        "value": 52,
+        "unit": "pages",
+        "pages_latest": 52,
+        "pages_all": 153,
+        "sessions": 72,
+        "observations": 34120,
+        "embedding_status": "ok",
+        "embedding_provider": "local",
+        "embedding_model": "all-MiniLM-L6-v2",
+        "embedding_dimensions": 384,
+        "llm_status": "disabled",
+        "embedding_rows": 54,
+        "latest_pages_missing_embeddings": 0,
+        "embed_failures_unresolved": 0
+      },
+      {
+        "schema_version": 1,
+        "record_kind": "memory",
+        "entity_id": "qmd",
+        "title": "QMD: configured collection",
+        "state": "ok",
+        "source_updated_at": "2026-09-21T05:04:55.023857+00:00",
+        "source_unix": 1789967095.023857,
+        "observed_unix": 1789967094.88876,
+        "source_command": "qmd --index <configured-index> status",
+        "kind": "native inventory",
+        "boundary": "Selected collection files; vector and total counts apply to its entire index. Zero vectors can be intentional BM25 operation.",
+        "timestamp_basis": "fresh_native_command_capture",
+        "value": 70,
+        "unit": "files",
+        "collection_files": 70,
+        "index_files": 70,
+        "index_vectors": 0
+      },
+      {
+        "schema_version": 1,
+        "record_kind": "memory",
+        "entity_id": "qdrant",
+        "title": "Qdrant: configured collection",
+        "state": "ok",
+        "source_updated_at": "2026-09-21T05:04:55.036799+00:00",
+        "source_unix": 1789967095.036799,
+        "observed_unix": 1789967094.88876,
+        "source_command": "GET /collections/<allowlisted-collection>",
+        "kind": "native inventory",
+        "boundary": "Native points_count for one explicitly selected collection; vector representations are not added together.",
+        "timestamp_basis": "fresh_native_api_capture",
+        "value": 196,
+        "points_count": 196,
+        "unit": "points",
+        "collection_status": "green",
+        "segments_count": 2
+      }
+    ],
+    "delivery": {
+      "requested": true,
+      "http_status": 204,
+      "payload_sha256": "3648e20a6be8b313507b01307edd2d58dc3d6a08326258ae2af21bbf35235d7f",
+      "error": null,
+      "response": {
+        "file": "loki-response",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  "native_loki_delivery": {
+    "observed_at": "2026-09-21T05:06:18.927068+00:00",
+    "argv": [
+      "curl",
+      "--silent",
+      "--show-error",
+      "--fail-with-body",
+      "--get",
+      "http://127.0.0.1:13100/loki/api/v1/query",
+      "--data-urlencode",
+      "query=last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"memory\"} | json | unwrap observed_unix | __error__=\"\" [30m]) == on() group_left() max(last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"snapshot\"} | json | entity_id=\"snapshot\" | unwrap observed_unix | __error__=\"\" [30m]))"
+    ],
+    "exit_code": 0,
+    "loki_status": "success",
+    "result_count": 3,
+    "memory_rows": [
+      {
+        "boundary": "Database-wide counts, not the selected project's inventory. Embedding coverage and provider status do not establish retrieval quality or LLM consolidation. Missing or unreviewed mode fields are unavailable.",
+        "detected_level": "unknown",
+        "embed_failures_unresolved": "0",
+        "embedding_dimensions": "384",
+        "embedding_model": "all-MiniLM-L6-v2",
+        "embedding_provider": "local",
+        "embedding_rows": "54",
+        "embedding_status": "ok",
+        "entity_id": "ai-memory",
+        "kind": "native inventory",
+        "latest_pages_missing_embeddings": "0",
+        "llm_status": "disabled",
+        "observations": "34120",
+        "pages_all": "153",
+        "pages_latest": "52",
+        "record_kind": "memory",
+        "record_kind_extracted": "memory",
+        "schema_version": "1",
+        "service_name": "agent-stack-native-data",
+        "sessions": "72",
+        "source_command": "ai-memory --data-dir <configured-db> status --json",
+        "source_unix": "1789967094.905116",
+        "source_updated_at": "2026-09-21T05:04:54.905116+00:00",
+        "state": "ok",
+        "timestamp_basis": "fresh_native_command_capture",
+        "title": "ai-memory: entire configured database",
+        "unit": "pages",
+        "value": "52"
+      },
+      {
+        "boundary": "Native points_count for one explicitly selected collection; vector representations are not added together.",
+        "collection_status": "green",
+        "detected_level": "unknown",
+        "entity_id": "qdrant",
+        "kind": "native inventory",
+        "points_count": "196",
+        "record_kind": "memory",
+        "record_kind_extracted": "memory",
+        "schema_version": "1",
+        "segments_count": "2",
+        "service_name": "agent-stack-native-data",
+        "source_command": "GET /collections/<allowlisted-collection>",
+        "source_unix": "1789967095.036799",
+        "source_updated_at": "2026-09-21T05:04:55.036799+00:00",
+        "state": "ok",
+        "timestamp_basis": "fresh_native_api_capture",
+        "title": "Qdrant: configured collection",
+        "unit": "points",
+        "value": "196"
+      },
+      {
+        "boundary": "Selected collection files; vector and total counts apply to its entire index. Zero vectors can be intentional BM25 operation.",
+        "collection_files": "70",
+        "detected_level": "unknown",
+        "entity_id": "qmd",
+        "index_files": "70",
+        "index_vectors": "0",
+        "kind": "native inventory",
+        "record_kind": "memory",
+        "record_kind_extracted": "memory",
+        "schema_version": "1",
+        "service_name": "agent-stack-native-data",
+        "source_command": "qmd --index <configured-index> status",
+        "source_unix": "1789967095.023857",
+        "source_updated_at": "2026-09-21T05:04:55.023857+00:00",
+        "state": "ok",
+        "timestamp_basis": "fresh_native_command_capture",
+        "title": "QMD: configured collection",
+        "unit": "files",
+        "value": "70"
+      }
+    ],
+    "browser_return": {
+      "file": "grafana-browser-after.txt",
+      "bytes": 4884,
+      "sha256": "2084f0612971054ae08d77de56098b03a14e23c4a0363f99ca9adba8fc9c96bd",
+      "captured_file_mtime_utc": "2026-09-21T05:04:08.421887+00:00"
+    }
+  },
+  "browser": {
+    "grafana": {
+      "command": "agent-browser --session <owned-session> open http://127.0.0.1:13000/d/native-foundation-data; eval document.body.innerText after scrolling the memory panel into view",
+      "returned_binding": {
+        "file": "grafana-browser-after.txt",
+        "bytes": 4884,
+        "sha256": "2084f0612971054ae08d77de56098b03a14e23c4a0363f99ca9adba8fc9c96bd",
+        "captured_file_mtime_utc": "2026-09-21T05:04:08.421887+00:00"
+      },
+      "observed": [
+        "Memory browser search uses FTS5; semantic recall uses MCP",
+        "Code graph snapshot",
+        "ai-memory 52 pages; local; 54 embedding rows",
+        "Qdrant 196 points",
+        "QMD 70 files"
+      ],
+      "boundary": "Visible fields reflect the earlier browser capture. Later native rows have their own timestamp; vectors may include superseded page versions."
+    },
+    "qdrant": {
+      "command": "agent-browser find role tab click --name Info; eval document.body.innerText",
+      "returned_binding": {
+        "file": "qdrant-info-after.txt",
+        "bytes": 4308,
+        "sha256": "07daffbde519a88503647a8d426c9a9efe466c45d575628c43c5b5a0cd6a91ae",
+        "captured_file_mtime_utc": "2026-09-21T05:06:33.485982+00:00"
+      },
+      "observed": {
+        "status": "green",
+        "points_count": 196,
+        "dense_dimensions": 2048,
+        "dense_distance": "Cosine",
+        "sparse_modifier": "idf"
+      },
+      "boundary": "Points and Info inspected. Other maintenance controls were present, not executed."
+    },
+    "wiki": {
+      "command": "agent-browser open http://127.0.0.1:49374/web/w/agent-lab/agent-lab; eval bounded DOM metadata",
+      "returned_binding": {
+        "file": "memory-browser-after.txt",
+        "bytes": 131,
+        "sha256": "abcaa4efb9d54b46e49ac8d1493d8a6e575d4354e3c40a698305dbdf557114a2",
+        "captured_file_mtime_utc": "2026-09-21T05:06:19.398648+00:00"
+      },
+      "observed": {
+        "title": "agent-lab — ai-memory",
+        "shared_decision_visible": true,
+        "search_inputs": 1
+      }
+    },
+    "graph": {
+      "served_file": {
+        "file": "socraticode-graph.html",
+        "bytes": 879659,
+        "sha256": "c29d3aa41495993be76c9ea7ef60ae42fefc5d71f895ad4217904b8a34d4b54c",
+        "captured_file_mtime_utc": "2026-09-21T04:51:59.545277+00:00"
+      },
+      "built_at": "2026-09-21T04:47:15.503Z",
+      "unchanged_upstream_export": true
+    },
+    "prior_feature_probe": {
+      "binding": {
+        "file": "findings.json",
+        "bytes": 6710,
+        "sha256": "dcd6e100db2dd6684eed9b2e4f93682d995dc7e141b733f7be7f6b61acde91ce",
+        "captured_file_mtime_utc": "2026-09-21T04:46:54.369310+00:00"
+      },
+      "scope": "Before index repair: worker exercised wiki article/tree/search and graph Files/Symbols navigation. Its prior graph and collection counts are historical."
+    }
+  }
+}

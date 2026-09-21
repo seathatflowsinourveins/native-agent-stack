@@ -1,0 +1,652 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-21T05:11:53.658443+00:00",
+  "scope": "Selected native command returns and independently derived checks. Normalized public projection, not a replacement for retained exact raw bytes. File mtime is the capture-bound timestamp when invocation timing was not retained.",
+  "commands": [
+    {
+      "command": {
+        "argv": [
+          "ai-memory",
+          "--data-dir",
+          "<memory-data>",
+          "status",
+          "--json"
+        ]
+      },
+      "retained_returns": [
+        {
+          "file": "memory-status-after.stdout",
+          "bytes": 2167,
+          "sha256": "df35d57d76aa0c4b7ba985d0a444ff333f07c9b79ae69ba8c3cbb11e3935000c",
+          "captured_file_mtime_utc": "2026-09-21T04:51:59.076326+00:00"
+        },
+        {
+          "file": "memory-status-after.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "captured_file_mtime_utc": "2026-09-21T04:51:59.065526+00:00"
+        }
+      ],
+      "selected_returned_output": {
+        "version": "2.3.2",
+        "counts": {
+          "pages_latest": 52,
+          "pages_all": 151,
+          "sessions": 72,
+          "observations": 33875
+        },
+        "derived": {
+          "embedding_rows": 52,
+          "latest_pages_missing_embeddings": 0,
+          "embed_failures_unresolved": 0
+        },
+        "providers": {
+          "embedding": {
+            "status": "ok",
+            "provider": "local",
+            "model": "all-MiniLM-L6-v2",
+            "dim": 384
+          },
+          "llm": {
+            "status": "disabled",
+            "provider": null,
+            "model": null,
+            "dim": null
+          }
+        }
+      },
+      "boundary": "Selected native output; private paths and identifiers normalized. Full unchanged bytes retained locally."
+    },
+    {
+      "command": {
+        "argv": [
+          "journalctl",
+          "--user",
+          "-u",
+          "ai-memory.service",
+          "--since",
+          "2026-09-21 04:50:00 UTC",
+          "--until",
+          "2026-09-21 04:51:00 UTC",
+          "--no-pager",
+          "-o",
+          "cat",
+          "--grep",
+          "embed|model|backfill"
+        ]
+      },
+      "retained_returns": [
+        {
+          "file": "embedding-startup-journal.txt",
+          "bytes": 1225,
+          "sha256": "11dd1c5ed71053f7a863899331ef59c61c43e35824c6decb5e2316c240e0d96a",
+          "captured_file_mtime_utc": "2026-09-21T05:03:31.410088+00:00"
+        }
+      ],
+      "selected_returned_output": "\u001b[2m2026-09-21T04:50:04.783039Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[2mai_memory_cli::commands::serve\u001b[0m\u001b[2m:\u001b[0m local embedding model not present; fetching (~87 MB, one time) \u001b[3mdir\u001b[0m\u001b[2m=\u001b[0m<memory-data>/models\n\u001b[2m2026-09-21T04:50:04.785767Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[2mai_memory_llm::local\u001b[0m\u001b[2m:\u001b[0m fetching local embedding model file \u001b[3mfile\u001b[0m\u001b[2m=\u001b[0m\"model.safetensors\"\n\u001b[2m2026-09-21T04:50:06.255540Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[2mai_memory_llm::local\u001b[0m\u001b[2m:\u001b[0m fetching local embedding model file \u001b[3mfile\u001b[0m\u001b[2m=\u001b[0m\"tokenizer.json\"\n\u001b[2m2026-09-21T04:50:06.329857Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[2mai_memory_llm::local\u001b[0m\u001b[2m:\u001b[0m fetching local embedding model file \u001b[3mfile\u001b[0m\u001b[2m=\u001b[0m\"config.json\"\n\u001b[2m2026-09-21T04:50:06.518275Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[2mai_memory_cli::commands::serve\u001b[0m\u001b[2m:\u001b[0m embedder enabled \u001b[3mprovider\u001b[0m\u001b[2m=\u001b[0m\"local\" \u001b[3mmodel\u001b[0m\u001b[2m=\u001b[0m\"all-MiniLM-L6-v2\" \u001b[3mdim\u001b[0m\u001b[2m=\u001b[0m384\n\u001b[2m2026-09-21T04:50:17.890796Z\u001b[0m \u001b[32m INFO\u001b[0m \u001b[2mai_memory_cli::commands::serve\u001b[0m\u001b[2m:\u001b[0m startup embedding backfill completed \u001b[3mscopes\u001b[0m\u001b[2m=\u001b[0m1 \u001b[3membedded\u001b[0m\u001b[2m=\u001b[0m52 \u001b[3mskipped\u001b[0m\u001b[2m=\u001b[0m0 \u001b[3mfailed\u001b[0m\u001b[2m=\u001b[0m0 \u001b[3merrors\u001b[0m\u001b[2m=\u001b[0m0 \u001b[3melapsed_ms\u001b[0m\u001b[2m=\u001b[0m11253\n",
+      "boundary": "Selected native output; private paths and identifiers normalized. Full unchanged bytes retained locally."
+    },
+    {
+      "command": {
+        "argv": [
+          "ai-memory",
+          "--data-dir",
+          "<memory-data>",
+          "embed",
+          "--workspace",
+          "agent-lab",
+          "--project",
+          "agent-lab",
+          "--dry-run"
+        ]
+      },
+      "retained_returns": [
+        {
+          "file": "embed-ready-dry-run.stdout",
+          "bytes": 54,
+          "sha256": "1a8633c8f397f3a68bf4d46c6d4fef3d6300879799ad984c12a838d075119ab3",
+          "captured_file_mtime_utc": "2026-09-21T04:51:03.108333+00:00"
+        },
+        {
+          "file": "embed-ready-dry-run.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "captured_file_mtime_utc": "2026-09-21T04:51:03.093697+00:00"
+        }
+      ],
+      "selected_returned_output": "dry-run: would embed 0 page(s), 52 already up-to-date\n",
+      "boundary": "Selected native output; private paths and identifiers normalized. Full unchanged bytes retained locally."
+    },
+    {
+      "command": {
+        "argv": [
+          "ai-memory",
+          "--data-dir",
+          "<memory-data>",
+          "embed",
+          "--workspace",
+          "agent-lab",
+          "--project",
+          "agent-lab"
+        ]
+      },
+      "retained_returns": [
+        {
+          "file": "embed-idempotent.stdout",
+          "bytes": 140,
+          "sha256": "6be33a8dae6653f7a094f0a9efeed4c6aedd1f78cbef20459cda6842fe9f86d7",
+          "captured_file_mtime_utc": "2026-09-21T04:51:59.061926+00:00"
+        },
+        {
+          "file": "embed-idempotent.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "captured_file_mtime_utc": "2026-09-21T04:51:59.054726+00:00"
+        }
+      ],
+      "selected_returned_output": "{\n  \"embedded\": 0,\n  \"skipped\": 52,\n  \"failed\": 0,\n  \"would_embed\": 0,\n  \"provider\": \"local\",\n  \"model\": \"all-MiniLM-L6-v2\",\n  \"dim\": 384\n}\n",
+      "boundary": "Selected native output; private paths and identifiers normalized. Full unchanged bytes retained locally."
+    },
+    {
+      "command": {
+        "argv": [
+          "ai-memory",
+          "--data-dir",
+          "<memory-data>",
+          "search",
+          "switching between coding assistants",
+          "--workspace",
+          "agent-lab",
+          "--project",
+          "agent-lab",
+          "--json"
+        ]
+      },
+      "retained_returns": [
+        {
+          "file": "memory-fts-query.stdout",
+          "bytes": 3,
+          "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+          "captured_file_mtime_utc": "2026-09-21T04:51:59.054726+00:00"
+        }
+      ],
+      "selected_returned_output": "[]\n",
+      "boundary": "Selected native output; private paths and identifiers normalized. Full unchanged bytes retained locally."
+    },
+    {
+      "command": {
+        "tool": "mcp__ai_memory__memory_query",
+        "arguments": {
+          "workspace": "agent-lab",
+          "project": "agent-lab",
+          "query": "switching between coding assistants",
+          "limit": 3
+        }
+      },
+      "retained_returns": [
+        {
+          "file": "memory-semantic-query.json",
+          "bytes": 1679,
+          "sha256": "4fd9334c8a2b8175c38f9e371f34a34ea37835bd850a2330e575a92ce46b2d94",
+          "captured_file_mtime_utc": "2026-09-21T04:51:03.843772+00:00"
+        }
+      ],
+      "selected_returned_output": {
+        "first_path": "decisions/shared-project-memory.md",
+        "results": 3
+      },
+      "boundary": "Current Desktop MCP returned the existing decision first. Exact invocation bound from coordinator tool call; explain omitted. No ranking attribution, broad benchmark or fresh Claude semantic-run claim."
+    },
+    {
+      "command": {
+        "argv": [
+          "ai-memory",
+          "--data-dir",
+          "<memory-data>",
+          "backup",
+          "--to",
+          "<private-evidence>/root/before-semantic-memory.tar.gz"
+        ]
+      },
+      "retained_returns": [
+        {
+          "file": "backup.stdout",
+          "bytes": 131,
+          "sha256": "255286e7f9d664efbd09be227b21ed945b9d275739a66edd484e2142cd3970d6",
+          "captured_file_mtime_utc": "2026-09-21T04:47:22.534537+00:00"
+        },
+        {
+          "file": "backup.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "captured_file_mtime_utc": "2026-09-21T04:47:21.117191+00:00"
+        }
+      ],
+      "selected_returned_output": "✓ wrote backup to <private-evidence>/root/before-semantic-memory.tar.gz (19.65 MiB)\n",
+      "boundary": "Selected native output; private paths and identifiers normalized. Full unchanged bytes retained locally."
+    },
+    {
+      "command": {
+        "argv": [
+          "ai-memory",
+          "--data-dir",
+          "<private-evidence>/root/restore-check",
+          "restore",
+          "--from",
+          "<private-evidence>/root/before-semantic-memory.tar.gz"
+        ]
+      },
+      "retained_returns": [
+        {
+          "file": "restore-stopped.stdout",
+          "bytes": 194,
+          "sha256": "49bacc38f2a00e12e796fe0b878ef913bdf9521f2c60a2cedf10350d0239cd48",
+          "captured_file_mtime_utc": "2026-09-21T04:50:04.234398+00:00"
+        },
+        {
+          "file": "restore-stopped.stderr",
+          "bytes": 175,
+          "sha256": "edba53d8224a267570938ca18f3127e49656ceba30cfc3c9661ab6fcaa184486",
+          "captured_file_mtime_utc": "2026-09-21T04:50:04.234398+00:00"
+        }
+      ],
+      "selected_returned_output": "restored <private-evidence>/root/before-semantic-memory.tar.gz -> <private-evidence>/root/restore-check\n",
+      "boundary": "Selected native output; private paths and identifiers normalized. Full unchanged bytes retained locally."
+    },
+    {
+      "command": {
+        "tool": "codebase_update",
+        "arguments": {
+          "projectPath": "<project>"
+        }
+      },
+      "retained_returns": [
+        {
+          "file": "rag-update.json",
+          "bytes": 378,
+          "sha256": "28a18801a8461a6f21fcc3bce401b343ac79c70addb905b6406002e4fc5b7e45",
+          "captured_file_mtime_utc": "2026-09-21T04:47:22.927033+00:00"
+        }
+      ],
+      "selected_returned_output": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Updated project index: <project>\nAdded: 0\nUpdated: 0\nRemoved: 0\nNew chunks: 0\n\nProgress:\nChecking external Qdrant at http://127.0.0.1:16333...\nFound 39 indexable files, scanning for changes...\n0 files changed, 39 unchanged/skipped\nUpdate complete: 0 added, 0 updated, 0 removed"
+          }
+        ]
+      },
+      "boundary": "Selected native output; private paths and identifiers normalized. Full unchanged bytes retained locally."
+    },
+    {
+      "command": {
+        "tool": "codebase_status",
+        "arguments": {
+          "projectPath": "<project>"
+        }
+      },
+      "retained_returns": [
+        {
+          "file": "rag-status-after.json",
+          "bytes": 404,
+          "sha256": "a8b0ae9b2b21a56dd9062f7fbd445ba33b76041532d7ce4b4548ed67a4edfa3f",
+          "captured_file_mtime_utc": "2026-09-21T04:48:17.974077+00:00"
+        }
+      ],
+      "selected_returned_output": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Project: <project>\nCollection: <configured-collection>\nStatus: green\nIndexed chunks: 196\n\nLast operation: Incremental update — completed\n  Files: 0, Chunks: 0\n  55s ago (took 0.2s)\n\nFile watcher: active (auto-updating on changes)\n\nCode graph: 26 files, 3 edges\n  Last built: 62s ago (cached in memory)"
+          }
+        ]
+      },
+      "boundary": "Selected native output; private paths and identifiers normalized. Full unchanged bytes retained locally."
+    },
+    {
+      "command": {
+        "tool": "codebase_search",
+        "arguments": {
+          "projectPath": "<project>",
+          "query": "collect agent usage totals separately for native Linux and Desktop configuration homes",
+          "limit": 3,
+          "includeLinked": false
+        }
+      },
+      "retained_returns": [
+        {
+          "file": "rag-query.json",
+          "bytes": 5936,
+          "sha256": "8604484df2422071564930a303d55c58e26ef5a713860b32d7e4a749f8de49f3",
+          "captured_file_mtime_utc": "2026-09-21T04:44:06.011984+00:00"
+        },
+        {
+          "file": "rag-query-after.json",
+          "bytes": 4587,
+          "sha256": "c796a32d05e1937272f962506d2c981dbc7a479eefe73c67cf3c8ec3d7d4e0c9",
+          "captured_file_mtime_utc": "2026-09-21T04:48:18.936958+00:00"
+        }
+      ],
+      "selected_returned_output": {
+        "before_first_path": "packaging-repo/evidence/artifacts/direct-desktop-search.txt",
+        "after_first_path": "tools/ecosystem/linux-usage-report.cjs",
+        "after_first_score": 0.6667
+      },
+      "boundary": "Same single query before and after native ignore/watcher reconciliation. Raw code snippets retained privately. This does not measure aggregate retrieval quality."
+    },
+    {
+      "command": {
+        "argv": [
+          "curl",
+          "--silent",
+          "--show-error",
+          "--fail-with-body",
+          "http://127.0.0.1:16333/collections/<configured-collection>"
+        ]
+      },
+      "retained_returns": [
+        {
+          "file": "qdrant-after.json",
+          "bytes": 1092,
+          "sha256": "dd0feed31386b1d553ad701691c1ca4fe8fb13e245adcdbf7b6298085dc51546",
+          "captured_file_mtime_utc": "2026-09-21T04:53:18.530705+00:00"
+        }
+      ],
+      "selected_returned_output": {
+        "result": {
+          "status": "green",
+          "optimizer_status": "ok",
+          "indexed_vectors_count": 1300,
+          "points_count": 196,
+          "segments_count": 2,
+          "config": {
+            "params": {
+              "vectors": {
+                "dense": {
+                  "size": 2048,
+                  "distance": "Cosine"
+                }
+              },
+              "shard_number": 1,
+              "replication_factor": 1,
+              "write_consistency_factor": 1,
+              "on_disk_payload": true,
+              "sparse_vectors": {
+                "bm25": {
+                  "modifier": "idf"
+                }
+              }
+            },
+            "hnsw_config": {
+              "m": 16,
+              "ef_construct": 100,
+              "full_scan_threshold": 10000,
+              "max_indexing_threads": 0,
+              "on_disk": false
+            },
+            "optimizer_config": {
+              "deleted_threshold": 0.2,
+              "vacuum_min_vector_number": 1000,
+              "default_segment_number": 2,
+              "max_segment_size": null,
+              "memmap_threshold": null,
+              "indexing_threshold": 10000,
+              "flush_interval_sec": 5,
+              "max_optimization_threads": null,
+              "prevent_unoptimized": null
+            },
+            "wal_config": {
+              "wal_capacity_mb": 32,
+              "wal_segments_ahead": 0,
+              "wal_retain_closed": 1
+            },
+            "quantization_config": null
+          },
+          "payload_schema": {
+            "relativePath": {
+              "data_type": "keyword",
+              "points": 196
+            },
+            "contentHash": {
+              "data_type": "keyword",
+              "points": 196
+            },
+            "filePath": {
+              "data_type": "keyword",
+              "points": 196
+            },
+            "language": {
+              "data_type": "keyword",
+              "points": 196
+            }
+          },
+          "update_queue": {
+            "length": 0
+          }
+        },
+        "status": "ok",
+        "time": 0.000270842
+      },
+      "boundary": "Selected native output; private paths and identifiers normalized. Full unchanged bytes retained locally."
+    },
+    {
+      "command": {
+        "argv": [
+          "curl",
+          "--silent",
+          "--show-error",
+          "--fail-with-body",
+          "-H",
+          "Content-Type: application/json",
+          "-d",
+          "{\"limit\":1000,\"with_payload\":[\"filePath\",\"relativePath\"],\"with_vector\":false}",
+          "http://127.0.0.1:16333/collections/<configured-collection>/points/scroll"
+        ]
+      },
+      "retained_returns": [
+        {
+          "file": "qdrant-paths-after.json",
+          "bytes": 38198,
+          "sha256": "af78d883b74385585ffcaee6c56bfbc6c97f4ee566d6d9457b8144e5d4e2c6aa",
+          "captured_file_mtime_utc": "2026-09-21T04:53:18.537905+00:00"
+        }
+      ],
+      "selected_returned_output": {
+        "points_scanned": 196,
+        "next_page_offset": null,
+        "excluded_paths": 0,
+        "usage_implementation_present": true,
+        "raw_response": {
+          "file": "qdrant-paths-after.json",
+          "bytes": 38198,
+          "sha256": "af78d883b74385585ffcaee6c56bfbc6c97f4ee566d6d9457b8144e5d4e2c6aa",
+          "captured_file_mtime_utc": "2026-09-21T04:53:18.537905+00:00"
+        }
+      },
+      "boundary": "Selected native output; private paths and identifiers normalized. Full unchanged bytes retained locally."
+    },
+    {
+      "command": {
+        "tool": "codebase_graph_visualize",
+        "arguments": {
+          "projectPath": "<project>",
+          "mode": "interactive",
+          "open": false
+        }
+      },
+      "retained_returns": [
+        {
+          "file": "rag-graph.json",
+          "bytes": 828,
+          "sha256": "3d5d5cab0ecbec14067fb4f58e1c1d73e668dd696a93f78d288576b6989a3440",
+          "captured_file_mtime_utc": "2026-09-21T04:51:08.144363+00:00"
+        }
+      ],
+      "selected_returned_output": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Interactive dependency graph for: <project>\nFile written: /tmp/socraticode-graph/<project-id>.html\nStats: 26 files · 3 edges · symbol view: full (254 symbols / 318 calls)\n\nBrowser auto-open skipped (open=false). Open the file above manually.\n\nInteractions:\n  • Click a node → sidebar with file/symbol details, symbols list, and action buttons.\n  • Right-click a node → highlight its blast radius (reverse-transitive closure).\n  • Toggle Files ↔ Symbols at the top (Symbols disabled on gigantic repos — use codebase_impact for those).\n  • Search box filters nodes live; layout dropdown switches between Dagre / force / concentric / grid.\n  • Export PNG button produces a shareable image of the current view."
+          }
+        ]
+      },
+      "boundary": "Selected native output; private paths and identifiers normalized. Full unchanged bytes retained locally."
+    }
+  ],
+  "restore": {
+    "observed_at": "2026-09-21T05:06:18.871735+00:00",
+    "kind": "local read-only comparison of native backup and isolated restore",
+    "native_backup": {
+      "file": "before-semantic-memory.tar.gz",
+      "bytes": 20600461,
+      "sha256": "0f3d832f06bb1b70cd7cee4128f65f3f4a2160d4fc923bda70cf0220e6074ff0",
+      "captured_file_mtime_utc": "2026-09-21T04:47:22.534537+00:00"
+    },
+    "extracted_member": "db/memory.sqlite",
+    "member_sha256": "3dc1f6bcbca99f5e287befb23ece9b45e184b3457ef366fa99b30355dbbdd148",
+    "query": "SELECT path, hex(body_sha256) FROM pages WHERE is_latest=1 ORDER BY path",
+    "backup_latest_pages": 52,
+    "restored_latest_pages": 52,
+    "ordered_path_body_hashes_equal": true,
+    "backup_ordered_rows_sha256": "5ef0692d9461cf932e65f598026802ab45177cb30552155623ca503bd59d3b02",
+    "restored_ordered_rows_sha256": "5ef0692d9461cf932e65f598026802ab45177cb30552155623ca503bd59d3b02",
+    "boundary": "The immutable native backup is the comparison baseline. The live service continues capturing and may change later. No page bodies or identifiers are published."
+  },
+  "independent_observations": {
+    "observed_at": "2026-09-21T05:06:18.928677+00:00",
+    "qdrant": {
+      "points_scanned": 196,
+      "next_page_offset": null,
+      "excluded_paths": 0,
+      "usage_implementation_present": true,
+      "raw_response": {
+        "file": "qdrant-paths-after.json",
+        "bytes": 38198,
+        "sha256": "af78d883b74385585ffcaee6c56bfbc6c97f4ee566d6d9457b8144e5d4e2c6aa",
+        "captured_file_mtime_utc": "2026-09-21T04:53:18.537905+00:00"
+      }
+    },
+    "graph": {
+      "served_file": {
+        "file": "socraticode-graph.html",
+        "bytes": 879659,
+        "sha256": "c29d3aa41495993be76c9ea7ef60ae42fefc5d71f895ad4217904b8a34d4b54c",
+        "captured_file_mtime_utc": "2026-09-21T04:51:59.545277+00:00"
+      },
+      "built_at": "2026-09-21T04:47:15.503Z",
+      "unchanged_upstream_export": true
+    },
+    "models": [
+      {
+        "file": "config.json",
+        "bytes": 612,
+        "sha256": "953f9c0d463486b10a6871cc2fd59f223b2c70184f49815e7efbcab5d8908b41",
+        "captured_file_mtime_utc": "2026-09-21T04:50:06.370922+00:00"
+      },
+      {
+        "file": "model.safetensors",
+        "bytes": 90868376,
+        "sha256": "53aa51172d142c89d9012cce15ae4d6cc0ca6895895114379cacb4fab128d9db",
+        "captured_file_mtime_utc": "2026-09-21T04:50:06.216903+00:00"
+      },
+      {
+        "file": "tokenizer.json",
+        "bytes": 466247,
+        "sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037",
+        "captured_file_mtime_utc": "2026-09-21T04:50:06.323531+00:00"
+      }
+    ]
+  },
+  "retained_failures": [
+    {
+      "stage": "restore while native server running",
+      "return": "Error: refusing to restore: 1 other ai-memory process(es) running (pids: [211782]). Stop them first, then re-run.\n",
+      "binding": {
+        "file": "restore.stderr",
+        "bytes": 114,
+        "sha256": "14229fd6f5e86747cf032dea6d1aecbe1b52904bdda547314c7347b2a4d9b147",
+        "captured_file_mtime_utc": "2026-09-21T04:49:09.724319+00:00"
+      }
+    },
+    {
+      "stage": "embed before provider reload",
+      "return": "Error: POST /admin/embed: server returned 503 Service Unavailable: {\"error\":\"embedder not configured on server\"}\n",
+      "binding": {
+        "file": "embed-dry-run.stderr",
+        "bytes": 113,
+        "sha256": "c46647de1ce2b4275a1b84d295113226b18ba7f5784af62b4682272dfa77e03f",
+        "captured_file_mtime_utc": "2026-09-21T04:49:10.584719+00:00"
+      }
+    },
+    {
+      "stage": "embed before listener ready",
+      "return": "Error: could not reach http://127.0.0.1:49374/admin/embed.\nAI_MEMORY_SERVER_URL is NOT set; the CLI defaulted to http://127.0.0.1:49374 and nothing answered. If your server lives on another machine (e.g. a homelab), `export AI_MEMORY_SERVER_URL=http://<server>:49374` and (if auth is on) `export AI_MEMORY_AUTH_TOKEN=<token>` before re-running.\n\nCaused by:\n    0: error sending request for url (http://127.0.0.1:49374/admin/embed)\n    1: client error (Connect)\n    2: tcp connect error\n    3: Connection refused (os error 111)\n",
+      "binding": {
+        "file": "embed-dry-run-reloaded.stderr",
+        "bytes": 527,
+        "sha256": "9e7d10c09a8fc81bcec9e1056a26dbd0b26f24d561679c6413e8b1d56cb5570d",
+        "captured_file_mtime_utc": "2026-09-21T04:50:05.245396+00:00"
+      }
+    }
+  ],
+  "migration_warning": {
+    "schema_version": 1,
+    "captured_at": "2026-09-21T04:51:32Z",
+    "scope": "Read-only pinned upstream source inspection and read-only SQLite observations; no schema/history edits and no migration execution by this reviewer.",
+    "trigger": "Root reported native service startup and isolated restore stderr containing refinery divergence for V62__page_ingestion_windows while both operations continued.",
+    "conclusion": "Expected upstream compatibility warning for this exact reshaped V62, not an unresolved schema failure in the observed store. Preserve the warning with the source explanation; do not rewrite migration history to silence it.",
+    "explanation": "Upstream changed V62 in place under issue776: historical version populated page ingestion windows inside the migration; current version adds only DDL and invokes a chunked/resumable boot backfill. Historical checksums therefore differ. Production migrations::run deliberately sets abort_divergent=false while abort_missing remains true. The current store has the complete expected page-window end state and is not ahead of embedded migrations.",
+    "sources": [
+      {
+        "url": "https://github.com/akitaonrails/ai-memory/blob/v2.3.2/crates/ai-memory-store/src/migrations.rs#L16-L36",
+        "raw_sha256": "30b9a91419bb788216e5d6903b9210e7b0c1ad6682243820ac7ebc08cd04b010",
+        "supports": "Exact rationale plus production set_abort_divergent(false), set_abort_missing(true)."
+      },
+      {
+        "url": "https://github.com/akitaonrails/ai-memory/blob/v2.3.2/crates/ai-memory-store/src/migrations.rs#L894-L932",
+        "supports": "Upstream regression reshaped_migration_divergent_checksum_is_tolerated contrasts strict rejection with production acceptance and no-op completed backfill. Inspected, not rerun."
+      },
+      {
+        "url": "https://github.com/akitaonrails/ai-memory/blob/v2.3.2/crates/ai-memory-store/migrations/V62__page_ingestion_windows.sql",
+        "raw_sha256": "c6b11a076229200bc1ed2073d8c20c5c4879adcfd6c022f3699a58a97b7d0fd2",
+        "supports": "DDL-only reshape, historical checksum and exact window invariants."
+      },
+      {
+        "url": "https://github.com/akitaonrails/ai-memory/blob/v2.3.2/crates/ai-memory-store/src/lib.rs#L159-L168",
+        "raw_sha256": "aef8044ba69e53e70e44c83855e734a43f471032009c48ff48eaf7df29a4a64b",
+        "supports": "Store::open performs window backfill before writer spawn and before server accepts traffic."
+      },
+      {
+        "url": "https://github.com/akitaonrails/ai-memory/blob/v2.3.2/crates/ai-memory-store/src/ops.rs#L839-L882",
+        "raw_sha256": "cdd5a1accff3a97b7008e8591f1c9573630acc34481d689a187b35d3a7150240",
+        "supports": "Exact ingestion-window invariants and immediate no-op when no NULL valid_from remain."
+      },
+      {
+        "url": "https://github.com/akitaonrails/ai-memory/blob/v2.3.2/crates/ai-memory-store/migrations/V64__agent_messages.sql",
+        "supports": "Highest embedded migration is64."
+      }
+    ],
+    "observed_database": {
+      "open_mode": "SQLite file URI mode=ro",
+      "max_applied_migration": 64,
+      "v62_history": {
+        "version": 62,
+        "name": "page_ingestion_windows",
+        "checksum": "16518128245137964566"
+      },
+      "pages_total": 151,
+      "pages_with_null_valid_from": 0,
+      "idx_pages_validity_present": true,
+      "page_window_invariant_mismatches": 0
+    },
+    "read_only_queries": [
+      "SELECT max(version) FROM refinery_schema_history",
+      "SELECT version,name,checksum FROM refinery_schema_history WHERE version=62",
+      "SELECT count(*) FROM pages",
+      "SELECT count(*) FROM pages WHERE valid_from IS NULL",
+      "SELECT count(*) FROM sqlite_master WHERE type='index' AND name='idx_pages_validity'",
+      "SELECT count(*) FROM pages p WHERE p.valid_from IS NOT p.created_at OR p.valid_to IS NOT (CASE WHEN EXISTS (SELECT 1 FROM pages n WHERE n.supersedes=p.id) THEN (SELECT min(n.created_at) FROM pages n WHERE n.supersedes=p.id) WHEN p.is_latest=0 THEN coalesce(p.superseded_at,(SELECT min(l.superseded_at) FROM entity_page_links l WHERE l.page_id=p.id),p.updated_at) ELSE NULL END)"
+    ],
+    "boundary": "This establishes the exact V62 compatibility explanation and observed window invariants. It does not certify arbitrary checksum divergence or replace the root's separately retained native backup/restore and retrieval checks. The upstream regression test was not run in this read-only source review."
+  }
+}

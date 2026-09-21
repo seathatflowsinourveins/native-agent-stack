@@ -25,7 +25,7 @@ their existing account and configuration behavior.
 | Source | Supported native read | Published scope |
 | --- | --- | --- |
 | RTK 0.49.0 | `rtk gain --format json`; `rtk gain --project --format json` | Global retained history and the explicit project working directory, separately |
-| ai-memory 2.3.2 | `ai-memory --data-dir <configured-db> status --json` | Entire configured database: current pages, all versions, sessions, observations |
+| ai-memory 2.3.2 | `ai-memory --data-dir <configured-db> status --json` | Entire configured database: current pages, all versions, sessions, observations; allowlisted embedding mode and native completeness counts; memory LLM status |
 | QMD 2.8.3 | `qmd --index <configured-index> status` | Selected collection file count; index file/vector totals kept separately |
 | Qdrant | `GET /collections/<allowlisted-collection>` | Native `points_count`, segments and collection status |
 | Other token tools | Existing report `native[].latest` | Three Context Mode runtime roots, Headroom and jCodeMunch |
@@ -35,7 +35,19 @@ The ai-memory CLI status command has no workspace/project selector. Those two
 config fields document the intended workspace privately; they do **not** filter
 its database-wide counts. The native scoped MCP `memory_status` and the memory
 web UI remain the interfaces for project-specific observations. No page content,
-provider configuration, database path or scope name is sent to Loki. QMD can
+provider configuration objects, endpoints, credentials, diagnostic text, database
+path or scope name is sent to Loki. The memory row includes only reviewed status
+values (`ok`, `disabled`), the `local` embedding provider, the known public model
+`all-MiniLM-L6-v2`, bounded dimensions, and native `embedding_rows`,
+`latest_pages_missing_embeddings`, and `embed_failures_unresolved` counts. These
+are fields returned by the native command, not calculated retrieval scores.
+Grafana shows the mode, completeness counts and memory LLM status together.
+Missing or unreviewed string fields become `unavailable`; absent or malformed
+optional numbers become `null` (displayed as `—`), never zero. An older status
+schema therefore preserves its valid inventory without implying embedding
+readiness. Extending the provider/model allowlist requires source review.
+Complete embedding coverage is not evidence of retrieval relevance, and a
+disabled memory LLM means consolidation is not enabled by this collector. QMD can
 operate in BM25 mode with zero vectors; the adapter never downloads models or
 recommends that zero means failure.
 

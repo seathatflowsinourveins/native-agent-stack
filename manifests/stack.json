@@ -109,7 +109,8 @@
         "foundation-native-20260920",
         "native-offhost-app-state-20260920",
         "native-dashboard-data-20260921",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "native-memory-rag-alignment-20260921"
       ],
       "upstream_sources": [
         "https://github.com/akitaonrails/ai-memory",
@@ -660,7 +661,8 @@
         "foundation-native-20260920",
         "native-offhost-app-state-20260920",
         "native-dashboard-data-20260921",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "native-memory-rag-alignment-20260921"
       ],
       "upstream_sources": [
         "https://github.com/qdrant/qdrant"
@@ -690,7 +692,8 @@
         "foundation-native-20260920",
         "native-catalog-retrieval-20260920",
         "native-dashboard-data-20260921",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "native-memory-rag-alignment-20260921"
       ],
       "upstream_sources": [
         "https://github.com/tobi/qmd/releases/tag/v2.8.3"
@@ -876,7 +879,8 @@
         "current-session-observation-20260920",
         "foundation-native-20260920",
         "native-dashboard-data-20260921",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "native-memory-rag-alignment-20260921"
       ],
       "upstream_sources": [
         "https://github.com/giancarloerra/SocratiCode"
@@ -927,7 +931,8 @@
         "desktop-direct-rag",
         "component-history",
         "token-practice-coverage-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "native-memory-rag-alignment-20260921"
       ],
       "upstream_sources": [
         "https://github.com/vllm-project/vllm"
@@ -1045,7 +1050,8 @@
         "native-token-stack-final-20260920",
         "foundation-native-20260920",
         "native-dashboard-data-20260921",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "native-memory-rag-alignment-20260921"
       ],
       "source_pin": "09e6ce2ff1bdc19763a10265b870c86f51c98655",
       "upstream_sources": [
@@ -1073,7 +1079,8 @@
         "token-practice-coverage-20260920",
         "current-session-observation-20260920",
         "native-dashboard-data-20260921",
-        "native-returned-results-20260921"
+        "native-returned-results-20260921",
+        "native-memory-rag-alignment-20260921"
       ],
       "source_pin": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
       "upstream_sources": [

@@ -2,6 +2,30 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "native-memory-rag-alignment-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory",
+        "socraticode",
+        "qdrant",
+        "qmd",
+        "vllm",
+        "grafana",
+        "loki"
+      ],
+      "claim": "Activated upstream local semantic memory with verified model pins and isolated backup restore; corrected native code retrieval scope, regenerated the upstream graph, and observed current memory/RAG metadata through native Loki and Grafana.",
+      "limitations": [
+        "Dated installed/native qualification, not universal SOTA superiority or execution of every upstream test suite.",
+        "One semantic-memory query and one code-search relevance repair; no broad retrieval benchmark, provider-billed token savings or fresh Claude semantic run.",
+        "Browser wiki search remains FTS5. LLM consolidation remains disabled. 52 latest pages include one ordinary decision and 51 System pages, not 52 curated decisions.",
+        "Embedding rows can retain superseded versions: initial native status reported52, later observation54, while latest-page count52 and missing-vector count0 persisted.",
+        "Graph generation is explicit and its snapshot does not refresh with the index watcher. Search/layout/impact/PNG controls and Qdrant snapshot restore/ANN benchmarks were not functionally qualified here.",
+        "vLLM0.25.0 remains the verified WSL-compatible embedding runtime; current0.29.0 is not adopted after the retained GPU compatibility failure.",
+        "Local adapter regression tests and SQLite comparisons are integration evidence, separate from upstream project tests. Private raw pages, database files, identifiers and credentials are not published."
+      ],
+      "path": "evidence/receipts/native-memory-rag-alignment-20260921.json"
+    },
+    {
       "id": "native-returned-results-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2293,6 +2317,41 @@
   ],
   "files": [
     {
+      "path": "evidence/artifacts/native-memory-rag-alignment-20260921/report-delivery.json",
+      "sha256": "df5576077b40a19e5eeff1863e30251a2f7fb378aa526caad953d54f8425f15a",
+      "bytes": 939
+    },
+    {
+      "path": "docs/memory-rag-native-practice.md",
+      "sha256": "9a22a09ee522e95c272036323e348fbcd16c296f93e11af4a9cbcaf568cd1241",
+      "bytes": 7927
+    },
+    {
+      "path": "evidence/artifacts/native-memory-rag-alignment-20260921/dashboard-observations.json",
+      "sha256": "dbedf036532ddc33c4485981cd5e24ff1867d1a624e0b3fef6cde4b9a02e204f",
+      "bytes": 10310
+    },
+    {
+      "path": "evidence/artifacts/native-memory-rag-alignment-20260921/selected-commands.json",
+      "sha256": "b8a1e8fc9492b491fe3297dbf79728e3cb628d396e1d8f597aaca92e65629b3a",
+      "bytes": 28313
+    },
+    {
+      "path": "evidence/artifacts/native-memory-rag-alignment-20260921/upstream-sources.json",
+      "sha256": "9353212af1a02853600e0e2cc3f9a5d9a9adf02f0fb3e196abe15a2cd7e39e54",
+      "bytes": 6158
+    },
+    {
+      "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
+      "sha256": "c5a07f622edea1ffc04de0be79dd54e7028d22dbcb215d9b183e6a9d984123f7",
+      "bytes": 5413
+    },
+    {
+      "path": "examples/socraticodeignore.example",
+      "sha256": "7740916e8dc20b5dbf2a5e066fa1e646573cb340feb0c0417305d59c3d9194ab",
+      "bytes": 457
+    },
+    {
       "path": "evidence/artifacts/native-returned-results-20260921/serena-recovery.json",
       "sha256": "5197d3138e181667eb3c100bb60c7c021d473accd572b3c33985a2c4287c2096",
       "bytes": 11000
@@ -2574,8 +2633,8 @@
     },
     {
       "path": "docs/native-dashboard-data.md",
-      "sha256": "073f44cb56c62396d2a771c6431caadc752b69fb281cf7ec5e3b20a91dcbce43",
-      "bytes": 17937
+      "sha256": "640bb2c71d66043e3e5fcac869f22ab9eb525086a4fa8c193b33f44964138cfe",
+      "bytes": 18453
     },
     {
       "path": "evidence/artifacts/native-dashboard-data-20260921/agentsview-selected-sync.json",
@@ -2649,8 +2708,8 @@
     },
     {
       "path": "observability/native-data/README.md",
-      "sha256": "8865fc66028336769c53c30cad6a559c202265e898fc2b385b447e3ae2fe5e73",
-      "bytes": 7453
+      "sha256": "875bb6330e4d22d5e955d353a3d1b086ba109d005d522da4acd4363723332298",
+      "bytes": 8464
     },
     {
       "path": "observability/native-data/config.example.json",
@@ -2679,18 +2738,18 @@
     },
     {
       "path": "observability/native-data/render.py",
-      "sha256": "f1ec77eafdf1d0634f69153ee8c9e5a7683cbdfd32cad68c007eab5e62bfc388",
-      "bytes": 8311
+      "sha256": "e9f9cd70e52c5c7ee73c544c1f891cfbac3393f70674dd2f69211bed471425a3",
+      "bytes": 9165
     },
     {
       "path": "observability/native-data/snapshot.py",
-      "sha256": "57c27bba6d4394fdbced3cb160d1dafc65167999b1e355c3b0400b0ecfe7b90d",
-      "bytes": 24397
+      "sha256": "c5b3adc1d6b730d256a26817dc8be9b56988cfee61b993326c39eb3c14dc1a3d",
+      "bytes": 26023
     },
     {
       "path": "tests/test_native_dashboard_data.py",
-      "sha256": "92d611726aa731e1f0ed86cf24d9f0866d664a3c6aa6868b5b6e329d4aae3da5",
-      "bytes": 11361
+      "sha256": "4cf14a90c84598f71ce4486683b08de8e9f1d10eb5249e7e229bdd90f4465bcf",
+      "bytes": 17763
     },
     {
       "path": "evidence/artifacts/native-quality-defaults-20260920/codex-effective.json",
@@ -4290,8 +4349,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "20b4394705e495be10f8336ed5806cb317704f2bd7954b5b438a7e14d88a60eb",
-      "bytes": 418419
+      "sha256": "84e8fd252fa63e28865f9f0fcd14d28135620b7f86327f15c58b5016c0f708b9",
+      "bytes": 419840
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -5890,8 +5949,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "294942adb7d663905e1307c3867d8e80c5ee5eb98328c9de9f34a9cf404f3331",
-      "bytes": 4058565
+      "sha256": "a7bdb1143ae9c105d7413b1aba56335317cf086a0a80bb5e0a424e0d731d459f",
+      "bytes": 4084698
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5900,8 +5959,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "57616066879fd178125a8efdaf73778db4e18707b7b03b492f9e7a00f69bea53",
-      "bytes": 32812
+      "sha256": "372e44e90bc8ce7af78590d9735dc0fafa975bd9f2b11dfe44243a223a5a6209",
+      "bytes": 33242
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6305,8 +6364,8 @@
     },
     {
       "path": "examples/ai-memory-config.toml.example",
-      "sha256": "e81f60df223df38f29d6989c23dbd8191758347bf306fcd4367719d7d52fb039",
-      "bytes": 274
+      "sha256": "e2bf451070061ab0deb7d116e1f5920cc60bcd56df674c56a94df7dbc05b99b6",
+      "bytes": 578
     },
     {
       "path": "examples/ai-memory-project.toml.example",
@@ -6405,8 +6464,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 77241,
-      "sha256": "96aafb39e24da532ec9bef62dc8f196f05168e9aa36a1242a79f4ad179b9233e"
+      "bytes": 77577,
+      "sha256": "d2243e7c93514e5eb18d48ce9e7aca65d692a4e8e282b44b2f70c3c45ea01c44"
     },
     {
       "path": "observability/README.md",
@@ -6585,8 +6644,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "d0fd6bb27026ded23a756482ab4dc1d0c479b6ff90e08fd67ef3c04dfd222115",
-      "bytes": 55764
+      "sha256": "f2d44cd9bb98f6ace2f4bbab3ab9fcde80da50f1beff9eca57725fcdae8866d8",
+      "bytes": 56235
     },
     {
       "path": "scripts/adoption_status.py",

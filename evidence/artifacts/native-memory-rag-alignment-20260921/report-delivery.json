@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-09-21T05:15:26.473089+00:00",
+  "scope": "Local browser delivery check; verifies report attachment integrity, not upstream retrieval quality.",
+  "url": "http://127.0.0.1:17500/token-savings.html#native",
+  "browser_return": {
+    "attachments": 60,
+    "hashMatches": 60,
+    "newChecks": 24
+  },
+  "download": {
+    "native_command": "agent-browser --session <owned-session> download '#native-result-0 button[data-native-download]' <private-output>",
+    "name": "memory-status-after.stdout",
+    "bytes": 2167,
+    "native_sha256": "df35d57d76aa0c4b7ba985d0a444ff333f07c9b79ae69ba8c3cbb11e3935000c",
+    "downloaded_sha256": "df35d57d76aa0c4b7ba985d0a444ff333f07c9b79ae69ba8c3cbb11e3935000c",
+    "equal": true
+  },
+  "browser_binding": {
+    "file": "report-attachment-hashes.json",
+    "bytes": 59,
+    "sha256": "a5d5f056f015f50296cbd9ce53cb0fa2dd8b7dbce764dc7be1b11102b21cb2a5"
+  }
+}

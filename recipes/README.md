@@ -217,12 +217,12 @@ ai-memory is the shared durable-memory lane; routine hook observations are not c
 ai-memory init
 ```
 
-Use the relevant fields from [ai-memory-config.toml.example](../examples/ai-memory-config.toml.example) in the default data directory's `config.toml`. Embeddings are explicitly `none`; leave `llm_provider` and reranker unset. Literal `llm_provider="none"` is not a valid replacement. Disable startup backfill, assistant capture and session-end consolidation. Do not import old transcripts. Keep one data directory/config shared by service and native hooks; choosing a different server config alone does not redirect hook fallback storage.
+Use the relevant fields from [ai-memory-config.toml.example](../examples/ai-memory-config.toml.example) in the default data directory's `config.toml`. The selected semantic-memory profile uses upstream `embedding_provider="local"`: checksum-pinned MiniLM, 384 dimensions, about 87 MiB downloaded once, with inference inside ai-memory. Use `none` for a deliberately FTS-only profile. Leave the LLM provider and reranker unset; literal `llm_provider="none"` is invalid. Historical transcript backfill, assistant capture and session-end LLM consolidation remain disabled. Embedding backfill is separate: an enabled server embeds existing latest pages across its configured store, so inspect that store's scope first. Keep one data directory/config shared by service and native hooks; choosing a different server config alone does not redirect hook fallback storage. See the [qualified memory/RAG workflow](../docs/memory-rag-native-practice.md) for native returns, recovery and interface boundaries.
 
 After reviewing scope, copy [ai-memory-project.toml.example](../examples/ai-memory-project.toml.example) to **only this project's** `.ai-memory.toml`. It names both workspace and project and excludes selected sensitive paths. Exclusions cover recognized file tools; they do not sanitize arbitrary shell output by path. Start the upstream service directly:
 
 ```sh
-ai-memory serve --transport http --bind 127.0.0.1:49374 --workspace local --project native-agent-stack
+ai-memory serve --transport http --enable-web --bind 127.0.0.1:49374 --workspace local --project native-agent-stack
 ```
 
 The upstream `packaging/systemd/ai-memory-user.service` can be adapted into a user unit, preserving the same data/config location. Do not use `--force` to take over another active instance. Register MCP using the project examples or native registration above, then install the native hooks in allowlist mode:
