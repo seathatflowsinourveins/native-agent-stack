@@ -93,14 +93,18 @@ from older exclusions. The existing daily maintenance heartbeat retains its
 schedule and scope but now explicitly researches current native features and
 upstream alternatives, verifies returned results and avoids noisy polling.
 
-Priorities after this qualification:
+Subsequent qualification and remaining priorities:
 
-1. Evaluate the routing policy on one real implementation task with an owned
-   worktree, independent acceptance tests, total usage and elapsed time. Compare
-   a simple baseline; do not assume fan-out improves quality or cost.
-2. Qualify native Workflow pause/resume, cancellation, missing-worker results
-   and writing-worker integration for the intended task. Earlier ordinary-worker
-   recovery does not automatically qualify this runtime.
+1. The later [writing comparison](native-workflow-writing-recovery-20260921.md)
+   accepted the repairs in both fixture arms through independent checks, while
+   retaining procedure failures and higher usage in the Workflow arm. Evaluate
+   a representative application task only when it needs parallel work; this
+   small fixture does not justify a universal fan-out default.
+2. The same follow-up qualified selected-worker stop, a failed child with a null
+   result, completed-implementation replay, graceful native exit, same-session
+   resume, cleanup and integration. Reuse that scoped evidence. Hard crash, host
+   restart, remote provider cancellation and complete recovery-usage
+   reconciliation remain separate gaps.
 3. Observe the next existing maintenance trigger and its useful persisted
    result. Cross-host messages, post-reboot scheduling and ai-memory cross-project
    mailbox claim semantics remain separate acceptance tasks.

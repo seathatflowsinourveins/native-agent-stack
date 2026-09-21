@@ -488,10 +488,11 @@
         "full-stack-convergence-20260921"
       ],
       "upstream_sources": [
-        "https://github.com/chopratejas/headroom"
+        "https://github.com/headroomlabs-ai/headroom",
+        "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0"
       ],
       "source_pin": null,
-      "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
+      "freshness": "Installed tested pin equals the September 21 current stable release. Canonical upstream is headroomlabs-ai/headroom; the historical repository identity remains an alias for catalog joins.",
       "command_scope": "Direct synthetic MCP compression/retrieval passed; global and isolated fixture ledgers remain separate. No automatic provider interception."
     },
     {

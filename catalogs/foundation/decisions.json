@@ -8,13 +8,23 @@
       "capability": "Maintain useful scoped memory across native Codex and Claude",
       "capability_key": "native-memory-learning-maintenance",
       "checked_at": "2026-09-21",
-      "layer_ids": ["durable-memory"],
+      "layer_ids": [
+        "durable-memory"
+      ],
       "selection": "default",
       "review_status": "accepted_within_scope",
       "activation": "Use ai-memory's supported scoped capture, bounded assistant summaries and hourly learning scheduler with the adopted native provider; preserve client prompt-capture choices.",
-      "component_ids": ["ai-memory", "codex", "claude-code"],
+      "component_ids": [
+        "ai-memory",
+        "codex",
+        "claude-code"
+      ],
       "candidate": null,
-      "evidence_ids": ["memory-landscape-20260921", "memory-landscape-lifecycle-20260921", "dashboard-gap-resolution-20260921"],
+      "evidence_ids": [
+        "memory-landscape-20260921",
+        "memory-landscape-lifecycle-20260921",
+        "dashboard-gap-resolution-20260921"
+      ],
       "evidence_scope": "Nine current repository sources reviewed; native learning, scheduler admission, unchanged upstream tests and real client outcome capture are recorded separately. Existing code/document/context retrieval remain complementary layers.",
       "limitations": [
         "Scheduler covers all store scopes, with a per-project limit and once-per-session claims; current deployment has one adopted project.",
@@ -22,16 +32,32 @@
         "Model review rejected insufficient evidence; scheduler admission did not establish learned-write quality. Exact memory lifetime token savings remain unknown.",
         "Alternative systems are research candidates, not installed or locally benchmarked winners."
       ],
-      "source_paths": ["docs/memory-landscape-maintenance.md", "docs/native-memory-consolidation.md", "docs/native-memory-rag-lifecycle.md"],
+      "source_paths": [
+        "docs/memory-landscape-maintenance.md",
+        "docs/native-memory-consolidation.md",
+        "docs/native-memory-rag-lifecycle.md"
+      ],
       "next_gap": "Evaluate real subsequent learned proposals and representative retrieval quality before changing the accepted memory of record.",
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
         "scope": "Reuse each canonical component's accepted use stage; this maintenance wave adds the separate native operation and capture evidence linked above.",
         "unknown": "Other stages retain their original boundaries. Future learned-write quality, current Desktop hot reload and physical-PC reboot remain unestablished.",
         "stage_refs": [
-          {"component_id": "ai-memory", "stage": "use", "status": "accepted_within_scope"},
-          {"component_id": "codex", "stage": "use", "status": "accepted_within_scope"},
-          {"component_id": "claude-code", "stage": "use", "status": "accepted_within_scope"}
+          {
+            "component_id": "ai-memory",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "codex",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "claude-code",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          }
         ]
       },
       "supersedes": []
@@ -337,7 +363,7 @@
       "lifecycle": {
         "source_path": "blueprints/token-native-focus/saturation-audit.json",
         "scope": "Only the listed canonical stages and their original host/operation scopes apply. One foreground native Opus child repaired the owned file; twelve frozen tests and independent exhaustive checks passed.",
-        "unknown": "Unlisted or unestablished stages are not implied by this capability decision. Exercise abrupt worker failure and effect-aware same-task resume.",
+        "unknown": "Unlisted stages are not implied. The separate inherited-child interruption and native Workflow graceful-recovery decisions retain their own task, cleanup and failure boundaries.",
         "stage_refs": [
           {
             "component_id": "claude-code",
@@ -1112,7 +1138,7 @@
       "id": "selected-context-processing",
       "capability": "Process large tool output while preserving useful source facts",
       "capability_key": "selected-context-processing",
-      "checked_at": "2026-09-20",
+      "checked_at": "2026-09-21",
       "layer_ids": [
         "token-efficiency"
       ],
@@ -1129,16 +1155,19 @@
         "token-practice-artifacts-20260920",
         "token-practice-native-pairs-20260920",
         "native-token-focus-clients-20260920",
-        "foundation-native-20260920"
+        "foundation-native-20260920",
+        "claude-selective-context-pilot-20260921"
       ],
-      "evidence_scope": "Selected explicit native calls and exact artifact checks passed; paired trials retain both a Codex reduction and a Claude increase.",
+      "evidence_scope": "Selected explicit native calls and exact artifact checks passed; paired trials retain both a Codex reduction and a Claude increase. The later six-attempt selective-policy pilot passed its fixture checks but made zero Context Mode calls.",
       "limitations": [
         "Cache conditions were uncontrolled and enclosing workflow usage was incomplete.",
-        "The foundation gateway RTK/lite previews failed required semantic checks; general CLI acceptance does not repair those failures."
+        "The foundation gateway RTK/lite previews failed required semantic checks; general CLI acceptance does not repair those failures.",
+        "The selective-policy pilot's +2.42% aggregate token difference is not a causal Context Mode measurement; its rejected first attempt remains retained."
       ],
       "source_paths": [
         "docs/token-practice.md",
-        "docs/foundation-stack.md"
+        "docs/foundation-stack.md",
+        "docs/claude-selective-context-pilot-20260921.md"
       ],
       "next_gap": "Measure only a concrete changed workload, with correctness and complete attempt accounting.",
       "lifecycle": {
@@ -2545,6 +2574,58 @@
           },
           {
             "component_id": "restic",
+            "stage": "recovery",
+            "status": "accepted_within_scope"
+          }
+        ]
+      },
+      "supersedes": []
+    },
+    {
+      "id": "native-workflow-graceful-recovery",
+      "capability": "Replay and resume a native Claude Workflow after selected-worker stop and graceful coordinator exit",
+      "capability_key": "native-workflow-graceful-recovery",
+      "checked_at": "2026-09-21",
+      "layer_ids": [
+        "workers",
+        "scheduling-supervision",
+        "recovery-portability"
+      ],
+      "selection": "conditional",
+      "review_status": "accepted_within_scope",
+      "activation": "Use the native Ultracode profile when substantial parallel work is justified; preserve null/failed child results and verify integration independently.",
+      "component_ids": [
+        "claude-code"
+      ],
+      "candidate": null,
+      "evidence_ids": [
+        "native-workflow-graceful-recovery-20260921",
+        "native-workflow-writing-comparison-20260921"
+      ],
+      "evidence_scope": "Existing local invoice fixture: selected reviewer stop retained a failed child and null result; replay reused completed implementation, graceful native exit cleaned observed processes, and same-session resume integrated the repair while preserving later user edits. Independent 29 visible and seven hidden checks passed.",
+      "limitations": [
+        "This is a local integration fixture, not an unchanged upstream product test or general reliability benchmark.",
+        "The separate writing comparison passed code checks but both arms retained procedural failures; the Workflow arm used more reported tokens.",
+        "Recovery native cumulative usage exceeds deduplicated persisted usage by 205701 tokens; complete accounting remains unresolved.",
+        "Hard crash, physical-host reboot, remote provider cancellation and external exactly-once effects are unqualified."
+      ],
+      "source_paths": [
+        "docs/native-workflow-writing-recovery-20260921.md",
+        "recipes/claude-native-ultracode.md"
+      ],
+      "next_gap": "Reuse the accepted graceful-recovery fixture; qualify a representative application or a different failure/effect boundary only when required.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Native selected-child stop, replay and graceful same-session exit/resume with owned local integration.",
+        "unknown": "Hard crash, host reboot, provider cancellation, external effects and complete usage reconciliation.",
+        "stage_refs": [
+          {
+            "component_id": "claude-code",
+            "stage": "use",
+            "status": "accepted_within_scope"
+          },
+          {
+            "component_id": "claude-code",
             "stage": "recovery",
             "status": "accepted_within_scope"
           }

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-21",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "c6d3da8d2a08acbddf2f86527bab885430723059",
+  "source_revision": "06ee9ccfa81823c94b03903e39ee7bb012ff5514",
   "layers": [
     {
       "id": "agents",
@@ -310,6 +310,12 @@
     }
   ],
   "guides": [
+    {
+      "title": "Current foundation convergence: Claude cooperation and source results",
+      "body": "Six stable versions checked, real native research workers, independently verified sources, corrected claims and separately recorded recovery/context evidence.",
+      "path": "docs/foundation-convergence-20260921.md",
+      "category": "evaluation"
+    },
     {
       "title": "Persistent Claude workflows: setup and returned native evidence",
       "body": "Opt-in native profile, bounded workers, actual role and workflow discovery, setting precedence and preserved failed attempts. The complete setup recipe is embedded in this HTML; another PC must collect its own acceptance.",
