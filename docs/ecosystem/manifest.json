@@ -311,6 +311,12 @@
   ],
   "guides": [
     {
+      "title": "Full-stack native convergence: commands, screenshots and portable coverage",
+      "body": "68 components, 16 layers, current Claude/Codex returned results, upstream patch qualification and explicitly scoped lifetime evidence. Every selected component has a recipe/evidence join; uncovered execution remains visible.",
+      "path": "docs/full-stack-convergence.md",
+      "category": "evaluation"
+    },
+    {
       "title": "Current HF models: native results and upstream dashboards",
       "body": "Pinned Nemotron3Embed1B files and exact NVIDIA example verified. Model identities, native context limits, published benchmark scopes and the upstream memory-model compatibility gap remain explicit.",
       "path": "docs/hf-memory-model-qualification.md",

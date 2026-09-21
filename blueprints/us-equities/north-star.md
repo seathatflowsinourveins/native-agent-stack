@@ -9,6 +9,13 @@ The [trading catalog](../../catalogs/us-equities/README.md) is separate from the
 general [native harness foundation](../../catalogs/foundation/README.md).
 This is not a deployed broker service or a validated profitable strategy.
 
+The [September 21 foundation convergence](../../docs/full-stack-convergence.md)
+adds current Astra/Fable native retrieval results, populated upstream dashboards,
+complete component evidence joins and qualified tool updates. Those receipts
+support the native research foundation; they do not advance strategy, dataset,
+broker, production-hosting or profit claims. Older Opus research comparisons keep
+their original model/task boundary.
+
 The current [architecture and next-role contract](architecture/README.md) records
 the latest research wave, official Alpaca limits, native SDK compatibility gap,
 simulation realism requirements and platform-specific acceptance. The

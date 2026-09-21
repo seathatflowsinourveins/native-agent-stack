@@ -1,0 +1,152 @@
+{
+  "scope": "Local repository and reporter checks. Test fixtures do not establish upstream or provider E2E. Full gitleaks retains exit 1 with 204 independently classified digest/fixture false positives; no ignore rules changed.",
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "scripts/catalog_decisions.py",
+        "--check"
+      ],
+      "started_at": "2026-09-21T14:03:02.860659+00:00",
+      "completed_at": "2026-09-21T14:03:02.906300+00:00",
+      "exit_code": 0,
+      "stdout_text": "{\"beyond_public_stars\": 171, \"public_star_repositories\": 342, \"references\": 1072, \"repositories\": 513, \"repositories_by_record_type\": {\"catalog_card\": 147, \"component_record\": 68, \"legacy_candidate\": 20, \"public_star\": 342, \"research_supplement\": 108, \"star_review\": 342}}\nIdentity union and typed source pointers validated; no upstream source or native execution was rerun.\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "started_at": "2026-09-21T14:03:02.906757+00:00",
+      "completed_at": "2026-09-21T14:03:04.791066+00:00",
+      "exit_code": 0,
+      "stdout_text": "{\"components\": 68, \"hashed_files\": 1325, \"profiles\": 4, \"receipts\": 117, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/validate_catalogs.py"
+      ],
+      "started_at": "2026-09-21T14:03:04.791469+00:00",
+      "completed_at": "2026-09-21T14:03:04.880516+00:00",
+      "exit_code": 0,
+      "stdout_text": "{\"beyond_star_catalog_repositories\": 105, \"models\": 20, \"public_stars\": 342, \"repository_entries\": 152, \"starred_catalog_repositories\": 42, \"unique_catalog_repositories\": 147}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun.\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/validate_foundation.py",
+        "--root",
+        ".",
+        "--json"
+      ],
+      "started_at": "2026-09-21T14:03:04.880874+00:00",
+      "completed_at": "2026-09-21T14:03:04.941245+00:00",
+      "exit_code": 0,
+      "stdout_text": "{\n  \"ok\": true,\n  \"counts\": {\n    \"layers\": 16,\n    \"decisions\": 44,\n    \"foundation_components\": 61,\n    \"domain_components\": 7,\n    \"evidence_receipts\": 75,\n    \"candidates\": 0\n  },\n  \"errors\": []\n}\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/validate_convergence.py",
+        "--all-recorded",
+        "--root",
+        ".",
+        "--json"
+      ],
+      "started_at": "2026-09-21T14:03:04.941638+00:00",
+      "completed_at": "2026-09-21T14:03:05.077838+00:00",
+      "exit_code": 0,
+      "stdout_text": "{\"records\": [{\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/application-delivery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/ci-security/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/document-ingestion/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/gpu-inference/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/job-recovery/experiment-macos.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/job-recovery/experiment-wsl.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/mac-memory-patch/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/native-recovery/claude/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/native-recovery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/native-worker/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 1, \"path\": \"blueprints/convergence-practice/wsl-memory-maintenance/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 2, \"path\": \"blueprints/convergence-practice/wsl-native-tools/experiment-wsl.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"blueprints/convergence-practice/wsl-transport-recovery/experiment.json\", \"valid\": true}, {\"errors\": [], \"observations\": 3, \"path\": \"evidence/artifacts/native-workflow-writing-recovery-20260921/experiment.json\", \"valid\": true}], \"valid\": true}\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/build_ecosystem.py",
+        "--check"
+      ],
+      "started_at": "2026-09-21T14:03:05.078211+00:00",
+      "completed_at": "2026-09-21T14:03:05.527436+00:00",
+      "exit_code": 0,
+      "stdout_text": "{\"bytes\": 6116649, \"sha256\": \"e806033b7c0db7e87b09f4079b43fe0420fc7e2eb393f1254aeb2c0d0d218911\", \"status\": \"passed\"}\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests"
+      ],
+      "started_at": "2026-09-21T14:03:05.528628+00:00",
+      "completed_at": "2026-09-21T14:03:16.604734+00:00",
+      "exit_code": 0,
+      "stdout_text": "Installed dashboard and two units; service activation remains explicit.\n{\"status\": \"failed\", \"error\": \"[Errno 2] No such file or directory: '/tmp/tmp59vovhpv/quickstart.py'\", \"receipt\": \"/tmp/tmp59vovhpv/verification.json\"}\n",
+      "stderr_text": "...................................s..ss.............................................................ssss.................................................................................................................................................s.s....................................................................................ss...............ssssssssssss.........................................................................................................................sssssssssssss.............................................sss.s...........s........................................................................................................................................\n----------------------------------------------------------------------\nRan 698 tests in 10.938s\n\nOK (skipped=41)\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tools/token-report",
+        "-p",
+        "test_*.py"
+      ],
+      "started_at": "2026-09-21T14:03:16.605127+00:00",
+      "completed_at": "2026-09-21T14:03:17.837127+00:00",
+      "exit_code": 0,
+      "stdout_text": "",
+      "stderr_text": "..................................................\n----------------------------------------------------------------------\nRan 50 tests in 1.186s\n\nOK\n"
+    },
+    {
+      "argv": [
+        "node",
+        "--test",
+        "tools/token-report/test_returned_results.cjs"
+      ],
+      "started_at": "2026-09-21T14:03:17.837508+00:00",
+      "completed_at": "2026-09-21T14:03:17.903243+00:00",
+      "exit_code": 0,
+      "stdout_text": "✔ coverage joins aliases, retains failures, and exposes uncovered selected components (1.914821ms)\n✔ raster bytes render inline while source text and active image formats stay inert (1.435762ms)\n✔ combined filters and evidence jumps never leave the target hidden (1.251512ms)\nℹ tests 3\nℹ suites 0\nℹ pass 3\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 39.878798\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "started_at": "2026-09-21T14:03:17.903659+00:00",
+      "completed_at": "2026-09-21T14:03:17.977751+00:00",
+      "exit_code": 0,
+      "stdout_text": "",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "gitleaks",
+        "dir",
+        ".",
+        "--redact",
+        "--no-banner",
+        "--exit-code",
+        "1"
+      ],
+      "started_at": "2026-09-21T14:03:17.978187+00:00",
+      "completed_at": "2026-09-21T14:03:19.338430+00:00",
+      "exit_code": 1,
+      "stdout_text": "",
+      "stderr_text": "10:03AM INF scanned ~23674056 bytes (23.67 MB) in 1.11s\n10:03AM WRN leaks found: 204\n"
+    }
+  ]
+}

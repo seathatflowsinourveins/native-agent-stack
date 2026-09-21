@@ -1,0 +1,447 @@
+{
+  "recorded_at_utc": "2026-09-21T13:50:40.163243+00:00",
+  "reviewer_scope": "Independent review of a different executor's upgrades. Read original tool returns and upstream test source; independently inspected current launchers/archive bytes/Git state. No model, research, paper-download or lifecycle mutation was rerun.",
+  "receipt_sha256": "9217999f07182fb0de10fe56f5a21a472d740944c6da31750f524d7c58f86c78",
+  "checks": [
+    {
+      "check": "openresearch: launcher is symlink to declared isolated prefix",
+      "passed": true
+    },
+    {
+      "check": "openresearch: actual binary hash matches receipt",
+      "passed": true
+    },
+    {
+      "check": "openresearch: current actual version",
+      "passed": true
+    },
+    {
+      "check": "openresearch: rollback binary remains runnable",
+      "passed": true
+    },
+    {
+      "check": "openresearch: archive matches downloaded upstream checksum and receipt",
+      "passed": true
+    },
+    {
+      "check": "openresearch: installed binary matches exact downloaded archive member",
+      "passed": true
+    },
+    {
+      "check": "openresearch: source pin matches actual checkout",
+      "passed": true
+    },
+    {
+      "check": "openresearch: source checkout unchanged",
+      "passed": true
+    },
+    {
+      "check": "worktrunk: launcher is symlink to declared isolated prefix",
+      "passed": true
+    },
+    {
+      "check": "worktrunk: actual binary hash matches receipt",
+      "passed": true
+    },
+    {
+      "check": "worktrunk: current actual version",
+      "passed": true
+    },
+    {
+      "check": "worktrunk: rollback binary remains runnable",
+      "passed": true
+    },
+    {
+      "check": "worktrunk: archive matches downloaded upstream checksum and receipt",
+      "passed": true
+    },
+    {
+      "check": "worktrunk: installed binary matches exact downloaded archive member",
+      "passed": true
+    },
+    {
+      "check": "worktrunk: source pin matches actual checkout",
+      "passed": true
+    },
+    {
+      "check": "worktrunk: source checkout unchanged",
+      "passed": true
+    },
+    {
+      "check": "Worktrunk: independent Git final worktree count is one",
+      "passed": true
+    },
+    {
+      "check": "Worktrunk: only main branch remains",
+      "passed": true
+    },
+    {
+      "check": "Worktrunk: current disposable repository clean",
+      "passed": true
+    },
+    {
+      "check": "Worktrunk: no remote attached",
+      "passed": true
+    },
+    {
+      "check": "Worktrunk: removed worktree directory absent",
+      "passed": true
+    },
+    {
+      "check": "Worktrunk: original create exit zero and created branch returned",
+      "passed": true
+    },
+    {
+      "check": "Worktrunk: original cleanup exit zero and deleted branch returned",
+      "passed": true
+    },
+    {
+      "check": "Worktrunk: original list reports two worktrees",
+      "passed": true
+    },
+    {
+      "check": "Worktrunk: baseline and candidate command suffixes identical",
+      "passed": true
+    },
+    {
+      "check": "Worktrunk: both comparison exits zero",
+      "passed": true
+    },
+    {
+      "check": "Worktrunk: baseline returned outer repository cwd",
+      "passed": true
+    },
+    {
+      "check": "Worktrunk: candidate returned selected worktree cwd",
+      "passed": true
+    },
+    {
+      "check": "Worktrunk: upstream oracle source hash matches",
+      "passed": true
+    },
+    {
+      "check": "Worktrunk: read upstream oracle tests selected worktree directory",
+      "passed": true
+    },
+    {
+      "check": "OpenResearch: selected test source declares seven tests",
+      "passed": true
+    },
+    {
+      "check": "OpenResearch: executed test source byte-identical to upstream pinned commit",
+      "passed": true
+    },
+    {
+      "check": "OpenResearch: original unchanged test command and seven passes",
+      "passed": true
+    },
+    {
+      "check": "OpenResearch: paper raw return hash/size/characters match public metadata",
+      "passed": true
+    },
+    {
+      "check": "OpenResearch: original full-paper exit zero and telemetry disabled",
+      "passed": true
+    },
+    {
+      "check": "OpenResearch: convenience copy adds exactly one LF",
+      "passed": true
+    },
+    {
+      "check": "OpenResearch: original discovery exit zero with declared three paper IDs",
+      "passed": true
+    },
+    {
+      "check": "Public receipt excludes absolute private home",
+      "passed": true
+    },
+    {
+      "check": "Public receipt excludes Windows private home",
+      "passed": true
+    },
+    {
+      "check": "Public receipt excludes session UUID",
+      "passed": true
+    },
+    {
+      "check": "Public receipt excludes email",
+      "passed": true
+    },
+    {
+      "check": "Public receipt excludes credential-shaped value",
+      "passed": true
+    },
+    {
+      "check": "Public receipt contains no 20-word verbatim paper-body span",
+      "passed": true
+    },
+    {
+      "check": "Copyright-bearing raw bodies explicitly excluded from publication",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: README.md",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: candidate-help.txt",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: discovery-command-initial.json",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: discovery-return.json",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: independent-state-verification.txt",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: initial-download-source-commands.json",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: launcher-promotion.json",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: openresearch-upstream-markdown-tests.txt",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: paper-full-command.json",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: paper-full-native-return-private.json",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: paper-full-private.txt",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: promoted-native-verification.txt",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: releases-selected.txt",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: source-test-inspection.txt",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: upgrade-receipt-public.json",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: upstream-release-comparison.txt",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: worktrunk-cleanup.json",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: worktrunk-create.json",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: worktrunk-fixture-init.json",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: worktrunk-lifecycle-before-cleanup.txt",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: worktrunk-test-config.toml",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: downloads/openresearch-cli-x86_64-unknown-linux-musl.tar.xz",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: downloads/worktrunk-x86_64-unknown-linux-musl.tar.xz",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: sources/openresearch/ui/tests/markdownTarget.test.mjs",
+      "passed": true
+    },
+    {
+      "check": "Retained artifact hash: sources/openresearch/ui/src/markdownTarget.ts",
+      "passed": true
+    }
+  ],
+  "findings": [],
+  "independent_commands": [
+    {
+      "argv": [
+        "${HOME}/.local/share/codex-ecosystem/bin/orx",
+        "--no-telemetry",
+        "--version"
+      ],
+      "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/orx-worktrunk",
+      "started_at": "2026-09-21T13:50:38.589724+00:00",
+      "exit_code": 0,
+      "stdout": "orx 0.2.7\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "${HOME}/.local/share/codex-ecosystem/tools/openresearch-0.2.4/openresearch-cli-x86_64-unknown-linux-musl/orx",
+        "--no-telemetry",
+        "--version"
+      ],
+      "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/orx-worktrunk",
+      "started_at": "2026-09-21T13:50:38.592389+00:00",
+      "exit_code": 0,
+      "stdout": "orx 0.2.4\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/orx-worktrunk/sources/openresearch",
+      "started_at": "2026-09-21T13:50:39.447416+00:00",
+      "exit_code": 0,
+      "stdout": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--porcelain=v1"
+      ],
+      "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/orx-worktrunk/sources/openresearch",
+      "started_at": "2026-09-21T13:50:39.448620+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "${HOME}/.local/share/codex-ecosystem/bin/wt",
+        "--version"
+      ],
+      "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/orx-worktrunk",
+      "started_at": "2026-09-21T13:50:39.471618+00:00",
+      "exit_code": 0,
+      "stdout": "wt v0.79.0\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "${HOME}/.local/share/codex-ecosystem/tools/worktrunk-0.78.0/wt",
+        "--version"
+      ],
+      "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/orx-worktrunk",
+      "started_at": "2026-09-21T13:50:39.475284+00:00",
+      "exit_code": 0,
+      "stdout": "wt v0.78.0\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/orx-worktrunk/sources/worktrunk",
+      "started_at": "2026-09-21T13:50:40.139667+00:00",
+      "exit_code": 0,
+      "stdout": "5ba6f148e8505c20794f2d8bc706aa4f26335c95\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--porcelain=v1"
+      ],
+      "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/orx-worktrunk/sources/worktrunk",
+      "started_at": "2026-09-21T13:50:40.140939+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "worktree",
+        "list",
+        "--porcelain"
+      ],
+      "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/orx-worktrunk/disposable-repository",
+      "started_at": "2026-09-21T13:50:40.144291+00:00",
+      "exit_code": 0,
+      "stdout": "worktree ${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/orx-worktrunk/disposable-repository\nHEAD a0ea711f27ce72a9168ad0e4fdc7248a798f54bd\nbranch refs/heads/main\n\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "branch",
+        "--format=%(refname:short)"
+      ],
+      "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/orx-worktrunk/disposable-repository",
+      "started_at": "2026-09-21T13:50:40.145102+00:00",
+      "exit_code": 0,
+      "stdout": "main\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "status",
+        "--porcelain=v1"
+      ],
+      "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/orx-worktrunk/disposable-repository",
+      "started_at": "2026-09-21T13:50:40.146064+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "remote"
+      ],
+      "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/orx-worktrunk/disposable-repository",
+      "started_at": "2026-09-21T13:50:40.146991+00:00",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "show",
+        "HEAD:ui/tests/markdownTarget.test.mjs"
+      ],
+      "cwd": "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/upgrades/orx-worktrunk/sources/openresearch",
+      "started_at": "2026-09-21T13:50:40.148553+00:00",
+      "exit_code": 0,
+      "stdout": "import assert from \"node:assert/strict\";\nimport test from \"node:test\";\n\nimport {\n  chatImageTarget,\n  isExternalMarkdownTarget,\n  markdownTargetUrl,\n  resolveMarkdownTarget,\n} from \"../src/markdownTarget.ts\";\n\ntest(\"repository markdown resolves images relative to the document\", () => {\n  assert.deepEqual(resolveMarkdownTarget(\"\", \"dev/logo.png\"), {\n    path: \"dev/logo.png\",\n    query: \"\",\n    hash: \"\",\n  });\n  assert.deepEqual(resolveMarkdownTarget(\"docs/guides\", \"../../images/chart 1.png?raw=1#plot\"), {\n    path: \"images/chart 1.png\",\n    query: \"raw=1\",\n    hash: \"#plot\",\n  });\n  assert.deepEqual(resolveMarkdownTarget(\"docs\", \"/assets/logo.svg\"), {\n    path: \"assets/logo.svg\",\n    query: \"\",\n    hash: \"\",\n  });\n});\n\ntest(\"markdown paths cannot escape their root\", () => {\n  assert.equal(resolveMarkdownTarget(\"docs\", \"../../secret.png\"), null);\n  assert.equal(resolveMarkdownTarget(\"\", \"../secret.png\"), null);\n  assert.equal(resolveMarkdownTarget(\"\", \"%E0%A4%A\"), null);\n});\n\ntest(\"absolute markdown files preserve filesystem-rooted image paths\", () => {\n  assert.deepEqual(resolveMarkdownTarget(\"/tmp/reports\", \"../images/chart.png\", true), {\n    path: \"/tmp/images/chart.png\",\n    query: \"\",\n    hash: \"\",\n  });\n});\n\ntest(\"external image targets remain external\", () => {\n  assert.equal(isExternalMarkdownTarget(\"https://example.com/image.png\"), true);\n  assert.equal(isExternalMarkdownTarget(\"data:image/png;base64,AAAA\"), true);\n  assert.equal(isExternalMarkdownTarget(\"../images/chart.png\"), false);\n});\n\ntest(\"resolved image URLs preserve query parameters and fragments\", () => {\n  const target = resolveMarkdownTarget(\"docs\", \"image.png?raw=1#preview\");\n  assert.ok(target);\n  assert.equal(\n    markdownTargetUrl(\"/api/file/raw?path=docs%2Fimage.png\", target),\n    \"/api/file/raw?path=docs%2Fimage.png&raw=1#preview\",\n  );\n});\n\ntest(\"chat images resolve local paths without crossing the session root\", () => {\n  assert.deepEqual(chatImageTarget(\"paper/figures/plot%20one.png\"), {\n    path: \"paper/figures/plot one.png\", hash: \"\", source: \"checkout\",\n  });\n  assert.equal(chatImageTarget(\"/tmp/figure.png\").source, \"absolute\");\n  assert.equal(chatImageTarget(\"~/figures/figure.png\").source, \"absolute\");\n  assert.deepEqual(chatImageTarget(\"C:/papers/figure.png\"), {\n    path: \"C:/papers/figure.png\", hash: \"\", source: \"absolute\",\n  });\n  assert.deepEqual(chatImageTarget(\"artifacts/paper/figure.png\"), {\n    path: \"paper/figure.png\", hash: \"\", source: \"artifact\",\n  });\n  for (const src of [\"../secret.png\", \"%E0%A4%A\", \"javascript:alert(1)\", \"data:text/html,test\", \"https://example.com/image.png\"]) {\n    assert.equal(chatImageTarget(src), null, src);\n  }\n});\n\n\ntest(\"chat image URLs discard injected query parameters and preserve SVG fragments\", () => {\n  assert.deepEqual(chatImageTarget(\"figure.svg?path=/secret&sessionId=other#diagram\"), {\n    path: \"figure.svg\", hash: \"#diagram\", source: \"checkout\",\n  });\n  assert.equal(chatImageTarget(\"figures/100%25.png\").path, \"figures/100%.png\");\n  assert.equal(chatImageTarget(String.raw`C:\\papers\\figure.png`).path, \"C:/papers/figure.png\");\n});\n",
+      "stderr": ""
+    }
+  ],
+  "limitations": [
+    "Rust suites were not run by executor or reviewer; receipt clearly limits them.",
+    "Seven Node tests were checked against unchanged pinned upstream source and original returned output; reviewer did not rerun them.",
+    "Worktrunk regression is a local real-command comparison following the upstream directory oracle, not execution of its Rust test suite.",
+    "Pattern/overlap scans are bounded, not a proof against every possible sensitive string or copyright concern.",
+    "Raw paper/discovery bodies must remain private; approval applies to the selected public receipt only."
+  ]
+}

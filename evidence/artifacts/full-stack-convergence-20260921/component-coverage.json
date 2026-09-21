@@ -1,0 +1,4677 @@
+{
+  "schema_version": 1,
+  "components": [
+    {
+      "id": "affaan-m/ECC",
+      "repository": "https://github.com/affaan-m/ECC",
+      "selected_version": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+      "profile": "optional",
+      "role": "Selective on-demand community guidance",
+      "upstream_commands": [
+        {
+          "skill_invocation": [
+            "search-first"
+          ],
+          "source_only": false
+        }
+      ],
+      "recipe": "recipes/claude-native-profile.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "foundation-closure-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-closure-20260921.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/affaan-m/ECC/releases/tag/v2.2.1",
+        "prerelease": false,
+        "published_at": "2026-09-08T17:52:08Z",
+        "tag_name": "v2.2.1",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "agent-browser",
+      "repository": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
+      "selected_version": "0.38.1",
+      "profile": "core",
+      "role": "Local native browser snapshot/ref interaction",
+      "upstream_commands": [
+        "agent-browser --config examples/agent-browser.json --namespace native-stack --session selected-owned-session open \"file://${PROJECT_ROOT}/fixtures/greeting.html\""
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [
+        {
+          "id": "dashboard-agent-browser",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:07:09.416386+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-cli-gaps",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-cli-gaps.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "desktop-cli-workflows",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/desktop-cli-workflows.json"
+        },
+        {
+          "id": "native-observability",
+          "kind": "native_cli_e2e",
+          "path": "observability/receipt.json"
+        },
+        {
+          "id": "native-observability-followup",
+          "kind": "native_model_e2e",
+          "path": "observability/followup-receipt.json"
+        },
+        {
+          "id": "token-practice-artifacts-20260920",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
+        "prerelease": false,
+        "published_at": "2026-09-16T20:05:12Z",
+        "tag_name": "v0.38.1",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "agentsview",
+      "repository": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
+      "selected_version": "0.43.0",
+      "profile": "supporting",
+      "role": "Scoped historical Codex/Claude transcript lexical search",
+      "upstream_commands": [
+        "agentsview --help"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [
+        {
+          "id": "dashboard-agentsview",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:13:12.454026+00:00"
+        },
+        {
+          "id": "convergence-dashboard-agentsview",
+          "status": "populated-scoped-archive",
+          "kind": "official-upstream-dashboard",
+          "completed_at": "2026-09-21T13:32:08.511495+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-practice-gap-followup-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/token-practice-gap-followup-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        },
+        {
+          "id": "native-dashboard-data-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dashboard-data-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
+        "prerelease": false,
+        "published_at": "2026-09-14T13:22:53Z",
+        "tag_name": "v0.43.0",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "selected_version": "2.3.2",
+      "profile": "core",
+      "role": "Shared scoped Markdown decisions and automatic heuristic cross-client handoffs",
+      "upstream_commands": [
+        "ai-memory --version",
+        "ai-memory install-mcp --client codex --apply",
+        "ai-memory install-mcp --client claude-code --apply"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [
+        {
+          "id": "hf-model-files-20260921",
+          "status": "returned-with-explicit-model-scope",
+          "kind": "upstream CLI/API/example and browser observation",
+          "completed_at": null
+        },
+        {
+          "id": "hf-upstream-example-20260921",
+          "status": "returned-with-explicit-model-scope",
+          "kind": "upstream CLI/API/example and browser observation",
+          "completed_at": null
+        },
+        {
+          "id": "hf-model-dashboards-20260921",
+          "status": "returned-with-explicit-model-scope",
+          "kind": "upstream CLI/API/example and browser observation",
+          "completed_at": null
+        },
+        {
+          "id": "semantic-memory-20260921",
+          "status": "returned-with-scope-boundaries",
+          "kind": "native upstream results and identified independent observations",
+          "completed_at": "2026-09-21T05:11:53.658443+00:00"
+        },
+        {
+          "id": "desktop-memory-query-20260921",
+          "status": "returned-with-scope-boundaries",
+          "kind": "native upstream results and identified independent observations",
+          "completed_at": "2026-09-21T05:11:53.658443+00:00"
+        },
+        {
+          "id": "memory-restore-20260921",
+          "status": "returned-with-scope-boundaries",
+          "kind": "native upstream results and identified independent observations",
+          "completed_at": "2026-09-21T05:11:53.658443+00:00"
+        },
+        {
+          "id": "memory-observation-20260921",
+          "status": "returned-with-scope-boundaries",
+          "kind": "native upstream results and identified independent observations",
+          "completed_at": "2026-09-21T05:11:53.658443+00:00"
+        },
+        {
+          "id": "dashboard-ai-memory",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:16:48.949212+00:00"
+        },
+        {
+          "id": "convergence-native-claude-20260921",
+          "status": "completed, independent review recorded separately",
+          "kind": "actual native client retrieval operation",
+          "completed_at": "2026-09-21T13:27:32.014794+00:00"
+        },
+        {
+          "id": "convergence-native-codex-20260921",
+          "status": "completed, independent review recorded separately",
+          "kind": "actual native client retrieval operation",
+          "completed_at": "2026-09-21T13:28:55.903051+00:00"
+        },
+        {
+          "id": "convergence-dashboard-ai-memory",
+          "status": "populated-and-read-navigation-exercised",
+          "kind": "official-upstream-dashboard",
+          "completed_at": "2026-09-21T13:29:23.019509+00:00"
+        },
+        {
+          "id": "convergence-dashboard-grafana",
+          "status": "populated-live-metadata",
+          "kind": "official-upstream-dashboard-with-local-provisioned-panels",
+          "completed_at": "2026-09-21T13:31:30.055503+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-memory",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-memory.json"
+        },
+        {
+          "id": "desktop-direct-rag",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/desktop-direct-rag.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "native-observability-followup",
+          "kind": "native_model_e2e",
+          "path": "observability/followup-receipt.json"
+        },
+        {
+          "id": "ai-memory-native-state-recovery-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/state-recovery/memory/receipt.json"
+        },
+        {
+          "id": "native-memory-lifecycle-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/memory-lifecycle/receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "native-ai-memory-maintenance-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-ai-memory-maintenance-20260920.json"
+        },
+        {
+          "id": "mac-memory-patch-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/mac-memory-patch-20260920.json"
+        },
+        {
+          "id": "wsl-memory-maintenance-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/wsl-memory-maintenance-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "native-offhost-app-state-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-offhost-app-state-20260920.json"
+        },
+        {
+          "id": "native-dashboard-data-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dashboard-data-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "native-memory-rag-alignment-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-memory-rag-alignment-20260921.json"
+        },
+        {
+          "id": "hf-memory-models-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/hf-memory-models-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2",
+        "prerelease": false,
+        "published_at": "2026-09-20T02:34:33Z",
+        "tag_name": "v2.3.2",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "ast-grep",
+      "repository": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+      "selected_version": "0.45.3",
+      "profile": "supporting",
+      "role": "Structural source search",
+      "upstream_commands": [
+        "ast-grep run --lang javascript --pattern 'function $NAME($$$ARGS) { $$$BODY }' --json=compact --stdin < evidence/artifacts/usage-report.source.txt"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "portable-cli-artifacts",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/portable-cli-artifacts.json"
+        },
+        {
+          "id": "token-practice-artifacts-20260920",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+        "prerelease": false,
+        "published_at": "2026-08-31T01:42:23Z",
+        "tag_name": "0.45.3",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "ccusage",
+      "repository": "https://github.com/ccusage/ccusage",
+      "selected_version": "20.0.24",
+      "profile": "supporting",
+      "role": "Read existing native provider usage logs",
+      "upstream_commands": [
+        "ccusage --help"
+      ],
+      "recipe": "recipes/native-upgrades-20260921.md",
+      "attached_observations": [
+        {
+          "id": "convergence-upgrade-ccusage",
+          "status": "installed and qualified within recorded scope",
+          "kind": "release upgrade and selected upstream qualification",
+          "completed_at": "2026-09-21T13:35:15.990267+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-practice-gap-followup-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/token-practice-gap-followup-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/ccusage/ccusage/releases/tag/v20.0.24",
+        "prerelease": false,
+        "published_at": "2026-09-21T11:23:53Z",
+        "tag_name": "v20.0.24",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "claude-code",
+      "repository": "https://github.com/anthropics/claude-code",
+      "selected_version": "2.1.278",
+      "profile": "core",
+      "role": "Native subscription coding client",
+      "upstream_commands": [
+        "claude --version",
+        "claude -p --output-format stream-json --verbose --max-turns 14 < fixtures/native-gap-prompt.txt"
+      ],
+      "recipe": "recipes/claude-native-profile.md",
+      "attached_observations": [
+        {
+          "id": "native-claude-current-turn-20260921",
+          "status": "passed-with-accounting-boundaries",
+          "kind": "upstream-native-client-check",
+          "completed_at": "2026-09-21T04:02:40.457209+00:00"
+        },
+        {
+          "id": "convergence-native-claude-20260921",
+          "status": "completed, independent review recorded separately",
+          "kind": "actual native client retrieval operation",
+          "completed_at": "2026-09-21T13:27:32.014794+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-workflow-writing-comparison-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-workflow-writing-comparison-20260921.json"
+        },
+        {
+          "id": "native-workflow-graceful-recovery-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-workflow-graceful-recovery-20260921.json"
+        },
+        {
+          "id": "portable-userspace-install-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/portable-userspace-install-20260921.json"
+        },
+        {
+          "id": "claude-selective-context-pilot-20260921",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/claude-selective-context-pilot-20260921.json"
+        },
+        {
+          "id": "native-context-memory",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-context-memory.json"
+        },
+        {
+          "id": "native-memory",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-memory.json"
+        },
+        {
+          "id": "native-rag",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-rag.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "native-observability",
+          "kind": "native_cli_e2e",
+          "path": "observability/receipt.json"
+        },
+        {
+          "id": "native-research-runtime-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/research-runtime/receipt.json"
+        },
+        {
+          "id": "native-claude-convergence-review-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/convergence-review/receipt.json"
+        },
+        {
+          "id": "native-paired-adoption-20260919",
+          "kind": "native_model_e2e",
+          "path": "adoption/paired/receipt.json"
+        },
+        {
+          "id": "native-architecture-review-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/architecture/receipt.json"
+        },
+        {
+          "id": "native-convergence-review-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/convergence-program/review-receipt.json"
+        },
+        {
+          "id": "token-practice-native-pairs-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/token-practice-native-pairs-20260920.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "native-research-efficiency-20260920",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/research-efficiency/native-receipt.json"
+        },
+        {
+          "id": "native-claude-child-patch-20260920",
+          "kind": "native_model_e2e",
+          "path": "blueprints/convergence-practice/native-worker/receipt.json"
+        },
+        {
+          "id": "native-claude-session-recovery-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-claude-session-recovery-20260920.json"
+        },
+        {
+          "id": "native-token-focus-clients-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-token-focus-clients-20260920.json"
+        },
+        {
+          "id": "native-token-stack-final-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-token-stack-final-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "native-worker-cgroup-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-worker-cgroup-20260920.json"
+        },
+        {
+          "id": "foundation-closure-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-closure-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.278",
+        "prerelease": false,
+        "published_at": "2026-09-19T03:10:40Z",
+        "tag_name": "v2.1.278",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "claude-hud",
+      "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
+      "selected_version": "0.8.0",
+      "profile": "optional",
+      "role": "Claude statusline rendering",
+      "upstream_commands": [
+        {
+          "skill_invocation": null,
+          "source_only": true
+        }
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-practice-gap-followup-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/token-practice-gap-followup-20260920.json"
+        },
+        {
+          "id": "native-claude-hud-interactive-20260920",
+          "kind": "compatibility_attempt",
+          "path": "evidence/receipts/native-claude-hud-interactive-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
+        "prerelease": false,
+        "published_at": "2026-08-18T14:20:35Z",
+        "tag_name": "v0.8.0",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "codebase-memory-mcp",
+      "repository": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
+      "selected_version": "0.11.0",
+      "profile": "core",
+      "role": "Persistent static code graph and call tracing",
+      "upstream_commands": [
+        "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory.search_graph --args \"${GRAPH_QUERY_ARGS}\" --output json --no-oauth"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-cli-gaps",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-cli-gaps.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "desktop-cli-workflows",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/desktop-cli-workflows.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
+        "prerelease": false,
+        "published_at": "2026-09-15T23:40:39Z",
+        "tag_name": "v0.11.0",
+        "target_commitish": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "codex",
+      "repository": "https://github.com/openai/codex",
+      "selected_version": "0.155.1",
+      "profile": "core",
+      "role": "Native subscription coding client",
+      "upstream_commands": [
+        "codex --version",
+        "codex exec -C \"${PROJECT_ROOT}\" --json - < fixtures/native-gap-prompt.txt"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [
+        {
+          "id": "native-codex-current-turn-20260921",
+          "status": "passed-with-accounting-boundaries",
+          "kind": "upstream-native-client-check",
+          "completed_at": "2026-09-21T04:01:51.260566+00:00"
+        },
+        {
+          "id": "convergence-native-codex-20260921",
+          "status": "completed, independent review recorded separately",
+          "kind": "actual native client retrieval operation",
+          "completed_at": "2026-09-21T13:28:55.903051+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "portable-userspace-install-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/portable-userspace-install-20260921.json"
+        },
+        {
+          "id": "native-context-memory",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-context-memory.json"
+        },
+        {
+          "id": "native-memory",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-memory.json"
+        },
+        {
+          "id": "native-rag",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-rag.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "desktop-cli-workflows",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/desktop-cli-workflows.json"
+        },
+        {
+          "id": "native-observability",
+          "kind": "native_cli_e2e",
+          "path": "observability/receipt.json"
+        },
+        {
+          "id": "native-observability-followup",
+          "kind": "native_model_e2e",
+          "path": "observability/followup-receipt.json"
+        },
+        {
+          "id": "desktop-restart-acceptance",
+          "kind": "native_cli_e2e",
+          "path": "observability/restart-receipt.json"
+        },
+        {
+          "id": "portable-sdk-adoption-20260919",
+          "kind": "native_cli_e2e",
+          "path": "adoption/receipt.json"
+        },
+        {
+          "id": "native-paired-adoption-20260919",
+          "kind": "native_model_e2e",
+          "path": "adoption/paired/receipt.json"
+        },
+        {
+          "id": "native-architecture-review-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/architecture/receipt.json"
+        },
+        {
+          "id": "native-convergence-review-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/convergence-program/review-receipt.json"
+        },
+        {
+          "id": "token-practice-native-pairs-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/token-practice-native-pairs-20260920.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-practice-gap-followup-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/token-practice-gap-followup-20260920.json"
+        },
+        {
+          "id": "native-research-efficiency-20260920",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/research-efficiency/native-receipt.json"
+        },
+        {
+          "id": "native-codex-session-recovery-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-codex-session-recovery-20260920.json"
+        },
+        {
+          "id": "native-token-focus-clients-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-token-focus-clients-20260920.json"
+        },
+        {
+          "id": "native-token-stack-final-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-token-stack-final-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "foundation-closure-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-closure-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.155.1",
+        "prerelease": false,
+        "published_at": "2026-09-18T20:03:04Z",
+        "tag_name": "rust-v0.155.1",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "codex-for-claude",
+      "repository": "https://github.com/openai/codex-plugin-cc/tree/v1.0.6",
+      "selected_version": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "profile": "optional",
+      "role": "Official Claude plugin and native Codex companion delegation",
+      "upstream_commands": [
+        {
+          "skill_invocation": [
+            "codex"
+          ],
+          "source_only": false
+        }
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-practice-gap-followup-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/token-practice-gap-followup-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/openai/codex-plugin-cc/releases/tag/v1.0.6",
+        "prerelease": false,
+        "published_at": "2026-07-08T00:17:32Z",
+        "tag_name": "v1.0.6",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "context-hub",
+      "repository": "https://github.com/andrewyng/context-hub",
+      "selected_version": "0.1.4",
+      "profile": "supporting",
+      "role": "Retrieve selected curated developer documentation",
+      "upstream_commands": [
+        "chub search \"python json\" --json"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-native-retained-functional-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/token-native-retained-functional-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/andrewyng/context-hub/releases/tag/v0.1.4",
+        "prerelease": false,
+        "published_at": "2026-04-27T22:10:03Z",
+        "tag_name": "v0.1.4",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "context-mode",
+      "repository": "https://github.com/mksglu/context-mode",
+      "selected_version": "1.0.169",
+      "profile": "core",
+      "role": "Local execution, file processing, indexed retrieval, native context hooks",
+      "upstream_commands": [
+        "mcporter --config \"${MCPORTER_CONFIG}\" call context-mode.ctx_doctor --args '{}' --output text --no-oauth"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [
+        {
+          "id": "desktop-context-mode-direct-20260921",
+          "status": "returned-with-accounting-boundaries",
+          "kind": "native MCP result",
+          "completed_at": "2026-09-21 03:59:25 UTC"
+        },
+        {
+          "id": "native-codex-current-turn-20260921",
+          "status": "passed-with-accounting-boundaries",
+          "kind": "upstream-native-client-check",
+          "completed_at": "2026-09-21T04:01:51.260566+00:00"
+        },
+        {
+          "id": "native-claude-current-turn-20260921",
+          "status": "passed-with-accounting-boundaries",
+          "kind": "upstream-native-client-check",
+          "completed_at": "2026-09-21T04:02:40.457209+00:00"
+        },
+        {
+          "id": "dashboard-token-report",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:12:32.941754+00:00"
+        },
+        {
+          "id": "convergence-native-claude-20260921",
+          "status": "completed, independent review recorded separately",
+          "kind": "actual native client retrieval operation",
+          "completed_at": "2026-09-21T13:27:32.014794+00:00"
+        },
+        {
+          "id": "convergence-native-codex-20260921",
+          "status": "completed, independent review recorded separately",
+          "kind": "actual native client retrieval operation",
+          "completed_at": "2026-09-21T13:28:55.903051+00:00"
+        },
+        {
+          "id": "convergence-dashboard-grafana",
+          "status": "populated-live-metadata",
+          "kind": "official-upstream-dashboard-with-local-provisioned-panels",
+          "completed_at": "2026-09-21T13:31:30.055503+00:00"
+        },
+        {
+          "id": "convergence-desktop-context-stats",
+          "status": "returned with scope limitations",
+          "kind": "direct upstream MCP result",
+          "completed_at": "2026-09-21T13:25:09.989Z"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "claude-selective-context-pilot-20260921",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/claude-selective-context-pilot-20260921.json"
+        },
+        {
+          "id": "native-context-memory",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-context-memory.json"
+        },
+        {
+          "id": "artifact-reductions",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/artifact-reductions.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "native-observability-followup",
+          "kind": "native_model_e2e",
+          "path": "observability/followup-receipt.json"
+        },
+        {
+          "id": "desktop-restart-acceptance",
+          "kind": "native_cli_e2e",
+          "path": "observability/restart-receipt.json"
+        },
+        {
+          "id": "token-practice-native-pairs-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/token-practice-native-pairs-20260920.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-practice-native-counters-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-native-counters-20260920.json"
+        },
+        {
+          "id": "native-token-focus-clients-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-token-focus-clients-20260920.json"
+        },
+        {
+          "id": "token-practice-confirmation-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-confirmation-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        },
+        {
+          "id": "native-token-stack-final-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-token-stack-final-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "foundation-closure-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-closure-20260921.json"
+        },
+        {
+          "id": "native-dashboard-data-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dashboard-data-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169",
+        "prerelease": false,
+        "published_at": "2026-06-29T18:18:53Z",
+        "tag_name": "v1.0.169",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "davila7/claude-code-templates",
+      "repository": "https://github.com/davila7/claude-code-templates",
+      "selected_version": "c840d6f626be7ba418da60aeb0f2080413562451",
+      "profile": "optional",
+      "role": "Selective on-demand community guidance",
+      "upstream_commands": [
+        {
+          "skill_invocation": [
+            "concise-planning"
+          ],
+          "source_only": false
+        }
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/davila7/claude-code-templates/releases/tag/v1.29.6",
+        "prerelease": false,
+        "published_at": "2026-09-17T01:14:32Z",
+        "tag_name": "v1.29.6",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "difftastic",
+      "repository": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+      "selected_version": "0.71.0",
+      "profile": "supporting",
+      "role": "Syntax-aware source difference review",
+      "upstream_commands": [
+        "difft --exit-code --color never fixtures/before.py fixtures/after.py"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "portable-cli-artifacts",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/portable-cli-artifacts.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+        "prerelease": false,
+        "published_at": "2026-09-18T22:57:29Z",
+        "tag_name": "0.71.0",
+        "target_commitish": "master"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "gitleaks",
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "selected_version": "8.30.1",
+      "profile": "supporting",
+      "role": "Redacted Git history secret detection",
+      "upstream_commands": [
+        "gitleaks dir --redact=100 --no-banner --no-color --report-format json --report-path \"${REPORT_PATH}\" \"${PROJECT_ROOT}\""
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "runtime-tools",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/runtime-tools.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "velanext-native-quality-tools-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/convergence-practice/wsl-native-tools/receipt.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
+        "prerelease": false,
+        "published_at": "2026-03-21T02:17:58Z",
+        "tag_name": "v8.30.1",
+        "target_commitish": "master"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "headroom",
+      "repository": "https://github.com/chopratejas/headroom",
+      "selected_version": "0.37.0",
+      "profile": "supporting",
+      "role": "On-demand upstream MCP compression/retrieval and separately guarded offline artifact compression",
+      "upstream_commands": [
+        "headroom mcp serve --proxy-url http://127.0.0.1:1",
+        "headroom savings --json"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [
+        {
+          "id": "dashboard-token-report",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:12:32.941754+00:00"
+        },
+        {
+          "id": "convergence-dashboard-grafana",
+          "status": "populated-live-metadata",
+          "kind": "official-upstream-dashboard-with-local-provisioned-panels",
+          "completed_at": "2026-09-21T13:31:30.055503+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-practice-native-counters-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-native-counters-20260920.json"
+        },
+        {
+          "id": "token-native-retained-functional-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/token-native-retained-functional-20260920.json"
+        },
+        {
+          "id": "native-headroom-mcp-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-headroom-mcp-20260920.json"
+        },
+        {
+          "id": "token-practice-confirmation-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-confirmation-20260920.json"
+        },
+        {
+          "id": "native-token-clean-prefix-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-token-clean-prefix-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        },
+        {
+          "id": "native-token-stack-final-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-token-stack-final-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "native-dashboard-data-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dashboard-data-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0",
+        "prerelease": false,
+        "published_at": "2026-08-27T21:18:26Z",
+        "tag_name": "v0.37.0",
+        "target_commitish": "32d7ca4577d599b8a5f811ada74cf31504302c9d"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "huggingface-hub-native",
+      "repository": "https://github.com/huggingface/huggingface_hub",
+      "selected_version": "1.32.0",
+      "profile": "core",
+      "role": "Native authenticated model discovery and revision-pinned downloads",
+      "upstream_commands": [
+        "hf --version",
+        "hf download nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 --local-dir \"${MODEL_DIRECTORY}\" --max-workers 2 --json"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "native-rag",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-rag.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/huggingface/huggingface_hub/releases/tag/v1.32.0",
+        "prerelease": false,
+        "published_at": "2026-09-17T10:21:24Z",
+        "tag_name": "v1.32.0",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "markitdown",
+      "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.7",
+      "selected_version": "0.1.7",
+      "profile": "supporting",
+      "role": "Convert supported source documents to readable Markdown",
+      "upstream_commands": [
+        "markitdown fixtures/greeting.html"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "portable-cli-artifacts",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/portable-cli-artifacts.json"
+        },
+        {
+          "id": "token-practice-artifacts-20260920",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/microsoft/markitdown/releases/tag/v0.1.7",
+        "prerelease": false,
+        "published_at": "2026-07-29T18:19:15Z",
+        "tag_name": "v0.1.7",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "mcp-inspector",
+      "repository": "https://github.com/modelcontextprotocol/inspector",
+      "selected_version": "2.7.0",
+      "profile": "supporting",
+      "role": "Upstream direct stdio tool inspection/calls",
+      "upstream_commands": [
+        "npx @modelcontextprotocol/inspector@2.7.0 --help"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-native-retained-functional-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/token-native-retained-functional-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.7.0",
+        "prerelease": false,
+        "published_at": "2026-09-16T15:09:20Z",
+        "tag_name": "2.7.0",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "mcporter",
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.13.13",
+      "selected_version": "0.13.13",
+      "profile": "core",
+      "role": "Native CLI bridge with persistent MCP daemon connection",
+      "upstream_commands": [
+        "mcporter --config \"${MCPORTER_CONFIG}\" list --brief --no-oauth"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "desktop-restart-acceptance",
+          "kind": "native_cli_e2e",
+          "path": "observability/restart-receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.13.13",
+        "prerelease": false,
+        "published_at": "2026-09-14T15:21:47Z",
+        "tag_name": "v0.13.13",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "openresearch",
+      "repository": "https://github.com/alphaXiv/OpenResearch",
+      "selected_version": "0.2.7",
+      "profile": "supporting",
+      "role": "Selected public literature discovery and extracted paper retrieval",
+      "upstream_commands": [
+        "orx --no-telemetry discover keyword \"local code retrieval\" --limit 3",
+        "orx --no-telemetry paper \"${PAPER_ID}\" --full"
+      ],
+      "recipe": "recipes/native-upgrades-20260921.md",
+      "attached_observations": [
+        {
+          "id": "convergence-upgrade-openresearch",
+          "status": "installed; independent original-state review passed",
+          "kind": "release upgrade and scoped native qualification",
+          "completed_at": "2026-09-21"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "artifact-reductions",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/artifact-reductions.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-practice-gap-followup-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/token-practice-gap-followup-20260920.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.7",
+        "prerelease": false,
+        "published_at": "2026-09-21T08:30:58Z",
+        "tag_name": "v0.2.7",
+        "target_commitish": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "playwright-cli",
+      "repository": "https://github.com/microsoft/playwright-cli",
+      "selected_version": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
+      "profile": "optional",
+      "role": "Native browser CLI with bounded Linux fixture acceptance and separately scoped Windows history",
+      "upstream_commands": [
+        "playwright-cli --help",
+        "playwright-cli --version"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-practice-gap-followup-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/token-practice-gap-followup-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.21",
+        "prerelease": false,
+        "published_at": "2026-09-18T23:34:47Z",
+        "tag_name": "v0.1.21",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "promptfoo",
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "selected_version": "0.123.1",
+      "profile": "optional",
+      "role": "Explicit evaluation configuration/fixtures",
+      "upstream_commands": [
+        "promptfoo --help"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [
+        {
+          "id": "dashboard-promptfoo",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:12:32.932736+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-native-retained-functional-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/token-native-retained-functional-20260920.json"
+        },
+        {
+          "id": "native-dashboard-data-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dashboard-data-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/promptfoo/promptfoo/releases/tag/0.123.1",
+        "prerelease": false,
+        "published_at": "2026-09-18T01:07:54Z",
+        "tag_name": "0.123.1",
+        "target_commitish": "34f74d34e140b5e17d23770dfb2340057b1936b8"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "qdrant",
+      "repository": "https://github.com/qdrant/qdrant",
+      "selected_version": "1.19.1",
+      "profile": "core",
+      "role": "Local persistent vector and payload storage",
+      "upstream_commands": [
+        "qdrant --config-path \"${QDRANT_CONFIG}\" --disable-telemetry"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [
+        {
+          "id": "code-rag-repair-20260921",
+          "status": "returned-with-scope-boundaries",
+          "kind": "native upstream results and identified independent observations",
+          "completed_at": "2026-09-21T05:11:53.658443+00:00"
+        },
+        {
+          "id": "memory-observation-20260921",
+          "status": "returned-with-scope-boundaries",
+          "kind": "native upstream results and identified independent observations",
+          "completed_at": "2026-09-21T05:11:53.658443+00:00"
+        },
+        {
+          "id": "dashboard-qdrant",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:13:13.437386+00:00"
+        },
+        {
+          "id": "convergence-dashboard-qdrant",
+          "status": "populated",
+          "kind": "official-upstream-dashboard",
+          "completed_at": "2026-09-21T13:32:40.971483+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-rag",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-rag.json"
+        },
+        {
+          "id": "desktop-direct-rag",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/desktop-direct-rag.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "qdrant-native-state-recovery-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/state-recovery/qdrant/receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "native-offhost-app-state-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-offhost-app-state-20260920.json"
+        },
+        {
+          "id": "native-dashboard-data-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dashboard-data-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "native-memory-rag-alignment-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-memory-rag-alignment-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/qdrant/qdrant/releases/tag/v1.19.1",
+        "prerelease": false,
+        "published_at": "2026-09-04T07:59:14Z",
+        "tag_name": "v1.19.1",
+        "target_commitish": "master"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "qmd",
+      "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+      "selected_version": "2.8.3",
+      "profile": "core",
+      "role": "Local lexical retrieval over selected documentation",
+      "upstream_commands": [
+        "qmd --index \"${QMD_INDEX}\" search \"automatic local code RAG Nemotron\" -c \"${QMD_COLLECTION}\" -n 2 --json"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [
+        {
+          "id": "memory-observation-20260921",
+          "status": "returned-with-scope-boundaries",
+          "kind": "native upstream results and identified independent observations",
+          "completed_at": "2026-09-21T05:11:53.658443+00:00"
+        },
+        {
+          "id": "native-codex-current-turn-20260921",
+          "status": "passed-with-accounting-boundaries",
+          "kind": "upstream-native-client-check",
+          "completed_at": "2026-09-21T04:01:51.260566+00:00"
+        },
+        {
+          "id": "native-claude-current-turn-20260921",
+          "status": "passed-with-accounting-boundaries",
+          "kind": "upstream-native-client-check",
+          "completed_at": "2026-09-21T04:02:40.457209+00:00"
+        },
+        {
+          "id": "dashboard-qmd",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:00:39.858517+00:00"
+        },
+        {
+          "id": "convergence-native-claude-20260921",
+          "status": "completed, independent review recorded separately",
+          "kind": "actual native client retrieval operation",
+          "completed_at": "2026-09-21T13:27:32.014794+00:00"
+        },
+        {
+          "id": "convergence-native-codex-20260921",
+          "status": "completed, independent review recorded separately",
+          "kind": "actual native client retrieval operation",
+          "completed_at": "2026-09-21T13:28:55.903051+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "portable-userspace-install-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/portable-userspace-install-20260921.json"
+        },
+        {
+          "id": "native-cli-gaps",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-cli-gaps.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "desktop-cli-workflows",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/desktop-cli-workflows.json"
+        },
+        {
+          "id": "qmd-bm25-retrieval-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/retrieval-evaluation/receipt.json"
+        },
+        {
+          "id": "token-practice-artifacts-20260920",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "native-research-efficiency-20260920",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/research-efficiency/native-receipt.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "native-catalog-retrieval-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-catalog-retrieval-20260920.json"
+        },
+        {
+          "id": "native-dashboard-data-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dashboard-data-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "native-memory-rag-alignment-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-memory-rag-alignment-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+        "prerelease": false,
+        "published_at": "2026-08-16T22:30:34Z",
+        "tag_name": "v2.8.3",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "repomix",
+      "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.0",
+      "selected_version": "1.18.1",
+      "profile": "supporting",
+      "role": "Explicit repository packing and structural compression",
+      "upstream_commands": [
+        "repomix --include fixtures/records.json,fixtures/example.sh --output \"${OUTPUT_DIR}/repomix.xml\""
+      ],
+      "recipe": "recipes/native-upgrades-20260921.md",
+      "attached_observations": [
+        {
+          "id": "convergence-upgrade-repomix",
+          "status": "installed and qualified within recorded scope",
+          "kind": "release upgrade and selected upstream qualification",
+          "completed_at": "2026-09-21T13:36:39.857847+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "portable-userspace-install-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/portable-userspace-install-20260921.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "portable-cli-artifacts",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/portable-cli-artifacts.json"
+        },
+        {
+          "id": "token-practice-artifacts-20260920",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+        "prerelease": false,
+        "published_at": "2026-09-21T08:34:49Z",
+        "tag_name": "v1.18.1",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "rtk",
+      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
+      "selected_version": "0.49.0",
+      "profile": "core",
+      "role": "Compact supported command outputs, retain failure/raw recovery",
+      "upstream_commands": [
+        "rtk git status"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [
+        {
+          "id": "native-codex-current-turn-20260921",
+          "status": "passed-with-accounting-boundaries",
+          "kind": "upstream-native-client-check",
+          "completed_at": "2026-09-21T04:01:51.260566+00:00"
+        },
+        {
+          "id": "native-claude-current-turn-20260921",
+          "status": "passed-with-accounting-boundaries",
+          "kind": "upstream-native-client-check",
+          "completed_at": "2026-09-21T04:02:40.457209+00:00"
+        },
+        {
+          "id": "dashboard-token-report",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:12:32.941754+00:00"
+        },
+        {
+          "id": "convergence-native-claude-20260921",
+          "status": "completed, independent review recorded separately",
+          "kind": "actual native client retrieval operation",
+          "completed_at": "2026-09-21T13:27:32.014794+00:00"
+        },
+        {
+          "id": "convergence-native-codex-20260921",
+          "status": "completed, independent review recorded separately",
+          "kind": "actual native client retrieval operation",
+          "completed_at": "2026-09-21T13:28:55.903051+00:00"
+        },
+        {
+          "id": "convergence-dashboard-grafana",
+          "status": "populated-live-metadata",
+          "kind": "official-upstream-dashboard-with-local-provisioned-panels",
+          "completed_at": "2026-09-21T13:31:30.055503+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "portable-userspace-install-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/portable-userspace-install-20260921.json"
+        },
+        {
+          "id": "native-context-memory",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-context-memory.json"
+        },
+        {
+          "id": "artifact-reductions",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/artifact-reductions.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-artifacts-20260920",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-practice-native-counters-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-native-counters-20260920.json"
+        },
+        {
+          "id": "token-practice-confirmation-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-confirmation-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        },
+        {
+          "id": "native-token-stack-final-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-token-stack-final-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "native-dashboard-data-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dashboard-data-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
+        "prerelease": false,
+        "published_at": "2026-09-11T08:52:38Z",
+        "tag_name": "v0.49.0",
+        "target_commitish": "b1c0dc00649c50fbe8930f849c800d4d6ca12091"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "sandbox-runtime",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "selected_version": "0.0.77",
+      "profile": "supporting",
+      "role": "On-demand OS isolation for selected native commands",
+      "upstream_commands": [
+        "srt --settings \"${SANDBOX_POLICY}\" -- COMMAND"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "runtime-tools",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/runtime-tools.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "native-sandbox-network-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-sandbox-network-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77",
+        "prerelease": false,
+        "published_at": "2026-09-18T22:09:16Z",
+        "tag_name": "v0.0.77",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "serena",
+      "repository": "https://github.com/oraios/serena",
+      "selected_version": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "profile": "core",
+      "role": "Language-server symbol and reference retrieval",
+      "upstream_commands": [
+        {
+          "tool": "find_symbol",
+          "arguments": {
+            "name_path_pattern": "greeting",
+            "relative_path": "fixtures/after.py",
+            "include_body": true
+          }
+        }
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [
+        {
+          "id": "native-codex-current-turn-20260921",
+          "status": "passed-with-accounting-boundaries",
+          "kind": "upstream-native-client-check",
+          "completed_at": "2026-09-21T04:01:51.260566+00:00"
+        },
+        {
+          "id": "native-claude-current-turn-20260921",
+          "status": "passed-with-accounting-boundaries",
+          "kind": "upstream-native-client-check",
+          "completed_at": "2026-09-21T04:02:40.457209+00:00"
+        },
+        {
+          "id": "dashboard-serena",
+          "status": "unavailable",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:14:21.361477+00:00"
+        },
+        {
+          "id": "dashboard-serena-current-recovery",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-recovery",
+          "completed_at": "2026-09-21T04:28:42.877629+00:00"
+        },
+        {
+          "id": "convergence-native-claude-20260921",
+          "status": "completed, independent review recorded separately",
+          "kind": "actual native client retrieval operation",
+          "completed_at": "2026-09-21T13:27:32.014794+00:00"
+        },
+        {
+          "id": "convergence-native-codex-20260921",
+          "status": "completed, independent review recorded separately",
+          "kind": "actual native client retrieval operation",
+          "completed_at": "2026-09-21T13:28:55.903051+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-context-memory",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-context-memory.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "native-dashboard-data-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dashboard-data-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/oraios/serena/releases/tag/v1.7.0",
+        "prerelease": false,
+        "published_at": "2026-08-09T18:38:06Z",
+        "tag_name": "v1.7.0",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "shanraisshan/claude-code-best-practice",
+      "repository": "https://github.com/shanraisshan/claude-code-best-practice",
+      "selected_version": "15969ed2471a177d938c889255d2f23f07e4742a",
+      "profile": "optional",
+      "role": "Selective on-demand community guidance",
+      "upstream_commands": [
+        {
+          "skill_invocation": null,
+          "source_only": true
+        }
+      ],
+      "recipe": "recipes/claude-native-profile.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": null,
+      "release_query_status": "upstream latest-release request failed; failure retained, pin unchanged",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "shellcheck",
+      "repository": "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0",
+      "selected_version": "0.11.0",
+      "profile": "supporting",
+      "role": "Static shell review",
+      "upstream_commands": [
+        "shellcheck fixtures/example.sh"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "portable-cli-artifacts",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/portable-cli-artifacts.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0",
+        "prerelease": false,
+        "published_at": "2025-08-04T00:27:19Z",
+        "tag_name": "v0.11.0",
+        "target_commitish": "master"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "socraticode",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "selected_version": "1.14.0",
+      "profile": "core",
+      "role": "Automatically refreshed semantic code retrieval and native code graph",
+      "upstream_commands": [
+        "mcporter --config \"${MCPORTER_CONFIG}\" call socraticode.codebase_health --args '{}' --output text --no-oauth",
+        "mcporter --config \"${MCPORTER_CONFIG}\" call socraticode.codebase_search --args \"${SEARCH_ARGS}\" --output text --no-oauth"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [
+        {
+          "id": "hf-model-files-20260921",
+          "status": "returned-with-explicit-model-scope",
+          "kind": "upstream CLI/API/example and browser observation",
+          "completed_at": null
+        },
+        {
+          "id": "hf-upstream-example-20260921",
+          "status": "returned-with-explicit-model-scope",
+          "kind": "upstream CLI/API/example and browser observation",
+          "completed_at": null
+        },
+        {
+          "id": "hf-model-dashboards-20260921",
+          "status": "returned-with-explicit-model-scope",
+          "kind": "upstream CLI/API/example and browser observation",
+          "completed_at": null
+        },
+        {
+          "id": "code-rag-repair-20260921",
+          "status": "returned-with-scope-boundaries",
+          "kind": "native upstream results and identified independent observations",
+          "completed_at": "2026-09-21T05:11:53.658443+00:00"
+        },
+        {
+          "id": "dashboard-socraticode",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:12:32.941098+00:00"
+        },
+        {
+          "id": "convergence-dashboard-socraticode",
+          "status": "populated-snapshot",
+          "kind": "official-upstream-generated-static-graph",
+          "completed_at": "2026-09-21T13:32:07.907495+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-rag",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-rag.json"
+        },
+        {
+          "id": "desktop-direct-rag",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/desktop-direct-rag.json"
+        },
+        {
+          "id": "artifact-reductions",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/artifact-reductions.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "vllm-compatibility",
+          "kind": "compatibility_attempt",
+          "path": "evidence/receipts/vllm-compatibility.json"
+        },
+        {
+          "id": "native-observability-followup",
+          "kind": "native_model_e2e",
+          "path": "observability/followup-receipt.json"
+        },
+        {
+          "id": "token-practice-artifacts-20260920",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "native-dashboard-data-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dashboard-data-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "native-memory-rag-alignment-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-memory-rag-alignment-20260921.json"
+        },
+        {
+          "id": "hf-memory-models-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/hf-memory-models-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.14.0",
+        "prerelease": false,
+        "published_at": "2026-09-16T14:26:47Z",
+        "tag_name": "v1.14.0",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "toon",
+      "repository": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+      "selected_version": "4.1.1",
+      "profile": "supporting",
+      "role": "Compact suitable structured data with explicit decode",
+      "upstream_commands": [
+        "toon fixtures/records.json --stats -o \"${OUTPUT_DIR}/records.toon\"",
+        "toon \"${OUTPUT_DIR}/records.toon\" --decode --strict -o \"${OUTPUT_DIR}/recovered.json\""
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "portable-userspace-install-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/portable-userspace-install-20260921.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "portable-cli-artifacts",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/portable-cli-artifacts.json"
+        },
+        {
+          "id": "token-practice-artifacts-20260920",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-practice-catalog-toon-20260920",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/token-practice-catalog-toon-20260920.json"
+        },
+        {
+          "id": "token-practice-native-counters-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-native-counters-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+        "prerelease": false,
+        "published_at": "2026-08-05T11:49:55Z",
+        "tag_name": "v4.1.1",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "vllm",
+      "repository": "https://github.com/vllm-project/vllm",
+      "selected_version": "0.25.0",
+      "profile": "core",
+      "role": "Native GPU serving for pinned recent local embeddings",
+      "upstream_commands": [
+        "vllm serve \"${MODEL_DIRECTORY}\" --served-model-name nvidia/Nemotron-3-Embed-1B-BF16 --host 127.0.0.1 --port 8231 --max-model-len 4096 --max-num-seqs 4 --gpu-memory-utilization 0.16 --enforce-eager --no-enable-log-requests"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [
+        {
+          "id": "hf-model-files-20260921",
+          "status": "returned-with-explicit-model-scope",
+          "kind": "upstream CLI/API/example and browser observation",
+          "completed_at": null
+        },
+        {
+          "id": "hf-upstream-example-20260921",
+          "status": "returned-with-explicit-model-scope",
+          "kind": "upstream CLI/API/example and browser observation",
+          "completed_at": null
+        },
+        {
+          "id": "hf-model-dashboards-20260921",
+          "status": "returned-with-explicit-model-scope",
+          "kind": "upstream CLI/API/example and browser observation",
+          "completed_at": null
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-rag",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-rag.json"
+        },
+        {
+          "id": "vllm-compatibility",
+          "kind": "compatibility_attempt",
+          "path": "evidence/receipts/vllm-compatibility.json"
+        },
+        {
+          "id": "desktop-direct-rag",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/desktop-direct-rag.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "native-memory-rag-alignment-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-memory-rag-alignment-20260921.json"
+        },
+        {
+          "id": "hf-memory-models-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/hf-memory-models-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/vllm-project/vllm/releases/tag/v0.29.0",
+        "prerelease": false,
+        "published_at": "2026-09-09T08:54:49Z",
+        "tag_name": "v0.29.0",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "worktrunk",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "selected_version": "0.79.0",
+      "profile": "optional",
+      "role": "Native Git worktree convenience CLI",
+      "upstream_commands": [
+        "wt list"
+      ],
+      "recipe": "recipes/native-upgrades-20260921.md",
+      "attached_observations": [
+        {
+          "id": "convergence-upgrade-worktrunk",
+          "status": "installed; independent original-state review passed",
+          "kind": "release upgrade and scoped native qualification",
+          "completed_at": "2026-09-21"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "worktrunk-list",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/worktrunk-list.json"
+        },
+        {
+          "id": "component-history",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/component-history.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "token-native-retained-functional-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/token-native-retained-functional-20260920.json"
+        },
+        {
+          "id": "velanext-native-quality-tools-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/convergence-practice/wsl-native-tools/receipt.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0",
+        "prerelease": false,
+        "published_at": "2026-09-21T01:01:42Z",
+        "tag_name": "v0.79.0",
+        "target_commitish": "5ba6f148e8505c20794f2d8bc706aa4f26335c95"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "opentelemetry-collector-contrib",
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "selected_version": "0.161.0",
+      "profile": "observability",
+      "role": "Single native core/contrib Collector process; content filtering, metric conversion, upstream exporters and SDK file receiver",
+      "upstream_commands": [
+        "otelcol-contrib validate --config=\"$OTEL_CONFIG\""
+      ],
+      "recipe": "observability/README.md",
+      "attached_observations": [
+        {
+          "id": "dashboard-provider-telemetry",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:14:12.352075+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-observability",
+          "kind": "native_cli_e2e",
+          "path": "observability/receipt.json"
+        },
+        {
+          "id": "native-observability-followup",
+          "kind": "native_model_e2e",
+          "path": "observability/followup-receipt.json"
+        },
+        {
+          "id": "desktop-restart-acceptance",
+          "kind": "native_cli_e2e",
+          "path": "observability/restart-receipt.json"
+        },
+        {
+          "id": "native-research-runtime-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/research-runtime/receipt.json"
+        },
+        {
+          "id": "native-claude-convergence-review-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/convergence-review/receipt.json"
+        },
+        {
+          "id": "native-paired-adoption-20260919",
+          "kind": "native_model_e2e",
+          "path": "adoption/paired/receipt.json"
+        },
+        {
+          "id": "native-architecture-review-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/architecture/receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        },
+        {
+          "id": "native-token-stack-final-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-token-stack-final-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.161.0",
+        "prerelease": false,
+        "published_at": "2026-09-15T15:05:47Z",
+        "tag_name": "v0.161.0",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "prometheus",
+      "repository": "https://github.com/prometheus/prometheus",
+      "selected_version": "3.14.0",
+      "profile": "observability",
+      "role": "Native operational metric storage and alert evaluation",
+      "upstream_commands": [
+        "promtool check config \"$PROMETHEUS_CONFIG\"",
+        "promtool query instant http://127.0.0.1:19090 up"
+      ],
+      "recipe": "observability/backends/README.md",
+      "attached_observations": [
+        {
+          "id": "dashboard-provider-telemetry",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:14:12.352075+00:00"
+        },
+        {
+          "id": "convergence-dashboard-grafana",
+          "status": "populated-live-metadata",
+          "kind": "official-upstream-dashboard-with-local-provisioned-panels",
+          "completed_at": "2026-09-21T13:31:30.055503+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-observability",
+          "kind": "native_cli_e2e",
+          "path": "observability/receipt.json"
+        },
+        {
+          "id": "native-observability-followup",
+          "kind": "native_model_e2e",
+          "path": "observability/followup-receipt.json"
+        },
+        {
+          "id": "desktop-restart-acceptance",
+          "kind": "native_cli_e2e",
+          "path": "observability/restart-receipt.json"
+        },
+        {
+          "id": "native-research-runtime-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/research-runtime/receipt.json"
+        },
+        {
+          "id": "native-claude-convergence-review-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/convergence-review/receipt.json"
+        },
+        {
+          "id": "native-paired-adoption-20260919",
+          "kind": "native_model_e2e",
+          "path": "adoption/paired/receipt.json"
+        },
+        {
+          "id": "native-architecture-review-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/architecture/receipt.json"
+        },
+        {
+          "id": "native-grand-dashboard-20260919",
+          "kind": "native_cli_e2e",
+          "path": "observability/grand-dashboard/receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        },
+        {
+          "id": "native-token-stack-final-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-token-stack-final-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/prometheus/prometheus/releases/tag/v3.14.0",
+        "prerelease": false,
+        "published_at": "2026-08-18T08:49:40Z",
+        "tag_name": "v3.14.0",
+        "target_commitish": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "loki",
+      "repository": "https://github.com/grafana/loki",
+      "selected_version": "3.7.8",
+      "profile": "observability",
+      "role": "Native structured log storage",
+      "upstream_commands": [
+        "loki -config.file=\"$LOKI_CONFIG\" -verify-config=true"
+      ],
+      "recipe": "observability/backends/README.md",
+      "attached_observations": [
+        {
+          "id": "memory-observation-20260921",
+          "status": "returned-with-scope-boundaries",
+          "kind": "native upstream results and identified independent observations",
+          "completed_at": "2026-09-21T05:11:53.658443+00:00"
+        },
+        {
+          "id": "dashboard-foundation",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:13:14.941462+00:00"
+        },
+        {
+          "id": "dashboard-research",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:12:32.955349+00:00"
+        },
+        {
+          "id": "convergence-dashboard-grafana",
+          "status": "populated-live-metadata",
+          "kind": "official-upstream-dashboard-with-local-provisioned-panels",
+          "completed_at": "2026-09-21T13:31:30.055503+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-observability",
+          "kind": "native_cli_e2e",
+          "path": "observability/receipt.json"
+        },
+        {
+          "id": "native-observability-followup",
+          "kind": "native_model_e2e",
+          "path": "observability/followup-receipt.json"
+        },
+        {
+          "id": "desktop-restart-acceptance",
+          "kind": "native_cli_e2e",
+          "path": "observability/restart-receipt.json"
+        },
+        {
+          "id": "native-research-runtime-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/research-runtime/receipt.json"
+        },
+        {
+          "id": "native-claude-convergence-review-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/convergence-review/receipt.json"
+        },
+        {
+          "id": "native-paired-adoption-20260919",
+          "kind": "native_model_e2e",
+          "path": "adoption/paired/receipt.json"
+        },
+        {
+          "id": "native-architecture-review-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/architecture/receipt.json"
+        },
+        {
+          "id": "native-grand-dashboard-20260919",
+          "kind": "native_cli_e2e",
+          "path": "observability/grand-dashboard/receipt.json"
+        },
+        {
+          "id": "native-simulation-research-dashboard-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/simulation-research/receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        },
+        {
+          "id": "native-token-stack-final-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-token-stack-final-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "native-dashboard-data-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dashboard-data-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "native-memory-rag-alignment-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-memory-rag-alignment-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/grafana/loki/releases/tag/v3.7.8",
+        "prerelease": false,
+        "published_at": "2026-09-17T15:51:10Z",
+        "tag_name": "v3.7.8",
+        "target_commitish": "09e6ce2ff1bdc19763a10265b870c86f51c98655"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "grafana",
+      "repository": "https://github.com/grafana/grafana",
+      "selected_version": "13.2.2",
+      "profile": "observability",
+      "role": "Local native observation dashboard",
+      "upstream_commands": [
+        "grafana --version",
+        "curl --fail --silent http://127.0.0.1:13000/api/health"
+      ],
+      "recipe": "observability/backends/README.md",
+      "attached_observations": [
+        {
+          "id": "hf-model-files-20260921",
+          "status": "returned-with-explicit-model-scope",
+          "kind": "upstream CLI/API/example and browser observation",
+          "completed_at": null
+        },
+        {
+          "id": "hf-upstream-example-20260921",
+          "status": "returned-with-explicit-model-scope",
+          "kind": "upstream CLI/API/example and browser observation",
+          "completed_at": null
+        },
+        {
+          "id": "hf-model-dashboards-20260921",
+          "status": "returned-with-explicit-model-scope",
+          "kind": "upstream CLI/API/example and browser observation",
+          "completed_at": null
+        },
+        {
+          "id": "memory-observation-20260921",
+          "status": "returned-with-scope-boundaries",
+          "kind": "native upstream results and identified independent observations",
+          "completed_at": "2026-09-21T05:11:53.658443+00:00"
+        },
+        {
+          "id": "dashboard-foundation",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:13:14.941462+00:00"
+        },
+        {
+          "id": "dashboard-provider-telemetry",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:14:12.352075+00:00"
+        },
+        {
+          "id": "dashboard-research",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:12:32.955349+00:00"
+        },
+        {
+          "id": "convergence-dashboard-grafana",
+          "status": "populated-live-metadata",
+          "kind": "official-upstream-dashboard-with-local-provisioned-panels",
+          "completed_at": "2026-09-21T13:31:30.055503+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-observability",
+          "kind": "native_cli_e2e",
+          "path": "observability/receipt.json"
+        },
+        {
+          "id": "native-observability-followup",
+          "kind": "native_model_e2e",
+          "path": "observability/followup-receipt.json"
+        },
+        {
+          "id": "desktop-restart-acceptance",
+          "kind": "native_cli_e2e",
+          "path": "observability/restart-receipt.json"
+        },
+        {
+          "id": "native-grand-dashboard-20260919",
+          "kind": "native_cli_e2e",
+          "path": "observability/grand-dashboard/receipt.json"
+        },
+        {
+          "id": "native-simulation-research-dashboard-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/simulation-research/receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        },
+        {
+          "id": "native-dashboard-data-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dashboard-data-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "native-memory-rag-alignment-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-memory-rag-alignment-20260921.json"
+        },
+        {
+          "id": "hf-memory-models-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/hf-memory-models-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/grafana/grafana/releases/tag/v13.2.2",
+        "prerelease": false,
+        "published_at": "2026-09-15T12:21:32Z",
+        "tag_name": "v13.2.2",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "alertmanager",
+      "repository": "https://github.com/prometheus/alertmanager",
+      "selected_version": "0.34.1",
+      "profile": "observability",
+      "role": "Native alert grouping and delivery",
+      "upstream_commands": [
+        "amtool check-config \"$ALERTMANAGER_CONFIG\""
+      ],
+      "recipe": "observability/backends/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-observability",
+          "kind": "native_cli_e2e",
+          "path": "observability/receipt.json"
+        },
+        {
+          "id": "desktop-restart-acceptance",
+          "kind": "native_cli_e2e",
+          "path": "observability/restart-receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/prometheus/alertmanager/releases/tag/v0.34.1",
+        "prerelease": false,
+        "published_at": "2026-09-17T08:12:07Z",
+        "tag_name": "v0.34.1",
+        "target_commitish": "73c6bfe7393929211294c1954f30d8ed78e4d0ad"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "ntfy",
+      "repository": "https://github.com/binwiederhier/ntfy",
+      "selected_version": "2.28.0",
+      "profile": "observability",
+      "role": "Local retained notification inbox",
+      "upstream_commands": [
+        "ntfy --version",
+        "curl --fail --silent http://127.0.0.1:18080/v1/health"
+      ],
+      "recipe": "observability/backends/README.md",
+      "attached_observations": [
+        {
+          "id": "dashboard-ntfy",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:02:11.303500+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-observability",
+          "kind": "native_cli_e2e",
+          "path": "observability/receipt.json"
+        },
+        {
+          "id": "desktop-restart-acceptance",
+          "kind": "native_cli_e2e",
+          "path": "observability/restart-receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/binwiederhier/ntfy/releases/tag/v2.28.0",
+        "prerelease": false,
+        "published_at": "2026-08-27T20:27:10Z",
+        "tag_name": "v2.28.0",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "duckdb",
+      "repository": "https://github.com/duckdb/duckdb",
+      "selected_version": "1.5.5",
+      "profile": "supporting",
+      "role": "Native SQL/Parquet research data, exact decimal storage and source-anchored nanosecond observation eligibility with explicit quality flags",
+      "upstream_commands": [
+        "python -c \"import duckdb; print(duckdb.__version__)\"",
+        "python blueprints/us-equities/data/summarize_backtest.py \"$LEAN_EVENTS\" \"$NEW_PARQUET\""
+      ],
+      "recipe": "blueprints/us-equities/data/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "sec-financial-data-20260919",
+          "kind": "compatibility_attempt",
+          "path": "blueprints/us-equities/financial-data/receipt.json"
+        },
+        {
+          "id": "native-research-runtime-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/research-runtime/receipt.json"
+        },
+        {
+          "id": "portable-sdk-adoption-20260919",
+          "kind": "native_cli_e2e",
+          "path": "adoption/receipt.json"
+        },
+        {
+          "id": "native-paired-adoption-20260919",
+          "kind": "native_model_e2e",
+          "path": "adoption/paired/receipt.json"
+        },
+        {
+          "id": "native-point-in-time-contract-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/point-in-time/receipt.json"
+        },
+        {
+          "id": "native-exact-nanosecond-replay-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/nanosecond-replay/receipt.json"
+        },
+        {
+          "id": "sec-catalyst-dataset-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/catalyst-dataset/native-receipt.json"
+        },
+        {
+          "id": "native-security-identity-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/identity-readiness/native-receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "native-lifecycle-sample-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json"
+        },
+        {
+          "id": "synthetic-catalyst-contract-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/catalyst-experiment/receipt.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/duckdb/duckdb/releases/tag/v1.5.5",
+        "prerelease": false,
+        "published_at": "2026-07-22T10:51:50Z",
+        "tag_name": "v1.5.5",
+        "target_commitish": "d8cdaa33fda8df955cc76ef58a280f68f4cd43fa"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "restic",
+      "repository": "https://github.com/restic/restic",
+      "selected_version": "0.19.1",
+      "profile": "supporting",
+      "role": "Scoped encrypted backup and verified restore, including synthetic independent-host recovery",
+      "upstream_commands": [
+        "restic backup --files-from \"$SELECTION\" --json",
+        "restic check --read-data",
+        "restic restore latest --target \"$NEW_RESTORE\" --verify"
+      ],
+      "recipe": "blueprints/us-equities/hosting/backup/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "restic-local-public-reference-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/hosting/backup/receipt.json"
+        },
+        {
+          "id": "ai-memory-native-state-recovery-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/state-recovery/memory/receipt.json"
+        },
+        {
+          "id": "qdrant-native-state-recovery-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/state-recovery/qdrant/receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "native-wsl-restic-synthetic-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/convergence-practice/wsl-restore/receipt.json"
+        },
+        {
+          "id": "native-offhost-restic-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-offhost-restic-20260920.json"
+        },
+        {
+          "id": "native-offhost-app-state-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-offhost-app-state-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/restic/restic/releases/tag/v0.19.1",
+        "prerelease": false,
+        "published_at": "2026-07-05T08:13:33Z",
+        "tag_name": "v0.19.1",
+        "target_commitish": "master"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "dagu",
+      "repository": "https://github.com/dagucloud/dagu",
+      "selected_version": "2.16.6",
+      "profile": "supporting",
+      "role": "Manual native research workflows and private local run history",
+      "upstream_commands": [
+        "dagu validate --dagu-home \"$RESEARCH_HOME\" \"$DAG\"",
+        "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id \"$NEW_RUN_ID\" \"$DAG\"",
+        "dagu history --context local --dagu-home \"$RESEARCH_HOME\" --format json"
+      ],
+      "recipe": "blueprints/us-equities/hosting/README.md",
+      "attached_observations": [
+        {
+          "id": "dashboard-dagu",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:07:08.301063+00:00"
+        },
+        {
+          "id": "dashboard-research",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:12:32.955349+00:00"
+        },
+        {
+          "id": "convergence-dashboard-dagu",
+          "status": "populated-retained-history",
+          "kind": "official-upstream-dashboard",
+          "completed_at": "2026-09-21T13:32:41.591482+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-research-runtime-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/research-runtime/receipt.json"
+        },
+        {
+          "id": "native-paired-adoption-20260919",
+          "kind": "native_model_e2e",
+          "path": "adoption/paired/receipt.json"
+        },
+        {
+          "id": "native-convergence-review-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/convergence-program/review-receipt.json"
+        },
+        {
+          "id": "native-grand-dashboard-20260919",
+          "kind": "native_cli_e2e",
+          "path": "observability/grand-dashboard/receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "native-dagu-job-recovery-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dagu-job-recovery-20260920.json"
+        },
+        {
+          "id": "wsl-transport-recovery-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/wsl-transport-recovery-20260920.json"
+        },
+        {
+          "id": "native-dagu-retry-tests-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dagu-retry-tests-20260920.json"
+        },
+        {
+          "id": "native-service-reboot-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-service-reboot-20260920.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/dagucloud/dagu/releases/tag/v2.16.6",
+        "prerelease": false,
+        "published_at": "2026-09-14T14:45:57Z",
+        "tag_name": "v2.16.6",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "lean",
+      "repository": "https://github.com/QuantConnect/Lean",
+      "selected_version": "985ef30 with documented dependency remediation",
+      "profile": "supporting",
+      "role": "Deterministic native historical research backtest engine; no broker initialized",
+      "upstream_commands": [
+        "\"$DOTNET\" \"$LEAN_LAUNCHER\" --config \"$LEAN_CONFIG\" --environment backtesting --algorithm-location \"$LEAN_ALGORITHM\" --data-folder \"$LEAN_DATA\" --results-destination-folder \"$LEAN_RESULTS\""
+      ],
+      "recipe": "blueprints/us-equities/engine/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-research-runtime-20260919",
+          "kind": "native_model_e2e",
+          "path": "blueprints/us-equities/research-runtime/receipt.json"
+        },
+        {
+          "id": "native-paired-adoption-20260919",
+          "kind": "native_model_e2e",
+          "path": "adoption/paired/receipt.json"
+        },
+        {
+          "id": "native-lean-execution-sensitivity-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/execution-realism/receipt.json"
+        },
+        {
+          "id": "native-historical-leverage-stress-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/historical-simulation/receipt.json"
+        },
+        {
+          "id": "native-chronological-controls-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/research-evaluation/receipt.json"
+        },
+        {
+          "id": "native-corporate-actions-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/corporate-action-readiness/receipt.json"
+        },
+        {
+          "id": "native-alpaca-historical-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/authenticated-data/native-receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/QuantConnect/Lean/releases/tag/v2.4.0.1",
+        "prerelease": false,
+        "published_at": "2017-08-08T20:57:57Z",
+        "tag_name": "v2.4.0.1",
+        "target_commitish": "master"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "syft",
+      "repository": "https://github.com/anchore/syft",
+      "selected_version": "1.52.0",
+      "profile": "supporting",
+      "role": "Scoped native SDK dependency inventory; no vulnerability verdict",
+      "upstream_commands": [
+        "syft version -o json",
+        "syft scan dir:/sdk --base-path /sdk --source-name equity-worker-sdk --parallelism 2 -o syft-json=/output/runtime.syft.json -o cyclonedx-json=/output/runtime.cdx.json"
+      ],
+      "recipe": "blueprints/us-equities/supply-chain/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "syft-sdk-inventory-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/supply-chain/receipt.json"
+        },
+        {
+          "id": "token-practice-artifacts-20260920",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/anchore/syft/releases/tag/v1.52.0",
+        "prerelease": false,
+        "published_at": "2026-09-17T14:38:17Z",
+        "tag_name": "v1.52.0",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "alpaca-py",
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "selected_version": "0.44.0",
+      "profile": "supporting",
+      "role": "Official Python SDK; offline intent guard and bounded native historical bars, corporate actions and symbol-mapping observations with current asset metadata",
+      "upstream_commands": [
+        "python3 blueprints/us-equities/order-contract/order_contract.py < blueprints/us-equities/order-contract/basic-intent.json",
+        "bwrap --unshare-net --ro-bind / / --proc /proc --dev /dev --die-with-parent \"$SDK_PYTHON\" blueprints/us-equities/order-contract/sdk_probe.py",
+        "\"$SDK_PYTHON\" blueprints/us-equities/alpaca-historical/collect.py collect --out \"$NEW_PRIVATE_RUN\""
+      ],
+      "recipe": "blueprints/us-equities/order-contract/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "alpaca-offline-order-contract-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/order-contract/receipt.json"
+        },
+        {
+          "id": "native-alpaca-historical-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/authenticated-data/native-receipt.json"
+        },
+        {
+          "id": "native-security-identity-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/identity-readiness/native-receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0",
+        "prerelease": false,
+        "published_at": "2026-08-11T10:11:55Z",
+        "tag_name": "v0.44.0",
+        "target_commitish": "master"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "systemd",
+      "repository": "https://github.com/systemd/systemd",
+      "selected_version": "255.4-1ubuntu8.17",
+      "profile": "supporting",
+      "role": "Existing Linux user manager; bounded transient research process-tree supervision",
+      "upstream_commands": [
+        "systemd-run --user --wait --property=RuntimeMaxSec=4s --property=TimeoutStopSec=1s --property=KillMode=control-group ...",
+        "systemctl --user show \"$SYNTHETIC_UNIT\""
+      ],
+      "recipe": "blueprints/us-equities/worker-supervision/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-worker-supervision-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/worker-supervision/receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "native-worker-cgroup-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-worker-cgroup-20260920.json"
+        },
+        {
+          "id": "native-service-reboot-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-service-reboot-20260920.json"
+        },
+        {
+          "id": "native-dashboard-data-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dashboard-data-20260921.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/systemd/systemd/releases/tag/v261.3",
+        "prerelease": false,
+        "published_at": "2026-09-10T19:49:12Z",
+        "tag_name": "v261.3",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "pandas",
+      "repository": "https://github.com/pandas-dev/pandas",
+      "selected_version": "3.0.6",
+      "profile": "supporting",
+      "role": "Existing dependency accepted for strict exact nanosecond timestamp parsing",
+      "upstream_commands": [
+        "python blueprints/us-equities/nanosecond-replay/replay.py --help"
+      ],
+      "recipe": "blueprints/us-equities/nanosecond-replay/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-exact-nanosecond-replay-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/nanosecond-replay/receipt.json"
+        },
+        {
+          "id": "native-chronological-controls-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/research-evaluation/receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/pandas-dev/pandas/releases/tag/v3.0.6",
+        "prerelease": false,
+        "published_at": "2026-09-17T21:32:36Z",
+        "tag_name": "v3.0.6",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "skfolio",
+      "repository": "https://github.com/skfolio/skfolio",
+      "selected_version": "1.2.9",
+      "profile": "supporting",
+      "role": "Native chronological splitter accepted for a frozen raw-price control study; portfolio optimizers remain unaccepted",
+      "upstream_commands": [
+        "uv pip sync --python \"$WAVE_DIR/venv/bin/python\" --require-hashes blueprints/us-equities/research-evaluation/requirements.lock",
+        "\"$WAVE_DIR/venv/bin/python\" blueprints/us-equities/research-evaluation/evaluate.py --lean-source \"$LEAN_SOURCE\" --out \"$WAVE_DIR/run-1\""
+      ],
+      "recipe": "blueprints/us-equities/research-evaluation/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-chronological-controls-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/research-evaluation/receipt.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/skfolio/skfolio/releases/tag/v1.3.0",
+        "prerelease": false,
+        "published_at": "2026-09-20T10:12:14Z",
+        "tag_name": "v1.3.0",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "edgartools",
+      "repository": "https://github.com/dgunning/edgartools",
+      "selected_version": "5.58.0",
+      "profile": "supporting",
+      "role": "Native SEC filing-index acquisition and local parsing; bounded raw-source provenance with historical strategy availability still gated",
+      "upstream_commands": [
+        "uv pip install --python \"$CATALYST_RUNTIME/sdk/bin/python\" -r blueprints/us-equities/catalyst-provenance/requirements.lock",
+        "\"$CATALYST_RUNTIME/sdk/bin/python\" blueprints/us-equities/catalyst-provenance/native_edgar.py --help",
+        "\"$CATALYST_RUNTIME/sdk/bin/python\" blueprints/us-equities/catalyst-provenance/native_document.py --help"
+      ],
+      "recipe": "blueprints/us-equities/catalyst-provenance/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-edgartools-catalyst-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/catalyst-provenance/receipt.json"
+        },
+        {
+          "id": "native-sec-access-resolution-20260919",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/catalyst-provenance/access-resolution.json"
+        },
+        {
+          "id": "sec-catalyst-dataset-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/catalyst-dataset/native-receipt.json"
+        },
+        {
+          "id": "token-practice-artifacts-20260920",
+          "kind": "artifact_measurement",
+          "path": "evidence/receipts/token-practice-artifacts-20260920.json"
+        },
+        {
+          "id": "token-practice-coverage-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-coverage-20260920.json"
+        },
+        {
+          "id": "native-lifecycle-sample-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/us-equities/lifecycle-sample/native-receipt.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/dgunning/edgartools/releases/tag/v5.58.0",
+        "prerelease": false,
+        "published_at": "2026-09-11T15:41:47Z",
+        "tag_name": "v5.58.0",
+        "target_commitish": "abe44344c56cf4bfb5443e0debca7e39342f6e7a"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "zizmor",
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "selected_version": "1.30.1",
+      "profile": "supporting",
+      "role": "Offline GitHub workflow security analysis with failing fixtures",
+      "upstream_commands": [
+        "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\"",
+        "python3 -m unittest -v tests.test_workflow_security"
+      ],
+      "recipe": "blueprints/convergence-practice/ci-security/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-ci-security-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/convergence-practice/ci-security/receipt.json"
+        },
+        {
+          "id": "native-linux-zizmor-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-linux-zizmor-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1",
+        "prerelease": false,
+        "published_at": "2026-09-09T05:34:10Z",
+        "tag_name": "v1.30.1",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "beads",
+      "repository": "https://github.com/gastownhall/beads",
+      "selected_version": "1.3.0",
+      "profile": "supporting",
+      "role": "Selected-project persistent task claims and dependency queue",
+      "upstream_commands": [
+        "bd ready --json",
+        "bd show \"$RETURNED_TASK_ID\" --json"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "upstream-native-tools-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/upstream-native-tools-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/gastownhall/beads/releases/tag/v1.3.0",
+        "prerelease": false,
+        "published_at": "2026-09-15T19:33:18Z",
+        "tag_name": "v1.3.0",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "skills-ref",
+      "repository": "https://github.com/agentskills/agentskills",
+      "selected_version": "0.1.0",
+      "profile": "supporting",
+      "role": "On-demand portable Agent Skills reference/demo validation",
+      "upstream_commands": [
+        "skills-ref validate \"$SKILL_DIRECTORY\"",
+        "skills-ref read-properties \"$SKILL_DIRECTORY\"",
+        "skills-ref to-prompt \"$SKILL_DIRECTORY\""
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "upstream-native-tools-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/upstream-native-tools-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": null,
+      "release_query_status": "upstream latest-release request failed; failure retained, pin unchanged",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "otel-tui",
+      "repository": "https://github.com/ymtdzzz/otel-tui",
+      "selected_version": "0.7.5",
+      "profile": "supporting",
+      "role": "On-demand local OTLP receiver and terminal trace inspection",
+      "upstream_commands": [
+        "otel-tui --host 127.0.0.1 --grpc 14317 --http 14318"
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "upstream-native-tools-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/upstream-native-tools-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/ymtdzzz/otel-tui/releases/tag/v0.7.5",
+        "prerelease": false,
+        "published_at": "2026-09-12T10:28:45Z",
+        "tag_name": "v0.7.5",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "llama-cpp",
+      "repository": "https://github.com/ggml-org/llama.cpp",
+      "selected_version": "b11057 (0.4.1-dev)",
+      "profile": "optional",
+      "role": "Trial local text inference with one qualified partial-offload planner repair on WSL RTX4090",
+      "upstream_commands": [
+        "python3 blueprints/convergence-practice/gpu-inference/qualify.py --help"
+      ],
+      "recipe": "blueprints/convergence-practice/gpu-inference/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-gpu-patch-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-gpu-patch-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/ggml-org/llama.cpp/releases/tag/v0.4.1",
+        "prerelease": false,
+        "published_at": "2026-09-14T18:27:29Z",
+        "tag_name": "v0.4.1",
+        "target_commitish": "391fac16460f15233a7740550d858ac96df3419d"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "jcodemunch-mcp",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "selected_version": "1.108.319",
+      "profile": "supporting",
+      "role": "Explicitly scoped code index and exact symbol retrieval through a six-tool MCP surface",
+      "upstream_commands": [
+        {
+          "tool": "order",
+          "arguments": {
+            "action": "get_session_stats",
+            "args": {}
+          }
+        }
+      ],
+      "recipe": "recipes/README.md",
+      "attached_observations": [
+        {
+          "id": "dashboard-token-report",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:12:32.941754+00:00"
+        },
+        {
+          "id": "convergence-dashboard-grafana",
+          "status": "populated-live-metadata",
+          "kind": "official-upstream-dashboard-with-local-provisioned-panels",
+          "completed_at": "2026-09-21T13:31:30.055503+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-jcodemunch-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-jcodemunch-20260920.json"
+        },
+        {
+          "id": "native-token-focus-clients-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-token-focus-clients-20260920.json"
+        },
+        {
+          "id": "token-practice-confirmation-20260920",
+          "kind": "historical_inventory",
+          "path": "evidence/receipts/token-practice-confirmation-20260920.json"
+        },
+        {
+          "id": "native-token-clean-prefix-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-token-clean-prefix-20260920.json"
+        },
+        {
+          "id": "current-session-observation-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/current-session-observation-20260920.json"
+        },
+        {
+          "id": "native-token-stack-final-20260920",
+          "kind": "native_model_e2e",
+          "path": "evidence/receipts/native-token-stack-final-20260920.json"
+        },
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "native-dashboard-data-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-dashboard-data-20260921.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "prerelease": false,
+        "published_at": "2026-09-16T14:04:32Z",
+        "tag_name": "v1.108.319",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "nextjs",
+      "repository": "https://github.com/vercel/next.js",
+      "selected_version": "16.3.5",
+      "profile": "supporting",
+      "role": "Typed production application UI with native build and browser acceptance",
+      "upstream_commands": [
+        "pnpm typecheck",
+        "pnpm build",
+        "pnpm test:e2e"
+      ],
+      "recipe": "blueprints/convergence-practice/application-delivery/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-application-delivery-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/convergence-practice/application-delivery/receipt.json"
+        },
+        {
+          "id": "wsl-application-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/wsl-application-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/vercel/next.js/releases/tag/v16.3.5",
+        "prerelease": false,
+        "published_at": "2026-09-11T19:15:50Z",
+        "tag_name": "v16.3.5",
+        "target_commitish": "canary"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "react",
+      "repository": "https://github.com/react/react",
+      "selected_version": "19.3.0",
+      "profile": "supporting",
+      "role": "React UI with server-backed create/update and restart persistence",
+      "upstream_commands": [
+        "pnpm build",
+        "pnpm test:e2e"
+      ],
+      "recipe": "blueprints/convergence-practice/application-delivery/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-application-delivery-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/convergence-practice/application-delivery/receipt.json"
+        },
+        {
+          "id": "wsl-application-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/wsl-application-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/react/react/releases/tag/v19.3.0",
+        "prerelease": false,
+        "published_at": "2026-09-09T18:01:33Z",
+        "tag_name": "v19.3.0",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "fastapi",
+      "repository": "https://github.com/fastapi/fastapi",
+      "selected_version": "0.141.1",
+      "profile": "supporting",
+      "role": "Typed API with exact generated contract, validation/conflict and rollback checks",
+      "upstream_commands": [
+        "uv run --frozen pytest -q",
+        "uv run --frozen python verify_schema.py"
+      ],
+      "recipe": "blueprints/convergence-practice/application-delivery/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-application-delivery-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/convergence-practice/application-delivery/receipt.json"
+        },
+        {
+          "id": "mac-native-application-migration-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/convergence-practice/application-delivery/migration-rollback.json"
+        },
+        {
+          "id": "wsl-application-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/wsl-application-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/fastapi/fastapi/releases/tag/0.141.1",
+        "prerelease": false,
+        "published_at": "2026-07-29T17:17:26Z",
+        "tag_name": "0.141.1",
+        "target_commitish": "95f8322ee1dcda7ceace7b1c4f6c9915b36d748f"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "postgresql",
+      "repository": "https://github.com/postgres/postgres",
+      "selected_version": "18.6",
+      "profile": "supporting",
+      "role": "Local synthetic database with migration, transaction and stop/start persistence",
+      "upstream_commands": [
+        "initdb",
+        "pg_ctl start",
+        "psql",
+        "pg_ctl stop"
+      ],
+      "recipe": "blueprints/convergence-practice/application-delivery/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-application-delivery-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/convergence-practice/application-delivery/receipt.json"
+        },
+        {
+          "id": "mac-native-container-storage-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/convergence-practice/container-storage/receipt.json"
+        },
+        {
+          "id": "mac-native-application-migration-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/convergence-practice/application-delivery/migration-rollback.json"
+        },
+        {
+          "id": "wsl-application-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/wsl-application-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": null,
+      "release_query_status": "upstream latest-release request failed; failure retained, pin unchanged",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "poppler",
+      "repository": "https://github.com/tsdgeos/poppler_mirror",
+      "selected_version": "26.09.0",
+      "profile": "supporting",
+      "role": "Explicit PDF source to bounded text/page/coordinate evidence; official release source, GitHub identity is upstream-linked CI mirror",
+      "upstream_commands": [
+        "pdftotext -bbox-layout -enc UTF-8 \"$SOURCE\" -"
+      ],
+      "recipe": "blueprints/convergence-practice/document-ingestion/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "mac-native-document-ingestion-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/convergence-practice/document-ingestion/receipt.json"
+        },
+        {
+          "id": "wsl-document-ingestion-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/wsl-document-ingestion-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": null,
+      "release_query_status": "upstream latest-release request failed; failure retained, pin unchanged",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "apple-container",
+      "repository": "https://github.com/apple/container",
+      "selected_version": "1.4.1",
+      "profile": "supporting",
+      "role": "Native Mac isolated Linux container with pinned image and ext4-volume persistence",
+      "upstream_commands": [
+        "container volume create",
+        "container run",
+        "container exec",
+        "container stop",
+        "container start",
+        "container volume delete"
+      ],
+      "recipe": "blueprints/convergence-practice/container-storage/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "mac-native-container-storage-20260920",
+          "kind": "native_cli_e2e",
+          "path": "blueprints/convergence-practice/container-storage/receipt.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/apple/container/releases/tag/1.4.1",
+        "prerelease": false,
+        "published_at": "2026-09-09T01:28:43Z",
+        "tag_name": "1.4.1",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "playwright-test",
+      "repository": "https://github.com/microsoft/playwright",
+      "selected_version": "1.63.0",
+      "profile": "supporting",
+      "role": "Locked project browser regression runner, distinct from optional interactive playwright-cli",
+      "upstream_commands": [
+        "pnpm exec playwright test"
+      ],
+      "recipe": "blueprints/convergence-practice/wsl-application/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "wsl-application-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/wsl-application-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0",
+        "prerelease": false,
+        "published_at": "2026-09-04T22:40:31Z",
+        "tag_name": "v1.63.0",
+        "target_commitish": "release-1.63"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "omniroute",
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "selected_version": "3.8.50",
+      "profile": "optional",
+      "role": "Optional authenticated model gateway with scoped compression previews and persisted usage/cache observations",
+      "upstream_commands": [
+        "npm install --global --prefix \"${OMNIROUTE_PREFIX}\" --include=optional omniroute@3.8.50",
+        "omniroute serve --port \"${OMNIROUTE_PORT}\" --no-open --no-tray --daemon",
+        "omniroute status",
+        "omniroute api compression post-api-compression-preview --body @preview.json"
+      ],
+      "recipe": "docs/foundation-stack.md",
+      "attached_observations": [
+        {
+          "id": "dashboard-omniroute",
+          "status": "observed",
+          "kind": "native-read-only-dashboard-observation",
+          "completed_at": "2026-09-21T04:09:38.549926+00:00"
+        },
+        {
+          "id": "convergence-dashboard-omniroute",
+          "status": "populated-traffic-compression-disabled",
+          "kind": "official-upstream-dashboard",
+          "completed_at": "2026-09-21T13:28:41.059516+00:00"
+        }
+      ],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "foundation-native-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "id": "native-returned-results-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-returned-results-20260921.json"
+        },
+        {
+          "id": "full-stack-convergence-20260921",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/full-stack-convergence-20260921.json"
+        }
+      ],
+      "new_wave_evidence": "full-stack-convergence-20260921",
+      "latest_release_observation": {
+        "html_url": "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",
+        "prerelease": false,
+        "published_at": "2026-08-26T19:30:30Z",
+        "tag_name": "v3.8.50",
+        "target_commitish": "main"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "tavily-cli",
+      "repository": "https://github.com/tavily-ai/tavily-cli",
+      "selected_version": "0.1.8",
+      "profile": "supporting",
+      "role": "On-demand authenticated web Search/Extract and official global skills for native Codex/Claude",
+      "upstream_commands": [
+        "tvly auth --json",
+        "tvly search \"Tavily Search API\" --json",
+        "tvly extract \"$SELECTED_PUBLIC_URL\" --json"
+      ],
+      "recipe": "recipes/tavily.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-tavily-cli-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-tavily-cli-20260920.json"
+        },
+        {
+          "id": "native-tavily-session-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-tavily-session-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": null,
+      "release_query_status": "upstream latest-release request failed; failure retained, pin unchanged",
+      "provider_lifetime_saved": null
+    },
+    {
+      "id": "nautilus-trader",
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "selected_version": "2.0.0rc5",
+      "profile": "optional",
+      "role": "User-selected trading-engine destination; isolated upstream synthetic FX acceptance, separate from equity data and broker adapters",
+      "upstream_commands": [
+        "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --pre nautilus_trader==2.0.0rc5",
+        "\"$NAUTILUS_ENV/bin/python\" \"$UPSTREAM_QUICKSTART\""
+      ],
+      "recipe": "blueprints/us-equities/engine-nautilus/README.md",
+      "attached_observations": [],
+      "coverage_boundary": "Observations include historical results and failures; not all-component fresh execution or quality acceptance.",
+      "registered_evidence": [
+        {
+          "id": "native-nautilus-v2-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-nautilus-v2-20260920.json"
+        },
+        {
+          "id": "native-nautilus-ci-20260920",
+          "kind": "native_cli_e2e",
+          "path": "evidence/receipts/native-nautilus-ci-20260920.json"
+        }
+      ],
+      "new_wave_evidence": null,
+      "latest_release_observation": {
+        "html_url": "https://github.com/nautechsystems/nautilus_trader/releases/tag/v1.231.0",
+        "prerelease": false,
+        "published_at": "2026-08-02T18:53:49Z",
+        "tag_name": "v1.231.0",
+        "target_commitish": "develop"
+      },
+      "release_query_status": "release metadata only; not installation or capability acceptance",
+      "provider_lifetime_saved": null
+    }
+  ],
+  "foundation_layers": [
+    {
+      "id": "native-clients",
+      "title": "Native clients",
+      "purpose": "Run ordinary coding, research and review through locally signed-in native clients.",
+      "selection": "Codex and Claude keep native accounts, model selection, caching and compaction.",
+      "activation": "Use the intended native client and inspect its loaded project tools; new process defaults require a fresh session.",
+      "lifecycle_scope": "Dated native source retrieval, process environment and scoped session continuation passed; host-wide restart recovery is separate.",
+      "next_gap": "Bind fresh-session activation and resumed effects to the next target host without repeating accepted model trials."
+    },
+    {
+      "id": "instructions-skills",
+      "title": "Instructions and skills",
+      "purpose": "Keep project rules short and load detailed task procedures on demand.",
+      "selection": "Canonical project instructions plus selected upstream skills; reference validation is optional.",
+      "activation": "Load only the skill needed for the requested operation; repository discovery never activates every skill.",
+      "lifecycle_scope": "Selected skill format and renderer checks exist; source guidance has no executable lifecycle.",
+      "next_gap": "Check the target client actually discovers a newly selected skill before claiming integration."
+    },
+    {
+      "id": "workers",
+      "title": "Workers and task ownership",
+      "purpose": "Delegate bounded independent work with an actual base, owned paths and independent acceptance.",
+      "selection": "Native workers first; Beads only when a dependency-aware queue helps.",
+      "activation": "One coordinator integrates; each writing worker uses its own worktree and concise task contract.",
+      "lifecycle_scope": "Native child repair and a same-child cancellation/crash/resume fixture passed; an owned systemd cgroup automatically removed the pending descendant and continuation produced one final effect.",
+      "next_gap": "Qualify changed task effects, independent hosts and provider cancellation separately from the accepted same-host fixture."
+    },
+    {
+      "id": "isolation",
+      "title": "Isolation",
+      "purpose": "Bound filesystem, network, checkout and shared-resource ownership.",
+      "selection": "Git worktrees for edits; optional native sandbox for a task requiring enforced restrictions.",
+      "activation": "Assign ownership before writes and use supported OS permissions for enforcement; prose is not a sandbox.",
+      "lifecycle_scope": "Disposable worktree operations and filesystem/HTTP allow-deny fixtures passed; worktrees do not isolate accounts or services.",
+      "next_gap": "Qualify only the required platform/network boundary; broader sandbox escape and crash isolation are unknown."
+    },
+    {
+      "id": "code-navigation",
+      "title": "Code navigation",
+      "purpose": "Find exact implementations, symbols, references and structural relationships.",
+      "selection": "Known source or exact search first; Serena, ast-grep, static graph or scoped jCodeMunch when useful.",
+      "activation": "Choose one fitting retrieval lane and read original implementation before edits or correctness decisions.",
+      "lifecycle_scope": "Recorded exact source/symbol checks passed; language coverage and index freshness stay project-specific.",
+      "next_gap": "Test the actual target language and a changed/deleted symbol after moving to a new project."
+    },
+    {
+      "id": "document-retrieval",
+      "title": "Documents and ingestion",
+      "purpose": "Retrieve bounded, source-attributed documentation and supported document text.",
+      "selection": "Scoped QMD BM25, selected Context Hub documentation, MarkItDown HTML and Poppler PDF fixtures.",
+      "activation": "Name the collection/corpus, refresh changed files, search then read the selected source.",
+      "lifecycle_scope": "Lexical retrieval and designed PDF/text fixtures passed with retained misses; arbitrary OCR/layout is unknown.",
+      "next_gap": "Freeze a representative new corpus and negative queries before claiming wider retrieval quality."
+    },
+    {
+      "id": "semantic-rag",
+      "title": "Semantic code retrieval",
+      "purpose": "Retrieve conceptual code using the selected project index and local embeddings.",
+      "selection": "SocratiCode with Qdrant and the accepted local vLLM embedding runtime.",
+      "activation": "Activate only the selected project and models; do not index unrelated folders or change the accepted runtime for release novelty.",
+      "lifecycle_scope": "Native source retrieval and add/change/delete persistence passed; a newer GPU runtime startup failed and remains failed. Separate synthetic Qdrant off-host full-state restore and exact native queries passed.",
+      "next_gap": "Retain the accepted environment and collect changed-runtime/GPU acceptance only when a concrete need warrants it."
+    },
+    {
+      "id": "durable-memory",
+      "title": "Durable memory",
+      "purpose": "Preserve scoped decisions, approved durable knowledge and recoverable handoffs across clients.",
+      "selection": "One ai-memory store as cross-harness memory of record.",
+      "activation": "Retrieve relevant history when needed; durable writes require explicit intent and recalled text never authorizes actions.",
+      "lifecycle_scope": "Synthetic migration, scope, restart, backup and empty-target restore passed; capture is bounded, not a full transcript. Separate synthetic off-host native restore and real scoped MCP queries passed.",
+      "next_gap": "Qualify intended production activation and native-client rebinding; lost-account/key recovery remains separate."
+    },
+    {
+      "id": "web-research",
+      "title": "Web research",
+      "purpose": "Find current primary sources and inspect selected web content.",
+      "selection": "Native browser, bounded literature retrieval and the upstream Tavily CLI/skills for selected web research.",
+      "activation": "Use an existing authenticated route on demand; load only the research operation needed.",
+      "lifecycle_scope": "Dated browser/paper retrieval and Tavily Search/Extract passed. Eight official skills were discovered in fresh Codex probes; broader operations and the active Desktop registry remain separate.",
+      "next_gap": "Qualify Map, Crawl or Research only for a concrete task; retain current Desktop discovery and account limits."
+    },
+    {
+      "id": "token-efficiency",
+      "title": "Context and usage efficiency",
+      "purpose": "Reduce task context only while preserving required facts, source recovery and answer quality.",
+      "selection": "Known focused reads, RTK, Context Mode, scoped jCodeMunch, guarded Headroom and selected representations.",
+      "activation": "Choose the cheapest sufficient lane for each artifact; preserve raw failure output and native caching.",
+      "lifecycle_scope": "Exact artifact comparisons and mixed native trial results are retained; heuristic counters and consumed usage are separate.",
+      "next_gap": "Measure complete matched attempts only for a decision-changing optimization; do not infer causal lifetime savings."
+    },
+    {
+      "id": "quality-evaluation",
+      "title": "Quality and evaluation",
+      "purpose": "Use deterministic oracles and independent review to accept the actual requested behavior.",
+      "selection": "Project tests, browser acceptance, promptfoo fixtures, shell review and structural diffs as applicable.",
+      "activation": "Freeze useful acceptance and negative cases before a substantive change; reuse matching passing evidence.",
+      "lifecycle_scope": "Selected deterministic fixtures and browser flows passed; no universal model-quality or production guarantee follows.",
+      "next_gap": "Add a representative failure oracle when the next task exposes an untested behavior."
+    },
+    {
+      "id": "ci-supply-chain",
+      "title": "CI and supply chain",
+      "purpose": "Check published artifacts, workflow permissions, secret controls and scoped dependency identity.",
+      "selection": "Native publication checks, actionlint, zizmor, Dependabot, GitHub artifact attestations, gitleaks and scoped Syft inventory; selected revisions and ownership are in catalogs/foundation/automation.json.",
+      "activation": "Use the GitHub automation handbook; qualify changed inputs and update only reviewed hashes. One existing Codex maintenance task owns source research; keep private state out of artifacts.",
+      "lifecycle_scope": "Required PR checks and main-only publication passed. Independent archive download and online/detached provenance verification passed with altered-byte rejection. Workflow fixtures, source integrity, provenance and useful native output are separate claims.",
+      "next_gap": "Selected Python/Go setup upgrades passed unchanged upstream verifiers and Go standard-library tests; Node setup passed existing hosted fixtures. Weekly Dependabot timing, nonempty grouping, hosted PR cancellation and improved native research outcomes remain unmeasured; no broad vulnerability assurance is accepted."
+    },
+    {
+      "id": "scheduling-supervision",
+      "title": "Scheduling and supervision",
+      "purpose": "Schedule owned work, bound process lifetime and resume unfinished steps deliberately.",
+      "selection": "Dagu for selected workflows and Linux user-manager supervision for owned process trees.",
+      "activation": "Use explicit task/service ownership, bounded retries and independent state/effect checks.",
+      "lifecycle_scope": "Local descendant termination, native child cgroup crash cleanup, Dagu cancel/retry/SSH continuation and one independently observed orderly guest service reboot passed within their retained scopes.",
+      "next_gap": "Qualify changed deployment boundaries and external provider or application effects when needed."
+    },
+    {
+      "id": "hosting-services",
+      "title": "Application and service hosting",
+      "purpose": "Build, run and inspect recoverable local application and MCP services.",
+      "selection": "Locked Next/React/FastAPI/PostgreSQL fixture; platform-specific container and MCP tools only as needed.",
+      "activation": "Select the target host recipe, explicit service owner and isolated prefix; external hosting is a separate action.",
+      "lifecycle_scope": "Typed API/browser flows, migration reversal and rows after restart passed on named hosts; production auth and cloud deployment are unqualified.",
+      "next_gap": "Qualify independent database restore and production-specific access requirements before broader hosting claims."
+    },
+    {
+      "id": "recovery-portability",
+      "title": "Recovery and portability",
+      "purpose": "Retain pinned inputs and prove usable restore, continuity and cleanup at the intended boundary.",
+      "selection": "Owned lifecycle recipes, Restic, native application backups and native session resume.",
+      "activation": "Use exact snapshots and empty restore targets; keep keys/account sign-ins private and separate from the checkout.",
+      "lifecycle_scope": "Selected same-host and synthetic independent-host application restores, native session/job continuations and one orderly guest scheduled-service reboot passed. Source pins, native outputs and independent observations retain separate scopes.",
+      "next_gap": "Reuse matching accepted recipes; qualify actual production data, client rebinding, atomicity or a physical recovery target when required by a project."
+    },
+    {
+      "id": "observation-inference",
+      "title": "Observation and optional inference",
+      "purpose": "Observe bounded native outcomes and usage; trial local inference or routing only against a concrete gap.",
+      "selection": "Loopback native telemetry and scoped history; local model and gateway remain optional trials.",
+      "activation": "Preserve writer/task attribution, account boundaries and native default routes; dashboards do not grant operator authority.",
+      "lifecycle_scope": "Recorded telemetry reconciles scoped usage; HUD live rendering and exact-model gateway inference remain incomplete.",
+      "next_gap": "Resolve only the selected unknown attribution, interactive rendering or provider compatibility condition before retrying."
+    }
+  ],
+  "counts": {
+    "selected_components": 68,
+    "foundation_layers": 16,
+    "research_identities": 513
+  },
+  "scope": "Complete selected stack and recipe/evidence joins; current execution remains operation-specific. Source pins and historical results never establish automatic new-host adoption."
+}

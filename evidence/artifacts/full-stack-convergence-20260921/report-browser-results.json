@@ -1,0 +1,225 @@
+{
+  "scope": "Actual browser integration checks of private full/portable templates; not an upstream browser test suite.",
+  "download_hash_checks": {
+    "full-image": {
+      "expected": "975f13f3eb87e0cbd213b67e2db9a33af9275fab48c2f20e0c9948cdd3c2b866",
+      "actual": "975f13f3eb87e0cbd213b67e2db9a33af9275fab48c2f20e0c9948cdd3c2b866",
+      "equal": true
+    },
+    "full-text": {
+      "expected": "1eff85e810c38719553f76aa7c93b2d17b813e25b11a20f0752f19a914e9417b",
+      "actual": "1eff85e810c38719553f76aa7c93b2d17b813e25b11a20f0752f19a914e9417b",
+      "equal": true
+    },
+    "portable-image": {
+      "expected": "975f13f3eb87e0cbd213b67e2db9a33af9275fab48c2f20e0c9948cdd3c2b866",
+      "actual": "975f13f3eb87e0cbd213b67e2db9a33af9275fab48c2f20e0c9948cdd3c2b866",
+      "equal": true
+    },
+    "portable-text": {
+      "expected": "1eff85e810c38719553f76aa7c93b2d17b813e25b11a20f0752f19a914e9417b",
+      "actual": "1eff85e810c38719553f76aa7c93b2d17b813e25b11a20f0752f19a914e9417b",
+      "equal": true
+    }
+  },
+  "commands": [
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "open",
+        "http://127.0.0.1:17500/token-savings.html#native"
+      ],
+      "started_at": "2026-09-21T13:40:32.188392+00:00",
+      "completed_at": "2026-09-21T13:40:32.491847+00:00",
+      "exit_code": 0,
+      "stdout_text": "✓ Native token practice · Full stack and lifetime evidence\n  http://127.0.0.1:17500/token-savings.html#native\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "eval",
+        "(async()=>{\n      document.querySelector('[data-tab=\"native\"]')?.click();\n      const coverage=document.getElementById('native-component-coverage'); coverage.open=true;\n      const imgs=[...document.querySelectorAll('#current-native-results img')];\n      for(const img of imgs){img.closest('details').open=true;img.loading='eager';}\n      await Promise.all(imgs.map(img=>img.decode()));\n      const component=document.getElementById('native-component-filter'),runtime=document.getElementById('native-runtime-filter');\n      component.value='claude-code';component.onchange();\n      const claudeMatches=[...document.querySelectorAll('.native-run')].filter(x=>!x.hidden).length;\n      runtime.value='Current Codex Desktop connection';runtime.onchange();\n      const zeroMatched=!document.getElementById('native-filter-empty').hidden;\n      document.querySelector('[data-native-jump]')?.click();\n      const jumpCleared=component.value===''&&runtime.value==='';\n      const img=imgs[0];img.closest('details').querySelector('button').id='verify-image-download';\n      const txt=[...document.querySelectorAll('[data-native-download]')].find(x=>x.textContent==='Download codex-invocation.json');\n      txt.closest('details').open=true;txt.id='verify-text-download';\n      return JSON.stringify({title:document.title,coverageRows:document.querySelectorAll('[data-native-component-row]').length,\n        imagesDecoded:imgs.filter(x=>x.naturalWidth>0).length,claudeMatches,zeroMatched,jumpCleared,\n        nativeRuns:document.querySelectorAll('.native-run').length});})()"
+      ],
+      "started_at": "2026-09-21T13:40:32.492335+00:00",
+      "completed_at": "2026-09-21T13:40:32.687329+00:00",
+      "exit_code": 0,
+      "stdout_text": "\"{\\\"title\\\":\\\"Native token practice · Full stack and lifetime evidence\\\",\\\"coverageRows\\\":68,\\\"imagesDecoded\\\":10,\\\"claudeMatches\\\":2,\\\"zeroMatched\\\":true,\\\"jumpCleared\\\":true,\\\"nativeRuns\\\":37}\"\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "download",
+        "#verify-image-download",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/browser-check/full-image.png"
+      ],
+      "started_at": "2026-09-21T13:40:32.687725+00:00",
+      "completed_at": "2026-09-21T13:40:32.716436+00:00",
+      "exit_code": 0,
+      "stdout_text": "✓ Download saved to ${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/browser-check/full-image.png\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "download",
+        "#verify-text-download",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/browser-check/full-invocation.json"
+      ],
+      "started_at": "2026-09-21T13:40:32.716798+00:00",
+      "completed_at": "2026-09-21T13:40:32.741753+00:00",
+      "exit_code": 0,
+      "stdout_text": "✓ Download saved to ${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/browser-check/full-invocation.json\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "eval",
+        "document.querySelector('#verify-image-download').closest('details').scrollIntoView({block:'start'}); 'shown'"
+      ],
+      "started_at": "2026-09-21T13:40:32.742120+00:00",
+      "completed_at": "2026-09-21T13:40:32.745583+00:00",
+      "exit_code": 0,
+      "stdout_text": "\"shown\"\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "screenshot",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/browser-check/full-image-preview.png"
+      ],
+      "started_at": "2026-09-21T13:40:32.745998+00:00",
+      "completed_at": "2026-09-21T13:40:32.781071+00:00",
+      "exit_code": 0,
+      "stdout_text": "✓ Screenshot saved to ${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/browser-check/full-image-preview.png\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "errors"
+      ],
+      "started_at": "2026-09-21T13:40:32.781470+00:00",
+      "completed_at": "2026-09-21T13:40:32.783579+00:00",
+      "exit_code": 0,
+      "stdout_text": "",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "open",
+        "file://${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/browser-check/portable.html"
+      ],
+      "started_at": "2026-09-21T13:40:32.783871+00:00",
+      "completed_at": "2026-09-21T13:40:33.111631+00:00",
+      "exit_code": 0,
+      "stdout_text": "✓ Native token practice · Retained evidence\n  file://${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/browser-check/portable.html\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "eval",
+        "(async()=>{\n      document.querySelector('[data-tab=\"native\"]')?.click();\n      const coverage=document.getElementById('native-component-coverage'); coverage.open=true;\n      const imgs=[...document.querySelectorAll('#current-native-results img')];\n      for(const img of imgs){img.closest('details').open=true;img.loading='eager';}\n      await Promise.all(imgs.map(img=>img.decode()));\n      const component=document.getElementById('native-component-filter'),runtime=document.getElementById('native-runtime-filter');\n      component.value='claude-code';component.onchange();\n      const claudeMatches=[...document.querySelectorAll('.native-run')].filter(x=>!x.hidden).length;\n      runtime.value='Current Codex Desktop connection';runtime.onchange();\n      const zeroMatched=!document.getElementById('native-filter-empty').hidden;\n      document.querySelector('[data-native-jump]')?.click();\n      const jumpCleared=component.value===''&&runtime.value==='';\n      const img=imgs[0];img.closest('details').querySelector('button').id='verify-image-download';\n      const txt=[...document.querySelectorAll('[data-native-download]')].find(x=>x.textContent==='Download codex-invocation.json');\n      txt.closest('details').open=true;txt.id='verify-text-download';\n      return JSON.stringify({title:document.title,coverageRows:document.querySelectorAll('[data-native-component-row]').length,\n        imagesDecoded:imgs.filter(x=>x.naturalWidth>0).length,claudeMatches,zeroMatched,jumpCleared,\n        nativeRuns:document.querySelectorAll('.native-run').length});})()"
+      ],
+      "started_at": "2026-09-21T13:40:33.112306+00:00",
+      "completed_at": "2026-09-21T13:40:33.757720+00:00",
+      "exit_code": 0,
+      "stdout_text": "\"{\\\"title\\\":\\\"Native token practice · Retained evidence\\\",\\\"coverageRows\\\":68,\\\"imagesDecoded\\\":10,\\\"claudeMatches\\\":2,\\\"zeroMatched\\\":true,\\\"jumpCleared\\\":true,\\\"nativeRuns\\\":37}\"\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "download",
+        "#verify-image-download",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/browser-check/portable-image.png"
+      ],
+      "started_at": "2026-09-21T13:40:33.758136+00:00",
+      "completed_at": "2026-09-21T13:40:33.777162+00:00",
+      "exit_code": 0,
+      "stdout_text": "✓ Download saved to ${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/browser-check/portable-image.png\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "download",
+        "#verify-text-download",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/browser-check/portable-invocation.json"
+      ],
+      "started_at": "2026-09-21T13:40:33.777547+00:00",
+      "completed_at": "2026-09-21T13:40:33.787328+00:00",
+      "exit_code": 0,
+      "stdout_text": "✓ Download saved to ${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/browser-check/portable-invocation.json\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "eval",
+        "document.querySelector('#verify-image-download').closest('details').scrollIntoView({block:'start'}); 'shown'"
+      ],
+      "started_at": "2026-09-21T13:40:33.787695+00:00",
+      "completed_at": "2026-09-21T13:40:33.790799+00:00",
+      "exit_code": 0,
+      "stdout_text": "\"shown\"\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "screenshot",
+        "${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/browser-check/portable-image-preview.png"
+      ],
+      "started_at": "2026-09-21T13:40:33.791126+00:00",
+      "completed_at": "2026-09-21T13:40:33.832313+00:00",
+      "exit_code": 0,
+      "stdout_text": "✓ Screenshot saved to ${HOME}/codex-ecosystem/state/full-stack-convergence-20260921/browser-check/portable-image-preview.png\n",
+      "stderr_text": ""
+    },
+    {
+      "argv": [
+        "agent-browser",
+        "--session",
+        "convergence-report-20260921",
+        "errors"
+      ],
+      "started_at": "2026-09-21T13:40:33.832672+00:00",
+      "completed_at": "2026-09-21T13:40:33.834626+00:00",
+      "exit_code": 0,
+      "stdout_text": "",
+      "stderr_text": ""
+    }
+  ]
+}

@@ -196,6 +196,11 @@
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -295,6 +300,11 @@
           {
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -433,6 +443,11 @@
           {
             "id": "hf-memory-models-20260921",
             "path": "evidence/receipts/hf-memory-models-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -864,7 +879,7 @@
     {
       "component_id": "ccusage",
       "repository": "https://github.com/ccusage/ccusage",
-      "version": "20.0.23",
+      "version": "20.0.24",
       "profile": "supporting",
       "role": "Read existing native provider usage logs",
       "installation_assessment": "runtime present at retained native operation date",
@@ -875,7 +890,7 @@
           "ccusage --help"
         ],
         "scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow.",
-        "recipe_document": "recipes/README.md",
+        "recipe_document": "recipes/native-upgrades-20260921.md",
         "lifecycle_guide": "adoption/lifecycle.md"
       },
       "functional_evidence": {
@@ -899,17 +914,22 @@
             "id": "current-session-observation-20260920",
             "path": "evidence/receipts/current-session-observation-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
           "fresh-ccusage-native-utc",
           "fresh-ccusage-codex-utc"
         ],
-        "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim."
+        "scope": "September 21 candidate operations and selected upstream tests are attached with exact source pins. Earlier dated operations retain their original versions and boundaries."
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,
-      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "next_action": "Use the selected candidate path and operation-specific evidence in recipes/native-upgrades-20260921.md; qualify a new host independently and preserve rollback.",
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
@@ -918,9 +938,9 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "ecb676cce27cb5dd0090c7804a5cecc35e8ba805",
       "lifecycle_stages": {
-        "install": {"status": "observed_installed", "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.", "evidence_refs": ["evidence/receipts/component-history.json", "evidence/receipts/token-practice-coverage-20260920.json", "evidence/receipts/token-practice-gap-followup-20260920.json"]},
+        "install": {"status": "observed_installed", "scope": "September 21 isolated release upgrade with preserved previous installation and qualified candidate operations. This does not establish full uninstall or dependency rollback.", "evidence_refs": ["evidence/receipts/component-history.json", "evidence/receipts/token-practice-coverage-20260920.json", "evidence/receipts/token-practice-gap-followup-20260920.json", "evidence/receipts/full-stack-convergence-20260921.json"]},
         "use": {"status": "accepted_within_scope", "scope": "Native current-state/API/usage query only; no complete lifecycle or independent provider-saving claim.", "evidence_refs": ["evidence/receipts/token-practice-gap-followup-20260920.json"]},
         "persistence": {"status": "not_applicable", "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.", "evidence_refs": []},
         "restart": {"status": "not_applicable", "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.", "evidence_refs": []},
@@ -1079,6 +1099,11 @@
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -1169,11 +1194,11 @@
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,
-      "next_action": "Synthetic renderer accepted. Real interactive attempt reached onboarding before HUD appeared despite existing authenticated state; live statusline remains unverified. No model/login route was changed.",
-      "integration_mode": "Configured automatic statusline renderer; actual interactive rendering not established because onboarding was shown.",
+      "next_action": "Resolve the current terminal/effort-dialog boundary and observe the actual statusline. Existing authentication/onboarding is ready; do not repeat sign-in as the presumed blocker.",
+      "integration_mode": "Configured optional statusline; actual interactive rendering remains unverified.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Synthetic renderer passed. Actual interactive attempt stopped at onboarding before HUD display; native authenticated state was already reported.",
+        "scope": "Historical synthetic rendering passed. Two September 21 authenticated native resumes stopped at the effort overlay; actual HUD rendering remains unverified. Settings/model/effort were preserved and owned processes cleaned up.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
@@ -1181,7 +1206,7 @@
       "source_pin": null,
       "lifecycle_stages": {
         "install": {"status": "observed_installed", "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.", "evidence_refs": ["evidence/receipts/component-history.json", "evidence/receipts/token-practice-coverage-20260920.json", "evidence/receipts/token-practice-gap-followup-20260920.json", "evidence/receipts/native-claude-hud-interactive-20260920.json"]},
-        "use": {"status": "partial_acceptance", "scope": "Synthetic HUD rendering passed but the real interactive attempt reached onboarding before a visible status line.", "evidence_refs": ["evidence/receipts/native-claude-hud-interactive-20260920.json"]},
+        "use": {"status": "partial_acceptance", "scope": "Historical synthetic rendering passed. Two September 21 authenticated native resumes stopped at the effort overlay; actual HUD rendering remains unverified. Settings/model/effort were preserved and owned processes cleaned up.", "evidence_refs": ["evidence/receipts/native-claude-hud-interactive-20260920.json", "evidence/artifacts/full-stack-convergence-20260921/hud-observation.json"]},
         "persistence": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
         "restart": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
         "cleanup": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
@@ -1413,6 +1438,11 @@
           {
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -1704,6 +1734,11 @@
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -1809,6 +1844,11 @@
           {
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -2448,6 +2488,11 @@
             "id": "hf-memory-models-20260921",
             "path": "evidence/receipts/hf-memory-models-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2561,6 +2606,11 @@
           {
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -2788,6 +2838,11 @@
             "id": "token-practice-coverage-20260920",
             "path": "evidence/receipts/token-practice-coverage-20260920.json",
             "kind": "historical_inventory"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2892,6 +2947,11 @@
           {
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -3253,6 +3313,11 @@
           {
             "id": "native-memory-rag-alignment-20260921",
             "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -3690,6 +3755,11 @@
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [],
@@ -3711,32 +3781,44 @@
         "install": {
           "status": "accepted_within_scope",
           "scope": "Isolated Linux npm prefix at 3.8.50, scoped dependency postinstall and actual local server/database startup accepted. No default client route or global npm policy was changed.",
-          "evidence_refs": ["evidence/receipts/foundation-native-20260920.json"]
+          "evidence_refs": [
+            "evidence/receipts/foundation-native-20260920.json"
+          ]
         },
         "use": {
           "status": "partial_acceptance",
           "scope": "Local health and bounded compression preview executed. Required-fact checks rejected RTK/lite outputs; native gateway/provider attempts retained model-prefix and quota failures. Local preview is not successful outer native integration or provider-token saving.",
-          "evidence_refs": ["evidence/receipts/foundation-native-20260920.json"]
+          "evidence_refs": [
+            "evidence/receipts/foundation-native-20260920.json"
+          ]
         },
         "persistence": {
           "status": "accepted_within_scope",
           "scope": "Only the isolated Linux fixture: private password and synthetic state remained available across owned server restart with the same DATA_DIR. Production account/state migration is not claimed.",
-          "evidence_refs": ["evidence/receipts/foundation-native-20260920.json"]
+          "evidence_refs": [
+            "evidence/receipts/foundation-native-20260920.json"
+          ]
         },
         "restart": {
           "status": "accepted_within_scope",
           "scope": "Only the isolated Linux fixture: upstream owned stop/start and successful loopback health/state continuity accepted. This is not host boot or existing Windows service restart qualification.",
-          "evidence_refs": ["evidence/receipts/foundation-native-20260920.json"]
+          "evidence_refs": [
+            "evidence/receipts/foundation-native-20260920.json"
+          ]
         },
         "cleanup": {
           "status": "accepted_within_scope",
           "scope": "Only the isolated Linux fixture: owned server processes stopped and acceptance listener absent; private data/receipts archived and installed package retained. Working gateway processes/counters and authentication stores were preserved; package uninstall was not tested.",
-          "evidence_refs": ["evidence/receipts/foundation-native-20260920.json"]
+          "evidence_refs": [
+            "evidence/receipts/foundation-native-20260920.json"
+          ]
         },
         "recovery": {
           "status": "partial_acceptance",
           "scope": "Plaintext upstream restore passed for isolated synthetic state. Encrypted backup was independently decrypted and SQLite-verified, but this release's native restore ignores encrypted filenames and can misleadingly report completion. Native encrypted restore and production recovery are not accepted.",
-          "evidence_refs": ["evidence/receipts/foundation-native-20260920.json"]
+          "evidence_refs": [
+            "evidence/receipts/foundation-native-20260920.json"
+          ]
         }
       },
       "baseline_applicability": {
@@ -3750,7 +3832,7 @@
     {
       "component_id": "openresearch",
       "repository": "https://github.com/alphaXiv/OpenResearch",
-      "version": "0.2.4",
+      "version": "0.2.7",
       "profile": "supporting",
       "role": "Selected public literature discovery and extracted paper retrieval",
       "installation_assessment": "runtime present at retained native operation date",
@@ -3762,7 +3844,7 @@
           "orx --no-telemetry paper \"${PAPER_ID}\" --full"
         ],
         "scope": "Use the selected native recipe only when its task applies.",
-        "recipe_document": "recipes/README.md",
+        "recipe_document": "recipes/native-upgrades-20260921.md",
         "lifecycle_guide": "adoption/lifecycle.md"
       },
       "functional_evidence": {
@@ -3786,16 +3868,21 @@
             "id": "token-practice-gap-followup-20260920",
             "path": "evidence/receipts/token-practice-gap-followup-20260920.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
           "fresh-openresearch-paper-full"
         ],
-        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+        "scope": "September 21 candidate operations and selected upstream tests are attached with exact source pins. Earlier dated operations retain their original versions and boundaries."
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,
-      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "next_action": "Use the selected candidate path and operation-specific evidence in recipes/native-upgrades-20260921.md; qualify a new host independently and preserve rollback.",
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
@@ -3804,9 +3891,9 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
       "lifecycle_stages": {
-        "install": {"status": "observed_installed", "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.", "evidence_refs": ["evidence/receipts/component-history.json", "evidence/receipts/artifact-reductions.json", "evidence/receipts/token-practice-coverage-20260920.json", "evidence/receipts/token-practice-gap-followup-20260920.json"]},
+        "install": {"status": "observed_installed", "scope": "September 21 isolated release upgrade with preserved previous installation and qualified candidate operations. This does not establish full uninstall or dependency rollback.", "evidence_refs": ["evidence/receipts/component-history.json", "evidence/receipts/artifact-reductions.json", "evidence/receipts/token-practice-coverage-20260920.json", "evidence/receipts/token-practice-gap-followup-20260920.json", "evidence/receipts/full-stack-convergence-20260921.json"]},
         "use": {"status": "accepted_within_scope", "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance.", "evidence_refs": ["evidence/receipts/artifact-reductions.json", "evidence/receipts/token-practice-gap-followup-20260920.json"]},
         "persistence": {"status": "not_applicable", "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.", "evidence_refs": []},
         "restart": {"status": "not_applicable", "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.", "evidence_refs": []},
@@ -4414,6 +4501,11 @@
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4595,6 +4687,11 @@
             "id": "native-memory-rag-alignment-20260921",
             "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4755,6 +4852,11 @@
             "id": "native-memory-rag-alignment-20260921",
             "path": "evidence/receipts/native-memory-rag-alignment-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -4868,7 +4970,7 @@
     {
       "component_id": "repomix",
       "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.0",
-      "version": "1.18.0",
+      "version": "1.18.1",
       "profile": "supporting",
       "role": "Explicit repository packing and structural compression",
       "installation_assessment": "runtime present at retained native operation date",
@@ -4879,7 +4981,7 @@
           "repomix --include fixtures/records.json,fixtures/example.sh --output \"${OUTPUT_DIR}/repomix.xml\""
         ],
         "scope": "Use the selected native recipe only when its task applies.",
-        "recipe_document": "recipes/README.md",
+        "recipe_document": "recipes/native-upgrades-20260921.md",
         "lifecycle_guide": "adoption/lifecycle.md"
       },
       "functional_evidence": {
@@ -4911,15 +5013,20 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
           "fresh-repomix-full",
           "fresh-repomix-compressed"
         ],
-        "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings."
+        "scope": "September 21 candidate operations and selected upstream tests are attached with exact source pins. Earlier dated operations retain their original versions and boundaries."
       },
       "artifact_baselines": [
         {
@@ -4934,7 +5041,7 @@
         }
       ],
       "exact_causal_lifetime_provider_tokens_saved": null,
-      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "next_action": "Use the selected candidate path and operation-specific evidence in recipes/native-upgrades-20260921.md; qualify a new host independently and preserve rollback.",
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
@@ -4943,9 +5050,9 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "80b4280a9196feace092fc672dfe2b5fac62ef08",
       "lifecycle_stages": {
-        "install": {"status": "observed_installed", "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.", "evidence_refs": ["evidence/receipts/component-history.json", "evidence/receipts/portable-cli-artifacts.json", "evidence/receipts/token-practice-artifacts-20260920.json", "evidence/receipts/token-practice-coverage-20260920.json"]},
+        "install": {"status": "observed_installed", "scope": "September 21 isolated release upgrade with preserved previous installation and qualified candidate operations. This does not establish full uninstall or dependency rollback.", "evidence_refs": ["evidence/receipts/component-history.json", "evidence/receipts/portable-cli-artifacts.json", "evidence/receipts/token-practice-artifacts-20260920.json", "evidence/receipts/token-practice-coverage-20260920.json", "evidence/receipts/full-stack-convergence-20260921.json"]},
         "use": {"status": "accepted_within_scope", "scope": "Exact retained same-source comparison with the explicitly stated shared acceptance gate; not causal provider savings.", "evidence_refs": ["evidence/receipts/portable-cli-artifacts.json", "evidence/receipts/token-practice-artifacts-20260920.json"]},
         "persistence": {"status": "not_applicable", "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.", "evidence_refs": []},
         "restart": {"status": "not_applicable", "scope": "The selected operation is a finite command/library invocation with no managed application-state lifecycle. Input/output files and the pinned environment still need host-local retention.", "evidence_refs": []},
@@ -5178,6 +5285,11 @@
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -5359,6 +5471,11 @@
           {
             "id": "native-returned-results-20260921",
             "path": "evidence/receipts/native-returned-results-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -5750,6 +5867,11 @@
             "id": "hf-memory-models-20260921",
             "path": "evidence/receipts/hf-memory-models-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6041,8 +6163,13 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6136,8 +6263,8 @@
           },
           {
             "id": "foundation-native-20260920",
-            "kind": "native_cli_e2e",
-            "path": "evidence/receipts/foundation-native-20260920.json"
+            "path": "evidence/receipts/foundation-native-20260920.json",
+            "kind": "native_cli_e2e"
           },
           {
             "id": "native-memory-rag-alignment-20260921",
@@ -6147,6 +6274,11 @@
           {
             "id": "hf-memory-models-20260921",
             "path": "evidence/receipts/hf-memory-models-20260921.json",
+            "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
             "kind": "native_cli_e2e"
           }
         ],
@@ -6186,7 +6318,7 @@
     {
       "component_id": "worktrunk",
       "repository": "https://github.com/max-sixty/worktrunk",
-      "version": "0.78.0",
+      "version": "0.79.0",
       "profile": "optional",
       "role": "Native Git worktree convenience CLI",
       "installation_assessment": "runtime present at retained native operation date",
@@ -6197,7 +6329,7 @@
           "wt list"
         ],
         "scope": "Use the selected native recipe only when its task applies.",
-        "recipe_document": "recipes/README.md",
+        "recipe_document": "recipes/native-upgrades-20260921.md",
         "lifecycle_guide": "adoption/lifecycle.md"
       },
       "functional_evidence": {
@@ -6226,6 +6358,11 @@
             "id": "velanext-native-quality-tools-20260920",
             "path": "blueprints/convergence-practice/wsl-native-tools/receipt.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "full-stack-convergence-20260921",
+            "path": "evidence/receipts/full-stack-convergence-20260921.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -6236,11 +6373,11 @@
           "fresh-wt-remove",
           "fresh-wt-list-removed"
         ],
-        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance."
+        "scope": "September 21 candidate operations and selected upstream tests are attached with exact source pins. Earlier dated operations retain their original versions and boundaries."
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,
-      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "next_action": "Use the selected candidate path and operation-specific evidence in recipes/native-upgrades-20260921.md; qualify a new host independently and preserve rollback.",
       "integration_mode": "Explicit native CLI, MCP or SDK operation for the selected task.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
@@ -6249,9 +6386,9 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
       "lifecycle_stages": {
-        "install": {"status": "observed_installed", "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.", "evidence_refs": ["evidence/receipts/worktrunk-list.json", "evidence/receipts/component-history.json", "evidence/receipts/token-practice-coverage-20260920.json", "evidence/receipts/token-native-retained-functional-20260920.json", "blueprints/convergence-practice/wsl-native-tools/receipt.json"]},
+        "install": {"status": "observed_installed", "scope": "September 21 isolated release upgrade with preserved previous installation and qualified candidate operations. This does not establish full uninstall or dependency rollback.", "evidence_refs": ["evidence/receipts/worktrunk-list.json", "evidence/receipts/component-history.json", "evidence/receipts/token-practice-coverage-20260920.json", "evidence/receipts/token-native-retained-functional-20260920.json", "blueprints/convergence-practice/wsl-native-tools/receipt.json", "evidence/receipts/full-stack-convergence-20260921.json"]},
         "use": {"status": "accepted_within_scope", "scope": "Disposable Git repository completed native create/select/list/remove with hooks disabled, leaving only its original worktree. No user branch was removed.", "evidence_refs": ["evidence/receipts/token-native-retained-functional-20260920.json"]},
         "persistence": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
         "restart": {"status": "not_established", "scope": "No separately mapped acceptance for this stage; inspect the role recipe before a new host claims completion.", "evidence_refs": []},
@@ -6549,8 +6686,8 @@
     }
   ],
   "installation_gap_conclusion": "The selected roles have recipes and explicit dated/partial/platform-specific evidence. Optional OmniRoute 3.8.50 is installed with isolated Linux lifecycle acceptance; native gateway use remains incomplete after model-prefix/quota failures and encrypted native restore is unsupported. These are functional/recovery limits rather than a missing installer. Unestablished lifecycle stages and new-host acceptance remain visible; this is not universal saturation or a claim that every installed tool improves tokens.",
-  "integration_note": "Original wave based on8babbd6; integrated main9b7b5d9 preserves qualified recovery and adds llama-cpp, producing58 selected component records.",
-  "reconciled_at_utc": "2026-09-20",
+  "integration_note": "Current identity/recipe/evidence joins reconciled with the September 21 wave. Historical lifecycle stages retain their operation boundaries; metadata reconciliation does not execute or recertify every component.",
+  "reconciled_at_utc": "2026-09-21",
   "reconciliation_base_public_commit": "6f74bc503ccecaaf6ccebd53677b23aedab50921",
   "stage_policy": {
     "stages": [

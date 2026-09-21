@@ -49,7 +49,12 @@ RETURNED_RECEIPT_FAMILIES = {
 PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
 PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024
 NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json",
-                    "docs/harness-defaults.md", "catalogs/README.md"}
+                    "docs/harness-defaults.md", "catalogs/README.md", STACK, ADOPTION,
+                    "docs/full-stack-convergence.md", "recipes/native-upgrades-20260921.md",
+                    "docs/token-practice.md", "tools/token-report/README.md", "recipes/README.md",
+                    "catalogs/foundation/decisions.json", "catalogs/foundation/manifest.json",
+                    "blueprints/token-native-focus/saturation-audit.json",
+                    "blueprints/us-equities/north-star.md"}
 EXECUTION_KINDS = {"native_cli_e2e", "native_model_e2e"}
 
 

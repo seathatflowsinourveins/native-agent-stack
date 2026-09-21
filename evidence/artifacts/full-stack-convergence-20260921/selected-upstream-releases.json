@@ -1,0 +1,2079 @@
+{
+  "observed_at": "2026-09-21T13:30:53.748430+00:00",
+  "scope": "Current latest-release metadata for the selected stack only. Source review and compatibility remain recipe-specific.",
+  "records": [
+    {
+      "component": "affaan-m/ECC",
+      "selected_pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
+      "repository": "https://github.com/affaan-m/ECC",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/affaan-m/ECC/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:47.734400+00:00",
+        "completed_at": "2026-09-21T13:30:48.047572+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/affaan-m/ECC/releases/tag/v2.2.1\",\"prerelease\":false,\"published_at\":\"2026-09-08T17:52:08Z\",\"tag_name\":\"v2.2.1\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/affaan-m/ECC/releases/tag/v2.2.1",
+        "prerelease": false,
+        "published_at": "2026-09-08T17:52:08Z",
+        "tag_name": "v2.2.1",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "441f6abbedeb85f8c4066350b3344c494bcc53d233843b06584d0c7156d7a961",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "agent-browser",
+      "selected_pin": "0.38.1",
+      "repository": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/vercel-labs/agent-browser/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:47.734449+00:00",
+        "completed_at": "2026-09-21T13:30:48.092644+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1\",\"prerelease\":false,\"published_at\":\"2026-09-16T20:05:12Z\",\"tag_name\":\"v0.38.1\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
+        "prerelease": false,
+        "published_at": "2026-09-16T20:05:12Z",
+        "tag_name": "v0.38.1",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "44d0c10baa8971922a064fff46af29983acb2392c485d3c379b00559a82445c5",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "agentsview",
+      "selected_pin": "0.43.0",
+      "repository": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/kenn-io/agentsview/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:47.734812+00:00",
+        "completed_at": "2026-09-21T13:30:48.117300+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/kenn-io/agentsview/releases/tag/v0.43.0\",\"prerelease\":false,\"published_at\":\"2026-09-14T13:22:53Z\",\"tag_name\":\"v0.43.0\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
+        "prerelease": false,
+        "published_at": "2026-09-14T13:22:53Z",
+        "tag_name": "v0.43.0",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "39d4173c983b19151e1caedc58106dfa21a772a6d55231e94526616f6b104638",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "ai-memory",
+      "selected_pin": "2.3.2",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/akitaonrails/ai-memory/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:47.735488+00:00",
+        "completed_at": "2026-09-21T13:30:48.063451+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2\",\"prerelease\":false,\"published_at\":\"2026-09-20T02:34:33Z\",\"tag_name\":\"v2.3.2\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.3.2",
+        "prerelease": false,
+        "published_at": "2026-09-20T02:34:33Z",
+        "tag_name": "v2.3.2",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "c2349ed49598eec726c6cd59a456ec4e02b567be8a5fd458030e91614a9457cd",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "ast-grep",
+      "selected_pin": "0.45.3",
+      "repository": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/ast-grep/ast-grep/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:48.048093+00:00",
+        "completed_at": "2026-09-21T13:30:48.371962+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/ast-grep/ast-grep/releases/tag/0.45.3\",\"prerelease\":false,\"published_at\":\"2026-08-31T01:42:23Z\",\"tag_name\":\"0.45.3\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3",
+        "prerelease": false,
+        "published_at": "2026-08-31T01:42:23Z",
+        "tag_name": "0.45.3",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "6f418b3761b1049406f5a2df11c8e53be013b94f8b5ee41c9d0879612c404708",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "ccusage",
+      "selected_pin": "20.0.23",
+      "repository": "https://github.com/ccusage/ccusage",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/ccusage/ccusage/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:48.063934+00:00",
+        "completed_at": "2026-09-21T13:30:48.379098+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/ccusage/ccusage/releases/tag/v20.0.24\",\"prerelease\":false,\"published_at\":\"2026-09-21T11:23:53Z\",\"tag_name\":\"v20.0.24\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/ccusage/ccusage/releases/tag/v20.0.24",
+        "prerelease": false,
+        "published_at": "2026-09-21T11:23:53Z",
+        "tag_name": "v20.0.24",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "b45add8615968fea4560cd6e8847914f805fca43f457252272ba351f26c0fa08",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "claude-code",
+      "selected_pin": "2.1.278",
+      "repository": "https://github.com/anthropics/claude-code",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/anthropics/claude-code/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:48.093097+00:00",
+        "completed_at": "2026-09-21T13:30:48.410896+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/anthropics/claude-code/releases/tag/v2.1.278\",\"prerelease\":false,\"published_at\":\"2026-09-19T03:10:40Z\",\"tag_name\":\"v2.1.278\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.278",
+        "prerelease": false,
+        "published_at": "2026-09-19T03:10:40Z",
+        "tag_name": "v2.1.278",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "fe5a6ea4e28075361dad9dd9f4268c1ea6c4715d243f529dd4a9ce907f3e067d",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "claude-hud",
+      "selected_pin": "0.8.0",
+      "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/jarrodwatts/claude-hud/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:48.117816+00:00",
+        "completed_at": "2026-09-21T13:30:48.465954+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0\",\"prerelease\":false,\"published_at\":\"2026-08-18T14:20:35Z\",\"tag_name\":\"v0.8.0\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
+        "prerelease": false,
+        "published_at": "2026-08-18T14:20:35Z",
+        "tag_name": "v0.8.0",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "e653cb317c4164614b059d200020c4676e523743733367a00c6b82ee2e45ee08",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "codebase-memory-mcp",
+      "selected_pin": "0.11.0",
+      "repository": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/DeusData/codebase-memory-mcp/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:48.372444+00:00",
+        "completed_at": "2026-09-21T13:30:48.680148+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0\",\"prerelease\":false,\"published_at\":\"2026-09-15T23:40:39Z\",\"tag_name\":\"v0.11.0\",\"target_commitish\":\"8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
+        "prerelease": false,
+        "published_at": "2026-09-15T23:40:39Z",
+        "tag_name": "v0.11.0",
+        "target_commitish": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798"
+      },
+      "original_stdout_sha256": "cbdf6e077939865ce92fcbd32ab12642d1cf97eafad4a634f5631e58a58f90a5",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "codex",
+      "selected_pin": "0.155.1",
+      "repository": "https://github.com/openai/codex",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/openai/codex/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:48.379614+00:00",
+        "completed_at": "2026-09-21T13:30:48.813400+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/openai/codex/releases/tag/rust-v0.155.1\",\"prerelease\":false,\"published_at\":\"2026-09-18T20:03:04Z\",\"tag_name\":\"rust-v0.155.1\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.155.1",
+        "prerelease": false,
+        "published_at": "2026-09-18T20:03:04Z",
+        "tag_name": "rust-v0.155.1",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "66bd88adc1a6ba68c07aa742d5d03fcbe5e95122cdd800aa5a252c2a4e7dcec4",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "codex-for-claude",
+      "selected_pin": "1.0.6 @ db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "repository": "https://github.com/openai/codex-plugin-cc/tree/v1.0.6",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/openai/codex-plugin-cc/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:48.411390+00:00",
+        "completed_at": "2026-09-21T13:30:48.760798+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/openai/codex-plugin-cc/releases/tag/v1.0.6\",\"prerelease\":false,\"published_at\":\"2026-07-08T00:17:32Z\",\"tag_name\":\"v1.0.6\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/openai/codex-plugin-cc/releases/tag/v1.0.6",
+        "prerelease": false,
+        "published_at": "2026-07-08T00:17:32Z",
+        "tag_name": "v1.0.6",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "daa4281e0e4f7ac68dd69898bca2d325feabb0a6c82e944e47367b152fc2320d",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "context-hub",
+      "selected_pin": "0.1.4",
+      "repository": "https://github.com/andrewyng/context-hub",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/andrewyng/context-hub/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:48.466475+00:00",
+        "completed_at": "2026-09-21T13:30:48.797185+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/andrewyng/context-hub/releases/tag/v0.1.4\",\"prerelease\":false,\"published_at\":\"2026-04-27T22:10:03Z\",\"tag_name\":\"v0.1.4\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/andrewyng/context-hub/releases/tag/v0.1.4",
+        "prerelease": false,
+        "published_at": "2026-04-27T22:10:03Z",
+        "tag_name": "v0.1.4",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "b63714aecf99138c997175a5bc5e075603d67a83892eafc1a6719a18c3742821",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "context-mode",
+      "selected_pin": "1.0.169",
+      "repository": "https://github.com/mksglu/context-mode",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/mksglu/context-mode/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:48.680559+00:00",
+        "completed_at": "2026-09-21T13:30:49.016200+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/mksglu/context-mode/releases/tag/v1.0.169\",\"prerelease\":false,\"published_at\":\"2026-06-29T18:18:53Z\",\"tag_name\":\"v1.0.169\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169",
+        "prerelease": false,
+        "published_at": "2026-06-29T18:18:53Z",
+        "tag_name": "v1.0.169",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "09ab715e6b616f8ae34b4d93409d1addd1f73f0f5d80968a718580115f77f657",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "davila7/claude-code-templates",
+      "selected_pin": "c840d6f626be7ba418da60aeb0f2080413562451",
+      "repository": "https://github.com/davila7/claude-code-templates",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/davila7/claude-code-templates/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:48.761229+00:00",
+        "completed_at": "2026-09-21T13:30:49.089551+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/davila7/claude-code-templates/releases/tag/v1.29.6\",\"prerelease\":false,\"published_at\":\"2026-09-17T01:14:32Z\",\"tag_name\":\"v1.29.6\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/davila7/claude-code-templates/releases/tag/v1.29.6",
+        "prerelease": false,
+        "published_at": "2026-09-17T01:14:32Z",
+        "tag_name": "v1.29.6",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "55c5085d4a83e773398cbd93f5146ddd940fb56435b123b8f92ace90d0f8ac18",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "difftastic",
+      "selected_pin": "0.71.0",
+      "repository": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/Wilfred/difftastic/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:48.797582+00:00",
+        "completed_at": "2026-09-21T13:30:49.131074+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/Wilfred/difftastic/releases/tag/0.71.0\",\"prerelease\":false,\"published_at\":\"2026-09-18T22:57:29Z\",\"tag_name\":\"0.71.0\",\"target_commitish\":\"master\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/Wilfred/difftastic/releases/tag/0.71.0",
+        "prerelease": false,
+        "published_at": "2026-09-18T22:57:29Z",
+        "tag_name": "0.71.0",
+        "target_commitish": "master"
+      },
+      "original_stdout_sha256": "a4368ed383d46bc1cf8c1e2c4645d0ef4c10c923f9a09a25920bfd79c979942b",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "gitleaks",
+      "selected_pin": "8.30.1",
+      "repository": "https://github.com/gitleaks/gitleaks",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/gitleaks/gitleaks/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:48.813877+00:00",
+        "completed_at": "2026-09-21T13:30:49.166096+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1\",\"prerelease\":false,\"published_at\":\"2026-03-21T02:17:58Z\",\"tag_name\":\"v8.30.1\",\"target_commitish\":\"master\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
+        "prerelease": false,
+        "published_at": "2026-03-21T02:17:58Z",
+        "tag_name": "v8.30.1",
+        "target_commitish": "master"
+      },
+      "original_stdout_sha256": "abb4ce7299ba7f4a681d270b979df52dfc0cbb0239a9ef46fac7936d5fb8fab7",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "headroom",
+      "selected_pin": "0.37.0",
+      "repository": "https://github.com/chopratejas/headroom",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/chopratejas/headroom/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:49.016644+00:00",
+        "completed_at": "2026-09-21T13:30:49.480409+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0\",\"prerelease\":false,\"published_at\":\"2026-08-27T21:18:26Z\",\"tag_name\":\"v0.37.0\",\"target_commitish\":\"32d7ca4577d599b8a5f811ada74cf31504302c9d\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/headroomlabs-ai/headroom/releases/tag/v0.37.0",
+        "prerelease": false,
+        "published_at": "2026-08-27T21:18:26Z",
+        "tag_name": "v0.37.0",
+        "target_commitish": "32d7ca4577d599b8a5f811ada74cf31504302c9d"
+      },
+      "original_stdout_sha256": "07b8fc1ef9339949e4d5e48704a9f234854e574d53dae2abb41a01c4c39ef78a",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "huggingface-hub-native",
+      "selected_pin": "1.32.0",
+      "repository": "https://github.com/huggingface/huggingface_hub",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/huggingface/huggingface_hub/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:49.090029+00:00",
+        "completed_at": "2026-09-21T13:30:49.411001+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/huggingface/huggingface_hub/releases/tag/v1.32.0\",\"prerelease\":false,\"published_at\":\"2026-09-17T10:21:24Z\",\"tag_name\":\"v1.32.0\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/huggingface/huggingface_hub/releases/tag/v1.32.0",
+        "prerelease": false,
+        "published_at": "2026-09-17T10:21:24Z",
+        "tag_name": "v1.32.0",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "a1a3106d5d0078d2ebee420be576005f7d7ecf1085231ba6b47df51cf9d04397",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "markitdown",
+      "selected_pin": "0.1.7",
+      "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.7",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/microsoft/markitdown/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:49.131501+00:00",
+        "completed_at": "2026-09-21T13:30:49.481183+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/microsoft/markitdown/releases/tag/v0.1.7\",\"prerelease\":false,\"published_at\":\"2026-07-29T18:19:15Z\",\"tag_name\":\"v0.1.7\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/microsoft/markitdown/releases/tag/v0.1.7",
+        "prerelease": false,
+        "published_at": "2026-07-29T18:19:15Z",
+        "tag_name": "v0.1.7",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "b820765f039e6ef4f184233c72ec8c86a13bc504752d59e533d07475ce55e996",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "mcp-inspector",
+      "selected_pin": "2.7.0",
+      "repository": "https://github.com/modelcontextprotocol/inspector",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/modelcontextprotocol/inspector/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:49.166617+00:00",
+        "completed_at": "2026-09-21T13:30:49.493064+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/modelcontextprotocol/inspector/releases/tag/2.7.0\",\"prerelease\":false,\"published_at\":\"2026-09-16T15:09:20Z\",\"tag_name\":\"2.7.0\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.7.0",
+        "prerelease": false,
+        "published_at": "2026-09-16T15:09:20Z",
+        "tag_name": "2.7.0",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "cf761a58290337484e31253b0659e807438acaacfc47395e10e33ce07c0200ad",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "mcporter",
+      "selected_pin": "0.13.13",
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.13.13",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/openclaw/mcporter/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:49.411437+00:00",
+        "completed_at": "2026-09-21T13:30:49.751489+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/openclaw/mcporter/releases/tag/v0.13.13\",\"prerelease\":false,\"published_at\":\"2026-09-14T15:21:47Z\",\"tag_name\":\"v0.13.13\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.13.13",
+        "prerelease": false,
+        "published_at": "2026-09-14T15:21:47Z",
+        "tag_name": "v0.13.13",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "80f5e591c44e617bf64b437e2342d10af01defd0d7627a8461a12d8e52b04ac4",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "openresearch",
+      "selected_pin": "0.2.4",
+      "repository": "https://github.com/alphaXiv/OpenResearch",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/alphaXiv/OpenResearch/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:49.480836+00:00",
+        "completed_at": "2026-09-21T13:30:49.797971+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.7\",\"prerelease\":false,\"published_at\":\"2026-09-21T08:30:58Z\",\"tag_name\":\"v0.2.7\",\"target_commitish\":\"24e404ecbe19cb9184ea8177e8e9f90d4f3205b0\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.7",
+        "prerelease": false,
+        "published_at": "2026-09-21T08:30:58Z",
+        "tag_name": "v0.2.7",
+        "target_commitish": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0"
+      },
+      "original_stdout_sha256": "6aacd4fe39b119bbd16179affe19a92a23336d0c1904d6f8a8eb23f1ea7b082a",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "playwright-cli",
+      "selected_pin": "0.1.21; Playwright 1.64.0-alpha-1789764292000",
+      "repository": "https://github.com/microsoft/playwright-cli",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/microsoft/playwright-cli/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:49.481467+00:00",
+        "completed_at": "2026-09-21T13:30:49.829535+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/microsoft/playwright-cli/releases/tag/v0.1.21\",\"prerelease\":false,\"published_at\":\"2026-09-18T23:34:47Z\",\"tag_name\":\"v0.1.21\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/microsoft/playwright-cli/releases/tag/v0.1.21",
+        "prerelease": false,
+        "published_at": "2026-09-18T23:34:47Z",
+        "tag_name": "v0.1.21",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "490c17331ceea78c58c593500ca56de8cff5d6eb5704b70c3956e48d1c9eb3bb",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "promptfoo",
+      "selected_pin": "0.123.1",
+      "repository": "https://github.com/promptfoo/promptfoo",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/promptfoo/promptfoo/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:49.493481+00:00",
+        "completed_at": "2026-09-21T13:30:49.834160+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/promptfoo/promptfoo/releases/tag/0.123.1\",\"prerelease\":false,\"published_at\":\"2026-09-18T01:07:54Z\",\"tag_name\":\"0.123.1\",\"target_commitish\":\"34f74d34e140b5e17d23770dfb2340057b1936b8\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/promptfoo/promptfoo/releases/tag/0.123.1",
+        "prerelease": false,
+        "published_at": "2026-09-18T01:07:54Z",
+        "tag_name": "0.123.1",
+        "target_commitish": "34f74d34e140b5e17d23770dfb2340057b1936b8"
+      },
+      "original_stdout_sha256": "85f83db13b1df921024c665d699b7f95d6c1dbe0114921432e2a765a3673a171",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "qdrant",
+      "selected_pin": "1.19.1",
+      "repository": "https://github.com/qdrant/qdrant",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/qdrant/qdrant/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:49.751912+00:00",
+        "completed_at": "2026-09-21T13:30:50.136538+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/qdrant/qdrant/releases/tag/v1.19.1\",\"prerelease\":false,\"published_at\":\"2026-09-04T07:59:14Z\",\"tag_name\":\"v1.19.1\",\"target_commitish\":\"master\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/qdrant/qdrant/releases/tag/v1.19.1",
+        "prerelease": false,
+        "published_at": "2026-09-04T07:59:14Z",
+        "tag_name": "v1.19.1",
+        "target_commitish": "master"
+      },
+      "original_stdout_sha256": "d68b0160362998cd9d94afa1d86dacc431909c50f74c5b4c642ec49596c0cdf0",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "qmd",
+      "selected_pin": "2.8.3",
+      "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/tobi/qmd/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:49.798428+00:00",
+        "completed_at": "2026-09-21T13:30:50.095886+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/tobi/qmd/releases/tag/v2.8.3\",\"prerelease\":false,\"published_at\":\"2026-08-16T22:30:34Z\",\"tag_name\":\"v2.8.3\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+        "prerelease": false,
+        "published_at": "2026-08-16T22:30:34Z",
+        "tag_name": "v2.8.3",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "ca2764de6b630c1048e8c6767fde35d4742307e1f38d38d36a9f185d286e6fc8",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "repomix",
+      "selected_pin": "1.18.0",
+      "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.0",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/yamadashy/repomix/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:49.830048+00:00",
+        "completed_at": "2026-09-21T13:30:50.096124+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/yamadashy/repomix/releases/tag/v1.18.1\",\"prerelease\":false,\"published_at\":\"2026-09-21T08:34:49Z\",\"tag_name\":\"v1.18.1\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+        "prerelease": false,
+        "published_at": "2026-09-21T08:34:49Z",
+        "tag_name": "v1.18.1",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "e11018278cd8330db8db9eead8e0e01fc1bc62e9481461cfecb2ff4059cc1fa8",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "rtk",
+      "selected_pin": "0.49.0",
+      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/rtk-ai/rtk/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:49.834517+00:00",
+        "completed_at": "2026-09-21T13:30:50.190673+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/rtk-ai/rtk/releases/tag/v0.49.0\",\"prerelease\":false,\"published_at\":\"2026-09-11T08:52:38Z\",\"tag_name\":\"v0.49.0\",\"target_commitish\":\"b1c0dc00649c50fbe8930f849c800d4d6ca12091\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.49.0",
+        "prerelease": false,
+        "published_at": "2026-09-11T08:52:38Z",
+        "tag_name": "v0.49.0",
+        "target_commitish": "b1c0dc00649c50fbe8930f849c800d4d6ca12091"
+      },
+      "original_stdout_sha256": "4609702cb0cc7185ef43d7cc0de87ba9554d35cb0ee616d8952c8d42dfd91c36",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "sandbox-runtime",
+      "selected_pin": "0.0.77",
+      "repository": "https://github.com/anthropics/sandbox-runtime",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/anthropics/sandbox-runtime/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:50.096691+00:00",
+        "completed_at": "2026-09-21T13:30:50.411158+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77\",\"prerelease\":false,\"published_at\":\"2026-09-18T22:09:16Z\",\"tag_name\":\"v0.0.77\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77",
+        "prerelease": false,
+        "published_at": "2026-09-18T22:09:16Z",
+        "tag_name": "v0.0.77",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "99d9e685970dc28121514de41e074b24a0fd223145354ee5e510128a53472e4a",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "serena",
+      "selected_pin": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "repository": "https://github.com/oraios/serena",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/oraios/serena/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:50.096788+00:00",
+        "completed_at": "2026-09-21T13:30:50.363808+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/oraios/serena/releases/tag/v1.7.0\",\"prerelease\":false,\"published_at\":\"2026-08-09T18:38:06Z\",\"tag_name\":\"v1.7.0\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/oraios/serena/releases/tag/v1.7.0",
+        "prerelease": false,
+        "published_at": "2026-08-09T18:38:06Z",
+        "tag_name": "v1.7.0",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "48323d655195e88ca58198304e77b8958ff3be0884ee7d05cdae87eb97f28d58",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "shanraisshan/claude-code-best-practice",
+      "selected_pin": "15969ed2471a177d938c889255d2f23f07e4742a",
+      "repository": "https://github.com/shanraisshan/claude-code-best-practice",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/shanraisshan/claude-code-best-practice/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:50.136993+00:00",
+        "completed_at": "2026-09-21T13:30:50.541489+00:00",
+        "exit_code": 1,
+        "error": null,
+        "stdout_text": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}",
+        "stderr_text": "gh: Not Found (HTTP 404)\n"
+      },
+      "status": "upstream latest-release request failed; failure retained, pin unchanged",
+      "original_stdout_sha256": "d9e37600354c1839f6b22cebde497e9d14750d2401a06c9a51b1619baf991613",
+      "original_stderr_sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+    },
+    {
+      "component": "shellcheck",
+      "selected_pin": "0.11.0",
+      "repository": "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/koalaman/shellcheck/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:50.191134+00:00",
+        "completed_at": "2026-09-21T13:30:50.534877+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/koalaman/shellcheck/releases/tag/v0.11.0\",\"prerelease\":false,\"published_at\":\"2025-08-04T00:27:19Z\",\"tag_name\":\"v0.11.0\",\"target_commitish\":\"master\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/koalaman/shellcheck/releases/tag/v0.11.0",
+        "prerelease": false,
+        "published_at": "2025-08-04T00:27:19Z",
+        "tag_name": "v0.11.0",
+        "target_commitish": "master"
+      },
+      "original_stdout_sha256": "784f36d1b2b2948b9b0c453437d67bdbdc5ee1eb27b15f3b280d0f26c2315629",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "socraticode",
+      "selected_pin": "1.14.0",
+      "repository": "https://github.com/giancarloerra/SocratiCode",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/giancarloerra/SocratiCode/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:50.364251+00:00",
+        "completed_at": "2026-09-21T13:30:50.717406+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/giancarloerra/SocratiCode/releases/tag/v1.14.0\",\"prerelease\":false,\"published_at\":\"2026-09-16T14:26:47Z\",\"tag_name\":\"v1.14.0\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.14.0",
+        "prerelease": false,
+        "published_at": "2026-09-16T14:26:47Z",
+        "tag_name": "v1.14.0",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "1ae15610fc516b307d0e1143aef54928b5d93a9e6da9d09ef0ac8dc63bb109a6",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "toon",
+      "selected_pin": "4.1.1",
+      "repository": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/toon-format/toon/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:50.411600+00:00",
+        "completed_at": "2026-09-21T13:30:50.756366+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/toon-format/toon/releases/tag/v4.1.1\",\"prerelease\":false,\"published_at\":\"2026-08-05T11:49:55Z\",\"tag_name\":\"v4.1.1\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/toon-format/toon/releases/tag/v4.1.1",
+        "prerelease": false,
+        "published_at": "2026-08-05T11:49:55Z",
+        "tag_name": "v4.1.1",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "932d6a6f0b2ec99925f84ceffe667194698380e63ba5b5fba241d96abf40f000",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "vllm",
+      "selected_pin": "0.25.0",
+      "repository": "https://github.com/vllm-project/vllm",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/vllm-project/vllm/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:50.535281+00:00",
+        "completed_at": "2026-09-21T13:30:50.848097+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/vllm-project/vllm/releases/tag/v0.29.0\",\"prerelease\":false,\"published_at\":\"2026-09-09T08:54:49Z\",\"tag_name\":\"v0.29.0\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/vllm-project/vllm/releases/tag/v0.29.0",
+        "prerelease": false,
+        "published_at": "2026-09-09T08:54:49Z",
+        "tag_name": "v0.29.0",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "db34446dad068cf8bdfb1dc9eca045b3c4cca59d39b6bc3f7eacf2dfbf632f27",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "worktrunk",
+      "selected_pin": "0.78.0",
+      "repository": "https://github.com/max-sixty/worktrunk",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/max-sixty/worktrunk/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:50.542071+00:00",
+        "completed_at": "2026-09-21T13:30:50.827433+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0\",\"prerelease\":false,\"published_at\":\"2026-09-21T01:01:42Z\",\"tag_name\":\"v0.79.0\",\"target_commitish\":\"5ba6f148e8505c20794f2d8bc706aa4f26335c95\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0",
+        "prerelease": false,
+        "published_at": "2026-09-21T01:01:42Z",
+        "tag_name": "v0.79.0",
+        "target_commitish": "5ba6f148e8505c20794f2d8bc706aa4f26335c95"
+      },
+      "original_stdout_sha256": "d67fda06dbe8196f287b9ca04290ef40377e4fa63990a4e6edc79dd46a25af45",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "opentelemetry-collector-contrib",
+      "selected_pin": "0.161.0",
+      "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/open-telemetry/opentelemetry-collector-contrib/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:50.717925+00:00",
+        "completed_at": "2026-09-21T13:30:51.044099+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.161.0\",\"prerelease\":false,\"published_at\":\"2026-09-15T15:05:47Z\",\"tag_name\":\"v0.161.0\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.161.0",
+        "prerelease": false,
+        "published_at": "2026-09-15T15:05:47Z",
+        "tag_name": "v0.161.0",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "f7772f9d3281877bdd008754afa369867157824297df966ba912dabbbfe566a8",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "prometheus",
+      "selected_pin": "3.14.0",
+      "repository": "https://github.com/prometheus/prometheus",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/prometheus/prometheus/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:50.756781+00:00",
+        "completed_at": "2026-09-21T13:30:51.121618+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/prometheus/prometheus/releases/tag/v3.14.0\",\"prerelease\":false,\"published_at\":\"2026-08-18T08:49:40Z\",\"tag_name\":\"v3.14.0\",\"target_commitish\":\"d7598b7141418fa35be2b5ec5d0fefb634199610\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/prometheus/prometheus/releases/tag/v3.14.0",
+        "prerelease": false,
+        "published_at": "2026-08-18T08:49:40Z",
+        "tag_name": "v3.14.0",
+        "target_commitish": "d7598b7141418fa35be2b5ec5d0fefb634199610"
+      },
+      "original_stdout_sha256": "d036fc495cf2ba7a7663307c94fe3c86699194b7d20e5daa75ff4c5f53eaeec0",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "loki",
+      "selected_pin": "3.7.8",
+      "repository": "https://github.com/grafana/loki",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/grafana/loki/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:50.827859+00:00",
+        "completed_at": "2026-09-21T13:30:51.207567+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/grafana/loki/releases/tag/v3.7.8\",\"prerelease\":false,\"published_at\":\"2026-09-17T15:51:10Z\",\"tag_name\":\"v3.7.8\",\"target_commitish\":\"09e6ce2ff1bdc19763a10265b870c86f51c98655\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/grafana/loki/releases/tag/v3.7.8",
+        "prerelease": false,
+        "published_at": "2026-09-17T15:51:10Z",
+        "tag_name": "v3.7.8",
+        "target_commitish": "09e6ce2ff1bdc19763a10265b870c86f51c98655"
+      },
+      "original_stdout_sha256": "8811d7a729ea7cdd06a824134123b41f25a207740b385e3a862fdb17755158f1",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "grafana",
+      "selected_pin": "13.2.2",
+      "repository": "https://github.com/grafana/grafana",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/grafana/grafana/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:50.848545+00:00",
+        "completed_at": "2026-09-21T13:30:51.222164+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/grafana/grafana/releases/tag/v13.2.2\",\"prerelease\":false,\"published_at\":\"2026-09-15T12:21:32Z\",\"tag_name\":\"v13.2.2\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/grafana/grafana/releases/tag/v13.2.2",
+        "prerelease": false,
+        "published_at": "2026-09-15T12:21:32Z",
+        "tag_name": "v13.2.2",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "09b0320dab02ad09b99e0e1e24d6170df59f4f07c49deb7f1a2f0fa21d7a4896",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "alertmanager",
+      "selected_pin": "0.34.1",
+      "repository": "https://github.com/prometheus/alertmanager",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/prometheus/alertmanager/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:51.044529+00:00",
+        "completed_at": "2026-09-21T13:30:51.401889+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/prometheus/alertmanager/releases/tag/v0.34.1\",\"prerelease\":false,\"published_at\":\"2026-09-17T08:12:07Z\",\"tag_name\":\"v0.34.1\",\"target_commitish\":\"73c6bfe7393929211294c1954f30d8ed78e4d0ad\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/prometheus/alertmanager/releases/tag/v0.34.1",
+        "prerelease": false,
+        "published_at": "2026-09-17T08:12:07Z",
+        "tag_name": "v0.34.1",
+        "target_commitish": "73c6bfe7393929211294c1954f30d8ed78e4d0ad"
+      },
+      "original_stdout_sha256": "56dcc7c9c4a31b5c6295efa14056cea63a2702eadc0666092c0b94fb85d20961",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "ntfy",
+      "selected_pin": "2.28.0",
+      "repository": "https://github.com/binwiederhier/ntfy",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/binwiederhier/ntfy/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:51.122081+00:00",
+        "completed_at": "2026-09-21T13:30:51.447581+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/binwiederhier/ntfy/releases/tag/v2.28.0\",\"prerelease\":false,\"published_at\":\"2026-08-27T20:27:10Z\",\"tag_name\":\"v2.28.0\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/binwiederhier/ntfy/releases/tag/v2.28.0",
+        "prerelease": false,
+        "published_at": "2026-08-27T20:27:10Z",
+        "tag_name": "v2.28.0",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "2bb1b712752e1b8655eb01edb5256c3cb9ea11b7f5c1f62f1676c59ea04c2d93",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "duckdb",
+      "selected_pin": "1.5.5",
+      "repository": "https://github.com/duckdb/duckdb",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/duckdb/duckdb/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:51.208057+00:00",
+        "completed_at": "2026-09-21T13:30:51.553647+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/duckdb/duckdb/releases/tag/v1.5.5\",\"prerelease\":false,\"published_at\":\"2026-07-22T10:51:50Z\",\"tag_name\":\"v1.5.5\",\"target_commitish\":\"d8cdaa33fda8df955cc76ef58a280f68f4cd43fa\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/duckdb/duckdb/releases/tag/v1.5.5",
+        "prerelease": false,
+        "published_at": "2026-07-22T10:51:50Z",
+        "tag_name": "v1.5.5",
+        "target_commitish": "d8cdaa33fda8df955cc76ef58a280f68f4cd43fa"
+      },
+      "original_stdout_sha256": "59e7a69f024fb92ced7d089c6048416f2497df7dd57df4f3cb3b881db158aea5",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "restic",
+      "selected_pin": "0.19.1",
+      "repository": "https://github.com/restic/restic",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/restic/restic/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:51.222590+00:00",
+        "completed_at": "2026-09-21T13:30:51.546015+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/restic/restic/releases/tag/v0.19.1\",\"prerelease\":false,\"published_at\":\"2026-07-05T08:13:33Z\",\"tag_name\":\"v0.19.1\",\"target_commitish\":\"master\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/restic/restic/releases/tag/v0.19.1",
+        "prerelease": false,
+        "published_at": "2026-07-05T08:13:33Z",
+        "tag_name": "v0.19.1",
+        "target_commitish": "master"
+      },
+      "original_stdout_sha256": "90c0da4c7f9dec42ef99d6f3aacf5b479036cfe6e7121d434ebd7955c423fd6b",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "dagu",
+      "selected_pin": "2.16.6",
+      "repository": "https://github.com/dagucloud/dagu",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/dagucloud/dagu/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:51.402314+00:00",
+        "completed_at": "2026-09-21T13:30:51.700433+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/dagucloud/dagu/releases/tag/v2.16.6\",\"prerelease\":false,\"published_at\":\"2026-09-14T14:45:57Z\",\"tag_name\":\"v2.16.6\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/dagucloud/dagu/releases/tag/v2.16.6",
+        "prerelease": false,
+        "published_at": "2026-09-14T14:45:57Z",
+        "tag_name": "v2.16.6",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "38425f620be5048b7a7edfbd676c04b59f4254428d9ce957880ca87ba5c155f2",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "lean",
+      "selected_pin": "985ef30 with documented dependency remediation",
+      "repository": "https://github.com/QuantConnect/Lean",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/QuantConnect/Lean/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:51.447999+00:00",
+        "completed_at": "2026-09-21T13:30:51.904229+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/QuantConnect/Lean/releases/tag/v2.4.0.1\",\"prerelease\":false,\"published_at\":\"2017-08-08T20:57:57Z\",\"tag_name\":\"v2.4.0.1\",\"target_commitish\":\"master\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/QuantConnect/Lean/releases/tag/v2.4.0.1",
+        "prerelease": false,
+        "published_at": "2017-08-08T20:57:57Z",
+        "tag_name": "v2.4.0.1",
+        "target_commitish": "master"
+      },
+      "original_stdout_sha256": "020e7f8102c574fa6b0f27cd0ce0488ea7dfc30a8e9f6aebbf0c4bcbaf98f7fb",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "syft",
+      "selected_pin": "1.52.0",
+      "repository": "https://github.com/anchore/syft",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/anchore/syft/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:51.546535+00:00",
+        "completed_at": "2026-09-21T13:30:51.889945+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/anchore/syft/releases/tag/v1.52.0\",\"prerelease\":false,\"published_at\":\"2026-09-17T14:38:17Z\",\"tag_name\":\"v1.52.0\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/anchore/syft/releases/tag/v1.52.0",
+        "prerelease": false,
+        "published_at": "2026-09-17T14:38:17Z",
+        "tag_name": "v1.52.0",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "6f2e41eb34c50b4ee2680a44dc81a98f77b74440e44e2e7eea7eed05c70d8066",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "alpaca-py",
+      "selected_pin": "0.44.0",
+      "repository": "https://github.com/alpacahq/alpaca-py",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/alpacahq/alpaca-py/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:51.554035+00:00",
+        "completed_at": "2026-09-21T13:30:51.835337+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0\",\"prerelease\":false,\"published_at\":\"2026-08-11T10:11:55Z\",\"tag_name\":\"v0.44.0\",\"target_commitish\":\"master\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0",
+        "prerelease": false,
+        "published_at": "2026-08-11T10:11:55Z",
+        "tag_name": "v0.44.0",
+        "target_commitish": "master"
+      },
+      "original_stdout_sha256": "d6c47786bb8275e551f7d4d36fed0a285b9f6fa500056a3082a8c76722b823dd",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "systemd",
+      "selected_pin": "255.4-1ubuntu8.17",
+      "repository": "https://github.com/systemd/systemd",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/systemd/systemd/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:51.700861+00:00",
+        "completed_at": "2026-09-21T13:30:52.048245+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/systemd/systemd/releases/tag/v261.3\",\"prerelease\":false,\"published_at\":\"2026-09-10T19:49:12Z\",\"tag_name\":\"v261.3\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/systemd/systemd/releases/tag/v261.3",
+        "prerelease": false,
+        "published_at": "2026-09-10T19:49:12Z",
+        "tag_name": "v261.3",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "6f9ae521a39e333a7f9652c840774f985178b7e9a28f027171604f58cab92aa2",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "pandas",
+      "selected_pin": "3.0.6",
+      "repository": "https://github.com/pandas-dev/pandas",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/pandas-dev/pandas/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:51.835732+00:00",
+        "completed_at": "2026-09-21T13:30:52.150687+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/pandas-dev/pandas/releases/tag/v3.0.6\",\"prerelease\":false,\"published_at\":\"2026-09-17T21:32:36Z\",\"tag_name\":\"v3.0.6\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/pandas-dev/pandas/releases/tag/v3.0.6",
+        "prerelease": false,
+        "published_at": "2026-09-17T21:32:36Z",
+        "tag_name": "v3.0.6",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "703ffe0043d741a70cb0d2a1c251f275cf396976f3a1e09772ffb25318666d9d",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "skfolio",
+      "selected_pin": "1.2.9",
+      "repository": "https://github.com/skfolio/skfolio",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/skfolio/skfolio/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:51.890355+00:00",
+        "completed_at": "2026-09-21T13:30:52.200376+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/skfolio/skfolio/releases/tag/v1.3.0\",\"prerelease\":false,\"published_at\":\"2026-09-20T10:12:14Z\",\"tag_name\":\"v1.3.0\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/skfolio/skfolio/releases/tag/v1.3.0",
+        "prerelease": false,
+        "published_at": "2026-09-20T10:12:14Z",
+        "tag_name": "v1.3.0",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "e1d0ee62e6d0a55c94c3fd075b6de466d238b1dd68cc808c299f15e02cd282e6",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "edgartools",
+      "selected_pin": "5.58.0",
+      "repository": "https://github.com/dgunning/edgartools",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/dgunning/edgartools/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:51.904664+00:00",
+        "completed_at": "2026-09-21T13:30:52.218297+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/dgunning/edgartools/releases/tag/v5.58.0\",\"prerelease\":false,\"published_at\":\"2026-09-11T15:41:47Z\",\"tag_name\":\"v5.58.0\",\"target_commitish\":\"abe44344c56cf4bfb5443e0debca7e39342f6e7a\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/dgunning/edgartools/releases/tag/v5.58.0",
+        "prerelease": false,
+        "published_at": "2026-09-11T15:41:47Z",
+        "tag_name": "v5.58.0",
+        "target_commitish": "abe44344c56cf4bfb5443e0debca7e39342f6e7a"
+      },
+      "original_stdout_sha256": "c6ca039ffd89cb7620c01d5752ce895e956ca48cd6b5060d3371668dbede3121",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "zizmor",
+      "selected_pin": "1.30.1",
+      "repository": "https://github.com/zizmorcore/zizmor",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/zizmorcore/zizmor/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:52.048744+00:00",
+        "completed_at": "2026-09-21T13:30:52.416164+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1\",\"prerelease\":false,\"published_at\":\"2026-09-09T05:34:10Z\",\"tag_name\":\"v1.30.1\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/zizmorcore/zizmor/releases/tag/v1.30.1",
+        "prerelease": false,
+        "published_at": "2026-09-09T05:34:10Z",
+        "tag_name": "v1.30.1",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "5301c78802a0979bc6a142f37c0c5062a35dddbf03c58af1974fad9e00822dd4",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "beads",
+      "selected_pin": "1.3.0",
+      "repository": "https://github.com/gastownhall/beads",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/gastownhall/beads/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:52.151101+00:00",
+        "completed_at": "2026-09-21T13:30:52.496866+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/gastownhall/beads/releases/tag/v1.3.0\",\"prerelease\":false,\"published_at\":\"2026-09-15T19:33:18Z\",\"tag_name\":\"v1.3.0\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/gastownhall/beads/releases/tag/v1.3.0",
+        "prerelease": false,
+        "published_at": "2026-09-15T19:33:18Z",
+        "tag_name": "v1.3.0",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "4b5df3b606a45bd5e05c2e78418d8bd5114c63ef1a6a456921104b93f3c34095",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "skills-ref",
+      "selected_pin": "0.1.0",
+      "repository": "https://github.com/agentskills/agentskills",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/agentskills/agentskills/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:52.200793+00:00",
+        "completed_at": "2026-09-21T13:30:52.585987+00:00",
+        "exit_code": 1,
+        "error": null,
+        "stdout_text": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}",
+        "stderr_text": "gh: Not Found (HTTP 404)\n"
+      },
+      "status": "upstream latest-release request failed; failure retained, pin unchanged",
+      "original_stdout_sha256": "d9e37600354c1839f6b22cebde497e9d14750d2401a06c9a51b1619baf991613",
+      "original_stderr_sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+    },
+    {
+      "component": "otel-tui",
+      "selected_pin": "0.7.5",
+      "repository": "https://github.com/ymtdzzz/otel-tui",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/ymtdzzz/otel-tui/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:52.218724+00:00",
+        "completed_at": "2026-09-21T13:30:52.508174+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/ymtdzzz/otel-tui/releases/tag/v0.7.5\",\"prerelease\":false,\"published_at\":\"2026-09-12T10:28:45Z\",\"tag_name\":\"v0.7.5\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/ymtdzzz/otel-tui/releases/tag/v0.7.5",
+        "prerelease": false,
+        "published_at": "2026-09-12T10:28:45Z",
+        "tag_name": "v0.7.5",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "1a044d0cf4c5b95f18ca70d462e47beb5c4f6556c3e9d8878b25d1ed6b3f2c6b",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "llama-cpp",
+      "selected_pin": "b11057 (0.4.1-dev)",
+      "repository": "https://github.com/ggml-org/llama.cpp",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/ggml-org/llama.cpp/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:52.416597+00:00",
+        "completed_at": "2026-09-21T13:30:52.818484+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/ggml-org/llama.cpp/releases/tag/v0.4.1\",\"prerelease\":false,\"published_at\":\"2026-09-14T18:27:29Z\",\"tag_name\":\"v0.4.1\",\"target_commitish\":\"391fac16460f15233a7740550d858ac96df3419d\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/ggml-org/llama.cpp/releases/tag/v0.4.1",
+        "prerelease": false,
+        "published_at": "2026-09-14T18:27:29Z",
+        "tag_name": "v0.4.1",
+        "target_commitish": "391fac16460f15233a7740550d858ac96df3419d"
+      },
+      "original_stdout_sha256": "c768355990df967e25b06207e05e08ebb1d481e642908722a93af8d451ce4576",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "jcodemunch-mcp",
+      "selected_pin": "1.108.319",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/jgravelle/jcodemunch-mcp/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:52.497811+00:00",
+        "completed_at": "2026-09-21T13:30:52.805437+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319\",\"prerelease\":false,\"published_at\":\"2026-09-16T14:04:32Z\",\"tag_name\":\"v1.108.319\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "prerelease": false,
+        "published_at": "2026-09-16T14:04:32Z",
+        "tag_name": "v1.108.319",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "852d61b518dccde78d4d5310756c25b7d48f1908fd67e7d733c53accc4b9e5df",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "nextjs",
+      "selected_pin": "16.3.5",
+      "repository": "https://github.com/vercel/next.js",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/vercel/next.js/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:52.508623+00:00",
+        "completed_at": "2026-09-21T13:30:52.846168+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/vercel/next.js/releases/tag/v16.3.5\",\"prerelease\":false,\"published_at\":\"2026-09-11T19:15:50Z\",\"tag_name\":\"v16.3.5\",\"target_commitish\":\"canary\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/vercel/next.js/releases/tag/v16.3.5",
+        "prerelease": false,
+        "published_at": "2026-09-11T19:15:50Z",
+        "tag_name": "v16.3.5",
+        "target_commitish": "canary"
+      },
+      "original_stdout_sha256": "abc4d0006529750a98cea2c46f3ebe353effca7a01a3091f529105a59a0a2151",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "react",
+      "selected_pin": "19.3.0",
+      "repository": "https://github.com/react/react",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/react/react/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:52.586499+00:00",
+        "completed_at": "2026-09-21T13:30:52.934601+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/react/react/releases/tag/v19.3.0\",\"prerelease\":false,\"published_at\":\"2026-09-09T18:01:33Z\",\"tag_name\":\"v19.3.0\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/react/react/releases/tag/v19.3.0",
+        "prerelease": false,
+        "published_at": "2026-09-09T18:01:33Z",
+        "tag_name": "v19.3.0",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "ef3aa85803d918c4674dd2f42876b253f591efc547090765299a3fead3dc4786",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "fastapi",
+      "selected_pin": "0.141.1",
+      "repository": "https://github.com/fastapi/fastapi",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/fastapi/fastapi/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:52.805928+00:00",
+        "completed_at": "2026-09-21T13:30:53.105169+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/fastapi/fastapi/releases/tag/0.141.1\",\"prerelease\":false,\"published_at\":\"2026-07-29T17:17:26Z\",\"tag_name\":\"0.141.1\",\"target_commitish\":\"95f8322ee1dcda7ceace7b1c4f6c9915b36d748f\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/fastapi/fastapi/releases/tag/0.141.1",
+        "prerelease": false,
+        "published_at": "2026-07-29T17:17:26Z",
+        "tag_name": "0.141.1",
+        "target_commitish": "95f8322ee1dcda7ceace7b1c4f6c9915b36d748f"
+      },
+      "original_stdout_sha256": "6f107f6efc62461df875ca0c967dcced108eed705d1637759bcb79acd32ab178",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "postgresql",
+      "selected_pin": "18.6",
+      "repository": "https://github.com/postgres/postgres",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/postgres/postgres/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:52.818900+00:00",
+        "completed_at": "2026-09-21T13:30:53.209232+00:00",
+        "exit_code": 1,
+        "error": null,
+        "stdout_text": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}",
+        "stderr_text": "gh: Not Found (HTTP 404)\n"
+      },
+      "status": "upstream latest-release request failed; failure retained, pin unchanged",
+      "original_stdout_sha256": "d9e37600354c1839f6b22cebde497e9d14750d2401a06c9a51b1619baf991613",
+      "original_stderr_sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+    },
+    {
+      "component": "poppler",
+      "selected_pin": "26.09.0",
+      "repository": "https://github.com/tsdgeos/poppler_mirror",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/tsdgeos/poppler_mirror/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:52.846612+00:00",
+        "completed_at": "2026-09-21T13:30:53.232010+00:00",
+        "exit_code": 1,
+        "error": null,
+        "stdout_text": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}",
+        "stderr_text": "gh: Not Found (HTTP 404)\n"
+      },
+      "status": "upstream latest-release request failed; failure retained, pin unchanged",
+      "original_stdout_sha256": "d9e37600354c1839f6b22cebde497e9d14750d2401a06c9a51b1619baf991613",
+      "original_stderr_sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+    },
+    {
+      "component": "apple-container",
+      "selected_pin": "1.4.1",
+      "repository": "https://github.com/apple/container",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/apple/container/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:52.935302+00:00",
+        "completed_at": "2026-09-21T13:30:53.325191+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/apple/container/releases/tag/1.4.1\",\"prerelease\":false,\"published_at\":\"2026-09-09T01:28:43Z\",\"tag_name\":\"1.4.1\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/apple/container/releases/tag/1.4.1",
+        "prerelease": false,
+        "published_at": "2026-09-09T01:28:43Z",
+        "tag_name": "1.4.1",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "c9673c7e703aac214e09dbda51d2b753e50c04c3cd4e8936e0b10b44739470c8",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "playwright-test",
+      "selected_pin": "1.63.0",
+      "repository": "https://github.com/microsoft/playwright",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/microsoft/playwright/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:53.105583+00:00",
+        "completed_at": "2026-09-21T13:30:53.488035+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/microsoft/playwright/releases/tag/v1.63.0\",\"prerelease\":false,\"published_at\":\"2026-09-04T22:40:31Z\",\"tag_name\":\"v1.63.0\",\"target_commitish\":\"release-1.63\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/microsoft/playwright/releases/tag/v1.63.0",
+        "prerelease": false,
+        "published_at": "2026-09-04T22:40:31Z",
+        "tag_name": "v1.63.0",
+        "target_commitish": "release-1.63"
+      },
+      "original_stdout_sha256": "5b6cd5c78dcc9a9dd6b01cbe85eff8c741cea05361bc8a987f6661e8c00ab885",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "omniroute",
+      "selected_pin": "3.8.50",
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/diegosouzapw/OmniRoute/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:53.209660+00:00",
+        "completed_at": "2026-09-21T13:30:53.545853+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50\",\"prerelease\":false,\"published_at\":\"2026-08-26T19:30:30Z\",\"tag_name\":\"v3.8.50\",\"target_commitish\":\"main\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",
+        "prerelease": false,
+        "published_at": "2026-08-26T19:30:30Z",
+        "tag_name": "v3.8.50",
+        "target_commitish": "main"
+      },
+      "original_stdout_sha256": "c6d255b62ad5efaaf76aac246e7cd7eac25a6fe1c13329b6cdb34db2af9169d7",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "component": "tavily-cli",
+      "selected_pin": "0.1.8",
+      "repository": "https://github.com/tavily-ai/tavily-cli",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/tavily-ai/tavily-cli/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:53.232492+00:00",
+        "completed_at": "2026-09-21T13:30:53.625918+00:00",
+        "exit_code": 1,
+        "error": null,
+        "stdout_text": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/releases/releases#get-the-latest-release\",\"status\":\"404\"}",
+        "stderr_text": "gh: Not Found (HTTP 404)\n"
+      },
+      "status": "upstream latest-release request failed; failure retained, pin unchanged",
+      "original_stdout_sha256": "d9e37600354c1839f6b22cebde497e9d14750d2401a06c9a51b1619baf991613",
+      "original_stderr_sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6"
+    },
+    {
+      "component": "nautilus-trader",
+      "selected_pin": "2.0.0rc5",
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "native_command": {
+        "argv": [
+          "gh",
+          "api",
+          "repos/nautechsystems/nautilus_trader/releases/latest",
+          "--jq",
+          "{tag_name, published_at, html_url, target_commitish, prerelease}"
+        ],
+        "cwd": "${CATALOG_ROOT}",
+        "started_at": "2026-09-21T13:30:53.325663+00:00",
+        "completed_at": "2026-09-21T13:30:53.747948+00:00",
+        "exit_code": 0,
+        "error": null,
+        "stdout_text": "{\"html_url\":\"https://github.com/nautechsystems/nautilus_trader/releases/tag/v1.231.0\",\"prerelease\":false,\"published_at\":\"2026-08-02T18:53:49Z\",\"tag_name\":\"v1.231.0\",\"target_commitish\":\"develop\"}\n",
+        "stderr_text": ""
+      },
+      "status": "release metadata only; not installation or capability acceptance",
+      "returned": {
+        "html_url": "https://github.com/nautechsystems/nautilus_trader/releases/tag/v1.231.0",
+        "prerelease": false,
+        "published_at": "2026-08-02T18:53:49Z",
+        "tag_name": "v1.231.0",
+        "target_commitish": "develop"
+      },
+      "original_stdout_sha256": "a2bd6d2431b2f289a12acbbf4615f1654796fccfaf0a29a771331f081893c538",
+      "original_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

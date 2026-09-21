@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "id": "full-stack-convergence-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "agent-browser",
+    "agentsview",
+    "ai-memory",
+    "ccusage",
+    "claude-code",
+    "codex",
+    "context-mode",
+    "dagu",
+    "grafana",
+    "headroom",
+    "huggingface-hub-native",
+    "jcodemunch-mcp",
+    "loki",
+    "omniroute",
+    "openresearch",
+    "prometheus",
+    "qdrant",
+    "qmd",
+    "repomix",
+    "rtk",
+    "serena",
+    "socraticode",
+    "toon",
+    "vllm",
+    "worktrunk"
+  ],
+  "recorded_at_utc": "2026-09-21T14:06:54.798763+00:00",
+  "claim": "Native Codex and Claude returned the five-step scoped retrieval task in this session; original streams and usage were independently reviewed. Populated upstream dashboards, current release-query results and hash-bound screenshots are embedded in both evidence presentations. Qualified tool upgrades preserve rollback and explicit upstream test limits.",
+  "limitations": [
+    "Selected host/task acceptance, not universal SOTA saturation, all 68 components executed today, production hosting, physical power-loss recovery or another-PC acceptance.",
+    "Fresh child tasks consumed 255335 Codex and 250492 Claude tokens; no matched baseline. Cache/reasoning subsets are not added twice. Coordinator/other workers are outside those child totals.",
+    "Context Mode direct narratives mix scopes; retained event/byte estimates and stale source snapshots are not exact net provider lifetime savings. RTK snapshots overlap; zero Headroom events is distinct from offline artifact measurements.",
+    "Dashboard screenshots are native UI observations. Grafana panels/static hosting/reporters are local integration code; no new jobs/notifications/gateway inference were manufactured to fill dashboards.",
+    "Release queries are metadata only. Five 404 responses remain; distro/development/prerelease and incompatible pins are retained with source-specific reasons.",
+    "Package source tests are unchanged selected upstream suites; npm release integrity does not prove reproducible source-to-binary attestation. Rust suites unavailable where noted.",
+    "Public projections omit private identifiers/paths, setup discovery contents and memory result bodies; originals and hashes remain private. Screenshots exclude private archive titles.",
+    "Older fixed-order provider comparison reduced Codex usage but increased Claude usage. Broad compact JSON outperformed TOON; counterexamples remain visible."
+  ],
+  "public_artifacts": [
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/agentsview-aggregate-safe.png",
+      "bytes": 40878,
+      "sha256": "08007354ff3878d7f60c936334fd9728d2fe3efbdbd76c578be34785667362a6"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/ai-memory-projects.png",
+      "bytes": 57173,
+      "sha256": "1ce6f62686df076595f916b9bbecc8575cdf15dbf81192228cd1a70d1de621d9"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/catalog-browser-results.json",
+      "bytes": 6960,
+      "sha256": "4df1ccdc11cc32dce2c703712fa1c350b8908a0deb631efb31a3b0614e0c2ad0"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/ccusage-repomix-upgrades.json",
+      "bytes": 12513,
+      "sha256": "6e97a17039da9f95ae5c56adf98efd7cca4e8157e59dbfe8647b222e42f033a1"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/component-coverage.json",
+      "bytes": 190933,
+      "sha256": "95a472f153a1b698cbf53ca8f1113bd5eb64eb5f9f8b4e1c8e7a303b95fb61ea"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/dagu-retained-runs-full.png",
+      "bytes": 133973,
+      "sha256": "d1c2bbf48c99c6e0ec8262dadbdfb568d0fd837df6290366e5fc4899deb2dff4"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/dashboard-results.json",
+      "bytes": 28575,
+      "sha256": "69afa364bd9e958c7153b14f81bf1d3beab918293f8a3abdf6b113e011c94b51"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/embedding-result.json",
+      "bytes": 1453,
+      "sha256": "42a2652dc531748a9ce708b10938a03927c42b4734fc8f50b36cc95dccb2994c"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/grafana-memory-model.png",
+      "bytes": 27557,
+      "sha256": "27163cd1d873b1aeec95a17ae0dfc58c65f77ac9443c0f4624607e9f335a7e9c"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/grafana-native-foundation.png",
+      "bytes": 91423,
+      "sha256": "3b3185e00ae0cb826b2096bf1028a30a7f4c647d30d074b682ea3e6959c1d907"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/grafana-token-scopes-1331utc.png",
+      "bytes": 92609,
+      "sha256": "1be8c00f336a56ff36f896a060caaf9224f6a753c7c5ca9af31f71ce11147b9c"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/hud-observation.json",
+      "bytes": 3382,
+      "sha256": "af99e7ff087428e1339d375307bfc7e4f7b31dd5bc8f89fef4d1fad38e13eac9"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/independent-review.md",
+      "bytes": 5343,
+      "sha256": "cc7aa091c64b3ed09bd5ee9772c976d30aed08df1f688e3deff49863605991ea"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/local-validation.json",
+      "bytes": 8621,
+      "sha256": "44cf744e40840ff98aab8f9fecdf14395dacf84e5b7cc5bd60fe9ff6b285dc7f"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/native-client-results.json",
+      "bytes": 50965,
+      "sha256": "f90048738bee9dc9f488687690c4c549e004b74349e056100f52a37ac5ecfa1d"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/native-token-counters.json",
+      "bytes": 32905,
+      "sha256": "ce6fe8d2ee9bd8ba6494ee3b862e319279f3040436a147896b8672be5cd0176f"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/native-token-workflow.json",
+      "bytes": 32668,
+      "sha256": "be4221ac44fdd53bc87aae7cb6c82204594af60b3a5a5cfc324576c035b206b1"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/omniroute-compression-zero.png",
+      "bytes": 88427,
+      "sha256": "d140601fd3d07c230db5fd68dfe65f908f829a4e493677f796c18b6a87ded8ad"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/omniroute-usage.png",
+      "bytes": 92884,
+      "sha256": "8f412255d2f433b3aa0691b5afe8cb2a67845c183b373f567192c6ed9d93c827"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-returned-outputs.json",
+      "bytes": 24123,
+      "sha256": "e27b977bb83ac9bb664e9bb919e870cec18661f1b9460d7497224bef4ae76010"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/orx-worktrunk-upgrades.json",
+      "bytes": 9576,
+      "sha256": "9217999f07182fb0de10fe56f5a21a472d740944c6da31750f524d7c58f86c78"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/projection-review.json",
+      "bytes": 46209,
+      "sha256": "62e5656b8ba2f6591c652116985ee60bdfee61fa36e14d1880977e7b28225cdb"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/qdrant-collections-full.png",
+      "bytes": 92106,
+      "sha256": "975f13f3eb87e0cbd213b67e2db9a33af9275fab48c2f20e0c9948cdd3c2b866"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/report-browser-results.json",
+      "bytes": 11447,
+      "sha256": "2f080aaed2d5f3c3f9468c7a16d70137d104c620fe7fb7f8b7f3cb8ebc1f8868"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/security-review.json",
+      "bytes": 4432,
+      "sha256": "bccee6e996f4397b64b63065bb2f0ece6debc46e8b4452e4a4ecb2ae381db70b"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/selected-upstream-releases.json",
+      "bytes": 93856,
+      "sha256": "f0c1203fcf8028bb28818142c4f8b650fac599cdce41eed877b110662bfde8c5"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/socraticode-upstream-graph.png",
+      "bytes": 67235,
+      "sha256": "9ed796d516c0d11085d67b58f46a117148d8be83e211d7370250cbc9d2ae5923"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/upgrade-independent-review.json",
+      "bytes": 16552,
+      "sha256": "a0fd71e4b1f40dc4bd51e4285a50fcb19529ebdbe5303e9ce07b17204aad0dbd"
+    },
+    {
+      "path": "evidence/artifacts/full-stack-convergence-20260921/upgrade-returned-outputs.json",
+      "bytes": 17118,
+      "sha256": "976c73ba79529f4636cabb5866955784230764d323c1c8a74fbe56ad4b616b4c"
+    }
+  ],
+  "upstream_sources": [
+    "https://learn.chatgpt.com/docs/codex/cli",
+    "https://code.claude.com/docs/en/headless",
+    "https://github.com/mksglu/context-mode",
+    "https://github.com/rtk-ai/rtk",
+    "https://github.com/ccusage/ccusage/releases/tag/v20.0.24",
+    "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
+    "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.7",
+    "https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0"
+  ],
+  "new_installed_pins": {
+    "ccusage": {
+      "version": "20.0.24",
+      "source_commit": "ecb676cce27cb5dd0090c7804a5cecc35e8ba805",
+      "release_url": "https://github.com/ccusage/ccusage/releases/tag/v20.0.24"
+    },
+    "repomix": {
+      "version": "1.18.1",
+      "source_commit": "80b4280a9196feace092fc672dfe2b5fac62ef08",
+      "release_url": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1"
+    },
+    "openresearch": {
+      "version": "0.2.7",
+      "source_commit": "24e404ecbe19cb9184ea8177e8e9f90d4f3205b0",
+      "release_url": "https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.7"
+    },
+    "worktrunk": {
+      "version": "0.79.0",
+      "source_commit": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+      "release_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0"
+    }
+  },
+  "independent_review": "evidence/artifacts/full-stack-convergence-20260921/independent-review.md",
+  "retained_lifecycle_boundaries": [
+    "blueprints/convergence-practice/worker-recovery/native-exact-read-receipt.json",
+    "evidence/receipts/native-service-reboot-20260920.json",
+    "evidence/receipts/native-offhost-app-state-20260920.json"
+  ]
+}

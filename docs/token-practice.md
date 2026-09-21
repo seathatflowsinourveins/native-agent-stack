@@ -2,7 +2,9 @@
 
 For a new PC or a separate local ledger, use the [portable upstream counter collector](../tools/token-report/README.md). It produces local JSON/HTML reports, retains failed refreshes and never adds overlapping lifetime snapshots.
 
-Recorded September 20, 2026. Read this guide on demand when selecting a context
+Updated September 21, 2026. The [current full-stack convergence](full-stack-convergence.md)
+attaches native results, dashboard screenshots and complete component coverage.
+Read this guide on demand when selecting a context
 lane, interpreting native counters, or designing a measured comparison.
 
 The [foundation setup and evidence](foundation-stack.md) adds the repaired
@@ -10,11 +12,11 @@ Python/JavaScript retrieval configuration, fresh native client checks and the
 optional pinned OmniRoute install. It includes the exact returned counters,
 failed comparisons and bounded telemetry-readiness method for future hosts.
 
-The current selection has **66 component records**. The broader catalog has
-**512 repository identities: 342 public stars and 170 beyond stars, with 1,065
+The current selection has **68 component records**. The broader catalog has
+**513 repository identities: 342 public stars and 171 beyond stars, with 1,072
 typed references**. The earlier audit retains its 52-component scope, and the
 full-catalog TOON receipt retains the 502-repository input actually measured.
-These are bounded catalog counts, not a universal ranking, 66 successful full
+These are bounded catalog counts, not a universal ranking, 68 successful full
 E2E runs, or savings from every repository. Supporting runtimes and historical
 alternative installations retain separate scope.
 
