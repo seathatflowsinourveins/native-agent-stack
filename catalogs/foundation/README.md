@@ -6,9 +6,17 @@ Start with the layer needed for the task in [manifest.json](manifest.json), then
 read its scoped capability decision in [decisions.json](decisions.json). A default
 is a selected way to do a task, not permission to install or activate every tool.
 
-The catalog references 61 selected components through 44 capability decisions. Its
+The catalog references 61 selected components through 46 capability decisions. Its
 registered evidence references are listed per capability. These are coverage counts, not a
 score of complete installation, execution or lifecycle acceptance.
+
+The [operator surface manifest](surfaces.json) maps every layer to its upstream
+dashboard, native terminal view or CLI, plus installation and lifecycle runbooks.
+The existing [Foundation explorer](../../docs/ecosystem/index.html#foundation)
+joins those surfaces with canonical repository pins and capability evidence.
+Links labelled **This PC** are dated loopback examples: they do not provision a
+service or establish installation on another machine. Hosted services, generated
+reports, retained exports and live upstream UIs keep their distinct scopes.
 
 The [September 20 community review](../../docs/community-native-practice.md)
 explains the selected ECC and Claude practice sources across all sixteen layers.
@@ -41,7 +49,7 @@ and original results remain in the canonical manifests linked below.
 | Recovery and portability | Restic, ai-memory, Qdrant, Dagu, systemd, native session continuation | [Lifecycle operations](../../adoption/lifecycle.md), [off-host application restore](../../blueprints/convergence-practice/offhost-app-state/README.md) |
 | Observation and inference | OpenTelemetry Collector/otel-tui, Prometheus, Grafana, Loki, Alertmanager, ntfy, AgentsView, ccusage; vLLM/llama.cpp | [Observation setup](../../observability/README.md), [native backends](../../observability/backends/README.md), [GPU compatibility evidence](../../blueprints/convergence-practice/gpu-inference/README.md) |
 
-The September 20 selected baseline has 40 accepted capabilities, three partial
+The September 21 selected baseline has 42 accepted capabilities, three partial
 optional capabilities and one source-review capability. Layer coverage overlaps:
 do not add per-layer counts. No required installation gap is declared in the
 current manifest. Interactive Claude sign-in/context/HUD, the outer companion

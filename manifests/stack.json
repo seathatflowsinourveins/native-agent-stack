@@ -42,6 +42,7 @@
         "agent-browser --config examples/agent-browser.json --namespace native-stack --session selected-owned-session open \"file://${PROJECT_ROOT}/fixtures/greeting.html\""
       ],
       "evidence_ids": [
+        "claude-foundation-finalization-20260921",
         "native-cli-gaps",
         "component-history",
         "desktop-cli-workflows",
@@ -187,6 +188,7 @@
         "claude -p --output-format stream-json --verbose --max-turns 14 < fixtures/native-gap-prompt.txt"
       ],
       "evidence_ids": [
+        "claude-foundation-finalization-20260921",
         "native-workflow-writing-comparison-20260921",
         "native-workflow-graceful-recovery-20260921",
         "portable-userspace-install-20260921",
@@ -285,6 +287,7 @@
         "codex exec -C \"${PROJECT_ROOT}\" --json - < fixtures/native-gap-prompt.txt"
       ],
       "evidence_ids": [
+        "claude-foundation-finalization-20260921",
         "portable-userspace-install-20260921",
         "native-context-memory",
         "native-memory",
@@ -742,7 +745,7 @@
     },
     {
       "id": "repomix",
-      "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.0",
+      "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1",
       "version": "1.18.1",
       "license": "MIT",
       "profile": "supporting",
@@ -751,6 +754,7 @@
         "repomix --include fixtures/records.json,fixtures/example.sh --output \"${OUTPUT_DIR}/repomix.xml\""
       ],
       "evidence_ids": [
+        "claude-foundation-finalization-20260921",
         "portable-userspace-install-20260921",
         "component-history",
         "portable-cli-artifacts",

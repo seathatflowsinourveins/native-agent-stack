@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "claude-foundation-finalization-20260921",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "claude-code",
+    "codex",
+    "agent-browser",
+    "repomix"
+  ],
+  "recorded_at_utc": "2026-09-21",
+  "claim": "Native Claude completed a packet-scoped readiness run after independently reviewed source-gate corrections; earlier rejected and incomplete runs remain visible. Native Codex configuration and sign-in were audited. Portable examples and the sixteen-layer repository/dashboard explorer are separately verified.",
+  "limitations": [
+    "Three optional capabilities retain their earlier partial acceptance; no new-host or physical-PC reboot qualification.",
+    "Application hosting evidence remains fixture-scoped; no paid hosting, public deployment, broker action or new account connection.",
+    "Native review model citation/count transcription errors are retained; the evidence gate was not relaxed to relabel them accepted.",
+    "Portable native roles omit host-specific MCP permissions; tests use stubbed model responses and stay distinct from native execution."
+  ],
+  "references": [
+    "docs/claude-foundation-finalization-20260921.md",
+    "catalogs/foundation/surfaces.json",
+    "examples/claude-native/workflows/README.md"
+  ],
+  "artifact_directory": "evidence/artifacts/claude-foundation-finalization-20260921",
+  "public_artifacts": [
+    {
+      "path": "evidence/artifacts/claude-foundation-finalization-20260921/qualification.json",
+      "bytes": 11469,
+      "sha256": "08792220e1f1888ecdc0e2af028d2619b646645be19e5588b0dec55da304ed77"
+    },
+    {
+      "path": "evidence/artifacts/claude-foundation-finalization-20260921/workers-desktop.png",
+      "bytes": 112234,
+      "sha256": "b1997d260f314c1802657145701d8fece709690590659b0d7db2752f81771293"
+    },
+    {
+      "path": "evidence/artifacts/claude-foundation-finalization-20260921/workers-mobile.png",
+      "bytes": 69436,
+      "sha256": "80c159e5889279a421ffee6458dbba0eb961c77bffc1acf482aebf4a571f2569"
+    }
+  ],
+  "exact_saved_tokens": null
+}
