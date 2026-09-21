@@ -2314,8 +2314,8 @@
     },
     {
       "path": "evidence/receipts/native-returned-results-20260921.json",
-      "sha256": "b5c040b078b614b62de7a2ea32fe9380ee9acc8053ea66b0628c1afa798e5bdc",
-      "bytes": 8592
+      "sha256": "2fda903207f5668362cf93da9f9dc7e83c27e2ec03e087752b7a88805ab1acee",
+      "bytes": 8633
     },
     {
       "path": "tools/token-report/returned_results.js",
@@ -5890,7 +5890,7 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "783c8cd484a18b2811a6946d69c99f3c8b3753b1e4ea99e0b5a0cb3d77223cd3",
+      "sha256": "294942adb7d663905e1307c3867d8e80c5ee5eb98328c9de9f34a9cf404f3331",
       "bytes": 4058565
     },
     {
@@ -5900,7 +5900,7 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "f7d26e145e296cf59950e8c21761c3e7757c6f57171bc36bc6a19b8971680d7f",
+      "sha256": "57616066879fd178125a8efdaf73778db4e18707b7b03b492f9e7a00f69bea53",
       "bytes": 32812
     },
     {
