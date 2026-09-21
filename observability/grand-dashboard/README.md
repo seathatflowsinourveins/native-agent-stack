@@ -77,7 +77,10 @@ No environment, credentials, account balances, user prompts, raw memory content,
 or provider transcripts are read. Evidence paths must stay within the repository.
 Only service and record kind are ingestion labels; entity/state fields are
 parsed at query time. A generation cap prevents a growing catalog from silently
-flooding telemetry. Changing the selected catalog scope requires review.
+flooding telemetry. The generation limit is 128 entities, including the native
+history summary and up to ten runs. Oversized and duplicate inventories fail
+before publication; no records are silently truncated. Changing the selected
+catalog scope requires review.
 
 ## Native acceptance and limits
 
@@ -104,6 +107,17 @@ Context Mode estimates have different accounting scopes. They are not summed
 into a claimed saving. Missing usage, prewarm, retries and outage loss remain
 explicit limits. This local dashboard does not establish exact-once financial
 audit, off-host recovery, paper execution or production trading readiness.
+
+The [September 21 capacity repair](capacity-recovery-20260921.json) retains an
+actual failure: the combined local foundation/paper inventory reached 81 unique
+entities and exceeded the former 80-entry cap. After the bounded increase, the
+existing native timer published all 81 entries with exit 0. An independent Loki
+query returned the complete same generation with no missing, extra or changed
+entities; the [exact returned HTTP body](capacity-loki-result.json) is retained.
+The 15 project tests include synthetic capacity/history fixtures and preserve
+rejection before HTTP/cache mutation. These tests are local integration evidence.
+This timer observation is separate from the daily Codex maintenance schedule and
+does not establish restart persistence or acceptance of the displayed work.
 
 Primary interfaces: [Loki push/query API](https://grafana.com/docs/loki/latest/reference/loki-http-api/),
 [LogQL metric queries](https://grafana.com/docs/loki/latest/query/metric_queries/),
