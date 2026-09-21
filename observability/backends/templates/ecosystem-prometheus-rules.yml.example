@@ -40,16 +40,16 @@ groups:
         annotations:
           summary: 'Local Collector health response is unexpected or missing'
           description: 'Expected 2xx at http://127.0.0.1:14333/; this checks transport/protection, not provider or job execution.'
-      - alert: EcosystemDaguAuthenticationHealthUnexpected
-        expr: '(max(ecosystem_httpcheck_status{http_url="http://127.0.0.1:18525/api/v1/dags",http_status_code="401"}) or vector(0)) < 1'
+      - alert: EcosystemDaguDashboardHealthUnexpected
+        expr: '(max(ecosystem_httpcheck_status{http_url="http://127.0.0.1:18525/api/v1/dags",http_status_code="200"}) or vector(0)) < 1'
         for: 2m
         labels:
           severity: warning
           scope: local-ecosystem
-          component: DaguAuthentication
+          component: DaguDashboard
         annotations:
-          summary: 'Local DaguAuthentication health response is unexpected or missing'
-          description: 'Expected 401 at http://127.0.0.1:18525/api/v1/dags; this checks transport/protection, not provider or job execution.'
+          summary: 'Local Dagu dashboard health response is unexpected or missing'
+          description: 'Expected 200 at the loopback passwordless Dagu API; DAG write/run permissions are checked separately. This is not provider or job execution evidence.'
       - alert: EcosystemAcceptanceTargetDown
         expr: up{job="acceptance-fixture"} == 0
         for: 10s

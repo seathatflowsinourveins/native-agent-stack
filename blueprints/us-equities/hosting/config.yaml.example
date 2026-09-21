@@ -15,10 +15,7 @@ env_passthrough:
   - NATIVE_RUNTIME_PATH
   - SDK_OBSERVATION_DIR
 auth:
-  mode: basic
-  basic:
-    username: local-research
-    password: REPLACE_WITH_A_PRIVATE_RANDOM_PASSWORD
+  mode: none
 permissions:
   write_dags: false
   run_dags: false

@@ -1,0 +1,8 @@
+http://127.0.0.1:18525/api/v1/dags	200	0
+http://127.0.0.1:13000/d/ecosystem-native/native-agent-ecosystem	200	0
+http://127.0.0.1:16333/dashboard	200	0
+http://127.0.0.1:17384/	200	0
+http://127.0.0.1:4848/	200	0
+http://127.0.0.1:19090/query	200	0
+http://127.0.0.1:18080/	200	0
+http://127.0.0.1:20128/dashboard	200	0

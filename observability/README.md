@@ -68,7 +68,10 @@ flowchart LR
   restart. Its native turn histogram was not observed, even with a bounded
   flush experiment. That historical gap is now resolved in the [fresh follow-up](session-e2e.md); the original receipt remains intact.
 - All seven configured scrape targets were up. Gateway/Collector probes returned
-  200; the unauthenticated Dagu API probe returned the expected 401.
+  200; the original unauthenticated Dagu API probe returned the then-expected 401.
+  The current passwordless loopback profile expects 200 without a Basic challenge;
+  its DAG run/write denials are checked separately. See the
+  [native dashboard access guide](../docs/native-dashboards.md).
 - Six checks passed across a controlled restart of the five new backends.
   Grafana checks establish provisioned views available after restart, not unique
   SQLite-only user-state durability.

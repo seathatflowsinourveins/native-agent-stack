@@ -1,0 +1,286 @@
+{
+  "schema_version": 1,
+  "id": "native-dashboard-access-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "dagu",
+    "qdrant",
+    "agentsview",
+    "grafana",
+    "prometheus",
+    "ntfy",
+    "agent-browser",
+    "omniroute"
+  ],
+  "recorded_at_utc": "2026-09-21T02:04:00Z",
+  "claim": "Passwordless loopback dashboard access was qualified with eight direct native HTTP responses and scoped browser checks. Dagu's recurring Basic challenge was removed using upstream auth.mode none; its DAG execution/wiki-write denials remained. The official Qdrant UI was installed and existing collections remained visible. AgentsView now uses a scoped user service. OmniRoute's supported dashboard-login setting was disabled while anonymous gateway requests remained rejected.",
+  "limitations": [
+    "Current-host dashboard/API integration acceptance, not a complete upstream test suite, provider inference, broker execution, performance comparison, or token-saving benchmark.",
+    "Dagu auth none and OmniRoute requireLogin false permit ordinary local administration. Dagu's DAG permission flags do not make all APIs read-only. Keep these profiles on loopback; remote access needs appropriate upstream authentication.",
+    "Qdrant collection-name equality and green statuses do not establish byte-identical storage. Qdrant's UI exposes the existing management API; it is not a read-only client.",
+    "AgentsView uses the existing explicit archive with no syncing/import. The initial unmanaged process disappeared; exact termination cause is unknown. The supervised replacement was verified after restart, not physical-PC reboot.",
+    "Native agent-browser default sessions rendered the selected pages. A prior allowed-domains profile broke Grafana relative URL resolution; separate late archive navigation timed out while its unmanaged server was absent. Both failures remain retained, and final supervised archive rendering passed.",
+    "Hosted Context Mode Insight was not enrolled, purchased, or connected to local telemetry. Its account authentication remains separate.",
+    "Selected upstream test sources informed permission probes; their Go test suites were identified but not executed in this dashboard configuration wave."
+  ],
+  "upstream_sources": {
+    "dagu": {
+      "version": "2.16.6",
+      "repository": "https://github.com/dagucloud/dagu",
+      "commit": "58fed633d58c1dd1319091fdb2c2f6158ecfa053"
+    },
+    "qdrant": {
+      "version": "1.19.1",
+      "repository": "https://github.com/qdrant/qdrant",
+      "commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de"
+    },
+    "qdrant_web_ui": {
+      "version": "0.2.18",
+      "repository": "https://github.com/qdrant/qdrant-web-ui",
+      "commit": "6f8536529934672a0d2631cfaa0d0779967922bc",
+      "archive": "dist-qdrant.zip",
+      "archive_bytes": 7189135,
+      "archive_sha256": "fdce24c04ec1627d2369cb8fe610ee06ad9236f82aad214aa7f294ac37372859",
+      "installed_asset_matches": 225,
+      "openapi_sha256": "eb3e5d71ba74e1d99124ca1a77d563bbfa47084f04a13ef9b197e339f5a4ce0a"
+    },
+    "omniroute": {
+      "version": "3.8.50",
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "commit": "5458026c216f77a3da68ea49152dc33470cfe2cb"
+    }
+  },
+  "dagu": {
+    "all_non_auth_config_fields_preserved": true,
+    "host": "127.0.0.1",
+    "port": 18525,
+    "auth_mode": "none",
+    "write_dags": false,
+    "run_dags": false,
+    "before": {
+      "status": 401,
+      "challenge": "Basic realm=\"restricted\""
+    },
+    "after": {
+      "status": 200,
+      "challenge": null
+    },
+    "native_requests": [
+      {
+        "command": "curl --include http://127.0.0.1:18525/api/v1/dags",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/dags/__dashboard_permission_probe_20260921__/start",
+        "json_body": {},
+        "status": 403
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/v1/wiki/page?path=__dashboard_permission_probe_20260921__",
+        "status": 403
+      }
+    ],
+    "probe_boundary": "Installed handlers check permission before resource lookup; both requests were rejected. Probe names were deliberately synthetic, not real work.",
+    "service_restart": {
+      "command": "systemctl --user restart dagu-equities.service",
+      "exit_code": 0
+    },
+    "observation": {
+      "native_collector_status_200_value": 1,
+      "alert": "EcosystemDaguDashboardHealthUnexpected",
+      "alert_state": "inactive",
+      "promtool_rules": 8,
+      "promtool_exit_code": 0
+    }
+  },
+  "qdrant": {
+    "only_static_content_settings_added": true,
+    "host": "127.0.0.1",
+    "port": 16333,
+    "before_dashboard_status": 404,
+    "after_dashboard_status": 200,
+    "same_collection_names": true,
+    "collection_count": 5,
+    "all_collections_green": true,
+    "browser_collection_rows": 5,
+    "service_restart_exit_code": 0
+  },
+  "agentsview": {
+    "version": "0.43.0",
+    "archive_scope": "existing explicitly adopted archive",
+    "no_sync": true,
+    "telemetry_enabled": false,
+    "service": "agentsview-archive.service",
+    "foreground_command": "agentsview serve --host 127.0.0.1 --port 17384 --no-sync --no-browser --no-update-check",
+    "enabled": true,
+    "active": true,
+    "restart_exit_code": 0,
+    "browser_before_and_after_restart": "no password fields/dialogs; application controls rendered"
+  },
+  "omniroute": {
+    "host": "127.0.0.1",
+    "port": 20128,
+    "requireLogin": false,
+    "settings_method": "POST /api/settings/require-login",
+    "settings_body": {
+      "requireLogin": false
+    },
+    "native_login_status": 200,
+    "settings_status": 200,
+    "readback_status": 200,
+    "dashboard_status": 200,
+    "dashboard_http_path": "/dashboard",
+    "dashboard_client_path": "/home",
+    "gateway_without_credentials": 401,
+    "gateway_invalid_key": 401,
+    "observer": "Local integration invokes native HTTP endpoints; existing password and returned cookie are kept only in process memory, omitted from output.",
+    "observer_binding": {
+      "bytes": 2972,
+      "sha256": "cf1485fd982fb60431feb3e1a3bd8466aedd05fd9358e98090be92de84a24fa5"
+    }
+  },
+  "http_capture": {
+    "command_template": "curl --silent --show-error --max-time 5 --location --output /dev/null --write-out '%{url_effective}\\t%{http_code}\\t%{exitcode}\\n' \"$dash_url\"",
+    "artifact": "evidence/artifacts/native-dashboard-access-20260921/dashboard-http-final.tsv",
+    "rows": 8,
+    "all_status_200": true,
+    "all_exit_zero": true
+  },
+  "browser_capture": {
+    "command_family": "agent-browser --session <owned-session> open|reload|eval|close",
+    "format": "Exact native eval stdout, including its JSON string encoding; parse outer JSON and then the inner JSON object.",
+    "retained_pages": [
+      "dagu",
+      "grafana",
+      "qdrant",
+      "omniroute",
+      "agentsview"
+    ],
+    "body_policy": "Only page titles, paths and structural UI counts; no transcript bodies, credentials or usage details."
+  },
+  "bindings": {
+    "public": {
+      "agentsview-browser-after-restart.json": {
+        "bytes": 90,
+        "sha256": "a369debe91b7dd52d41fc5b9b312c923d9b5f41838543c1937f0143160d83c24"
+      },
+      "agentsview-browser-supervised.json": {
+        "bytes": 90,
+        "sha256": "a369debe91b7dd52d41fc5b9b312c923d9b5f41838543c1937f0143160d83c24"
+      },
+      "dagu-browser.json": {
+        "bytes": 89,
+        "sha256": "10c9b64ad92ba94f6eea7cd937dd9165ca2310f28ca9e87680d070407534bb90"
+      },
+      "dashboard-http-final.tsv": {
+        "bytes": 314,
+        "sha256": "59665da4174466b1953a7fc210f0de2917c7b33b07ae48923631be9883991c57"
+      },
+      "dashboard-http.tsv": {
+        "bytes": 314,
+        "sha256": "59665da4174466b1953a7fc210f0de2917c7b33b07ae48923631be9883991c57"
+      },
+      "grafana-browser.json": {
+        "bytes": 138,
+        "sha256": "4f643bb67718dc220521d9e4588cbbb45e74bc902020660f125090368144e54f"
+      },
+      "omniroute-browser.json": {
+        "bytes": 141,
+        "sha256": "a2affe5409e937e81ac23ce003cd61b4d0547905f8e7d20131ad98bea779fd39"
+      },
+      "omniroute-passwordless.json": {
+        "bytes": 361,
+        "sha256": "d1275da768f8b612b3875fbbd5b289f49634bdc51a98286c67e2575c768d3f7b"
+      },
+      "qdrant-browser.json": {
+        "bytes": 109,
+        "sha256": "727c18e6a2fdd8d39bc06e59c8c4bb939a19fe037e5ed9e102d95fc7e3fe9034"
+      },
+      "agentsview-unit-state.txt": {
+        "bytes": 90,
+        "sha256": "4175f3d667953ac3877064ad30d036b0eb91ae2e217c9065e32f6ed3c540ccc7"
+      }
+    },
+    "private_headers": {
+      "dagu-before.headers": {
+        "bytes": 344,
+        "sha256": "96f153d17a957ac3abdea08234a721b770ccc743f88ac0af261e26e9d3fa46f3"
+      },
+      "dagu-after.headers": {
+        "bytes": 331,
+        "sha256": "e3ef02c37019d291863d20c3bfe6e2bfa097049bf30ec6debf977b5c29538ca4"
+      },
+      "dagu-run-denied.headers": {
+        "bytes": 330,
+        "sha256": "9336c393b9053d4f8399b548e3923617a7c4708931ff6fe5173ce2d8e3f3c424"
+      },
+      "dagu-write-denied.headers": {
+        "bytes": 330,
+        "sha256": "9336c393b9053d4f8399b548e3923617a7c4708931ff6fe5173ce2d8e3f3c424"
+      }
+    },
+    "upstream_source": {
+      "dagu-config.go": {
+        "bytes": 41124,
+        "sha256": "b22da631c2d0fc986dd0d2a7d83205e8a41c5b74771870edfd1eff9b86aacd8d"
+      },
+      "dagu-dags.go": {
+        "bytes": 64549,
+        "sha256": "6f6b3c00291cfa64edd098ca934c23b63efe5867490ae2ab9b7e79d5e1595f84"
+      },
+      "dagu-middleware.go": {
+        "bytes": 10715,
+        "sha256": "1485d87b862a01294b12cac9a02fe583e16c7db59b157479b52da9b037fcdc93"
+      },
+      "dagu-wiki.go": {
+        "bytes": 26191,
+        "sha256": "aa0219985057ad35f941410a9e3f49e42b743de42d16a7f8195f93298a00ee6a"
+      },
+      "dagu-workspace-access.go": {
+        "bytes": 11400,
+        "sha256": "da755e38ccbb397f2d057688fdff650f7d4b0f3443ba27194ecd97d8b30ed9f5"
+      },
+      "qdrant-sync-web-ui.sh": {
+        "bytes": 722,
+        "sha256": "b25d5f5428078cd8ff5bc86b496f6ed83c470177a46ce187fd8af75c6d91189b"
+      },
+      "qdrant-web-ui.rs": {
+        "bytes": 4541,
+        "sha256": "6caf9ba6d280e0bf79c5c83fecf1b74889fc0d925225babdbdbeb0b5122c2060"
+      }
+    },
+    "omniroute_observer": {
+      "bytes": 2972,
+      "sha256": "cf1485fd982fb60431feb3e1a3bd8466aedd05fd9358e98090be92de84a24fa5"
+    },
+    "private_observation": {
+      "prometheus-dagu-200.json": {
+        "bytes": 453,
+        "sha256": "b8aca9a7a164ade1ae7e5ec9efa280d5f9691d39b2d635beb6ee9b8234fbafce"
+      },
+      "promtool-rules.txt": {
+        "bytes": 110,
+        "sha256": "1103665be9d4eb256da6921ba649d472c73240d3245ddc37770ea426a53dfc64"
+      }
+    }
+  },
+  "model_requests": 0,
+  "provider_tokens_saved": null,
+  "references": [
+    "https://docs.dagu.sh/server-admin/configuration",
+    "https://qdrant.tech/documentation/web-ui/",
+    "https://github.com/qdrant/qdrant/blob/v1.19.1/tools/sync-web-ui.sh",
+    "https://github.com/diegosouzapw/OmniRoute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/src/app/api/settings/require-login/route.ts",
+    "https://github.com/kenn-io/agentsview",
+    "https://github.com/vercel-labs/agent-browser"
+  ],
+  "observation_provenance": {
+    "historical_service_commands": "Restart/enable exit codes are transcribed native exec tool results; their original empty stdout was not separately retained.",
+    "current_agentsview_command": "systemctl --user show agentsview-archive.service --property=ActiveState,SubState,UnitFileState,MainPID,ExecMainStatus",
+    "current_agentsview_artifact": "evidence/artifacts/native-dashboard-access-20260921/agentsview-unit-state.txt",
+    "prometheus_observation": "Fresh native curl query response and promtool output retained privately with hashes. The response reports Dagu HTTP200 value1.",
+    "browser_failure": "Additional native browser capture timeouts and the observed absence of the unmanaged AgentsView process are retained privately. The final supervised browser artifacts supersede that failed capture."
+  }
+}

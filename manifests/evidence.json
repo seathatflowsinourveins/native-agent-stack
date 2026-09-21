@@ -2,6 +2,31 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "native-dashboard-access-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "dagu",
+        "qdrant",
+        "agentsview",
+        "grafana",
+        "prometheus",
+        "ntfy",
+        "agent-browser",
+        "omniroute"
+      ],
+      "claim": "Passwordless loopback dashboard access was qualified with eight direct native HTTP responses and scoped browser checks. Dagu's recurring Basic challenge was removed using upstream auth.mode none; its DAG execution/wiki-write denials remained. The official Qdrant UI was installed and existing collections remained visible. AgentsView now uses a scoped user service. OmniRoute's supported dashboard-login setting was disabled while anonymous gateway requests remained rejected.",
+      "limitations": [
+        "Current-host dashboard/API integration acceptance, not a complete upstream test suite, provider inference, broker execution, performance comparison, or token-saving benchmark.",
+        "Dagu auth none and OmniRoute requireLogin false permit ordinary local administration. Dagu's DAG permission flags do not make all APIs read-only. Keep these profiles on loopback; remote access needs appropriate upstream authentication.",
+        "Qdrant collection-name equality and green statuses do not establish byte-identical storage. Qdrant's UI exposes the existing management API; it is not a read-only client.",
+        "AgentsView uses the existing explicit archive with no syncing/import. The initial unmanaged process disappeared; exact termination cause is unknown. The supervised replacement was verified after restart, not physical-PC reboot.",
+        "Native agent-browser default sessions rendered the selected pages. A prior allowed-domains profile broke Grafana relative URL resolution; separate late archive navigation timed out while its unmanaged server was absent. Both failures remain retained, and final supervised archive rendering passed.",
+        "Hosted Context Mode Insight was not enrolled, purchased, or connected to local telemetry. Its account authentication remains separate.",
+        "Selected upstream test sources informed permission probes; their Go test suites were identified but not executed in this dashboard configuration wave."
+      ],
+      "path": "evidence/receipts/native-dashboard-access-20260921.json"
+    },
+    {
       "id": "native-quality-defaults-20260920",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2081,6 +2106,71 @@
   ],
   "files": [
     {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/agentsview-unit-state.txt",
+      "sha256": "4175f3d667953ac3877064ad30d036b0eb91ae2e217c9065e32f6ed3c540ccc7",
+      "bytes": 90
+    },
+    {
+      "path": "docs/native-dashboards.md",
+      "sha256": "b90f6a5308b8b9449cd9ab97458b4d78fba233cc903a8cd42c71a35fba8a4098",
+      "bytes": 10728
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/agentsview-browser-after-restart.json",
+      "sha256": "a369debe91b7dd52d41fc5b9b312c923d9b5f41838543c1937f0143160d83c24",
+      "bytes": 90
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/agentsview-browser-supervised.json",
+      "sha256": "a369debe91b7dd52d41fc5b9b312c923d9b5f41838543c1937f0143160d83c24",
+      "bytes": 90
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/dagu-browser.json",
+      "sha256": "10c9b64ad92ba94f6eea7cd937dd9165ca2310f28ca9e87680d070407534bb90",
+      "bytes": 89
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/dashboard-http-final.tsv",
+      "sha256": "59665da4174466b1953a7fc210f0de2917c7b33b07ae48923631be9883991c57",
+      "bytes": 314
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/dashboard-http.tsv",
+      "sha256": "59665da4174466b1953a7fc210f0de2917c7b33b07ae48923631be9883991c57",
+      "bytes": 314
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/grafana-browser.json",
+      "sha256": "4f643bb67718dc220521d9e4588cbbb45e74bc902020660f125090368144e54f",
+      "bytes": 138
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/omniroute-browser.json",
+      "sha256": "a2affe5409e937e81ac23ce003cd61b4d0547905f8e7d20131ad98bea779fd39",
+      "bytes": 141
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/omniroute-passwordless.json",
+      "sha256": "d1275da768f8b612b3875fbbd5b289f49634bdc51a98286c67e2575c768d3f7b",
+      "bytes": 361
+    },
+    {
+      "path": "evidence/artifacts/native-dashboard-access-20260921/qdrant-browser.json",
+      "sha256": "727c18e6a2fdd8d39bc06e59c8c4bb939a19fe037e5ed9e102d95fc7e3fe9034",
+      "bytes": 109
+    },
+    {
+      "path": "evidence/receipts/native-dashboard-access-20260921.json",
+      "sha256": "e58cf7ec6498f1ca06c6a2d526f5db300d344366dd432aff3827f86d18fc315e",
+      "bytes": 12089
+    },
+    {
+      "path": "examples/agentsview-archive.service.example",
+      "sha256": "eb4ce1a6eb14cd739f47b0381e12478d5519d348ad4e06a409eb861d7167f16b",
+      "bytes": 574
+    },
+    {
       "path": "evidence/artifacts/native-quality-defaults-20260920/codex-effective.json",
       "sha256": "609255c3478fa016245e1c9657aa7a3b4712e0abcc90b3e3fb4615b74d45fae7",
       "bytes": 387
@@ -2172,8 +2262,8 @@
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "4fb5c6306a82e09f5d9bbc776839b8b470faa05938e8bfd8aec87d4664f86d64",
-      "bytes": 13654
+      "sha256": "de5995729ac76279038fc3ee496e8b6248a7fb07edc2542e4e34596d99369963",
+      "bytes": 13875
     },
     {
       "path": ".gitattributes",
@@ -4338,8 +4428,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/README.md",
-      "sha256": "a851df2da74345fe34717d7c5f74f805d236bbbb1893e9c25a61db8642ab3811",
-      "bytes": 4549
+      "sha256": "7e831fd731249aae2f92b5606d3449ecf3c464cf71f2f6274894a0190f225153",
+      "bytes": 5256
     },
     {
       "path": "blueprints/us-equities/hosting/backup/README.md",
@@ -4368,8 +4458,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/config.yaml.example",
-      "sha256": "506681517d291447a0500bac6478616d7adc78aadab570a2c146cbd5adcac62b",
-      "bytes": 461
+      "sha256": "e411b4c53b531f4c1f44efd0d8c597b5229972bd163f3ba179a29daed4c14d9f",
+      "bytes": 369
     },
     {
       "path": "blueprints/us-equities/hosting/dagu-equities.service.example",
@@ -5278,8 +5368,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "75846b5f38b72448a8deec1c22622149c20916f534a20202ffe6a3138983da6c",
-      "bytes": 3802604
+      "sha256": "3d2d49735994b2edba66f58d3de6619bb97be1cf44477a4b4d5504274218ba86",
+      "bytes": 3803771
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5798,8 +5888,8 @@
     },
     {
       "path": "observability/README.md",
-      "sha256": "ac57328e88dd7ee63afc497b7b453bcaf00ebefd95f63907cfee9c830d271554",
-      "bytes": 14522
+      "sha256": "29bb61f67614f52e9759b958bb35556f34fe4ef5ad49f0fd7e1d30a525e90646",
+      "bytes": 14744
     },
     {
       "path": "observability/backends/README.md",
@@ -5838,8 +5928,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-dashboard.json.example",
-      "sha256": "2ef932ec6a2093a7623a742d758427cff460bc326a1275cc5368e3e9372775d5",
-      "bytes": 9845
+      "sha256": "7e5f4366298eba285c71973e82580ee02de3d35d087ffe1f90db6fdffb7c47eb",
+      "bytes": 9851
     },
     {
       "path": "observability/backends/templates/ecosystem-grafana-dashboards.yml.example",
@@ -5868,8 +5958,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus-rules.yml.example",
-      "sha256": "332e9cdcf787f25a55e312c196041667d41e1db4da42c0fd49ff53e0a73c5214",
-      "bytes": 3815
+      "sha256": "4927e3b754d8dd228e9b0710988af00e1cc6dcb7f058c7875bc15d5bdc1fa0ce",
+      "bytes": 3834
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus.yml.example",
