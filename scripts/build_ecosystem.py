@@ -45,6 +45,7 @@ TOKEN_RECEIPT_FAMILIES = {
 RETURNED_RECEIPT_FAMILIES = {
     "native-returned-results", "native-memory-rag-alignment", "hf-memory-models",
     "native-dashboard-data", "native-dashboard-access", "full-stack-convergence",
+    "dashboard-render-e2e", "dashboard-gap-resolution",
 }
 PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
 PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024

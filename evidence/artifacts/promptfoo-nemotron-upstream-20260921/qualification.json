@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "scope": "Native Promptfoo integration of NVIDIA's published four-query retrieval example against an existing local vLLM endpoint",
+  "classification": "Upstream NVIDIA example execution with endpoint-only substitution; local source-derived Promptfoo ranking assertion and browser integration checks",
+  "upstream": {
+    "promptfoo_version": "0.123.1",
+    "promptfoo_revision": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "model": "nvidia/Nemotron-3-Embed-1B-BF16",
+    "model_revision": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
+    "example_section": "Recommended Retrieval Endpoint",
+    "original_example_sha256": "09df5e6a97308b18b576f6ab29e8c652ee67a81b5ecc9390f00219edc8d3aa32",
+    "executed_example_sha256": "c4b486325725ae865f00a0b67e254795b3390ba14002e9589b46270565864d1f",
+    "source_matches_with_endpoint_only_change": true,
+    "endpoint_substitution": {
+      "from": "http://localhost:8000/v2/embed",
+      "to": "http://127.0.0.1:8231/v2/embed"
+    }
+  },
+  "execution": {
+    "command": "promptfoo eval -c promptfooconfig.yaml --no-cache -j 1 -o results.json report.html",
+    "provider": "exec:python upstream-example.py",
+    "python_environment": "Existing vLLM 0.25.0 environment with NumPy and requests",
+    "started_at": "2026-09-21T13:39:14.116299+00:00",
+    "completed_at": "2026-09-21T13:39:25.606630+00:00",
+    "exit_code": 0,
+    "cache_enabled": false,
+    "max_concurrency": 1,
+    "eval_id": "eval-H2V-2026-09-21T13:39:25",
+    "config_sha256": "07c64ff592209af4ac973d0cadf3bb69099cbf3ab79f89e5129f182c93a32df2",
+    "stdout_sha256": "7f648c4b3677bb818c8b119aec17c4b821c967233132c8e6d4f02b47f8e074d7",
+    "stderr_sha256": "79a78e527eca6d243092cf8a3830a0baf02472cad501483baa19f51aa1f21117"
+  },
+  "result": {
+    "promptfoo_cases_passed": 1,
+    "promptfoo_cases_failed": 0,
+    "promptfoo_errors": 0,
+    "upstream_queries": 4,
+    "upstream_documents": 4,
+    "unique_top_documents": [0, 1, 2, 3],
+    "ranked_paired_document_first": 4,
+    "direct_provider_token_usage": null,
+    "direct_provider_cost": null,
+    "usage_status": "Unreported by upstream script; Promptfoo zero placeholders do not establish zero usage or zero cost",
+    "lifetime_savings": null
+  },
+  "independent_observation": {
+    "method": "Native vLLM metrics snapshots bracketing the eval command",
+    "before_at": "2026-09-21T13:39:14.116054+00:00",
+    "after_at": "2026-09-21T13:39:25.614748+00:00",
+    "before_sha256": "57e17cf03c44053807bc57fbfc539b14f9034e33674759735ebe891210a5c04d",
+    "after_sha256": "96417c4e2225923021ab5487129c4c3ed1a13f0af21e5e00a89353da8b7e728a",
+    "model_prompt_token_counter_delta": 336,
+    "model_completed_sequence_counter_delta": 8,
+    "scope": "Model-specific observation window, consistent with eight texts in two HTTP batches; not exclusive per-eval attribution or savings"
+  },
+  "browser": {
+    "url": "http://127.0.0.1:17500/promptfoo.html",
+    "native_export_bytes_equal_served_bytes": true,
+    "result_matrix_rendered": true,
+    "detail_opened": true,
+    "usage_unknown_label_rendered": true,
+    "failure_filter_hides_passing_result": true,
+    "search_returns_matrix": true,
+    "screenshot_viewed": true,
+    "screenshot": "native-report-detail-final.png",
+    "screenshot_sha256": "1e1af0033a7ccd52f00dec0569a2a0d80661e84710bca8a074aa93d1d24523b3"
+  },
+  "artifacts": {
+    "results.public.json": "16e5ad1e1590ccef9ed6c73d5ab39f494620bdef7213bb3bcddbf316f99e01b7",
+    "report.html": "01ac2f6b4a28727729ba4a84ca96ced13ff74e2287d848e7b89789d0af11f088"
+  },
+  "private_native_json": {
+    "filename": "results.json",
+    "sha256": "6388260f116cd8c2483e678d1688fcf4eb98390e2b173c7cbdbfb3993e980a7e",
+    "public_projection": "Only the local Promptfoo result UUID was replaced with promptfoo-local-result-1 to meet repository publication policy. Provider output, grading, native metadata and usage placeholders are unchanged."
+  },
+  "recovery": {
+    "prior_served_report_preserved_privately": true,
+    "prior_served_report_sha256": "072260edaf43bc5e4738169169ee184a04220f93351f8ddb2aa87635c705c3d8",
+    "first_successful_run_preserved_privately": true,
+    "rerun_reason": "Report detail originally displayed upstream zero usage placeholders without an adjacent explanation; added explicit unknown-usage text to the native test description and reran",
+    "browser_harness_failures": "Retained stale-ref error and an incorrect row-count text expectation; recovered using fresh native refs and observed result visibility"
+  },
+  "limitations": [
+    "This is the four-query upstream example, not MTEB, held-out retrieval qualification, or a production workload benchmark.",
+    "The JavaScript assertion is locally authored from NVIDIA's published query/document pairings and checks rounded printed values.",
+    "The upstream program and native HTML export are unchanged apart from the program's endpoint substitution; the Promptfoo configuration is local integration.",
+    "The report is an official static HTML export captured at the recorded time, not a continuously refreshed Promptfoo server."
+  ]
+}

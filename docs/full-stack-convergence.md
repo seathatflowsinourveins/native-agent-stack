@@ -75,7 +75,10 @@ identify the source host, not a service on every PC.
 
 - ai-memory: native project counts, a ten-hit FTS search and an opened article.
   Public captures exclude page bodies/session titles. MiniLM384 has no missing
-  latest-page embeddings; LLM consolidation is disabled.
+  latest-page embeddings in this wave's capture; LLM consolidation was disabled
+  at that capture time. The subsequently merged [native consolidation
+  qualification](native-memory-consolidation.md) enables the existing native
+  provider and verifies persistence/readback for actual Claude and Codex sessions.
 - Qdrant: five green collections; 225 points in the selected code collection.
 - SocratiCode: upstream generated snapshot with 29 files, five edges, 266 symbols
   and 323 calls. It is not a live graph refresh.
@@ -86,6 +89,13 @@ identify the source host, not a service on every PC.
 - AgentsView: selected archive aggregates; session titles and bodies stay private.
 - OmniRoute: 57.7K retained tokens across 31 gateway requests are usage. Token
   Saver is off with zero savings. Native clients keep their independent routes.
+
+The [later dashboard resolution](dashboard-gap-resolution.md) adds current native
+memory consolidation, archive refresh, passwordless gateway dashboard access,
+real Claude telemetry, corrected ntfy templates and NVIDIA's upstream retrieval
+example through Promptfoo. Its dated receipts complement these captures; neither
+set changes older failed attempts into successful ones. Use those latest recipes
+when adopting the affected capabilities on another PC.
 
 Active vLLM serves NVIDIA **Nemotron-3-Embed-1B-BF16**, revision
 `c0c9fea93ea424587517f2c59e20db9f1d6bf615`. Actual inference returned 2,048 finite

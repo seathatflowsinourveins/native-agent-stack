@@ -1,0 +1,23 @@
+# Local override of ntfy v2.28.0 server/templates/alertmanager.yml.
+# Native template-dir support loads this file on each webhook; no bridge process.
+title: |
+  {{- if eq .status "firing" }}
+  🚨 Alert: {{ (first .alerts).labels.alertname }}
+  {{- else if eq .status "resolved" }}
+  ✅ Resolved: {{ (first .alerts).labels.alertname }}
+  {{- else }}
+  {{ fail "Unsupported Alertmanager status." }}
+  {{- end }}
+message: |
+  Status: {{ .status | title }}
+  Receiver: {{ .receiver }}
+  {{ range .alerts }}
+  Alert: {{ .labels.alertname }}
+  {{ with .labels.instance }}Instance: {{ . }}
+  {{ end }}{{ with .labels.severity }}Severity: {{ . }}
+  {{ end }}Starts at: {{ .startsAt }}
+  {{ if and (eq .status "resolved") .endsAt (ne .endsAt "0001-01-01T00:00:00Z") }}Ends at: {{ .endsAt }}
+  {{ end }}{{ with .annotations.summary }}Summary: {{ . }}
+  {{ end }}{{ with .annotations.description }}Description: {{ . }}
+  {{ end }}Source: {{ .generatorURL }}
+  {{ end }}

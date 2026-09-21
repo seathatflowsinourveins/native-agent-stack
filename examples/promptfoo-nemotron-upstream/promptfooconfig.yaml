@@ -1,0 +1,35 @@
+# Local integration of NVIDIA's published retrieval example, not MTEB.
+description: NVIDIA Nemotron upstream retrieval example — live endpoint check; usage not reported
+prompts:
+  - NVIDIA's four published retrieval queries and documents (the upstream script owns the inputs)
+providers:
+  - id: exec:python upstream-example.py
+    label: NVIDIA published example via native Python and local vLLM
+tests:
+  - description: Published four-query retrieval example; local source-derived ranking assertion. Script token usage is UNKNOWN; displayed zero counters mean unavailable.
+    assert:
+      - type: javascript
+        value: |
+          const rows = output.split(/\r?\n/)
+            .map(line => line.match(/^q\[(\d+)\]\s+(.+)$/))
+            .filter(Boolean);
+          if (rows.length !== 4) {
+            return {pass: false, score: 0, reason: 'Expected four rows from the upstream example; received ' + rows.length};
+          }
+          const best = [];
+          let correct = 0;
+          for (let i = 0; i < rows.length; i++) {
+            const values = rows[i][2].trim().split(/\s+/).map(Number);
+            if (Number(rows[i][1]) !== i || values.length !== 4 || !values.every(Number.isFinite)) {
+              return {pass: false, score: 0, reason: 'Upstream matrix row has invalid shape or nonfinite values'};
+            }
+            const maximum = Math.max(...values);
+            const winners = values.map((v, j) => v === maximum ? j : -1).filter(j => j >= 0);
+            best.push(winners);
+            if (winners.length === 1 && winners[0] === i) correct++;
+          }
+          return {
+            pass: correct === 4,
+            score: correct / 4,
+            reason: correct + '/4 NVIDIA published queries ranked the paired document first; winners=' + JSON.stringify(best) + '. Local source-derived assertion on rounded upstream stdout, not a benchmark. Provider token usage is not reported.'
+          };

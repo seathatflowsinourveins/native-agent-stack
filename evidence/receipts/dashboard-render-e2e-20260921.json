@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "dashboard-render-e2e-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "ai-memory",
+    "qdrant",
+    "socraticode",
+    "serena",
+    "agentsview",
+    "dagu",
+    "omniroute",
+    "agent-browser",
+    "grafana",
+    "prometheus",
+    "alertmanager",
+    "ntfy",
+    "promptfoo"
+  ],
+  "recorded_at_utc": "2026-09-21T13:16:18.983472+00:00",
+  "claim": "Inspected rendered screenshots for13 installed repository interfaces, compared supported native operations, refreshed stale graph, repaired unreadable Grafana memory panels and retained actual limitations.",
+  "limitations": [
+    "ai-memory model-based consolidation remains disabled; native Codex provider is available but not activated by this UI review.",
+    "Bundled ai-memory web search is global FTS, not project-scoped. No richer official admin SPA exists in reviewed release/current-main.",
+    "Old deployment memory marked stale via supported memory_feedback; body not silently rewritten.",
+    "OmniRoute CLI initialized local encryption-key file during read command; no key exposed; coordinator restricted file mode to 0600.",
+    "One wrong System text selector, initial blank ntfy image, recursive browser observation, Dagu preset-only link, Symbols filename no-match and MCP-disabled OmniRoute command retained.",
+    "FreeLLMAPI optional Windows route remains unavailable; no alert suppression.",
+    "Historical Promptfoo fixture is not model-quality evidence. No new jobs, notifications or inference created to populate screens."
+  ],
+  "artifact_directory": "evidence/artifacts/dashboard-render-e2e-20260921",
+  "validation": {
+    "adapter_tests": "24 passed, including failed-source row preservation. Local integration checks, not upstream suites.",
+    "publication_validation": "68 components,1299 hash-listed files,4 profiles,117 receipts passed. Structural integrity only.",
+    "independent_review": "No actionable findings remain. Reviewer verified491 retained bindings,48 viewer assets,13 screenshots and public privacy/hash projections; failure-state preservation and stale-screenshot fallback findings resolved.",
+    "local_viewer": "13 rendered cards,13 screenshots,34 stdout/stderr download links plus native Serena result. Browser downloaded2175-byte ai-memory status with matching SHA256."
+  },
+  "references": [
+    "docs/dashboard-rendered-acceptance.md"
+  ],
+  "public_artifacts": [
+    {
+      "path": "evidence/artifacts/dashboard-render-e2e-20260921/rendered-observations.json",
+      "bytes": 27781,
+      "sha256": "9d443e1005ed9917b1a1c0b0c5f0c8d383583836907171c46cd72ef4a33eee65"
+    }
+  ]
+}

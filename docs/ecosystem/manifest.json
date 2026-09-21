@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-21",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "bc6ea86bd289c9da05899698c0648f9755867ee2",
+  "source_revision": "b6fbcdf72d7afb15955f4a52eb756ac653d6537f",
   "layers": [
     {
       "id": "agents",
@@ -507,6 +507,18 @@
       "body": "Scoped native QMD registration, stale-checkout repair and exact-source retrieval for future sessions and PCs.",
       "path": "docs/catalog-retrieval.md",
       "category": "setup"
+    },
+    {
+      "title": "Dashboard gap resolution: native memory, telemetry and evaluation",
+      "body": "Actual cross-harness consolidation, scoped archive refresh, gateway recovery, real Claude telemetry and native notification templates. Source-backed retrieval evaluation replaces echo-only evidence; limitations remain explicit.",
+      "path": "docs/dashboard-gap-resolution.md",
+      "category": "evaluation"
+    },
+    {
+      "title": "Rendered upstream dashboards: screenshots and returned results",
+      "body": "Thirteen installed interfaces inspected against native commands. Memory wiki limits, repaired Grafana panels, refreshed graph, actual alerts and historical fixtures remain explicit; HTTP success alone is insufficient.",
+      "path": "docs/dashboard-rendered-acceptance.md",
+      "category": "evaluation"
     }
   ],
   "highlights": [

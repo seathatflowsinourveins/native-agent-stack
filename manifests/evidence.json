@@ -2,6 +2,62 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "dashboard-gap-resolution-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory",
+        "codex",
+        "claude-code",
+        "agentsview",
+        "grafana",
+        "prometheus",
+        "alertmanager",
+        "ntfy",
+        "promptfoo",
+        "vllm"
+      ],
+      "claim": "Resolved concrete native dashboard gaps: automatic Claude and Codex memory consolidation, scoped archive refresh, passwordless gateway desktop access, current Claude telemetry, native ntfy template formatting and published NVIDIA retrieval example execution.",
+      "limitations": [
+        "Bounded current-host native operations and local integration checks; not universal SOTA or complete-foundation certification.",
+        "Fresh PreCompact event and active Desktop session end remain unforced.",
+        "Next genuine post-deployment ntfy webhook remains unobserved; native renderer replay and deployed template are verified separately.",
+        "Promptfoo ranks all four published pairs; local source-derived assertion, not MTEB or held-out quality evaluation. Direct script usage and consolidation usage remain unknown.",
+        "Native consumed/cache counters and model-scoped observation windows are not lifetime savings.",
+        "Read-only memory wiki/global browser FTS and compatible MiniLM profile remain upstream boundaries."
+      ],
+      "path": "evidence/receipts/dashboard-gap-resolution-20260921.json"
+    },
+    {
+      "id": "dashboard-render-e2e-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory",
+        "qdrant",
+        "socraticode",
+        "serena",
+        "agentsview",
+        "dagu",
+        "omniroute",
+        "agent-browser",
+        "grafana",
+        "prometheus",
+        "alertmanager",
+        "ntfy",
+        "promptfoo"
+      ],
+      "claim": "Inspected rendered screenshots for13 installed repository interfaces, compared supported native operations, refreshed stale graph, repaired unreadable Grafana memory panels and retained actual limitations.",
+      "limitations": [
+        "ai-memory model-based consolidation remains disabled; native Codex provider is available but not activated by this UI review.",
+        "Bundled ai-memory web search is global FTS, not project-scoped. No richer official admin SPA exists in reviewed release/current-main.",
+        "Old deployment memory marked stale via supported memory_feedback; body not silently rewritten.",
+        "OmniRoute CLI initialized local encryption-key file during read command; no key exposed; coordinator restricted file mode to 0600.",
+        "One wrong System text selector, initial blank ntfy image, recursive browser observation, Dagu preset-only link, Symbols filename no-match and MCP-disabled OmniRoute command retained.",
+        "FreeLLMAPI optional Windows route remains unavailable; no alert suppression.",
+        "Historical Promptfoo fixture is not model-quality evidence. No new jobs, notifications or inference created to populate screens."
+      ],
+      "path": "evidence/receipts/dashboard-render-e2e-20260921.json"
+    },
+    {
       "id": "hf-memory-models-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2416,8 +2472,8 @@
     },
     {
       "path": "docs/memory-rag-native-practice.md",
-      "sha256": "d43adcfd2ab1c77d588cc0698d7a82fdc95b2f4d36a183f13c94cbe2a3579a20",
-      "bytes": 8231
+      "sha256": "691a9f2599429a6b90343c628320ca184bbdb9883059f89110fcae96470867d1",
+      "bytes": 8400
     },
     {
       "path": "evidence/artifacts/native-memory-rag-alignment-20260921/dashboard-observations.json",
@@ -2726,8 +2782,8 @@
     },
     {
       "path": "docs/native-dashboard-data.md",
-      "sha256": "640bb2c71d66043e3e5fcac869f22ab9eb525086a4fa8c193b33f44964138cfe",
-      "bytes": 18453
+      "sha256": "47feadeeb88475d31f4fd0d1ad6f963471d3540eaac5ae4bb61387668f971234",
+      "bytes": 18699
     },
     {
       "path": "evidence/artifacts/native-dashboard-data-20260921/agentsview-selected-sync.json",
@@ -2831,8 +2887,8 @@
     },
     {
       "path": "observability/native-data/render.py",
-      "sha256": "629ec4c4a43bea2f3a08e87c8a38af82bbeda1f47823d21ff9e5fefa3298882b",
-      "bytes": 9697
+      "sha256": "3e29ec76e51620a6d130f8dbe90f108b1429fd2b6d8ec5dfd1a9c83d4d2501e1",
+      "bytes": 11151
     },
     {
       "path": "observability/native-data/snapshot.py",
@@ -2841,8 +2897,8 @@
     },
     {
       "path": "tests/test_native_dashboard_data.py",
-      "sha256": "4cf14a90c84598f71ce4486683b08de8e9f1d10eb5249e7e229bdd90f4465bcf",
-      "bytes": 17763
+      "sha256": "ef502fb8344dda83a9e92c3056b8ffeaeda43d277081337d62da53d42fffe558",
+      "bytes": 18097
     },
     {
       "path": "evidence/artifacts/native-quality-defaults-20260920/codex-effective.json",
@@ -2941,8 +2997,8 @@
     },
     {
       "path": ".gitattributes",
-      "sha256": "a752d7e669e55fea832431991b21d0f92f6d060fb5dd49bceefa9684c3253977",
-      "bytes": 304
+      "sha256": "b3ffd27e5ca28d7fd987dc7c594601e4532660ddfeb4992ae92b3916ecb45e9f",
+      "bytes": 467
     },
     {
       "path": ".github/requirements-ci.lock",
@@ -6042,8 +6098,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "84e5bf0bdbe441c5f43d450c9d23fe5bc6bd4b53028ed8466da6a3504ada372a",
-      "bytes": 6187636
+      "sha256": "c5a985e01a84d59d9ac2f2c645cb9076b296508d17f40105100e9494ad41c371",
+      "bytes": 6247042
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6052,8 +6108,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "6216eb7a5f37670b986c5251941e379b8cee406f3580678a2afe5b89561b39c7",
-      "bytes": 34059
+      "sha256": "75ac0fa8d5ef303438402d2f8a52c19211e640953a3de0db2cd051f5bafcfdbb",
+      "bytes": 34897
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6577,8 +6633,8 @@
     },
     {
       "path": "observability/backends/configure.py",
-      "sha256": "cecc864da7f472d31021d8b4a69363546136d4ee5ca65dc68ecd315719ba69da",
-      "bytes": 3911
+      "sha256": "d5e3a92337fba097365a061d31ed35457b903d98ef2f3e088b0421420ea90b9e",
+      "bytes": 4049
     },
     {
       "path": "observability/backends/install.py",
@@ -6627,8 +6683,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-ntfy.yml.example",
-      "sha256": "4fa2642cc3b94cd5337e2057018e4501eff79f1f5e541943abaa80839c6ab91d",
-      "bytes": 350
+      "sha256": "f0528202dd0c48c1ac3a0eadf66d4a3e5cd3644b4758884546534411f0e046c8",
+      "bytes": 405
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus-rules.yml.example",
@@ -6747,8 +6803,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "697bbae35e72a78681022250c910b15ca27f3d598d14231ee1dacf0018c004c3",
-      "bytes": 33650
+      "sha256": "28878aaa3b64bf03bcff7d3d1541fa667e9deaae425c7b4fd59311718ba7ce45",
+      "bytes": 33706
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -8877,8 +8933,8 @@
     },
     {
       "path": "docs/full-stack-convergence.md",
-      "bytes": 9592,
-      "sha256": "c4ee59d809b9b40d904dbd8e4ff385a0a6a06cab679665b8e8440f4d09a8ceba"
+      "bytes": 10303,
+      "sha256": "a2c1a2613fe9dba03e3305866ded7411caa6d3741c39dd693866f719020a1521"
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/agentsview-aggregate-safe.png",
@@ -9002,8 +9058,8 @@
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/security-review.json",
-      "bytes": 4432,
-      "sha256": "bccee6e996f4397b64b63065bb2f0ece6debc46e8b4452e4a4ecb2ae381db70b"
+      "bytes": 5102,
+      "sha256": "4f0ee1fd01224188b4fe9cb171fb72c443af46736672dd6ec424b641642c6322"
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/selected-upstream-releases.json",
@@ -9028,7 +9084,7 @@
     {
       "path": "evidence/receipts/full-stack-convergence-20260921.json",
       "bytes": 10366,
-      "sha256": "fb99a748d270d480a37c92fbd10c89829ed96a8d490339da199aaa6ce55f26a7"
+      "sha256": "4546eb5d6cf1e4e80fdcba360aca74a5970e0e0036e2450d28b53b24f89f055b"
     },
     {
       "path": "recipes/native-upgrades-20260921.md",
@@ -9039,6 +9095,101 @@
       "path": "tools/token-report/test_returned_results.cjs",
       "bytes": 3513,
       "sha256": "9b589310a78d3d77c768bd7ee219ba891d7877dee9ad4f6be4309a2951747f62"
+    },
+    {
+      "path": "docs/dashboard-gap-resolution.md",
+      "sha256": "a28617634c8c6fd7bc866810328f7658aa84ea375c571bbc7b8b9365b9cd4602",
+      "bytes": 2962
+    },
+    {
+      "path": "docs/dashboard-rendered-acceptance.md",
+      "sha256": "5c4f71b5a8bedccc7dc59fb8e6476313ed1443a0c6b0181039a708684d972e01",
+      "bytes": 7671
+    },
+    {
+      "path": "docs/native-dashboard-operations-resolution.md",
+      "sha256": "0c42e73c610bb620b100cfb4cf620066b508c3e06c2e48c4b19900b009998fa9",
+      "bytes": 6086
+    },
+    {
+      "path": "docs/native-memory-consolidation.md",
+      "sha256": "28a5c8494f6f96b02e470454ac81ae7ca2a8c9c8a0d19a302c933044c6f7a70a",
+      "bytes": 6785
+    },
+    {
+      "path": "docs/native-telemetry-resolution.md",
+      "sha256": "3ba6612f7eb83a47de8ca959eae57efcb36de3e3d8bff0ff4d5a61dc59de55c1",
+      "bytes": 5499
+    },
+    {
+      "path": "docs/promptfoo-upstream-retrieval.md",
+      "sha256": "af73fafcc415e7917ed254b18ec38b5207c34592d7291c4a383c052ba38d5f72",
+      "bytes": 5247
+    },
+    {
+      "path": "evidence/artifacts/dashboard-gap-resolution-20260921/resolution.json",
+      "sha256": "b5904a44daa4545c77dde645aeb47370e53a34e6252ebd0bbfe1a0b8a4a5bfe8",
+      "bytes": 17280
+    },
+    {
+      "path": "evidence/artifacts/dashboard-render-e2e-20260921/rendered-observations.json",
+      "sha256": "9d443e1005ed9917b1a1c0b0c5f0c8d383583836907171c46cd72ef4a33eee65",
+      "bytes": 27781
+    },
+    {
+      "path": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/native-report-detail-final.png",
+      "sha256": "1e1af0033a7ccd52f00dec0569a2a0d80661e84710bca8a074aa93d1d24523b3",
+      "bytes": 203915
+    },
+    {
+      "path": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/promptfoo-eval.stderr",
+      "sha256": "79a78e527eca6d243092cf8a3830a0baf02472cad501483baa19f51aa1f21117",
+      "bytes": 168
+    },
+    {
+      "path": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/promptfoo-eval.stdout",
+      "sha256": "7f648c4b3677bb818c8b119aec17c4b821c967233132c8e6d4f02b47f8e074d7",
+      "bytes": 2775
+    },
+    {
+      "path": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/qualification.json",
+      "sha256": "924be14cffd71b505d595b6b1b17ca31cfe35e5c3927d9d83bf5c13bbbb563a2",
+      "bytes": 5115
+    },
+    {
+      "path": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/report.html",
+      "sha256": "01ac2f6b4a28727729ba4a84ca96ced13ff74e2287d848e7b89789d0af11f088",
+      "bytes": 41418
+    },
+    {
+      "path": "evidence/artifacts/promptfoo-nemotron-upstream-20260921/results.public.json",
+      "sha256": "16e5ad1e1590ccef9ed6c73d5ab39f494620bdef7213bb3bcddbf316f99e01b7",
+      "bytes": 10521
+    },
+    {
+      "path": "evidence/receipts/dashboard-gap-resolution-20260921.json",
+      "sha256": "d0c871acf3f0f56959ad1670e744bccd6674a9fa18d1aaacce84dc0de70dfdb3",
+      "bytes": 3390
+    },
+    {
+      "path": "evidence/receipts/dashboard-render-e2e-20260921.json",
+      "sha256": "15e85ee331ee29c5cff07bb0e73ef48dfb0df93be1d3a845b93728213e5a93a5",
+      "bytes": 2641
+    },
+    {
+      "path": "examples/promptfoo-nemotron-upstream/promptfooconfig.yaml",
+      "sha256": "07c64ff592209af4ac973d0cadf3bb69099cbf3ab79f89e5129f182c93a32df2",
+      "bytes": 1940
+    },
+    {
+      "path": "observability/backends/telemetry-resolution-20260921.json",
+      "sha256": "34f31ac6272ef39483fbd850bc339997be4d61fd9530a4f986f0e65e5a70cbb3",
+      "bytes": 12942
+    },
+    {
+      "path": "observability/backends/templates/ecosystem-ntfy-alertmanager.yml.example",
+      "sha256": "718d709ce0e1748f2d9b255cba9292b5bdca286a5ead64f5ace2b9d3af49211b",
+      "bytes": 962
     }
   ],
   "convergence_records": [

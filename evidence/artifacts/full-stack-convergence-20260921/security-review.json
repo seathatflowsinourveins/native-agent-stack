@@ -110,5 +110,21 @@
     "Classifications apply to the retained report and source bytes inspected during this review; zero identified credentials is not a universal absence guarantee.",
     "Focused scan timestamps were not captured, so they remain null rather than inferred.",
     "No new scans were run to write this record; no repository code, scanner configuration or ignore rules were changed."
-  ]
+  ],
+  "later_native_fixture_projection_scan": {
+    "command": [
+      "gitleaks",
+      "dir",
+      "evidence/artifacts/full-stack-convergence-20260921",
+      "--redact",
+      "--no-banner"
+    ],
+    "exit_code": 1,
+    "findings": 2,
+    "classification": "Two SHA-256 source values in native-token-workflow.json matched generic-api-key. Both were independently recomputed from the named current source files and matched; neither is a credential. No allowlist was changed. Earlier zero-result scan predates attachment of this native fixture receipt.",
+    "source_files": [
+      "scripts/native_token_ci.py",
+      ".github/workflows/native-token-e2e.yml"
+    ]
+  }
 }

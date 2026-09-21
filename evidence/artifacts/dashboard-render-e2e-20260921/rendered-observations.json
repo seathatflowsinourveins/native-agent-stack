@@ -1,0 +1,678 @@
+{
+  "schema_version": 1,
+  "captured_at_utc": "2026-09-21T13:16:18.983472+00:00",
+  "scope": "13 installed repository interfaces; rendered capabilities plus native CLI/MCP/API comparisons. Not all upstream suites or universal SOTA acceptance.",
+  "base_commit": "d2cf07c49c684005989b7beb0d3a55fe183c4cdc",
+  "screenshots_published": false,
+  "records": [
+    {
+      "repository": "ai-memory",
+      "url": "http://127.0.0.1:49374/web/w/agent-lab/agent-lab",
+      "observed": "53 latest pages; one ordinary decision. Expand System. Global FTS search works. Consolidation disabled; deployment note flagged stale.",
+      "screenshot": {
+        "name": "memory/ai-memory-system.png",
+        "sha256": "6b82b0e2b68f163e4121b685d50d203d924684fd910f7b0c07369a37442eef4a",
+        "capture_file_mtime_utc": "2026-09-21T12:57:46.859703+00:00",
+        "privacy": "retained locally; not published"
+      },
+      "commands": [
+        {
+          "argv_host_paths_redacted": [
+            "ai-memory",
+            "status",
+            "--json"
+          ],
+          "started_at": "2026-09-21T12:57:47.819027+00:00",
+          "completed_at": "2026-09-21T12:57:47.832081+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "f6f9d68df6ebd6bd3d104685888f18afee860ce338a0e5e57bdfaa335d8294ef",
+          "streams": {
+            "stdout": {
+              "bytes": 2175,
+              "sha256": "5a38356c3c4cd359c93ba7c2312bb37173af790d81c4c30ebec3c875903e80ce"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        },
+        {
+          "argv_host_paths_redacted": [
+            "ai-memory",
+            "doctor",
+            "--workspace",
+            "agent-lab",
+            "--project",
+            "agent-lab",
+            "--since-days",
+            "1",
+            "--json"
+          ],
+          "started_at": "2026-09-21T12:58:29.487043+00:00",
+          "completed_at": "2026-09-21T12:58:30.434210+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "e93ce645aa009dd4422c3b0993b5aba54165c1b58c043fe296ec0598d70ebdd9",
+          "streams": {
+            "stdout": {
+              "bytes": 428,
+              "sha256": "195cd880a4465cdfe9416a481920d98d5a7061401571c6223d3ba5d902888546"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        },
+        {
+          "argv_host_paths_redacted": [
+            "ai-memory",
+            "search",
+            "Shared project memory",
+            "--workspace",
+            "agent-lab",
+            "--project",
+            "agent-lab",
+            "--json"
+          ],
+          "started_at": "2026-09-21T12:59:16.674869+00:00",
+          "completed_at": "2026-09-21T12:59:16.686209+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "d3b17585a617dfc86084fb57b779996126a70638cbe86e14166d679b0be762a0",
+          "streams": {
+            "stdout": {
+              "bytes": 875,
+              "sha256": "b8262378cd85490a6c8f41c334f271c65d4b5978b019cce2e63c8fefcfdae1dd"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      ],
+      "catalog_source": {
+        "repository": "https://github.com/akitaonrails/ai-memory",
+        "version": "2.3.2",
+        "boundary": "Selected upstream version/source; individual execution results and limits are recorded separately."
+      }
+    },
+    {
+      "repository": "Qdrant",
+      "url": "http://127.0.0.1:16333/dashboard#/collections/codebase_72cfa87c5abf",
+      "observed": "Actual project points render. Native API: green, 225 points, dense 2048 plus sparse vectors.",
+      "screenshot": {
+        "name": "memory/qdrant-project.png",
+        "sha256": "6a78471053cd5ee5de51f503683c9f7dabb27cb0a81b056d31c9f21168a2234d",
+        "capture_file_mtime_utc": "2026-09-21T12:59:15.675693+00:00",
+        "privacy": "retained locally; not published"
+      },
+      "commands": [
+        {
+          "argv_host_paths_redacted": [
+            "python3",
+            "-c",
+            "import urllib.request; print(urllib.request.urlopen(\"http://127.0.0.1:16333/collections/codebase_72cfa87c5abf\",timeout=10).read().decode())"
+          ],
+          "started_at": "2026-09-21T12:59:16.145240+00:00",
+          "completed_at": "2026-09-21T12:59:16.189589+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "b8161917a65219c22dc8833e98caec30ba50f0eecc206494d2a1c9b9871276bd",
+          "streams": {
+            "stdout": {
+              "bytes": 1093,
+              "sha256": "015080810db3a98f8975d420d9550c7188952fa05a18c2b901fd72f953064a6a"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      ],
+      "catalog_source": {
+        "repository": "https://github.com/qdrant/qdrant",
+        "version": "1.19.1",
+        "boundary": "Selected upstream version/source; individual execution results and limits are recorded separately."
+      }
+    },
+    {
+      "repository": "SocratiCode",
+      "url": "http://127.0.0.1:17500/socraticode-graph.html?revision=dc6f348d2afb",
+      "observed": "Refreshed unchanged upstream export: 29 files, 5 edges, 266 symbols, 323 calls. Explicit snapshot; file filter exercised. Filename search in Symbols returned no match, as retained.",
+      "screenshot": {
+        "name": "memory/socraticode-file-filter-final.png",
+        "sha256": "131fd7aa4bd97b97e0fb8cfb7cba38a9ae3cfa536f53a1e6a8a0915a257998d5",
+        "capture_file_mtime_utc": "2026-09-21T13:04:43.643663+00:00",
+        "privacy": "retained locally; not published"
+      },
+      "commands": [
+        {
+          "argv_host_paths_redacted": [
+            "mcporter",
+            "--config",
+            "<host-path>/mcporter.json",
+            "call",
+            "socraticode.codebase_graph_visualize",
+            "--args",
+            "{\"projectPath\":\"<host-path>/agent-lab\",\"mode\":\"interactive\",\"open\":false}",
+            "--output",
+            "json",
+            "--no-oauth"
+          ],
+          "started_at": "2026-09-21T13:01:05.576806+00:00",
+          "completed_at": "2026-09-21T13:01:06.299050+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "69798c82f9d5810f8b82b45f31e1da55d36aeac2d9b52e4dfbd271ad4a024b83",
+          "streams": {
+            "stdout": {
+              "bytes": 828,
+              "sha256": "98c0bae44464d558d131e81dfb6dac6ff1cbad585c9809af3faf684d4de66d44"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      ],
+      "catalog_source": {
+        "repository": "https://github.com/giancarloerra/SocratiCode",
+        "version": "1.14.0",
+        "boundary": "Selected upstream version/source; individual execution results and limits are recorded separately."
+      }
+    },
+    {
+      "repository": "Serena",
+      "url": "http://127.0.0.1:24286/dashboard/index.html",
+      "observed": "Current MCP process: agent-lab, Codex context, LSP ready, 24 active tools. This port is process-specific.",
+      "screenshot": {
+        "name": "memory/serena.png",
+        "sha256": "8039409fa37a24d84536f7d3f55688d2897226fd28eed190db7ada0ad96f6da6",
+        "capture_file_mtime_utc": "2026-09-21T13:01:07.567686+00:00",
+        "privacy": "retained locally; not published"
+      },
+      "commands": [],
+      "native_mcp_result_sha256": "c6da7c2c51595298cad225dfa4769d1c3c33bc95eec13cd03283bd1ec8ca0bfa",
+      "catalog_source": {
+        "repository": "https://github.com/oraios/serena",
+        "version": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+        "boundary": "Selected upstream version/source; individual execution results and limits are recorded separately."
+      }
+    },
+    {
+      "repository": "AgentsView",
+      "url": "http://127.0.0.1:17384/",
+      "observed": "14 parent sessions, 17 with children, 3,193 analytics messages. Historical scoped archive, last synced about 10 hours earlier.",
+      "screenshot": {
+        "name": "operations/agentsview-filtered.png",
+        "sha256": "8d0fb425d89052230e2cb1b8c26343f35f76a2eac839038c3ee2255c3d809a73",
+        "capture_file_mtime_utc": "2026-09-21T12:58:15.647702+00:00",
+        "privacy": "retained locally; not published"
+      },
+      "commands": [
+        {
+          "argv_host_paths_redacted": [
+            "agentsview",
+            "session",
+            "list",
+            "--server",
+            "http://127.0.0.1:17384",
+            "--include-one-shot",
+            "--include-automated",
+            "--json"
+          ],
+          "started_at": "2026-09-21T12:58:14.610490+00:00",
+          "completed_at": "2026-09-21T12:58:14.639274+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "e111ae14743ca998de7a2ece7401989a0d29e8c2cebde8b2dcc121307f9b51d3",
+          "streams": {
+            "stdout": {
+              "bytes": 20837,
+              "sha256": "f9e941c4da08507a6e4ba971b500ceec182168aa5bd6a802c1dd344268a23b0e"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        },
+        {
+          "argv_host_paths_redacted": [
+            "agentsview",
+            "session",
+            "list",
+            "--server",
+            "http://127.0.0.1:17384",
+            "--include-one-shot",
+            "--include-automated",
+            "--include-children",
+            "--json"
+          ],
+          "started_at": "2026-09-21T12:58:44.250417+00:00",
+          "completed_at": "2026-09-21T12:58:44.270924+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "48674ac48c60b3cad71d59cb6952f867746957cf36a88e73cf404c99b729ee91",
+          "streams": {
+            "stdout": {
+              "bytes": 24646,
+              "sha256": "32b911dfecd6cf68f81cdc7599b4ac090c85b891616e0dd47fea5975104b5ea0"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      ],
+      "catalog_source": {
+        "repository": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
+        "version": "0.43.0",
+        "boundary": "Selected upstream version/source; individual execution results and limits are recorded separately."
+      }
+    },
+    {
+      "repository": "Dagu",
+      "url": "http://127.0.0.1:18525/dag-runs?preset=last30days&dateMode=preset&fromDate=2026-08-22T00%3A00",
+      "observed": "9 retained runs: 6 success, 2 failed, 1 aborted. Today empty. This date link is capture-specific; use the date picker for future sessions.",
+      "screenshot": {
+        "name": "operations/dagu-complete-link.png",
+        "sha256": "eea1156a5da03df428b21db261fc2e46d612e481443f766125c0d9f2e890719a",
+        "capture_file_mtime_utc": "2026-09-21T13:04:58.635664+00:00",
+        "privacy": "retained locally; not published"
+      },
+      "commands": [
+        {
+          "argv_host_paths_redacted": [
+            "<host-path>/dagu",
+            "history",
+            "--dagu-home",
+            "<host-path>/dagu-equities",
+            "--last",
+            "30d",
+            "--format",
+            "json"
+          ],
+          "started_at": "2026-09-21T12:59:05.998516+00:00",
+          "completed_at": "2026-09-21T12:59:06.024475+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "7d4cd433affb2155ad8b6259fee91c15b3d4e4ed047276c594b2e1031c76a6d3",
+          "streams": {
+            "stdout": {
+              "bytes": 2313,
+              "sha256": "65906de31660a4f36b0fbe257fbce9302e3cec69553cc93980b87fa0a49bd070"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      ],
+      "catalog_source": {
+        "repository": "https://github.com/dagucloud/dagu",
+        "version": "2.16.6",
+        "boundary": "Selected upstream version/source; individual execution results and limits are recorded separately."
+      }
+    },
+    {
+      "repository": "OmniRoute",
+      "url": "http://127.0.0.1:20128/dashboard/analytics/compression",
+      "observed": "31 requests and 57,720 consumed tokens in returned 30-day scope. Compression All time: 3 skipped/off records, 0 saved tokens. Direct native clients are outside gateway scope.",
+      "screenshot": {
+        "name": "operations/omniroute-compression-all.png",
+        "sha256": "fd437494f4fc08dab2f239a0d9a97dddcb73605695604ffd668109c5e7bcd140",
+        "capture_file_mtime_utc": "2026-09-21T13:00:23.575691+00:00",
+        "privacy": "retained locally; not published"
+      },
+      "commands": [
+        {
+          "argv_host_paths_redacted": [
+            "node",
+            "<host-path>/omniroute.mjs",
+            "--quiet",
+            "--output",
+            "json",
+            "--base-url",
+            "http://127.0.0.1:20128",
+            "api",
+            "usage",
+            "get-api-usage-analytics",
+            "--period",
+            "all"
+          ],
+          "started_at": "2026-09-21T13:01:59.632535+00:00",
+          "completed_at": "2026-09-21T13:02:00.173791+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "08df2d4f939610750f1b884b555c8a718b5f9b48129435da997ed7d997b7760f",
+          "streams": {
+            "stdout": {
+              "bytes": 6463,
+              "sha256": "f28e09804e78786d285cae008a3338007a4a99bec4506a9fbc0cb7e193359cbe"
+            },
+            "stderr": {
+              "bytes": 184,
+              "sha256": "98eaa6620ea3999d3efc3b083d74429bf587714813fc59c1fb6ec211c71644fc"
+            }
+          }
+        },
+        {
+          "argv_host_paths_redacted": [
+            "node",
+            "<host-path>/omniroute.mjs",
+            "--quiet",
+            "--output",
+            "json",
+            "--base-url",
+            "http://127.0.0.1:20128",
+            "api",
+            "compression",
+            "get-api-settings-compression"
+          ],
+          "started_at": "2026-09-21T13:02:00.657195+00:00",
+          "completed_at": "2026-09-21T13:02:01.202198+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "8367137f453eb330b8866fb6c7450de20eb946c4124916fb9ce077cc693d38d1",
+          "streams": {
+            "stdout": {
+              "bytes": 4077,
+              "sha256": "60d813047d88f4c1938f6c4e89d4fb1328cb13b629ddd227e36a089765f4de66"
+            },
+            "stderr": {
+              "bytes": 184,
+              "sha256": "98eaa6620ea3999d3efc3b083d74429bf587714813fc59c1fb6ec211c71644fc"
+            }
+          }
+        },
+        {
+          "argv_host_paths_redacted": [
+            "node",
+            "<host-path>/omniroute.mjs",
+            "--base-url",
+            "http://127.0.0.1:20128",
+            "compression",
+            "status"
+          ],
+          "started_at": "2026-09-21T13:01:16.241599+00:00",
+          "completed_at": "2026-09-21T13:01:18.361370+00:00",
+          "exit_code": 1,
+          "private_command_record_sha256": "5cdc695c5b995001e6da42d88357af0658e9851b3625a3b4c68c9daab34f57dd",
+          "streams": {
+            "stdout": {
+              "bytes": 180,
+              "sha256": "0ce79fa73c3aa3d3ec9e76cdf34af471551ae93103c4f1a20ab13354e318688a"
+            },
+            "stderr": {
+              "bytes": 296,
+              "sha256": "da88052fb00e2403d93b2a6c380ef43a36e3c8a643b5e5db90513b0577506b55"
+            }
+          }
+        }
+      ],
+      "catalog_source": {
+        "repository": "https://github.com/diegosouzapw/OmniRoute",
+        "version": "3.8.50",
+        "boundary": "Selected upstream version/source; individual execution results and limits are recorded separately."
+      }
+    },
+    {
+      "repository": "agent-browser",
+      "url": "http://127.0.0.1:4848/",
+      "observed": "Separate observer displayed the real Dagu browser stream and activity. Test browser sessions have since been closed; an empty session list afterward is expected.",
+      "screenshot": {
+        "name": "operations/agent-browser-confirmed-stream.png",
+        "sha256": "5bb9ba075b2d0a6db94d946a436630c4351b4d5e15dc1bcf0dfca46ba2314933",
+        "capture_file_mtime_utc": "2026-09-21T13:04:59.171664+00:00",
+        "privacy": "retained locally; not published"
+      },
+      "commands": [
+        {
+          "argv_host_paths_redacted": [
+            "agent-browser",
+            "session",
+            "list",
+            "--json"
+          ],
+          "started_at": "2026-09-21T13:00:50.384614+00:00",
+          "completed_at": "2026-09-21T13:00:50.385890+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "dd414be131567da68f04d7dbe338f8b657ec56083e4ff82f597b1ce26b1faeea",
+          "streams": {
+            "stdout": {
+              "bytes": 108,
+              "sha256": "d20076da15cda0c71ae5cda3e602c22576241163ab7026a0f9e57a610679333b"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      ],
+      "catalog_source": {
+        "repository": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
+        "version": "0.38.1",
+        "boundary": "Selected upstream version/source; individual execution results and limits are recorded separately."
+      }
+    },
+    {
+      "repository": "Grafana",
+      "url": "http://127.0.0.1:13000/d/native-foundation-data",
+      "observed": "Local integration repaired: compact inventory, model health and separate provenance. Native counters retained; missing Claude series remains unavailable.",
+      "screenshot": {
+        "name": "telemetry/final-with-state.png",
+        "sha256": "b3e0511f95a3e57628b7465d7ce38daf347296f7af66e22d89a2ecaf3c58c092",
+        "capture_file_mtime_utc": "2026-09-21T13:15:19.235569+00:00",
+        "privacy": "retained locally; not published"
+      },
+      "commands": [
+        {
+          "argv_host_paths_redacted": [
+            "python3",
+            "-c",
+            "import json,urllib.request,urllib.parse,sys; p=json.load(open('<host-path>/native-foundation-data.json')); q=next(x for x in p['panels'] if x['id']==6)['targets'][0]['expr']; sys.stdout.buffer.write(urllib.request.urlopen('http://127.0.0.1:13100/loki/api/v1/query?'+urllib.parse.urlencode({'query':q}),timeout=20).read())"
+          ],
+          "started_at": "2026-09-21T13:05:01.693665+00:00",
+          "completed_at": "2026-09-21T13:05:01.750269+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "12edc2d870d773eae7a13632d721437e79f451bb97c0adac1337da32c6ddaebb",
+          "streams": {
+            "stdout": {
+              "bytes": 6180,
+              "sha256": "882416def9e4b1e5a188a2cc61c0e4ad1da03bff55690225af62b70b0d6805ee"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      ],
+      "catalog_source": {
+        "repository": "https://github.com/grafana/grafana",
+        "version": "13.2.2",
+        "boundary": "Selected upstream version/source; individual execution results and limits are recorded separately."
+      }
+    },
+    {
+      "repository": "Prometheus",
+      "url": "http://127.0.0.1:19090/query",
+      "observed": "UI up query and upstream promtool agree: 7 scrape targets, all up. This is scrape health, not every application capability.",
+      "screenshot": {
+        "name": "telemetry/prometheus.png",
+        "sha256": "956321dc0876fc106e83bcb8f9c3ec981aabe2d6fcbb15ae56f1a6e9ad010034",
+        "capture_file_mtime_utc": "2026-09-21T12:59:23.771690+00:00",
+        "privacy": "retained locally; not published"
+      },
+      "commands": [
+        {
+          "argv_host_paths_redacted": [
+            "<host-path>/promtool",
+            "query",
+            "instant",
+            "http://127.0.0.1:19090",
+            "up"
+          ],
+          "started_at": "2026-09-21T13:00:28.175760+00:00",
+          "completed_at": "2026-09-21T13:00:28.194870+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "ea6c786c379e69c5394381e65374c74ed072fd39d303b4f8941bd9cfc910ec0c",
+          "streams": {
+            "stdout": {
+              "bytes": 501,
+              "sha256": "892350b2c157ffc718dfaf9cbe7155ae1d3d78ee439194ddb032449e189860ff"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      ],
+      "catalog_source": {
+        "repository": "https://github.com/prometheus/prometheus",
+        "version": "3.14.0",
+        "boundary": "Selected upstream version/source; individual execution results and limits are recorded separately."
+      }
+    },
+    {
+      "repository": "Alertmanager",
+      "url": "http://127.0.0.1:19093/",
+      "observed": "Real active FreeLLMAPI readiness warning. Optional Windows route is not running; warning preserved.",
+      "screenshot": {
+        "name": "telemetry/alertmanager-expanded.png",
+        "sha256": "6d218f76e039443b7603540e4cb4744e4cbc48227b0b47aacd21966d98ed62f8",
+        "capture_file_mtime_utc": "2026-09-21T13:00:29.371689+00:00",
+        "privacy": "retained locally; not published"
+      },
+      "commands": [
+        {
+          "argv_host_paths_redacted": [
+            "<host-path>/amtool",
+            "--alertmanager.url=http://127.0.0.1:19093",
+            "--output=json",
+            "alert",
+            "query"
+          ],
+          "started_at": "2026-09-21T13:00:28.204217+00:00",
+          "completed_at": "2026-09-21T13:00:28.212753+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "4e1ed62c84d31a669c56bd004e37e48e810704eb4a03e4f27fa40a432f8c7bd7",
+          "streams": {
+            "stdout": {
+              "bytes": 845,
+              "sha256": "dae115d6a34b335cbe87d04db8408ae32b96e43e7ac6e7dce292ef19cd27c30f"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      ],
+      "catalog_source": {
+        "repository": "https://github.com/prometheus/alertmanager",
+        "version": "0.34.1",
+        "boundary": "Selected upstream version/source; individual execution results and limits are recorded separately."
+      }
+    },
+    {
+      "repository": "ntfy",
+      "url": "http://127.0.0.1:18080/ecosystem-alerts",
+      "observed": "23 retained records include the same real warning. Browser desktop push permission is separate. Existing message formatting has missing-instance/spacing defects.",
+      "screenshot": {
+        "name": "telemetry/ntfy-rendered.png",
+        "sha256": "ccd083ff2900530dbf78caeb48143dfaff0d1c2b2636d4035c0b0f65f1a1ebec",
+        "capture_file_mtime_utc": "2026-09-21T13:01:34.183681+00:00",
+        "privacy": "retained locally; not published"
+      },
+      "commands": [
+        {
+          "argv_host_paths_redacted": [
+            "<host-path>/ntfy",
+            "subscribe",
+            "--poll",
+            "--since",
+            "all",
+            "http://127.0.0.1:18080/ecosystem-alerts"
+          ],
+          "started_at": "2026-09-21T13:00:28.216731+00:00",
+          "completed_at": "2026-09-21T13:00:28.236019+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "8cf79f415bee3ff0a1facff321d0fe92a0c159184a5c58f5dd0d43eb7b641676",
+          "streams": {
+            "stdout": {
+              "bytes": 17641,
+              "sha256": "905a92d2d9200781be4d46f50fea217a668e31aa8d4a4f02ae401b0f2e3f3b73"
+            },
+            "stderr": {
+              "bytes": 0,
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          }
+        }
+      ],
+      "catalog_source": {
+        "repository": "https://github.com/binwiederhier/ntfy",
+        "version": "2.28.0",
+        "boundary": "Selected upstream version/source; individual execution results and limits are recorded separately."
+      }
+    },
+    {
+      "repository": "Promptfoo",
+      "url": "http://127.0.0.1:17500/promptfoo.html",
+      "observed": "Historical local echo fixture only: 2 assertions passed, 0 tokens. Upstream export rerun; no model-quality or new inference claim.",
+      "screenshot": {
+        "name": "telemetry/promptfoo-detail.png",
+        "sha256": "e25067e0d394ec30fafb58f91862c6b6aa3c7c53c8827458560986c31de3ea20",
+        "capture_file_mtime_utc": "2026-09-21T13:02:54.135659+00:00",
+        "privacy": "retained locally; not published"
+      },
+      "commands": [
+        {
+          "argv_host_paths_redacted": [
+            "env",
+            "PROMPTFOO_CONFIG_DIR=<host-path>/profile",
+            "PROMPTFOO_LOG_DIR=<host-path>/promptfoo-logs",
+            "PROMPTFOO_DISABLE_TELEMETRY=1",
+            "PROMPTFOO_DISABLE_UPDATE_CHECK=1",
+            "promptfoo",
+            "export",
+            "eval",
+            "eval-2pS-2026-09-20T04:00:22",
+            "--output",
+            "<host-path>/promptfoo-reexport.json"
+          ],
+          "started_at": "2026-09-21T13:04:10.420471+00:00",
+          "completed_at": "2026-09-21T13:04:21.406454+00:00",
+          "exit_code": 0,
+          "private_command_record_sha256": "794d5c6633405ea732330d4029fc557f488ce3acfa0f6adfad08772b382b32ca",
+          "streams": {
+            "stdout": {
+              "bytes": 175,
+              "sha256": "64169c3775f2a966c2f3d5e0e130a045a0a9486d7ef852c35c0cd8d02fe01f5a"
+            },
+            "stderr": {
+              "bytes": 167,
+              "sha256": "74b21800adb2de50e92d8b2bbe2adab06c6b372b395860b84357b50172b995a9"
+            }
+          }
+        }
+      ],
+      "catalog_source": {
+        "repository": "https://github.com/promptfoo/promptfoo",
+        "version": "0.123.1",
+        "boundary": "Selected upstream version/source; individual execution results and limits are recorded separately."
+      }
+    }
+  ],
+  "retained_limitations": [
+    "ai-memory model-based consolidation remains disabled; native Codex provider is available but not activated by this UI review.",
+    "Bundled ai-memory web search is global FTS, not project-scoped. No richer official admin SPA exists in reviewed release/current-main.",
+    "Old deployment memory marked stale via supported memory_feedback; body not silently rewritten.",
+    "OmniRoute CLI initialized local encryption-key file during read command; no key exposed; coordinator restricted file mode to 0600.",
+    "One wrong System text selector, initial blank ntfy image, recursive browser observation, Dagu preset-only link, Symbols filename no-match and MCP-disabled OmniRoute command retained.",
+    "FreeLLMAPI optional Windows route remains unavailable; no alert suppression.",
+    "Historical Promptfoo fixture is not model-quality evidence. No new jobs, notifications or inference created to populate screens."
+  ]
+}

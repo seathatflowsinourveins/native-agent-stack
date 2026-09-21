@@ -164,8 +164,8 @@
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/security-review.json",
-      "bytes": 4432,
-      "sha256": "bccee6e996f4397b64b63065bb2f0ece6debc46e8b4452e4a4ecb2ae381db70b"
+      "bytes": 5102,
+      "sha256": "4f0ee1fd01224188b4fe9cb171fb72c443af46736672dd6ec424b641642c6322"
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/selected-upstream-releases.json",
