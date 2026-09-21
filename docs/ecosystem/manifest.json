@@ -311,6 +311,18 @@
   ],
   "guides": [
     {
+      "title": "Claude and Codex foundation: all layers and dashboards",
+      "body": "Sixteen layers with canonical repository pins, 24 scoped native/dashboard surfaces, corrected evidence gates and separately recorded verification.",
+      "path": "docs/claude-foundation-finalization-20260921.md",
+      "category": "evaluation"
+    },
+    {
+      "title": "Portable native Claude workflow examples",
+      "body": "Selected review/readiness scripts, exact source coverage, task-matched native agent definitions and local fixture boundaries.",
+      "path": "examples/claude-native/workflows/README.md",
+      "category": "setup"
+    },
+    {
       "title": "Claude-to-Codex review: actual native return",
       "body": "Literal official slash command returned successfully in an isolated checkout. Native output, usage limits, source hashes and lifecycle boundaries retained.",
       "path": "recipes/claude-codex-foreground-review.md",

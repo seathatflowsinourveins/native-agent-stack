@@ -2,6 +2,24 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "claude-foundation-finalization-20260921",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "agent-browser",
+        "repomix"
+      ],
+      "claim": "Native Claude completed a packet-scoped readiness run after independently reviewed source-gate corrections; earlier rejected and incomplete runs remain visible. Native Codex configuration and sign-in were audited. Portable examples and the sixteen-layer repository/dashboard explorer are separately verified.",
+      "limitations": [
+        "Three optional capabilities retain their earlier partial acceptance; no new-host or physical-PC reboot qualification.",
+        "Application hosting evidence remains fixture-scoped; no paid hosting, public deployment, broker action or new account connection.",
+        "Native review model citation/count transcription errors are retained; the evidence gate was not relaxed to relabel them accepted.",
+        "Portable native roles omit host-specific MCP permissions; tests use stubbed model responses and stay distinct from native execution."
+      ],
+      "path": "evidence/receipts/claude-foundation-finalization-20260921.json"
+    },
+    {
       "id": "dashboard-gap-resolution-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2584,6 +2602,71 @@
     }
   ],
   "files": [
+    {
+      "path": "catalogs/foundation/surfaces.json",
+      "sha256": "53965cb8d459e4cc7fe59629f8321e733e94766d115599d198e3622bcceed1f9",
+      "bytes": 18780
+    },
+    {
+      "path": "docs/claude-foundation-finalization-20260921.md",
+      "sha256": "e6c1b96aea4a63dd2ea3d71c0304e8ec32087e892c4ddae54624f0d96116bc85",
+      "bytes": 11161
+    },
+    {
+      "path": "evidence/artifacts/claude-foundation-finalization-20260921/qualification.json",
+      "sha256": "08792220e1f1888ecdc0e2af028d2619b646645be19e5588b0dec55da304ed77",
+      "bytes": 11469
+    },
+    {
+      "path": "evidence/artifacts/claude-foundation-finalization-20260921/workers-desktop.png",
+      "sha256": "b1997d260f314c1802657145701d8fece709690590659b0d7db2752f81771293",
+      "bytes": 112234
+    },
+    {
+      "path": "evidence/artifacts/claude-foundation-finalization-20260921/workers-mobile.png",
+      "sha256": "80c159e5889279a421ffee6458dbba0eb961c77bffc1acf482aebf4a571f2569",
+      "bytes": 69436
+    },
+    {
+      "path": "evidence/receipts/claude-foundation-finalization-20260921.json",
+      "sha256": "7ae1138350835ff33cc9c261d8112553997e64c20b50c298ae84d5de04146134",
+      "bytes": 2073
+    },
+    {
+      "path": "examples/claude-native/agents/evidence-reviewer.md",
+      "sha256": "939ca910e06152a0d273161a43beaddb9d0ce78e0e1451eede8e09680e6e9641",
+      "bytes": 568
+    },
+    {
+      "path": "examples/claude-native/agents/isolated-builder.md",
+      "sha256": "d8f3cd687dfc1c2089b25322ede53844bdd3a4c9cf47a478dcb61f2515b16dab",
+      "bytes": 624
+    },
+    {
+      "path": "examples/claude-native/workflows/README.md",
+      "sha256": "c46e288d676f9f7d78195d411ed2bce943a8fdda14a1b3272a5c84023f20543d",
+      "bytes": 2707
+    },
+    {
+      "path": "examples/claude-native/workflows/check-syntax.mjs",
+      "sha256": "ca62177687420fe22e03d0510a18e4f32b5d150e0156f6651c48367c3da506e1",
+      "bytes": 978
+    },
+    {
+      "path": "examples/claude-native/workflows/readiness-audit.js",
+      "sha256": "59794f395ecda2dcb86e03db06d53fb98bd190dc1cfcbf92629f473dcd4de53e",
+      "bytes": 12738
+    },
+    {
+      "path": "examples/claude-native/workflows/review-changes.js",
+      "sha256": "e3bd599c2355123deab62f5d39abac44ecbe2b04e73b76a9cf08d71a649f925c",
+      "bytes": 10526
+    },
+    {
+      "path": "examples/claude-native/workflows/test-envelope.mjs",
+      "sha256": "d1ecdeea386dcec565ae3a395b16ce00db431991ecabf29b0052e229bb940269",
+      "bytes": 19844
+    },
     {
       "path": "docs/hf-memory-model-qualification.md",
       "sha256": "beb6b7b165fce95ce5f501b39ab226089bb3aa5d73a46d2f21d8083ae47756e5",
@@ -6247,8 +6330,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 7086656,
-      "sha256": "2ed13ea4f556b6fc2a87c5b586722ce3909deff95a4fd10484cdb23b914b9d63"
+      "bytes": 7433281,
+      "sha256": "859f91602cc4a4991d6603c5e5ab1d492ab4c0d374c53f424cb40811da2a2758"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6257,8 +6340,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "bytes": 37912,
-      "sha256": "efa00bcc90dc0fdfb5ffb93c4484791f4cfa05e48b8f32ad57c15c3bd6dc2fe9"
+      "sha256": "151daac35330ebec55975861d972d8512955e7bd8738a802a7e87bece2ab4e24",
+      "bytes": 38559
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6277,8 +6360,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "bytes": 81629,
-      "sha256": "34aad04f25023eea0112cc14ac98353bf9c4c1195311dbe1e76f10c08c05c733"
+      "sha256": "97570fba6d4bf2d06e811cf6691e1d72fa5c42e9467fd661bae6f3104a52b1d8",
+      "bytes": 85946
     },
     {
       "path": "docs/evidence.md",
@@ -6762,8 +6845,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 80842,
-      "sha256": "61f5ea4f1cbdb6a50848330fad54fa68fee92e130d58fe6c5e41728acaa93cba"
+      "bytes": 81046,
+      "sha256": "02567fe213aae27a0c9908260120d3f483436fe2674cc207dee22d6d4925782a"
     },
     {
       "path": "observability/README.md",
@@ -6952,8 +7035,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "bytes": 34776,
-      "sha256": "e4abe10cf51618d79f4c00d7e139a64fb01dc050d18da9ae0e05d0177700e5a3"
+      "sha256": "94d21356dc9ace6452639c6204b775498451497d67353222801bd7e8d7876322",
+      "bytes": 39451
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -7062,8 +7145,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "5f5048bd2d038207d480f4fd25b7eb28e7dc9e796bbe1430ba4bebb2daf9f3b7",
-      "bytes": 38009
+      "sha256": "386cb42e21a39607ca68b3cbc66b2396ab4255e845e1e5b75a796cd86aba4793",
+      "bytes": 45979
     },
     {
       "path": "tests/test_execution_realism.py",
@@ -7247,8 +7330,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "fa3d563dd3bb3e46e17bd1951f0b92d09de4640a132c5dac1d456d6e1cb3b9c3",
-      "bytes": 12005
+      "sha256": "fcfdb5aa150988f3a3d96f48f0f5a111d7f04755de40e7a4a402947bb7bf9bb8",
+      "bytes": 12561
     },
     {
       "path": "catalogs/foundation/decisions.json",
@@ -8997,8 +9080,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "51876a958e91fcf82b4d5296b62ab39af96c805e8e33661004baaac393afc3cd",
-      "bytes": 9110
+      "sha256": "3200dca15fe615436fe8973c5d0fb2dbd30f5eff273be1455cbc2da7b111cea2",
+      "bytes": 9875
     },
     {
       "path": "docs/native-ultracode-20260921.md",
