@@ -1,5 +1,6 @@
 """Local real-LiveNode integration with fake transport; never broker acceptance."""
 import asyncio
+from decimal import Decimal
 import importlib.util
 from pathlib import Path
 import time
@@ -22,11 +23,12 @@ class FakePort:
         self.submissions, self.events = [], []
         self.qty, self.cash = 0, 10000
         self.active = {}
+        self.quote_bid, self.quote_ask = "100.00", "100.01"
 
     async def start(self, on_quote, on_order):
         self.started += 1
         self.on_quote, self.on_order = on_quote, on_order
-        on_quote({"symbol": "SPY", "bid": "100.00", "ask": "100.01", "bid_size": "100",
+        on_quote({"symbol": "SPY", "bid": self.quote_bid, "ask": self.quote_ask, "bid_size": "100",
                   "ask_size": "100", "ts_ns": time.time_ns()})
 
     async def stop(self):
@@ -76,6 +78,17 @@ class FakePort:
 
 
 if NATIVE:
+    class QuoteCapture(Strategy):
+        def __init__(self):
+            self.received = []
+
+        def on_start(self):
+            self.subscribe_quotes(InstrumentId.from_str("SPY.ALPACA"))
+
+        def on_quote(self, tick):
+            self.received.append(tick)
+            self.shutdown_system("test quote preserved")
+
     class Roundtrip(Strategy):
         def __init__(self, mode="fills"):
             super().__init__(StrategyConfig(log_events=False, log_commands=False))
@@ -124,6 +137,25 @@ if NATIVE:
 
 @unittest.skipUnless(NATIVE, "requires pinned Nautilus 2.0.0rc5 runtime")
 class NativeIntegration(unittest.TestCase):
+    def test_native_quote_precision_preserves_normalized_and_subpenny_values(self):
+        for bid, ask, precision in (("650.1", "650.12", 2), ("650.10", "650.12", 2),
+                                    ("650.1234", "650.13", 4), ("0.1234", "0.1235", 4),
+                                    ("0.1234567890123456", "0.123456789012346", 16)):
+            with self.subTest(bid=bid, ask=ask):
+                port, strategy = FakePort(), QuoteCapture()
+                port.quote_bid, port.quote_ask = bid, ask
+                session = ADAPTER.build_node(port, [{"symbol": "SPY"}], [strategy])
+                async def exercise():
+                    await asyncio.wait_for(session.run_async(), timeout=3)
+                asyncio.run(exercise())
+                self.assertEqual(session.errors, [])
+                self.assertEqual(len(strategy.received), 1)
+                quote = strategy.received[0]
+                self.assertEqual((quote.bid_price.precision, quote.ask_price.precision), (precision, precision))
+                self.assertEqual(Decimal(str(quote.bid_price)), Decimal(bid))
+                self.assertEqual(Decimal(str(quote.ask_price)), Decimal(ask))
+                self.assertEqual(port.submissions, [])
+
     def run_node(self, mode):
         port, strategy = FakePort(mode), Roundtrip(mode)
         session = ADAPTER.build_node(port, [{"symbol": "SPY", "currency": "USD"}], [strategy])

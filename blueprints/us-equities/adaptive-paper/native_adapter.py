@@ -119,7 +119,14 @@ class NativeSession:
             bid, ask = dec(row["bid"]), dec(row["ask"])
             if bid <= 0 or ask < bid or type(row["ts_ns"]) is not int or row["ts_ns"] <= 0:
                 raise ValueError("invalid_quote")
-            q = QuoteTick(ins.id, Price.from_str(str(bid)), Price.from_str(str(ask)),
+            # QuoteTick requires matching precision on both sides. Normalized
+            # decimal strings may have different trailing-zero counts; pad to
+            # their common exact precision, independently of cent order ticks.
+            precision = max(0, -bid.as_tuple().exponent, -ask.as_tuple().exponent)
+            if precision > 16:
+                raise ValueError("quote_precision_unsupported")
+            q = QuoteTick(ins.id, Price.from_str(format(bid, f".{precision}f")),
+                          Price.from_str(format(ask, f".{precision}f")),
                           shares(row["bid_size"]), shares(row["ask_size"]), row["ts_ns"],
                           self.data.clock.timestamp_ns())
             previous = self.quotes.get(sym)
