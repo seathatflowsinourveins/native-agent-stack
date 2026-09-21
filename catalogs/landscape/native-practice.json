@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-21",
+  "base_commit": "710ea0f2253bc4561535bc291c078c83490750fd",
+  "scope": "Selected native Codex/Claude skill practice supplement. The existing landscape did not contain a structured TypeSafe choice; this record makes that already authorized capability and two focused skill additions explicit. Source review, installer registration, native client discovery, provider execution and demonstrated task improvement are separate evidence levels. Nothing here establishes a universal skill or repository ranking.",
+  "selection_policy": "Select the strongest evidenced fit for a concrete gap. Preserve upstream skill bytes and licenses, use one supported installation method per skill, load only the task-relevant procedure and retain current user/project authorization. Awesome lists are discovery indexes, not ranking proof or instructions to install whole packs.",
+  "installation_method": {
+    "tool": "npx skills",
+    "agents": ["codex", "claude-code"],
+    "global_skills": ["typesafe-ai", "gh-fix-ci", "security-best-practices"],
+    "project_skills": ["typesafe-ai"],
+    "recorded_commands": [
+      "npx --yes skills add typesafe-ai/skills --skill typesafe-ai --agent codex claude-code --global --yes --json",
+      "npx --yes skills add typesafe-ai/skills --skill typesafe-ai --agent codex claude-code --copy --yes --json",
+      "npx --yes skills add openai/skills --skill gh-fix-ci security-best-practices --agent codex claude-code --global --yes --json"
+    ],
+    "strategy": "Use the supported skills add workflow for the selected repository and named skills. TypeSafe uses this same method at global and adopted-project scopes; do not layer a second manual installer or copy an authentication store. The other two skills are user-level and available to selected projects through native discovery.",
+    "observed_state": "The coordinator reported successful global installation for both native agents. Independent read-only inspection found matching global installer registrations for all three and a project TypeSafe registration. All three inspected global SKILL.md hashes matched their pinned upstream files; the project TypeSafe copy matched as well.",
+    "claim_boundary": "Installer records and matching source bytes do not establish loaded native discovery, model behavior or TypeSafe API execution. Those checks remain explicitly pending below. The recorded commands resolve repository sources when run; verify the resulting pin/bytes instead of treating a future run as acceptance of this exact source."
+  },
+  "skills": [
+    {
+      "name": "typesafe-ai",
+      "repository": "https://github.com/typesafe-ai/skills",
+      "source_pin": "65a39f393687675ce170e6094757de20370365b9",
+      "skill_path": "skills/typesafe-ai/SKILL.md",
+      "skill_sha256": "71ea90d7906c6554c4f4c460ef7361b2d26f59116ccdae986dc6d997b9389f52",
+      "license": "MIT",
+      "selection": "retain_and_make_explicit",
+      "rationale": "Typed semantic judgments fit routing, ranking, extraction and evidence questions that deterministic code cannot answer from syntax alone. The upstream skill keeps known rules, computation and execution in code, asks for representative task evaluation and points to live API/cookbook documentation. It complements the native coding clients rather than replacing their reasoning or account routes.",
+      "evidence_level": "source_review_and_installation_observation",
+      "evidence_refs": [
+        "https://github.com/typesafe-ai/skills/blob/65a39f393687675ce170e6094757de20370365b9/skills/typesafe-ai/SKILL.md",
+        "https://docs.typesafe.ai/llms.txt",
+        "https://docs.typesafe.ai/concepts/how-to-build-with-system-one.md",
+        "https://docs.typesafe.ai/confidence.md"
+      ],
+      "activation": "Load for semantic judgments or a feature that benefits from typed common-sense decisions. Read the current task-relevant API/SDK page and cookbook. The selected native evidence-review workers receive the skill and sanitized advisory packet explicitly; they have no credentials or API authority. The coordinator alone makes any authorized TypeSafe calls, with credentials scoped to that process.",
+      "limits": [
+        "Typed output guarantees an interface, not truth; confidence is not authority to execute an action.",
+        "Do not replace numeric risk, permissions, exact lookups or execution rules with model judgments.",
+        "Installed skill files do not prove valid API authentication, representative quality, cost or latency. Provider and native-worker qualification remain pending in this supplement.",
+        "The current documentation index was retrieved, but this record performs no API request and contains no credentials."
+      ],
+      "native_verification": {
+        "status": "pending",
+        "required_scope": "Fresh Codex and Claude discovery plus actual worker use; separately qualify the authorized TypeSafe API path with representative positive, negative and uncertain cases.",
+        "expected_observations": ["Selected native clients discover the intended skill without unintended duplicate activation.", "A bounded worker reads the relevant live source and preserves deterministic execution boundaries.", "Any API trial records actual typed responses, errors, latency and usage against frozen task expectations without exposing credentials."],
+        "evidence_refs": []
+      }
+    },
+    {
+      "name": "gh-fix-ci",
+      "repository": "https://github.com/openai/skills",
+      "source_pin": "49f948faa9258a0c61caceaf225e179651397431",
+      "skill_path": "skills/.curated/gh-fix-ci/SKILL.md",
+      "skill_sha256": "7b326b4a2f0f5f85122144628ec02077e48841e0e0e82efce88b3415bcfb7c26",
+      "license": "Apache-2.0",
+      "selection": "adopt_selected_skill",
+      "rationale": "The catalog maintains real GitHub Actions checks and retained failure evidence. This focused official skill reuses an upstream standard-library helper for check inspection, GitHub CLI field drift and job-log fallback instead of adding custom parsing or another CI service.",
+      "evidence_level": "source_review_and_bounded_native_helper_execution",
+      "evidence_refs": [
+        "https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/gh-fix-ci/SKILL.md",
+        "https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/gh-fix-ci/scripts/inspect_pr_checks.py",
+        "docs/github-automation.md",
+        "catalogs/foundation/automation.json"
+      ],
+      "activation": "Use when an authorized task asks to inspect or repair failing GitHub Actions PR checks. Existing task authorization takes precedence over the imported skill's repeated approval language; do not insert another planning or permission loop into already authorized work. Preserve native gh sign-in.",
+      "limits": [
+        "The retained helper run exercised only a successful-check state; failure-log extraction, actual repair quality and client-trigger behavior were not qualified by that run.",
+        "The helper returns plain text for a clean result even when --json is supplied; callers must not assume every output is JSON.",
+        "External CI providers remain outside this helper's accepted scope; their details URLs are reported rather than silently treated as GitHub Actions.",
+        "No provider-token or task-quality improvement against a matched baseline has been measured."
+      ],
+      "retained_helper_check": {
+        "observed_at": "2026-09-21",
+        "source_path": "skills/.curated/gh-fix-ci/scripts/inspect_pr_checks.py",
+        "source_sha256": "9459e5b03f86785d184a83e5cd8d621b832e918ec04158a2962d867785812c6c",
+        "execution": "The unchanged pinned script was inspected, fetched into process memory and executed with Python against the selected native-agent-stack worktree and --pr 55 --json. It used native gh/git read operations; no skill installation or repository edit was performed by this check.",
+        "target": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/55",
+        "arguments": ["--repo", "<selected-native-agent-stack-worktree>", "--pr", "55", "--json"],
+        "exit_code": 0,
+        "stdout": "PR #55: no failing checks detected.\n",
+        "stderr": "",
+        "independent_observation": "A separate native gh pr checks 55 --json name,state,bucket,link query returned five checks, each in SUCCESS state at the time of inspection.",
+        "claim_boundary": "Actual clean-check helper compatibility on the inspected host, not a failing-check repair, a native agent skill invocation or a future PR status guarantee."
+      },
+      "native_verification": {
+        "status": "pending",
+        "required_scope": "Fresh Codex and Claude discovery and bounded native-worker invocation of the installed skill.",
+        "expected_observations": ["Both clients locate the correct installed SKILL.md and helper.", "The worker preserves upstream failure/exit semantics and current authorization without requesting repeated approval.", "A retained real failing check can later qualify log extraction without rerunning or manufacturing a failing CI job solely for the catalog."],
+        "evidence_refs": []
+      }
+    },
+    {
+      "name": "security-best-practices",
+      "repository": "https://github.com/openai/skills",
+      "source_pin": "49f948faa9258a0c61caceaf225e179651397431",
+      "skill_path": "skills/.curated/security-best-practices/SKILL.md",
+      "skill_sha256": "7b3dae1ffc5434d890f3c65c8f552af52d0307fab3b35dec13013c9ca3844c4f",
+      "license": "Apache-2.0",
+      "selection": "adopt_selected_skill",
+      "rationale": "Existing gitleaks, zizmor and inventory checks do not supply application authorization, input/output, browser or framework security review guidance. This narrowly triggered official skill supplies relevant Python, JavaScript/TypeScript and Go references without a standing scan service or broad rule pack.",
+      "evidence_level": "source_review_and_installation_observation",
+      "evidence_refs": [
+        "https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-best-practices/SKILL.md",
+        "https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-best-practices/references/python-fastapi-web-server-security.md",
+        "https://github.com/openai/skills/blob/49f948faa9258a0c61caceaf225e179651397431/skills/.curated/security-best-practices/references/javascript-typescript-nextjs-web-server-security.md",
+        "manifests/stack.json",
+        "docs/acceptance-evidence-policy.md"
+      ],
+      "activation": "Use for an explicitly requested security review, security guidance or secure-by-default development in a supported language. Load the relevant framework references only after identifying the actual task. Current user scope and existing authorization prevail over generic imported process advice.",
+      "limits": [
+        "The bundled FastAPI specification names 0.128.x and the Next.js specification names 16.1.x; the reviewed foundation pins are FastAPI 0.141.1 and Next.js 16.3.5. Verify version-dependent advice in current framework sources.",
+        "Reference coverage is limited to the documented languages/frameworks. Generic advice must not be promoted to a verified vulnerability without source, deployment context and impact evidence.",
+        "The skill is not a full security audit or an instruction to review every ordinary coding task. Local loopback/development conditions must not be mislabeled as production vulnerabilities.",
+        "Installed references do not prove useful native-worker findings or false-positive control; those checks remain pending."
+      ],
+      "native_verification": {
+        "status": "pending",
+        "required_scope": "Fresh native discovery and an explicitly scoped review of a relevant fixture or change with a supported finding and a safe control.",
+        "expected_observations": ["Both clients load the intended skill only for the requested security task.", "The worker names the applicable reference and actual source lines, while preserving the supported framework/version boundary.", "Verification separates a real supported finding from assumptions and does not label the safe control insecure or claim comprehensive audit coverage."],
+        "evidence_refs": []
+      }
+    }
+  ],
+  "alternatives": [
+    {
+      "name": "Vercel focused UI and React guidance",
+      "repository": "https://github.com/vercel-labs/agent-skills",
+      "source_pin": "063bee94c3f4df8453406c830b0a7df0f2860278",
+      "skill_paths": ["skills/web-design-guidelines/SKILL.md", "skills/react-best-practices/SKILL.md"],
+      "decision": "conditional",
+      "rationale": "The small UI review skill is a useful future accessibility/interface checklist. It fetches mutable external rules, so a review needs the fetched revision retained. The 70-rule React guide is appropriate for concrete React/Next performance work; the current static catalog dashboard does not demonstrate a need to load that broader guide.",
+      "evidence_level": "source_review",
+      "evidence_refs": ["https://github.com/vercel-labs/agent-skills/tree/063bee94c3f4df8453406c830b0a7df0f2860278/skills/web-design-guidelines", "https://github.com/vercel-labs/agent-skills/tree/063bee94c3f4df8453406c830b0a7df0f2860278/skills/react-best-practices"],
+      "overturn_when": "A requested UI/accessibility or React-performance review reveals a missing procedure, and a bounded trial produces supported findings beyond existing browser acceptance without unnecessary whole-guide loading."
+    },
+    {
+      "name": "Anthropic web application testing",
+      "repository": "https://github.com/anthropics/skills",
+      "source_pin": "34040c9c568585f6929bedeaad110ad08f079624",
+      "skill_paths": ["skills/webapp-testing/SKILL.md"],
+      "decision": "overlap",
+      "rationale": "Its Playwright interaction and server helper overlap the accepted agent-browser/Playwright lanes. The instruction to always wait for networkidle has not demonstrated an advantage over task-specific readiness checks, so this source review does not justify replacing or duplicating the current browser skill.",
+      "evidence_level": "source_review",
+      "evidence_refs": ["https://github.com/anthropics/skills/blob/34040c9c568585f6929bedeaad110ad08f079624/skills/webapp-testing/SKILL.md", "catalogs/foundation/decisions.json"],
+      "overturn_when": "A concrete multi-server lifecycle or browser-testing gap is demonstrated and the upstream helper improves that case against the current lane."
+    },
+    {
+      "name": "Trail of Bits differential review",
+      "repository": "https://github.com/trailofbits/skills",
+      "source_pin": "32e34f8173796e3566a51aee877dc96bc5191f64",
+      "skill_paths": ["plugins/differential-review/skills/differential-review/SKILL.md"],
+      "decision": "conditional",
+      "rationale": "Git-history, caller-impact and concrete-attack evidence are useful for a substantial security-sensitive diff. Mandatory comprehensive reporting/history phases and the optional namespaced plugin agent are a heavier and differently integrated procedure than the existing bounded independent review; do not import the whole pack as a default.",
+      "evidence_level": "source_review",
+      "evidence_refs": ["https://github.com/trailofbits/skills/blob/32e34f8173796e3566a51aee877dc96bc5191f64/plugins/differential-review/skills/differential-review/SKILL.md", "docs/acceptance-evidence-policy.md"],
+      "overturn_when": "A security-sensitive diff requires the deeper procedure and a selected native-compatible trial improves supported findings while keeping report effort and plugin dependencies proportionate."
+    },
+    {
+      "name": "Agent Skills reference specification and tools",
+      "repository": "https://github.com/agentskills/agentskills",
+      "source_pin": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+      "skill_paths": [],
+      "decision": "retain_existing_reference",
+      "rationale": "The already installed skills-ref validator remains useful for portable format checks. The inspected repository tree contains no SKILL.md additions to install, and reference validation does not establish Claude/Codex extension support or native discovery.",
+      "evidence_level": "source_review_and_installed_help_observation",
+      "evidence_refs": ["https://github.com/agentskills/agentskills/tree/69ef37e9424c0a7ea9dd2293b559e43ec8176379", "catalogs/foundation/decisions.json"],
+      "overturn_when": "A new supported format or client-discovery problem needs a targeted validator update; a new standard revision alone is not evidence of a runtime improvement."
+    }
+  ],
+  "coordinator_owned_qualification": {
+    "status": "pending",
+    "scope": "Opt-in native evidence-review roles inherit model and effort, preserve read-only boundaries, receive sanitized advisory results and do not receive service credentials or call the API. The coordinator's eight-case catalog diagnostic is a bounded qualification target, not a performance benchmark or completed result.",
+    "role_source_refs": ["examples/claude-native/agents/semantic-evidence-reviewer.md", "examples/codex-native/agents/semantic-evidence-reviewer.toml"],
+    "diagnostic_source_refs": ["blueprints/native-skill-practice/catalog-cases.json", "blueprints/native-skill-practice/promptfooconfig.yaml"],
+    "claim_boundary": "These configuration sources are maintained by the coordinator and require integration with this supplement. Configuration presence is not native role discovery, successful worker execution or completed TypeSafe inference."
+  },
+  "preparation": {
+    "worker_model_effort": "inherited",
+    "worker_provider_usage": "unavailable",
+    "source_review_scope": "Current official repository heads and selected original skill/helper/reference files were inspected. Five native user/project skill roots were checked before selection. No installed skill or client setting was modified by this documentation worker.",
+    "validation_scope": "JSON structure, exact source-pin shape, selected skill identities, local reference existence and staged whitespace are structural checks only. Native client and provider checks are delegated to the coordinator and remain pending until actual returned evidence is recorded."
+  }
+}
