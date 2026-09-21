@@ -1,5 +1,11 @@
 # Full-stack native practice and returned evidence
 
+The subsequent [landscape reconciliation](../catalogs/landscape/README.md) covers
+all 20 foundation/domain layers, expands the joined research index to 519
+identities, and records the current 343-public-star snapshot. The original wave
+counts and measurements below retain their dated scope; the current HTML derives
+its totals from the canonical records.
+
 The September 21 convergence connects **68 selected components**, **16 foundation
 layers** and **513 research repository identities** to upstream commands, dated
 native results, dashboards and portable recipes. Open the [offline HTML](ecosystem/index.html),
@@ -55,16 +61,18 @@ and [independent review](../evidence/artifacts/full-stack-convergence-20260921/i
 | Recovery/portability | Versioned prefixes, rollback, Restic native restore | Scoped disposable/hosted-job evidence; qualify new PCs |
 | Observation/inference | Grafana/Prometheus/Loki/OTel and native outputs | Source time differs from scrape time; usage differs from savings |
 
-The [foundation catalog](../catalogs/foundation/manifest.json) retains 44 capability
+The [foundation catalog](../catalogs/foundation/manifest.json) retains 46 capability
 decisions. The [lifecycle guide](../adoption/lifecycle.md) covers installation,
 restart, recovery and cleanup. Reuse accepted evidence while its inputs and scope
 match; additional testing should resolve a concrete uncertainty.
 
-Two current native Claude terminal resumes did not reach the actual HUD. Existing
+Two native Claude terminal resumes in this wave did not reach the actual HUD. Existing
 authentication and onboarding were ready; the effort overlay remained visible
 after Enter was sent. Settings/model/effort stayed unchanged and owned processes
 were cleaned up. The [attempt record](../evidence/artifacts/full-stack-convergence-20260921/hud-observation.json)
-preserves this current boundary instead of repeating the older onboarding blocker.
+preserves those attempts. The later [foundation-closure observation](foundation-closure-20260921.md#actual-session-and-terminal-evidence)
+records actual HUD rendering; the current capability/lifecycle catalog now joins
+that evidence, with the original screen-observation and statistics limits.
 Outer bridge, gateway and Beads recovery qualification also remain optional gaps.
 
 ## Useful upstream dashboards

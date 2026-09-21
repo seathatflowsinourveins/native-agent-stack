@@ -32,15 +32,16 @@
   },
   "counts": {
     "selected_components": 68,
-    "catalog_identities": 513,
-    "nonselected_catalog_identities": 445,
+    "catalog_identities": 519,
+    "nonselected_catalog_identities": 451,
     "exclusive_identity_groups": {
       "star_review": 275,
       "component_record": 68,
       "catalog_card": 114,
-      "research_supplement": 54,
+      "research_supplement": 60,
       "legacy_candidate": 2
-    }
+    },
+    "exclusive_identity_group_scope": "Retains the preceding reconciliation groups; the six newly indexed identities enter through landscape research supplements. Current public-star membership is reported separately by the upstream snapshot."
   },
   "counter_policy": {
     "rtk": "retained upstream command-output estimate; global/project overlap",
@@ -55,11 +56,11 @@
   "next_wave": [
     {
       "component_id": "claude-hud",
-      "gap": "Synthetic renderer accepted. Real interactive attempt reached onboarding before HUD appeared despite existing authenticated state; live statusline remains unverified. No model/login route was changed."
+      "gap": "Configured live rendering is accepted within the later foundation-closure native PTY scope. Every statistic, billing reconciliation, Windows dropdown interaction and new-host lifecycle remain unqualified."
     },
     {
       "component_id": "context-mode",
-      "gap": "Project scope passes in fresh native sessions. Existing desktop process retains its loaded connection; no hot reload was claimed."
+      "gap": "Fresh native project scope and later manual PreCompact hook execution have retained acceptance. Automatic compaction, full fact preservation and new-host/session qualification remain unestablished; an existing desktop connection was not hot-reloaded."
     },
     {
       "component_id": "vllm",
@@ -1623,15 +1624,15 @@
         "retained_operation_ids": [
           "fresh-claude-hud-synthetic"
         ],
-        "scope": "Representative synthetic stdin label and context bar; not a live interactive account display."
+        "scope": "Historical synthetic stdin label/context-bar evidence is retained. The later foundation-closure native PTY observations, linked under lifecycle use, qualify configured live HUD rendering separately; this reconciliation did not repeat the operation."
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,
-      "next_action": "Resolve the current terminal/effort-dialog boundary and observe the actual statusline. Existing authentication/onboarding is ready; do not repeat sign-in as the presumed blocker.",
-      "integration_mode": "Configured optional statusline; actual interactive rendering remains unverified.",
+      "next_action": "Reuse the recorded native rendering evidence; verify destination-host activation or a specifically needed statistic before extending that scope.",
+      "integration_mode": "Configured optional statusline rendered in the retained foundation-closure native Claude terminal observations.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Historical synthetic rendering passed. Two September 21 authenticated native resumes stopped at the effort overlay; actual HUD rendering remains unverified. Settings/model/effort were preserved and owned processes cleaned up.",
+        "scope": "Retained foundation-closure observations record the configured HUD rendering model, project, context and usage fields before and after a native review. Earlier synthetic and effort-overlay attempts remain historical evidence. The landscape reconciliation performed no new native run.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
@@ -1649,11 +1650,13 @@
           ]
         },
         "use": {
-          "status": "partial_acceptance",
-          "scope": "Historical synthetic rendering passed. Two September 21 authenticated native resumes stopped at the effort overlay; actual HUD rendering remains unverified. Settings/model/effort were preserved and owned processes cleaned up.",
+          "status": "accepted_within_scope",
+          "scope": "Native PTY screen observations and installed-plugin audit qualify visible claude-hud 0.8.0 rendering in Claude 2.1.278. Every statistic, billing reconciliation, Windows dropdown interaction and a new host remain unqualified. No execution was repeated for this catalog reconciliation.",
           "evidence_refs": [
             "evidence/receipts/native-claude-hud-interactive-20260920.json",
-            "evidence/artifacts/full-stack-convergence-20260921/hud-observation.json"
+            "evidence/artifacts/full-stack-convergence-20260921/hud-observation.json",
+            "evidence/receipts/foundation-closure-20260921.json",
+            "evidence/artifacts/foundation-closure-20260921/observations.json"
           ]
         },
         "persistence": {
@@ -2428,9 +2431,11 @@
         },
         "use": {
           "status": "accepted_within_scope",
-          "scope": "Fresh native Claude/Codex connections used the corrected project root and returned the requested file content. Existing Desktop connections were not hot-reloaded; forced PreCompact was not exercised.",
+          "scope": "September 20 native Claude/Codex connections used the corrected project root and returned requested file content. Later foundation-closure observations qualify manual PreCompact hook execution and selected continuity facts. Automatic compaction, every-fact preservation, new-host/session acceptance and hot-reloading an existing Desktop connection remain unqualified.",
           "evidence_refs": [
-            "evidence/receipts/native-token-focus-clients-20260920.json"
+            "evidence/receipts/native-token-focus-clients-20260920.json",
+            "evidence/receipts/foundation-closure-20260921.json",
+            "evidence/artifacts/foundation-closure-20260921/compaction.json"
           ]
         },
         "persistence": {
@@ -2440,7 +2445,7 @@
         },
         "restart": {
           "status": "accepted_within_scope",
-          "scope": "Fresh native Claude/Codex connections used the corrected project root and returned the requested file content. Existing Desktop connections were not hot-reloaded; forced PreCompact was not exercised.",
+          "scope": "The September 20 native Claude/Codex connections used the corrected project root and returned requested file content. That run did not hot-reload an existing Desktop connection or force PreCompact; later manual compaction evidence is mapped under use.",
           "evidence_refs": [
             "evidence/receipts/native-token-focus-clients-20260920.json"
           ]
@@ -3506,7 +3511,7 @@
     },
     {
       "component_id": "headroom",
-      "repository": "https://github.com/chopratejas/headroom",
+      "repository": "https://github.com/headroomlabs-ai/headroom",
       "version": "0.37.0",
       "profile": "supporting",
       "role": "On-demand upstream MCP compression/retrieval and separately guarded offline artifact compression",
@@ -8970,8 +8975,8 @@
   "remaining_boundaries": [
     {
       "component_id": "claude-hud",
-      "type": "interactive_onboarding_boundary",
-      "status": "Live HUD not rendered; synthetic fixture remains separately valid."
+      "type": "remaining_hud_metric_and_host_scope",
+      "status": "Later native PTY observations qualify configured live HUD rendering. Earlier failed attempts remain retained; every statistic, billing reconciliation, Windows dropdown interaction and a new host are not established."
     },
     {
       "component_id": "codex-for-claude",
@@ -8980,8 +8985,12 @@
     },
     {
       "component_id": "context-mode",
-      "type": "unforced_native_lifecycle",
-      "status": "Fresh native PreCompact unforced; existing Desktop process retains its loaded old connection."
+      "type": "automatic_compaction_and_continuity_scope",
+      "status": "Later manual compaction returned a successful Context Mode PreCompact hook and bounded continuity observations. Automatic compaction, preservation of every fact and a new host/session remain unqualified. Existing Desktop connections were not hot-reloaded.",
+      "evidence_refs": [
+        "evidence/receipts/native-token-focus-clients-20260920.json",
+        "evidence/artifacts/foundation-closure-20260921/compaction.json"
+      ]
     },
     {
       "component_id": "agentsview",
@@ -8997,7 +9006,7 @@
   "installation_gap_conclusion": "The selected roles have recipes and explicit dated/partial/platform-specific evidence. Optional OmniRoute 3.8.50 is installed with isolated Linux lifecycle acceptance; native gateway use remains incomplete after model-prefix/quota failures and encrypted native restore is unsupported. These are functional/recovery limits rather than a missing installer. Unestablished lifecycle stages and new-host acceptance remain visible; this is not universal saturation or a claim that every installed tool improves tokens.",
   "integration_note": "Current identity/recipe/evidence joins reconciled with the September 21 wave. Historical lifecycle stages retain their operation boundaries; metadata reconciliation does not execute or recertify every component.",
   "reconciled_at_utc": "2026-09-21",
-  "reconciliation_base_public_commit": "6f74bc503ccecaaf6ccebd53677b23aedab50921",
+  "reconciliation_base_public_commit": "fb04bf702ea67b14163405f0ebe132e393ebbd8a",
   "stage_policy": {
     "stages": [
       "install",

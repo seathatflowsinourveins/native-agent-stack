@@ -27,6 +27,132 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/0/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/1/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/10/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/11/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/12/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/13/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/14/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/15/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/2/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/3/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/4/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/5/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/6/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/7/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/8/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "collection": "/layers/9/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/upstream-snapshot.json",
+      "collection": "/stars/added_reviews",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "collection": "/layers/0/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "collection": "/layers/1/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "collection": "/layers/2/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "collection": "/layers/3/candidates",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/agents-operations.json",
       "collection": "/entries",
       "repository_field": "repository",
@@ -167,16 +293,16 @@
     "zep-ai/graphiti": "getzep/graphiti"
   },
   "counts": {
-    "repositories": 513,
+    "repositories": 519,
     "public_star_repositories": 342,
-    "beyond_public_stars": 171,
-    "references": 1072,
+    "beyond_public_stars": 177,
+    "references": 1241,
     "repositories_by_record_type": {
       "catalog_card": 147,
       "component_record": 68,
       "legacy_candidate": 20,
       "public_star": 342,
-      "research_supplement": 108,
+      "research_supplement": 194,
       "star_review": 342
     }
   },
@@ -382,6 +508,22 @@
       ]
     },
     {
+      "repository": "https://github.com/actions/attest",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/11/candidates/1",
+          "disposition": "selected"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/actions/checkout",
       "aliases": [],
       "public_star": true,
@@ -451,6 +593,12 @@
           "evidence_level": "source_review"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/1/candidates/0",
+          "disposition": "selected"
+        },
+        {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
           "pointer": "/stars/10",
@@ -500,9 +648,16 @@
         "component_record",
         "legacy_candidate",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/1/candidates/1",
+          "disposition": "selected"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -585,6 +740,12 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/12",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/trading.json",
           "pointer": "/entries/8",
           "decision": "research_only_after_simple_baselines_and_data_gates",
@@ -664,6 +825,18 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/7/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/0",
+          "disposition": "selected"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/foundation.json",
@@ -879,6 +1052,18 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/2",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/alpaca.json",
           "pointer": "/repositories/0",
           "decision": "retain_current_offline_sdk_baseline",
@@ -1052,9 +1237,16 @@
       "record_types": [
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/8/candidates/2",
+          "disposition": "selected"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -1100,9 +1292,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/11/candidates/7",
+          "disposition": "unqualified"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -1119,9 +1318,16 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/11/candidates/4",
+          "disposition": "selected"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -1145,9 +1351,16 @@
       "record_types": [
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/5/candidates/1",
+          "disposition": "selected"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -1232,6 +1445,12 @@
       ],
       "references": [
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/0/candidates/3",
+          "disposition": "conditional"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
           "pointer": "/entries/39",
@@ -1283,9 +1502,28 @@
       "record_types": [
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/0/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/2/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/1",
+          "disposition": "selected"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -1414,9 +1652,16 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/3/candidates/1",
+          "disposition": "selected"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -1525,9 +1770,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/3/candidates/2",
+          "disposition": "conditional"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -1543,9 +1795,16 @@
       "record_types": [
         "catalog_card",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/11/candidates/6",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -1609,9 +1868,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/15/candidates/10",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -1677,9 +1943,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/4/candidates/1",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -1706,6 +1979,12 @@
           "kind": "research_supplement",
           "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
           "pointer": "/reviewed_repositories/1"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/14/candidates/2",
+          "disposition": "selected"
         }
       ]
     },
@@ -1930,6 +2209,12 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/7/candidates/2",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/convergence-program/foundation.json",
           "pointer": "/repositories/8",
           "decision": "alternative_not_parallel_default",
@@ -1963,13 +2248,36 @@
       ]
     },
     {
+      "repository": "https://github.com/benbjohnson/litestream",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/14/candidates/1",
+          "disposition": "conditional"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/bentoml/bentoml",
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/13/candidates/5",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -2061,9 +2369,16 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/15/candidates/5",
+          "disposition": "selected"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -2221,9 +2536,16 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/8/candidates/4",
+          "disposition": "overlap"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -2301,6 +2623,12 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/12",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -2419,9 +2747,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/9/candidates/5",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -2570,9 +2905,16 @@
       "record_types": [
         "catalog_card",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/10",
+          "disposition": "conditional"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -2728,9 +3070,16 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/4/candidates/4",
+          "disposition": "unqualified"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -3070,9 +3419,22 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/12/candidates/5",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/10",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -3100,6 +3462,18 @@
           "kind": "research_supplement",
           "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
           "pointer": "/reviewed_repositories/2"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/12/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/2",
+          "disposition": "selected"
         },
         {
           "kind": "catalog_card",
@@ -3146,6 +3520,12 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/4",
+          "disposition": "conditional"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/authenticated-data-review.json",
@@ -3220,9 +3600,16 @@
       "record_types": [
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/1/candidates/3",
+          "disposition": "conditional"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -3328,9 +3715,22 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/6/candidates/5",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/11",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/foundation-memory.json",
@@ -3390,9 +3790,16 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/11/candidates/5",
+          "disposition": "selected"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -3447,6 +3854,12 @@
           "path": "adoption/research.json",
           "pointer": "/candidates/5",
           "decision": "defer_privileged_platform_installation"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/14/candidates/6",
+          "disposition": "out_of_scope"
         }
       ]
     },
@@ -3458,9 +3871,16 @@
         "catalog_card",
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/4/candidates/2",
+          "disposition": "selected"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -3504,6 +3924,12 @@
           "path": "adoption/research.json",
           "pointer": "/candidates/2",
           "decision": "defer_container_profile_until_container_hosting_is_selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/13/candidates/4",
+          "disposition": "conditional"
         }
       ]
     },
@@ -3519,6 +3945,12 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/1",
+          "disposition": "selected"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -3607,6 +4039,12 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/13",
+          "disposition": "measured_tradeoff"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -3717,9 +4155,22 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/5/candidates/4",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/14",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/foundation-memory.json",
@@ -3786,9 +4237,16 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/9/candidates/6",
+          "disposition": "overlap"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -3815,6 +4273,12 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/2",
+          "disposition": "selected"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/convergence-program/trading.json",
@@ -3875,9 +4339,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/3/candidates/4",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -4218,9 +4689,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/13/candidates/2",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -4329,9 +4807,16 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/8/candidates/6",
+          "disposition": "unqualified"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -4526,9 +5011,16 @@
         "component_record",
         "legacy_candidate",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/2/candidates/3",
+          "disposition": "conditional"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -4566,6 +5058,12 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/3",
+          "disposition": "selected"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/trading.json",
@@ -4633,9 +5131,22 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "legacy_candidate"
+        "legacy_candidate",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/7/candidates/4",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/10",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/foundation-memory.json",
@@ -4689,6 +5200,18 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/6/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/3",
+          "disposition": "selected"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/foundation.json",
@@ -4759,9 +5282,16 @@
         "catalog_card",
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/11/candidates/3",
+          "disposition": "selected"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -4969,14 +5499,43 @@
       ]
     },
     {
+      "repository": "https://github.com/google/gvisor",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/3/candidates/3",
+          "disposition": "unqualified"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/grafana/grafana",
       "aliases": [],
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/15/candidates/3",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/6",
+          "disposition": "selected"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -4999,9 +5558,22 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/15/candidates/2",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/5",
+          "disposition": "selected"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -5126,9 +5698,22 @@
         "catalog_card",
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/9/candidates/2",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/15",
+          "disposition": "conditional"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -5274,9 +5859,16 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "legacy_candidate"
+        "legacy_candidate",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/12",
+          "disposition": "unqualified"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/foundation-memory.json",
@@ -5451,9 +6043,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/9",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
@@ -5575,6 +6174,12 @@
       ],
       "references": [
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/7",
+          "disposition": "overlap"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
           "pointer": "/entries/4",
@@ -5598,9 +6203,16 @@
       "record_types": [
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/15/candidates/8",
+          "disposition": "selected"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -5678,6 +6290,12 @@
           "decision": "optional_native_tool_layer_not_required_for_current_uv_only_adoption"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/14/candidates/3",
+          "disposition": "conditional"
+        },
+        {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
           "pointer": "/stars/139",
@@ -5731,6 +6349,12 @@
           "path": "adoption/research.json",
           "pointer": "/candidates/4",
           "decision": "defer_nix_environment_platform"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/14/candidates/5",
+          "disposition": "unqualified"
         }
       ]
     },
@@ -5750,6 +6374,12 @@
           "kind": "research_supplement",
           "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
           "pointer": "/reviewed_repositories/6"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/4/candidates/3",
+          "disposition": "selected"
         },
         {
           "kind": "public_star",
@@ -5861,9 +6491,16 @@
       "record_types": [
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/15/candidates/6",
+          "disposition": "selected"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -5922,6 +6559,12 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/7",
+          "disposition": "out_of_scope"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/trading.json",
@@ -6033,9 +6676,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/10/candidates/2",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -6099,9 +6749,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/6/candidates/4",
+          "disposition": "unqualified"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/foundation-memory.json",
@@ -6146,6 +6803,18 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/2/candidates/4",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/11",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -6330,9 +6999,16 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "legacy_candidate"
+        "legacy_candidate",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/0/candidates/4",
+          "disposition": "unqualified"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/foundation-memory.json",
@@ -6613,6 +7289,12 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/4",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/trading.json",
           "pointer": "/entries/2",
           "decision": "hold_python_first_alternative_until_license_and_execution_acceptance",
@@ -6773,6 +7455,12 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/5",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/authenticated-data-review.json",
           "pointer": "/decisions/0",
           "decision": "retain_conditional_identity_provider",
@@ -6827,9 +7515,22 @@
       "record_types": [
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/2/candidates/2",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/3/candidates/0",
+          "disposition": "selected"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -6891,6 +7592,18 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/7/candidates/3",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/7",
+          "disposition": "overlap"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/foundation.json",
           "pointer": "/repositories/11",
           "decision": "omit",
@@ -6931,9 +7644,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/6",
+          "disposition": "overlap"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
@@ -6993,9 +7713,16 @@
         "catalog_card",
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/5/candidates/2",
+          "disposition": "selected"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -7031,9 +7758,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/10/candidates/0",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -7047,9 +7781,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/8/candidates/1",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -7092,6 +7833,12 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/11",
+          "disposition": "conditional"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/trading.json",
@@ -7213,6 +7960,18 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/9/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/5",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/foundation.json",
           "pointer": "/repositories/0",
           "decision": "retain",
@@ -7287,9 +8046,16 @@
       "record_types": [
         "catalog_card",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/10/candidates/5",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -7327,9 +8093,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/13/candidates/6",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -7653,6 +8426,12 @@
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/0",
+          "disposition": "selected"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/trading.json",
@@ -8339,6 +9118,18 @@
       ],
       "references": [
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/15/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/3",
+          "disposition": "selected"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
           "pointer": "/entries/20",
@@ -8371,6 +9162,24 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/0/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/2/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/0",
+          "disposition": "selected"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -8447,9 +9256,22 @@
       "record_types": [
         "catalog_card",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/0/candidates/2",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/15",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -8551,6 +9373,12 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/6",
+          "disposition": "conditional"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/authenticated-data-review.json",
@@ -8682,9 +9510,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/15/candidates/9",
+          "disposition": "overlap"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -8721,9 +9556,22 @@
         "catalog_card",
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/4/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/2",
+          "disposition": "selected"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -9050,9 +9898,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/6/candidates/3",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/foundation-memory.json",
@@ -9156,9 +10011,16 @@
       "record_types": [
         "catalog_card",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/8",
+          "disposition": "conditional"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -9194,6 +10056,12 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/5",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/trading.json",
           "pointer": "/entries/3",
           "decision": "optional_research_sweeps_not_order_authority",
@@ -9214,9 +10082,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/13/candidates/3",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -9274,9 +10149,22 @@
       "record_types": [
         "catalog_card",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/12/candidates/4",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/9",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -9332,9 +10220,16 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/15/candidates/4",
+          "disposition": "selected"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -9375,9 +10270,22 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/15/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/4",
+          "disposition": "selected"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -9402,9 +10310,16 @@
         "catalog_card",
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/10/candidates/1",
+          "disposition": "selected"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -9541,9 +10456,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/14",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/engines-strategies.json",
@@ -9601,9 +10523,22 @@
       "public_star": false,
       "record_types": [
         "catalog_card",
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/6/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/4",
+          "disposition": "selected"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/foundation-memory.json",
@@ -9630,6 +10565,12 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/1",
+          "disposition": "selected"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/trading.json",
@@ -9683,6 +10624,12 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/3",
+          "disposition": "conditional"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/convergence-program/trading.json",
@@ -9748,9 +10695,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/9",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
@@ -9792,9 +10746,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/14",
+          "disposition": "out_of_scope"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
@@ -9828,9 +10789,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/13/candidates/1",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -9883,6 +10851,22 @@
       ]
     },
     {
+      "repository": "https://github.com/restatedev/restate",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/12/candidates/3",
+          "disposition": "conditional"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/restic/restic",
       "aliases": [],
       "public_star": true,
@@ -9901,6 +10885,18 @@
           "decision": "retain",
           "review_level": "source_review",
           "evidence_level": "pinned_source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/14/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/7",
+          "disposition": "selected"
         },
         {
           "kind": "catalog_card",
@@ -9961,6 +10957,22 @@
           "decision": "overlaps_established",
           "review_level": "source_review",
           "review_depth": "readme_license_overview"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/rhysd/actionlint",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/11/candidates/0",
+          "disposition": "selected"
         }
       ]
     },
@@ -10138,6 +11150,18 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/9/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/6",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/convergence-program/foundation.json",
           "pointer": "/repositories/2",
           "decision": "retain_conditional_hook_review",
@@ -10178,9 +11202,22 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/5/candidates/5",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/13",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/foundation-memory.json",
@@ -10339,9 +11376,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/15/candidates/11",
+          "disposition": "unqualified"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -10370,6 +11414,12 @@
           "id": "claude-best-practice",
           "decision": "retain",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/1/candidates/2",
+          "disposition": "conditional"
         },
         {
           "kind": "public_star",
@@ -10654,6 +11704,12 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/10",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/trading.json",
           "pointer": "/entries/10",
           "decision": "preferred_conditional_statistical_evaluation_library",
@@ -10867,6 +11923,12 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/8",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/trading.json",
           "pointer": "/entries/5",
           "decision": "alternate_equity_data_semantics_reference",
@@ -11058,6 +12120,12 @@
       "references": [
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/12/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/convergence-program/hosting.json",
           "pointer": "/candidates/7",
           "decision": "adopt_scoped_supervision_recipe",
@@ -11076,9 +12144,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/14",
+          "disposition": "unqualified"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -11096,9 +12171,16 @@
       "record_types": [
         "catalog_card",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/3/candidates/13",
+          "disposition": "unqualified"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -11128,9 +12210,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/8/candidates/3",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -11180,6 +12269,24 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/12/candidates/2",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/2/candidates/5",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/8",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
@@ -11303,9 +12410,16 @@
         "catalog_card",
         "legacy_candidate",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/7/candidates/5",
+          "disposition": "overlap"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -11462,6 +12576,18 @@
         },
         {
           "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/5/candidates/0",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/1",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
           "path": "catalogs/us-equities/architecture/foundation.json",
           "pointer": "/repositories/2",
           "decision": "retain",
@@ -11504,9 +12630,16 @@
         "catalog_card",
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/9/candidates/4",
+          "disposition": "measured_tradeoff"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -11693,9 +12826,16 @@
       ],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/11",
+          "disposition": "unqualified"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
@@ -11711,9 +12851,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "catalog_card"
+        "catalog_card",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/13",
+          "disposition": "conditional"
+        },
         {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/data-research.json",
@@ -11725,13 +12872,44 @@
       ]
     },
     {
+      "repository": "https://github.com/trycua/cua",
+      "aliases": [],
+      "public_star": false,
+      "record_types": [
+        "research_supplement"
+      ],
+      "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/8/candidates/7",
+          "disposition": "conditional"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/upstream-snapshot.json",
+          "pointer": "/stars/added_reviews/0",
+          "decision": "targeted_candidate",
+          "review_level": "source_review",
+          "review_depth": "selected_primary_files"
+        }
+      ]
+    },
+    {
       "repository": "https://github.com/tsdgeos/poppler_mirror",
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/5/candidates/3",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -11861,6 +13039,12 @@
           "path": "adoption/research.json",
           "pointer": "/candidates/3",
           "decision": "defer_optional_selected_dotfile_management"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/14/candidates/4",
+          "disposition": "conditional"
         }
       ]
     },
@@ -11955,6 +13139,12 @@
           "evidence_level": "pinned_source_review"
         },
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/10/candidates/4",
+          "disposition": "conditional"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
           "pointer": "/entries/30",
@@ -11995,9 +13185,16 @@
       "public_star": true,
       "record_types": [
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/8/candidates/5",
+          "disposition": "conditional"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -12023,6 +13220,12 @@
         "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/2/candidates/12",
+          "disposition": "unqualified"
+        },
         {
           "kind": "research_supplement",
           "path": "catalogs/us-equities/authenticated-data-review.json",
@@ -12175,9 +13378,22 @@
         "catalog_card",
         "legacy_candidate",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/7/candidates/1",
+          "disposition": "unqualified"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/8",
+          "disposition": "conditional"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -12263,9 +13479,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/8/candidates/0",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -12304,9 +13527,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/13/candidates/0",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -12460,6 +13690,18 @@
       ],
       "references": [
         {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/6/candidates/2",
+          "disposition": "selected"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/1/candidates/16",
+          "disposition": "measured_tradeoff"
+        },
+        {
           "kind": "catalog_card",
           "path": "catalogs/us-equities/agents-operations.json",
           "pointer": "/entries/10",
@@ -12490,9 +13732,16 @@
         "catalog_card",
         "legacy_candidate",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/us-equities.json",
+          "pointer": "/layers/0/candidates/9",
+          "disposition": "conditional"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -12565,6 +13814,12 @@
           "id": "awesome-claude-subagents",
           "decision": "conditional",
           "evidence_level": "source_review"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/1/candidates/4",
+          "disposition": "overlap"
         },
         {
           "kind": "public_star",
@@ -12854,9 +14109,16 @@
       "aliases": [],
       "public_star": false,
       "record_types": [
-        "component_record"
+        "component_record",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/10/candidates/3",
+          "disposition": "selected"
+        },
         {
           "kind": "component_record",
           "path": "manifests/stack.json",
@@ -13040,9 +14302,16 @@
         "catalog_card",
         "component_record",
         "public_star",
+        "research_supplement",
         "star_review"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/9/candidates/3",
+          "disposition": "selected"
+        },
         {
           "kind": "public_star",
           "path": "catalogs/us-equities/coverage.json",
@@ -13179,9 +14448,16 @@
       "public_star": false,
       "record_types": [
         "component_record",
-        "legacy_candidate"
+        "legacy_candidate",
+        "research_supplement"
       ],
       "references": [
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/15/candidates/7",
+          "disposition": "selected"
+        },
         {
           "kind": "legacy_candidate",
           "path": "manifests/candidates.json",
@@ -13367,6 +14643,12 @@
           "kind": "research_supplement",
           "path": "catalogs/convergence-practice/architecture-wave/source-review.json",
           "pointer": "/reviewed_repositories/9"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/landscape/foundation.json",
+          "pointer": "/layers/11/candidates/2",
+          "disposition": "selected"
         },
         {
           "kind": "component_record",

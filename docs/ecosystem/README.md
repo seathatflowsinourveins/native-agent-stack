@@ -7,8 +7,9 @@ external font. Source links navigate only when selected. GitHub shows HTML sourc
 download the file to view it locally. The same file can be served by an existing
 static host, but this change does not configure GitHub Pages or paid hosting.
 
-The five views connect a layered ecosystem map, the canonical repository explorer,
-selected-stack setup, token-efficiency evidence, and dated source provenance. Every
+The views connect a layered ecosystem map, foundation and trading capabilities,
+current choices and alternatives, the repository explorer, selected-stack setup,
+token-efficiency evidence, and dated source provenance. Every
 current public index identity and the existing 342-star snapshot are retained. The separate
 current-integrations lane makes newly observed Tavily setup searchable without
 silently enlarging the canonical index or accepted component manifest. Stars and
@@ -16,6 +17,17 @@ awesome lists remain discovery signals. Layer tags are navigation heuristics,
 not adoption decisions or quality scores.
 
 ## Use the setup and efficiency views
+
+**Choices & alternatives** covers all 16 foundation layers and four domain
+research layers. Each card states the requirement, current choice, named candidate
+outcomes, linked evidence, limitations and the comparison that would reopen the
+decision. Search across layers/candidates or filter by catalog and outcome.
+The 152 original domain candidate cards remain expandable with their historical
+dates and recommendations. The current interpretation stays visibly separate.
+Download the complete joined comparison JSON from this view. Fresh upstream
+metadata is linked separately; release recency does not establish superiority.
+The [landscape manifest](../../catalogs/landscape/manifest.json) drives this view,
+and `python3 scripts/landscape.py` checks coverage and reference integrity.
 
 **Selected stack & setup** includes every component in `manifests/stack.json`,
 with layer and adoption-profile filters, the selected version, native command

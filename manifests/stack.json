@@ -481,7 +481,7 @@
     },
     {
       "id": "headroom",
-      "repository": "https://github.com/chopratejas/headroom",
+      "repository": "https://github.com/headroomlabs-ai/headroom",
       "version": "0.37.0",
       "license": "Apache-2.0",
       "profile": "supporting",

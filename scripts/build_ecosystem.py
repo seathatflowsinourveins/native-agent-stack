@@ -13,9 +13,11 @@ import re
 from urllib.parse import quote, urlsplit
 
 try:
-    from .catalog_decisions import InvalidDecisionIndex, load, pointer, safe_file
+    from .catalog_decisions import InvalidDecisionIndex, canonical, load, pointer, safe_file
+    from .landscape import build_landscape
 except ImportError:
-    from catalog_decisions import InvalidDecisionIndex, load, pointer, safe_file
+    from catalog_decisions import InvalidDecisionIndex, canonical, load, pointer, safe_file
+    from landscape import build_landscape
 
 
 CONFIG = "docs/ecosystem/manifest.json"
@@ -54,6 +56,8 @@ RETURNED_RECEIPT_FAMILIES = {
 PUBLIC_ARTIFACT_LIMIT = 2 * 1024 * 1024
 PUBLIC_BUNDLE_LIMIT = 16 * 1024 * 1024
 NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-confirmation-20260920.json",
+                    "docs/token-native-saturation.md", "catalogs/us-equities/README.md",
+                    "catalogs/us-equities/decision-index.json", "catalogs/us-equities/manifest.json",
                     "docs/claude-upstream-checks.md", "docs/ecosystem/claude-upstream-checks.html",
                     "evidence/artifacts/claude-upstream-checks-20260921/results.json",
                     "evidence/artifacts/claude-upstream-checks-20260921/provenance.json",
@@ -327,13 +331,25 @@ def build_data(root):
         safe_file(root, path)
         # This packet is newer than the immutable base; its own new pages resolve
         # at the public branch after publication, with exact input hashes retained.
-        new_catalog = path.startswith("catalogs/foundation/") or path in config.get("grand_catalogs", {}).values()
+        new_catalog = path.startswith(("catalogs/foundation/", "catalogs/landscape/", "docs/landscape-")) or path in config.get("grand_catalogs", {}).values()
         revision = "main" if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog or path in current_public_paths else config["source_revision"]
         return f'{config["repository_url"]}/blob/{revision}/{quote(path, safe="/")}'
 
     index, stack, evidence, stars, review = (read(path) for path in (INDEX, STACK, EVIDENCE, STARS, REVIEW))
     star_map = {row["repository"].casefold(): row for row in stars["repositories"]}
     require(len(star_map) == stars["count"], "public-star count or duplicate identity mismatch")
+    stars_observed_at = stars["retrieved_at"]
+    if config.get("landscape_manifest"):
+        landscape_manifest = read(config["landscape_manifest"])
+        current_stars = read(landscape_manifest["sources"]["freshness_snapshot"])["stars"]
+        require(current_stars.get("status") == "checked", "current public-star snapshot must be checked")
+        latest_map = {}
+        for row in current_stars["repositories"]:
+            key = canonical(repository_key(row["repository"]), index.get("aliases", {}))
+            require(key not in latest_map, "duplicate current public-star identity")
+            latest_map[key] = {**star_map.get(key, {}), **row}
+        star_map = latest_map
+        stars_observed_at = current_stars["repository_snapshot_checked_at"]
     receipts_by_id = {row["id"]: row for row in evidence["receipts"]}
     require(len(receipts_by_id) == len(evidence["receipts"]), "duplicate evidence receipt identity")
     receipt_ids = set(TOKEN_RECEIPTS)
@@ -366,20 +382,22 @@ def build_data(root):
             entry = pointer(document, ref["pointer"])
             require(isinstance(entry, dict), "source pointer must address a record")
             fields = {name: text(entry.get(name) or ref.get(name)) for name in (
-                "role", "decision", "rationale", "evidence_level", "review_level",
+                "role", "decision", "disposition", "rationale", "evidence_kind", "evidence_level", "review_level",
                 "review_depth", "evidence_depth", "version_or_commit", "source_commit",
                 "version", "license", "acceptance_gate")}
             pin = (fields["source_commit"] or text(entry.get("reviewed_source", {}).get("commit"))
                    or fields["version_or_commit"] or fields["version"])
             depth = " ".join(fields[name] for name in (
-                "evidence_level", "review_level", "review_depth", "evidence_depth"))
+                "evidence_kind", "evidence_level", "review_level", "review_depth", "evidence_depth"))
             reviewed = reviewed or "source_review" in depth or "primary_source" in depth
             if pin and pin not in pins:
                 pins.append(pin)
             if fields["decision"] and fields["decision"] not in decisions:
                 decisions.append(fields["decision"])
+            if fields["disposition"] and fields["disposition"] not in decisions:
+                decisions.append(fields["disposition"])
             role = role or fields["role"] or text(entry.get("description"))
-            terms.extend([fields["role"], text(entry.get("layer"))])
+            terms.extend([fields["role"], fields["rationale"], text(entry.get("name")), text(entry.get("layer"))])
             terms.extend(entry.get("layers", []))
             refs.append({"kind": ref["kind"], "path": ref["path"], "pointer": ref["pointer"],
                          "url": file_url(ref["path"]), "date": stamp(entry) if stamp(entry).startswith("20") else stamp(document),
@@ -473,6 +491,9 @@ def build_data(root):
                  "recipes/claude-codex-foreground-review.md", "docs/claude-upstream-checks.md"):
         if (root / path).exists():
             guide_paths.append(path)
+    if config.get("landscape_manifest"):
+        guide_paths.extend(["catalogs/landscape/README.md", "docs/landscape-foundation-notes.md",
+                            "docs/landscape-domain-notes.md", "docs/landscape-freshness-notes.md"])
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))
     recipes = []
     for path in documents_to_embed:
@@ -597,15 +618,20 @@ def build_data(root):
             topic_rows.append(item)
         token_topic = {**topic_source, "rows": topic_rows, "url": file_url(TOKEN_TOPIC)}
     grand_catalogs = build_grand_catalogs(config, stack, receipts_by_id, read, track, file_url, root)
+    landscape = None
+    if config.get("landscape_manifest"):
+        landscape = build_landscape(root, config["landscape_manifest"], read=read,
+                                    track=track, file_url=file_url)
     return {"schema_version": 1, "snapshot_date": config["snapshot_date"],
             "repository_url": config["repository_url"], "source_revision": config["source_revision"],
-            "stars_observed_at": stars["retrieved_at"], "component_snapshot_at": stamp(stack),
+            "stars_observed_at": stars_observed_at, "historical_star_audit_count": stars["count"],
+            "component_snapshot_at": stamp(stack),
             "counts": {"repositories": len(output), "stars": len(star_map),
                        "components": len(stack["components"]),
                        "source_reviewed": sum(row["source_reviewed"] for row in output),
                        "executed": sum(row["executed"] for row in output)},
             "layers": layers, "repositories": output, "integrations": integrations, "awesome": awesome,
-            "grand_catalogs": grand_catalogs,
+            "grand_catalogs": grand_catalogs, "landscape": landscape,
             "setup": {"components": selected, "profiles": profiles, "recipes": recipes,
                       "default_profile": adoption["default_profile"],
                       "supported_platforms": adoption.get("supported_platforms", []),

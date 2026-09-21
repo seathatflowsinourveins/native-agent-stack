@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-21",
+  "source_base": "fb04bf702ea67b14163405f0ebe132e393ebbd8a",
+  "status": "reviewed_baseline",
+  "scope": "Current evidence-led selection across every foundation layer and all four domain research layers. Named alternatives have explicit dispositions; the wider repository inventory remains discovery and historical research.",
+  "universal_superiority": "not_established",
+  "new_pc_scope": "Documented Linux/WSL2 x86_64 adoption baseline. Each destination host must establish its own sign-in, scoped integrations and useful behavior. Cross-platform and complete second-physical-PC acceptance are not established.",
+  "catalogs": {
+    "foundation": "catalogs/landscape/foundation.json",
+    "us-equities": "catalogs/landscape/us-equities.json"
+  },
+  "sources": {
+    "foundation_manifest": "catalogs/foundation/manifest.json",
+    "foundation_decisions": "catalogs/foundation/decisions.json",
+    "domain_manifest": "catalogs/us-equities/manifest.json",
+    "repository_index": "catalogs/us-equities/decision-index.json",
+    "selected_manifest": "manifests/stack.json",
+    "freshness_snapshot": "catalogs/landscape/upstream-snapshot.json"
+  },
+  "rules": [
+    "Selected means the supported choice for the stated task and scope; it does not mean universal benchmark winner.",
+    "Only an actual retained execution result can support observed_failure. Unqualified, overlapping, conditional and out-of-scope candidates did not thereby fail a test.",
+    "Primary source review, actual native operation, local integration tests and comparative measurements are different evidence depths.",
+    "A current release or repository activity check does not supersede an accepted pin without a relevant compatibility or improvement result.",
+    "The current layer decision takes precedence over historical candidate-card recommendations. Historical dates, failures and original source pins remain visible.",
+    "Counts are derived from canonical records. Metadata coverage, receipt integrity and reviewer agreement do not prove performance superiority.",
+    "Reopen a selection when its stated overturning comparison meets the requirement; retain competitive alternatives until then."
+  ]
+}

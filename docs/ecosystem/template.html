@@ -22,6 +22,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 .navigation{flex-wrap:wrap;column-gap:22px;row-gap:0}.navigation button:last-child{margin-left:0}
 .catalog-entries,.catalog-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:0 0 36px}.catalog-entry,.catalog-layer,.catalog-card{min-width:0;border:1px solid var(--line);border-radius:var(--radius);padding:25px;background:var(--white);overflow-wrap:anywhere}.catalog-entry:first-child{background:#e8eddf}.catalog-entry h2{margin:12px 0;font-size:35px}.catalog-entry p,.catalog-layer p,.catalog-card p{font-size:13px;margin:12px 0;color:var(--muted)}.catalog-entry .button{margin-top:15px}.catalog-entry .catalog-count{color:var(--green);font-weight:600}.catalog-layer h3,.catalog-card h3{font-size:20px}.catalog-layer .eyebrow{color:var(--copper);margin-bottom:8px}.catalog-layer .accepted-scope{color:var(--green)}.catalog-gap{border-left:3px solid var(--copper);padding-left:12px;margin:16px 0;font-size:12px}.catalog-gap strong{display:block}.catalog-gap p{margin:5px 0}.catalog-detail{border-top:1px solid var(--line);padding:15px 0 0;margin-top:16px;min-width:0}.catalog-detail p,.catalog-detail li{font-size:12px}.catalog-detail summary,.catalog-detail a{overflow-wrap:anywhere}.catalog-capability{border-top:1px solid var(--line);padding:18px 0 4px}.catalog-capability h4{font-size:15px;margin:0 0 9px}.catalog-capability .badge{font-size:10px}.catalog-sources{display:flex;flex-direction:column;gap:8px;margin:14px 0;font-size:12px}.catalog-facts{display:grid;grid-template-columns:minmax(90px,1fr) minmax(0,2fr);gap:9px 16px;font-size:12px;margin:15px 0}.catalog-facts dt{color:var(--muted)}.catalog-facts dd{margin:0;overflow-wrap:anywhere}.catalog-layer .catalog-detail .catalog-detail{padding-left:12px}.catalog-summary{margin:0 0 22px}.catalog-summary p{font-size:13px;margin-top:10px}.catalog-controls{margin-bottom:20px}.catalog-scope{font-size:12px;color:var(--muted);margin:15px 0 25px}.catalog-empty{padding:30px;border:1px dashed var(--line);border-radius:12px;margin-bottom:30px}.catalog-grid>*{min-width:0}.catalog-card pre{max-width:100%}@media(max-width:800px){.catalog-entries,.catalog-grid{grid-template-columns:1fr}}@media(max-width:670px){.navigation{overflow:visible;column-gap:16px}.catalog-entry,.catalog-layer,.catalog-card{padding:20px}.catalog-facts{grid-template-columns:1fr}.catalog-facts dd{margin-bottom:7px}.catalog-entry h2{font-size:31px}}
 .foundation-repos{padding-left:18px;font-size:12px}.foundation-repos li{margin:9px 0}.foundation-repos code{display:block;font-size:10px;overflow-wrap:anywhere;color:var(--muted)}.foundation-surfaces{margin:20px 0}.foundation-surfaces h4{font-size:14px;margin:0 0 10px}.foundation-surface{border-left:2px solid var(--line);padding-left:12px;margin:16px 0}.foundation-surface h5{font-size:13px;margin:0 0 6px}.foundation-surface p{font-size:12px;margin:8px 0}.foundation-surface .catalog-sources{margin:9px 0}.foundation-surface .native-code{max-width:100%}
+.navigation{gap:20px;overflow-x:auto;flex-wrap:nowrap}.navigation button{flex-shrink:0}.landscape-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:24px 0 42px}.landscape-card{border:1px solid var(--line);border-radius:var(--radius);padding:25px;background:var(--white);min-width:0}.landscape-card h3{margin:12px 0}.landscape-card p{font-size:13px;margin:12px 0}.landscape-choice{background:#edf1e7;border-radius:8px;padding:14px}.landscape-choice strong{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}.landscape-candidate{border-top:1px solid var(--line);padding:14px 0}.landscape-candidate h4{font-size:14px;margin:0 0 8px}.landscape-candidate a{overflow-wrap:anywhere}.landscape-candidate p{font-size:12px}.landscape-candidate .badges{margin:9px 0}.landscape-card details{margin-top:17px}.landscape-card .catalog-sources{font-size:10px}.landscape-summary{margin-bottom:22px}.landscape-summary p{margin-top:12px}.landscape-actions{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.landscape-tag{display:inline-block;padding:4px 9px;background:var(--sand);border-radius:5px;font-size:10px}.landscape-tag.selected{background:var(--lime)}.landscape-tag.observed_failure{background:#f5ddd2;color:#873f28}.landscape-legend{display:flex;gap:9px;flex-wrap:wrap;margin:17px 0}.landscape-legend span{font-size:11px}.landscape-candidate .catalog-sources{display:block}.landscape-candidate .catalog-sources a{display:block;margin-top:6px}.landscape-grid .catalog-empty{grid-column:1/-1}@media(max-width:850px){.landscape-grid{grid-template-columns:1fr}.landscape-card{padding:21px}}
 </style>
 </head>
 <body>
@@ -32,6 +33,7 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <button role="tab" id="tab-overview" aria-controls="overview" aria-selected="true" data-tab="overview"><span class="tab-number">01</span>Ecosystem map</button>
 <button role="tab" id="tab-foundation" aria-controls="foundation" aria-selected="false" tabindex="-1" data-tab="foundation" data-catalog-tab hidden>Foundation</button>
 <button role="tab" id="tab-trading" aria-controls="trading" aria-selected="false" tabindex="-1" data-tab="trading" data-catalog-tab hidden>Trading</button>
+<button role="tab" id="tab-landscape" aria-controls="landscape" aria-selected="false" tabindex="-1" data-tab="landscape" hidden>Choices & alternatives</button>
 <button role="tab" id="tab-explorer" aria-controls="explorer" aria-selected="false" tabindex="-1" data-tab="explorer"><span class="tab-number">02</span>Repository explorer</button>
 <button role="tab" id="tab-setup" aria-controls="setup" aria-selected="false" tabindex="-1" data-tab="setup"><span class="tab-number">03</span>Selected stack & setup</button>
 <button role="tab" id="tab-efficiency" aria-controls="efficiency" aria-selected="false" tabindex="-1" data-tab="efficiency"><span class="tab-number">04</span>Token efficiency</button>
@@ -62,6 +64,15 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <div class="section-head"><div><div class="eyebrow">Each broker has its own boundary</div><h2>Data access and execution.</h2></div></div><div id="trading-brokers" class="catalog-grid"></div>
 <div class="section-head"><div><div class="eyebrow">Next acceptance</div><h2>Advance one check at a time.</h2></div></div><div id="trading-next" class="catalog-grid"></div>
 <details class="catalog-card" style="margin-bottom:35px"><summary>Retained evidence and limits</summary><div id="trading-evidence"></div></details>
+</section>
+<section id="landscape" role="tabpanel" aria-labelledby="tab-landscape" hidden>
+<div class="page-heading"><div><div class="eyebrow">Dated decisions / evidence for each layer</div><h2>Why these choices.</h2><p>Inspect the requirement, the selected approach, the competing candidates and what would change the decision. A candidate that was not tested has not failed.</p></div></div>
+<div id="landscape-summary" class="scope-note landscape-summary"></div>
+<div id="landscape-actions" class="landscape-actions"></div>
+<div class="controls"><div class="control"><label for="landscape-search">Find a layer or candidate</label><input id="landscape-search" type="search" placeholder="Try QMD, Temporal, Nautilus, memory…" autocomplete="off"></div><div class="control"><label for="landscape-catalog">Catalog</label><select id="landscape-catalog"><option value="">Both catalogs</option><option value="foundation">Foundation</option><option value="us-equities">US equities</option></select></div><div class="control"><label for="landscape-outcome">Candidate outcome</label><select id="landscape-outcome"><option value="">All outcomes</option><option value="selected">Selected for this scope</option><option value="observed_failure">Observed test failure</option><option value="measured_tradeoff">Measured tradeoff</option><option value="conditional">Conditional alternative</option><option value="unqualified">Not qualified</option><option value="overlap">Overlapping capability</option><option value="out_of_scope">Outside this requirement</option></select></div></div>
+<div class="filter-row"><p id="landscape-count" class="result-count" role="status" aria-live="polite"></p><button class="button secondary small" id="landscape-reset">Reset comparison filters</button></div>
+<p class="small muted">An observed failure applies to its recorded version, host and test. An alternative can remain competitive even when the current choice is retained. Historical candidate cards keep their original dates and do not override the current decision.</p>
+<div id="landscape-layers" class="landscape-grid"></div>
 </section>
 <section id="explorer" role="tabpanel" aria-labelledby="tab-explorer" hidden>
 <div class="page-heading"><div><div class="eyebrow">Discovery / the broad public index</div><h2>Explore the whole field.</h2><p>Search names, roles, layers and decisions. Open a record to inspect its dated sources, distinct pins and bounded receipts. Repository discovery is broader than either maintained catalog.</p></div><button class="button secondary small" id="reset-filters">Reset filters</button></div>
@@ -112,6 +123,7 @@ const add = (parent, ...children) => { children.forEach(child => parent.appendCh
 const link = (label, url) => { const node = make("a", "", label); node.href = url; node.target = "_blank"; node.rel = "noopener noreferrer"; return node; };
 const layerNames = new Map(data.layers.map(layer => [layer.id, layer.name]));
 document.querySelectorAll("[data-catalog-tab]").forEach(tab => { tab.hidden = !data.grand_catalogs; });
+$("tab-landscape").hidden = !data.landscape;
 const tabs = [...document.querySelectorAll("[data-tab]")].filter(tab => !tab.hidden);
 function showTab(id, focus = false) {
   if(!tabs.some(tab => tab.dataset.tab === id)) id = "overview";
@@ -149,7 +161,7 @@ data.policies.forEach(policy => add($("policy-grid"), add(make("article", "polic
 data.highlights.forEach(proof => add($("evidence-grid"), add(make("article", "proof"), make("div", "eyebrow", proof.status), make("h3", "", proof.title), make("p", "", proof.body), link("Inspect evidence ↗", proof.url))));
 data.awesome.forEach(item => add($("awesome-list"), add(make("article", "awesome"), link(item.name + " ↗", item.url), make("code", "", item.pin), make("p", "small muted", "Observed " + item.date.slice(0,10) + " · " + item.license))));
 $("provenance-summary").textContent = "Snapshot provenance · " + data.inputs.length + " public input hashes";
-$("provenance-note").textContent = "Public star snapshot: " + data.stars_observed_at + ". Component snapshot: " + data.component_snapshot_at + ". Existing source-link base: " + data.source_revision + ". This new explorer packet links its own documents at public main after publication; their exact snapshot hashes are below. Hashes bind bytes and scope, not truth or independent execution attestation. The evidence manifest hashes only its receipts section to avoid a generated-file hash cycle.";
+$("provenance-note").textContent = "Public star snapshot: " + data.stars_observed_at + ". Earlier reviewed star snapshot: " + data.historical_star_audit_count + " identities; its original evidence is retained. Component snapshot: " + data.component_snapshot_at + ". Existing source-link base: " + data.source_revision + ". This explorer packet links its current documents at public main after publication; exact snapshot hashes are below. Hashes bind bytes and scope, not truth or independent execution attestation. The evidence manifest hashes only its receipts section to avoid a generated-file hash cycle.";
 data.inputs.forEach(item => add($("input-table"), add(make("tr"), add(make("td"), make("span", "", item.path), make("div", "small muted", item.scope)), add(make("td"), make("code", "", item.sha256)), make("td", "mono", item.bytes))));
 const stringify = value => typeof value === "string" ? value : JSON.stringify(value, null, 2);
 const codeBlock = value => make("pre", "native-code", stringify(value));
@@ -255,6 +267,7 @@ function renderFoundation() {
     matches.forEach(row => shown.add(row.id));
     const card = add(make("article", "catalog-layer"), make("div", "eyebrow", "Layer " + String(index + 1).padStart(2, "0")), make("h3", "", layer.title), make("p", "", layer.purpose));
     add(card, make("p", "", "Selection: " + layer.selection), make("p", "small", "Use when: " + layer.activation));
+    if(data.landscape) add(card, landscapeAction("foundation", layer.id));
     const accepted = matches.filter(row => row.review_status === "accepted_within_scope");
     add(card, make("p", "accepted-scope", accepted.length ? "Accepted within scope: " + accepted.map(row => row.capability).join("; ") : "No accepted capability in this view."));
     foundationSurfaces(card, layer, matches);
@@ -315,6 +328,81 @@ function renderGrandCatalogs() {
   renderFoundation();
 }
 renderGrandCatalogs();
+const dispositionLabels = {selected:"Selected for this scope",observed_failure:"Observed test failure",measured_tradeoff:"Measured tradeoff",overlap:"Overlapping capability",out_of_scope:"Outside this requirement",unqualified:"Not qualified",conditional:"Conditional alternative"};
+const landscapeDecisionLabels = {retain:"Retained",adjust:"Adjusted with evidence",keep_but_compare:"Retained; comparison remains open"};
+function landscapeAction(catalog, layerId = "") {
+  const action = make("button", "button secondary small", "Why selected / alternatives →");
+  action.addEventListener("click", () => {
+    $("landscape-catalog").value = catalog; $("landscape-outcome").value = "";
+    const layer = data.landscape.layers.find(row => row.catalog === catalog && row.layer_id === layerId);
+    $("landscape-search").value = layer ? layer.title : "";
+    renderLandscape(); showTab("landscape", true);
+  });
+  return action;
+}
+function comparisonCandidate(row, historical = false) {
+  const card = add(make("article", "landscape-candidate"), add(make("h4"), link(row.name + " ↗", row.repository)));
+  const disposition = historical ? "Historical: " + readable(row.decision) : dispositionLabels[row.disposition];
+  add(card, add(make("div", "badges"), make("span", "landscape-tag " + (historical ? "" : row.disposition), disposition), make("span", "badge", readable(row.evidence_kind))));
+  if(historical) add(card, make("p", "small muted", "Recorded " + row.checked_at + " · " + row.pin), make("p", "", row.role));
+  add(card, make("p", "", row.rationale));
+  const proof = add(make("details"), make("summary", "", "Evidence and scope"));
+  if(historical) { listLimits(proof, row.limitations); add(proof, link("Original candidate card " + row.pointer + " ↗", row.url)); }
+  catalogSources(proof, row.sources); add(card, proof);
+  return card;
+}
+function renderLandscape() {
+  if(!data.landscape) return;
+  const words = $("landscape-search").value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const catalog = $("landscape-catalog").value, outcome = $("landscape-outcome").value;
+  const grid = $("landscape-layers"); grid.replaceChildren(); let candidateCount = 0;
+  data.landscape.layers.forEach(layer => {
+    if(catalog && layer.catalog !== catalog) return;
+    const haystack = [layer.title,layer.requirement,layer.current_choice,layer.rationale,layer.overturn_when,...layer.candidates.flatMap(row=>[row.name,row.repository,row.rationale,row.disposition]),...layer.catalog_candidates.flatMap(row=>[row.name,row.role,row.rationale])].join(" ").toLowerCase();
+    if(!words.every(word => haystack.includes(word))) return;
+    const candidates = layer.candidates.filter(row => !outcome || row.disposition === outcome);
+    if(!candidates.length) return;
+    candidateCount += candidates.length;
+    const card = add(make("article", "landscape-card"), make("div", "eyebrow", layer.catalog === "foundation" ? "Foundation" : "US equities"), make("h3", "", layer.title), make("span", "landscape-tag", landscapeDecisionLabels[layer.decision]));
+    card.dataset.comparisonLayer = layer.id;
+    add(card, make("p", "", layer.requirement), add(make("div", "landscape-choice"), make("strong", "", "Current choice"), make("span", "", layer.current_choice)), make("p", "", layer.rationale));
+    const alternatives = add(make("details"), make("summary", "", "Candidate decisions · " + candidates.length));
+    alternatives.open = Boolean(outcome);
+    candidates.forEach(row => add(alternatives, comparisonCandidate(row))); add(card, alternatives);
+    const evidence = add(make("details"), make("summary", "", "Limits, evidence and when to reconsider"));
+    listLimits(evidence, layer.limitations); add(evidence, make("p", "", "Reopen when: " + layer.overturn_when)); catalogSources(evidence, layer.sources); add(card, evidence);
+    if(layer.catalog_candidates.length) {
+      const archive = add(make("details"), make("summary", "", "All recorded candidate cards · " + layer.catalog_candidates.length), make("p", "small muted", "Original dated research. Current choices are stated above; source screening and historical defaults do not establish a present-day win."));
+      // Build this larger archive only when requested; the full data stays offline.
+      archive.addEventListener("toggle", () => {
+        if(archive.open && !archive.dataset.loaded) { layer.catalog_candidates.forEach(row => add(archive, comparisonCandidate(row, true))); archive.dataset.loaded = "true"; }
+      });
+      add(card, archive);
+    }
+    add(grid, card);
+  });
+  const layerCount = grid.childElementCount;
+  $("landscape-count").textContent = layerCount + (layerCount === 1 ? " layer · " : " layers · ") + candidateCount + " current candidate decisions shown";
+  if(!layerCount) add(grid, make("p", "catalog-empty", "No comparisons match. Clear the search or choose another outcome."));
+}
+function initializeLandscape() {
+  if(!data.landscape) return;
+  const landscape = data.landscape, counts = landscape.counts;
+  add($("landscape-summary"), make("strong", "", counts.layers + " layers · " + counts.comparison_candidates + " candidate decisions · " + counts.historical_candidate_cards + " historical cards"), make("p", "", "Reviewed " + landscape.checked_at + ". " + landscape.scope), make("p", "", landscape.new_pc_scope));
+  add($("landscape-summary"), make("p", "", counts.selected_components + " selected component metadata checks · " + counts.current_public_stars + " current public stars · " + counts.research_repositories + " research identities. Release availability is separate from installed qualification."));
+  const exportButton = make("button", "button secondary small", "Download comparison manifest");
+  exportButton.addEventListener("click", () => {
+    const url = URL.createObjectURL(new Blob([JSON.stringify(landscape,null,2)+"\n"],{type:"application/json"}));
+    const anchor = make("a"); anchor.href=url; anchor.download="native-stack-landscape-"+landscape.checked_at+".json"; anchor.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
+  add($("landscape-actions"), exportButton, link("Canonical manifest ↗", landscape.url), link("Current upstream metadata and failures ↗", landscape.freshness_url));
+  add($("foundation-guides"), landscapeAction("foundation")); add($("trading-guides"), landscapeAction("us-equities"));
+  add($("catalog-entry-points"), add(make("article", "catalog-entry"), make("div", "eyebrow", "Evidence for the selection"), make("h2", "", "Choices & alternatives"), make("p", "", "Why each layer is selected, why alternatives remain conditional, and the evidence needed to change the choice."), catalogAction("landscape","Compare the choices →")));
+  ["landscape-search","landscape-catalog","landscape-outcome"].forEach(id=>$(id).addEventListener(id.endsWith("search")?"input":"change",renderLandscape));
+  $("landscape-reset").addEventListener("click",()=>{["landscape-search","landscape-catalog","landscape-outcome"].forEach(id=>$(id).value="");renderLandscape();});
+  renderLandscape();
+}
+initializeLandscape();
 function recipeButton(path, label, component = "") {
   const button = make("button", "button secondary small", label);
   button.addEventListener("click", () => showRecipe(path, component));

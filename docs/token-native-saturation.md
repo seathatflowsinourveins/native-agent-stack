@@ -17,7 +17,18 @@ The [retained functional follow-up](../evidence/receipts/token-native-retained-f
 
 The focus wave closed the avoidable project-scope, upstream Headroom MCP and sandbox HTTP-network gaps. Both native clients passed the selected Context Mode/jCodeMunch task with six successful MCP calls. Existing desktop processes retain their loaded connection; fresh native sessions prove the corrected scope. The newly selected jCodeMunch server has exact retrieval evidence and both-client acceptance, with its cheaper known-source alternative documented.
 
-Remaining boundaries are explicit: Claude HUD's actual interactive attempt reached onboarding before rendering; the bridge backend passed but an outer Claude delegation was not exercised; fresh native PreCompact was not forced. AgentsView has scoped explicit-endpoint acceptance, while automatic archive discovery remains unestablished. vLLM 0.25.0 is the working WSL compatibility pin after 0.29.0 failed initialization. These do not justify repeating every installation or a broad synthetic campaign. No additional useful installation gap was identified for the selected roles after this bounded catalog/evidence review; that is not a claim that every optional feature or all 512 research repositories passed a lifecycle test.
+The earlier HUD attempt reached onboarding before rendering; the later
+[foundation-closure observations](foundation-closure-20260921.md#actual-session-and-terminal-evidence)
+record actual configured HUD rendering and manual PreCompact hooks. The current
+matrix now joins that accepted use scope while retaining every earlier failed
+attempt. Every HUD statistic, automatic compaction and new-host activation remain
+unqualified. The bridge backend passed but outer plugin integration remains
+separate. AgentsView has scoped explicit-endpoint acceptance; automatic archive
+discovery remains unestablished. vLLM 0.25.0 remains the working WSL pin after
+0.29.0 failed initialization. These results do not establish full lifecycle
+acceptance for the research inventory. The subsequent
+[landscape ledger](../catalogs/landscape/README.md) carries current counts and
+selection comparisons; the original audit above retains its dated counts.
 
 The current reconciliation includes the later native application, Poppler, Apple
 Container and WSL memory/transport evidence. The original source pins and dated
@@ -54,7 +65,7 @@ pairs, including losing comparisons; they are not provider lifetime savings.
 | `beads` | supporting | use, persistence, cleanup | supporting workflow / 0 |
 | `ccusage` | supporting | use | supporting workflow / 0 |
 | `claude-code` | core | use, persistence, recovery | supporting workflow / 0 |
-| `claude-hud` | optional | None; inspect documented/partial scope | supporting workflow / 0 |
+| `claude-hud` | optional | use (later retained native rendering) | supporting workflow / 0 |
 | `codebase-memory-mcp` | core | use | direct context / 1 |
 | `codex` | core | use, persistence, recovery | supporting workflow / 0 |
 | `codex-for-claude` | optional | None; inspect documented/partial scope | supporting workflow / 0 |

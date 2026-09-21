@@ -3,7 +3,7 @@
 A current, evidence-backed reference for native **Codex + Claude Code**, with scoped memory, automatic local code RAG, context-efficient retrieval and reproducible upstream workflows.
 
 The [current token practice and measured results](docs/token-practice.md) connect
-68 selected component records to the 513-repository grand catalog, upstream
+68 selected component records to the 519-repository grand catalog, upstream
 installation recipes and scoped native evidence. The latest wave attaches fresh
 Claude/Codex results, ten dashboard screenshots and four qualified upgrades.
 Earlier 52-component studies retain their original boundaries and mixed results.
@@ -20,6 +20,15 @@ layer map, searchable public repository index, native skills and workers, scoped
 memory/retrieval, and token-efficiency policy. Its downloadable single HTML file
 keeps dated source reviews, recorded execution and current-host acceptance distinct.
 
+The **[current landscape comparison](catalogs/landscape/README.md)** adds
+**168 candidate decisions across all 16 foundation and four domain layers**.
+Each layer explains the requirement, current selection, alternatives, evidence
+limits and what would change the choice. Fresh primary-source metadata covers
+all 68 selected components and **343 public stars**. The comparison preserves
+all 152 historical domain cards and keeps untested candidates distinct from
+observed failures. Use **Choices & alternatives** in the offline HTML or download
+its combined JSON manifest.
+
 The new **[evidence-led convergence practice](blueprints/convergence-practice/README.md)**
 connects public own repositories, stars and curated-list discovery to pinned
 source review, frozen experiments and explicit adoption decisions. It adds an
@@ -35,8 +44,9 @@ analysis. [Ten-source review and current star delta](catalogs/convergence-practi
 
 The **[US-equities grand catalog](catalogs/us-equities/README.md)** now covers
 **147 unique repositories in 152 layer decision cards**, **20 model entries**,
-and an auditable **342-star coverage ledger**. Its combined index includes
-**513 repository identities** across all 342 public stars and 171 beyond them,
+and its retained **342-star coverage ledger**. Its current combined index includes
+**519 repository identities**, including the fresh 343-public-star snapshot and
+176 identities beyond it,
 with typed, validated pointers to decisions and evidence. The latest
 [architecture research wave](catalogs/us-equities/architecture/README.md) adds
 source reviews, awesome-list coverage and official Alpaca constraints.

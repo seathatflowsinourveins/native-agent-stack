@@ -5,6 +5,12 @@ workers, skills, memory, retrieval, efficiency and operations are maintained in
 the separate [foundation catalog](../foundation/README.md). Trading work reuses
 that foundation and adds data, strategy, risk and broker-specific requirements.
 
+The [current four-layer comparisons](../landscape/us-equities.json) explain the
+selected roles and meaningful alternatives using later retained evidence. The
+[offline comparison view](../../docs/ecosystem/index.html#landscape) also preserves
+every historical candidate card. Current target selection takes precedence over
+old default labels; source-only proposals remain unqualified until executed.
+
 The current selected destination is **NautilusTrader 2.0.0rc5 with IBKR**, plus a
 separately validated **Alpaca** data/paper-execution boundary. LEAN remains the
 accepted historical comparison engine. See the [current target and official

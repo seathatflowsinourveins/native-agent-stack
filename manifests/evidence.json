@@ -3218,8 +3218,8 @@
     },
     {
       "path": ".github/workflows/validate.yml",
-      "sha256": "dc0405f71df254ca0b0af91f52f763492e495ca4a2291629e315c328ca9a4c7a",
-      "bytes": 2603
+      "sha256": "585b2391ebbffce5a7ce8492834c074b597fe661e4e58e621cba1866c94c1ada",
+      "bytes": 2720
     },
     {
       "path": ".gitignore",
@@ -3248,8 +3248,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "c68cfe2fcb6a9c264b5a6b4f1a3722fcca59be97890c7d80e8266f8356ad0242",
-      "bytes": 16202
+      "sha256": "3cbe5bd64ad3eef59820927e97b2fb5bdcca130f810078a59dd300fe821f875c",
+      "bytes": 16810
     },
     {
       "path": "adoption/README.md",
@@ -4699,8 +4699,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "bytes": 458151,
-      "sha256": "b19622f2986f1b9c1b9615d59830ec60604b903d5b1cebe1858d13f4252b324e"
+      "bytes": 459814,
+      "sha256": "f7e4588b06254365a2ceba7a2cd9688e95ab15f010c31962c757d7b7643ee60c"
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -5989,8 +5989,8 @@
     },
     {
       "path": "catalogs/us-equities/README.md",
-      "bytes": 14473,
-      "sha256": "7f563d6162e68af81d1aa19783f45c4eee91f43998bc5d917a65200fa8d5f17e"
+      "bytes": 14873,
+      "sha256": "c494a8e7e6d7048665c31d12543d56b815018c6655e5c946a88f696067a619af"
     },
     {
       "path": "catalogs/us-equities/agents-operations.json",
@@ -6134,8 +6134,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "4cfa4baa08cf540fc7f0508aa8b4c67184a9d8e795a9cd683156ff0617683e11",
-      "bytes": 389369
+      "sha256": "1fa6e9fffb740464fb1b1af2781179468aa951141981dc5230560b6d9c2db4ea",
+      "bytes": 431497
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -6179,7 +6179,7 @@
     },
     {
       "path": "catalogs/us-equities/manifest.json",
-      "sha256": "fd53543d7b3e020dcf7c749c7e4b834a1e44666a356f4b30161339e30f70f296",
+      "sha256": "7e0eda91c5b2ff7d93c8870bb2ac2ec735f26820187e5054f8b50541aa2daf7b",
       "bytes": 3112
     },
     {
@@ -6294,13 +6294,13 @@
     },
     {
       "path": "docs/ecosystem/README.md",
-      "sha256": "5763df9ce89a343fc2aa662058b1d026178b37d12e2970d48cf13fcef921b1bb",
-      "bytes": 10464
+      "sha256": "e343543564d022c5d060851a2c279c46c7e38f8331e5677c5c2dfc801d2a4d71",
+      "bytes": 11307
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 8013135,
-      "sha256": "9f23bb05125abf08582698a3eca9ff98a5ec4ed3d334972b2ec8cefff33f06e5"
+      "bytes": 8854439,
+      "sha256": "31cbc171eff64f0d4be71112eeb6865bdb8c5170fd293050fd245d0954eea230"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6309,8 +6309,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "bytes": 38932,
-      "sha256": "bdd813e7afce2cc3e11afb795cc1156f4a05c4bf5a8e5e94118ecda67841ffd7"
+      "bytes": 38992,
+      "sha256": "8bb0baeed5a6b0fe0ea0a080d90127b5b716e306f3f33a3aa0c96864cf93eddc"
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6329,8 +6329,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "bytes": 86268,
-      "sha256": "9cd5d11994ae3f67299fa148e990ed3b0005d543d42b4adaf32a0087c9782fc2"
+      "bytes": 97504,
+      "sha256": "b370b24c4b297116b50b8233b51ca45f57db479dcdc508d307961adf733ae13d"
     },
     {
       "path": "docs/evidence.md",
@@ -6369,8 +6369,8 @@
     },
     {
       "path": "docs/token-native-saturation.md",
-      "sha256": "33c3ae436dbb2147f1589641d0feb78bd2c6c7d0fd2bca1d7b5891c0a6b0bda7",
-      "bytes": 10956
+      "sha256": "7e3bc6b340440ac7d293a33c374167c80f935c95a58bd6b594900b828bafdf19",
+      "bytes": 11158
     },
     {
       "path": "docs/token-practice.md",
@@ -6814,8 +6814,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "bytes": 82461,
-      "sha256": "7a454a013f7e048feefbbc7e7cbf7e1309286dc7951b48652bb67302439e6b5a"
+      "bytes": 82465,
+      "sha256": "1846ff8c66fa9820a2a6507678d59fed78f488960ff02fe6d1c8b2a9c274bfbf"
     },
     {
       "path": "observability/README.md",
@@ -7004,8 +7004,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "bytes": 40120,
-      "sha256": "e965dd8f59f3879d5f818ab820e2ed9d551ea915e302f07afabc982fa8ab3f28"
+      "bytes": 41990,
+      "sha256": "40ca1a9745a8156e0399b5cb102da165095d89dccc68ceb392613b1040c76877"
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -7229,8 +7229,8 @@
     },
     {
       "path": "tests/test_stack_lifecycle.py",
-      "sha256": "36c665dd6fe85bf1150236116238336ddd4769629b68e64737ada800c9af6edf",
-      "bytes": 4470
+      "sha256": "fac17fc2fd2288c90e32cd1d93301dcc1f78619fc5366b6da2c2e2aafa5b2812",
+      "bytes": 4667
     },
     {
       "path": "tests/test_validate.py",
@@ -7294,18 +7294,18 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "cdeba9a8ab1a01fbbe2bfdc512de8088c0f8f8dacb5ee52395d9aabc95fa557d",
-      "bytes": 2005
+      "sha256": "a8fc08f6ed50ac3e5490e2db13e91b8c9d68ebe1d6d998f3930e2bc7b4e1f25d",
+      "bytes": 2350
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "fcfdb5aa150988f3a3d96f48f0f5a111d7f04755de40e7a4a402947bb7bf9bb8",
-      "bytes": 12561
+      "sha256": "8d29d9b5b84a04b5c9b5fc5d9a40153595fb947aab7f59084cd4372e6c6d30d7",
+      "bytes": 12942
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "bytes": 116569,
-      "sha256": "709d3e8ec1d037f0f6bfa5a391aaa10449b0a943b044abbc1e04916e089ce174"
+      "bytes": 117195,
+      "sha256": "4283a3ab0bab103900cf8943c14fd335fb97e88313c322e99235819bf9e4d048"
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -9134,8 +9134,8 @@
     },
     {
       "path": "docs/full-stack-convergence.md",
-      "bytes": 10817,
-      "sha256": "0cfb65f54fdcc308e6b97fa3ad9dcfad9d45ae0f20c3388b15970b1df8bc180c"
+      "bytes": 11390,
+      "sha256": "51822d10a6112b4d558e16fccb693c5119ccc1b94b60d5d5e109d581135ba0f8"
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/agentsview-aggregate-safe.png",
@@ -9766,6 +9766,61 @@
       "path": "examples/claude-native/workflows/test-envelope.mjs",
       "sha256": "d1ecdeea386dcec565ae3a395b16ce00db431991ecabf29b0052e229bb940269",
       "bytes": 19844
+    },
+    {
+      "path": "catalogs/landscape/README.md",
+      "sha256": "94b0d2b632aed30724672d048273e29262bf4143902f150de6d2d7b43118ad0d",
+      "bytes": 4411
+    },
+    {
+      "path": "catalogs/landscape/foundation.json",
+      "sha256": "0dfab8f65076040c21df06bbf57600b7a613212dc0b5a7d0a4f0c3e93bf06fb5",
+      "bytes": 64727
+    },
+    {
+      "path": "catalogs/landscape/manifest.json",
+      "sha256": "05caff1ab2aece2c591fa7643172ed1833efca59850497a1f31b9c9d43e26cfa",
+      "bytes": 2244
+    },
+    {
+      "path": "catalogs/landscape/upstream-snapshot.json",
+      "sha256": "bdcad1ce01b6093f6be5e9f72f491d61f9428ed68219d742a3e721b91da366f7",
+      "bytes": 245202
+    },
+    {
+      "path": "catalogs/landscape/us-equities.json",
+      "sha256": "7dda998cbee95bb9067e52f511f7650c1c32c1ea5cce2ed7ff14e7082b6773bc",
+      "bytes": 49539
+    },
+    {
+      "path": "docs/landscape-domain-notes.md",
+      "sha256": "41a42b95dd586177ff02dcb19cffa12c17691be2dda71c6ae1789243e665df70",
+      "bytes": 11159
+    },
+    {
+      "path": "docs/landscape-foundation-notes.md",
+      "sha256": "cbd47da4b06c0d4a3e481b97f195ae924814b24208fe000aa1e0afbf761cc41a",
+      "bytes": 4929
+    },
+    {
+      "path": "docs/landscape-freshness-notes.md",
+      "sha256": "393a460a620a1dddcbd948cc2287f2008b97ddf9febb1a44fc5ec433af8c17ef",
+      "bytes": 7675
+    },
+    {
+      "path": "docs/tasks/2026-09-21-landscape-finalization.md",
+      "sha256": "741b056cb79e9152e2fdb803e95ef4ca7ce60b6348235b682ea418710ea433a2",
+      "bytes": 7456
+    },
+    {
+      "path": "scripts/landscape.py",
+      "sha256": "fa61af8ec596a683e4addfdbaa3b7cc3e9dad453fa35f10862e65f86b78fdf76",
+      "bytes": 12457
+    },
+    {
+      "path": "tests/test_landscape.py",
+      "sha256": "8df46e16ae10bd8b74a144080b2bc936b4e700b381c54c03d3ce779877dc63e7",
+      "bytes": 10521
     }
   ],
   "convergence_records": [
