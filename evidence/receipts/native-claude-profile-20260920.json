@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "id": "native-claude-profile-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "claude-code",
+    "codex",
+    "affaan-m/ECC",
+    "context-mode",
+    "rtk"
+  ],
+  "claim": "Native Claude2.1.278 installer repair, persistent scoped defaults, pinned global ECC skill discovery and independent native Codex SDK/Claude reviews passed within their recorded scopes. A local launcher regression preserves native stdout; the global instruction artifact is smaller after reviewed safeguards were restored.",
+  "recorded_at_utc": "2026-09-20T23:58:42.218377+00:00",
+  "status": "accepted_with_explicit_interactive_and_efficiency_limits",
+  "scope": "Native WSL Claude defaults, selected global ECC skill discovery, terminal profile configuration and independent native Codex/Claude file reviews.",
+  "source_catalog": "catalogs/foundation/community-practice-20260920.json",
+  "recipe": "recipes/claude-native-profile.md",
+  "commands": "evidence/artifacts/native-claude-profile-20260920/selected-commands.json",
+  "changes": [
+    "Native installer repaired standard Claude2.1.278 installation.",
+    "Native user-bin path added to the shell environment and existing Claude PATH override; other settings preserved.",
+    "Dedicated Windows Terminal Claude profile added; previous profiles/default preserved.",
+    "Global instructions shortened with original-source and project-scoping safeguards; detailed command routes retained on demand.",
+    "Exact pinned ECC research skills installed globally and discovered by native Claude.",
+    "Launcher usage notice moved to stderr; regression now uses an owned temporary project."
+  ],
+  "skills": [
+    {
+      "name": "search-first",
+      "source_commit": "2b6e839771e53096d8451a213d40dc64ec8acac0",
+      "sha256": "d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733",
+      "bytes": 8021,
+      "native_discovery": true
+    },
+    {
+      "name": "iterative-retrieval",
+      "source_commit": "2b6e839771e53096d8451a213d40dc64ec8acac0",
+      "sha256": "b453b16d3e36174b8487c05ab807d0321a66c2d058812b2ae129d82824183725",
+      "bytes": 6786,
+      "native_discovery": true
+    }
+  ],
+  "instruction_comparison": {
+    "encoding": "o200k_base",
+    "tokenizer": "tiktoken0.14.0",
+    "raw_before": {
+      "bytes": 5784,
+      "sha256": "cd547a2d562e7650f2656077c8785f1554f344a3f81505bd22f0a5257864043b",
+      "tokens": 1175
+    },
+    "raw_after": {
+      "bytes": 2369,
+      "sha256": "ba85d632b1912513957d2e96c1bad8b5ee3a8fc615851279b647bcefa29432d1",
+      "tokens": 418
+    },
+    "tokens_removed": 757,
+    "ledger_comparison_id": "b0487a9480bb36444e09f372e2c9c5cc0d44af6cf0afdc186edb74fc2d6e2837",
+    "provider_tokens_saved": null,
+    "boundary": "Exact private instruction-file comparison; published path-normalized projections have different token counts. Not current-session, billing or lifetime savings."
+  },
+  "reviews": {
+    "claude": {
+      "command": "timeout --signal=TERM --kill-after=10s 300s ecosystem-claude --project <STACK_CHECKOUT> -p --tools Read,Glob,Grep --strict-mcp-config --mcp-config '{\"mcpServers\":{}}' --output-format stream-json --verbose --include-hook-events --max-turns 12 --permission-prompts none",
+      "started_at_utc": "2026-09-20T23:45:37Z",
+      "finished_at_utc": "2026-09-20T23:47:27Z",
+      "exit_code": 0,
+      "model": "claude-opus-5[1m]",
+      "actual_tools": [
+        "Glob",
+        "Grep",
+        "Read"
+      ],
+      "jsonl_events": 268,
+      "terminal_results": 1,
+      "is_error": false,
+      "reported_num_turns": 19,
+      "duration_ms": 103548,
+      "usage": {
+        "input_tokens": 24,
+        "cache_creation_input_tokens": 43705,
+        "cache_read_input_tokens": 325266,
+        "output_tokens": 20356
+      },
+      "consumed_tokens": 389351,
+      "api_equivalent_cost_usd": 1.108703,
+      "report": "evidence/artifacts/native-claude-profile-20260920/claude-review.md"
+    },
+    "codex": {
+      "sdk": "openai-codex",
+      "sdk_version": "0.154.0",
+      "native_version": "codex-cli 0.155.1",
+      "helper": "blueprints/us-equities/workers/native_worker.py",
+      "helper_sha256": "dabce0cf91bd44579501f3862429453b4a86b4002b0fbcf0151d5951dae2d5ad",
+      "argv": "[\"timeout\", \"--signal=TERM\", \"--kill-after=10s\", \"285s\", \"<NATIVE_INSTALL>/tools/equity-worker-sdk/bin/python\", \"<STACK_CHECKOUT>/blueprints/us-equities/workers/native_worker.py\", \"run\", \"--codex-bin\", \"<NATIVE_INSTALL>/bin/codex\", \"--codex-home\", \"<HOME>/.codex\", \"--workspace\", \"<STACK_CHECKOUT>\", \"--prompt\", \"<ECOSYSTEM_HOME>/state/foundation-practice-20260920/codex-review/prompt.txt\", \"--receipt\", \"<ECOSYSTEM_HOME>/state/foundation-practice-20260920/codex-review/native-result.json\", \"--turn-deadline-seconds\", \"240\"]",
+      "started_at_utc": "2026-09-20T23:49:07.038815+00:00",
+      "finished_at_utc": "2026-09-20T23:50:05.783740+00:00",
+      "exit_code": 0,
+      "model": "gpt-6-astra",
+      "provider": "openai",
+      "status": "completed",
+      "duration_ms": 53813,
+      "usage_total": {
+        "cacheWriteInputTokens": 0,
+        "cachedInputTokens": 108800,
+        "inputTokens": 128080,
+        "outputTokens": 1472,
+        "reasoningOutputTokens": 289,
+        "totalTokens": 129552
+      },
+      "consumed_tokens": 129552,
+      "report": "evidence/artifacts/native-claude-profile-20260920/codex-review.md",
+      "cleanup": {
+        "supervisor_absent": true,
+        "matching_review_app_servers": 0
+      }
+    }
+  },
+  "adjudication": [
+    {
+      "finding": "Both reviewers identified the host-specific test cwd.",
+      "resolution": "Replaced with owned temporary project, realpath comparison and finally cleanup;20local checks pass. Codex reviewer independently inspected fix."
+    },
+    {
+      "finding": "Codex identified the original-source safeguard lost while shortening instructions.",
+      "resolution": "Restored in both installed and portable core; independently inspected."
+    },
+    {
+      "finding": "Claude identified missing on-demand routes and portable memory-scope divergence.",
+      "resolution": "Added the route index and aligned core instruction paragraphs; preserve native RTK import separately."
+    },
+    {
+      "finding": "Claude requested actual tool-inventory verification and qualified stdout wording.",
+      "resolution": "Captured exact Read/Glob/Grep initialization inventory; recipe now requires that check and exempts check-only diagnostics."
+    },
+    {
+      "finding": "Context Mode hook guidance remains even when this file review disables MCP.",
+      "resolution": "Retained as observed overhead; no global hook patch or savings claim. Native review is not the minimum possible context profile."
+    }
+  ],
+  "limitations": [
+    "The two reviewers independently reviewed concrete files; model agreement is not correctness or a comparative benchmark.",
+    "Usage covers those two native reviews only. Coordinator, other research workers and setup usage are excluded; no whole-workflow savings is established.",
+    "Codex cached input is a subset of input; reasoning is inside output. Claude cache creation/read are separate categories. Client cost estimates are not bills.",
+    "Claude reported19turns for an invocation requesting max-turns12; no hard spending ceiling or exact turn-count enforcement claim follows.",
+    "The terminal profile launched the native client but interactive first-run subscription sign-in remains. /context, /usage, /compact and live HUD were not qualified.",
+    "Doctor installation diagnostics are clean. Its whitespace diagnostic is retained for the accepted embedding profile requiring query: and passage: prefixes with trailing spaces; those values were not trimmed.",
+    "Windows Terminal settings preservation was structurally checked; launching the named dropdown profile through Windows UI was not independently observed.",
+    "Selected skill file installation and native discovery do not establish improved task performance or activate the full ECC bundle.",
+    "Original model streams and host settings remain private; public outputs are explicitly selected and path-normalized projections."
+  ]
+}

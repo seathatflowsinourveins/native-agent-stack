@@ -2,6 +2,30 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "native-claude-profile-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "affaan-m/ECC",
+        "context-mode",
+        "rtk"
+      ],
+      "claim": "Native Claude2.1.278 installer repair, persistent scoped defaults, pinned global ECC skill discovery and independent native Codex SDK/Claude reviews passed within their recorded scopes. A local launcher regression preserves native stdout; the global instruction artifact is smaller after reviewed safeguards were restored.",
+      "limitations": [
+        "The two reviewers independently reviewed concrete files; model agreement is not correctness or a comparative benchmark.",
+        "Usage covers those two native reviews only. Coordinator, other research workers and setup usage are excluded; no whole-workflow savings is established.",
+        "Codex cached input is a subset of input; reasoning is inside output. Claude cache creation/read are separate categories. Client cost estimates are not bills.",
+        "Claude reported19turns for an invocation requesting max-turns12; no hard spending ceiling or exact turn-count enforcement claim follows.",
+        "The terminal profile launched the native client but interactive first-run subscription sign-in remains. /context, /usage, /compact and live HUD were not qualified.",
+        "Doctor installation diagnostics are clean. Its whitespace diagnostic is retained for the accepted embedding profile requiring query: and passage: prefixes with trailing spaces; those values were not trimmed.",
+        "Windows Terminal settings preservation was structurally checked; launching the named dropdown profile through Windows UI was not independently observed.",
+        "Selected skill file installation and native discovery do not establish improved task performance or activate the full ECC bundle.",
+        "Original model streams and host settings remain private; public outputs are explicitly selected and path-normalized projections."
+      ],
+      "path": "evidence/receipts/native-claude-profile-20260920.json"
+    },
+    {
       "id": "native-offhost-restic-20260920",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2021,6 +2045,81 @@
   ],
   "files": [
     {
+      "path": "catalogs/foundation/community-practice-20260920.json",
+      "sha256": "3be2e20d06643032dccf9ce24fdaac369c21afdf705ee9e024ede1cb74c9d056",
+      "bytes": 37274
+    },
+    {
+      "path": "docs/community-native-practice.md",
+      "sha256": "73414dff430d441288ac7440cb8d8bfc7e0fbfc4bc0be805b2a171f61b6f49b7",
+      "bytes": 8089
+    },
+    {
+      "path": "evidence/artifacts/native-claude-profile-20260920/claude-review.md",
+      "sha256": "7801ca5add36718de8b02054ad16de7a6bea648d5b6ef75fac11639eb1b8d200",
+      "bytes": 8426
+    },
+    {
+      "path": "evidence/artifacts/native-claude-profile-20260920/codex-review.md",
+      "sha256": "2c035a7d155b0766b98f7ff04168588faa9a9ecea196de578cd5d3a5bf264d32",
+      "bytes": 2147
+    },
+    {
+      "path": "evidence/artifacts/native-claude-profile-20260920/doctor-before.txt",
+      "sha256": "a1c25cc1b89b415fd9ef93f759766e81c7898825965d06730a5a2a9a9ed1dbcf",
+      "bytes": 1220
+    },
+    {
+      "path": "evidence/artifacts/native-claude-profile-20260920/doctor-final.txt",
+      "sha256": "fc188b2b629706e9b12b34d3418c178494c1911644660f9d4042f0662175ad4f",
+      "bytes": 941
+    },
+    {
+      "path": "evidence/artifacts/native-claude-profile-20260920/instructions-after.md",
+      "sha256": "c7cd3e93d91a95dd4aa77330b98b48beff96939f3befa2f968d9f497dd2835ec",
+      "bytes": 2347
+    },
+    {
+      "path": "evidence/artifacts/native-claude-profile-20260920/instructions-before.md",
+      "sha256": "255f1f5ed900688b07e573b213d6e02853c5390c0288aaa08ef2e40bb1bae968",
+      "bytes": 5627
+    },
+    {
+      "path": "evidence/artifacts/native-claude-profile-20260920/launcher-change.diff",
+      "sha256": "3cc9333aff4f83d60b48010345be544d8ef81283a3dd9fb13aff4eb12bf64eb5",
+      "bytes": 906
+    },
+    {
+      "path": "evidence/artifacts/native-claude-profile-20260920/launcher-tests.json",
+      "sha256": "ba7ae06e171bb6d8561d4e97d0c4e61afd5d3ad7a8fc233c74e7255e7acf2136",
+      "bytes": 47
+    },
+    {
+      "path": "evidence/artifacts/native-claude-profile-20260920/native-install.txt",
+      "sha256": "8120e669db8dc68311df7af983ac362e6841c28da90613736a1c131d66cf96f0",
+      "bytes": 613
+    },
+    {
+      "path": "evidence/artifacts/native-claude-profile-20260920/selected-commands.json",
+      "sha256": "234c3aed643ba87b7027d5e272831bd223b72c67755f6bf0837fc13f8347d400",
+      "bytes": 3596
+    },
+    {
+      "path": "evidence/receipts/native-claude-profile-20260920.json",
+      "sha256": "4b4e5f3ee46129bb3df720216cf53a430d210ee79bdf9aef2b2d7099b770e16a",
+      "bytes": 8227
+    },
+    {
+      "path": "examples/claude-native/CLAUDE.md",
+      "sha256": "7ff1a300d6926e8ed63aaa3c626944aad603de228e3bb657c50091ff06e18d51",
+      "bytes": 2409
+    },
+    {
+      "path": "recipes/claude-native-profile.md",
+      "sha256": "9522e5e76229910091a2ff203f3b68616ca0155eafccef0c3b0a2d6455cbee1f",
+      "bytes": 10132
+    },
+    {
       "path": ".gitattributes",
       "sha256": "a752d7e669e55fea832431991b21d0f92f6d060fb5dd49bceefa9684c3253977",
       "bytes": 304
@@ -2092,8 +2191,8 @@
     },
     {
       "path": "adoption/manifest.json",
-      "bytes": 14823,
-      "sha256": "55d2fb168a56cde20cf20b26dd8e70af8dd0a0b265229497b30f209db7bf454c"
+      "bytes": 14912,
+      "sha256": "02564a8b67baba3469950b663abf141a6a4ef010b4c863e3f181454f14de46f5"
     },
     {
       "path": "adoption/paired/README.md",
@@ -3523,8 +3622,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "ee8284a2919b276fc9093503df515a489d73352d50c43b4ce2ba563fe67be2ff",
-      "bytes": 409000
+      "sha256": "0b7f16f7c8c78bb7d2b22b66a155b7e1cf1bcaa00388f9a30f9227e18369477b",
+      "bytes": 409045
     },
     {
       "path": "blueprints/us-equities/README.md",
@@ -4958,8 +5057,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "0fb8deeec6ee77323d904350bbd5245b8ef4d3a0ff0616535cfbbede1d46d451",
-      "bytes": 387581
+      "sha256": "4cfa4baa08cf540fc7f0508aa8b4c67184a9d8e795a9cd683156ff0617683e11",
+      "bytes": 389369
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -5123,8 +5222,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "b91fd33d1ea6edefefe49b6dcf4e6e245b0f8379adda21b58bbfb08de2f43bc4",
-      "bytes": 3763327
+      "sha256": "a2ae4de1b7ce416fff30ec58855322e951086b9ccae58216983b3b780a4d7a89",
+      "bytes": 3794503
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5133,7 +5232,7 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "dc58c1cb0b9119aa1386eb2fa2866daf49b88b1119c888fcae3a206b57242dbc",
+      "sha256": "477371277cce8f499588b1f5e26951e17e9c15673a85b8321f43c2f7319c77a2",
       "bytes": 31611
     },
     {
@@ -5153,8 +5252,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "4ae02aaa971508447b9ac5717c6c1dab431d0812dd84285c067f5eeb93bb4bdb",
-      "bytes": 76385
+      "sha256": "0e5e6fbef932ca597b14cded5993756ab2c6a2c044604e36d0b1658025d57b2a",
+      "bytes": 76722
     },
     {
       "path": "docs/evidence.md",
@@ -5828,8 +5927,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "0820d962351dbe74bac7dbbe4477e5b45794117c1ef6fe717bab57e629aaf082",
-      "bytes": 29468
+      "sha256": "a909447f3677b8a62801d69454998d58c650a6273bf32b5b8288ac24b2794343",
+      "bytes": 29558
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -6123,13 +6222,13 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "2e463b51a2813f4cb71805ecafa1cd728b8a1daed89929d7ca297940653152ed",
-      "bytes": 8142
+      "sha256": "289838beeec393687c8ec97a346cf89cafcc0cc7683f520452dc870a36f6ac05",
+      "bytes": 8459
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "c63b2357cba6f5ac8e21c2e4b6e60a30541a098ed38a367e356fc901d89128d9",
-      "bytes": 109907
+      "sha256": "e81b565a38dc948b4327d2925ddace79e1e3b03d8d26dc2ac9713d8b59166e64",
+      "bytes": 110148
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -6143,8 +6242,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "6ed3941360da4b963ee4afcc620336d2c11192171735fc70ae5e71e5ebe8f637",
-      "bytes": 7137
+      "sha256": "1f6e65730ef7b1cf7f6c95f91e49ab852033b171c17ab805219d68a9e0da576e",
+      "bytes": 7448
     },
     {
       "path": "evidence/receipts/native-harness-defaults-20260920.json",

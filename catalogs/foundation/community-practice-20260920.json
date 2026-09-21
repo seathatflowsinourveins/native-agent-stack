@@ -1,0 +1,706 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-09-20",
+  "scope": "Dated community-practice source review across the existing 16 foundation layers. Selection refers to named guidance files or discovery roles, not whole-repository runtime acceptance.",
+  "base_commit": "85ead5519995d90ed4681f9e6820578b9612eef9",
+  "canonical_sources": [
+    "AGENTS.md",
+    "docs/convergence-architecture.md",
+    "docs/harness-defaults.md",
+    "docs/acceptance-evidence-policy.md",
+    "catalogs/foundation/manifest.json",
+    "catalogs/foundation/decisions.json"
+  ],
+  "merit_criteria": {
+    "maintenance": "Current canonical repository, dated head, archived flag and selected source files; popularity is not a score.",
+    "fit": "A concrete gap or duplicated incumbent responsibility determines adoption.",
+    "native_compatibility": "Supported skill/agent/plugin surfaces, actual tool authority and current primary Claude guidance.",
+    "evidence": "Source review, installation, discovery, native task output and comparative performance are separate. Reuse existing scoped receipts.",
+    "cost": "Prefer two on-demand skill files to whole catalogs/hooks/services; record bytes and added surfaces without inventing token or dollar savings."
+  },
+  "candidates": [
+    {
+      "id": "ecc",
+      "repository": "affaan-m/ECC",
+      "url": "https://github.com/affaan-m/ECC",
+      "requested_url": "https://github.com/affaan-m/everything-claude-code",
+      "role": "Selected on-demand research and context-retrieval skills",
+      "decision": "adopt",
+      "rationale": "Use only pinned search-first and iterative-retrieval to extend the existing project deployment to the native user skill surface. Existing canonical rules continue to bound delegation, validation, side effects and repeat work.",
+      "evidence_level": "source_review",
+      "source": {
+        "repository": "affaan-m/ECC",
+        "commit": "2b6e839771e53096d8451a213d40dc64ec8acac0",
+        "commit_date": "2026-09-20T19:37:57Z",
+        "pushed_at": "2026-09-20T19:37:57Z",
+        "archived": false,
+        "license_spdx_from_api": "MIT",
+        "license_reviewed": "MIT",
+        "source_files": [
+          {
+            "path": "README.md",
+            "url": "https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/README.md",
+            "sha256": "4af0d3294957ba7ee0b2f7ee43cff5ae647f128de0c2b92573da825a25710e78",
+            "bytes": 105295,
+            "git_blob_sha": "f9d202b28f3f5ae7e5f28bd7d3443f27fc804ad8"
+          },
+          {
+            "path": "LICENSE",
+            "url": "https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/LICENSE",
+            "sha256": "326146379f01bb137c0a5d3c54770c1aa31076705c8b88a7f6b26a460f6221b2",
+            "bytes": 1071,
+            "git_blob_sha": "b832b6f642312312367c07688dc7426db40a82ed"
+          },
+          {
+            "path": ".claude-plugin/plugin.json",
+            "url": "https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/.claude-plugin/plugin.json",
+            "sha256": "1471b27b262e7f479e7ec74e0500e2d439e761f156b29b4967f01403cb667f3f",
+            "bytes": 1265,
+            "git_blob_sha": "072edddfec1d63ab8db70339778a4782481549d7"
+          },
+          {
+            "path": "install.sh",
+            "url": "https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/install.sh",
+            "sha256": "a0583f0bdd66a5eeeaa7109087572aa53ba67d20162d3ac269ad7b89cb75b0db",
+            "bytes": 1354,
+            "git_blob_sha": "c69a11dd71bd167f7536ca9cc9e814209328e694"
+          },
+          {
+            "path": "skills/search-first/SKILL.md",
+            "url": "https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/search-first/SKILL.md",
+            "sha256": "d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733",
+            "bytes": 8021,
+            "git_blob_sha": "beed89fa5c5e82e27303c1d88ece3d771497d157"
+          },
+          {
+            "path": "skills/verification-loop/SKILL.md",
+            "url": "https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/verification-loop/SKILL.md",
+            "sha256": "f0d56107f79e607d4de6c5543b8edfb1b58ab9ae4019b39831689cd91116543e",
+            "bytes": 2625,
+            "git_blob_sha": "8713f2b78a927f330428475c72b5192d1839cfea"
+          },
+          {
+            "path": "skills/eval-harness/SKILL.md",
+            "url": "https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/eval-harness/SKILL.md",
+            "sha256": "6a8fae5d958ff9b6bdf97c7d9217fdf0b2ec9196f61d125bac0a71468f7d44d0",
+            "bytes": 8531,
+            "git_blob_sha": "6076dd18548503bf00ab28c06e05086d8bc90ea9"
+          },
+          {
+            "path": "skills/iterative-retrieval/SKILL.md",
+            "url": "https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/iterative-retrieval/SKILL.md",
+            "sha256": "b453b16d3e36174b8487c05ab807d0321a66c2d058812b2ae129d82824183725",
+            "bytes": 6786,
+            "git_blob_sha": "5b4fbcd58c38701a8ef6a43f80b820f792716982"
+          },
+          {
+            "path": "rules/common/agents.md",
+            "url": "https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/rules/common/agents.md",
+            "sha256": "4946437db9ad562af9a2d6f3eaffdc7c1b23f8534bec403a9e066d9219157cc3",
+            "bytes": 2900,
+            "git_blob_sha": "14d9b90059fced8f3021178d47354449df9b6012"
+          },
+          {
+            "path": "rules/common/testing.md",
+            "url": "https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/rules/common/testing.md",
+            "sha256": "09314a247342c12698deb308c2d0ffcf80b58341274bb8f9bba63fa03ce33323",
+            "bytes": 1400,
+            "git_blob_sha": "416c1c28c7578d26fa7cfe4cccc672166aefc002"
+          }
+        ]
+      },
+      "installation_mechanism": "Supported skill directories or ECC plugin/installer; only two standalone skill directories are selected. Full plugin hooks, rule packs and the evaluation framework are not selected.",
+      "activation_status": "Existing project skill copies matched the selected source. The coordinator separately reported successful global installation of both exact files and native Claude symlinks; runtime discovery was observed in the subsequent native Claude initialization event. No skill task-performance trial occurred in this review.",
+      "limitations": [
+        "The plugin manifest is version 2.2.2 and enables its local hooks by default; a full plugin install is broader than the selected change.",
+        "verification-loop includes generic 15-minute reruns, an 80% coverage target and raw grep-output examples; these do not override task-scoped validation and secret-output rules.",
+        "eval-harness is a useful guide but its candidate execution is disabled with gate.isolation_required; utility tests or receipts do not establish runtime containment."
+      ]
+    },
+    {
+      "id": "claude-best-practice",
+      "repository": "shanraisshan/claude-code-best-practice",
+      "url": "https://github.com/shanraisshan/claude-code-best-practice",
+      "requested_url": "https://github.com/shanraisshan/claude-code-best-practice",
+      "role": "Community explanations and worked native Claude examples",
+      "decision": "retain",
+      "rationale": "Keep as a source-linked reference for skills, subagents, commands and hooks; verify consequential claims against current primary Claude documentation. Its weather/presentation workflows are demonstrations, not evidence for this foundation.",
+      "evidence_level": "source_review",
+      "source": {
+        "repository": "shanraisshan/claude-code-best-practice",
+        "commit": "bde3f03174714fff4145d21cfda41ddd2ffffb28",
+        "commit_date": "2026-09-20T06:37:48Z",
+        "pushed_at": "2026-09-20T06:37:53Z",
+        "archived": false,
+        "license_spdx_from_api": "MIT",
+        "license_reviewed": "MIT",
+        "source_files": [
+          {
+            "path": "README.md",
+            "url": "https://raw.githubusercontent.com/shanraisshan/claude-code-best-practice/bde3f03174714fff4145d21cfda41ddd2ffffb28/README.md",
+            "sha256": "62ef15aba69b296a4a457dee46a4651891ca6ce1532d8940fb0494eb7666f171",
+            "bytes": 74855,
+            "git_blob_sha": "45c4f90c154d5309ba55d4c5679d70e5e3c5a3a8"
+          },
+          {
+            "path": "LICENSE",
+            "url": "https://raw.githubusercontent.com/shanraisshan/claude-code-best-practice/bde3f03174714fff4145d21cfda41ddd2ffffb28/LICENSE",
+            "sha256": "ff213c37152ebef37261ce48b413e9f2d62a156a7d105ba297cd5a0cfe18cbac",
+            "bytes": 1073,
+            "git_blob_sha": "a618c28c1b7517ced276c5b509ae57ee7a58e612"
+          },
+          {
+            "path": "CLAUDE.md",
+            "url": "https://raw.githubusercontent.com/shanraisshan/claude-code-best-practice/bde3f03174714fff4145d21cfda41ddd2ffffb28/CLAUDE.md",
+            "sha256": "9f9a7f3e400baf77b21d150effbda92cae1b3bbfdb2f9110e5906164ddc75f40",
+            "bytes": 7809,
+            "git_blob_sha": "953fe929d0d02d06e94604a7bfa3ae697b0aed30"
+          },
+          {
+            "path": "best-practice/claude-skills.md",
+            "url": "https://raw.githubusercontent.com/shanraisshan/claude-code-best-practice/bde3f03174714fff4145d21cfda41ddd2ffffb28/best-practice/claude-skills.md",
+            "sha256": "87e5a470aa859e4793794c45a89ada5f797aae6163b94de0b2cdba8ba22d31db",
+            "bytes": 8217,
+            "git_blob_sha": "abf4c94713d456d77b819a2db6d8a829b8d11390"
+          },
+          {
+            "path": "best-practice/claude-subagents.md",
+            "url": "https://raw.githubusercontent.com/shanraisshan/claude-code-best-practice/bde3f03174714fff4145d21cfda41ddd2ffffb28/best-practice/claude-subagents.md",
+            "sha256": "7de594dbfcc0b23353294c18f58c3aaabb06652d5a2a654d3cd80fd8f38f4e04",
+            "bytes": 4134,
+            "git_blob_sha": "3700c1b316e05a561f5e27ea5108e29334eb7244"
+          }
+        ]
+      },
+      "installation_mechanism": "Repository-specific .claude/agents, .claude/skills, commands and hook examples can be copied deliberately; this review selects no repository-wide configuration or hook installation.",
+      "activation_status": "Source review only. No example workflow, model task, hook or service was executed.",
+      "limitations": [
+        "README contributor tips, rankings and claims are not independent effectiveness measurements.",
+        "Repository CLAUDE.md configures work on that reference repository; it is not a global policy for this project."
+      ]
+    },
+    {
+      "id": "awesome-claude-code",
+      "repository": "hesreallyhim/awesome-claude-code",
+      "url": "https://github.com/hesreallyhim/awesome-claude-code",
+      "requested_url": "https://github.com/hesreallyhim/awesome-claude-code",
+      "role": "Curated discovery links for Claude tools and practice",
+      "decision": "retain",
+      "rationale": "Use links to discover a specific missing capability, then inspect that project independently. Recency and listing position are not adoption evidence.",
+      "evidence_level": "source_review",
+      "source": {
+        "repository": "hesreallyhim/awesome-claude-code",
+        "commit": "72f437590bb430a08e88e9b68d44c026ff626904",
+        "commit_date": "2026-09-20T21:07:55Z",
+        "pushed_at": "2026-09-20T21:07:56Z",
+        "archived": false,
+        "license_spdx_from_api": "NOASSERTION",
+        "license_reviewed": "CC-BY-NC-ND-4.0",
+        "source_files": [
+          {
+            "path": "README.md",
+            "url": "https://raw.githubusercontent.com/hesreallyhim/awesome-claude-code/72f437590bb430a08e88e9b68d44c026ff626904/README.md",
+            "sha256": "6ab722f7a401152c02ed98eb9fd7f4f7b8cf259a2abdb5b056c3a7c4632b22a3",
+            "bytes": 194635,
+            "git_blob_sha": "ab37074287d1920fe1aba4e88120f11b9e3739d6"
+          },
+          {
+            "path": "LICENSE",
+            "url": "https://raw.githubusercontent.com/hesreallyhim/awesome-claude-code/72f437590bb430a08e88e9b68d44c026ff626904/LICENSE",
+            "sha256": "e5da1bc9159d6e1190b3390a6e794093e766913068251f46e84c1874f864aacc",
+            "bytes": 632,
+            "git_blob_sha": "24464a29072f0a1a7f59d24df52726dadcb414f9"
+          }
+        ]
+      },
+      "installation_mechanism": "An informational curated list, not a runtime package. No list content, plugin set or linked repositories are installed.",
+      "activation_status": "Source discovery only.",
+      "limitations": [
+        "LICENSE is CC-BY-NC-ND-4.0 despite API SPDX NOASSERTION. This review links the list and records independent factual findings; it does not vendor or adapt the list.",
+        "Each linked implementation has its own license, security boundary and acceptance requirements."
+      ]
+    },
+    {
+      "id": "awesome-claude-subagents",
+      "repository": "VoltAgent/awesome-claude-code-subagents",
+      "url": "https://github.com/VoltAgent/awesome-claude-code-subagents",
+      "requested_url": "https://github.com/VoltAgent/awesome-claude-code-subagents",
+      "role": "Native-format subagent role examples",
+      "decision": "conditional",
+      "rationale": "Consider one named role only when a real task lacks a useful role contract. The accepted owned native worker remains the baseline; do not install a category catalog to increase apparent coverage.",
+      "evidence_level": "source_review",
+      "source": {
+        "repository": "VoltAgent/awesome-claude-code-subagents",
+        "commit": "ca7a50b7648682c3a9e33dbf0a12c5a4c770cb89",
+        "commit_date": "2026-09-14T09:59:52Z",
+        "pushed_at": "2026-09-14T09:59:52Z",
+        "archived": false,
+        "license_spdx_from_api": "MIT",
+        "license_reviewed": "MIT",
+        "source_files": [
+          {
+            "path": "README.md",
+            "url": "https://raw.githubusercontent.com/VoltAgent/awesome-claude-code-subagents/ca7a50b7648682c3a9e33dbf0a12c5a4c770cb89/README.md",
+            "sha256": "fc23c4cd6bd5dd7517998b31a0a47a5fbf7bba65b35824c68835febaf4c65ad6",
+            "bytes": 35130,
+            "git_blob_sha": "dec6d490683ffc79bdfac1bf2742c38f1da0ebc8"
+          },
+          {
+            "path": "LICENSE",
+            "url": "https://raw.githubusercontent.com/VoltAgent/awesome-claude-code-subagents/ca7a50b7648682c3a9e33dbf0a12c5a4c770cb89/LICENSE",
+            "sha256": "8ed27772f4430d6e3815599b849c1b6e59088671133ef67e9b1be4acef2b75da",
+            "bytes": 1065,
+            "git_blob_sha": "d0d77b4b2054f2e2ac448150dc1ac6acc4112281"
+          },
+          {
+            "path": "categories/04-quality-security/code-reviewer.md",
+            "url": "https://raw.githubusercontent.com/VoltAgent/awesome-claude-code-subagents/ca7a50b7648682c3a9e33dbf0a12c5a4c770cb89/categories/04-quality-security/code-reviewer.md",
+            "sha256": "cf8235884dd8b4bc15aa20cc822f727ecbde2b65823b7ba2b027a638804dfc78",
+            "bytes": 6607,
+            "git_blob_sha": "0d3fcfac32a98dc292ba164d041e068cb1a46baa"
+          }
+        ]
+      },
+      "installation_mechanism": "Upstream supports category plugins or copying a selected role file to .claude/agents or the user agents directory. No role is installed by this review.",
+      "activation_status": "Selected code-reviewer source reviewed, not executed.",
+      "limitations": [
+        "The reviewed code-reviewer inherits the model but exposes Write/Edit/Bash as well as read tools; its title does not make it read-only.",
+        "Do not infer native multi-worker quality, best worker count, durable replay or cost improvement from prompt templates."
+      ]
+    },
+    {
+      "id": "awesome-mcp-servers",
+      "repository": "punkpeye/awesome-mcp-servers",
+      "url": "https://github.com/punkpeye/awesome-mcp-servers",
+      "requested_url": "https://github.com/punkpeye/awesome-mcp-servers",
+      "role": "Discovery directory for specific MCP capability gaps",
+      "decision": "retain",
+      "rationale": "Use only to locate maintained primary implementations. Keep the already accepted scoped navigation, memory and browser integrations unless a representative task shows a gap.",
+      "evidence_level": "source_review",
+      "source": {
+        "repository": "punkpeye/awesome-mcp-servers",
+        "commit": "393b4e9fafb0348e5a1c2a4ef5a8719b0d85e061",
+        "commit_date": "2026-09-15T23:17:38Z",
+        "pushed_at": "2026-09-15T23:17:39Z",
+        "archived": false,
+        "license_spdx_from_api": "MIT",
+        "license_reviewed": "MIT",
+        "source_files": [
+          {
+            "path": "README.md",
+            "url": "https://raw.githubusercontent.com/punkpeye/awesome-mcp-servers/393b4e9fafb0348e5a1c2a4ef5a8719b0d85e061/README.md",
+            "sha256": "9b6a1ee410fde8132c92444f15cc153c2d6c4866dd74c4ac8b428981d49f777c",
+            "bytes": 1756337,
+            "git_blob_sha": "45f85250febd3da224f78340c775ff50d72842fb"
+          },
+          {
+            "path": "LICENSE",
+            "url": "https://raw.githubusercontent.com/punkpeye/awesome-mcp-servers/393b4e9fafb0348e5a1c2a4ef5a8719b0d85e061/LICENSE",
+            "sha256": "8cb2c0a4c6590502ffb793005c0f1b440ca4db34dcc209bbe9cf34d3b52a7e07",
+            "bytes": 1125,
+            "git_blob_sha": "7f5a6e30ea24860b1528cfb7a54cf777650fd46a"
+          }
+        ]
+      },
+      "installation_mechanism": "Informational directory with per-project setup links; it is not an instruction to register all listed servers.",
+      "activation_status": "Source discovery only.",
+      "limitations": [
+        "New MCP registrations can widen authority and discovery context; directory inclusion does not establish safe configuration.",
+        "No listed server is newly installed, connected or benchmarked here."
+      ]
+    }
+  ],
+  "selected_skills": [
+    {
+      "name": "search-first",
+      "repository": "affaan-m/ECC",
+      "commit": "2b6e839771e53096d8451a213d40dc64ec8acac0",
+      "path": "skills/search-first/SKILL.md",
+      "source_url": "https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/search-first/SKILL.md",
+      "git_blob_sha": "beed89fa5c5e82e27303c1d88ece3d771497d157",
+      "sha256": "d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733",
+      "bytes": 8021,
+      "native_registration": "A SKILL.md inside the selected project or user skill directory; invoke through native skill discovery.",
+      "project_deployment_observed": "Existing project Claude and shared copies both matched the selected upstream bytes before global activation. Preserve all project copies and customizations.",
+      "global_activation": "installation_and_exact_source_hash_verified_by_coordinator; native_runtime_discovery_observed_in_claude_init",
+      "acceptance_boundary": "File installation and native discovery can be checked separately; retrieval or task-quality improvement requires actual representative work."
+    },
+    {
+      "name": "iterative-retrieval",
+      "repository": "affaan-m/ECC",
+      "commit": "2b6e839771e53096d8451a213d40dc64ec8acac0",
+      "path": "skills/iterative-retrieval/SKILL.md",
+      "source_url": "https://raw.githubusercontent.com/affaan-m/ECC/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/iterative-retrieval/SKILL.md",
+      "git_blob_sha": "5b4fbcd58c38701a8ef6a43f80b820f792716982",
+      "sha256": "b453b16d3e36174b8487c05ab807d0321a66c2d058812b2ae129d82824183725",
+      "bytes": 6786,
+      "native_registration": "A SKILL.md inside the selected project or user skill directory; invoke through native skill discovery.",
+      "project_deployment_observed": "Existing project Claude and shared copies both matched the selected upstream bytes before global activation. Preserve all project copies and customizations.",
+      "global_activation": "installation_and_exact_source_hash_verified_by_coordinator; native_runtime_discovery_observed_in_claude_init",
+      "acceptance_boundary": "File installation and native discovery can be checked separately; retrieval or task-quality improvement requires actual representative work."
+    }
+  ],
+  "layer_map": [
+    {
+      "layer_id": "native-clients",
+      "decision": "retain",
+      "candidate_ids": [
+        "claude-best-practice"
+      ],
+      "rationale": "Retain native Codex/Claude accounts, model choices and session behavior. Read community explanations on demand; no new wrapper or global client replacement.",
+      "incumbent_decision_ids": [
+        "native-source-tasks",
+        "native-process-defaults",
+        "native-session-resume"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "A newly selected skill must appear through actual native discovery; a repository recipe is not a client execution result."
+    },
+    {
+      "layer_id": "instructions-skills",
+      "decision": "adopt",
+      "candidate_ids": [
+        "ecc",
+        "claude-best-practice"
+      ],
+      "rationale": "Select only search-first and iterative-retrieval as on-demand skills, preserving current project rules and copies. Retain other advice as reference.",
+      "incumbent_decision_ids": [
+        "native-process-defaults",
+        "on-demand-guidance",
+        "portable-skill-reference",
+        "tavily-native-search-extract"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "The coordinator reports exact global file installation; native runtime discovery was observed in the subsequent native Claude initialization event. Canonical project authority overrides generic repeat checks, fixed coverage thresholds and approval examples."
+    },
+    {
+      "layer_id": "workers",
+      "decision": "retain",
+      "candidate_ids": [
+        "ecc",
+        "awesome-claude-subagents",
+        "claude-best-practice"
+      ],
+      "rationale": "Keep the accepted owned native child and bounded coordinator pattern; use iterative retrieval for a demonstrated missing-context problem.",
+      "incumbent_decision_ids": [
+        "owned-native-child",
+        "companion-backend",
+        "dependency-task-queue",
+        "owned-worktrees",
+        "owned-process-deadlines",
+        "native-session-resume",
+        "native-child-interruption-recovery"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "Role-template breadth does not prove multi-worker task quality, provider budget enforcement or distributed replay."
+    },
+    {
+      "layer_id": "isolation",
+      "decision": "retain",
+      "candidate_ids": [
+        "claude-best-practice",
+        "awesome-claude-subagents"
+      ],
+      "rationale": "Keep actual worktree and OS boundary receipts. Do not adopt community hook/role prose as a security boundary.",
+      "incumbent_decision_ids": [
+        "owned-worktrees",
+        "scoped-os-isolation",
+        "mac-container-volume"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "An inherited model or read-only-sounding role can still expose write tools; qualify changed effects and permissions."
+    },
+    {
+      "layer_id": "code-navigation",
+      "decision": "retain",
+      "candidate_ids": [
+        "ecc",
+        "awesome-mcp-servers"
+      ],
+      "rationale": "Use exact/structural/scoped semantic incumbents; search-first finds an existing implementation before custom glue.",
+      "incumbent_decision_ids": [
+        "language-symbols",
+        "structural-code-lane",
+        "scoped-symbol-index",
+        "project-semantic-index",
+        "selected-file-representations",
+        "native-mcp-adapters"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "Select a new server only for an actual language or indexing gap; do not register a directory wholesale."
+    },
+    {
+      "layer_id": "document-retrieval",
+      "decision": "adopt",
+      "candidate_ids": [
+        "ecc"
+      ],
+      "rationale": "Use the selected iterative-retrieval guidance for relevant missing-source queries while retaining scoped QMD and its recorded misses.",
+      "incumbent_decision_ids": [
+        "scoped-document-bm25",
+        "source-document-conversion",
+        "curated-developer-docs"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "The bounded three-cycle recipe is guidance, not a new ranker or proof that the four retained benchmark misses are fixed."
+    },
+    {
+      "layer_id": "semantic-rag",
+      "decision": "retain",
+      "candidate_ids": [
+        "awesome-mcp-servers"
+      ],
+      "rationale": "Retain accepted SocratiCode/Qdrant/embedding state and recovery; use discovery only when the selected workload exposes a gap.",
+      "incumbent_decision_ids": [
+        "project-semantic-index",
+        "local-embedding-runtime",
+        "same-host-restore",
+        "synthetic-offhost-application-restore"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "No community listing establishes embedding quality, GPU compatibility or arbitrary-corpus retrieval."
+    },
+    {
+      "layer_id": "durable-memory",
+      "decision": "retain",
+      "candidate_ids": [
+        "ecc",
+        "claude-best-practice"
+      ],
+      "rationale": "Keep ai-memory as the cross-harness memory of record. Omit automatic community learning/memory hooks from this change.",
+      "incumbent_decision_ids": [
+        "scoped-memory-lifecycle",
+        "same-host-restore",
+        "synthetic-offhost-application-restore"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "Avoid parallel durable stores and implicit capture; existing scope, deletion and recovery evidence remains authoritative."
+    },
+    {
+      "layer_id": "web-research",
+      "decision": "retain",
+      "candidate_ids": [
+        "ecc",
+        "claude-best-practice",
+        "awesome-claude-code"
+      ],
+      "rationale": "Retain native Tavily Search/Extract and browser/source checks; use lists only for discovery, then inspect primary sources.",
+      "incumbent_decision_ids": [
+        "bounded-browser-operations",
+        "public-literature-retrieval",
+        "tavily-native-search-extract"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "Search and extraction success is source access, not research correctness or a consensus ranking."
+    },
+    {
+      "layer_id": "token-efficiency",
+      "decision": "retain",
+      "candidate_ids": [
+        "ecc",
+        "claude-best-practice"
+      ],
+      "rationale": "Keep on-demand guidance and the accepted context lanes; avoid loading whole skill/role inventories.",
+      "incumbent_decision_ids": [
+        "scoped-symbol-index",
+        "selected-context-processing",
+        "guarded-recoverable-compression",
+        "selected-file-representations",
+        "native-usage-reading",
+        "clean-token-tool-ci"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "Selected file sizes are recorded, but token savings, cache effects and complete task cost were not measured here."
+    },
+    {
+      "layer_id": "quality-evaluation",
+      "decision": "conditional",
+      "candidate_ids": [
+        "ecc",
+        "awesome-claude-subagents"
+      ],
+      "rationale": "Retain deterministic upstream/project tests and independent review. Keep verification-loop/eval-harness as optional references, not automatic installations.",
+      "incumbent_decision_ids": [
+        "portable-skill-reference",
+        "deterministic-quality-tools",
+        "offline-security-inventory",
+        "local-typed-application"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "Task-specific oracles and actual returns matter; generic coverage targets, static warnings and disabled evaluator execution cannot certify a result."
+    },
+    {
+      "layer_id": "ci-supply-chain",
+      "decision": "retain",
+      "candidate_ids": [
+        "ecc",
+        "awesome-claude-code"
+      ],
+      "rationale": "Keep the existing pinned CI, provenance and publication checks. Pin any selected skill files and retain their license/source hashes.",
+      "incumbent_decision_ids": [
+        "offline-security-inventory",
+        "clean-token-tool-ci"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "No community popularity or README benchmark substitutes for native CI, source integrity or supply-chain review."
+    },
+    {
+      "layer_id": "scheduling-supervision",
+      "decision": "retain",
+      "candidate_ids": [
+        "claude-best-practice",
+        "awesome-claude-subagents"
+      ],
+      "rationale": "Keep accepted Dagu/systemd cancellation, continuation and guest-reboot recipes. Omit perpetual community loops and category orchestrators from this change.",
+      "incumbent_decision_ids": [
+        "dependency-task-queue",
+        "owned-process-deadlines",
+        "checkpointed-workflow-resume",
+        "native-child-interruption-recovery",
+        "owned-guest-scheduled-reboot"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "No source review here establishes provider cancellation, distributed scheduling or durable external effects."
+    },
+    {
+      "layer_id": "hosting-services",
+      "decision": "retain",
+      "candidate_ids": [
+        "awesome-mcp-servers",
+        "claude-best-practice"
+      ],
+      "rationale": "Reuse accepted local services and scoped deployment recipes; no community example warrants a new standing service.",
+      "incumbent_decision_ids": [
+        "local-typed-application",
+        "mac-container-volume",
+        "native-mcp-adapters",
+        "optional-gateway-lifecycle"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "Production authentication, a new host and independent application recovery still require their relevant evidence."
+    },
+    {
+      "layer_id": "recovery-portability",
+      "decision": "retain",
+      "candidate_ids": [
+        "ecc",
+        "claude-best-practice"
+      ],
+      "rationale": "Keep native resume, application backup and Restic recovery recipes; community handoff advice is supplementary.",
+      "incumbent_decision_ids": [
+        "synthetic-offhost-restic-restore",
+        "scoped-memory-lifecycle",
+        "checkpointed-workflow-resume",
+        "same-host-restore",
+        "native-session-resume",
+        "native-child-interruption-recovery",
+        "owned-guest-scheduled-reboot",
+        "synthetic-offhost-application-restore"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "A skill prompt is not a native checkpoint or backup. Do not reopen accepted fixtures for a documentation refresh."
+    },
+    {
+      "layer_id": "observation-inference",
+      "decision": "retain",
+      "candidate_ids": [
+        "claude-best-practice",
+        "awesome-claude-code"
+      ],
+      "rationale": "Keep scoped native telemetry and current inference routes; dashboards, HUDs and provider wrappers remain separately qualified.",
+      "incumbent_decision_ids": [
+        "local-embedding-runtime",
+        "native-usage-reading",
+        "loopback-usage-observation",
+        "bounded-history-and-traces",
+        "interactive-hud-boundary",
+        "local-generation-trial",
+        "optional-gateway-lifecycle"
+      ],
+      "incumbent_decisions_path": "catalogs/foundation/decisions.json",
+      "acceptance_boundary": "No new model/provider call, rendering acceptance, attribution improvement or cost claim is made."
+    }
+  ],
+  "primary_guidance": [
+    {
+      "url": "https://code.claude.com/docs/en/best-practices",
+      "retrieved_on": "2026-09-20",
+      "retrieval_method": "Tavily query-focused extraction of the official page",
+      "representation": "returned extract, not complete origin document bytes",
+      "returned_content_sha256": "7cd2c87786f18772c7e86c4e3e758a9da5fe7cfcceaaa498605fa6fb350fc594",
+      "returned_content_bytes": 2330
+    },
+    {
+      "url": "https://code.claude.com/docs/en/skills",
+      "retrieved_on": "2026-09-20",
+      "retrieval_method": "Tavily query-focused extraction of the official page",
+      "representation": "returned extract, not complete origin document bytes",
+      "returned_content_sha256": "456889a3d8c9e1e1d98573613dcaccf1a88b7d1a4ef133f4bae953369b0bd980",
+      "returned_content_bytes": 2902
+    },
+    {
+      "url": "https://code.claude.com/docs/en/sub-agents",
+      "retrieved_on": "2026-09-20",
+      "retrieval_method": "Tavily query-focused extraction of the official page",
+      "representation": "returned extract, not complete origin document bytes",
+      "returned_content_sha256": "2362fcae84482654a8e6a3b24194aab183aa8db1b3528e631e4ff49917d6e68d",
+      "returned_content_bytes": 2970
+    }
+  ],
+  "primary_guidance_application": [
+    "Keep verification tied to actual behavior and the task-specific oracle.",
+    "Use native skill directories and deliberate invocation; full skill preloading is different from discovery.",
+    "Review native subagent tools and permissions separately from model inheritance; prompt prose is not isolation."
+  ],
+  "retrieval_record": {
+    "native_tavily_search_exit": 0,
+    "native_tavily_extract_exit": 0,
+    "official_extract_failed_results": [],
+    "github_repositories_verified": 5,
+    "selected_github_blobs_fetched": 22,
+    "preserved_source_read_failures": [
+      {
+        "url": "https://raw.githubusercontent.com/shanraisshan/claude-code-best-practice/bde3f03174714fff4145d21cfda41ddd2ffffb28/best-practice/claude-rules.md",
+        "error": "HTTP Error 404: Not Found"
+      },
+      {
+        "url": "https://code.claude.com/docs/en/best-practices.md",
+        "error": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://code.claude.com/docs/en/skills.md",
+        "error": "HTTP Error 403: Forbidden"
+      },
+      {
+        "url": "https://code.claude.com/docs/en/sub-agents.md",
+        "error": "HTTP Error 403: Forbidden"
+      }
+    ],
+    "interpretation": "The unavailable guessed community rules path is not claimed present. Direct official Markdown requests were refused; official-page extraction succeeded through a different supported access path. No failed retrieval is labeled execution acceptance."
+  },
+  "activation_plan": [
+    "The coordinator reports successful installation of the two exact skills through the official skill installer and their Claude symlinks. Retain separate native discovery/interactive results and independent review; installation alone is not task acceptance.",
+    "Preserve existing project copies/customizations, native models/accounts/permissions and canonical task-scoped rules.",
+    "Do not install the full ECC or VoltAgent plugin bundle, global hook/rule packs, community memory capture or executable eval framework for this selection."
+  ],
+  "limitations": [
+    "This review is not a universal ranking, current consensus or proof of state-of-the-art performance.",
+    "Community lists are discovery sources. Every newly selected implementation needs its own license/source and task-specific native acceptance.",
+    "No model/provider/broker invocation, installation, live configuration edit or new native qualification trial was performed by this review.",
+    "Global file installation and matching hashes were reported by the coordinator; native runtime discovery was observed in the subsequent native Claude initialization event. Existing project deployment, global installation and actual task performance are separate observations.",
+    "Existing foundation acceptance and open-gap status are unchanged."
+  ],
+  "native_runs": 0,
+  "installs_by_this_review": 0,
+  "measured_task_quality_improvement": null,
+  "measured_provider_cost_change": null,
+  "coordinator_activation_report": {
+    "reported_on": "2026-09-20",
+    "scope": "Separate coordinator-owned activation, not execution by this source-review worker.",
+    "installation": "Official skill-installer returned success for both selected shared skills; Claude symlinks added.",
+    "exact_skill_hashes_match_selected_sources": true,
+    "native_runtime_discovery": "observed_search_first_and_iterative_retrieval_in_native_claude_system_init; see native-claude-profile-20260920 receipt",
+    "recipe_path_owned_by_coordinator": "recipes/claude-native-profile.md",
+    "task_quality_or_cost_improvement_established": false
+  }
+}

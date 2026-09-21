@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "scope": "Selected native command results; source history, local checks and native model reviews remain distinct.",
+  "commands": [
+    {
+      "command": "claude install 2.1.278",
+      "exit_code": 0,
+      "exit_source": "native exec result",
+      "output": "evidence/artifacts/native-claude-profile-20260920/native-install.txt"
+    },
+    {
+      "command": "ecosystem-claude --project <PROJECT> doctor",
+      "exit_code": 0,
+      "exit_source": "native exec result",
+      "output": "evidence/artifacts/native-claude-profile-20260920/doctor-final.txt",
+      "result": "No installation issues found; intentional embedding-prefix whitespace diagnostic remains."
+    },
+    {
+      "command": "ecosystem-claude --project <STACK_CHECKOUT> --version",
+      "exit_code": 0,
+      "stdout": "2.1.278 (Claude Code)\n",
+      "stderr": "Local Linux usage snapshot refreshed.\n"
+    },
+    {
+      "command": "python3 <SKILL_INSTALLER>/install-skill-from-github.py --repo affaan-m/ECC --ref 2b6e839771e53096d8451a213d40dc64ec8acac0 --path skills/search-first skills/iterative-retrieval --dest <HOME>/.agents/skills",
+      "exit_code": 0,
+      "exit_source": "native exec result",
+      "reported_stdout": "Installed search-first to <HOME>/.agents/skills/search-first\nInstalled iterative-retrieval to <HOME>/.agents/skills/iterative-retrieval\n",
+      "scope": "Official Codex skill-installer download; not the full ECC installer/plugin."
+    },
+    {
+      "command": "node <ECOSYSTEM_HOME>/validation/verify-native-scope.cjs",
+      "exit_code": 0,
+      "output": "evidence/artifacts/native-claude-profile-20260920/launcher-tests.json",
+      "kind": "local integration regression, not upstream Claude tests",
+      "red_before_fix": "Assertion failed because usage-refresh text was emitted on stdout."
+    }
+  ],
+  "projection_sources": {
+    "native-install.txt": {
+      "raw": {
+        "sha256": "6d6a22ec3994391e183e9186e610a37ed4c4755c31156213a31bfb01b47555ac",
+        "bytes": 614
+      },
+      "projection": "ANSI removal, declared host-path substitutions, and terminal trailing-blank-line normalization to one newline"
+    },
+    "doctor-before.txt": {
+      "raw": {
+        "sha256": "3a25d8ef1609ff46459cb52f45337e9a676c9b4b91926055df4c9384eb18a12a",
+        "bytes": 1259
+      },
+      "projection": "ANSI removal and declared host-path substitutions only"
+    },
+    "doctor-final.txt": {
+      "raw": {
+        "sha256": "c85585e0ed848820c1bd76e73cb9af625133a405cec2c1436cca5db44504a10d",
+        "bytes": 982
+      },
+      "projection": "ANSI removal and declared host-path substitutions only"
+    },
+    "instructions-before.md": {
+      "raw": {
+        "sha256": "cd547a2d562e7650f2656077c8785f1554f344a3f81505bd22f0a5257864043b",
+        "bytes": 5784
+      },
+      "projection": "ANSI removal and declared host-path substitutions only"
+    },
+    "instructions-after.md": {
+      "raw": {
+        "sha256": "ba85d632b1912513957d2e96c1bad8b5ee3a8fc615851279b647bcefa29432d1",
+        "bytes": 2369
+      },
+      "projection": "ANSI removal and declared host-path substitutions only"
+    }
+  },
+  "raw_private_model_artifacts": {
+    "claude_stream": {
+      "sha256": "f1fe04e9dd48bd756762c2920c308979f7bf8ed51233ac47907ce1066aa815ec",
+      "bytes": 279941
+    },
+    "codex_result": {
+      "sha256": "244cb57fe99201996af42ccfde8262607841d52798930c954b5ae00f961c7ea9",
+      "bytes": 48089
+    },
+    "codex_audit": {
+      "sha256": "b1309b0d1ebee2bd0851e6a7264cf5b62340e7768708595a60ffd223233823a4",
+      "bytes": 6382
+    }
+  }
+}

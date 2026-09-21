@@ -195,15 +195,18 @@
       "candidate": null,
       "evidence_ids": [
         "component-history",
-        "token-practice-coverage-20260920"
+        "token-practice-coverage-20260920",
+        "native-claude-profile-20260920"
       ],
-      "evidence_scope": "Selected guidance/source records are retained; they have no executable installation or process lifecycle.",
+      "evidence_scope": "Selected guidance sources are retained. Two pinned ECC skill files were installed globally and observed in native Claude discovery; this is not a full community bundle or a task-performance claim.",
       "limitations": [
         "Source selection is not execution acceptance and does not activate a complete skills catalog."
       ],
       "source_paths": [
         "docs/convergence-architecture.md",
-        "adoption/lifecycle.md"
+        "adoption/lifecycle.md",
+        "catalogs/foundation/community-practice-20260920.json",
+        "recipes/claude-native-profile.md"
       ],
       "next_gap": "Review a newly selected skill against current project rules before activation.",
       "lifecycle": {

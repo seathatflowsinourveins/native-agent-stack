@@ -14,6 +14,11 @@ Keep native sign-ins, model choices, permission settings, caching, deferred tool
 
 ## Use skills, workers and tools deliberately
 
+The [native Claude profile](../recipes/claude-native-profile.md) applies these
+defaults to terminal entry, selected global skills and context accounting.
+Its [dated community review](community-native-practice.md) records why each
+candidate is retained, adopted or deferred; guidance is not runtime acceptance.
+
 Keep always-loaded instructions short and load a skill for the actual operation. Resolve conflicting guidance using the current user request and canonical project instructions. Routine authorized work continues through a reviewable result without repeated intake, planning approvals or restarts.
 
 Use one coordinator and bounded independent workers when that improves the result. Give each writer its own checkout, exact base, owned paths, acceptance commands and handoff. A research worker returns source-linked proposals; deterministic code owns numeric calculations and consequential execution. Preserve failures, retries and complete usage when evaluating a worker strategy.
