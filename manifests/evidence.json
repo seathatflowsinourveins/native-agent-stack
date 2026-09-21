@@ -2,6 +2,23 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "native-quality-defaults-20260920",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Supported persistent effort defaults were aligned with the user's quality preference: native Codex now saves ultra, matching Desktop; Claude saves xhigh. Native config/read returned ultra for both Codex homes with the selected project's layers. A short acceptance and independent-review rule is saved in all three global instruction files.",
+      "limitations": [
+        "Configuration and schema acceptance only; no model turn, comparative quality benchmark, token-saving or full workflow E2E claim.",
+        "Saved defaults apply to fresh sessions; already-open sessions may retain their earlier effort. Native workers can resolve effort differently through roles and overrides.",
+        "Claude max is available as a session option, not a valid persisted effortLevel. Adaptive thinking stays at its native enabled default.",
+        "Claude doctor retains the known intentional whitespace warning for query/document embedding prefixes. No other configuration was changed to suppress it.",
+        "The official SDK config/read observer is a local integration that selects safe fields. It is not an upstream test suite and does not execute a model task."
+      ],
+      "path": "evidence/receipts/native-quality-defaults-20260920.json"
+    },
+    {
       "id": "native-terminal-profiles-20260920",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -2064,6 +2081,16 @@
   ],
   "files": [
     {
+      "path": "evidence/artifacts/native-quality-defaults-20260920/codex-effective.json",
+      "sha256": "609255c3478fa016245e1c9657aa7a3b4712e0abcc90b3e3fb4615b74d45fae7",
+      "bytes": 387
+    },
+    {
+      "path": "evidence/receipts/native-quality-defaults-20260920.json",
+      "sha256": "74e08167924b868deb906b99a01c2b9ddac151e483b4b09a430380996c94b2b9",
+      "bytes": 4793
+    },
+    {
       "path": "evidence/artifacts/native-terminal-profiles-20260920/native-processes.txt",
       "sha256": "0669f843035324a6a4578fdc56189f794187442efefc35e5d8125e043828da6a",
       "bytes": 96
@@ -2140,13 +2167,13 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "7ff1a300d6926e8ed63aaa3c626944aad603de228e3bb657c50091ff06e18d51",
-      "bytes": 2409
+      "sha256": "3156579ed4d7096f4477e84f1b82d8c89c5d5b0eb45c10f5686ce1468d812d0f",
+      "bytes": 2802
     },
     {
       "path": "recipes/claude-native-profile.md",
-      "sha256": "12e1b1addab13fe91780dea475722bfc97fde888d28e2078855234e9c4f8fd46",
-      "bytes": 11330
+      "sha256": "4fb5c6306a82e09f5d9bbc776839b8b470faa05938e8bfd8aec87d4664f86d64",
+      "bytes": 13654
     },
     {
       "path": ".gitattributes",
@@ -5251,8 +5278,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "11c458e1a184335659a9d6d4aa25795804629927878f54ca9cfd45d6b8a6dba6",
-      "bytes": 3799437
+      "sha256": "75846b5f38b72448a8deec1c22622149c20916f534a20202ffe6a3138983da6c",
+      "bytes": 3802604
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -5261,7 +5288,7 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "afa5f00f0584450582c38e5c6246f0529d6680cadfbe0c2103954a21a7b4c6c7",
+      "sha256": "3d558f25e70a40f09af624ea502ebd53996a275c44b2052710bf84aef565f190",
       "bytes": 31611
     },
     {
@@ -6271,8 +6298,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "1f6e65730ef7b1cf7f6c95f91e49ab852033b171c17ab805219d68a9e0da576e",
-      "bytes": 7448
+      "sha256": "507abf1c7539e6e710b5e3937c98777511d74e9fd05901e71d8a96c78330d258",
+      "bytes": 7841
     },
     {
       "path": "evidence/receipts/native-harness-defaults-20260920.json",

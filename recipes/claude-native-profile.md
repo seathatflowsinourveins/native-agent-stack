@@ -99,6 +99,51 @@ RTK, Context Mode and ai-memory lifecycle handlers. The selected reference
 repository `shanraisshan/claude-code-best-practice` supplies reviewed guidance,
 not a runtime daemon. A source review is its relevant acceptance level.
 
+## Supported quality defaults
+
+For the selected native Codex 0.155.1 and GPT-6-Astra, this host saves the same
+quality-oriented reasoning setting already selected in Desktop:
+
+```toml
+model = "gpt-6-astra"
+model_reasoning_effort = "ultra"
+```
+
+Merge only the effort field into the intended Codex home. Preserve the native and
+Desktop homes, account, model, permissions and project configuration. The installed
+upstream `codex debug models --bundled` catalog explicitly supports `ultra` for
+this model; its unconfigured native default is `low`. Generic API effort tables
+are not the native client's complete model-specific catalog. Fresh native
+`config/read` calls through the official SDK returned `ultra` in both homes,
+including this project's configuration layers, without starting a model turn.
+
+For Claude Code 2.1.278, merge this field into the existing user settings:
+
+```json
+{"effortLevel": "xhigh"}
+```
+
+Retain the selected `opus[1m]` model. The installed persistent schema accepts
+`low`, `medium`, `high` and `xhigh`; `max` is a session-selected effort, not a
+valid persisted `effortLevel`. Native adaptive thinking already applies when
+`alwaysThinkingEnabled` is absent or true. Preserve that default and avoid fixed
+thinking-token or global effort environment overrides. See [Claude model
+configuration](https://code.claude.com/docs/en/model-config) and
+[settings lifecycle](https://code.claude.com/docs/en/settings).
+
+Saved effort defaults apply to fresh sessions. Already-open sessions can retain
+their previous selection; Claude supports `/effort` for the current session.
+Do not interrupt active work to reload a default. [Codex worker settings](https://learn.chatgpt.com/docs/agent-configuration/subagents)
+and [Claude subagent frontmatter](https://code.claude.com/docs/en/sub-agents)
+can override effort/model inheritance, so do not claim all workers run at the
+coordinator's maximum. The short global instruction example makes task-based
+acceptance, original-source verification and independent review persistent.
+
+The [settings receipt](../evidence/receipts/native-quality-defaults-20260920.json)
+records supported values, effective configuration and preservation checks. More
+reasoning can increase time and tokens; no quality improvement or savings is
+established until the actual task is evaluated.
+
 ## Architectural token practice
 
 - Preserve the requested model and native cache, compaction and deferred MCP

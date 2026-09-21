@@ -4,6 +4,8 @@ Use native Codex and Claude as the general engineering harnesses. This policy ap
 
 ## Decide from the task and evidence
 
+Define acceptance from the requested outcome. Verify changed behavior with relevant upstream or project checks, inspect original source, and obtain independent review for substantive changes. Resolve supported findings before claiming completion; distinguish measured results, simulations and untested boundaries. More tools, more reasoning and reviewer agreement alone do not prove quality.
+
 Start with the requested result, current repository state and a concrete acceptance condition. Select only the foundation layers needed for that task. Reuse accepted receipts while their inputs, version, platform and scope still match. Resolve a demonstrated missing dependency or broken connection directly; a healthy environment does not need another installation sweep.
 
 Prefer the installed upstream executable, SDK and supported client integration. Consult current primary documentation before adopting changing interfaces. Discover alternatives through owned/starred repositories, curated lists and research, then record why a candidate closes a gap or improves a comparable workload. Stars, release dates, author benchmarks and installation success do not establish the best workflow.
