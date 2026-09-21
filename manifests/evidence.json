@@ -6230,7 +6230,7 @@
     {
       "path": "docs/ecosystem/index.html",
       "bytes": 7077193,
-      "sha256": "e7f18bdd505e620cc5dc10cab6b696c2e99785052694cafef829ddd0613384b9"
+      "sha256": "e8891ddeddda45cf3f171ae09293b645ae49160e1e563c032fa4a28c231eb2cb"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6240,7 +6240,7 @@
     {
       "path": "docs/ecosystem/manifest.json",
       "bytes": 37912,
-      "sha256": "1d83ceeaab1b33556c093ebcb1eb88cef13e22841ea05e01de6093e4678919dd"
+      "sha256": "efa00bcc90dc0fdfb5ffb93c4484791f4cfa05e48b8f32ad57c15c3bd6dc2fe9"
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
