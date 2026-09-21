@@ -2,7 +2,7 @@
   "schema_version": 1,
   "snapshot_date": "2026-09-21",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
-  "source_revision": "06ee9ccfa81823c94b03903e39ee7bb012ff5514",
+  "source_revision": "b6af5ed98892ff86526654781e8353b393f84543",
   "layers": [
     {
       "id": "agents",
@@ -321,6 +321,18 @@
       "body": "Selected review/readiness scripts, exact source coverage, task-matched native agent definitions and local fixture boundaries.",
       "path": "examples/claude-native/workflows/README.md",
       "category": "setup"
+    },
+    {
+      "title": "Claude-to-Codex review: actual native return",
+      "body": "Literal official slash command returned successfully in an isolated checkout. Native output, usage limits, source hashes and lifecycle boundaries retained.",
+      "path": "recipes/claude-codex-foreground-review.md",
+      "category": "setup"
+    },
+    {
+      "title": "Foundation ready: next north-star R&D acceptance",
+      "body": "Current decisions, retained AAPL/paper results, QMD comparison and exact frozen SPY build contract. Remaining broker, data and continuous-operation gates stay explicit.",
+      "path": "docs/foundation-rd-readiness.md",
+      "category": "evaluation"
     },
     {
       "title": "Current foundation convergence: Claude cooperation and source results",

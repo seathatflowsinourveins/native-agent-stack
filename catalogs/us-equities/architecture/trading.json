@@ -4,6 +4,9 @@
   "base_publication_commit": "a9f40f21a26819cc8fdf109b1b36e2867d792c08",
   "scope": "Two bounded source-review waves: seven event/replay engines, then eight research/evaluation/calendar tools; discovery through three currently maintained primary awesome lists. Selected source sections and tests were inspected, not entire codebases. No provider, broker, model, installation or backtest ran in this lane.",
   "execution_status": "research_only",
+  "snapshot_scope": "Historical September 19 source review. Its primary-engine/challenger labels do not override the September 21 selected NautilusTrader2.0.0rc5 destination, retained LEAN oracle, or later skfolio1.2.9 bounded native study.",
+  "current_selection_record": "catalogs/us-equities/runtime-target.json",
+  "reconciliation_record": "docs/foundation-rd-readiness.md",
   "universal_sota_or_completeness_claimed": false,
   "entries": [
     {

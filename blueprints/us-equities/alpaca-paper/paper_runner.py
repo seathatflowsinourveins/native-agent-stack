@@ -314,14 +314,24 @@ class Runner:
         self.orders = {}
         self.quote_observations = []
         self.last_quote = None
+        self.last_clock = None
 
     def clock(self, entry=False):
+        self.last_clock = None
+        started = self.gate.now()
         clock = self.broker.clock()
-        offset = timestamp(clock["at"]) - self.gate.now()
+        received = self.gate.now()
+        at, close = timestamp(clock["at"]), timestamp(clock["close"])
+        offset = at - received
+        if received < started:
+            raise SafetyError("clock_moved_backward")
         if (abs(offset) > self.config["max_clock_offset_seconds"] or clock["open"] is not True
-                or timestamp(clock["close"]) - clock["at"] <
+                or close - at <
                    (self.config["minimum_session_remaining_seconds"] if entry else 60)):
             raise SafetyError("regular_session_clock_required")
+        # Advance from request start, not response receipt: clock response latency
+        # and any local rate wait must never extend the remaining session budget.
+        self.last_clock = (close, at, started, received)
         return offset
 
     def quote(self):
@@ -398,6 +408,15 @@ class Runner:
             at, offset = self.last_quote
             if not -1 <= self.gate.now() + offset - at <= self.config["max_quote_age_seconds"]:
                 raise SafetyError("quote_not_fresh_at_submit")
+            if self.last_clock is None:
+                raise SafetyError("session_clock_required_at_submit")
+            close, clock_at, started, received = self.last_clock
+            now = self.gate.now()
+            if now < received:
+                raise SafetyError("clock_moved_backward")
+            required = self.config["minimum_session_remaining_seconds"] if intent["side"] == "buy" else 60
+            if close - (clock_at + now - started) < required:
+                raise SafetyError("session_buffer_exhausted_at_submit")
         self.gate.submit_guard = guard
         try:
             return self.validate_order(self.broker.submit(intent), intent)

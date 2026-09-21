@@ -142,13 +142,16 @@ Fourteen documented dashboard pages returned HTTP 200 in the read-only audit;
 those responses establish transport only. Earlier native/rendered evidence is
 reused at its original scope.
 
-Final catalog validation passed for 68 stack components, 126 receipts and 1,409
+Final catalog validation passed for 68 stack components, 127 receipts and 1,415
 hashed files; foundation and repository-catalog structure checks also passed.
 The generated explorer matched its inputs. A final browser reload confirmed
 the added Codex surface and embedded setup guide, with the Workers filter still
 showing eight capabilities and no overflow at desktop or 390px mobile width.
 Native token-report refresh returned no collection issues; native counters,
 artifact comparisons and cumulative provider usage retain separate scopes.
+Concurrent published foundation R&D and foreground Codex review records were
+preserved during integration; their separate evidence and next-work boundaries
+remain visible in the same explorer.
 
 Native workflow qualification and final integrity results are recorded in the
 [execution receipt](../evidence/receipts/claude-foundation-finalization-20260921.json).
