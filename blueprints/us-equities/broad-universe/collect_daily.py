@@ -94,7 +94,7 @@ class Ledger:
                 for line in handle:
                     rec = json.loads(line)
                     if rec.get("event") == "batch_complete":
-                        done[(rec["adjustment"], rec["batch"])] = rec["symbols_sha256"]
+                        done[(rec.get("series", "b"), rec["adjustment"], rec["batch"])] = rec["symbols_sha256"]
         return done
 
     def write(self, **rec):
@@ -180,16 +180,16 @@ def collect_symbols(session, headers, symbols, args, adjustment, label, out, led
             return
 
 
-def run_batch(index, symbols, adjustment, args, headers, out, ledger):
+def run_batch(index, symbols, adjustment, args, headers, out, ledger, prefix="b"):
     import requests
     session = requests.Session()
     session.trust_env = False
-    label = f"b{index:05d}"
+    label = f"{prefix}{index:05d}"
     rows = []
     try:
         collect_symbols(session, headers, symbols, args, adjustment, label, out, ledger, rows)
     except Exception as exc:
-        ledger.write(event="batch_failed", adjustment=adjustment, batch=index, error=str(exc)[:300])
+        ledger.write(event="batch_failed", adjustment=adjustment, batch=index, series=prefix, error=str(exc)[:300])
         return index, adjustment, False, 0
     finally:
         session.close()
@@ -200,7 +200,7 @@ def run_batch(index, symbols, adjustment, args, headers, out, ledger):
         writer.writerow(COLUMNS)
         writer.writerows(rows)
     os.replace(temporary, target)
-    ledger.write(event="batch_complete", adjustment=adjustment, batch=index, symbols=len(symbols),
+    ledger.write(event="batch_complete", adjustment=adjustment, batch=index, series=prefix, symbols=len(symbols),
                  symbols_sha256=symbols_digest(symbols), bars=len(rows),
                  symbols_with_bars=len({r[0] for r in rows}))
     return index, adjustment, True, len(rows)
@@ -218,6 +218,8 @@ def main():
     parser.add_argument("--batch-size", type=int, default=100)
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--max-batches", type=int, default=0, help="bounded trial; 0 means every batch")
+    parser.add_argument("--supplement-symbols", help="JSON list of extra symbols absent from the asset-master list "
+                        "(e.g. delisted names found in corporate actions); collected as series 's' beside the main run")
     args = parser.parse_args()
 
     adjustments = [a for a in args.adjustments.split(",") if a]
@@ -226,6 +228,11 @@ def main():
     key, secret = read_credentials(args.env_file)
     headers = {"APCA-API-KEY-ID": key, "APCA-API-SECRET-KEY": secret}
     symbols, identities, collisions, skipped = select_symbols(args.assets)
+    series = "b"
+    if args.supplement_symbols:
+        with open(args.supplement_symbols, encoding="utf-8") as handle:
+            extra = sorted({s for s in json.load(handle) if DATA_SYMBOL.match(s)} - set(symbols))
+        symbols, series = extra, "s"
     groups = batches(symbols, args.batch_size)
     if args.max_batches:
         groups = groups[:args.max_batches]
@@ -241,19 +248,25 @@ def main():
             "symbols": len(symbols), "batches": len(groups), "symbols_sha256": symbols_digest(symbols),
             "excluded_exchange_assets": skipped, "symbol_collisions": len(collisions),
             "asof": "provider default (request date)", "asset_files": [os.path.basename(p) for p in args.assets]}
-    with open(os.path.join(args.out, "plan.json"), "w", encoding="utf-8") as handle:
+    plan["series"] = series
+    plan_name = "plan.json" if series == "b" else "plan-supplement.json"
+    with open(os.path.join(args.out, plan_name), "w", encoding="utf-8") as handle:
         json.dump(plan, handle, indent=1)
-    with open(os.path.join(args.out, "symbol-identities.json"), "w", encoding="utf-8") as handle:
-        json.dump({"identities": identities, "collisions": collisions}, handle)
+    if series == "b":
+        with open(os.path.join(args.out, "symbol-identities.json"), "w", encoding="utf-8") as handle:
+            json.dump({"identities": identities, "collisions": collisions}, handle)
+    else:
+        with open(os.path.join(args.out, "supplement-symbols.json"), "w", encoding="utf-8") as handle:
+            json.dump(symbols, handle)
 
     jobs = [(i, g, a) for a in adjustments for i, g in enumerate(groups)
-            if done.get((a, i)) != symbols_digest(g)]
+            if done.get((series, a, i)) != symbols_digest(g)]
     print(f"symbols={len(symbols)} batches={len(groups)} jobs={len(jobs)} resumed={len(done)}", flush=True)
     failed = 0
     total = 0
     started = time.time()
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        futures = [pool.submit(run_batch, i, g, a, args, headers, args.out, ledger) for i, g, a in jobs]
+        futures = [pool.submit(run_batch, i, g, a, args, headers, args.out, ledger, series) for i, g, a in jobs]
         for n, future in enumerate(as_completed(futures), 1):
             _, _, ok, bars = future.result()
             failed += 0 if ok else 1
@@ -261,7 +274,7 @@ def main():
             if n % 20 == 0 or n == len(futures):
                 print(f"jobs={n}/{len(futures)} bars={total} failed={failed} elapsed_s={int(time.time() - started)}",
                       flush=True)
-    ledger.write(event="run_complete", jobs=len(jobs), failed=failed, bars=total)
+    ledger.write(event="run_complete", series=series, jobs=len(jobs), failed=failed, bars=total)
     return 1 if failed else 0
 
 
