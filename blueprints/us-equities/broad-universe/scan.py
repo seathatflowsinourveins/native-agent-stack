@@ -29,6 +29,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation, ROUND_HALF_EVEN
 from pathlib import Path
+from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo
 
 _HERE = Path(__file__).resolve().parent
@@ -59,6 +60,14 @@ TOP_N = 50
 MAX_RETRIES = 3
 FUND_NAME_RE = re.compile(r"(ETF|ETN|Fund|Trust|Shares|ProShares|Direxion|iShares|SPDR|Index|Portfolio)", re.IGNORECASE)
 EXCLUSION_SUFFIX_RE = re.compile(r"\.(WS|W|U|R|RT)$")
+# Mirrors evaluate.py's AMBIGUOUS_TAIL: five-letter tickers with no dotted suffix ending in
+# W/R/U are flagged (not excluded) per protocol.json eligibility.symbol_exclusion_pattern.
+AMBIGUOUS_TAIL = ("W", "R", "U")
+ELIGIBILITY_LOOKBACK_BARS = 60
+S4_LOOKBACK_BARS = 130
+RANGE10_BARS = 10
+RANGE10_P20_OBS = 120
+POSSIBLE_CORPORATE_ACTION_THRESHOLD = 0.40
 
 
 class ScanError(RuntimeError):
@@ -106,10 +115,12 @@ class Session:
         prepared.prepare_url(host + path, params or {})
         if len(prepared.url.encode("utf-8")) >= MAX_URL_BYTES:
             raise ScanError("url_too_large")
-        if len(self.log) >= self.request_cap:
-            raise ScanError("request_cap_exceeded")
         delay = 0.05
         for attempt in range(1, MAX_RETRIES + 1):
+            # Checked before every attempt (including retries), not only once before the loop,
+            # so a request that starts within budget cannot spend extra retry attempts past it.
+            if len(self.log) >= self.request_cap:
+                raise ScanError("request_cap_exceeded")
             response = self._session.request("GET", host + path, params=params, headers=self._headers,
                                                timeout=(5, 20), allow_redirects=False)
             entry = {"path": path, "attempt": attempt, "status": response.status_code,
@@ -244,19 +255,27 @@ def batch_symbols_for_url(symbols, host, path, params_extra, max_url_bytes=MAX_U
     return batches
 
 
-def fetch_snapshots(session, symbols):
-    snapshots, missing = {}, set(symbols)
+def fetch_snapshots(session, symbols, clock=utc_now):
+    """Fetch snapshots batch by batch, stamping each batch with its OWN fetch-time clock() call.
+
+    Returns (snapshots, missing, observed_at) where observed_at maps every requested symbol to
+    the timestamp its batch was actually fetched at, so age arithmetic against a symbol's quote
+    never uses a run-start timestamp captured before that batch's request was made.
+    """
+    snapshots, missing, observed_at = {}, set(symbols), {}
     for group in batch_symbols_for_url(symbols, DATA_HOST, "/v2/stocks/snapshots", {"feed": "sip"}):
         payload = session.get(DATA_HOST, "/v2/stocks/snapshots", params={"symbols": ",".join(group), "feed": "sip"})
+        batch_observed_at = clock()
         # The multi-symbol snapshot endpoint returns a flat {symbol: snapshot} map (no wrapper key),
         # unlike the single-symbol endpoint. Support a "snapshots" wrapper too in case of a future change.
         data = payload.get("snapshots", payload) if isinstance(payload, dict) else {}
         for symbol in group:
+            observed_at[symbol] = batch_observed_at
             snap = data.get(symbol)
             if snap:
                 snapshots[symbol] = snap
                 missing.discard(symbol)
-    return snapshots, missing
+    return snapshots, missing, observed_at
 
 
 # --------------------------------------------------------------------------- per-symbol observation
@@ -279,8 +298,10 @@ def classify_observation(symbol, snapshot, current_or_last_session, previous_ses
     result["daily_bar_date"] = daily_date
     if daily_date == current_or_last_session:
         result["observation_class"] = "today_session"
-    elif daily_date:
+    elif daily_date and daily_date == previous_session:
         result["observation_class"] = "previous_session"
+    elif daily_date:
+        result["observation_class"] = "stale_bar"
     else:
         result["observation_class"] = "missing"
 
@@ -293,7 +314,13 @@ def classify_observation(symbol, snapshot, current_or_last_session, previous_ses
             result.update(quote_at=iso(quote_at), quote_age_seconds=age)
             if bid is not None and ask is not None:
                 result["quote_invalid"] = bool(bid <= 0 or ask < bid)
-            if session_state == "regular_open":
+            if age < 0:
+                # The batch-fetch clock ran before the quote timestamp: the two clocks disagree
+                # (provider skew, or clock() called ahead of the quote's own timestamp source).
+                # Never silently treat this as "fresh" - flag it and leave staleness unknown.
+                result["clock_skew"] = True
+                result["stale_quote"] = None
+            elif session_state == "regular_open":
                 result["stale_quote"] = age > STALE_QUOTE_SECONDS
             else:
                 result["stale_quote"] = False
@@ -305,7 +332,10 @@ def classify_observation(symbol, snapshot, current_or_last_session, previous_ses
     if trade_t is not None:
         try:
             trade_at = parse_iso(trade_t)
-            result.update(trade_at=iso(trade_at), trade_age_seconds=(observed_at - trade_at).total_seconds())
+            trade_age = (observed_at - trade_at).total_seconds()
+            result.update(trade_at=iso(trade_at), trade_age_seconds=trade_age)
+            if trade_age < 0:
+                result["trade_clock_skew"] = True
         except (ValueError, TypeError):
             result["trade_parse_error"] = True
 
@@ -331,7 +361,16 @@ def classify_observation(symbol, snapshot, current_or_last_session, previous_ses
 
 
 def compute_history_features(path, previous_regular_session):
+    """Per-symbol features as of the symbol's own last history row (t-1, feeding today's t decision).
+
+    Mirrors evaluate.py's frozen contiguity rules so scan and evaluator signal definitions cannot
+    diverge: a session calendar is built from SPY's own raw bars in the SAME history file (as
+    evaluate.py's build_calendar does), and every window feature is gated on calendar-index
+    contiguity (span60/span130) and, for range10_p20, on having exactly RANGE10_P20_OBS complete
+    range10 observations - never on however many rows happen to exist.
+    """
     import duckdb
+    import pandas as pd
     con = duckdb.connect()
     try:
         global_last = con.execute("SELECT MAX(session_date) FROM read_parquet(?)", [path]).fetchone()[0]
@@ -342,49 +381,76 @@ def compute_history_features(path, previous_regular_session):
                   "history_not_adjacent": global_last_str != previous_regular_session}
         if status["history_not_adjacent"] or global_last_str is None:
             return {}, status
-        query = """
-        WITH base AS (
-            SELECT symbol, session_date, raw_c, raw_v, all_o, all_h, all_l, all_c,
-                   raw_c * raw_v AS dv
-            FROM read_parquet(?)
-            WHERE raw_c IS NOT NULL AND all_c IS NOT NULL AND all_h IS NOT NULL AND all_l IS NOT NULL
+        query = f"""
+        WITH calendar AS (
+            SELECT session_date, (row_number() OVER (ORDER BY session_date) - 1)::BIGINT AS cal_idx
+            FROM (SELECT DISTINCT session_date FROM read_parquet(?) WHERE symbol = 'SPY' AND in_raw)
+        ),
+        base AS (
+            -- SPY itself is NOT excluded here (evaluate.py's bars table does not exclude it either):
+            -- it is used to build the calendar above AND still gets its own features/eligibility
+            -- computed like any other symbol, so scan and evaluator never diverge on this point.
+            SELECT b.symbol, b.session_date, c.cal_idx, b.raw_c, b.raw_v,
+                   b.all_o, b.all_h, b.all_l, b.all_c, b.raw_c * b.raw_v AS dv
+            FROM read_parquet(?) b
+            JOIN calendar c USING (session_date)
+            WHERE b.raw_c IS NOT NULL AND b.all_c IS NOT NULL
+              AND b.all_h IS NOT NULL AND b.all_l IS NOT NULL AND b.all_o IS NOT NULL
         ),
         windowed AS (
             SELECT *,
-                (MAX(all_h) OVER (PARTITION BY symbol ORDER BY session_date ROWS BETWEEN 9 PRECEDING AND CURRENT ROW)
-                 - MIN(all_l) OVER (PARTITION BY symbol ORDER BY session_date ROWS BETWEEN 9 PRECEDING AND CURRENT ROW))
-                 / NULLIF(all_c, 0) AS range10_row
+                CASE WHEN COUNT(*) OVER w10 = {RANGE10_BARS}
+                     THEN (MAX(all_h) OVER w10 - MIN(all_l) OVER w10) / NULLIF(all_c, 0) END AS range10_row,
+                cal_idx - LAG(cal_idx, {ELIGIBILITY_LOOKBACK_BARS}) OVER w AS span60,
+                cal_idx - LAG(cal_idx, {S4_LOOKBACK_BARS}) OVER w AS span130
             FROM base
+            WINDOW w   AS (PARTITION BY symbol ORDER BY session_date),
+                   w10 AS (PARTITION BY symbol ORDER BY session_date ROWS BETWEEN {RANGE10_BARS - 1} PRECEDING AND CURRENT ROW)
         ),
         finalized AS (
             SELECT *,
                 COUNT(*) OVER (PARTITION BY symbol) AS prior_bars,
-                MEDIAN(dv) OVER (PARTITION BY symbol ORDER BY session_date ROWS BETWEEN 19 PRECEDING AND CURRENT ROW) AS med20,
-                MAX(all_h) OVER (PARTITION BY symbol ORDER BY session_date ROWS BETWEEN 59 PRECEDING AND CURRENT ROW) AS high60,
-                MAX(all_h) OVER (PARTITION BY symbol ORDER BY session_date ROWS BETWEEN 19 PRECEDING AND CURRENT ROW) AS high20,
-                LAG(all_c, 4) OVER (PARTITION BY symbol ORDER BY session_date) AS prev5_close,
-                QUANTILE_CONT(range10_row, 0.2) OVER (PARTITION BY symbol ORDER BY session_date
-                                                       ROWS BETWEEN 120 PRECEDING AND 1 PRECEDING) AS range10_p20,
+                MEDIAN(dv) OVER w20 AS med20,
+                MAX(all_h) OVER w60 AS high60,
+                MAX(all_h) OVER w20 AS high20,
+                LAG(all_c, 4) OVER w AS prev5_close,
+                CASE WHEN COUNT(range10_row) OVER wp = {RANGE10_P20_OBS}
+                     THEN QUANTILE_CONT(range10_row, 0.2) OVER wp END AS range10_p20,
                 MAX(session_date) OVER (PARTITION BY symbol) AS symbol_last_date
             FROM windowed
+            WINDOW w   AS (PARTITION BY symbol ORDER BY session_date),
+                   w20 AS (PARTITION BY symbol ORDER BY session_date ROWS BETWEEN 19 PRECEDING AND CURRENT ROW),
+                   w60 AS (PARTITION BY symbol ORDER BY session_date ROWS BETWEEN 59 PRECEDING AND CURRENT ROW),
+                   wp  AS (PARTITION BY symbol ORDER BY session_date
+                           ROWS BETWEEN {RANGE10_P20_OBS + 1} PRECEDING AND 2 PRECEDING)
         )
-        SELECT symbol, all_c AS prev_close, prior_bars, med20, high60, high20, prev5_close,
-               range10_row, range10_p20
+        SELECT symbol, session_date, all_c AS prev_close, prior_bars, med20, high60, high20, prev5_close,
+               range10_row, range10_p20, span60, span130
         FROM finalized
         WHERE session_date = symbol_last_date
         """
-        df = con.execute(query, [path]).df()
+        df = con.execute(query, [path, path]).df()
+
+        def num(value, cast):
+            # DuckDB's nullable BIGINT (span60/span130, from a LAG that can be NULL) round-trips
+            # through pandas as a pandas.NA scalar, not None or float('nan'); pd.isna() is the one
+            # check that is correct for all three (None, NaN and pandas.NA).
+            return None if pd.isna(value) else cast(value)
+
         features = {}
         for row in df.itertuples(index=False):
             features[row.symbol] = {
-                "prior_bars": int(row.prior_bars) if row.prior_bars is not None else None,
-                "med20": float(row.med20) if row.med20 is not None else None,
-                "high60": float(row.high60) if row.high60 is not None else None,
-                "high20": float(row.high20) if row.high20 is not None else None,
-                "prev_close": float(row.prev_close) if row.prev_close is not None else None,
-                "prev5_close": float(row.prev5_close) if row.prev5_close is not None else None,
-                "range10": float(row.range10_row) if row.range10_row is not None else None,
-                "range10_p20": float(row.range10_p20) if row.range10_p20 is not None else None,
+                "last_session_date": num(row.session_date, lambda v: v.date().isoformat()),
+                "prior_bars": num(row.prior_bars, int),
+                "med20": num(row.med20, float),
+                "high60": num(row.high60, float),
+                "high20": num(row.high20, float),
+                "prev_close": num(row.prev_close, float),
+                "prev5_close": num(row.prev5_close, float),
+                "range10": num(row.range10_row, float),
+                "range10_p20": num(row.range10_p20, float),
+                "span60": num(row.span60, int),
+                "span130": num(row.span130, int),
             }
         return features, status
     finally:
@@ -397,6 +463,10 @@ def compute_signals(obs_row, hist, dv_scanned):
     med20, high60, high20 = hist.get("med20"), hist.get("high60"), hist.get("high20")
     prev_close, prev5_close = hist.get("prev_close"), hist.get("prev5_close")
     range10, range10_p20 = hist.get("range10"), hist.get("range10_p20")
+    # S4 additionally needs a fully contiguous 130-bar window (evaluate.py's has_gap_s4); the
+    # 120-observation range10_p20 gate alone is not sufficient because a symbol can have exactly
+    # 120 valid range10 observations spread across a non-contiguous (gapped) 130-session span.
+    s4_history_ok = hist.get("span130") == S4_LOOKBACK_BARS
 
     clv = None
     if raw_high is not None and raw_low is not None and raw_close is not None:
@@ -404,34 +474,78 @@ def compute_signals(obs_row, hist, dv_scanned):
     r1 = (raw_close / prev_close - 1) if raw_close is not None and prev_close else None
     r5 = (raw_close / prev5_close - 1) if raw_close is not None and prev5_close else None
     gap = (raw_open / prev_close - 1) if raw_open is not None and prev_close else None
+    # obs_row["pct_change"] is a raw-to-raw same-feed ratio (in percentage points) independent of
+    # the history file's adjustment basis; checking it alongside gap/r1 catches an adjustment-basis
+    # mismatch (e.g. a split that post-dates the collected history) even when r1/gap themselves look
+    # unremarkable because both their inputs were rebased by the same stale factor.
+    pct_change = obs_row.get("pct_change")
+
+    possible_corporate_action = bool(
+        (gap is not None and abs(gap) >= POSSIBLE_CORPORATE_ACTION_THRESHOLD) or
+        (r1 is not None and abs(r1) >= POSSIBLE_CORPORATE_ACTION_THRESHOLD) or
+        (pct_change is not None and abs(pct_change) >= POSSIBLE_CORPORATE_ACTION_THRESHOLD * 100))
 
     flags = {}
-    if None not in (raw_close, high60, dv_scanned, med20, clv):
-        flags["S1_momentum_breakout"] = bool(raw_close > high60 and dv_scanned >= 2 * med20 and clv >= 0.75)
-    if None not in (r1, dv_scanned, med20, clv):
-        flags["S2_volume_shock_continuation"] = bool(r1 >= 0.05 and dv_scanned >= 3 * med20 and clv >= 0.5)
-    if None not in (r5, raw_close, raw_open, dv_scanned, med20):
-        flags["S3_oversold_reversal"] = bool(r5 <= -0.15 and raw_close > raw_open and dv_scanned >= med20)
-    if None not in (range10, range10_p20, raw_close, high20):
-        flags["S4_contraction_breakout"] = bool(range10 <= range10_p20 and raw_close > high20)
-    if None not in (gap, raw_close, raw_open, dv_scanned, med20):
-        flags["S5_gap_and_hold"] = bool(gap >= 0.04 and raw_close >= raw_open and dv_scanned >= 2 * med20)
+    flags_null_reason = None
+    if possible_corporate_action:
+        # The snapshot's raw price and the history file's adjustment basis cannot be verified as
+        # consistent (see the module docstring / protocol raw_vs_adjusted); every signal depends on
+        # comparing today's raw/adjusted bar against history built on a possibly different basis, so
+        # all five are withheld rather than publishing a signal derived from mismatched share units.
+        flags_null_reason = "adjustment_basis_unverified"
+    else:
+        if None not in (raw_close, high60, dv_scanned, med20, clv):
+            flags["S1_momentum_breakout"] = bool(raw_close > high60 and dv_scanned >= 2 * med20 and clv >= 0.75)
+        if None not in (r1, dv_scanned, med20, clv):
+            flags["S2_volume_shock_continuation"] = bool(r1 >= 0.05 and dv_scanned >= 3 * med20 and clv >= 0.5)
+        if None not in (r5, raw_close, raw_open, dv_scanned, med20):
+            flags["S3_oversold_reversal"] = bool(r5 <= -0.15 and raw_close > raw_open and dv_scanned >= med20)
+        if s4_history_ok and None not in (range10, range10_p20, raw_close, high20):
+            flags["S4_contraction_breakout"] = bool(range10 <= range10_p20 and raw_close > high20)
+        if None not in (gap, raw_close, raw_open, dv_scanned, med20):
+            flags["S5_gap_and_hold"] = bool(gap >= 0.04 and raw_close >= raw_open and dv_scanned >= 2 * med20)
 
-    possible_corporate_action = bool((gap is not None and abs(gap) >= 0.40) or (r1 is not None and abs(r1) >= 0.40))
-    return {"flags": {k: v for k, v in flags.items() if v}, "flags_evaluated": sorted(flags),
-            "r1": r1, "r5": r5, "gap": gap, "clv": clv,
-            "possible_corporate_action": possible_corporate_action,
-            "research_flag_not_prediction": True}
+    result = {"flags": {k: v for k, v in flags.items() if v}, "flags_evaluated": sorted(flags),
+              "r1": r1, "r5": r5, "gap": gap, "clv": clv,
+              "possible_corporate_action": possible_corporate_action,
+              "research_flag_not_prediction": True}
+    if flags_null_reason:
+        result["flags_null_reason"] = flags_null_reason
+    return result
 
 
 def compute_eligibility(symbol, obs_row, asset, hist, history_status):
-    result = {"symbol": symbol}
+    # Mirrors evaluate.py's AMBIGUOUS_TAIL rule exactly: flagged, never excluded, and reported
+    # regardless of any other eligibility outcome so scan and evaluator never silently disagree.
+    ambiguous_suffix_flag = bool(len(symbol) == 5 and "." not in symbol and symbol[-1] in AMBIGUOUS_TAIL)
+    result = {"symbol": symbol, "ambiguous_suffix_flag": ambiguous_suffix_flag}
     if not history_status.get("history_used"):
         return {**result, "eligible": None, "eligibility_status": "unknown_no_history"}
     if history_status.get("history_not_adjacent"):
         return {**result, "eligible": None, "eligibility_status": "unknown_history_not_adjacent"}
     if hist is None:
         return {**result, "eligible": False, "eligibility_status": "no_prior_history_for_symbol"}
+
+    # Per-symbol freshness/contiguity gate (protocol execution_assumptions.window_contiguity):
+    # a symbol's own last history row must BE the previous regular session (otherwise its series is
+    # stale even though some other symbol - or the dataset max - is current), and its trailing 60
+    # bars must be calendar-contiguous against the SPY calendar in the same history file. Either
+    # failure makes eligibility/signals unusable: eligible is None (unknown), never False, because
+    # "not eligible" and "cannot be evaluated" are different facts.
+    previous_regular_session = history_status.get("previous_regular_session")
+    if hist.get("last_session_date") != previous_regular_session:
+        return {**result, "eligible": None, "eligibility_status": "history_stale",
+                "prior_bars": hist.get("prior_bars")}
+    if hist.get("span60") != ELIGIBILITY_LOOKBACK_BARS:
+        return {**result, "eligible": None, "eligibility_status": "has_gap",
+                "prior_bars": hist.get("prior_bars")}
+
+    # protocol.json eligibility.bar_required_on_decision_session: a previous-session or older
+    # snapshot bar cannot stand in for today's decision-session bar.
+    observation_class = obs_row.get("observation_class")
+    if observation_class != "today_session":
+        return {**result, "eligible": False, "eligibility_status": "stale_snapshot_bar",
+                "observation_class": observation_class}
 
     raw_close_scanned, daily_v = obs_row.get("raw_close"), obs_row.get("raw_volume")
     if raw_close_scanned is None or daily_v is None:
@@ -444,8 +558,7 @@ def compute_eligibility(symbol, obs_row, asset, hist, history_status):
     excluded_suffix = bool(EXCLUSION_SUFFIX_RE.search(symbol))
     meets_price = raw_close_scanned >= 5
     meets_liquidity = med20 is not None and med20 >= 20_000_000
-    meets_history = prior_bars is not None and prior_bars >= 60
-    eligible_all_instruments = bool(meets_price and meets_liquidity and meets_history and not excluded_suffix)
+    eligible_all_instruments = bool(meets_price and meets_liquidity and not excluded_suffix)
     eligible = eligible_all_instruments and not fund_like
     result.update(eligible=eligible, eligible_all_instruments=eligible_all_instruments,
                   eligibility_status="computed", instrument_lane_fund_like=fund_like,
@@ -465,6 +578,12 @@ def normalize_news_row(raw, observed_at, requested_symbols):
     article_id = raw.get("id")
     if not headline or not symbols or article_id is None:
         return None
+    url = raw.get("url")
+    # Provider news URLs commonly carry the headline as a slug (e.g. .../48372910/meta-jumps).
+    # The full url is kept only in the private artifact; only its host and a hash of the whole
+    # url are ever eligible for publication (see assemble_public).
+    url_host = urlsplit(url).netloc if url else None
+    url_sha256 = hashlib.sha256(url.encode("utf-8")).hexdigest() if url else None
     return {
         "article_id": str(article_id),
         "created_at": raw.get("created_at"),
@@ -472,7 +591,9 @@ def normalize_news_row(raw, observed_at, requested_symbols):
         "observed_at": iso(observed_at),
         "symbols": symbols,
         "source": raw.get("source"),
-        "url": raw.get("url"),
+        "url": url,
+        "url_host": url_host,
+        "url_sha256": url_sha256,
         "headline_sha256": hashlib.sha256(headline.encode("utf-8")).hexdigest(),
     }
 
@@ -598,7 +719,8 @@ def public_symbol_row(symbol, rows, eligibility, lists):
         membership.append("signal_flagged")
     if symbol in lists["pinned"]:
         membership.append("pinned")
-    signal_flags = sorted((elig.get("signals") or {}).get("flags", {}))
+    signals = elig.get("signals") or {}
+    signal_flags = sorted(signals.get("flags", {}))
     return {
         "symbol": symbol, "list_membership": membership,
         "pct_change_rank_among_eligible": lists["gainer_rank"].get(symbol),
@@ -606,6 +728,8 @@ def public_symbol_row(symbol, rows, eligibility, lists):
         "percent_change": round_pct(row.get("pct_change")),
         "dollar_volume_bucket": dollar_volume_bucket(row.get("dollar_volume")),
         "signal_flags": signal_flags, "research_flag_not_prediction": True,
+        "possible_corporate_action": signals.get("possible_corporate_action"),
+        "ambiguous_suffix_flag": elig.get("ambiguous_suffix_flag"),
         "observation_class": row.get("observation_class"),
         "observed_at": row.get("observed_at"), "daily_bar_t": row.get("daily_bar_t"),
         "stale_quote": row.get("stale_quote"), "prev_bar_mismatch": row.get("prev_bar_mismatch", False),
@@ -629,7 +753,8 @@ def assemble_public(session_info, lists, rows, eligibility, counts, history_stat
             "Signal flags are research_flag_not_prediction, never a prediction of return.",
             "Provider screens are bounded_top_n_provider_screen_includes_sub_5_names_not_market_coverage.",
             "Daily bars may still be revised by late prints after the close.",
-            "This artifact carries no quotes, prices or headline text; see the private artifact for full rows.",
+            "This artifact carries no quotes, prices, headline text or full news URLs"
+            " (only url host and a sha256 of the full url); see the private artifact for full rows.",
         ],
         "pinned": lists["pinned"],
         "lists": {"top_50_gainers": lists["top_gainers"], "top_50_losers": lists["top_losers"],
@@ -637,7 +762,8 @@ def assemble_public(session_info, lists, rows, eligibility, counts, history_stat
         "symbols": [public_symbol_row(s, rows, eligibility, lists) for s in symbols_to_publish],
         "provider_screens": screens_public,
         "news": [{"symbols": n["symbols"], "created_at": n["created_at"], "updated_at": n["updated_at"],
-                  "observed_at": n["observed_at"], "source": n["source"], "url": n["url"],
+                  "observed_at": n["observed_at"], "source": n["source"],
+                  "url_host": n.get("url_host"), "url_sha256": n.get("url_sha256"),
                   "headline_sha256": n["headline_sha256"]} for n in news_items],
         "news_window_status": "capped_more_available" if news_capped else "returned_provider_window",
         "requests": request_meta,
@@ -653,6 +779,25 @@ def assemble_private(session_info, lists, rows, eligibility, counts, history_sta
         "rows": rows, "eligibility": eligibility, "provider_screens_raw": screens_raw,
         "news": news_items, "news_window_status": "capped_more_available" if news_capped else "returned_provider_window",
         "requests": request_log,
+    }
+
+
+def build_counts(symbols, rows, eligibility, lists, history_status):
+    """History is only usable at all when it was supplied AND the dataset-level freshness check
+    passed; a null (not zero) counts.eligible then distinguishes "not computed" from "computed and
+    nothing qualified". Per-symbol has_gap/history_stale/unknown_* outcomes are folded into
+    eligibility_unknown so the reconciliation (scanned = eligible + ineligible + unknown) holds.
+    """
+    history_used_effectively = bool(history_status.get("history_used")) and not history_status.get("history_not_adjacent")
+    eligibility_unknown = sum(1 for e in eligibility.values() if e.get("eligible") is None)
+    return {
+        "scanned": len(symbols),
+        "eligible": lists["eligible_count"] if history_used_effectively else None,
+        "eligibility_unknown": eligibility_unknown,
+        "missing": sum(1 for r in rows.values() if r["observation_class"] == "missing"),
+        "previous_session": sum(1 for r in rows.values() if r["observation_class"] == "previous_session"),
+        "stale_bar": sum(1 for r in rows.values() if r["observation_class"] == "stale_bar"),
+        "today_session": sum(1 for r in rows.values() if r["observation_class"] == "today_session"),
     }
 
 
@@ -673,7 +818,12 @@ def run(args, clock=None):
     now = parse_iso(args.now) if args.now else clock()
     key, secret = collect_daily.read_credentials(args.env_file)
     session = Session(key, secret, clock=clock)
-    ledger = collect_daily.Ledger(os.path.join(os.path.dirname(os.path.abspath(args.out_private)), "scan-ledger.jsonl"))
+    private_dir = os.path.dirname(os.path.abspath(args.out_private))
+    # Create the private output directory BEFORE the ledger is opened: Ledger.write() appends via
+    # plain open(path, "a"), which raises FileNotFoundError on a fresh destination directory, and
+    # that happens before any output helper (write_json_file creates its own directory, but too late).
+    os.makedirs(private_dir, exist_ok=True)
+    ledger = collect_daily.Ledger(os.path.join(private_dir, "scan-ledger.jsonl"))
     try:
         clock_payload = fetch_clock(session)
         cal_start = (now - timedelta(days=10)).date().isoformat()
@@ -689,13 +839,14 @@ def run(args, clock=None):
         symbols = [a["symbol"] for a in universe]
         ledger.write(event="universe_built", total_assets=len(assets), universe=len(universe), skipped=skipped)
 
-        snapshots, missing = fetch_snapshots(session, symbols)
+        snapshots, missing, snapshot_observed_at = fetch_snapshots(session, symbols, clock)
         ledger.write(event="snapshots_fetched", requested=len(symbols), returned=len(snapshots), missing=len(missing))
 
         rows = {symbol: classify_observation(symbol, snapshots.get(symbol),
                                               session_info["current_or_last_regular_session"],
                                               session_info["previous_regular_session"],
-                                              session_info["session_state"], now)
+                                              session_info["session_state"],
+                                              snapshot_observed_at.get(symbol, now))
                 for symbol in symbols}
 
         if args.history:
@@ -716,12 +867,7 @@ def run(args, clock=None):
         news_symbols = sorted(set(pinned) | set(lists["news_candidates"]))
         news_items, news_capped = fetch_news(session, news_symbols, now, clock)
 
-        counts = {
-            "scanned": len(symbols), "eligible": lists["eligible_count"],
-            "missing": sum(1 for r in rows.values() if r["observation_class"] == "missing"),
-            "previous_session": sum(1 for r in rows.values() if r["observation_class"] == "previous_session"),
-            "today_session": sum(1 for r in rows.values() if r["observation_class"] == "today_session"),
-        }
+        counts = build_counts(symbols, rows, eligibility, lists, history_status)
         request_meta = {"total_requests": len(session.log), "request_cap": session.request_cap,
                          "rate_headers_last": session.log[-1]["rate_headers"] if session.log else {}}
 
