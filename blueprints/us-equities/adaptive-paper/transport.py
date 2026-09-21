@@ -189,7 +189,11 @@ class GuardedSession:
         with self.lock:
             if kind == "submit":
                 try:
-                    self.before_request(kind, client_id=kwargs.get("json", {}).get("client_order_id"))
+                    reservation = self.before_request(kind, client_id=kwargs.get("json", {}).get("client_order_id"))
+                    # The POST hook is an atomic admission check, never a wait.
+                    # A positive delay leaves management calls free to proceed.
+                    if reservation not in (None, 0):
+                        raise SubmissionNotSent("submission budget deferred")
                     if self.before_send:
                         self.before_send(kwargs.get("json", {}))
                 except Exception:
@@ -475,21 +479,26 @@ class AlpacaPaperTransport:
             return await result
         return result
 
-    def _on_owner(self, callback, *args, **kwargs):
+    def _on_owner(self, callback, *args, _owner_timeout=65, _freeze_timeout=True, **kwargs):
         if self._loop is None or not self._loop.is_running():
             raise TransportError("owner loop unavailable")
         # Invoked only in a REST worker thread. Never block the owner loop.
         future = asyncio.run_coroutine_threadsafe(self._invoke(callback, *args, **kwargs), self._loop)
         try:
-            return future.result(timeout=65)
+            return future.result(timeout=_owner_timeout)
         except FutureTimeout:
             future.cancel()
-            self.freeze_health("owner_callback_timeout")
+            if _freeze_timeout:
+                self.freeze_health("owner_callback_timeout")
             raise TransportError("owner callback exceeded bounded deadline") from None
 
     def _budget_sync(self, kind, client_id=None):
         if client_id is not None:
-            return self._on_owner(self.before_request, kind, client_id=client_id)
+            # Never park a submission for an entire rolling window while it
+            # holds locks needed by cancels. The supported hook reserves or
+            # refuses immediately; this deadline also cancels accidental sleeps.
+            return self._on_owner(self.before_request, kind, client_id=client_id,
+                                  _owner_timeout=0.25, _freeze_timeout=False)
         return self._on_owner(self.before_request, kind)
 
     def _wire_guard(self, order):

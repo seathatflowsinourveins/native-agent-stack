@@ -15,8 +15,13 @@ before_submit, sink_observation, request_observer=None, history_start=None,
 required_quote_symbols=None)` on
 the owning asyncio loop. The three required callbacks may be synchronous or
 asynchronous and run on that same loop. `before_request(kind, client_id=None)`
-must reserve the actual attempt, waiting within the caller's deadline or raising;
-a positive delay return value does **not** cause an automatic wait. Kinds are
+must reserve the actual attempt. For POST it must reserve atomically and return
+`None`/zero or refuse immediately; a positive delay is a pre-wire deferral, never
+a wait under locks needed for cancellation. The caller schedules later admission
+using a new validated intent. An accidentally sleeping async POST hook is canceled
+after 250 ms and its unsent intent is rejected locally, preserving cancellation
+access to management capacity. Read/cancel hooks may wait within the caller's
+bounded overall budget deadline. Kinds are
 `submit`, `cancel`, `read`, and `data_read`; POST supplies its stable client ID.
 Every Trading HTTP attempt, including reconciliation and unsuccessful requests,
 passes that hook under one shared request lock. The optional request observer

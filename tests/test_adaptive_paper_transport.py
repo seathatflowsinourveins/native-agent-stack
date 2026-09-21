@@ -110,7 +110,7 @@ class Normalization(unittest.TestCase):
 @unittest.skipUnless(HAS_SDK, "requires isolated reviewed alpaca-py runtime")
 class HTTPBoundary(unittest.TestCase):
     def setUp(self):
-        self.budget = Mock()
+        self.budget = Mock(return_value=None)
         self.observer = Mock()
         self.session = t.GuardedSession(origin=t.PAPER_URL, before_request=self.budget, observer=self.observer)
         self.addCleanup(self.session.close)
@@ -151,6 +151,13 @@ class HTTPBoundary(unittest.TestCase):
             with self.assertRaises(Exception):
                 client.get_account()
         self.assertEqual(request.call_count, 1)
+
+    def test_positive_submission_delay_is_deferred_without_sending(self):
+        self.budget.return_value = 60
+        with patch.object(self.session._session, "request") as request:
+            with self.assertRaises(t.SubmissionNotSent):
+                self.session.request("POST", t.PAPER_URL + "/v2/orders", json=intent())
+        request.assert_not_called()
 
     def test_preflight_is_read_only_and_hashes_identity(self):
         payloads = {"/v2/account": {"id": "fixture-account-id", "cash": "1000", "equity": "1000", "buying_power": "1000"},
@@ -283,6 +290,33 @@ class AsyncTransport(unittest.IsolatedAsyncioTestCase):
             self.port._quote_values["SPY"]["ts_ns"] = now + 251_000_000
             with self.assertRaises(t.SubmissionNotSent):
                 self.port._wire_guard(intent())
+
+    async def test_sleeping_submit_budget_cannot_starve_owned_cancel(self):
+        blocked = asyncio.Event()
+        canceled_hook = asyncio.Event()
+        calls = []
+        async def budget(kind, client_id=None):
+            if kind == "submit":
+                try:
+                    await blocked.wait()
+                finally:
+                    canceled_hook.set()
+            else:
+                calls.append(kind)
+        self.port.before_request = budget
+        self.port.adopt_intents([intent(client_order_id="owned-prior")])
+        initial = order(client_order_id="owned-prior")
+        final = order(client_order_id="owned-prior", status="canceled")
+        with patch.object(self.port._client._session._session, "request",
+                          side_effect=[response(initial), response(None, 204), response(final)]) as request:
+            results = await asyncio.wait_for(asyncio.gather(
+                self.port.submit(intent()), self.port.cancel("owned-prior"), return_exceptions=True), 2)
+        self.assertIsInstance(results[0], t.SubmissionNotSent)
+        self.assertEqual(results[1]["status"], "canceled")
+        self.assertFalse(blocked.is_set())
+        self.assertTrue(canceled_hook.is_set())
+        self.assertEqual(calls, ["read", "cancel", "read"])
+        self.assertEqual([c.args[0] for c in request.call_args_list], ["GET", "DELETE", "GET"])
 
     async def test_replayed_id_cannot_change_intent(self):
         self.port.adopt_intents([intent()])
