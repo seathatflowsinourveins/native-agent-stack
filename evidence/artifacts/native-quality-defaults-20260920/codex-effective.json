@@ -1,0 +1,21 @@
+{
+  "model_turns": 0,
+  "results": [
+    {
+      "scope": "native",
+      "method": "config/read",
+      "effective": {
+        "model": "gpt-6-astra",
+        "model_reasoning_effort": "ultra"
+      }
+    },
+    {
+      "scope": "desktop",
+      "method": "config/read",
+      "effective": {
+        "model": "gpt-6-astra",
+        "model_reasoning_effort": "ultra"
+      }
+    }
+  ]
+}

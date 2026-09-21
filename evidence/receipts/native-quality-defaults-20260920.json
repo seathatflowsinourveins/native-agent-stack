@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "id": "native-quality-defaults-20260920",
+  "kind": "native_cli_e2e",
+  "component_ids": ["codex", "claude-code"],
+  "recorded_at_utc": "2026-09-21T00:43:59Z",
+  "claim": "Supported persistent effort defaults were aligned with the user's quality preference: native Codex now saves ultra, matching Desktop; Claude saves xhigh. Native config/read returned ultra for both Codex homes with the selected project's layers. A short acceptance and independent-review rule is saved in all three global instruction files.",
+  "limitations": [
+    "Configuration and schema acceptance only; no model turn, comparative quality benchmark, token-saving or full workflow E2E claim.",
+    "Saved defaults apply to fresh sessions; already-open sessions may retain their earlier effort. Native workers can resolve effort differently through roles and overrides.",
+    "Claude max is available as a session option, not a valid persisted effortLevel. Adaptive thinking stays at its native enabled default.",
+    "Claude doctor retains the known intentional whitespace warning for query/document embedding prefixes. No other configuration was changed to suppress it.",
+    "The official SDK config/read observer is a local integration that selects safe fields. It is not an upstream test suite and does not execute a model task."
+  ],
+  "saved_settings": {
+    "native_codex": {"model": "gpt-6-astra", "model_reasoning_effort": "ultra", "previous_effort": null},
+    "desktop_codex": {"model": "gpt-6-astra", "model_reasoning_effort": "ultra", "changed": false, "preservation_basis": "No Desktop config edit was performed. Current values were read back; no before-copy was retained for independent byte comparison."},
+    "claude": {"model": "opus[1m]", "effortLevel": "xhigh", "previous_effortLevel": null, "thinking": "native adaptive default"},
+    "project_effort_overrides_observed": false,
+    "native_codex_all_other_fields_preserved": true,
+    "claude_all_other_fields_preserved": true,
+    "all_three_prior_instruction_bodies_preserved": true
+  },
+  "codex_model_catalog": {
+    "command": ["ecosystem-codex", "--project", "$PROJECT", "debug", "models", "--bundled"],
+    "exit_code": 0,
+    "native_version": "0.155.1",
+    "raw_bytes": 443829,
+    "raw_sha256": "404c1dd19656240244e0ae74d7e82326bd192ec4c2a0e6f32d130075fa1fb0f4",
+    "selected_slug": "gpt-6-astra",
+    "supported_reasoning_levels": ["low", "medium", "high", "xhigh", "max", "ultra"],
+    "bundled_default_reasoning_level": "low",
+    "multi_agent_reasoning_effort": "xhigh"
+  },
+  "codex_effective_configuration": {
+    "upstream_sdk": "openai-codex 0.154.0",
+    "protocol_method": "config/read",
+    "params": {"includeLayers": false, "cwd": "$PROJECT"},
+    "observer_raw_sha256": "d22ca9bd25148ad39a9509fff14224e375339c26f5db4717644b211ab8720fa2",
+    "exit_code": 0,
+    "stderr_bytes": 0,
+    "artifact": "evidence/artifacts/native-quality-defaults-20260920/codex-effective.json",
+    "artifact_bytes": 387,
+    "artifact_sha256": "609255c3478fa016245e1c9657aa7a3b4712e0abcc90b3e3fb4615b74d45fae7",
+    "projection": "Exact stdout of the local SDK observer; it selects only scope, method, model and effort from actual native responses. Original private home/project paths are not printed."
+  },
+  "claude_acceptance": {
+    "native_version": "2.1.278",
+    "persistent_schema_effort_values": ["low", "medium", "high", "xhigh"],
+    "schema_binary_sha256": "5c4735937844e84f8a93306e841a5b0e12252909b07870f789b190468da147ab",
+    "schema_byte_range": [192596065, 192596194],
+    "schema_excerpt_sha256": "f5e7fd715a9d0acc59cf707dc1a7c9506f53a0b7a4dec694048ea74694eea80a",
+    "command": ["ecosystem-claude", "--project", "$PROJECT", "doctor"],
+    "exit_code": 0,
+    "raw_bytes": 982,
+    "raw_sha256": "c85585e0ed848820c1bd76e73cb9af625133a405cec2c1436cca5db44504a10d",
+    "installation_result": "No installation issues found.",
+    "new_effort_setting_rejected": false,
+    "remaining_diagnostic": "Existing intentional whitespace in EMBEDDING_QUERY_PREFIX and EMBEDDING_DOCUMENT_PREFIX."
+  },
+  "instruction_accounting": {
+    "tokenizer": "tiktoken 0.14.0 / o200k_base",
+    "scope": "Exact local instruction artifacts; not provider consumption or savings.",
+    "claude": {"before": 418, "after": 478, "added": 60},
+    "native_codex": {"before": 1241, "after": 1301, "added": 60},
+    "desktop_codex": {"before": 1244, "after": 1304, "added": 60}
+  },
+  "references": [
+    "https://learn.chatgpt.com/docs/app-server",
+    "https://learn.chatgpt.com/docs/agent-configuration/subagents",
+    "https://code.claude.com/docs/en/model-config",
+    "https://code.claude.com/docs/en/settings",
+    "https://code.claude.com/docs/en/sub-agents"
+  ],
+  "model_turns": 0,
+  "provider_tokens_saved": null
+}
