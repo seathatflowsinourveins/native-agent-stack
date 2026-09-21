@@ -25,8 +25,9 @@ environment passthrough in this version. No model inference was needed.
 Set `DAGU`, `RESEARCH_HOME`, `STACK_REPO`, `SDK_ENV`, `LEAN_EVENTS` and a fresh
 `RESEARCH_OUTPUT` directory to your own installed paths. The environment names are
 explicitly allowed in [config.yaml.example](config.yaml.example). Install that
-configuration privately with a generated password and mode 0600; never publish
-the real file or use the placeholder password. The release contains the binary,
+configuration privately with mode 0600. Its upstream `auth.mode: none` serves a
+passwordless dashboard on `127.0.0.1` only, with DAG write/run permissions disabled.
+Do not expose this local mode through a network listener or tunnel. The release contains the binary,
 license and current workflow schema. No Docker or cloud account is required.
 
 ```sh
@@ -65,9 +66,18 @@ and aborted its dependent step.
 
 The installed [user service](dagu-equities.service.example) runs `dagu server`,
 not the scheduler, with a minimal inherited environment and no provider or broker
-credentials. It is enabled for future user-service sessions. Anonymous API
-requests returned 401; authenticated requests returned 200. The UI cannot write
-or run workflows. Manual native CLI commands are the execution lane. Private
+credentials. It is enabled for future user-service sessions. The current local
+dashboard uses upstream `auth.mode: none`: anonymous API reads return 200 without
+a Basic-auth challenge. The previous Basic mode returned 401 and repeatedly
+prompted the browser. Remove its `auth.basic` subsection when changing modes;
+upstream rejects Basic credentials under `none`.
+
+DAG execution and DAG/wiki writes remain disabled by `run_dags: false` and
+`write_dags: false`. These are not blanket read-only controls: base configuration,
+views and managed-secret administration use separate role checks and remain
+available to trusted local users without authentication. Keep this configuration
+on loopback. Use upstream builtin/OIDC authentication for access beyond this PC.
+Manual native CLI commands remain the workflow execution lane. Private
 configuration and history are stored beneath the user's local application data.
 
 `systemctl --user disable --now dagu-equities.service` stops and disables it
