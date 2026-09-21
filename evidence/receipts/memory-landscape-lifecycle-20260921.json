@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "memory-landscape-lifecycle-20260921",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "ai-memory",
+    "socraticode",
+    "qdrant",
+    "vllm",
+    "serena",
+    "qmd",
+    "codex",
+    "claude-code"
+  ],
+  "recorded_at_utc": "2026-09-21T15:27:56.861626+00:00",
+  "claim": "Current native memory/RAG use across Codex and Claude; independently matched stored Claude outcome and consolidation; current upstream release comparison and observed native inventory timer, with updated daily behavioral follow-up.",
+  "limitations": [
+    "This is one useful real retrieval question, not a general relevance benchmark or universal SOTA claim.",
+    "Existing unchanged upstream tests, add/change/delete and recovery receipts reused within their accepted scope; not rerun here.",
+    "Current Desktop hook hot reload, physical-PC reboot and the next daily scheduler execution remain unknown.",
+    "Exact memory session/lifetime savings are not returned and remain null.",
+    "vLLM intentionally retains its compatible pin; the newest release has a recorded host failure."
+  ],
+  "references": [
+    {
+      "repository": "akitaonrails/ai-memory",
+      "revision": "353841d91618d20b110b208de284a74d0b960379",
+      "url": "https://github.com/akitaonrails/ai-memory/tree/353841d91618d20b110b208de284a74d0b960379"
+    }
+  ],
+  "artifact_directory": "evidence/artifacts/memory-rag-lifecycle-20260921",
+  "public_artifacts": [
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/catalog-lifecycle.png",
+      "bytes": 118237,
+      "sha256": "7e2bce14ded57666c62edd5a7de74a5f7b9f7e2ad7caef8aedd60490bd16d9d3"
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/current-codex-tools.json",
+      "bytes": 9130,
+      "sha256": "a48217dfb55c26332b8633dce4ba221761b49e2aeb861eca49bc70b88c944c1a"
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/monitor-observation.json",
+      "bytes": 3988,
+      "sha256": "3535c672ec8b01d9d1003e69cb35460fc827bfda7e7116d279894e719ba25469"
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/native-client.json",
+      "bytes": 9150,
+      "sha256": "8a54a60e88490cd1305a946fb781c282196e5fc5bc80b740fa6896a6e8bc4d11"
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/native-commands.json",
+      "bytes": 26093,
+      "sha256": "ae5e35c2a7a8a15684c7ec4fb35bf7e77b215feeeab5b391a383fe3604955258"
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/qualification.json",
+      "bytes": 3649,
+      "sha256": "5111d912105b819c0c7e1c586f13a6de225c564c21e0b08d1bd4e0e0180c6ed5"
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/upstream-release-observation.json",
+      "bytes": 4187,
+      "sha256": "d7a07aff13bad911dec59bc2a3c47f6dea57be792f30bbad45183b61bb6ada98"
+    }
+  ],
+  "exact_memory_saved_tokens": {
+    "session": null,
+    "lifetime": null
+  }
+}

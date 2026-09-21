@@ -311,6 +311,12 @@
   ],
   "guides": [
     {
+      "title": "Native memory and RAG lifecycle",
+      "body": "Actual Codex/Claude retrieval and stored outcomes, current compatible pins, and the existing native monitoring schedule with explicit execution boundaries.",
+      "path": "docs/native-memory-rag-lifecycle.md",
+      "category": "evaluation"
+    },
+    {
       "title": "Memory landscape and active native maintenance",
       "body": "Nine pinned repository sources, selected cross-client memory, actual native learning/admission results and bounded assistant capture. Alternative dashboards remain candidates until their workload merits adoption.",
       "path": "docs/memory-landscape-maintenance.md",

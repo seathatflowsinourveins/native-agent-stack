@@ -871,7 +871,7 @@
         "prometheus",
         "loki"
       ],
-      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest→Dagu→DuckDB→GPT-6 Astra→Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
+      "claim": "After native sign-in restored readiness, the freshly reproduced SDK completed a real LEAN backtest\u2192Dagu\u2192DuckDB\u2192GPT-6 Astra\u2192Claude Opus 5 prepared-packet research workflow; both native reports passed structural citation/value/unit/scope checks and the accepted Astra report was bound into Claude's prompt by verified hashes.",
       "limitations": [
         "This validates a bounded historical simulation research workflow on the authoring host, not a profitable strategy, current market source, broker execution or unattended production service.",
         "The two reported model tasks used no model tools. Their native hooks and telemetry remain separate evidence; this does not repeat every MCP, memory or GPU-RAG behavior.",
@@ -1853,7 +1853,7 @@
       "component_ids": [
         "ai-memory"
       ],
-      "claim": "Mac arm64 synthetic2.3.1→2.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
+      "claim": "Mac arm64 synthetic2.3.1\u21922.3.2 migration, scoped exact reads/FTS, reserved and Unicode paths, restart and no-capture checks passed.",
       "limitations": [
         "Separate synthetic store and explicit no-model policy only; no production migration claimed by this receipt.",
         "OS filesystem/network confinement was not established; failed restricted-sandbox attempt retained. Native execution succeeded without security overrides; Gatekeeper assessment rejected the ad-hoc distribution.",
@@ -2454,6 +2454,29 @@
         "Initial capture test filter selected zero tests and first Codex task lacked Stop because the modified hook was not yet trusted; corrected tests and real capture were qualified separately."
       ],
       "path": "evidence/receipts/memory-landscape-20260921.json"
+    },
+    {
+      "id": "memory-landscape-lifecycle-20260921",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "ai-memory",
+        "socraticode",
+        "qdrant",
+        "vllm",
+        "serena",
+        "qmd",
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Current native memory/RAG use across Codex and Claude; independently matched stored Claude outcome and consolidation; current upstream release comparison and observed native inventory timer, with updated daily behavioral follow-up.",
+      "limitations": [
+        "This is one useful real retrieval question, not a general relevance benchmark or universal SOTA claim.",
+        "Existing unchanged upstream tests, add/change/delete and recovery receipts reused within their accepted scope; not rerun here.",
+        "Current Desktop hook hot reload, physical-PC reboot and the next daily scheduler execution remain unknown.",
+        "Exact memory session/lifetime savings are not returned and remain null.",
+        "vLLM intentionally retains its compatible pin; the newest release has a recorded host failure."
+      ],
+      "path": "evidence/receipts/memory-landscape-lifecycle-20260921.json"
     }
   ],
   "files": [
@@ -6120,8 +6143,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "sha256": "bde33005b536bf5d36df695be7357735baa6e3ab6db0d3d161464340673b8182",
-      "bytes": 6629575
+      "bytes": 6865163,
+      "sha256": "a6eeee74ba7e14450d3b9e0c8c0807b8c2ddfd02bac86268138ec66458de7e08"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -6130,8 +6153,8 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "81e078b452e9c6a6911328433101149a1ebaa5e433cb93c4351d047adcc08c19",
-      "bytes": 35290
+      "bytes": 35610,
+      "sha256": "73c4b231bb60604e5ae8f63aee8c2e505701fda9421303936878ed44386db787"
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -6150,8 +6173,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "25afeb288b2eff9cac58f3054e9aafde22baafa8a5f75d52608477492f9d6c25",
-      "bytes": 80800
+      "bytes": 80969,
+      "sha256": "732d5ecad64ad8995ffd531ac0bc9db9ce84ee44109bdc62c7bc6dd43d90158c"
     },
     {
       "path": "docs/evidence.md",
@@ -6795,8 +6818,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "1433945181a68d987200eabeefd78c54c82322548b6d7c4954227f5ec0b47a92",
-      "bytes": 5983
+      "bytes": 6364,
+      "sha256": "fe89bc893b2ed62099e964f94234c77452853cf102bae2701f58afc78a1a7bc5"
     },
     {
       "path": "observability/receipt.json",
@@ -6825,8 +6848,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "8b9f857e6e71c4a0a57e10ac27b60bb9988155ec8171befce382a5497000810e",
-      "bytes": 33826
+      "bytes": 33934,
+      "sha256": "9f4125eff6971c3d03517a2fbd14c1ce3522732815af54fe1b5811d1180729a2"
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -7125,8 +7148,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "bb20e548a1febf628fdd0eded7ed5583e2925302d773ef6eee7eb6401d9394b5",
-      "bytes": 113039
+      "bytes": 113117,
+      "sha256": "a91f35507f0593faa3adefeb7c44f63d651d56787bd6f384a656ca37810eba13"
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -9225,8 +9248,8 @@
     },
     {
       "path": "docs/memory-landscape-maintenance.md",
-      "sha256": "f12dc952eefb876476c56cf463ede203ad1a254b85d849774ee56a3403e8b819",
-      "bytes": 12385
+      "bytes": 12614,
+      "sha256": "27daf45f98aa686811e5a70ffd21b803bdc6572813a188ec39934640a588bd78"
     },
     {
       "path": "evidence/receipts/memory-landscape-20260921.json",
@@ -9262,6 +9285,51 @@
       "path": "evidence/artifacts/memory-landscape-20260921/qualification.json",
       "sha256": "5d6e728caefcaf9a43ec2a738ac75147c232b89b3c0475164225fafbab82dff9",
       "bytes": 3568
+    },
+    {
+      "path": "docs/native-memory-rag-lifecycle.md",
+      "bytes": 7880,
+      "sha256": "1b587d2415ca1812850b0bbaf53e3fd3e329cb70d8395b89f788ae1ac99a1747"
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/current-codex-tools.json",
+      "bytes": 9130,
+      "sha256": "a48217dfb55c26332b8633dce4ba221761b49e2aeb861eca49bc70b88c944c1a"
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/monitor-observation.json",
+      "bytes": 3988,
+      "sha256": "3535c672ec8b01d9d1003e69cb35460fc827bfda7e7116d279894e719ba25469"
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/native-client.json",
+      "bytes": 9150,
+      "sha256": "8a54a60e88490cd1305a946fb781c282196e5fc5bc80b740fa6896a6e8bc4d11"
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/native-commands.json",
+      "bytes": 26093,
+      "sha256": "ae5e35c2a7a8a15684c7ec4fb35bf7e77b215feeeab5b391a383fe3604955258"
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/upstream-release-observation.json",
+      "bytes": 4187,
+      "sha256": "d7a07aff13bad911dec59bc2a3c47f6dea57be792f30bbad45183b61bb6ada98"
+    },
+    {
+      "path": "evidence/receipts/memory-landscape-lifecycle-20260921.json",
+      "bytes": 2989,
+      "sha256": "df8c49ded54972950c05d5264f863f4e170efe9ef8bd8e944976a18765e099e7"
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/qualification.json",
+      "bytes": 3649,
+      "sha256": "5111d912105b819c0c7e1c586f13a6de225c564c21e0b08d1bd4e0e0180c6ed5"
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-lifecycle-20260921/catalog-lifecycle.png",
+      "bytes": 118237,
+      "sha256": "7e2bce14ded57666c62edd5a7de74a5f7b9f7e2ad7caef8aedd60490bd16d9d3"
     }
   ],
   "convergence_records": [

@@ -1,0 +1,42 @@
+{
+  "evidence_class": "independent integration review and acceptance boundaries",
+  "native_registration_review": {
+    "codex": "Native mcp list returned ai-memory, Serena and SocratiCode enabled in both configured homes; executable targets exist.",
+    "claude": "Native mcp get returned Connected for all three integrations.",
+    "skills": "The six memory skills and two SocratiCode skills match between project client roots; QMD skill roots exist.",
+    "scope": "Upstream hook --check-capture admitted the adopted project and rejected an unrelated directory.",
+    "boundary": "These read-only observations establish configuration and scope, not inference or lifecycle completion. Separate original client streams and stored outcomes provide that evidence."
+  },
+  "independent_lifecycle_review": {
+    "result": "Separate reader confirmed one native Claude session, nine observations, exact 764-byte Stop body, generation 9 completed on attempt 1 and no error.",
+    "final_sha256": "e11e188b8c1b1dce6d91843dd81dd5765965879aa4f185f2606a314081fbaf4d",
+    "source": "ai-memory 353841d91618d20b110b208de284a74d0b960379: crates/ai-memory-store/migrations/V01__init.sql defines BLOB session IDs; ops.rs inserts session.id.as_bytes().",
+    "retained_error": "Initial coordinator TEXT lookup falsely returned no rows. Correct source-typed lookup resolved the observation error; runtime was not changed."
+  },
+  "monitor_update_readback": {
+    "tool": "native Codex automation_update",
+    "updated_prompt_matches_persisted_prompt": true,
+    "preserved_fields": ["id", "name", "kind", "schedule", "target task", "active status"],
+    "new_scheduler_execution_observed": null,
+    "boundary": "Interactive configuration update, distinct from the actual independently observed systemd native-data timer executions."
+  },
+  "progress_publisher_review": {
+    "repair": "A native systemd drop-in selects the canonical catalog instead of the older dirty publication checkout. No files in that older checkout were changed.",
+    "independent_verification": "Effective ExecStart targets the canonical checkout; timer stays enabled and active at its existing cadence; cache and Dagu arguments match the base unit; publisher code and selected plan are byte-identical between checkouts.",
+    "observed_outcome": "Subsequent timer invocation completed with exit 0 using the canonical path. This proves source routing; delivery of the new lifecycle row follows its integration."
+  },
+  "local_validation": {
+    "ecosystem_tests_passed": 33,
+    "grand_dashboard_tests_passed": 13,
+    "foundation_tests_passed": 18,
+    "upstream_unit_validation": "systemd-analyze --user verify returned exit 0 for the configured service.",
+    "browser": "Opened the generated setup page, selected Native memory and RAG lifecycle, and visually inspected the actual embedded guide; screenshot retained.",
+    "boundary": "Local integration checks; these do not replace the separately recorded real native operations."
+  },
+  "reused_evidence": [
+    "memory-landscape-20260921: unchanged upstream 4 scheduler and 18 assistant-capture tests; these fixture tests were not rerun.",
+    "Existing native RAG add/change/delete watcher and recovery evidence retain their original pins and scope.",
+    "vllm-compatibility: actual newer-runtime failure and qualified recovery remain the reason for retaining the accepted version."
+  ],
+  "not_claimed": ["Universal best retrieval", "Measured net memory token savings", "Every alternative installed", "Current Desktop hook hot reload", "Physical-PC reboot", "Next daily scheduler wake", "New learned-write quality improvement"]
+}
