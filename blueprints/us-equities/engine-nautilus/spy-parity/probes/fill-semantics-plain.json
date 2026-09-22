@@ -1,0 +1,109 @@
+{
+  "bar_specs": [
+    {
+      "close": 100.5,
+      "high": 101.0,
+      "index": 0,
+      "low": 99.0,
+      "open": 100.0
+    },
+    {
+      "close": 201.0,
+      "high": 202.0,
+      "index": 1,
+      "low": 198.0,
+      "open": 200.0
+    },
+    {
+      "close": 301.0,
+      "high": 303.0,
+      "index": 2,
+      "low": 297.0,
+      "open": 300.0
+    },
+    {
+      "close": 401.0,
+      "high": 404.0,
+      "index": 3,
+      "low": 396.0,
+      "open": 400.0
+    }
+  ],
+  "engine_version": "2.0.0rc5",
+  "events": [
+    {
+      "close": "100.50",
+      "event": "bar",
+      "high": "101.00",
+      "index": 0,
+      "low": "99.00",
+      "open": "100.00",
+      "ts_event": 1600000000000000000
+    },
+    {
+      "clock_ns": 1600000000000000000,
+      "event": "submit",
+      "when": "on_bar[0]"
+    },
+    {
+      "event": "OrderInitialized",
+      "last_px": null,
+      "reason": null,
+      "ts_event": 1600000000000000000
+    },
+    {
+      "event": "OrderSubmitted",
+      "last_px": null,
+      "reason": null,
+      "ts_event": 1600000000000000000
+    },
+    {
+      "event": "OrderFilled",
+      "last_px": "100.50",
+      "reason": null,
+      "ts_event": 1600000000000000000
+    },
+    {
+      "close": "201.00",
+      "event": "bar",
+      "high": "202.00",
+      "index": 1,
+      "low": "198.00",
+      "open": "200.00",
+      "ts_event": 1600003600000000000
+    },
+    {
+      "close": "301.00",
+      "event": "bar",
+      "high": "303.00",
+      "index": 2,
+      "low": "297.00",
+      "open": "300.00",
+      "ts_event": 1600007200000000000
+    },
+    {
+      "close": "401.00",
+      "event": "bar",
+      "high": "404.00",
+      "index": 3,
+      "low": "396.00",
+      "open": "400.00",
+      "ts_event": 1600010800000000000
+    }
+  ],
+  "fills": [
+    {
+      "avg_px": "100.50",
+      "filled_qty": "10",
+      "quantity": "10",
+      "side": "BUY",
+      "status": "FILLED",
+      "time_in_force": "GTC",
+      "ts_init": 1600000000000,
+      "ts_last": 1600000000000
+    }
+  ],
+  "mode": "plain",
+  "probe": "fill_semantics",
+  "python": "3.12.3"
+}

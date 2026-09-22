@@ -469,11 +469,14 @@ class Pr4CardsReconciliationTests(unittest.TestCase):
         # Codex cross-family review of PR-4: the card must state the retained parity
         # state (a completed BLOCKED replay with four failed checks recorded in the
         # comparison summary), not "planned_not_executed", and never a per-check total
-        # that is not retained in this repository.
+        # that is not retained in this repository. PR #67 (2026-09-22) retains the
+        # verdict file itself on main, so the card now points there instead of the
+        # former parity worktree.
         self.assertIn("reported_execution_blocked_review_incomplete", joined_limitations)
         self.assertIn("completed BLOCKED replay", joined_limitations)
         self.assertIn("four failed checks", joined_limitations)
-        self.assertIn("parity worktree", joined_limitations)
+        self.assertIn("blueprints/us-equities/engine-nautilus/spy-parity/verdict.json", joined_limitations)
+        self.assertNotIn("parity worktree", joined_limitations)
         self.assertNotIn("planned_not_executed", joined_limitations)
         self.assertNotIn("25 pass / 4 fail", joined_limitations)
         self.assertNotIn("29 checks", joined_limitations)

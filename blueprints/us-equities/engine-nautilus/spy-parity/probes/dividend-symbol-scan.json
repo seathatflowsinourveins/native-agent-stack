@@ -1,0 +1,88 @@
+{
+  "binary_match_count": 9,
+  "binary_matches": [
+    {
+      "context": "size_bidZeroTypeBCE year_contextTD67BGP9DividendISOLATED........candle.l......./. ..p...",
+      "file": "_libnautilus.cpython-312-x86_64-linux-gnu.so",
+      "matched": "Dividend",
+      "offset": 8572456
+    },
+    {
+      "context": "E.GOOD_TILL_CROSSING.OPTION_BID_EXCH.IB_DIVIDENDS.DELAYED_HALTED.ETF_NAV_CLOSE.EXERCISE.",
+      "file": "_libnautilus.cpython-312-x86_64-linux-gnu.so",
+      "matched": "DIVIDEND",
+      "offset": 10136364
+    },
+    {
+      "context": "ent_id, flat_interest_rate=0.0425, flat_dividend_yield=None, spot_shock=0.0, vol_shock=0",
+      "file": "_libnautilus.cpython-312-x86_64-linux-gnu.so",
+      "matched": "dividend",
+      "offset": 10987872
+    },
+    {
+      "context": "e=None, flat_interest_rate=0.0425, flat_dividend_yield=None, spot_shock=0.0, vol_shock=0",
+      "file": "_libnautilus.cpython-312-x86_64-linux-gnu.so",
+      "matched": "dividend",
+      "offset": 11205488
+    },
+    {
+      "context": "_pricetick_attribimplied_volopt_pricepv_dividendund_priceCommissionAndFeesReportcommissi",
+      "file": "_libnautilus.cpython-312-x86_64-linux-gnu.so",
+      "matched": "dividend",
+      "offset": 12179691
+    },
+    {
+      "context": "idvol_index_priceflat_interest_rateflat_dividend_yieldspot_shockvol_shocktime_to_expiry_",
+      "file": "_libnautilus.cpython-312-x86_64-linux-gnu.so",
+      "matched": "dividend",
+      "offset": 12802590
+    },
+    {
+      "context": "TickType.RT_HISTORICAL_VOLIbTickType.IB_DIVIDENDSIbTickType.BOND_FACTOR_MULTIPLIERIbTick",
+      "file": "_libnautilus.cpython-312-x86_64-linux-gnu.so",
+      "matched": "DIVIDEND",
+      "offset": 13031584
+    },
+    {
+      "context": "eVolumeRateLastRthTradeRtHistoricalVolIbDividendsBondFactorMultiplierRegulatoryImbalance",
+      "file": "_libnautilus.cpython-312-x86_64-linux-gnu.so",
+      "matched": "Dividend",
+      "offset": 13067011
+    },
+    {
+      "context": "H.AdlTradeH9.......H.DeliveryH9.......H.DividendH9..........G.....H.BustTradH3...N.H..eH",
+      "file": "_libnautilus.cpython-312-x86_64-linux-gnu.so",
+      "matched": "Dividend",
+      "offset": 94505655
+    }
+  ],
+  "engine_version": "2.0.0rc5",
+  "probe": "dividend_symbol_scan",
+  "python": "3.12.3",
+  "scanned_files": {
+    "py": 54,
+    "pyi": 41,
+    "so": [
+      "_libnautilus.cpython-312-x86_64-linux-gnu.so"
+    ]
+  },
+  "scanned_root": "~/.local/share/codex-ecosystem/tools/nautilus-2.0.0rc5/lib/python3.12/site-packages/nautilus_trader",
+  "source_match_count": 3,
+  "source_matches": [
+    {
+      "file": "adapters/interactive_brokers/__init__.pyi",
+      "line": 658,
+      "text": "IB_DIVIDENDS = ..."
+    },
+    {
+      "file": "common/__init__.pyi",
+      "line": 1164,
+      "text": "flat_dividend_yield: float | None = None,"
+    },
+    {
+      "file": "common/__init__.pyi",
+      "line": 1208,
+      "text": "flat_dividend_yield: float | None = None,"
+    }
+  ]
+}
