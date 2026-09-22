@@ -128,6 +128,7 @@ jobs:
               "gitleaks|gitleaks/gitleaks|8.30.1" \
               "syft|anchore/syft|1.52.0" \
               "zizmor|zizmorcore/zizmor|1.30.1" \
+              "grype|anchore/grype|0.119.0" \
               "nautilus_trader|nautechsystems/nautilus_trader|2.0.0rc5"; do
               IFS='|' read -r name repo pinned <<<"$spec"
               latest=$(gh api "repos/$repo/releases/latest" --jq '.tag_name' 2>/dev/null || echo "unavailable")
