@@ -67,6 +67,7 @@ NEW_PUBLIC_FILES = {"adoption/lifecycle.md", "evidence/receipts/token-practice-c
                     "evidence/artifacts/foundation-rd-20260921/native-review.json",
                     "recipes/claude-native-ultracode.md", "examples/claude-native/ultracode.settings.json",
                     "docs/ultracode-token-routing-20260921.md", "recipes/claude-codex-cooperation-lanes.md", "examples/codex-native/README.md",
+                    "evidence/receipts/ultracode-token-routing-20260921.json", "evidence/receipts/portable-claude-native-qualification-20260921.json",
                     "evidence/artifacts/native-claude-coop-20260921/persistent-profile.json",
                     "docs/memory-landscape-maintenance.md", "docs/native-memory-rag-lifecycle.md", "docs/foundation-convergence-20260921.md",
                     "docs/harness-defaults.md", "catalogs/README.md", STACK, ADOPTION,
@@ -329,6 +330,8 @@ def build_data(root):
         # This packet is newer than the immutable base; its own new pages resolve
         # at the public branch after publication, with exact input hashes retained.
         new_catalog = path.startswith("catalogs/foundation/") or path in config.get("grand_catalogs", {}).values()
+        # Artifact bundles that arrived with this packet do not exist at the immutable base.
+        new_catalog = new_catalog or path.startswith(("evidence/artifacts/ultracode-token-routing-20260921/", "evidence/artifacts/portable-claude-native-qualification-20260921/"))
         revision = "main" if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog or path in current_public_paths else config["source_revision"]
         return f'{config["repository_url"]}/blob/{revision}/{quote(path, safe="/")}'
 

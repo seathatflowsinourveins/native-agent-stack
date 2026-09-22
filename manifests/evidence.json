@@ -3093,8 +3093,8 @@
     },
     {
       "path": "observability/native-data/README.md",
-      "sha256": "f854395627bf29f8ae5f71772451d20eae39a16e83e427c109d43d9efd754c70",
-      "bytes": 9610
+      "sha256": "39d2a43ace58d34e679f401a742e1d2de831012a39b2aeedfac3758b9de436bd",
+      "bytes": 9829
     },
     {
       "path": "observability/native-data/config.example.json",
@@ -6334,8 +6334,8 @@
     },
     {
       "path": "docs/ecosystem/index.html",
-      "bytes": 8093214,
-      "sha256": "b1da457397b24517eb9cc065227676fc0ecdcf821cc0067b0ecc57d7aed6f5ac"
+      "bytes": 8093263,
+      "sha256": "4697c0905598f370a6c116789403ced4bf94c76792722bce9758ad33ac0fc5c8"
     },
     {
       "path": "docs/ecosystem/legacy-worker-receipt.json",
@@ -7039,8 +7039,8 @@
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "bytes": 40405,
-      "sha256": "0df65413c61da8a8d8fe343cbf6dc82e4b9094eb0476022f02783b05afe7d777"
+      "bytes": 40829,
+      "sha256": "eec6a662588c3eee418e333e9e3f108700fac8757a752cb832d6858ce5d672e6"
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -7339,8 +7339,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "bytes": 120597,
-      "sha256": "cdfb80d3587b924975bd09797e55ef305858cbaef54765a4d5e57af0e2271c59"
+      "bytes": 120741,
+      "sha256": "bc208d98b23f2e87287afc0462b889a61919a9ed37f8f74326a16a3b7e1ec29c"
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -9084,8 +9084,8 @@
     },
     {
       "path": "recipes/claude-native-ultracode.md",
-      "sha256": "057cd1520fcaeee8beca39f4a0f8d90cca4ef3b5bf418c2c04f900dc1b70c2d4",
-      "bytes": 11509
+      "sha256": "acd33e839c5f884e51641b13bb75ca809c29b40aec4756aabdade0c7cabbdce6",
+      "bytes": 11617
     },
     {
       "path": "docs/native-ultracode-20260921.md",
@@ -10009,8 +10009,8 @@
     },
     {
       "path": "examples/codex-native/README.md",
-      "sha256": "16c937a63b471e650a9274ec97f4eb6a022fbfb8cc4d33090e7b35b9afe83b40",
-      "bytes": 1257
+      "sha256": "d53c58e9d8e2c86ffd0ec901ffbc5bc03e125a2c622951c4c42fba78b822aae6",
+      "bytes": 1374
     },
     {
       "path": "examples/codex-native/agents/evidence-reviewer.toml",
@@ -10029,8 +10029,13 @@
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
-      "sha256": "fd2cd5aa22030839ea06e20745f555b9176cb645cc6c7abf26075d91ee092258",
-      "bytes": 5513
+      "sha256": "7e13cb55bb5e6ebc88c14f2a98840832c701777bcac4a3cee19f035536edf56a",
+      "bytes": 5622
+    },
+    {
+      "path": "evidence/artifacts/portable-claude-native-qualification-20260921/codex-pr-review.json",
+      "sha256": "6821eeae58c350ea3bc79dfb099c7ef7944c1a377ba330a97b821e411c6bb07d",
+      "bytes": 5004
     }
   ],
   "convergence_records": [

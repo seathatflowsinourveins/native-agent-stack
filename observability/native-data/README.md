@@ -138,8 +138,11 @@ sum by (model, type, query_source) (increase(ecosystem_claude_code_token_usage_t
 ```
 
 `query_source` separates the coordinator (`main`) from workflow children
-(`subagent`) and auxiliary calls; `instance` carries the session id, which is how
-the dated qualification scoped one headless run to its own counters. Per-child
+(`subagent`) and auxiliary calls. The collector keeps no session id on metrics and
+`instance` is not the session id; to scope one run, launch it with
+`OTEL_RESOURCE_ATTRIBUTES=ecosystem.client.scope=<run name>`, which the collector
+keeps as the `client_scope` label, and query `{client_scope="<run name>"}`. That is
+how the dated qualification scoped its headless runs. Per-child
 provider usage inside one native Workflow run comes from
 `examples/claude-native/workflows/child-usage.mjs`, which reads the run's
 transcript directory; its counters are provider-returned and are not the same

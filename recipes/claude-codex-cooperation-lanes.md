@@ -96,8 +96,10 @@ firing inside workflow children.
 ## Codex agents
 
 The Codex agent examples mirror the Claude roles (`evidence-reviewer`,
-`isolated-builder`) with `developer_instructions` and `sandbox_mode`; they carry
-no `model` or `model_reasoning_effort` and inherit the session's configuration.
+`isolated-builder`) with `name`, `description` and `developer_instructions` only;
+they carry no `model`, `model_reasoning_effort` or `sandbox_mode` and inherit the
+session's configuration, so the reviewer's no-edit instruction is a prompt rule,
+not an enforced sandbox.
 `[agents] max_concurrent_threads_per_session = 3` mirrors the Claude concurrency
 setting. These examples have no end-to-end run of their own in the dated guide;
 qualify them per task before relying on them.
