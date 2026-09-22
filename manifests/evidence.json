@@ -12566,6 +12566,61 @@
       "path": "evidence/artifacts/gap-resolution-20260922/workers/upstream-currency-sweep.json",
       "sha256": "5588aebc536561d71923261f9161204ea27341dfb40d596cd5bda23240e61f48",
       "bytes": 18246
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/token-efficiency/headroom-0.38.0-upgrade-recovery.json",
+      "sha256": "da5dae9851fa8ef2e7ecaf131fecac56827fd76d7a16d03d9d5b2de776856dd3",
+      "bytes": 16427
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/token-efficiency/rtk-second-artifact-pair.json",
+      "sha256": "07da607ac095491b13fabd136e88b284a51fa70277292cb6cd75638c15df120e",
+      "bytes": 6932
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/token-efficiency/ccusage-real-log-coverage.json",
+      "sha256": "56cd603682515e30734458983d126cc65b8cb5d33d437d5dd909642d8e9138dd",
+      "bytes": 7951
+    },
+    {
+      "path": "evidence/artifacts/gap-resolution-20260922/observation-inference/observability-offline-regression.json",
+      "sha256": "e9ba66a759c0a54a290542afd20add68a887b0d7d56234d740227c3b9e06bba0",
+      "bytes": 3603
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/headroom-0.38.0-recovery/run.sh",
+      "sha256": "45ac3a653bfc77d613e2b32457538f9bc276065f5e7eb43bbf401d01ef3cf19e",
+      "bytes": 3185
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/headroom-0.38.0-recovery/run_v2.sh",
+      "sha256": "dba338720b8a37e17f8481bbcf3d83da44d1ad5d9746f160fdd57763b53dc933",
+      "bytes": 4508
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/headroom-0.38.0-recovery/make_mcp_listing_fixture.py",
+      "sha256": "015fc6622763f580953f30e384f0b81d84b3268ccf29c5a52ef2d71b5278d2e1",
+      "bytes": 5343
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/headroom-0.38.0-recovery/mcp-tool-listing.json",
+      "sha256": "2b17eb36da607cc8d2f6f0e2802193c0a0587ffbae361e667d093930d3a5533d",
+      "bytes": 183628
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/rtk-second-artifact-pair/run.sh",
+      "sha256": "7744487a401d2dadffc622c5f457571f9d3e1f12ac7cec26ec1a99477609681d",
+      "bytes": 1538
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/ccusage-real-log-coverage/run.sh",
+      "sha256": "edec3276cfe37609d828336723ee3991ef168d4bcd95818d3652bea04b81ed48",
+      "bytes": 1842
+    },
+    {
+      "path": "blueprints/gap-resolution-20260922/observability-offline-regression/run.sh",
+      "sha256": "853799b3b37231811b40f7824d4e640523fc128e8eca397c0141067ac05be6ad",
+      "bytes": 475
     }
   ],
   "convergence_records": [

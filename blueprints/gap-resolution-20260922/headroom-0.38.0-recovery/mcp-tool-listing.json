@@ -1,0 +1,5204 @@
+{
+  "tools": [
+    {
+      "name": "jcodemunch__route",
+      "server": "jcodemunch",
+      "description": "Start here: describe the task in plain words, get back an action to run against the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "jcodemunch__menu",
+      "server": "jcodemunch",
+      "description": "Search the jCodeMunch action catalog when you already know roughly what you want.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "jcodemunch__order",
+      "server": "jcodemunch",
+      "description": "Dispatch any jCodeMunch action by name with order(action, args); read-only by default.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "serena__find_symbol",
+      "server": "serena",
+      "description": "Locate a symbol definition by name path within the project, optionally restricted to a relative path.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "serena__find_referencing_symbols",
+      "server": "serena",
+      "description": "Find all symbols that reference the given symbol, with surrounding context.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "serena__get_symbols_overview",
+      "server": "serena",
+      "description": "Get a top-level overview of the symbols defined in a given file or directory.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "serena__replace_symbol_body",
+      "server": "serena",
+      "description": "Replace the full body of an existing symbol identified by name path and file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "serena__insert_after_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately after the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "serena__insert_before_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately before the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "ai-memory__memory_query",
+      "server": "ai-memory",
+      "description": "Retrieve relevant memory pages, observations, or handoffs scoped to a project or globally.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "ai-memory__memory_read_page",
+      "server": "ai-memory",
+      "description": "Read one durable memory page by its identifier, including its full body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "context-mode__ctx_execute",
+      "server": "context-mode",
+      "description": "Run a command through Context Mode so large stdout/stderr is filtered outside the model.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "context-mode__ctx_search",
+      "server": "context-mode",
+      "description": "Search Context Mode's retained output history for a prior command's results.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "socraticode__codebase_search",
+      "server": "socraticode",
+      "description": "Run a conceptual semantic search over the locally indexed and embedded codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "socraticode__codebase_symbol",
+      "server": "socraticode",
+      "description": "Fetch a single symbol's indexed summary and embedding-based neighbors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "socraticode__codebase_impact",
+      "server": "socraticode",
+      "description": "Estimate the blast radius of changing a given symbol across the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 0
+      }
+    },
+    {
+      "name": "jcodemunch__route",
+      "server": "jcodemunch",
+      "description": "Start here: describe the task in plain words, get back an action to run against the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "jcodemunch__menu",
+      "server": "jcodemunch",
+      "description": "Search the jCodeMunch action catalog when you already know roughly what you want.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "jcodemunch__order",
+      "server": "jcodemunch",
+      "description": "Dispatch any jCodeMunch action by name with order(action, args); read-only by default.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "serena__find_symbol",
+      "server": "serena",
+      "description": "Locate a symbol definition by name path within the project, optionally restricted to a relative path.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "serena__find_referencing_symbols",
+      "server": "serena",
+      "description": "Find all symbols that reference the given symbol, with surrounding context.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "serena__get_symbols_overview",
+      "server": "serena",
+      "description": "Get a top-level overview of the symbols defined in a given file or directory.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "serena__replace_symbol_body",
+      "server": "serena",
+      "description": "Replace the full body of an existing symbol identified by name path and file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "serena__insert_after_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately after the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "serena__insert_before_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately before the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "ai-memory__memory_query",
+      "server": "ai-memory",
+      "description": "Retrieve relevant memory pages, observations, or handoffs scoped to a project or globally.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "ai-memory__memory_read_page",
+      "server": "ai-memory",
+      "description": "Read one durable memory page by its identifier, including its full body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "context-mode__ctx_execute",
+      "server": "context-mode",
+      "description": "Run a command through Context Mode so large stdout/stderr is filtered outside the model.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "context-mode__ctx_search",
+      "server": "context-mode",
+      "description": "Search Context Mode's retained output history for a prior command's results.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "socraticode__codebase_search",
+      "server": "socraticode",
+      "description": "Run a conceptual semantic search over the locally indexed and embedded codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "socraticode__codebase_symbol",
+      "server": "socraticode",
+      "description": "Fetch a single symbol's indexed summary and embedding-based neighbors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "socraticode__codebase_impact",
+      "server": "socraticode",
+      "description": "Estimate the blast radius of changing a given symbol across the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 1
+      }
+    },
+    {
+      "name": "jcodemunch__route",
+      "server": "jcodemunch",
+      "description": "Start here: describe the task in plain words, get back an action to run against the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "jcodemunch__menu",
+      "server": "jcodemunch",
+      "description": "Search the jCodeMunch action catalog when you already know roughly what you want.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "jcodemunch__order",
+      "server": "jcodemunch",
+      "description": "Dispatch any jCodeMunch action by name with order(action, args); read-only by default.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "serena__find_symbol",
+      "server": "serena",
+      "description": "Locate a symbol definition by name path within the project, optionally restricted to a relative path.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "serena__find_referencing_symbols",
+      "server": "serena",
+      "description": "Find all symbols that reference the given symbol, with surrounding context.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "serena__get_symbols_overview",
+      "server": "serena",
+      "description": "Get a top-level overview of the symbols defined in a given file or directory.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "serena__replace_symbol_body",
+      "server": "serena",
+      "description": "Replace the full body of an existing symbol identified by name path and file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "serena__insert_after_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately after the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "serena__insert_before_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately before the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "ai-memory__memory_query",
+      "server": "ai-memory",
+      "description": "Retrieve relevant memory pages, observations, or handoffs scoped to a project or globally.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "ai-memory__memory_read_page",
+      "server": "ai-memory",
+      "description": "Read one durable memory page by its identifier, including its full body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "context-mode__ctx_execute",
+      "server": "context-mode",
+      "description": "Run a command through Context Mode so large stdout/stderr is filtered outside the model.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "context-mode__ctx_search",
+      "server": "context-mode",
+      "description": "Search Context Mode's retained output history for a prior command's results.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "socraticode__codebase_search",
+      "server": "socraticode",
+      "description": "Run a conceptual semantic search over the locally indexed and embedded codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "socraticode__codebase_symbol",
+      "server": "socraticode",
+      "description": "Fetch a single symbol's indexed summary and embedding-based neighbors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "socraticode__codebase_impact",
+      "server": "socraticode",
+      "description": "Estimate the blast radius of changing a given symbol across the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 2
+      }
+    },
+    {
+      "name": "jcodemunch__route",
+      "server": "jcodemunch",
+      "description": "Start here: describe the task in plain words, get back an action to run against the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "jcodemunch__menu",
+      "server": "jcodemunch",
+      "description": "Search the jCodeMunch action catalog when you already know roughly what you want.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "jcodemunch__order",
+      "server": "jcodemunch",
+      "description": "Dispatch any jCodeMunch action by name with order(action, args); read-only by default.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "serena__find_symbol",
+      "server": "serena",
+      "description": "Locate a symbol definition by name path within the project, optionally restricted to a relative path.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "serena__find_referencing_symbols",
+      "server": "serena",
+      "description": "Find all symbols that reference the given symbol, with surrounding context.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "serena__get_symbols_overview",
+      "server": "serena",
+      "description": "Get a top-level overview of the symbols defined in a given file or directory.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "serena__replace_symbol_body",
+      "server": "serena",
+      "description": "Replace the full body of an existing symbol identified by name path and file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "serena__insert_after_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately after the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "serena__insert_before_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately before the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "ai-memory__memory_query",
+      "server": "ai-memory",
+      "description": "Retrieve relevant memory pages, observations, or handoffs scoped to a project or globally.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "ai-memory__memory_read_page",
+      "server": "ai-memory",
+      "description": "Read one durable memory page by its identifier, including its full body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "context-mode__ctx_execute",
+      "server": "context-mode",
+      "description": "Run a command through Context Mode so large stdout/stderr is filtered outside the model.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "context-mode__ctx_search",
+      "server": "context-mode",
+      "description": "Search Context Mode's retained output history for a prior command's results.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "socraticode__codebase_search",
+      "server": "socraticode",
+      "description": "Run a conceptual semantic search over the locally indexed and embedded codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "socraticode__codebase_symbol",
+      "server": "socraticode",
+      "description": "Fetch a single symbol's indexed summary and embedding-based neighbors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "socraticode__codebase_impact",
+      "server": "socraticode",
+      "description": "Estimate the blast radius of changing a given symbol across the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 3
+      }
+    },
+    {
+      "name": "jcodemunch__route",
+      "server": "jcodemunch",
+      "description": "Start here: describe the task in plain words, get back an action to run against the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "jcodemunch__menu",
+      "server": "jcodemunch",
+      "description": "Search the jCodeMunch action catalog when you already know roughly what you want.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "jcodemunch__order",
+      "server": "jcodemunch",
+      "description": "Dispatch any jCodeMunch action by name with order(action, args); read-only by default.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "serena__find_symbol",
+      "server": "serena",
+      "description": "Locate a symbol definition by name path within the project, optionally restricted to a relative path.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "serena__find_referencing_symbols",
+      "server": "serena",
+      "description": "Find all symbols that reference the given symbol, with surrounding context.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "serena__get_symbols_overview",
+      "server": "serena",
+      "description": "Get a top-level overview of the symbols defined in a given file or directory.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "serena__replace_symbol_body",
+      "server": "serena",
+      "description": "Replace the full body of an existing symbol identified by name path and file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "serena__insert_after_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately after the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "serena__insert_before_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately before the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "ai-memory__memory_query",
+      "server": "ai-memory",
+      "description": "Retrieve relevant memory pages, observations, or handoffs scoped to a project or globally.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "ai-memory__memory_read_page",
+      "server": "ai-memory",
+      "description": "Read one durable memory page by its identifier, including its full body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "context-mode__ctx_execute",
+      "server": "context-mode",
+      "description": "Run a command through Context Mode so large stdout/stderr is filtered outside the model.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "context-mode__ctx_search",
+      "server": "context-mode",
+      "description": "Search Context Mode's retained output history for a prior command's results.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "socraticode__codebase_search",
+      "server": "socraticode",
+      "description": "Run a conceptual semantic search over the locally indexed and embedded codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "socraticode__codebase_symbol",
+      "server": "socraticode",
+      "description": "Fetch a single symbol's indexed summary and embedding-based neighbors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "socraticode__codebase_impact",
+      "server": "socraticode",
+      "description": "Estimate the blast radius of changing a given symbol across the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 4
+      }
+    },
+    {
+      "name": "jcodemunch__route",
+      "server": "jcodemunch",
+      "description": "Start here: describe the task in plain words, get back an action to run against the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "jcodemunch__menu",
+      "server": "jcodemunch",
+      "description": "Search the jCodeMunch action catalog when you already know roughly what you want.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "jcodemunch__order",
+      "server": "jcodemunch",
+      "description": "Dispatch any jCodeMunch action by name with order(action, args); read-only by default.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "serena__find_symbol",
+      "server": "serena",
+      "description": "Locate a symbol definition by name path within the project, optionally restricted to a relative path.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "serena__find_referencing_symbols",
+      "server": "serena",
+      "description": "Find all symbols that reference the given symbol, with surrounding context.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "serena__get_symbols_overview",
+      "server": "serena",
+      "description": "Get a top-level overview of the symbols defined in a given file or directory.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "serena__replace_symbol_body",
+      "server": "serena",
+      "description": "Replace the full body of an existing symbol identified by name path and file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "serena__insert_after_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately after the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "serena__insert_before_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately before the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "ai-memory__memory_query",
+      "server": "ai-memory",
+      "description": "Retrieve relevant memory pages, observations, or handoffs scoped to a project or globally.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "ai-memory__memory_read_page",
+      "server": "ai-memory",
+      "description": "Read one durable memory page by its identifier, including its full body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "context-mode__ctx_execute",
+      "server": "context-mode",
+      "description": "Run a command through Context Mode so large stdout/stderr is filtered outside the model.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "context-mode__ctx_search",
+      "server": "context-mode",
+      "description": "Search Context Mode's retained output history for a prior command's results.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "socraticode__codebase_search",
+      "server": "socraticode",
+      "description": "Run a conceptual semantic search over the locally indexed and embedded codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "socraticode__codebase_symbol",
+      "server": "socraticode",
+      "description": "Fetch a single symbol's indexed summary and embedding-based neighbors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "socraticode__codebase_impact",
+      "server": "socraticode",
+      "description": "Estimate the blast radius of changing a given symbol across the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 5
+      }
+    },
+    {
+      "name": "jcodemunch__route",
+      "server": "jcodemunch",
+      "description": "Start here: describe the task in plain words, get back an action to run against the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "jcodemunch__menu",
+      "server": "jcodemunch",
+      "description": "Search the jCodeMunch action catalog when you already know roughly what you want.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "jcodemunch__order",
+      "server": "jcodemunch",
+      "description": "Dispatch any jCodeMunch action by name with order(action, args); read-only by default.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "serena__find_symbol",
+      "server": "serena",
+      "description": "Locate a symbol definition by name path within the project, optionally restricted to a relative path.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "serena__find_referencing_symbols",
+      "server": "serena",
+      "description": "Find all symbols that reference the given symbol, with surrounding context.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "serena__get_symbols_overview",
+      "server": "serena",
+      "description": "Get a top-level overview of the symbols defined in a given file or directory.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "serena__replace_symbol_body",
+      "server": "serena",
+      "description": "Replace the full body of an existing symbol identified by name path and file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "serena__insert_after_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately after the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "serena__insert_before_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately before the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "ai-memory__memory_query",
+      "server": "ai-memory",
+      "description": "Retrieve relevant memory pages, observations, or handoffs scoped to a project or globally.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "ai-memory__memory_read_page",
+      "server": "ai-memory",
+      "description": "Read one durable memory page by its identifier, including its full body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "context-mode__ctx_execute",
+      "server": "context-mode",
+      "description": "Run a command through Context Mode so large stdout/stderr is filtered outside the model.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "context-mode__ctx_search",
+      "server": "context-mode",
+      "description": "Search Context Mode's retained output history for a prior command's results.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "socraticode__codebase_search",
+      "server": "socraticode",
+      "description": "Run a conceptual semantic search over the locally indexed and embedded codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "socraticode__codebase_symbol",
+      "server": "socraticode",
+      "description": "Fetch a single symbol's indexed summary and embedding-based neighbors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "socraticode__codebase_impact",
+      "server": "socraticode",
+      "description": "Estimate the blast radius of changing a given symbol across the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 6
+      }
+    },
+    {
+      "name": "jcodemunch__route",
+      "server": "jcodemunch",
+      "description": "Start here: describe the task in plain words, get back an action to run against the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "jcodemunch__menu",
+      "server": "jcodemunch",
+      "description": "Search the jCodeMunch action catalog when you already know roughly what you want.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "jcodemunch__order",
+      "server": "jcodemunch",
+      "description": "Dispatch any jCodeMunch action by name with order(action, args); read-only by default.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "serena__find_symbol",
+      "server": "serena",
+      "description": "Locate a symbol definition by name path within the project, optionally restricted to a relative path.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "serena__find_referencing_symbols",
+      "server": "serena",
+      "description": "Find all symbols that reference the given symbol, with surrounding context.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "serena__get_symbols_overview",
+      "server": "serena",
+      "description": "Get a top-level overview of the symbols defined in a given file or directory.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "serena__replace_symbol_body",
+      "server": "serena",
+      "description": "Replace the full body of an existing symbol identified by name path and file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "serena__insert_after_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately after the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "serena__insert_before_symbol",
+      "server": "serena",
+      "description": "Insert new source text immediately before the given symbol's body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "ai-memory__memory_query",
+      "server": "ai-memory",
+      "description": "Retrieve relevant memory pages, observations, or handoffs scoped to a project or globally.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "ai-memory__memory_read_page",
+      "server": "ai-memory",
+      "description": "Read one durable memory page by its identifier, including its full body.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "context-mode__ctx_execute",
+      "server": "context-mode",
+      "description": "Run a command through Context Mode so large stdout/stderr is filtered outside the model.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "context-mode__ctx_search",
+      "server": "context-mode",
+      "description": "Search Context Mode's retained output history for a prior command's results.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "socraticode__codebase_search",
+      "server": "socraticode",
+      "description": "Run a conceptual semantic search over the locally indexed and embedded codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "socraticode__codebase_symbol",
+      "server": "socraticode",
+      "description": "Fetch a single symbol's indexed summary and embedding-based neighbors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    },
+    {
+      "name": "socraticode__codebase_impact",
+      "server": "socraticode",
+      "description": "Estimate the blast radius of changing a given symbol across the indexed codebase.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Absolute or repo-relative path this action should read, write, or resolve symbols within."
+          },
+          "query": {
+            "type": "string",
+            "description": "Free-text or structured query describing what the caller wants to find or do."
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "Upper bound on the number of results to return in a single call.",
+            "default": 20
+          },
+          "include_context": {
+            "type": "boolean",
+            "description": "Whether to include surrounding lines or symbol context in the response.",
+            "default": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "Optional scope restriction such as a project name, workspace, or symbol kind filter."
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "variant_index": 7
+      }
+    }
+  ]
+}
